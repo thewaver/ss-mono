@@ -1,6 +1,4 @@
-import type { AccessorProps, StaircaseDir } from "@thewaver/ss-components";
-
-import type { StaircaseIndents } from "../../Samples/StaircaseIndents/StaircaseIndents.const";
+import type { AccessorProps, StaircaseDir, StaircaseIndents } from "@thewaver/ss-components";
 
 export type StaircaseExampleProps = AccessorProps<{
     steps: string[];

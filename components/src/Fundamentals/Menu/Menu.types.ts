@@ -3,7 +3,7 @@ import type { Accessor, JSX, Signal } from "solid-js";
 import { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
-import type { InteractionFlags } from "../../Abstracts/Interaction/Interaction.types";
+import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 import type {
     InteractionControlProps,

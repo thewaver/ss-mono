@@ -14,7 +14,7 @@ import { example, prop, variant } from "./helpers";
  * cannot express this, because Playwright's clock fakes frames as a 16ms timer — advancing time to reach a
  * fallback would fire the frame first and prove nothing.
  *
- * `Rotation` is the third consumer, and it arrived with the same question already answered: a wheel that
+ * `Rotator` is the third consumer, and it arrived with the same question already answered: a wheel that
  * computes its own angle every frame has no browser interpolation to fall back on, so with frames gone it
  * would sit exactly where the press left it and never report a prize. The two tests at the bottom drive
  * both halves of the answer.

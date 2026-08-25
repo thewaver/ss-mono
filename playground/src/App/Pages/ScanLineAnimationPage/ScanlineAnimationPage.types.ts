@@ -1,8 +1,6 @@
 import type { Signal } from "solid-js";
 
-import type { AccessorProps } from "@thewaver/ss-components";
-
-import type { CellAnimationWeights } from "../../Samples/CellAnimationWeights/CellAnimationWeights.const";
+import type { AccessorProps, CellAnimationWeights } from "@thewaver/ss-components";
 
 export type ScanlineAnimationExampleProps = AccessorProps<{
     src: string;

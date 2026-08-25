@@ -2,7 +2,7 @@ import { Index, type JSX, Show, createEffect, createMemo, createSignal, onCleanu
 import { Dynamic } from "solid-js/web";
 
 import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
-import { NavigationUtils } from "../../Abstracts/Navigation/Navigation.utils";
+import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { access } from "../../Utils/propUtils";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import type { TabPanelProps, TabsDir, TabsItemProps, TabsProps } from "./Tabs.types";
@@ -177,7 +177,7 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
         if (navigable.length < 1) return;
 
         const from = navigable.indexOf(getRovingIndex() ?? navigable[0]);
-        const position = NavigationUtils.computeNextPosition(e.key, from, navigable.length, {
+        const position = NavigatorUtils.computeNextPosition(e.key, from, navigable.length, {
             orientation: getDir() === "row" ? "row" : "column",
         });
 

@@ -1,12 +1,12 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { FormationLayouts } from "@thewaver/ss-components";
 import { ShapeConst } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { FormationLayouts } from "../../Samples/FormationLayouts/FormationLayouts.const";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import type { FormationExampleProps } from "./FormationPage.types";

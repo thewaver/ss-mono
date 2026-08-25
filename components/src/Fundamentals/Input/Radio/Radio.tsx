@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 
-import { InteractionUtils } from "../../../Abstracts/Interaction/Interaction.utils";
+import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
 import { access } from "../../../Utils/propUtils";
 import { BinarySwitch } from "../BinarySwitch/BinarySwitch";
 import { useRadioGroupContext } from "../RadioGroup/RadioGroup.context";
@@ -16,7 +16,7 @@ export const Radio = <T,>(props: RadioProps<T>) => {
     const getIsDisabled = () => access(props.isDisabled) ?? false;
 
     const getIsReachable = () =>
-        InteractionUtils.computeIsReachable(
+        InteractionTracker.computeIsReachable(
             getIsDisabled(),
             access(props.isReachableWhenDisabled) ?? false,
             props.tooltipDefs !== undefined,

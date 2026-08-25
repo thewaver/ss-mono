@@ -13,20 +13,17 @@ import {
     access,
 } from "@thewaver/ss-components";
 
-import { PageCheckboxContent } from "../../StyledComponents/CheckboxContent/CheckboxContent";
-import { pageColorPickerSlots } from "../../StyledComponents/ColorAreaContent/ColorAreaContent";
-import { PageColorInputContent } from "../../StyledComponents/ColorInputContent/ColorInputContent";
-import { PageFileInputContent } from "../../StyledComponents/FileInputContent/FileInputContent";
-import { PageNumberInputStepper } from "../../StyledComponents/NumberInputStepper/NumberInputStepper";
-import { PagePopoverSurface } from "../../StyledComponents/PopoverSurface/PopoverSurface";
-import { PageSelectContent } from "../../StyledComponents/SelectContent/SelectContent";
-import { PageSelectGroupContent } from "../../StyledComponents/SelectGroupContent/SelectGroupContent";
-import { PageSelectOptionContent } from "../../StyledComponents/SelectOptionContent/SelectOptionContent";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent";
-import { PageTextFieldPlaceholder } from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
+import { PageCheckboxContent } from "../CheckboxContent/CheckboxContent";
+import { pageColorPickerSlots } from "../ColorAreaContent/ColorAreaContent";
+import { PageColorInputContent } from "../ColorInputContent/ColorInputContent";
+import { PageFileInputContent } from "../FileInputContent/FileInputContent";
+import { PageNumberInputStepper } from "../NumberInputStepper/NumberInputStepper";
+import { PagePopoverSurface } from "../PopoverSurface/PopoverSurface";
+import { PageSelectContent } from "../SelectContent/SelectContent";
+import { PageSelectGroupContent } from "../SelectGroupContent/SelectGroupContent";
+import { PageSelectOptionContent } from "../SelectOptionContent/SelectOptionContent";
+import { PageTextFieldContent, computePageTextFieldTextStyle } from "../TextFieldContent/TextFieldContent";
+import { PageTextFieldPlaceholder } from "../TextFieldPlaceholder/TextFieldPlaceholder";
 import type {
     PageCheckFieldProps,
     PageColorFieldProps,
@@ -37,11 +34,7 @@ import type {
     PageTextFieldProps,
 } from "./Field.types";
 
-import {
-    FIELD_GAP,
-    FIELD_PADDING,
-    FIELD_STEPPER_PADDING,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent.css";
+import { FIELD_GAP, FIELD_PADDING, FIELD_STEPPER_PADDING } from "../TextFieldContent/TextFieldContent.css";
 
 const DEFAULT_NUMBER_FIELD_WIDTH = 100;
 const DEFAULT_SELECT_FIELD_WIDTH = 150;

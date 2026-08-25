@@ -7,7 +7,7 @@ import type {
 } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
 import { LiveAnnouncer } from "../../../Abstracts/LiveAnnouncer/LiveAnnouncer";
-import { NavigationUtils } from "../../../Abstracts/Navigation/Navigation.utils";
+import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { access } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../InteractionWrapper/InteractionWrapper";
 import type { CalendarCompositeProps, CalendarDayProps, CalendarFlags, CalendarProps } from "./Calendar.types";
@@ -206,7 +206,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
 
         if (!cell) return;
 
-        const next = NavigationUtils.computeNextCell(
+        const next = NavigatorUtils.computeNextCell(
             e.key,
             cell,
             { width: DAYS_PER_WEEK, height: GRID_WEEKS },

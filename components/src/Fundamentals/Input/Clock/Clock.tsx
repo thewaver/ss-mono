@@ -4,7 +4,7 @@ import { Index, createEffect, createMemo, createSignal, createUniqueId } from "s
 import { TimeUtils } from "@thewaver/ss-utils";
 import type { TimeValue } from "@thewaver/ss-utils";
 
-import { NavigationUtils } from "../../../Abstracts/Navigation/Navigation.utils";
+import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { access } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../InteractionWrapper/InteractionWrapper";
 import type { ClockFlags, ClockOption, ClockOptionProps, ClockProps, ClockSteps, ClockUnit } from "./Clock.types";
@@ -186,7 +186,7 @@ export const Clock = (props: ClockProps) => {
             return;
         }
 
-        const nextIndex = NavigationUtils.computeNextPosition(e.key, index, column.readings.length, {
+        const nextIndex = NavigatorUtils.computeNextPosition(e.key, index, column.readings.length, {
             orientation: "column",
         });
 
@@ -199,7 +199,7 @@ export const Clock = (props: ClockProps) => {
             return;
         }
 
-        const nextUnitIndex = NavigationUtils.computeNextPosition(e.key, unitIndex, columns.length, {
+        const nextUnitIndex = NavigatorUtils.computeNextPosition(e.key, unitIndex, columns.length, {
             orientation: "row",
             hasEdgeKeys: false,
         });

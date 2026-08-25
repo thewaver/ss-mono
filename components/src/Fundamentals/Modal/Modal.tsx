@@ -1,13 +1,13 @@
 import { Show, createEffect, createMemo, createSignal } from "solid-js";
 import { Portal } from "solid-js/web";
 
-import { CSSUtils, StringUtils } from "@thewaver/ss-utils";
+import { CSSUtils, GestureUtils, StringUtils } from "@thewaver/ss-utils";
+import type { SwipeAxis, SwipeDirection } from "@thewaver/ss-utils";
 
-import { DismissStack } from "../../Abstracts/Dismiss/DismissStack";
+import { DismisserStack } from "../../Abstracts/Dismisser/DismisserStack";
 import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
-import { FocusUtils } from "../../Abstracts/Focus/Focus.utils";
-import type { InteractionSwipeAxis, InteractionSwipeDirection } from "../../Abstracts/Interaction/Interaction.types";
-import { InteractionUtils } from "../../Abstracts/Interaction/Interaction.utils";
+import { FocusManager } from "../../Abstracts/FocusManager/FocusManager";
+import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
 import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
 import type { ModalAlignment, ModalProps, ModalRole } from "./Modal.types";
@@ -19,8 +19,8 @@ const DEFAULT_MODAL_ROLE: ModalRole = "dialog";
 const DEFAULT_MODAL_ALIGNMENT: ModalAlignment = "center";
 
 const MODAL_SWIPE_COMMIT_RATIO = 0.35;
-const MODAL_SWIPE_FALLBACK_AXIS: InteractionSwipeAxis = "horizontal";
-const MODAL_SWIPE_DIRECTIONS: Partial<Record<ModalAlignment, InteractionSwipeDirection>> = {
+const MODAL_SWIPE_FALLBACK_AXIS: SwipeAxis = "horizontal";
+const MODAL_SWIPE_DIRECTIONS: Partial<Record<ModalAlignment, SwipeDirection>> = {
     left: "left",
     right: "right",
     top: "up",
@@ -44,7 +44,7 @@ export const Modal = (props: ModalProps) => {
     const getSwipeAxis = createMemo(() => {
         const direction = getSwipeDirection();
 
-        return direction ? InteractionUtils.computeSwipeAxis(direction) : MODAL_SWIPE_FALLBACK_AXIS;
+        return direction ? GestureUtils.computeSwipeAxis(direction) : MODAL_SWIPE_FALLBACK_AXIS;
     });
 
     const getMargins = createMemo(() => {
@@ -56,7 +56,7 @@ export const Modal = (props: ModalProps) => {
         { getTransitionDurationMs, onShow: props.onShow, onHide: props.onHide },
     );
 
-    FocusUtils.autoFocus(getContainerRef, getIsVisible, { getInitialRef: () => access(props.initialFocusRef) });
+    FocusManager.autoFocus(getContainerRef, getIsVisible, { getInitialRef: () => access(props.initialFocusRef) });
 
     const handleDismiss = () => {
         props.visibilitySignal[1](false);
@@ -70,7 +70,7 @@ export const Modal = (props: ModalProps) => {
 
     const [getSwipeOffsetRatio, setSwipeOffsetRatio] = createSignal(0);
 
-    const { getIsSwiping } = InteractionUtils.trackSwipe(
+    const { getIsSwiping } = InteractionTracker.trackSwipe(
         getContainerRef,
         () => getSwipeDirection() === undefined || access(props.isDismissableOnOverlayClick) === false,
         {
@@ -81,7 +81,7 @@ export const Modal = (props: ModalProps) => {
 
                 if (!direction) return;
 
-                setSwipeOffsetRatio(InteractionUtils.computeSwipeOffset(progressRatio, direction));
+                setSwipeOffsetRatio(GestureUtils.computeSwipeOffset(progressRatio, direction));
             },
             onSwipeEnd: (direction) => {
                 if (direction !== undefined && direction === getSwipeDirection()) {
@@ -112,7 +112,7 @@ export const Modal = (props: ModalProps) => {
         setSwipeOffsetRatio(0);
     });
 
-    DismissStack.createLayer(getIsVisible, {
+    DismisserStack.createLayer(getIsVisible, {
         getRoots: () => [getContainerRef()],
         onDismiss: (reason) => {
             if (reason !== "escape") return;
@@ -137,7 +137,7 @@ export const Modal = (props: ModalProps) => {
             >
                 <div
                     class={[styles.modalRoot, styles.modalAlignmentVariants[getAlignment()]].join(" ")}
-                    onKeyDown={(e) => FocusUtils.focusTrapKeyDown(e, getContainerRef())}
+                    onKeyDown={(e) => FocusManager.focusTrapKeyDown(e, getContainerRef())}
                 >
                     <div class={styles.modalOverlay} onClick={handleOverlayClick}>
                         {props.renderOverlay(getTransitionTarget, getTransitionDurationMs)}

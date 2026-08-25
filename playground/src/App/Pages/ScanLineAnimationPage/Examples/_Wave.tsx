@@ -1,9 +1,12 @@
-import { ScanlineAnimation, access } from "@thewaver/ss-components";
+import {
+    CellAnimationBreakpoints,
+    CellAnimationWeights,
+    ScanlineAnimation,
+    ScanlineAnimationKeyframes,
+    access,
+} from "@thewaver/ss-components";
 import type { AccessorProps } from "@thewaver/ss-components";
 
-import { CellAnimationBreakpoints } from "../../../Samples/CellAnimationBreakpoints/CellAnimationBreakpoints.const";
-import { CellAnimationWeights } from "../../../Samples/CellAnimationWeights/CellAnimationWeights.const";
-import { ScanlineAnimationKeyframes } from "../../../Samples/ScanlineAnimationKeyframes/ScanlineAnimationKeyframes.const";
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
 
 const WEIGHT_ORIGIN = { x: 0, y: 0 };

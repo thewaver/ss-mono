@@ -1,11 +1,14 @@
 import { createMemo } from "solid-js";
 
-import { CellAnimation, access } from "@thewaver/ss-components";
+import {
+    CellAnimation,
+    CellAnimationBreakpoints,
+    CellAnimationKeyframes,
+    CellAnimationOrigins,
+    CellAnimationWeights,
+    access,
+} from "@thewaver/ss-components";
 
-import { CellAnimationBreakpoints } from "../../../Samples/CellAnimationBreakpoints/CellAnimationBreakpoints.const";
-import { CellAnimationKeyframes } from "../../../Samples/CellAnimationKeyframes/CellAnimationKeyframes.const";
-import { CellAnimationOrigins } from "../../../Samples/CellAnimationOrigins/CellAnimationOrigins.const";
-import { CellAnimationWeights } from "../../../Samples/CellAnimationWeights/CellAnimationWeights.const";
 import type { CellAnimationSourcedExampleProps } from "../CellAnimationPage.types";
 
 export const DefaultExample = ({

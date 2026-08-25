@@ -3,10 +3,9 @@ import { Portal } from "solid-js/web";
 
 import { MathUtils } from "@thewaver/ss-utils";
 
-import type { AnimDirection } from "../../Abstracts/Anim/Anim.types";
 import { access } from "../../Utils/propUtils";
 import { useViewportContext } from "../Viewport/Viewport.context";
-import type { ScreenWiperProps, ScreenWiperShape } from "./ScreenWiper.types";
+import type { ScreenWiperDirection, ScreenWiperProps, ScreenWiperShape } from "./ScreenWiper.types";
 
 import * as styles from "./ScreenWiper.css";
 
@@ -15,7 +14,7 @@ const DEFAULT_SCREENWIPER_TRANSITION_DURATION_MS = 200;
 const DEFAULT_SCREENWIPER_CELL_SIZE: number = 120;
 const TRANSITION_STAGGER_FACTOR = 0.05;
 
-const getTargetFromDirection = (direction: AnimDirection) => (direction === "in" ? 1 : 0);
+const getTargetFromDirection = (direction: ScreenWiperDirection) => (direction === "in" ? 1 : 0);
 
 export const ScreenWiper = (props: ScreenWiperProps) => {
     const viewportContext = useViewportContext();

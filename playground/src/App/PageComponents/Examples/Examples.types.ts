@@ -7,7 +7,6 @@ export type ExampleDefs = {
     name: string;
     span?: number;
     path?: string;
-    sampleKeys?: () => string[];
     readout?: () => string;
     component: () => JSX.Element;
 };

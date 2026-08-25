@@ -1,7 +1,10 @@
 import type { JSX } from "solid-js";
 
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
-import type { ExternalInteractionFlags, InteractionFlags } from "../../Abstracts/Interaction/Interaction.types";
+import type {
+    ExternalInteractionFlags,
+    InteractionFlags,
+} from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 import type { TooltipProps } from "../Tooltip/Tooltip.types";
 

@@ -3,7 +3,7 @@ import { Index, createEffect, createMemo, createSignal, onCleanup } from "solid-
 
 import { MathUtils } from "@thewaver/ss-utils";
 
-import { InteractionUtils } from "../../Abstracts/Interaction/Interaction.utils";
+import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
 import { LiveAnnouncer } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer";
 import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
 import { access } from "../../Utils/propUtils";
@@ -85,7 +85,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
 
     const getAutoplayDelayMs = createMemo(() => access(props.autoplayDelayMs));
 
-    const getIsHeld = InteractionUtils.trackHold(getRootRef);
+    const getIsHeld = InteractionTracker.trackHold(getRootRef);
 
     const goTo = (index: number) => {
         const next = CarouselUtils.wrapIndex(index, getCount());
@@ -97,7 +97,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         void props.onIndexChange?.(next);
     };
 
-    const { getIsSwiping } = InteractionUtils.trackSwipe(
+    const { getIsSwiping } = InteractionTracker.trackSwipe(
         getViewportRef,
         () => props.renderControls === undefined || getIsDisabled() || getCount() < MIN_ROTATABLE_COUNT,
         {

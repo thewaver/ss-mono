@@ -91,14 +91,14 @@ export const CarouselPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"delayMs"} label={"Rotation delay"}>
+                <PageProp key={"delayMs"} label={"Rotator delay"}>
                     <PageNumberField
                         value={getDelayMs}
                         min={() => MIN_DELAY_MS}
                         max={() => MAX_DELAY_MS}
                         step={() => DELAY_STEP_MS}
                         width={() => FIELD_WIDTH}
-                        ariaLabel={"Rotation delay in milliseconds"}
+                        ariaLabel={"Rotator delay in milliseconds"}
                         onInput={setDelayMs}
                     />
                 </PageProp>

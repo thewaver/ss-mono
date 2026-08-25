@@ -7,7 +7,7 @@ import { Anchor } from "../../Abstracts/Anchor/Anchor";
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
 import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
 import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
-import { FocusUtils } from "../../Abstracts/Focus/Focus.utils";
+import { FocusManager } from "../../Abstracts/FocusManager/FocusManager";
 import { LiveAnnouncer } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer";
 import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
@@ -185,7 +185,7 @@ export const Spotlight = (props: SpotlightProps) => {
         if (getPosition()) setHasPlaced(true);
     });
 
-    FocusUtils.autoFocus(getPopupRef, getHasPlaced);
+    FocusManager.autoFocus(getPopupRef, getHasPlaced);
 
     return (
         <Show when={getIsVisible() && getSegmentRects()}>
@@ -235,7 +235,7 @@ export const Spotlight = (props: SpotlightProps) => {
                         role="dialog"
                         aria-modal="true"
                         aria-label={access(props.ariaLabel)}
-                        onKeyDown={(e) => FocusUtils.focusTrapKeyDown(e, getPopupRef())}
+                        onKeyDown={(e) => FocusManager.focusTrapKeyDown(e, getPopupRef())}
                     >
                         {props.renderPopup?.(getTransitionTarget, getTransitionDurationMs, getPlacement)}
                     </div>

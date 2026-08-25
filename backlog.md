@@ -75,7 +75,7 @@ privately inside them.
   _grew_ with delay, because every control built without it grew its own half of the error plumbing — and that
   cost has stopped growing. What is left of it in item 6 is one small piece, that nothing groups fields into
   sections with their own validity, and it carries none of the original urgency.
-- **Dismissal, open state and openers are all settled.** All five layers dismiss through `DismissStack`, all
+- **Dismissal, open state and openers are all settled.** All five layers dismiss through `DismisserStack`, all
   five take a `visibilitySignal`, and `Menu` takes an anchor while `ContextMenu` opens at a point; see
   `conventions.md`. Nothing in this family is outstanding.
 - **`Table` / data grid stays out of scope**, and specifically must not arrive as a by-product of
@@ -85,7 +85,7 @@ privately inside them.
 
 ## 1. One-shot positioned effects still have nowhere to go
 
-`InteractionUtils.trackDrag` now reports pointer position, so the primitive this item asked for exists —
+`InteractionTracker.trackDrag` now reports pointer position, so the primitive this item asked for exists —
 but it reports a **ratio while a drag lasts**, which is not the same thing as an event with an origin.
 A ripple needs to know where a single click landed and then run once from there; the flags a painter
 receives still describe state only, and `trackDrag` is something a control opts into rather than something
@@ -117,7 +117,7 @@ than having to earn it again.
 **The half this item used to be mostly about is closed.** A fill that is not a photograph — a gradient, a
 solid, a pattern — is a source like any other: an SVG string as a `data:image/svg+xml,` URI, which the
 component slices exactly as it slices a photograph. It needed one library fix, quoting the cell's background
-URL, and no new machinery; see `conventions.md`. `Samples/SVGDefsSources` goes further and serialises
+URL, and no new machinery; see `conventions.md`. `PageComponents/SVGDefsSources` goes further and serialises
 `Shape`'s own gradients and patterns into sources, so the two drawn examples pick from the same registry the
 Shape page uses.
 
@@ -204,7 +204,7 @@ gaps, each with the reason it is still a gap.
 
 - **There are no groups and no separators.** `SelectItem<T>`'s discriminated record would carry them
   unchanged, but a second copy of `getFlatOptions` plus `getItemOffsets` would come with it — and that
-  is the duplication `NavigationUtils` deliberately did _not_ absorb, since it walks positions and has
+  is the duplication `NavigatorUtils` deliberately did _not_ absorb, since it walks positions and has
   no opinion about what produced them. Flattening a nested list into a navigable one is now written twice —
   `SelectUtils.getFlatOptions` and `TreeUtils.getVisibleRows` — and whether the two become one is item 15.
   A consumer that needs sections today paints them into `renderPopup` around a flat list.
@@ -278,7 +278,7 @@ control had been argued. Neither is dropped; neither is next.
   shortcut rather than by a button, and holds every action in the application rather than the few that relate
   to one element. Two pieces are missing: results gathered from several sources and shown in labelled groups,
   which is the grouped-and-windowed case item 3 leaves open, and a document-level hotkey, which wants the
-  register-and-stack shape `DismissStack` has rather than a listener per consumer.
+  register-and-stack shape `DismisserStack` has rather than a listener per consumer.
 
 **_Elsewhere._** Ark UI's set is the widest of the headless libraries and is the most useful scope check
 available: it has a tree view, a pagination component, a **segment group** — a segmented control as its
@@ -313,7 +313,7 @@ with its own release cycle, which is this item's call arrived at independently.
 Grouped here because each one is shared by several of the controls in item 5, and because building
 any of those without first deciding these would bake the decision in by accident.
 
-- **Pointer drag capture ships; one-shot pointer geometry does not.** `InteractionUtils.trackDrag` is in
+- **Pointer drag capture ships; one-shot pointer geometry does not.** `InteractionTracker.trackDrag` is in
   `conventions.md` and `Range` and `ColorArea` are both built over it, so nothing is blocked here any more. What is
   still missing is the origin of a **single activation** — see item 1, which also argues it is not worth building
   until something asks.
@@ -329,7 +329,7 @@ any of those without first deciding these would bake the decision in by accident
 - **The form story is decided and wired.** `Form` and `FormField` ship and every control reads the
   description context; see `conventions.md`, which also records which errors wait for a submit and which
   do not. What is still unbuilt is smaller: nothing groups fields into sections with their own validity.
-- **Dismissal is one stack, and paint order comes from the anchor.** `DismissStack` holds the open layers
+- **Dismissal is one stack, and paint order comes from the anchor.** `DismisserStack` holds the open layers
   and `Popover` registers one, so all five controls dismiss through the same mechanism; a portalled layer's
   z-index is one above the highest on its anchor's ancestor chain, so a popup opened inside a `Modal` paints
   above it. Both are in `conventions.md`. Nothing here is outstanding.
@@ -602,7 +602,7 @@ These are the gaps.
     and rejected: a prop that does nothing in three browsers out of four is the thing this item exists to
     avoid.
 
-**Nothing about dismissal or open state is outstanding.** `ColorInput` dismisses through `DismissStack` like
+**Nothing about dismissal or open state is outstanding.** `ColorInput` dismisses through `DismisserStack` like
 every other layer and takes a `visibilitySignal` like every other popup; both are in `conventions.md`.
 
 **_Elsewhere._**
@@ -1019,7 +1019,7 @@ decision to take, or into `conventions.md` if building it settles something.
 ### The animation sample collections: what to add instead of more entries
 
 `CellAnimation` and `ScanlineAnimation` take their weights and their keyframes from
-`playground/src/App/Samples`, which now holds around sixty entries across two shapes. Two batches of new ones
+`components/src/Samples`, which now holds around sixty entries across two shapes. Two batches of new ones
 were built and the user's verdict on most was that they look repetitive; `conventions.md` records why that is
 structural — a weight that falls away from a point is always a wipe, a per-cell function ending in place is
 always an entrance. So the ideas below are all machinery that recombines the collection rather than extending

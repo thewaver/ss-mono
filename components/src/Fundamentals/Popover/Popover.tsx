@@ -3,9 +3,9 @@ import { Portal } from "solid-js/web";
 
 import { Anchor } from "../../Abstracts/Anchor/Anchor";
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
-import { DismissStack } from "../../Abstracts/Dismiss/DismissStack";
+import { DismisserStack } from "../../Abstracts/Dismisser/DismisserStack";
 import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
-import { FocusUtils } from "../../Abstracts/Focus/Focus.utils";
+import { FocusManager } from "../../Abstracts/FocusManager/FocusManager";
 import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
 import type { PopoverProps } from "./Popover.types";
@@ -57,9 +57,9 @@ export const Popover = (props: PopoverProps) => {
         () => (access(props.hasAutoFocus) ?? false) && access(props.isOpen) && getPosition() !== undefined,
     );
 
-    FocusUtils.autoFocus(getRootRef, getHasFocus, { getInitialRef: getRootRef });
+    FocusManager.autoFocus(getRootRef, getHasFocus, { getInitialRef: getRootRef });
 
-    DismissStack.createLayer(() => access(props.isOpen), {
+    DismisserStack.createLayer(() => access(props.isOpen), {
         getRoots: () => [getRootRef(), props.anchorRect === undefined ? access(props.anchorRef) : undefined],
         onDismiss: (reason) => props.onDismiss?.(reason),
     });

@@ -1,7 +1,5 @@
-import type { AccessorProps } from "@thewaver/ss-components";
+import type { AccessorProps, FormationLayouts } from "@thewaver/ss-components";
 import type { ShapeConst } from "@thewaver/ss-utils";
-
-import type { FormationLayouts } from "../../Samples/FormationLayouts/FormationLayouts.const";
 
 export type FormationExampleProps = AccessorProps<{
     items: string[];

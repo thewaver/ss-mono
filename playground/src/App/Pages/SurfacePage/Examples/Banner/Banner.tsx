@@ -1,10 +1,9 @@
 import { createUniqueId } from "solid-js";
 
-import { Surface } from "@thewaver/ss-components";
+import { SVGDefsSamples, Surface } from "@thewaver/ss-components";
 import type { SurfaceProps } from "@thewaver/ss-components";
 import { CSSUtils, type Size2d } from "@thewaver/ss-utils";
 
-import { SVGDefsSamples } from "../../../../Samples/SVGDefs/SVGDefs.const";
 import knight from "../../../../knight.webp";
 
 import * as styles from "./Banner.css";

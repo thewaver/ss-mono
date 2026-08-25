@@ -4,8 +4,8 @@ import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueI
 import { CSSUtils, StringUtils } from "@thewaver/ss-utils";
 
 import { ElementObserver } from "../../../Abstracts/ElementObserver/ElementObserver";
-import { InteractionUtils } from "../../../Abstracts/Interaction/Interaction.utils";
-import { NavigationUtils } from "../../../Abstracts/Navigation/Navigation.utils";
+import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
+import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
 import { TextSync } from "../../../Abstracts/TextSync/TextSync";
 import { Typeahead } from "../../../Abstracts/Typeahead/Typeahead";
@@ -232,7 +232,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 
     const getNavigableIndexes = createMemo(() =>
         getFlatOptions().reduce<number[]>((acc, option, index) => {
-            const isReachable = InteractionUtils.computeIsReachable(
+            const isReachable = InteractionTracker.computeIsReachable(
                 option.isDisabled ?? false,
                 option.isReachableWhenDisabled ?? false,
                 option.tooltipDefs !== undefined,
@@ -403,7 +403,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 
         const isArrow = e.key === "ArrowDown" || e.key === "ArrowUp";
         const from = navigable.indexOf(getHighlightedIndex() ?? navigable[0]);
-        const position = NavigationUtils.computeNextPosition(e.key, from, navigable.length, {
+        const position = NavigatorUtils.computeNextPosition(e.key, from, navigable.length, {
             hasEdgeKeys: !getIsFilterable(),
         });
 

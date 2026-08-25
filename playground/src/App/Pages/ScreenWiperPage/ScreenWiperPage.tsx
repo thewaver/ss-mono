@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 
-import type { AnimDirection } from "@thewaver/ss-components";
+import type { ScreenWiperDirection } from "@thewaver/ss-components";
 import { Button, ScreenWiper } from "@thewaver/ss-components";
 
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
@@ -8,10 +8,10 @@ import { PageTooltipContent } from "../../StyledComponents/TooltipContent/Toolti
 
 import * as styles from "./ScreenWiperPage.css";
 
-const INITIAL_WIPE_DIRECTION: AnimDirection = "out";
+const INITIAL_WIPE_DIRECTION: ScreenWiperDirection = "out";
 
 export const ScreenWiperPage = () => {
-    const [getWipeDirection, setWipeDirection] = createSignal<AnimDirection>(INITIAL_WIPE_DIRECTION);
+    const [getWipeDirection, setWipeDirection] = createSignal<ScreenWiperDirection>(INITIAL_WIPE_DIRECTION);
     const [getIsWiping, setIsWiping] = createSignal(false);
 
     return (

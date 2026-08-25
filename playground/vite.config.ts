@@ -47,7 +47,6 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            "@components": fromRepo("../components/src"),
             "@thewaver/ss-components": fromRepo("../components/src/index.ts"),
             "@thewaver/ss-utils": fromRepo("../utils/src/index.ts"),
         },

@@ -1,7 +1,7 @@
 import type { JSX } from "solid-js";
 import { createEffect, createMemo, createSignal, on } from "solid-js";
 
-import { FPSUtils, SelectUtils } from "@thewaver/ss-components";
+import { FrameRateMonitor, SelectUtils } from "@thewaver/ss-components";
 import type { SelectOption } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -136,7 +136,7 @@ export const SelectPage = () => {
         setIsFetching(false);
     };
 
-    const { getFPS } = FPSUtils.createMonitor(() => !stressVisibility[0]());
+    const { getFrameRate } = FrameRateMonitor.create(() => !stressVisibility[0]());
 
     const getStressDeliveries = createMemo(() => createStressDeliveries(getStressCount()));
 
@@ -255,7 +255,7 @@ export const SelectPage = () => {
                     getOpenMs() === undefined
                         ? "never opened"
                         : `${Math.round(getOpenMs()!)} ms from click to the first painted frame`
-                }, ${stressVisibility[0]() ? `${getFPS().current.toFixed(0)} fps while open` : "closed"}`,
+                }, ${stressVisibility[0]() ? `${getFrameRate().current.toFixed(0)} fps while open` : "closed"}`,
             component: () => (
                 <VirtualizedExample
                     valueSignal={stressSignal}

@@ -3,7 +3,7 @@ import { Index, createMemo, createRenderEffect, createSignal } from "solid-js";
 import { MathUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-import { InteractionUtils } from "../../../Abstracts/Interaction/Interaction.utils";
+import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
 import { access } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../InteractionWrapper/InteractionWrapper";
 import { FormFieldUtils } from "../FormField/FormField.utils";
@@ -71,7 +71,7 @@ const RangeElement = (props: RangeElementProps) => {
         getElementRefs().forEach(syncElement);
     });
 
-    InteractionUtils.wrapExtraControls(() => getElementRefs().slice(1), getIsDisabled, {
+    InteractionTracker.wrapExtraControls(() => getElementRefs().slice(1), getIsDisabled, {
         getIsTabbable: props.isTabbable === undefined ? undefined : () => access(props.isTabbable)!,
     });
 

@@ -1,6 +1,5 @@
-import { Formation, access } from "@thewaver/ss-components";
+import { Formation, FormationLayouts, access } from "@thewaver/ss-components";
 
-import { FormationLayouts } from "../../../Samples/FormationLayouts/FormationLayouts.const";
 import { PageFormationItem } from "../../../StyledComponents/FormationContent/FormationContent";
 import type { FormationExampleProps } from "../FormationPage.types";
 

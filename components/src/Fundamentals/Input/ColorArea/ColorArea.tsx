@@ -2,7 +2,7 @@ import { For, createRenderEffect, createSignal } from "solid-js";
 
 import { Color, MathUtils } from "@thewaver/ss-utils";
 
-import { InteractionUtils } from "../../../Abstracts/Interaction/Interaction.utils";
+import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
 import { access } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../InteractionWrapper/InteractionWrapper";
 import { LabelUtils } from "../Label/Label.utils";
@@ -33,7 +33,7 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
 
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
-    const { getIsDragging } = InteractionUtils.trackDrag(getSurfaceRef, getIsDisabled, {
+    const { getIsDragging } = InteractionTracker.trackDrag(getSurfaceRef, getIsDisabled, {
         onDrag: (ratio) => {
             props.setAxis("saturation", ratio.x);
             props.setAxis("brightness", RATIO_MAX - ratio.y);
@@ -61,7 +61,7 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
         }
     });
 
-    InteractionUtils.wrapExtraControls(() => AXES.map((axis) => getAxisRefs()[axis]), getIsDisabled, {
+    InteractionTracker.wrapExtraControls(() => AXES.map((axis) => getAxisRefs()[axis]), getIsDisabled, {
         getIsTabbable: props.isTabbable === undefined ? undefined : () => access(props.isTabbable)!,
     });
 

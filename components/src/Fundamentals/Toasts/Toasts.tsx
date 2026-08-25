@@ -4,7 +4,7 @@ import { Portal } from "solid-js/web";
 import { CSSUtils, StringUtils } from "@thewaver/ss-utils";
 
 import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
-import { InteractionUtils } from "../../Abstracts/Interaction/Interaction.utils";
+import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
 import { LiveAnnouncer } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer";
 import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
@@ -109,7 +109,7 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
 
     const getStackAlignment = createMemo(() => ToastsUtils.computeStackAlignment(getAlignment(), getDir()));
 
-    const getIsPaused = InteractionUtils.trackHold(getRootRef);
+    const getIsPaused = InteractionTracker.trackHold(getRootRef);
 
     const getHotkey = createMemo(() => access(props.hotkey) ?? DEFAULT_TOASTS_HOTKEY);
 

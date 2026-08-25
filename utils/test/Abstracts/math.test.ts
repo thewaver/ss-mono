@@ -218,3 +218,18 @@ describe("MathUtils.lerp", () => {
         expect(MathUtils.normalize(MathUtils.lerp(20, 80, 0.25), 20, 80)).toBe(0.25);
     });
 });
+
+describe("MathUtils.wrapIndex", () => {
+    it("brings an index past the end back into range", () => {
+        expect(MathUtils.wrapIndex(8, 8)).toBe(0);
+        expect(MathUtils.wrapIndex(9, 8)).toBe(1);
+    });
+
+    it("wraps a negative index round the other way", () => {
+        expect(MathUtils.wrapIndex(-1, 8)).toBe(7);
+    });
+
+    it("has nowhere to land when there are no steps", () => {
+        expect(MathUtils.wrapIndex(3, 0)).toBe(0);
+    });
+});

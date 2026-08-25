@@ -3,7 +3,7 @@ import type { JSX, Signal } from "solid-js";
 import type { Point2d, TimeValue } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
-import type { InteractionFlags } from "../../../Abstracts/Interaction/Interaction.types";
+import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { AccessorProps } from "../../../Utils/typeUtils";
 import type { ClockColumnRenderer, ClockOptionRenderer, ClockSteps, ClockUnitRenderer } from "../Clock/Clock.types";
 import type { TextFieldFlags } from "../TextField/TextField.types";

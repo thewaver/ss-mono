@@ -1,17 +1,17 @@
 import { createMemo, createSignal } from "solid-js";
 
-import type { MosaicSizeAnchor } from "@thewaver/ss-components";
 import { access } from "@thewaver/ss-components";
+import type { MosaicSizeAnchor } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { MosaicImages } from "../../Samples/MosaicImages/MosaicImages.const";
 import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { DecoratedExample } from "./Examples/Decorated";
 import { DefaultExample } from "./Examples/Default";
 import type { ImageMosaicExampleProps } from "./ImageMosaicPage.types";
+import { MosaicImages } from "./MosaicImages.const";
 
 const MIN_IMAGE_COUNT = 1;
 const MAX_IMAGE_COUNT = 12;

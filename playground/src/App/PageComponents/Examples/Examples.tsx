@@ -101,10 +101,7 @@ export const PageExamples = (props: ExamplesProps) => {
                         transitionDurationMs={getTransitionDurationMs}
                         padding={"0"}
                     >
-                        <PageSourceView
-                            path={() => access(props.items)[getActiveIndex()].path!}
-                            sampleKeys={() => access(props.items)[getActiveIndex()].sampleKeys?.() ?? []}
-                        />
+                        <PageSourceView path={() => access(props.items)[getActiveIndex()].path!} />
                     </PageModalPanel>
                 )}
             />

@@ -6,7 +6,7 @@ import type {
     DateValueWeekStart,
     DateValueWeekdayWidth,
 } from "../../../Abstracts/DateValue/DateValue.types";
-import type { InteractionFlags } from "../../../Abstracts/Interaction/Interaction.types";
+import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { AccessorProps } from "../../../Utils/typeUtils";
 import type { InteractionControlProps } from "../../InteractionWrapper/InteractionWrapper.types";
 

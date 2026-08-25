@@ -103,6 +103,29 @@ export namespace MathUtils {
     export const clamp01 = (value: number) => clamp(value, 0, 1);
 
     /**
+     * Brings an index into `0..count - 1`, wrapping at both ends.
+     *
+     * The counterpart to `clamp` for anything arranged in a ring rather than along a line: where clamping
+     * holds a value at the boundary, wrapping carries it round, so the step after the last is the first and
+     * the step before the first is the last. `-1` in a ring of `8` is `7`.
+     *
+     * The index is truncated before wrapping, so a fractional index lands on the step it has reached rather
+     * than the one it is heading for.
+     *
+     * A count of zero or less has nothing to index and reports `0`, which is the only answer that cannot be
+     * out of range. A caller that needs to tell "empty" from "the first one" has to check the count itself,
+     * because this function cannot say it in a number.
+     *
+     * @param index The index to bring into range. Truncated if fractional.
+     * @param count How many there are.
+     */
+    export const wrapIndex = (index: number, count: number) => {
+        if (count < 1) return 0;
+
+        return ((Math.trunc(index) % count) + count) % count;
+    };
+
+    /**
      * Finds where a value sits between two others, as a ratio.
      *
      * The inverse of `lerp`, and its partner: `lerp(from, to, normalize(value, from, to))` returns `value`.

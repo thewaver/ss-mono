@@ -58,10 +58,9 @@ export const PageSourceView = (props: SourceViewProps) => {
 
     createEffect(() => {
         const path = access(props.path);
-        const sampleKeys = access(props.sampleKeys) ?? [];
         const token = ++loadToken;
 
-        void SourceViewUtils.loadGroups(path, sampleKeys).then((groups) => {
+        void SourceViewUtils.loadGroups(path).then((groups) => {
             if (token !== loadToken) return;
 
             setGroups(groups);

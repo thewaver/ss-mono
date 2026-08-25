@@ -1,6 +1,6 @@
 import { createMemo, createRenderEffect, createSignal, onCleanup } from "solid-js";
 
-import { InteractionUtils } from "../../Abstracts/Interaction/Interaction.utils";
+import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
 import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
 import { access } from "../../Utils/propUtils";
 import { FormFieldUtils } from "../Input/FormField/FormField.utils";
@@ -80,7 +80,7 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
         step();
     };
 
-    const { getIsDragging } = InteractionUtils.trackDrag(getTrackRef, getIsDisabled, {
+    const { getIsDragging } = InteractionTracker.trackDrag(getTrackRef, getIsDisabled, {
         onDrag: (ratio) => {
             const thumbRatio = getThumbRatio();
             const press = getPress();

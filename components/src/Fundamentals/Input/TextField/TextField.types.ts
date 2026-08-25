@@ -2,7 +2,7 @@ import type { JSX, Signal } from "solid-js";
 
 import type { CSSPadding } from "@thewaver/ss-utils";
 
-import type { InteractionFlags } from "../../../Abstracts/Interaction/Interaction.types";
+import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { TextSyncMaskResult } from "../../../Abstracts/TextSync/TextSync.utils";
 import type { AccessorProps } from "../../../Utils/typeUtils";
 import type {

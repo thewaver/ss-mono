@@ -2,8 +2,8 @@ import type { Accessor, JSX } from "solid-js";
 import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueId } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { InteractionUtils } from "../../Abstracts/Interaction/Interaction.utils";
-import { NavigationUtils } from "../../Abstracts/Navigation/Navigation.utils";
+import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
+import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { Typeahead } from "../../Abstracts/Typeahead/Typeahead";
 import { TypeaheadUtils } from "../../Abstracts/Typeahead/Typeahead.utils";
 import { Virtualizer } from "../../Abstracts/Virtualizer/Virtualizer";
@@ -92,7 +92,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     const getFlatRows = createMemo(() => TreeUtils.getFlatRows(getRows()));
 
     const computeIsNavigable = (row: TreeRow<T>) => {
-        const isReachable = InteractionUtils.computeIsReachable(
+        const isReachable = InteractionTracker.computeIsReachable(
             row.node.isDisabled ?? false,
             row.node.isReachableWhenDisabled ?? false,
             row.node.tooltipDefs !== undefined,
@@ -324,7 +324,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
             return;
         }
 
-        const position = NavigationUtils.computeNextPosition(e.key, navigable.indexOf(current), navigable.length);
+        const position = NavigatorUtils.computeNextPosition(e.key, navigable.indexOf(current), navigable.length);
 
         if (position === undefined) return;
 

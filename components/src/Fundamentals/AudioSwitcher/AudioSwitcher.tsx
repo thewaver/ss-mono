@@ -3,7 +3,6 @@ import { createEffect, createMemo, createSignal, on, onCleanup, onMount } from "
 import { AudioUtils } from "@thewaver/ss-utils";
 import { MathUtils } from "@thewaver/ss-utils";
 
-import type { AnimDirection } from "../../Abstracts/Anim/Anim.types";
 import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
 import { access } from "../../Utils/propUtils";
 import type { AudioSwitcherProps } from "./AudioSwitcher.types";
@@ -12,9 +11,11 @@ const DEFAULT_AUDIO_SWITCHER_CROSSFADE_MS = 500;
 const DEFAULT_AUDIO_SWITCHER_CROSSFADE_STEPS = 25;
 const DEFAULT_AUDIO_SWITCHER_VOLUME = 0.5;
 
+type FadeDirection = "in" | "out";
+
 type Fade = {
     handle: ReturnType<typeof setInterval>;
-    direction: AnimDirection;
+    direction: FadeDirection;
 };
 
 export const AudioSwitcher = (props: AudioSwitcherProps) => {
@@ -52,7 +53,7 @@ export const AudioSwitcher = (props: AudioSwitcherProps) => {
         fades.delete(element);
     };
 
-    const startFade = (element: HTMLAudioElement, direction: AnimDirection, tick: () => void) => {
+    const startFade = (element: HTMLAudioElement, direction: FadeDirection, tick: () => void) => {
         clearFade(element);
 
         fades.set(element, { handle: setInterval(tick, getIntervalMs()), direction });

@@ -2,7 +2,7 @@ import type { Accessor, JSX, Signal } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
-import type { RotationPhase, RotationSpinDefs } from "../../Abstracts/Rotation/Rotation.types";
+import type { RotatorPhase, RotatorSpinDefs } from "../../Abstracts/Rotator/Rotator.types";
 import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 
 export type WheelVariant = "flat" | "drum";
@@ -20,7 +20,7 @@ export type WheelWedgeState = {
 
 export type WheelController = {
     getIndex: Accessor<number>;
-    getPhase: Accessor<RotationPhase>;
+    getPhase: Accessor<RotatorPhase>;
     getIsSpinnable: Accessor<boolean>;
     getIsAutoSpinning: Accessor<boolean>;
     getIsUserSpinning: Accessor<boolean>;
@@ -45,7 +45,7 @@ export type WheelSlots<T> = {
     indexSignal?: Signal<number>;
     autoSpinSignal?: Signal<boolean>;
     computeSpinTarget: () => number | Promise<number>;
-    computeSpinDefs?: (index: number, wedgeCount: number) => RotationSpinDefs;
+    computeSpinDefs?: (index: number, wedgeCount: number) => RotatorSpinDefs;
     renderWedge: (getWedge: Accessor<T>, getState: Accessor<WheelWedgeState>) => JSX.Element;
     onSelectedWedgeChange?: (index: number) => void;
     onSpinEnd?: (index: number) => void;

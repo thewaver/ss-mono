@@ -4,8 +4,8 @@ import { Index, Show, createEffect, createMemo, createSignal, createUniqueId, on
 import { Rect } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
-import { InteractionUtils } from "../../Abstracts/Interaction/Interaction.utils";
-import { NavigationUtils } from "../../Abstracts/Navigation/Navigation.utils";
+import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
+import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
 import { Typeahead } from "../../Abstracts/Typeahead/Typeahead";
 import { TypeaheadUtils } from "../../Abstracts/Typeahead/Typeahead.utils";
@@ -108,7 +108,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 
     const getNavigableIndexes = createMemo(() =>
         access(props.items).reduce<number[]>((acc, item, index) => {
-            const isReachable = InteractionUtils.computeIsReachable(
+            const isReachable = InteractionTracker.computeIsReachable(
                 item.isDisabled ?? false,
                 item.isReachableWhenDisabled ?? false,
                 item.tooltipDefs !== undefined,
@@ -253,7 +253,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         if (navigable.length < 1) return;
 
         const from = navigable.indexOf(highlightedIndex ?? navigable[0]);
-        const position = NavigationUtils.computeNextPosition(e.key, from, navigable.length);
+        const position = NavigatorUtils.computeNextPosition(e.key, from, navigable.length);
 
         if (position === undefined) return;
 

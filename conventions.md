@@ -59,15 +59,12 @@ than by reaching into `components/src` along a relative path as it did when both
 is that the export list is now load-bearing: a component missing from `index.ts` breaks the Playground
 instead of going unnoticed. The user's call, taken with the cost below on the table.
 
-**`@components/…` is the deliberate hole in that**, an alias resolving to `components/src`, and it is down
-to one reason. `CellAnimationUtils` is imported through it by twenty `CellAnimationWeights` samples and one
-`CellAnimationZones` const — not because of visibility, since it is a public export, but because those
-modules are loaded by unit tests running in plain Node, and reaching anything through `index.ts` pulls in
-the whole library, which calls Solid's `delegateEvents` at module scope and dies without a `window`.
-Reaching the leaf module keeps the import graph those tests had before the merge. The alternative is a DOM
-test environment, which means a new package, so it was left to the user.
-
-`Surface` was the alias's other reason until the user opened `Composites/` up; see _"Layering"_.
+**There is no alias into `components/src` any more.** `@components/…` existed for one reason: twenty
+`CellAnimationWeights` samples and one `CellAnimationZones` const reached `CellAnimationUtils` as a leaf module
+rather than through `index.ts`, because their unit tests run in plain Node and loading the whole library there
+calls Solid's `delegateEvents` at module scope and dies without a `window`. Moving the samples into
+`components/src` made that an ordinary relative import inside one package, so the alias, its three definition
+sites and the DOM-test-environment question all went away together. See _"Samples live in the library"_.
 
 **Everything except the publish build resolves `ss-utils` from source.** The Vite dev server, the Vite
 Playground build, both Vitest configs and both `tsconfig.json` path maps point `@thewaver/ss-utils` at
@@ -91,12 +88,140 @@ file's folder, which sends it looking for `dist` at the repo root rather than th
 `src/Lib` when that was the only tree with anything to say; they now describe three packages and a test
 suite, so sitting inside one of them would be wrong.
 
+### Samples live in the library
+
+`components/src/Samples` holds what was `playground/src/App/Samples`: nine registries and the ~198 sample files
+under them. The user's call, argued from what it buys rather than from where the files started — which is
+where they started, before the Playground existed.
+
+**What it buys.** The `@components` alias disappears, because a sample reaching `CellAnimation.utils` is now an
+ordinary relative import inside one package, which also retires the DOM-test-environment question the alias was
+parked on. The source view loses the whole sample-tab mechanism for free, since `components/src` was already
+opaque to it. And a consumer imports a sample instead of copying it out of a page.
+
+**A consumer pays only for what they name.** Every sample is re-exported individually from `index.ts`, so
+`import { lineRow }` pulls one function and nothing else. Measured against the built `dist`, bundled with
+esbuild, minified / gzipped: **5.7K / 2.4K** for one sample and its machinery, against **19.2K / 5.9K** for the
+registry that names all sixty. This only works because _"a sample registry and the machinery that runs it are
+separate modules"_ landed first — with the machinery still importing the lookup table there is no light path
+to offer, and the move would have made every consumer pay for the whole collection.
+
+**The two `plain` files are the one name that could not travel unchanged.** `Pattern/plain` and
+`Gradient/plain` collide at the top level, so `index.ts` exports them as `patternPlain` and `gradientPlain`,
+which is what the registries already called them internally. Every other sample is exported under its own name,
+and the file-name-is-the-key rule is intact inside the registries.
+
+**`SVGDefsSources` and `SVGDefsUri` did not go with them**, and are now
+`playground/src/App/PageComponents/SVGDefsSources`. They are not samples: they render sample defs and serialise
+them to a data URI so two `CellAnimation` examples have something to animate. That is Playground furniture by
+the _"three trees"_ definition, it needs a DOM, and keeping it out of the library keeps page tooling off the
+published surface. Its source tab still works, because it is Playground-side.
+
+**What the tests did with the move.** The seven sample specs run under the library's Vitest now, in the same
+plain-Node environment they always used — which was the alias's entire justification. Nothing about them
+changed.
+
+### How Samples is laid out
+
+The user's restructure, taken once the tree was in the library and the old shape stopped fitting.
+
+**`CellAnimation` is one folder with the five parts inside it.** `Breakpoints`, `Keyframes`, `Origins`,
+`Weights` and `Zones` were five sibling folders at the top of `Samples`, each repeating the component's name
+in its own; they are now `Samples/CellAnimation/<Part>`. **Only the folder names shortened.** Files keep their
+full names and every exported namespace is untouched — `Samples/CellAnimation/Weights/CellAnimationWeights.const.ts`
+still exports `CellAnimationWeights`, and no name in the published API moved. The user's call between that and
+shortening the files too, which would have broken the file-is-named-after-its-namespace rule for a folder
+depth that already says `CellAnimation`.
+
+**`SVGDefs` lost its `Samples/` middle layer**, so `Gradient`, `Pattern` and `Iteration` sit directly under it.
+That layer existed to keep sample files apart from the registry files beside them; the three sub-registry
+folders already do that, and one called `Samples` inside a tree called `Samples` said nothing. `Weights` and
+`Keyframes` keep theirs, because their samples are loose files with no sub-registry to group them — dropping it
+would strew sixty files across the same folder as the const, the types and the utils.
+
+**Every registry is `<Component>/<Part>`, with no exceptions left.** `FormationLayouts`,
+`ScanlineAnimationKeyframes` and `StaircaseIndents` followed `CellAnimation` down the same path and are now
+`Formation/Layouts`, `ScanlineAnimation/Keyframes` and `Staircase/Indents`. Three of the four parents hold a
+single child, which is the point rather than an accident: the top level of `Samples` reads as a list of the
+components that have samples, and a second part slots in beside the first without the folder above it having
+to be invented later.
+
+**`MosaicImages` left `Samples` altogether** and is now `playground/src/App/Pages/ImageMosaicPage`. The user's
+reasoning, and it is the line that decides what belongs here at all: the other samples are things a consumer
+might plausibly reach for to get something working quickly, while the mosaic shapes and their generated
+placeholder images exist only to give one Playground page something to draw. Nothing reusable, nothing a
+consumer would want. It is exported from nowhere now and the page imports it as a local file.
+
 ### Layering
 
 `Abstracts/` renders no DOM (namespaced utils, hook-like factories). `Fundamentals/` renders DOM.
 `Composites/` combines Fundamentals. `Fundamentals/Input/` groups controls carrying a user-editable
 value (see _"Folder layout"_). `components/src/index.ts` enumerates every export path individually and stays
 sorted — not a barrel.
+
+**`Utils/typeUtils.ts` holds type transformers and nothing else.** Stated by the user: it is for things in
+the shape of `Omit`, `Exclude` and `Pick` — generics that take a type and give back another one. Everything in
+it qualifies (`MaybeAccessor`, `AccessorProps` and the three predicates behind them), as does `ss-utils`'
+own `TypeScript/typeUtils.ts`, so nothing had to move. **Recorded because the next lone type has to land
+somewhere else**: a union naming domain vocabulary is not a transformer, and putting one there would make the
+file a miscellany rather than a category.
+
+**`Abstracts/Anim` is gone, and `AnimDirection` with it.** One union, `"in" | "out"`, used by `ScreenWiper`
+and `AudioSwitcher`. `Abstracts/` is things that render no DOM but do something — namespaced utils and
+hook-like factories — and a lone type is neither, so the folder was a home of convenience. The two components
+did mean the same thing by it, which was the argument for keeping it shared somewhere; the user's call went
+the other way, and each now names its own: `ScreenWiperDirection` is exported beside `ScreenWiperShape`, and
+`AudioSwitcher` holds a module-private `FadeDirection`. **Naming them rather than repeating a bare union is
+what keeps the cost at zero** — a consumer writing an `onTransitionEnd` handler still has a type to import,
+which was the only thing the shared version was buying.
+
+**An `Abstract` is named for the thing that does the work, not for the activity.** The user's call, and a
+breaking change taken deliberately while the library has one consumer. `Dismiss`, `Navigation` and `Rotation`
+are `Dismisser`, `Navigator` and `Rotator` — folder, files, namespaces and the types hanging off them, so
+`DismissStack` is `DismisserStack`, `NavigationGrid` is `NavigatorGrid` and `Rotation.createRotation` is
+`Rotator.createRotator`. Renaming the type family too is what keeps a folder readable: a `DismissReason`
+sitting beside a `DismisserStack` reads as two things rather than one, and the rule is worth more than the
+sentence that one type name loses.
+
+**The last two outliers took a suffix, and one of them turned out to deserve it.** `FocusUtils` is
+`FocusManager`: it holds a module-level restore depth, decides whether a restore is in progress, traps focus
+in a subtree and moves it on mount — state plus policy, which is an agent rather than a bag of functions, and
+"focus manager" is the term the rest of the field already uses. The earlier verdict that it was a collection
+was made without opening the file.
+
+**`InteractionUtils` is `InteractionTracker`, and the arithmetic that made the name a lie went to
+`ss-utils`.** Most of it tracks — `trackHold`, `trackDrag`, `trackSwipe`, `trackPageHidden`, and
+`wrapElement`, which attaches listeners to report hover, press and focus flags. The four `computeSwipe*`
+functions did not, so `GestureUtils` in `utils/src/Abstracts/gesture.ts` has them, along with `SwipeAxis` and
+`SwipeDirection`. **The name is `Gesture` rather than `Swipe` on the user's call**: a package this small
+should not gain a file per gesture, and pinch and drag arithmetic would otherwise each arrive asking for one.
+`InteractionDragRatio` did not travel — the moved signatures take `Point2d`, which `ss-utils` already owns and
+which that type was structurally identical to.
+
+**The type family stayed on `Interaction`.** Unlike `Dismiss` → `Dismisser`, the subject noun here _adds_ a
+word, so following the family through would have produced `InteractionTrackerSwipeDirection`. The line taken
+instead: a flag or a reason belongs to the interaction, not to the thing watching it, so `InteractionFlags`,
+`InteractionDragRatio` and `InteractionDragEndReason` keep their names. Recorded because it is a deliberate
+exception to the rule directly above it, not an oversight.
+
+**An acronym is not a subject either, so `FPS` went too.** It is `FrameRateMonitor`, and its factory is
+`create` rather than `createMonitor`, which would have said monitor twice. The user's call between that and
+`FrameCounter`: nothing the thing returns is a count — `{ current, average }` are both rates — so counting is
+the mechanism rather than the subject, and `create` names what the code already called its own product. The
+acronym left the signature with it: `getFPS` is `getFrameRate`, since keeping it would have left the thing
+the rename was removing sitting in the return value. The Playground's on-screen label still reads `FPS`,
+which is a display string and not an API.
+
+**It also stopped being a `.utils.ts`.** `FPSUtils.createMonitor` returned reactive state, which is what
+`Rotator.createRotator` and `DismisserStack.createLayer` do, and both of those live in a plain `.ts` exporting
+the subject. A `.utils.ts` exports `<Subject>Utils` and holds functions; a factory for a live thing is not
+that, so the file is `FrameRateMonitor/FrameRateMonitor.ts`.
+
+**The rule reaches the abstract, not the components that use it.** A `Carousel` still has `getIsRotating`,
+`renderRotationControl` and `CarouselRotationFlags`, because those are the carousel's own vocabulary for what
+it does rather than references to the abstract. `RotationUtils` in `ss-utils` keeps its name for the same
+reason from the other side: that package names a namespace `<Subject>Utils` and the subject there is the
+arithmetic, not an agent.
 
 **`Composites/` ships; `BinarySwitch` does not.** The composites were held back on the argument that a
 composite demonstrates how Fundamentals combine rather than owning a contract, so shipping one freezes a
@@ -132,12 +257,28 @@ across ten files — **nobody should write that expression again.** Four collaps
 `clamp01(normalize(…))`; `Progress` keeps its own guard, because its zero-span answer is `1` where
 `normalize` reports `0`, and that choice is the caller's.
 
+**`RotationUtils` went, whole, and is `utils/src/Abstracts/rotation.ts`.** It was listed below as a kept
+candidate, and only `wrapIndex` was ever staked as qualifying — the rest reads as angular arithmetic in a
+wheel's vocabulary. The user asked for the namespace, not the qualifying half of it, and the split would have
+been worse than either whole: `getIndexAngle` calls `getStepAngle`, `getSpinAngle` calls `getIndexAngle`, so
+half a namespace here and half there means a package boundary through the middle of one calculation. **The
+line the "kept" list draws is about what a function needs, and every one of these needs only the language.**
+What made them look component-driven is that their _documentation_ has to talk about wheels — which the
+`utils/` doc rule now carries, in full, on all five.
+
+`wrapIndex` did not go with them: it is `MathUtils.wrapIndex`, since wrapping an integer is not angular
+arithmetic and `MathUtils` is where the sixteen hand-written clamps went for the same reason. It lost its
+`stepCount` parameter name for `count` on the way, nothing about a ring of things being a step outside a
+wheel. `CarouselUtils.wrapIndex` still exists and aliases it, so the published name a consumer already uses
+did not move; `RotationUtils` is now published by `ss-utils` rather than by this package, and
+`components/src/index.ts` no longer names it.
+
 **Kept, with the shape each would need first.** The user's verdict: the remainder still feels
 component-driven. Not outstanding work — the argument, so it is not re-derived.
 
 - **`TextSyncUtils`** is ready as it stands: string and caret arithmetic, no DOM, and a mask engine is
   normally its own package. Needs a name that is not "syncing a text field".
-- **`DismissUtils.getIsWithinOwnedLayer`** is ARIA-aware DOM containment with nothing about dismissal
+- **`DismisserUtils.getIsWithinOwnedLayer`** is ARIA-aware DOM containment with nothing about dismissal
   in it; `DOMUtils` is where that belongs.
 - **`AnchorUtils`** is "align one rect to another along an axis, in/out/center, then fall back to the
   variant that fits". `Rect`, `Bounds` and `Dir` already say that; the `AnchorHPlacement` vocabulary is
@@ -153,16 +294,9 @@ component-driven. Not outstanding work — the argument, so it is not re-derived
   `normalize`. What is left of the first is a thumb sliding in a track, which is `SlideButton`'s.
 - **`radar` and `spiral` should not go at all**: four multipliers named `cdoMul`, `croMul`, `cuoMul`,
   `cloMul` — real algorithms behind a signature only their one caller can read.
-- **`RotationUtils.wrapIndex`** qualifies on the test — it needs only the language — and is staying here
-  anyway. The user's call, and the reason was practical rather than architectural: `ss-utils` was not cloned
-  on the machine this was being written on, so the move was deferred for the foreseeable future. It has one
-  implementation here and two callers, which is the whole of what the move would have bought.
-  **That premise is gone** now that `ss-utils` is `utils/` in this repo: the move would cost a file change
-  rather than a clone, a publish and a version bump. Recorded as changed circumstances, not as a reopened
-  question — the decision stands as taken until the user says otherwise.
 
 **Never staged, by category**: anything shaped around a component's own record (`SelectUtils`,
-`TreeUtils`, `ToastsUtils`); anything bound to a framework (`Interaction`, `Focus`, `FPS`,
+`TreeUtils`, `ToastsUtils`); anything bound to a framework (`InteractionTracker`, `FocusManager`, `FrameRateMonitor`,
 `ElementFader`, the SVG defs modules that return JSX — the arithmetic that used to be tangled into them has
 since moved to the Playground samples instead, so what is left here is markup and nothing else); anything adapting a
 third-party package (`DateValue`, `Virtualizer` over `@tanstack/solid-virtual`); and three near misses
@@ -200,7 +334,7 @@ than this one's. The user's instruction when it was commissioned: put the curve 
 wherever, because it is going to be copy-pasted into `ss-utils` later — and while building it, fill out the
 family rather than stopping at the one curve the caller needed, so the package arrives complete.
 
-**So it exports far more than has a consumer, and that is deliberate.** `Rotation` uses `ease` and nothing
+**So it exports far more than has a consumer, and that is deliberate.** `Rotator` uses `ease` and nothing
 else. Everything beside it — the four CSS keyword curves, and `in` / `out` / `inOut` for quad, cubic, quart,
 quint, sine, expo, circ, back, elastic and bounce — exists because a package of easings missing two thirds of
 the set is a package nobody reaches for. Do not prune it back to what the repo happens to call, and do not
@@ -303,8 +437,10 @@ parked. The rule above stands for the next foreign file that needs somewhere to 
 ### Compatibility arguments cite `components/src` and nothing else
 
 When arguing a modern CSS or JS feature is safe here, **only `components/src` counts** — it is the published
-package and the only thing with a support contract. `playground/src` is a harness and
-`playground/src/App/Samples` is scratch content; citing either is not an argument.
+package and the only thing with a support contract, **with one carve-out: `components/src/Samples` does not
+count.** It ships from the library now, but it is sample code a consumer copies or ignores rather than
+component internals, and it was written to the Playground's old licence. `playground/src` is a harness;
+citing either is not an argument.
 
 **A use that carries a fallback is not evidence for a use that doesn't.** Relative colour syntax
 appears 71 times in Samples and twice in `components/src`, both in `Composites/Surface/Surface.css.ts` and
@@ -414,7 +550,7 @@ _optional_ ref is declared by hand: `ModalProps` writes
 
 **The rule bites on plain numbers too, not only on refs.** A wheel's `idleDelayMs` is absent when the wheel is
 not to turn on its own, so a consumer switching that off at runtime has to return `undefined` from the accessor
-— and the accessorized form will not let them, because it promises a `number`. `RotationDefs` and the three
+— and the accessorized form will not let them, because it promises a `number`. `RotatorDefs` and the three
 wheel props types therefore all declare `getIdleDelayMs?: Accessor<number | undefined>` by hand. Worth stating
 because the ref cases read as being about refs: **any optional prop whose meaningful "off" value is `undefined`
 is in the same position**, and the type error arrives at the call site rather than at the declaration.
@@ -526,8 +662,8 @@ Shortcut: **if calling `fn(x())` would lose a subscription the callee needs, pas
 
 `ref` (if any) → enabled / visible / disabled → opts / defs. Prefer `getIsDisabled` over
 `getIsEnabled`. Examples: `ElementObserver.createViewportRectObserver(ref, visible, opts)`,
-`Interaction.wrapElement(ref, disabled, opts)`, `Focus.autoFocus(ref, visible)`,
-`ElementFader(visible, opts)`, `FPS.createMonitor(disabled, opts)`.
+`InteractionTracker.wrapElement(ref, disabled, opts)`, `FocusManager.autoFocus(ref, visible)`,
+`ElementFader(visible, opts)`, `FrameRateMonitor.create(disabled, opts)`.
 
 **An observer's name carries its coordinate space**, because the wrong one fails silently — it returns
 a plausible number wrong by the `Viewport` scale factor. `createViewportRectObserver` polls on
@@ -956,7 +1092,7 @@ options unselectable, and a disabled-but-reachable option can still receive focu
 explains itself. `Home` / `End` jump to the ends of the same set. All four arrows work regardless of
 `getDir`, which only drives layout.
 
-This required `computeIsReachable` to move from `InteractionWrapper` into `InteractionUtils`, since
+This required `computeIsReachable` to move from `InteractionWrapper` into `InteractionTracker`, since
 `Radio` computes the same predicate. Extracting rather than restating is the point: the predicate is
 settled and two copies would drift. It does not re-expose reachability to a _leaf_ — `Radio` is a preset
 one level above the leaf.
@@ -1751,7 +1887,7 @@ representable twice. Multi differs in behaviour, so the `BinarySwitch` shape is 
 erecting it before a second consumer would be guessing at the seam.
 
 **The keyboard walk stops on reachable-disabled options and refuses to select them**, matching `RadioGroup`.
-`getNavigableIndexes` calls `InteractionUtils.computeIsReachable` with the option's own three fields rather
+`getNavigableIndexes` calls `InteractionTracker.computeIsReachable` with the option's own three fields rather
 than re-deriving the rule.
 
 **`scrollIntoView({ block: "nearest" })` on the highlighted option** is the only way the library reaches a
@@ -1903,7 +2039,7 @@ tri-state for a partially-selected group header is the one thing multi might sti
 every option sets `pointer-events: all` explicitly (it has to, to beat `interactionRoot`'s `none`), and an
 explicit value on a descendant beats an inherited one. So a click aimed at whatever sat under a closing
 popup was swallowed by an option of a list already visually gone. `inert` disables an entire subtree for
-pointer events, focus and the accessibility tree regardless of descendants; `FocusUtils.isReachable` already
+pointer events, focus and the accessibility tree regardless of descendants; `FocusManager.isReachable` already
 tests `[inert]`, so support was assumed all along. **General rule: `pointer-events` on an ancestor cannot
 switch off a subtree, only `inert` can.**
 
@@ -1953,7 +2089,7 @@ The rule is repeated under `&:focus, &:focus-visible`, which outranks a plain ps
 it. What it gives up: a `Select` whose filter emptied the list has nothing painted as focused and is
 announced empty; a consumer wanting a ring there paints it on their own surface.
 
-**The initial focus is `Popover`'s, and a real bug is why.** `Menu` first called `FocusUtils.autoFocus`
+**The initial focus is `Popover`'s, and a real bug is why.** `Menu` first called `FocusManager.autoFocus`
 itself and focus stayed on the trigger: the root carries `visibility: hidden` until `Anchor` has produced a
 position, and a `visibility: hidden` element silently refuses `focus()`. Being positioned is `Popover`'s own
 state, so `getHasAutoFocus` moved the call inside, gated on `getPosition() !== undefined`. **The gate is a
@@ -1964,7 +2100,7 @@ depending on it directly would re-focus the surface on every scroll.
 live.** ARIA supports the attribute on composite roles — `menu` is one, `button` is not — so the APG variant
 with a single focus target puts both on the `role="menu"` element. The items are then `Select`'s options
 exactly: non-focusable `role="menuitem"` divs at `getIsTabbable={() => false}`, `isFocused` never true, and
-a highlight held as a value resolved to an index. `FocusUtils.autoFocus` restores focus to the trigger on
+a highlight held as a value resolved to an index. `FocusManager.autoFocus` restores focus to the trigger on
 close through the same `onCleanup` `Modal` relies on.
 
 **Two keydown handlers rather than `Select`'s one**, because the two states have different focus owners: the
@@ -1983,7 +2119,7 @@ click that follows does the closing. Every other blur still closes with no docum
 dismissal turned out to be `Select`'s exactly — `Escape` in a keydown, close on the focused element's blur,
 no document listener — while `Modal`'s is a different mechanism (document keydown, overlay click, focus trap,
 explicit restore). Two identical siblings and one that does not fit is not the shape that wants an
-`Abstract`; the thing genuinely shared with `Modal` was `FocusUtils.autoFocus`, which existed.
+`Abstract`; the thing genuinely shared with `Modal` was `FocusManager.autoFocus`, which existed.
 
 ### `Menu` submenus: a level per popup, focus moving between them
 
@@ -2067,7 +2203,7 @@ carried the same wrap-around arithmetic character for character:
 navigable[(((from + delta) % navigable.length) + navigable.length) % navigable.length];
 ```
 
-**It is `NavigationUtils.computeNextPosition(key, from, length, opts)` rather than a `createRovingIndex`
+**It is `NavigatorUtils.computeNextPosition(key, from, length, opts)` rather than a `createRovingIndex`
 factory, and `RadioGroup` is the reason.** The `create*` names in `Abstracts/` all mean "owns reactive state
 and returns accessors". A walker cannot be one, because the state is already owned by each component and
 owned _differently_: `Tabs`, `Select` and `Menu` hold a value signal and resolve it against the navigable
@@ -2125,7 +2261,7 @@ example passes `computeCustomText` for exactly that reason, and typing a route's
 the window. And an item whose paint is **not text** — a swatch, an avatar — has nothing to read.
 
 **The buffer is a factory and the matching is a pure function, which splits the opposite way to the walk.**
-`NavigationUtils.computeNextPosition` was deliberately not a factory because each control owns its cursor
+`NavigatorUtils.computeNextPosition` was deliberately not a factory because each control owns its cursor
 differently. The typeahead buffer is the reverse: a string and a timer, owned identically by all three, with
 nothing per-control about it. So `Typeahead.createBuffer` owns that state and
 `TypeaheadUtils.computeNextIndex` stays pure, taking positions and a text lookup and returning a position.
@@ -2246,7 +2382,7 @@ would overflow flips to the side with room, a walk that wraps at both ends, a re
 the flip earlier — and the numbers are worked out from that situation.
 
 **Covered: every `*.utils` module that neither touches the DOM nor builds JSX** — `Anchor`, `Navigation`,
-`Interaction`'s reachability predicate, `Audio`, `Select`'s flattening, `ElementHighlight`'s segment
+`InteractionTracker`'s reachability predicate, `Audio`, `Select`'s flattening, `ElementHighlight`'s segment
 geometry, `RichText`'s parser and the whole of `CellAnimation` (geometry, origins, all thirty-seven weight
 functions, zones, breakpoints). The weights are covered by property rather than value: every type stays
 inside 0..1, is deterministic, and — for the origin-free ones — is unaffected by moving the origin. Pinning
@@ -2255,8 +2391,8 @@ re-blessed wholesale by any change.
 
 **Deliberately not covered:**
 
-- **Anything taking an element or a Solid owner.** `Focus`, `ElementObserver`, `ElementFader`, `TextSync`,
-  `Anchor`'s own factory, `InteractionUtils.wrapElement` and `Viewport`'s rect adjustment all need a real
+- **Anything taking an element or a Solid owner.** `FocusManager`, `ElementObserver`, `ElementFader`, `TextSync`,
+  `Anchor`'s own factory, `InteractionTracker.wrapElement` and `Viewport`'s rect adjustment all need a real
   layout to say anything true. They are `e2e/`'s half.
 - **The SVG defs builders.** `SVGPatternDefsUtils`, `SVGGradientDefsUtils` and `SVGAnimationUtils` return
   JSX, and their arithmetic — tiling offsets, `resolveStops`' interpolation — is written inline inside the
@@ -2358,7 +2494,7 @@ demanding an answer must not be answerable by clicking next to it. `Escape` stil
 dialog must be escapable regardless of role. `ModalPage` carries it as a second variant, which is the honest
 demonstration — it shows the three props rather than hiding them.
 
-**`FocusUtils.autoFocus` reads the initial ref untracked, and "initial" is why.** The effect already depends
+**`FocusManager.autoFocus` reads the initial ref untracked, and "initial" is why.** The effect already depends
 on the container ref and visibility; a third dependency that can change while the dialog is open would
 re-run it, re-capture `previouslyFocused` as whatever is focused _now_, and restore focus to the wrong
 element on close. A ref assigned during render is set before effects run, so the common path is unaffected.
@@ -2527,7 +2663,7 @@ summing to one without a normalisation pass and dragging at one end never reflow
 boundary as a percentage over 0–100, `aria-orientation` states the axis, and the arrow keys for that axis
 move it by `keyStep`. A drag-only splitter is unreachable without a pointer.
 
-**The drag is local rather than `InteractionUtils.trackDrag`.** That helper measures the pointer against the
+**The drag is local rather than `InteractionTracker.trackDrag`.** That helper measures the pointer against the
 element it is attached to, right when the drag surface _is_ the measured surface (`Range`, `ColorArea`). Here
 the drag surface is the gutter and the measured surface is the container. If a third consumer of that shape
 appears, widening `trackDrag` to take a separate measuring ref is the change to argue then.
@@ -2963,8 +3099,8 @@ uses `constant` everywhere.
 **The library names no weight and knows nothing about origins.** `CellAnimation` took
 `getOriginType`, `getWeightType` and `getWeightOpts`, so the nine named origins and thirty-seven named
 weights were the only ones a consumer could have. Wrong ownership: a consumer wanting an origin the library
-never thought of, or a distribution driven by their own data, had no way in. All of them moved to
-`playground/src/App/Samples` as sample code to copy, extend or ignore.
+never thought of, or a distribution driven by their own data, had no way in. All of them moved out of the component and into
+`components/src/Samples` as sample code to copy, extend or ignore.
 
 **The weights slot is a callback taking the count.** The grid the component draws is not the grid the
 consumer asked for — the requested count is clamped against the measured pixel size, since cells thinner
@@ -3346,7 +3482,7 @@ identical.
 **Headers are all in the tab order, and the arrows are an extra rather than a roving order.** The published
 accordion pattern, and the opposite of `Tabs` and `RadioGroup`. The difference is what the collection means: a
 tab list or radio group is one control with several states, so it gets one stop; an accordion is several
-independent disclosures. Arrow, `Home` and `End` come from `NavigationUtils.computeNextPosition` unchanged,
+independent disclosures. Arrow, `Home` and `End` come from `NavigatorUtils.computeNextPosition` unchanged,
 moving focus without selecting.
 
 **Each header is wrapped in a real heading element, and its level is a prop.** `getHeadingLevel` defaults to
@@ -3551,7 +3687,7 @@ the same `Intl` path the day labels use. Politely, because paging is something t
 than news. The previous month arrives as the effect's own argument, so the first run has nothing to compare
 against and a calendar never talks about itself as it mounts.
 
-### `NavigationUtils.computeNextCell`: the two-axis walk never wraps and never clamps
+### `NavigatorUtils.computeNextCell`: the two-axis walk never wraps and never clamps
 
 Settled, beside the 1D walk rather than replacing it, and deliberately different at the edges.
 
@@ -3837,7 +3973,7 @@ being the stricter of the two.
 ### Pointer drag: a ratio, opt-in, and captured
 
 Settled, closing the primitive `backlog.md` #2 asked for.
-`InteractionUtils.trackDrag(ref, disabled, opts)` reports where a pointer is inside an element for as long as
+`InteractionTracker.trackDrag(ref, disabled, opts)` reports where a pointer is inside an element for as long as
 a drag lasts.
 
 **It is a separate call rather than part of `wrapElement`**, as item 1 asked: most controls want no listener
@@ -3859,7 +3995,7 @@ and any track-clicking slider need.
 
 ### The swipe: one gesture over the drag machinery, an axis it claims, and a verdict at the end
 
-Settled, closing the gesture `Abstract` `backlog.md` #26 asked for. `InteractionUtils.trackSwipe(ref,
+Settled, closing the gesture `Abstract` `backlog.md` #26 asked for. `InteractionTracker.trackSwipe(ref,
 disabled, opts)` reports how far a pointer has pushed an element along one axis, and at the release says
 whether that push counts. `Drawer` and `Carousel` are its two consumers.
 
@@ -4295,7 +4431,7 @@ Settled, replacing five stories: `Select` closed on its field's blur, `Menu` on 
 blur, `DatePicker` and `ColorInput` each ran their own document-wide press listener, and `Modal` its own
 document `keydown`.
 
-**`DismissStack` is a module-level array of open layers with one set of document listeners**, in the
+**`DismisserStack` is a module-level array of open layers with one set of document listeners**, in the
 `LiveAnnouncer` position — it belongs to no component and there is one of it. Not owned by `Viewport`: a
 consumer with no `Viewport` still needs dismissal, the events are the document's rather than any element's,
 and nesting a `Viewport` inside a `Viewport` would need cross-authority ordering a single array does not have.
@@ -4333,7 +4469,7 @@ chain orders itself without anyone counting.
 
 **Why not the stack.** Open order and paint order are different questions: a `Modal` opened _from_ a menu
 should cover the menu that opened it, and the anchor chain says so while a counter does not. It also keeps
-`DismissStack` a listener rather than something that paints, and leaves a consumer's own stacking free of a
+`DismisserStack` a listener rather than something that paints, and leaves a consumer's own stacking free of a
 number the library invented.
 
 **`Tooltip` takes the same number and no longer takes a prop.** `computeZIndex` went with this change: it
@@ -4350,7 +4486,7 @@ inside its popup, and a popup is portalled to the end of the document — so the
 of the calendar rather than a descendant, and `contains` reported the click as outside. Every nested popup has
 this shape.
 
-`DismissUtils.getIsWithinOwnedLayer(target, roots)` walks up from the pressed element, and every time it
+`DismisserUtils.getIsWithinOwnedLayer(target, roots)` walks up from the pressed element, and every time it
 reaches an element something else points at with `aria-controls` it jumps to that controller and keeps
 walking. The select's list is controlled by its field, the field is inside the calendar, so the press resolves
 as inside. **Ownership is already in the markup**, put there for screen readers, so nothing has to be
@@ -4645,8 +4781,8 @@ Settled, closing a defect found while writing `e2e/range.spec.ts`: on a **disabl
 and `ColorAreaElement` forwards the `role="group"` rather than either slider, so every other focusable element
 was outside all of it at a native `tabIndex` of 0.
 
-**`InteractionUtils.wrapExtraControls(getRefs, getIsDisabled, opts)` is the fix, and it is deliberately only
-the disabled half.** It sets `tabIndex` and attaches the same focus refusal, and it is in `InteractionUtils`
+**`InteractionTracker.wrapExtraControls(getRefs, getIsDisabled, opts)` is the fix, and it is deliberately only
+the disabled half.** It sets `tabIndex` and attaches the same focus refusal, and it is in `InteractionTracker`
 rather than either leaf because two components needed it the day it was written.
 
 **Reachability deliberately does not enter into it, which keeps the fix small.** A control reachable while
@@ -5078,7 +5214,7 @@ positions its popup against that element instead of its own trigger.
 **The positioning is the smaller half; the dismissal is the point.** `Popover` builds its dismiss roots as
 `[the popup, the anchor]`, so whatever element is the anchor is inside the layer and a press on it is not an
 outside press. Before this a consumer's own toggle button was outside, so pressing it while open dismissed the
-menu and the handler re-opened it. Making that button the anchor fixes it without `DismissStack` learning
+menu and the handler re-opened it. Making that button the anchor fixes it without `DismisserStack` learning
 anything new.
 
 **A split button is now a composition rather than a missing feature**: the arrow half is the anchor, the main
@@ -5156,7 +5292,7 @@ consumer wanting the server to filter runs a new search on a query change and re
 then pages within that query. Note that `Home` and `End` are already suppressed on a filterable field, so the
 wrap rule below is the only keyboard behaviour applying to a fetched autocomplete.
 
-**An incomplete list does not wrap, and that is `Select`'s call rather than `NavigationUtils`'s.** The 1D walk
+**An incomplete list does not wrap, and that is `Select`'s call rather than `NavigatorUtils`'s.** The 1D walk
 still answers _which position is next_ and still wraps; `Select` answers _whether to go there_, and refuses
 when the step would carry off either end while more options exist. No option was added to
 `computeNextPosition`, because three of its four callers are closed rings and would gain a mode they can never
@@ -5506,15 +5642,14 @@ then one per thing it imports; inside a tab, an `Accordion` with the imported fi
 needs a special case.
 
 **A tab is not every file in the folder**, the version that looks simpler and is wrong: a page folder would
-drag in a 600-line props panel and `Samples/SVGDefs` would drag in sixty samples. It is the file that was
-imported, plus its style and types siblings.
+drag in a 600-line props panel. It is the file that was imported, plus its style and types siblings.
 
 **Only `playground/src` imports become tabs; everything from `components/src` stays opaque.** The line is what the
 consumer has to write: the Playground half is theirs to reproduce, the library half is already written for
 them. `@thewaver/ss-utils` and `solid-js` are on the library side for the same reason.
 
-**Depth stops where the code stops being consumer-shaped.** Tabs follow imports transitively through `Samples`
-and `StyledComponents`, and one level everywhere else. Not arbitrary: _"The three trees"_ defines
+**Depth stops where the code stops being consumer-shaped.** Tabs follow imports transitively through
+`StyledComponents`, and one level everywhere else. Not arbitrary: _"The three trees"_ defines
 `PageComponents` as what the Playground would still need if the library did not exist, which is exactly the code
 nobody copies. Following everything would put `Theme.css` on every example in the app.
 
@@ -5525,13 +5660,15 @@ other folder and one constant decides whether it survives, in the shape `SHOW_CO
 **The default is not the user's call, it is this file's** — on, so the path stays exercised and the question
 gets answered by looking at a real page.
 
-### Playground samples: one file per key, and the key is the file's name
+### Samples: one file per key, and the key is the file's name
 
 The same decision from the other end, and why `Samples/` had to be reorganised first.
 
 **A sample is a file, and the registry is an index that imports them.** `SVGDefs.const.tsx` was 2534 lines
 holding three registries; a tab showing it would have been useless whatever it cost to load. Splitting was
-never about weight — the source is fetched on demand — but about a tab a person can read.
+never about weight — the source is fetched on demand — but about a tab a person can read. That tab is gone now
+that the samples ship from the library, and the split earns its keep on a second ground it did not have at the
+time: one file is what a consumer can import on its own. See _"Samples live in the library"_.
 
 **The key is the file's name, which is what lets a runtime selection find its source.** The example imports the
 whole registry and indexes it with a key from the props panel, so nothing in its own imports says which sample
@@ -5540,7 +5677,7 @@ mechanisms that never have to know about each other: the example's imports give 
 key gives the sample tab. It also makes renaming a sample and renaming its file the same act.
 
 **Keys collide across registries, so the samples sit one folder down per registry.** `plain` exists in both
-`Pattern` and `Gradient`; `Samples/SVGDefs/Samples/Gradient/plain.ts` keeps the name-is-the-key rule intact.
+`Pattern` and `Gradient`; `Samples/SVGDefs/Gradient/plain.tsx` keeps the name-is-the-key rule intact.
 
 **Nothing is folded into a factory.** `circle("grid")` produced three of the pattern samples from one helper,
 and a file whose whole content is that call teaches nobody anything — the reader still has to open a second
@@ -5548,13 +5685,14 @@ tab. Each sample is written out. The line, taken from what `Gradient` already di
 explicit, while small shared helpers that are not the point of any sample — a base colour, a diagonal offset —
 stay shared and get a tab of their own when opened. The total line count goes up, deliberately.
 
-**A registry is only split when a tab of it would be unreadable, which is not every registry.**
+**A registry is only split when a tab of it would be unreadable, which is not every registry.** The tab is
+gone; the line it drew is kept, now read as "unreadable in one file". Which registries are split has not moved.
 `CellAnimationZones` and `CellAnimationOrigins` are 71 and 31 lines of one-line entries, and splitting those
 produces files shorter than their own import headers — the same emptiness that unfolding the pattern factories
 avoided, from the other direction. They get a folder and keep their registry whole. The rule is the goal
 restated: split until a tab reads, and stop. Split so far: `SVGDefs` (2534 lines), `CellAnimation` (600),
 `CellAnimationWeights` (515). Left whole: `CellAnimationZones`, `CellAnimationOrigins`,
-`CellAnimationBreakpoints`, `ScanlineAnimationKeyframes`, the largest at 123 lines.
+`CellAnimation/Breakpoints`, `ScanlineAnimation/Keyframes`, the largest at 123 lines.
 
 **A Playground namespace may not share a name with a library one, and the source view is what makes that a
 rule.** The keyframe helpers were `CellAnimationUtils`, which `Lib/Exotics` already exports for something else
@@ -5563,10 +5701,11 @@ code was only ever read in an editor that could tell you which was which. A tab 
 which is exactly the confusion a tab cannot resolve. The Playground one is now `CellAnimationKeyframeUtils`.
 
 Two smaller rules fell out, both house style everywhere else and broken only in the files this split created.
-**A `.utils.ts` exports a namespace**, like `InteractionUtils`, `TreeUtils` and `SelectUtils`; `SVGDefsUtils`
-and `CellAnimationWeightUtils` were bare exports and are not any more. And **a samples folder is named after
-the namespace it exports** — the keyframes folder was `CellAnimation/` while exporting
-`CellAnimationKeyframes`.
+**A `.utils.ts` exports a namespace**, like `InteractionTracker`, `TreeUtils` and `SelectUtils`; `SVGDefsUtils`
+and `CellAnimationWeightUtils` were bare exports and are not any more. And **the folder path names the
+namespace it exports** — the keyframes folder was `CellAnimation/` while exporting `CellAnimationKeyframes`.
+Since the restructure the path carries it in two parts rather than one: `CellAnimation/Keyframes` exports
+`CellAnimationKeyframes`, and the file inside still holds the whole name. See _"How Samples is laid out"_.
 
 **What is not shipping, and why it looks as though it should.** `fromStops` and the 3×3 matrix maths beside it
 turn a list of keyframe stops into the evaluation function `CellAnimation` asks for, so a consumer wanting
@@ -5583,6 +5722,44 @@ the registry needs the sample files, which is a cycle, so the types have to come
 a namespace of the same name, because a `namespace` does not merge across ES modules and any file wanting both
 would import one identifier twice. Plain exported type names are what the rest of the repo uses (see _"House
 style"_), and the namespace stays on the value side only.
+
+### A sample registry and the machinery that runs it are separate modules
+
+The rule: **a module a consumer imports for behaviour may not import the samples.** Machinery takes the sample
+itself; the registry that maps a name to a sample is its own export in the `.const.ts`, and only code driven by
+a runtime string — the Playground's dropdowns — touches it.
+
+**Why file layout alone did not achieve this.** The samples were already one file each, and that made no
+difference to what a consumer pays for: `CellAnimationWeights.const.ts` imported all sixty back into a
+`Record<WeightType, WeightFn>` and `computeCellWeights` looked its entry up by a string. A bundler cannot know
+which string arrives, so it keeps every entry — the lookup table, not the file count, is what defeats
+tree-shaking. Splitting the registries was for the source-view tabs and remains justified on that ground alone.
+
+**What moved.** `computeCellWeights` (with its private `normalizeWeights` / `makeWeightsUnique`) went to
+`CellAnimationWeights.utils.ts` and now takes a `WeightFn`. `computeAnimation` went to
+`CellAnimationKeyframes.utils.ts` and now takes a `CellAnimationFn`. Each `.const.ts` exports its registry as
+`SAMPLE_WEIGHTS` / `SAMPLE_ANIMATIONS`, matching the `SAMPLE_CONFIGS` / `SAMPLE_LAYOUTS` / `SAMPLE_INDENTS`
+names the other registries already used.
+
+**The key-based call is kept, as a one-line forwarder in the registry module.** `CellAnimationWeights.computeCellWeights("lineRow", …)` still works and every Playground call site is unchanged. This is not two APIs
+competing: the forwarder lives in the module that already costs the whole collection, so anyone paying for the
+registry keeps the ergonomic call, and anyone who wants one sample imports the sample and the utils module.
+
+**Measured, bundled with esbuild, minified / gzipped.** Weights: 19.4K / 6.0K for the registry path against
+5.7K / 2.5K for one sample. Keyframes: 27.3K / 7.1K against 13.7K / 4.8K.
+
+**Two shapes needed nothing.** `SVGDefs` was already correct — `SVGDefs.const.ts` holds only `SAMPLE_COLORS`
+and the three `SAMPLE_CONFIGS` registries, no sample imports the registry, and every helper the samples use
+(`SVGDefs.utils`, `SVGPatterns.const`, `SVGAnimations.const`, `SVGAnimationTracks.const`) is sample-free. The
+registries left whole under the split rule — `CellAnimation/Zones`, `CellAnimation/Origins`,
+`CellAnimation/Breakpoints`, `ScanlineAnimation/Keyframes`, `Formation/Layouts` and `Staircase/Indents` —
+define their samples inline in the same file, so there is no lighter path to offer without
+splitting them, which _"a registry is only split when a tab of it would be unreadable"_ already decided
+against.
+
+**A `namespace` compiles to one object, so it is opaque to tree-shaking.** This is why the utils modules are
+the right home for machinery and the wrong home for a collection: everything in one is kept together. The
+measurement above already includes each utils namespace whole.
 
 ### Controls: `Paginator`, where the arithmetic is the component
 
@@ -5787,16 +5964,10 @@ path is a plain literal rather than anything derived: `import.meta.glob` keys ar
 `/src/App/Pages/ShapePage/Examples/Default.tsx` is the same string the resolver looks up, and a typo
 produces an empty tab rather than a wrong one.
 
-**The current sample is declared too, as a key qualified by its sub-registry.** `sampleKeys` returns
-`["Gradient/sweep_diag_1v1", "Pattern/plain", "Iteration/constant"]`, and the resolver looks each up under
-whichever `Samples/<Registry>/Samples/` folder the example's imports reached. The qualifier is not decoration:
-_"Keys collide across registries"_ records that `plain` exists in both `Pattern` and `Gradient`.
-
-**Derived: a registry's own sample files are reached by key and never by import-following.** The two settled
-rules pull opposite ways — tabs follow imports transitively through `Samples`, and a tab is not every file in a
-folder — and `SVGDefs.const.ts` imports all fifty of its samples, so following it produces the sixty-tab
-outcome the second rule prevents. The resolver skips any specifier landing inside a `<Registry>/Samples/`
-folder. Nothing is lost: those files are exactly what the key mechanism resolves.
+**The sample-key mechanism is gone, along with the samples it addressed.** `sampleKeys` on `ExampleDefs`,
+the `<Registry>/Samples/` resolver and the skip rule that stopped a registry dragging in sixty tabs all went
+when the samples moved into the library, where the "everything from `components/src` stays opaque" rule covers
+them for free. See _"Samples live in the library"_.
 
 **Derived: a tab is a name, not a file, so `.const`, `.utils`, `.types` and `.css` collapse into one.** The
 settled rule says the imported file plus its `.css.ts` and `.types.ts` siblings. Applied literally to
@@ -5822,7 +5993,8 @@ as text comes back compiled and with no default export — `codeToHtml` then rec
 renders nothing. `?source` resolves to an id no other plugin recognises (a null-byte prefix and a `.source`
 extension) and is read off disk by the plugin itself. The only part of the feature living outside `src`.
 
-**An example is given the key rather than the resolved sample, and three pages changed to do it.** `Shape`
+**An example is given the key rather than the resolved sample, and three pages changed to do it.** Still true
+of what the example's own body shows, though the tab that displayed the resolved sample is gone. `Shape`
 passed `getStrokeConfig`, `getFillConfig` and `getIterationConfig` already looked up; `CellAnimation` passed a
 `computeCellWeights` closure and a resolved origin; `ScanlineAnimation` passed a `computeCellWeights` closure.
 All three now pass keys and the example does the lookup in its own body, which is the line the reader came to
@@ -5885,10 +6057,10 @@ third demo — the component with no satellite at all — was excluded on the us
 `with nothing to attach there is no wrapper either` went with it. The behaviour is still covered by unit
 tests; what is gone is the browser's confirmation of it.
 
-**Where a sample registry is not split, the key is still the example's to resolve.** `FormationLayouts` and
-`StaircaseIndents` are 80 and 46 lines and stay whole, so no `sampleKeys` entry can resolve to a file — but the
-example is still handed `getLayoutKey` / `getIndentKey` and does the lookup in its own body, because that is
-the line the reader came for. The registry it imports becomes a tab either way.
+**Where a sample registry is not split, the key is still the example's to resolve.** `Formation/Layouts` and
+`Staircase/Indents` are 80 and 46 lines and stay whole. The example is handed `getLayoutKey` / `getIndentKey`
+and does the lookup in its own body, because that is the line the reader came for. `sampleKeys` and the tab it
+produced are both gone; see _"Samples live in the library"_.
 
 **The turn count is a panel knob, and a spin style is handed it rather than owning one.** Asked for by the
 user: the page exposed how long a spin lasts but not how far it goes in that time, so the only thing the
@@ -6242,8 +6414,8 @@ where there is nothing to position. Lifted from the original, which did the same
 
 **A step's indent comes from a function of its index**, and the four curves the original shipped —
 linear, a broken bilinear, repeating, alternating — are `CellAnimation`'s weights again: one opinion about how
-to author the function the component actually asks for. They are Playground samples under
-`Samples/StaircaseIndents`, and only the linear default lives in the component, because a component with a
+to author the function the component actually asks for. They are samples under
+`Samples/Staircase/Indents`, and only the linear default lives in the component, because a component with a
 required function and no default cannot be written down in one line.
 
 **The direction knob hands the steps back to front instead of being passed down.** Every one of the original
@@ -6295,12 +6467,12 @@ fallback — 94.07%, and Firefox 121, which is **ten months later than the unit 
 published package already requires a strictly newer browser than this does, in the one component every control
 passes through.
 
-### `Rotation`: the behaviour both wheels share, with no DOM of its own
+### `Rotator`: the behaviour both wheels share, with no DOM of its own
 
 **A wheel that spins to an index is arithmetic plus a small state machine, and neither is markup.** The
 original had a `useRotationEffect` hook shared by its two wheels and left everything else — where to stop, how
-far to overshoot, whether to idle — in a consumer hook beside the styled components. `Abstracts/Rotation` takes
-the whole of it: `RotationUtils` is the pure angle maths with unit tests, and `createRotation(ref, disabled,
+far to overshoot, whether to idle — in a consumer hook beside the styled components. `Abstracts/Rotator` takes
+the whole of it: `RotationUtils` is the pure angle maths with unit tests, and `createRotator(ref, disabled,
 defs)` holds the phase, the timers and the holds.
 
 **The angle only ever increases.** `getSpinAngle` rounds the current angle up to a whole turn, adds the turns
@@ -6338,7 +6510,7 @@ consumer to hand anything to — the component that owns the element owns the ha
 vocabulary beats two in two vocabularies for the same thing.
 
 **The wheel computes its own angle every frame; CSS no longer interpolates anything.** This replaced the
-original arrangement, in which `Rotation` set a target angle, published a duration and a timing-function name,
+original arrangement, in which `Rotator` set a target angle, published a duration and a timing-function name,
 and let a `transition` on the wedge do the moving while a `setTimeout` of the same length stood in for "the
 turn has finished". The user asked for the change, and the reason is that the browser was the only thing that
 knew where the wheel actually was. Mid-transition the angle signal already held the destination, so nothing in
@@ -6429,8 +6601,8 @@ playing flag was doing two jobs at once, so it is split at the seam the user nam
 while the wheel turns by itself, `getIsUserSpinning` while it is fetching a target, spinning to it or settling
 on it. Both are views of `getPhase`, which remains for anyone wanting the four states apart.
 
-**`createRotation` no longer takes an element.** The hold was its only use for one, so the abstract is now what
-its own heading claimed: a state machine with no DOM whatsoever. `InteractionUtils.trackPageHidden` was split
+**`createRotator` no longer takes an element.** The hold was its only use for one, so the abstract is now what
+its own heading claimed: a state machine with no DOM whatsoever. `InteractionTracker.trackPageHidden` was split
 out of `trackHold` so the page-visibility half could be used without the pointer and focus halves; `trackHold`
 composes it and is unchanged for `Carousel` and `Toasts`.
 
@@ -6677,16 +6849,16 @@ scale factor, and layout numbers are what a positioner has to write back out.
 **Three components pause while somebody is looking at them, and each had written the test out.** `Toasts`
 stops its countdowns, `Carousel` stops advancing, and a wheel stops turning by itself; all three meant
 `hovered || focus within || page hidden`, and all three carried their own four handlers, their own
-`visibilitychange` effect and their own copy of a `getHasLeft` guard. `InteractionUtils.trackHold(ref)` is now
+`visibilitychange` effect and their own copy of a `getHasLeft` guard. `InteractionTracker.trackHold(ref)` is now
 the only copy, and the user's call was to convert the two existing components rather than leave them pointing
 at it.
 
-**It sits in `Interaction` rather than in a folder of its own.** `InteractionUtils.wrapElement` already turns an
+**It sits in `InteractionTracker` rather than in a folder of its own.** `InteractionTracker.wrapElement` already turns an
 element's pointer and keyboard events into state; this is the same job one level out — the region rather than
 the control — and `trackDrag` had already established the `track*` verb for "attach listeners, hand back a
 signal". A folder for one function would have been discoverable only by someone who already knew it existed.
 
-**Why it carries a Level A requirement rather than being a nicety**: see 2.2.2 under `Rotation`. That is the
+**Why it carries a Level A requirement rather than being a nicety**: see 2.2.2 under `Rotator`. That is the
 argument for one copy. Three copies of a conformance behaviour can drift apart silently, and the fourth
 component to want it copies whichever it finds first.
 
@@ -6714,12 +6886,10 @@ named for something it is not: it does not hold, because a carousel's own vocabu
 `getIsRotating`, `renderRotationControl`, `CarouselRotationFlags`. That the old export has to stay: it does not
 hold either, since a one-line re-export is a cost every arrangement but "leave both" would pay.
 
-**What does hold is that the function is not angular arithmetic, so `RotationUtils` is not strictly its home
-either.** Wrapping an integer needs nothing but the language, which is the `ss-utils` test, and `MathUtils` is
-where the sixteen hand-written clamps went for exactly that reason. **It is staying here regardless** — the
-user has deferred the move indefinitely, since that package is not cloned on this machine, and it is listed
-with the other kept candidates under _"What went to `ss-utils`"_. Nothing is outstanding: one implementation
-with two callers is what the move would have achieved, and this is not a task waiting to be finished.
+**What held is that the function is not angular arithmetic, so `RotationUtils` was not strictly its home
+either.** It is now `MathUtils.wrapIndex` in `ss-utils`, and `RotationUtils` — which lives in that package too
+these days — reaches for it like any other caller. See _"What went to `ss-utils`"_. The published
+`CarouselUtils.wrapIndex` alias is unchanged and now points there.
 
 ### A Playground page returns a fragment, and its demos sit in a `PageMeasureBox`
 

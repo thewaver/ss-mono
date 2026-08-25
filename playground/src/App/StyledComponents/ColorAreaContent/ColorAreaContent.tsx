@@ -4,7 +4,7 @@ import { access } from "@thewaver/ss-components";
 import { Color } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-import { PageColorChannels } from "../../StyledComponents/ColorChannels/ColorChannels";
+import { PageColorChannels } from "../ColorChannels/ColorChannels";
 import type {
     ColorAreaContentProps,
     ColorFieldTriggerProps,

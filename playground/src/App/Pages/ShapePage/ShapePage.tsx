@@ -1,7 +1,7 @@
 import { For, createMemo, createSignal, createUniqueId } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { Shape, access } from "@thewaver/ss-components";
+import { SVGDefsSamples, Shape, access } from "@thewaver/ss-components";
 import { ShapeConst } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -10,7 +10,6 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
-import { SVGDefsSamples } from "../../Samples/SVGDefs/SVGDefs.const";
 import {
     PageCheckField,
     PageColorField,
@@ -244,11 +243,6 @@ export const ShapePage = () => {
                 name: "Default",
                 component: () => <DefaultExampleWrapper {...commonProps} />,
                 path: DEFAULT_EXAMPLE_PATH,
-                sampleKeys: () => [
-                    `Gradient/${getStrokeConfigKey()}`,
-                    `Pattern/${getFillConfigKey()}`,
-                    `Iteration/${getIterationConfigKey()}`,
-                ],
             },
             {
                 key: "stressTest",

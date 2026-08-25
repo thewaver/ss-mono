@@ -1,4 +1,4 @@
-import type { AccessorProps, InteractionFlags, RotationPhase, WheelWedgeState } from "@thewaver/ss-components";
+import type { AccessorProps, InteractionFlags, RotatorPhase, WheelWedgeState } from "@thewaver/ss-components";
 
 export type PageWheelWedgeProps = AccessorProps<{
     state: WheelWedgeState;
@@ -17,5 +17,5 @@ export type PageWheelPipProps = AccessorProps<{
 
 export type PageWheelSpinProps = AccessorProps<{
     flags: InteractionFlags;
-    phase: RotationPhase | undefined;
+    phase: RotatorPhase | undefined;
 }>;

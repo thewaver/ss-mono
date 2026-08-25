@@ -1,8 +1,8 @@
 import { ImageMosaic, access } from "@thewaver/ss-components";
 
-import { MosaicImages } from "../../../Samples/MosaicImages/MosaicImages.const";
 import { PageMosaicLink } from "../../../StyledComponents/MosaicContent/MosaicContent";
 import type { ImageMosaicExampleProps } from "../ImageMosaicPage.types";
+import { MosaicImages } from "../MosaicImages.const";
 
 type Props = ImageMosaicExampleProps;
 

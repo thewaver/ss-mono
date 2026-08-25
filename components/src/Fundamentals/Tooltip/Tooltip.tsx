@@ -3,7 +3,7 @@ import { Portal } from "solid-js/web";
 
 import { Anchor } from "../../Abstracts/Anchor/Anchor";
 import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
-import { FocusUtils } from "../../Abstracts/Focus/Focus.utils";
+import { FocusManager } from "../../Abstracts/FocusManager/FocusManager";
 import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
 import type { TooltipProps } from "./Tooltip.types";
@@ -74,7 +74,7 @@ export const Tooltip = (props: TooltipProps) => {
 
         const anchorRef = access(props.anchorRef);
 
-        if (FocusUtils.getIsRestoringFocus()) return;
+        if (FocusManager.getIsRestoringFocus()) return;
         if (anchorRef && !anchorRef.matches(":focus-visible")) return;
 
         focusTimeout = setTimeout(() => {

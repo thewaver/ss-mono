@@ -13,5 +13,4 @@ export type SourceGroup = {
 
 export type SourceViewProps = AccessorProps<{
     path: string;
-    sampleKeys?: string[];
 }>;

@@ -1,6 +1,6 @@
 import type { Accessor, JSX, Signal } from "solid-js";
 
-import type { InteractionFlags } from "../../../Abstracts/Interaction/Interaction.types";
+import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { AccessorProps } from "../../../Utils/typeUtils";
 import type {
     InteractionControlProps,

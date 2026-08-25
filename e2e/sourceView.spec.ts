@@ -44,9 +44,11 @@ test("a file reached only through a displayed sibling is not followed", async ({
     const names = await tabNames(page);
 
     expect(names[0], "the example's own file is still the first tab").toBe("Avatar");
-    expect(names, "the sample registry it imports itself is a tab").toContain("SVGDefs");
     expect(names, "the stylesheet it imports is a section of its own folder rather than a tab").not.toContain(
         "Avatar.css",
+    );
+    expect(names, "and the defs registry it draws from ships in the library now, so it is opaque").not.toContain(
+        "SVGDefs",
     );
 });
 
@@ -62,33 +64,30 @@ test("the sections of a tab are the imported file plus its style and type siblin
     ).toEqual(["Card.tsx", "Card.css.ts"]);
 });
 
-test("the sample the props panel currently selects gets a tab of its own", async ({ page }) => {
+test("a sample gets no tab, and neither does the registry it lives in", async ({ page }) => {
     await page.goto("/shape");
     await openSource(page, "default");
 
     const names = await tabNames(page);
 
     expect(names[0], "the example is still first").toBe("Default");
-    expect(names, "the registry it imports is a tab").toContain("SVGDefs");
     expect(names, "the page's own types and stylesheet resolve as one more folder").toContain("ShapePage");
-    expect(names, "and the gradient the props panel is showing is resolved from its key to its own file").toContain(
-        "Gradient/sweep_diag_1v1",
-    );
-    expect(names, "as are the pattern and the iteration").toEqual(
-        expect.arrayContaining(["Pattern/plain", "Iteration/constant"]),
-    );
+    expect(names, "the registry the example imports arrives by package name and stays opaque").not.toContain("SVGDefs");
+    expect(
+        names.filter((name) => name.includes("/")),
+        "and nothing is resolved from a props-panel key any more, which is what the qualified names were",
+    ).toEqual([]);
 });
 
 test("switching tabs replaces the sections and closing the modal needs no source button", async ({ page }) => {
     await page.goto("/shape");
     await openSource(page, "default");
 
-    await page.locator(TAB, { hasText: "SVGDefs" }).first().click();
+    await page.locator(TAB, { hasText: "ShapePage" }).first().click();
 
     const sections = (await page.locator(SECTION_HEADER).allTextContents()).map((text) => text.replace("▶", "").trim());
 
-    expect(sections, "the registry's own folder is what is listed now").toContain("SVGDefs.const.ts");
-    expect(sections, "with the types beside it").toContain("SVGDefs.types.ts");
+    expect(sections, "the page's own folder is what is listed now").toEqual(["ShapePage.types.ts", "ShapePage.css.ts"]);
 
     await page.keyboard.press("Escape");
     await expect(page.locator(DIALOG), "and Escape still closes the modal").toHaveCount(0);

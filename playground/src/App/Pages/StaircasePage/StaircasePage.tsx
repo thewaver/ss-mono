@@ -1,12 +1,12 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { StaircaseIndents } from "@thewaver/ss-components";
 import type { StaircaseDir } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { StaircaseIndents } from "../../Samples/StaircaseIndents/StaircaseIndents.const";
 import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import type { StaircaseExampleProps } from "./StaircasePage.types";

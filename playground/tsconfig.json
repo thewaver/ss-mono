@@ -2,7 +2,6 @@
     "extends": "../tsconfig.base.json",
     "compilerOptions": {
         "paths": {
-            "@components/*": ["../components/src/*"],
             "@thewaver/ss-components": ["../components/src/index.ts"],
             "@thewaver/ss-utils": ["../utils/src/index.ts"]
         }

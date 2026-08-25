@@ -1,22 +1,24 @@
 import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { access } from "@thewaver/ss-components";
+import {
+    CellAnimationBreakpoints,
+    CellAnimationKeyframes,
+    CellAnimationOrigins,
+    CellAnimationWeights,
+    SVGDefsSamples,
+    access,
+} from "@thewaver/ss-components";
+import type { WeightOpts } from "@thewaver/ss-components";
 import type { Point2d } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { SVGDefsSources } from "../../PageComponents/SVGDefsSources/SVGDefsSources.const";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
-import { CellAnimationBreakpoints } from "../../Samples/CellAnimationBreakpoints/CellAnimationBreakpoints.const";
-import { CellAnimationKeyframes } from "../../Samples/CellAnimationKeyframes/CellAnimationKeyframes.const";
-import { CellAnimationOrigins } from "../../Samples/CellAnimationOrigins/CellAnimationOrigins.const";
-import { CellAnimationWeights } from "../../Samples/CellAnimationWeights/CellAnimationWeights.const";
-import type { WeightOpts } from "../../Samples/CellAnimationWeights/CellAnimationWeights.types";
-import { SVGDefsSamples } from "../../Samples/SVGDefs/SVGDefs.const";
-import { SVGDefsSources } from "../../Samples/SVGDefs/SVGDefsSources.const";
 import {
     PageCheckField,
     PageFileField,
@@ -61,7 +63,7 @@ const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
 ];
 
 const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Default.tsx";
-const DRAWN_SOURCE_PATH = "/src/App/Samples/SVGDefs/SVGDefsSources.const.ts";
+const DRAWN_SOURCE_PATH = "/src/App/PageComponents/SVGDefsSources/SVGDefsSources.const.ts";
 
 const MIN_CELL_COUNT = 1;
 const MAX_CELL_COUNT = 40;
@@ -246,7 +248,6 @@ export const CellAnimationPage = () => {
                 name: "A photograph, sliced",
                 component: () => <ImageExampleWrapper {...commonProps} />,
                 path: DEFAULT_EXAMPLE_PATH,
-                sampleKeys: () => [getAnimationType(), getWeightType()],
             },
             {
                 key: "gradient",
@@ -255,7 +256,6 @@ export const CellAnimationPage = () => {
                     "the Shape page's own gradients, serialised into a source — the start and the pause a script would have timed are written into the markup instead, so they run at the same length and rhythm as the cells",
                 component: () => <GradientExampleWrapper {...commonProps} />,
                 path: DRAWN_SOURCE_PATH,
-                sampleKeys: () => [getAnimationType(), getWeightType()],
             },
             {
                 key: "pattern",
@@ -264,7 +264,6 @@ export const CellAnimationPage = () => {
                     "the same for the patterns, which flow on without a pause — a repeating fill has no beat to be out of step with",
                 component: () => <PatternExampleWrapper {...commonProps} />,
                 path: DRAWN_SOURCE_PATH,
-                sampleKeys: () => [getAnimationType(), getWeightType()],
             },
             {
                 key: "stressTest",

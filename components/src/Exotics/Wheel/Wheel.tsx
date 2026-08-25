@@ -3,7 +3,7 @@ import { Index, Show, createMemo, onMount } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
-import { Rotation } from "../../Abstracts/Rotation/Rotation";
+import { Rotator } from "../../Abstracts/Rotator/Rotator";
 import { access } from "../../Utils/propUtils";
 import type { WheelAxis, WheelController, WheelFace, WheelProps, WheelWedgeState } from "./Wheel.types";
 import { DRUM_PERSPECTIVE_PX, WheelUtils } from "./Wheel.utils";
@@ -25,7 +25,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
 
     const getWedgeSize = createMemo(() => access(props.wedgeSize) ?? DEFAULT_WHEEL_WEDGE_SIZE);
 
-    const rotation = Rotation.createRotation(getIsDisabled, {
+    const rotation = Rotator.createRotator(getIsDisabled, {
         stepCount: getWedgeCount,
         spinDurationMs: props.spinDurationMs,
         settleDurationMs: props.settleDurationMs,

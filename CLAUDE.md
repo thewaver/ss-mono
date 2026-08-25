@@ -157,6 +157,21 @@ start. They keep `npm start` running while working, and losing it interrupts the
 serves a production preview on its own port and `reuseExistingServer` handles a stale one, so it never
 needs the dev server out of the way — and if a port really is taken, say so rather than clearing it.
 
+**Read from git freely; never write to it.** Stated by the user as exactly that split, after two replies
+in a row ended by offering to push for them. Any read is fine and needs no permission — `status`, `log`,
+`diff`, `show`, `blame`, `ls-remote`, and `pull` to bring the local copy up to date before checking
+something. Everything that changes the repository is theirs: `add`, `commit`, `push`, `branch`, `merge`,
+`rebase`, `reset`, `checkout`, `stash`, `tag`, and anything else that leaves a mark. So when a git action
+is the answer, name the command and stop; do not run it, and do not close by asking whether they want it run.
+
+**A drafted commit message keeps the `Co-Authored-By` trailer, and that is the only place credit appears.**
+The user weighed the stigma against the openness of crediting the work and chose to keep the trailer, so it
+stays as standing practice and is not a question to reopen. They then asked that it not be louder than that:
+one quiet line at the foot of the message, and nothing else anywhere. No `🤖 Generated with…` banner in a PR
+body, no "written by Claude" note in a commit body, a doc, a README or a code comment, and no rephrasing of
+the work in a reply to foreground who did it. The trailer carries the credit; everything else reads as
+shouting.
+
 ## Writing code
 
 **When you find something broken and can fix it, fix it — do not stop to ask.** Stated by the user on

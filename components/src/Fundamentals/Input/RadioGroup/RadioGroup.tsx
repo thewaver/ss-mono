@@ -1,7 +1,7 @@
 import { createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
 import { ElementFader } from "../../../Abstracts/ElementFader/ElementFader";
-import { NavigationUtils } from "../../../Abstracts/Navigation/Navigation.utils";
+import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { access } from "../../../Utils/propUtils";
 import { RadioGroupContextProvider } from "./RadioGroup.context";
 import type { RadioGroupContextType, RadioGroupEntry } from "./RadioGroup.context.types";
@@ -112,7 +112,7 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
 
         const focused = navigable.find((entry) => entry.getElementRef() === document.activeElement);
         const from = focused ?? getRovingEntry();
-        const position = NavigationUtils.computeNextPosition(
+        const position = NavigatorUtils.computeNextPosition(
             e.key,
             from ? navigable.indexOf(from) : 0,
             navigable.length,

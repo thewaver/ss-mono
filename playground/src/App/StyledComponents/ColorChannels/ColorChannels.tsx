@@ -3,20 +3,13 @@ import { createEffect, createSignal, untrack } from "solid-js";
 import { Radio, RadioGroup, TextInput } from "@thewaver/ss-components";
 import { Color } from "@thewaver/ss-utils";
 
-import {
-    PageColorChannel,
-    PageColorChannelGrid,
-    PageColorPickerRow,
-} from "../../StyledComponents/ColorAreaContent/ColorAreaContent";
-import { PageRadioContent } from "../../StyledComponents/RadioContent/RadioContent";
-import {
-    PageTextFieldContent,
-    computePageTextFieldTextStyle,
-} from "../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageColorChannel, PageColorChannelGrid, PageColorPickerRow } from "../ColorAreaContent/ColorAreaContent";
 import { PageNumberField } from "../Field/Field";
+import { PageRadioContent } from "../RadioContent/RadioContent";
+import { PageTextFieldContent, computePageTextFieldTextStyle } from "../TextFieldContent/TextFieldContent";
 import type { PageColorChannelsProps } from "./ColorChannels.types";
 
-import { FIELD_GAP, FIELD_PADDING } from "../../StyledComponents/TextFieldContent/TextFieldContent.css";
+import { FIELD_GAP, FIELD_PADDING } from "../TextFieldContent/TextFieldContent.css";
 
 const SPACES: Color.ValueSpace[] = ["rgba", "hsla", "hexa"];
 const RGB_CHANNELS = ["r", "g", "b"] as const;

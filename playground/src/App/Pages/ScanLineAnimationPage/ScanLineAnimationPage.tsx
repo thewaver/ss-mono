@@ -1,7 +1,13 @@
 import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { ScanlineAnimation, access } from "@thewaver/ss-components";
+import {
+    CellAnimationBreakpoints,
+    CellAnimationWeights,
+    ScanlineAnimation,
+    ScanlineAnimationKeyframes,
+    access,
+} from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
@@ -9,9 +15,6 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
-import { CellAnimationBreakpoints } from "../../Samples/CellAnimationBreakpoints/CellAnimationBreakpoints.const";
-import { CellAnimationWeights } from "../../Samples/CellAnimationWeights/CellAnimationWeights.const";
-import { ScanlineAnimationKeyframes } from "../../Samples/ScanlineAnimationKeyframes/ScanlineAnimationKeyframes.const";
 import {
     PageFileField,
     PageGroupedSelectField,
@@ -728,84 +731,72 @@ export const ScanlineAnimationPage = () => {
                 name: "Glitch",
                 component: () => <GlitchExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Glitch.tsx`,
-                sampleKeys: () => [getWeightType()],
             },
             {
                 key: "surge",
                 name: "Surge",
                 component: () => <SurgeExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Surge.tsx`,
-                sampleKeys: () => [getWeightType()],
             },
             {
                 key: "snake",
                 name: "Snake",
                 component: () => <SnakeExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Snake.tsx`,
-                sampleKeys: () => [getWeightType()],
             },
             {
                 key: "split",
                 name: "Split",
                 component: () => <SplitExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Split.tsx`,
-                sampleKeys: () => [getWeightType()],
             },
             {
                 key: "brightness",
                 name: "Brightness",
                 component: () => <BrightnessExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Brightness.tsx`,
-                sampleKeys: () => [getWeightType()],
             },
             {
                 key: "grayscale",
                 name: "Grayscale",
                 component: () => <GrayscaleExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Grayscale.tsx`,
-                sampleKeys: () => [getWeightType()],
             },
             {
                 key: "hue",
                 name: "Hue",
                 component: () => <HueExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Hue.tsx`,
-                sampleKeys: () => [getWeightType()],
             },
             {
                 key: "_wave",
                 name: "_Wave",
                 component: () => <WaveExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/_Wave.tsx`,
-                sampleKeys: () => [getWeightType()],
             },
             {
                 key: "_roll",
                 name: "_Roll",
                 component: () => <RollExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/_Roll.tsx`,
-                sampleKeys: () => [getWeightType()],
             },
             {
                 key: "_dropout",
                 name: "_Dropout",
                 component: () => <DropoutExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/_Dropout.tsx`,
-                sampleKeys: () => [getWeightType()],
             },
             {
                 key: "_interlace",
                 name: "_Interlace",
                 component: () => <InterlaceExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/_Interlace.tsx`,
-                sampleKeys: () => [getWeightType()],
             },
             {
                 key: "_skew",
                 name: "_Skew",
                 component: () => <SkewExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/_Skew.tsx`,
-                sampleKeys: () => [getWeightType()],
             },
             {
                 key: "stressTest",

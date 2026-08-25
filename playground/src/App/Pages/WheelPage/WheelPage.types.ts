@@ -1,8 +1,8 @@
 import type { Signal } from "solid-js";
 
-import type { AccessorProps, RotationSpinDefs } from "@thewaver/ss-components";
+import type { AccessorProps, RotatorSpinDefs } from "@thewaver/ss-components";
 
-export type WheelSpinStyleFn = (index: number, wedgeCount: number, turns: number) => RotationSpinDefs;
+export type WheelSpinStyleFn = (index: number, wedgeCount: number, turns: number) => RotatorSpinDefs;
 
 export type WheelExampleProps = AccessorProps<{
     wedges: string[];
@@ -12,6 +12,6 @@ export type WheelExampleProps = AccessorProps<{
     restDurationMs: number;
     idleDelayMs: number | undefined;
     indexSignal: Signal<number>;
-    computeSpinDefs: (index: number, wedgeCount: number) => RotationSpinDefs;
+    computeSpinDefs: (index: number, wedgeCount: number) => RotatorSpinDefs;
     onSelectedWedgeChange: (index: number) => void;
 }>;

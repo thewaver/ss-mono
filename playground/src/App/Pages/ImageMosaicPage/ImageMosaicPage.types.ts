@@ -1,6 +1,6 @@
 import type { AccessorProps, MosaicImageSource, MosaicSizeAnchor } from "@thewaver/ss-components";
 
-import type { MosaicImages } from "../../Samples/MosaicImages/MosaicImages.const";
+import type { MosaicImages } from "./MosaicImages.const";
 
 export type ImageMosaicExampleProps = AccessorProps<{
     sources: MosaicImageSource[];

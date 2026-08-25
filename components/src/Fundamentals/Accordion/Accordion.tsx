@@ -1,6 +1,6 @@
 import { Index, createMemo, createSignal, createUniqueId } from "solid-js";
 
-import { NavigationUtils } from "../../Abstracts/Navigation/Navigation.utils";
+import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
 import { access } from "../../Utils/propUtils";
 import { Collapsible } from "../Collapsible/Collapsible";
@@ -83,7 +83,7 @@ export const Accordion = <T,>(props: AccordionProps<T>) => {
 
         if (navigable.length < 1 || focused < 0) return;
 
-        const position = NavigationUtils.computeNextPosition(e.key, navigable.indexOf(focused), navigable.length);
+        const position = NavigatorUtils.computeNextPosition(e.key, navigable.indexOf(focused), navigable.length);
 
         if (position === undefined) return;
 

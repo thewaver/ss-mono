@@ -1,7 +1,7 @@
 import { Show, createMemo, createSignal } from "solid-js";
 
-import type { InteractionFlags } from "../../Abstracts/Interaction/Interaction.types";
-import { InteractionUtils } from "../../Abstracts/Interaction/Interaction.utils";
+import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
+import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import { access } from "../../Utils/propUtils";
 import { Tooltip } from "../Tooltip/Tooltip";
 import type { InteractionSizing, InteractionWrapperProps } from "./InteractionWrapper.types";
@@ -21,14 +21,14 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
     const getTooltipDefs = createMemo(() => access(props.tooltipDefs));
 
     const getIsReachable = createMemo(() =>
-        InteractionUtils.computeIsReachable(
+        InteractionTracker.computeIsReachable(
             getIsDisabled(),
             access(props.isReachableWhenDisabled) ?? false,
             getTooltipDefs() !== undefined,
         ),
     );
 
-    const { getFlags: getInternalFlags } = InteractionUtils.wrapElement(getElementRef, getIsDisabled, {
+    const { getFlags: getInternalFlags } = InteractionTracker.wrapElement(getElementRef, getIsDisabled, {
         getIsReachable,
         getIsTabbable: props.isTabbable === undefined ? undefined : () => access(props.isTabbable)!,
     });
