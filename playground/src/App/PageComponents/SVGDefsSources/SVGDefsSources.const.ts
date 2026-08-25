@@ -16,6 +16,12 @@ export const SOURCE_SIZE: Size2d = { width: 1200, height: 1200 };
 
 export const SOURCE_CELL_SIZE: Size2d = { width: 150, height: 150 };
 
+const SOURCE_RATIO_SIZES = {
+    "1:1": SOURCE_SIZE,
+    "2:1": { width: SOURCE_SIZE.width, height: SOURCE_SIZE.height / 2 },
+    "1:2": { width: SOURCE_SIZE.width / 2, height: SOURCE_SIZE.height },
+} satisfies Record<string, Size2d>;
+
 const appendRect = (svg: SVGElement, size: Size2d, defs: SVGDefs) => {
     const rect = document.createElementNS(SVG_NAMESPACE, "rect");
 
@@ -31,6 +37,12 @@ const appendRect = (svg: SVGElement, size: Size2d, defs: SVGDefs) => {
 };
 
 export namespace SVGDefsSources {
+    export type SourceRatio = keyof typeof SOURCE_RATIO_SIZES;
+
+    export const SOURCE_RATIOS = Object.keys(SOURCE_RATIO_SIZES) as SourceRatio[];
+
+    export const computeSourceSize = (ratio: SourceRatio): Size2d => SOURCE_RATIO_SIZES[ratio];
+
     export const toSourceSvg = (size: Size2d, entries: SVGDefs[], iterationDelayMs: number) => {
         const svg = document.createElementNS(SVG_NAMESPACE, "svg");
         const defsNode = document.createElementNS(SVG_NAMESPACE, "defs");
@@ -75,14 +87,15 @@ export namespace SVGDefsSources {
 
     export const computeGradientSource = (
         key: SVGDefsSamples.Gradient.SampleKey,
+        size: Size2d,
         animationDurationMs: number,
         animationIterationDelayMs: number,
     ) =>
         SVGDefsUri.toDataUri(
             toSourceSvg(
-                SOURCE_SIZE,
+                size,
                 SVGDefsSamples.Gradient.SAMPLE_CONFIGS[key].computeSVGDefs(`cell-gradient`, undefined, {
-                    getSize: () => SOURCE_SIZE,
+                    getSize: () => size,
                     animationDurationMs,
                     colors: SVGDefsSamples.SAMPLE_COLORS,
                     ...SVGDefsSamples.Iteration.SAMPLE_CONFIGS.constant.computeDefs(animationDurationMs),
@@ -91,12 +104,16 @@ export namespace SVGDefsSources {
             ),
         );
 
-    export const computePatternSource = (key: SVGDefsSamples.Pattern.SampleKey, animationDurationMs: number) =>
+    export const computePatternSource = (
+        key: SVGDefsSamples.Pattern.SampleKey,
+        size: Size2d,
+        animationDurationMs: number,
+    ) =>
         SVGDefsUri.toDataUri(
             toSourceSvg(
-                SOURCE_SIZE,
+                size,
                 SVGDefsSamples.Pattern.SAMPLE_CONFIGS[key].computeSVGDefs(`cell-pattern`, undefined, {
-                    getSize: () => SOURCE_SIZE,
+                    getSize: () => size,
                     cellSize: SOURCE_CELL_SIZE,
                     animationDurationMs,
                     colors: SVGDefsSamples.SAMPLE_COLORS,

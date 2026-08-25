@@ -10,8 +10,8 @@ import type {
     CellAnimationFn,
     CellStop,
     CellStopTrack,
+    CellZone,
     CompiledCellStops,
-    _CellZone,
 } from "./CellAnimationKeyframes.types";
 
 export namespace CellAnimationKeyframeUtils {
@@ -118,8 +118,8 @@ export namespace CellAnimationKeyframeUtils {
         };
     };
 
-    export const _fromZones =
-        (zones: _CellZone[], fallback: CellAnimationFn): CellAnimationFn =>
+    export const fromZones =
+        (zones: CellZone[], fallback: CellAnimationFn): CellAnimationFn =>
         (timeline, defs) => {
             for (const { zone, animation } of zones) {
                 if (CellAnimationZones.isInZone(zone, defs)) return animation(timeline, defs);

@@ -15,7 +15,71 @@ export namespace CellAnimationWeightUtils {
         return { x: Math.max(farthest.x, MIN_MAX_DISTANCE), y: Math.max(farthest.y, MIN_MAX_DISTANCE) };
     };
 
-    export const getFlatIndex = (pos: Point2d, count: Point2d) => pos.y * count.x + pos.x;
+    export const getRowFlatIndex = (pos: Point2d, count: Point2d) => pos.y * count.x + pos.x;
+
+    export const getColumnFlatIndex = (pos: Point2d, count: Point2d) => pos.x * count.y + pos.y;
+
+    export const getDiagonalDelta = (origin: Point2d, pos: Point2d) => {
+        const delta = { x: pos.x - origin.x, y: pos.y - origin.y };
+
+        return { down: Math.abs(delta.x - delta.y), up: Math.abs(delta.x + delta.y) };
+    };
+
+    export const getMaxDiagonalDistance = (origin: Point2d, count: Point2d) => {
+        const far = { x: count.x - 1 - origin.x, y: count.y - 1 - origin.y };
+
+        return {
+            down: Math.max(origin.x + far.y, far.x + origin.y, MIN_MAX_DISTANCE),
+            up: Math.max(origin.x + origin.y, far.x + far.y, MIN_MAX_DISTANCE),
+        };
+    };
+
+    const getBandMax = (from: number, to: number, distanceAt: (index: number) => number) =>
+        to < from ? 0 : Math.max(distanceAt(from), distanceAt(to));
+
+    export const getMaxDiagonalDistanceInBand = (
+        origin: Point2d,
+        count: Point2d,
+        dist: { down: number; up: number },
+    ) => {
+        const fallingOrigin = origin.x - origin.y;
+        const risingOrigin = origin.x + origin.y;
+
+        const maxUpInFallingBand = (falling: number) =>
+            getBandMax(Math.ceil(Math.max(0, falling)), Math.floor(Math.min(count.x - 1, count.y - 1 + falling)), (x) =>
+                Math.abs(2 * x - falling - risingOrigin),
+            );
+
+        const maxDownInRisingBand = (rising: number) =>
+            getBandMax(Math.ceil(Math.max(0, rising - (count.y - 1))), Math.floor(Math.min(count.x - 1, rising)), (x) =>
+                Math.abs(2 * x - rising - fallingOrigin),
+            );
+
+        return {
+            up: Math.max(
+                maxUpInFallingBand(fallingOrigin + dist.down),
+                maxUpInFallingBand(fallingOrigin - dist.down),
+                MIN_MAX_DISTANCE,
+            ),
+            down: Math.max(
+                maxDownInRisingBand(risingOrigin + dist.up),
+                maxDownInRisingBand(risingOrigin - dist.up),
+                MIN_MAX_DISTANCE,
+            ),
+        };
+    };
+
+    export const getMirroredPos = (pos: Point2d, origin: Point2d): Point2d => ({ x: origin.x * 2 - pos.x, y: pos.y });
+
+    export const getRoundedPos = (pos: Point2d): Point2d => ({ x: Math.round(pos.x), y: Math.round(pos.y) });
+
+    export const getSquareDistance = (dist: Point2d) => Math.max(dist.x, dist.y);
+
+    export const getStretchedDistance = (dist: Point2d, maxDist: Point2d) =>
+        Math.max(dist.x / maxDist.x, dist.y / maxDist.y) * Math.max(maxDist.x, maxDist.y);
+
+    export const isEvenStretchedRing = (dist: Point2d, maxDist: Point2d) =>
+        MathUtils.isEven(Math.round(getStretchedDistance(dist, maxDist)));
 
     export const fromOrderedIndex = (ordered: number, total: number) => (total <= 1 ? 1 : 1 - ordered / (total - 1));
 
@@ -33,14 +97,27 @@ export namespace CellAnimationWeightUtils {
 
     const HASH_RANGE = 4294967296;
 
-    export const _hashToUnit = (x: number, y: number) => {
-        const mixed = Math.imul(x + HASH_OFFSET, HASH_MULTIPLIER_X) ^ Math.imul(y + HASH_OFFSET, HASH_MULTIPLIER_Y);
+    export const FIXED_HASH_SEED = 0;
+
+    let randomSeed = FIXED_HASH_SEED;
+
+    export const advanceRandomSeed = () => {
+        randomSeed = Math.floor(Math.random() * HASH_RANGE);
+    };
+
+    export const getRandomSeed = () => randomSeed;
+
+    export const hashToUnit = (x: number, y: number, seed: number) => {
+        const mixed =
+            Math.imul(x + HASH_OFFSET, HASH_MULTIPLIER_X) ^
+            Math.imul(y + HASH_OFFSET, HASH_MULTIPLIER_Y) ^
+            Math.imul(seed + HASH_OFFSET, HASH_MULTIPLIER_MIX);
         const folded = Math.imul(mixed ^ (mixed >>> HASH_LOW_SHIFT), HASH_MULTIPLIER_MIX);
 
         return ((folded ^ (folded >>> HASH_HIGH_SHIFT)) >>> 0) / HASH_RANGE;
     };
 
-    export const _interleaveBits = (x: number, y: number, bits: number) => {
+    export const interleaveBits = (x: number, y: number, bits: number) => {
         let result = 0;
 
         for (let bit = 0; bit < bits; bit++) {
@@ -51,7 +128,7 @@ export namespace CellAnimationWeightUtils {
         return result;
     };
 
-    export const _greatestCommonDivisor = (a: number, b: number) => {
+    export const greatestCommonDivisor = (a: number, b: number) => {
         let high = Math.max(a, b);
         let low = Math.min(a, b);
 
@@ -63,6 +140,27 @@ export namespace CellAnimationWeightUtils {
         }
 
         return high;
+    };
+
+    const GOLDEN_RATIO = 0.6180339887498949;
+
+    export const stride = (index: number, originIndex: number, total: number) => {
+        if (total <= 1) return 1;
+
+        let step = Math.max(Math.round(total * GOLDEN_RATIO), 1);
+
+        while (step > 1 && greatestCommonDivisor(step, total) !== 1) {
+            step--;
+        }
+
+        return fromOrderedIndex((((index - originIndex + total) % total) * step) % total, total);
+    };
+
+    export const ripple = (spread: number, maxSpread: number, periodCells: number, travelRatio: number) => {
+        const band = (Math.cos((spread / periodCells) * Math.PI * 2) + 1) * 0.5;
+        const falloff = 1 - MathUtils.clamp01(spread / maxSpread);
+
+        return MathUtils.lerp(band, falloff, travelRatio);
     };
 
     export const radar = (
@@ -153,7 +251,7 @@ export namespace CellAnimationWeightUtils {
             }
         }
 
-        return MathUtils.clamp01(1 - (result - 1) / maxWeight);
+        return 1 - (result - 1) / maxWeight;
     };
 
     const getIndexedWeights = (weights: number[][]) => {
@@ -231,9 +329,14 @@ export namespace CellAnimationWeightUtils {
     export const computeCellWeights = (compute: WeightFn, count: Point2d, origin: Point2d, opts?: WeightOpts) => {
         const boundOrigin = Point2dUtils.getBoundPoint(origin, toBounds(count));
 
+        advanceRandomSeed();
+
         let weights = Array.from({ length: Math.max(count.y, 0) }, (_, y) =>
             Array.from({ length: Math.max(count.x, 0) }, (_, x) =>
-                MathUtils.roundToDecimalPlaces(compute({ x, y }, count, boundOrigin), WEIGHT_DECIMAL_PLACES),
+                MathUtils.roundToDecimalPlaces(
+                    MathUtils.clamp01(compute({ x, y }, count, boundOrigin)),
+                    WEIGHT_DECIMAL_PLACES,
+                ),
             ),
         );
 

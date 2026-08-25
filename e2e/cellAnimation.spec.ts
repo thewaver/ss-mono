@@ -233,7 +233,7 @@ test("a new picture starts the cell timeline over", async ({ page }) => {
 
     await expect.poll(() => progressOf(demo("gradient")), { message: "the cells are mid-assembly" }).not.toBe("");
 
-    await page.locator(`${demo("gradient")} [role="combobox"]`).click();
+    await page.locator(`${demo("gradient")} ${prop("gradient")} [role="combobox"]`).click();
     await page.locator('[role="listbox"] [role="option"]', { hasText: "orbit_async_3" }).first().click();
 
     const afterPick = await progressOf(demo("gradient"));
@@ -246,7 +246,7 @@ test("a new picture starts the cell timeline over", async ({ page }) => {
 test("picking another def rebuilds the source", async ({ page }) => {
     const before = await page.locator(`${demo("pattern")} img`).getAttribute("src");
 
-    await page.locator(`${demo("pattern")} [role="combobox"]`).click();
+    await page.locator(`${demo("pattern")} ${prop("pattern")} [role="combobox"]`).click();
     await page.locator('[role="listbox"] [role="option"]', { hasText: "triangle_t_2" }).first().click();
 
     await expect

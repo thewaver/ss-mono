@@ -72,16 +72,16 @@ export namespace SVGDefsSamples {
 
     export namespace Pattern {
         export const SAMPLE_CONFIGS = {
-            plain: patternPlain,
             circle_g_2,
             circle_hd_2,
             circle_hs_2,
             hexagon_ft_2,
             hexagon_pt_2,
             lozenge_d_2,
+            plain: patternPlain,
             triangle_t_2,
-            whirl_2,
             whirlCurved_2,
+            whirl_2,
         } as const satisfies Record<string, PatternConfig>;
 
         export type SampleKey = keyof typeof SAMPLE_CONFIGS;
@@ -89,11 +89,10 @@ export namespace SVGDefsSamples {
 
     export namespace Gradient {
         export const SAMPLE_CONFIGS = {
-            plain: gradientPlain,
             elastic_circle_3,
-            elastic_semicircle_3,
-            elastic_inter_semicircle_3,
             elastic_drip_3,
+            elastic_inter_semicircle_3,
+            elastic_semicircle_3,
             flow_2s,
             flow_3,
             flow_3s,
@@ -101,8 +100,8 @@ export namespace SVGDefsSamples {
             flow_diag_3,
             flow_diag_3s,
             hue_1,
-            hue_pulse_2,
             hue_diag_inter_2,
+            hue_pulse_2,
             hue_rot_3,
             merge_1v1,
             merge_diag_1v1,
@@ -111,6 +110,7 @@ export namespace SVGDefsSamples {
             orbit_1v1,
             orbit_async_2v1,
             orbit_async_3,
+            plain: gradientPlain,
             scan_1,
             scan_1v1,
             scan_diag_1,
@@ -119,8 +119,8 @@ export namespace SVGDefsSamples {
             snake_1v1,
             snake_2,
             snake_4,
-            snake_inter_2,
             snake_async_3,
+            snake_inter_2,
             sweep_1,
             sweep_1v1,
             sweep_diag_1,

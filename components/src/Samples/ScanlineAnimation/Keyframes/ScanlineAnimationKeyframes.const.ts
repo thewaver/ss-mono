@@ -197,7 +197,11 @@ export namespace ScanlineAnimationKeyframes {
     ): ScanlineAnimationEvaluationResult => {
         const mergedOpts = { ...DEFAULT_HORIZONTAL_DROPOUT_OPTS, ...opts };
 
-        if (CellAnimationWeightUtils._hashToUnit(defs.pos.y, defs.count.y) >= mergedOpts.dropChance) return {};
+        if (
+            CellAnimationWeightUtils.hashToUnit(defs.pos.y, defs.count.y, CellAnimationWeightUtils.FIXED_HASH_SEED) >=
+            mergedOpts.dropChance
+        )
+            return {};
 
         const p = peak(b0, b2, t);
 

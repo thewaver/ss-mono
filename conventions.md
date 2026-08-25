@@ -3036,6 +3036,16 @@ and the two drawn examples each carry a dropdown over `Shape`'s own gradient and
 the three share, the grid and the weights and the timing, stays in the page's own panel, since changing it is
 meant to change all of them.
 
+**A drawn example also picks its own shape, which the photograph cannot.** The two serialised sources are
+written at whatever width and height they are handed, so `1:1`, `2:1` and `1:2` are a per-example dropdown over
+`SOURCE_RATIO_SIZES` — the long side stays 1200 and the short one halves, so the default source is the same
+1200×1200 it always was. `computeGradientSource` and `computePatternSource` take that size as an argument
+rather than reading `SOURCE_SIZE`, since the rect, the sample's own `getSize` and the `<svg>` attributes all
+have to agree on one number. A photograph's ratio is the file's, so the first example has no such control, and
+the pattern's cell size is left at 150×150 — a wider source therefore shows more pattern cells rather than
+stretched ones. The demo box takes its width from the ratio so the longest side is always the same 480: a
+portrait source renders 240 wide rather than 960 tall.
+
 **The palette and the animation length come from the same places the Shape page gets them.** The four
 colours are `SVGDefsSamples.SAMPLE_COLORS`, which `ShapePage` now seeds its own editable store from rather
 than declaring a second copy; the duration is the cell animation's own, passed in per call. What a sample then
@@ -3127,8 +3137,11 @@ the line-shaped API reads better for the common case — the reasoning that make
 `Checkbox`.
 
 **A preset that loses an axis drops what indexed on it rather than narrowing it.** A scanline is a single
-column, so every weight reading `dist.x` collapses: six go constant (`lineColumn`, `lineColumnAlternate`,
-`lineColumnConvergent`, `radarDouble`, `radarQuad`, `quadrantDefault`), four more fall to two values, and
+column, so every weight reading `dist.x` collapses: measured on a single column of eleven with the origin pinned at
+`{ x: 0, y: 0 }`, which is what the Playground's Scanline page does, thirteen give every line the same weight
+(`lineColumn`, `lineColumnAlternate`, `lineColumnConvergent`, both `quadrant` entries, all six `radar` entries, and
+all three `frame` forms, whose ring is zero for every cell of a single column) and three more fall to two
+values (`entwineRow`, `rollRow`, `rollRowConvergent`), and
 most survivors are a plain row ramp wearing a name like `spiral` or `checkered`. The distance-based
 survivors are the only reason an origin would exist on a line, and a control meaningful for three of nine
 options reads as broken. This used to be enforced in the library — `ScanlineAnimation` narrowed `weightType`
@@ -3194,7 +3207,7 @@ function argument.
 `isolation: isolate` on the container those values escape into the nearest ancestor stacking context. In the
 Playground they landed in the stress test modal's context and painted over its FPS counter.
 
-### The animation sample collections: `_fromZones`, and why a fifth circle is not worth adding
+### The animation sample collections: `fromZones`, and why a fifth circle is not worth adding
 
 **Adding members to an existing family stops paying off, and the reason is structural rather than a matter of
 taste.** A weight function is one number per cell that does not change while the animation runs, so any weight
@@ -3205,10 +3218,236 @@ collection and the user's verdict on most of them was that they look repetitive,
 of adding a fifth circle rather than a failure of the individual samples. **What pays off instead is machinery
 that recombines what is already there**: an operator over any weight, or a combinator over any two animations,
 multiplies the collection without adding anything that looks like its neighbour. `shouldMakeUnique` and
-`shouldNormalize` on `computeCellWeights` are already this pattern, and `_fromZones` is the first one on the
+`shouldNormalize` on `computeCellWeights` are already this pattern, and `fromZones` is the first one on the
 animation side. Ideas of that kind, graded but not built, are in `backlog.md` under **_Open discussion_**.
 
-**`_fromZones` takes an ordered list and an explicit fallback**, not a record keyed by zone. Zones overlap by
+**The three ring metrics are diamond, circle and rectangle, and two of them were called the wrong thing.** What
+separated the family that was called `circular`, the one called `quadratic`, and `radial` is only how a cell's
+distance from the origin is measured: the `circular` family took the mean of the two axis distances, so its
+rings are diamonds standing on a corner, and it is now `diamond` — the word this file already used when it
+listed the shapes a wipe can be. `radial` takes the true straight-line distance, so its rings are the only
+actual circles in the collection, and it gained the third form the other two had, `radialConvergent`, built
+from `diamondConvergent`'s shape with the straight-line distance. `quadratic` took the larger of the two axis
+distances, so its rings are squares — and that turned out to be one half of a pair rather than a family of its
+own, which is the entry below.
+
+**`frame` is one metric with three normalisations, and it absorbed both `quadratic` and the old
+border-anchored `frame`.** The metric is the larger of the two axis distances, so its rings are nested
+rectangles around the origin, and what differs is only what that distance is divided by. `frameFarthest`
+divides by the larger of the two maximum distances, so the ring stays square and grows until it reaches the
+farthest edge, overshooting the short axis on the way. `frameNearest` divides by the smaller, so the square
+stops at the nearest edge. `frameStretched` divides each axis by its own maximum, so the ring is pulled to the
+grid's own proportions and all four edges are reached at once. `quadratic` was the Farthest one all along, under
+a name that described neither the shape nor the family.
+
+**What `frameNearest` costs is worth knowing before it is judged, because the clamp hides it.** Everything
+outside the square that fits inside the grid lands below zero and is clamped, so all of it starts at the same
+moment: measured on a twenty-one by seven grid with a centred origin, forty-nine of a hundred and forty-seven
+cells carry the ramp and the other ninety-eight arrive together. On a square grid it is identical to
+`frameFarthest`. It is here because the user asked for the nearest-edge member by name, having been told first
+what it does to a wide grid.
+
+**What that cost, and why it was still the right trade.** The `frame` that existed before measured its rings
+from the grid's border inward and ignored the origin entirely, which is a different idea rather than a second
+normalisation — a shared name with the origin-anchored metric would have hidden the larger difference. The
+user chose the pair, so the border-anchored behaviour is gone, and with it `frame`'s place in
+`ORIGIN_FREE_WEIGHT_TYPES` and therefore on the Playground's Scanline page. Measured before removing it, all
+three of its forms gave every line of a single column the same weight, so the Scanline page lost nothing it
+could show.
+
+**Each member keeps its own ring parity, which is what `Alternate` and `Convergent` turn on.** `isEvenRing`
+answers "is this cell's square ring an even one", so `frameNearest` and `frameFarthest` use it unchanged;
+`frameStretched`'s rings are stretched rectangles, so it asks the same question of its own metric —
+`isEvenStretchedRing`, the parity of the rounded stretched distance. Using `isEvenRing` for all three would have
+banded a wide grid's stretched entries across rings the ramp does not follow.
+
+**Handedness is an axis of an existing family, not a family of its own.** `_sweepCw` and `_sweepCcw` were a
+second implementation of the thing `radar` already does — one arm turning about the origin — and measured, with
+the origin at a corner they and `radarSingle` order the hundred and twenty-one cells identically to within a
+rounding error, so nothing on the page could tell them apart. At a centred origin they do differ, but only in
+which ray the arm starts from and which way it turns: `radarSingle` starts at six o'clock and turns
+counter-clockwise, `_sweepCw` starts at twelve and turns clockwise. Sweep also spaces the arm by true angle
+where radar spaces it by how far round the square ring a cell sits, which is a few percent of one cell's start
+time and not a difference anybody was going to see. So both sweeps went and the handedness they were carrying
+became `radarSingleCw`, `radarDoubleCw` and `radarQuadCw`, which reaches Double and Quad as well — something
+a one-armed sweep could never have done. The three existing radar entries keep their names and are the
+counter-clockwise ones.
+
+**A mirrored sample reflects its input rather than growing a parameter.** A clockwise entry is
+`radar` called with the position reflected across the vertical line through the origin —
+`getMirroredPos`, `x' = origin.x * 2 - pos.x`. The reflection leaves the distance the maths runs on untouched,
+since `|origin.x - (2 * origin.x - x)|` is `|x - origin.x|`, and flips only which side each quadrant test lands
+on, which is the whole of what handedness means here. So no branch went into the util, its arity did not grow
+past a signature this file already calls readable only to its own callers, and the same one-line reflection reaches
+`spiral` unchanged if a clockwise spiral is ever wanted.
+
+**A quadrant pair names the two corners it grows from, which `Default` could not.** The entry that was called
+`quadrantDefault` multiplied the two signed distances, so the product is negative in the two quadrants where the signs disagree
+and those corners start first — the top-right and the bottom-left, which are the two ends of a rising diagonal.
+It is therefore `quadrantUp`, and `quadrantDown` is the same expression with that product added instead of
+subtracted, so it starts from the top-left and the bottom-right. The direction words are the ones the diagonal
+band entries already use, so the pair reads off the same vocabulary rather than inventing `Mirrored`.
+
+**The diagonal is a band direction, and it was the one thing the collection had none of.** Diagonals were not
+absent so much as never straight: `diamond`'s rings are four diagonal segments meeting at corners, and
+`checkered`'s two passes alternate on the parity of `dist.x + dist.y`, which is a diagonal parity. What nothing
+produced was a band whose edge is a single 45° line — the thing `lineRow` and `lineColumn` are, turned
+half a right angle.
+
+**One rotated coordinate pair covers every family that had a Row and a Column.** `getDiagonalDelta` returns
+`down`, which is `|dx - dy|` and counts bands parallel to a line falling to the right, and `up`, which is
+`|dx + dy|` and counts bands parallel to one rising to the right. That is all the new arithmetic there is,
+because every one of these families is the same three ingredients: a band index, a position along the band,
+and the parity of the band index. `lineRow` is `(dist.y, dist.x, isEvenRow)`; `_lineDiagonalDown` is
+`(down, up, isEven(down))`, and the Up member swaps the pair over. So `line` gained all three forms, `roll`
+gained its two and `entwine` gained one each way, from two helpers and no new formula.
+
+**Each direction gets its own maximum, worked out rather than bounded.** `maxDist.x + maxDist.y` is an upper
+bound for both diagonals and is exact for neither: with the origin in a corner of an eleven by eleven grid the
+down-diagonal only reaches ten, so that bound would have left half the weight range unused and the wipe would
+finish halfway through its stagger. `getMaxDiagonalDistance` takes the larger of the two corner sums per
+direction instead.
+
+**Two of the four families degenerated on a diagonal basis, and the fix was to normalise along the band.** In
+the rotated basis `down + up` is always even, so a cell's two diagonal distances always share a parity. `roll`
+and `entwine` use the band index for nothing but its parity, so that parity was the parity of the coordinate
+the ramp already ran on, and the weight collapsed into a function of one coordinate — a banded diagonal wipe.
+For `roll` the collapse was exact: measured, `rollDiagonalUp` came out byte-identical to
+`lineDiagonalDownAlternate` on every grid and origin tried, and `rollDiagonalDown` to `lineDiagonalUpAlternate`.
+
+**What broke the collapse is dividing the position along a band by that band's own length.** Every row is as
+long as every other, so `rollRow` can divide by the grid's width and nothing is lost; diagonal bands are all
+different lengths, so dividing by the longest left short bands using a sliver of their range — and left the
+band index out of the value, which is what allowed the collapse. `getMaxDiagonalDistanceInBand` answers how far
+the along-band coordinate reaches inside one band, by intersecting the band with the grid and evaluating at the
+two ends, which is exact because the distance along a band is convex. After it, no two diagonal entries are
+equal on any grid or origin tried, and `roll` and `entwine` each vary within a band as well as across bands.
+It reads off both signed bands at the same distance, because these families index a band by distance and treat
+the two sides of the origin as one, exactly as `lineRow` treats the rows above and below it.
+
+**`zigzag` is the one family with no diagonal member, and the reason is a ratio it cannot change.** Its
+along-band term is one part in `bandCount + 1` of the range whatever it is divided by, and a diagonal basis has
+about twice as many bands as a row basis on a square grid — eleven against six on eleven by eleven. So the
+diagonal snake deviated from a plain diagonal wipe by at most 0.091 where the row snake reaches 0.167, and
+per-band normalisation could not widen that, only let every band sweep its own length. The user looked and
+deleted both entries: a snake that reads as a straight diagonal wipe is a fifth circle. `roll` and `entwine`
+kept theirs, because for them the same normalisation was the difference between a duplicate and a pattern.
+
+**The origin moves a diagonal wipe only across its bands, which is the family's own behaviour rather than a
+gap.** `lineRow` reads `dist.y` alone, so sliding the origin sideways changes nothing; a diagonal reads its own
+band index alone, so sliding the origin along the band changes nothing — measured, `_lineDiagonalDown` is
+identical at `center` and at `topLeft`, both being on the same falling line.
+
+**Ripple and the concentric families were deliberately left out of this.** The user axed ripple's row and
+column entries in the same breath as asking for diagonals, on the grounds that ripple is for concentric
+patterns; the same reasoning keeps a diagonal out of `radial`, `diamond` and the three `frame` members, whose
+whole subject is a ring around a point.
+
+**`oval` is not one of them, and reading it as one was a mistake made from its name.** `ovalRow` is
+`zigzagRow`'s even branch with the parity flip removed: rows are the bands, the ramp runs along each row from
+the origin's column, and every row sweeps the same way. The frontier that gives it its name is curved because
+the two terms compound, not because anything measures a radius. It is therefore a band family and does take a
+diagonal member — the caution about rings never applied to it.
+
+**Its diagonal member was built, measured and deleted, on `zigzag`'s ratio.** With a centred origin, `ovalRow`
+differs from `lineRow` by up to 0.167 on eleven by eleven and 0.250 on twenty-one by seven, while the diagonal
+member differed from `lineDiagonalDown` by 0.091 and 0.071 — the second figure worse, because a wide grid has
+few rows and many diagonal bands. That is the same 0.091 that had both `zigzagDiagonal` entries deleted, so
+`oval` and `zigzag` are the two band families with no diagonal, for one reason rather than two.
+
+**A sequence starts at the origin, which is the whole of what an origin can mean to an ordering.** `sequenceMorton`
+and `sequenceStride` were indexed on absolute grid coordinates, so the Origin control did nothing for them.
+Morton now interleaves the bits of the distance from the origin rather than of the position, so the Z-curve
+grows out of the origin — and at an origin of `{ x: 0, y: 0 }` the distance is the position, so it reproduces
+exactly what it used to do. Stride rotates its walk so the origin's own cell is the one that arrives first.
+Both consequences are worth stating: they leave `ORIGIN_FREE_WEIGHT_TYPES`, and with it the Playground's
+Scanline page, whose list is exactly that array; and the user had already said they do not look good on a
+scanline, so the removal went with their leaning rather than against it. Putting them back on that page means
+the page naming them, not the array.
+
+**Stride's axis is which way the flat index runs, not how long the step is.** `sequenceStrideRow` counts the
+index along rows and `sequenceStrideColumn` along columns, which is the `lineRow`/`lineColumn` pair applied to
+an ordering. The step itself stays the golden-ratio one, stepped down until it shares no factor with the total
+so that the walk visits every cell exactly once — a shorter step was offered as a second axis and not taken,
+so `stride` takes the total and the origin's index and owns the step.
+
+**`random` is a group of two, because reseeding made a third one redundant.** `randomDefault` draws per cell
+and `randomClustered` interpolates a hash over four-cell blocks, which is the only one that can give a smooth
+blob. A flat hash of the cell's coordinates was built as well, and its only distinction from `randomDefault` was
+that it repeated; once the user chose a pattern that never repeats, a freshly seeded flat hash is a slower
+`Math.random()` giving a statistically identical picture, so it was dropped rather than kept as a duplicate.
+`randomClustered` takes a seed, and the seed is drawn once per `computeCellWeights` call: a cluster needs
+neighbouring cells to agree on it, and a never-repeating pattern cannot fix it at module load either. That is
+the one piece of mutable state in the collection, it lives in `CellAnimationWeightUtils` beside the hash, and
+`FIXED_HASH_SEED` is there for the callers that want the opposite — `_computeHorizontalDropout` picks which
+scanlines drop out and is called every frame, so a seed that moved would reshuffle the dropout mid-animation.
+
+**Ripple is a cosine over a distance, and everything that varies is an argument.** The `ripple` util takes the
+spread, the spread's maximum, the period in cells and a travel ratio, and each entry is that call with its own
+distance measure. Eight were built to be looked at and four survived the first pass: straight bands along a row
+or a column and rings on the square metric were all discarded, and the diamond metric was kept — so the family
+is now two metrics, the straight-line distance and the diamond one, each with the same variants. The period
+gives `Tight` at two cells and `Wide` at eight, and the travel ratio gives `Travelling`, which mixes the bands
+with a falloff so the rings arrive in order outward instead of all at once — the difference between one wave
+crossing the grid and a set of standing rings. `rippleDefault` and `rippleDiamondDefault` are the two the user
+has kept, and the plain-distance entries carry no metric word in their names for the same reason the
+counter-clockwise `radar` entries carry no handedness: the unmarked name is the one that was there first.
+
+**A sample selector is sorted alphabetically, always.** The user's rule, given after a batch of new animations
+sat unsorted at the end of the dropdown. It covers every list a Playground control reads from — the weight and
+animation registries and the `SVGDefs` gradient and pattern registries, whose keys are what their dropdowns
+show. Sorting is by the name with any review marker stripped, which is also how the Playground groups, so a
+marked entry sits beside the family it belongs to rather than in a block of its own at one end. The registry
+records are sorted the same way as the type arrays, so there is one order to maintain rather than two.
+
+**Three lists are exempt, confirmed by the user, because their order carries meaning.** `ORIGIN_TYPES` walks
+the centre and then clockwise, `EASINGS` runs in the order CSS names them, and `ZONE_TYPES` groups by kind.
+Alphabetising any of the three would scatter something a reader uses to find an entry, which is the opposite of
+what the rule is for. The rule is about collections whose order is otherwise arbitrary.
+
+**A directional family names its members after the direction each one travels or the edge it turns on, and its
+quadrant entry reads that word off the zone.** `swing` pivots on an edge, so its members are `swingTop`,
+`swingBottom`, `swingLeft` and `swingRight`, and `swingDefault` became `swingTop` once there was more than one.
+`tumble`, `shoot`, `shake`, `drip` and `hop` are named for where the cell is heading, so they gained the missing
+directions under `Up`, `Down`, `Left` and `Right`, and `dripDefault` became `dripDown` for the same reason
+`swingDefault` had to go: a family of four with one member called Default cannot say which one it is. Their
+quadrant entries dispatch outward — a cell above the origin travels up — which is the mapping `elasticUp` and
+`pullUp` already had against the `top` zone.
+
+**An entrance starts hidden, by opacity or by geometry, and `skew` was the one entry that did not.** A cell
+animation runs from a weight-decided moment to the cell at rest, so at its first stop the cell must not be
+visible — otherwise the whole grid shows the picture before anything animates, and the stagger is invisible.
+Most entries satisfy this by scaling from nothing (`zoomIn`, the `pop` family, `pull`, `swarm`, `encircle`) and
+the rest by opening at `opacity: 0` and reaching `100` a fifth of the way in. `skewCw` and `skewCcw` did
+neither: they began at full size and full opacity with a 45 degree skew, so every cell was already there.
+Checked at the same time, those two were the only entries in the collection that started visible.
+
+**Where an entry can hide itself by geometry, that beats an opacity fade, and the user's reason is what it looks
+like at full size.** A cell that fades in at its final dimensions reads as the shape appearing rather than
+arriving — the eye is given a large rectangle that simply gains substance. So `skew` hides by scaling from
+nothing instead, and the shear it unwinds went from 45 degrees to 75 to keep the entry recognisably a skew now
+that a growing cell carries most of the movement. Transforms are written scale-last, so the shear is applied to
+an already-scaled cell and a 75 degree lean on a nearly-zero-size cell stays local rather than smearing across
+the grid. Opacity is still right where nothing about the geometry can hide the cell, which is what `cube`,
+`flip` and `swing` do — they rotate in place at full size.
+
+**A quadrant entry has an `Inverted` twin, which is the same zones pointing at the opposite members.** Where the
+plain entry sends a cell outward — above the origin travels up — the inverted one sends it inward, so `top` takes
+the Down member, `left` takes the Right one, and for the two diagonal families each quadrant and axis takes the
+member diagonally opposite. Nothing new is animated: an `Inverted` entry is its twin's list with the members
+swapped in pairs, which is why all thirteen came from one mapping. `pop` keeps `popCenter` as its fallback and
+the rest keep `zoomIn`, exactly as their plain twins do.
+
+**A pair that differs only in handedness or in axis can be mixed by a zone, and that is two entries rather than
+a new animation.** `encircle`, `skew`, `swarm`, `spinUp` and `spinDown` each hold a clockwise and a
+counter-clockwise member; `pull` and `flip` each hold a horizontal and a vertical one. Every one of those pairs
+gained a `Rings` entry, which gives the even square rings the first member and the odd rings the second, and a
+`Checkered` entry, which splits them by checkerboard parity instead. Both come free of new keyframes:
+`evenRings` and `evenCheckeredCells` were already in the zone vocabulary, and `fromZones` already dispatches on
+it. This is the _"machinery that recombines what is already there"_ argument applied to the animation side a
+second time, and the reason it pays is that neither member changes — what changes is which cell gets which.
+
+**`fromZones` takes an ordered list and an explicit fallback**, not a record keyed by zone. Zones overlap by
 design — `top` is every cell above the origin including the corners, and the four quadrants exclude the two
 axes entirely — so first-match-wins is the only contract that stays predictable, and the order is part of what
 a sample is saying. The fallback is required rather than defaulting to no animation: a cell that matched
@@ -3224,15 +3463,17 @@ quadrants would be invented here rather than read off the names.
 **A diagonal family needs the four axis zones as well as the four quadrants.** The quadrants leave out every
 cell sharing a row or a column with the origin, which on an odd grid with a centred origin is a cross of
 twenty-one cells out of a hundred and twenty-one — enough to look broken if they all fall through to the
-fallback. `_rollQuadrant` maps each axis to the quadrant member clockwise after it, and only the origin cell
+fallback. `rollQuadrant` maps each axis to the quadrant member clockwise after it, and only the origin cell
 itself reaches the fallback. A family with a centre member — `pop` has `popCenter` — needs no axis entries,
 because the fallback is already the right answer for the whole cross.
 
 **Entries the user has not yet groomed carry a leading underscore.** Asked for so that a batch of new samples
 can be found and judged against the existing collection in one pass; it is a review marker rather than a
 naming convention, and it comes off when an entry is kept. The Playground's option grouping strips it before
-grouping, so `_carouselQuadrant` appears inside the `carousel` group next to the four members it dispatches
-to, rather than in a group of its own — which is the comparison the prefix exists to make possible.
+grouping, so `_carouselQuadrant` sat inside the `carousel` group next to the four members it dispatches to
+while it was under review, rather than in a group of its own — which is the comparison the prefix exists to
+make possible. Nothing in the `CellAnimation` collections carries it now; the `ScanlineAnimation` keyframe
+builders still do.
 
 ### Controls: `Toasts`, and a queue the consumer owns
 
@@ -4677,16 +4918,26 @@ words, so this cannot be warned about; the requirement that a painter mark decor
 the other half. The Playground briefly used a visually-hidden span instead, which worked and is gone: it made
 every icon button carry a clip-rect idiom the consumer had to know.
 
-### `spiralSingle`'s overshoot is clamped, not re-derived
+### The 0..1 guarantee belongs to `computeCellWeights`, not to each formula
 
-The spiral mapping subtracts its raw result from 1 and divides, so a result below 1
-lifts the weight above it — which happens only with a half-integer origin, because the formula is built for
-whole-number distances. The return is now clamped into 0..1.
+Three formulas leave the range a weight is defined on, and always for the same reason: they are built for
+whole-number distances, and a centred origin on an even count makes the farthest bound a half-integer. `spiral`
+subtracts its raw result from 1 and divides, so a result below 1 lifts the weight above it. `radar` divides by
+`maxWeight - 1`, and measured on an eight-by-eight grid with a centred origin `radarSingle` reached -0.019,
+`radarDouble` -0.038 and `radarQuad` -0.083. `checkeredConvergent` reached -0.071 on the same grid and -0.25 on
+every cell of a two-by-two.
 
-It deliberately does **not** separate the two cells that share the extreme. Fixing that means rounding the
-distances before the formula runs, which changes measured weights across all three spiral variants — and
-measured values are the user's call, not something to re-bless while fixing a range violation. The test pins
-the range rather than the old 1.008.
+**So the clamp sits in `computeCellWeights`, once, on the user's call.** It is the only place that knows a
+weight is contractually a position on the timeline between 0 and 1, and per-formula clamps had already been
+added twice while a third case sat unnoticed. The two that existed are gone, so no formula clamps its own
+return any more, and a new sample cannot forget to.
+
+**What the clamp deliberately does not do is re-derive the formulas.** Dividing `radar` by `maxWeight`, or
+rounding `spiral`'s distances before it runs, would be the principled fix in each case and would move every
+measured weight on every grid, including the ones nobody complained about — and measured values are the user's
+call, not something to re-bless while closing a range violation. So the extremes stay shared where two cells
+share them, and the tests pin the range across every deterministic entry on the grids that overshoot rather
+than pinning the old out-of-range numbers.
 
 ### The form story: the library wires, the consumer validates
 

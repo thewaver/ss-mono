@@ -11,7 +11,7 @@ export const sequenceReverseBinary: WeightFn = (pos, count) => {
     const bits = Math.ceil(Math.log2(total));
 
     return CellAnimationWeightUtils.fromOrderedIndex(
-        MathUtils.reverseBits(CellAnimationWeightUtils.getFlatIndex(pos, count), bits) % total,
+        MathUtils.reverseBits(CellAnimationWeightUtils.getRowFlatIndex(pos, count), bits) % total,
         total,
     );
 };

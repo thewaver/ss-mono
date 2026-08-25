@@ -1028,7 +1028,7 @@ it, and each was put to the user as a sketch. Their gradings, in their own terms
 **Attractive, unbuilt.** The weight driving **how far** a cell travels rather than **when** it starts. Every
 cell would move at once and a heavy one would go further, so a stagger becomes a depth field and any existing
 animation reads completely differently without being rewritten. This was the second of the two they picked out;
-dispatch by zone was the first and is built, as `_fromZones`.
+dispatch by zone was the first and is built, as `fromZones`.
 
 **Rejected.** Composing two animations in sequence inside one cell's own window — fly in, then settle with a
 shake. Judged interesting in theory and likely too jarring in practice. Do not re-propose it without a new

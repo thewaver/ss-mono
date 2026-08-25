@@ -7,15 +7,19 @@ import { CellAnimationWeights } from "./CellAnimationWeights.const";
 
 const ODD_GRID: Point2d = { x: 7, y: 7 };
 const EVEN_COLUMN: Point2d = { x: 1, y: 8 };
+const EVEN_GRID: Point2d = { x: 8, y: 8 };
+const AWKWARD_GRIDS: Point2d[] = [EVEN_GRID, EVEN_COLUMN, { x: 10, y: 4 }, { x: 2, y: 2 }];
 
 const centreOf = (count: Point2d) => CellAnimationOrigins.computeOrigin("center", count);
 
-const DETERMINISTIC_WEIGHTS = CellAnimationWeights.WEIGHT_TYPES.filter((type) => type !== "randomDefault");
+const DETERMINISTIC_WEIGHTS = CellAnimationWeights.WEIGHT_TYPES.filter((type) => !type.startsWith("random"));
+
+const RANDOM_WEIGHTS = CellAnimationWeights.WEIGHT_TYPES.filter((type) => type.startsWith("random"));
 
 describe("CellAnimationWeightsConst", () => {
     it("knows which weights ignore the origin", () => {
         expect(CellAnimationWeights.isOriginAware("lineRow")).toBe(true);
-        expect(CellAnimationWeights.isOriginAware("circularDefault")).toBe(true);
+        expect(CellAnimationWeights.isOriginAware("diamondDefault")).toBe(true);
         expect(CellAnimationWeights.isOriginAware("sequenceLinear")).toBe(false);
         expect(CellAnimationWeights.isOriginAware("randomDefault")).toBe(false);
     });
@@ -32,7 +36,7 @@ describe("CellAnimationWeightsConst", () => {
     });
 
     it("stays finite on a single-cell grid, where the farthest bound is zero", () => {
-        const weights = CellAnimationWeights.computeCellWeights("circularDefault", { x: 1, y: 1 }, { x: 0, y: 0 });
+        const weights = CellAnimationWeights.computeCellWeights("diamondDefault", { x: 1, y: 1 }, { x: 0, y: 0 });
 
         expect(weights).toEqual([[1]]);
     });
@@ -52,7 +56,7 @@ describe("CellAnimationWeightsConst", () => {
         expect(first).toEqual(second);
     });
 
-    it.each(CellAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES.filter((type) => type !== "randomDefault"))(
+    it.each(CellAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES.filter((type) => !type.startsWith("random")))(
         "leaves %s unchanged when the origin moves",
         (type) => {
             const fromCorner = CellAnimationWeights.computeCellWeights(type, ODD_GRID, { x: 0, y: 0 });
@@ -63,8 +67,8 @@ describe("CellAnimationWeightsConst", () => {
     );
 
     it("moves an origin-aware weight when the origin moves", () => {
-        const fromCorner = CellAnimationWeights.computeCellWeights("circularDefault", ODD_GRID, { x: 0, y: 0 });
-        const fromCentre = CellAnimationWeights.computeCellWeights("circularDefault", ODD_GRID, centreOf(ODD_GRID));
+        const fromCorner = CellAnimationWeights.computeCellWeights("diamondDefault", ODD_GRID, { x: 0, y: 0 });
+        const fromCentre = CellAnimationWeights.computeCellWeights("diamondDefault", ODD_GRID, centreOf(ODD_GRID));
 
         expect(fromCorner).not.toEqual(fromCentre);
     });
@@ -118,14 +122,41 @@ describe("CellAnimationWeightsConst", () => {
         expect(Math.max(...convergent)).toBe(0.929);
     });
 
-    it("keeps spiralSingle inside 0..1 on a half-integer origin", () => {
-        const weights = CellAnimationWeights.computeCellWeights(
-            "spiralSingle",
-            EVEN_COLUMN,
-            centreOf(EVEN_COLUMN),
-        ).flat();
+    it.each(DETERMINISTIC_WEIGHTS)("keeps %s inside 0..1 on the grids a formula overshoots", (type) => {
+        for (const count of AWKWARD_GRIDS) {
+            const weights = CellAnimationWeights.computeCellWeights(type, count, centreOf(count)).flat();
 
-        expect(Math.max(...weights)).toBe(1);
-        expect(Math.min(...weights)).toBeGreaterThanOrEqual(0);
+            expect(Math.min(...weights), `${count.x}x${count.y}`).toBeGreaterThanOrEqual(0);
+            expect(Math.max(...weights), `${count.x}x${count.y}`).toBeLessThanOrEqual(1);
+        }
+    });
+
+    it.each(RANDOM_WEIGHTS)("draws %s again on every call, rather than repeating one pattern", (type) => {
+        const first = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centreOf(ODD_GRID));
+        const second = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centreOf(ODD_GRID));
+
+        expect(first).not.toEqual(second);
+    });
+
+    it.each(["sequenceMorton", "sequenceStrideRow", "sequenceStrideColumn"] as const)(
+        "starts %s from the origin, rather than from the first cell",
+        (type) => {
+            const fromCorner = CellAnimationWeights.computeCellWeights(type, ODD_GRID, { x: 0, y: 0 });
+            const fromCentre = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centreOf(ODD_GRID));
+
+            expect(fromCorner).not.toEqual(fromCentre);
+            expect(fromCorner[0][0], "the origin's own cell is the first to arrive").toBe(1);
+        },
+    );
+
+    it("turns the mirrored radar the other way round", () => {
+        const centre = centreOf(ODD_GRID);
+        const ccw = CellAnimationWeights.computeCellWeights("radarSingle", ODD_GRID, centre);
+        const cw = CellAnimationWeights.computeCellWeights("radarSingleCw", ODD_GRID, centre);
+        const axes = (weights: number[][]) => [weights[centre.y][ODD_GRID.x - 1], weights[centre.y][0]];
+
+        expect(axes(ccw), "counter-clockwise reaches the right of the origin before the left").toEqual(
+            axes(cw).reverse(),
+        );
     });
 });

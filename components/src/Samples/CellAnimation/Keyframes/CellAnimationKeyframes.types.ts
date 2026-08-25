@@ -19,7 +19,7 @@ export type CellAnimationFn = (
     defs: CellAnimationEvaluationDefs & { origin: Point2d },
 ) => CellAnimationEvaluationResult;
 
-export type _CellZone = {
+export type CellZone = {
     zone: CellAnimationZones.ZoneType;
     animation: CellAnimationFn;
 };

@@ -10,7 +10,7 @@ import {
     access,
 } from "@thewaver/ss-components";
 import type { WeightOpts } from "@thewaver/ss-components";
-import type { Point2d } from "@thewaver/ss-utils";
+import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
@@ -33,6 +33,7 @@ import { DefaultExample } from "./Examples/Default";
 import * as styles from "./CellAnimationPage.css";
 
 const IMAGE_CONTAINER_SIZE = 480;
+const DEFAULT_SOURCE_RATIO: SVGDefsSources.SourceRatio = "1:1";
 const STRESS_CELL_COUNT: Point2d = { x: 11, y: 11 };
 const STRESS_ITEM_SIZE = 120;
 const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
@@ -77,6 +78,8 @@ const DURATION_STEP_MS = 100;
 const MIN_ITERATION_DELAY_MS = 0;
 const MAX_ITERATION_DELAY_MS = 5000;
 
+const computeContainerWidth = (size: Size2d) => (IMAGE_CONTAINER_SIZE * size.width) / Math.max(size.width, size.height);
+
 const extractOptionGroupWord = (key: string) => key.replace(/^_/, "").match(/^[a-z]+/)?.[0] ?? key;
 
 const groupOptions = <T extends string>(keys: readonly T[]) => {
@@ -120,17 +123,21 @@ const ImageExampleWrapper = (props: CellAnimationExampleProps) => {
 };
 
 const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
-    const [getKey, setKey] = createSignal<SVGDefsSamples.Gradient.SampleKey>("orbit_1");
+    const [getKey, setKey] = createSignal<SVGDefsSamples.Gradient.SampleKey>("orbit_async_2v1");
+    const [getRatio, setRatio] = createSignal<SVGDefsSources.SourceRatio>(DEFAULT_SOURCE_RATIO);
+
+    const getSize = createMemo(() => SVGDefsSources.computeSourceSize(getRatio()));
 
     return (
         <>
             <div class={styles.exampleRoot}>
-                <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+                <PageMeasureBox width={() => computeContainerWidth(getSize())}>
                     <DefaultExample
                         {...props}
                         src={() =>
                             SVGDefsSources.computeGradientSource(
                                 getKey(),
+                                getSize(),
                                 access(props.animationDurationMs),
                                 access(props.animationIterationDelayMs),
                             )
@@ -148,6 +155,15 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
                         onChange={(key) => setKey(() => key)}
                     />
                 </PageProp>
+
+                <PageProp key={"gradientRatio"} label={"Ratio"}>
+                    <PageSelectField
+                        value={getRatio}
+                        values={() => SVGDefsSources.SOURCE_RATIOS}
+                        ariaLabel={"Gradient ratio"}
+                        onChange={(ratio) => setRatio(() => ratio)}
+                    />
+                </PageProp>
             </PagePropsPanel>
         </>
     );
@@ -155,14 +171,19 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
 
 const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
     const [getKey, setKey] = createSignal<SVGDefsSamples.Pattern.SampleKey>("hexagon_pt_2");
+    const [getRatio, setRatio] = createSignal<SVGDefsSources.SourceRatio>(DEFAULT_SOURCE_RATIO);
+
+    const getSize = createMemo(() => SVGDefsSources.computeSourceSize(getRatio()));
 
     return (
         <>
             <div class={styles.exampleRoot}>
-                <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
+                <PageMeasureBox width={() => computeContainerWidth(getSize())}>
                     <DefaultExample
                         {...props}
-                        src={() => SVGDefsSources.computePatternSource(getKey(), access(props.animationDurationMs))}
+                        src={() =>
+                            SVGDefsSources.computePatternSource(getKey(), getSize(), access(props.animationDurationMs))
+                        }
                     />
                 </PageMeasureBox>
             </div>
@@ -174,6 +195,15 @@ const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
                         values={() => SVGDefsSources.PATTERN_KEYS}
                         ariaLabel={"Pattern"}
                         onChange={(key) => setKey(() => key)}
+                    />
+                </PageProp>
+
+                <PageProp key={"patternRatio"} label={"Ratio"}>
+                    <PageSelectField
+                        value={getRatio}
+                        values={() => SVGDefsSources.SOURCE_RATIOS}
+                        ariaLabel={"Pattern ratio"}
+                        onChange={(ratio) => setRatio(() => ratio)}
                     />
                 </PageProp>
             </PagePropsPanel>
@@ -214,7 +244,7 @@ export const CellAnimationPage = () => {
     const playback = createSignal(true);
 
     const [getOriginType, setOriginType] = createSignal<CellAnimationOrigins.OriginType>("center");
-    const [getWeightType, setWeightType] = createSignal<CellAnimationWeights.WeightType>("circularDefault");
+    const [getWeightType, setWeightType] = createSignal<CellAnimationWeights.WeightType>("diamondDefault");
     const [getAnimationType, setAnimationType] = createSignal<CellAnimationKeyframes.AnimationType>("zoomIn");
     const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(2000);
     const [getAnimationIterationDelayMs, setAnimationIterationDelayMs] = createSignal(1000);
