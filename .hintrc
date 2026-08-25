@@ -1,0 +1,11 @@
+{
+    "extends": [
+        "development"
+    ],
+    "hints": {
+        "axe/aria": "warning",
+        "axe/forms": "warning",
+        "axe/text-alternatives": "warning",
+        "no-inline-styles": "off"
+    }
+}

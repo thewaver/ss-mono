@@ -1,0 +1,17 @@
+import type { JSX } from "solid-js";
+
+import type { AccessorProps } from "@thewaver/ss-components";
+
+export type StressTestDefs = {
+    count: number;
+    cols: number;
+    gap: number;
+};
+
+export type StressTestProps = AccessorProps<{
+    configs: StressTestDefs[];
+    onShowModal?: () => void;
+    onHideModal?: () => void;
+    renderLabel: (getConfigIndex: () => number) => JSX.Element;
+    renderItem: (getConfigIndex: () => number, getItemIndex: () => number) => JSX.Element;
+}>;

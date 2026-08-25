@@ -1,0 +1,19 @@
+import type { AccessorProps } from "../../Utils/typeUtils";
+
+export type TypewriterUpdateCause = "content" | "layout" | "other";
+
+export type TypewriterController = {
+    restartAnimation: () => boolean;
+    update: (cause: TypewriterUpdateCause) => void;
+};
+
+export type TypewriterProps = AccessorProps<{
+    animationName?: string;
+    animationDurationMs?: number;
+    animationDelayMs?: number;
+    initialAnimationDelayMs?: number;
+    resetAnimationOnLayout?: boolean;
+    resetAnimationOnContent?: boolean;
+    onMount?: (controller: TypewriterController) => void;
+    onAnimationEnd?: () => void;
+}>;

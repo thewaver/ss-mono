@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "jsx": "preserve",
+        "jsxImportSource": "solid-js",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "target": "ESNext",
+        "strict": true,
+        "verbatimModuleSyntax": true,
+        "skipLibCheck": true,
+        "noUnusedParameters": false,
+        "noUnusedLocals": true,
+        "noEmit": true,
+        "ignoreDeprecations": "6.0"
+    }
+}

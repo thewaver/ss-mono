@@ -1,0 +1,49 @@
+{
+    "name": "ss-mono",
+    "private": true,
+    "type": "module",
+    "workspaces": [
+        "utils",
+        "components",
+        "playground"
+    ],
+    "scripts": {
+        "start": "npm run start -w playground",
+        "dev": "npm run dev -w components",
+        "build": "npm run build -w utils && npm run build -w components",
+        "build:playground": "npm run build -w playground",
+        "build:all": "npm run build && npm run build:playground",
+        "preview": "npm run preview -w playground",
+        "test": "npm run test --workspaces --if-present",
+        "verify:dom": "playwright test",
+        "verify:dom:ui": "playwright test --ui",
+        "format": "prettier --write ."
+    },
+    "devDependencies": {
+        "@playwright/test": "^1.62.1",
+        "@trivago/prettier-plugin-sort-imports": "^6.0.2",
+        "prettier": "^3.9.6",
+        "typescript": "^6.0.3",
+        "vitest": "^4.1.11"
+    },
+    "prettier": {
+        "tabWidth": 4,
+        "printWidth": 120,
+        "quoteProps": "consistent",
+        "endOfLine": "auto",
+        "plugins": [
+            "@trivago/prettier-plugin-sort-imports"
+        ],
+        "importOrder": [
+            "^[a-z]",
+            "^@",
+            "^[./](?!.*\\.css$)",
+            ".*\\.css$"
+        ],
+        "importOrderSeparation": true,
+        "importOrderSortSpecifiers": true
+    },
+    "allowScripts": {
+        "esbuild@0.27.2": true
+    }
+}

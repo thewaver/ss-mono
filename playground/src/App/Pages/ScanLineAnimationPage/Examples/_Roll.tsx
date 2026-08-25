@@ -1,0 +1,34 @@
+import { ScanlineAnimation, access } from "@thewaver/ss-components";
+import type { AccessorProps } from "@thewaver/ss-components";
+
+import { CellAnimationBreakpoints } from "../../../Samples/CellAnimationBreakpoints/CellAnimationBreakpoints.const";
+import { CellAnimationWeights } from "../../../Samples/CellAnimationWeights/CellAnimationWeights.const";
+import { ScanlineAnimationKeyframes } from "../../../Samples/ScanlineAnimationKeyframes/ScanlineAnimationKeyframes.const";
+import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
+
+const WEIGHT_ORIGIN = { x: 0, y: 0 };
+
+type Props = ScanlineAnimationExampleProps &
+    AccessorProps<{
+        breakpointOpts: CellAnimationBreakpoints.BreakpointOpts;
+        keyframeOpts: ScanlineAnimationKeyframes._HorizontalRollOpts;
+    }>;
+
+export const RollExample = ({ keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props) => {
+    return (
+        <ScanlineAnimation
+            {...otherProps}
+            computeCellWeights={(count) =>
+                CellAnimationWeights.computeCellWeights(access(weightType), count, WEIGHT_ORIGIN)
+            }
+            computeScanlineAnimation={(defs, timeline) =>
+                ScanlineAnimationKeyframes._computeHorizontalRoll(
+                    CellAnimationBreakpoints.computeBreakpoints(defs.weight, access(breakpointOpts)),
+                    defs,
+                    timeline,
+                    access(keyframeOpts),
+                )
+            }
+        />
+    );
+};

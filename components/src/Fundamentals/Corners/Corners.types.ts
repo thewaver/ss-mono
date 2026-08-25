@@ -1,0 +1,13 @@
+import { Size2d } from "@thewaver/ss-utils";
+
+import type { AccessorProps } from "../../Utils/typeUtils";
+
+export type CornerKey = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
+
+export type CornersProps = AccessorProps<{
+    color?: string;
+    cornerLength?: Size2d;
+    strokeThickness?: number;
+    transitionDurationMs?: number;
+    visibleCorners?: Set<CornerKey>;
+}>;
