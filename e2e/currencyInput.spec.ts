@@ -94,11 +94,19 @@ test("a bound refuses a value as it is typed rather than nudging it", async ({ p
     await typeInto(page, field(BOUNDED), "600000");
 
     expect(await inputValue(page.locator(field(BOUNDED))), "the text is what was typed").toBe("6,000.00");
-    expect(await readout(page, "bounded"), "but a value over the maximum is not a value").toContain("value: none");
+    expect(
+        await readout(page, "bounded"),
+        "while the owner keeps the last amount the bound allowed, which is what 600000 passed through on its way up",
+    ).toContain("value: 600 —");
+    await expect(
+        page.locator(field(BOUNDED)),
+        "and the field says the figure it is showing is not the value",
+    ).toHaveAttribute("aria-invalid", "true");
 
     await typeInto(page, field(BOUNDED), "400000");
 
-    expect(await readout(page, "bounded"), "and one inside it is").toContain("value: 4000");
+    expect(await readout(page, "bounded"), "and one inside it is").toContain("value: 4000 —");
+    await expect(page.locator(field(BOUNDED)), "with the mark gone again").not.toHaveAttribute("aria-invalid", "true");
 });
 
 test("reads a pasted amount in punctuation it does not use", async ({ page }) => {

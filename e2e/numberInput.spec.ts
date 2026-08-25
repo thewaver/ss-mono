@@ -107,9 +107,33 @@ test("a typed value is clamped when the field is left, not while it is typed", a
         "clamping per keystroke would make the second digit untypeable",
     ).toBe("999");
 
+    expect(
+        await readout(page, "steppedClamped"),
+        "while the owner keeps the last reading the range allowed and never sees the 999",
+    ).toContain("value: 99");
+    await expect(
+        page.locator(QUANTITY),
+        "which the field says of itself rather than only holding back",
+    ).toHaveAttribute("aria-invalid", "true");
+
     await page.locator(DEFAULT).focus();
     expect(await inputValue(page.locator(QUANTITY)), "leaving the field is when it is brought into range").toBe("100");
-    expect(await readout(page, "steppedClamped"), "and the owner is told").toContain("value: 100");
+    expect(await readout(page, "steppedClamped"), "and the owner is told then").toContain("value: 100");
+    await expect(page.locator(QUANTITY), "with the field back in range and no longer marked").not.toHaveAttribute(
+        "aria-invalid",
+        "true",
+    );
+});
+
+test("an out-of-range number in the field is what the stepper steps from", async ({ page }) => {
+    await page.locator(QUANTITY).focus();
+    await page.keyboard.press("ControlOrMeta+a");
+    await page.keyboard.type("999");
+    await page.locator(QUANTITY_DOWN).click();
+    expect(
+        await inputValue(page.locator(QUANTITY)),
+        "stepping from the 99 the owner still holds would jump somewhere nobody typed",
+    ).toBe("100");
 });
 
 test("a read-only field refuses every way of moving the value", async ({ page }) => {

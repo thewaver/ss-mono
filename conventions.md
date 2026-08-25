@@ -1502,6 +1502,43 @@ digit. Written to keep half-typed values typeable rather than to accept only com
 minimum of 40, typing `5` becomes `40` before the `0` arrives. Stepping still clamps immediately, because
 a step is a complete gesture and typing is not.
 
+**And an out-of-range number is reported to nobody until the field settles.** Blur-clamping alone was not
+enough, because it only governs the text: the number still went out on every keystroke, so a duration field
+with a floor of 100 handed its consumer `5`, then `50`, and restarted the animation twice at durations nobody
+asked for. What holds the range now is silence — while the text parses to something the range refuses, the
+`valueSignal` and `onInput` are left alone and the owner keeps the last reading that was allowed. Leaving the
+field clamps and reports, as before, so the value an owner sees is only ever one it could have been given.
+
+**`undefined` is still only "empty", and out-of-range is held rather than reported as `undefined`.** An owner
+cannot afford the two to be one answer: `undefined` is what it acts on to mean "nothing was entered", and
+holding needs no third state to say the rest. `CurrencyInput`, `DateInput` and `TimeInput` reported `undefined`
+for a figure or a date their codec refused, which is the same fault a level down; `MaskedField` holds too now,
+so all four controls agree — see _"a value the codec refuses"_ in the `MaskedField` entry.
+
+**The field says so itself**, `hasError` ORing the range issue into whatever the owner passed, the same line
+`CurrencyInput` writes. It shows immediately rather than on blur, matching a native number field: `:invalid`
+tracks the value, so it follows `rangeUnderflow` from the keystroke that causes it — waiting for the field to
+be left is what the separate `:user-invalid` is for, and a control that reports nothing meanwhile owes the
+person typing the reason straight away.
+
+**Stepping, `Home` / `End` and the stepper's end flags read the text, not the reported value.** They used to
+read `valueSignal`, which was the same thing while every keystroke was reported and is not any more: with
+`999` typed into a field capped at 100 and the owner still holding `99`, an arrow would have stepped from the
+`99` nobody can see. The text is what the field holds; `valueSignal` is what the owner has accepted.
+
+**The fault this came out of was one level out, in the Playground's own panel adapter.** `PageNumberField`
+brought every keystroke into range before storing it, and the mirror then wrote the stored number back over
+the text — so with a floor of 100, pressing `5` to begin `500` left `100` in the field and the `0`s appended
+to that. It also reported twice, once through the mirror's setter and once through `NumberInput`'s `onInput`.
+Both are gone and the adapter now guards nothing, because the control does.
+
+**The general rule is that an owner may not correct a value a control reports mid-gesture.** A mirror is two
+sides that both write: the control writes what was typed, the owner writes what it decided to store, and
+anything the owner changes on the way in comes back over the text on the way out. Clamping, rounding and
+normalising are one shape here, and none of them is safe per keystroke. Where a control defines the moment a
+value settles, a correction belongs at that moment or nowhere — and a control that can be handed a reading it
+refuses should refuse it itself, rather than leaving every owner to remember not to.
+
 **The step ladder counts from `min`, not from zero**, matching a native number field: a value on a rung
 moves a whole step, one between rungs snaps to the next rung in the direction of travel. `computeStep`
 runs the arithmetic in whole units of the smallest decimal in play rather than in floats, so `0.1` from
@@ -5284,6 +5321,17 @@ the signal. Same shape as `SignalMirror`, same reason.
 whose digit run is short; measuring the _text_ agrees while every group is a fixed width and stops agreeing the
 moment one is not. `getDigitCount` returning `undefined` says the field has no notion of half-typed at all,
 which is the honest answer for an amount.
+
+**A value the codec refuses is reported to nobody, and the owner keeps the one it holds.** The commit effect
+used to hand `undefined` outward whenever a complete digit run yielded nothing — the 31st of February, a 24th
+hour, an amount over a field's maximum — so a field that had held a date all along spent a few keystrokes
+telling its owner it was empty, and whatever read that value acted on it. It now commits only what the codec
+accepts, plus the empty field itself: no digits still means no value, because that is what an empty field
+means, and everything else waits. Two things fall out of it. The half-typed guard is gone, because a codec
+that needs all its digits already answers `undefined` without them, which leaves `getDigitCount` to
+`getHasIssue` alone. And blur restores the text from the held value, which is what a half-typed value already
+did and what a refused one now does too — the field cannot clamp arbitrary text the way `NumberInput` clamps a
+number, so going back to the last accepted value is the only settling available.
 
 **The spelling follows the formatting as well as the value, and that needs its own effect.** Nothing else
 catches a change of format on its own: switching an amount field's locale leaves the value and the digits

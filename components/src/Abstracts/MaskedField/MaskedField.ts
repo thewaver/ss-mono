@@ -45,11 +45,11 @@ export namespace MaskedField {
 
         createEffect(() => {
             const digits = getDigits();
-            const digitCount = defs.getDigitCount();
+            const next = defs.fromDigits(digits);
 
-            if (digitCount !== undefined && digits.length > 0 && digits.length < digitCount) return;
+            if (digits.length > 0 && next === undefined) return;
 
-            commit(defs.fromDigits(digits));
+            commit(next);
         });
 
         createEffect(() => {

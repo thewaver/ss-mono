@@ -47,7 +47,8 @@ export const DatePickerPage = () => {
         {
             key: "typed",
             name: "Typed only",
-            readout: () => `value: ${describe(typedSignal[0]())} — a half-typed date reports nothing`,
+            readout: () =>
+                `value: ${describe(typedSignal[0]())} — a half-typed or impossible date leaves this value alone`,
             component: () => (
                 <TypedExample valueSignal={typedSignal} calendar={getCalendarId} ariaLabel={"Start date"} />
             ),

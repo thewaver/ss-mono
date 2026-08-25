@@ -46,6 +46,25 @@ describe("parseValue", () => {
     });
 });
 
+describe("getIsInRange", () => {
+    it("answers for both ends of the range it is given", () => {
+        expect(NumberInputUtils.getIsInRange(5, { min: 10, max: 20 })).toBe(false);
+        expect(NumberInputUtils.getIsInRange(25, { min: 10, max: 20 })).toBe(false);
+        expect(NumberInputUtils.getIsInRange(15, { min: 10, max: 20 })).toBe(true);
+    });
+
+    it("counts the ends themselves as inside", () => {
+        expect(NumberInputUtils.getIsInRange(10, { min: 10, max: 20 })).toBe(true);
+        expect(NumberInputUtils.getIsInRange(20, { min: 10, max: 20 })).toBe(true);
+    });
+
+    it("leaves an open end open", () => {
+        expect(NumberInputUtils.getIsInRange(-100, { max: 20 })).toBe(true);
+        expect(NumberInputUtils.getIsInRange(100, { min: 10 })).toBe(true);
+        expect(NumberInputUtils.getIsInRange(0, {})).toBe(true);
+    });
+});
+
 describe("clampValue", () => {
     it("holds the value inside the range it is given", () => {
         expect(NumberInputUtils.clampValue(5, { min: 10, max: 20 })).toBe(10);

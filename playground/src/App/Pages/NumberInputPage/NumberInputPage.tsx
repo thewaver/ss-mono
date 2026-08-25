@@ -37,7 +37,7 @@ export const NumberInputPage = () => {
             key: "steppedClamped",
             name: "Stepped and clamped",
             readout: () =>
-                `value: ${quantitySignal[0]()} — steps of ${QUANTITY_STEP} counted from ${QUANTITY_MIN}, typed values are clamped on blur`,
+                `value: ${quantitySignal[0]()} — steps of ${QUANTITY_STEP} counted from ${QUANTITY_MIN}; an out-of-range value is held back until the field is left`,
             component: () => <SteppedClampedExample valueSignal={quantitySignal} />,
             path: `${EXAMPLES_ROOT}/SteppedClamped.tsx`,
         },

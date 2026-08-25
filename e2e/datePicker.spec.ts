@@ -39,10 +39,17 @@ test("a complete date reaches the owner as a date, not as text", async ({ page }
     expect(await readout(page, "typed")).toContain("value: 2026-12-25");
 });
 
-test("a date that does not exist reports nothing rather than being nudged", async ({ page }) => {
+test("a date that does not exist is refused rather than nudged, and costs the owner nothing", async ({ page }) => {
     await typeInto(page, field(TYPED), "2026-02-31");
 
-    expect(await readout(page, "typed"), "the 31st of February is not the 3rd of March").toContain("value: none");
+    expect(
+        await readout(page, "typed"),
+        "the 31st of February is not the 3rd of March, and the date the field started with still stands",
+    ).toContain("value: 2026-08-10");
+    await expect(
+        page.locator(field(TYPED)),
+        "the field says instead that what it is showing is not a date",
+    ).toHaveAttribute("aria-invalid", "true");
 
     await typeInto(page, field(TYPED), "2026-02-28");
 
@@ -71,7 +78,10 @@ test.describe("a day-first field", () => {
         await typeInto(page, field(LOCALE), "31022026");
 
         expect(await inputValue(page.locator(field(LOCALE))), "the text is what was typed").toBe("31/02/2026");
-        expect(await readout(page, "locale"), "but the 31st of February is still not a date").toContain("value: none");
+        expect(
+            await readout(page, "locale"),
+            "but the 31st of February is still not a date, so the owner keeps the one it had",
+        ).toContain("value: 2026-08-10");
     });
 
     test("takes the digit with the separator when the separator is backspaced", async ({ page }) => {
@@ -199,11 +209,17 @@ test("a complete time reaches the owner, and an impossible one does not", async 
 
     await typeInto(page, field(TIME), "24:00");
 
-    expect(await readout(page, "time"), "there is no 24th hour").toContain("value: none");
+    expect(await readout(page, "time"), "there is no 24th hour, so quarter to three still stands").toContain(
+        "value: 14:45",
+    );
+    await expect(page.locator(field(TIME)), "with the field marking what it shows").toHaveAttribute(
+        "aria-invalid",
+        "true",
+    );
 
     await typeInto(page, field(TIME), "09:60");
 
-    expect(await readout(page, "time"), "nor a 60th minute").toContain("value: none");
+    expect(await readout(page, "time"), "nor a 60th minute").toContain("value: 14:45");
 });
 
 test("the arrows step whichever segment the caret is in, and select it", async ({ page }) => {
@@ -322,7 +338,10 @@ test.describe("a twelve-hour field", () => {
     test("refuses an hour a twelve-hour clock does not have", async ({ page }) => {
         await typeInto(page, field(TWELVE), "13:00");
 
-        expect(await readout(page, "twelve"), "there is no thirteenth hour to read").toContain("value: none");
+        expect(
+            await readout(page, "twelve"),
+            "there is no thirteenth hour to read, and half past two in the afternoon is unharmed by the attempt",
+        ).toContain("value: 14:30");
     });
 
     test("stepping the hour crosses noon and takes the half of the day with it", async ({ page }) => {

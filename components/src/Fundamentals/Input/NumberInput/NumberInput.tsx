@@ -22,6 +22,14 @@ export const NumberInput = (props: NumberInputProps) => {
 
     const getIsWritable = () => !(access(props.isDisabled) ?? false) && !(access(props.isReadOnly) ?? false);
 
+    const getTypedValue = () => NumberInputUtils.parseValue(textSignal[0]());
+
+    const getHasRangeIssue = () => {
+        const value = getTypedValue();
+
+        return value !== undefined && !NumberInputUtils.getIsInRange(value, getStepDefs());
+    };
+
     const reportValue = (value: number | undefined) => {
         props.valueSignal[1](value);
 
@@ -37,7 +45,7 @@ export const NumberInput = (props: NumberInputProps) => {
     const stepValue = (direction: 1 | -1) => {
         if (!getIsWritable()) return;
 
-        applyValue(NumberInputUtils.computeStep(props.valueSignal[0](), direction, getStepDefs()));
+        applyValue(NumberInputUtils.computeStep(getTypedValue(), direction, getStepDefs()));
     };
 
     let repeatDelay: ReturnType<typeof setTimeout> | undefined;
@@ -70,13 +78,13 @@ export const NumberInput = (props: NumberInputProps) => {
 
     const stepper: NumberInputStepper = {
         getIsAtMin: () => {
-            const value = props.valueSignal[0]();
+            const value = getTypedValue();
             const min = getStepDefs().min;
 
             return min !== undefined && value !== undefined && value <= min;
         },
         getIsAtMax: () => {
-            const value = props.valueSignal[0]();
+            const value = getTypedValue();
             const max = getStepDefs().max;
 
             return max !== undefined && value !== undefined && value >= max;
@@ -104,13 +112,18 @@ export const NumberInput = (props: NumberInputProps) => {
             type={"text"}
             inputMode={() => access(props.inputMode) ?? DEFAULT_NUMBER_INPUT_MODE}
             isSpinButton={true}
+            hasError={() => (access(props.hasError) ?? false) || getHasRangeIssue()}
             renderTrailing={props.renderTrailing && ((getFlags) => props.renderTrailing!(getFlags, stepper))}
             onInput={(text) => {
                 const sanitized = NumberInputUtils.sanitizeText(text);
 
                 textSignal[1](sanitized);
 
-                reportValue(NumberInputUtils.parseValue(sanitized));
+                const value = NumberInputUtils.parseValue(sanitized);
+
+                if (value !== undefined && !NumberInputUtils.getIsInRange(value, getStepDefs())) return;
+
+                reportValue(value);
             }}
             onKeyDown={(e) => {
                 if (!getIsWritable()) return;
@@ -132,7 +145,7 @@ export const NumberInput = (props: NumberInputProps) => {
                 }
             }}
             onBlur={() => {
-                const value = NumberInputUtils.parseValue(textSignal[0]());
+                const value = getTypedValue();
 
                 applyValue(value === undefined ? undefined : NumberInputUtils.clampValue(value, getStepDefs()));
             }}

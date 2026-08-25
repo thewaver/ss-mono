@@ -40,12 +40,6 @@ const DEFAULT_NUMBER_FIELD_WIDTH = 100;
 const DEFAULT_SELECT_FIELD_WIDTH = 150;
 const EMPTY_TEXT = "";
 
-const clampToRange = (value: number, min?: number, max?: number) => {
-    const floored = min === undefined ? value : Math.max(value, min);
-
-    return max === undefined ? floored : Math.min(floored, max);
-};
-
 const renderFieldPopup = (
     renderOptions: () => JSX.Element,
     getVisibilityTarget: () => 0 | 1,
@@ -90,11 +84,6 @@ export const PageNumberField = (props: PageNumberFieldProps) => {
                 />
             )}
             renderTrailing={(getFlags, stepper) => <PageNumberInputStepper flags={getFlags} stepper={stepper} />}
-            onInput={(value) => {
-                if (value === undefined) return;
-
-                props.onInput(clampToRange(value, access(props.min), access(props.max)));
-            }}
         />
     );
 };

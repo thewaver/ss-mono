@@ -54,6 +54,9 @@ export namespace NumberInputUtils {
 
     export const formatValue = (value: number | undefined) => (value === undefined ? "" : String(value));
 
+    export const getIsInRange = (value: number, defs: NumberInputRangeDefs) =>
+        (defs.min === undefined || value >= defs.min) && (defs.max === undefined || value <= defs.max);
+
     export const clampValue = (value: number, defs: NumberInputRangeDefs) => {
         const floored = defs.min === undefined ? value : Math.max(value, defs.min);
 
