@@ -1,4 +1,4 @@
-import { Carousel } from "@thewaver/ss-components";
+import { TrackCarousel } from "@thewaver/ss-components";
 import type { CarouselControls } from "@thewaver/ss-components";
 
 import {
@@ -25,11 +25,12 @@ const renderBar = (controls: CarouselControls) => (
 
 export const RotatingExample = (props: Props) => {
     return (
-        <Carousel
+        <TrackCarousel
             slides={props.slides}
             indexSignal={props.indexSignal}
             playingSignal={props.playingSignal}
             isDisabled={props.isDisabled}
+            dir={props.dir}
             autoplayDelayMs={props.autoplayDelayMs}
             gap={() => CAROUSEL_GAP}
             ariaLabel={"Rotating sampler"}

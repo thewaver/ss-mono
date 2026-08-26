@@ -146,7 +146,7 @@ single child, which is the point rather than an accident: the top level of `Samp
 components that have samples, and a second part slots in beside the first without the folder above it having
 to be invented later.
 
-**`MosaicImages` left `Samples` altogether** and is now `playground/src/App/Pages/ImageMosaicPage`. The user's
+**`MosaicImages` left `Samples` altogether** and is now `playground/src/App/Pages/MosaicPage`. The user's
 reasoning, and it is the line that decides what belongs here at all: the other samples are things a consumer
 might plausibly reach for to get something working quickly, while the mosaic shapes and their generated
 placeholder images exist only to give one Playground page something to draw. Nothing reusable, nothing a
@@ -2949,7 +2949,7 @@ ends**, clearing 7:1 rather than merely 4.5:1. Three groups have one AAA end and
 5.73 / 7.78, `info` 7.89 / 5.76 and `error` 7.30 / 5.22. Nothing in the palette is below AA on either end
 any more, so any `dark`-to-`light` gradient is safe to put its own `contrast` on.
 
-**The flat wheel's wedge is an SVG `path`, so it needed a real gradient def rather than a CSS one.** `fill`
+**The overhead wheel's wedge is an SVG `path`, so it needed a real gradient def rather than a CSS one.** `fill`
 cannot take a CSS gradient. Each `PageWheelWedge` renders its own two-stop `<linearGradient>` under a
 `createUniqueId`, and the picked state points the path's `fill` at it through an inline style — inline so it
 beats the class rule that carries the unpicked colour, which stays in the stylesheet where every other colour
@@ -6251,6 +6251,159 @@ is **not** rotating, because narrating a slide every few seconds is the noise WC
 scrolled off the side is still in the tab order without it, so a keyboard user would tab into a slide nobody
 can see and drag the track after them.
 
+**Both directions ship, as a `dir` prop of `"row" | "column"` defaulting to `"row"`** — the name and the union
+`Tabs`, `Stepper`, `RadioGroup` and `SplitPane` already carry. Four things read it: the track's flex direction,
+the slide's basis (a flex basis of `100%` is measured along the main axis, so one declaration means width in a
+row and height in a column), the axis the transform translates on, and the swipe axis handed to
+`InteractionTracker`, which already had a vertical mode for `Modal`. The step a committed swipe takes is now
+one expression covering all four directions — left and up bring the next slide in, right and down the previous
+— rather than a comparison per direction.
+
+**Nothing in the markup names an axis, and that is the pattern's own position.** The published carousel pattern
+defines a carousel as sequential display of slides and never mentions orientation; its controls are "previous"
+and "next", which are sequence words rather than compass ones. `aria-orientation` is not among the attributes
+`role="region"` supports, so there is nothing to set even if there were something to say. A column carousel is
+therefore announced exactly as a row one is.
+
+**A column carousel has no height of its own and takes it from the box around it, rather than from a prop.** A
+row carousel gets its width from the page for nothing; a column one cannot get a height the same way, because
+the track must be exactly one slide tall for a translation of `100%` to mean one step, and slides stacked in
+normal flow make the track as tall as all of them together. So in column mode the root is `height: 100%`, the
+viewport takes what is left of it after the controls, and the consumer's own element carries the number. That
+is `SplitPane`'s arrangement — fill the box you are given, state no size. A `height` prop was the alternative
+and was refused for the reason `DrumWheel` can require `wedgeSize` and this cannot: a prop mandatory in one
+direction and meaningless in the other is a shape the type cannot state, which is the same objection that
+keeps a drum carousel out of `Carousel`'s own props.
+
+### `TrackCarousel` and `DrumCarousel`: one behaviour, two ways of showing it
+
+A carousel and a drum wheel are the same picture driven by different arithmetic, which is what `Barrel` was
+lifted out to make usable twice. The wheel spins to a wedge nobody chose; a carousel steps to a slide somebody
+did. So the barrel is now shown by two components — one turned by `Rotator`, one turned by an index — and the
+carousel's own behaviour, all of it, is shared between its two presentations.
+
+**The shell is `Carousel` and it is not exported; the presets are.** Same arrangement as `Spotlight` and as
+`OverheadWheel` / `DrumWheel`, and for the same reason: `slideSize` is required on the drum and meaningless on
+the track, `renderSlideBack` likewise, and a single component with a variant prop could state neither. The
+public names are `TrackCarousel` and `DrumCarousel`.
+
+**The user took this knowing it reads worse than the sets it copies.** `Spotlight` and `Wheel` were shells from
+the start, so no name was taken away when their presets arrived; here the plain `Carousel` was already the
+component people rendered, and it is now the family name instead. `Track` was chosen over `Slide` because both
+kinds have slides — naming a preset after the half they share is the fault `Flat` had, recorded above.
+
+**`dir` belongs to the track and `axis` to the drum, and they are not the same word for the same thing.**
+`dir` is a flex direction: it says whether the slides sit in a row or a column, exactly as it does on `Tabs` and
+`Stepper`. `axis` is the line the barrel turns about, which is `DrumWheel`'s word for the same idea and takes
+the same `"row" | "column"` values for the same reason — a row of faces turns about the upright axis. One prop
+each, on the preset that has the concept, rather than one prop meaning two things.
+
+**The drum keeps a running angle and turns the short way; the track slides straight to the index.** A face's
+transform is derived from an angle, and an angle taken as `index × step` jumps from `0°` to `270°` on the first
+forward step of a four-slide drum — a quarter turn that animates as three quarters backwards. So the shell
+holds the angle itself, moves it by the signed shorter number of steps on each index change
+(`CarouselUtils.getTurnSteps`), and resets it when the slide count changes underneath it. The track has no such
+choice to make: its transform is `index × 100%` along one axis, which is already continuous, and it rewinds
+visibly when a step wraps from the last slide to the first. **The two therefore disagree at the wrap**, and the
+disagreement is not resolved here: making the track wrap the short way means moving a slide before it is shown,
+which is a different mechanism rather than a different constant.
+
+**A partial swipe turns the barrel by that fraction of a step**, the same way it drags the track by that
+fraction of a slide, and it is written once: the swipe ratio times the step angle for the drum, times a slide
+width for the track. What commits, what is thrown away, and what a hold does are all the shared shell's.
+
+**`CarouselSlideState` gained a `face`, and the track's is always `"front"`.** A drum face can be the back of a
+slide, which the consumer renders through `renderSlideBack`; the field is on the shared state rather than on a
+drum-only one, exactly as `WheelWedgeState.face` is shared by a wheel that never has a back.
+
+### `FlipCard`: the smallest thing that can turn a barrel
+
+**A card is not a carousel, and inheriting the carousel's contract was the alternative that got refused.** The
+options were a Playground example of a two-slide `DrumCarousel`, a preset over the carousel shell, and a
+component of its own over `Barrel`; the user took the third. A card has no sequence — nothing wraps, there is no
+picker, nothing rotates on a timer, and there is nothing to announce as "1 of 2". What it needs is two faces, a
+side to show and a duration, and everything else the carousel holds would arrive as vocabulary a consumer has
+to ignore.
+
+**A flip card is the degenerate barrel rather than a special case of one.** At two faces the apothem works out
+to zero, so the pair sits back to back with nothing between them, and the existing rule that a barrel prints no
+reverse below three faces already covers it. Nothing was added to `Barrel` to make this component: two faces, an
+angle of `0°` or `-180°`, and the same `computeFaceDefs` every other consumer uses. That it needed nothing is
+the evidence the abstract was drawn in the right place.
+
+**The barrel's own front and back are not the card's two sides.** A barrel slot has a front and a reverse; this
+card's sides are two _slots_, at `0°` and `180°`. The distinction matters only when reading the code, and it is
+why `FlipCardFace` is a different idea from `BarrelFace` despite being the same two words.
+
+**The angle reverses rather than accumulating.** Flipping back turns the card the way it came, which is what a
+hand does with a card. Nothing accumulates, so there is no running angle to keep — unlike the drum carousel,
+which does keep one because it has more than two faces to reach.
+
+**`flippedSignal` is required, and the card renders no control at all.** Two reasons, and the first is the
+hard one: a card's faces hold arbitrary content, which may itself be interactive, so the card cannot be a
+`<button>` without swallowing whatever is inside it. The second is `Carousel`'s recorded exposure — a library
+that renders no button cannot promise one is reachable or named — which means the page must own the control
+either way. The signal is required rather than optional because an internal one nobody can set is a card that
+can never turn.
+
+**Placed in `Fundamentals` beside `ImageSwitcher`, and that was derived rather than asked.** It swaps one piece
+of content for another with a transition, which is what `ImageSwitcher` does for a single image. The `Exotics`
+test — renders DOM, holds no value, lays elements out or turns them — would also take it, and where these two
+folders divide is the user's call rather than a rule written here.
+
+### `Cuboid`: a box of six faces, and two counts that drive it
+
+Asked for as "like the drum, but two axes of control, and not necessarily even faces". It shares the barrel's
+perspective and its projection formula and none of its arithmetic, which is the honest split rather than a
+missed reuse.
+
+**Named `Cuboid` and placed in `Exotics`, both on the user's call.** It was built as `Cube` and the name was
+put to them, since a component whose point is that the three extents differ is only a cube by accident; they
+took the exact word. `Exotics` is where they put it, which also settles that the turning components belong
+there rather than beside the carousels — `FlipCard` sits in `Fundamentals` and was not moved, and the user
+noted that `DrumCarousel` would fit `Exotics` too but that splitting the two carousels across folders is not
+worth doing now. That last point is recorded in `backlog.md` under _Open discussion_ rather than settled here.
+
+**What a screen reader is told is `box`, not `cuboid`.** `aria-roledescription` is read aloud, and the word it
+replaces the role with should be the ordinary one — a listener meets "box, group" rather than a term they may
+have to stop and parse. The exact word is right for the API, where the reader is a developer choosing a
+component, and the plain one is right for the page.
+
+**A barrel derives one radius; a box is told three extents.** Every face of a barrel is the same size, so the
+distance from the axis follows from the face count by trigonometry. A box has a width, a height and a depth,
+each face sits at half of one of them, and each face's own size is the two extents it spans — the sides take
+the depth as their width, the lid and the floor take it as their height. There is no trigonometry anywhere in
+`CuboidUtils`.
+
+**The rotation is on the box; a barrel's is on each face.** A box turns as one about two axes, so one transform
+on the body says everything: push back by half the depth, then pitch, then yaw. A barrel cannot do that,
+because each of its faces sits at its own angle around a single axis. This is why `Cuboid` renders its own
+markup rather than going through `Barrel`.
+
+**Two counts of quarter turns, not a named face.** `yawSignal` and `pitchSignal` are unbounded integers, and
+the angle is the count times ninety degrees. Three things fall out of that. The box always turns the way it was
+pushed, because a count of `+1` is a quarter turn in that direction whatever the count already was. There is no
+wrapping problem to solve — the drum carousel had to keep a running angle for exactly this reason, and here the
+running total _is_ the API. And naming a face instead would have required the component to choose a route to it,
+of which there are several, none obviously right.
+
+**Turning over the top leaves the far side upside down, and that is kept rather than prevented.** The strategy
+put to the user said the pitch would be clamped at a quarter turn either way, on the grounds that the two axes
+collide there — on the lid, turning across spins the lid in place instead of bringing a new face. Built, that
+argument does not hold up: clamping makes a second press of "up" do nothing, where a real box tips over its top
+and shows its back inverted. So pitch cycles like yaw, the inverted states are reachable, and `cuboid.spec.ts`
+pins the sequence. What is genuinely degenerate — turning across while on the lid — is left as it is, because
+it is what a box does.
+
+**The room it reserves is the silhouette of the sphere the box sits inside.** `BarrelUtils.getProjectedExtent`
+is now the shared piece: it takes a circumradius and how far the centre sits behind the screen, and returns the
+extent the projection can reach — `getGirth` is expressed through it and its numbers are unchanged, which the
+existing wheel tests prove. `Cuboid` passes the half-diagonal of the whole box, so the reservation is correct at
+every orientation including the ones that combine both turns. It over-reserves for a slab — a box 400 wide, 40
+tall and 400 deep reserves a square of its diagonal — and that was chosen deliberately: the drum's reservation
+shipped wrong twice, both times by being tight and self-consistent, and a box that paints outside its room
+overlaps whatever sits beside it.
+
 ### The source view, as built, and the four calls the mechanism forced
 
 Built against the two entries above. Where a rule had to be derived rather than read off, it is
@@ -6340,15 +6493,49 @@ the Playground needs for its own sake does not.
 One type per page rather than one per example is what lets a single props panel drive all of them, which is
 the rule the panel already worked to.
 
+**A knob whose value has a unit names it in the label, in parentheses.** `Width (px)`, `Turn duration (ms)`,
+`Shift (%)`, `Skew (deg)`. Asked for by the user after a page shipped with bare `Width` and `Turn`, and it is
+the whole rule: a count has no unit and takes none, so `Slide count`, `Wedges` and `Items` stay as they are.
+The field's own `ariaLabel` spells the unit in words instead — "width in pixels" — because the panel's label is
+a plain `div` rather than a `<label>`, so the accessible name is whatever the field carries and a screen reader
+never hears the visible text. The one place left without a unit on purpose is `Toasts`' duration: its values
+are a select whose options print their own `ms`, and one of them is `sticky`, which is not a duration at all.
+
+**A page may hold two components, and then the page's type is what the global panel drives rather than what an
+example takes.** `ElementMosaic` and `ImageMosaic` had a page each and now share `MosaicPage`, one example
+apiece. Three knobs mean the same thing to both — how many items, the gap, and which side is fixed — so those
+stay global behind a single `MosaicExampleProps`, while each example file keeps its own props type for what it
+actually receives: tiles on one side, image sources on the other. **What only one of them has goes in that
+example's own local panel** — a target shape means nothing to an element mosaic, so it sits under the image
+demo instead of in the global row. The user's instruction when merging the pages, and it generalises: share
+what can be shared, make the rest local.
+
+**The image mosaic's second demo became a knob on the first**, which is the rule above rather than a new one.
+The decorated version differed from the plain one only in whether each image is wrapped in an element of the
+consumer's own, so it is a checkbox in that example's local panel now. `imageMosaic.spec.ts` turns it on before
+the one test that needs it, and addresses its demo by the example key `images` rather than by the page.
+
 **Two demos differing by one prop are one example and a panel knob, never two files.** Corrected by the user,
-three times in a row on the same mistake: `Formation`'s pair differed only in `getIsStackedInReverse`,
+four times now, and the fourth went further than the first three, in two steps. A carousel demo turned on its
+side was built as its own example on the argument that a column also needs a box with a height around it, so
+the two differed by more than the prop; that does not survive, because the box is the page's furniture. The
+correction to _that_ was the second step and is the part worth keeping: **a knob that means the same thing to
+every demo on the page belongs in the global panel, not in a local one per example.** Direction is one global
+select now, and it drives the tracks' `dir` and the drum's `axis` together — a local knob per demo would have
+been the same choice asked four times.
+
+**Furniture that only one direction needs is still sized for both, so a card does not resize when a knob
+changes.** The user's objection, and it is about the page rather than the component: the box round each
+carousel demo was `height: 320` for a column and nothing for a row, so switching direction made every card
+jump. It is one fixed height for both now, with the demo centred in it — a row carousel leaves slack under
+itself and a column one fills it, and the card stays put either way. The first three corrections: `Formation`'s pair differed only in `getIsStackedInReverse`,
 `Satellite`'s first two only in `getIsBehindSubject`, and `Staircase`'s only in `getDir`, and each was first
 built as two example files with the value written into each. Every one of them is now a single example with
 that prop wired to a control in the global panel — a `PageCheckField` for a boolean, a `PageSelectField` for
 an enum. This is the same rule as _"a props-panel control drives every instance"_ read from the other end: a
 value the panel could own is not a reason for a second demo, and two demos over one differing literal are two
 copies of one example rather than two examples. **A second example has to be a different call**, as
-`Wheel`'s three are — `FlatWheel` against `DrumWheel`, and a drum handed the prize list twice over to prove it
+`Wheel`'s three are — `OverheadWheel` against `DrumWheel`, and a drum handed the prize list twice over to prove it
 can carry the same prizes round more than once.
 
 **Dropping a demo drops its spec, and that is the trade to state rather than work around.** `Satellite`'s
@@ -6518,7 +6705,7 @@ the content — so hugging implies a wrapping row, and a wrapping row is only wo
 `getLayout` is therefore a single prop with `grid` (the default) and `flow`, and no page states both.
 
 **The rule for which is whether the demo owns its width.** A demo the page hands a size to is being shown for
-its footprint, so the card has to be flush with it: `Shape`'s `fit-content` host, `Wheel`'s 340px flat wheel,
+its footprint, so the card has to be flush with it: `Shape`'s `fit-content` host, `Wheel`'s 340px overhead wheel,
 every measure box that is given a width. A control that takes whatever width it is given — a field, a tree, a
 tab strip — has no size of its own, any width is as arbitrary as any other, and an even column beats a ragged
 one. Argued from ownership rather than from how the pages happen to look: a demo with no width cannot be
@@ -6651,8 +6838,15 @@ user's call was where these four go; whether that is the general test is theirs 
 `Fundamentals` control, and `DecorationWrapper` would have given the library a second meaning for
 "decoration" — `InteractionWrapper.renderDecoration` is the full-box overlay behind a control, which is a
 different mechanism. `Staircase` was kept, `Satellite` and `Formation` chosen with the user, and `TopWheel` /
-`SideWheel` became `FlatWheel` / `DrumWheel` because "top" and "side" describe where the camera is rather than
-what the object is.
+`SideWheel` first became `FlatWheel` / `DrumWheel` on the argument that "top" and "side" describe where the
+camera is rather than what the object is.
+
+**That argument was overturned by the user, and the wheel is now `OverheadWheel`.** Where the camera stands is
+exactly what distinguishes these two, and "flat" named the absence of perspective rather than the view — a
+property of the drawing, not of the thing. `OverheadWheel` was taken over `TopWheel` because "top" reads as
+topmost or best for a moment before it reads as a viewpoint, at the price of a longer name than the library
+usually carries. `DrumWheel` keeps its name: "drum" names the object and needs no viewpoint to be understood,
+so the pair is deliberately mixed rather than forced into `OverheadWheel` / `SideWheel`.
 
 **What came across as paint stayed out of the library.** The originals shipped a leaf painter with five SVG
 shapes, a wedge painter, a pointer, a banner and a starfield. `Shape` and `ShapeConst.getDefaultShapePoints`
@@ -6933,7 +7127,7 @@ only `trackPageHidden`.
 are all still on the page, so a live region over them announces nothing, and narrating an idle wheel every few
 seconds is the noise 2.2.2 exists to prevent.
 
-### `FlatWheel` and `DrumWheel`: two presets, because a wheel cannot become a drum
+### `OverheadWheel` and `DrumWheel`: two presets, because a wheel cannot become a drum
 
 **They share behaviour and no markup at all.** One rotates in the plane of the screen; the other is a barrel
 seen edge-on, with a front and a back face per wedge, a perspective ancestor and a size derived from the
@@ -7052,10 +7246,10 @@ named.** A consumer who wires up no control has a wheel that can only be driven 
 item 18 records for `Scroller` and it is now the wheel's too.
 
 **No slot survives either, and the one that briefly did was kept for a bad reason.** A `renderHub` was left on
-the flat wheel out of deference to an earlier choice — that a flat wheel has one control slot and it is the
+the overhead wheel out of deference to an earlier choice — that an overhead wheel has one control slot and it is the
 hub. The user axed it. That choice was about where a **button** goes and there is no button
 now; intrinsically the slot contributed one number, `inset: 35%`, which is paint, and a consumer who wraps the
-wheel in a positioned box writes it themselves. The Playground does exactly that. `FlatWheel` renders wedges
+wheel in a positioned box writes it themselves. The Playground does exactly that. `OverheadWheel` renders wedges
 and nothing else, `DrumWheel` renders a barrel and nothing else.
 
 **The handle arrives after the first render, which is a real consequence rather than a wrinkle.** A control
@@ -7063,7 +7257,7 @@ reading `getController()?.getIsSpinnable()` sees `undefined` for the first tick 
 `onMount` fires after the tree is built. `Typewriter`'s `getController()?.update(…)` has the same shape and the
 same tick. Nothing on screen has moved by then, so no consumer has yet been able to press anything.
 
-**The flat wheel exposes every wedge; the drum hides the ones that have turned away.** All of a flat wheel's
+**The overhead wheel exposes every wedge; the drum hides the ones that have turned away.** All of an overhead wheel's
 wedges are painted at once, so all of them are real content. A drum's are not — `backface-visibility` removes
 them from the picture — and `Carousel`'s rule applies: a control nobody can see is still in the tab order, so
 the faces that are not at the marker are `aria-hidden` and `inert`, and the back faces always are.
@@ -7093,7 +7287,7 @@ lavender to plain white.
 
 Measured on the built page afterwards, so nobody has to take them again:
 
-- **The flat wheel's label**, 17.35px regular on a 340px wheel, so normal text needing 4.5:1: **7.04:1**, up
+- **The overhead wheel's label**, 17.35px regular on a 340px wheel, so normal text needing 4.5:1: **7.04:1**, up
   from 3.41:1.
 - **The drum card's text**, 14px regular, the same pairing: **7.04:1**, up from 3.41:1.
 - **The drum card's rank badge**, `primary.main` at 24px, which is large text needing 3:1: **4.10:1**, up from
@@ -7113,18 +7307,18 @@ conditions cannot both hold, so nothing was needed to keep the highlight off the
 demos put a `PageWheelPip` — a filled triangle — against the edge of the box that the wedge at rest fills, so
 whatever the wheel has stopped on has the pip touching it. The wheel never has to say where that is, because
 the resting position is fixed by the geometry already recorded above: `getIndexAngle` turns the chosen wedge
-to zero degrees, and at zero degrees a flat wheel's wedge is drawn straight up and a drum's face is the one
+to zero degrees, and at zero degrees an overhead wheel's wedge is drawn straight up and a drum's face is the one
 squarely in front. So the pip is a static piece of paint at a known edge, and nothing about it moves or is
 measured.
 
 **Which edge it sits on follows the direction of travel, not the variant.** Faces that travel sideways — a
-flat wheel's rim and a drum on the upright axis — take the pip above, pointing down; the reel's faces travel
+overhead wheel's rim and a drum on the upright axis — take the pip above, pointing down; the reel's faces travel
 up and over, so it takes the pip at the left, pointing in. `PageWheelPip` accepts that as `getSide`, one of
 `"top"` or `"left"`, and the same class both places the box and turns the glyph. It hangs 70% of its own size
 outside the edge, so the tip crosses onto the wedge and the body reads as sitting outside it.
 
 **The drums needed a box of their own to be measured against, and `PageWheelStack` could not be it.** The flat
-demo's stack is a full-width block because `FlatWheel` is `width: 100%` inside it, and a box that shrinks to
+demo's stack is a full-width block because `OverheadWheel` is `width: 100%` inside it, and a box that shrinks to
 its content cannot give a percentage width anything to resolve against. A drum's own girth box is definite
 pixels, so `PageWheelMount` is `width: fit-content` with automatic side margins: it ends up exactly the girth
 box, whose top edge is the front face's top edge and whose left edge is the front face's left edge. That is
@@ -7134,6 +7328,42 @@ the whole difference between the two wrappers, and it is why there are two.
 Playwright check compares the box a drum reserves against the boxes its faces occupy, reading both from inside
 `[aria-roledescription="wheel"]`. The pip is a sibling of that element rather than a child, so it can hang over
 the edge without the check reading the overhang as a drum painting outside its room.
+
+### `Barrel`: the drum, lifted out of the wheel so a second component can turn one
+
+A drum and a carousel are the same picture driven by different arithmetic — a barrel of faces seen through a
+perspective, turned to bring one of them to the front. What differs is where the angle comes from: `Rotator`'s
+spin, overshoot and settle for a wheel, an index and a step for a carousel. So the barrel is now an abstract
+and the angle is its caller's.
+
+**The abstract renders, which most of `Abstracts` does not.** `Rotator`, `Anchor` and `Virtualizer` are state
+with no DOM at all. `Barrel` is four nested elements — a girth box, a perspective box, the barrel itself, and
+one absolutely positioned element per face — and lifting only the arithmetic would have left both consumers
+holding the same markup and the same four class names. The split is drawn where it costs nothing: the abstract
+owns the box, the depth and every face's `transform`; the consumer owns the element around it, what goes inside
+each face, and every word said about them.
+
+**Each face's name and hidden-ness come back through `computeFaceDefs`, because the vocabulary is the
+consumer's.** A wheel's faces are wedges and a carousel's are slides, and the two disagree about what is
+hidden — a wheel hides everything but the wedge at the front, and only its own rules say so. `Barrel` takes
+`faceRoleDescription` and asks per face for a label and whether it is away, then writes `aria-hidden` and
+`inert` from the answer. It never decides either.
+
+**The geometry moved and the names stayed, which is what proves the move changed nothing.** `WheelUtils.getApothem`,
+`getCircumdiameter`, `getGirth`, `getWedgeExtent` and `getHasWedgeBacks` are now aliases of `BarrelUtils`, so
+`Wheel.utils.test.ts` still exercises the same functions through the same published names, and the wheel's own
+Playwright suite — including the drum's "paints inside the room it reserves" checks — is unchanged and passes.
+That is the same standard the `RotationUtils` conversion was held to.
+
+**The face transform is a function now, rather than a template literal inside the markup.** It was the one
+piece of the drum with no test around it: an axis, a face, an angle, an index, a count and an apothem in;
+`rotateY(-120deg) translateZ(50px)` out, with a half-turn appended for a back. `BarrelUtils.getFaceTransform`
+is unit-tested against those strings, which is cheaper than reading them off a rendered page.
+
+**A barrel carries a transition duration it does not use by default.** The wheel animates its angle frame by
+frame and wants no transition at all, so the property is declared and the duration left unset, which is a
+transition of zero. A carousel steps its angle in one jump and asks for the duration it already publishes.
+Both behaviours live side by side rather than one winning.
 
 ### `ElementObserver` reports a size, and the height observer is a view of it
 

@@ -1,11 +1,11 @@
 import { ElementMosaic } from "@thewaver/ss-components";
 
 import { PageMosaicTile } from "../../../StyledComponents/MosaicContent/MosaicContent";
-import type { ElementMosaicExampleProps } from "../ElementMosaicPage.types";
+import type { ElementsExampleProps } from "../MosaicPage.types";
 
-type Props = ElementMosaicExampleProps;
+type Props = ElementsExampleProps;
 
-export const DefaultExample = (props: Props) => {
+export const ElementsExample = (props: Props) => {
     return (
         <ElementMosaic
             items={props.items}

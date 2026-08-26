@@ -38,3 +38,30 @@ describe("getStepTarget", () => {
         expect(CarouselUtils.getStepTarget("previous", 0, 1)).toBe(0);
     });
 });
+
+describe("getTurnSteps", () => {
+    it("counts one step forward as one step forward", () => {
+        expect(CarouselUtils.getTurnSteps(0, 1, 4)).toBe(1);
+        expect(CarouselUtils.getTurnSteps(1, 0, 4)).toBe(-1);
+    });
+
+    it("goes backwards over the end rather than the whole way round", () => {
+        expect(CarouselUtils.getTurnSteps(0, 3, 4)).toBe(-1);
+        expect(CarouselUtils.getTurnSteps(3, 0, 4)).toBe(1);
+    });
+
+    it("takes the shorter side of a long jump", () => {
+        expect(CarouselUtils.getTurnSteps(0, 7, 8)).toBe(-1);
+        expect(CarouselUtils.getTurnSteps(0, 5, 8)).toBe(-3);
+        expect(CarouselUtils.getTurnSteps(0, 3, 8)).toBe(3);
+    });
+
+    it("goes forward when the two are exactly opposite, so the choice is at least the same every time", () => {
+        expect(CarouselUtils.getTurnSteps(0, 2, 4)).toBe(2);
+        expect(CarouselUtils.getTurnSteps(2, 0, 4)).toBe(2);
+    });
+
+    it("has nowhere to turn with no slides", () => {
+        expect(CarouselUtils.getTurnSteps(0, 1, 0)).toBe(0);
+    });
+});

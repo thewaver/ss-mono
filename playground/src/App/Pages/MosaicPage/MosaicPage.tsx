@@ -7,9 +7,11 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
-import type { ElementMosaicExampleProps, PageMosaicTileDefs } from "./ElementMosaicPage.types";
-import { DefaultExample } from "./Examples/Default";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
+import { ElementsExample } from "./Examples/Elements";
+import { ImagesExample } from "./Examples/Images";
+import { MosaicImages } from "./MosaicImages.const";
+import type { MosaicExampleProps, PageMosaicTileDefs } from "./MosaicPage.types";
 
 const MIN_ITEM_COUNT = 1;
 const MAX_ITEM_COUNT = 12;
@@ -19,13 +21,14 @@ const MAX_GAP = 24;
 const GAP_STEP = 2;
 const FIELD_WIDTH = 130;
 const MOSAIC_EXTENT = 380;
-const EXAMPLES_ROOT = "/src/App/Pages/ElementMosaicPage/Examples";
+const EXAMPLES_ROOT = "/src/App/Pages/MosaicPage/Examples";
 
 const SIZE_ANCHORS: MosaicSizeAnchor[] = ["width", "height"];
 
 const STARTING_ITEM_COUNT = 9;
 const STARTING_GAP = 8;
 const STARTING_SIZE_ANCHOR: MosaicSizeAnchor = "width";
+const STARTING_SHAPE_KEY: MosaicImages.SampleShapeKey = "square";
 
 const TILES: PageMosaicTileDefs[] = [
     { name: "Aurora", width: 150, height: 90 },
@@ -42,37 +45,83 @@ const TILES: PageMosaicTileDefs[] = [
     { name: "Loam", width: 50, height: 90 },
 ];
 
-const DefaultExampleWrapper = (props: ElementMosaicExampleProps) => {
+const ElementsExampleWrapper = (props: MosaicExampleProps) => {
+    const getItems = createMemo(() => TILES.slice(0, access(props.itemCount)));
+
     return (
         <PageMeasureBox
             width={access(props.sizeAnchor) === "width" ? () => MOSAIC_EXTENT : undefined}
             height={access(props.sizeAnchor) === "height" ? () => MOSAIC_EXTENT : undefined}
         >
-            <DefaultExample {...props} />
+            <ElementsExample items={getItems} gap={props.gap} sizeAnchor={props.sizeAnchor} />
         </PageMeasureBox>
     );
 };
 
-export const ElementMosaicPage = () => {
+const ImagesExampleWrapper = (props: MosaicExampleProps) => {
+    const [getShapeKey, setShapeKey] = createSignal<MosaicImages.SampleShapeKey>(STARTING_SHAPE_KEY);
+    const [getIsDecorated, setIsDecorated] = createSignal(false);
+
+    const getSources = createMemo(() => MosaicImages.SAMPLE_SOURCES.slice(0, access(props.itemCount)));
+
+    return (
+        <>
+            <PageMeasureBox
+                width={access(props.sizeAnchor) === "width" ? () => MOSAIC_EXTENT : undefined}
+                height={access(props.sizeAnchor) === "height" ? () => MOSAIC_EXTENT : undefined}
+            >
+                <ImagesExample
+                    sources={getSources}
+                    gap={props.gap}
+                    sizeAnchor={props.sizeAnchor}
+                    shapeKey={getShapeKey}
+                    isDecorated={getIsDecorated}
+                />
+            </PageMeasureBox>
+
+            <PagePropsPanel scope={"local"}>
+                <PageProp key={"shapeKey"} label={"Target shape"}>
+                    <PageSelectField
+                        value={getShapeKey}
+                        values={() => MosaicImages.SAMPLE_SHAPE_KEYS}
+                        width={() => FIELD_WIDTH}
+                        ariaLabel={"Target shape"}
+                        onChange={(key) => setShapeKey(() => key)}
+                    />
+                </PageProp>
+
+                <PageProp key={"isDecorated"} label={"Wrapped"}>
+                    <PageCheckField value={getIsDecorated} ariaLabel={"Wrapped"} onChange={setIsDecorated} />
+                </PageProp>
+            </PagePropsPanel>
+        </>
+    );
+};
+
+export const MosaicPage = () => {
     const [getItemCount, setItemCount] = createSignal(STARTING_ITEM_COUNT);
     const [getGap, setGap] = createSignal(STARTING_GAP);
     const [getSizeAnchor, setSizeAnchor] = createSignal<MosaicSizeAnchor>(STARTING_SIZE_ANCHOR);
 
-    const getItems = createMemo(() => TILES.slice(0, getItemCount()));
-
     const getExamples = createMemo(() => {
-        const commonProps: ElementMosaicExampleProps = {
-            items: getItems,
+        const commonProps: MosaicExampleProps = {
+            itemCount: getItemCount,
             gap: getGap,
             sizeAnchor: getSizeAnchor,
         };
 
         return [
             {
-                key: "default",
-                name: "Default",
-                component: () => <DefaultExampleWrapper {...commonProps} />,
-                path: `${EXAMPLES_ROOT}/Default.tsx`,
+                key: "elements",
+                name: "Elements the consumer sizes",
+                component: () => <ElementsExampleWrapper {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/Elements.tsx`,
+            },
+            {
+                key: "images",
+                name: "Images the component sizes",
+                component: () => <ImagesExampleWrapper {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/Images.tsx`,
             },
         ];
     });
@@ -92,14 +141,14 @@ export const ElementMosaicPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"gap"} label={"Gap"}>
+                <PageProp key={"gap"} label={"Gap (px)"}>
                     <PageNumberField
                         value={getGap}
                         min={() => MIN_GAP}
                         max={() => MAX_GAP}
                         step={() => GAP_STEP}
                         width={() => FIELD_WIDTH}
-                        ariaLabel={"Gap"}
+                        ariaLabel={"Gap in pixels"}
                         onInput={setGap}
                     />
                 </PageProp>

@@ -33,6 +33,10 @@ export const PageCarouselSlide = (props: ParentProps<CarouselSlideProps>) => {
     );
 };
 
+export const PageCarouselSlideBack = () => <div class={styles.carouselSlideBack} />;
+
+export const PageCarouselBox = (props: ParentProps) => <div class={styles.carouselBox}>{props.children}</div>;
+
 export const PageCarouselBar = (props: ParentProps) => <div class={styles.carouselBar}>{props.children}</div>;
 
 export const PageCarouselStep = (props: CarouselStepProps) => {

@@ -14,6 +14,7 @@ export const carouselSlide = style({
     alignItems: "center",
     gap: themeVars.spacing.half,
     height: 140,
+    minHeight: "100%",
     borderRadius: themeVars.borderRadius.half,
     backgroundImage: `linear-gradient(135deg, ${themeVars.color.tooltip.dark}, ${themeVars.color.tooltip.light})`,
     color: themeVars.color.tooltip.contrast,
@@ -26,6 +27,20 @@ export const carouselSlideTitle = style({
 export const carouselSlideBody = style({
     fontSize: themeVars.fontSize.xSmall,
     opacity: 0.75,
+});
+
+export const carouselSlideBack = style({
+    height: "100%",
+    minHeight: "100%",
+    borderRadius: themeVars.borderRadius.half,
+    backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
+});
+
+export const carouselBox = style({
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    height: 240,
 });
 
 export const carouselBar = style({

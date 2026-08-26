@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 
-import { Button, FlatWheel, access } from "@thewaver/ss-components";
+import { Button, OverheadWheel, access } from "@thewaver/ss-components";
 import type { WheelController } from "@thewaver/ss-components";
 
 import {
@@ -21,14 +21,14 @@ const pickPrizeIndex = (wedgeCount: number) =>
         setTimeout(() => resolve(Math.floor(Math.random() * wedgeCount)), PRIZE_FETCH_DELAY_MS);
     });
 
-export const FlatExample = ({ wedges, ...otherProps }: Props) => {
+export const OverheadExample = ({ wedges, ...otherProps }: Props) => {
     const getWedges = () => access(wedges);
 
     const [getController, setController] = createSignal<WheelController>();
 
     return (
         <PageWheelStack>
-            <FlatWheel
+            <OverheadWheel
                 {...otherProps}
                 wedges={getWedges}
                 ariaLabel={"Prize wheel"}
@@ -42,7 +42,7 @@ export const FlatExample = ({ wedges, ...otherProps }: Props) => {
 
             <PageWheelCentre>
                 <Button
-                    id={"flatSpin"}
+                    id={"overheadSpin"}
                     ariaLabel={"Spin the wheel"}
                     isDisabled={() => !getController()?.getIsSpinnable()}
                     renderContent={(getFlags) => (

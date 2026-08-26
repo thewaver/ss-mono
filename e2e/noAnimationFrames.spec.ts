@@ -103,7 +103,7 @@ const WHEEL_DURATION_MS = 500;
 const WHEEL_IDLE_DELAY_MS = 1000;
 const WHEEL_SPIN_TOTAL_MS = 6000;
 
-const FLAT_WHEEL = example("flat");
+const OVERHEAD_WHEEL = example("overhead");
 const ANNOUNCER = '[role="log"][aria-live="polite"]';
 
 const setDuration = async (page: import("@playwright/test").Page, key: string, value: number) => {
@@ -113,7 +113,7 @@ const setDuration = async (page: import("@playwright/test").Page, key: string, v
 
 const wedgeTransform = (page: import("@playwright/test").Page) =>
     page
-        .locator(`${FLAT_WHEEL} [aria-roledescription="wedge"]`)
+        .locator(`${OVERHEAD_WHEEL} [aria-roledescription="wedge"]`)
         .first()
         .evaluate((element) => (element as HTMLElement).style.transform);
 
@@ -127,16 +127,16 @@ const wedgeTransform = (page: import("@playwright/test").Page) =>
  */
 test("a spin still lands on its prize when no frame ever arrives", async ({ page }) => {
     await page.goto("/wheel");
-    await expect(page.locator(`${FLAT_WHEEL} [aria-roledescription="wheel"]`)).toBeVisible();
+    await expect(page.locator(`${OVERHEAD_WHEEL} [aria-roledescription="wheel"]`)).toBeVisible();
 
     await setDuration(page, "spinDurationMs", WHEEL_DURATION_MS);
     await setDuration(page, "settleDurationMs", WHEEL_DURATION_MS);
 
-    await page.locator("#flatSpin").click();
+    await page.locator("#overheadSpin").click();
 
     await expect(page.locator(ANNOUNCER)).toContainText(/.+, \d+ of 8/, { timeout: WHEEL_SPIN_TOTAL_MS });
     await expect
-        .poll(() => page.locator("#flatSpin").getAttribute("aria-disabled"), { timeout: WHEEL_SPIN_TOTAL_MS })
+        .poll(() => page.locator("#overheadSpin").getAttribute("aria-disabled"), { timeout: WHEEL_SPIN_TOTAL_MS })
         .toBe(null);
 });
 
@@ -149,7 +149,7 @@ test("a spin still lands on its prize when no frame ever arrives", async ({ page
  */
 test("but the idle turn simply stops, because it owes nobody an answer", async ({ page }) => {
     await page.goto("/wheel");
-    await expect(page.locator(`${FLAT_WHEEL} [aria-roledescription="wheel"]`)).toBeVisible();
+    await expect(page.locator(`${OVERHEAD_WHEEL} [aria-roledescription="wheel"]`)).toBeVisible();
 
     await setDuration(page, "idleDelayMs", WHEEL_IDLE_DELAY_MS);
 

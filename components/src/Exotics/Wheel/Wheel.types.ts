@@ -2,14 +2,15 @@ import type { Accessor, JSX, Signal } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
+import type { BarrelAxis, BarrelFace } from "../../Abstracts/Barrel/Barrel.types";
 import type { RotatorPhase, RotatorSpinDefs } from "../../Abstracts/Rotator/Rotator.types";
 import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 
-export type WheelVariant = "flat" | "drum";
+export type WheelVariant = "overhead" | "drum";
 
-export type WheelAxis = "row" | "column";
+export type WheelAxis = BarrelAxis;
 
-export type WheelFace = "front" | "back";
+export type WheelFace = BarrelFace;
 
 export type WheelWedgeState = {
     index: number;
@@ -64,7 +65,7 @@ export type WheelProps<T> = AccessorProps<
         renderWedgeBack?: (getWedge: Accessor<T>, getState: Accessor<WheelWedgeState>) => JSX.Element;
     };
 
-export type FlatWheelProps<T> = AccessorProps<WheelState & WheelLabels> & WheelSlots<T>;
+export type OverheadWheelProps<T> = AccessorProps<WheelState & WheelLabels> & WheelSlots<T>;
 
 export type DrumWheelProps<T> = AccessorProps<
     WheelState &

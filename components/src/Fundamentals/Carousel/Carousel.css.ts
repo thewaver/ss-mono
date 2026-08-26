@@ -9,7 +9,15 @@ export const carouselRoot = style({
 
 export const carouselViewport = style({
     position: "relative",
+    flexGrow: 1,
+    minHeight: 0,
     overflow: "hidden",
+});
+
+export const carouselStage = style({
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
 });
 
 export const carouselTrack = style({
@@ -20,6 +28,7 @@ export const carouselTrack = style({
 export const carouselSlide = style({
     flex: "0 0 100%",
     minWidth: 0,
+    minHeight: 0,
 });
 
 export const carouselControl = style([buttonElement, {}]);

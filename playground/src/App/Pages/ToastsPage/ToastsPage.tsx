@@ -144,22 +144,22 @@ export const ToastsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"gap"} label={"Gap"}>
+                <PageProp key={"gap"} label={"Gap (px)"}>
                     <PageNumberField
                         value={getGap}
                         min={() => MIN_GAP}
                         max={() => MAX_GAP}
-                        ariaLabel={"Gap"}
+                        ariaLabel={"Gap in pixels"}
                         onInput={setGap}
                     />
                 </PageProp>
 
-                <PageProp key={"margin"} label={"Margin"}>
+                <PageProp key={"margin"} label={"Margin (px)"}>
                     <PageNumberField
                         value={getMargin}
                         min={() => MIN_MARGIN}
                         max={() => MAX_MARGIN}
-                        ariaLabel={"Margin"}
+                        ariaLabel={"Margin in pixels"}
                         onInput={setMargin}
                     />
                 </PageProp>

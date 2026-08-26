@@ -22,8 +22,11 @@ import { example, prop } from "./helpers";
  *
  * Items are found by their inline `left`, which only the item wrappers carry. The measure box around the
  * demo and the mosaic root both write inline styles too, but neither writes a position.
+ *
+ * Both presets share one Playground page, so the demo is addressed by the key of its example rather than by
+ * the page: `elements` here, `images` in `imageMosaic.spec.ts`.
  */
-const MOSAIC = example("default");
+const MOSAIC = example("elements");
 
 const item = (scope: string) => `${scope} div[style*="left"]`;
 
@@ -69,7 +72,7 @@ const pick = async (page: import("@playwright/test").Page, key: string, name: st
 };
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/element-mosaic");
+    await page.goto("/mosaic");
     await expect(page.locator(item(MOSAIC)).first()).toBeVisible();
 });
 

@@ -7,11 +7,12 @@ import { demo, prop, readout } from "./helpers";
  * page's own default. Everything timed here is then measured against `DELAY_MS` with a margin, and the
  * assertions are about whether the slide moved at all rather than about landing on a particular frame.
  *
- * Three carousels sit on the page and only one of them rotates, which is what makes the holds testable:
- * a hold that leaked would show up as the other two behaving differently from the one under the pointer.
+ * Four carousels sit on the page and only one of them rotates, which is what makes the holds testable:
+ * a hold that leaked would show up as the others behaving differently from the one under the pointer.
  */
 const MANUAL = demo("manual");
 const ROTATING = demo("rotating");
+const DRUM = demo("drum");
 const NO_CONTROLS = demo("noControls");
 
 const region = (scope: string) => `${scope} [aria-roledescription="carousel"]`;
@@ -22,6 +23,7 @@ const viewport = (scope: string) => `${region(scope)} > div:first-child`;
 const field = (key: string) => `${prop(key)} input`;
 
 const DELAY_MS = 500;
+const MIN_COLUMN_HEIGHT = 150;
 const SETTLE_MS = 900;
 const DRAG_STEPS = 10;
 
@@ -200,4 +202,121 @@ test("a carousel with no controls refuses the swipe, because nothing else could 
     await swipeAcross(page, NO_CONTROLS, 0.8, 0.2);
 
     expect(await currentSlide(page, NO_CONTROLS), "and the swipe moves nothing").toBe("1 of 4");
+});
+
+/**
+ * A column carousel is the same component with `dir` set — a knob on the stepped demo rather than a demo of
+ * its own — so the drag that steps it runs down the viewport rather than across it, and is written as a pair of fractions of the height for the same reason the
+ * horizontal one uses fractions of the width: a fraction means the same thing whatever the window is doing.
+ */
+const swipeDown = async (page: import("@playwright/test").Page, scope: string, from: number, to: number) => {
+    const box = (await page.locator(viewport(scope)).boundingBox())!;
+    const x = box.x + box.width / 2;
+
+    await page.mouse.move(x, box.y + box.height * from);
+    await page.mouse.down();
+    await page.mouse.move(x, box.y + box.height * to, { steps: DRAG_STEPS });
+    await page.mouse.up();
+};
+
+test("a column carousel claims the other axis and steps the way the finger went", async ({ page }) => {
+    await pickOption(page, "dir", "Up and down");
+
+    await expect(
+        page.locator(viewport(MANUAL)),
+        "the browser keeps the axis this carousel does not travel on",
+    ).toHaveCSS("touch-action", "pan-x");
+
+    await swipeDown(page, MANUAL, 0.8, 0.3);
+
+    expect(await currentSlide(page, MANUAL), "pushing the slides upwards brings the next one in").toBe("2 of 4");
+
+    await swipeDown(page, MANUAL, 0.2, 0.7);
+
+    expect(await currentSlide(page, MANUAL), "and pushing them back down returns to the first").toBe("1 of 4");
+});
+
+/**
+ * A row carousel gets its width from the page and needs nothing said about it; a column carousel has no
+ * height of its own, so it takes the one the surrounding box was given. A viewport that collapsed to nothing
+ * is the failure this watches for, and it is measured in layout space rather than from a client rect.
+ */
+test("a column carousel takes its height from the box around it and gives all of it to one slide", async ({ page }) => {
+    await pickOption(page, "dir", "Up and down");
+
+    const viewportHeight = await page.locator(viewport(MANUAL)).evaluate((element) => element.clientHeight);
+    const slideHeight = await page
+        .locator(`${slide(MANUAL)}:not([aria-hidden="true"])`)
+        .evaluate((element) => (element as HTMLElement).offsetHeight);
+
+    expect(viewportHeight, "the window the slides move through is as tall as the page made it").toBeGreaterThan(
+        MIN_COLUMN_HEIGHT,
+    );
+    expect(slideHeight, "and the slide on screen fills it exactly, so only one is ever in view").toBe(viewportHeight);
+});
+
+/**
+ * The drum is the same carousel with its slides on the faces of a barrel, so everything asked above about
+ * labels, wrapping, holds and picks holds here for the same reasons and is not asked twice. What is checked
+ * here is the part that genuinely differs: a step turns the barrel rather than sliding a track, and the faces
+ * that have turned away are as far out of reach as the slides that have scrolled off the side.
+ */
+const faceTransform = (page: import("@playwright/test").Page, scope: string) =>
+    page
+        .locator(slide(scope))
+        .first()
+        .evaluate((element) => (element as HTMLElement).style.transform);
+
+test("a drum steps by turning, and its slides ride the faces round", async ({ page }) => {
+    const before = await faceTransform(page, DRUM);
+
+    expect(before, "a face carries its angle and its distance from the axis in one transform").toContain("translateZ(");
+
+    await page.locator(control(DRUM, "Next slide")).click();
+
+    expect(await currentSlide(page, DRUM), "the step lands on the next slide, exactly as on the track").toBe("2 of 4");
+    expect(await faceTransform(page, DRUM), "and the faces turned to bring it to the front").not.toBe(before);
+});
+
+test("a swipe turns the drum the way the finger went", async ({ page }) => {
+    await swipeAcross(page, DRUM, 0.8, 0.3);
+
+    expect(await currentSlide(page, DRUM), "pushing the faces leftwards turns the next one round").toBe("2 of 4");
+});
+
+test("the faces of a drum that have turned away are out of reach, not merely out of sight", async ({ page }) => {
+    const away = page.locator(`${slide(DRUM)}[aria-hidden="true"]`);
+
+    await expect(away.first()).toHaveAttribute("inert", "");
+    await expect(
+        page.locator(`${slide(DRUM)}:not([aria-hidden="true"])`),
+        "exactly one face is the current one, backs and far faces included",
+    ).toHaveCount(1);
+});
+
+/**
+ * The drum turns about one of two axes, and the swipe follows whichever it is — across for a barrel on the
+ * upright axis, up and down for one lying on its side. Direction is one knob for the whole page, so switching
+ * it turns the drum and turns the tracks with it; this reads the face's own transform, where the choice shows.
+ */
+const pickOption = async (page: import("@playwright/test").Page, key: string, name: string) => {
+    await page.locator(`${prop(key)} [role="combobox"]`).click();
+    await page.locator('[role="listbox"] [role="option"]', { hasText: name }).click();
+};
+
+test("a drum on the other axis turns end over end, and takes its swipe the same way", async ({ page }) => {
+    expect(await faceTransform(page, DRUM), "on the upright axis by default").toContain("rotateY(");
+
+    await pickOption(page, "dir", "Up and down");
+
+    expect(await faceTransform(page, DRUM), "and end over end once it is laid on its side").toContain("rotateX(");
+
+    await expect(page.locator(viewport(DRUM)), "the browser keeps the axis the barrel no longer travels on").toHaveCSS(
+        "touch-action",
+        "pan-x",
+    );
+
+    await swipeDown(page, DRUM, 0.8, 0.3);
+
+    expect(await currentSlide(page, DRUM), "pushing the faces upwards brings the next one round").toBe("2 of 4");
 });

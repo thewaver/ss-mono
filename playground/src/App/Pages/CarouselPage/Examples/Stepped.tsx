@@ -1,4 +1,4 @@
-import { Carousel } from "@thewaver/ss-components";
+import { TrackCarousel } from "@thewaver/ss-components";
 import type { CarouselControls } from "@thewaver/ss-components";
 
 import {
@@ -23,10 +23,11 @@ const renderBar = (controls: CarouselControls) => (
 
 export const SteppedExample = (props: Props) => {
     return (
-        <Carousel
+        <TrackCarousel
             slides={props.slides}
             indexSignal={props.indexSignal}
             isDisabled={props.isDisabled}
+            dir={props.dir}
             gap={() => CAROUSEL_GAP}
             ariaLabel={"Sampler"}
             renderSlide={(getSlide, getState) => <PageCarouselSlide state={getState}>{getSlide()}</PageCarouselSlide>}

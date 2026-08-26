@@ -54,12 +54,12 @@ Ordered by the user on 2026-08-15. A toolbar, a segmented control, a rating inpu
 | 3      | **`Select`, filtered**          | A filter injecting a non-matching option lands the highlight on it                           |
 | 4      | **`Menu`**                      | `Tab` returns to the trigger rather than moving past it                                      |
 | 10     | **`Calendar`**                  | A consumer's disabled predicate is called once per cell, so 42 times per render              |
-| 12, 20 | **`Accordion`, `Carousel`**     | Every panel and every slide is built; forced by the track width in `Carousel`                |
+| 12, 20 | **`Accordion`, carousels**      | Every panel and every slide is built, on the track by its width and on the drum by its faces |
 | 15     | **`Tree`**                      | Cannot express a branch whose children have not loaded                                       |
 | 18     | **`Scroller`**                  | A second press mid-scroll advances less than a page                                          |
 | 9      | **`Toasts`**                    | An id re-added while leaving fades back in instead of restarting                             |
 | 21     | **`DrumWheel`**                 | Girth arithmetic replaced a tuned constant; the user recalls it misbehaving and will retest  |
-| 21     | **`FlatWheel`**                 | Hit-tests up to 70px outside its circle; nothing visible, a trap for a control in a wedge    |
+| 21     | **`OverheadWheel`**             | Hit-tests up to 70px outside its circle; nothing visible, a trap for a control in a wedge    |
 
 ## Accessibility gaps
 
@@ -68,7 +68,7 @@ They cluster, and no single item owns them.
 | #   | Where           | What is missing                                                                                |
 | --- | --------------- | ---------------------------------------------------------------------------------------------- |
 | 17  | **`Spotlight`** | `prompt` cannot hide the page from a screen reader — `inert` cannot be lifted off a descendant |
-| 20  | **`Carousel`**  | With no `renderControls` there is no keyboard route at all                                     |
+| 20  | **Carousels**   | With no `renderControls` there is no keyboard route at all                                     |
 
 ## Planned projects
 

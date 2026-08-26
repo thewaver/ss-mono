@@ -15,20 +15,21 @@ import { CellAnimationPage } from "./Pages/CellAnimationPage/CellAnimationPage";
 import { CheckboxPage } from "./Pages/CheckboxPage/CheckboxPage";
 import { ColorAreaPage } from "./Pages/ColorAreaPage/ColorAreaPage";
 import { ColorInputPage } from "./Pages/ColorInputPage/ColorInputPage";
+import { CuboidPage } from "./Pages/CuboidPage/CuboidPage";
 import { CurrencyInputPage } from "./Pages/CurrencyInputPage/CurrencyInputPage";
 import { DatePickerPage } from "./Pages/DatePickerPage/DatePickerPage";
 import { DateRangePickerPage } from "./Pages/DateRangePickerPage/DateRangePickerPage";
 import { DateTimePickerPage } from "./Pages/DateTimePickerPage/DateTimePickerPage";
 import { DrawerPage } from "./Pages/DrawerPage/DrawerPage";
-import { ElementMosaicPage } from "./Pages/ElementMosaicPage/ElementMosaicPage";
 import { FileInputPage } from "./Pages/FileInputPage/FileInputPage";
+import { FlipCardPage } from "./Pages/FlipCardPage/FlipCardPage";
 import { FormPage } from "./Pages/FormPage/FormPage";
 import { FormationPage } from "./Pages/FormationPage/FormationPage";
-import { ImageMosaicPage } from "./Pages/ImageMosaicPage/ImageMosaicPage";
 import { ImageSwitcherPage } from "./Pages/ImageSwitcherPage/ImageSwitcherPage";
 import { LabelPage } from "./Pages/LabelPage/LabelPage";
 import { MenuPage } from "./Pages/MenuPage/MenuPage";
 import { ModalPage } from "./Pages/ModalPage/ModalPage";
+import { MosaicPage } from "./Pages/MosaicPage/MosaicPage";
 import { NumberInputPage } from "./Pages/NumberInputPage/NumberInputPage";
 import { PaginatorPage } from "./Pages/PaginatorPage/PaginatorPage";
 import { PreviewPage } from "./Pages/PreviewPage/PreviewPage";
@@ -94,10 +95,10 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 component: () => <CellAnimationPage />,
             },
             {
-                name: "ElementMosaic",
+                name: "Cuboid",
                 description:
-                    "Packs a set of differently sized elements into the least room they will fit in. One side is taken from the parent and the other is whatever the arrangement costs, so a short item does not leave a hole under it — the next item that fits rises into it. Items are rendered in the order they end up reading in rather than the order they were passed, so Tab and a screen reader follow the eye.",
-                component: () => <ElementMosaicPage />,
+                    "Six faces on a box that is only a cube when you make it one: width, height and depth are given separately, and each face is sized from the two extents it spans. Two counts of quarter turns drive it, one across and one up, so it always turns the way it was pushed rather than working out a route to a face.",
+                component: () => <CuboidPage />,
             },
             {
                 name: "Formation",
@@ -112,10 +113,10 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
             },
             */
             {
-                name: "ImageMosaic",
+                name: "Mosaic",
                 description:
-                    "The same packing over images, where the sizes are the component's to choose rather than the consumer's. Every row is scaled to fill the fixed side exactly and each image keeps its own shape, so what the consumer picks is not a size but the shape the finished mosaic should come out closest to — a square by default.",
-                component: () => <ImageMosaicPage />,
+                    "Packs differently sized things into the least room they will fit in. One side is taken from the parent and the other is whatever the arrangement costs, so a short item leaves no hole under it — the next item that fits rises into it. The two presets differ over who chooses the sizes: an element mosaic is given them, while an image mosaic scales every row to fill the fixed side exactly and asks only for the shape the finished mosaic should come out closest to. Both render items in the order they end up reading in rather than the order they were passed, so Tab and a screen reader follow the eye.",
+                component: () => <MosaicPage />,
             },
             {
                 name: "Satellite",
@@ -162,7 +163,7 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
             {
                 name: "Wheel",
                 description:
-                    "A wheel of wedges that spins to a wedge the consumer names, flat on the page or as a drum seen from the side. Both are presets over one unexported shell, and both take their rotation from the same abstract: spinning to an index, overshooting and settling back, and turning on its own until it is spun.",
+                    "A wheel of wedges that spins to a wedge the consumer names, seen from overhead or as a drum seen from the side. Both are presets over one unexported shell, and both take their rotation from the same abstract: spinning to an index, overshooting and settling back, and turning on its own until it is spun.",
                 component: () => <WheelPage />,
             },
         ],
@@ -259,6 +260,12 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 description:
                     "A file field where the operating system owns the dialog. The component owns what activates it and what comes back.",
                 component: () => <FileInputPage />,
+            },
+            {
+                name: "FlipCard",
+                description:
+                    "Two faces back to back on a barrel with no depth, turned by the side you ask it for. It renders no control of its own: what turns the card is the page's own button, driven through the signal the two share.",
+                component: () => <FlipCardPage />,
             },
             {
                 name: "Form",

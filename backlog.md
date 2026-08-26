@@ -237,7 +237,8 @@ gaps, each with the reason it is still a gap.
 
 `Fundamentals/Input` covers `TextInput`, `TextArea`, `NumberInput`, `CurrencyInput`, `Checkbox`, `Toggle`, `Radio`,
 `RadioGroup`, `Select`, `MultiSelect`, `FileInput`, `ColorInput`, `Label`, `Calendar`, `DateInput`,
-`DatePicker`, `TagInput` and `TimeInput`; `Fundamentals` adds `Accordion`, `Breadcrumbs`, `Button`, `Carousel`,
+`DatePicker`, `TagInput` and `TimeInput`; `Fundamentals` adds `Accordion`, `Breadcrumbs`, `Button`,
+`TrackCarousel`, `DrumCarousel`, `FlipCard`,
 `SlideButton`, `Scroller`, `Paginator`, `SplitPane`, `Stepper`, `Tabs`, `Tooltip`, `Popover`, `Menu`, `Modal`, `Drawer`, `Progress`,
 `Range`, `Toasts` and `Tree`.
 Beyond the date and time family, this is what is missing. **The order below is the user's, taken on 2026-08-15 after reading a
@@ -878,10 +879,12 @@ is the component"_. These are the gaps, each with the reason it is still one.
 
 ---
 
-## 20. `Carousel` — four things deliberately not built
+## 20. The carousels — four things deliberately not built
 
 The decisions behind what exists are in `conventions.md` under _"Controls: `Carousel`, and the first component
-that acts without being asked"_. These are the gaps, each with the reason it is still one.
+that acts without being asked"_ and _"`TrackCarousel` and `DrumCarousel`: one behaviour, two ways of showing
+it"_. These are the gaps, each with the reason it is still one. They are the shared shell's, so both presets
+have them unless the entry says otherwise.
 
 - **One slide at a time; a page of several is not built.** The description this came from allowed either, and
   one slide is the reading with a published pattern behind it. A page of several needs the arithmetic to start
@@ -892,21 +895,23 @@ that acts without being asked"_. These are the gaps, each with the reason it is 
   rendered with no `renderControls` has no keyboard route at all. The published pattern puts the arrows on the
   buttons rather than on the region, so this matches it — but a consumer who skips the controls gets a control
   a keyboard cannot move, which is worth knowing before it is called a bug.
-- **The track always slides; a fade is not expressible.** The library owns the transform, so a consumer cannot
+- **The motion is the library's; a fade is not expressible.** A track slides and a drum turns, and neither
+  can be swapped for anything else — the library owns the transform, so a consumer cannot
   make one slide dissolve into the next. `ImageSwitcher` is the component that already does that for a single
   image, and the two would be one only if the motion became the consumer's — which would mean handing out a
   visibility target per slide, the way `Tabs`' floater now does. That is a real design, not an oversight, and
   nothing has asked for it.
 - **Every slide is built, always.** All of them are in the document from the first render, `inert` and hidden
   when away. This is `Accordion`'s trade rather than `Tree`'s, and here it is forced rather than chosen: the
-  track has to be as wide as the slides to translate across them. A carousel of a hundred expensive slides
-  builds all hundred, and windowing it is the same boundary `Select` and `Tree` already record.
+  track has to be as wide as the slides to translate across them, and a drum has a face for each. A carousel of
+  a hundred expensive slides builds all hundred — two hundred elements on a drum, which prints a back for each
+  face — and windowing it is the same boundary `Select` and `Tree` already record.
 
 ---
 
 ## 21. The four components ported from React — one thing to retest, one deliberately not built
 
-`Satellite`, `Staircase`, `Formation`, `FlatWheel` and `DrumWheel` came in from a React codebase; what the port
+`Satellite`, `Staircase`, `Formation`, `OverheadWheel` and `DrumWheel` came in from a React codebase; what the port
 settled is in `conventions.md`. Two things did not settle, and only the first is live.
 
 **The drum's girth arithmetic was wrong twice and is now measured rather than argued.** What it reserves and
@@ -929,7 +934,7 @@ too, since the shape of the mistake repeated. What remains open is smaller than 
 - **Whether the user still sees the errors they remember from the original codebase.** Two wrong formulas have
   been found and fixed since that note, so the recollection may already be accounted for.
 
-**A flat wheel hit-tests outside its visible circle, and is left that way for now.** The user's call, to be
+**An overhead wheel hit-tests outside its visible circle, and is left that way for now.** The user's call, to be
 revisited. Each wedge is a full-size square div carrying the rotation, so a rotated square's corners point at the
 middles of the axis-aligned edges — measured, a press 40px clear of the wheel at mid-height lands on a wedge,
 while the same distance past a corner lands outside it. Nothing paints there and nothing in a wedge is
@@ -945,11 +950,11 @@ becomes the pie itself. Better than clipping the root to its square or the wedge
 were considered. **What stopped it is the consumer trap**: anything painted into a wedge silently stops being
 pressable until it opts back in with `pointer-events: auto`.
 
-**A flat wheel has one slot for its controls and it is the hub, chosen by the user over two alternatives.** A
-drum's controls sit under the barrel; a flat wheel's sit in the middle of it, and there is no second slot. The
+**An overhead wheel has one slot for its controls and it is the hub, chosen by the user over two alternatives.** A
+drum's controls sit under the barrel; an overhead wheel's sit in the middle of it, and there is no second slot. The
 cost is the one item 18 already records for `Scroller`: a consumer who wants the control somewhere else renders
 their own button, and a library that renders no button cannot promise it is named or reachable. The two
-alternatives were a second slot beneath the wheel, rejected because the flat wheel is a square and anything
+alternatives were a second slot beneath the wheel, rejected because the overhead wheel is a square and anything
 under it changes the box it reserves, and a slot with a position prop, rejected because `Toasts` had already
 settled that a component does not fully delegate position. Recorded so it is not re-proposed as an oversight.
 
@@ -1015,6 +1020,17 @@ answer to "what is next for development"** — see the note at the top of this f
 commitment, and an entry that already carries the user's verdict is recorded here so that the same sketch is
 not put to them twice. An entry leaves this section in one of two directions: upward into a numbered item, which is the user's
 decision to take, or into `conventions.md` if building it settles something.
+
+### `DrumCarousel` in `Exotics`, and the cost of splitting the carousels
+
+`Cuboid` went to `Exotics` when it was built, and the user observed that `DrumCarousel` would fit there by the
+same test — it turns elements in perspective and is not a composition of `Fundamentals`. **Their verdict was to
+leave it where it is for now**, because moving it alone would put the two carousels in different folders while
+they share one shell, one set of props and one page.
+
+What would make this worth revisiting is a reason to separate them that is not about folders — a second drum
+consumer, or a shell that stops being shared. Until then the pair stays in `Fundamentals` together, and the
+inconsistency is known rather than overlooked.
 
 ### The animation sample collections: what to add instead of more entries
 

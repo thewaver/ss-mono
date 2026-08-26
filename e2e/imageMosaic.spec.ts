@@ -16,9 +16,12 @@ import { example, prop } from "./helpers";
  * The row count is not asked for. It falls out of the target shape, and the assertion that says so is a
  * comparison rather than a fixed number: asking for a square has to land nearer a square than asking for a
  * panorama does, whatever either one actually measures.
+ *
+ * Both presets share one Playground page, so this addresses its demo by the example key `images`. Wrapping
+ * each image in something of the consumer's own is a knob on that example rather than a second demo, which
+ * is why the last test turns it on before it looks.
  */
-const MOSAIC = example("default");
-const DECORATED = example("decorated");
+const MOSAIC = example("images");
 
 const item = (scope: string) => `${scope} div[style*="left"]`;
 
@@ -68,7 +71,7 @@ const pick = async (page: import("@playwright/test").Page, key: string, name: st
 };
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/image-mosaic");
+    await page.goto("/mosaic");
     await expect(page.locator(`${MOSAIC} img`).first()).toBeVisible();
 });
 
@@ -142,6 +145,9 @@ test("anchoring the height fills columns instead of rows", async ({ page }) => {
 });
 
 test("whatever the consumer wraps the image in fills the cell, without being told a size", async ({ page }) => {
+    await page.locator(`${prop("isDecorated")} input`).check();
+    await expect(page.locator(`${MOSAIC} a`).first()).toBeVisible();
+
     const mismatched = await page.evaluate((selector) => {
         const cells = [...document.querySelectorAll(selector)] as HTMLElement[];
 
@@ -155,7 +161,7 @@ test("whatever the consumer wraps the image in fills the cell, without being tol
                 };
             })
             .filter((pair) => pair.cell !== pair.wrapper);
-    }, item(DECORATED));
+    }, item(MOSAIC));
 
     expect(mismatched, "an inline anchor has to be stretched by the cell, not by anything the page wrote").toEqual([]);
 });

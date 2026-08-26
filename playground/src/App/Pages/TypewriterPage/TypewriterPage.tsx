@@ -112,13 +112,13 @@ export const TypewriterPage = () => {
     return (
         <div class={styles.root}>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"textContainerWidth"} label={"Container width"}>
+                <PageProp key={"textContainerWidth"} label={"Container width (px)"}>
                     <PageNumberField
                         value={getTextContainerWidth}
                         min={() => MIN_CONTAINER_WIDTH}
                         max={() => MAX_CONTAINER_WIDTH}
                         step={() => CONTAINER_WIDTH_STEP}
-                        ariaLabel={"Container width"}
+                        ariaLabel={"Container width in pixels"}
                         onInput={setTextContainerWidth}
                     />
                 </PageProp>

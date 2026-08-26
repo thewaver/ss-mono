@@ -100,14 +100,14 @@ export const SplitPanePage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"gutterSize"} label={"Gutter size"}>
+                <PageProp key={"gutterSize"} label={"Gutter size (px)"}>
                     <PageNumberField
                         value={getGutterSize}
                         min={() => MIN_GUTTER}
                         max={() => MAX_GUTTER}
                         step={() => GUTTER_STEP}
                         width={() => GUTTER_FIELD_WIDTH}
-                        ariaLabel={"Gutter size"}
+                        ariaLabel={"Gutter size in pixels"}
                         onInput={setGutterSize}
                     />
                 </PageProp>

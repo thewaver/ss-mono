@@ -8,7 +8,7 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { DrumOverExample } from "./Examples/DrumOver";
 import { DrumSidewaysExample } from "./Examples/DrumSideways";
-import { FlatExample } from "./Examples/Flat";
+import { OverheadExample } from "./Examples/Overhead";
 import type { WheelExampleProps, WheelSpinStyleFn } from "./WheelPage.types";
 
 const MIN_WEDGE_COUNT = 2;
@@ -68,10 +68,10 @@ const SPIN_STYLE_KEYS = Object.keys(SPIN_STYLES) as SpinStyleKey[];
 
 const STARTING_SPIN_STYLE_KEY: SpinStyleKey = "bouncy";
 
-const FlatExampleWrapper = (props: WheelExampleProps) => {
+const OverheadExampleWrapper = (props: WheelExampleProps) => {
     return (
         <PageMeasureBox width={() => FLAT_WHEEL_SIZE}>
-            <FlatExample {...props} />
+            <OverheadExample {...props} />
         </PageMeasureBox>
     );
 };
@@ -104,11 +104,11 @@ export const WheelPage = () => {
     const [getIsDisabled, setIsDisabled] = createSignal(false);
     const [getIsIdlingAllowed, setIsIdlingAllowed] = createSignal(true);
 
-    const flatIndexSignal = createSignal(0);
+    const overheadIndexSignal = createSignal(0);
     const sidewaysIndexSignal = createSignal(0);
     const reelIndexSignal = createSignal(0);
 
-    const [getFlatMarkedIndex, setFlatMarkedIndex] = createSignal(0);
+    const [getOverheadMarkedIndex, setOverheadMarkedIndex] = createSignal(0);
     const [getSidewaysMarkedIndex, setSidewaysMarkedIndex] = createSignal(0);
     const [getReelMarkedIndex, setReelMarkedIndex] = createSignal(0);
 
@@ -135,17 +135,17 @@ export const WheelPage = () => {
 
         return [
             {
-                key: "flat",
-                name: "Flat, top",
+                key: "overhead",
+                name: "Overhead",
                 component: () => (
-                    <FlatExampleWrapper
+                    <OverheadExampleWrapper
                         {...commonProps}
-                        indexSignal={flatIndexSignal}
-                        onSelectedWedgeChange={setFlatMarkedIndex}
+                        indexSignal={overheadIndexSignal}
+                        onSelectedWedgeChange={setOverheadMarkedIndex}
                     />
                 ),
-                readout: getReadout(getFlatMarkedIndex, flatIndexSignal[0]),
-                path: `${EXAMPLES_ROOT}/Flat.tsx`,
+                readout: getReadout(getOverheadMarkedIndex, overheadIndexSignal[0]),
+                path: `${EXAMPLES_ROOT}/Overhead.tsx`,
             },
             {
                 key: "sideways",
