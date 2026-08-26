@@ -9,3 +9,8 @@ export type CuboidExampleProps = AccessorProps<{
     yawSignal: Signal<number>;
     pitchSignal: Signal<number>;
 };
+
+export type CuboidWanderingExampleProps = CuboidExampleProps &
+    AccessorProps<{
+        turnIntervalMs: number | undefined;
+    }>;

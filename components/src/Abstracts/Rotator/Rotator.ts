@@ -1,10 +1,9 @@
 import type { Accessor } from "solid-js";
 import { createEffect, createMemo, createSignal, on, onCleanup, untrack } from "solid-js";
 
-import { MathUtils, RotationUtils } from "@thewaver/ss-utils";
+import type { EasingFn } from "@thewaver/ss-utils";
+import { EasingUtils, MathUtils, RotationUtils } from "@thewaver/ss-utils";
 
-import type { EasingFn } from "../../Utils/easing";
-import { EasingUtils } from "../../Utils/easing";
 import { access } from "../../Utils/propUtils";
 import { InteractionTracker } from "../InteractionTracker/InteractionTracker";
 import { LiveAnnouncer } from "../LiveAnnouncer/LiveAnnouncer";

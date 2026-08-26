@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import type { EasingFn } from "./easing";
-import { EasingUtils } from "./easing";
+import type { EasingFn } from "../../src/Abstracts/easing.js";
+import { EasingUtils } from "../../src/Abstracts/easing.js";
 
 const PRECISION = 6;
 const SAMPLE_COUNT = 64;

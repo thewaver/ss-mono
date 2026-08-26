@@ -6,7 +6,7 @@ export namespace RichTextUtils {
 
     export const parseContent = (input: string): RichTextNode[] => {
         const stack: { tag: string; children: RichTextNode[] }[] = [{ tag: "root", children: [] }];
-        const tagRE = /\[\/?[a-z]+\]/gi;
+        const tagRE = /\[\/?[a-z_][a-z0-9_]*\]/gi;
 
         let lastIndex = 0;
 

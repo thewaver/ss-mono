@@ -14,6 +14,7 @@ const EXPECTED_EXPORTS = [
     "Count2d",
     "Count2dString",
     "DecimalUtils",
+    "EasingUtils",
     "FunctionUtils",
     "GestureUtils",
     "MathUtils",

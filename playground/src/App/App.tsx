@@ -37,6 +37,7 @@ import { ProgressPage } from "./Pages/ProgressPage/ProgressPage";
 import { RadioPage } from "./Pages/RadioPage/RadioPage";
 import { RangeCalendarPage } from "./Pages/RangeCalendarPage/RangeCalendarPage";
 import { RangePage } from "./Pages/RangePage/RangePage";
+import { RichTextPage } from "./Pages/RichTextPage/RichTextPage";
 import { SatellitePage } from "./Pages/SatellitePage/SatellitePage";
 import { ScanlineAnimationPage } from "./Pages/ScanLineAnimationPage/ScanLineAnimationPage";
 import { ScreenWiperPage } from "./Pages/ScreenWiperPage/ScreenWiperPage";
@@ -106,17 +107,17 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                     "Places a set of items into an arrangement — a podium, a whorl of three, a zigzag — from a function that answers with a position per item. Every position is a fraction of the formation's own width, so the whole thing scales with the container and nothing is measured in JavaScript.",
                 component: () => <FormationPage />,
             },
-            /*
-            {
-                name: "RichText",
-                component: () => null,
-            },
-            */
             {
                 name: "Mosaic",
                 description:
                     "Packs differently sized things into the least room they will fit in. One side is taken from the parent and the other is whatever the arrangement costs, so a short item leaves no hole under it — the next item that fits rises into it. The two presets differ over who chooses the sizes: an element mosaic is given them, while an image mosaic scales every row to fill the fixed side exactly and asks only for the shape the finished mosaic should come out closest to. Both render items in the order they end up reading in rather than the order they were passed, so Tab and a screen reader follow the eye.",
                 component: () => <MosaicPage />,
+            },
+            {
+                name: "RichText",
+                description:
+                    "Paints a plain string that carries bracketed tags — [b], [i], [s], [u], [li] — so text arriving from a server or a file can say which of its words are emphasised without bringing markup along. Nothing is handed to the browser as HTML: the string is parsed into a tree of runs and painted with classes the consumer supplies, and a tag it does not recognise is either left on screen exactly as typed or dropped, whichever the consumer asks for.",
+                component: () => <RichTextPage />,
             },
             {
                 name: "Satellite",

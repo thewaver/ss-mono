@@ -474,6 +474,5 @@ export type * from "./Samples/Staircase/Indents/StaircaseIndents.types";
 export { plain as gradientPlain } from "./Samples/SVGDefs/Gradient/plain";
 export { plain as patternPlain } from "./Samples/SVGDefs/Pattern/plain";
 
-export * from "./Utils/easing";
 export * from "./Utils/propUtils";
 export type * from "./Utils/typeUtils";

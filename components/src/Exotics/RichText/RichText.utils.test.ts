@@ -66,6 +66,16 @@ describe("parseContent", () => {
         expect(warn.mock.calls[0][0]).toContain("[i]");
     });
 
+    it("takes digits and underscores inside a tag name", () => {
+        expect(RichTextUtils.parseContent("[tag_1]x[/tag_1]")).toEqual([
+            { type: "tag", tag: "tag_1", children: [text("x")] },
+        ]);
+    });
+
+    it("refuses a tag name that starts with a digit", () => {
+        expect(RichTextUtils.parseContent("[1tag]x[/1tag]")).toEqual([text("[1tag]x[/1tag]")]);
+    });
+
     it("leaves a bracketed word that is not a tag alone", () => {
         expect(RichTextUtils.parseContent("[123] and [b-c]")).toEqual([text("[123] and [b-c]")]);
     });

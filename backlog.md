@@ -385,14 +385,20 @@ spec asserts both that a successful load is reported and that the two swap paths
 source, a cleared source) report nothing. The shape is what to keep: reaching a callback means giving the
 page a reason to consume it first.
 
-**Components with no Playground page at all**, so nothing can drive them until one exists:
-`AudioSwitcher` and `RichText`, both commented out of `TAB_CONFIGS` in
-`playground/src/App/App.tsx`. `AudioSwitcher` is the more exposed of the two: its play and pause moved from a
-mount handle to a `playbackSignal` and that change has never been run, because there is nothing to run it. The
+**Components with no Playground page at all**, so nothing can drive them until one exists: `AudioSwitcher`
+alone, still commented out of `CATEGORY_CONFIGS` in `playground/src/App/App.tsx`. Its play and pause moved from
+a mount handle to a `playbackSignal` and that change has never been run, because there is nothing to run it. The
 fades it drives are the part most likely to be wrong.
 
 **Deprioritised by the user**, after being offered as the next piece of work and passed over. It stays here
 because the exposure is real and unchanged; it is not next, and it is not to be proposed as next.
+
+**`RichText` has left that group and joined the next one down.** `RichTextPage` mounts a single example: a
+legend naming the five tags the component paints, a `TextArea` holding the source string, and the parsed result
+underneath it, with `removeOtherTags` as the page's one global prop so both answers to an unrecognised tag can be
+seen. So the component can now be driven, and what is missing is narrower than it was. `RichTextUtils.parseContent`
+is unit-tested and the painted output is not, so the class map and the `removeOtherTags` branch are checked by eye;
+`computeClassNames` is the one prop nothing on the page reaches, because the page takes the default class map.
 
 **Covered only through a consumer**, which is worth distinguishing from uncovered because it decides
 whether a spec is worth writing: `Popover` through `Select` and `Menu`, `Radio` through

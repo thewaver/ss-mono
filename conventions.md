@@ -273,6 +273,10 @@ wheel. `CarouselUtils.wrapIndex` still exists and aliases it, so the published n
 did not move; `RotationUtils` is now published by `ss-utils` rather than by this package, and
 `components/src/index.ts` no longer names it.
 
+**`EasingUtils` went too**, but not out of this round — it was written for the move from the day it was
+commissioned, and only the separate clone was holding it here. See _"`EasingUtils` went to `ss-utils` whole"_
+below.
+
 **Kept, with the shape each would need first.** The user's verdict: the remainder still feels
 component-driven. Not outstanding work — the argument, so it is not re-derived.
 
@@ -327,12 +331,24 @@ rather than the verb, since the package names things after what they operate on.
 genuinely absent, it is a candidate to go _to_ `ss-utils` — see the section above for which side of the
 line it falls on.
 
-### `EasingUtils` is written here to be lifted into `ss-utils` whole
+### `EasingUtils` went to `ss-utils` whole
 
-`components/src/Utils/easing.ts` is the one file in `components/src` written against another repo's conventions rather
-than this one's. The user's instruction when it was commissioned: put the curve maths in its own file,
-wherever, because it is going to be copy-pasted into `ss-utils` later — and while building it, fill out the
-family rather than stopping at the one curve the caller needed, so the package arrives complete.
+It is `utils/src/Abstracts/easing.ts` now, its test is `utils/test/Abstracts/easing.test.ts`, and it is in the
+barrel and in the barrel test's export list. It was written for that move from the start: the user's
+instruction when it was commissioned was to put the curve maths in its own file, wherever, because it was
+going to be copy-pasted into `ss-utils` later — and while building it, to fill out the family rather than
+stopping at the one curve the caller needed, so the package would arrive complete. Merging the repos removed
+the copy-paste step, and the user took the move.
+
+**`components/src` no longer exports it, and no alias was left behind.** `RotationUtils` kept a published name
+alive on its way out only because `CarouselUtils.wrapIndex` already aliased it; there was no equivalent here,
+so the user chose the clean break. Anyone importing `EasingUtils` from `@thewaver/ss-components` has to import
+it from `@thewaver/ss-utils` instead. `Rotator` is the only caller inside the repo and does exactly that.
+
+**Its exports gained doc blocks on arrival**, because `utils/` documents everything it publishes and
+`components/src` documents nothing — that difference is the whole of what the move cost. The arithmetic itself
+crossed untouched; the only other edit was the `MathUtils` import becoming the relative `./math.js` its new
+neighbours use.
 
 **So it exports far more than has a consumer, and that is deliberate.** `Rotator` uses `ease` and nothing
 else. Everything beside it — the four CSS keyword curves, and `in` / `out` / `inOut` for quad, cubic, quart,
@@ -360,7 +376,7 @@ applies, and for the same reason: time may not run backwards, so `x1` and `x2` o
 in, whereas a `y` outside it is how an overshooting curve is expressed and is left alone. A caller who wants
 `easeOutBack` as a Bezier gets it.
 
-**Its tests are the ones that will travel with it.** `ease` is checked against three known values of the CSS
+**Its tests travelled with it.** `ease` is checked against three known values of the CSS
 curve — 0.408511, 0.802403, 0.960459 at a quarter, a half and three quarters — which is what proves the
 solver rather than the arithmetic around it. Everything else is a property held across the whole set: every
 curve starts at nothing and finishes whole, every curve holds its ends when given a ratio outside the range,
@@ -7696,3 +7712,26 @@ happens to paint inside or outside the box is the consumer's half, the same line
 knowing is that a grown tile paints **under** the tiles after it, since later siblings win ties, and the
 cell wrapper is deliberately not a stacking context — so `position: relative` plus a `z-index` on the
 consumer's own element reaches past its neighbours and lifts it clear.
+
+### `RichText`: a tag name is what you could write after a dot in JavaScript
+
+The parser used to accept letters and nothing else, so `[tag1]` and `[h1]` were not tags — they came out as
+the characters they were typed as. The user asked for digits, and for the widest set that still makes sense,
+which raised the question the answer is easy to get wrong: **an object key is not a limit.** Every property
+key in JavaScript is a string, so `""`, `"hello world"` and `"[b]"` are all valid keys, and the class map
+here is a `Record<string, string>` that would take any of them. Nothing about the map constrains the syntax.
+
+What does constrain it is that the text around a tag is ordinary prose, and prose contains square brackets.
+So the rule chosen is the **identifier** rule — the subset JavaScript itself accepts after a dot: a letter or
+an underscore first, then letters, digits and underscores. `[tag1]`, `[h1]` and `[my_tag]` are tags;
+`[123]`, `[b-c]`, `[$5]` and `[2024-01]` are not, and pass through as text.
+
+**The hyphen is the interesting exclusion**, because a markup vocabulary would usually take one. It is out
+for the same reason it is out of an identifier, and the practical benefit is that a date-shaped or
+reference-shaped bracket in someone's text cannot become a tag. `$` is out too, despite being legal in an
+identifier, because `[$5]` is a plausible thing to have written on purpose.
+
+**What was already decided and is unchanged:** tags are found case-insensitively and matched
+case-sensitively, so `[B]bold[/B]` is recognised as a tag, finds no class under `"B"` and prints its own
+brackets. Both halves are pinned by name in `RichText.utils.test.ts`, as is the exclusion of `[123]` and
+`[b-c]`.

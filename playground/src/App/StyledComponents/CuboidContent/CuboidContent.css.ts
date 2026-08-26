@@ -18,10 +18,13 @@ export const cuboidFace = styleVariants({
     front: [cuboidFaceBase, { backgroundColor: themeVars.color.tooltip.dark, color: themeVars.color.tooltip.contrast }],
     back: [cuboidFaceBase, { backgroundColor: themeVars.color.tooltip.light, color: themeVars.color.tooltip.contrast }],
     left: [cuboidFaceBase, { backgroundColor: themeVars.color.primary.dark, color: themeVars.color.primary.contrast }],
-    right: [cuboidFaceBase, { backgroundColor: themeVars.color.primary.main, color: themeVars.color.primary.contrast }],
+    right: [
+        cuboidFaceBase,
+        { backgroundColor: themeVars.color.primary.light, color: themeVars.color.primary.contrast },
+    ],
     top: [
         cuboidFaceBase,
-        { backgroundColor: themeVars.color.secondary.main, color: themeVars.color.secondary.contrast },
+        { backgroundColor: themeVars.color.secondary.light, color: themeVars.color.secondary.contrast },
     ],
     bottom: [
         cuboidFaceBase,

@@ -5,8 +5,10 @@ import { CuboidUtils } from "@thewaver/ss-components";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField } from "../../StyledComponents/Field/Field";
+import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
+import type { CuboidExampleProps } from "./CuboidPage.types";
 import { DefaultExample } from "./Examples/Default";
+import { WanderingExample } from "./Examples/Wandering";
 
 const MIN_EXTENT = 40;
 const MAX_EXTENT = 400;
@@ -20,8 +22,43 @@ const MAX_DURATION_MS = 3000;
 const DURATION_STEP_MS = 100;
 const STARTING_DURATION_MS = 600;
 
+const MIN_TURN_INTERVAL_MS = 200;
+const MAX_TURN_INTERVAL_MS = 5000;
+const TURN_INTERVAL_STEP_MS = 100;
+const STARTING_TURN_INTERVAL_MS = 1000;
+
 const FIELD_WIDTH = 110;
 const EXAMPLES_ROOT = "/src/App/Pages/CuboidPage/Examples";
+
+const WanderingExampleWrapper = (props: CuboidExampleProps) => {
+    const [getTurnIntervalMs, setTurnIntervalMs] = createSignal(STARTING_TURN_INTERVAL_MS);
+    const [getIsTurning, setIsTurning] = createSignal(true);
+
+    return (
+        <>
+            <WanderingExample {...props} turnIntervalMs={() => (getIsTurning() ? getTurnIntervalMs() : undefined)} />
+
+            <PagePropsPanel scope={"local"}>
+                <PageProp key={"isTurning"} label={"Turns by itself"}>
+                    <PageCheckField value={getIsTurning} ariaLabel={"Turns by itself"} onChange={setIsTurning} />
+                </PageProp>
+
+                <PageProp key={"turnIntervalMs"} label={"Turn every (ms)"}>
+                    <PageNumberField
+                        value={getTurnIntervalMs}
+                        min={() => MIN_TURN_INTERVAL_MS}
+                        max={() => MAX_TURN_INTERVAL_MS}
+                        step={() => TURN_INTERVAL_STEP_MS}
+                        width={() => FIELD_WIDTH}
+                        isDisabled={() => !getIsTurning()}
+                        ariaLabel={"Turn interval in milliseconds"}
+                        onInput={setTurnIntervalMs}
+                    />
+                </PageProp>
+            </PagePropsPanel>
+        </>
+    );
+};
 
 export const CuboidPage = () => {
     const [getWidth, setWidth] = createSignal(STARTING_WIDTH);
@@ -31,6 +68,8 @@ export const CuboidPage = () => {
 
     const yawSignal = createSignal(0);
     const pitchSignal = createSignal(0);
+    const wanderingYawSignal = createSignal(0);
+    const wanderingPitchSignal = createSignal(0);
 
     const getSize = createMemo(() => ({ width: getWidth(), height: getHeight(), depth: getDepth() }));
 
@@ -49,6 +88,21 @@ export const CuboidPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,
+        },
+        {
+            key: "wandering",
+            name: "Turning to a neighbour on its own",
+            readout: () =>
+                `${CuboidUtils.getFacing(wanderingYawSignal[0](), wanderingPitchSignal[0]())} — every tick takes one quarter turn at random, discarding the ones that would leave the same face in view or turn back to the face it just left, so the box only ever moves on to a new face sharing an edge with this one`,
+            component: () => (
+                <WanderingExampleWrapper
+                    yawSignal={wanderingYawSignal}
+                    pitchSignal={wanderingPitchSignal}
+                    size={getSize}
+                    transitionDurationMs={getTransitionDurationMs}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Wandering.tsx`,
         },
     ]);
 

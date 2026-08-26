@@ -4,6 +4,7 @@ export * from "./Abstracts/color.js";
 export * from "./Abstracts/count.js";
 export * from "./Abstracts/decimal.js";
 export * from "./Abstracts/dir.js";
+export * from "./Abstracts/easing.js";
 export * from "./Abstracts/function.js";
 export * from "./Abstracts/gesture.js";
 export * from "./Abstracts/math.js";
