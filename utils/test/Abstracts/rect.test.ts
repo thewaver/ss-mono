@@ -140,3 +140,52 @@ describe("RectUtils.hasAnyCornerInside", () => {
         expect(RectUtils.hasAnyCornerInside(a, undefined)).toBe(false);
     });
 });
+
+describe("RectUtils.getEdgePointTowards", () => {
+    // A 100x60 box centred on the origin: it reaches 50 sideways and 30 up and down.
+    const rect = { x: -50, y: -30, width: 100, height: 60 };
+
+    it("leaves through the side the point lies towards", () => {
+        expect(RectUtils.getEdgePointTowards(rect, { x: 500, y: 0 })).toEqual({ x: 50, y: 0 });
+        expect(RectUtils.getEdgePointTowards(rect, { x: -500, y: 0 })).toEqual({ x: -50, y: 0 });
+        expect(RectUtils.getEdgePointTowards(rect, { x: 0, y: 500 })).toEqual({ x: 0, y: 30 });
+        expect(RectUtils.getEdgePointTowards(rect, { x: 0, y: -500 })).toEqual({ x: 0, y: -30 });
+    });
+
+    it("lands on the corner when the point lies along the diagonal", () => {
+        expect(RectUtils.getEdgePointTowards(rect, { x: 100, y: 60 })).toEqual({ x: 50, y: 30 });
+    });
+
+    it("gives the same crossing wherever along the ray the point sits", () => {
+        const near = RectUtils.getEdgePointTowards(rect, { x: 10, y: 4 });
+        const far = RectUtils.getEdgePointTowards(rect, { x: 1000, y: 400 });
+
+        expect(near).toEqual(far);
+    });
+
+    it("reports the reach in that direction, which a tall box and a wide one disagree about", () => {
+        const wide = { x: -50, y: -10, width: 100, height: 20 };
+        const tall = { x: -10, y: -50, width: 20, height: 100 };
+        const sideways = { x: 1, y: 0 };
+
+        expect(RectUtils.getEdgePointTowards(wide, sideways)).toEqual({ x: 50, y: 0 });
+        expect(RectUtils.getEdgePointTowards(tall, sideways)).toEqual({ x: 10, y: 0 });
+    });
+
+    it("keeps the rectangle's own position out of the direction", () => {
+        const offset = { x: 100, y: 100, width: 100, height: 60 };
+
+        expect(RectUtils.getEdgePointTowards(offset, { x: 150, y: 1000 })).toEqual({ x: 150, y: 160 });
+    });
+
+    it("has no direction to leave in at the centre, so it reports the right-hand edge", () => {
+        expect(RectUtils.getEdgePointTowards(rect, { x: 0, y: 0 })).toEqual({ x: 50, y: 0 });
+    });
+
+    it("reports the centre of a rectangle with no size", () => {
+        expect(RectUtils.getEdgePointTowards({ x: 5, y: 5, width: 0, height: 0 }, { x: 50, y: 50 })).toEqual({
+            x: 5,
+            y: 5,
+        });
+    });
+});

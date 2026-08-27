@@ -15,7 +15,6 @@ const DEFAULT_SETTLE_DURATION_MS = 1500;
 const DEFAULT_REST_DURATION_MS = 3000;
 const DEFAULT_SPIN_DEFS: RotatorSpinDefs = { turns: 3, jitterRatio: 0 };
 const MIN_ROTATABLE_STEP_COUNT = 2;
-const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const FRAME_STARVATION_SLACK_MS = 100;
 const SPIN_EASING: EasingFn = EasingUtils.ease;
 
@@ -24,7 +23,6 @@ export namespace Rotator {
         const [getAngle, setAngle] = createSignal(0);
         const [getSpinPhase, setSpinPhase] = createSignal<Exclude<RotatorPhase, "idling">>("still");
         const [getIsAwaitingTarget, setIsAwaitingTarget] = createSignal(false);
-        const [getPrefersReducedMotion, setPrefersReducedMotion] = createSignal(false);
         const [getIsResting, setIsResting] = createSignal(false);
 
         const [getIndex, setIndex] = SignalMirror.createOptional(() => defs.indexSignal, 0);
@@ -64,7 +62,6 @@ export namespace Rotator {
                 getIsAutoSpinEnabled() &&
                 !getIsResting() &&
                 !getIsPageHidden() &&
-                !getPrefersReducedMotion() &&
                 getIsRotatable();
 
             return isIdling ? "idling" : "still";
@@ -169,18 +166,6 @@ export namespace Rotator {
                     setIsAwaitingTarget(false);
                 });
         };
-
-        createEffect(() => {
-            const query = window.matchMedia(REDUCED_MOTION_QUERY);
-            const onChange = () => setPrefersReducedMotion(query.matches);
-
-            onChange();
-            query.addEventListener("change", onChange);
-
-            onCleanup(() => {
-                query.removeEventListener("change", onChange);
-            });
-        });
 
         createEffect(() => {
             const restDurationMs = getRestDurationMs();

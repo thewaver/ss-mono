@@ -7086,8 +7086,8 @@ needs.
 **The idle turn runs indefinitely, and rests only after a spin. This replaced an arrangement built on holds,
 and the replacement is the user's.** The first build stopped turning whenever the pointer was over the wheel,
 whenever anything inside it had focus, and for good once a spin had settled. All of that is gone. The wheel now
-turns by itself for as long as it is on the page, with two exceptions: `prefers-reduced-motion: reduce` stops it
-outright, and a hidden tab stops it.
+turns by itself for as long as it is on the page, with one exception: a hidden tab stops it. **Reduced motion
+was a second exception and is not any more** — see the entry below.
 
 **After a user spin settles, the wheel rests for `restDurationMs` and then picks up again; `-1` rests for
 good.** The rest is its own private state, deliberately not the same thing as the auto-spin switch, because the
@@ -7133,8 +7133,19 @@ version of this note had too. A consumer who wants a pause control still has `au
 against.
 
 The user-initiated spin is outside the criterion in any case — it does not start automatically — and it is the
-essential activity, which is what 2.3.3 Animation from Interactions exempts at AAA. That is why reduced motion
-suppresses the idle turn and leaves the spin alone.
+essential activity, which is what 2.3.3 Animation from Interactions exempts at AAA.
+
+**The wheel no longer reads `prefers-reduced-motion` at all, and this is a deliberate reversal.** It used to be
+one of the five conditions on the idle turn, so a visitor asking for less motion got a wheel that waited to be
+spun. The user's call, taken when `PointerTracker` raised the same question: the library reports and the
+consumer decides, and the door is already open — `autoSpinSignal` and an absent `idleDelayMs` both stop the
+idle turn, and either can be driven from the preference in a line at the call site. Nothing was resting on the
+internal check: the analysis above already records that `prefers-reduced-motion` is not among 2.2.2's
+sufficient techniques and that the user's answer to that criterion is the essential-activity exemption, so
+removing it changes no conformance claim. **The Playground is now the consumer that answers it** — `WheelPage`
+reads the query and returns no `idleDelayMs` under reduce, which is what keeps `e2e/wheel.spec.ts`'s
+reduced-motion expectation true. That spec is testing the Playground's behaviour, not the library's, and its
+prose still reads correctly.
 
 `Carousel` and `Toasts` keep the three-part hold; the wheel no longer has one at all, so what they share now is
 only `trackPageHidden`.
@@ -7250,7 +7261,7 @@ no `indexSignal` is passed.
 **`Carousel`'s argument does not carry over, and it is worth being exact about why, since the two now sit on
 opposite sides.** There the library owns every button because the rotation is automatic and WCAG 2.2.2 requires
 a stop mechanism that is not the author's to omit — a carousel with no controls is one nobody can stop. A wheel
-has nothing to stop: the idle turn is ended by the spin, by the holds and by reduced motion, all recorded above,
+has nothing to stop: the idle turn is ended by the spin and by the consumer's own switch, both recorded above,
 and the spin itself only ever happens because someone asked for it. So the button the wheel rendered was
 carrying no conformance load, and what is left is `Scroller`'s trade — the consumer renders the button, inherits
 naming and the focus ring and the disabled treatment from `Button`, and the library keeps only what nobody else
@@ -7735,3 +7746,301 @@ identifier, because `[$5]` is a plausible thing to have written on purpose.
 case-sensitively, so `[B]bold[/B]` is recognised as a tag, finds no class under `"B"` and prints its own
 brackets. Both halves are pinned by name in `RichText.utils.test.ts`, as is the exclusion of `[123]` and
 `[b-c]`.
+
+### `PointerTracker`: one reading of where the pointer is relative to one element
+
+The abstract answers a single question — where is the pointer, relative to this box — and everything a
+consumer paints from it is arithmetic on that answer. The brief was a grid of squares that light as the pointer
+nears, a card whose cast shadow swings away from the pointer, and a surface under a veil with a hole at the
+pointer; the veil became the `Reveal` `Exotic` and left the abstract's page, and the shadow turned out to need
+no second element at all — a `box-shadow` whose offset, blur and alpha come from the reading does it, which is
+the honest version of the demo and one fewer div in the tree.
+
+**The page's examples are the user's pick, and two were cut after they ran them.** A card that started
+fetching when the pointer came within three radii, and the veil the `Exotic` replaced. Recorded so neither is
+re-proposed: the fetch-on-approach one was making a point about the reading being data rather than paint, and
+that point did not survive contact with a demo where nothing visible happens.
+
+**The magnet's reach is in pixels, not in radii, and that is the example's whole lesson.** It first used the
+edge ratio like the lamps, and on a wide, short button that made the vertical reach about twenty pixels — the
+element's own radius upwards is half its height. A magnet's field is a distance, so it reads `distance`
+against a pixel range, eased so the pull is already visible at the far end of it rather than creeping in over
+the last few pixels. The lamps keep the edge ratio because a lamp's glow really is a property of its shape.
+Both numbers are in the reading precisely so a consumer can pick the one that matches what it is modelling.
+
+**The magnet tracks the box it sits in, not itself, and this is the feedback trap `trackSwipe` already
+documents.** An element that leans towards the pointer moves the very box its reading is measured from, so the
+next reading is taken from the displaced position and the direction wanders as the pointer closes in. The fix
+here is not a frozen rect but a different subject: the tracker watches the stage, which never moves, and the
+transform goes on the button inside it. That is also the truer model — a magnet's pull is a property of where
+the thing rests, not of where it has already been dragged to.
+
+**The lean is a fraction of the offset, capped — not a fixed length along the direction.** The first two
+versions multiplied a unit direction by a constant scaled by the falloff, which is wrong in the way that is
+easiest to miss: the falloff is strongest at the centre, so the button jumped its full travel towards a pointer
+sitting almost on top of it and only snapped back to nothing at the exact centre, where the direction
+degenerates. Reported by the user as the button not being centred when the pointer is. The reading was not at
+fault — the compass on the same page reads `distance: 0px` at its own centre — the arithmetic on top of it was.
+Taking `distance × follow ratio × pull` gives the behaviour the name promises: nothing at the centre, and a
+reach that grows as the pointer approaches without ever overshooting it.
+
+**What limits the reach is the room the box leaves, not a constant.** A fixed maximum was the first answer and
+it was visibly wrong in the way the user reported next: the button stopped short of the edges with no
+explanation, because thirty-four pixels is less than the travel a two-hundred-and-eighty-pixel stage allows a
+button half its width. The cap is now `(stage − button) ÷ 2` per axis, from two
+`ElementObserver.createBorderBoxSizeObserver` calls, and it is clamped per axis rather than along the
+direction — so a pointer off one corner slides the button along the edge it has already reached instead of
+stopping in mid-air. Measured flush on all four sides.
+
+**The reading carries pixels _and_ a ratio, because the two answer different questions.** A pixel offset from
+the element's centre is isotropic, so the angle derived from it is the true direction on any shape; a ratio of
+the box says where inside the box the pointer sits, which is what a mask position wants and what
+`trackDrag` already reports. Reporting only the ratio would have distorted the angle on a non-square element —
+a bar 400 by 40 would call a shallow approach 45° — and reporting only pixels would have left every
+mask-positioning consumer dividing by a size it has to measure again. Both fall out of one measurement, so
+carrying both costs nothing.
+
+**The user's contribution, and the part that makes the reading shape-aware: `edgeOffset`.** Draw the line from
+the element's centre through the pointer and record where it leaves the box. `distance / edgeDistance` is then
+one number that means the same thing on any element: below `1` the pointer is inside, `1` is on the edge, `2`
+is a further element-radius away. A wide bar reports a short reach sideways and a long one along its length,
+so a falloff written against it lights the way a bar-shaped lamp actually would, with no consumer arithmetic
+about aspect ratio. It is also scale-free by construction — both lengths are measured in the same space, so an
+ancestor scale divides out, the same immunity `trackDrag`'s ratio has.
+
+**The boundary is the element's rectangle, so a rounded element over-reports its corners** — a circle made
+with a 50% radius says its diagonal reaches about 1.4 times as far as it is drawn. Left alone: none of the
+three consumers is round, and teaching the abstract about shapes means either reading `border-radius` back out
+of computed style or taking a shape argument, both of which are a lot to carry for a decoration.
+
+**The arithmetic went to `ss-utils` as `RectUtils.getEdgePointTowards`.** It needs only the language, which is
+the line for that package, and the degenerate case follows a rule already recorded there: the centre has no
+direction to leave in, so it reports the middle of the right-hand edge, matching `Point2dUtils.getAngle`
+reporting `0` for the origin.
+
+**One document listener and one frame, shared by every consumer, because an element cannot hear a pointer that
+never touches it.** The listener has to be on the document, and the lamp grid alone calls `create` twelve
+times, so a listener per consumer would be twelve listeners and twelve `getBoundingClientRect` calls per
+pointer event. Instead the module holds the client point and a subscriber set, `pointermove` marks the frame
+dirty, and one `requestAnimationFrame` recomputes every subscriber — the `DismisserStack` shape, which
+attaches on the first consumer and detaches on the last. Scroll and resize mark the same frame dirty, since a
+page moving under a still pointer changes every reading.
+
+**`getIsPointerPresent` is returned from every `create` call even though it is module state**, so a consumer
+reads one thing and never has to know which parts of the reading are shared.
+
+**A resting reading rather than an absent one, and it rests infinitely far away.** The reading is never
+`undefined`: before the first pointer event, and on a touch device where the pointer only exists while a
+finger is down, it reports `distance` and `edgeRatio` of `Infinity` with a zero offset. That is the honest
+statement — infinitely far away, in no particular direction — and it means the arithmetic path never branches:
+a falloff clamps to nothing lit, an offset multiplied by a normalised zero direction displaces nothing. Zeros
+would have been the wrong resting value, since a zero distance is the pointer at the centre, which is every
+effect at full strength. **After a pointer has been seen the last reading is kept**, and
+`getIsPointerPresent` goes false, so a consumer can fade out from where it was rather than snapping — which
+is what leaving a room looks like. A consumer ignoring the flag gets an effect frozen mid-strength; that was
+weighed and accepted as the price of not making the reading optional.
+
+**Reduced motion is the consumer's to answer, and the abstract does not touch it — see
+`MediaQueryMonitor` below for where the preference is read.** Considered and rejected: the abstract
+suppressing the reading itself. It cannot do the thing the preference actually asks
+for. The platform preference is to "remove, **reduce, or replace**" motion, and success criterion 2.3.3
+Animation from Interactions (AAA) covers only motion animation triggered by interaction — its own definition
+excludes changes of colour and opacity that do not change perceived size, shape or position, with an erratum
+amending it to no longer exclude blurring. So the lamp's brightness is outside the criterion entirely, while
+the shadow's offset and blur and the reveal's travelling hole are inside it. An abstract that stops reporting
+can only delete, and it would delete the brightness along with the movement; only the consumer knows which of
+its own responses is motion, and only the consumer can substitute. The three examples each answer differently:
+the lamp keeps its brightness and drops its glow, the shadow pins its offset and blur and keeps responding
+through opacity alone, and the reveal replaces the travelling hole with the whole veil fading.
+
+**The abstract briefly published the preference alongside the reading, and does not any more.** The user's
+question closed it: a consumer can read a media query in CSS with no JavaScript at all, or in about ten lines
+of signal and listener, so publishing it bought a saved listener rather than a capability the consumer lacked.
+What survived the question is the observation that made it non-trivial — a `PointerTracker` consumer paints
+from computed numbers as inline styles, and a CSS media query cannot withdraw an inline style without
+`!important` — and that is an argument for the preference being reachable from JavaScript, not for a pointer
+abstract being the one to hand it out.
+
+**The Playground gained an `Abstracts` category for it**, ahead of `Exotics`. Nothing that renders no DOM had
+a page before; the alternative was filing it under `Exotics`, which is the folder for things that do render.
+
+### `MediaQueryMonitor`: a media query as an accessor, shared per query
+
+Extracted on the user's call, from the flag `PointerTracker` briefly published and the ten lines `WheelPage`
+briefly held: the reduced-motion preference should be reachable from plain JavaScript by anything that needs
+it, rather than riding on an abstract that measures something else.
+
+**It is a media query rather than a preference, because the mechanism is the general one.**
+`MediaQueryMonitor.create(query)` returns an accessor of whether the query matches, and
+`createReducedMotion()` is the one named shortcut over it, so the query string is written once in the library
+and nowhere else. Naming the general thing was the choice over a `ReducedMotionMonitor`: the next preference
+worth reading — forced colours, reduced transparency, a colour scheme — is the same code with a different
+string, and a monitor per preference would be a file each.
+
+**One `MediaQueryList` and one listener per distinct query, however many consumers ask.** A module-level map
+keyed by the query string holds the signal and a subscriber count; the first consumer opens the listener and
+the last closes it, the `DismisserStack` shape again. The lamp grid is the case that makes it matter —
+twelve consumers on one page, which as a listener each is what `Rotator` used to do with one wheel and would
+have done badly with twelve. The signal stays in the map after the last consumer leaves, so a page mounting
+the same query again reuses it rather than flickering from a stale `false`.
+
+**Nothing in the library reads it internally.** `Rotator` stopped consulting the preference when the wheel's
+enforcement was removed, and `PointerTracker` never did anything with it. Every consumer is a Playground page
+or example, which is the point: the library reports, the consumer decides.
+
+### The Playground's `Abstracts` category, and which four earn a page
+
+The category exists because `PointerTracker` had nowhere honest to go: `Exotics` is things that render DOM, and
+it renders none. The user's call was to keep the category rather than file it wrongly or ship no page at all —
+the one Abstract with no component consumer would otherwise be the only thing in the library you cannot look
+at.
+
+**Four Abstracts earn a page, and the test is whether anything already shows them.** `PointerTracker` has no
+component consumer at all. `InteractionTracker` is seen today only through a colour surface, a drawer and a
+carousel, which show what it is used for rather than what it reports. `Virtualizer` was visible only inside a
+stress-test modal buried in the Select page. Everything else is either already on screen through the component
+that consumes it — `Rotator` through the wheels, `ElementFader` through every overlay, `Dismisser` and
+`FocusManager` through the modal, `Typeahead` through select, `MaskedField` through the inputs, `ColorExtractor`
+through the colour input — or would be a page of numbers changing, which is `ElementObserver`, `SignalMirror`,
+`TextSync`, `MediaQueryMonitor`, `LiveAnnouncer` and `FrameRateMonitor`.
+
+**`Anchor` was argued for and rejected by the user: it is already everywhere.** Tooltips, menus, selects and
+the spotlight all position through it, so a page would be a fourth showing of a thing three pages already show.
+
+**This is a Playground answer, not a documentation answer.** The user's note, recorded because it changes the
+shape of the question later: the site is a showcase today and will likely become documentation, and at that
+point every Abstract needs a page whether or not it has anything to demonstrate. The four-page rule is about
+what is worth demonstrating, not about what is worth documenting.
+
+**Also raised by the user and not built: listing, in each component page's description, which Abstracts it
+uses.** The objection they raised themselves is maintenance — a hand-written list rots the moment a component
+gains an import. Worth knowing before anyone attempts it: the dependency is already in the import graph, and
+the Playground already runs a build-time plugin over its own source for the source viewer, so the list is
+derivable rather than curated. Nothing has been decided.
+
+### `Reveal`: a cover with a hole where the pointer is
+
+The user's suggestion, made while looking at the `PointerTracker` example that does the same thing by hand.
+Both now exist and that is deliberate: the example on the abstract's page shows the reading is enough to build
+this yourself, and the `Exotic` is the packaged one.
+
+**The cover is the consumer's and the hole is the component's.** `renderContent` is what is hidden,
+`renderCover` is what hides it, and the component contributes only the mask that cuts the hole and the
+positioning that lays one over the other. This follows `Spotlight`'s split — that component owns the hole in an
+overlay and hands the overlay's paint to `renderOverlay` — and it is why the frosted, opaque and text-carrying
+covers on the Playground page are all the same component with nothing switched.
+
+**`renderCover` is handed whether a reveal is happening.** A cover that says "nothing to see here" until the
+pointer arrives needs to know, and the alternative — the consumer tracking the pointer a second time to find
+out — would make the component the harder way to do it. The flag is true only while the pointer is inside the
+element, which is also what the reduced-motion path keys off.
+
+**The cover takes no pointer events.** Its text was selectable, which is wrong twice over: a cover is paint
+rather than content, and a caret dragged across it is a pointer interaction the thing has no business
+answering. `pointer-events: none` on the cover layer settles it. The consequence, stated rather than fixed:
+the content underneath then takes those events instead, so a determined visitor can select the hidden text
+through the cover. Hiding it from selection as well is the consumer's to decide, and it is not something a
+mask could ever have promised — the content is in the document either way.
+
+**`roundness` runs the hole from a square to a circle**, and the mask changed shape to allow it. A
+`radial-gradient` can only be a circle or an ellipse, so the hole is now a small SVG image — a rounded
+rectangle, blurred by `softness`, with `roundness` setting the corner radius from zero to half its side —
+composited against a full-coverage layer with `mask-composite: exclude`, which is Baseline widely available
+since December 2023. **The image depends only on the three shape props, never on the position**, so it is
+built once per shape change and moved with `mask-position`; regenerating a data URI every frame would have
+been an image decode per pointer move. Following the pointer in pixels needs the element's own size, which the
+reading deliberately does not carry, so the component observes it with `ElementObserver` — visible now in the
+page's derived dependency row, which is the mechanism working as intended.
+
+**`radius` and `softness` rather than a gradient string.** Softness is the fraction of the radius that is fully
+clear before the mask starts fading back to opaque, so `0` is a hard-edged hole and `1` never quite closes.
+Handing the consumer the gradient instead would have exposed that the hole is a mask, which is the one
+implementation detail the component exists to hide.
+
+**It reads no preference of any kind, and reduced motion is the consumer's to answer.** The first build had
+the component substituting for itself — under reduce, no travelling hole and the whole cover fading instead —
+on the argument that the motion is not incidental here but is the entire component. The user rejected it: the
+rule set with the wheel holds for a component too, so the library reports and the consumer decides.
+
+**What made that answerable rather than a refusal is `radius`.** A radius of zero cuts no hole while the
+tracking carries on, so `getIsRevealing` still reports whether the pointer is inside. A consumer answering the
+preference therefore writes one expression — zero radius under reduce — and fades its own cover on the flag it
+is already handed, which is the substitution the preference actually asks for rather than the deletion
+`isDisabled` would give. **The general rule this settled: a component or abstract that reports rather than
+enforces has to leave the consumer a way to express the answer, or "the consumer decides" is a refusal wearing
+a rule's clothes.** A Playground example demonstrating exactly that was built and then cut on the user's call,
+so the door is recorded here rather than shown there.
+
+**`transitionDurationMs` went with the substitution.** It existed to time the cover's fade; with the fade now
+the consumer's, the transition belongs in the consumer's own stylesheet, and a prop timing a transition the
+component no longer performs is dead API.
+
+### Which Abstracts a page's component uses, derived rather than curated
+
+Asked for by the user, and built only because the maintenance objection they raised themselves turned out to
+be answerable: a hand-written list of each component's Abstracts rots the moment a component gains an import,
+and nobody will re-check fifty pages after every commit.
+
+**The dependency is already in the import graph, so nothing is typed twice.** A Vite plugin walks
+`components/src` at build time, follows relative imports transitively from each component's entry file, and
+classifies every file it reaches by the folder that owns it — `Abstracts/<Name>` is an abstract, anything under
+`Fundamentals`, `Composites` or `Exotics` is a component. The result reaches the Playground as a virtual module
+and renders under each page's description. In the dev server the plugin watches `components/src` and reloads
+the module, so the list is right without a restart.
+
+**Transitive rather than direct, deliberately.** `Wheel` lists `Barrel`, `InteractionTracker`, `LiveAnnouncer`,
+`Rotator` and `SignalMirror` — `Rotator` is imported by the wheel itself, `LiveAnnouncer` through the shell it
+wraps. Direct imports would have answered "which files does this one file name", which is a fact about the code
+layout; the reader's question is which abstracts are running when this component runs, and that is the
+transitive set.
+
+**Type-only imports do not count.** `import type` names a type and runs nothing, so counting it would list an
+abstract a component merely borrows a shape from.
+
+**Internal components are listed alongside exported ones.** `Select` names `InteractionWrapper` and `FormField`,
+neither of which a consumer can import. The alternative — filtering to what `index.ts` exports — would have
+made the list a partial truth for the sake of tidiness, and the list is describing what runs, not what can be
+bought.
+
+**A name links to its page when one exists.** The matching is case-insensitive, because the Playground's
+display names and the folder names disagree in a couple of places (`TypeWriter` against `Typewriter`), and a
+name with no page renders as plain text rather than a dead link.
+
+### Colour in the Playground: two rules, both the user's
+
+Stated after a review of the pages built for the `Abstracts`. They are house rules for the Playground's own
+paint, not library behaviour, and they are recorded because every new page will otherwise re-invent an answer.
+
+**A background always runs from a family's `dark` to its `light`.** `linear-gradient(135deg, X.dark, X.light)`
+with both stops from the same family — not two families mixed, and not a `.main` used as a stop. What went in
+before the rule: a card gradient from `primary.dark` to `secondary.main`, and a drag pad from `surface.dark` to
+`info.dark`, both of which read as arbitrary because they are.
+
+**`color.background.*` is the page's, and nothing else may use it.** Stated by the user after the first pass
+painted every example's stage with a `background.dark` to `background.light` gradient: that family names the
+page's own ground, so an example borrowing it is claiming to be the page. The cast-shadow demo is the one
+exception, and only because a black shadow needs a light ground to read against; it carries a `secondary.dark`
+to `secondary.light` stage of its own.
+
+**What replaces it depends on what the example is showing, and there are three answers.** The correction came
+after a second pass wrapped everything in `PageMeasureBox`, which was as wrong as painting everything.
+
+- **`PageMeasureBox`** — the checkered, dash-bordered wrapper — is for an example whose **outer shell matters**:
+  something is measured, something moves inside its bounds, or the point is where the component's box ends.
+  The compass, lamps, magnet and tilt qualify, because every one of them is about a reading taken against a
+  box; so does the swipe, which travels a fraction of its own width. **The interaction flags do not** — nothing
+  moves, nothing is measured, and a box around a hover state is decoration pretending to be information.
+- **`color.control.background.main`** is for anything that should read as a control's own surface. The
+  virtualizer's lists take it, because a scrolling list of rows is what a select's popup is, and the two
+  looking alike is the useful signal.
+- **A surface-family card** for everything else.
+
+**Text on a background is that family's `contrast`, and a highlight colour has to be checked against the
+background it actually lands on.** A highlight is allowed — `primary.main` on a dark surface is fine — but it
+travels with the element, and the failure the user caught is what happens when the background moves out from
+under it: the virtualizer's row index is `primary.main`, and a pinned row painted itself `secondary.dark`,
+leaving teal on warm brown with almost nothing between them. The fix is that the pinned row's own paint claims
+the text inside it — a `globalStyle` on the index within a pinned row sets `color: inherit`, so the highlight
+gives way to the row's `contrast` rather than surviving into a background it was never checked against.
+**The general form: when a container can change its own background, it owns the colour of the text inside
+it.**

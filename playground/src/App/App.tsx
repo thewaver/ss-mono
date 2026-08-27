@@ -1,5 +1,6 @@
 import type { JSX } from "solid-js";
 import { Index, Show, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 
 import { A, Route, type RouteSectionProps, Router } from "@solidjs/router";
 import { TabPanel, Tabs, Viewport } from "@thewaver/ss-components";
@@ -26,17 +27,20 @@ import { FlipCardPage } from "./Pages/FlipCardPage/FlipCardPage";
 import { FormPage } from "./Pages/FormPage/FormPage";
 import { FormationPage } from "./Pages/FormationPage/FormationPage";
 import { ImageSwitcherPage } from "./Pages/ImageSwitcherPage/ImageSwitcherPage";
+import { InteractionTrackerPage } from "./Pages/InteractionTrackerPage/InteractionTrackerPage";
 import { LabelPage } from "./Pages/LabelPage/LabelPage";
 import { MenuPage } from "./Pages/MenuPage/MenuPage";
 import { ModalPage } from "./Pages/ModalPage/ModalPage";
 import { MosaicPage } from "./Pages/MosaicPage/MosaicPage";
 import { NumberInputPage } from "./Pages/NumberInputPage/NumberInputPage";
 import { PaginatorPage } from "./Pages/PaginatorPage/PaginatorPage";
+import { PointerTrackerPage } from "./Pages/PointerTrackerPage/PointerTrackerPage";
 import { PreviewPage } from "./Pages/PreviewPage/PreviewPage";
 import { ProgressPage } from "./Pages/ProgressPage/ProgressPage";
 import { RadioPage } from "./Pages/RadioPage/RadioPage";
 import { RangeCalendarPage } from "./Pages/RangeCalendarPage/RangeCalendarPage";
 import { RangePage } from "./Pages/RangePage/RangePage";
+import { RevealPage } from "./Pages/RevealPage/RevealPage";
 import { RichTextPage } from "./Pages/RichTextPage/RichTextPage";
 import { SatellitePage } from "./Pages/SatellitePage/SatellitePage";
 import { ScanlineAnimationPage } from "./Pages/ScanLineAnimationPage/ScanLineAnimationPage";
@@ -59,6 +63,7 @@ import { TogglePage } from "./Pages/TogglePage/TogglePage";
 import { TreePage } from "./Pages/TreePage/TreePage";
 import { TypewriterPage } from "./Pages/TypewriterPage/TypewriterPage";
 import { ViewportPage } from "./Pages/ViewportPage/ViewportPage";
+import { VirtualizerPage } from "./Pages/VirtualizerPage/VirtualizerPage";
 import { WheelPage } from "./Pages/WheelPage/WheelPage";
 import { PageTextField } from "./StyledComponents/Field/Field";
 
@@ -87,6 +92,29 @@ const SEARCH_FIELD_WIDTH = 200;
 
 const CATEGORY_CONFIGS: CategoryConfig[] = [
     {
+        name: "Abstracts",
+        components: [
+            {
+                name: "InteractionTracker",
+                description:
+                    "Everything the library knows about a pointer on an element: the hover, focus and press flags a painter reads; a hold that stops a carousel while it is looked at; a drag reported as a ratio of the element's own box; and a swipe that reports travel while it lasts and a verdict when it ends.",
+                component: () => <InteractionTrackerPage />,
+            },
+            {
+                name: "PointerTracker",
+                description:
+                    "Reports where the pointer is relative to one element: the offset from its centre, the angle, the distance, and the point where that same line leaves the element. Dividing the two distances gives one shape-aware number — below 1 inside, 1 on the edge, 2 a further element-radius away. It renders nothing at all; every example on this page is a consumer built on top of it.",
+                component: () => <PointerTrackerPage />,
+            },
+            {
+                name: "Virtualizer",
+                description:
+                    "A window over a list too long to mount: it reports which rows should exist right now, where each one starts, and how tall the whole thing would be. Rows can be measured after they mount rather than guessed, and named rows can be pinned so they stay mounted when scrolled away.",
+                component: () => <VirtualizerPage />,
+            },
+        ],
+    },
+    {
         name: "Exotics",
         components: [
             {
@@ -112,6 +140,12 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 description:
                     "Packs differently sized things into the least room they will fit in. One side is taken from the parent and the other is whatever the arrangement costs, so a short item leaves no hole under it — the next item that fits rises into it. The two presets differ over who chooses the sizes: an element mosaic is given them, while an image mosaic scales every row to fill the fixed side exactly and asks only for the shape the finished mosaic should come out closest to. Both render items in the order they end up reading in rather than the order they were passed, so Tab and a screen reader follow the eye.",
                 component: () => <MosaicPage />,
+            },
+            {
+                name: "Reveal",
+                description:
+                    "A cover with a hole cut where the pointer is. The cover is the consumer's — opaque, frosted, or something that reads what it is told — and the component only masks it and hands it whether a reveal is happening.",
+                component: () => <RevealPage />,
             },
             {
                 name: "RichText",
@@ -457,6 +491,57 @@ const COMPONENT_CONFIGS_BY_ROUTE = Object.fromEntries(
     COMPONENT_CONFIGS.map((config) => [componentToRouteName(config.name), config]),
 );
 
+const DEPENDENCIES_BY_KEY = new Map(
+    Object.entries(COMPONENT_DEPENDENCIES).map(([name, dependencies]) => [name.toLowerCase(), dependencies]),
+);
+
+const ROUTES_BY_KEY = new Map(COMPONENT_CONFIGS.map((config) => [config.name.toLowerCase(), config.name]));
+
+const DEPENDENCY_GROUPS = [
+    { key: "abstracts" as const, label: "Abstracts" },
+    { key: "components" as const, label: "Components" },
+];
+
+const PageDependencies = (props: { name: string }) => {
+    const getDependencies = () => DEPENDENCIES_BY_KEY.get(props.name.toLowerCase());
+
+    return (
+        <div class={styles.tabPageDependencies}>
+            <Index each={DEPENDENCY_GROUPS}>
+                {(getGroup) => (
+                    <Show when={getDependencies()?.[getGroup().key].length}>
+                        <div class={styles.dependencyGroup}>
+                            <span class={styles.dependencyLabel}>{getGroup().label}</span>
+
+                            <Index each={getDependencies()?.[getGroup().key] ?? []}>
+                                {(getName) => {
+                                    const getPageName = () => ROUTES_BY_KEY.get(getName().toLowerCase());
+
+                                    return (
+                                        <Show
+                                            when={getPageName()}
+                                            fallback={<span class={styles.dependencyName}>{getName()}</span>}
+                                        >
+                                            {(getFound) => (
+                                                <A
+                                                    class={styles.dependencyName}
+                                                    href={componentToRouteName(getFound())}
+                                                >
+                                                    {getName()}
+                                                </A>
+                                            )}
+                                        </Show>
+                                    );
+                                }}
+                            </Index>
+                        </div>
+                    </Show>
+                )}
+            </Index>
+        </div>
+    );
+};
+
 export function AppContent(props: RouteSectionProps) {
     const [getSelectedConfig, setSelectedConfig] = createSignal<ComponentConfig>();
     const [getSearchTerm, setSearchTerm] = createSignal("");
@@ -541,6 +626,8 @@ export function AppContent(props: RouteSectionProps) {
                                 <div class={styles.tabPageHeader}>
                                     <div class={styles.tabPageTitle}>{getConfig().name}</div>
                                     <div class={styles.tabPageDescription}>{getConfig().description}</div>
+
+                                    <PageDependencies name={getConfig().name} />
                                 </div>
 
                                 {props.children}

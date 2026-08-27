@@ -1,6 +1,8 @@
 import type { Accessor } from "solid-js";
 import { createMemo, createSignal } from "solid-js";
 
+import { MediaQueryMonitor } from "@thewaver/ss-components";
+
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -104,6 +106,8 @@ export const WheelPage = () => {
     const [getIsDisabled, setIsDisabled] = createSignal(false);
     const [getIsIdlingAllowed, setIsIdlingAllowed] = createSignal(true);
 
+    const getPrefersReducedMotion = MediaQueryMonitor.createReducedMotion();
+
     const overheadIndexSignal = createSignal(0);
     const sidewaysIndexSignal = createSignal(0);
     const reelIndexSignal = createSignal(0);
@@ -114,7 +118,7 @@ export const WheelPage = () => {
 
     const getWedges = createMemo(() => PRIZES.slice(0, getWedgeCount()));
 
-    const getIdleDelay = () => (getIsIdlingAllowed() ? getIdleDelayMs() : undefined);
+    const getIdleDelay = () => (getIsIdlingAllowed() && !getPrefersReducedMotion() ? getIdleDelayMs() : undefined);
 
     const getRestDuration = () => (getDoesResume() ? getRestDurationMs() : INDEFINITE_REST_DURATION_MS);
 

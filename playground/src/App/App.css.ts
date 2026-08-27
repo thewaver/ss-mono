@@ -110,3 +110,31 @@ export const tabPageDescription = style({
     maxWidth: 960,
     opacity: 0.75,
 });
+
+export const tabPageDependencies = style({
+    display: "flex",
+    flexWrap: "wrap",
+    gap: themeVars.spacing.full,
+    maxWidth: 960,
+    fontSize: themeVars.fontSize.xSmall,
+});
+
+export const dependencyGroup = style({
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "baseline",
+    gap: themeVars.spacing.half,
+});
+
+export const dependencyLabel = style({
+    opacity: 0.5,
+    textTransform: "uppercase",
+    letterSpacing: 1,
+});
+
+export const dependencyName = style({
+    padding: `1px ${themeVars.spacing.half}`,
+    borderRadius: themeVars.borderRadius.half,
+    backgroundColor: `rgb(from ${themeVars.color.surface.light} r g b / 50%)`,
+    fontFamily: "monospace",
+});

@@ -76,6 +76,43 @@ export namespace RectUtils {
     });
 
     /**
+     * Finds where the line from a rectangle's centre out to a point leaves the rectangle.
+     *
+     * Draw a straight line from the centre of `rect` through `point` and this is where that line
+     * crosses an edge, giving the rectangle's own reach in that particular direction. Dividing the
+     * distance from the centre to `point` by the distance from the centre to this result therefore
+     * says where the point sits relative to the rectangle regardless of its shape or size: below
+     * `1` inside it, exactly `1` on an edge, `2` a further rectangle-radius away.
+     *
+     * The result lies on the edge in both directions, so a point on the far side of the centre gets
+     * the crossing on its own side rather than the opposite one.
+     *
+     * @param rect The rectangle to leave. Corners are given by its own `x`, `y`, `width` and `height`.
+     * @param point Any point, inside the rectangle or outside it, in the same coordinate space as
+     * `rect`.
+     * @returns The crossing point, in that same space. The centre itself has no direction to leave
+     * in, so it reports the middle of the right-hand edge, matching {@link Point2dUtils.getAngle}'s
+     * choice of `0` for the origin. A rectangle with no width and no height reports its centre.
+     */
+    export const getEdgePointTowards = (rect: Rect, point: Point2d): Point2d => {
+        const centerX = rect.x + rect.width * 0.5;
+        const centerY = rect.y + rect.height * 0.5;
+        const halfWidth = rect.width * 0.5;
+        const halfHeight = rect.height * 0.5;
+        const dirX = point.x - centerX;
+        const dirY = point.y - centerY;
+
+        if (dirX === 0 && dirY === 0) return { x: centerX + halfWidth, y: centerY };
+
+        const scale = Math.min(
+            dirX === 0 ? Infinity : halfWidth / Math.abs(dirX),
+            dirY === 0 ? Infinity : halfHeight / Math.abs(dirY),
+        );
+
+        return { x: centerX + dirX * scale, y: centerY + dirY * scale };
+    };
+
+    /**
      * Tests whether a point falls within a rectangle.
      *
      * Points exactly on an edge count as inside.
