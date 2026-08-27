@@ -1,12 +1,15 @@
-import { Index, Show, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import { Show, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import type { JSX } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { Rect } from "@thewaver/ss-utils";
 
 import { Anchor } from "../../Abstracts/Anchor/Anchor";
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
+import { CutoutUtils } from "../../Abstracts/Cutout/Cutout.utils";
 import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
 import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
+import { Elevation } from "../../Abstracts/Elevation/Elevation";
 import { FocusManager } from "../../Abstracts/FocusManager/FocusManager";
 import { LiveAnnouncer } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer";
 import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
@@ -51,6 +54,12 @@ export const Spotlight = (props: SpotlightProps) => {
         getPadding,
     });
 
+    Elevation.createElevation(
+        () => access(props.elementRef),
+        getIsVisible,
+        () => styles.SPOTLIGHT_Z_INDEX,
+    );
+
     createEffect(() => {
         const element = access(props.elementRef);
 
@@ -69,12 +78,16 @@ export const Spotlight = (props: SpotlightProps) => {
         },
     );
 
-    const getSegmentRects = createMemo(() => {
+    const getMaskStyle = createMemo<JSX.CSSProperties>(() => {
         const rect = getElementRect();
 
-        if (!rect) return;
+        return rect ? CutoutUtils.getMaskStyle(rect) : {};
+    });
 
-        return SpotlightUtils.getSegmentRects(rect);
+    const getClipPath = createMemo(() => {
+        const rect = getElementRect();
+
+        return rect ? SpotlightUtils.getHoleClipPath(rect) : undefined;
     });
 
     const dismiss = () => {
@@ -188,21 +201,17 @@ export const Spotlight = (props: SpotlightProps) => {
     FocusManager.autoFocus(getPopupRef, getHasPlaced);
 
     return (
-        <Show when={getIsVisible() && getSegmentRects()}>
+        <Show when={getIsVisible() && getElementRect()}>
             <Portal ref={setPortalRef} mount={viewportContext.getPortalRef()}>
                 <div class={styles.spotlightOverlay}>
-                    <Index each={Object.values(getSegmentRects()!)}>
-                        {(getRect) => (
-                            <div
-                                class={styles.spotlightOverlaySegment}
-                                style={getRect()}
-                                onClick={() => access(props.mode) === "hint" && dismiss()}
-                            >
-                                {props.renderOverlay(getTransitionTarget, getTransitionDurationMs)}
-                            </div>
-                        )}
-                    </Index>
+                    {props.renderOverlay(getTransitionTarget, getTransitionDurationMs, getMaskStyle)}
                 </div>
+
+                <div
+                    class={styles.spotlightBlocker}
+                    style={{ "clip-path": getClipPath() }}
+                    onClick={() => access(props.mode) === "hint" && dismiss()}
+                />
 
                 <Show when={props.renderHighlight && getElementRect()}>
                     {(getRect) => (

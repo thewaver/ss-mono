@@ -1,54 +1,18 @@
 import type { Rect } from "@thewaver/ss-utils";
 
 export namespace SpotlightUtils {
-    export const getSegmentRects = (rect: Rect) => ({
-        topLeft: {
-            top: `0`,
-            left: `0`,
-            width: `${rect.x}px`,
-            height: `${rect.y}px`,
-        },
-        topCenter: {
-            top: `0`,
-            left: `${rect.x}px`,
-            width: `${rect.width}px`,
-            height: `${rect.y}px`,
-        },
-        topRight: {
-            top: `0`,
-            left: `${rect.x + rect.width}px`,
-            width: `calc(100% - ${rect.x + rect.width}px)`,
-            height: `${rect.y}px`,
-        },
-        centerLeft: {
-            top: `${rect.y}px`,
-            left: `0`,
-            width: `${rect.x}px`,
-            height: `${rect.height}px`,
-        },
-        centerRight: {
-            top: `${rect.y}px`,
-            left: `${rect.x + rect.width}px`,
-            width: `calc(100% - ${rect.x + rect.width}px)`,
-            height: `${rect.height}px`,
-        },
-        bottomLeft: {
-            top: `${rect.y + rect.height}px`,
-            left: `0`,
-            width: `${rect.x}px`,
-            height: `calc(100% - ${rect.y + rect.height}px)`,
-        },
-        bottomCenter: {
-            top: `${rect.y + rect.height}px`,
-            left: `${rect.x}px`,
-            width: `${rect.width}px`,
-            height: `calc(100% - ${rect.y + rect.height}px)`,
-        },
-        bottomRight: {
-            top: `${rect.y + rect.height}px`,
-            left: `${rect.x + rect.width}px`,
-            width: `calc(100% - ${rect.x + rect.width}px)`,
-            height: `calc(100% - ${rect.y + rect.height}px)`,
-        },
-    });
+    export const getHoleClipPath = (rect: Rect) => {
+        const right = rect.x + rect.width;
+        const bottom = rect.y + rect.height;
+        const outer = "0 0, 0 100%, 100% 100%, 100% 0, 0 0";
+        const inner = [
+            `${rect.x}px ${rect.y}px`,
+            `${right}px ${rect.y}px`,
+            `${right}px ${bottom}px`,
+            `${rect.x}px ${bottom}px`,
+            `${rect.x}px ${rect.y}px`,
+        ].join(", ");
+
+        return `polygon(evenodd, ${outer}, ${inner}, 0 0)`;
+    };
 }

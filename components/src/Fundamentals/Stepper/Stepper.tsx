@@ -69,6 +69,8 @@ export const Stepper = <TValue, TState>(props: StepperProps<TValue, TState>) => 
                 {(getStep, index) => {
                     const getTooltipDefs = () => props.computeTooltipDefs?.(getStep(), index);
 
+                    const getHasConnector = () => props.renderConnector !== undefined && index !== getLastIndex();
+
                     return (
                         <li class={styles.stepperEntry} style={{ "flex-direction": getDir() }}>
                             <InteractionWrapper
@@ -88,10 +90,30 @@ export const Stepper = <TValue, TState>(props: StepperProps<TValue, TState>) => 
                                 )}
                             />
 
-                            <Show when={props.renderConnector && index !== getLastIndex()}>
-                                <span class={styles.stepperConnector} aria-hidden="true">
-                                    {props.renderConnector!()}
-                                </span>
+                            <Show
+                                when={props.renderBody}
+                                fallback={
+                                    <Show when={getHasConnector()}>
+                                        <span class={styles.stepperConnector} aria-hidden="true">
+                                            {props.renderConnector!()}
+                                        </span>
+                                    </Show>
+                                }
+                            >
+                                {(getRenderBody) => (
+                                    <div class={styles.stepperTail}>
+                                        <Show when={getHasConnector()}>
+                                            <span
+                                                class={[styles.stepperConnector, styles.stepperTailConnector].join(" ")}
+                                                aria-hidden="true"
+                                            >
+                                                {props.renderConnector!()}
+                                            </span>
+                                        </Show>
+
+                                        <div class={styles.stepperBody}>{getRenderBody()(getStep, index)}</div>
+                                    </div>
+                                )}
                             </Show>
                         </li>
                     );

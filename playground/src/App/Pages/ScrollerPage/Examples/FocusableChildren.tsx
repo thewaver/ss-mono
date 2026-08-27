@@ -20,9 +20,13 @@ export const FocusableChildrenExample = (props: Props) => {
                 renderButton={(getStep, stepper) => <PageScrollerButton step={getStep} stepper={stepper} />}
             >
                 {access(props.labels).map((label) => (
-                    <Button
-                        renderContent={(getFlags) => <PageButtonContent flags={getFlags}>{label}</PageButtonContent>}
-                    />
+                    <div class={styles.item}>
+                        <Button
+                            renderContent={(getFlags) => (
+                                <PageButtonContent flags={getFlags}>{label}</PageButtonContent>
+                            )}
+                        />
+                    </div>
                 ))}
             </Scroller>
         </div>

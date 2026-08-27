@@ -1,7 +1,8 @@
 import { For, createEffect, createSignal } from "solid-js";
 
-import { Virtualizer } from "@thewaver/ss-components";
+import { Button, Virtualizer } from "@thewaver/ss-components";
 
+import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import type { VirtualizerPinnedExampleProps } from "../VirtualizerPage.types";
 
 import * as styles from "../VirtualizerPage.css";
@@ -27,13 +28,23 @@ export const PinnedExample = (props: Props) => {
     return (
         <div class={styles.pinnedRoot}>
             <div class={styles.controls}>
-                <button type="button" class={styles.button} onClick={() => rowWindow.scrollToRow(props.pinnedRow())}>
-                    {`Jump to #${props.pinnedRow()}`}
-                </button>
+                <Button
+                    onClick={async () => {
+                        rowWindow.scrollToRow(props.pinnedRow());
+                    }}
+                    renderContent={(getFlags) => (
+                        <PageButtonContent flags={getFlags}>{`Jump to #${props.pinnedRow()}`}</PageButtonContent>
+                    )}
+                />
 
-                <button type="button" class={styles.button} onClick={() => rowWindow.scrollToRow(TOP_ROW)}>
-                    Back to the top
-                </button>
+                <Button
+                    onClick={async () => {
+                        rowWindow.scrollToRow(TOP_ROW);
+                    }}
+                    renderContent={(getFlags) => (
+                        <PageButtonContent flags={getFlags}>Back to the top</PageButtonContent>
+                    )}
+                />
             </div>
 
             <div class={styles.scroller}>

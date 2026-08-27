@@ -3,6 +3,7 @@ import type { JSX } from "solid-js";
 
 import { MathUtils, type Point2d, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
 
+import { CutoutUtils } from "../../Abstracts/Cutout/Cutout.utils";
 import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
 import { PointerTracker } from "../../Abstracts/PointerTracker/PointerTracker";
 import { access } from "../../Utils/propUtils";
@@ -73,24 +74,15 @@ export const Reveal = (props: RevealProps) => {
         const size = getSize();
         const reading = getReading();
         const radius = getRadius();
-        const left = reading.boxRatio.x * size.width - radius;
-        const top = reading.boxRatio.y * size.height - radius;
-        const layers = `linear-gradient(black, black), ${getHoleImage()}`;
-        const positions = `0 0, ${left}px ${top}px`;
-        const sizes = `auto, ${radius * 2}px ${radius * 2}px`;
-
-        return {
-            "mask-image": layers,
-            "-webkit-mask-image": layers,
-            "mask-position": positions,
-            "-webkit-mask-position": positions,
-            "mask-size": sizes,
-            "-webkit-mask-size": sizes,
-            "mask-repeat": "no-repeat",
-            "-webkit-mask-repeat": "no-repeat",
-            "mask-composite": "exclude",
-            "-webkit-mask-composite": "xor",
+        const diameter = radius * 2;
+        const hole = {
+            x: reading.boxRatio.x * size.width - radius,
+            y: reading.boxRatio.y * size.height - radius,
+            width: diameter,
+            height: diameter,
         };
+
+        return CutoutUtils.getMaskStyle(hole, getHoleImage());
     });
 
     return (

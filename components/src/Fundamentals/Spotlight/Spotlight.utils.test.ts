@@ -6,59 +6,25 @@ import { SpotlightUtils } from "./Spotlight.utils";
 
 const RECT: Rect = { x: 100, y: 50, width: 200, height: 80 };
 
-describe("getSegmentRects", () => {
-    it("cuts the screen into the eight pieces around the hole", () => {
-        expect(Object.keys(SpotlightUtils.getSegmentRects(RECT))).toEqual([
-            "topLeft",
-            "topCenter",
-            "topRight",
-            "centerLeft",
-            "centerRight",
-            "bottomLeft",
-            "bottomCenter",
-            "bottomRight",
-        ]);
+describe("getHoleClipPath", () => {
+    it("traces the whole layer and then the hole, so the hole is what is cut away", () => {
+        expect(SpotlightUtils.getHoleClipPath(RECT)).toBe(
+            "polygon(evenodd, 0 0, 0 100%, 100% 100%, 100% 0, 0 0, " +
+                "100px 50px, 300px 50px, 300px 130px, 100px 130px, 100px 50px, 0 0)",
+        );
     });
 
-    it("leaves the highlighted rect itself uncovered", () => {
-        const segments = SpotlightUtils.getSegmentRects(RECT);
-
-        expect(segments.topCenter, "the band above spans the hole's width and stops at its top edge").toEqual({
-            top: "0",
-            left: "100px",
-            width: "200px",
-            height: "50px",
-        });
-        expect(segments.centerLeft, "the band to the left stops at the hole's left edge").toEqual({
-            top: "50px",
-            left: "0",
-            width: "100px",
-            height: "80px",
-        });
-        expect(segments.centerRight, "and the one to the right starts where the hole ends").toEqual({
-            top: "50px",
-            left: "300px",
-            width: "calc(100% - 300px)",
-            height: "80px",
-        });
+    it("measures the outer ring against the layer rather than a known size", () => {
+        expect(SpotlightUtils.getHoleClipPath(RECT), "so it fills whatever the viewport is").toContain(
+            "0 0, 0 100%, 100% 100%, 100% 0",
+        );
     });
 
-    it("measures the far edges against the viewport rather than a known size", () => {
-        const segments = SpotlightUtils.getSegmentRects(RECT);
+    it("collapses to a hole of nothing for a rect with no size", () => {
+        const path = SpotlightUtils.getHoleClipPath({ x: 0, y: 0, width: 0, height: 0 });
 
-        expect(segments.bottomRight).toEqual({
-            top: "130px",
-            left: "300px",
-            width: "calc(100% - 300px)",
-            height: "calc(100% - 130px)",
-        });
-    });
-
-    it("collapses the leading segments to nothing for a rect in the top-left corner", () => {
-        const segments = SpotlightUtils.getSegmentRects({ x: 0, y: 0, width: 40, height: 30 });
-
-        expect(segments.topLeft).toEqual({ top: "0", left: "0", width: "0px", height: "0px" });
-        expect(segments.centerLeft.width).toBe("0px");
-        expect(segments.topCenter.height).toBe("0px");
+        expect(path, "every hole corner lands on the same point, so nothing is cut").toBe(
+            "polygon(evenodd, 0 0, 0 100%, 100% 100%, 100% 0, 0 0, 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0px 0px, 0 0)",
+        );
     });
 });

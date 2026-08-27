@@ -34,5 +34,9 @@ export const PageStepContent = (props: ParentProps<StepContentProps>) => {
 };
 
 export const PageStepConnector = (props: StepConnectorProps) => {
-    return <span class={access(props.dir) === "row" ? styles.rowConnector : styles.columnConnector} />;
+    const getColumnClass = () => (access(props.isRail) === true ? styles.columnRailConnector : styles.columnConnector);
+
+    return <span class={access(props.dir) === "row" ? styles.rowConnector : getColumnClass()} />;
 };
+
+export const PageStepBody = (props: ParentProps) => <div class={styles.stepBody}>{props.children}</div>;

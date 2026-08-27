@@ -7,7 +7,7 @@ import solid from "vite-plugin-solid";
 
 import { vanillaExtractPlugin } from "@vanilla-extract/vite-plugin";
 
-import { componentDependencies } from "./vite/componentDependencies";
+import { componentDependencies } from "./vite/componentDependencies.ts";
 
 const SOURCE_QUERY = "?source";
 const SOURCE_PREFIX = "\0source:";

@@ -11,4 +11,5 @@ export type StepContentProps = AccessorProps<{
 
 export type StepConnectorProps = AccessorProps<{
     dir: StepperDir;
+    isRail?: boolean;
 }>;

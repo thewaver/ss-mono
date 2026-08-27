@@ -2,6 +2,9 @@ import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
 
+const TOGGLE_WIDTH = 44;
+const TOGGLE_HEIGHT = 24;
+
 export const isChecked = style({});
 export const isMixed = style({});
 export const isHovered = style({});
@@ -12,11 +15,11 @@ export const toggleContent = style({
     position: "relative",
     display: "flex",
     alignItems: "center",
-    width: 44,
-    height: 24,
+    width: TOGGLE_WIDTH,
+    height: TOGGLE_HEIGHT,
     boxShadow: themeVars.shadow.small,
     border: `2px solid rgb(from currentColor r g b / 25%)`,
-    borderRadius: 12,
+    borderRadius: TOGGLE_HEIGHT / 2,
     backgroundColor: "black",
     transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
 

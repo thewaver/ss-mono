@@ -6362,10 +6362,12 @@ that renders no button cannot promise one is reachable or named — which means 
 either way. The signal is required rather than optional because an internal one nobody can set is a card that
 can never turn.
 
-**Placed in `Fundamentals` beside `ImageSwitcher`, and that was derived rather than asked.** It swaps one piece
-of content for another with a transition, which is what `ImageSwitcher` does for a single image. The `Exotics`
-test — renders DOM, holds no value, lays elements out or turns them — would also take it, and where these two
-folders divide is the user's call rather than a rule written here.
+**It sits in `Exotics`, and it took two passes to get there.** The first placement was `Fundamentals` beside
+`ImageSwitcher`, derived rather than asked: it swaps one piece of content for another with a transition, which
+is what `ImageSwitcher` does for a single image. The user moved it. The `Exotics` test — renders DOM, holds no
+value, lays elements out or turns them — takes it, and **turning is the part that decides**, which is the same
+line `Cuboid` was placed on. Where the two folders divide was the user's call and now has an answer for the
+turning components: a thing that rotates in space is an `Exotic` whatever else it also does.
 
 ### `Cuboid`: a box of six faces, and two counts that drive it
 
@@ -6376,9 +6378,10 @@ missed reuse.
 **Named `Cuboid` and placed in `Exotics`, both on the user's call.** It was built as `Cube` and the name was
 put to them, since a component whose point is that the three extents differ is only a cube by accident; they
 took the exact word. `Exotics` is where they put it, which also settles that the turning components belong
-there rather than beside the carousels — `FlipCard` sits in `Fundamentals` and was not moved, and the user
-noted that `DrumCarousel` would fit `Exotics` too but that splitting the two carousels across folders is not
-worth doing now. That last point is recorded in `backlog.md` under _Open discussion_ rather than settled here.
+there rather than beside the carousels. `FlipCard` was left in `Fundamentals` at the time and has since been
+moved across on the user's call, so the rule now reaches every turning component; the user noted that
+`DrumCarousel` would fit `Exotics` too but that splitting the two carousels across folders is not worth doing
+now. That last point is recorded in `backlog.md` under _Open discussion_ rather than settled here.
 
 **What a screen reader is told is `box`, not `cuboid`.** `aria-roledescription` is read aloud, and the word it
 replaces the role with should be the ordinary one — a listener meets "box, group" rather than a term they may
@@ -6825,6 +6828,128 @@ stutter this mechanism exists to avoid rather than cause.
 page is short enough that both tour steps were always on screen, which made the scroll unobservable and the
 spec unwritable. The strip is what reproduces a long page inside a card, and `spotlight.spec.ts` reads its
 `scrollTop` — the same shape as `viewport.spec.ts` driving `[data-scroll-box]`.
+
+### The hint example's moving buttons are bounded by a `PageMeasureBox`
+
+The user's call, after the sliding buttons walked out of the example card — the vertical one worst, because a
+column of two buttons reserves only their own height and the second then travelled a further two of its own
+heights past the bottom.
+
+**The travel was a fraction of the button, and it needed to be a fraction of a box.** Each wrapper slid
+`translate(200%)`, which is 200% of the moving element, so the distance was set by how wide the words
+"Highlight Me" happen to render and the container had no say in it. Both buttons now sit absolutely inside a
+`PageMeasureBox` of a stated width and height, and each keyframe travels `calc(<box>px - 100%)` — the box's
+size less the element's own — so the far edge of the travel is the far edge of the box exactly, whatever the
+button measures. The checkered box is also the honest wrapper for this example under the Playground's own
+rule: something moves inside its bounds, which is what `PageMeasureBox` is for.
+
+**The two get separate lanes, because they would otherwise cross.** The horizontal one runs along the top and
+the vertical one hangs from the right below it, so the horizontal one reaching the right-hand edge passes
+above the vertical one rather than through it. The lane height is what the vertical one's travel is measured
+down from, which is why the three numbers live together in `SpotlightPage.css.ts` and the component reads two
+of them back for the box's props.
+
+**240 by 200, because the narrowest column the examples grid produces is 320.** The card's own padding takes
+40 of that, so anything wider than 280 overflows on a narrow viewport; the button measures 136 by 40, which
+leaves a little over 100 pixels of travel on each axis.
+
+**The `border-width` the keyframes used to animate was deleted with them.** Nothing set a `border-style`, so
+the used width was zero at every step and the declaration painted nothing on any frame.
+
+### `Abstracts/Elevation`: a height an element has without carrying a z-index
+
+Built after a tooltip added to the hint example's sliding button turned up blurred and greyed while the
+spotlight was open on that very button — the one element the spotlight exists to keep readable.
+
+**Anchor already worked out its own height, and the method was right.** `AnchorUtils.getStackingBase` walks
+from the anchor to the root, takes the largest `z-index` it passes, and the popup sits one above it. That is
+why a hovered button's tooltip lands at 3: `interactionRoot` goes to 2 on hover. What the walk cannot see is
+an overlay that is **not on the walk** — `Spotlight` portals its layers into the `Viewport`'s portal, so they
+are siblings of the tooltip rather than ancestors of the button, and nothing in the button's chain says the
+page has been covered.
+
+**So the height is published rather than discovered.** A module-level registry holds element-and-z-index
+pairs, the `DismisserStack` shape again: `Elevation.createElevation` registers on an effect and drops the
+entry on cleanup, and `Elevation.getBase(element)` returns the largest registered height whose element
+contains the one asked about. `Anchor`'s z-index is now the larger of the DOM walk and the registry, plus one.
+`Spotlight` registers its highlighted element at `SPOTLIGHT_Z_INDEX` while it is open, which is the same
+constant its four layers are styled with — it was a literal `10` written four times and is now one export, so
+the paint and the registration cannot drift apart.
+
+**Nothing is written onto the consumer's element.** The alternative was setting an inline `z-index` on the
+highlighted element, which needs a `position` as well, mutates markup the library does not own, and — because
+an element painting above the overlay is no longer part of its backdrop — would lift the element's own shadow
+and focus ring out of the blur wherever they reach past the hole. The registry is a fact held beside the DOM
+instead of a change made to it.
+
+**The registry carries a revision signal, and that is not decoration.** The case that needs it is the ordinary
+one: you hover the button, the tooltip opens, and _then_ you press it and the spotlight arrives. The z-index
+memo has already run by that point, so without something reactive to depend on it would keep the height it
+worked out before the page was covered. `spotlight.spec.ts` asserts the lift without hovering a second time
+for exactly that reason.
+
+**It is in `Anchor` rather than in `Tooltip`, so everything anchored to the highlighted element rises.** A
+select's popup or a menu opened on it is as much part of "this element is still usable" as its tooltip, and
+all of them come through `createPortalPosition`.
+
+**The scale it lands in.** The house runs 1–2 for local lifts, 10 for overlays, 100 for a modal, 200 for
+toasts. An elevated tooltip is 11, so it clears the spotlight and still sits under a modal opened over it —
+confirmed as the wanted order by the user.
+
+**Only the spotlight grants the lift; tooltips do not outrank overlays in general.** A `guide` seals the page
+precisely so that nothing behind it can be read, and a blanket rule would have floated a sharp tooltip over
+the elements it is sealing. The spec pins both halves: below the overlay's height on the plain page, above it
+once the spotlight is on that element.
+
+### `Spotlight`'s overlay is one masked layer and one clipped layer, not a ring of eight boxes
+
+The user's suggestion, made while looking at `Reveal`, and taken as the option that keeps the pointer honest.
+The first build cut the screen into the eight rectangles around the highlighted element and rendered the
+consumer's overlay into every one of them, so the hole was a genuine gap in the DOM.
+
+**A mask decides what is painted and nothing else, so it cannot replace the eight boxes on its own.** Hit
+testing does not read `mask-image`: a single masked overlay looks right and then swallows every click over
+the hole, which breaks `prompt` — the mode whose whole promise is that the highlighted control is still
+usable — and makes the dark area of a `hint` include the one place a click must pass through. So the paint
+and the pointer are now two layers rather than one: an overlay carrying the mask, `pointer-events: none`, and
+a transparent blocker under it carrying a `clip-path` with the same rectangle cut out. `clip-path` **does**
+take a region out of hit testing, which is what makes the blocker a real hole rather than a painted one.
+
+**The blocker is transparent on purpose, and that is what keeps it out of the browser bug.** Chromium handles
+`clip-path` and filters on the same element badly; the masked layer is where the `backdrop-filter` lives and it
+carries no clip, and the clipped layer paints nothing at all, so the two never meet on one element. This is the
+same shape as the rule the `Reveal` entry records for masks and filters, arrived at from the other side.
+
+**One polygon with `evenodd` and a seam, because `clip-path: polygon()` is a single closed path.** There is no
+way to give it two subpaths, so the outer ring returns to the origin, runs a zero-width segment out to the
+hole's first corner, traces the hole, and runs the same segment back. Crossing a doubled segment changes
+nothing under either fill rule, so the seam is invisible; `evenodd` is stated explicitly rather than left to
+`nonzero` so a later edit that reorders the points cannot quietly fill the hole in. It is Baseline widely
+available and has been since January 2020. `path()` would have allowed two honest subpaths and no seam, but it
+takes no percentages, so the layer's own size would have had to be observed to write it.
+
+**`renderOverlay` gained a third argument and now renders once.** The signature is
+`renderOverlay(getVisibilityTarget, getTransitionDurationMs, getMaskStyle)`, and the consumer spreads the mask
+onto the element it was already returning — the same handout `Reveal` makes to `renderCover` and `Shape` makes
+to `renderChildren`, with the same cost attached: an overlay that ignores the style covers the hole as well as
+the page, and nothing can detect the omission. The overlay container took `display: grid` so the one child
+still fills it, which is what the individual segments used to do.
+
+**What visibly changed, both ways.** Eight adjacent `backdrop-filter` elements each blur their own patch and
+each clamps at its own edge, so the four lines running out from the highlight carried a faint seam; one layer
+blurs continuously and they are gone, and it is one filter pass per frame rather than eight while the
+highlighted element moves. Against that, the blur now samples across the hole's edge, so the highlighted
+element's colour bleeds a little way into the darkened ring around it. That is inherent to blurring the whole
+backdrop and then punching a hole in the result, and it is what `Reveal`'s frosted cover has always done.
+
+**The mask itself is `Abstracts/Cutout`, shared with `Reveal`.** `CutoutUtils.getMaskStyle(hole, holeImage?)`
+composes the full-coverage layer, the hole layer, their positions and sizes, and `mask-composite: exclude` with
+its prefixed twin — a dozen property names that were about to be written twice. `Reveal` passes the SVG it
+builds from its shape props as `holeImage`; `Spotlight` passes none and gets a plain `linear-gradient` layer,
+which is a hard-edged rectangle and is exactly the hole it had before. **Softness and shape were deliberately
+not added to `Spotlight`**: the generalisation makes them reachable, but a soft or rounded spotlight is a
+design decision nobody has taken, and adding props under a refactor's justification is the thing that must not
+ride along. Both pages now list `Cutout` in their derived Abstracts row, which is the mechanism working.
 
 ### `Anchor` positions against a rect when it is given one
 
@@ -7929,7 +8054,9 @@ this yourself, and the `Exotic` is the packaged one.
 positioning that lays one over the other. The mask is computed here and applied there — see _"The mask is
 handed to `renderCover`"_ below. This follows `Spotlight`'s split — that component owns the hole in an
 overlay and hands the overlay's paint to `renderOverlay` — and it is why the frosted, opaque and text-carrying
-covers on the Playground page are all the same component with nothing switched.
+covers on the Playground page are all the same component with nothing switched. The two now share the mask
+builder as well as the shape of the handout: see _"`Spotlight`'s overlay is one masked layer and one clipped
+layer"_ for `Abstracts/Cutout` and for what a mask cannot do about the pointer.
 
 **`renderCover` is handed whether a reveal is happening.** A cover that says "nothing to see here" until the
 pointer arrives needs to know, and the alternative — the consumer tracking the pointer a second time to find
@@ -8052,6 +8179,66 @@ bought.
 **A name links to its page when one exists.** The matching is case-insensitive, because the Playground's
 display names and the folder names disagree in a couple of places (`TypeWriter` against `Typewriter`), and a
 name with no page renders as plain text rather than a dead link.
+
+### A Playground style names a theme token, never repeats its number
+
+Stated by the user after they found `gap`, `padding` and `borderRadius` written as plain `10`, `20` and `40`
+across the pages: a number that happens to equal a token is not the same thing as the token, because the
+theme can no longer move it. So wherever a value in `playground/src` matches something the theme names, the
+style reaches for `themeVars` and the number goes.
+
+**The tokens with numbers behind them are `spacing` — `half` 5, `full` 10, `double` 20, `quad` 40 — and
+`borderRadius` — `half` 5, `full` 10 — with `fontSize` in `rem`, where `xSmall` is `0.75rem` and so 12
+pixels against the Playground's 16-pixel root.** The first pass took the fourteen declarations whose number
+already equalled a token and touched no paint at all, since every token resolves to the number it replaced;
+the second took the ones that did not, and the paragraph below is what that cost.
+
+**A number the theme does not name exactly is rounded to the nearest token rather than kept.** The user's
+call, over the opposite proposal — that bending a value onto a token changes paint under cover of a
+tidy-up — which they overruled: the scale is the thing, and a value sitting a pixel off it is a value that
+missed. So the `8`, `10` and `11` pixel font sizes on the steppers, the era cycle, the meridiem toggle and
+the two picker triggers all became `fontSize.xSmall`, which is the nearest token at `0.75rem`, and the era
+cycle's `0 4px` became `spacing.half`.
+
+**A value too small to approximate stays a number.** `2` may remain, and only inside a `style({})` — it is
+below the smallest token by enough that rounding it to `5` would be a change rather than an approximation,
+and the hairline `1` values fall under the same reasoning.
+
+**A value that is arithmetic against something else is not a missed token, and rounding it is the wrong
+answer.** The rule's boundary, and the user's, drawn on the two cases where rounding moved something. Both
+were reported with what they cost and both came back with a correction rather than an acceptance, which is
+the shape to expect from the next one.
+
+- **The step connector's `19` is a token minus a pixel, and is now written that way.**
+  `calc(${themeVars.spacing.double} - 1px)`. It offsets a two-pixel line against the marker beside it, so
+  `20` slid it one pixel right. The `calc` keeps the token visible as the thing the value is derived from,
+  which is what the rule is actually asking for — the number is anchored to the scale rather than floating
+  free of it.
+- **The toggle's `12` is half its own fixed height, and stays a number.** The user's words: it is a
+  proportion of the element's height, so it earns its uniqueness. `borderRadius: TOGGLE_HEIGHT / 2` on a
+  44-by-24 track, with the height hoisted beside the width the way `TextFieldContent` already hoists its
+  own. `10` makes the pill visibly less than round.
+
+    **`borderRadius: "100%"` was tried first and is wrong, which is worth recording so nobody tries it
+    again.** A percentage radius resolves against each axis separately, so a 44-by-24 box asks for a 44
+    horizontal radius and a 24 vertical one, both scaled down to fit — the result is a full ellipse, not a
+    stadium. The track then narrows towards its ends faster than the round 16-pixel handle does and the handle
+    spills out at both extremes. **There is no relative CSS value that produces a stadium**; the common dodge
+    is a huge pixel radius that clamps to half the shorter side, which is a magic number in a different hat.
+
+**Nothing was done to the transition durations.** `80ms` and `150ms` on the pointer-tracker page sit either
+side of the `100ms` token, but a duration is a tuned value and those are the user's to move, so they were
+flagged rather than rounded.
+
+**The rule is `playground/src` only, because it is the only tree with a theme.** `components/src` has no
+`themeVars` and no colours of its own — a component's paint is the consumer's, which is the whole shape of
+this library — so a number there is a layout fact rather than a missed token.
+
+**One exception, and it is mechanical rather than a matter of taste.** `FIELD_STEPPER_PADDING` in
+`TextFieldContent.css.ts` is not a CSS declaration; it is a value handed to a component's `padding` prop,
+which takes numbers. A `var(--…)` string does not typecheck there and would not survive the arithmetic the
+neighbouring `FIELD_PADDING` does either. A value crossing into a prop stays a number; only declarations
+inside a `style({})` take tokens.
 
 ### Colour in the Playground: two rules, both the user's
 

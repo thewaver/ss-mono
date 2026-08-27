@@ -130,6 +130,12 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 component: () => <CuboidPage />,
             },
             {
+                name: "FlipCard",
+                description:
+                    "Two faces back to back on a barrel with no depth, turned by the side you ask it for. It renders no control of its own: what turns the card is the page's own button, driven through the signal the two share.",
+                component: () => <FlipCardPage />,
+            },
+            {
                 name: "Formation",
                 description:
                     "Places a set of items into an arrangement — a podium, a whorl of three, a zigzag — from a function that answers with a position per item. Every position is a fraction of the formation's own width, so the whole thing scales with the container and nothing is measured in JavaScript.",
@@ -295,12 +301,6 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 description:
                     "A file field where the operating system owns the dialog. The component owns what activates it and what comes back.",
                 component: () => <FileInputPage />,
-            },
-            {
-                name: "FlipCard",
-                description:
-                    "Two faces back to back on a barrel with no depth, turned by the side you ask it for. It renders no control of its own: what turns the card is the page's own button, driven through the signal the two share.",
-                component: () => <FlipCardPage />,
             },
             {
                 name: "Form",

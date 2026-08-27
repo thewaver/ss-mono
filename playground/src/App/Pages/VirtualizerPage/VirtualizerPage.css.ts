@@ -64,13 +64,3 @@ export const controls = style({
     marginBottom: themeVars.spacing.full,
     fontSize: themeVars.fontSize.xSmall,
 });
-
-export const button = style({
-    padding: `2px ${themeVars.spacing.full}`,
-    border: `1px solid ${themeVars.color.primary.main}`,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: "transparent",
-    color: themeVars.color.primary.main,
-    fontSize: themeVars.fontSize.xSmall,
-    cursor: "pointer",
-});

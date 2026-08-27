@@ -17,8 +17,8 @@ export const flagTarget = style({
     height: 90,
     border: `1px solid ${themeVars.color.primary.main}`,
     borderRadius: themeVars.borderRadius.full,
-    backgroundImage: panel(themeVars.color.surface.dark, themeVars.color.surface.light),
-    color: themeVars.color.surface.contrast,
+    backgroundColor: themeVars.color.control.background.main,
+    color: themeVars.color.control.background.contrast,
     fontSize: themeVars.fontSize.small,
     userSelect: "none",
 });

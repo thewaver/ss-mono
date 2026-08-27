@@ -1,11 +1,13 @@
 import { style } from "@vanilla-extract/css";
 
+import { themeVars } from "../../Theme.css";
+
 export const root = style({
     display: "flex",
     flexDirection: "column",
     justifyContent: "start",
     alignItems: "start",
-    gap: 40,
+    gap: themeVars.spacing.quad,
 });
 
 export const exampleRoot = style({
@@ -14,11 +16,11 @@ export const exampleRoot = style({
     justifyContent: "start",
     alignItems: "start",
     flexWrap: "wrap",
-    gap: 20,
+    gap: themeVars.spacing.double,
 });
 
 export const valueList = style({
     display: "grid",
     gridTemplateColumns: "repeat(2, 1fr)",
-    gap: 10,
+    gap: themeVars.spacing.full,
 });

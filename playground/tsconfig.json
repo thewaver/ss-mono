@@ -1,6 +1,7 @@
 {
     "extends": "../tsconfig.base.json",
     "compilerOptions": {
+        "allowImportingTsExtensions": true,
         "paths": {
             "@thewaver/ss-components": ["../components/src/index.ts"],
             "@thewaver/ss-utils": ["../utils/src/index.ts"]

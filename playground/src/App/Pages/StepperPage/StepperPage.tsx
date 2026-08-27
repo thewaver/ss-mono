@@ -10,6 +10,7 @@ import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonCo
 import { PageCheckField } from "../../StyledComponents/Field/Field";
 import type { PageStepState } from "../../StyledComponents/StepContent/StepContent.types";
 import { BareExample } from "./Examples/Bare";
+import { DetailedExample } from "./Examples/Detailed";
 import { FailedExample } from "./Examples/Failed";
 import { LinearExample } from "./Examples/Linear";
 import { StackedExample } from "./Examples/Stacked";
@@ -19,6 +20,7 @@ import type { StepValue } from "./StepperPage.types";
 const STARTING_LINEAR: StepValue = "address";
 const STARTING_FAILED: StepValue = "payment";
 const STARTING_STACKED: StepValue = "address";
+const STARTING_DETAILED: StepValue = "payment";
 const EXAMPLES_ROOT = "/src/App/Pages/StepperPage/Examples";
 
 export const StepperPage = () => {
@@ -27,11 +29,13 @@ export const StepperPage = () => {
     const [getLinearCurrent, setLinearCurrent] = createSignal<StepValue>(STARTING_LINEAR);
     const [getFailedCurrent, setFailedCurrent] = createSignal<StepValue>(STARTING_FAILED);
     const [getStackedCurrent, setStackedCurrent] = createSignal<StepValue>(STARTING_STACKED);
+    const [getDetailedCurrent, setDetailedCurrent] = createSignal<StepValue>(STARTING_DETAILED);
 
     const reset = () => {
         setLinearCurrent(STARTING_LINEAR);
         setFailedCurrent(STARTING_FAILED);
         setStackedCurrent(STARTING_STACKED);
+        setDetailedCurrent(STARTING_DETAILED);
     };
 
     const computeState = (value: StepValue, current: StepValue): PageStepState => {
@@ -101,6 +105,21 @@ export const StepperPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Stacked.tsx`,
+        },
+        {
+            key: "detailed",
+            name: "Steps that carry their own content",
+            readout: () =>
+                `current: ${getDetailedCurrent()} — each step holds a body beside the connector, so the line runs past the content rather than stopping at it`,
+            component: () => (
+                <DetailedExample
+                    steps={() => buildSteps(getDetailedCurrent())}
+                    currentValue={getDetailedCurrent}
+                    computeStepAriaLabel={describe}
+                    onCurrentChange={setDetailedCurrent}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Detailed.tsx`,
         },
         {
             key: "bare",

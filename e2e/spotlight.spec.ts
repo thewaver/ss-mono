@@ -10,12 +10,19 @@ const SETTLE_MS = 300;
 
 /**
  * The overlay is portalled and every part of it is styled through a hashed class, so these key on what the
- * geometry produces rather than on names: the segments measure themselves against the viewport with
- * `calc(100% - …)`, and the corner polygons are what the consumer's `renderHighlight` draws.
+ * geometry produces rather than on names: one transparent layer carries an inline `clip-path` with the
+ * highlighted rect cut out of it, which is what keeps the pointer off everything but the hole, and the
+ * corner polygons are what the consumer's `renderHighlight` draws. The even-odd fill rule is what makes the
+ * inner ring a hole rather than a second filled box, so it is the part of the value worth keying on — a bare
+ * `clip-path` would also catch the announcer's visually-hidden region, which clips itself to nothing.
  */
-const SEGMENTS = 'div[style*="calc(100% - "]';
+const BLOCKER = 'div[style*="polygon(evenodd"]';
 const CORNERS = "svg polygon";
 const POPUP = '[role="dialog"]';
+const TOOLTIP = '[role="tooltip"]';
+
+/** Every layer the spotlight paints sits here, so a tooltip that is to stay readable has to beat it. */
+const SPOTLIGHT_Z_INDEX = 10;
 
 const button = (scope: string, name: string) => `${scope} button:has-text("${name}")`;
 
@@ -39,24 +46,67 @@ const pressByKeyboard = async (page: Page, selector: string) => {
     await page.keyboard.press("Enter");
 };
 
+/**
+ * The hint's triggers loop forever, which is also what stops a pointer action from ever settling. Pausing the
+ * looping animations and leaving every other one alone gives the pointer something to land on without
+ * freezing the fades the spotlight and the tooltip run to show themselves.
+ */
+const stopSliding = (page: Page) =>
+    page.evaluate(() => {
+        for (const animation of document.getAnimations()) {
+            if (animation.effect?.getTiming().iterations === Infinity) animation.pause();
+        }
+    });
+
 test.beforeEach(async ({ page }) => {
     await page.goto("/spotlight");
     await expect(page.locator(button(HINT, "Highlight Me")).first()).toBeVisible();
 });
 
 test("nothing is portalled before anything is highlighted", async ({ page }) => {
-    await expect(page.locator(SEGMENTS), "no overlay segments").toHaveCount(0);
+    await expect(page.locator(BLOCKER), "nothing is holding the pointer off the page").toHaveCount(0);
     await expect(page.locator(CORNERS), "and no highlight decoration").toHaveCount(0);
 });
 
-test("opening cuts the overlay into segments around the element", async ({ page }) => {
+test("opening lays one clipped layer over the page with the element cut out of it", async ({ page }) => {
     await pressByKeyboard(page, button(HINT, "Highlight Me"));
 
-    await expect(
-        page.locator(SEGMENTS),
-        "the five segments whose far edge is the viewport rather than a known size",
-    ).toHaveCount(5);
+    await expect(page.locator(BLOCKER), "one layer rather than a ring of boxes").toHaveCount(1);
     await expect(page.locator(CORNERS), "and the consumer's four corner marks").toHaveCount(4);
+});
+
+/**
+ * A spotlight's whole promise is that the highlighted element stays readable, and a tooltip describing that
+ * element is part of what has to be read. The tooltip works out its own height by walking up from its anchor
+ * and going one above the tallest thing it passes — and the overlay is not on that walk, because it is a
+ * sibling in the portal rather than an ancestor of the button. So the height has to be published rather than
+ * discovered, which is what the elevation registry does. The second half of this is the half that matters: it
+ * is the spotlight granting the lift, not tooltips outranking overlays everywhere.
+ *
+ * The lift is asserted without hovering a second time, because the tooltip is already open when the spotlight
+ * arrives — that is the ordering a visitor produces by hovering the button and then pressing it, and the one
+ * that needs the registry to be reactive rather than merely read once on show.
+ */
+test("a tooltip on the highlighted element rises above the overlay, and only there", async ({ page }) => {
+    const readTooltipZIndex = () =>
+        page.locator(TOOLTIP).evaluate((element) => Number.parseInt(getComputedStyle(element).zIndex, 10));
+
+    await stopSliding(page);
+    await page.locator(button(HINT, "Highlight Me")).first().hover();
+    await expect(page.locator(TOOLTIP)).toBeVisible();
+
+    expect(await readTooltipZIndex(), "on the plain page it sits just above its own button").toBeLessThan(
+        SPOTLIGHT_Z_INDEX,
+    );
+
+    await pressByKeyboard(page, button(HINT, "Highlight Me"));
+    await expect(page.locator(BLOCKER)).toHaveCount(1);
+    await expect(page.locator(TOOLTIP), "the tooltip is still the one opened before the spotlight").toBeVisible();
+
+    expect(
+        await readTooltipZIndex(),
+        "and it has risen over the overlay rather than blurring with the page",
+    ).toBeGreaterThan(SPOTLIGHT_Z_INDEX);
 });
 
 /**
@@ -78,7 +128,7 @@ test("a hint is dismissed by a real key and survives a bare modifier", async ({ 
 
 test("a prompt refuses every other control until the highlighted one is used", async ({ page }) => {
     await page.locator(button(PROMPT, "Insist")).click();
-    await expect(page.locator(SEGMENTS)).toHaveCount(5);
+    await expect(page.locator(BLOCKER)).toHaveCount(1);
 
     await page
         .locator(button(PROMPT, "Insist"))
@@ -99,11 +149,11 @@ test("a prompt refuses every other control until the highlighted one is used", a
  */
 test("a prompt still answers Escape, which is what keeps it out of a keyboard trap", async ({ page }) => {
     await page.locator(button(PROMPT, "Insist")).click();
-    await expect(page.locator(SEGMENTS)).toHaveCount(5);
+    await expect(page.locator(BLOCKER)).toHaveCount(1);
 
     await page.keyboard.press("Escape");
 
-    await expect(page.locator(SEGMENTS), "the spotlight is gone").toHaveCount(0);
+    await expect(page.locator(BLOCKER), "the spotlight is gone").toHaveCount(0);
     expect(await readout(page, "prompt"), "without the highlighted control ever being used").toContain("bought: 0");
 });
 
@@ -174,6 +224,12 @@ test("a step change is announced, and opening the tour is not announced twice", 
  * the element is wherever the page put it. A tour is where that bites first and where it is easiest to
  * drive: the guide example holds its steps in a strip only one step tall, so the second one is out of sight
  * until something scrolls to it, which is the situation a long page produces naturally.
+ *
+ * The reading at the first step is captured rather than asserted to be zero. The strip is padded and a step
+ * is taller than the band left inside it, so `scrollIntoView({ block: "nearest" })` aligns the step's top
+ * and that alone moves the strip by the padding — a fact about how the example is painted, which is not what
+ * this test is for. What it is for is the travel between the two, so the second reading is compared against
+ * the first.
  */
 test("a guide scrolls a step that is out of sight into view", async ({ page }) => {
     const strip = page.locator(`${GUIDE} [data-scroll-box]`);
@@ -182,12 +238,14 @@ test("a guide scrolls a step that is out of sight into view", async ({ page }) =
     await expect(page.locator(POPUP)).toBeVisible();
     await page.waitForTimeout(SETTLE_MS);
 
-    expect(await scrollTop(strip), "the first step is where the strip already was").toBe(0);
+    const atFirstStep = await scrollTop(strip);
 
     await page.locator(popupButton("Next")).click();
     await page.waitForTimeout(SETTLE_MS);
 
-    expect(await scrollTop(strip), "and the second is reached rather than highlighted off-screen").toBeGreaterThan(0);
+    expect(await scrollTop(strip), "the second is reached rather than highlighted off-screen").toBeGreaterThan(
+        atFirstStep,
+    );
 });
 
 test("a guide can be abandoned, and says so", async ({ page }) => {

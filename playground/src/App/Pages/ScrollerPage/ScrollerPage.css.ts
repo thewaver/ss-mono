@@ -13,6 +13,11 @@ export const demo = style({
     maxWidth: "100%",
 });
 
+export const item = style({
+    display: "flex",
+    flexShrink: 0,
+});
+
 export const chip = style({
     display: "flex",
     justifyContent: "center",

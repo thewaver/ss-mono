@@ -13,7 +13,7 @@ export const meridiemToggle = style({
     height: 22,
     borderRadius: themeVars.borderRadius.half,
     color: `rgb(from currentColor r g b / 60%)`,
-    fontSize: 10,
+    fontSize: themeVars.fontSize.xSmall,
     fontWeight: 600,
     letterSpacing: 0.5,
     lineHeight: 1,

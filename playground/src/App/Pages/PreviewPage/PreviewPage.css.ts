@@ -9,14 +9,14 @@ export const paragraphs = style({
 });
 
 export const panel = style({
-    borderRadius: 10,
+    borderRadius: themeVars.borderRadius.full,
     padding: themeVars.spacing.full,
     backgroundColor: themeVars.color.background.dark,
 });
 
 export const fade = style({
     height: 60,
-    backgroundImage: `linear-gradient(to bottom, transparent, ${themeVars.color.background.dark})`,
+    backgroundImage: `linear-gradient(to bottom, transparent, ${themeVars.color.background.dark} 75%)`,
 });
 
 export const scrollBox = style({

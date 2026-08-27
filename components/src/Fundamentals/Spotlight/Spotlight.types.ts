@@ -10,6 +10,12 @@ export type SpotlightRenderer = (
     getTransitionDurationMs: () => number,
 ) => JSX.Element;
 
+export type SpotlightOverlayRenderer = (
+    getVisibilityTarget: () => 0 | 1,
+    getTransitionDurationMs: () => number,
+    getMaskStyle: () => JSX.CSSProperties,
+) => JSX.Element;
+
 export type SpotlightState = {
     visibilitySignal: Signal<boolean>;
     padding?: number;
@@ -24,7 +30,7 @@ export type SpotlightCbs = {
 
 export type SpotlightSlots = {
     renderHighlight?: SpotlightRenderer;
-    renderOverlay: SpotlightRenderer;
+    renderOverlay: SpotlightOverlayRenderer;
 };
 
 export type SpotlightPopupState = {

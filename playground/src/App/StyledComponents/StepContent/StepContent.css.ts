@@ -31,13 +31,15 @@ export const rowStep = style({
 
 export const columnStep = style([rowStep, { width: "100%" }]);
 
+const MARKER_SIZE = 28;
+
 const markerBase = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
     flexShrink: 0,
-    width: 28,
-    height: 28,
+    width: MARKER_SIZE,
+    height: MARKER_SIZE,
     borderRadius: "50%",
     fontSize: themeVars.fontSize.xSmall,
     transition: `background-color ${themeVars.animation.duration}, box-shadow ${themeVars.animation.duration}`,
@@ -91,6 +93,18 @@ export const rowConnector = style({
 export const columnConnector = style({
     width: 2,
     height: 20,
-    marginInlineStart: 19,
+    marginInlineStart: `calc(${themeVars.spacing.double} - 1px)`,
     backgroundColor: `rgb(from currentColor r g b / 25%)`,
+});
+
+export const columnRailConnector = style([columnConnector, { height: "auto", alignSelf: "stretch" }]);
+
+export const stepBody = style({
+    display: "flex",
+    flexDirection: "column",
+    gap: themeVars.spacing.half,
+    marginInlineStart: `calc(${themeVars.spacing.half} + ${MARKER_SIZE}px + ${themeVars.spacing.full})`,
+    marginBlockEnd: themeVars.spacing.half,
+    fontSize: themeVars.fontSize.small,
+    opacity: 0.75,
 });

@@ -38,6 +38,7 @@ export type StepperProps<TValue, TState> = AccessorProps<{
         getStep: Accessor<Step<TValue, TState>>,
         getFlags: () => InteractionFlags<StepperFlags>,
     ) => JSX.Element;
+    renderBody?: (getStep: Accessor<Step<TValue, TState>>, index: number) => JSX.Element;
     renderConnector?: () => JSX.Element;
     onCurrentChange?: (value: TValue) => void;
 };

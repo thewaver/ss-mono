@@ -5,6 +5,7 @@ import { type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
 import { ElementObserver } from "../ElementObserver/ElementObserver";
+import { Elevation } from "../Elevation/Elevation";
 import type { AnchorPlacement } from "./Anchor.types";
 import { AnchorUtils } from "./Anchor.utils";
 
@@ -118,7 +119,13 @@ export namespace Anchor {
             };
         });
 
-        const getZIndex = createMemo(() => (getIsVisible() ? AnchorUtils.getStackingBase(getAnchorRef()) + 1 : 1));
+        const getZIndex = createMemo(() => {
+            if (!getIsVisible()) return 1;
+
+            const anchorRef = getAnchorRef();
+
+            return Math.max(AnchorUtils.getStackingBase(anchorRef), Elevation.getBase(anchorRef)) + 1;
+        });
 
         ElementObserver.createViewportRectObserver(getAnchorRef, () => getIsVisible() && !opts.getAnchorRect, {
             setElementRect: setAnchorRect,

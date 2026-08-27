@@ -22,4 +22,23 @@ export const stepperConnector = style({
     alignItems: "center",
 });
 
+export const stepperTail = style({
+    position: "relative",
+    display: "flex",
+    alignItems: "stretch",
+    minWidth: 0,
+});
+
+export const stepperTailConnector = style({
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    insetInlineStart: 0,
+});
+
+export const stepperBody = style({
+    flexGrow: 1,
+    minWidth: 0,
+});
+
 export const stepperItem = style([buttonElement, {}]);
