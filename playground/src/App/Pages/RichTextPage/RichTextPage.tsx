@@ -12,7 +12,8 @@ import {
     computePageTextFieldTextStyle,
 } from "../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
-import { CustomExample } from "./Examples/Custom";
+import { CustomInputExample } from "./Examples/CustomInput";
+import { CustomTagsExample } from "./Examples/CustomTags";
 import { DefaultTagsExample } from "./Examples/DefaultTags";
 import { FIELD_WIDTH, MAX_ROWS, MIN_ROWS, PREVIEW_WIDTH, STARTING_CONTENT } from "./RichTextPage.const";
 
@@ -34,8 +35,14 @@ export const RichTextPage = () => {
             path: `${EXAMPLES_ROOT}/DefaultTags.tsx`,
         },
         {
-            key: "custom",
-            name: "Custom",
+            key: "customTags",
+            name: "Custom Tags",
+            component: () => <CustomTagsExample />,
+            path: `${EXAMPLES_ROOT}/CustomTags.tsx`,
+        },
+        {
+            key: "customInput",
+            name: "Custom Input",
             component: () => (
                 <>
                     <TextArea
@@ -58,11 +65,11 @@ export const RichTextPage = () => {
                     />
 
                     <PageMeasureBox width={() => PREVIEW_WIDTH} padding={() => MEASURE_BOX_PADDING}>
-                        <CustomExample content={contentSignal[0]} removeOtherTags={getRemoveOtherTags} />
+                        <CustomInputExample content={contentSignal[0]} removeOtherTags={getRemoveOtherTags} />
                     </PageMeasureBox>
                 </>
             ),
-            path: `${EXAMPLES_ROOT}/Custom.tsx`,
+            path: `${EXAMPLES_ROOT}/CustomInput.tsx`,
         },
     ]);
 

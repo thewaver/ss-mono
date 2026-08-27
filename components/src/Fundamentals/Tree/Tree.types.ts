@@ -7,6 +7,7 @@ import type { InteractionControlProps, InteractionTooltipDefs } from "../Interac
 export type TreeNodeFlags = {
     isBranch: boolean;
     isExpanded: boolean;
+    isPending: boolean;
     isSelected: boolean;
     depth: number;
 };
@@ -17,6 +18,7 @@ export type TreeNode<T> = {
     value: T;
     href?: string;
     children?: TreeNode<T>[];
+    hasMoreChildren?: boolean;
     isDisabled?: boolean;
     isReachableWhenDisabled?: boolean;
     tooltipDefs?: InteractionTooltipDefs<TreeNodeFlags>;
@@ -54,5 +56,6 @@ export type TreeProps<T> = AccessorProps<{
     computeCustomText?: (node: TreeNode<T>) => string;
     computeEstimatedNodeHeight?: (index: number) => number;
     renderNode: (getNode: Accessor<TreeNode<T>>, getFlags: () => InteractionFlags<TreeNodeFlags>) => JSX.Element;
+    renderPendingChildren?: (getNode: Accessor<TreeNode<T>>, getDepth: () => number) => JSX.Element;
     onSelectionChange?: (value: T) => void;
 };

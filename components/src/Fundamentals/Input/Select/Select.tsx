@@ -190,17 +190,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 
     const getTextInset = createMemo(() => CSSUtils.spreadableToStyle(getSpreadPadding(), StringUtils.camelToKebabCase));
 
-    const getItemOffsets = createMemo(() => {
-        let offset = 0;
-
-        return access(props.options).map((item) => {
-            const start = offset;
-
-            offset += SelectUtils.getIsGroup(item) ? item.options.length : 1;
-
-            return start;
-        });
-    });
+    const getItemOffsets = createMemo(() => SelectUtils.getItemOffsets(access(props.options)));
 
     const getFlatOptions = createMemo(() => SelectUtils.getFlatOptions(access(props.options)));
 

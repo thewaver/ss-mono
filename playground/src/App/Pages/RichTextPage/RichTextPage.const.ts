@@ -20,3 +20,9 @@ export const STARTING_CONTENT = [
     "",
     "An [warning]unknown tag[/warning] stays put unless you ask for it to go, and an [b]unclosed one is printed the way it was typed.",
 ].join("\n");
+
+export const DIFF_CONTENT = [
+    "The class map is [sub]the library's[/sub][add]the consumer's[/add], so this page can name",
+    "[add][b]two tags of its own[/b][/add] and paint them [sub]the way every other tag is painted[/sub]",
+    "[add]however it likes[/add].",
+].join(" ");

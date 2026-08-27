@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { FilesExample } from "./Examples/Files";
+import { LazyExample } from "./Examples/Lazy";
 import { LinkComponentExample } from "./Examples/LinkComponent";
 import { LinksExample } from "./Examples/Links";
 import { OutsideExample } from "./Examples/Outside";
@@ -39,6 +40,9 @@ export const TreePage = () => {
 
     const customLinkSignal = createSignal<string | undefined>();
     const customLinkExpandedSignal = createSignal<string[]>(["Guides"]);
+
+    const lazySignal = createSignal<string | undefined>();
+    const lazyExpandedSignal = createSignal<string[]>([]);
 
     const stressSignal = createSignal<string | undefined>();
     const stressExpandedSignal = createSignal<string[]>(["package-1", "package-2", "package-3"]);
@@ -117,6 +121,14 @@ export const TreePage = () => {
                 <LinkComponentExample valueSignal={customLinkSignal} expandedSignal={customLinkExpandedSignal} />
             ),
             path: `${EXAMPLES_ROOT}/LinkComponent.tsx`,
+        },
+        {
+            key: "lazy",
+            name: "Branches that arrive later",
+            readout: () =>
+                `expanded: ${JSON.stringify(lazyExpandedSignal[0]())} — packages and docs say they have children before they have them`,
+            component: () => <LazyExample valueSignal={lazySignal} expandedSignal={lazyExpandedSignal} />,
+            path: `${EXAMPLES_ROOT}/Lazy.tsx`,
         },
         {
             key: "virtualized",

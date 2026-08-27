@@ -8,8 +8,8 @@ type Props = AccessorProps<{
     removeOtherTags: boolean;
 }>;
 
-export const CustomExample = (props: Props) => (
-    <div class={styles.previewText}>
+export const CustomInputExample = (props: Props) => (
+    <div id={"customInputPreview"} class={styles.previewText}>
         <RichText content={props.content} removeOtherTags={props.removeOtherTags} />
     </div>
 );

@@ -6,25 +6,39 @@ export namespace SelectUtils {
     export const getFlatOptions = <T>(items: SelectItem<T>[]): SelectOption<T>[] =>
         items.flatMap((item) => (getIsGroup(item) ? item.options : [item]));
 
-    export const getRows = <T>(items: SelectItem<T>[]): SelectRow<T>[] => {
-        const rows: SelectRow<T>[] = [];
+    export const getItemOffsets = <T>(items: SelectItem<T>[]): number[] => {
+        let offset = 0;
 
-        let optionIndex = 0;
+        return items.map((item) => {
+            const start = offset;
+
+            offset += getIsGroup(item) ? item.options.length : 1;
+
+            return start;
+        });
+    };
+
+    export const getRows = <T>(items: SelectItem<T>[]): SelectRow<T>[] => {
+        const offsets = getItemOffsets(items);
+        const rows: SelectRow<T>[] = [];
 
         items.forEach((item, itemIndex) => {
             if (!getIsGroup(item)) {
-                rows.push({ group: undefined, groupIndex: undefined, option: item, optionIndex });
-                optionIndex += 1;
+                rows.push({ group: undefined, groupIndex: undefined, option: item, optionIndex: offsets[itemIndex] });
 
                 return;
             }
 
             rows.push({ group: item, groupIndex: itemIndex, option: undefined, optionIndex: undefined });
 
-            for (const option of item.options) {
-                rows.push({ group: item, groupIndex: itemIndex, option, optionIndex });
-                optionIndex += 1;
-            }
+            item.options.forEach((option, groupIndex) => {
+                rows.push({
+                    group: item,
+                    groupIndex: itemIndex,
+                    option,
+                    optionIndex: offsets[itemIndex] + groupIndex,
+                });
+            });
         });
 
         return rows;

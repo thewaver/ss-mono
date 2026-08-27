@@ -2007,6 +2007,29 @@ filter, and it is why the left menu's keep-the-selected-item rule must not be co
 the IME composition gating. Exactly `TextInput.syncElement`'s code; extracting beat duplicating fifteen
 lines of caret arithmetic.
 
+### One walk numbers the options, and both of `Select`'s rendering paths read it
+
+`Select` renders a grouped list two ways — mounted, which walks the written items and nests a `role="group"`
+box per group, and windowed, which walks a flat row list because a window cannot draw a box whose ends are
+outside it. Both need the same number for each option: **its flat index among all options**, which is what the
+highlight, `aria-activedescendant`, typeahead and the keyboard all index by.
+
+**That number used to be worked out twice, once per path**, by two walks that had to agree and nothing checked:
+a `getItemOffsets` memo inside `Select.tsx` counting options per written item for the mounted path, and a
+running counter inside `SelectUtils.getRows` for the windowed one. Two walks producing one number is the shape
+of a bug that only shows on one of the two paths, which is also the harder of the two to look at.
+
+**`getItemOffsets` is now in `SelectUtils` and `getRows` is built on it**, so there is one definition of how
+many options precede a written item and the row list reads its `optionIndex` from that. Neither rendering path
+changed. `Select.utils.test.ts` pins the walk directly — including that an empty group contributes nothing, so
+the offsets repeat rather than leaving a hole — and that the option indexes on the rows are the same sequence
+`getFlatOptions` produces, which is the agreement that used to be implicit.
+
+**Note what is not shared: the row index and the option index are different numbers**, and
+`getRowIndexOfOption` is the bridge. A group header is a row and is not an option, so the two spaces diverge
+the moment a list is grouped. `Tree` has no such split — every row is a node — which is the difference that
+makes the two components' flatteners less alike than they look.
+
 ### Grouping and windowing compose, and the group box is what makes it possible
 
 **The window runs over rows, not options.** `SelectUtils.getRows` flattens the item list into one row per group
@@ -5045,6 +5068,59 @@ rather than a conflict.
 one control that is not a field and reads it anyway — see the entry under its own heading. The plain `Button`,
 `Menu` and the navigational controls do not, and nothing has asked.
 
+### `FormSection`: the collecting stops at the nearest one
+
+The piece item 6 had left of the form story. `Form` collected every field on the page and there was no way to
+say that a run of fields belongs together, which left two things with nowhere to go: a heading over a group,
+and a rule that is true of a group rather than of any one field in it.
+
+**A section provides a `FormContext` of its own and registers itself with the one outside it.** That is the
+whole implementation, and it is why neither `Form` nor `FormField` changed by a line. A field registers with
+the nearest collector — its section if it is inside one, the form otherwise — and a section reports one
+verdict upward to whatever is collecting above it. Sections nest for free by the same rule, and nothing is
+counted twice, because a field is only ever heard by one collector.
+
+**What a section reports is `!isValid`, and `isValid` is its own rule plus every entry inside it.** The own
+rule is `hasError`, set by the owner exactly as it is on `FormField` — validation is still not the library's.
+This is the half that could not be expressed before: "these two passwords do not match" is answerable from
+neither field alone, so neither field can carry it, and both are individually fine while the form still has
+to refuse.
+
+**`getHasSubmitted` passes straight through from the enclosing form.** A section is not submitted, so it has
+no state of its own to report there; a submit button inside a section reads the section's validity and the
+form's submitted flag, which is the honest answer to both questions. In practice nothing hits that case,
+because `Form` hands its own state to `renderContent` and a submit button reads it from there.
+
+**It renders a real `<fieldset>` and a real `<legend>`, and the legend is the whole naming mechanism.** A
+`<fieldset>` is `role="group"` already, so the library adds no role; the legend names the group with no
+generated id and no `aria-labelledby`, which is the same argument `FormField` makes about ids — an
+accessibility relationship threaded through consumer markup fails silently when a strand is dropped.
+`ariaLabel` is there for a section with no visible caption; a legend, when present, is what names it.
+
+**A section cannot mark itself invalid, and that is a fact about ARIA rather than a choice.** `aria-invalid`
+is not global: it is supported on `checkbox`, `combobox`, `gridcell`, `listbox`, `radiogroup`, `slider`,
+`spinbutton`, `textbox`, `tree` and `application`, and `group` is not among them — which is why `RadioGroup`
+may carry it and this may not. So the only route to a section-level rule is the text of it, and the message
+is wired both ways: `role="alert"` while the section reports an error, so it is read out when it appears, and
+`aria-describedby` on the fieldset, so it is still reachable to someone navigating into the group afterwards.
+Without that pair, `hasError` on a section would be a state with no accessible surface at all, which
+WCAG 3.3.1 asks for in text.
+
+**The UA paint is stripped, and it is the only element in the library that needs stripping.** A `<fieldset>`
+arrives with a border, padding, margin and `min-inline-size: min-content`, none of which the library chose;
+`<legend>` arrives with padding. Both are reset with `!important`, for the reason the `TextField` resets carry
+it — element-level styling is what every reset stylesheet ships, and a blank slate that loses to an element
+selector is broken. The consequence worth stating: the border-with-a-gap-for-the-legend look a fieldset is
+known for is the UA's, and it is gone, so a consumer wanting a box paints one inside `renderContent`. A
+`<div role="group" aria-labelledby>` was the alternative — it is what `Select` already does for an option
+group — and it was not taken, because it buys the same box back at the cost of generating an id and wiring a
+label reference that the platform will do for nothing.
+
+**The legend is not a flex item.** A `<fieldset>` with `display: flex` puts its content in an anonymous flex
+box and leaves the legend outside it, so `dir` and `gap` lay out the fields and the message while the caption
+always sits above them. That differs from `FormField`, where the caption is a flex item and `dir: "row"`
+puts it beside the control, and it is the platform's arrangement rather than a decision.
+
 ### `Button` reports the pointer, and `NumberInput` repeats while held
 
 Settled, on the user's call.
@@ -5697,12 +5773,12 @@ records, flattening them, finding the navigable ones — and that is the floor a
 where the two axes mean different things. Most of it is `Select`'s model applied a second time; the parts that
 are not are here.
 
-**A node is one record with optional children, and a branch is a node that has at least one.** `TreeNode<T>`
-carries `value`, `children`, and the same `isDisabled` / `isReachableWhenDisabled` / `tooltipDefs` trio every
-other item record carries. `TreeUtils.getIsBranch` is `(node.children?.length ?? 0) > 0`, `Menu`'s test for a
-submenu character for character. The cost is that a branch whose children have not been fetched cannot be
-spelled — an empty list reads as a leaf — and that is in `backlog.md` rather than solved, because the fix is a
-second field whose only job is to contradict the first.
+**A node is one record with optional children, and a branch is a node that has at least one — or one that
+says it will.** `TreeNode<T>` carries `value`, `children`, and the same `isDisabled` /
+`isReachableWhenDisabled` / `tooltipDefs` trio every other item record carries. `TreeUtils.getIsBranch` was
+`(node.children?.length ?? 0) > 0`, `Menu`'s test for a submenu character for character; it is now that **or**
+`hasMoreChildren`. See the next section for why the second field turned out not to be the contradiction this
+entry once predicted.
 
 **Render from the nesting, walk the flat order.** `TreeUtils.getVisibleRows` takes the nodes and a predicate
 and returns a rendering tree with collapsed branches already removed; `getFlatRows` collapses that into walking
@@ -5774,6 +5850,45 @@ rather than the arithmetic.
 Wrapping is what `Select`, `Menu`, `Tabs` and `RadioGroup` all do through `computeNextPosition`, and a tree
 that stopped would be the one list here behaving differently — consistency inside the library won over the
 published behaviour, recorded here rather than being discoverable only by pressing `ArrowUp` on the first row.
+
+### A branch whose children have not arrived: `hasMoreChildren`, and where the waiting is painted
+
+The gap this closes was recorded as hard for two reasons, and only one of them survived contact.
+
+**The field cannot contradict the children, because it can only add.** The objection on record was that the
+fix would be "a second field whose only job is to contradict the first" — which is what `isBranch?: boolean`
+would have been, since `isBranch: false` on a node with children is a state the component would have to pick a
+winner for. `hasMoreChildren` is the other shape: `getIsBranch` is `children.length > 0 || hasMoreChildren`, so
+setting it on a node that already has children changes nothing and there is no disagreement to resolve. The
+name is `Select`'s — `getHasMoreOptions` says the same thing about a list, and this says it about a node's
+children, so a consumer meeting the second has already met the first.
+
+**Nothing new tells the consumer to fetch, and that is deliberate.** No `loadChildren` prop and no
+`onExpandBranch`. Opening a branch writes its value into `expandedSignal`, which is the **consumer's** signal —
+they already see every expansion, so a callback would report a change they were handed anyway. Ark UI takes
+`loadChildren` plus `onLoadChildrenComplete` and React Aria has a loading item, but both of those own the list;
+here the nodes are a prop, so the arrival is a new `nodes` value and nothing else. The library reports and the
+consumer decides, which is the same split `getHasMoreOptions` / `onReachEnd` took for `Select`.
+
+**Where "loading" is painted was the half this was blocked on, and the answer is a render prop into the box the
+library owns.** `renderPendingChildren` is called for a branch that is expanded and has no rows, and it is
+given the branch's node and **the depth its children would have had** — without that second argument a consumer
+cannot line the placeholder up with the rows it stands in for, since the indent is theirs to draw. It is
+optional, and a tree that does not pass it renders no group box at all rather than an empty one.
+
+**A branch reports `aria-busy`, not a fabricated child row.** `aria-busy` is global, so it is valid on a
+`treeitem`, and it says exactly what is true: this element's contents are being updated. The alternative was a
+placeholder row carrying `role="treeitem"`, React Aria's shape — rejected because a row that is not a node
+would have to be given an `aria-posinset` and an `aria-setsize` it does not have, and would land in the
+walking order the arrows and typeahead use. **The consequence to know:** a consumer who sets `hasMoreChildren`
+and never delivers leaves a branch permanently busy. That is the consumer stating something untrue rather than
+something for the library to time out.
+
+**It works in a windowed tree, which took one extra placement rather than a second design.** A windowed tree
+emits no `role="group"` boxes at all, so the placeholder is rendered inside the branch row's own positioned box
+instead, after the row. The virtualizer measures each row rather than trusting the estimate, so a row that grows
+by a placeholder is measured at its new height and the ones below it move down. `isPending` is on
+`TreeNodeFlags` besides, so a painter can put a spinner on the twisty itself in either rendering.
 
 ### A windowed `Tree` is flat, and that is the opposite of a windowed `Select`
 
@@ -7647,6 +7762,14 @@ formality.** An optional key would let the next variant arrive without one, and 
 reach for the caption again because that is what is there. Required means the compiler names every site, which
 is also how all 218 variants and 103 props rows were found rather than by grepping for `name:`.
 
+**A key may be renamed deliberately; what it may not be is re-derived.** The user's call, when two examples
+called "Custom" became "Custom Input" — the caption was the thing being fixed, and leaving the key reading
+`custom` underneath it would have left the page saying one thing and the suite another for no gain. So the
+rule this section states is about the mechanism rather than the string: nothing derives a key from a caption,
+which is why rewording one cannot silently reach the suite. Moving a key is an edit like any other, and it
+moves in one change with everything that names it — the `path`, the example file, its exported component, any
+`id` composed from it, and the spec's locators.
+
 **A demo control a spec drives carries an `id`, and the spec finds it by `#key`.** The user's call, over two
 alternatives: wrapping each control in a keyed element, rejected because every wrapped demo grows a box and a
 few of them sit in layouts where that is not free; and adding a test-attribute pass-through to the library,
@@ -7672,6 +7795,24 @@ A radio named `Small`, a tag named `solid`, a menu item named `Paste`, an option
 select's value `hourglass` — the string is the fixture the test chose, not furniture somebody may reword for
 prose reasons, and there is no single control to key. This is the line worth being exact about: what was
 converted is a control the page **names**, and what stays is a control the page **lists**.
+
+**An assertion reads the mapping, not the value.** The user's rule, and the same argument as this section one
+step further in. A locator built from a caption answers "did the behaviour change" and "has somebody edited the
+copy" in one red; an assertion built from a hardcoded style answers "did the wiring break" and "has somebody
+restyled it" in one red. **A border going from `1px dashed` to `2px solid` is a change, not a failure**, and a
+spec pinning the value cannot tell which it is looking at. So an assertion checks the relationship — this
+element came back carrying the class it was mapped to, and that class is not the one something else was mapped
+to — and says nothing about what the class draws. **Where a spec has no mechanism to separate a change from a
+failure, it does not check that thing at all.** It bites hardest on pure aesthetics, which is where it was
+found: an underline written into `richText.spec.ts` turned the user's own restyle of their own Playground into
+a red run.
+
+**What is left reading CSS reads state rather than paint, which is the line to hold when adding one.**
+`visibility` on the image switcher, `animation-play-state` on the toast countdown, the tabs floater's
+`transform`, `caret-color: transparent` on a disabled field, `resize: none` on a textarea: each is a
+component's own behaviour with nowhere else to show, not a choice about how something looks. Satellite reads
+padding as a measurement and Formation reads `left` only to ask which side resolved the unit. None of them
+pins an appearance.
 
 **Three kinds of locator are sound and stay**: a role, a role description or a state attribute
 (`[aria-roledescription="wedge"]`, `[role="log"]`, `[aria-disabled]`, `[inert]`) is the component's published
@@ -7871,6 +8012,37 @@ identifier, because `[$5]` is a plausible thing to have written on purpose.
 case-sensitively, so `[B]bold[/B]` is recognised as a tag, finds no class under `"B"` and prints its own
 brackets. Both halves are pinned by name in `RichText.utils.test.ts`, as is the exclusion of `[123]` and
 `[b-c]`.
+
+### `RichText`: the class map is handed over whole, and the diff example is what proves it
+
+`computeClassNames` is given the library's own map and returns the one to paint with, so a consumer choosing
+to keep the defaults spreads them and a consumer choosing to replace them simply does not. That is the whole
+contract, and the shape it takes was never visible from the page until an example reached the prop: the page
+took the defaults, so a map that failed to arrive at all would have looked identical.
+
+**The example that reaches it is an inline diff**, over two tags the library has never heard of — `[add]` and
+`[sub]`. A diff is the case that makes the argument on its own: nobody would expect a component to ship an
+insertion or a deletion colour, the two tags are obviously the page's rather than the library's, and the
+sentence being diffed can carry a `[b]` inside an `[add]` to show that the default map came through the same
+call unchanged. The tags are named after what they mark rather than after what they look like, which is why
+they are not `green` and `red`.
+
+**How the two runs are drawn is the user's, and the spec does not touch it.** The correction that fixed this
+file: the first version struck the deletion through and underlined the insertion, argued it from WCAG 1.4.1
+Use of Color, and wrote both into `richText.spec.ts`. The user removed the underline, and the spec went red —
+which is the failure mode to learn from, because nothing was broken. A spec that pins the decoration or the
+colour of a Playground run has made the user's own styling a thing they cannot change without a red run, and
+the paint on that page is theirs. The grounds are `success.dark` and `error.dark` with each family's own
+`contrast` for the text, under the rule that a container changing its own background owns the colour of the
+text inside it; beyond that, nothing here states what the diff must look like.
+
+**`richText.spec.ts` reads no computed style at all, and that is the general rule rather than a quirk of this
+page** — see _"An assertion reads the mapping, not the value"_ below. What `computeClassNames` promises is a
+lookup: a tag comes back carrying the class it was mapped to. So the legend's check is that all five default
+tags reach a class and that no two reach the same one; the diff's is that `[add]` and `[sub]` reach classes of
+their own; and the check that the defaults survived the page's spread is that the `[b]` inside an `[add]` run
+carries **the same class** as the `[b]` in the legend. Not one of those says what a class draws, so all of them
+survive a restyle on either side.
 
 ### `PointerTracker`: one reading of where the pointer is relative to one element
 

@@ -7,8 +7,10 @@ const COLLAPSED = demo("collapsed");
 const DISABLED = demo("disabled");
 const REACHABLE = demo("reachable");
 const OUTSIDE = demo("outside");
+const LAZY = demo("lazy");
 
 const OUTSIDE_COLLAPSE_DELAY_MS = 500;
+const REMOTE_LOAD_DELAY_MS = 600;
 
 const node = (scope: string) => `${scope} [role="treeitem"]`;
 
@@ -315,4 +317,79 @@ test.describe("a windowed tree", () => {
 
         expect(await items.count(), "and the mounted count stays small").toBeLessThan(40);
     });
+});
+
+/**
+ * A branch is normally a node that has at least one child, which leaves a folder whose contents have not been
+ * fetched yet with no way to say what it is: an empty list reads as a leaf, so nothing draws a twisty and
+ * nothing opens. `hasMoreChildren` is the node saying "there are children you have not been given". It can
+ * only add — a node with real children is a branch whether it carries the flag or not — so there is no state
+ * in which the two fields disagree.
+ *
+ * Nothing new tells the consumer to go and fetch. Opening a branch writes its value into `expandedSignal`,
+ * which is the consumer's own signal, so the request is theirs to start and the arrival is theirs to hand
+ * back as new nodes. That is `Select`'s arrangement for a list that has not finished arriving, applied a
+ * level down.
+ */
+test("a branch can say it has children before it has them", async ({ page }) => {
+    const packages = page.locator(node(LAZY)).filter({ hasText: "packages" }).first();
+
+    await expect(packages, "it is a branch, though its children have not arrived").toHaveAttribute(
+        "aria-expanded",
+        "false",
+    );
+    await expect(packages, "and nothing is being awaited yet").not.toHaveAttribute("aria-busy");
+    await expect(page.locator(`${LAZY} [role="group"]`), "so it has no group box either").toHaveCount(0);
+});
+
+test("opening one reports itself as busy, and paints what the consumer put there", async ({ page }) => {
+    const packages = page.locator(node(LAZY)).filter({ hasText: "packages" }).first();
+
+    await packages.click();
+
+    await expect(packages, "the branch is open").toHaveAttribute("aria-expanded", "true");
+    await expect(
+        packages,
+        "and says its contents are on the way, which is the only route a reader has",
+    ).toHaveAttribute("aria-busy", "true");
+    await expect(
+        page.locator(`${LAZY} [role="group"]`),
+        "the group box exists so the placeholder sits where the children will",
+    ).toContainText("Fetching");
+});
+
+test("and stops being busy once the children turn up", async ({ page }) => {
+    const packages = page.locator(node(LAZY)).filter({ hasText: "packages" }).first();
+
+    await packages.click();
+    await expect(page.locator(node(LAZY)).filter({ hasText: "core" }), "the fetch lands", {
+        timeout: REMOTE_LOAD_DELAY_MS * 4,
+    }).toBeVisible();
+
+    await expect(packages, "nothing is outstanding any more").not.toHaveAttribute("aria-busy");
+    await expect(page.locator(`${LAZY} [role="group"]`).first(), "and the placeholder is gone").not.toContainText(
+        "Fetching",
+    );
+});
+
+/**
+ * The point of the flag being additive rather than an override: a branch that arrives carrying children of
+ * its own, each of which is itself unfetched, needs no special handling. `core` is handed over as a branch
+ * with nothing in it, and opening it does exactly what opening `packages` did.
+ */
+test("a branch that arrives unfetched behaves like the one that delivered it", async ({ page }) => {
+    await page.locator(node(LAZY)).filter({ hasText: "packages" }).first().click();
+
+    const core = page.locator(node(LAZY)).filter({ hasText: "core" }).first();
+
+    await expect(core, { timeout: REMOTE_LOAD_DELAY_MS * 4 }).toBeVisible();
+    await expect(core, "it arrived as a branch with no children").toHaveAttribute("aria-expanded", "false");
+
+    await core.click();
+
+    await expect(core, "and opens the same way").toHaveAttribute("aria-busy", "true");
+    await expect(page.locator(node(LAZY)).filter({ hasText: "index.ts" }), "down to the fetch", {
+        timeout: REMOTE_LOAD_DELAY_MS * 4,
+    }).toBeVisible();
+    await expect(core).not.toHaveAttribute("aria-busy");
 });

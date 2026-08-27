@@ -16,6 +16,12 @@ export const PageFormFieldMessage = (props: ParentProps<FormFieldMessageProps>) 
     );
 };
 
+export const PageFormSectionCaption = (props: ParentProps) => (
+    <div class={styles.formSectionCaption}>{props.children}</div>
+);
+
+export const PageFormSectionBody = (props: ParentProps) => <div class={styles.formSectionBody}>{props.children}</div>;
+
 export const PageFormStack = (props: ParentProps) => <div class={styles.formFieldStack}>{props.children}</div>;
 
 export const PageFormButtons = (props: ParentProps) => <div class={styles.formFieldButtons}>{props.children}</div>;

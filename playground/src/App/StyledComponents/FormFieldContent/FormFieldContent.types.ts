@@ -1,5 +1,5 @@
-import type { AccessorProps, FormFieldState } from "@thewaver/ss-components";
+import type { AccessorProps, FormFieldState, FormSectionState } from "@thewaver/ss-components";
 
 export type FormFieldMessageProps = AccessorProps<{
-    state: FormFieldState;
+    state: FormFieldState | FormSectionState;
 }>;

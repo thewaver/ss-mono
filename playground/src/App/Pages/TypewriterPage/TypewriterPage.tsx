@@ -14,7 +14,7 @@ import {
 } from "../../StyledComponents/TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import { ComplexExample } from "./Examples/Complex";
-import { CustomExample } from "./Examples/Custom";
+import { CustomInputExample } from "./Examples/CustomInput";
 import type { TypewriterExampleProps } from "./TypewriterPage.types";
 
 import { MEASURE_BOX_PADDING } from "../../PageComponents/MeasureBox/MeasureBox.css";
@@ -52,7 +52,7 @@ const ComplexExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
     );
 };
 
-const CustomExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
+const CustomInputExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
     const textSignal = createSignal("Line one\n\nline two");
 
     return (
@@ -77,7 +77,7 @@ const CustomExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
             />
 
             <PageMeasureBox width={width} padding={() => MEASURE_BOX_PADDING}>
-                <CustomExample {...props} text={textSignal[0]} />
+                <CustomInputExample {...props} text={textSignal[0]} />
             </PageMeasureBox>
         </>
     );
@@ -101,10 +101,10 @@ export const TypewriterPage = () => {
                 path: `${EXAMPLES_ROOT}/Complex.tsx`,
             },
             {
-                key: "custom",
-                name: "Custom",
-                component: () => <CustomExampleWrapper {...commonProps} />,
-                path: `${EXAMPLES_ROOT}/Custom.tsx`,
+                key: "customInput",
+                name: "Custom Input",
+                component: () => <CustomInputExampleWrapper {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/CustomInput.tsx`,
             },
         ];
     });

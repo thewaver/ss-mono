@@ -164,6 +164,19 @@ the code regressed, or the spec is describing something they decided against —
 distinguishable from the failure. Say which assertion fails and what it expects, and let them say which it is.
 This is the exception to _"fix on sight"_: a spec disagreeing with the code is not a defect on sight.
 
+**A spec asks whether rendered content matches the class it was given, never whether it matches a value
+written down in the spec.** Stated by the user, in those terms, after a `richText.spec.ts` assertion pinned an
+underline on the diff example's inserted text: they removed the underline, the run went red, and the reply
+called their own edit a regression and put it back. **A hardcoded value cannot tell a change from a failure** —
+a border going from `1px dashed` to `2px solid` is somebody changing their mind, and it arrives as the same red
+as a break. So assert the relationship, which has no such ambiguity: the element came back carrying the class
+it was mapped to, that class is not the one some other thing was mapped to, and what the class draws is nobody's
+business. **Where a spec has no mechanism to separate the two readings, it does not check that thing at all.**
+
+This is the same defect as the caption-derived locators that the demo keys replaced, on a different axis: there
+a red answered "did the behaviour change" and "has somebody edited the copy" at once, here it answers "did the
+wiring break" and "has somebody restyled it" at once. It bites hardest on pure aesthetics.
+
 **Temporary files go in `.scratch/` at the repo root, never in the system temp folder.** Asked for by the
 user. The harness points at a session directory under `AppData\Local\Temp`, which is three folders up and
 outside the project entirely; they would rather anything a task needs sit where they can see it. `.scratch` is

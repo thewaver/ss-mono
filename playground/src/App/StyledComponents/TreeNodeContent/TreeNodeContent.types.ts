@@ -4,3 +4,7 @@ export type TreeNodeContentProps = AccessorProps<{
     flags: InteractionFlags<TreeNodeFlags>;
     detail?: string;
 }>;
+
+export type TreeNodePendingProps = AccessorProps<{
+    depth: number;
+}>;

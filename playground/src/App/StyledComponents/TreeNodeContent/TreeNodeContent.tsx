@@ -3,7 +3,7 @@ import { Show } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
-import type { TreeNodeContentProps } from "./TreeNodeContent.types";
+import type { TreeNodeContentProps, TreeNodePendingProps } from "./TreeNodeContent.types";
 
 import { themeVars } from "../../Theme.css";
 import * as styles from "./TreeNodeContent.css";
@@ -37,3 +37,18 @@ export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) =>
         </div>
     );
 };
+
+export const PageTreeNodePending = (props: ParentProps<TreeNodePendingProps>) => (
+    <div
+        class={styles.treeNodePending}
+        style={{
+            "padding-left": `calc(${themeVars.spacing.half} + ${access(props.depth) * INDENT_PER_DEPTH}px)`,
+        }}
+    >
+        <div class={styles.treeNodeMarker} aria-hidden>
+            {"·"}
+        </div>
+
+        <div>{props.children}</div>
+    </div>
+);

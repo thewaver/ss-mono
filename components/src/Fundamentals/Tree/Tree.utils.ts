@@ -1,9 +1,11 @@
 import type { TreeNode, TreeRow } from "./Tree.types";
 
 const EMPTY_ROWS: never[] = [];
+const EMPTY_NODES: never[] = [];
 
 export namespace TreeUtils {
-    export const getIsBranch = <T>(node: TreeNode<T>) => (node.children?.length ?? 0) > 0;
+    export const getIsBranch = <T>(node: TreeNode<T>) =>
+        (node.children?.length ?? 0) > 0 || (node.hasMoreChildren ?? false);
 
     export const getVisibleRows = <T>(nodes: TreeNode<T>[], computeIsExpanded: (value: T) => boolean): TreeRow<T>[] => {
         let index = 0;
@@ -20,7 +22,7 @@ export namespace TreeUtils {
                     position,
                     setSize: siblings.length,
                     isExpanded,
-                    rows: isExpanded ? build(node.children!, depth + 1) : EMPTY_ROWS,
+                    rows: isExpanded ? build(node.children ?? EMPTY_NODES, depth + 1) : EMPTY_ROWS,
                 };
             });
 

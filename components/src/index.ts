@@ -141,6 +141,8 @@ export * from "./Fundamentals/Input/FormField/FormField.context";
 export type * from "./Fundamentals/Input/FormField/FormField.context.types";
 export type * from "./Fundamentals/Input/FormField/FormField.types";
 export * from "./Fundamentals/Input/FormField/FormField.utils";
+export * from "./Fundamentals/Input/FormSection/FormSection";
+export type * from "./Fundamentals/Input/FormSection/FormSection.types";
 export * from "./Fundamentals/Input/Label/Label";
 export * from "./Fundamentals/Input/Label/Label.context";
 export type * from "./Fundamentals/Input/Label/Label.context.types";

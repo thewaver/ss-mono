@@ -45,6 +45,9 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
         get "aria-expanded"() {
             return access(props.flags).isBranch ? access(props.flags).isExpanded : undefined;
         },
+        get "aria-busy"() {
+            return access(props.flags).isPending || undefined;
+        },
         get "aria-level"() {
             return access(props.level);
         },
@@ -104,6 +107,10 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     const getNavigableRows = createMemo(() => getFlatRows().filter(computeIsNavigable));
 
     const getIsVirtualized = createMemo(() => props.computeEstimatedNodeHeight !== undefined);
+
+    const getIsPending = (row: TreeRow<T>) => row.isExpanded && row.rows.length < 1;
+
+    const getHasPendingPaint = (row: TreeRow<T>) => getIsPending(row) && props.renderPendingChildren !== undefined;
 
     const getRovingRow = createMemo(() => {
         const navigable = getNavigableRows();
@@ -343,6 +350,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
             extraFlags={() => ({
                 isBranch: TreeUtils.getIsBranch(getRow().node),
                 isExpanded: getRow().isExpanded,
+                isPending: getIsPending(getRow()),
                 isSelected: getRow().node.value === props.valueSignal[0](),
                 depth: getRow().depth,
             })}
@@ -369,8 +377,15 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                 <>
                     {renderRow(getRow)}
 
-                    <Show when={getRow().rows.length > 0}>
-                        <div role="group">{renderRows(() => getRow().rows)}</div>
+                    <Show when={getRow().rows.length > 0 || getHasPendingPaint(getRow())}>
+                        <div role="group">
+                            <Show when={getIsPending(getRow())} fallback={renderRows(() => getRow().rows)}>
+                                {props.renderPendingChildren?.(
+                                    () => getRow().node,
+                                    () => getRow().depth + 1,
+                                )}
+                            </Show>
+                        </div>
                     </Show>
                 </>
             )}
@@ -387,6 +402,13 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                         ref={(element) => rowWindow.measureRow(element, row.index)}
                     >
                         {renderRow(() => getFlatRows()[row.index])}
+
+                        <Show when={getHasPendingPaint(getFlatRows()[row.index])}>
+                            {props.renderPendingChildren?.(
+                                () => getFlatRows()[row.index].node,
+                                () => getFlatRows()[row.index].depth + 1,
+                            )}
+                        </Show>
                     </div>
                 )}
             </For>

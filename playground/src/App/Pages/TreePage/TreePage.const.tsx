@@ -110,3 +110,21 @@ export const createStressFiles = (): TreeNode<string>[] =>
             value: `package-${branchIndex + 1}/file-${leafIndex + 1}.ts`,
         })),
     }));
+
+export const REMOTE_LOAD_DELAY_MS = 600;
+
+export const REMOTE_ROOT: TreeNode<string>[] = [
+    { value: "packages", hasMoreChildren: true },
+    { value: "docs", hasMoreChildren: true },
+    { value: "README.md" },
+];
+
+export const REMOTE_CHILDREN: Record<string, TreeNode<string>[]> = {
+    packages: [
+        { value: "core", hasMoreChildren: true },
+        { value: "ui", hasMoreChildren: true },
+    ],
+    core: [{ value: "index.ts" }, { value: "registry.ts" }],
+    ui: [{ value: "Button.tsx" }, { value: "Modal.tsx" }],
+    docs: [{ value: "getting-started.md" }, { value: "api.md" }],
+};

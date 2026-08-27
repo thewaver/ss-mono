@@ -54,3 +54,14 @@ export const treeNodeDetail = style({
     fontSize: themeVars.fontSize.small,
     opacity: 0.6,
 });
+
+export const treeNodePending = style({
+    display: "flex",
+    alignItems: "center",
+    gap: themeVars.spacing.full,
+    padding: themeVars.spacing.half,
+    fontSize: themeVars.fontSize.small,
+    fontStyle: "italic",
+    whiteSpace: "nowrap",
+    opacity: 0.6,
+});

@@ -45,13 +45,14 @@ reading.
 12. `Accordion` — two things deliberately not built — _open_
 13. `Tabs` — a pairing the consumer can still skip — _open_
 14. `Viewport` as a region: what is settled and what is not — _open_
-15. `Tree` — three things deliberately not built, and one extraction to decide — _open_
+15. `Tree` — two things deliberately not built, and one extraction to decide — _open_
 16. `SlideButton` — three things deliberately not built — _open_
 17. `Spotlight` — one thing deliberately not built — _open_
 18. `Scroller` — four things deliberately not built — _open_
 19. `Paginator` — four things deliberately not built — _open_
 20. `Carousel` — four things deliberately not built — _open_
-21. The four components ported from React — one thing to retest, one deliberately not built — _open_
+21. The four components ported from React — what did not settle — _open_
+22. An anchored layer is always a frame behind — _postponed until the platform catches up_
 
 ### Build order
 
@@ -70,11 +71,10 @@ privately inside them.
 
 **Out of the cost ordering, deliberately:**
 
-- **The form story is settled and wired.** `Form` and `FormField` ship and every control reads the description
-  context; see `conventions.md`. This entry used to say the opposite — that it was the one item whose cost
-  _grew_ with delay, because every control built without it grew its own half of the error plumbing — and that
-  cost has stopped growing. What is left of it in item 6 is one small piece, that nothing groups fields into
-  sections with their own validity, and it carries none of the original urgency.
+- **The form story is settled, wired and finished.** `Form`, `FormField` and `FormSection` ship and every
+  control reads the description context; see `conventions.md`. This entry used to say the opposite — that it
+  was the one item whose cost _grew_ with delay, because every control built without it grew its own half of
+  the error plumbing — and nothing of it is outstanding now.
 - **Dismissal, open state and openers are all settled.** All five layers dismiss through `DismisserStack`, all
   five take a `visibilitySignal`, and `Menu` takes an anchor while `ContextMenu` opens at a point; see
   `conventions.md`. Nothing in this family is outstanding.
@@ -327,9 +327,11 @@ any of those without first deciding these would bake the decision in by accident
   order, each answering the `role="group"` question its own way; see `conventions.md`. Note that the on-demand loading that shipped for `Select` is
   **not** it and did not reduce the need for it — that answers a list which is incomplete, this one answers
   a list which is complete and large, and the two compose.
-- **The form story is decided and wired.** `Form` and `FormField` ship and every control reads the
-  description context; see `conventions.md`, which also records which errors wait for a submit and which
-  do not. What is still unbuilt is smaller: nothing groups fields into sections with their own validity.
+- **The form story is decided, wired and now grouped.** `Form` and `FormField` ship and every control reads
+  the description context; see `conventions.md`, which also records which errors wait for a submit and which
+  do not. `FormSection` closed the last piece — a run of fields can be a group with a name and a verdict of
+  its own, and a rule that is true of the group rather than of any field in it now has somewhere to live.
+  Nothing here is outstanding.
 - **Dismissal is one stack, and paint order comes from the anchor.** `DismisserStack` holds the open layers
   and `Popover` registers one, so all five controls dismiss through the same mechanism; a portalled layer's
   z-index is one above the highest on its anchor's ancestor chain, so a popup opened inside a `Modal` paints
@@ -351,8 +353,9 @@ any of those without first deciding these would bake the decision in by accident
   UI's `Fieldset` renders `<fieldset>` plus `<legend>` with helper-text and error-text parts, and its
   `invalid` and `disabled` are props the consumer sets which then reach every field inside through
   context. Nothing aggregates the contained fields' own validity. That is the opposite direction from
-  `Form`'s registration, and the two do not conflict — one distributes state, the other collects it, and
-  a section with its own validity wants both halves.
+  `Form`'s registration, and the two do not conflict — one distributes state, the other collects it.
+  `FormSection` is the collecting one, and it renders the same `<fieldset>` plus `<legend>`; see
+  `conventions.md`. The distributing half is not built and nobody has asked for it.
 - **"Errors only after the first attempt" is two flags, not one.** React Hook Form validates on submit
   by default, and the per-field gate people actually write is `touchedFields[name] || isSubmitted` —
   the field's own touched flag or the form's submitted flag. So `hasSubmitted` is half of the published
@@ -393,12 +396,13 @@ fades it drives are the part most likely to be wrong.
 **Deprioritised by the user**, after being offered as the next piece of work and passed over. It stays here
 because the exposure is real and unchanged; it is not next, and it is not to be proposed as next.
 
-**`RichText` has left that group and joined the next one down.** `RichTextPage` mounts a single example: a
-legend naming the five tags the component paints, a `TextArea` holding the source string, and the parsed result
-underneath it, with `removeOtherTags` as the page's one global prop so both answers to an unrecognised tag can be
-seen. So the component can now be driven, and what is missing is narrower than it was. `RichTextUtils.parseContent`
-is unit-tested and the painted output is not, so the class map and the `removeOtherTags` branch are checked by eye;
-`computeClassNames` is the one prop nothing on the page reaches, because the page takes the default class map.
+**`RichText` has left both groups.** It has a page and now a spec, and the prop that had nowhere to be
+driven from is driven. `RichTextPage` mounts three examples — a legend naming the five tags the component
+paints, an inline diff over two tags the page named itself, and a `TextArea` holding a source string with
+the parsed result underneath it — with `removeOtherTags` as the page's one global prop, so both answers to
+an unrecognised tag can be seen. `richText.spec.ts` reads computed styles rather than class names, since a
+vanilla-extract class name is hashed and reading one back would only prove a string had been copied around.
+See `conventions.md` for what the diff example settled.
 
 **Covered only through a consumer**, which is worth distinguishing from uncovered because it decides
 whether a spec is worth writing: `Popover` through `Select` and `Menu`, `Radio` through
@@ -413,14 +417,13 @@ fakes frames as a 16ms timer and advancing time to reach a fallback fires the fr
 
 - **`ElementFader`'s 100ms fallback is real and is now driven.** With no frames at all a `Modal` still
   reaches its visible target, which is the whole reason the fallback was written.
-- **The positioner's poll is load-bearing for exactly one thing: finishing the first placement.** A layer
-  measures itself on mount, before it has its final size, so the opening position is provisional and the
-  next tick corrects it — measured at 30px out on `ViewportPage`'s scrolled anchor. Everything after that is
-  carried by the capture-phase `scroll` listener alone: with frames starved, the first scroll lands the
-  layer exactly on its anchor's edge. So the fear this item used to record — a popup drifting further and
-  further from the field it belongs to — is not what happens. What does happen is that **every layer opens
-  one frame behind**, which is the same frame of drift item 14 records against a fast scroll, seen from the
-  other end. Whether to make the first placement frame-independent is a decision nobody has taken.
+- **Starving the frames showed the positioner opening a layer a frame behind, and that is item 22.** What
+  the test proves is narrower than the sentence it first produced: with no frames, a layer opens 30px out on
+  `ViewportPage`'s scrolled anchor and the first scroll still lands it exactly, so the capture-phase
+  listener carries a scroll on its own. It does **not** prove the poll has no other job — the test only ever
+  opens a layer and then scrolls, and the poll is the only thing watching for an anchor that moves with no
+  event to announce it. The fear this item used to record, of a popup drifting further and further from its
+  field, is what was actually ruled out.
 
 **Time is no longer a blind spot, and the mechanism is worth knowing before the next timing bug.**
 Playwright's clock API fakes `Date`, `setTimeout`, `setInterval`, `requestAnimationFrame`,
@@ -709,24 +712,18 @@ inside a nested viewport stays inside it. What is left:
   box, so a container with no height gives it a zero-sized region and it renders nothing visible. A warning
   would be the obvious kindness; whether the library should warn at all is the same question `Label` already
   answered for itself, and it went the other way.
-- **A fast scroll can still show a frame of drift.** The layer repositions from the `scroll` event and from
-  a frame poll, both on the main thread, while the scroll itself may be composited off it; see
-  `conventions.md`. `viewport.spec.ts` asserts the layer lands exactly on its anchor once the scroll
-  settles, which is what a spec can see. The published fix for the intermediate frames is CSS anchor
-  positioning, which is Chromium-only.
+- **A fast scroll can still show a frame of drift — see item 22**, which now holds it. It is not a
+  `Viewport` fault: the same frame is lost by every anchored layer on the page, and the scrolled anchor here
+  is only where it is easiest to see. `viewport.spec.ts` asserts the layer lands exactly on its anchor once
+  the scroll settles, which is what a spec can see.
 
 ---
 
-## 15. `Tree` — three things deliberately not built, and one extraction to decide
+## 15. `Tree` — two things deliberately not built, and one extraction to decide
 
 The decisions behind what exists are in `conventions.md` under _"Controls: `Tree`, and the group box that
 could not be a child"_. These are the gaps, each with the reason it is still one.
 
-- **A branch whose children have not arrived yet cannot be spelled.** A branch is a node with at least one
-  child, so an empty list reads as a leaf and there is nothing that shows a closed, openable, not-yet-fetched
-  folder. Two things would be needed and only the first is obvious: a way to say "this has children" without
-  having them, and somewhere to paint "loading" — which would have to be inside the `role="group"` box the
-  library owns and the consumer cannot reach.
 - **The marker cannot own the toggle.** One press both selects a node and opens it, because the branch
   marker is drawn inside `renderNode` and the component cannot tell a press on it from a press on the label.
   A consumer who wants the published desktop behaviour — the chevron opens, the label selects — has no route
@@ -762,8 +759,10 @@ having before a third consumer asks.
   This is what made the tree the strongest of the three arguments for building it.
 - **Lazy branches are a named feature with a completion callback.** Ark UI takes `loadChildren` plus
   `onLoadChildrenComplete`; React Aria has a `TreeLoadMoreItem` element and a `renderEmptyState` for the
-  spinner. Both answer the second half this item calls hard — where "loading" is painted — by making it an
-  element the consumer supplies, which is the shape the group box here would have to grow.
+  spinner. Both answered the half this item called hard — where "loading" is painted — by making it an element
+  the consumer supplies, and that is the shape the group box grew. Built as `hasMoreChildren` plus
+  `renderPendingChildren`, with no load callback, because `expandedSignal` is the consumer's already; see
+  `conventions.md`.
 - **Multi-select and checkboxes are one feature, and both libraries ship it.** `selectionMode="multiple"` in
   each, with Ark UI adding `NodeCheckbox` and a `checkedValue` list carrying `indeterminate`. So the tri-state
   parent is not an extra: it is what a multi-select tree is expected to include.
@@ -915,14 +914,16 @@ have them unless the entry says otherwise.
 
 ---
 
-## 21. The four components ported from React — one thing to retest, one deliberately not built
+## 21. The four components ported from React — what did not settle
 
 `Satellite`, `Staircase`, `Formation`, `OverheadWheel` and `DrumWheel` came in from a React codebase; what the port
-settled is in `conventions.md`. Two things did not settle, and only the first is live.
+settled is in `conventions.md`. What did not settle is below, and both entries are decisions taken rather than
+work waiting.
 
-**The drum's girth arithmetic was wrong twice and is now measured rather than argued.** What it reserves and
-why is in `conventions.md` under _"A drum reserves the room it paints in"_; both wrong answers are recorded there
-too, since the shape of the mistake repeated. What remains open is smaller than the original entry claimed:
+**The drum's girth arithmetic was wrong twice, is now measured rather than argued, and the user has retested
+it.** What it reserves and why is in `conventions.md` under _"A drum reserves the room it paints in"_; both wrong
+answers are recorded there too, since the shape of the mistake repeated. The errors they remembered from the
+original codebase were accounted for by those two fixes. One consequence is recorded rather than fixed:
 
 - **A wedge count that changes mid-turn interpolates the radius, and is left alone.** The user's call. A face
   carries its angle and its distance from the axis in one `transform`, and that property is transitioned, so
@@ -937,8 +938,6 @@ too, since the shape of the mistake repeated. What remains open is smaller than 
   matrix as today. The individual `rotate` and `translate` CSS properties cannot do it: they compose as
   `translate × rotate`, and this needs the translation to happen in the face's own turned frame, which is the
   opposite order.
-- **Whether the user still sees the errors they remember from the original codebase.** Two wrong formulas have
-  been found and fixed since that note, so the recollection may already be accounted for.
 
 **An overhead wheel hit-tests outside its visible circle, and is left that way for now.** The user's call, to be
 revisited. Each wedge is a full-size square div carrying the rotation, so a rotated square's corners point at the
@@ -963,6 +962,96 @@ their own button, and a library that renders no button cannot promise it is name
 alternatives were a second slot beneath the wheel, rejected because the overhead wheel is a square and anything
 under it changes the box it reserves, and a slot with a position prop, rejected because `Toasts` had already
 settled that a component does not fully delegate position. Recorded so it is not re-proposed as an oversight.
+
+---
+
+## 22. An anchored layer is always a frame behind — _postponed until the platform catches up_
+
+Folded together from item 7 and item 14 on the user's call, after they pointed out that the drag they see
+while scrolling is the same inaccuracy the opening placement shows. It was written up as two faults — a layer
+that opens a frame behind, and a fast scroll that shows a frame of drift — and it is one: **the position an
+anchored layer paints at is the position its anchor was in one frame ago.** At rest the last frame catches up,
+so it looks settled and only moves when something else does.
+
+**Where it shows.** Opening a layer against `ViewportPage`'s scrolled anchor, measured with frames starved:
+30px out, and it stays there until any event arrives. Scrolling a box with a layer open: the layer trails the
+anchor while the scroll is moving and lands exactly when it stops. `viewport.spec.ts` and
+`noAnimationFrames.spec.ts` both assert the settled position, which is what a spec can see; the intermediate
+frames are checked by eye.
+
+**What the layer is built on.** `Anchor.createPortalPosition` derives the position from two measured signals —
+the anchor's rect from `ElementObserver.createViewportRectObserver`, the content's size from a
+`ResizeObserver` — and the rect observer updates from three places: once on mount, from a capture-phase
+`scroll` and a window `resize`, and from a `requestAnimationFrame` loop that runs for as long as the layer is
+open. The poll is the only one of the three that catches an anchor moving with no event behind it: an ancestor
+being transformed or animated, content above it growing, a font arriving and reflowing the page.
+
+**Decided by the user: postponed, on the eyedropper's terms.** The fix is C, C needs a platform feature that
+is not there yet, and the two cheap options turned out to be no options at all. **Do not propose building it**
+until the trigger below fires. Everything under it is kept so that nobody measures any of it twice.
+
+**The trigger is browser support, and it is checkable rather than a matter of judgement.** Re-open when CSS
+anchor positioning reaches Baseline, or when the browsers this library supports have it far enough back that
+the JS positioner can actually be retired rather than kept beside it. Until then the only thing worth doing is
+reading [caniuse](https://caniuse.com/css-anchor-positioning). At the time of the decision it stood at 84%
+global with all three engines shipped — Chrome 125, Safari 26, Firefox 147 — which is the awkward middle: new
+enough that the JS path has to stay, established enough that it looks ready.
+
+**Why 84% is the argument rather than the percentage.** A layer that fails to position is broken, not
+degraded, so the JS positioner cannot be retired at that number. Both paths would ship, and the maintained-but-
+never-run one would be whichever your own browser does not take. That is the cost that decided it, more than
+the coverage did.
+
+**The four ways out, and what happened to each.** The user was inclined towards B and asked for D first.
+
+- **A — leave it.** Only visible while something is moving; at rest it always lands right. **This is what
+  the postponement leaves in place.**
+- **B — write the position straight from the handler that reads the rect**, skipping the reactive round-trip.
+  **Ruled out by D: there is no round-trip.** The write already happens synchronously inside the scroll
+  handler, so B would remove a delay that does not exist.
+- **C — hand the tracking to CSS anchor positioning.** The fix, and the thing being postponed. The anchor
+  takes an `anchor-name`, the layer a `position-anchor`, and the layer writes its edges against the anchor's
+  with `anchor()`; the browser then keeps the two glued in its own layout pass, which is why no frame can be
+  lost. Choosing another side when there is no room is `position-try-fallbacks` — alternatives in order, the
+  browser takes the first that fits. The note in item 14 calling this Chromium-only was out of date.
+- **D — measure where the frame is actually lost before choosing.** Done, and it is what ruled B out.
+
+**What C would have to answer, worked out before the postponement so it is not re-derived.** Two shapes, and
+neither was tried.
+
+- **Replacing the positioner outright** is the version that pays: the browser owns placement and flipping and
+  most of `AnchorUtils` goes. What blocks it is that the library's placement vocabulary is richer than
+  `position-try` can state — band clamping and `reservedScreenSize` are arithmetic on numbers, and there is no
+  CSS spelling for _"clamp into this band but keep the anchor's edge"_. Those semantics would have to be
+  re-expressed or dropped.
+- **Keeping the arithmetic and using CSS only for the glue** leaves every line of the placement logic alone
+  and lets `anchor()` carry the layer along with its anchor between JS updates. Smaller, keeps the semantics,
+  and puts two systems in charge of one number.
+- **`Viewport` is what would decide between them, and the answer is not known.** A viewport scales its
+  contents and positions layers in its own space through `getAdjustedBoundingClientRect`, while CSS anchor
+  positioning works in the real layout. Whether those compose is the first thing to test when this re-opens.
+
+**What D measured**, by probing the live page rather than by reading the code.
+
+- **The style write is synchronous inside the scroll handler.** A `scroll` listener on `window` in the capture
+  phase runs before the library's, one on `document` runs after it, and the layer's inline `transform` differs
+  between the two on every event. There is no reactive round-trip to remove: Solid propagates the new rect
+  through the memos and writes the style before the handler returns. **B would change nothing.**
+- **A layer never opens in the wrong place, as long as frames are arriving.** `Popover` already paints
+  `visibility: hidden` until `getPosition()` resolves. Sampled per frame from the moment the element is added:
+  hidden at `translate(0px, 0px)` for two frames, then visible at its final transform, and unchanged for the
+  next six. The 30px in `noAnimationFrames.spec.ts` is the starved case alone — with no poll to finish it, the
+  mount reading is what becomes visible.
+- **Frame by frame through a scroll, the gap between anchor and layer is constant**, under both a
+  `scrollTop` scroll and a real wheel scroll: 528 while the list sits above the anchor, then 268 after it
+  flips below. So on the main thread's own account the layer is never behind.
+- **What the probe cannot see is the only place left for the lag to be.** Both numbers it compares — the
+  anchor's `getBoundingClientRect` and the layer's `transform` — come from the main thread, so a frame where
+  the compositor has already scrolled the box and the main thread has not been told yet reads as a constant
+  gap while the screen shows otherwise. Ruling that in or out needs pixels rather than the DOM.
+- **One movement it did see, which is by design rather than drift.** Mid-scroll the list flips from above the
+  anchor to below it, and that is a 260px jump in one frame. `AnchorUtils.getSafeVPlacement` choosing a new
+  placement is what it is for; it is noted here because it is the largest thing that moves in this demo.
 
 ---
 

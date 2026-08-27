@@ -49,7 +49,7 @@ export const dragPad = style({
     position: "relative",
     height: 160,
     borderRadius: themeVars.borderRadius.full,
-    backgroundImage: panel(themeVars.color.info.dark, themeVars.color.info.light),
+    backgroundImage: panel(themeVars.color.tooltip.dark, themeVars.color.tooltip.light),
     touchAction: "none",
     cursor: "crosshair",
 });

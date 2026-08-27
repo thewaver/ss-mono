@@ -11,7 +11,7 @@ type Props = TypewriterExampleProps &
         text: string;
     }>;
 
-export const CustomExample = (props: Props) => {
+export const CustomInputExample = (props: Props) => {
     let hasMounted = false;
 
     const [getController, setController] = createSignal<TypewriterController>();

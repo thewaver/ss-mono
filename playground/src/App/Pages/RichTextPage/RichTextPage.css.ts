@@ -1,5 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
+import { PREVIEW_WIDTH } from "./RichTextPage.const";
+
 import { themeVars } from "../../Theme.css";
 
 export const root = style({
@@ -37,4 +39,21 @@ export const legendTag = style({
 export const previewText = style({
     whiteSpace: "pre-wrap",
     overflowWrap: "anywhere",
+});
+
+export const diffText = style([previewText, { maxWidth: PREVIEW_WIDTH }]);
+
+export const addedText = style({
+    color: themeVars.color.success.contrast,
+    backgroundColor: themeVars.color.success.dark,
+    padding: `0 ${themeVars.spacing.half}`,
+    borderRadius: themeVars.borderRadius.half,
+});
+
+export const removedText = style({
+    color: themeVars.color.error.contrast,
+    backgroundColor: themeVars.color.error.dark,
+    padding: `0 ${themeVars.spacing.half}`,
+    borderRadius: themeVars.borderRadius.half,
+    textDecorationLine: "line-through",
 });

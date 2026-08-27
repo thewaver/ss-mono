@@ -33,3 +33,17 @@ export const formFieldButtons = style({
     display: "flex",
     gap: themeVars.spacing.full,
 });
+
+export const formSectionCaption = style({
+    fontSize: themeVars.fontSize.small,
+    fontWeight: "bold",
+});
+
+export const formSectionBody = style({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "start",
+    gap: themeVars.spacing.full,
+    paddingLeft: themeVars.spacing.full,
+    borderLeft: `1px solid rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
+});
