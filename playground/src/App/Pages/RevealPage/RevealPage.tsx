@@ -1,40 +1,67 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
+
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { FrostedExample } from "./Examples/Frosted";
 import { PromptExample } from "./Examples/Prompt";
 import { TorchExample } from "./Examples/Torch";
 
 const EXAMPLES_ROOT = "/src/App/Pages/RevealPage/Examples";
+const CIRCLE = "circle";
+const SHAPES = [CIRCLE, ...ShapeConst.DEFAULT_SHAPES] as const;
+
+type RevealShape = (typeof SHAPES)[number];
+
 const MIN_RADIUS = 20;
 const MAX_RADIUS = 220;
 const RADIUS_STEP = 10;
-const MIN_ROUNDNESS = 0;
-const MAX_ROUNDNESS = 1;
-const ROUNDNESS_STEP = 0.05;
-const STARTING_ROUNDNESS = 1;
+const MIN_JOIN_RADIUS = 0;
+const MAX_JOIN_RADIUS = 120;
+const JOIN_RADIUS_STEP = 5;
+const MIN_LAME_EXPONENT = -5;
+const MAX_LAME_EXPONENT = 5;
+const LAME_EXPONENT_STEP = 0.5;
 const MIN_SOFTNESS = 0;
 const MAX_SOFTNESS = 1;
 const SOFTNESS_STEP = 0.05;
 const STARTING_RADIUS = 90;
+const STARTING_SHAPE: RevealShape = CIRCLE;
+const STARTING_JOIN_RADIUS = 0;
+const STARTING_LAME_EXPONENT = 1;
 const STARTING_SOFTNESS = 0.45;
 const FIELD_WIDTH = 110;
+const SHAPE_FIELD_WIDTH = 170;
 
 export const RevealPage = () => {
     const [getRadius, setRadius] = createSignal(STARTING_RADIUS);
-    const [getRoundness, setRoundness] = createSignal(STARTING_ROUNDNESS);
+    const [getShape, setShape] = createSignal<RevealShape>(STARTING_SHAPE);
+    const [getJoinRadius, setJoinRadius] = createSignal(STARTING_JOIN_RADIUS);
+    const [getLameExponent, setLameExponent] = createSignal(STARTING_LAME_EXPONENT);
     const [getSoftness, setSoftness] = createSignal(STARTING_SOFTNESS);
     const [getIsDisabled, setIsDisabled] = createSignal(false);
+
+    const getIsCircle = createMemo(() => getShape() === CIRCLE);
+
+    const getComputePoints = createMemo(() => {
+        const shape = getShape();
+
+        if (shape === CIRCLE) return undefined;
+
+        return (size: Size2d) => ShapeConst.getDefaultShapePoints(shape, size);
+    });
 
     const getExamples = createMemo(() => {
         const commonProps = {
             radius: getRadius,
-            roundness: getRoundness,
             softness: getSoftness,
+            joinRadii: () => [getJoinRadius()],
+            lameExponents: () => [getLameExponent()],
             isDisabled: getIsDisabled,
+            computePoints: getComputePoints,
         };
 
         return [
@@ -77,19 +104,43 @@ export const RevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"roundness"} label={"Roundness"}>
-                    <PageNumberField
-                        value={getRoundness}
-                        min={() => MIN_ROUNDNESS}
-                        max={() => MAX_ROUNDNESS}
-                        step={() => ROUNDNESS_STEP}
-                        width={() => FIELD_WIDTH}
-                        ariaLabel={"Roundness"}
-                        onInput={setRoundness}
+                <PageProp key={"computePoints"} label={"Shape"}>
+                    <PageSelectField
+                        value={getShape}
+                        values={() => SHAPES}
+                        width={() => SHAPE_FIELD_WIDTH}
+                        ariaLabel={"Shape"}
+                        onChange={(shape) => setShape(() => shape)}
                     />
                 </PageProp>
 
-                <PageProp key={"softness"} label={"Clear fraction"}>
+                <PageProp key={"joinRadii"} label={"Corner radius (px)"}>
+                    <PageNumberField
+                        value={getJoinRadius}
+                        min={() => MIN_JOIN_RADIUS}
+                        max={() => MAX_JOIN_RADIUS}
+                        step={() => JOIN_RADIUS_STEP}
+                        width={() => FIELD_WIDTH}
+                        isDisabled={getIsCircle}
+                        ariaLabel={"Corner radius"}
+                        onInput={setJoinRadius}
+                    />
+                </PageProp>
+
+                <PageProp key={"lameExponents"} label={"Lamé Exponent"}>
+                    <PageNumberField
+                        value={getLameExponent}
+                        min={() => MIN_LAME_EXPONENT}
+                        max={() => MAX_LAME_EXPONENT}
+                        step={() => LAME_EXPONENT_STEP}
+                        width={() => FIELD_WIDTH}
+                        isDisabled={getIsCircle}
+                        ariaLabel={"Corner style"}
+                        onInput={setLameExponent}
+                    />
+                </PageProp>
+
+                <PageProp key={"softness"} label={"Softness"}>
                     <PageNumberField
                         value={getSoftness}
                         min={() => MIN_SOFTNESS}

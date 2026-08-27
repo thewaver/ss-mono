@@ -144,7 +144,7 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
             {
                 name: "Reveal",
                 description:
-                    "A cover with a hole cut where the pointer is. The cover is the consumer's — opaque, frosted, or something that reads what it is told — and the component only masks it and hands it whether a reveal is happening.",
+                    "A cover with a hole cut where the pointer is. The cover is the consumer's — opaque, frosted, or something that reads what it is told — and the component hands it the mask that cuts the hole and whether a reveal is happening.",
                 component: () => <RevealPage />,
             },
             {

@@ -133,6 +133,18 @@ they wrote a given part, take it and move on. They may be wrong; unless acceptin
 gets built, being right about it costs tokens and buys nothing. `git log` is for one thing only: a
 practical regression — something that worked from a consumer's point of view and now does not.
 
+**The same holds for every factual claim they make, not just claims about history.** Stated by the user in
+exactly those terms, after they said screenshots had been left lying in their drive's root and the reply was a
+sweep of the drive root, the repository, `C:\` and the home folder, reporting that nothing was there — they
+had already deleted the files. If they say the sky outside their window is blue, the sky is blue; do not go
+looking for the weather. A statement about the state of their machine, their screen, their files or the world
+is taken as given and acted on directly. **The only claims worth checking are technical ones about the
+code** — a practical regression, a build that fails, a behaviour that decides what gets written next.
+Everything else spends their token allowance to buy nothing, and reads as calling them a liar besides.
+
+When they report a mess, the answer is to clear it or to ask where it is, never to produce evidence that it
+does not exist. Being right about it is worth less than they are.
+
 **Authorship claims are about who holds the rationale, not about blame.** "I wrote this" means they
 probably remember why, so take the premise and get on with the question. "You wrote this" means their
 review did not stop there and something may now be surprising — so the thing being asked for is the
@@ -151,6 +163,12 @@ removed it deliberately and do not update specs when they change behaviour. So a
 the code regressed, or the spec is describing something they decided against — and the two are not
 distinguishable from the failure. Say which assertion fails and what it expects, and let them say which it is.
 This is the exception to _"fix on sight"_: a spec disagreeing with the code is not a defect on sight.
+
+**Temporary files go in `.scratch/` at the repo root, never in the system temp folder.** Asked for by the
+user. The harness points at a session directory under `AppData\Local\Temp`, which is three folders up and
+outside the project entirely; they would rather anything a task needs sit where they can see it. `.scratch` is
+in `.gitignore`, so nothing there can reach a commit. Screenshots, throwaway scripts, spike pages,
+intermediate output — all of it lands there, and it gets deleted once the task that needed it is finished.
 
 **Never kill the user's processes.** No `pkill`, no killing a dev server, no stopping anything you did not
 start. They keep `npm start` running while working, and losing it interrupts them. `npm run verify:dom`

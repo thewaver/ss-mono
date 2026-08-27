@@ -7926,7 +7926,8 @@ this yourself, and the `Exotic` is the packaged one.
 
 **The cover is the consumer's and the hole is the component's.** `renderContent` is what is hidden,
 `renderCover` is what hides it, and the component contributes only the mask that cuts the hole and the
-positioning that lays one over the other. This follows `Spotlight`'s split — that component owns the hole in an
+positioning that lays one over the other. The mask is computed here and applied there — see _"The mask is
+handed to `renderCover`"_ below. This follows `Spotlight`'s split — that component owns the hole in an
 overlay and hands the overlay's paint to `renderOverlay` — and it is why the frosted, opaque and text-carrying
 covers on the Playground page are all the same component with nothing switched.
 
@@ -7942,9 +7943,8 @@ the content underneath then takes those events instead, so a determined visitor 
 through the cover. Hiding it from selection as well is the consumer's to decide, and it is not something a
 mask could ever have promised — the content is in the document either way.
 
-**`roundness` runs the hole from a square to a circle**, and the mask changed shape to allow it. A
-`radial-gradient` can only be a circle or an ellipse, so the hole is now a small SVG image — a rounded
-rectangle, blurred by `softness`, with `roundness` setting the corner radius from zero to half its side —
+**The hole is a small SVG image, not a gradient.** A `radial-gradient` can only be a circle or an ellipse,
+which is what shut the door on every other shape, so the hole is drawn as an SVG blurred by `softness` and
 composited against a full-coverage layer with `mask-composite: exclude`, which is Baseline widely available
 since December 2023. **The image depends only on the three shape props, never on the position**, so it is
 built once per shape change and moved with `mask-position`; regenerating a data URI every frame would have
@@ -7953,9 +7953,56 @@ reading deliberately does not carry, so the component observes it with `ElementO
 page's derived dependency row, which is the mechanism working as intended.
 
 **`radius` and `softness` rather than a gradient string.** Softness is the fraction of the radius that is fully
-clear before the mask starts fading back to opaque, so `0` is a hard-edged hole and `1` never quite closes.
-Handing the consumer the gradient instead would have exposed that the hole is a mask, which is the one
-implementation detail the component exists to hide.
+clear before the mask starts fading back to opaque, so `1` is a hard-edged hole at the full radius and `0` is
+all fade — the drawn shape shrinks as the blur grows, until only the very centre comes close to fully clear.
+The Playground labels the field _Clear fraction_ for that reason.
+Handing the consumer the gradient instead would have made the hole's geometry their arithmetic rather
+than the component's, and `radius` and `softness` name the effect where a gradient string names the mechanism.
+That the hole is a mask is no longer hidden — the paragraph below says why — but building it is still the
+component's job and only the finished style crosses the boundary.
+
+**An arbitrary hole is `computePoints`, the same callback `Shape` takes**, and `joinRadii` and
+`lameExponents` come with it. The component passes the points to `ShapeUtils.getPaths` — which lives in
+`@thewaver/ss-utils` rather than inside `Shape`, so nothing had to be extracted to reach it — and drops the
+resulting outline into the mask image in place of the built-in shape. A consumer who wants a hexagon writes
+the callback every `Shape` consumer already writes, and rounded or bevelled or scooped corners are the same
+two props they would use there.
+
+**`roundness` was deleted rather than kept beside it.** It ran the hole from a square to a circle, which is
+a four-point outline with a join radius said a second way — and the second way only worked while no points
+were given, so a page carrying both would have shown a control that silently stopped mattering. A rounded
+square now comes from four points and a `joinRadii`, and the Playground's _Corner radius_ and _Corner style_
+fields are disabled while the shape is the default circle, which is the honest form of the same fact.
+
+**With no `computePoints`, the hole is a circle drawn as a `<circle>`**, decided by the user. The alternative
+was a polygon standing in for one, which is worse at every count the component cares about: more points to
+blur, a visible facet count at large radii, and arithmetic in the common case that the SVG element does
+exactly. The points are computed in the image's inner box rather than its full square — the blur needs room
+inside the image or it clips at the edges — and the outline is then translated by that same inset.
+
+**The mask is handed to `renderCover`, not applied by the component.** The signature is
+`renderCover(getIsRevealing, getMaskStyle)` and the consumer spreads that style onto its own cover element;
+the component's cover layer keeps only its positioning and `pointer-events: none`. The idiom already existed
+one component over — `Shape` hands `renderChildren` a `getClipPath` for the consumer to put on its own
+element, and `Surface` is the in-library consumer that does exactly that.
+
+**What forced the change is a browser rule about filters.** An element carrying a mask becomes a _backdrop
+root_: it seals whatever is painted behind it off from `backdrop-filter` on anything inside it. While the
+component owned the mask, a frosted cover — the consumer's element, sitting inside the component's masked
+layer — had nothing left to blur the moment the pointer arrived and the mask appeared. So the blur existed
+only at rest and vanished on the first pointer move, which is the opposite of the effect the example claimed.
+Mask and filter on the same element and both hold together. This is what makes the whole family reachable:
+content greyed or blurred everywhere with colour and detail restored inside the hole is a `backdrop-filter`
+on the cover and nothing else.
+
+**The cost, accepted rather than mitigated.** `Shape`'s handout is optional — ignore `getClipPath` and the
+shape still draws correctly, since the clip only matters to children that must sit inside the outline.
+`Reveal`'s is the entire product: a cover that never applies the style shows no hole at all, and nothing can
+detect the omission to warn about it. The alternative weighed against it was keeping the mask on the
+component's layer _and_ handing it out, which masks a filtering cover twice and makes one `softness` value
+produce two different edges depending on which path the consumer took. A silent divergence in what a prop
+means was judged worse than a silent omission, and the user took the call on the grounds that nothing here is
+irreversible yet.
 
 **It reads no preference of any kind, and reduced motion is the consumer's to answer.** The first build had
 the component substituting for itself — under reduce, no travelling hole and the whole cover fading instead —

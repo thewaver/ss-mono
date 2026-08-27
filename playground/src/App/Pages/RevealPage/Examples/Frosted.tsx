@@ -11,9 +11,11 @@ export const FrostedExample = (props: Props) => {
         <div class={styles.root}>
             <Reveal
                 radius={props.radius}
-                roundness={props.roundness}
                 softness={props.softness}
+                joinRadii={props.joinRadii}
+                lameExponents={props.lameExponents}
                 isDisabled={props.isDisabled}
+                computePoints={props.computePoints()}
                 renderContent={() => (
                     <div class={styles.content}>
                         <span class={styles.contentTitle}>Frosted, not opaque</span>
@@ -21,7 +23,7 @@ export const FrostedExample = (props: Props) => {
                         <span>Same component, different cover.</span>
                     </div>
                 )}
-                renderCover={() => <div class={styles.frostedCover} />}
+                renderCover={(_, getMaskStyle) => <div class={styles.frostedCover} style={getMaskStyle()} />}
             />
         </div>
     );

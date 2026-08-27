@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
+import type { JSX } from "solid-js";
 
-import { MathUtils } from "@thewaver/ss-utils";
+import { MathUtils, type Point2d, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
 
 import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
 import { PointerTracker } from "../../Abstracts/PointerTracker/PointerTracker";
@@ -10,21 +11,31 @@ import type { RevealProps } from "./Reveal.types";
 import * as styles from "./Reveal.css";
 
 const DEFAULT_REVEAL_RADIUS = 90;
-const DEFAULT_REVEAL_ROUNDNESS = 1;
 const DEFAULT_REVEAL_SOFTNESS = 0.45;
+const NO_EDGE_THICKNESSES = [0];
 const INSIDE_EDGE_RATIO = 1;
 const NO_HOLE_RADIUS = 0;
 const BLUR_SPREAD = 3;
 const BLUR_MARGIN = 2;
 const HALF = 0.5;
 
-const buildHoleImage = (radius: number, roundness: number, softness: number) => {
+const buildHoleImage = (
+    radius: number,
+    softness: number,
+    computePoints: ((size: Size2d) => Point2d[]) | undefined,
+    joinRadii: number[] | undefined,
+    lameExponents: number[] | undefined,
+) => {
     const size = radius * 2;
     const blur = ((1 - softness) * radius) / BLUR_SPREAD;
     const inset = blur * BLUR_MARGIN;
     const side = Math.max(size - inset * 2, 0);
-    const corner = side * HALF * roundness;
-    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}"><rect x="${inset}" y="${inset}" width="${side}" height="${side}" rx="${corner}" fill="black" style="filter:blur(${blur}px)"/></svg>`;
+    const points = computePoints?.({ width: side, height: side });
+    const paint = `fill="black" style="filter:blur(${blur}px)"`;
+    const shape = points
+        ? `<path d="${ShapeUtils.getPaths(points, NO_EDGE_THICKNESSES, joinRadii, lameExponents).outerPath}" transform="translate(${inset}, ${inset})" ${paint}/>`
+        : `<circle cx="${radius}" cy="${radius}" r="${side * HALF}" ${paint}/>`;
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}">${shape}</svg>`;
 
     return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 };
@@ -49,12 +60,14 @@ export const Reveal = (props: RevealProps) => {
     const getHoleImage = createMemo(() =>
         buildHoleImage(
             getRadius(),
-            MathUtils.clamp01(access(props.roundness) ?? DEFAULT_REVEAL_ROUNDNESS),
             MathUtils.clamp01(access(props.softness) ?? DEFAULT_REVEAL_SOFTNESS),
+            props.computePoints,
+            access(props.joinRadii),
+            access(props.lameExponents),
         ),
     );
 
-    const getMaskStyle = createMemo(() => {
+    const getMaskStyle = createMemo<JSX.CSSProperties>(() => {
         if (!getHasHole()) return {};
 
         const size = getSize();
@@ -84,9 +97,7 @@ export const Reveal = (props: RevealProps) => {
         <div ref={setRootRef} class={styles.revealRoot}>
             {props.renderContent()}
 
-            <div class={styles.revealCover} style={getMaskStyle()}>
-                {props.renderCover(getIsRevealing)}
-            </div>
+            <div class={styles.revealCover}>{props.renderCover(getIsRevealing, getMaskStyle)}</div>
         </div>
     );
 };
