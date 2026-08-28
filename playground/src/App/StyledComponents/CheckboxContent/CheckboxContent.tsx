@@ -19,7 +19,7 @@ export const PageCheckboxContent = (props: CheckboxContentProps) => {
                 [styles.hasError]: access(props.flags).hasError,
             }}
         >
-            <div class={styles.checkboxMark} aria-hidden>
+            <div class={styles.checkboxMark} aria-hidden="true">
                 {access(props.flags).checkedState === "mixed" ? MIXED_MARK : CHECKED_MARK}
             </div>
         </div>

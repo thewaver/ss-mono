@@ -24,7 +24,6 @@ export type TimePickerProps = Omit<TimeInputProps, "renderTrailing"> &
         clockSteps?: ClockSteps;
         clockGap?: number;
         computeIsTimeDisabled?: (time: TimeValue) => boolean;
-    }> & {
         visibilitySignal?: Signal<boolean>;
         renderTrailing: (
             getFlags: () => InteractionFlags<TextFieldFlags>,
@@ -39,4 +38,4 @@ export type TimePickerProps = Omit<TimeInputProps, "renderTrailing"> &
             getVisibilityTarget: () => 0 | 1,
             getTransitionDurationMs: () => number,
         ) => JSX.Element;
-    };
+    }>;

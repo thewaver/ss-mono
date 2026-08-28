@@ -6,8 +6,9 @@ than marked resolved, and the remaining items are renumbered to stay contiguous 
 
 **`brief.md` beside this file lists the same faults one line each, grouped by kind, and the two are
 edited together.** Anything opened, closed or renumbered here is reflected there in the same change. If closing it
-settled a decision that drives future work, that decision moves to `conventions.md`; the record of
-having done the work does not go anywhere.
+settled a decision that drives future work, that decision moves to `conventions.md` when it is a rule the
+whole library follows and to `decisions.md` when it is about one component; the record of having done the
+work does not go anywhere.
 
 **Accepted limits are not outstanding work, and live in their own section at the end.** Asked for by the user
 on **2026-08-11**: a fault that has been looked at and consciously left alone should not be re-read and
@@ -25,16 +26,16 @@ a sketch can be written down and argued over without ever competing with real wo
 Most items now carry an **_Elsewhere_** block: what other component libraries do about the same
 question, read off their own documentation and source on **2026-08-10**. It is evidence for decisions
 that have not been taken — not a recommendation, and not a decision. Where a published answer
-contradicts something already settled in `conventions.md`, the settled entry stands until someone
-argues it down; where it names a mechanism this repo had not considered, that is the part worth
+contradicts something already settled in `conventions.md` or `decisions.md`, the settled entry stands until
+someone argues it down; where it names a mechanism this repo had not considered, that is the part worth
 reading.
 
 ### Index
 
 1. One-shot positioned effects still have nowhere to go — _open_
 2. Neither animation component can reveal its own children — _open_
-3. `Select` — five things deliberately not built — _open_
-4. `Menu` — three things deliberately not built — _open_
+3. `Select` — four things deliberately not built — _open_
+4. `Menu` — two things deliberately not built — _open_
 5. Other core controls the library does not have — _open, ordered by the user_
 6. Machinery those controls need, none of which exists — _open_
 7. What the verification suite still cannot see — _open_
@@ -50,9 +51,10 @@ reading.
 17. `Spotlight` — one thing deliberately not built — _open_
 18. `Scroller` — four things deliberately not built — _open_
 19. `Paginator` — four things deliberately not built — _open_
-20. `Carousel` — four things deliberately not built — _open_
+20. The carousels — four things deliberately not built — _open_
 21. The four components ported from React — what did not settle — _open_
 22. An anchored layer is always a frame behind — _postponed until the platform catches up_
+23. `Table` — six things deliberately not built — _open_
 
 ### Build order
 
@@ -67,17 +69,17 @@ privately inside them.
 1. **Nothing is blocked on a primitive any more.** The date and time family was the last entry here: the mask
    covers fixed patterns and growing groups, `MaskedField` holds the shared field, `CurrencyInput` was the third
    consumer that proved the seam, and the range variants, the date-and-time value, the typed sign and the
-   locale's own grouping have all since been built. See `conventions.md`; that item is closed.
+   locale's own grouping have all since been built. See `decisions.md`; that item is closed.
 
 **Out of the cost ordering, deliberately:**
 
 - **The form story is settled, wired and finished.** `Form`, `FormField` and `FormSection` ship and every
-  control reads the description context; see `conventions.md`. This entry used to say the opposite — that it
+  control reads the description context; see `decisions.md`. This entry used to say the opposite — that it
   was the one item whose cost _grew_ with delay, because every control built without it grew its own half of
   the error plumbing — and nothing of it is outstanding now.
 - **Dismissal, open state and openers are all settled.** All five layers dismiss through `DismisserStack`, all
   five take a `visibilitySignal`, and `Menu` takes an anchor while `ContextMenu` opens at a point; see
-  `conventions.md`. Nothing in this family is outstanding.
+  `decisions.md`. Nothing in this family is outstanding.
 - **`Table` / data grid stays out of scope**, and specifically must not arrive as a by-product of
   `Tree` or of virtualization.
 
@@ -117,7 +119,7 @@ than having to earn it again.
 **The half this item used to be mostly about is closed.** A fill that is not a photograph — a gradient, a
 solid, a pattern — is a source like any other: an SVG string as a `data:image/svg+xml,` URI, which the
 component slices exactly as it slices a photograph. It needed one library fix, quoting the cell's background
-URL, and no new machinery; see `conventions.md`. `PageComponents/SVGDefsSources` goes further and serialises
+URL, and no new machinery; see `decisions.md`. `PageComponents/SVGDefsSources` goes further and serialises
 `Shape`'s own gradients and patterns into sources, so the two drawn examples pick from the same registry the
 Shape page uses.
 
@@ -140,28 +142,25 @@ the one both components have.
 
 ---
 
-## 3. `Select` — five things deliberately not built
+## 3. `Select` — four things deliberately not built
 
-The decisions behind what exists are in `conventions.md` under the three `Select` headings. These are
+The decisions behind what exists are in `decisions.md` under the three `Select` headings. These are
 the gaps, each with the reason it is still a gap.
 
 - **A consumer whose filter injects a non-matching option can see the highlight land on it.** While
   filtering, the highlight goes to the first option rather than to the selection, because the component
   knows which options are _present_, not which ones _matched_. The fix belongs in the consumer's
-  filter; the trade-off is recorded in `conventions.md`.
-- **A group header cannot show partial selection.** `SelectOptionFlags.isSelected` is a boolean, and a
-  multi-select group header wants the `checkedState` tri-state `BinarySwitchFlags` already has. This is
-  the one place the two controls might legitimately share a type rather than each declaring its own.
+  filter; the trade-off is recorded in `decisions.md`.
 - **The group box is not paintable, only its header is.** The library owns
   `<div role="group" aria-label>` so the role cannot end up in consumer markup; the consumer fills the
   header via `renderGroup`. Handing it a `renderOptions` thunk in `renderPopup`'s shape would give it
   the whole box, and is available if something needs it.
 - **What the stress variant reports is the cost of mounting options**, which is a separate cost from painting
   them. Windowing removed the mounting cost for lists that opt in; nothing addresses the painting half, and the
-  cheap answer to it was `content-visibility` on the option paint, which is gone — see `conventions.md`.
+  cheap answer to it was `content-visibility` on the option paint, which is gone — see `decisions.md`.
 - **Dismissal does not restore the query.** Escape and blur clear it rather than restoring the selected option's
   text, because restoring it would need the per-option string this design does not have. The open state itself is
-  no longer private — `visibilitySignal` ships; see `conventions.md`.
+  no longer private — `visibilitySignal` ships; see `decisions.md`.
 
 **_Elsewhere._** Checked against Radix, React Aria and Kobalte, which is the SolidJS one.
 
@@ -171,15 +170,11 @@ the gaps, each with the reason it is still a gap.
   children are not plain text. Kobalte takes `optionTextValue`, a field name or getter on the option
   record, documented as being for typeahead. This is the reading that closed the gap: the option element
   is the library's here, so its text is reachable without a prop, and `computeCustomText` is the way out
-  for the cases that need one. See `conventions.md`.
+  for the cases that need one. See `decisions.md`.
 - **A filterable list is a separate component everywhere.** Radix has no autocomplete primitive at all,
   so the injected-non-matching-option case cannot arise there; and where a library does own the filter
   it necessarily knows which options matched, which is the knowledge this design trades away by
   choice.
-- **Tri-state is a string, and it is the same string.** MUI's tree view reports `"selected"`,
-  `"indeterminate"` or `"unselected"` per item; Ant Design's tree carries a `halfChecked` list beside
-  its checked one. `CheckedState` is already that shape, which supports the note that this is the one
-  place two controls might share a type.
 - **The group box is styleable everywhere else because everything is styleable everywhere else.**
   Radix's `Select.Group` and React Aria's `Section` are library elements that carry the role and accept
   the consumer's class name; neither hands over a thunk. That route is closed here by the rule that the
@@ -196,9 +191,9 @@ the gaps, each with the reason it is still a gap.
 
 ---
 
-## 4. `Menu` — three things deliberately not built
+## 4. `Menu` — two things deliberately not built
 
-The decisions behind what exists are in `conventions.md` under _"`Popover` extracted, and `Menu` as the
+The decisions behind what exists are in `decisions.md` under _"`Popover` extracted, and `Menu` as the
 second consumer"_ and _"`Menu` submenus: a level per popup, focus moving between them"_. These are the
 gaps, each with the reason it is still a gap.
 
@@ -212,22 +207,19 @@ gaps, each with the reason it is still a gap.
   to the next element after the trigger. The menu is portalled to the end of the document, so letting
   `Tab` through lands focus wherever the portal sits, which is worse than not moving. The cost is one
   extra `Tab`; fixing it properly means computing the trigger's next tab stop by hand.
-- **There is no `menuitemcheckbox` or `menuitemradio`.** Those carry state, which is the line this
-  control is on the other side of — `MenuFlags` has no selection and items have no `aria-checked`.
-  Adding them means deciding whether a stateful menu is this component or a `Select` with menu paint.
-
-**_Elsewhere._**
+  **_Elsewhere._**
 
 - **Groups, separators and stateful items all live inside the menu component.** Radix ships `Group`,
-  `Label` and `Separator`, plus `CheckboxItem` and `RadioGroup` / `RadioItem`. So the last bullet's
-  question is answered there by keeping a stateful menu in the menu rather than pointing at the select.
+  `Label` and `Separator`, plus `CheckboxItem` and `RadioGroup` / `RadioItem` — which is where the stateful
+  rows landed here too, on the user's call. The separators and labels are the first bullet above and are
+  still missing.
 - **Nothing does the `Tab` behaviour APG asks for.** Radix's menu does nothing at all on `Tab`, and
   that is filed against it as a spec-compliance bug (radix#1934) which is still open. Closing and
   returning focus to the trigger is therefore ahead of the field rather than behind it.
 - **Right-click is a separate opener, never a separate menu.** Radix ships a whole `ContextMenu`
   component with the same menu inside it; Ark UI and Zag instead add a `ContextTrigger` part to the
   same menu, and open it on a roughly 700ms long press when the pointer is pen or touch. Both keep one
-  menu and vary the opener, which is the shape `ContextMenu` took here — see `conventions.md`. The long
+  menu and vary the opener, which is the shape `ContextMenu` took here — see `decisions.md`. The long
   press for pen and touch is the half nobody has asked for yet: a `contextmenu` event is all that is
   listened for, so a touch device gets whatever its browser synthesises.
 
@@ -239,7 +231,7 @@ gaps, each with the reason it is still a gap.
 `RadioGroup`, `Select`, `MultiSelect`, `FileInput`, `ColorInput`, `Label`, `Calendar`, `DateInput`,
 `DatePicker`, `TagInput` and `TimeInput`; `Fundamentals` adds `Accordion`, `Breadcrumbs`, `Button`,
 `TrackCarousel`, `DrumCarousel`, `FlipCard`,
-`SlideButton`, `Scroller`, `Paginator`, `SplitPane`, `Stepper`, `Tabs`, `Tooltip`, `Popover`, `Menu`, `Modal`, `Drawer`, `Progress`,
+`SlideButton`, `Scroller`, `Paginator`, `Sortable`, `SplitPane`, `Stepper`, `Tabs`, `Tooltip`, `Popover`, `Menu`, `Modal`, `Drawer`, `Progress`,
 `Range`, `Toasts` and `Tree`.
 Beyond the date and time family, this is what is missing. **The order below is the user's, taken on 2026-08-15 after reading a
 worked example of each**, and it replaces the old ordering by architectural cost — that principle still
@@ -249,11 +241,17 @@ explains what a thing would need, but it no longer decides what comes first.
 is the trap: every control on every page and in every props panel is now a library control, so the
 Playground has nothing left to say about what the library lacks.
 
+**The library is the HTML layer, and that is what decides whether a thing belongs here at all.** The user's
+statement of scope: accessibility, layout and structure — the half that Canvas and WebGL game engines neglect.
+Anything that wants a drawing surface is the consumer's, and which one they reach for is theirs to choose. So a
+sprite sheet, a particle system and a renderer are all out of scope by construction rather than by priority,
+and a proposal that begins "the library could draw…" has already answered itself.
+
 **What was dropped on 2026-08-15, so it is not re-proposed:** a toolbar, a segmented control, a rating input,
 and the pure-paint family of `Skeleton`, `Avatar`, `Badge`, `Card` and `Icon`. The paint family was never a
 component question — the Playground already builds three of them as `Surface` examples — and the toolbar was
 judged not worth having. The segmented control and the rating are now the **Segmented** and **Rating**
-variants on the Radio page, which is the whole of what each was; see `conventions.md`, which also records why
+variants on the Radio page, which is the whole of what each was; see `decisions.md`, which also records why
 the rating's hover preview needed no library change. None of these is an accepted limit, because none is a
 fault; they are simply not wanted.
 
@@ -262,18 +260,22 @@ fault; they are simply not wanted.
 **Nothing is queued here.** `Stepper` was the last of them and shipped on **2026-08-15**.
 
 **`Breadcrumbs`, `TagInput`, `SplitPane` and `Stepper` were all built on 2026-08-15** and are no longer here; their decisions are in
-`conventions.md`. What each left behind as a gap is recorded there rather than reopened as an item: a
+`decisions.md`. What each left behind as a gap is recorded there rather than reopened as an item: a
 breadcrumb trail cannot collapse when it is too long, a tag input has no cap, no in-place editing, no
 paste-a-delimited-list and no reordering, a split pane cannot collapse a pane or reset on a double-click, and a stepper draws no connector of its own
 and does not enforce that a linear flow stays linear.
 
 ### Bottom of the list
 
-Both placed last by the user on **2026-08-15**, after the difference between each and its nearest existing
-control had been argued. Neither is dropped; neither is next.
+Placed last by the user on **2026-08-15**, after the difference between it and its nearest existing control
+had been argued. It is not dropped; it is not next.
 
-- **`Table` / data grid.** Sorting, selection, column sizing, sticky headers and virtualization together are
-  a project rather than a component, and it should not be started as a by-product of anything else.
+**`Table` / data grid was the other one, and it is built** — asked for directly, out of turn, so the ordering
+here was overtaken rather than wrong. Its decisions are in `decisions.md`. What it left behind as a gap is
+recorded there rather than reopened as an item: no column pinning, no grouping or aggregate rows, no
+expandable rows, no inline cell editing, no filtering, and no key that steps into a cell holding more than one
+control.
+
 - **A command palette.** Mostly assembled already — `Select`'s autocomplete inside a `Modal`, since typing to
   narrow a list is what the autocomplete does. What separates it from `Menu` is that it is opened by a
   shortcut rather than by a button, and holds every action in the application rather than the few that relate
@@ -285,14 +287,16 @@ control had been argued. Neither is dropped; neither is next.
 available: it has a tree view, a pagination component, a **segment group** — a segmented control as its
 own component, distinct from both tabs and toggle group — and a `Field` plus a `Fieldset`. It has no
 table and no data grid. TanStack Table is what that gap gets filled with, and it is a separate project
-with its own release cycle, which is this item's call arrived at independently.
+with its own release cycle, which is this item's call arrived at independently — the reasoning that put the
+table last, kept here because it is the scope check for what a data grid is, not because the table is still
+outstanding.
 
 - **Breadcrumbs is owned by at least one of them:** React Aria ships `Breadcrumbs`.
 - **Pagination is owned because it is arithmetic, not paint.** Ark UI's takes `page`, `pageSize`,
   `count`, `siblingCount` and `boundaryCount`, computes the visible page range and where the gaps fall,
   and switches between buttons and links with a `type` prop. That is more than a composition of `Button`,
   which is the argument this item lost — `Paginator` is built, and where it departs from that shape is in
-  `conventions.md`.
+  `decisions.md`.
 - **Worked examples of each, read on 2026-08-15**, which is what the user's ordering above was taken from:
   [TanStack Table](https://tanstack.com/table/latest/docs/overview),
   [React Aria Breadcrumbs](https://react-aria.adobe.com/Breadcrumbs/useBreadcrumbs.html),
@@ -315,30 +319,30 @@ Grouped here because each one is shared by several of the controls in item 5, an
 any of those without first deciding these would bake the decision in by accident.
 
 - **Pointer drag capture ships; one-shot pointer geometry does not.** `InteractionTracker.trackDrag` is in
-  `conventions.md` and `Range` and `ColorArea` are both built over it, so nothing is blocked here any more. What is
+  `decisions.md` and `Range` and `ColorArea` are both built over it, so nothing is blocked here any more. What is
   still missing is the origin of a **single activation** — see item 1, which also argues it is not worth building
   until something asks.
 - **Masking and formatting is built, shared, and public.** `applyMask`, `applyGroupedMask` and
-  `Abstracts/MaskedField` are all in `conventions.md`, with `DateInput`, `TimeInput` and `CurrencyInput` over
+  `Abstracts/MaskedField` are all in `decisions.md`, with `DateInput`, `TimeInput` and `CurrencyInput` over
   them; a typed sign and a locale's own grouping are in it, and `TextSyncUtils` now leaves through `index.ts`.
   Nothing here is outstanding.
 - **Virtualization is built, and both consumers it was made an `Abstract` for now use it.** `Abstracts/Virtualizer`
   wraps `@tanstack/solid-virtual`; `Select` windows a flat or a grouped list and `Tree` windows its flat walking
-  order, each answering the `role="group"` question its own way; see `conventions.md`. Note that the on-demand loading that shipped for `Select` is
+  order, each answering the `role="group"` question its own way; see `decisions.md`. Note that the on-demand loading that shipped for `Select` is
   **not** it and did not reduce the need for it — that answers a list which is incomplete, this one answers
   a list which is complete and large, and the two compose.
 - **The form story is decided, wired and now grouped.** `Form` and `FormField` ship and every control reads
-  the description context; see `conventions.md`, which also records which errors wait for a submit and which
+  the description context; see `decisions.md`, which also records which errors wait for a submit and which
   do not. `FormSection` closed the last piece — a run of fields can be a group with a name and a verdict of
   its own, and a rule that is true of the group rather than of any field in it now has somewhere to live.
   Nothing here is outstanding.
 - **Dismissal is one stack, and paint order comes from the anchor.** `DismisserStack` holds the open layers
   and `Popover` registers one, so all five controls dismiss through the same mechanism; a portalled layer's
   z-index is one above the highest on its anchor's ancestor chain, so a popup opened inside a `Modal` paints
-  above it. Both are in `conventions.md`. Nothing here is outstanding.
+  above it. Both are in `decisions.md`. Nothing here is outstanding.
 - **The `Signal` mirror is now `Abstracts/SignalMirror`**, taking a getter and a setter so a consumer without a
   signal is served too, and `createOptional` beside it so a control's state can be private until a consumer asks
-  for it; see `conventions.md`. What remains is that no library control accepts the getter-plus-setter pair
+  for it; see `decisions.md`. What remains is that no library control accepts the getter-plus-setter pair
   directly — a consumer still wraps it in a mirror to hand a control its `*Signal`, which is one indirection
   rather than none.
 
@@ -346,7 +350,7 @@ any of those without first deciding these would bake the decision in by accident
 
 - **Pointer geometry** — see item 1.
 - **Masking and formatting** — no component library owns a mask: the implementations are their own packages
-  and get integrated per field, which is what made exporting this one worth doing. See `conventions.md`.
+  and get integrated per field, which is what made exporting this one worth doing. See `decisions.md`.
 - **Virtualization** — see item 3. `@tanstack/virtual` is the shared dependency across libraries and
   frameworks; React Aria's `Virtualizer` is the only in-library one found.
 - **A field group is a real `<fieldset>` that broadcasts downward, not one that collects upward.** Ark
@@ -355,7 +359,7 @@ any of those without first deciding these would bake the decision in by accident
   context. Nothing aggregates the contained fields' own validity. That is the opposite direction from
   `Form`'s registration, and the two do not conflict — one distributes state, the other collects it.
   `FormSection` is the collecting one, and it renders the same `<fieldset>` plus `<legend>`; see
-  `conventions.md`. The distributing half is not built and nobody has asked for it.
+  `decisions.md`. The distributing half is not built and nobody has asked for it.
 - **"Errors only after the first attempt" is two flags, not one.** React Hook Form validates on submit
   by default, and the per-field gate people actually write is `touchedFields[name] || isSubmitted` —
   the field's own touched flag or the form's submitted flag. So `hasSubmitted` is half of the published
@@ -402,7 +406,7 @@ paints, an inline diff over two tags the page named itself, and a `TextArea` hol
 the parsed result underneath it — with `removeOtherTags` as the page's one global prop, so both answers to
 an unrecognised tag can be seen. `richText.spec.ts` reads computed styles rather than class names, since a
 vanilla-extract class name is hashed and reading one back would only prove a string had been copied around.
-See `conventions.md` for what the diff example settled.
+See `decisions.md` for what the diff example settled.
 
 **Covered only through a consumer**, which is worth distinguishing from uncovered because it decides
 whether a spec is worth writing: `Popover` through `Select` and `Menu`, `Radio` through
@@ -456,7 +460,7 @@ outstanding: there is no `style.css` anywhere in `src/`, and `App/Theme.css.ts` 
 vanilla-extract contract over colour, spacing, font size, radius, shadow, the hover / active / disabled
 filters and one animation duration, with a small global block for the reset, the focus ring, the
 scrollbars, links and `body`. The `--clr-*` custom properties this item used to call the de facto theme
-are gone, and the theme's token shape deliberately carries no reasoning — see `conventions.md`.
+are gone, and the theme's token shape deliberately carries no reasoning — see `decisions.md`.
 
 What is left is the third part.
 
@@ -469,7 +473,7 @@ because a narrowing that is correct here would be wrong one level down, and the 
 the same repo.
 
 **`App/StyledComponents` is not this layer and should not be mistaken for it.** Those forty-odd files are
-painters — each named `<LibComponent>Content` after the slot it fills, per `conventions.md` — so they are
+painters — each named `<LibComponent>Content` after the slot it fills, per `decisions.md` — so they are
 handed to a library control by the page that mounts it. Nothing there narrows an API: a page still passes
 every prop the library takes. This layer is the opposite move, and it would consume those painters rather
 than replace them.
@@ -495,18 +499,21 @@ same example.
 
 ## 9. `Toasts` — two things deliberately not built
 
-The decisions behind what exists are in `conventions.md` under the two `Toasts` headings. These are the
+The decisions behind what exists are in `decisions.md` under the two `Toasts` headings. These are the
 gaps, each with the reason it is still a gap.
 
 - **A pile cannot overlap by measured height.** `index` and `count` are enough for a fixed peek
   distance, but a painter that wants each card offset by the height of the one in front of it needs its
-  neighbours' measured heights and can only measure itself. That is the same measuring `Abstract` item 6
-  wants for auto-height animation, from a different direction.
+  neighbours' measured heights and can only measure itself. **This is now the only thing asking for a shared
+  measuring `Abstract`.** It used to be half of a pair with auto-height animation, but that half is built and
+  keeps its measurement to itself — `Accordion` and `Collapsible` measure their own panel, recorded in
+  `decisions.md` under _"Controls: `Accordion`, and where auto-height measurement lives"_. So one consumer
+  is asking, and the standing rule is that an `Abstract` waits for the second.
 - **An id re-added while it is leaving fades back in** rather than restarting as a new entry, because the
   id never left the rendered list. It is the reasonable behaviour and it is not obvious, so it is written
   down rather than left to be rediscovered.
 
-A hidden tab now holds every countdown, so that gap is closed — see `conventions.md`, and note the signal is
+A hidden tab now holds every countdown, so that gap is closed — see `decisions.md`, and note the signal is
 `document.hidden` rather than window focus, which is the narrower of the two published choices. The pause
 arithmetic is covered on a fake clock too, per item 7, so what is left in this item is the two gaps above
 and nothing about verification.
@@ -515,7 +522,7 @@ and nothing about verification.
 have.
 
 - **Per-toast urgency does not go through the region at all**, and that is the arrangement now built here —
-  see `conventions.md`. Radix announces through a throwaway element per toast, outside the viewport region,
+  see `decisions.md`. Radix announces through a throwaway element per toast, outside the viewport region,
   with `aria-live` from that toast's own type; the text is inserted after two animation frames so that NVDA
   picks it up. This library reserves the two shared announcer regions when the stack mounts instead, which
   answers the same hazard without a per-message frame delay. `role="status"` in both cases rather than
@@ -546,7 +553,7 @@ have.
 ## 10. `Calendar` — two things deliberately not built
 
 Item 8 covers the missing components. These are `Calendar`'s own gaps, each with the reason it is still
-one. The decisions behind what exists are in `conventions.md` under _"Controls: `Calendar`, and the date
+one. The decisions behind what exists are in `decisions.md` under _"Controls: `Calendar`, and the date
 value the library owns"_.
 
 - **No week numbers and no multi-month view.** Both are extra columns or extra grids around the same
@@ -561,7 +568,7 @@ value the library owns"_.
 
 - **A range is a second component or a mode, and both ship.** React Aria has a separate `RangeCalendar`;
   react-day-picker has `mode="range"` on the same component. Both shapes were weighed before `RangeCalendar`
-  was built; see `conventions.md`.
+  was built; see `decisions.md`.
 - **Month and year jumping is a caption layout, not a keyboard shortcut.** react-day-picker's
   `captionLayout` takes `"dropdown"`, `"dropdown-months"` or `"dropdown-years"`, with `startMonth` and
   `endMonth` bounding the lists and defaulting to a hundred years back. Selects inside the header are
@@ -581,13 +588,13 @@ value the library owns"_.
   the consumer's title nor the calendar. Nothing here is outstanding.
 - **One real focusable element per day is normal**, so forty-two of something was never the anomaly:
   react-day-picker renders a `<button>` per day and MUI a day component per day. What this library adds on top
-  is its own wrapper per cell, and that has now been measured — see `conventions.md`.
+  is its own wrapper per cell, and that has now been measured — see `decisions.md`.
 
 ---
 
 ## 11. `ColorInput` — two things deliberately not built
 
-`ColorInput` is the custom picker now; the decisions are in `conventions.md` under the `ColorArea` heading.
+`ColorInput` is the custom picker now; the decisions are in `decisions.md` under the `ColorArea` heading.
 These are the gaps.
 
 - **No native colour input anywhere, so no form value and no OS picker.** Deliberate, and the cost of
@@ -613,7 +620,7 @@ These are the gaps.
     avoid.
 
 **Nothing about dismissal or open state is outstanding.** `ColorInput` dismisses through `DismisserStack` like
-every other layer and takes a `visibilitySignal` like every other popup; both are in `conventions.md`.
+every other layer and takes a `visibilitySignal` like every other popup; both are in `decisions.md`.
 
 **_Elsewhere._**
 
@@ -642,14 +649,14 @@ every other layer and takes a `visibilitySignal` like every other popup; both ar
 
 ## 12. `Accordion` — two things deliberately not built
 
-The decisions behind what exists are in `conventions.md` under _"Controls: `Accordion`, and where
+The decisions behind what exists are in `decisions.md` under _"Controls: `Accordion`, and where
 auto-height measurement lives"_.
 
 - **A collapsed panel's content is still built.** `inert` plus a zero height is what makes the panel
   measurable and animatable, so an accordion of a hundred expensive panels builds all hundred. A
   `getIsLazy` that withholds the panel until first expansion would cost the open animation on that first
   expansion, since there would be nothing to measure yet. This now belongs to `Collapsible` rather than to
-  `Accordion` — see `conventions.md` — so whatever is decided lands in one place for both.
+  `Accordion` — see `decisions.md` — so whatever is decided lands in one place for both.
 - **The height animates, and nothing else can.** A consumer wanting the panel to slide in from the side
   gets it from `renderPanel`'s visibility target, but the panel box itself only ever animates `height`.
   Animating width instead — a horizontal accordion — would need the observer's twin and a direction prop.
@@ -675,7 +682,7 @@ auto-height measurement lives"_.
 
 ## 13. `Tabs` — a pairing the consumer can still skip
 
-The decisions behind what exists are in `conventions.md` under _"Controls: `Tabs` as records"_ and
+The decisions behind what exists are in `decisions.md` under _"Controls: `Tabs` as records"_ and
 _"`TabPanel`: the pairing is written on the record"_.
 
 - **Nothing makes a consumer wire the panel.** `id` and `panelId` are optional fields, so a tab list with
@@ -694,7 +701,7 @@ _"`TabPanel`: the pairing is written on the record"_.
   ids on the record is the price of that, and the optional-ness in the first bullet is its tail.
 - **Automatic activation is the default in both**, spelled `activationMode="automatic"` in Radix and
   `keyboardActivation="automatic"` in React Aria. Both modes now exist here under `hasAutoActivation`, with
-  manual still the default — the inversion is deliberate and the reasoning is in `conventions.md`.
+  manual still the default — the inversion is deliberate and the reasoning is in `decisions.md`.
 
 ---
 
@@ -703,7 +710,7 @@ _"`TabPanel`: the pairing is written on the record"_.
 ## 14. `Viewport` as a region: what is settled and what is not
 
 A viewport now fits its design size into the box the page gives it, clips everything inside it, and keeps
-its own layers within its own bounds; see `conventions.md`. `ViewportPage` is two 400px squares — a control
+its own layers within its own bounds; see `decisions.md`. `ViewportPage` is two 400px squares — a control
 that roams one of them at a scale you can change, and an anchor inside a scrolling area in the other — and
 `viewport.spec.ts` drives both, including that the two scales multiply and that a stack of toasts raised
 inside a nested viewport stays inside it. What is left:
@@ -721,7 +728,7 @@ inside a nested viewport stays inside it. What is left:
 
 ## 15. `Tree` — two things deliberately not built, and one extraction to decide
 
-The decisions behind what exists are in `conventions.md` under _"Controls: `Tree`, and the group box that
+The decisions behind what exists are in `decisions.md` under _"Controls: `Tree`, and the group box that
 could not be a child"_. These are the gaps, each with the reason it is still one.
 
 - **The marker cannot own the toggle.** One press both selects a node and opens it, because the branch
@@ -731,8 +738,9 @@ could not be a child"_. These are the gaps, each with the reason it is still one
   press landed, and neither has been argued.
 - **One selected value, and no checkboxes.** `valueSignal` is `Signal<T | undefined>`, so there is no
   `aria-multiselectable`, no `Shift`-extended range, and no tri-state parent following its children. That
-  last one is the same `CheckedState` that item 3 says `Select`'s group header wants, which is now two
-  controls asking for the same type.
+  last one is the only part with nothing left to decide: `CheckedState` and `CheckedStateUtils.fromMembers`
+  are a shared abstract already, built for `Select`'s group header, so a tri-state parent here is a call to
+  a function that exists rather than a type to argue about.
 
 **The focus rescue was wired to a function nothing could reach, and is now a guard over the visible rows.**
 It used to sit inside `collapse`, checking whether focus was on a descendant before removing the subtree — but
@@ -762,7 +770,7 @@ having before a third consumer asks.
   spinner. Both answered the half this item called hard — where "loading" is painted — by making it an element
   the consumer supplies, and that is the shape the group box grew. Built as `hasMoreChildren` plus
   `renderPendingChildren`, with no load callback, because `expandedSignal` is the consumer's already; see
-  `conventions.md`.
+  `decisions.md`.
 - **Multi-select and checkboxes are one feature, and both libraries ship it.** `selectionMode="multiple"` in
   each, with Ark UI adding `NodeCheckbox` and a `checkedValue` list carrying `indeterminate`. So the tri-state
   parent is not an extra: it is what a multi-select tree is expected to include.
@@ -781,7 +789,7 @@ having before a third consumer asks.
 
 ## 16. `SlideButton` — three things deliberately not built
 
-The decisions behind what exists are in `conventions.md` under _"Controls: `SlideButton`, and why the gesture
+The decisions behind what exists are in `decisions.md` under _"Controls: `SlideButton`, and why the gesture
 is the only thing it owns"_, including which WCAG criteria were read and what they decided. These are the
 gaps, each with the reason it is still one.
 
@@ -818,13 +826,13 @@ gaps, each with the reason it is still one.
   convenience.
 - **The standard that decides it is 2.5.7 Dragging Movements, and it is newer than the pattern**, which is
   most likely why none of the packages above answer it. What it asks for — a single-pointer route that is not
-  a drag — is what the hold is; see `conventions.md`.
+  a drag — is what the hold is; see `decisions.md`.
 
 ---
 
 ## 17. `Spotlight` — one thing deliberately not built
 
-The decisions behind what exists are in `conventions.md` under _"Controls: `Spotlight`, and three presets
+The decisions behind what exists are in `decisions.md` under _"Controls: `Spotlight`, and three presets
 because a mode cannot move at runtime"_. These are the gaps, each with the reason it is still one.
 
 - **`prompt` cannot hide the page from a screen reader.** `inert` is inherited and cannot be lifted off a
@@ -837,7 +845,7 @@ because a mode cannot move at runtime"_. These are the gaps, each with the reaso
 
 ## 18. `Scroller` — four things deliberately not built
 
-The decisions behind what exists are in `conventions.md` under _"Controls: `Scroller`, and why it renders no
+The decisions behind what exists are in `decisions.md` under _"Controls: `Scroller`, and why it renders no
 button of its own"_. These are the gaps, each with the reason it is still one.
 
 - **Horizontal only.** The whole component is one axis of arithmetic — `scrollLeft`, `clientWidth`,
@@ -863,7 +871,7 @@ button of its own"_. These are the gaps, each with the reason it is still one.
 
 ## 19. `Paginator` — four things deliberately not built
 
-The decisions behind what exists are in `conventions.md` under _"Controls: `Paginator`, where the arithmetic
+The decisions behind what exists are in `decisions.md` under _"Controls: `Paginator`, where the arithmetic
 is the component"_. These are the gaps, each with the reason it is still one.
 
 - **It counts pages, not items.** Ark UI takes `count` and `pageSize` and divides; this takes `pageCount` and
@@ -877,7 +885,7 @@ is the component"_. These are the gaps, each with the reason it is still one.
   numbers, and nothing composes one — the consumer builds it from a `NumberInput` and their own page signal.
   Probably right; recorded because it is the first thing a large page count makes you want.
 - **The whole row is in the tab order, and there is no way to ask for one stop.** Every page and every step is
-  its own tab stop, which is the accordion's rule and is defended in `conventions.md`. A paginator with a wide
+  its own tab stop, which is the accordion's rule and is defended in `decisions.md`. A paginator with a wide
   window and both end jumps is fifteen tab stops in a row, which is a lot to walk past to reach the content it
   pages. Nothing has asked, and the alternative — a roving order over a list of independent destinations —
   contradicts the reasoning rather than extending it.
@@ -886,7 +894,7 @@ is the component"_. These are the gaps, each with the reason it is still one.
 
 ## 20. The carousels — four things deliberately not built
 
-The decisions behind what exists are in `conventions.md` under _"Controls: `Carousel`, and the first component
+The decisions behind what exists are in `decisions.md` under _"Controls: `Carousel`, and the first component
 that acts without being asked"_ and _"`TrackCarousel` and `DrumCarousel`: one behaviour, two ways of showing
 it"_. These are the gaps, each with the reason it is still one. They are the shared shell's, so both presets
 have them unless the entry says otherwise.
@@ -917,11 +925,11 @@ have them unless the entry says otherwise.
 ## 21. The four components ported from React — what did not settle
 
 `Satellite`, `Staircase`, `Formation`, `OverheadWheel` and `DrumWheel` came in from a React codebase; what the port
-settled is in `conventions.md`. What did not settle is below, and both entries are decisions taken rather than
+settled is in `decisions.md`. What did not settle is below, and both entries are decisions taken rather than
 work waiting.
 
 **The drum's girth arithmetic was wrong twice, is now measured rather than argued, and the user has retested
-it.** What it reserves and why is in `conventions.md` under _"A drum reserves the room it paints in"_; both wrong
+it.** What it reserves and why is in `decisions.md` under _"A drum reserves the room it paints in"_; both wrong
 answers are recorded there too, since the shape of the mistake repeated. The errors they remembered from the
 original codebase were accounted for by those two fixes. One consequence is recorded rather than fixed:
 
@@ -1055,6 +1063,32 @@ neither was tried.
 
 ---
 
+## 23. `Table` — six things deliberately not built
+
+The decisions behind what exists are in `decisions.md` under _"Controls: `Table`, a grid rather than a
+table, and why the markup could not be `<table>`"_. These are the gaps, each with the reason it is still one.
+The resizer's discoverability is **not** here: the user weighed it and chose to leave it, so it sits under
+_Accepted limits_ instead.
+
+- **A column cannot be pinned.** Holding a column still while the rest scrolls needs a resolved pixel width
+  for every pinned column, so the sticky offsets can be added up. Without one, a pin silently does nothing on
+  an unsized column — the "looks supported and is not" failure this repo has refused twice already. It was
+  also outside the scope the user set for the component.
+- **Rows cannot be grouped, and there are no aggregate rows.** A run of rows under a heading, with a totals
+  row beneath them, is a second row kind the flattener and the roving cell would both have to know about.
+- **A row cannot expand.** Nothing opens beneath a row to hold detail, which is the other shape a second row
+  kind would take.
+- **A cell cannot be edited in place.** Editing is the consumer's, in whatever they paint into the cell; the
+  grid has no notion of a cell entering an editing state and no key that starts one.
+- **There is no filtering.** Sorting is the component's and filtering is not, so a consumer narrows the rows
+  themselves before handing them over — the same split `Select` makes with its query.
+- **A cell holding more than one control cannot be stepped into, and this one has an accessibility cost.**
+  The grid is a single tab stop with a roving cell, so a cell containing two buttons can be reached but there
+  is no defined key that moves _inside_ it to choose between them. The published answer is an `F2`-style
+  interaction mode, where a key swaps the grid between navigating cells and operating whatever is in one.
+
+---
+
 ## Accepted limits
 
 Faults that have been looked at and consciously left alone. Not outstanding work, not numbered, and not part
@@ -1085,6 +1119,20 @@ as an oversight: a consumer wanting animated hexagons gets a worked example rath
 anything that becomes worth publishing has to be moved back deliberately. Nothing in `components/src` depends on any
 of it, and the arithmetic is now unit-tested where it sits, which is what closed the item this came from.
 
+**A `Table` column can be resized without anything saying so.** Accepted by the user. The drag handle at a
+column's right edge is `aria-hidden`, so a screen reader is never told the column can be resized; the keyboard
+route exists — `Ctrl` with the left and right arrows on a focused header cell — but only somebody who already
+knows it is there will use it. Reachable in the Playground on the Table page's _Resizable columns_ example.
+
+Two fixes were offered and both were declined, and the reasons are worth keeping so neither is re-proposed.
+Putting the word into the header's accessible name means the library writing into content the consumer paints,
+which nothing else here does. React Aria's answer — a visually-hidden slider inside the header cell — is a
+real named control with a real value, and costs one extra tab stop per resizable column, which is precisely
+what a grid's single tab stop exists to prevent: a ten-column table would take eleven presses of Tab to cross
+instead of one. Success criterion 2.1.1 is met either way, since the function is reachable from the keyboard;
+what is given up is 3.3.2-style discoverability, and the user weighed that against the tab order and kept the
+tab order. The reasoning behind the whole arrangement is in `decisions.md`.
+
 **Screenshot baselines, and with them any automated check on appearance.** Accepted **2026-08-11**, by the
 user, on two grounds: style in this project is far too fluid for a baseline image to mean anything for long,
 and appearance is **not the library's responsibility** in the first place — `components/src` paints nothing, every
@@ -1114,7 +1162,7 @@ Ideas, sketches and things worth arguing about. **Not outstanding work, not numb
 answer to "what is next for development"** — see the note at the top of this file. Nothing here is a
 commitment, and an entry that already carries the user's verdict is recorded here so that the same sketch is
 not put to them twice. An entry leaves this section in one of two directions: upward into a numbered item, which is the user's
-decision to take, or into `conventions.md` if building it settles something.
+decision to take, or into `conventions.md` / `decisions.md` if building it settles something.
 
 ### `DrumCarousel` in `Exotics`, and the cost of splitting the carousels
 
@@ -1131,7 +1179,7 @@ inconsistency is known rather than overlooked.
 
 `CellAnimation` and `ScanlineAnimation` take their weights and their keyframes from
 `components/src/Samples`, which now holds around sixty entries across two shapes. Two batches of new ones
-were built and the user's verdict on most was that they look repetitive; `conventions.md` records why that is
+were built and the user's verdict on most was that they look repetitive; `decisions.md` records why that is
 structural — a weight that falls away from a point is always a wipe, a per-cell function ending in place is
 always an entrance. So the ideas below are all machinery that recombines the collection rather than extending
 it, and each was put to the user as a sketch. Their gradings, in their own terms:

@@ -267,7 +267,7 @@ export const Clock = (props: ClockProps) => {
 
                     return (
                         <div class={styles.clockColumn}>
-                            <div class={styles.clockUnit} aria-hidden>
+                            <div class={styles.clockUnit} aria-hidden="true">
                                 {props.renderUnit?.(getName(), getUnit())}
                             </div>
 

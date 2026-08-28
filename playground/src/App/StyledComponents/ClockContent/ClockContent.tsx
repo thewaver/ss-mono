@@ -16,7 +16,7 @@ export const PageClockOption = (props: ClockOptionProps) => {
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}
-            aria-hidden
+            aria-hidden="true"
         >
             {access(props.flags).option.label}
         </div>

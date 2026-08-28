@@ -19,7 +19,7 @@ export const PageDatePickerTrigger = (props: DatePickerTriggerProps) => {
                         [styles.isOpen]: access(props.isOpen),
                         [styles.isDisabled]: getFlags().isDisabled,
                     }}
-                    aria-hidden
+                    aria-hidden="true"
                 >
                     ▦
                 </div>

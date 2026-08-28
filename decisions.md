@@ -1,0 +1,7636 @@
+# Decisions
+
+Why this codebase is the way it is, component by component, so a settled argument is not had twice. Every
+entry here is local: it explains one control, one abstract's internals, the shape of the repo or the
+Playground, and would not survive a move to another project.
+
+**The rules that would survive such a move are in `conventions.md`**, which is the file to read first and
+the only one worth carrying anywhere else. The two cross-reference each other by heading name.
+
+Open problems are in `backlog.md`; nothing here is a task. `backlog.md`'s numbered items point at the
+headings below for the reasoning behind what exists.
+
+## Repo
+
+### The three trees
+
+`@thewaver/ss-components` is a SolidJS component library plus a Playground app documenting it.
+Vanilla-extract for styles, Vite for both builds. It shares this repo with `@thewaver/ss-utils`; see
+_"One repo, three packages"_ for why and for what that changes.
+
+- **`utils/src`** — `@thewaver/ss-utils`, published separately and depended on by the other two. Its
+  own conventions travel with it, including the documented exports; see _"`ss-utils` is the opposite"_
+  in `CLAUDE.md`.
+- **`components/src`** — the published library, and the only tree with a support contract (see
+  _"Compatibility arguments"_).
+- **`playground/src`** — the demo app. Every consumer-side painter lives in `App/StyledComponents`,
+  named `<LibComponent>Content` after the shell whose slot it fills, with the playground-wide `Page`
+  prefix: `PageButtonContent`, `PageCheckboxContent`, `PageTooltipContent`. `App/PageComponents`
+  holds the playground's own furniture: `PageVariants`, `PageExamples`, `PageCodeBox`.
+
+**The line between the two folders is the library, not the shape of the thing.** Anything that
+dresses a library component belongs in `StyledComponents`, even when it is not a `renderContent`
+painter and even when it composes several controls — `Field`, `ColorChannels`, `CalendarCaption`
+and `LabelCaption` sat in `PageComponents` until on the grounds that they were
+compositions rather than paint, which was the wrong test. `PageComponents` is what the Playground
+would still need if the library did not exist. The `<LibComponent>Content` naming is for slot
+painters only; these keep the name of the thing they are.
+
+- **`e2e/`** — Playwright interaction suite. Imports from neither tree; drives the built Playground in
+  a real browser. See _"Verifying interaction"_ in `conventions.md`.
+
+### One repo, three packages
+
+`ss-utils` used to be a separate clone next door, and the cost of that was not theoretical: a fix that
+belonged in the parser had to be parked here commented out, a utility that qualified for the move was left
+behind because the other repo was not on the machine, and `EasingUtils` was written to this repo's rules
+while waiting to be copied across by hand. The user's call to merge them, and `ss-utils` came across with
+its history rather than as a copy, so `git blame` on a `utils/` file still reaches its original commits —
+under its old path, since the files moved.
+
+**Both packages stay separately publishable.** `utils` and `components` each own a `package.json` with its
+own version, `files: ["dist"]` and export map, and each is published on its own with `npm publish -w`. The
+root `package.json` is `private` and exists only to hold the workspace list, the shared tooling and the
+scripts. `playground` is a third workspace, also private, so that its dependencies are declared rather than
+borrowed from whatever the library happened to install.
+
+**Npm workspaces and nothing else.** No pnpm, no Lerna, no Nx, no Turborepo: npm links each package into
+the root `node_modules` by itself, and the build order is one `&&` in one script. A task runner earns its
+place when the graph is too big to write down, and three packages in a line is not that.
+
+**The Playground imports the library the way a consumer does**, through `@thewaver/ss-components`, rather
+than by reaching into `components/src` along a relative path as it did when both were one tree. The point
+is that the export list is now load-bearing: a component missing from `index.ts` breaks the Playground
+instead of going unnoticed. The user's call, taken with the cost below on the table.
+
+**There is no alias into `components/src` any more.** `@components/…` existed for one reason: twenty
+`CellAnimationWeights` samples and one `CellAnimationZones` const reached `CellAnimationUtils` as a leaf module
+rather than through `index.ts`, because their unit tests run in plain Node and loading the whole library there
+calls Solid's `delegateEvents` at module scope and dies without a `window`. Moving the samples into
+`components/src` made that an ordinary relative import inside one package, so the alias, its three definition
+sites and the DOM-test-environment question all went away together. See _"Samples live in the library"_.
+
+**Everything except the publish build resolves `ss-utils` from source.** The Vite dev server, the Vite
+Playground build, both Vitest configs and both `tsconfig.json` path maps point `@thewaver/ss-utils` at
+`utils/src`, so editing a helper shows up in the Playground on save with nothing rebuilt. The library's own
+Vite build is the exception and deliberately so: `ss-utils` is listed in `EXTERNAL_PACKAGES` there, is never
+bundled into `components/dist`, and the emitted `.d.ts` still imports from the package by name. `tsup`'s
+declaration pass does read `utils/dist`, which is why `npm run build` builds `utils` first.
+
+**Aligning `utils` with `verbatimModuleSyntax` was the price of that**, and it was checked rather than
+assumed. Pointing the components `tsconfig` at `utils/src` puts this repo's stricter compiler options on
+that package's source, which raised twelve `TS1484` errors — imports of types that were not marked
+`type`. They were marked, `utils/dist` was rebuilt, and the output is byte-identical to the build before
+the change, so nothing about the published package moved.
+
+**Vite's root is pinned in `playground/vite.config.ts`.** `vite preview` is started from the repo root by
+the Playwright config, and without an explicit root Vite takes the working directory rather than the config
+file's folder, which sends it looking for `dist` at the repo root rather than the Playground's. `root` is set from
+`import.meta.url` so the config means the same thing wherever it is invoked from.
+
+**`conventions.md`, `backlog.md` and `brief.md` moved to the repo root**, beside `CLAUDE.md`. They were in
+`src/Lib` when that was the only tree with anything to say; they now describe three packages and a test
+suite, so sitting inside one of them would be wrong.
+
+### Samples live in the library
+
+`components/src/Samples` holds what was `playground/src/App/Samples`: nine registries and the ~198 sample files
+under them. The user's call, argued from what it buys rather than from where the files started — which is
+where they started, before the Playground existed.
+
+**What it buys.** The `@components` alias disappears, because a sample reaching `CellAnimation.utils` is now an
+ordinary relative import inside one package, which also retires the DOM-test-environment question the alias was
+parked on. The source view loses the whole sample-tab mechanism for free, since `components/src` was already
+opaque to it. And a consumer imports a sample instead of copying it out of a page.
+
+**A consumer pays only for what they name.** Every sample is re-exported individually from `index.ts`, so
+`import { lineRow }` pulls one function and nothing else. Measured against the built `dist`, bundled with
+esbuild, minified / gzipped: **5.7K / 2.4K** for one sample and its machinery, against **19.2K / 5.9K** for the
+registry that names all sixty. This only works because _"a sample registry and the machinery that runs it are
+separate modules"_ landed first — with the machinery still importing the lookup table there is no light path
+to offer, and the move would have made every consumer pay for the whole collection.
+
+**The two `plain` files are the one name that could not travel unchanged.** `Pattern/plain` and
+`Gradient/plain` collide at the top level, so `index.ts` exports them as `patternPlain` and `gradientPlain`,
+which is what the registries already called them internally. Every other sample is exported under its own name,
+and the file-name-is-the-key rule is intact inside the registries.
+
+**`SVGDefsSources` and `SVGDefsUri` did not go with them**, and are now
+`playground/src/App/PageComponents/SVGDefsSources`. They are not samples: they render sample defs and serialise
+them to a data URI so two `CellAnimation` examples have something to animate. That is Playground furniture by
+the _"three trees"_ definition, it needs a DOM, and keeping it out of the library keeps page tooling off the
+published surface. Its source tab still works, because it is Playground-side.
+
+**What the tests did with the move.** The seven sample specs run under the library's Vitest now, in the same
+plain-Node environment they always used — which was the alias's entire justification. Nothing about them
+changed.
+
+### How Samples is laid out
+
+The user's restructure. Every registry is `<Component>/<Part>` — `CellAnimation/Weights`,
+`Formation/Layouts`, `Staircase/Indents` — so the top level of `Samples` reads as a list of the components
+that have samples, and a second part slots in beside the first without a folder having to be invented later.
+Three of the four parents hold a single child, which is the point rather than an accident.
+
+**Only the folder names are short; files keep their full names.** `CellAnimation/Weights/CellAnimationWeights.const.ts`
+still exports `CellAnimationWeights`, and no name in the published API moved. The user's call between that and
+shortening the files too, which would have broken the file-is-named-after-its-namespace rule for a folder depth
+that already says `CellAnimation`.
+
+**A middle `Samples/` layer is kept only where the samples are loose files.** `Weights` and `Keyframes` have
+one because dropping it would strew sixty files in with the const, the types and the utils; `SVGDefs` lost its,
+because its three sub-registry folders already do that job and a folder called `Samples` inside a tree called
+`Samples` said nothing.
+
+**What belongs in `Samples` at all, which is the line the restructure drew.** A sample is something a consumer
+might plausibly reach for to get something working quickly. `MosaicImages` was not — the mosaic shapes and
+their generated placeholders exist only to give one Playground page something to draw — so it left for
+`playground/src/App/Pages/MosaicPage`, is exported from nowhere, and the page imports it as a local file.
+
+### Layering
+
+`Abstracts/` renders no DOM (namespaced utils, hook-like factories). `Fundamentals/` renders DOM.
+`Composites/` combines Fundamentals. `Fundamentals/Input/` groups controls carrying a user-editable
+value (see _"Folder layout"_ in `conventions.md`). `components/src/index.ts` enumerates every export path individually and stays
+sorted — not a barrel.
+
+**`Utils/typeUtils.ts` holds type transformers and nothing else.** Stated by the user: it is for things in
+the shape of `Omit`, `Exclude` and `Pick` — generics that take a type and give back another one. Everything in
+it qualifies (`MaybeAccessor`, `AccessorProps` and the three predicates behind them), as does `ss-utils`'
+own `TypeScript/typeUtils.ts`, so nothing had to move. **Recorded because the next lone type has to land
+somewhere else**: a union naming domain vocabulary is not a transformer, and putting one there would make the
+file a miscellany rather than a category.
+
+**`Abstracts/Anim` is gone, and `AnimDirection` with it.** One union, `"in" | "out"`, used by `ScreenWiper`
+and `AudioSwitcher`. `Abstracts/` is things that render no DOM but do something — namespaced utils and
+hook-like factories — and a lone type is neither, so the folder was a home of convenience. The two components
+did mean the same thing by it, which was the argument for keeping it shared somewhere; the user's call went
+the other way, and each now names its own: `ScreenWiperDirection` is exported beside `ScreenWiperShape`, and
+`AudioSwitcher` holds a module-private `FadeDirection`. **Naming them rather than repeating a bare union is
+what keeps the cost at zero** — a consumer writing an `onTransitionEnd` handler still has a type to import,
+which was the only thing the shared version was buying.
+
+**An `Abstract` is named for the thing that does the work, not for the activity.** The user's call, and a
+breaking change taken deliberately while the library has one consumer. `Dismiss`, `Navigation` and `Rotation`
+are `Dismisser`, `Navigator` and `Rotator` — folder, files, namespaces and the types hanging off them, so
+`DismissStack` is `DismisserStack`, `NavigationGrid` is `NavigatorGrid` and `Rotation.createRotation` is
+`Rotator.createRotator`. Renaming the type family too is what keeps a folder readable: a `DismissReason`
+sitting beside a `DismisserStack` reads as two things rather than one, and the rule is worth more than the
+sentence that one type name loses.
+
+**The last two outliers took a suffix, and one of them turned out to deserve it.** `FocusUtils` is
+`FocusManager`: it holds a module-level restore depth, decides whether a restore is in progress, traps focus
+in a subtree and moves it on mount — state plus policy, which is an agent rather than a bag of functions, and
+"focus manager" is the term the rest of the field already uses. The earlier verdict that it was a collection
+was made without opening the file.
+
+**`InteractionUtils` is `InteractionTracker`, and the arithmetic that made the name a lie went to
+`ss-utils`.** Most of it tracks — `trackHold`, `trackDrag`, `trackSwipe`, `trackPageHidden`, and
+`wrapElement`, which attaches listeners to report hover, press and focus flags. The four `computeSwipe*`
+functions did not, so `GestureUtils` in `utils/src/Abstracts/gesture.ts` has them, along with `SwipeAxis` and
+`SwipeDirection`. **The name is `Gesture` rather than `Swipe` on the user's call**: a package this small
+should not gain a file per gesture, and pinch and drag arithmetic would otherwise each arrive asking for one.
+`InteractionDragRatio` did not travel — the moved signatures take `Point2d`, which `ss-utils` already owns and
+which that type was structurally identical to.
+
+**The type family stayed on `Interaction`.** Unlike `Dismiss` → `Dismisser`, the subject noun here _adds_ a
+word, so following the family through would have produced `InteractionTrackerSwipeDirection`. The line taken
+instead: a flag or a reason belongs to the interaction, not to the thing watching it, so `InteractionFlags`,
+`InteractionDragRatio` and `InteractionDragEndReason` keep their names. Recorded because it is a deliberate
+exception to the rule directly above it, not an oversight.
+
+**An acronym is not a subject either, so `FPS` went too.** It is `FrameRateMonitor`, and its factory is
+`create` rather than `createMonitor`, which would have said monitor twice. The user's call between that and
+`FrameCounter`: nothing the thing returns is a count — `{ current, average }` are both rates — so counting is
+the mechanism rather than the subject, and `create` names what the code already called its own product. The
+acronym left the signature with it: `getFPS` is `getFrameRate`, since keeping it would have left the thing
+the rename was removing sitting in the return value. The Playground's on-screen label still reads `FPS`,
+which is a display string and not an API.
+
+**It also stopped being a `.utils.ts`.** `FPSUtils.createMonitor` returned reactive state, which is what
+`Rotator.createRotator` and `DismisserStack.createLayer` do, and both of those live in a plain `.ts` exporting
+the subject. A `.utils.ts` exports `<Subject>Utils` and holds functions; a factory for a live thing is not
+that, so the file is `FrameRateMonitor/FrameRateMonitor.ts`.
+
+**The rule reaches the abstract, not the components that use it.** A `Carousel` still has `getIsRotating`,
+`renderRotationControl` and `CarouselRotationFlags`, because those are the carousel's own vocabulary for what
+it does rather than references to the abstract. `RotationUtils` in `ss-utils` keeps its name for the same
+reason from the other side: that package names a namespace `<Subject>Utils` and the subject there is the
+arithmetic, not an agent.
+
+**`Composites/` ships; `BinarySwitch` does not.** The composites were held back on the argument that a
+composite demonstrates how Fundamentals combine rather than owning a contract, so shipping one freezes a
+composition the consumer is better off writing, and that `Surface` being reachable from the Playground's
+source was its whole audience. **The user reversed it**, so `Surface` and `SurfaceProps` are enumerated in
+`index.ts` like anything else. What has not changed is the inside: `SurfaceSVG` and `SurfaceDiv` stay
+unexported, because the wiring a composite assembles is not part of what it offers. `BinarySwitch` is still
+internal because `Checkbox`, `Toggle` and `Radio` are its presets; only `BinarySwitch.types` ships. Stated
+because a missing export reads as an oversight — it has been reported as a bug once.
+
+### What goes to `ss-utils` and what stays here
+
+Settled by the user, when `@internationalized/date` was taken as a dependency.
+
+**`ss-utils` is bare: it implements logic on top of nothing.** That is the line, not "maths versus
+layout". A primitive needing only the language belongs there. A module adapting a third-party package
+to this library's shape stays here however mathematical it looks, because sending it would put a
+dependency inside a package whose value is having none.
+
+So `Abstracts/DateValue` wraps `@internationalized/date` from inside `components/src`. Pure formatting or
+numeric helpers are candidates for `ss-utils`; anything importing the date package is not.
+
+### What went to `ss-utils`, and what was weighed and kept
+
+An extraction round ran: candidates were staged in a temporary `src/Extract`, the
+user lifted what they wanted, the folder was removed. Recorded so the next round starts from the
+argument rather than the survey.
+
+**Left**: `Audio`, `ColorValue` (now `Color`, a namespace per colour space), `Decimal`, `Matrix3` (now
+`Matrix3d`, over a `Point3d` rather than a tuple), `TimeValue` (now `TimeUtils`). `MathUtils` gained
+`clamp`, `clamp01`, `normalize`, `lerp`, retiring sixteen hand-written `Math.min(Math.max(…))` clamps
+across ten files — **nobody should write that expression again.** Four collapsed further to
+`clamp01(normalize(…))`; `Progress` keeps its own guard, because its zero-span answer is `1` where
+`normalize` reports `0`, and that choice is the caller's.
+
+**`RotationUtils` went, whole, and is `utils/src/Abstracts/rotation.ts`.** It was listed below as a kept
+candidate, and only `wrapIndex` was ever staked as qualifying — the rest reads as angular arithmetic in a
+wheel's vocabulary. The user asked for the namespace, not the qualifying half of it, and the split would have
+been worse than either whole: `getIndexAngle` calls `getStepAngle`, `getSpinAngle` calls `getIndexAngle`, so
+half a namespace here and half there means a package boundary through the middle of one calculation. **The
+line the "kept" list draws is about what a function needs, and every one of these needs only the language.**
+What made them look component-driven is that their _documentation_ has to talk about wheels — which the
+`utils/` doc rule now carries, in full, on all five.
+
+`wrapIndex` did not go with them: it is `MathUtils.wrapIndex`, since wrapping an integer is not angular
+arithmetic and `MathUtils` is where the sixteen hand-written clamps went for the same reason. It lost its
+`stepCount` parameter name for `count` on the way, nothing about a ring of things being a step outside a
+wheel. `CarouselUtils.wrapIndex` still exists and aliases it, so the published name a consumer already uses
+did not move; `RotationUtils` is now published by `ss-utils` rather than by this package, and
+`components/src/index.ts` no longer names it.
+
+**`EasingUtils` went too**, but not out of this round — it was written for the move from the day it was
+commissioned, and only the separate clone was holding it here. See _"`EasingUtils` went to `ss-utils` whole"_
+below.
+
+**Kept, with the shape each would need first.** The user's verdict: the remainder still feels
+component-driven. Not outstanding work — the argument, so it is not re-derived.
+
+- **`TextSyncUtils`** is ready as it stands: string and caret arithmetic, no DOM, and a mask engine is
+  normally its own package. Needs a name that is not "syncing a text field".
+- **`DismisserUtils.getIsWithinOwnedLayer`** is ARIA-aware DOM containment with nothing about dismissal
+  in it; `DOMUtils` is where that belongs.
+- **`AnchorUtils`** is "align one rect to another along an axis, in/out/center, then fall back to the
+  variant that fits". `Rect`, `Bounds` and `Dir` already say that; the `AnchorHPlacement` vocabulary is
+  the component-driven half, and dropping the word anchor **is** the abstraction. `getStackingBase`
+  stays behind either way.
+- **`ElementHighlightUtils.getSegmentRects`** computes the eight regions left when one rect is
+  subtracted from another — general, except it returns CSS strings. Returning rects is the change, and
+  it is why the function has no unit test: geometry cannot be asserted on a string.
+- **`CellAnimationUtils`** is two things. `assignAnimationProps` writes ordered transforms and filters
+  onto an element and already reads `CSSConst.ANIMATION_UNITS`, so it is the missing writer half of
+  something that package owns; the four parity predicates are grid tiling and belong with the weights.
+- **`SlideButtonUtils`** and half of **`CellAnimationWeightUtils`** mostly dissolved into `clamp01` and
+  `normalize`. What is left of the first is a thumb sliding in a track, which is `SlideButton`'s.
+- **`radar` and `spiral` should not go at all**: four multipliers named `cdoMul`, `croMul`, `cuoMul`,
+  `cloMul` — real algorithms behind a signature only their one caller can read.
+
+**Never staged, by category**: anything shaped around a component's own record (`SelectUtils`,
+`TreeUtils`, `ToastsUtils`); anything bound to a framework (`InteractionTracker`, `FocusManager`, `FrameRateMonitor`,
+`ElementFader`, the SVG defs modules that return JSX — the arithmetic that used to be tangled into them has
+since moved to the Playground samples instead, so what is left here is markup and nothing else); anything adapting a
+third-party package (`DateValue`, `Virtualizer` over `@tanstack/solid-virtual`); and three near misses
+blocked only by a pure type sharing a file with Solid props — `NumberInputUtils`,
+`RichTextUtils.parseContent`, `compileStops` / `sampleTrack`.
+
+### Look in `ss-utils` before writing anything general-purpose
+
+Asked for by the user. `ss-utils` is a dependency of this repo by the same author and already holds
+a lot. Re-implementing something it exports is the easiest waste to commit and the hardest to notice,
+because the duplicate works.
+
+**The trigger is the shape of the code, not the name of the file.** Most utils start as three lines
+inside a component, so "I am not writing a utility right now" is the wrong test. The real test:
+**could this function be given a name and a couple of arguments and still make sense with nothing
+around it?** If yes it is general-purpose, whatever file it is in. The user's example — comparing two
+arrays by an id on each element — is not in `ss-utils` and is still that shape.
+
+Aimed at the things that read as small enough to just write: clamping, rounding to a step, comparing
+rects, spreading a padding, kebab-casing, picking a random element, deduplicating, formatting a number.
+Several are already there — `MathUtils`, `RectUtils`, `CSSUtils`, `StringUtils`, `RandomUtils`,
+`PolygonUtils`, `ShapeUtils`, `BitwiseUtils`, `FunctionUtils`, `DOMUtils`, `SVGUtils`, `IOUtils`,
+`KeyframesUtils`, plus `Point2d`, `Vec2d`, `Vec4d`, `Rect`, `Bounds`, `Size2d`, `Dir` and `Count`.
+
+**How to check, in order**: pick the namespace it would belong to; read that namespace's file under
+`utils/src`, small enough to read whole; grep the export list for the noun
+rather than the verb, since the package names things after what they operate on. Only then write it. If
+genuinely absent, it is a candidate to go _to_ `ss-utils` — see the section above for which side of the
+line it falls on.
+
+### `EasingUtils` went to `ss-utils` whole
+
+It is `utils/src/Abstracts/easing.ts`, and the arithmetic and its reasoning are documented there, as
+everything in that package is. Two things about the move are this repo's to know.
+
+**No alias was left behind, on the user's call.** `RotationUtils` kept a published name alive on its way out
+only because `CarouselUtils.wrapIndex` already aliased it; there was no equivalent here, so anyone importing
+`EasingUtils` from `@thewaver/ss-components` imports it from `@thewaver/ss-utils` instead. `Rotator` is the
+only caller in this repo.
+
+**It exports far more than has a consumer, and that is deliberate.** `Rotator` uses `ease` and nothing else;
+the rest of the family exists because a package of easings missing two thirds of the set is one nobody reaches
+for. **Do not prune it back to what this repo happens to call, and do not read the unused exports as dead
+code.**
+
+### Commands
+
+```bash
+npm start # dev server for the Playground
+npm run build # utils first, then the components library: vite lib build + tsup .d.ts emit
+npm run build:playground
+npm run build:all # both of the above
+npm test # vitest in all three packages
+npm run verify:dom # playwright: build the playground, then drive it in a real browser
+npm run format # prettier, 4 spaces, 120 cols, import sorting
+npm run typecheck -w components # also -w utils, -w playground
+```
+
+Every script above is run from the repo root. A package's own scripts are reachable with `-w`, as in
+`npm run dev -w components`, which is the watch build for anyone consuming `components/dist` directly.
+
+### `external/` is a drop-zone, and every tool is told to leave it alone
+
+The user's convention, from the second migration of code written elsewhere. Code to be brought in is dropped
+in `external/` at the repo root, read, ported, and then deleted — but **the folder itself stays**, so the next
+migration has somewhere to land.
+
+**It is outside every tool, and the entry in `.gitignore` is what does most of the work.** Prettier 3 reads
+`.gitignore` as well as `.prettierignore`, so one rule covers formatting and version control together and there
+is no second list to keep in step — worth knowing, because `npm run format` is `prettier --write .` and would
+otherwise reformat and re-sort the imports of code that has not been read yet. `tsconfig.json` and
+`vitest.config.ts` name it as well: both already worked from a whitelist that could not reach it, and the
+explicit exclusion is there so somebody looking for the rule finds it where they look.
+
+**`external/*` with `!external/.gitkeep`**, rather than ignoring the folder, because git tracks files and not
+directories: a plain `external/` entry would mean the folder does not exist in a fresh clone.
+
+**The contents are nobody's contract.** They are a foreign framework's code, kept only long enough to read, so
+none of the rules about `components/src` apply to them — not the comment ban, not the house style, not the export list.
+Nothing in `src` may import from there.
+
+### A file in transit sits commented out, rather than excluded in config
+
+`components/src/JSXTextParser.utils.ts` is not this library's code and is not compiled. It is a copy of `ss-utils`'
+parser carrying a fix that has to be applied in that repo, parked here so it survives a change of machine, and
+**every line of it is commented out** — the user's instruction, and the reason is that the alternative leaves
+litter: a `tsconfig.json` exclusion outlives the file it was written for, and the next person to read the config
+finds a rule pointing at nothing. A commented file needs no rule at all, and one editor keystroke over a
+select-all restores it.
+
+**Line comments, not a block comment**, because the file carries `/** … */` documentation of its own and the
+first `*/` inside would close the wrapper early.
+
+**It is committed rather than ignored**, unlike `external/`, because the whole point is that it travels.
+
+**Nothing is in transit now, and for `ss-utils` nothing can be.** The parser copy this was written for is
+gone: the user applied its fix in `ss-utils` itself, so `utils/src/Web/JSX/Text/Parser/JSXTextParser.utils.ts`
+is the corrected version, and a break the author wrote pushes unconditionally while only structural breaks
+collapse. `ss-utils` sharing this repo means a fix that belongs to it is now made in place rather than
+parked. The rule above stands for the next foreign file that needs somewhere to wait.
+
+### Compatibility arguments cite `components/src` and nothing else
+
+When arguing a modern CSS or JS feature is safe here, **only `components/src` counts** — it is the published
+package and the only thing with a support contract, **with one carve-out: `components/src/Samples` does not
+count.** It ships from the library now, but it is sample code a consumer copies or ignores rather than
+component internals, and it was written to the Playground's old licence. `playground/src` is a harness;
+citing either is not an argument.
+
+**A use that carries a fallback is not evidence for a use that doesn't.** Relative colour syntax
+appears 71 times in Samples and twice in `components/src`, both in `Composites/Surface/Surface.css.ts` and
+both in vanilla-extract's array-value form — `backgroundColor: [fillColorVar, "rgb(from …)"]` — which
+emits the plain variable first, so an engine that does not understand the newer syntax keeps a working
+colour. That is graceful degradation, not a hard dependency. Check where the feature actually lives and
+whether existing uses degrade; if the new code has no fallback, say so.
+
+## Components
+
+### Audit: the React-era `BinarySwitch`, and what of it survives here
+
+A `_TEMP` copy of a two-year-old Preact implementation of these controls (a central
+`BinarySwitch` base plus `Checkbox` / `Toggle` / `RadioButton` leaves, 568 lines) was read in full and
+deleted — it referenced `@ui/*` and `preact` aliases, so `vite-plugin-checker` failed the build while it
+sat in the tree.
+
+**The base was the same idea from the other side**: a shell of a hidden native `<input>` plus a
+`children` slot doing all the painting, parameterised by `type: 'checkbox' | 'radio'`. One difference
+decides everything else.
+
+**How the painter learns the state.** The old painters read state out of CSS through sibling selectors —
+`input[type=checkbox]:checked + container &`, `:disabled + &`, `:focus-visible + &`. Free at runtime, and
+uncarryable here for three stacking reasons:
+
+- It hardcodes DOM adjacency. `CheckboxElement` renders the painter **first** and the input after it, so
+  the input can be `inset: 0` over the painter and own the hit area and ring. The selector would point
+  the wrong way, and fixing that fixes DOM order to the stylesheet forever.
+- CSS only sees states the DOM has. `isPressed`, `hasError`, `isActive` and "disabled but reachable" are
+  not DOM states, and disabled here is `aria-disabled`, so `:disabled` matches nothing — the old
+  disabled and focus rules would silently do nothing.
+- It puts library class names inside consumer paint. The settled model is the inverse: the library hands
+  over data, the painter owns every pixel.
+
+**`Toggle` needs no new library code**, the audit's most useful result. In the React tree `Toggle` was
+141 lines and almost all paint: body size, handle size, radii, two translate distances computed in JS,
+the colour swap on check. A toggle **is** a `Checkbox` whose painter draws a track and a sliding handle;
+`isChecked` is the entire input it needs. The only library-side difference is one line of semantics —
+`role="switch"` so it announces on/off rather than checked. So `Toggle` is a thin preset over `Checkbox`
+in the `Surface`-over-`Shape` shape: not a new leaf, and not a base extracted from two leaves with
+nothing to share.
+
+**`Radio` is where a shared base earns its keep.** _Corrected after the fact: this originally continued
+"and it is not the base `BinarySwitch` had", which was wrong. Only the group's state model and keyboard
+needed somewhere new — they became `RadioGroup`. The leaf-sharing job was exactly what the old base was
+for, down to the `type` parameter, and the shipped component keeps its name for that reason._
+
+Old radio support was `type="radio"` plus `name`, leaving mutual exclusion to the browser. Too little
+here, because the two things a radio group needs are behaviour, and behaviour is the shell's:
+
+- A radio group is a **single tab stop**, arrows both moving and selecting — a roving tabindex, which
+  `Tabs` already implements and is the model to follow.
+- The **group owns one value**, not one boolean per radio. `checkedSignal: Signal<boolean>` is the wrong
+  shape for a member of a set; a `RadioGroup` holding `Signal<T>` handing each radio a derived boolean is
+  right. Native `name` grouping gets DOM mutual exclusion free but leaves the state model unowned.
+
+**The size / config / token layer is inconsequent here, and it is the bulk of the code.** The three
+`*.config.ts` files, the `s | m | l` scale, `BINARY_SWITCH_SIZE_REMAP`, derivations off
+`uiCoreConfig.input.height`, `assignInlineVars` pushing per-instance colours, `useBackground` picking a
+contrast pair, `hasOutline` switching filled versus outlined — all so the library can paint with values
+the consumer chose. This library paints nothing. Port none of it. The `hasOutline` _technique_ (an empty
+marker class selecting a variant) is already the idiom here.
+
+**One genuine gap: the flags describe state, not events, and carry no pointer geometry.** The old
+controls spawned a ripple on change imperatively through a controller ref, reading the element's width
+and calling `controller.spawnEffect(x, y, …)`. `renderDecoration(getFlags)` is declarative and receives a
+snapshot: a painter can watch `isActive` flip, but cannot know **where** the pointer was, and a one-shot
+animation keyed on a boolean has nowhere to put an origin. The missing piece for ripples or any
+positioned one-shot effect is the originating event, or coordinates from it, reaching the decoration
+slot. Named now so it is not rediscovered as a styling problem; not worth building until asked for, and
+opt-in when it is, or every control pays for a listener it ignores.
+
+**Two smaller things, so they are not re-litigated.**
+
+- _The `<label>` wrapper and `LabelContext`._ `BinarySwitch` wrapped itself in a `<label>` so clicking
+  the painter toggled the input, reading a context to skip the wrapper when an ancestor `Label` supplied
+  one (nested `<label>` is invalid). The hit-area half is solved better here: the input is `inset: 0`
+  over the painter, so it **is** the hit target. The context half has no current need, but the pattern is
+  worth remembering if a `Label` or `FormField` arrives — a component supplying a wrapper should let
+  descendants detect it rather than making every caller pass "I am already labelled". Incidentally
+  `<label disabled>` was never valid HTML and did nothing.
+- _`hasOwnValue`._ A controlled-versus-uncontrolled mode flag: false force-wrote the DOM back to the prop
+  and reported the inverse; true reported the DOM's checkedness. `checkedSignal` replaces the flag with
+  one mechanism, so it should not come back. The force-write guards something real and became
+  `syncElement` — see below.
+
+### Controls: `BinarySwitch`, and `Toggle` / `Radio` as presets over it
+
+Settled, immediately after the audit, which predicted most of this.
+
+**`BinarySwitch` is a private shared composite, not a leaf and not public API**: `InteractionWrapper` plus
+the hidden-native-input leaf plus change gating plus the single-writer DOM sync, parameterised by
+`type: "checkbox" | "radio"`. `Checkbox`, `Toggle` and `Radio` are a dozen lines each on top. Checkbox and
+Radio shared about nine tenths of their leaf, including `syncElement` — the one piece that must not be
+copy-pasted, because the second copy is where the bug comes back.
+
+It lives in `Fundamentals/Input/BinarySwitch/` and is **absent from `index.ts`**; only
+`BinarySwitch.types` is exported, because `CheckboxProps` and `ToggleProps` alias
+`BinarySwitchPresetProps` and the emitted `.d.ts` has to resolve it. A folder under `Fundamentals`
+shipping no component is unusual and honest: it renders DOM so it is not an `Abstract`, and consumers
+should reach for the presets so it is not public. Promoting it later is one line; the reason not to is
+that a public `BinarySwitch` is the union of three controls and invites use over intent.
+
+**One writer for the input's state.** No JSX `checked` binding. A single `syncElement` pushes
+`element.checked = props.getIsChecked()` and `element.indeterminate = getIsMixed()` from state, called
+from a render effect and again from `onChange` immediately after reporting.
+
+The reason cost a bug to find: the browser flips `input.checked` **before** firing `change`. If the
+owner's setter refuses the write — an optimistic toggle a server rejects, a "keep at least one selected"
+rule, a form frozen mid-submit — the signal never changes, the render effect never re-runs, and the input
+is left `checked` while state says otherwise. Nothing looks wrong then, because `appearance: none` means
+the painter draws from the (correct) flags. The damage lands on the **next** click: the browser flips
+back and reports the opposite of what the user did, and stays inverted.
+
+`indeterminate` has the identical failure with a likelier trigger — the browser **clears** it on click,
+and an effect keyed on an unchanged mixed value will not put it back, so a mixed checkbox would silently
+stop being mixed. Hence both properties in one function.
+
+This holds only while the owner's write is synchronous. A consumer `onChange` returning a promise is
+awaited by nobody; an async accept would need the render effect to finish the job.
+
+**`checkedState` is a flag, so the painter stops being told twice.** The flag arrived on
+`ExternalInteractionFlags` and now sits on `BinarySwitchFlags`, with `InteractionWrapper` taking a matching
+`getCheckedState`, which the presets `Omit` — they own the value, and two sources for one state is what the omission prevents. `PageCheckboxContent` / `PageToggleContent` / `PageRadioContent` now read `getFlags().checkedState` and take nothing
+but flags. Before this, `CheckboxPage` passed `checkedSignal` to the component _and_ closed over the same signal for the
+painter, with the component connecting neither: the faked linkage `renderDecoration(getFlags)` was
+introduced to kill. Three states rather than two is also why it had to be a flag: mixed is computed by
+the shell, so a painter inferring it from a boolean could not draw it.
+
+**`CheckedState` is an abstract of its own, because a second control asked for it.** It was
+`boolean | "mixed"` declared inside `BinarySwitch.types`; it is now
+`Abstracts/CheckedState/CheckedState.types`, which `BinarySwitchFlags` imports like anyone else. The
+standing _private until a second consumer_ rule fired the moment `Select`'s group header needed the same
+three states — a header summarising a group of options is the same shape as a parent box summarising a group
+of children, and two controls each declaring their own `boolean | "mixed"` would agree by luck rather than by
+construction. It is a type and one fold, not a component, so it sits beside `DateValue` — the other abstract
+that is a vocabulary rather than a behaviour — rather than under `Fundamentals`.
+
+`CheckedStateUtils.fromMembers` takes the booleans and returns `true` only if every member is checked, `false`
+only if none is, and `"mixed"` the moment they disagree. **An empty set is `false`, not `"mixed"`**: mixed means
+_these disagree_, and nothing cannot disagree with itself; a group filtered down to no options would otherwise
+paint a half-tick over an empty box. Elsewhere confirms the shape rather than the name — MUI's tree view
+reports `"selected"` / `"indeterminate"` / `"unselected"` per item, and Ant Design's tree carries a
+`halfChecked` list beside its checked one, both of which are this same three-way value spelled differently.
+
+**Mixed is one-way and deliberately not part of the signal.** `getIsMixed` sits beside `getHasError`. A
+user can never _click into_ mixed: it is a summary the owner computes (a parent box over disagreeing
+children, a setting inherited elsewhere), and clicking always resolves it. Putting `"mixed"` in the
+two-way signal would force every plain-checkbox consumer to handle a third case that only arrives from
+their own code, and would let the component write a value the user cannot produce. `Radio` has no
+`getIsMixed` and it is `Omit`ted: ARIA gives `role="radio"` no mixed state, and a radio that summarises
+anything is a checkbox.
+
+**A switch may not be mixed, so `Toggle` drops its role exactly while mixed.** ARIA disallows
+`aria-checked="mixed"` under `role="switch"`, so the leaf computes
+`role = isSwitch && !isMixed ? "switch" : undefined`, falling back to the native checkbox whose
+`indeterminate` does map to mixed. A tri-state toggle announces as a mixed checkbox while mixed and as a
+switch otherwise; the role flips on a state change, which readers re-announce anyway. The one place a
+requested feature and the spec disagree, resolved by a role swap rather than an approximation.
+
+**The group owns the value; each radio derives a boolean.** `RadioGroup` takes `valueSignal: Signal<T>`
+and publishes a context; `Radio` takes `getValue` and reads `context.getValue() === props.getValue()`.
+Per-radio `checkedSignal` was never on the table: a member of a mutually exclusive set does not own its
+truth, and N booleans can represent states the group cannot be in.
+
+Context rather than `Tabs`' count-plus-`renderOption` shape, because each radio keeps the whole
+`InteractionWrapper` surface — its own tooltip, decoration, disabled and error state. A data-driven group
+would grow a `compute*` prop per capability and re-expose all of them per index. The cost is
+registration: `context.register(entry)` runs during each `Radio`'s setup and cleans up through the
+caller's `onCleanup`, and the group sorts entries by `compareDocumentPosition` rather than trusting
+registration order, so a reordered `<For>` cannot desynchronise keyboard order from the screen.
+
+The context is typed `unknown` on the value, because a context cannot be generic; `Radio<T>` casts at the
+boundary. Benign consequence: a `RadioGroup<SizeValue | undefined>` will accept a `Radio<string>`, and
+only the group's own signal keeps the type honest.
+
+**Native `name` grouping is used; native arrow-key navigation is not.** Every group generates a
+`createUniqueId()` name unless given one, so the browser does DOM-level mutual exclusion. Its keyboard
+handling cannot be used: disabled here is `aria-disabled`, so the browser sees no disabled radios and
+would happily move to one **and select it**. `RadioGroup` `preventDefault()`s the arrows and walks
+itself.
+
+Its rule is one step more generous than either pattern alone: arrows move to the next entry that is
+enabled **or** reachable-while-disabled, and select only if enabled. Single tab stop kept, disabled
+options unselectable, and a disabled-but-reachable option can still receive focus so its tooltip
+explains itself. `Home` / `End` jump to the ends of the same set. All four arrows work regardless of
+`getDir`, which only drives layout.
+
+This required `computeIsReachable` to move from `InteractionWrapper` into `InteractionTracker`, since
+`Radio` computes the same predicate. Extracting rather than restating is the point: the predicate is
+settled and two copies would drift. It does not re-expose reachability to a _leaf_ — `Radio` is a preset
+one level above the leaf.
+
+**`tabIndex` is now a conjunction, narrowing a previously absolute rule.** `wrapElement` takes an
+optional `getIsTabbable` and computes `(!isDisabled || isReachable) && isTabbable ? 0 : -1`. The
+wrapper's veto is still absolute; an ancestor owning a roving tab order can narrow it further. So the
+`tabIndex` line still runs for every element, it just no longer decides alone. `getIsTabbable` stays
+public on `InteractionWrapper` and is inherited by `Button` and `Checkbox`, because participating in
+someone else's roving order is a general capability — unlike `getCheckedState`, which the presets own.
+
+`InteractionWrapper` also gained a `ref` passthrough, since `RadioGroup` must `focus()` a specific radio.
+
+**Known gaps, deliberate.** Arrow keys do not cross groups, and a group with every option disabled has no
+tab stop at all — both correct, both look like bugs from outside. And **a caption drawn inside the painter
+is not a label**: `PageRadioContent` draws its caption inside the painter under the `inset: 0` input, so
+the whole row is clickable, which is legitimate but is not an accessible name and cannot place the caption
+anywhere the painter does not reach. `Label` is the answer.
+
+### Controls: `Label`
+
+Settled, closing the gap the audit recorded.
+
+**It wraps rather than points.** `Label` renders a `<label>` around both caption and control, so
+association is implicit and no `id` is invented or threaded. `for` / `getId` was rejected: an explicit id
+is a second thing to keep unique and in sync, and only earns its keep when the caption cannot be a
+sibling of the control, which nothing here needs.
+
+**It paints nothing, including the cursor.** Geometry only: `display: flex`, `width: fit-content`,
+`getDir`, `getGap`. Cursor was left out deliberately: a `<label>` cannot know whether the control inside
+is disabled, so a blanket `cursor: pointer` would lie, and taking `getIsDisabled` would duplicate state
+the control owns. The caption is the consumer's child, so the cursor is theirs; the Playground sets it in
+`pageStyles.labelCaption`.
+
+**`aria-label` loses to a visible caption.** `Label` publishes a context and `BinarySwitch` reads it:
+inside a `Label`, `getAriaLabel` is suppressed and a warning fires. Not a preference — `aria-label`
+overrides the label's text as the accessible name, so a control carrying both is announced as something
+other than what can be read, which is WCAG's _Label in Name_ failure. Suppressing rather than merging
+keeps one visible source of truth; warning rather than failing silently is the house pattern.
+
+That context is the audit's `LabelContext` idea put to better use, and it also does the original's job: a
+`Label` nested inside a `Label` renders a `<div>`, since nested `<label>` is invalid and its activation
+target ambiguous.
+
+**A group caption is not a `Label`.** `RadioGroup` takes `getAriaLabel` and puts it on the
+`role="radiogroup"` element. Wrapping a group in a `<label>` would claim one control is being named, and
+would make a caption click activate an arbitrary member.
+
+### Controls: `TextInput`
+
+The first control whose element the user can see through, which turns out to be
+the only thing separating it from `Checkbox`.
+
+**The overlay geometry survives; what the input keeps does not.** Painter first in flow, `<input>` second
+at `inset: 0` — the `CheckboxElement` arrangement, so the ring lands around what was painted. What
+changes is the blank-slate rule: a text input **is** the thing showing the value, caret and selection. So
+the reset keeps `appearance`, `background`, `border`, `border-radius`, `box-shadow`, `margin` and
+`min-width` — all `!important` — and leaves `padding`, `font`, `color`, `caret-color` and the rest of the
+text-drawing properties alone. `user-select: text` is set because `interactionRoot` sets `none`.
+
+**Nesting the input inside the painter was the obvious alternative and lost on the focus ring.**
+Typography would inherit and the padding duplication below would vanish, but the input is still the
+focusable element, so the ring would be drawn around the inner text area rather than the frame, and
+recovering it means the painter matching on `:has(:focus-visible)` — the arrangement rejected under
+_"Nothing that fades or filters may touch the element that owns the focus ring"_. It would also make
+`renderContent` a two-argument contract for one control.
+
+**Accepted cost: the painter's inner padding and the input's `padding` have to agree, and nothing
+enforces it.** Both are in the consumer's stylesheet, so a shared constant fixes it — the Playground's
+`TextFieldContent.css.ts` derives both from `FIELD_PADDING`. The first place the painter does not own
+literally every pixel, and the direct price of keeping the ring correct.
+
+**`computeTextStyle` is the one place paint lives on the element the browser owns**, because there is no
+other hook: the consumer must style the text, the text is inside the input, the input is the library's. It
+takes `getFlags` per _"Render props receive what drives them"_ — disabled text is grey, and no ancestor
+knows the flags.
+
+It returns a **whitelisted** object rather than a class name:
+`TextInputTextStyle = Pick<JSX.CSSProperties, "color" | "font-size" | "padding" | …>`. The first version
+took `computeClassName` plus a prose rule ("only properties that draw text") that nothing enforced. A
+`Pick` makes that a compile error, so a border or a `position` cannot decouple the painted box from the
+wrapper's box. Solid's `JSX.CSSProperties` extends `csstype.PropertiesHyphen`, so keys are kebab-case and
+lengths are strings — `"12px"`, not `12`.
+
+**Applied as an inline style, which ends the specificity war on the consumer's side.** Inline styles
+outrank every selector short of `!important`, so a consumer no longer reaches their input through a
+`globalStyle` to beat an app stylesheet's `input:not([type="range"])`; the Playground lost four
+`globalStyle` blocks. The library's own `!important` resets still win, correctly:
+`caret-color` under `[aria-disabled='true']` must beat whatever the consumer asked for.
+
+**One prop rather than one per property**, because almost everything that draws text is an _inherited_
+property — `color`, `font-*`, `line-height`, `letter-spacing`, `text-align`, `text-transform`,
+`caret-color`. Enumerating them reimplements CSS one prop at a time and still leaves a tail; one object
+covers the tail by widening the `Pick`.
+
+**Padding is deliberately _not_ whitelisted, because the library owns it.** The obvious division —
+background element owns borders, corners and padding; input owns text — does not work: an absolutely
+positioned box resolves `inset` against its containing block's padding box and **ignores that ancestor's
+padding**, so padding on `renderContent` insets nothing. The first version whitelisted padding and made
+the consumer compute it; `getPadding` and `getGap` replaced that (see below).
+
+**What a value-only API cannot express**, recorded because it is why the class may have to come back:
+`::selection`, `::placeholder`, `::-webkit-*` and `:autofill` are selectors, not values. The last is a
+real gap — Chrome's `:autofill` forces an opaque background that `background: transparent` cannot clear,
+so an autofilled field paints a solid square-cornered rectangle **over** the painter, and `color` is
+locked the same way.
+
+**Left alone deliberately, and not because it is hard.** The lock is anti-spoofing: Chromium refuses
+author overrides so a site cannot conceal that the browser filled a field with stored data. Defeating it
+is possible — `box-shadow: inset 0 0 0 1000px <colour>` paints above the background and below the text,
+and `-webkit-text-fill-color` covers the forced text colour — but doing it by default would suppress a
+signal the browser is deliberately showing. `opacity` and `filter` are not alternatives at any
+specificity: both composite the whole paint, fading text with background and reaching the ring. So no
+escape hatch ships; if one is ever wanted it should be a narrowly documented pseudo-selector hook rather
+than a general class prop, and the consumer should be the one deciding to override an anti-spoofing
+default.
+
+**`renderPlaceholder` is a slot, not a string.** Native `placeholder` is paint the library emits, which
+_"A control paints nothing"_ forbids. The slot is `position: absolute; inset: 0; pointer-events: none`,
+rendered between painter and input so typed text is never occluded, and **always rendered when the prop
+is given** — gating on `isEmpty` internally would make a floating label impossible. The painter reads
+`getFlags().isEmpty` and decides between hiding and floating. Placeholder text should be `aria-hidden`,
+for the same reason a checkbox painter's glyph is.
+
+This is also why the slot belongs to the leaf rather than `renderDecoration`: the decoration wrapper sits
+above the input and is shared by every control, whereas a placeholder must sit below the caret and only a
+text field has one.
+
+**Focus is drawn once, by the ring, and a painter must not draw a second one.** The first
+`PageTextFieldContent` coloured its border on `isFocused`, producing two concentric indications at
+different radii. The outline already hugs the painted box exactly, so there is nothing left to add.
+`isFocused` stays available for focus-driven paint that is **not** a ring.
+
+**Adornments are `renderLeading` / `renderTrailing`, and they are the leaf's.** Both absolutely
+positioned against the root at `insetBlock: 0`, both rendered **after** the input so they stack above it.
+Width is their content's, so the slot hugs what it holds and clicks either side still land on the field.
+The Playground puts a real `Button` in one: an adornment can hold anything, including another
+`InteractionWrapper` with its own ring, tooltip and disabled state.
+
+**The slot inherits `pointer-events: none` from the root and must not override it.** It briefly set
+`auto`, which inverted hover: the slot sits above the input, so pointing at a static adornment stole the
+hit test, the input never received `mouseenter`, and `isHovered` went **false** exactly while the cursor
+was over the adornment. Inheriting `none` lets the hit test fall through, and hovering the adornment
+reads as hovering the field, which is what it is.
+
+Interactivity is unaffected, which is why `none` is the right default rather than a compromise:
+`pointer-events` is inherited, so an interactive element re-enables it for itself, and every control
+element here already does (`buttonElement`, `binarySwitchElement`, `textInputElement` all set
+`pointer-events: all`). Only raw consumer markup that must be clickable needs `pointer-events: auto`, the
+same one-liner `interactionDecorationWrapper` always required.
+
+One consequence, left alone: hovering an interactive adornment drops the field's `isHovered`, since the
+adornment is a sibling of the input and `mouseleave` fires. That reads correctly — you are hovering the
+button — and fixing it means moving `wrapElement`'s hover tracking to the root and to `mouseover` /
+`mouseout`, which is shared-code surgery for a cosmetic gain.
+
+They do not go through `renderDecoration` because that slot is one full-box overlay shared by every
+control, while these are positional, text-specific and drive the input's padding. Nor are they one prop
+taking a side — _"one slot, not layered slots"_ was about stacking, and these reserve opposite ends.
+
+Named leading/trailing for **role, not axis**. They were briefly positioned with `inset-inline-start` /
+`inset-inline-end` on the argument that following the writing direction costs only a property name; that
+argument is withdrawn. Adopting `CSSPadding` made it incoherent, since `paddingLeft` is physical and
+feeding it into a logical property is a lie the moment anything is RTL. Physical throughout is honest
+while nothing else in the library is RTL-aware — `getDir` on `Label` and `RadioGroup` means flex
+direction, not writing direction. Going RTL later means changing the CSS, not the prop names.
+
+**The field's inset is measured, not declared.** `getPadding` and `getGap` are what the consumer states;
+everything else is derived. `getPadding` takes `CSSPadding | number`, normalised through
+`CSSUtils.spreadPadding`, so one number spreads to four sides and per-side control needs no second prop.
+`CSSUtils.spreadableToStyle` renames the keys and adds the `px`, so no template strings are built by
+hand. It briefly took a bare `number`, and briefly used `Bounds` — the right shape for
+`createViewportRectObserver`, which measures _edges_, while `CSSPadding` arrives keyed by CSS property.
+
+Each adornment slot is observed by a local `createAdornmentWidth`, and the input's text area is inset by
+`padding + (adornment ? adornmentWidth + gap : 0)` per side, applied as an inline style along with the
+same inset on the placeholder slot. The slots themselves sit at `padding` from their edge. So the only
+numbers anyone writes are padding and gap, and the placeholder need not know an adornment exists.
+
+_Corrected after the fact: this section originally argued that an adornment reserves no space and the
+consumer supplies matching padding, since measuring "buys correctness with a resize observer per field
+and takes the decision away from the painter". The decision it takes away is one the painter cannot make
+correctly — the strongest counter is **i18n**, where `Show` / `Hide` becomes `Anzeigen` / `Verbergen` and
+any declared width silently breaks, along with font swaps and dynamic adornment content._
+
+**A `ResizeObserver` specifically, not a measured rect.** `createViewportRectObserver` is a
+`requestAnimationFrame` loop, right for a position that moves and far too heavy for a width that changes
+rarely. `borderBoxSize` also reports **untransformed layout size**, which matters because the Playground
+runs inside `Viewport`'s `transform: scale()` and `getBoundingClientRect` would return scaled values —
+the whole reason `ViewportUtils.getAdjustedBoundingClientRect` exists. `offsetWidth`, used for the
+initial synchronous read so the first paint is already inset, is likewise transform-free.
+
+No feedback loop is possible while adornments stay absolutely positioned: the input's padding cannot
+change an adornment's size. `getMinWidth` derives the **root's** size from the same measurements and is
+safe for the same reason. Anything making an adornment's width depend on the root's would close the loop.
+
+**`getMinWidth` is the floor, and it is the same numbers summed.** `InteractionWrapper` gained
+`getMinWidth` beside `getSizing`; `TextInput` feeds it `leadingInset + trailingInset`, which expands to
+`padding × 2 + adornment widths + gap × adornment count` — exactly the chrome. Below that the field draws
+over its own adornments. It reserves nothing for the text: a zero-width text area is a legitimate floor,
+and picking a minimum number of visible characters would be the library inventing a design decision.
+
+This is why the measurement lives in `TextInput` rather than `TextInputElement`: `min-width` belongs on
+the root, the root belongs to `InteractionWrapper`, and props flow down. The leaf receives `getTextInset`
+and `getSpreadPadding` ready-made and is correspondingly dumber.
+
+**What `getMinWidth` does not do: make the painter follow.** It protects the root, the input and the
+adornments. A painter with a fixed `width` stays put, so if the floor exceeds it the root grows and the
+frame is narrower than the field it frames. Guaranteeing they move together needs `flex-grow: 1` in
+`interactionRoot > *`, which would change every control at once — not worth doing on `TextInput`'s
+account. Until then the rule is that a painter must not be narrower than its own adornments require.
+
+**It is a local helper in `TextInput.tsx`, not an `Abstracts` utility.** It briefly was
+`ElementObserver.createLayoutSizeObserver`, which put a second unrelated thing in a namespace whose name
+then had to work harder, and shipped public API for one internal caller. Both instances live in one file.
+Same rule as `TextArea` below: extraction is cheap, the wrong base is not, and the trigger is a second
+component wanting it.
+
+One correct-but-odd consequence: the focus ring encloses the adornments, because they are inside the
+field's box. An adornment that should own its ring is a `Button` in the slot, and it gets one.
+`interactionRoot > * { margin: 0 !important }` reaches the slots, which is the rule doing its job — a
+consumer insets an adornment with margin or padding on their own content, one level down.
+
+**Disabled means `readonly`, the first control where `preventDefault` could not do the job.** "Activation"
+for a text field is typing, pasting, dragging text in, autofill and IME composition, with no single event
+to cancel. `readonly` blocks every one and satisfies the constraints that forced the `aria-disabled`
+rule: the element stays focusable, its events keep firing so a disabled-but-reachable field still reveals
+its tooltip, and — decisively — **the UA does not repaint a readonly input**, so appearance parity holds
+for free. Selection and copying survive, which native `disabled` would have killed.
+`element.readOnly = isDisabled || isReadOnly`.
+
+**The caret is suppressed while disabled, and only while disabled.** A disabled-but-reachable field is
+focusable by design, and the browser draws a blinking caret in a `readonly` input — an invitation to type
+that the field will refuse. `caret-color: transparent` on `[aria-disabled='true']`, with `!important`
+because a consumer's `caret-color` reaches the input through `computeTextStyle`. Read-only keeps its
+caret, since keyboard navigation and selection inside it are the point.
+
+Read-only is a real feature, so `getIsReadOnly` is public, `aria-readonly` reflects only the consumer's
+intent and `aria-disabled` reflects disabled. There is deliberately **no redundant JS guard on the input
+path** — `readonly` is the single mechanism and a browser cannot deliver an `input` event past it. The
+mouse handlers keep explicit gating, because `readonly` does not suppress `mouseenter` / `mouseleave`.
+
+**Native constraint validation stays out.** `required` / `pattern` produce a UA-painted bubble, which is
+paint the library would be emitting; `hasError` is the owner's. `maxLength` is out for a different reason:
+the owner's setter owns transforms, and an attribute that truncates silently would be a second mechanism.
+
+**`syncElement` is `BinarySwitch`'s function with two problems `BinarySwitch` never had.** Same premise —
+the browser mutates `value` before `input` fires — except on every keystroke rather than a rejected
+toggle.
+
+- **Assigning `value` collapses the caret to the end.** The sync captures `selectionStart` /
+  `selectionEnd`, writes only when `element.value` actually differs, and restores; the accepted path
+  therefore never touches the selection. The `null` guard is load-bearing: `type="email"` and
+  `type="url"` do not support the selection API, so the properties read `null` and `setSelectionRange`
+  would throw. Truncation needs no special case — `setSelectionRange` clamps.
+- **Writing mid-composition destroys it.** An `isComposing` signal gates both the sync and the report,
+  and `compositionend` reports and re-syncs. Chrome and Firefox fire `input` after `compositionend` while
+  Safari has historically fired it before; running the report from both is idempotent.
+
+Both are read inside the render effect, so ending a composition re-syncs on its own.
+
+_Corrected after the fact: that re-sync is real, and in the original ordering it destroyed the commit._
+`handleCompositionEnd` cleared the composing flag **before** reporting. Clearing it re-runs the render
+effect synchronously, `syncElement` finds `element.value` holding the text the IME just committed and
+`getValue()` holding the pre-composition state, and writes the stale state over it — after which
+`reportValue` reads the clobbered element and reports the old string. Composing `にほ` into `Ada` and
+committing `日本` left both DOM and state at `Ada`. The report now runs first and the flag flips after, so
+the re-sync finds nothing to write; a refusing or transforming owner still gets its correction one step
+later. Found by the first run of the interaction suite, which is the whole argument for having one — the
+ordering reads as correct and nothing about it is visible in markup.
+
+**Transforms compose through `onInput`, not through a derived signal.** `TextInput` writes `valueSignal`
+with the raw value then calls `onInput`, exactly as `Checkbox` writes `checkedSignal` before reporting, so
+a consumer wanting upper-casing or digits-only writes the signal a second time from `onInput` and the sync
+corrects the DOM. Handing `TextInput` a hand-built `[getter, transformingSetter]` pair was abandoned:
+Solid's `Setter<T>` is an overloaded type a plain `(value: string) => void` cannot satisfy, so it needs a
+cast at every call site to express what the sanctioned path already does.
+
+**`isEmpty` and `isReadOnly` join the flags, now a trend rather than an exception.** Both follow
+`checkedState`: added to `ExternalInteractionFlags`, exposed as `getIsEmpty` / `getIsReadOnly`, and
+`getIsEmpty` `Omit`ted from `TextInputProps` because the component owns the value. `getIsReadOnly` stays
+public. The painter does **not** receive the value: the input already renders it, and a painter drawing it
+too would double it. `isEmpty` is the summary driving placeholder and floating-label paint, nothing more.
+The cost is in `backlog.md` — `ExternalInteractionFlags` is on its way to being the union of every
+control's private state.
+
+**`number` is a type, not a component.** _Corrected after the fact: this originally argued for a separate
+`NumberInput`, because writing `String(state)` back on every keystroke makes `"1."`, `"-"` and `"1e"`
+untypeable and `setSelectionRange` throws on `type="number"`. Both claims are true, and neither was a
+reason for a component._ The argument rested on an unstated assumption: that a number field means
+`valueSignal: Signal<number | undefined>`. It does not. **The DOM's value is a string for every input
+type**, and with `Signal<string>` the round-trip never happens — `syncElement` compares strings, finds
+them equal, writes nothing. The `setSelectionRange` hazard was already handled by the `null` guard written
+for `email` and `url`.
+
+So `"number"` is a member of `TextInputType`, and it needed three behavioural attributes (`getMin` /
+`getMax` / `getStep`, driving arrow-key stepping) and one CSS rule suppressing the spin buttons, which are
+UA paint. Consumers who want a number derive it from the string.
+
+This generalises: **an HTML input type is not a reason for a component.** `Toggle` was not one because its
+difference was paint; `number` is not one because its difference is an attribute. What earns a component
+is behaviour the shell has to own — which `RadioGroup` had and neither of these did.
+
+**One caveat `type="number"` carries and the library cannot repair.** During bad input — a lone `"e"`,
+`"-"`, `"1e"` mid-typing — the HTML value sanitisation algorithm makes `element.value` return `""` while
+the field still shows the characters. State and screen diverge, nothing in the DOM exposes the visible
+string, and `syncElement` sees two empty strings and correctly does nothing. The visible symptom is
+`isEmpty` reporting true with text on screen, so a `renderPlaceholder` overlay draws over it.
+`type="text"` with `getInputMode={() => "decimal"}` avoids it and is better wherever the placeholder or an
+exact value matters.
+
+**Password is not a component.** Its only distinguishing behaviour is revealing, which is `getType`
+flipping between `"password"` and `"text"` over a signal the consumer owns — the audit's "`Toggle` needs
+no new library code" result again. The Playground demonstrates it with a `Toggle` beside the field.
+
+**`LabelUtils.resolveAriaLabel` was extracted rather than copied.** The context read, the suppression and
+the warning lived inline in `BinarySwitchElement` and are needed identically here — the
+`computeIsReachable` situation, so it moved to `Label.utils.ts` under the same namespace idiom, and the
+warning lost its `BinarySwitch:` prefix.
+
+**The shared composite this section predicted is `TextField`** (below). Everything settled here still
+holds, one file down, and `TextInput` is a dozen lines on top of it.
+
+### Controls: `TextField` extracted, with `TextInput` and `TextArea` as presets
+
+Settled, on the terms `TextInput` had already written down: a private shared leaf
+parameterised by its element, presets that `Omit` what does not apply, in the `BinarySwitch` shape — and
+**not** a `"textarea"` member of the type union, which would be a type that silently changes the element.
+
+**Nothing about `TextInput` changed except where it lives.** `Fundamentals/Input/TextField/` holds the
+base; `TextInput` is `<TextField {...props} getElement={() => "input"} />` and `TextArea` the same with
+`"textarea"`. The base is absent from `index.ts`; only `TextField.types` ships. The types moved with it
+and the old names are gone rather than aliased: `TextFieldFlags`, `TextFieldTextStyle`, `TextFieldType`,
+`TextFieldMode`. `Select` imports the text style from the base, and the Playground's painters were renamed
+— `PageTextFieldContent` / `PageTextFieldPlaceholder` / `PageTextFieldAdornment` — since one painter now
+serves three shells.
+
+`TextSync` widened to `HTMLInputElement | HTMLTextAreaElement`, exported as `TextSyncElement`. Both carry
+`value`, `selectionStart`, `selectionEnd` and `setSelectionRange`, so the caret restore is unchanged
+rather than branched.
+
+**The element is a `Dynamic`, and that is the whole parameterisation.** One attribute list, with the two
+element-specific attributes computed: `type` is `undefined` on a textarea, `rows` on an input. This also
+tightened `min` / `max` / `step`, now emitted only for `type="number"` — the browser ignores them
+elsewhere, but a `type="text"` field carrying them is a lie in the DOM, and `NumberInput` is a
+`type="text"` field that owns a range.
+
+**Auto-growing height is opt-in, and the only thing that could not be inherited.** A fixed textarea leaves
+the settled arrangement untouched: the painter sizes the box, the element covers it, `rows` is beside the
+point. An auto-growing one inverts that — content decides the box — and the resolution keeps the inversion
+out of the overlay and puts it on the wrapper. `getIsAutoSizing` turns it on, `getMinRows` (default 2, the
+native default) is the floor, `getMaxRows` the optional ceiling.
+
+The measurement mirrors `getMinWidth` one axis over. `InteractionWrapper` gained `getMinHeight`;
+`TextField` sets the element's `bottom` to `auto` for one frame, reads `scrollHeight`, restores it, and
+clamps against the row floor and ceiling. `scrollHeight` includes the element's padding and the element
+has no border, so the number _is_ the root height needed. `bottom` is the only property touched, because
+the class already carries `height: auto !important` and an absolutely positioned box with `top`, `bottom`
+and `height: auto` takes its height from the insets. Nothing Solid writes as an inline style is disturbed.
+
+**A growing root only moves the painter if the painter lets it.** The root is `display: flex` with
+`align-items: stretch`, so a painter declaring no height follows the root. Same limitation `getMinWidth`
+records, load-bearing in the other direction: an auto-sizing `TextArea` wants a painter with no height, a
+fixed one wants a painter that sets one. The Playground says which through `getIsStretched` / `getHeight`
+on its own painter.
+
+Two smaller consequences. **The re-measure listens for width, not height**, because publishing a height
+the observer then reads back is a loop; it compares `inlineSize` against the last one and returns early.
+And **`overflow-y` is `hidden` while growing uncapped**, so no scrollbar flickers in during the frame
+between a keystroke and the new floor, and `auto` otherwise.
+
+**`resize` is `none`, deliberately without `!important`.** A user-dragged element would decouple the
+element's box from the painted box. The other resets carry `!important` because a real conflict was
+observed; no such selector exists for this property — a bare `textarea { resize }` is weaker than a class
+and loses already. Escalating on suspicion is the defensive habit that rule warns against.
+
+### Controls: `NumberInput`, and the first preset that earns a codec
+
+This does not reopen _"`number` is a type, not a component"_ — it passes that
+test. Four things a consumer would otherwise write per field, none of them an attribute: the ladder
+stepping walks, clamping when the field is left rather than per keystroke, refusing characters that cannot
+appear in a number, and the string-to-number codec.
+
+**It is a `type="text"` field**, which the caveat above already recommends: under `type="number"` the
+sanitisation algorithm makes `element.value` return `""` during half-typed input, so `isEmpty` lies and a
+placeholder overlay draws over what was typed. A field whose job is to own a number cannot afford that.
+What the browser stops providing — spin buttons, arrow stepping, the spin-button role — the shell
+provides.
+
+`getIsSpinButton` on `TextFieldState` is exactly the `getIsSwitch` shape: the base computes
+`role="spinbutton"` and publishes `aria-valuenow` / `aria-valuemin` / `aria-valuemax` from the value and
+range it already holds. `aria-valuenow` is omitted while the text does not parse.
+
+**`valueSignal` is `Signal<number | undefined>`, and `undefined` means an empty field.** The one place the
+`Signal<string>` rule is deliberately broken, because the codec is the feature. A private `Signal<string>`
+still runs the element, so the `"1."` hazard is untouched — the string signal is what `TextSync` compares
+and the number is never written back over it. `undefined` rather than `0`, because a `0` would be a value
+the user did not type.
+
+**Typing is refused character by character rather than parsed and rewritten** — the transforming-setter
+idiom moved inside the control. `NumberInputUtils.sanitizeText` keeps a character only where it can legally
+appear: one sign at the front, one more after an exponent, one decimal point, one exponent and only after a
+digit. Written to keep half-typed values typeable rather than to accept only complete numbers: `-`, `1.`,
+`1e` and `1e-` all survive, each reporting `undefined` upward until it parses.
+
+**Clamping happens on blur, not on input.** Per keystroke it makes the second digit untypeable — with a
+minimum of 40, typing `5` becomes `40` before the `0` arrives. Stepping still clamps immediately, because
+a step is a complete gesture and typing is not.
+
+**And an out-of-range number is reported to nobody until the field settles.** Blur-clamping alone was not
+enough, because it only governs the text: the number still went out on every keystroke, so a duration field
+with a floor of 100 handed its consumer `5`, then `50`, and restarted the animation twice at durations nobody
+asked for. What holds the range now is silence — while the text parses to something the range refuses, the
+`valueSignal` and `onInput` are left alone and the owner keeps the last reading that was allowed. Leaving the
+field clamps and reports, as before, so the value an owner sees is only ever one it could have been given.
+
+**`undefined` is still only "empty", and out-of-range is held rather than reported as `undefined`.** An owner
+cannot afford the two to be one answer: `undefined` is what it acts on to mean "nothing was entered", and
+holding needs no third state to say the rest. `CurrencyInput`, `DateInput` and `TimeInput` reported `undefined`
+for a figure or a date their codec refused, which is the same fault a level down; `MaskedField` holds too now,
+so all four controls agree — see _"a value the codec refuses"_ in the `MaskedField` entry.
+
+**The field says so itself**, `hasError` ORing the range issue into whatever the owner passed, the same line
+`CurrencyInput` writes. It shows immediately rather than on blur, matching a native number field: `:invalid`
+tracks the value, so it follows `rangeUnderflow` from the keystroke that causes it — waiting for the field to
+be left is what the separate `:user-invalid` is for, and a control that reports nothing meanwhile owes the
+person typing the reason straight away.
+
+**Stepping, `Home` / `End` and the stepper's end flags read the text, not the reported value.** They used to
+read `valueSignal`, which was the same thing while every keystroke was reported and is not any more: with
+`999` typed into a field capped at 100 and the owner still holding `99`, an arrow would have stepped from the
+`99` nobody can see. The text is what the field holds; `valueSignal` is what the owner has accepted.
+
+**The fault this came out of was one level out, in the Playground's own panel adapter.** `PageNumberField`
+brought every keystroke into range before storing it, and the mirror then wrote the stored number back over
+the text — so with a floor of 100, pressing `5` to begin `500` left `100` in the field and the `0`s appended
+to that. It also reported twice, once through the mirror's setter and once through `NumberInput`'s `onInput`.
+Both are gone and the adapter now guards nothing, because the control does.
+
+**The general rule is that an owner may not correct a value a control reports mid-gesture.** A mirror is two
+sides that both write: the control writes what was typed, the owner writes what it decided to store, and
+anything the owner changes on the way in comes back over the text on the way out. Clamping, rounding and
+normalising are one shape here, and none of them is safe per keystroke. Where a control defines the moment a
+value settles, a correction belongs at that moment or nowhere — and a control that can be handed a reading it
+refuses should refuse it itself, rather than leaving every owner to remember not to.
+
+**The step ladder counts from `min`, not from zero**, matching a native number field: a value on a rung
+moves a whole step, one between rungs snaps to the next rung in the direction of travel. `computeStep`
+runs the arithmetic in whole units of the smallest decimal in play rather than in floats, so `0.1` from
+`0.3` gives `0.4` and no epsilon has to be chosen. Pure function in `NumberInput.utils.ts` with tests.
+
+**The stepper reaches the painter through `renderTrailing`, widened rather than duplicated.**
+`NumberInput` re-declares that slot as `(getFlags, stepper)`, the same widening `InteractionTooltipDefs`
+does. A second `renderStepper` slot loses: both want the same physical position, and one slot lets a
+painter draw a unit and a stepper together. The `stepper` carries `stepUp` / `stepDown` plus `getIsAtMin` /
+`getIsAtMax`, so a painter can disable the end of the range it has reached — flags stay pure state, actions
+stay out of them.
+
+**`onKeyDown` and `onBlur` exist on `TextFieldCbs` and are `Omit`ted from both public presets.** The
+arrows, `Home` / `End` and the blur-clamp need them, and the base is where they belong; whether `TextInput`
+should expose them is a separate question, and answering it as a side effect would be smuggling.
+
+**`untrack` on the mirror is the fix for a real flip-flop, not a micro-optimisation.** The effect
+restating the text when the owner writes a new number must read the text _untracked_. Tracked, it also
+re-runs when the text changes — and `TextField` writes the raw text into the signal before the preset's
+`onInput` sanitises it, so for one moment the text says `"1"` and the number still says `undefined`. A
+tracked effect fires in that gap, formats `undefined` back to `""`, and the two fight: the observed
+symptom was a caret jumping to the start and digits arriving in reverse. The `ImageSwitcher` shape — an
+effect whose job is one-directional must only depend on the direction it syncs from.
+
+### Controls: `Range`
+
+`backlog.md` predicted this would be the most architecturally novel control left
+and got the central call wrong, which is the most useful thing to record.
+
+**A two-thumb range _is_ two native `<input type="range">` elements, one per thumb.** The prediction was
+that two thumbs had nowhere to go under overlay geometry, so both thumb counts would be custom. Each thumb
+is its own input, absolutely positioned `inset: 0` over the same painter, so a pair is the single case
+rendered twice and the two modes cannot diverge in paint, keyboard or ARIA. Native also keeps `step`,
+`Home`/`End`, `PageUp`/`PageDown`, drag and the track-click jump.
+
+`Range` therefore did **not** need `backlog.md` #2's pointer primitive, and item 1 stays open for the
+thing that does — a two-dimensional colour surface, which has no native equivalent.
+
+**Crossing is prevented by the inputs' own `min` and `max`, not by JS.** Thumb `n`'s `min` is thumb
+`n-1`'s value and its `max` is thumb `n+1`'s, so the browser clamps drag and keypress identically and no
+guard can be forgotten. The cost is the tie: two thumbs on the same value cannot move through each other,
+so which one you grab decides which way you can go. `raiseNearestThumb` resolves that on `pointermove` —
+the input nearest the pointer gets `z-index: 1`, and on an exact tie the side of the pointer decides.
+Verified in a browser with both thumbs at 80.
+
+**Ranking has to happen on `pointermove`, before the press.** `pointerdown` is too late — the browser has
+already picked the event target and begun its native drag. The move handler is skipped while a button is
+held (`e.buttons === 0`) so a drag in progress cannot be stolen.
+
+**The library owns the thumb's hit size; the painter owns its appearance.** `appearance: none` leaves the
+thumb with no size in Chromium, which kills dragging, so `Range.css.ts` styles
+`::-webkit-slider-thumb` and `::-moz-range-thumb` — transparent, sized from `getThumbSize`. That number
+and the painter's visible thumb must agree and nothing enforces it: exactly `TextInput`'s
+padding-versus-inset cost, paid the same way with one shared `RANGE_THUMB_SIZE` constant.
+
+It is also why the painter is handed `ratios` rather than percentages. A thumb's centre travels between
+`thumbSize / 2` and `length - thumbSize / 2`, never the full track, so `left: ratio%` would overhang both
+ends. The painter positions with `calc(ratio * (100% - thumbSize))`, which it can only write because it
+knows the thumb size.
+
+**One prop per mode, and giving neither or both warns.** `valueSignal: Signal<number>` drives one thumb;
+`rangeSignal: Signal<RangeValues>` drives a pair. A single `Signal<number | RangeValues>` would force
+every plain-slider consumer to narrow a union on every read, and a generic would hit the `AccessorProps`
+hole. Mode is structural rather than a `getMode` prop because the value's shape carries it.
+
+**The selection is `{ start, end }`, and the scale keeps `min` / `max`.** The pair's fields were `min` /
+`max` for one draft, which collided badly: `getMin` would be the floor of the track while
+`rangeSignal[0]().min` was the floor of the selected band. `getMin` / `getMax` match the native attributes
+and `TextInputState` already uses them.
+
+`start` / `end` over `from` / `to` on published precedent rather than taste. Adobe's React Spectrum
+`RangeSlider` takes `{ start, end }`; MUI's prose describes its array as "the start and end of a range";
+Radix is `number[]` and offers no names. The only major library with other names is Ionic's
+`{ lower, upper }`, whose type is the single union this component avoided. Nothing checked uses `from` /
+`to` for a slider — that reads as a date-range and filter idiom.
+
+`RangeValues` and `RangeSpan` are the same shape on purpose: the selection is in scale units and
+`flags.fill` is the same span as 0..1 ratios.
+
+**Disabled refuses the write and pushes the element back.** A range has no `readonly`, so the guard is
+the `BinarySwitch` shape: the browser moves the thumb before firing `input`, so a refused value is
+overwritten by `syncElement`. Both paths run it, since the accepted path is also where an owner may clamp.
+
+**Vertical is `writing-mode: vertical-lr` plus `direction: rtl`, with no fallback — accepted.**
+The `direction` puts the low value at the bottom. Per MDN, vertical form controls via `writing-mode` "only
+gained full browser support in 2024", and this is `components/src`, so the baseline was put to the user and taken.
+The older routes could not have been layered underneath anyway: `appearance: slider-vertical` cannot
+combine with the `appearance: none` that strips UA paint, and Firefox's `orient="vertical"` is
+non-standard. On an older engine a vertical `Range` renders horizontal rather than degrading.
+
+The first hard modern-CSS dependency in `components/src` with no fallback, so it is the precedent
+_"Compatibility arguments"_ will be cited against. It is a real one: argued from a dated support claim and
+sanctioned explicitly, not inferred from the Playground.
+
+### Controls: `Tabs` as records, and the shape a data-driven group has to take
+
+Settled, as the rehearsal for `Select`. `Tabs` predated the control model and was the last
+component contradicting it: it hand-rolled its `<button>` / `<a>` and set native `disabled`. It is now
+`InteractionWrapper` per item plus an unexported `TabsItem` leaf, in the `Button` shape.
+
+**Parallel arrays became one array of records.** `getTabCount` + `getHrefs` + `computeIsDisabled` were
+three sources indexed against each other; now `getTabs: Accessor<Tab<T>[]>` with
+`Tab<T> = { value, href?, isDisabled? }`. This answers the objection recorded under `RadioGroup` — that
+data-driven groups "grow a `compute*` prop per capability and re-expose all of them per index". True of
+_indexed callbacks_, not of data: a capability is a field, and adding one costs nothing at the call site.
+The earlier entry rules out the callback form only.
+
+**Identity is the value, never the position.** `getSelectedIndex` / `onSelectionChange(index)` became
+`getSelectedValue` / `onSelectionChange(value)`. An index is stable only while the list is, and a filtered
+or searchable group changes exactly that. Everything internal resolves through the value and treats the
+index as a lookup result.
+
+**`<Index>`, not `<For>`, and that is why `renderTab` takes an accessor.** Records are rebuilt on every
+filter keystroke, so `<For>`'s by-reference keying would remount every row, losing focus and every ref.
+`<Index>` keys by position and lets the record change under a stable node, so the painter must subscribe:
+`renderTab(getTab, getFlags)`. The one place the choice of list primitive dictates a prop's shape.
+
+**Refs replace `querySelectorAll`.** The old `:scope > a, :scope > button` walk could not survive the
+wrapper, option groups or a painter rendering a `Button`. Each slot reports its control element through
+`InteractionWrapper`'s `ref`, so the element list is keyed by the same index as the data. Registration in
+the `RadioGroup` sense is unnecessary: the group already owns the array.
+
+**Selection stays one-way, and this is where `Tabs` and `RadioGroup` legitimately differ.** `RadioGroup`
+takes `valueSignal` because it owns its value; a `Tabs` with `hrefs` does not — selection is derived from
+the route, the case _"Signal tuples for two-way state"_ in `conventions.md` records as the shape's cost. `getSelectedValue`
+plus `onSelectionChange` keeps the router as owner.
+
+**The floater measures the wrapper, not the control.** `interactionRoot` is `position: relative`, so
+wrapping each item reparented the control's `offsetParent` and `offsetTop` / `offsetLeft` reported `0`.
+The observer hops one level to `control.offsetParent`, which is exact: the wrapper's box equals the painted
+box by construction, and `offset*` is unaffected by `Viewport`'s `transform: scale()`.
+
+**`tooltipDefs` is not on the record yet, for a real hazard rather than YAGNI.** `InteractionWrapper`
+branches on prop _presence_, so a record field would be forwarded conditionally and a tab gaining or
+losing a tooltip mid-life under `<Index>` reuse would not pick it up. Solid's props getters do make the
+conditional reactive, so it can be made to work; it is left out because `Tabs` has no use for it and
+untested API is worse than absent API. `Select` will want it.
+
+**A consumer selecting on `:disabled` breaks when a control stops lying about it.** The Playground's
+`tabCategory` reset the cursor through `:disabled &` and silently stopped applying; it became
+`[aria-disabled='true'] &`. The visible tail of the mechanism decision: consumer stylesheets written
+against native disabled do not fail loudly.
+
+**Verified by headless dump**: `role="tablist"`, one `tabindex="0"` across the list with the rest at `-1`,
+`aria-selected` on the right item, a floater at a real offset — also the proof that the `offsetParent` hop
+resolves and that `ref` forwards through the router's `A`. The disabled-tab half of that proof now lives
+on `TabsPage`, since the category item it used no longer exists.
+
+**The list names itself and states its axis.** Added, when `TabsPage` put five tab lists on
+one page. `getAriaLabel` lands on the `role="tablist"` element, `RadioGroup`'s arrangement for the same
+problem. `aria-orientation="vertical"` is set whenever `dir` is `column`: a tab list is horizontal by
+default, so a stacked one that does not say so tells a screen reader user to press the wrong arrows. Not a
+general rule about `dir` — it is stated here because `tablist` has a published default a column
+contradicts.
+
+**Arrows move the focus and `hasAutoActivation` makes them move the selection too, off by default.** The
+published pattern allows both, and calls the second one automatic activation. Manual stays the default
+because the cost of guessing wrong is asymmetric: a panel that fetches or builds something expensive is
+built once per tab arrowed _past_ under automatic, and the person walking a list to reach the far end pays
+for every stop on the way. Automatic is the better behaviour for a panel already in the document, which is
+why it is a prop rather than a rejection — and it is one flag rather than a mode string, because there are
+exactly two behaviours and no third one is coming.
+
+**The flag rides on the same key handler and changes nothing else.** The arrow already sets the focused
+value and moves focus; automatic activation reports that value through `onSelectionChange` afterwards, so
+selection still travels the one road, and a consumer who ignores the callback still gets the focus walk.
+Nothing new is announced, because the selection change is what a screen reader is already told about.
+
+### `TabPanel`: the pairing is written on the record, and read from both ends
+
+A tab must name the panel it opens and the panel must name the tab back, and the
+two elements have different owners — the library owns the tab, the consumer owns the panel — so neither
+can complete the link alone.
+
+**Both ids are fields on the record, and neither is generated.** `Tab<T>` gains `id` and `panelId`;
+`Tabs` writes them as the tab's `id` and its `aria-controls`, and writes nothing when absent. Radix and
+React Aria generate the tab's id privately, which they can only do because their panels are enclosed by
+their root. Here a panel may be a page the router mounts elsewhere — the Playground's left menu is that —
+so a generated id would have no route to the element that must quote it.
+
+**`TabPanel` is the other end, a wrapper in the `Label` sense**: `getId` and `getTabId` become the panel's
+id, `role="tabpanel"` and an `aria-labelledby`. Two strings rather than the record, since two strings are
+all it reads. It holds no state and does not decide whether it is mounted. `tabindex="0"` is
+unconditional, matching Radix, because a panel of plain prose offers a reader arriving from the tab list
+nothing else to land on, and testing for focusable descendants would mean measuring consumer content on
+every render.
+
+**It carries no class**, so a consumer's flex or grid child would become this element rather than their own
+box. Copy the Playground: `PageTabPanel` holds the `TabPanel` and paints inside it, so the library element
+is absorbed by the styled component and layout stays outside both.
+
+**Driven by `tabs.spec.ts` against `TabsPage`, not the Playground's left menu.** The menu is app
+furniture — adding a page or renaming a category used to break the keyboard spec and read as a `Tabs`
+regression, which happened once. The page carries a row, a column, links, a consumer link component and an
+all-disabled list.
+
+### The left menu is one tab list per category
+
+Settled, on the user's call between three options. The menu was a single `role="tablist"`
+holding every entry, with `Exotics`, `Fundamentals` and `Composites` inside it as disabled tabs. A tab list
+may own tabs and nothing else, and those three were never destinations. They are now `<h2>` elements
+outside the lists, and each category gets its own `Tabs` named by `getAriaLabel` with the same text.
+
+**The cost is one tab stop per category rather than one for the menu**, accepted rather than overlooked:
+arrows walk within a category and `Tab` crosses between them. The rejected alternative — dropping the
+category names from the markup — keeps one stop but tells a screen reader user nothing about a grouping the
+sighted user can see.
+
+**The `Tab<T>` `id` / `panelId` pairing is wired here too.** Each component config derives both from its
+own name and the routed page is wrapped in `TabPanel`, so the menu stopped being the standing example of a
+tab list naming a panel nobody wrote. The `backlog.md` bullet this fixes is about the library, not the
+menu: nothing still forces a consumer to do it.
+
+**A category whose entries are all filtered out disappears, heading and all** — an empty heading over an
+empty list is furniture with nothing under it. The rule that survived untouched, and the one the `Select`
+autocomplete argument rests on: the currently selected entry stays visible even when it does not match.
+
+**`Tabs` stopped orphaning its floater as part of this.** With one list the marker could never be stranded;
+with several, the list that used to hold the selection kept drawing its own, because the positioning effect
+returned early on "no selected item" instead of acting on it. The first fix cleared the stored bounds and
+was superseded a day later by the fader below — the bounds are what the exit animation draws from.
+
+### The floater appears and disappears through `ElementFader`, like every other library element that comes and goes
+
+Settled, at the user's request, once the menu split made a floater that comes and goes
+normal. A tab list with no selection has no marker, and that was a hard cut: in the document one frame,
+gone the next, with no way for a consumer to fade, shrink or slide it.
+
+**`renderFloater` now takes the same pair every appearing element's painter takes** — a visibility target
+of `0` or `1` and the transition duration — which is `Tooltip`, `Popover`, `Modal`, `Toasts` and
+`Spotlight`'s signature, transition pair first. `ElementFader.createFader` is driven by "is there a
+selected tab whose position we have measured", and the element is mounted while the fader says visible
+**or** still transitioning.
+
+**The duration is `getTransitionDurationMs`, the knob the floater already had**, rather than a second one
+beside it: a list that slides in 300ms and fades in 80ms describes two animations to one eye. A consumer
+who wants them apart puts a CSS `transition` in their painter.
+
+**The stored bounds outlive the selection and die with the element, and both halves are load bearing.**
+They are the last place the marker was, which is where the exit is drawn, so clearing them when the
+selection goes unmounts the element with nothing to play out. Keeping them past the exit is the other
+error and the one that shipped first: a list still holding a position starts its next entrance there, so
+the marker returned where it had left and slid across to the new tab over the deliberately long duration.
+A second effect watches the fader and clears them once the element is genuinely gone; the positioning
+effect re-fills them on a selection change, and the render is gated on having bounds at all, so an entrance
+cannot precede a fresh measurement.
+
+The tail of `tabs.spec.ts` measures the rendered box rather than waiting for the entrance to settle — a
+slide and an entrance take the same duration, so anything polling until the painter reaches its shown state
+has already let the slide finish and passes either way. Checked by putting the fault back and watching the
+assertion fail by 106 pixels.
+
+**`TabsPage` grew a variant whose selection can be cleared**, since none of the other five can lose theirs.
+It sets a longer duration on purpose: the middle of a 200ms transition is neither watchable by eye nor
+readable by a spec without a race.
+
+### `Anchor`: a placement may fall back within its family and never outside it
+
+`getSafeHPlacement` and its vertical twin choose between candidates by asking each where the content would
+land — `getHPlacementShift` plus that candidate's own `getHPlacementOffset` — and taking the least
+overflow. They used to hand-derive a "space" figure per branch from the anchor's edges, which is how the
+`in` branch came to ignore the content size and place content off-screen in 78 of a 240-case sweep.
+Deriving the span from the functions that do the positioning makes that class of error unexpressible, and
+fixes a second one: the offset was previously computed once from the _requested_ placement and reused to
+judge its mirror, whose offset has the opposite sign.
+
+**A placement never crosses between `in` and `out`.** `in` means aligned to an anchor edge and overlapping
+it; `out` means beside it. Choosing between them is the consumer stating a relationship, not a hint — a
+tooltip that hops from inside its anchor to outside has changed what it means. So `left-in` may become
+`right-in` and `left-out` may become `right-out`, and nothing else. `center` may fall back to either `in`,
+since a centred layer already overlaps.
+
+The cost is measured: when an anchor is itself clipped by the viewport there are cases where no `in`
+placement fits and an `out` one would have. All of them require the anchor to be partly off-screen.
+
+**Content that fits nowhere takes the least-overflow candidate and may run off the screen.** `getPosition`
+never clamps. Clamping would keep content visible at the price of detaching it from the edge it was aligned
+to, which is the same trade as crossing families and refused for the same reason. A layer wider than the
+viewport is the consumer's to size.
+
+### `Anchor`: the positioning half of a floating layer, extracted
+
+Settled, as the other half of the `Select` groundwork. A dropdown needs everything `Tooltip`
+knows about placing a box against an element and nothing it knows about when to show one.
+
+**The split is behaviour from markup**, and the existing rule decides where it falls: _"it renders DOM, so
+it is not an `Abstract`"_ means the extraction is the effect, not the popup. `Abstracts/Anchor/` holds
+`AnchorUtils` (the placement math, formerly `TooltipUtils`, moved unchanged) and
+`Anchor.createPortalPosition(getAnchorRef, getIsVisible, opts)`, which observes the anchor, measures the
+content, resolves the collision-safe placement and returns `{ getPlacement, getPosition, setContentRef }`.
+`Tooltip` lost sixty lines and kept its triggers, `aria-describedby`, `role` and markup.
+
+**The name carries the coordinate space**: `createPortalPosition` returns a position in the `Viewport`
+portal's space, which is what a consumer assigns to `top` / `left` on a portalled element. The anchor rect
+still comes from `createViewportRectObserver`, so the scale factor is divided out exactly once.
+
+**What stays duplicated is the dozen lines of `<Show><Portal><div>`, deliberately.** Both consumers portal
+into the same mount and position absolutely, but disagree about everything else — a tooltip is
+`role="tooltip"` and `pointer-events: none`, a listbox is clickable, focusable and `role="listbox"` — so a
+shared component would be a two-mode component. Behaviour is shared; markup is not.
+
+`Tooltip` is not renamed. `AnchorPlacement` replaces `TooltipPlacement` (and its `H` / `V` halves) because
+the type is now shared vocabulary.
+
+### Controls: `Select`, and who owns a floating list
+
+This and the two `Select` headings after it are what remains of a design brief
+deleted once it shipped; `backlog.md` #6 carries what was left out.
+
+**One `mousedown` `preventDefault()` on the popup root is what makes the whole model work.** The options
+live in the `Viewport` portal, so clicking one would blur the field. Refusing the default action of
+`mousedown` means focus never leaves the field. Three things fall out, and they are why `Tooltip` could not
+have been the dropdown: an option click cannot dismiss the popup before the click resolves;
+`aria-activedescendant` is honest, because focus really is on the field; and **close-on-blur becomes correct
+rather than fatal**, so there is no document-level outside-click listener.
+
+**The field is a `<button role="combobox">`.** The APG select-only pattern uses `<div tabindex="0">`, which
+means re-implementing focusability and activation a button has for free, and the house rule is that the leaf
+is a real element with real semantics. `Enter` and `Space` are handled in `keydown` with `preventDefault()`,
+which suppresses the button's synthesised click — otherwise every keyboard activation toggles twice.
+
+**Options are `role="option"` divs, never buttons, never tab stops.** `getIsTabbable={() => false}` puts
+them at `tabIndex -1`; a button inside a listbox breaks option semantics. The consequence a painter must
+know: **`isFocused` is never true for an option**, because focus is on the field. Hence their own extras.
+
+**`isHighlighted`, not `isActive`.** `SelectOptionFlags = { isHighlighted, isSelected }`.
+`InteractionFlags.isActive` already means "held down" across every control.
+
+**The highlight is a value resolved to an index — never a stored index.** Same shape as `Tabs`' roving
+entry: a `highlightedValue` signal and a memo resolving it against the navigable indexes, falling back to
+the selected option then the first navigable one. Opening therefore highlights the selection with no
+imperative set, and a list changing under a filter cannot leave the highlight pointing elsewhere.
+
+**The painter owns the panel, so the option list arrives as a thunk.**
+`renderPopup(renderOptions, getVisibilityTarget, getTransitionDurationMs, getPlacement, getFlags)` — the
+consumer returns their own bordered, scrolling, animating box with `{renderOptions()}` inside. The
+`renderDecoration` shape (an absolutely-positioned painter behind a library-owned list) was rejected: a
+decoration cannot scroll with the content, which would force `max-height` and `overflow` into library props.
+`role="listbox"` stays on the library's positioned root and options are descendants at whatever depth the
+painter nests them, which ARIA allows as long as nothing between carries a conflicting role.
+
+**Geometry is the library's, including the width floor.** `createPortalPosition` also returns
+`getAnchorRect`, and the popup root sets `min-width` from it. A painter cannot compute this — it is portalled
+away from the field — and a dropdown narrower than its control is a positioning artefact, not a style choice.
+Everything above the floor stays the painter's, exactly as `getMinWidth` draws that line for adornment insets.
+
+**`pointer-events` is switched off for the closing fade**, since `ElementFader` keeps the popup mounted for
+the transition and a click during those 200ms would select a second time from a list visually leaving. The
+inline style overrides the `pointer-events: all` the class needs while open.
+
+**Single-select first, and no shared private composite yet.** `valueSignal: Signal<T | undefined>` is what a
+consumer already holds; `Signal<T[]>` for both cases would tax the common one and make "nothing selected"
+representable twice. Multi differs in behaviour, so the `BinarySwitch` shape is the likely end state, but
+erecting it before a second consumer would be guessing at the seam.
+
+**The keyboard walk stops on reachable-disabled options and refuses to select them**, matching `RadioGroup`.
+`getNavigableIndexes` calls `InteractionTracker.computeIsReachable` with the option's own three fields rather
+than re-deriving the rule.
+
+**`scrollIntoView({ block: "nearest" })` on the highlighted option** is the only way the library reaches a
+scroll container the painter owns. It runs from an effect on the highlight, so it covers opening onto a
+selection far down the list as well as the walk.
+
+### Controls: `Select`'s autocomplete, and why the consumer filters
+
+The question was whether `Select` owns a default matcher with a `computeIsMatch`
+escape hatch, or owns only the query string.
+
+**The consumer filters, and the precedent is the Playground's own left menu.** `Tabs` has no filtering API:
+`AppContent` owns the search box, the query, and derives each list's tabs. Its rules are the argument — it
+decides what a fully-filtered category does, and it **keeps the currently selected item even when it does
+not match**. Neither is expressible by a library matcher over an unknown `T`, and the second silently breaks
+a select whose matcher would filter the selected option away. The `Select` page makes the point from the
+other end: it matches an airport on **either its city or its IATA code**, two fields the library cannot know
+exist. Ownership follows knowledge.
+
+**`Select` owns the query, because the query is the field's text.** `querySignal: Signal<string>` is a
+`*Signal` by the existing rule, since the component writes it on every keystroke and the consumer reads it
+to derive `getOptions`. The loop through the consumer is a plain memo, not a cycle.
+
+**"No matches" stopped being a flag.** The candidate `hasNoMatches` is gone rather than deferred: the consumer filtered, so it already knows the result is empty, and
+its empty state is its own JSX inside `renderPopup`. A flag would be the library telling the consumer
+something they just computed.
+
+**The mode is `querySignal`'s presence, and this is the one sanctioned use of that.** No `getIsAutoComplete` boolean beside it. _"Presence as a
+trigger fails invisibly"_ warns about a prop whose real purpose is something else quietly changing
+semantics; a query string has exactly one purpose, an editable field with nowhere to put its text is
+incoherent, and forgetting the prop yields a working non-editable select — so it fails toward the safe
+default. Precedent: `Tab<T>`'s `href` choosing `<a>` over `<button>`.
+
+**One leaf, two elements, in the `TabsItem` shape.** `SelectField` holds a `commonProps` object of getters
+for the shared ARIA and a `<Show>` rendering either a `<button>` or an `<input>`. The `<input>` follows
+overlay geometry, and `getPadding` plus `computeTextStyle` are the same two props `TextInput` uses.
+`TextInputTextStyle` is imported rather than re-declared: same concept, and duplicating a twelve-key `Pick`
+to avoid a sibling import is the worse trade.
+
+**The painter draws the selection, the input draws the query, and `isFiltering` decides which is visible.**
+The two texts are stacked by the overlay geometry, so the painter fades its value text out while the query
+is non-empty and back in when it clears — so no option ever needs a `label` field for the field to display a
+selection.
+
+**The component clears the query, and waits for the fade to finish.** Closing ends the interaction, so the
+query is the component's to reset; doing it in `close()` repopulated the consumer's list mid-fade and
+visibly re-grew the box. It now runs off `ElementFader`'s `getHasTransitionFinished`, guarded on the query
+already being empty so it never writes on mount.
+
+**An editable field takes the keyboard back.** `Space` types a space instead of selecting, and `Home` /
+`End` move the caret instead of jumping to the first or last option — both gated on the mode, because
+hijacking either in a text field is a bug rather than a shortcut. `Enter`, `Escape`, `Tab` and the arrows
+are unchanged. Typing opens the popup and resets the highlight, so each keystroke re-highlights the first
+option of the new list.
+
+**While filtering, the highlight prefers the first option over the selection.** Otherwise typing `lis` with
+`Oslo` selected leaves the highlight on `Oslo` and `Enter` re-picks it. The limit is inherent to the consumer
+owning the filter: the component knows which options are _present_, not which _matched_, so a consumer
+injecting a non-matching option can still see the highlight land on it. That is theirs to fix in their own
+filter, and it is why the left menu's keep-the-selected-item rule must not be copied into a select.
+
+**`TextSync` came out of `TextInput` because a second consumer arrived.** `Abstracts/TextSync/` holds
+`createValueSync(ref, value, opts)` — the element/value sync, the caret restore after a transforming setter,
+the IME composition gating. Exactly `TextInput.syncElement`'s code; extracting beat duplicating fifteen
+lines of caret arithmetic.
+
+### One walk numbers the options, and both of `Select`'s rendering paths read it
+
+`Select` renders a grouped list two ways — mounted, which walks the written items and nests a `role="group"`
+box per group, and windowed, which walks a flat row list because a window cannot draw a box whose ends are
+outside it. Both need the same number for each option: **its flat index among all options**, which is what the
+highlight, `aria-activedescendant`, typeahead and the keyboard all index by.
+
+**That number used to be worked out twice, once per path**, by two walks that had to agree and nothing checked:
+a `getItemOffsets` memo inside `Select.tsx` counting options per written item for the mounted path, and a
+running counter inside `SelectUtils.getRows` for the windowed one. Two walks producing one number is the shape
+of a bug that only shows on one of the two paths, which is also the harder of the two to look at.
+
+**`getItemOffsets` is now in `SelectUtils` and `getRows` is built on it**, so there is one definition of how
+many options precede a written item and the row list reads its `optionIndex` from that. Neither rendering path
+changed. `Select.utils.test.ts` pins the walk directly — including that an empty group contributes nothing, so
+the offsets repeat rather than leaving a hole — and that the option indexes on the rows are the same sequence
+`getFlatOptions` produces, which is the agreement that used to be implicit.
+
+**Note what is not shared: the row index and the option index are different numbers**, and
+`getRowIndexOfOption` is the bridge. A group header is a row and is not an option, so the two spaces diverge
+the moment a list is grouped. `Tree` has no such split — every row is a node — which is the difference that
+makes the two components' flatteners less alike than they look.
+
+### Grouping and windowing compose, and the group box is what makes it possible
+
+**The window runs over rows, not options.** `SelectUtils.getRows` flattens the item list into one row per group
+header and one per option, each carrying the option's flat index so the highlight, the ids, typeahead and the
+keyboard walk keep counting options the way they always did. `getIsVirtualized` no longer refuses a grouped
+list; the only condition left is that the consumer supplied an estimate.
+
+**A `role="group"` box holds whatever slice of its group is in the window, and that is correct rather than a
+compromise.** The obstacle recorded against this was that a box wraps its options, so a window opening halfway
+down a group would have to draw a box whose header is above the window and whose end is below it. It dissolves
+once the box's own entry above is taken seriously: the box is **not paintable** — the library owns
+`<div role="group" aria-label>` and the consumer fills only the header. A box with no paint has no visual
+extent to preserve, so wrapping only the mounted rows changes nothing a reader can see, and the group's name
+travels on `aria-label`, which is present whether or not the header row is in the window.
+
+**Visible rows are cut into runs of one group.** Consecutive rows sharing a group get one box; a run beginning
+mid-group is ordinary. The box is a static element, so the rows inside keep resolving their `position:
+absolute` against the sizer and their transforms are untouched — wrapping them costs no layout.
+
+**The header is not sticky, and that is not a taste call.** Windowing is an optimisation, so the windowed list
+must look like the mounted one, and in the mounted list a header scrolls away with its group. Repeating or
+pinning a header would make the two renderings differ by whether the consumer happened to pass an estimate.
+If sticky headers are ever wanted they belong to both renderings at once.
+
+**The pinned row keeps its own box.** `getPinnedRows` already held the highlighted option mounted so typeahead
+and the active-descendant id survive scrolling; converted to a row index it now also pulls that option's group
+box along, which is why a scrolled list can show two boxes — the group under the window and the one holding the
+pinned row.
+
+**`computeEstimatedGroupHeight` is optional and falls back to the option estimate.** A header is usually
+shorter than an option, and an estimate that is wrong only shifts the scrollbar until the row is measured, so
+requiring it would be ceremony; getting it right is worth doing when the headers are tall.
+
+### Controls: option groups, and `Select` / `MultiSelect` as presets
+
+Settled, completing the brief. Both landed together because they answer the same question
+from opposite ends: what the option list is a list _of_, and what a selection is.
+
+**A group is a record with children, in the same array as ungrouped options.**
+`SelectItem<T> = SelectOption<T> | SelectOptionGroup<T>`, discriminated by `SelectUtils.getIsGroup`
+(`"options" in item`), so a list can mix both and a group cannot be malformed — no sibling marker to get out
+of order, no second prop to keep in step. `SelectOption<T>` is a closed record shape, so the `in` check
+cannot be fooled by a `T` with its own `options` field.
+
+**The tree is a rendering concern only; everything else works off the flat list.**
+`SelectUtils.getFlatOptions` gives traversal order, and the keyboard, highlight, ids and selection all index
+into it — so the arrow walk crosses group boundaries without knowing groups exist, and `Home` / `End` reach
+the ends of the whole list. The one piece of bookkeeping is `getItemOffsets`, mapping each top-level item to
+where its options start in the flat list, which lets a nested `<Index>` hand each slot its flat index.
+
+**The library owns `role="group"` and its name; the consumer paints the header.** The wrapper is a bare
+`<div role="group" aria-label={label}>` and `renderGroup(getGroup)` fills in the visible header. Two
+rejections: `display: contents`, because Chromium has historically dropped such elements from the
+accessibility tree and the role is the point of the element; and a `renderGroup(getGroup, renderOptions)`
+thunk in `renderPopup`'s shape, which would put the ARIA role in consumer markup. The cost is that a
+consumer cannot style the group box itself, only its header — recorded rather than solved, since the thunk
+form is available later.
+
+**Option refs are gone, and each option scrolls itself into view.** An array keyed by index cannot survive a
+tree, since a flat index shifts when a preceding group is filtered. `SelectOptionItem` watches its own
+`isHighlighted` and calls `scrollIntoView({ block: "nearest" })` on its own element, correct at any depth.
+
+**`SelectComposite` is private, `Select` and `MultiSelect` are thin presets over it** — the `BinarySwitch`
+shape, down to `SelectPresetProps<T>` being an `Omit` of the composite's props. `index.ts` exports the two
+presets and the types but not the composite. The seam is four props: `getSelectedOptions`,
+`computeIsSelected`, `onPick`, `getIsMultiple`. Everything else is written once.
+
+**Multi is a preset rather than a mode flag because the value's _type_ changes.**
+`Signal<T | undefined>` versus `Signal<T[]>` cannot be reconciled by a boolean, and a single `Signal<T[]>`
+would tax the common case and give "nothing selected" two spellings. The composite never sees a value: it
+asks the preset which options are selected and tells it what was picked. `MultiSelect` toggles membership;
+`Select` replaces. That is why `renderContent` takes `getSelectedOptions` plural and `Select`'s preset
+narrows it to `getSelectedOptions()[0]`.
+
+**Picking in a multi list keeps it open, and moves the highlight to what was picked.** The second half was
+found by driving it: with the highlight left alone, arrowing after a mouse pick continued from the _first
+selected_ option. `aria-multiselectable="true"` goes on the listbox, and `isSelected` on an option stays a
+boolean — an option is selected or it is not. The three-way value belongs to the group header, below.
+
+**A group header is told how much of its group is selected, through a second argument rather than a new prop.**
+`renderGroup` was `(getGroup) => JSX.Element` and is now `(getGroup, getFlags) => JSX.Element`, where
+`SelectGroupFlags` carries one field, `checkedState`. Adding an argument rather than a prop keeps every
+existing header working untouched — a consumer who does not want the state simply never names the second
+parameter — and it matches `renderOption`, which has taken `(getOption, getFlags)` all along. The field is
+a record rather than a bare accessor so that a second thing about a group has somewhere to go.
+
+**The state is computed the same way in both presets, and is degenerate in one of them.** `Select` and
+`MultiSelect` differ only in `computeIsSelected`, which the header folds over the group's own options, so a
+single-select group holding the selected option reports `"mixed"` — accurate, since some of its options are
+selected and some are not, but never useful, because a single-select group can only reach `true` when it
+holds exactly one option. Gating the computation on `isMultiple` was rejected: it would make one field mean
+two different things depending on which preset was mounted, and the consumer paints the header anyway, so a
+single-select consumer simply does not ask for the flags. The Playground does exactly that — only the
+grouped multi-select passes them through to `PageSelectGroupContent`.
+
+**A disabled option is still a member of its group.** The Playground's Nordics group holds a disabled Finland,
+so picking Denmark and Sweden leaves that header at `"mixed"` for good. Excluding unpickable options was
+rejected because it would let a header say _everything here is selected_ while an option sat there unselected,
+which is worse than a header that never fills in. The rule is that the header describes the group's options
+against the current selection, and nothing else.
+
+**Nothing about this reaches the accessibility tree, and that is not an omission.** A `role="group"` has no
+checked state in ARIA — `aria-checked` is not among the attributes it supports — and each option already
+announces its own through `aria-selected`. So `checkedState` is paint input and nothing more, and the library
+still draws no header of its own.
+
+**`inert` is what disables a closing popup, not `pointer-events`.** A real bug: the fading popup carried
+`pointer-events: none` on its root, which looked sufficient and was not — `pointer-events` is inherited, but
+every option sets `pointer-events: all` explicitly (it has to, to beat `interactionRoot`'s `none`), and an
+explicit value on a descendant beats an inherited one. So a click aimed at whatever sat under a closing
+popup was swallowed by an option of a list already visually gone. `inert` disables an entire subtree for
+pointer events, focus and the accessibility tree regardless of descendants; `FocusManager.isReachable` already
+tests `[inert]`, so support was assumed all along. **General rule: `pointer-events` on an ancestor cannot
+switch off a subtree, only `inert` can.**
+
+**Behaviours a `Select` guarantees, to re-check after touching it** — none visible in markup, and the last
+two were wrong once: `Enter` on a reachable-disabled option changes nothing and leaves the popup open;
+clicking an option leaves `document.activeElement` on the field; a disabled field neither opens nor takes
+focus while its reachable twin stays at `tabIndex 0`; the arrow walk skips a disabled option _inside_ a group
+and crosses into the next; a multi list stays open across a pick and moves its highlight to the row picked;
+and a closing popup lets a click through.
+
+### Controls: `Popover` extracted, and `Menu` as the second consumer
+
+The standing "private until a second consumer" rule fired: `Select`'s floating layer
+became `Fundamentals/Popover/`.
+
+**This does not reverse _"What stays duplicated is the dozen lines of `<Show><Portal><div>`"_ — it is the
+same argument reaching the opposite answer on different inputs.** That entry refused to share markup between
+a tooltip and a listbox because they agree on nothing. A listbox and a menu are both _interactive_ floating
+layers and agree on every line. `Tooltip` keeps its own dozen lines and stays out.
+
+**`Popover` owns everything true of a floating layer and nothing about what it contains:** the portal mount,
+`createPortalPosition`, the `ElementFader`, `inert` while the fade closes, the `mousedown` refusal,
+`tabindex="-1"`, and the anchor-width floor. Content arrives as
+`renderContent(getVisibilityTarget, getTransitionDurationMs, getPlacement)` — `Tooltip`'s signature.
+
+**The role is the consumer's, so the ARIA that role requires is the consumer's too.** `getRole` plus one
+`getAriaAttributes: Accessor<JSX.AriaAttributes>` rather than a prop per role-specific attribute.
+`aria-multiselectable` is a listbox word and `aria-labelledby`-to-the-trigger is a menu word; a `Popover`
+learning either would grow a branch per consumer. It sits on the same element as the role because it has to
+— the options are descendants, so the role cannot be nested one level in.
+
+**The anchor-width floor is opt-in, because the argument for it was a listbox argument.** A menu hanging off
+an icon button has no such relationship and should size to its content. `Select` passes
+`getHasAnchorMinWidth`, `Menu` does not.
+
+**The fader stays inside and reports out through `onTransitionStatusChange`**, the shape `Modal` uses. A
+component cannot return values, and `Select` needs the settled flag to know when it may clear the query.
+
+**`outline: none` on the root is deliberate and is not a colour decision.** The root is focusable only to
+host `aria-activedescendant`; the visible focus is the highlighted item, painted by the consumer. A ring
+around the whole surface would point at the wrong thing.
+
+**It is written twice so a consumer cannot reverse it by accident**, added later. A bare `outline`
+on the class ties with a consumer's blanket `:focus-visible` rule on specificity, so the winner is whichever
+stylesheet was emitted last — the Playground's was, which is how every popup grew a ring nobody asked for.
+The rule is repeated under `&:focus, &:focus-visible`, which outranks a plain pseudo-class rather than racing
+it. What it gives up: a `Select` whose filter emptied the list has nothing painted as focused and is
+announced empty; a consumer wanting a ring there paints it on their own surface.
+
+**The initial focus is `Popover`'s, and a real bug is why.** `Menu` first called `FocusManager.autoFocus`
+itself and focus stayed on the trigger: the root carries `visibility: hidden` until `Anchor` has produced a
+position, and a `visibility: hidden` element silently refuses `focus()`. Being positioned is `Popover`'s own
+state, so `getHasAutoFocus` moved the call inside, gated on `getPosition() !== undefined`. **The gate is a
+memo of the boolean, not of the position**: the position object is rebuilt on every anchor observation, so
+depending on it directly would re-focus the surface on every scroll.
+
+**`Menu` moves focus to the menu, not to the items, and that is where `aria-activedescendant` is allowed to
+live.** ARIA supports the attribute on composite roles — `menu` is one, `button` is not — so the APG variant
+with a single focus target puts both on the `role="menu"` element. The items are then `Select`'s options
+exactly: non-focusable `role="menuitem"` divs at `getIsTabbable={() => false}`, `isFocused` never true, and
+a highlight held as a value resolved to an index. `FocusManager.autoFocus` restores focus to the trigger on
+close through the same `onCleanup` `Modal` relies on.
+
+**Two keydown handlers rather than `Select`'s one**, because the two states have different focus owners: the
+trigger handles the closed menu (`Enter` / `Space` / `ArrowDown` open on the first item, `ArrowUp` on the
+last), the menu handles the open one. They cannot both be focused, so neither tests whether the menu is open.
+
+**Clicking the trigger while the menu is open would otherwise reopen it.** The `mousedown` moves focus to
+the trigger, the menu blurs, blur closes, and the click's own toggle then opens it again. The guard is
+`relatedTarget === trigger` in the blur handler: focus going to the trigger is not a dismissal, and the
+click that follows does the closing. Every other blur still closes with no document-level listener.
+
+**`MenuFlags` is `{ isOpen }` and nothing else.** A menu carries no value, so no `isEmpty`, no
+`aria-selected`, no `isSelected` equivalent, and the callback is `onActivate` rather than `onPick`.
+
+**Dismissal was not extracted as an `Abstract`, against the plan that scheduled this work.** `Menu`'s
+dismissal turned out to be `Select`'s exactly — `Escape` in a keydown, close on the focused element's blur,
+no document listener — while `Modal`'s is a different mechanism (document keydown, overlay click, focus trap,
+explicit restore). Two identical siblings and one that does not fit is not the shape that wants an
+`Abstract`; the thing genuinely shared with `Modal` was `FocusManager.autoFocus`, which existed.
+
+### `Menu` submenus: a level per popup, focus moving between them
+
+An item may carry `items`, and a level is drawn per popup all the way down.
+
+**The choice was one focus target for the whole tree versus one per level, and support decided it rather
+than structure.** Keeping focus on the root menu looked like the smaller change. It is not:
+`aria-activedescendant` may only name a descendant of the focused element **or** one claimed through
+`aria-owns`, and every level is portalled out to the viewport — so that variant rests entirely on
+`aria-owns` across a portal, which is sanctioned and thinly supported. A level holding its own focus has its
+items physically inside it, and it is the variant the APG menu examples implement: `ArrowRight` opens a
+submenu onto its first item, `ArrowLeft` closes it and returns.
+
+**`MenuLevel` is the recursion; `Menu` is the trigger plus the root level.** A level owns its highlighted
+value, which of its items is open, its own popup and its own keyboard. It renders each submenu inside the
+item that owns it, so a level unmounts with its parent for free and the anchor is that item's element.
+
+**An item with children is the trigger for its level, and says so in the same words the button does** —
+`aria-haspopup="menu"`, `aria-expanded`, `aria-controls` while open. `MenuItemFlags` gained `hasSubmenu` and
+`isOpen` so a painter can draw the arrow and the open state, which it could not otherwise infer.
+
+**`MenuItemFlags` is a superset of `MenuFlags`, and that keeps `renderPopup` at one signature.** A popup is
+handed the flags of whatever opened it — the trigger's for the root, the parent item's for a submenu.
+Disjoint flag types would have forced a union every consumer had to narrow.
+
+**A key is handled by the level it was pressed in, and the check has to be explicit because Solid
+re-dispatches delegated events through the component tree rather than the DOM tree.** The levels are
+portalled siblings, so nothing bubbles between them in the page — but `keydown` is delegated, and Solid walks
+a portal back to the component that rendered it, so a key pressed three levels deep ran every ancestor
+level's handler: `Escape` collapsed two levels and `ArrowLeft` closed the menu outright. Each level now
+ignores a keydown whose target is not its own popup root. Stopping propagation would have worked and was
+rejected: it would swallow the key for anything outside the menu that listens.
+
+**A blur dismisses only when focus has left the whole tree**, identified by id prefix — every level's id
+derives from the root's. The previous `relatedTarget === trigger` guard cannot generalise, because closing a
+level restores focus to the level above and that restore reaches the parent as a blur; with three levels
+open, hovering back up the chain closed everything. The trigger check stays beside it for its own reason.
+
+**Hovering an item opens its submenu, and moves the highlight there.** Splitting them is worse: the highlight
+is what `aria-activedescendant` names, so a submenu open under an unhighlighted item states two positions at
+once, and `ArrowLeft` back out would land on neither. Hovering an item with no children closes whatever was
+open at that level. Nothing is on a timer.
+
+**`ArrowUp` on a closed trigger still opens onto the last item, but the mechanism moved.** The highlight now
+lives in the level, so the trigger states an intent — `initialHighlightPosition` — which the level reads only
+as the fallback for a highlight nothing has set. It is not written into the level's state, so the first arrow
+press walks from it and overwrites it as before.
+
+**A trigger swallows its own keys while its menu is open, rather than opening it again.** Added
+. A menu is drawn and highlighted before it takes keyboard focus — the layer takes focus only
+once positioned, and its position waits on a `ResizeObserver` callback in a later task. In that window an
+`Enter` meant for the highlighted item reached the trigger, which read it the only way it knows: open the
+menu. Opening an open menu reset the highlight to the first item, so the keystroke silently moved the
+highlight and the next `Enter` ran the wrong item. Refusing the four opening keys while the state says open
+turns that into a keystroke ignored, the tolerable failure.
+
+**The default is prevented before the open state is consulted, and the order is load-bearing.** All four
+keys activate a `<button>` natively, so returning early without preventing the default lets the browser
+synthesise a click that toggles the menu shut.
+
+**What this does not do is make that early keystroke work.** Closing the window means giving a layer focus
+as soon as it is open rather than once positioned; the cheap version — reading the content size once on mount
+instead of waiting for the observer — was tried and reverted. Positioned a frame earlier, the
+menu lands under the pointer that just clicked the trigger and `onMouseEnter` takes the highlight, so six
+menu specs failed on a highlight one item further down. That makes it a question about whether the pointer or
+the keyboard owns the highlight at open, which nobody has decided.
+
+**The submenu's placement defaults to `right-out` / `top-in`; its offset is zero and belongs to the
+consumer.** A submenu anchors to its parent item, and an item sits inside whatever padding and border the
+painter's surface has, so a submenu flush against its anchor overlaps the surface it came from. The library
+cannot know that inset, so `getSubmenuOffset` is where the consumer states it; the Playground passes its own
+surface's padding plus border. Anything a consumer paints _outside_ its box — a drop shadow — overlaps by the
+same arithmetic and is theirs by the same argument.
+
+### Typeahead: the text is read off the item, and `computeCustomText` is the way out
+
+Settled on the user's call, closing the gap `Select`, `Menu` and `Tree` each recorded separately. All three
+had the same blocker written down — the library has no text for an item, only what the painter drew — and
+all three now have typeahead.
+
+**The blocker was smaller than it read, because the item element is the library's own.** A
+`role="option"`, a `role="menuitem"` and a `role="treeitem"` are all built here, with the painter's markup
+inside them, so the text is already in the document and reachable without asking the consumer for it a
+second time. Two of the three libraries checked do exactly this — Radix falls back to the item's rendered
+text when no `textValue` is given, and React Aria requires `textValue` only when the children are not plain
+text. What the earlier note called "a second source for text the painter already renders" was a prop that
+did not have to exist.
+
+**It is the accessible text, not `textContent`, and the difference is not cosmetic.** Every painter here
+marks its decorative glyphs `aria-hidden` — `Tree` draws a "▶" before a branch's name, `Select` a "✓" after
+a selected option. Raw text would make every branch in the tree begin with an arrow and match nothing a
+person would type. So `TypeaheadUtils.getElementText` walks the element and skips any subtree carrying
+`aria-hidden`, which lands on the same string a screen reader announces. Typing what you hear is the rule,
+and it falls out rather than having to be arranged.
+
+**The override is `computeCustomText`, and the word "custom" is doing work.** Named by the user, so that
+the prop's own name says a default already exists — a bare `computeText` would read as the only source and
+invite every consumer to supply one. Two cases need it, and only two. A **windowed** list mounts the rows in
+view and nothing else, so an unmounted option has no element and no text; the Playground's virtualized
+example passes `computeCustomText` for exactly that reason, and typing a route's name reaches one far below
+the window. And an item whose paint is **not text** — a swatch, an avatar — has nothing to read.
+
+**The buffer is a factory and the matching is a pure function, which splits the opposite way to the walk.**
+`NavigatorUtils.computeNextPosition` was deliberately not a factory because each control owns its cursor
+differently. The typeahead buffer is the reverse: a string and a timer, owned identically by all three, with
+nothing per-control about it. So `Typeahead.createBuffer` owns that state and
+`TypeaheadUtils.computeNextIndex` stays pure, taking positions and a text lookup and returning a position.
+The rule from the walk still holds — the abstract answers _which item is next_, the control answers _what to
+do about it_: `Select` moves its highlight, `Menu` moves its highlight, `Tree` moves real focus.
+
+**A repeated letter cycles, and a growing query holds.** `l` then `l` means "the next thing starting with
+l"; `l` then `i` means Lisbon. One rule covers both: when the query normalises to a single character the
+current item is excluded from the scan, otherwise it is not — which is why typing `li` does not walk away
+from the Lisbon it just landed on.
+
+**The query is forgotten after a second**, following React Aria and Radix rather than the shorter half-second
+some native controls use. A slow typist breaks a two-word name at 500ms, and the cost of the longer window is
+only a stale query, which the next pause clears anyway.
+
+**Space joins the query only when there is a query to join.** Space activates a menu item and selects an
+option, so it cannot be a query key from cold; once something has been typed it belongs to the query, which
+is what makes "depot p" reachable. The dangerous half is the one worth stating: a space typed mid-query must
+not run the item the highlight happens to be sitting on, and `menu.spec.ts` pins that.
+
+**Each control claims its own printable keys first.** `Tree` uses `*` to open every branch at a level, which
+the published pattern names, so that branch moved above the typeahead check rather than the key being
+special-cased inside the abstract. **An autocomplete `Select` is excluded outright** — a field with a query
+signal is a real text input and every keystroke belongs to the consumer's filter. Filtering shortens the
+list; typeahead walks it; a control does not do both.
+
+**Typing on a closed `Select` opens it and lands on the first keystroke.** The list is opened before the
+match runs, and Solid mounts it synchronously on the signal write, so the options exist by the time the text
+is read. This was expected to need two keystrokes and does not.
+
+### `ElementFader`: the frame that starts a transition needs a fallback
+
+`setTarget` flips `transitionTarget` inside a `requestAnimationFrame` so the browser
+paints the pre-transition state first — without that the CSS transition has no start value. The bug was that
+the frame was the _only_ path: `setHasTransitionFinished(false)` happens immediately,
+`getIsVisible` is `transitionTarget === 1 || !hasTransitionFinished`, and the duration timer was armed only
+inside the callback. So on a page that stops producing frames — a backgrounded tab — a dismissed `Modal`
+never leaves: `getIsVisible` stays true, the `<Show>` stays mounted, and the focus trap stays with it.
+
+It now schedules the same idempotent `commit` from both a frame and a 100ms timer, whichever arrives first,
+cancelling the loser. The frame wins wherever frames exist; where they do not, the state machine advances
+without an animation, which is correct on a page that is not painting.
+
+### Controls: `Progress`, and what a non-interactive Fundamental looks like
+
+The first `Fundamentals` component that is neither an interaction nor a composition
+of one, so it settles the shape by being it.
+
+**No `InteractionWrapper`, and no flags.** Nothing to hover, focus or activate. The root is a bare
+`<div role="progressbar">` and the painter receives `getState`, not `getFlags` — `ProgressState` is the
+analogue, and calling it flags would claim an interaction contract this component does not have.
+
+**The painter is handed a normalised `ratio` as well as the raw value.** Clamping `(value - min) / span`
+into 0..1 is the one computation a painter must not repeat, since getting it wrong draws past the end of the
+track. `value`, `min` and `max` come along because a painter rendering "1.2 of 2.4 MB" cannot get them
+anywhere else — the opposite of `TextInput`, which withholds the value because the input already draws it.
+One rule both times: hand over what the painter would otherwise have to double.
+
+**`ratio` is `number | undefined`, and the `undefined` is the mode.** An absent `getValue()` means
+indeterminate, which is what ARIA means too — `aria-valuenow` is omitted. Sanctioned "presence as a
+trigger": one meaning, and forgetting the prop yields a working indeterminate bar. It reads the **value**,
+not the prop, for `getTooltipDefs`' reason — an upload with no total yet returns `undefined` from a
+`getValue` that later returns numbers. Extras elsewhere are required so a painter never handles an
+`undefined` its control cannot emit; here the control genuinely can emit one.
+
+**The indeterminate animation is the painter's**, contradicting the note that raised this component: an
+indeterminate bar is a looping animation with no state behind it, CSS runs it on the compositor free, and a
+library-owned clock would burn frames handing over a phase `@keyframes` already gives. The library says
+_that_ the bar is indeterminate.
+
+**Placement is the library's**, contradicting the same note in the other direction — see the `Modal` presets.
+
+**`getSizing` defaults to `"fill"`, the inverse of `InteractionWrapper`'s, and the type is declared here
+rather than imported.** A control's natural size is its content; a track's is its container. Both
+vocabularies have the same two members, and sharing the type would file a non-interactive component's
+geometry under `InteractionWrapper.types`.
+
+### Controls: `Drawer` as a `Modal` preset, and why `AlertDialog` is not one
+
+Settled for `Drawer`, the `Toggle`-over-`Checkbox` shape. `AlertDialog` shipped the same day
+on the same reasoning and was **deleted **.
+
+**Placement is geometry, not paint** — a correction to the note that asked for these. The slide is paint (a
+painter transitions its own `transform` off `getVisibilityTarget`). Placement is not: the box carrying
+`role="dialog"` is `Modal`'s, and only its position within `modalRoot` decides where the dialog is. Making it
+paint would mean stretching the container over the viewport and letting the painter position itself inside,
+which hands the dialog role a viewport-sized box and breaks the margin-derived `max-width` / `max-height`.
+
+**`modalRoot` became a grid so both axes can say `stretch`.** A flex row has no main-axis equivalent of
+`justify-items: stretch`, so a top-edge drawer could stick to the top or fill the width but not both.
+`modalContainer` is `display: flex; flex-direction: column` with `flex-grow: 1` on its child so the painter
+fills whichever axis the grid stretched. The absolutely positioned overlay is unaffected.
+
+**That grid states its single track as `100%`, and without it a dialog taller than the screen escaped the
+screen.** An implicit grid track is auto-sized, so a container holding more than fits grew the track with it;
+the container's own `max-height: calc(100% - margins)` then resolved against that grown track and capped
+nothing, and the dialog ran off the bottom with the overflow unreachable — no scrollbar, because nothing had
+been asked to scroll. Stating `grid-template-rows: 100%` and `grid-template-columns: 100%` pins the area to
+the root, the `max-height` and `max-width` become real limits again, and a painter with `overflow: auto`
+scrolls inside them. Found when every drawer on the Playground page was given more content than fits.
+
+**`ModalAlignment`, not `ModalPlacement`** — `AnchorPlacement` already names `{ x, y }` collision placement,
+and one prop meaning a string union on one component and a record on another is the two-contracts-one-name
+trap.
+
+**`Drawer` narrows to four edges and adds nothing else**: `DrawerEdge` drops `"center"`, and `getEdge` is
+required where `getAlignment` was optional. An edge-attached dialog that could be centred is not a drawer.
+
+**`AlertDialog` was a preset that earned nothing.** It set `role="alertdialog"`, required
+`getInitialFocusRef` and turned overlay-click dismissal off — three props already public on `Modal`, and no
+behaviour of its own. The line: `Drawer` narrows a vocabulary so a wrong state is unexpressible;
+`AlertDialog` only pre-filled values. A component whose whole body is three defaults is a comment with a
+build step. This does not overturn the `Toggle`-over-`Checkbox` rule — `Toggle` both removes surface and adds
+semantics a consumer cannot reach (the `switch` role, the mixed-state role swap).
+
+Its reasoning now belongs to whoever sets those three props: an alert interrupts to demand a decision, so
+focus must land on the control that answers it and the initial focus target is not optional; and a dialog
+demanding an answer must not be answerable by clicking next to it. `Escape` still closes it, because every
+dialog must be escapable regardless of role. `ModalPage` carries it as a second variant, which is the honest
+demonstration — it shows the three props rather than hiding them.
+
+**`FocusManager.autoFocus` reads the initial ref untracked, and "initial" is why.** The effect already depends
+on the container ref and visibility; a third dependency that can change while the dialog is open would
+re-run it, re-capture `previouslyFocused` as whatever is focused _now_, and restore focus to the wrong
+element on close. A ref assigned during render is set before effects run, so the common path is unaffected.
+
+**`getIsDismissableOnOverlayClick` and `getAriaDescribedBy` are public on `Modal`** — a form with unsaved
+changes wants the first, any dialog can want the second.
+
+### Controls: `FileInput` and `ColorInput`, where the UA owns the activation
+
+Both are the `TextInput` arrangement (overlay geometry, wrapper, flags, private
+leaf), and both exist because of one thing the library cannot take over.
+
+**Activation must stay native, so gating a disabled control is `preventDefault` on `click`.** Only a user
+gesture on the real element opens a file dialog or the OS colour picker, so there is no JS path to gate and
+no `readonly` to lean on. `preventDefault` cancels the default action — `BinarySwitch`'s mechanism rather
+than `Button`'s early return, which would have left both dialogs opening. `wrapElement`'s `mousedown`
+refusal still keeps a disabled control from taking focus.
+
+**Suppressing the UA's own rendering is the rule that kept `placeholder` and the number spinner out**, and
+each needed a different mechanism:
+
+- **A file input** hides `::file-selector-button` and sets `color: transparent` for the filename. It stays
+  transparent-but-present rather than `opacity: 0`, because opacity paints the outline too.
+- **A colour input** needs `visibility: hidden` on `::-webkit-color-swatch`; a transparent background is
+  **not** enough, since the UA paints the current colour onto the swatch through a path an author
+  `background` does not reach, covering the painter with a solid rectangle. Visible on screen and invisible
+  to every DOM assertion — the shape of what markup checks cannot catch. `visibility` takes the swatch out
+  of paint and leaves the input's outline alone.
+
+**Both give the painter the value, and `TextInput` deliberately does not.** `FileInputFlags = { files }`,
+`ColorInputFlags = { value }`: once the native rendering is suppressed nothing else draws them. The other
+side of one rule — withhold what the element already draws, hand over what it does not.
+
+**`syncElement` returns for a third time**, on `BinarySwitch`'s premise:
+
+- **`ColorInput`** assigns `value` when it differs, so a snapping owner ("nearest of four") sees its
+  correction reach the element instead of the picker's raw colour.
+- **`FileInput`** cannot be pushed into an arbitrary state, because a `FileList` cannot be constructed. Only
+  the empty case is expressible, via `element.value = ""`, and it is the case that matters: an owner that
+  rejects a file and writes `[]` back would otherwise leave the input holding it, and **re-picking the same
+  file fires no `change` event**, so the user cannot retry what they were just told to fix.
+
+**Scoped without drag-and-drop, deliberately.** A drop target belongs to whatever surface accepts the drop,
+and adding it would give `FileInput` a second activation path.
+
+### Controls: `Stepper`, where the state vocabulary is the consumer's
+
+Built, after the longest design conversation in this file's history. A progress strip over a
+multi-step flow.
+
+**The library never computes whether a step is complete.** Each step arrives with a `state` the component
+declares as a generic and never inspects — `done`, `failed`, `skipped`, whatever the consumer needs — and
+its source is deliberately unknown. This dissolved the months-old "what does the stepper gate on" question:
+nothing, because it is told.
+
+**What the library does own is `aria-current="step"`**, which is not a state a consumer may invent.
+`aria-current` is enumerated and `step` means exactly this, and an unrecognised value degrades silently to
+plain `true` — so a consumer expressing "current" as one of their own states would produce a strip whose
+position is invisible to a screen reader. Same split `Breadcrumbs` makes with `aria-current="page"`.
+
+**`computeStepAriaLabel` is required, and that is why the free vocabulary is safe.** No ARIA attribute
+exists for "this step failed", for any invented state, so a red ring on step two is indistinguishable from
+step three and the only route by which an invented state can be announced is **text in the accessible
+name**. The strings are the consumer's, for the reason `TagInput` does not ship the word "Remove".
+
+**Navigability is per step and decides the element, not an attribute.** A step you can move to is a
+`<button>`; one you cannot is a `<span>` — `Breadcrumbs`' call for its last crumb. A non-navigable step with
+a tooltip stays reachable, which is `getIsReachableWhenDisabled`'s pairing, derived from whether a tooltip
+exists rather than taken as a prop, so that rule's warning can never fire from here.
+
+**Each step is its own tab stop; there is no roving order.** Researched on request. Roving is legal — no
+criterion counts tab stops — but the APG's account of how a user _discovers_ arrow keys is that assistive
+technology recognises the role and says so, and its composite list (combobox, grid, listbox, menu, radio
+group, tabs, toolbar, treegrid, tree view) has no stepper. An ordered list of buttons announces "list", so
+roving hides most of the strip from anyone who did not guess. No ARIA attribute advertises arrow-key
+navigation either: `aria-keyshortcuts` is for shortcuts that activate or focus, `aria-roledescription`
+renames a role without adding behaviour and is explicitly discouraged, and `role="application"` disables
+browse mode wholesale. Getting the announcement would mean claiming `role="tablist"`, which asserts the
+steps swap panels — untrue when the state source is agnostic. A stepper that does swap panels is `Tabs`.
+
+The sharper argument is local: a locked or failed step stays reachable **so its tooltip can be read**, and
+under roving someone who does not know to press an arrow tabs in, lands on the current step, tabs out, and
+never reaches it.
+
+**Both orientations ship**, as a `dir` prop with `aria-orientation` on the list.
+
+**Not built:** the connector is a slot rather than something the library draws, and nothing enforces that a
+linear flow is linear — a consumer who marks every step navigable gets free navigation, which is
+`nonLinear` elsewhere and needs no prop here.
+
+**The entry takes the list's direction, and the first build forgot to give it one.** Fixed afterwards.
+`dir` was written onto the `<ol>` alone, but the `<li>` holds the step and the connector after it and was a
+hard-coded row — so a column strip laid a 2px hairline to the right of the label instead of a track running
+down the page. The `<li>` now carries the same `flex-direction`. Nothing else was wrong with the column
+case, which is why it looked like a paint bug.
+
+**A row strip wraps rather than overflowing.** Four steps with word-length names are
+wider than a 370px column, and the strip had no answer: `stepperList` could not shrink (the painter's labels
+are `nowrap`, the connector is a fixed-size slot the library does not own) and could not wrap, so it grew
+past its container **in both directions** — the first entry sat at `offsetLeft: -45`. Of shrinking,
+scrolling and wrapping: shrinking is not the library's to do, since it needs the painter to let its labels
+truncate; scrolling hides steps behind a gesture with nothing saying they are there; wrapping needs nothing
+from the painter and truncates no label. A consumer wanting either of the others has `overflow` on their own
+container. The `<li>` is the wrap unit, so a connector never separates from its step — a wrapped line can
+end on a connector, which is the cost. `maxWidth: 100%` on the list and `minWidth: 0` on the entry stop a
+single over-wide step escaping either edge.
+
+### Controls: `SplitPane`, where CSS grid is the arithmetic
+
+Resizable panes with a draggable gutter between each pair.
+
+**The stated objection to building it was wrong**: `backlog.md` held that this would be the first control to
+write a dimension, against a rule that the library leaves layout to the consumer. `Collapsible` already
+writes a measured pixel height, the `Tabs` and `RadioGroup` floaters write a full box, `Viewport` scales its
+contents, and the library already owns wrapper elements around consumer content (`Breadcrumbs`' `<li>`,
+`Select`'s group box). The rule the objection appealed to does not exist in that form.
+
+**The value is ratios, and pixels are never stored.** `ratiosSignal` is `Signal<number[]>`, one share per
+pane. A container resize must not rewrite what the person chose: drag to 30/70 in a 1000px box, narrow the
+window, and the stored `0.3` stands while the rendered widths clamp. Same shape as `ColorArea` keeping HSV
+while emitting hex, and `DateValue` keeping the lossless form.
+
+**The layout is one `grid-template` string and nothing else.** A pane is
+`calc(ratio * (100% - totalGutterPx))`, and a pane with bounds is that share inside a `clamp()`; gutters are
+fixed tracks between them. A window resize needs no observer and no code — the browser recomputes. That is
+why this shape beat an `fr`-based one: `fr` cannot appear inside `clamp()` or `min()`, so a per-pane maximum
+is not expressible alongside it, while percentages and pixels compose freely. N panes come free.
+
+**When the minimums cannot all fit, it overflows — accepted by the user.** Two floors of 250px
+and 400px in a 600px box do not shrink proportionally; grid honours both and the row spills. Chosen over
+computing a proportional shrink, which needs a `ResizeObserver` and the library rewriting floors on every
+resize. The user's reasoning: grid's behaviour is consistent, expected and documented, a consumer declaring
+floors that cannot fit is misusing the API, and inheriting the platform's answer beats inventing a second
+one. `splitPane.spec.ts` pins it.
+
+**A gutter moves its two neighbours and nothing else.** Their combined share is conserved, so ratios keep
+summing to one without a normalisation pass and dragging at one end never reflows the far side.
+
+**The gutter is a `<button>` with `role="separator"`, and it carries a value.** `aria-valuenow` is the
+boundary as a percentage over 0–100, `aria-orientation` states the axis, and the arrow keys for that axis
+move it by `keyStep`. A drag-only splitter is unreachable without a pointer.
+
+**The drag is local rather than `InteractionTracker.trackDrag`.** That helper measures the pointer against the
+element it is attached to, right when the drag surface _is_ the measured surface (`Range`, `ColorArea`). Here
+the drag surface is the gutter and the measured surface is the container. If a third consumer of that shape
+appears, widening `trackDrag` to take a separate measuring ref is the change to argue then.
+
+**A pixel bound has to be reconciled with a ratio value, and CSS alone cannot do it.** Fixed,
+correcting the above. `minPx` / `maxPx` were only the `clamp()` around each track — correct for _rendering_,
+useless for _dragging_: `moveBoundary` knew nothing about them, so a drag kept writing ratios the `clamp()`
+refused. Past a pane's floor the pane stopped while the gutter carried on under the pointer, the far pane
+went on growing, and the tracks summed to more than the container. The bound is now converted to a ratio
+against the container's measured size and the drag clamped there.
+
+Two non-obvious details. **The measurement is `offsetWidth` / `offsetHeight`, not `getBoundingClientRect`** —
+`Viewport` scales its contents, so a client rect is layout size times a factor that is almost never 1, while
+`minPx` is a layout-space number. `computePointerBoundary` keeps the client rect, correctly, because both
+sides of its division carry the same factor. **And the CSS `clamp()` stays**: the drag clamp holds while the
+pointer moves, the `clamp()` holds when the _container_ resizes. When floors cannot all fit, the drag clamp's
+window is empty and it pins to the floor, which is what `clamp(min, …, max)` does when `min > max` — so the
+accepted overflow survives.
+
+**Not built:** collapsing a pane to nothing and restoring it, a double-click to reset, persisting the split.
+All three are the consumer's, since they own the signal.
+
+### Controls: `TagInput`, and why it is not a `TextField` preset
+
+A field whose value is a list: type a word, press Enter, it becomes a tag beside the
+caret.
+
+**It owns its own box rather than sitting in `TextField`'s leading slot, and that was the whole decision.**
+The cheap route was a preset like `NumberInput` with tags in `renderLeading`. That slot is absolutely
+positioned and the input's left padding inset by its measured width — right for a currency symbol, wrong for
+a list: the moment tags wrap onto a second row, an out-of-flow strip and one inset number cannot describe the
+layout. Widening `TextField` to make its slot optionally in-flow was the third option, rejected on ownership:
+`TextField` is a single-line field with decorations at its edges, and a tag input is a box of controls that
+happens to contain a field. Bending the first into the second costs four shipped presets a concept they do
+not need.
+
+**Twelve tags in a 240px box wrap, and the box grows — settled by the user.** Nothing clips,
+nothing scrolls sideways, no cap. Stated rather than hidden: the control's height is a function of its value,
+so a form reflows as tags are added. That is what every published tag input does, and the alternatives were
+deferred rather than missed — a `maxRows`-style cap, a single scrolling line over `Scroller`, and a "+10
+more" collapse are all additions on top of wrapping. `tagInput.spec.ts` pins the growth.
+
+**Backspace on an empty field steps into the tags rather than deleting one.** First press moves focus onto
+the last tag, a second removes it. Deleting outright changes the value with nothing focused to announce it,
+which is silent for a screen reader and invisible to anyone who mis-hit the key. `ArrowLeft` does the same
+step, arrows walk the tags, walking past the last returns to the field. Backspace only leaves the field when
+the field is empty, or it would swallow ordinary editing.
+
+**The tag is a `<button>` whose accessible name is the tag text, and pressing it removes it.** No separate
+delete trigger; a consumer painting an `✕` is painting decoration on a control that is already the remove
+control. The name defaults to the tag's own text rather than "Remove X", because a library that paints
+nothing has no business shipping an English sentence — `computeTagAriaLabel` is where a consumer supplies
+wording.
+
+**Tags are `string[]`, not `T[]`.** Every other list control here is generic; a tag genuinely is the text
+that was typed, with no identity apart from its characters. A consumer needing records keeps a map beside it.
+`computeTag` is where text becomes the stored form — trimming, casing, refusing a duplicate — and returning
+nothing declines a word, leaving the text in the field to be edited rather than retyped.
+
+**The draft text is private unless asked for**: `textSignal` is optional through
+`SignalMirror.createOptional`, the arrangement the popups use for their open state.
+
+**Owning the box means owning the pointer back, which the first build did not.** Fixed afterwards.
+`interactionRoot` sets `pointer-events: none` and each part turns it back on for itself (`buttonElement` does,
+`textFieldElement` does); `tagInputField` did
+not, so the field could not be clicked, focused or typed into and the control read as a box of tags with no
+text entry. Every spec passed throughout, because `fill()` writes the element directly and never asks whether
+a person could have reached it — the click path is now asserted, and that is the general lesson. The root
+turns pointer events on too, with `cursor: text` and a `pointerdown` that focuses the field when the press
+landed on the root itself, so the padding around the tags behaves like the padding of any text box.
+
+**A control that owns its box must be positioned, or the painter paints over it.** Fixed, and
+the more general of the two. `renderContent` draws an opaque box at `position: absolute; inset: 0`, and CSS
+paints positioned elements _after_ ordinary in-flow content regardless of document order — so the painter's
+background covered the field's text. The value was in the DOM, the caret was in the field, the click worked,
+and the box looked empty. The tags escaped only by accident, each sitting in an `InteractionWrapper` whose
+root is `position: relative`; `TextField` escapes it deliberately, its element being absolute too.
+
+So: **anything the painter is meant to sit behind has to be positioned.** `tagInputRoot` is now
+`position: relative`. This is the trap for every future control rendering in-flow content next to
+`renderContent` — the symptom is content that is simply not there, and nothing in the markup or the flags
+hints at it.
+
+**The field is a row of its own beneath the tags.** Settled by the user, and recorded
+because the first build arrived there by accident and the second "fixed" it. An `<input>`'s intrinsic width
+is around 177px (the default `size`), and `flex-basis: auto` takes that as its starting size, so it happened
+not to fit beside the tags and wrapped. That looked like a stray empty row and was changed to a 60px basis.
+The user asked for the full row and is right about the shape: chips in front of a caret read as a search box
+that has already matched something, while a block of tags with an empty line under it reads as a list and a
+place to add to it. It is now `flex: 1 0 100%` — a 100% basis cannot share a line, so the break is declared
+rather than incidental.
+
+**The caret is the painter's, through `computeTextStyle`.** `TagInput` had no way to reach the
+input's text, so the caret fell back to the inherited colour while every other field drew the theme's. The
+slot is `TextField`'s, reused with the same name and `TextFieldTextStyle` type — the `TabLinkProps`
+precedent: a second identical type for the second caller is the thing to avoid.
+
+**A printable key on a focused tag returns to the field.** `handleTagKeyDown` answered
+only Backspace, Delete and the arrows, so a letter pressed on a tag went nowhere. Focus now moves back to the
+field and the keystroke lands there. Deliberately not `preventDefault`ed: the character is inserted by the
+default action, after the handler has moved focus.
+
+**Disabled has to close the write paths, not only announce itself.** Same fix. The field carried
+`aria-disabled` and nothing else, so a disabled tag input could still be typed into and Enter still added
+tags. It now takes `readOnly` the way `TextField` does — never native `disabled` — and both key handlers
+return early. `userSelect: text` was missing for the same reason as `pointer-events`.
+
+**Not built:** a cap or a collapse; editing a tag in place; pasting a delimited list as several tags; a drag
+to reorder.
+
+### Controls: `Breadcrumbs`, and why the last crumb is not a control
+
+A trail of links to where you are. The standing position was that it was a `Tabs`
+composition; what earns it a file is markup the consumer cannot get from `Tabs` at all.
+
+**A trail is a landmark around an ordered list**: `<nav aria-label>` holding an `<ol>` holding one `<li>` per
+crumb. The landmark lets someone jump straight to the trail; the list makes "four of these, in this order"
+true for a screen reader. `Tabs` renders `role="tablist"`, which says these swap a region, so the
+composition was never right, only convenient.
+
+**The last crumb is the page you are on, so it is a `<span>` with `aria-current="page"`.** Not a disabled
+link, which would stay in the tab order and look pressable; not a button that does nothing. Which crumb is
+current is positional, so the component decides it and hands the answer to the painter through
+`BreadcrumbsFlags.isCurrent`.
+
+**`isCurrent` is an extra flag rather than something the page recomputes.** `Tabs` lets its page derive
+`isSelected` because selection is the consumer's state. Here it is not: only the component knows the crumb
+count, so a page deriving "last one" would re-derive something known one level up and get it wrong the moment
+a trail is trimmed.
+
+**The item is a `<button>` without an `href` and an anchor with one**, with a `linkComponent` escape for a
+router's link — the three-way shape `Tabs` and `Paginator` use, reusing `TabLinkProps`.
+
+**Separators are the consumer's paint, live outside the item, and are `aria-hidden`** — otherwise a trail
+reads as "Home slash Library slash Inputs". The slot is optional and renders no wrapper when absent.
+
+**There is no keyboard handling at all, and that is correct.** Crumbs are independent destinations, so each
+is its own tab stop, as `Paginator` records for its page numbers. A roving order would make the trail one
+stop, which is what a `tablist` wants and a `nav` does not.
+
+**Trimming the trail is the consumer's.** Raised by the user: pressing `B` in `A > B > C > D`
+ought to leave `A > B`. The behaviour is right and so is the component — `onSelect` reports the press and
+nothing else, since the component does not own the route and a trail that trimmed itself would fight a
+router-driven consumer. The demo was wrong: it reported into a readout and left the trail at four. The page
+now derives the trail from the pressed crumb's index, and the panel's `Reset` is the way back.
+
+**Not built:** collapsing a long trail behind an overflow menu. It needs a decision about where the hidden
+crumbs go, and nothing has asked.
+
+### `RadioGroup` takes a floater, and both floater observers are guarded
+
+Settled, straight after the segmented control below. A sliding indicator behind the chosen
+segment cannot be painted from inside one radio: it needs the selected item's **box**, and a painter only
+knows its own.
+
+**The objection this had to clear was purity, and it does not survive.** `RadioGroup` already takes `dir` and
+`gap` — it already decides where its children sit, so handing that measurement back out exposes something it
+owns rather than teaching it something new.
+
+**The mechanism is `Tabs`', copied deliberately rather than generalised**: a root ref, a `ResizeObserver`
+watching the root and the selected item's `offsetParent`, the box written as inline `top` / `left` / `width` /
+`height`, and `ElementFader` for entry and exit. Two consumers is not yet an `Abstract`; a third is when to
+extract.
+
+**The observer is now guarded on the prop, in both controls.** It previously ran for every `Tabs` on the
+page, measuring for a floater nobody asked to render, and copying it unguarded into `RadioGroup` would have
+put a `ResizeObserver` inside every radio group in every form. The effect returns early when `renderFloater`
+is absent. Not guarded: `Tabs` keeps its item refs regardless, because arrow keys focus through them — only
+the measuring is optional, and confusing the two would break the keyboard.
+
+**Both roots carry `isolation: isolate`, and without it the floater escapes the control.** The floater sits
+at `z-index: -1` so the items paint over it. A negative index resolves against the nearest ancestor that
+starts a **stacking context**, and `position: relative` alone does not start one — so the floater travelled up
+the ancestor chain until it found one, and any background painted on the way covered it. Exactly what happened
+when the Playground put a background on the box wrapping the segmented strip: measured correctly, positioned
+correctly, painted underneath the wrapper. `isolation: isolate` starts a stacking context and nothing else;
+`z-index: 0` would work too but says something about the control's own order among its siblings, which is the
+consumer's business. `Tabs` had the same latent fault and now carries the same line.
+
+Worth knowing for the next painter: this class of fault is invisible to `e2e/`. The floater spec asserts the
+measured box, which was right the whole time.
+
+**The preset route was considered and rejected.** A segmented preset over `RadioGroup` owning the floater
+privately resurrects as a component the thing just decided to be paint, for one optional prop's worth of
+surface — and a preset existing to hide a prop the base already needs is a worse trade than the prop.
+
+### A segmented control is `RadioGroup` paint, and the Radio page proves it
+
+Settled, closing a `backlog.md` entry. A row of joined buttons with exactly one pressed reads
+like `Tabs` and is not: `Tabs` is navigation and swaps which region is shown, while a segmented control holds
+a **value** that is part of a form's answer. Same appearance, different meaning, and the role reflects the
+meaning.
+
+So it needs no component. `RadioPage`'s **Segmented** variant is the demonstration: `RadioGroup` with
+`getDir` row and `getGap` zero, painted by `RadioSegmentContent` instead of `RadioContent`. **A segment paints almost nothing** — no
+dot, no border, no background, only padding and a text colour that flips when checked.
+
+**The strip's own look belongs to a wrapper, not to the segments.** `PageRadioSegmentGroup` is a plain
+`<div>` around the whole `RadioGroup` carrying the border, background and outer radius, and the fill behind
+the chosen segment is the floater. Segments drawing their own borders was tried first: it needed an `isFirst`
+/ `isLast` pair so the ends could round and the inner dividers collapse, it made every segment opaque —
+hiding the floater completely, since it sits behind at `z-index: -1` — and it put the strip's appearance in
+three places. A container can round its own corners without knowing which child is first.
+
+The library cannot be that wrapper: `RadioGroup` accepts no class name, so the page supplies its own box.
+Library owns the roles and the geometry, page owns the paint.
+
+**A rating input went the same way on the same day, and it is the more interesting of the two** because one
+part genuinely is not `RadioGroup`. Five stars are five radios; the **preview** is not — hovering the third
+star fills the first three. A painter cannot do that alone, because `isHovered` is its own and star two would
+have to know star three's. The page holds it: a `hoveredRatingSignal` written from each `Radio`'s
+`onMouseEnter` / `onMouseLeave`, each star filled when its number is at or below the hovered one, falling
+back to the value. Nothing was added to the library — the preview was the argument for a `Rating` component
+being more than paint, and it turned out to be **eight lines in the consumer**; a radio group's arrow keys
+move the value itself, so the keyboard case needs no preview.
+
+### The Playground theme is an example, and carries no rationale on purpose
+
+Settled by the user, when asked whether `App/Theme.css.ts`'s token shape deserved an entry
+here. It does not: **every value in it is as arbitrary as any consumer's own.** Four steps per colour rather
+than a numeric ramp, one animation duration rather than a set, `half` / `full` / `double` / `quad` spacing —
+none of it is a recommendation and none of it constrains the library, which paints nothing and reads no
+token. A consumer copying its shape is copying an example.
+
+This does **not** license changing it casually. It is the only theme the Playground has, so a token edit
+repaints every page at once; the values being arbitrary is a statement about their origin, not an invitation
+to churn them.
+
+### The Playground's field look is one surface, and every field-shaped control wears it
+
+Extracted, after the user pointed out that `TagInput` did not look like the other inputs — it
+had 1px border instead of 2, a theme background instead of black, no shadow, its own padding.
+
+`TextFieldContent.css` now exports **`fieldSurface`**: the border and its 25% currentColor, the radius, the
+black fill, the small shadow, the transition, and the `isReadOnly` / `hasError` / `isHovered` / `isDisabled`
+selectors. `textFieldContent` is `fieldSurface` plus the fixed 240×40 box and its `isStretched` escape;
+`tagInputContent` is `fieldSurface` plus `position: absolute; inset: 0`, since there the tags size the box.
+The flag classes are imported from the same file, so hover, error and disabled behave identically rather than
+similarly.
+
+The two shapes are why this is a shared **surface** and not a shared component: in `TextField` the painter
+declares the size and the input is laid over it; in `TagInput` the content declares the size and the painter
+is laid under it. Only the appearance is common. The metrics travel as the existing `FIELD_PADDING` /
+`FIELD_GAP` / `FIELD_HEIGHT` constants, which `TagInput`'s page now passes — `FIELD_HEIGHT` through
+`getMinHeight`, so an empty tag box is exactly as tall as a text field and grows from there.
+
+**Width is deliberately not matched.** A text field is 240px because its painter says so; a tag box is as
+wide as its tags, which is the documented behaviour of the control.
+
+### A Playground demo a visitor can move must be a demo they can put back
+
+Stated by the user, after `TagInput` and `Stepper` shipped with no way to restore them.
+**If pressing something inside a variant changes state the page owns, the page ships a way back to where it
+started.**
+
+The reset lives in the **props panel**, not beside the variant, for the reason every other knob does: one
+control governs every instance, so the page returns as a whole. The starting values move to module constants
+and the reset writes them back.
+
+**A knob that happens to express the state does not stand in for the button.** Confirmed by the user on
+against the opposite guess: `Breadcrumbs` was left without one because its `Depth` field can
+put the trail back, and they asked for the button anyway. A knob is somewhere to _set_ a value, and knowing
+that setting it to 4 happens to be the starting point is knowledge the page has and the visitor does not. A
+reset also resets everything the page moved: pressing a crumb moved the trail _and_ the readout under it.
+
+The exception is a variant whose whole point is a one-way gesture with an owner-held latch, which is why
+`SlideButton` keeps its `Reset` inside the card.
+
+### `ScreenWiper`: CSS shapes, not SVG
+
+Each wipe cell used to be a `<div>` wrapping an `<svg>` wrapping a `<polygon>` or
+`<circle>` — three nodes per cell, with the polygon's `points` string rebuilt per cell. It is now one `<div>`
+carrying `clip-path: polygon(...)` for the lozenge or `border-radius: 50%` for the circle, picked by a
+`styleVariants` map. Measured at 1920×1080: **1370 elements down to 508**, pixel-identical (byte-for-byte
+screenshot comparison).
+
+**Collapsing into one `<svg>` with `<use>` was rejected.** It reaches a similar node count and shares the
+geometry, but it moves several hundred animating elements inside one viewport-sized SVG. SVG has no
+per-element compositing, so a transform change on any child invalidates the whole raster — trading a few
+hundred cheap independent `div` transforms for a full-viewport repaint every frame. The node count was never
+the expensive part; the concurrent staggered transitions are, and no restructuring changes that.
+
+A tiled `<pattern>` does not apply whatever the node count: each cell scales on its own staggered delay, so
+there is no repeating unit to tile.
+
+`flex-shrink: 0` on the cell is load-bearing. The old markup got its size from the `<svg>`'s width attribute,
+which ignored flex shrinking; a plain `div` would shrink and break the tessellation where a row overflows.
+
+Not exercised: the `circle` shape has no Playground variant, so `border-radius: 50%` replacing `<circle>` is
+reasoned, not observed.
+
+### `CellAnimation`: weights as the staggering primitive
+
+**A cell's weight is its position on the timeline.** A weight function returns 0..1 per cell from
+`(pos, count, origin)`, and `computeBreakpoints(weight, opts)` turns that into the slice of the global
+timeline the cell owns — direction is weight inversion, smoothness is the width of the window.
+
+**The timing curve is the sample's, and it shapes a cell's own window rather than the whole timeline.**
+`computeLocalTimeline` takes one of the five CSS timing functions — `linear`, `ease`, `ease-in`, `ease-out`,
+`ease-in-out` — and applies it to the ratio a cell has travelled through its own slice, so the stagger keeps
+the arrival order the weights decided and only the playback within each cell bends. It is solved as CSS
+solves it, a cubic bezier inverted by Newton with a bisection fallback, so `ease` here and `ease` in a
+stylesheet are the same curve rather than two approximations of it.
+
+**Per-keyframe easing stays out, because the keyframe data can already express it.** CSS puts a timing
+function on each keyframe, and that was the shape the React-era component had — but a stop list interpolated
+linearly is exactly what `linear()` is, so an eased segment is written as denser stops in the sample rather
+than as a second easing mechanism in the sampler. What denser stops cannot express is a curve over the
+cell's whole window, which is why that is the half that got built.
+
+**A source that is drawn rather than photographed is a data URI, and it needs nothing from the library.** The
+component slices whatever URL it is handed, so an SVG written as a string — a gradient, a solid, a pattern —
+is a first-class source: `data:image/svg+xml,` followed by `encodeURIComponent` of the markup. No base64 step;
+the Playground has been doing this for its `Mosaic` samples all along, and `Samples/CellAnimationSources` is
+the same trick for this component. Two things the SVG must do: declare `xmlns`, and state a `width` and
+`height`, because the invisible anchor takes the box's aspect ratio from the image's intrinsic size — a
+400×200 source at `width: 100%` in a 300px box measures 300×150, exactly as a photograph would.
+
+**The cell's background URL is quoted, and that is what makes a drawn source work at all.** `encodeURIComponent`
+escapes the quotes in the markup but leaves parentheses alone, and every interesting SVG has them — `hsl(...)`,
+`rgb(...)`, an internal `url(#id)` reference. An unquoted CSS `url()` cannot take a literal parenthesis, so the
+whole declaration is dropped: measured, **zero** cells painted a background while the anchor still sized the box
+correctly, which is the failure that looks like the animation having broken rather than the source. Quoting the
+value costs nothing for a path or a `blob:` URL and is what makes the drawn case reachable.
+
+**The Playground shows three source kinds as three examples, each owning the one setting only it can
+answer.** A photograph is picked per example rather than per page — `ScanlineAnimationPage`'s arrangement —
+and the two drawn examples each carry a dropdown over `Shape`'s own gradient and pattern samples. Everything
+the three share, the grid and the weights and the timing, stays in the page's own panel, since changing it is
+meant to change all of them.
+
+**A drawn example also picks its own shape, which the photograph cannot.** The two serialised sources are
+written at whatever width and height they are handed, so `1:1`, `2:1` and `1:2` are a per-example dropdown over
+`SOURCE_RATIO_SIZES` — the long side stays 1200 and the short one halves, so the default source is the same
+1200×1200 it always was. `computeGradientSource` and `computePatternSource` take that size as an argument
+rather than reading `SOURCE_SIZE`, since the rect, the sample's own `getSize` and the `<svg>` attributes all
+have to agree on one number. A photograph's ratio is the file's, so the first example has no such control, and
+the pattern's cell size is left at 150×150 — a wider source therefore shows more pattern cells rather than
+stretched ones. The demo box takes its width from the ratio so the longest side is always the same 480: a
+portrait source renders 240 wide rather than 960 tall.
+
+**The palette and the animation length come from the same places the Shape page gets them.** The four
+colours are `SVGDefsSamples.SAMPLE_COLORS`, which `ShapePage` now seeds its own editable store from rather
+than declaring a second copy; the duration is the cell animation's own, passed in per call. What a sample then
+does with that duration is the sample's business and is not normalised — the pointy-top hexagon runs its fill
+cycle at four times what it is given, on the Shape page and here alike, so the numbers agree at the input
+rather than at the output.
+
+**A `Shape` def becomes a source by being rendered and serialised, which is `SVGDefsSources`.** The samples
+are Solid callbacks returning live elements, so the helper renders them into a detached `<svg>`, adds a
+full-size rect per entry filled from that entry's colour or `url(#id)`, serialises with `XMLSerializer`, and
+disposes the reactive root. Nothing about the samples changes; the Shape page and the animation page ask the
+same registry for the same thing.
+
+**Whether a def still moves inside a source is decided by how its animation begins.** Loading an SVG through
+an `src` runs no script but does run SMIL — measured: an `<animate>` with `begin="0s"` kept animating inside a
+data URI while the same animation with `begin="indefinite"` sat frozen. The pattern samples carry a `dur` and
+no `begin`, which defaults to zero, so they were always going to move. The gradient samples are driven by
+`createAnimateDefs`, which sets `begin="indefinite"` on purpose and starts it from a ref that reads the
+document's own clock, so that the iteration patterns can be sequenced.
+
+**So the serialiser writes the timing into the markup, which is the whole of what a script would have done for
+the common case.** With no iteration delay asked for, every `begin="indefinite"` becomes `begin="0s"` on the
+way out. That is exact rather than
+approximate wherever the iteration config is `constant`, because `constant` supplies no patterns at all: the
+repeat count is already `indefinite` and the only thing missing was the start. It is a serialisation-time
+rewrite rather than a change to the builders, and it is only correct because a source is a document nothing
+will ever drive — the live `Shape` on a page still needs the script, which is what sequences its stages.
+
+**The cell timeline is keyed on the picture as well as the iteration, so a new source starts it over.** Two
+clocks are in play and only one of them can be restarted: the cells run on the page's frame loop, a drawn
+source runs on the image's own timeline, which begins when the image loads. Rebuilding a source hands it a
+fresh timeline while the cells carry on, so the offset between them becomes whatever the cells happened to be
+doing — visible as a sweep sliding against the slicing. Treating a changed `src` as a reason to begin again
+puts both back near zero together. Near, not exactly: the image's clock starts on load, so a slow source still
+lands a frame or two behind, and nothing can hold them together after that.
+
+**The pause between repeats is a begin that refers to the animation's own end.** The component waits on a
+timer between runs; a document nothing drives has no timer, so the wait has to be stated. SMIL says it
+declaratively: one repeat, and `begin="0s;<id>.end+<delay>ms"` — measured, the animation runs, freezes at its
+end, holds through the pause and starts again. Every animation in the source is given an id and that begin
+when a delay is asked for, which is why an overridden `repeatCount="indefinite"` is part of it: an animation
+that never ends never reaches an end to start again from, so a repeat that never stops and a pause between
+repeats are not two things that can both be true. At a delay of zero there is nothing to express and the
+simpler continuous form comes back.
+
+**Only the gradients take the pause; the patterns flow on.** Settled by the user, and the reason is what each
+one looks like when it is out of step. A repeating fill has no beat — it tiles and cycles, so there is nothing
+in it that can be seen to happen at the wrong moment, and a pause would only make it stutter against cells
+that are resting for their own reasons. A gradient does have a beat: a sweep crosses the box once, and a sweep
+crossing while the cells sit still reads as two things that were meant to agree and do not. So the delay is
+passed for a gradient and pinned to zero for a pattern.
+
+**What that does not reach is a multi-stage iteration pattern**, where the script advances a repeat count and
+re-begins the animations after each stage ends. As a source, a def built that way plays its first stage and
+freezes. Expressing the rest declaratively is possible — SMIL's syncbase timing works inside an image source,
+measured: an animation beginning at `one.end+0.2s` ran after the one it names — so the chain would be one
+`<animate>` per stage with a begin referring to the previous one's end, and a begin list to loop it. That is a
+second variant of the builders rather than a rewrite of the existing one, and nothing has asked: the Playground
+uses `constant` everywhere.
+
+**The library names no weight and knows nothing about origins.** `CellAnimation` took
+`getOriginType`, `getWeightType` and `getWeightOpts`, so the nine named origins and thirty-seven named
+weights were the only ones a consumer could have. Wrong ownership: a consumer wanting an origin the library
+never thought of, or a distribution driven by their own data, had no way in. All of them moved out of the component and into
+`components/src/Samples` as sample code to copy, extend or ignore.
+
+**The weights slot is a callback taking the count.** The grid the component draws is not the grid the
+consumer asked for — the requested count is clamped against the measured pixel size, since cells thinner
+than a pixel cannot draw. A weight grid built from the consumer's own numbers would be the wrong shape
+whenever that clamp bites, and a wrong shape breaks indexing, so the component hands the effective count to
+`computeCellWeights`. Missing weights fall back to `0` per cell rather than throwing.
+
+**The origin never enters the library at all, not even as data on the defs.**
+`CellAnimationEvaluationDefs` is `{ pos, count, weight, size }`; a consumer needing an origin merges their
+own in at the call site, as the Playground's `DefaultExample` does. A threaded origin would be a value the
+component stores, validates and re-renders on while never reading it — API surface that only forwards. The
+consumer already holds the point, having computed the weights from it.
+
+Two consequences. Whoever wants origin-aware zones or keyframes types their own defs as
+`CellAnimationEvaluationDefs & { origin: Point2d }`, which is what `CellAnimationZones.isInZone` and
+`CellAnimationKeyframes.computeAnimation` take. And a consumer whose origin is derived from the grid must
+derive it from the count they requested, not the count the component settled on — the one place this shape
+is weaker than threading the value.
+
+**`ScanlineAnimation` is a preset over this, not a second engine.** A scanline is a 1×N grid, so a line is a
+cell and `getLineCount` is the only prop it adds; the five orderings it used to own became the `sequence*`
+weight functions, which are exact rather than approximate. It kept its own name and evaluator alias because
+the line-shaped API reads better for the common case — the reasoning that makes `Toggle` a preset over
+`Checkbox`.
+
+**A preset that loses an axis drops what indexed on it rather than narrowing it.** A scanline is a single
+column, so every weight reading `dist.x` collapses: measured on a single column of eleven with the origin pinned at
+`{ x: 0, y: 0 }`, which is what the Playground's Scanline page does, thirteen give every line the same weight
+(`lineColumn`, `lineColumnAlternate`, `lineColumnConvergent`, both `quadrant` entries, all six `radar` entries, and
+all three `frame` forms, whose ring is zero for every cell of a single column) and three more fall to two
+values (`entwineRow`, `rollRow`, `rollRowConvergent`), and
+most survivors are a plain row ramp wearing a name like `spiral` or `checkered`. The distance-based
+survivors are the only reason an origin would exist on a line, and a control meaningful for three of nine
+options reads as broken. This used to be enforced in the library — `ScanlineAnimation` narrowed `weightType`
+to `ORIGIN_FREE_WEIGHT_TYPES` and exposed no origin. With the vocabulary gone there is nothing to narrow, so
+the constraint is now the Playground's: its Scanline page offers only origin-free weights and pins the
+origin to `{ x: 0, y: 0 }`. A real loss — the type used to make the trap unreachable.
+
+**Cell geometry is integral and the requested count is honoured exactly.** Edges are
+`round(idx * total / count)`, so every cell starts on a whole pixel and the remainder is spread across the
+row — 7 cells over 240px start at 0, 34, 69, 103, 137, 171, 206. This replaced two worse rules:
+`ScanlineAnimation` snapped `lineCount` down to a divisor of the measured size, tiling exactly but silently
+giving 80 lines when you asked for 119; `CellAnimation` used fractional sizes, which have no visual upside
+and push a consumer toward a higher count purely to tile cleanly. The count is separately clamped to the
+pixel dimension.
+
+**Cells are still drawn one pixel larger than their slot, and integer edges did not make that redundant.**
+The Playground renders inside `Viewport`'s `transform: scale()`, so whole-pixel layout edges land on
+fractional device pixels, the browser antialiases each cell independently, and hairline seams appear. This
+was removed once on the reasoning that exact tiling made it unnecessary and had to go straight back — the
+seams were visible on screen, and reasoning about sub-pixel rounding is not a substitute for looking. Only
+the drawn box grows: positions, `background-position` and the logical span stay exact, so the extra pixel
+repeats the neighbour's first column rather than shifting the slicing. `defs.size` reports the drawn box,
+because that is what a percentage `translateX` resolves against.
+
+**Whole-grid operations cannot live in a per-cell evaluator**, which is why weights are computed once per
+count rather than per frame: `shouldMakeUnique` and `shouldNormalize` rank every cell against every other,
+and memoising the grid also stops `randomDefault` reshuffling every frame. The component owns that memo and
+calls the consumer's function to fill it.
+
+**Grid geometry belongs to `ss-utils`.** The per-axis distance between two cells, the clamp of a point into
+a grid, and the distance from a cell to the further of its two edges are `Point2dUtils.getDelta`,
+`getBoundPoint` and `getFarthestBound`, added in `ss-utils` 0.0.20 for exactly this. `CellAnimationUtils`
+keeps only the parity predicates (`isEvenRow`, `isEvenColumn`, `isEvenRing`, `isEvenCheckered`), which read
+a distance rather than measure one.
+
+**`getFarthestBound` is not a drop-in for the old `getMaxDistance`.** It reports the honest `0` on a
+single-cell grid where the original floored at `1`. Every distance-based weight divides by that number, so
+the floor is what stops a 1×1 grid producing `Infinity` — a property of the weight functions rather than the
+geometry, so it lives in `CellAnimationWeights.const.ts`. `computeCellWeights` is pinned on a 1×1 grid so a
+future simplification that drops it fails loudly.
+
+**An anchor is a translate, not a new value key.** Scaling or rotating about an anchor `a` equals the
+centre-anchored transform `M` plus a translate of `(I - M)·a`, and translate percentages resolve against the
+element's own unscaled border box — so `transform-origin` folds into `translateX` / `translateY` inside
+`fromStops` and never reaches the result type. Exact rather than an approximation, and it generalises to 3D:
+with `perspective` on the **parent**, a 3D rotation folds the same way using `translateZ`. It does **not**
+work with the `perspective()` transform function on the element itself, which puts the vanishing point at
+that element's own `transform-origin`, so moving the origin changes the projection. Perspective on the
+parent is also the better rendering: one shared vanishing point is a 3D scene, per-element perspective is N
+independent cards.
+
+**Transform functions are emitted in a fixed order** — perspective, matrix, translate, rotate, skew, scale,
+with each family's axis variants together — because `translateX(50%) scaleX(50%)` and its reverse are
+different matrices, so ordering by `Object.entries` would make composition depend on the key order of a
+literal the consumer wrote. Filters are ordered by `CSS_FILTER_KEYS`, and the transform/filter split is
+decided by those lists rather than by the ordering constant, so a key nobody listed cannot end up in the
+wrong string. `assignAnimationProps` always assigns both properties, so a frame that stops producing a
+filter clears the previous one, and it zips each value against `CSSConst.ANIMATION_UNITS[key]`, one entry per
+function argument.
+
+**A component that computes a `z-index` owes the page a stacking context.** Cells carry a per-cell
+`z-index` from weight so earlier ones layer above later ones while they overlap; without
+`isolation: isolate` on the container those values escape into the nearest ancestor stacking context. In the
+Playground they landed in the stress test modal's context and painted over its FPS counter.
+
+### The animation sample collections: `fromZones`, and why a fifth circle is not worth adding
+
+**Adding members to an existing family stops paying off, and the reason is structural rather than a matter of
+taste.** A weight function is one number per cell that does not change while the animation runs, so any weight
+that falls away smoothly from a point is a wipe, and there are only so many shapes a wipe can be — round,
+square, diamond, banded, spiral. A keyframe sample is a function of one cell's own progress that ends with the
+cell in place, so it is always an entrance. Two batches of new entries were built against the existing
+collection and the user's verdict on most of them was that they look repetitive, which is the expected outcome
+of adding a fifth circle rather than a failure of the individual samples. **What pays off instead is machinery
+that recombines what is already there**: an operator over any weight, or a combinator over any two animations,
+multiplies the collection without adding anything that looks like its neighbour. `shouldMakeUnique` and
+`shouldNormalize` on `computeCellWeights` are already this pattern, and `fromZones` is the first one on the
+animation side. Ideas of that kind, graded but not built, are in `backlog.md` under **_Open discussion_**.
+
+**The three ring metrics are diamond, circle and rectangle, and two of them were called the wrong thing.** What
+separated the family that was called `circular`, the one called `quadratic`, and `radial` is only how a cell's
+distance from the origin is measured: the `circular` family took the mean of the two axis distances, so its
+rings are diamonds standing on a corner, and it is now `diamond` — the word this file already used when it
+listed the shapes a wipe can be. `radial` takes the true straight-line distance, so its rings are the only
+actual circles in the collection, and it gained the third form the other two had, `radialConvergent`, built
+from `diamondConvergent`'s shape with the straight-line distance. `quadratic` took the larger of the two axis
+distances, so its rings are squares — and that turned out to be one half of a pair rather than a family of its
+own, which is the entry below.
+
+**`frame` is one metric with three normalisations, and it absorbed both `quadratic` and the old
+border-anchored `frame`.** The metric is the larger of the two axis distances, so its rings are nested
+rectangles around the origin, and what differs is only what that distance is divided by. `frameFarthest`
+divides by the larger of the two maximum distances, so the ring stays square and grows until it reaches the
+farthest edge, overshooting the short axis on the way. `frameNearest` divides by the smaller, so the square
+stops at the nearest edge. `frameStretched` divides each axis by its own maximum, so the ring is pulled to the
+grid's own proportions and all four edges are reached at once. `quadratic` was the Farthest one all along, under
+a name that described neither the shape nor the family.
+
+**What `frameNearest` costs is worth knowing before it is judged, because the clamp hides it.** Everything
+outside the square that fits inside the grid lands below zero and is clamped, so all of it starts at the same
+moment: measured on a twenty-one by seven grid with a centred origin, forty-nine of a hundred and forty-seven
+cells carry the ramp and the other ninety-eight arrive together. On a square grid it is identical to
+`frameFarthest`. It is here because the user asked for the nearest-edge member by name, having been told first
+what it does to a wide grid.
+
+**What that cost, and why it was still the right trade.** The `frame` that existed before measured its rings
+from the grid's border inward and ignored the origin entirely, which is a different idea rather than a second
+normalisation — a shared name with the origin-anchored metric would have hidden the larger difference. The
+user chose the pair, so the border-anchored behaviour is gone, and with it `frame`'s place in
+`ORIGIN_FREE_WEIGHT_TYPES` and therefore on the Playground's Scanline page. Measured before removing it, all
+three of its forms gave every line of a single column the same weight, so the Scanline page lost nothing it
+could show.
+
+**Each member keeps its own ring parity, which is what `Alternate` and `Convergent` turn on.** `isEvenRing`
+answers "is this cell's square ring an even one", so `frameNearest` and `frameFarthest` use it unchanged;
+`frameStretched`'s rings are stretched rectangles, so it asks the same question of its own metric —
+`isEvenStretchedRing`, the parity of the rounded stretched distance. Using `isEvenRing` for all three would have
+banded a wide grid's stretched entries across rings the ramp does not follow.
+
+**Handedness is an axis of an existing family, not a family of its own.** `_sweepCw` and `_sweepCcw` were a
+second implementation of the thing `radar` already does — one arm turning about the origin — and measured, with
+the origin at a corner they and `radarSingle` order the hundred and twenty-one cells identically to within a
+rounding error, so nothing on the page could tell them apart. At a centred origin they do differ, but only in
+which ray the arm starts from and which way it turns: `radarSingle` starts at six o'clock and turns
+counter-clockwise, `_sweepCw` starts at twelve and turns clockwise. Sweep also spaces the arm by true angle
+where radar spaces it by how far round the square ring a cell sits, which is a few percent of one cell's start
+time and not a difference anybody was going to see. So both sweeps went and the handedness they were carrying
+became `radarSingleCw`, `radarDoubleCw` and `radarQuadCw`, which reaches Double and Quad as well — something
+a one-armed sweep could never have done. The three existing radar entries keep their names and are the
+counter-clockwise ones.
+
+**A mirrored sample reflects its input rather than growing a parameter.** A clockwise entry is
+`radar` called with the position reflected across the vertical line through the origin —
+`getMirroredPos`, `x' = origin.x * 2 - pos.x`. The reflection leaves the distance the maths runs on untouched,
+since `|origin.x - (2 * origin.x - x)|` is `|x - origin.x|`, and flips only which side each quadrant test lands
+on, which is the whole of what handedness means here. So no branch went into the util, its arity did not grow
+past a signature this file already calls readable only to its own callers, and the same one-line reflection reaches
+`spiral` unchanged if a clockwise spiral is ever wanted.
+
+**A quadrant pair names the two corners it grows from, which `Default` could not.** The entry that was called
+`quadrantDefault` multiplied the two signed distances, so the product is negative in the two quadrants where the signs disagree
+and those corners start first — the top-right and the bottom-left, which are the two ends of a rising diagonal.
+It is therefore `quadrantUp`, and `quadrantDown` is the same expression with that product added instead of
+subtracted, so it starts from the top-left and the bottom-right. The direction words are the ones the diagonal
+band entries already use, so the pair reads off the same vocabulary rather than inventing `Mirrored`.
+
+**The diagonal is a band direction, and it was the one thing the collection had none of.** Diagonals were not
+absent so much as never straight: `diamond`'s rings are four diagonal segments meeting at corners, and
+`checkered`'s two passes alternate on the parity of `dist.x + dist.y`, which is a diagonal parity. What nothing
+produced was a band whose edge is a single 45° line — the thing `lineRow` and `lineColumn` are, turned
+half a right angle.
+
+**One rotated coordinate pair covers every family that had a Row and a Column.** `getDiagonalDelta` returns
+`down`, which is `|dx - dy|` and counts bands parallel to a line falling to the right, and `up`, which is
+`|dx + dy|` and counts bands parallel to one rising to the right. That is all the new arithmetic there is,
+because every one of these families is the same three ingredients: a band index, a position along the band,
+and the parity of the band index. `lineRow` is `(dist.y, dist.x, isEvenRow)`; `_lineDiagonalDown` is
+`(down, up, isEven(down))`, and the Up member swaps the pair over. So `line` gained all three forms, `roll`
+gained its two and `entwine` gained one each way, from two helpers and no new formula.
+
+**Each direction gets its own maximum, worked out rather than bounded.** `maxDist.x + maxDist.y` is an upper
+bound for both diagonals and is exact for neither: with the origin in a corner of an eleven by eleven grid the
+down-diagonal only reaches ten, so that bound would have left half the weight range unused and the wipe would
+finish halfway through its stagger. `getMaxDiagonalDistance` takes the larger of the two corner sums per
+direction instead.
+
+**Two of the four families degenerated on a diagonal basis, and the fix was to normalise along the band.** In
+the rotated basis `down + up` is always even, so a cell's two diagonal distances always share a parity. `roll`
+and `entwine` use the band index for nothing but its parity, so that parity was the parity of the coordinate
+the ramp already ran on, and the weight collapsed into a function of one coordinate — a banded diagonal wipe.
+For `roll` the collapse was exact: measured, `rollDiagonalUp` came out byte-identical to
+`lineDiagonalDownAlternate` on every grid and origin tried, and `rollDiagonalDown` to `lineDiagonalUpAlternate`.
+
+**What broke the collapse is dividing the position along a band by that band's own length.** Every row is as
+long as every other, so `rollRow` can divide by the grid's width and nothing is lost; diagonal bands are all
+different lengths, so dividing by the longest left short bands using a sliver of their range — and left the
+band index out of the value, which is what allowed the collapse. `getMaxDiagonalDistanceInBand` answers how far
+the along-band coordinate reaches inside one band, by intersecting the band with the grid and evaluating at the
+two ends, which is exact because the distance along a band is convex. After it, no two diagonal entries are
+equal on any grid or origin tried, and `roll` and `entwine` each vary within a band as well as across bands.
+It reads off both signed bands at the same distance, because these families index a band by distance and treat
+the two sides of the origin as one, exactly as `lineRow` treats the rows above and below it.
+
+**`zigzag` is the one family with no diagonal member, and the reason is a ratio it cannot change.** Its
+along-band term is one part in `bandCount + 1` of the range whatever it is divided by, and a diagonal basis has
+about twice as many bands as a row basis on a square grid — eleven against six on eleven by eleven. So the
+diagonal snake deviated from a plain diagonal wipe by at most 0.091 where the row snake reaches 0.167, and
+per-band normalisation could not widen that, only let every band sweep its own length. The user looked and
+deleted both entries: a snake that reads as a straight diagonal wipe is a fifth circle. `roll` and `entwine`
+kept theirs, because for them the same normalisation was the difference between a duplicate and a pattern.
+
+**The origin moves a diagonal wipe only across its bands, which is the family's own behaviour rather than a
+gap.** `lineRow` reads `dist.y` alone, so sliding the origin sideways changes nothing; a diagonal reads its own
+band index alone, so sliding the origin along the band changes nothing — measured, `_lineDiagonalDown` is
+identical at `center` and at `topLeft`, both being on the same falling line.
+
+**Ripple and the concentric families were deliberately left out of this.** The user axed ripple's row and
+column entries in the same breath as asking for diagonals, on the grounds that ripple is for concentric
+patterns; the same reasoning keeps a diagonal out of `radial`, `diamond` and the three `frame` members, whose
+whole subject is a ring around a point.
+
+**`oval` is not one of them, and reading it as one was a mistake made from its name.** `ovalRow` is
+`zigzagRow`'s even branch with the parity flip removed: rows are the bands, the ramp runs along each row from
+the origin's column, and every row sweeps the same way. The frontier that gives it its name is curved because
+the two terms compound, not because anything measures a radius. It is therefore a band family and does take a
+diagonal member — the caution about rings never applied to it.
+
+**Its diagonal member was built, measured and deleted, on `zigzag`'s ratio.** With a centred origin, `ovalRow`
+differs from `lineRow` by up to 0.167 on eleven by eleven and 0.250 on twenty-one by seven, while the diagonal
+member differed from `lineDiagonalDown` by 0.091 and 0.071 — the second figure worse, because a wide grid has
+few rows and many diagonal bands. That is the same 0.091 that had both `zigzagDiagonal` entries deleted, so
+`oval` and `zigzag` are the two band families with no diagonal, for one reason rather than two.
+
+**A sequence starts at the origin, which is the whole of what an origin can mean to an ordering.** `sequenceMorton`
+and `sequenceStride` were indexed on absolute grid coordinates, so the Origin control did nothing for them.
+Morton now interleaves the bits of the distance from the origin rather than of the position, so the Z-curve
+grows out of the origin — and at an origin of `{ x: 0, y: 0 }` the distance is the position, so it reproduces
+exactly what it used to do. Stride rotates its walk so the origin's own cell is the one that arrives first.
+Both consequences are worth stating: they leave `ORIGIN_FREE_WEIGHT_TYPES`, and with it the Playground's
+Scanline page, whose list is exactly that array; and the user had already said they do not look good on a
+scanline, so the removal went with their leaning rather than against it. Putting them back on that page means
+the page naming them, not the array.
+
+**Stride's axis is which way the flat index runs, not how long the step is.** `sequenceStrideRow` counts the
+index along rows and `sequenceStrideColumn` along columns, which is the `lineRow`/`lineColumn` pair applied to
+an ordering. The step itself stays the golden-ratio one, stepped down until it shares no factor with the total
+so that the walk visits every cell exactly once — a shorter step was offered as a second axis and not taken,
+so `stride` takes the total and the origin's index and owns the step.
+
+**`random` is a group of two, because reseeding made a third one redundant.** `randomDefault` draws per cell
+and `randomClustered` interpolates a hash over four-cell blocks, which is the only one that can give a smooth
+blob. A flat hash of the cell's coordinates was built as well, and its only distinction from `randomDefault` was
+that it repeated; once the user chose a pattern that never repeats, a freshly seeded flat hash is a slower
+`Math.random()` giving a statistically identical picture, so it was dropped rather than kept as a duplicate.
+`randomClustered` takes a seed, and the seed is drawn once per `computeCellWeights` call: a cluster needs
+neighbouring cells to agree on it, and a never-repeating pattern cannot fix it at module load either. That is
+the one piece of mutable state in the collection, it lives in `CellAnimationWeightUtils` beside the hash, and
+`FIXED_HASH_SEED` is there for the callers that want the opposite — `_computeHorizontalDropout` picks which
+scanlines drop out and is called every frame, so a seed that moved would reshuffle the dropout mid-animation.
+
+**Ripple is a cosine over a distance, and everything that varies is an argument.** The `ripple` util takes the
+spread, the spread's maximum, the period in cells and a travel ratio, and each entry is that call with its own
+distance measure. Eight were built to be looked at and four survived the first pass: straight bands along a row
+or a column and rings on the square metric were all discarded, and the diamond metric was kept — so the family
+is now two metrics, the straight-line distance and the diamond one, each with the same variants. The period
+gives `Tight` at two cells and `Wide` at eight, and the travel ratio gives `Travelling`, which mixes the bands
+with a falloff so the rings arrive in order outward instead of all at once — the difference between one wave
+crossing the grid and a set of standing rings. `rippleDefault` and `rippleDiamondDefault` are the two the user
+has kept, and the plain-distance entries carry no metric word in their names for the same reason the
+counter-clockwise `radar` entries carry no handedness: the unmarked name is the one that was there first.
+
+**A sample selector is sorted alphabetically, always.** The user's rule, given after a batch of new animations
+sat unsorted at the end of the dropdown. It covers every list a Playground control reads from — the weight and
+animation registries and the `SVGDefs` gradient and pattern registries, whose keys are what their dropdowns
+show. Sorting is by the name with any review marker stripped, which is also how the Playground groups, so a
+marked entry sits beside the family it belongs to rather than in a block of its own at one end. The registry
+records are sorted the same way as the type arrays, so there is one order to maintain rather than two.
+
+**Three lists are exempt, confirmed by the user, because their order carries meaning.** `ORIGIN_TYPES` walks
+the centre and then clockwise, `EASINGS` runs in the order CSS names them, and `ZONE_TYPES` groups by kind.
+Alphabetising any of the three would scatter something a reader uses to find an entry, which is the opposite of
+what the rule is for. The rule is about collections whose order is otherwise arbitrary.
+
+**A directional family names its members after the direction each one travels or the edge it turns on, and its
+quadrant entry reads that word off the zone.** `swing` pivots on an edge, so its members are `swingTop`,
+`swingBottom`, `swingLeft` and `swingRight`, and `swingDefault` became `swingTop` once there was more than one.
+`tumble`, `shoot`, `shake`, `drip` and `hop` are named for where the cell is heading, so they gained the missing
+directions under `Up`, `Down`, `Left` and `Right`, and `dripDefault` became `dripDown` for the same reason
+`swingDefault` had to go: a family of four with one member called Default cannot say which one it is. Their
+quadrant entries dispatch outward — a cell above the origin travels up — which is the mapping `elasticUp` and
+`pullUp` already had against the `top` zone.
+
+**An entrance starts hidden, by opacity or by geometry, and `skew` was the one entry that did not.** A cell
+animation runs from a weight-decided moment to the cell at rest, so at its first stop the cell must not be
+visible — otherwise the whole grid shows the picture before anything animates, and the stagger is invisible.
+Most entries satisfy this by scaling from nothing (`zoomIn`, the `pop` family, `pull`, `swarm`, `encircle`) and
+the rest by opening at `opacity: 0` and reaching `100` a fifth of the way in. `skewCw` and `skewCcw` did
+neither: they began at full size and full opacity with a 45 degree skew, so every cell was already there.
+Checked at the same time, those two were the only entries in the collection that started visible.
+
+**Where an entry can hide itself by geometry, that beats an opacity fade, and the user's reason is what it looks
+like at full size.** A cell that fades in at its final dimensions reads as the shape appearing rather than
+arriving — the eye is given a large rectangle that simply gains substance. So `skew` hides by scaling from
+nothing instead, and the shear it unwinds went from 45 degrees to 75 to keep the entry recognisably a skew now
+that a growing cell carries most of the movement. Transforms are written scale-last, so the shear is applied to
+an already-scaled cell and a 75 degree lean on a nearly-zero-size cell stays local rather than smearing across
+the grid. Opacity is still right where nothing about the geometry can hide the cell, which is what `cube`,
+`flip` and `swing` do — they rotate in place at full size.
+
+**A quadrant entry has an `Inverted` twin, which is the same zones pointing at the opposite members.** Where the
+plain entry sends a cell outward — above the origin travels up — the inverted one sends it inward, so `top` takes
+the Down member, `left` takes the Right one, and for the two diagonal families each quadrant and axis takes the
+member diagonally opposite. Nothing new is animated: an `Inverted` entry is its twin's list with the members
+swapped in pairs, which is why all thirteen came from one mapping. `pop` keeps `popCenter` as its fallback and
+the rest keep `zoomIn`, exactly as their plain twins do.
+
+**A pair that differs only in handedness or in axis can be mixed by a zone, and that is two entries rather than
+a new animation.** `encircle`, `skew`, `swarm`, `spinUp` and `spinDown` each hold a clockwise and a
+counter-clockwise member; `pull` and `flip` each hold a horizontal and a vertical one. Every one of those pairs
+gained a `Rings` entry, which gives the even square rings the first member and the odd rings the second, and a
+`Checkered` entry, which splits them by checkerboard parity instead. Both come free of new keyframes:
+`evenRings` and `evenCheckeredCells` were already in the zone vocabulary, and `fromZones` already dispatches on
+it. This is the _"machinery that recombines what is already there"_ argument applied to the animation side a
+second time, and the reason it pays is that neither member changes — what changes is which cell gets which.
+
+**`fromZones` takes an ordered list and an explicit fallback**, not a record keyed by zone. Zones overlap by
+design — `top` is every cell above the origin including the corners, and the four quadrants exclude the two
+axes entirely — so first-match-wins is the only contract that stays predictable, and the order is part of what
+a sample is saying. The fallback is required rather than defaulting to no animation: a cell that matched
+nothing would otherwise sit fully visible and motionless while the rest of the grid assembles, which reads as
+a defect rather than as a choice.
+
+**A zone entry picks the family member of the same name, and where no such member exists the family does not
+get a zone entry.** So the `top` zone takes `carouselTop`, `hingeTop`, `elasticUp` and `pullUp`, and the
+top-left quadrant takes `popTopLeft` and `rollUpLeft`. `spin` is the family deliberately left without one: its
+four members are two directions times two handednesses rather than four positions, so any mapping onto
+quadrants would be invented here rather than read off the names.
+
+**A diagonal family needs the four axis zones as well as the four quadrants.** The quadrants leave out every
+cell sharing a row or a column with the origin, which on an odd grid with a centred origin is a cross of
+twenty-one cells out of a hundred and twenty-one — enough to look broken if they all fall through to the
+fallback. `rollQuadrant` maps each axis to the quadrant member clockwise after it, and only the origin cell
+itself reaches the fallback. A family with a centre member — `pop` has `popCenter` — needs no axis entries,
+because the fallback is already the right answer for the whole cross.
+
+**Entries the user has not yet groomed carry a leading underscore.** Asked for so that a batch of new samples
+can be found and judged against the existing collection in one pass; it is a review marker rather than a
+naming convention, and it comes off when an entry is kept. The Playground's option grouping strips it before
+grouping, so `_carouselQuadrant` sat inside the `carousel` group next to the four members it dispatches to
+while it was under review, rather than in a group of its own — which is the comparison the prefix exists to
+make possible. Nothing in the `CellAnimation` collections carries it now; the `ScanlineAnimation` keyframe
+builders still do.
+
+### Controls: `Toasts`, and a queue the consumer owns
+
+The shape question `backlog.md` parked toasts on rested on a premise that does not
+hold here.
+
+**`backlog.md` claimed toasts needed "an out-of-tree queue and an API that is called rather than bound,
+which nothing here has". Both halves were already covered.** "Out of tree" is a signal created outside any
+component — `createRoot(() => createSignal<Toast<T>[]>([]))`, which `Viewport.context.ts` already does — so
+the list outlives whatever raised a notification without the library owning anything. "Called rather than
+bound" is what a signal's setter is: `queue[1]((prev) => [...prev, toast])` is an imperative call from
+arbitrary code with no component in scope. What the note reached for is sugar — `toast.error("…")` — which is
+a layer for a consumer who has been met, and a library that has not met them should not pick their
+vocabulary.
+
+So the prop is `toastsSignal: Signal<Toast<T>[]>`, per _"Signal tuples for two-way state"_ in
+`conventions.md`.
+
+**The division of writes is what makes the two-way signal correct rather than convenient.** The consumer is
+the only thing that adds; the component is the only thing that removes — a duration elapsing, and the limit
+being exceeded. `Modal`'s `visibilitySignal` argument with a list instead of a boolean.
+
+It also settles an ownership question no other shape answers cleanly. If the consumer owned the list outright
+and the component only reported, "show at most three" would be enforced consumer-side, making queue policy
+the consumer's job when policy is behaviour and behaviour is the shell's. If the component owned the list
+privately, nothing could raise a toast without a handle to a mounted component. A shared signal is the only
+arrangement where the component enforces policy by writing something the consumer can see.
+
+**A controller handed over at mount is deliberately not used.** The `onMount` shape issues commands to a
+mounted thing; a queue is state, and state that must outlive the mount cannot be reached through a handle the
+mount gives out.
+
+**The component keeps everything with a clock**: the enter transition (`ElementFader` unchanged), the
+retention window during which an entry already gone from the consumer's list stays mounted to play its exit,
+the auto-dismiss duration and its pausing, and the limit.
+
+**Duration lives on the record and nowhere else — there is no component-wide default.** `Toast<T>` is
+`{ id, value, durationMs? }`, and an absent `durationMs` means the toast waits to be dismissed. A default
+prop would make per-toast stickiness inexpressible, since `undefined` would then read as "use the default"
+and there would be no second spelling for "never" that was not a magic number. A consumer wanting four
+seconds everywhere puts it in the push helper they already have. This is _"the absent value is the mode"_
+from `Progress`, and it fails visibly.
+
+**`id` is a separate field rather than identity living on `value`.** `Tabs` keys on `value` because two tabs
+with the same value are meaningless; two identical toasts are meaningful — "Saved" twice in a row — so keying
+on value would collapse them or make a change look like no change.
+
+**One piece of internal state: the ordered list of rendered ids**, the admitted list plus the ids still
+playing their exit. Everything else derives — an id absent from the admitted list is leaving. Ids are
+strings, so `<For>` keys them by value and each entry keeps a stable node whatever the consumer does with
+record references; the problem that forced `Tabs` onto `<Index>` does not arise. The record for an id is
+latched inside the `<For>` callback, so an entry keeps painting its last known content while it fades.
+
+**An unexported `ToastsItem` leaf per entry**, in the `TabsItem` shape, owning its own `ElementFader` and
+duration timer so both are disposed with the entry rather than accumulating in a container that lives as long
+as the application. It reports upward once its exit has finished and the container drops the id then.
+
+**The duration timer arms and disarms through `onCleanup` inside its own effect, which is load-bearing.**
+The first version cleared a timeout at the top of the effect and measured elapsed time only when pausing, so
+the clock restarted from full whenever the effect re-ran — and it re-ran on every array change, because it
+read whether the entry was exiting. Three toasts raised together therefore dismissed one and reset the other
+two, indefinitely. Arming inside the effect and subtracting the elapsed time in its cleanup makes the
+arithmetic correct regardless of _why_ the effect re-runs, and shrinks the dependency set to the duration and
+whether it is paused. Found by driving the page, invisible to every type and DOM assertion.
+
+**Pausing is region-wide and forced.** Hovering or focusing anywhere in the region holds every countdown;
+there is no prop to switch it off. Focus is the half that matters — a toast must not vanish out from under
+the button someone is reaching for. The listeners are `mouseover` / `mouseout` and `focusin` / `focusout` on
+the region with a `relatedTarget` containment guard, **not** `mouseenter` / `mouseleave`, because the region
+is `pointer-events: none` and is never itself a hit-test target; bubbling from the entries is the only thing
+that reaches it.
+
+**Urgency is per toast, and announcing is the announcer's job rather than the visible region's.** A live
+region carries one politeness for everything inside it and there is no way to mark one child as more urgent
+than its box, so an error could not interrupt while a confirmation waited its turn. `computeAnnouncement` is
+the way out: given it, `Toasts` announces each arrival through `LiveAnnouncer` at that toast's own
+`ariaLive` — falling back to the region-wide `ariaLive` as the default — and the visible region carries no
+politeness at all. This is Radix's arrangement, reached from the same constraint.
+
+**It is a branch on prop presence, and the branch is deliberate rather than lazy.** Without
+`computeAnnouncement` the region keeps its own `aria-live` and behaves exactly as before, because the library
+does not own the toast's text and cannot start announcing on a consumer's behalf — and silently _stopping_
+announcements for a consumer who has already shipped would be an accessibility regression they would never
+see. So the mode is chosen by whether the consumer has said what to announce.
+
+**Both announcer regions are reserved when the stack mounts.** A live region only announces what is inserted
+after it is already in the document, so a region created by the first message may be silent for exactly that
+message — the failure that is hardest to notice, because everything after it works. `LiveAnnouncer.reserve`
+exists for this: it creates a region without saying anything into it.
+
+**The keyboard route in is `F8`, and `Escape` is the way back.** A toast is portalled to the end of the
+document, so nothing tabs to it in any order a reader would expect; the published answer is a hotkey, and
+Radix's default is the one adopted. The region takes `tabindex="-1"` so the key can focus it, the element
+focused before the press is remembered, and `Escape` from anywhere inside hands focus back there. A consumer
+with two stacks on one page sets `hotkey` to an empty string on the one that should not answer — the only
+spelling for "no hotkey", since an absent prop has to mean the default.
+
+**A toast's own `onShow` and `onHide` are `Modal`'s pair, at the same two boundaries.** They fire when the
+entry transition starts and when the exit transition starts, not when either finishes, because that is what
+`ElementFader` reports and what `Modal` already means by those names. The consumer owns the list, so arrivals
+and departures are already visible to them; what an effect over their own array cannot see is the transition
+boundary, which is the whole of what these two add.
+
+### `Toasts`: what the painter gets, and why position is not fully delegated
+
+**`renderToast(getToast, getVisibilityTarget, getTransitionDurationMs, getState)` opens with `Modal`'s
+contract, in `Modal`'s order.** A consumer's toast painter and their modal painter are the same kind of
+object — something that transitions itself between two states over a duration it was handed — and spelling
+that two ways would be one contract under two shapes. Four arguments is not new:
+`InteractionTooltipDefs.renderContent` already takes four with the same ordering. `getToast` is an accessor
+and comes first, following `Tabs.renderTab`, because a consumer may replace the record for an id
+("Uploading" becoming "Uploaded") and the painter must see that without remounting and restarting the entry
+animation.
+
+**`ToastState` is `{ index, count, isPaused }`, and those are the stacking hints.** The number of cards in
+front of an entry is `count - 1 - index`, and newest-ness is a comparison against the ends. `index` is queue
+position, oldest first, independent of `getDir` — the consumer sets the direction so they can map it to
+visual order. Both are inside the reactive record rather than passed plain like `Tabs.renderTab`'s index,
+because they change while an entry is mounted: removing the first toast renumbers everything behind it.
+`isPaused` is there so a painter drawing a countdown can hold it; the countdown itself is the painter's, for
+`Progress`'s reason.
+
+**Nothing says _why_ an entry is leaving** — elapsed, closed, or pushed out by the limit. A painter drawing
+those differently would animate a distinction the reader cannot act on.
+
+**Nothing carries a dismiss action, and that is not an omission.** The consumer owns the signal, so the close
+button their painter draws removes the entry from their own list, and the exit still plays because the
+component holds the entry through it.
+
+**Position cannot be fully delegated, and the reason is the live region rather than the geometry.** A
+notification region only announces content inserted into it if the element was already in the document, so it
+has to be a persistent element the component mounts once and keeps — and it has to be the component's, by the
+rule that keeps `Select`'s `<div role="group">` out of consumer markup, with more force here because a
+subtly wrong live region fails silently. Given that, delegating its position would mean accepting a class name
+or a style object, and `TextInput` already argued that out: it accepted a whitelisted style object _only_
+because text the browser draws had no other hook. Here there is another hook, used by three components —
+`Modal` with `getAlignment` / `getMargins`, `Drawer` with `getEdge`, `Label` with `getDir` / `getGap`. Per
+`Modal`: placement is geometry, not paint.
+
+So the region is a viewport-sized layer in the `Viewport` portal that paints nothing and clicks through, and
+four geometry props place the stack inside it: `getAlignment` (nine positions), `getDir` (which end new
+entries enter from, and whether the stack runs down an edge or along one), `getGap` and `getMargins`. Each
+entry sits in a minimal library box that re-enables pointer events and is the flex item; it carries no role,
+since politeness is set once on the region and a role per entry would announce twice.
+
+**Alignment is independent of direction, and `ToastsUtils.computeStackAlignment` keeps it that way.** A
+reversed flex direction inverts "start" on the main axis, so a naive mapping would make `bottom-right` name
+different corners depending on `getDir`. The function flips the main axis alone — exact arithmetic over two
+enums, and the one part of this component reachable from `npm test`.
+
+**Flow stacking is the geometry props; an overlapping pile is the painter's**, offsetting and scaling itself
+off `index` and `count`, which works for a fixed peek distance. Overlapping by each card's own measured
+height does not work and is in `backlog.md` rather than half-solved.
+
+**Toasts sit above dialogs** — `z-index` 200 against `Modal`'s 100 — because a toast routinely reports the
+outcome of the action a dialog just took.
+
+**`getLimit` is written out as `Accessor<number | undefined>`** for the `AccessorProps` hole: an optional
+prop whose value may be `undefined` cannot pass through the mapped type, and "no limit" is a value a consumer
+switches to at runtime rather than a prop they omit. `getAriaLabel` is **required**, since a `role="region"`
+with no name is not exposed as a landmark at all.
+
+**`getOverflow` keeps both queue behaviours rather than picking one.** `dismiss-oldest` writes the excess out
+of the consumer's list so the newest is on screen; `hold-newest` renders only the limit and leaves the rest
+queued, entering as slots free. Genuinely different products — latest-news versus lose-nothing — and the
+request for a prop rather than a default is why both exist. Held entries are not rendered at all, so they run
+no clock, which falls out of the design.
+
+### Controls: `Collapsible`, and what an accordion adds to one
+
+Settled, on the user's call, when a single show-more panel became the second consumer of
+machinery `Accordion` had kept to itself. The split is **what each layer claims about the page** rather than
+how either one opens.
+
+**`Collapsible` owns the disclosure**: the trigger's `aria-expanded` and `aria-controls`, the panel, the
+measured height, the fader, and `inert` while closed. `expandedSignal: Signal<boolean>` is its state — a lone
+panel genuinely owns its own boolean.
+
+**`Accordion` adds the three things that make a panel part of a set**, each a statement rather than a
+behaviour: the heading element around the trigger, the panel's `role="region"` named by that trigger, and the
+arrow-key walk across the headers. The expanded-set policy, including single-expand, stays with it too, since
+only a set can have a policy.
+
+**The heading is the load-bearing half of that split.** A show-more at the end of a paragraph is a control
+inside prose; wrapping it in an `h3` puts a heading in the document outline that no reader would agree is
+one, and a `region` landmark for a two-sentence expansion is landmark noise. So `getHeadingLevel` is
+**optional** on `Collapsible` and absent means no heading element at all — the only component here where the
+absence of a prop removes an element rather than defaulting one.
+
+**The panel's role arrives as `getPanelRole` plus `getPanelAriaAttributes`, which is `Popover`'s shape**: the
+role is the consumer's, so the ARIA that role requires is too, and one bag beats a prop per attribute.
+`Accordion` passes `region` and an `aria-labelledby` pointing at the header id it generated, which is also why
+`Collapsible` takes `getId` — whoever names the panel owns the id.
+
+**A section has no boolean, so `SignalMirror` is the bridge.** `Accordion` owns `Signal<T[]>` and each
+section reads its own membership out of it, while `Collapsible` wants the whole signal.
+`SignalMirror.createValueMirror` was extracted for this and writes outward only when the value actually
+differs, so "the difference is the toggle" holds and the set stays the single source of truth. Its fifth
+consumer, and the first inside the library.
+
+**`AccordionFlags` is gone rather than aliased to `CollapsibleFlags`**, following the `TextField` extraction:
+old names went with it and the Playground's painter was renamed. One shape, one name.
+
+### Controls: `Accordion`, and where auto-height measurement lives
+
+The first component whose geometry cannot be expressed in CSS at all, which decides
+the division of labour.
+
+**The height animation is the library's, and that is not a contradiction of "a control paints nothing".**
+CSS cannot transition to `auto`, so animating a panel open requires measuring the content and animating to a
+pixel value. Measurement is not paint — same category as `Modal`'s alignment and `Label`'s gap — and a
+painter cannot do it because the element being constrained is the library's. The painter still owns
+everything visible: `renderPanel` receives `getVisibilityTarget` and `getTransitionDurationMs` in `Modal`'s
+shape, so a fade or slide inside the panel is the consumer's, layered on a height the library drives.
+
+**Three boxes, each for a reason.** The section wraps a heading and a panel; the panel carries
+`overflow: hidden` and the animated height; inside it an unconstrained content div is what gets measured.
+Measuring the constrained box would need the height released and restored on every pass — `TextField`'s trick
+on an absolutely positioned overlay — and would fight the transition it is feeding.
+
+**`ElementObserver.createBorderBoxHeightObserver` is the extracted half, and `TextField` was deliberately not
+migrated onto it.** `backlog.md` asked for the shared piece so the measurement would not be written twice; on
+reading both, they share less than that implied — `TextField` clamps to a row count derived from
+`line-height`, releases `bottom` to measure a `scrollHeight`, and republishes the result as the wrapper's
+`getMinHeight`. What is genuinely common is "observe an element and republish its own height", which is all
+the new observer is. Its name follows the coordinate-space rule — border box, layout pixels, so `Viewport`'s
+scale never enters.
+
+**The panel stays mounted and goes `inert` rather than being unmounted or hidden.** Unmounting or
+`display: none` would make the content unmeasurable and the animation impossible. `inert` takes the subtree
+out of the tab order and the accessibility tree while leaving it laid out, as `Popover` does with its root.
+The cost is that a collapsed panel's content is still built, so an accordion of a hundred expensive panels
+builds all hundred.
+
+**"Always exactly one open" is a second boolean, not a third state on the first one.** `isSingleExpand`
+allows zero expanded — pressing the open header closes it — and `isExpandRequired` is what refuses that last
+close. Two flags rather than a mode string, which is Radix's spelling of the same pair and the shape that
+does not break a prop already shipped. It reads on its own terms in either mode: with single expansion it
+means the only way out of a section is into another one, and with several open at once it means the last one
+standing stays.
+
+**A refused press changes nothing and says nothing.** The header is still a real button, still reports
+`aria-expanded="true"`, and is not marked disabled — the same arrangement as pressing the radio that is
+already selected, which is also a no-op nobody labels. Marking it disabled would make the one open section
+look like the unavailable one, and the parity rule says disabled and disabled-but-reachable must look
+identical.
+
+**Headers are all in the tab order, and the arrows are an extra rather than a roving order.** The published
+accordion pattern, and the opposite of `Tabs` and `RadioGroup`. The difference is what the collection means: a
+tab list or radio group is one control with several states, so it gets one stop; an accordion is several
+independent disclosures. Arrow, `Home` and `End` come from `NavigatorUtils.computeNextPosition` unchanged,
+moving focus without selecting.
+
+**Each header is wrapped in a real heading element, and its level is a prop.** `getHeadingLevel` defaults to
+3 and picks `h1`..`h6` from a fixed list rather than building a tag name, so it stays typed. The level is
+document structure, which only the consumer knows; the library owning it would either invent an outline or
+force `role="heading"` with `aria-level`, and a real element is better for both AT and outline. The heading
+gets `margin: 0; font: inherit` — a reset in the same category as `interactionRoot > * { margin: 0
+!important }`, not paint.
+
+**`getSizing` defaults to `"fill"`, following `Progress` rather than `InteractionWrapper`.** Found by driving
+it: with the root shrink-wrapping its content, opening one section changed the widest section and re-wrapped
+the text in every other one. An accordion's natural width is its container's. The type is declared on
+`Accordion` rather than imported, for `Progress`'s reason.
+
+**The header leaf must re-enable pointer events, and forgetting to is invisible to types.** The first
+`Accordion.css.ts` did not, so a header looked perfect and could not be clicked — the hit test landed on the
+heading above it. `Button.css.ts` and `BinarySwitch.css.ts` are the precedent. Nothing in the type system or
+in a DOM assertion catches it; only a real click does.
+
+**Scrolling a newly opened section into view is `Collapsible`'s, and it is opt-in.** `getIsScrolledIntoViewOnExpand`
+defaults to off; `Accordion` passes it straight through, since the section that opened is a disclosure rather
+than anything the set knows about. Off by default because the library cannot tell whether the disclosure **is**
+the page — where taking the scroll position is a kindness — or one widget in a column beside other content,
+where taking it steals the reader's place in something they were not touching. The consumer is the only one who
+knows which, and the expensive half, knowing when the growing has stopped, stays library-side either way.
+Nothing published ships it on: it is an open request against Base UI and MUI, and `backlog.md` recorded the
+recipe everyone agrees on.
+
+**It waits for the growth to finish, because the panel's size is what it has to aim at.** Scrolling when the
+click lands would aim at a panel still at zero height and leave the page in the wrong place. `ElementFader`
+already exposes `getHasTransitionFinished` beside its target — the completion signal `backlog.md` assumed did
+not exist — so the wait is a latch armed when the section expands and read when the fader reports the
+transition over. The latch is `on(..., { defer: true })`, so a section that starts life expanded does not
+scroll the page as the app loads.
+
+**Two calls, and each answers a different failure.** `scrollIntoView({ block: "nearest" })` on the whole
+section brings it up by the smallest amount that shows it, and does nothing at all when it is already visible;
+the same call on the **header** immediately afterwards is the clamp for a panel with more in it than the
+window can hold, where reaching the panel's far edge would push the header that was just pressed off the top.
+The second call gives back the least amount that puts the header back, so the panel is cut at the bottom
+instead. Chromium's own reading of `"nearest"` happens to keep the header for that case already, but the
+behaviour is stated rather than inherited from one engine's reading.
+
+**And each call happens twice, once on the finish and once on the frame after it.** The fader's completion is
+a timer started a frame before the CSS transition does, so it can report "over" while the last few pixels of
+growth are still to paint; scrolling on that frame alone lands a few pixels short. A second pass on the next
+frame corrects it. It is not a frame **instead** of the immediate call: a frame may be a long time coming on a
+loaded machine, and the suite failed exactly that way while the whole of it ran at once.
+
+### Controls: `Preview`, which shortens rather than hides
+
+Settled with the user, for a "read more" on the Playground's card. A `Preview` shows its content down to a
+height the consumer sets and opens it the rest of the way on a press.
+
+**It is a component beside `Collapsible`, not a prop on it, because the two disagree about what collapsed
+means.** MUI and Chakra took the other route — `collapsedSize` and `startingHeight` on their own `Collapse` —
+and it costs them nothing because their `Collapse` is a bare transition wrapper with no `aria-expanded`, no
+`aria-controls` and no `inert`. Ours has all three, and one of them **inverts**: `Collapsible` marks its panel
+`inert` while closed, which is right when nothing shows and wrong here, where the opening lines are on screen
+being read. A flag that silently reverses an accessibility rule is not a flag.
+
+**Nothing is ever hidden from a screen reader, and that is a consequence rather than a choice.** `inert`
+cannot be lifted off part of a text flow, so the remainder past the cut cannot be sealed without sealing the
+visible opening too. The control is therefore an affordance for the eye, and a reader using a virtual cursor
+gets the whole text. `preview.spec.ts` asserts it, because it is exactly the thing a later change would
+"tidy up" by copying `Collapsible`.
+
+**`getCollapsedHeight` is required, alone among the props.** There is no defensible default: the right
+height depends entirely on what is being shortened, and a component that guessed would be inventing the one
+number it exists to hold. `Spotlight`'s `getPadding` defaults to 0 because 0 means "no padding"; there is no
+equivalent no-op height.
+
+**Content that already fits gets no control and no overlay.** A control that opens nothing invites a press
+and does not reward it. Mantine's `Spoiler` does the same — under its `maxHeight` it renders the children and
+nothing else — and it is the reason the overflow test drives the paint as well as the button.
+
+**An unmeasured content box reads as the collapsed height, never as zero.** The height observer starts at 0,
+so the first render would otherwise ask for a zero-height box and then grow to the collapsed height once the
+measurement arrived — a preview that visibly unfolds on page load, and a transition running before anybody
+touched anything. Reading "not measured yet" as the collapsed height means the common case, where the content
+overflows, never changes height at all.
+
+**The overlay's visibility target is 1 while collapsed, which is the one place a renderer is handed the
+inverse of the open state.** It is the fade that says there is more, so it belongs to the shortened state;
+handing it the expanded target would mean every consumer writing the inversion themselves. The pair is
+`(getVisibilityTarget, getTransitionDurationMs)` as everywhere else, and the wrapper around it is positioned
+across the bottom of the clipped box — which is the library's element and unreachable from `renderContent`,
+the same reason `InteractionWrapper` owns the box its `renderDecoration` paints into.
+
+**The scroll is opt-in and fires on the way in, which is the opposite of `Accordion`'s.**
+`getIsScrolledIntoViewOnCollapse`, off by default, for the user. Opening pushes what is below further
+down and leaves the reader looking at the text they asked for, so nothing should move; closing pulls it all up
+by the height that just vanished and takes the control they pressed with it, so something should. `Accordion`
+is the mirror image — its growth is the event that can leave a section below the fold — which is why the two
+props are named for the half they act on rather than sharing one name. The machinery underneath is the same,
+latch and all: see _"Scrolling a newly opened section into view is `Collapsible`'s"_ for why the wait, the two
+calls and the extra frame are each there.
+
+**`Fold` is reserved and must not be spent on anything else.** The user's call, made while naming this: it is
+being kept for a possible component that folds in the literal sense, growing or shrinking by 2× or 0.5×.
+`Spoiler` was rejected for meaning content concealed until revealed, `Summary` because `<summary>` is the
+**trigger** half of a native disclosure, and `Excerpt` because a name has to be spellable from memory.
+
+### A SMIL animation resets by being rebuilt, and the defs record is what says so
+
+Settled by the user, closing the `Show ... keyed` item `backlog.md` had parked. SMIL cannot be rewound in
+place, so an animation restarts by being **built again** — and what rebuilds it is a new defs record: the
+consumer's callback returns fresh objects, `Shape` inserts new elements, and the old ones are discarded
+mid-flight. That is the whole mechanism, and it is now the stated contract rather than a side effect nobody
+had written down.
+
+**What was removed is the thing that pretended to own it.** Every animation builder wrapped its `animate`
+elements in `<Show when={defs.animationIterationPatterns ?? EMPTY_ARRAY} keyed>`, whose intent was exactly
+this remount. It could never fire: `defs` is a plain object, so reading a field off it tracks nothing, the
+memo behind `Show` has no dependencies, and the children were built once and never again. Deleting it changed
+nothing — measured, the `animate` elements are replaced on a duration change and on an iteration-pattern
+change with the wrapper gone exactly as with it there. Three builders wrapped sibling elements, so a fragment
+took the wrapper's place; the rest lost a level of nesting.
+
+**An animation is started by asking for a delay from now, never by naming a moment.** `createAnimateDefs`
+used to work out the document's current time and write it into `begin`; switching iteration pattern while one
+was running then produced an animation that looked perfectly healthy — connected, right duration, right repeat
+count, a real interval — and never animated, then reverted at the end of that interval. The instant had
+already passed by the time the browser read the attribute, and an interval that begins in the past is not the
+same thing as one beginning now. `beginElementAt(delay)` is the call the sequencing already used for every
+later stage, so both paths now start the same way and the clock is never consulted. Measured across the
+sequence that reaches it — pick a repeating pattern, let it run, switch mid-run — twenty-four runs clean where
+the old path failed roughly one in three.
+
+**The guard is a spec rather than a note**, because the failure mode is silent: memoise the defs so the same
+record survives a change and the animation simply carries on with the old timing, looking like a component
+that ignores its props. `shape.spec.ts` holds an element, changes the duration, and asserts the one it held is
+neither the current one nor still connected.
+
+**This is the same shape as the cell timeline being keyed on its source**, and worth reading together: in both
+cases the restart is owned by an identity that changes, and in both cases the thing to avoid is a restart that
+happens by accident somewhere up the tree. The difference is which document owns the clock — a `Shape` on the
+page rebuilds its own elements, while a serialised source gets a new clock only by being a new image.
+
+### The SVG defs vocabulary is sample code, and the arithmetic is a file with no JSX in it
+
+Settled by the user, applying the `CellAnimation` ownership rule to the one place it had not reached.
+
+**The library never used any of it.** Seven named tilings, four families of animation builder, and the shared
+helpers under them were exported from `components/src` and called by nothing except Playground samples. `Shape`
+takes `computeFillDefs` and `computeStrokeDefs` from its consumer and renders whatever it is handed, which is
+the same seam `CellAnimation` has for weights — so a named set of tilings is vocabulary, and vocabulary
+belongs where the origins and the weights already went.
+
+**What moved and what stayed.** The seven tilings and the `Linear` / `Radial` / `Path` / `Gradient` builders
+are now `Samples/SVGDefs`. `computePattern` — place N cells in a tile and repeat it — stays, along with
+`createAnimateDefs` and `unrollSelfReferencingPatterns`, because those are what a consumer writing a tiling of
+their own would build on. The gradient file stays whole.
+
+**The split the move was for is a file extension.** `vitest` runs `src/**/*.test.ts` in a node environment
+with no JSX transform, which is the rule _"Unit tests"_ in `conventions.md` already states — so a test cannot import a file
+containing an element. That makes the separation mandatory rather than stylistic: `SVGPatternLayouts.const.ts`
+and `SVGAnimationTracks.const.ts` hold the arithmetic and no markup, `SVGPatterns.const.tsx` and
+`SVGAnimations.const.tsx` hold the builders that consume them. This is what `backlog.md` asked for and could
+not get while the numbers lived inside the callback that emitted the element.
+
+**A tiling is now four pure functions rather than a closure.** Each entry in `SVGPatternLayouts.ALL` answers
+how many cells the requested count rounds to, how big one tile is, where a cell sits, and whether it straddles
+the seam. A wrong tiling still tiles — that is the whole reason this arithmetic could be wrong for months —
+and now the pointy-top hexagon's rows can be asserted to sit at −15, 7.5 and 30 for a 30px cell, which is the
+three-quarter overlap that makes hexagons interlock rather than merely repeat.
+
+**One thing the extraction found immediately.** `computeGrowTracks` assumes its two ends are given in order;
+handed them reversed it walks outside the segment instead of mirroring. No call site does that, so it is a
+precondition rather than a defect, and it is pinned by a test rather than changed — the behaviour is what
+ships and nothing has asked for the other one.
+
+### `LiveAnnouncer`: the region that belongs to no component
+
+Settled, on the user's call, for `Calendar`'s month change.
+
+**A live region only announces content inserted after it is already in the document** — the rule `Toasts`
+records — which is why a component cannot mount one when it needs to speak. Two module-level regions, polite
+and assertive, created on first use and kept, sidestep that. They live on `document.body` rather than in the
+`Viewport` portal: nothing about them is painted, so the scale factor is irrelevant, and they must outlive any
+subtree that might announce through them.
+
+**A region can be reserved before there is anything to say.** `reserve(politeness)` creates one without
+announcing, for a consumer that knows it will speak later and cannot afford the first message to be the one
+that creates the region — `Toasts` calls it for both politeness levels when its stack mounts. Nothing else
+needs it: a `Calendar` cannot announce a month change until someone has already paged it, by which time the
+region has existed for as long as the page.
+
+**Each message is its own node, removed a second later.** Setting the text of one persistent node does not
+re-announce an identical string, so paging back to a month you were just on would be silent. Appending a fresh
+child is an addition every time, which is what `aria-relevant="additions"` tells a reader to watch. Radix's
+per-toast announce arrangement and React Aria's shared announcer, from the same constraint.
+
+**Visually hidden by the clip-rect idiom, not `display: none` or `visibility: hidden`**, either of which
+would take the text out of the accessibility tree along with the paint. The styles are applied imperatively
+because the element is the library's own and never reaches a stylesheet.
+
+**`Calendar` is the first consumer, and it formats the month itself.** Paging swaps all 42 cells and changes
+nothing else, so a screen reader user hears nothing until they move focus. The month title on the page is the
+consumer's markup — `Calendar` renders no header — so the announcement cannot be read off it and goes through
+the same `Intl` path the day labels use. Politely, because paging is something the reader just did rather
+than news. The previous month arrives as the effect's own argument, so the first run has nothing to compare
+against and a calendar never talks about itself as it mounts.
+
+### `NavigatorUtils.computeNextCell`: the two-axis walk never wraps and never clamps
+
+Settled, beside the 1D walk rather than replacing it, and deliberately different at the edges.
+
+`computeNextPosition` wraps within its length, because a tab list or menu is a closed ring.
+`computeNextCell` does neither: overflow along a row **carries** into the neighbouring row, and `y` is
+allowed out of range. That lets a caller whose grid is a window onto something larger resolve the overflow by
+moving the window — `Calendar` reads `y === -1` as "the previous month" and needs no special case for the
+first or last day. `x` is always in range, because carrying is what puts it there.
+
+**Page keys mean a page of rows, and a caller for whom they mean something else turns them off.** A month is
+not six weeks, so `Calendar` passes `hasPageKeys: false` and does month arithmetic itself. `hasEdgeKeys`
+works as before, and `Home` / `End` are the ends of the **row**, not of the grid.
+
+### Controls: `RangeCalendar`, `DateRangePicker`, and the half-entered state
+
+**`RangeCalendar` is a second component beside `Calendar`, not a mode on it**, on the precedent `MultiSelect`
+already set: the shared work moved into a `CalendarComposite` — the grid, the roving day, the keyboard, the
+month announcement — and the two thin components over it own only their value shape and answer three hooks,
+`computeIsSelected`, `computeAnchorDay` and `onPick`. `SelectComposite` is the same arrangement, so a reader
+who knows one knows both. `DateRangePicker` sits beside `DatePicker` the same way.
+
+**The half-entered state is the component's, and never reaches the consumer.** `RangeCalendar` holds the first
+end in a private signal; while it is set, the outward value is `undefined` and the grid paints the span from
+that end to the roving day, so keyboard movement previews the range without a pointer. The second press
+commits `orderRange(first, second)`, which sorts the ends — so picking backwards gives the same span, and a
+consumer never receives a record of which end was clicked first. A third press starts again rather than
+extending, which is the behaviour that needs no rule to remember.
+
+**Three flags carry the band: `isInRange`, `isRangeStart`, `isRangeEnd`.** `isInRange` is inclusive of both
+ends, so a painter can lay a continuous band and then round the two caps; the ends are marked separately
+rather than inferred from position, because the first and last day of a visible week are not the ends of the
+span. The Playground's day painter writes them out as `data-in-range`, `data-range-start` and `data-range-end`
+so the suite can read the flag rather than a hashed class or a computed colour.
+
+**`DateRangePicker` derives its two fields from the one signal.** A start typed on its own leaves the outward
+value `undefined`, exactly as a single press on the calendar does, and the grid and the fields are two ways
+into the same value rather than two values kept in step.
+
+### A typed sign is opt-in, and only the grouped mask has one
+
+**`TextSyncGroupDefs` gained `hasSign`, and nothing else can hold a sign.** `applyGroupedMask` takes a minus
+wherever it appears in the text, moves it to the front, and keeps it while the digits regroup; `applyMask`, the
+fixed-pattern one, has no notion of it. That asymmetry is the point rather than an omission: a date's ISO
+spelling is `2026-08-10`, so a fixed-pattern field that read a hyphen as a sign would misread every date it
+was given. The flag is off by default, so an unsigned field drops a typed minus rather than refusing the
+keystroke — the digits still land, which is what a consumer who did not ask for signed amounts wants.
+
+**A lone minus is held rather than dropped**, because otherwise the sign could never be typed before the
+digits, which is the order everybody types it in. The mask returns the sign alone with the caret behind it,
+and `MaskedField` reports no value until digits arrive — a sign is not an amount.
+
+**The sign rides in the digit string, and `MaskedField` gained one optional def to allow it.** `readDigits`
+overrides how the field reads digits out of its text, defaulting to `TextSyncUtils.getMaskedDigits`, which
+strips everything that is not a digit. `CurrencyInput` passes `readSignedDigits` when signed, so `fromDigits`
+receives `"-123456"` and `toDigits` returns it. Widening the shared digit reader instead was rejected for the
+same reason the mask flag exists: `DateInput` would have started reading its ISO separators as signs.
+
+**`DecimalUtils.toDigits` drops the sign**, which is documented in `ss-utils` and is correct there — it
+converts a magnitude. `CurrencyInput` re-attaches the sign around it rather than asking that utility to
+change, because the sign belongs to the field's spelling and not to the decimal shift.
+
+### Group sizes are read from the decimal point outwards, and the last one repeats
+
+**`TextSyncGroupDefs.groupSizes` is a list, read from the point outwards.** `[3]` is every locale that groups
+in threes, `[4]` is a group of four, and `[3, 2]` is the Indian grouping: three digits nearest the point, then
+twos for as long as the digits last. The last entry repeating is what lets a fixed-length list describe a
+number of any size — the alternative, a list as long as the value has groups, would have to be recomputed
+every keystroke by whoever supplied it.
+
+**An empty list means no grouping at all**, which is the same rule read at its limit: there is no size to
+repeat, so the whole run is one group. A size below one is treated the same way, because the alternative is a
+loop that never advances.
+
+**`getGroupSizes` reads the pattern off `Intl` rather than carrying a table of locales.** It formats a
+ten-digit sample, measures each group the locale produced, reverses them and drops the leading one — which is
+a remainder rather than a group — then collapses the repeated tail to a single entry. Ten digits is chosen
+because it divides evenly by none of the group sizes in use, so the leftmost part is always a partial group
+and dropping it is always safe. A locale that produced no groups at all falls back to threes, matching what
+`DecimalUtils.getSeparators` does when a locale names no separator.
+
+### `DateTimeValue`, and why a missing half is no value
+
+**`DateTimeValue` is `{ date: DateValue; time: TimeValue }` in `Abstracts`**, joining the calendar-aware date
+this library owns to the `TimeValue` from `ss-utils`. `DateTimeValueUtils` covers the operations the two
+halves cannot answer between them — `isSame` ignores the seconds shape the way `TimeUtils` does, `compare`
+orders by date and falls back to time, and `toDate` flattens to a real `Date`.
+
+**`createSplit` is the composition, and `DateTimePicker` is the control over it.** The helper takes the one
+signal and returns a date signal and a time signal for the existing fields; the control pairs `DatePicker`
+with `TimePicker` over them, so the consumer holds one value and the two fields are an implementation detail.
+The helper is exported in its own right, because pairing a plain `DateInput` with a `TimeInput` needs the
+split without the two popups.
+
+**The control passes its shared props to both halves and overrides what cannot be shared.** The props type is
+`Omit<DatePickerProps, "valueSignal" | "ariaLabel" | "visibilitySignal">` plus the time-only knobs, so the
+field paint, the layer placement and the locale are written once. Three things collide and are named apart:
+`renderTimeTrailing`, `renderTimePopup`, and the two visibility signals. One collides silently and is
+overridden — `renderLeading` on the date side takes an era as its second argument, which the time field has
+no notion of, so the time half is given `undefined` rather than the date half's renderer.
+
+**Both composed pickers set `width: fit-content` and stop their children shrinking.** Without it the two
+picker roots are flex items that shrink below their content and overlap, which puts the second field's trigger
+underneath the first field's input — clickable by coordinate, unclickable by pointer. `DateRangePicker` has the
+same rule for the same reason. The Playground pages give these examples `span: 2`, because a control about
+460px wide otherwise overflows a 320px grid column and the neighbouring card paints over its trigger.
+
+**A pair with a half missing reports nothing, and this was corrected mid-build.** The first version filled the
+absent half from a default, so typing a date alone produced a value at midnight. That is wrong twice over: it
+disagrees with `RangeCalendar`, where half a range is explicitly not a range, and it made editing destructive,
+because clearing a field to retype it dropped the other half. The split now remembers each half privately and
+emits only when both are present — so clearing one clears the value, and retyping it brings the other back.
+
+### Controls: `Calendar`, and the date value the library owns
+
+Settled, closing the dependency question `backlog.md` recorded as a real decision.
+
+**No date library, and no `Date` in the public API.** `Abstracts/DateValue` holds
+`DateValue = { year, month, day }` with **`month` 1-12**, plus `DateValueUtils`. Two things drove it: a
+`Date` is an instant, so a date-only value round-tripping through one shifts across a zone boundary, while a
+record has nothing to shift by; and `Intl.DateTimeFormat` already supplies every locale-dependent string, so
+the only thing left to own is arithmetic, about eighty lines. Months are 1-12 rather than `Date`'s 0-11
+because an off-by-one month is the most common bug in date code and no type catches it.
+
+**Every conversion goes through midday**, never midnight. A midnight anchor can land on the hour a zone skips
+or repeats, so "add a day" moves by 23 or 25 hours and lands on the same or the wrong calendar date — a
+stepper that appears to stick. Midday is never inside a transition anywhere on Earth.
+`DateValue.utils.test.ts` pins both European transition dates.
+
+**No conversion may pass a year to the `Date` constructor, because it reads 0 to 99 as the 1900s.** Corrected
+. `new Date(year, month - 1, day, 12)` was the single conversion for a long time and is wrong
+below year 100: a Caesar born in year 44 was stored as 44 and described everywhere as 1944 — wrong weekday,
+wrong grid, wrong label — with nothing reporting a problem. `getDaysInMonth` had it twice over: February in
+year 4 answered 29 because it was really being asked about 1904.
+
+Both now go through one private `buildLocalDate`, which builds an anchor date in a safe year and calls
+`setFullYear(year, month, day)` — the documented way past the shorthand. **All three fields go in that one
+call**: set alone, the year lands on an anchor whose month and day have already been normalised, and year 0 is
+a leap year while the 1900 it was shorthand for is not, so 29 February in year 0 would have become 1 March on
+the way through. The shorthand is unreachable from the rest of the file — the two remaining `new Date` calls
+with a literal year build the month and weekday **name** lists, where the year is an arbitrary anchor.
+
+**A year outside 0000 to 9999 is written in ISO 8601's expanded form, and only then.** Same day, closing the
+other half of the same bug. `toIso` was padding the _signed_ string, so year −44 came out as `0-44-08-01` with
+the minus where the third digit belongs, and `fromIso`'s four-digit pattern refused to read it back. Padding
+the absolute value and putting the sign in front is the whole fix; the pattern widens to "four bare digits, or
+a sign and six" and the fixed length check goes, since a pattern anchored at both ends already rejects
+anything longer. Six digits with a leading sign is what ISO 8601 prescribes and what
+`Date.prototype.toISOString` emits, so the expanded form round-trips through the platform.
+
+**Expanded only when the year needs it.** Emitting a sign on every date would be more uniform and would
+rewrite every stored date string every consumer has, for a case almost nobody reaches. The cost is that the
+writer is canonical while the reader is lenient — `fromIso` accepts `+002026-08-10` and `toIso` gives back
+`2026-08-10` — so reading and writing normalises rather than reproducing the input character for character.
+Both halves are pinned by tests. `-000000` is refused: ISO 8601 does not allow a negative zero year, and
+`toIso` can never emit one.
+
+**What this does not buy: a BC date still cannot be typed.** `DateInput`'s mask is a fixed run of digit slots
+and everything that is not a digit is discarded on the way in, so a sign has nowhere to go — the same missing
+piece `backlog.md` tracks for the formatted number. Storing, loading, computing and displaying a
+pre-common-era date all work; entering one is by code or by the calendar's paging.
+
+Before anything labels one: this is astronomical year numbering, inherited from `Date`, so there is a year 0
+and it is 1 BC — year −44 is 45 BC. `Intl`'s `era` option already does that conversion, and nothing here
+should reimplement it.
+
+**`addMonths` clamps the day; `fromIso` refuses an impossible date.** 31 January plus a month is 28 or 29
+February, never 2 or 3 March, because `Date.setMonth`'s rollover makes a month stepper skip months. And
+`fromIso("2026-02-31")` is `undefined` rather than 3 March: a field that silently moves what was typed is
+worse than one reporting the value as not yet valid.
+
+**The grid is always six weeks of seven days, and carries the neighbouring months' days.** A fixed row count
+stops the calendar changing height as months are paged. The neighbouring days make the keyboard walk work
+without a special case — the grid is a continuous run of dates, so the next cell from `computeNextCell` maps
+back as `addDays(gridStart, y * 7 + x)` whatever `y` is.
+
+**The page keys move a month, and held Shift moves a year.** `PageUp` and `PageDown` step the roving day by
+one month, `Shift` with either steps it by one year, and both go through the same `moveTo` — so both clamp to
+`min` and `max`, both pull the visible month along, and both are announced by the month effect already
+watching it. This is the one part of the grid's keyboard a consumer cannot supply from outside: the grid owns
+its `keydown` handler, so a caption can offer a year jump as a button but nothing outside can bind a key to
+one. Note that the year step is `addYears` rather than twelve `addMonths`, which is what keeps 29 February on
+a year that has no 29 February from walking somewhere unexpected.
+
+**Forty-two `InteractionWrapper`s per month is the cost of consistency, and it has been measured rather than
+worried about.** Building a whole calendar — which is what opening a `DatePicker` popup does — takes about
+3ms of work, and changing month takes about 1.7ms, worst case under 3ms; both are the synchronous update, so
+the frame they land in is not otherwise at risk. That is a headless Chromium on one machine over a production
+build rather than a guarantee, but it settles the shape of the answer: a three-month view would be roughly
+9ms to build and 5ms to page, still inside a frame, and the per-cell wrapper is not what would make a
+multi-month calendar expensive. The remaining per-cell cost worth caring about is a consumer's own disabled
+predicate, which is called once per cell and is theirs to make cheap.
+
+**The visible month is a `Signal` the consumer owns, and `Calendar` renders no header.** `monthSignal` is
+required, and the month title and paging buttons are the consumer's markup outside the component. The
+alternative — a private month plus a `renderHeader` slot handed paging callbacks — would invent a controller
+record for something the settled convention covers. `Calendar` writes the signal when the keyboard walk leaves
+the month, which is exactly the two-way case, and it means `DatePicker` can snap the month to the value when
+its popup opens without the component having an opinion.
+
+**That header being the consumer's is what made an interactive caption free.** Added: the
+Playground's caption is a month title that turns into a `Select` for the month and a `NumberInput` for the
+year when clicked, with the paging arrows either side throughout. `Calendar` was not touched — the caption
+writes `monthSignal` exactly as the arrows did. It lives in `StyledComponents/CalendarCaption` and both
+`CalendarPage` and `DatePickerPage` use it, since the two had written the same header twice.
+
+**The fields are a mode, not the resting state**, so a calendar reads as a calendar until someone asks to
+jump. Three things end the mode and they are not interchangeable: `Enter` accepts and hands focus back to the
+title; `Escape` puts the month back to what it was when the mode opened, which is the only reason a restore
+point is kept; and focus leaving the group ends it without moving focus, since the usual way out is clicking a
+day and pulling focus off that day would undo the click.
+
+`Escape` layers correctly with the month `Select` underneath — `Select` handles the key only while its popup
+is open and marks the event handled, so the first press closes the popup and the second closes the mode; the
+caption checks that flag rather than the key alone. The cost: `Enter` cannot close the mode from the month
+field, because `Select` claims `Enter` unconditionally. From the year field it works, and `Escape` and `Tab`
+work from either.
+
+**Two bugs found building it, both recurring in any component with modes.** A `focusout` fires when the
+fields unmount, _after_ the mode has been ended by `Enter` or `Escape`, so the focus-out handler ran a second
+time and cancelled the focus restore the first exit asked for; it now ignores anything arriving once the mode
+is closed. And the year field's `SignalMirror` pushes its inner value outward from an effect, which runs after
+the handler that closed the mode — so `Escape` restored the old month and the mirror wrote the abandoned one
+back over it; the year write ignores anything queued while the mode is closed. Both are the same shape:
+**ending a mode is not one event, and the tail of the old mode arrives after it.**
+
+**The year is written on a `FunctionUtils.debounce`, not on every keystroke.** Typing 1066 into a live field
+pages the calendar through years 1, 10 and 106. `Enter` and focus-out flush whatever is pending rather than
+waiting, so nothing is lost by leaving quickly. The mirror tolerates this without special handling — while no
+write has landed the outer value has not changed, so nothing pushes back over what is being typed.
+
+**The year is a number field rather than a second `Select`, and not on taste.** A `Select` materialises every
+option and nothing here virtualises them, so a year list must be bounded — and any bound is invented, since a
+hundred years back is right for a birthday and absurd for a booking. A number field needs no bound, and typing
+four digits beats scrolling eighty rows even in the ordinary case.
+
+**The caption sets the calendar's width, which is why the day cell grew from 36px to 46px.** Two arrow
+buttons, a month name and a four-digit year do not fit across seven 36px columns — the frame ended up a
+hundred pixels wider than the grid, with the grid visibly floating. `Calendar`'s root is `width: fit-content`
+and the cell size is the Playground painter's, so the cell is the only end that can move: 46px × 7 is 322px,
+which is what the caption needs. If a `getSizing` is ever added to `Calendar`, this constraint goes away.
+
+It also keeps the frame still across the mode switch: the edit-mode header is the wider of the two, so sizing
+the grid to it means the box does not resize under the pointer when the title is clicked — which it would
+have, by seventy pixels, at the old cell size.
+
+**Selection is by date, one tab stop, and the cell carries the whole date as its name.** `valueSignal` holds a
+`DateValue | undefined`. The grid is a roving tab order over 42 `InteractionWrapper`s, following `Tabs` rather
+than `Select`'s `aria-activedescendant`, because each day is a real element that can hold focus. Since the
+painter draws a bare number, the cell sets `aria-label` to the full formatted date, or a reader announces
+"17" with no month. `aria-current="date"` marks today, `aria-selected` the selection.
+
+**`CalendarFlags` carries the day itself**, unlike every other flags record, because the painter's whole job
+is to draw that date and it would otherwise be handed the accessor twice — once as `renderDay`'s first
+argument and once inside the flags. Both are available, and the flag is the one a `classList` block can read
+alongside `isSelected` and `isOutsideMonth`.
+
+**An intervening wrapper div sits between `role="row"` and `role="gridcell"`**, because every cell is an
+`InteractionWrapper` owning its own root. `Select` already made this trade between `role="listbox"` and
+`role="option"`; it is in `backlog.md` now that a second component has hit it, a grid's row/cell relationship
+being the stricter of the two.
+
+### Pointer drag: a ratio, opt-in, and captured
+
+Settled, closing the primitive `backlog.md` #2 asked for.
+`InteractionTracker.trackDrag(ref, disabled, opts)` reports where a pointer is inside an element for as long as
+a drag lasts.
+
+**It is a separate call rather than part of `wrapElement`**, as item 1 asked: most controls want no listener
+at all, and a two-dimensional surface is the one shape that cannot borrow a native input the way `Range`
+borrows one per thumb.
+
+**It reports a ratio of the element's own box, not a position**, which keeps it out of the coordinate-space
+trap: pointer coordinates and the element's rect are both client-space, so `Viewport`'s scale divides out of
+the fraction exactly and never has to be looked up. Same insight that fixed the two geometry specs — a ratio
+of two same-space measurements is scale-free by construction.
+
+**`setPointerCapture` is load-bearing.** A drag that stops reporting when the pointer leaves the element
+strands the control mid-drag, and releasing outside must still land the value. Capture also means the
+`pointermove` handler can be on the element rather than the document, so nothing leaks when the component goes
+away.
+
+**`pointerdown` reports immediately**, so a click positions the value without a drag — what a colour surface
+and any track-clicking slider need.
+
+### The swipe: one gesture over the drag machinery, an axis it claims, and a verdict at the end
+
+Settled, closing the gesture `Abstract` `backlog.md` #26 asked for. `InteractionTracker.trackSwipe(ref,
+disabled, opts)` reports how far a pointer has pushed an element along one axis, and at the release says
+whether that push counts. `Drawer` and `Carousel` are its two consumers.
+
+**Both gestures sit on one private `trackPointer`, and the public pair stay separate.** `trackPointer` owns
+the pointer bookkeeping — which pointer is being followed, capture, the four listeners, and whether a release
+was a release or a cancel. `trackDrag` reports position from it and `trackSwipe` reports travel from it, and
+neither has a way to express the other's report. The item argued for exactly this: a drag reports **state**
+for as long as it lasts, a swipe reports **an event** with a verdict, and the argument survived the later
+decision that a swipe also reports progress in flight, because the verdict is still a thing a drag has no
+word for.
+
+**`trackDrag` now says why a drag ended, which closes `SlideButton`'s cancelled-pointer gap in the same
+change.** `onDragEnd` receives `"release"` or `"cancel"`; `SlideButton` activates only on the first, so a
+drag the browser or the OS takes over with the thumb already at the end no longer confirms. A swipe must
+never commit on a cancel, and that consumer is what made the change to a shipped `Abstract` worth making —
+recorded in the item as the condition for doing it.
+
+**Travel is a ratio of the element's own box, not a distance in pixels.** Same insight as `trackDrag`'s:
+pointer coordinates and the element's rect are both client-space, so a `Viewport` scale divides out of the
+fraction exactly. It also answers the question the item left open — whether in-flight progress should be a
+raw offset or a ratio — without taking either horn. A ratio **of the commit threshold** would mean the
+`Abstract` dividing by a number only the consumer knows, which is why the item leaned towards the offset; a
+ratio **of the element** is neither, and it is the space `trackDrag` already reports in. A consumer wanting
+the fraction-of-threshold reading divides at the call site, where the threshold lives.
+
+**The box is the one the gesture started in, and this is load-bearing rather than tidy.** A drawer that
+follows the finger moves the very element the ratio is measured against, so a live `getBoundingClientRect`
+feeds the element's own displacement back into the travel: pushing a left-edge drawer leftwards halves every
+reading, and pushing a right-edge one rightwards runs away to a commit on the first move. Freezing the rect
+at `pointerdown` removes the loop. `trackDrag` keeps measuring live, because its two consumers do not move
+under the pointer and a page scrolling during a drag would strand a frozen rect.
+
+**A swipe takes the pointer over only once it has travelled, and a drag takes it immediately.** `trackDrag`
+captures and calls `preventDefault` on `pointerdown`, which is right for a colour surface — a click there
+sets a value. A swipe cannot: the elements it watches are a dialog and a carousel viewport, both full of
+buttons and links, and capturing every press inside them would break all of them. So `trackSwipe` waits until
+the travel passes a small slop, then captures, and swallows the one `click` that follows an engaged gesture
+so a swipe that began over a button does not also press it. The slop is a ratio of the element like everything
+else here, which does mean a wide carousel tolerates more jitter than a narrow drawer; a constant in pixels
+would be the truer reading of finger jitter, and was not worth reintroducing the scale question for.
+
+**The `Abstract` writes `touch-action` itself, from the axis it was given.** A horizontal swipe sets `pan-y`
+and a vertical one `pan-x`, so the browser keeps the axis the gesture does not want and the page still
+scrolls. Leaving this to the consumer's stylesheet is the silent-failure case the item warned about: get it
+wrong and the browser claims the gesture, the handler never fires, and it happens only on touch hardware.
+Since the axis and the CSS have to agree, the `Abstract` owns both ends rather than documenting the pairing.
+
+**`Modal` moves the container, and no painter had to change.** The swipe offset is a `transform` on
+`modalContainer` while the painter keeps its own slide off `getVisibilityTarget` — two elements, two
+transforms, composing. This follows the rule already recorded for the edges: **placement is geometry and the
+slide is paint**, and where the dialog box sits is placement. It also means every existing `Modal` consumer
+gets the gesture without touching `renderContent`, which a third argument handing out the offset would not
+have.
+
+**A committed swipe keeps its offset and lets the exit run from there.** Resetting the transform on commit
+would snap the panel back to fully open for one frame before the painter slid it out. The offset is cleared
+when the fader stops being visible, which is after the exit has finished and the whole layer has unmounted.
+
+**Where the gesture is offered is derived, never configured — SC 2.5.1 Pointer Gestures, Level A.** A swipe
+is path-based, so anything operable by one must also be operable with a single pointer and no path. `Modal`
+attaches it only when the alignment is an edge, and only when overlay-click dismissal is still on: `Escape`
+is the path-free route, and a consumer who has already turned off casual dismissal is not handed a more
+casual one. `Carousel` attaches it only when `renderControls` was passed, since a carousel without controls
+has no keyboard route at all — the same shape as the floater observers running only when `renderFloater` is
+passed. A consumer cannot ask for the conformance failure because there is no prop with which to ask.
+
+**A swiping carousel does not rotate, for the same reason a hovered one does not.** WCAG 2.2.2 asks that
+self-moving content not move under the pointer; a finger on the track is a pointer on it. `getIsHeld` keeps
+its recorded meaning — hovered, focus within, page hidden — and the swipe joins the rotation predicate beside
+it rather than being folded into the flag the consumer reads.
+
+**The commit thresholds are per component, not one constant here.** `trackSwipe` takes `getCommitRatio` and
+has no default; `Modal` and `Carousel` each name their own. The item recorded that shape, and it is the same
+rule as merging two implementations that disagree on a constant. Neither number is a public prop, for the
+reason `SlideButton` has no threshold prop: a tuned value with no consumer behind it is a guess.
+
+**A threshold is a fraction of the drawer, so the four edges commit at the same fraction and different
+distances.** The travel is measured against the dialog box along the swipe axis, and how thick a drawer is
+belongs to the painter — on the Playground a side drawer is 320px wide and a sheet 400px deep, so the same
+0.35 asks for 112px sideways and 140px vertically. The alternative readings are a fraction of the viewport,
+which would make a narrow drawer need a push most of the way across the screen, and a distance in pixels,
+which would make a thin drawer commit almost at once and a thick one feel stuck. Proportional to the thing
+being pushed is the reading that holds at every size, and it is the one a person's hand is already using —
+the drawer under the finger is the whole of what they can see moving.
+
+**A sheet whose content scrolls needs a second mechanism, and `touch-action` alone cannot be it.** The first
+build left top and bottom edges out on the reasoning that `touch-action: pan-x` on the dialog would disable
+touch scrolling inside it. That reasoning was wrong in both directions, and the correction is the useful part.
+
+`touch-action` is **not** simply inherited down the tree. A gesture resolves it by walking from the touched
+element up to the nearest ancestor that would handle the gesture — the first containing scroll container —
+and intersecting only that stretch. Anything above that scroller is never consulted. So `pan-x` on the dialog
+does not reach a scrolling panel inside it, and the panel keeps scrolling normally. What actually happens is
+the reverse of the fear: over a scrolling panel the browser takes the vertical gesture and the swipe never
+fires, and over a panel that does not scroll the swipe works. A gesture that silently works in some places
+and not others is worse than one that does not exist, which is why the limit was worth removing rather than
+documenting.
+
+**So the gesture is claimed on the first touch move, and held for the whole gesture.** `trackSwipe` listens
+to `touchmove` non-passively and, on the first move that has a direction, walks the scroll chain from the
+touch target up to the tracked element asking whether anything there could still scroll the way the finger is
+pushing. If something can, the gesture is the browser's and the swipe stays out of it; if nothing can — the
+sheet is at the top of its content and the finger is pushing down — `preventDefault` claims it. This is the
+iOS sheet rule: reading scrolls, and pushing from the top dismisses.
+
+**Holding it for the whole gesture is the part that is easy to get wrong.** Preventing only the first move
+stops that one scroll, and then the browser claims the _next_ move and sends `pointercancel` — the pointer
+stream ends mid-swipe and nothing commits. Measured in Chromium: preventing every move keeps `pointermove`
+flowing to the end with no cancel and no scrolling; preventing none scrolls and cancels at the second move;
+preventing only the first scrolls nothing but still cancels. So the decision is taken once per gesture and
+then applied to every move of it.
+
+**`touch-action` still carries the axis, because it is the up-front declaration.** It is what tells the
+browser the intent before any listener runs, and it is what keeps the page from panning across a drawer in
+the areas that have no scroller of their own. The `touchmove` guard is the second half, not a replacement.
+
+**This is the only place in the library that listens to touch events rather than pointer events.** Pointer
+events cannot express it: by the time `pointercancel` arrives the browser has already taken the gesture, and
+there is no pointer-level way to say "not this one". The guard is therefore touch-only and the mouse path
+never reaches it.
+
+### Controls: `ColorArea`, and the value form a picker has to hold
+
+The saturation-and-brightness surface replacing the OS colour dialog, plus the
+arithmetic under it.
+
+**Hex is the storage form and HSV the working one, and they do not round-trip.** `Abstracts/ColorValue` holds
+both plus the conversions. Eight bits per channel cannot carry hue at black or saturation at grey, so a
+surface re-reading the hex on every drag frame would drift and then stick — drag brightness to zero and the
+hue is gone. `ColorArea` takes `hsvSignal: Signal<ColorValueHsv>` and never touches hex; converting at the
+boundary is the consumer's, and `ColorValueUtils.getIsSameHex` exists so a caller can tell whether the hex it
+was handed still describes the HSV it holds. Same shape as the timezone decision under `Calendar`: keep the
+lossless form in the working state, convert only at the edges.
+
+**The surface is a `role="group"` over two real range inputs, one per axis.** Both collapsed to a pixel and
+taken out of hit-testing, so the drag on the group owns the pointer while the keyboard and assistive
+technology get the native slider free — arrow keys, `aria-valuetext`, the lot. Collapsed rather than
+`display: none`, because a hidden element is not focusable and the tab order is the point of them. A single
+`role="slider"` element was rejected: one slider cannot honestly carry two values, and it would mean
+reimplementing key handling two native inputs already have.
+
+Accepted cost: the axis inputs' own focus rings are invisible, so the painter draws focus from `focusedAxis`
+in the flags — the arrangement `TextInput` uses for its caret colour rather than the rejected
+`:has(:focus-visible)` shape, because here the flag reaches the painter directly.
+
+**`syncElement` returns for a fourth time.** Both axis inputs are pushed from state in a render effect, for
+`BinarySwitch`'s reason: the browser moves a range input before it reports, so an owner that refuses or snaps
+the write would leave the element holding a value state does not agree with.
+
+**`PopoverRole` gained `"dialog"`.** `Select` brought `listbox` and `Menu` brought `menu`; a popup holding a
+control surface rather than a list of choices is a dialog. The union grows as consumers arrive rather than
+being a general string.
+
+**`ColorInput` **is** the picker now, and the OS dialog is gone.** It was a native
+`<input type="color">` behind a painter; it is now a field button plus a `Popover` with `ColorArea` and a hue
+`Range` inside. The three open ownership questions:
+
+- **The hex boundary is the component's.** `valueSignal` stays `Signal<string>`, so no consumer changed, and
+  the HSV working state lives inside where a drag cannot lose hue at black. Both directions of that sync
+  guard with `getIsSameHex` and read the far side `untrack`ed — a mirror that tracks both sides writes its
+  stale half over the new value. The emitted spelling is six digits while alpha is 1 and eight when it is
+  not, so the old contract is unchanged until a consumer uses opacity.
+- **Dismissal is the component's, and it needs a document listener.** `Select` closes on blur because its
+  popup refuses focus; a colour popup cannot, since the axis sliders and the hue slider must be focusable. So
+  `ColorInput` listens for a `pointerdown` outside both popup and field while open, and `Escape` closes from
+  either and returns focus to the field. The first popup here needing outside-click detection, and why
+  `Popover` still has none — the need is the consumer's, not the layer's.
+- **The paint is four slots**, following `Select`'s count: `renderContent` for the field, `renderArea` and
+  `renderHue` for the two controls, and `renderPopup` for everything around them. `renderPopup` receives a
+  thunk rendering the surface plus the HSV signal itself, which lets a consumer add a colour-space toggle and
+  channel inputs — paint and arithmetic over a value they now hold, not behaviour the library owes them.
+
+**There is no `renderAlpha`, and there will not be one — settled by the user.** Alpha is a
+channel input in `renderPopup`. It was argued the other way first, on the grounds that alpha is judged by eye
+and a number field makes you type-look-type; what defeated that is `NumberInput`'s press-and-hold, which
+repeats while the stepper is held, so the field already gives continuous adjustment against a live preview. A
+fourth slot would have bought the checkerboard track and nothing else, at the price of a permanent optional
+prop and a mode on a shipped control.
+
+The omission reads as a gap from outside: `renderArea` and `renderHue` are library-owned inputs and alpha has
+no twin, so a consumer scanning the props concludes transparency is unsupported. It is not — the value is
+`HSVA` throughout and `toHexValue` emits eight digits whenever alpha is below opaque. The two slots exist
+because those controls own a **gesture** the library implements, and alpha owns none.
+
+**A native colour input is no longer reachable through this control**, which is the cost: no form value and
+no OS picker, and `FileInput` remains the only control where the UA owns activation. The suite got better for
+it — every part of the picker is drivable, where the OS dialog could only be tested by writing the value.
+
+**`Popover` refuses `mousedown` for a list, not for a dialog.** The `preventDefault` that makes `Select` work
+also cancels the default action of pressing a native control, and a range thumb's drag **is** that default
+action. So a `dialog` popover holding real controls skips it: the hue slider could be typed into but not
+dragged, and nothing in the DOM showed it. The role already states the intent, so this is a branch on
+`getRole()` rather than a new prop.
+
+**Alpha is optional on the working form, and 0-1 everywhere except in a hex string.** `ColorValueHsv` gained
+`a?: number`, so `ColorArea` passes it through untouched and an absent alpha means opaque. `toHexa` always
+emits eight digits, because a form that only sometimes carries alpha is a form you cannot type into. `hsl` is
+a display form only.
+
+**A two-way mirror must track only its own source, and this cost two bugs to learn.** The Playground's picker
+mirrors the hue into a `Signal<number>` for the slider, and both directions originally read the other side's
+value inside the effect. That makes the pair fight: picking a colour elsewhere re-ran the hue-to-picker
+direction, which found the hue signal still holding the previous hue and wrote that stale hue over the new
+colour — so typing a hex produced a different colour entirely. The guard on the far side has to be read
+`untrack`ed. The same shape broke the hex field twice over: an effect refreshing the field's text while
+tracking the picker overwrote what was being typed. The fourth mirror in the Playground and the first two to
+go wrong, which is the argument for extracting it.
+
+**A hex field owns its text until it is left.** Three and four digit hex forms parse, so a half-typed value
+commits early; pushing the canonical spelling back in would replace the text under the caret and send the rest
+of the keystrokes into the middle of it. Refreshing on the way out is `NumberInput`'s clamp-on-blur rule
+applied to a different kind of incompleteness.
+
+**`PageTextField` cannot be used for a field whose value is derived.** Its internal mirror lands one tick
+behind the element, and `TextSync` then restores the caret to the offsets captured before the write, so every
+character after the first is inserted one position early. The picker's hex field uses `TextInput` directly
+with a signal it owns. Worth recording because the wrapper is used on nine other pages and works fine — the
+difference is only that their values are not converted on the way through.
+
+### Controls: `DateInput` and `DatePicker`, without the mask
+
+Both ship; the mask `backlog.md` named as their blocker turned out not to be one for
+a typed date.
+
+**`DateInput` is a `TextField` over a private text signal, and it reads and writes ISO order only.**
+`yyyy-mm-dd`, because that is the one spelling `DateValueUtils.fromIso` accepts and refuses exactly — it
+returns nothing for 31 February rather than nudging it into March. A locale-ordered display (`dd/mm/yyyy`) is
+what actually needs the mask, since the caret has to skip separators and the display form stops matching the
+value form.
+
+**The field owns its text while it is being typed, and snaps when it is left.** The rule the hex field arrived
+at, for the same reason: a partial value is not a value, so a string shorter than a complete date is ignored
+rather than treated as cleared, and the canonical spelling is written back on blur. This is why `DateInput`
+sits on `TextField` rather than `TextInput` — `TextFieldPresetProps` omits `onBlur`, and the blur is the whole
+mechanism.
+
+**Its two range props are `getMinDate` / `getMaxDate`, not `getMin` / `getMax`.** `TextFieldState` already has
+numeric `min` and `max` for a spin button, and spreading a `DateValue` into those would either fail to compile
+or set a nonsense attribute; renaming is cheaper than an `Omit` plus a hand-written pass-through. There is no
+`onInput` either: the consumer owns the signal, so an effect over it sees every change.
+
+**`DatePicker` is `DateInput` plus `Calendar` in a `Popover`, and the trigger lives in the field's trailing
+slot** — the slot that existed for `NumberInput`'s stepper, needing no widening. The visible month is the
+picker's own signal, snapped to the value each time the popup opens, which is what `Calendar`'s required
+`monthSignal` was left public for. Typing a date and picking one agree without either knowing about the other:
+both write the same value signal, and the calendar follows it.
+
+**Dismissal repeats `ColorInput`'s arrangement**, outside-`pointerdown` plus `Escape` — the third dismissal
+story in the repo, and the count is the argument rather than any one of them.
+
+**Paint is four slots**, matching `ColorInput` and `Select`: the field's `renderContent`, `renderTrigger`,
+`renderDay`, `renderWeekday`, and `renderPopup` for the surround, which receives the month signal so the
+consumer draws the title and paging buttons.
+
+### The mask: only digits are typed, and the caret is computed rather than preserved
+
+Settled, on the user's call to try a mask rather than the element-per-segment shape every other library uses.
+The primitive two shipped fields were waiting on.
+
+**What the survey found, kept here because it is the argument against the shape that was chosen.** React Aria
+renders one focusable, editable segment per date unit, each a spin button in its own right, and says so as the
+point of the design: any locale order, in any calendar system, without a browser input mask. MUI moved to the
+same shape in v7, replacing the single `<input>` with a list of sections behind an
+`enableAccessibleFieldDOMStructure` prop, so that ARIA attributes can sit on each section. An element per
+segment does not solve the display-form-versus-value-form problem; it makes it not arise, because there is no
+single string to be in two forms. **And no component library owns a mask at all** — MUI's own text-field
+documentation covers formatting by swapping the inner input for `react-imask` or `react-number-format`, so
+everywhere it appears it is a dependency rather than a component. That is the gap this primitive fills, and it
+is why exporting it was worth doing.
+
+**`TextSyncUtils.applyMask(pattern, previous, next, caret)` is a pure function, so the caret arithmetic is
+reachable from `npm test`.** A pattern is `#` for a digit slot and any other character as a literal, so
+`dd/mm/yyyy` is `##/##/####`. It returns the text and where the caret belongs; `TextSync.utils.test.ts` covers
+the cases that are easy to get wrong.
+
+**Only the digits carry meaning.** Everything that is not a digit is discarded on the way in and re-emitted
+from the pattern on the way out. That single rule makes typing `25122026`, pasting `25/12/2026`, pasting
+`25.12.2026` and pasting ` 25 12 2026` all land the same value, and it is why the caret cannot simply be
+preserved: the position that survives an edit is _how many digits precede it_, and the text offset is derived
+from that afterwards.
+
+**Deleting a literal deletes the digit in front of it.** Backspacing the slash in `12/34` would otherwise
+strip a character the mask immediately puts back, so the key would read as broken. The tell is that the digit
+count did not change across an edit that shortened the text.
+
+**The mask lives in `TextSync` because it owns the caret, and a transforming setter cannot.** The owner's
+setter runs after the browser has written the text; it can refuse or rewrite a value but cannot move a caret
+it never saw, and a caret left where the keystroke put it lands before the separator the mask just inserted.
+`createValueSync` therefore takes an optional `getMask` and, when there is one, writes the masked text, sets
+the caret and reports upward — instead of reporting first and syncing back.
+
+**One consequence, accepted: inserting into the middle shifts rather than overwrites.** Typing a digit into
+the middle of a complete date pushes every later digit along and drops the last, because the mask holds a
+digit string and not a set of fixed-width fields. Overwrite-in-place is what per-segment elements give free,
+and it is the main thing this shape does not.
+
+**What a mask cannot do at all**, which is the line where segments would come back: with one input the browser
+draws the whole string, so nothing can tint or box the segment the caret is in, and nothing can be placed
+_between_ two segments. What it keeps is everything about the field being one input — `renderLeading` /
+`renderTrailing` untouched, the measured adornment inset still applying, `computeTextStyle` still styling the
+value. Verified on the masked `DatePicker`.
+
+### Controls: `DateInput`'s format states the order, and the mask follows from it
+
+Settled, with the mask. `getFormat` takes `"iso"`, `"day-month-year"` or `"month-day-year"`,
+defaulting to ISO.
+
+**An arbitrary mask string is deliberately not the prop.** A consumer passing `##/##/####` directly would
+leave the component guessing which slots were the month, and a pattern the parse does not agree with is a
+field that reads a date wrong in silence. So the order is stated and the pattern derived from it — one source
+of truth, the argument the discriminated `SelectItem` record makes.
+
+**`fromIso` is still the only thing that decides whether a date exists.** The display order is reassembled
+into `yyyy-mm-dd` and handed to it, so 31 February is refused in every order rather than once per order, and no
+second validator exists to disagree with the first.
+
+**ISO is masked too, on the same path.** It could have kept its unmasked branch and did not, because two
+paths would be two behaviours to keep in step. Nothing observable changed: a typed `-` is discarded and the
+mask supplies its own.
+
+**`TextSyncUtils` is not exported from `index.ts` yet.** `DateInput` is its only consumer and the standing
+rule is private until a second arrives — which will be `TimeInput`'s 12-hour clock or the formatted number,
+either of which is also the moment to decide whether a consumer building their own masked field should reach
+it. _`TimeInput` became that second consumer; the export decision is still open._
+
+### A masked field shows the separator it wants next, and never deletes what it could not read
+
+Both settled, from the user testing the fields and finding them, in their words, broken. One
+complaint: **a field must say what it is waiting for, and must never answer a mistake by throwing the mistake
+away.**
+
+**The separator arrives with the group before it, not the digit after it.** Four digits into `####-##-##` the
+text is `2026-` with the caret after the dash. The old rule was the opposite and is argued a few paragraphs up
+— a half-finished field never held a trailing separator, so nothing had to decide whether an incomplete value
+ended at a digit or at punctuation. A real simplification bought at the reader's expense: typing `2020` into an
+ISO field gave no sign that a month was wanted next, or that the dash would be supplied rather than typed.
+Nothing downstream cared, because every consumer of the text counts digits rather than characters.
+
+The deletion rule is unchanged and now does more work: backspacing over a separator still removes the digit in
+front of it, so two presses remove two digits rather than a digit and a dash. What changes is where it stops —
+`25/12/` loses the `2` and becomes `25/1`, keeping the separator its first group earns.
+
+**An unreadable field keeps its text and reports an error.** `DateInput` and `TimeInput` used to rewrite the
+text from the value whenever the field was left, and with no value that meant erasing what had been typed:
+entering `2020-20-20` and tabbing away left an empty field and no explanation. The rewrite now runs only when
+there is a value to rewrite from.
+
+**Wrong and unfinished are different, and they report at different moments.** A spelling that cannot exist —
+the 20th month, `29:99`, a date outside `getMinDate` / `getMaxDate` — is wrong the instant the last digit
+lands, and errors immediately while the field still has focus. A half-typed value is not wrong yet; saying so
+mid-keystroke would be noise, so it errors only once the field is left, and typing again clears that. Both
+surface through the flag the painter already reads: `getHasError` is the consumer's own prop **or** the
+field's own judgment, so a consumer who passes nothing still gets a field that says no.
+
+This is what `hasError` on sixteen controls was waiting for a producer to do, and the producer turned out to be
+the control itself rather than the form story `backlog.md` files it under.
+
+**The value is still cleared when the text cannot be read.** The error is about the text; the owner is told
+there is no date, which is true. What changed is that the field stops agreeing with the owner by going blank.
+
+**A part that cannot exist is refused before the rest of the value does.** Added the same day, on the user's
+observation that a 13th month is already wrong without waiting for a day: `TextSyncUtils.readGroups` reads the
+**complete** fixed-width groups of the digits typed so far and range-checks each on its own — month 1-12, day
+1-31, hour 0-23 or 1-12 on a 12-hour clock, minute and second 0-59. A group still being typed is not reported,
+so `1` never has to answer for the month it might become.
+
+The bounds are per-part rather than per-value: the day's ceiling is the longest month, because a 30 February is
+two parts _disagreeing_ rather than one part being impossible, and that stays `fromIso`'s to catch. Three
+checks in order — impossible part, complete-value parse and bounds, then unfinished — each reporting at the
+earliest moment it can be sure.
+
+**Not extended to an impossible _prefix_**, though the same argument reaches it: a month whose first digit is 2
+can only become 20-29 and is already doomed. Refusing it needs the field to reason about what a group could
+still become, and the published answer to that case is auto-advance — typing `2` fills `02` and moves on —
+which is a different feature with its own keyboard consequences.
+
+### A masked field offers the placeholder that matches its own mask
+
+`renderPlaceholder` is `(getFlags, hint)`, where `hint` is `yyyy-mm-dd`, `dd/mm/yyyy`,
+`hh:mm` or `hh:mm:ss` depending on what the field is spelling. A consumer wanting something else ignores the
+argument; the Playground's eight variants stopped carrying eight hand-written strings, three of which were
+wrong — every time field said `yyyy-mm-dd`.
+
+**It comes from the format, not from the mask string.** The hint and the pattern are two renderings of one
+definition (the ordered parts and the separator), so `computeHint` sits beside `computeMask` and reads the
+same record. Deriving the hint by rewriting `####-##-##` would need a second thing to know that the first
+group is a year — the guessing _"an arbitrary mask string is deliberately not the prop"_ avoids.
+
+**It is a plain string rather than an accessor**, following `Calendar.renderWeekday`'s `name`: the painter
+reads it inside a tracking scope, so a format change re-renders it anyway.
+
+The prop behind it is `getPlaceholderHint` on `TextField`, `Omit`ted by `DateInput` and `TimeInput` for the
+reason they omit `getMask` — they own the format. A hand-built `TextField` or `TextInput` sets neither and its
+painter is handed `undefined`.
+
+### `ContextMenu`: the same menu, opened by a right-click at a point
+
+Settled while closing the last of `backlog.md` item 4's opener bullets. What differs between a menu on a
+button and a menu on a right-click is the opener, not the menu — so the level, the items, the submenus, the
+typeahead, the keyboard and the dismissal are all the ones `Menu` already has.
+
+**It is a second component rather than a mode, because a right-click menu has no button to render.** `Menu`
+is a trigger plus a root level, and its trigger is a real `<button>` with a name, a tab stop and an
+`aria-expanded` — none of which a context menu has any use for. A `hasTrigger` flag would have left an empty
+button in the tab order, or an `InteractionWrapper` wrapping a control that is not there. `ContextMenu`
+renders the level and nothing else. This is also what the published libraries do: Radix ships a whole
+`ContextMenu` over the same menu internals, and Ark UI adds a second trigger part rather than a second menu.
+
+**The region is the consumer's element, handed over as `regionRef`.** The library cannot render it — it is
+whatever area the menu belongs to, a canvas, a row, a whole page — so it is a ref, and the component attaches
+the `contextmenu` listener to it. That the listener is the library's rather than the consumer's is the point:
+the point has to be converted out of client coordinates into the space the positioner works in, and a
+consumer cannot be expected to know that a `Viewport` may be scaling everything around them.
+
+**The point is a rect of no size, which is what let this be built with nothing new underneath.**
+`Anchor.createPortalPosition` already took an optional `getAnchorRect` for `Spotlight`, so a zero-size rect at
+the pointer is an anchor like any other: the default placement puts the popup's near corner on it, and the
+same edge-safety logic flips it near a screen edge. `Popover` gained the one prop that threads it through.
+
+**A popup with an explicit rect drops its anchor from the dismiss roots, and that reversal is deliberate.**
+`Popover` normally treats the anchor element as part of its own layer, so pressing a toggle button does not
+dismiss the popup before the button's handler can toggle it. A point-anchored popup is the opposite case: the
+anchor is a whole region rather than a button, and a plain left-click inside it has to dismiss the menu like
+any other press outside. The right-click that re-opens the menu elsewhere in the region is unaffected —
+`pointerdown` dismisses first and `contextmenu` opens again at the new point, so the menu appears to move.
+
+**The menu names itself, because there is no trigger to be named by.** `MenuLevel` labelled its popup with
+the trigger's id; it now takes an `ariaLabel` beside that, and `ContextMenu` requires one.
+
+### Dismissal is one stack, and `Popover` is the layer
+
+Settled, replacing five stories: `Select` closed on its field's blur, `Menu` on its popup's
+blur, `DatePicker` and `ColorInput` each ran their own document-wide press listener, and `Modal` its own
+document `keydown`.
+
+**`DismisserStack` is a module-level array of open layers with one set of document listeners**, in the
+`LiveAnnouncer` position — it belongs to no component and there is one of it. Not owned by `Viewport`: a
+consumer with no `Viewport` still needs dismissal, the events are the document's rather than any element's,
+and nesting a `Viewport` inside a `Viewport` would need cross-authority ordering a single array does not have.
+
+**A press or a focus move is positional; `Escape` is a stack operation.** Every layer the target sits outside
+of hears about a press or a focus move, which closes a whole menu tree at once and is what
+`getIsWithinOwnedLayer` keeps from closing a parent when the press was inside a child. `Escape` goes to the
+innermost layer and stops — the bug this fixed: every control handled `Escape` locally and let the key travel
+on, so a popup dismissed inside a `Modal` took the `Modal` with it. `modal.spec.ts` drives it over a `Select`
+inside the modal on `ModalPage`.
+
+**The reason reaches the consumer, because the right response differs by reason.** `DatePicker` and
+`ColorInput` return focus to their field on `Escape` and do not on a press, since moving focus to a field
+someone just clicked away from is wrong. A submenu closes only its own level whatever the reason; `Tab` still
+closes the whole menu, from the menu's own key handler, before focus moves.
+
+**`Popover` registers the layer, so its four consumers get dismissal by existing.** Roots are the popup
+element and the anchor. The controls kept `onDismiss` shaped as their own close paths and lost their
+listeners, their `onBlur` plumbing and `Menu`'s `computeIsInsideMenu` walk.
+
+**Window blur no longer closes anything.** `focusout` with no `relatedTarget` is ignored, so switching apps
+leaves a popup open where `Select`'s old field blur would have closed it. That matches Radix, and it is why a
+focus move alone is not enough — the press listener covers a click on dead space.
+
+### The am/pm segment is a control in the trailing slot, not a slot in the mask
+
+Settled, on the user's suggestion, removing the extension the mask looked like it needed. A
+12-hour field was the reason to add a non-digit slot to the pattern; putting the meridiem in `renderTrailing`
+means **the pattern stays digits-only** and nothing about the mask changes.
+
+**It is `renderTrailing` widened, not a new slot, and not `renderDecoration`.** `TimeInput` re-declares that
+slot as `(getFlags, meridiem)`, exactly what `NumberInput` does with its stepper — both would want the same
+physical position, and one slot lets a painter draw a unit and a control together. The decoration overlay
+cannot host this at all: one full-box overlay inheriting `pointer-events: none`, so a control inside it is
+unclickable, and it is not positional.
+
+**The value stays 24-hour and the meridiem is a way of reading it.** `TimeValue` gains no fourth field.
+`TimeValueUtils.getMeridiem` / `getTwelveHour` / `withMeridiem` / `fromTwelveHour` are pure and tested, and
+they are tested because **midnight reads as 12 am and noon as 12 pm** — the mapping is not `hour % 12` in
+either direction, and nothing in the type system catches an off-by-twelve. Keeping 24-hour form also makes the
+hard case free: stepping the hour past eleven carries into the next half of the day with no arithmetic of its
+own, because the meridiem is derived from the hour rather than stored beside it.
+
+**The meridiem is nonetheless a signal, and only because of the empty field.** With no value there is no hour
+to read it off, and a consumer who chooses "pm" before typing has to have that remembered. Whenever a value
+exists it wins — an effect pushes the value's own meridiem back into the signal — so the two cannot disagree
+about a time that is actually held. The parse reads the signal `untrack`ed, per the mirror rule.
+
+**Accepted consequence: it is a second tab stop.** Native `<input type="time">` makes am/pm a third segment
+inside one control, reachable by arrow keys. Here it is a `Button` in the trailing slot with its own focus
+ring, the same call recorded for a two-thumb `Range`. It has to carry a name: the Playground's toggle sets
+`aria-label` to "Before or after noon: AM", because the glyph is `aria-hidden` like every painter's text.
+
+**`TimeInput` uses the mask too, as of.** It did not, and the paragraph here argued that was
+deliberate; the user found out what it meant by typing `203` and getting `203` rather than `20:3`. The
+reasoning was sound about not bundling and wrong about the outcome: a field whose twin punctuates itself and
+which does not is not a smaller feature, it is an inconsistency the reader hits immediately.
+`computeMask(segmentCount)` builds `##:##` or `##:##:##` from the same constants the caret arithmetic uses, so
+the two cannot drift, and the segment stride is unchanged because a mask emits exactly the fixed-width
+segments the arithmetic assumed.
+
+### Controls: `TimeInput`, and stepping the segment the caret is in
+
+Settled, immediately after `DateInput` and on the same shape.
+
+**`TimeValue` is `{ hour, minute, second? }` and mirrors `DateValue` deliberately**: a record rather than a
+`Date`, its own arithmetic, `Intl` only for formatting. No midday trick, because a time of day carries no zone
+— which is also why `second` is optional in a way `DateValue`'s fields are not: a time to the minute and a
+time to the second are both complete values, and the shape says which one a consumer holds.
+
+**Everything compares through `getSecondOfDay`**, so a value with seconds and one without mix safely: `09:00`
+and `09:00:00` are the same time and `isSame` says so. Field-by-field comparison would make those different,
+which shows up as a filter quietly dropping rows.
+
+**Stepping wraps around the day; typing does not.** `addUnit` carries between segments and wraps at midnight,
+because a clock has no end. A **typed** time is refused instead: `24:00` reports no value rather than becoming
+midnight, on `fromIso`'s rule. Bounds behave the same way in both directions: a stepped value clamps, a typed
+one outside the range is simply not a value.
+
+**The arrow keys step whichever segment the caret is in, and then select it.** The segment is derived from the
+caret offset — three characters per segment including its separator — so no per-segment elements and no mask
+are needed. Selecting the stepped segment afterwards is what makes a run of presses work: the caret would
+otherwise drift and the second press would land on a different unit. The one part of the control with no
+precedent in the repo, and why `TimeInput` takes `onKeyDown` for itself rather than passing it through.
+
+**The time popup is `Clock`, and it is a column per unit.** The paragraph here used to say there was no
+popup and that a list of generated times in a `Popover` would be one; the second half is what was
+reconsidered, and why is under `Controls: Clock` below.
+
+### Controls: `Clock`, and why a time popup is columns rather than a list
+
+Settled on the user's call, after the two shapes were weighed side by side.
+
+**The name pairs with `Calendar`.** `Calendar` is the standalone surface a date is picked from and
+`DatePicker` is the field plus that surface in a popup; `Clock` and `TimePicker` are the same two things for
+a time. Neither surface knows anything about a popup, which is what lets the Playground put a calendar on a
+page of its own and would let a consumer do the same with a clock.
+
+**One column per unit, not one list of times.** The list shape is the obvious one — 09:00, 09:15, 09:30, the
+thing a booking site shows — and it is what this file used to predict. It was rejected on a single point:
+`TimeInput` accepts `getHasSeconds`, and a list at seconds granularity is 86,400 rows. The picker would then
+have had to refuse a value the field beside it accepts, which is the one failure a paired field and popup
+cannot have. Columns have no such ceiling: the longest is 60 rows whatever the granularity, and the same
+`hasSeconds` and `isTwelveHour` accessors drive both halves, so the two cannot disagree about what a time is.
+
+The cost, accepted: picking a time is two or three separate acts rather than one, and the keyboard walk
+crosses columns as well as running down one.
+
+**An option carries the whole time it would produce, not just its own number.** Each option is
+`{ unit, time, label }` where `time` is the current value with that one unit replaced. Everything else falls
+out of it: the option is disabled when that time is outside the bounds, selected when the value already reads
+that way, and picking it writes that time. It also gives the honest reading of a bound — with opening hours
+of 09:00 to 17:30 and a value of 09:47, the hour option 17 is disabled, because 17:47 is shut.
+
+**The label is the library's, and that is a departure from `Calendar`.** `Calendar` hands the painter a
+`DateValue` and lets it draw `day.day`; `Clock` hands over a finished string. Two reasons, and the first is
+the load-bearing one: a twelve-hour column reads 12, 01 … 11 rather than 00 … 11, and the conversion is the
+one `TimeUtils` documents as easy to get wrong — midnight is 12 am and noon is 12 pm, so it is not `hour % 12`
+in either direction. A painter deriving that itself would be re-deriving the exact arithmetic that was moved
+into `ss-utils` to stop it being re-derived. Second, the am/pm label is locale text, not a number.
+
+**Twelve is the first row, not the last.** The column runs 12, 01 … 11, because that is the order the hours
+fall in — twelve am is midnight. Listing 01 … 12 would put midnight at the bottom.
+
+**The column names come from `Intl.DisplayNames`, and the am/pm words from `Intl.DateTimeFormat`.** A
+listbox has to carry a name, and inventing "Hour" in English would bake one language into the library.
+`Intl.DisplayNames` with `type: "dateTimeField"` answers `hour`, `minute`, `second` and `dayPeriod` per
+locale — "Stunde" in German, "am/pm" in `en-GB` — and it has been in every browser since April 2021, so it
+needs no fallback. The am/pm words are read off `formatToParts` of a formatter forced to `hour12: true`,
+picking out the `dayPeriod` part, because the words are the locale's and no list of them belongs here.
+
+**The visible column heading sits outside the listbox, and the options sit inside it.** A listbox may
+contain options and groups; a heading among them is noise a screen reader has to step over. So the library
+draws four levels — a `role="group"` for the whole clock, a plain column, a heading whose content is
+`renderUnit`'s, and the `role="listbox"` around the options — and the painter's scrolling box goes inside
+the listbox through `renderColumn`, which is where `Select` already put the painter's panel. Keeping
+`max-height` and `overflow` out of the library's props is the same argument as there.
+
+**With no value, the fallback time is pulled inside the bounds.** The base a column mutates is the value, or
+the current time when there is none. Left unclamped, a bounded clock opened at 22:00 with opening hours of
+09:00 to 17:30 has every option in its minute column disabled — each would produce 22-something — so the
+picker looks broken until the user happens to pick an hour first. `TimeUtils.clamp` on the fallback fixes it
+outright and costs nothing when a value exists.
+
+**Selection is one tab stop over the whole clock, as in `Calendar`.** Up and down move within a column and
+wrap; left and right cross to the next column, landing on its reading of the same time; Home and End go to
+the ends of a column; only Enter or Space commits. Moving the highlight deliberately does not select, so a
+walk across three columns does not write three times. The roving position is stored as **one whole time**
+rather than a per-column index, which is what makes crossing columns free — the new column simply reads the
+same time its own way.
+
+**Two bugs found building it, both worth knowing because neither is visible in the source.**
+
+An effect that focuses the roving option had its early return _above_ the line that reads the highlight, so
+on the first run — when nothing inside the clock has focus yet — the effect finished without ever subscribing
+to the highlight and never ran again. Focus then stayed on whichever option it started on while the highlight
+walked away. `Calendar`'s equivalent reads its roving day above the guard and is correct by accident of
+ordering. **Read every signal an effect depends on before the first `return`.**
+
+And the whole column re-rendered on every value change, destroying the focused option and dropping focus to
+the body. The column's children expression read `getColumn().unit`, and the column object is rebuilt whenever
+the base time changes, so the expression re-ran and called `renderColumn` again — a fresh `Index`, fresh
+elements. A `createMemo` over the unit stops it: the memo only notifies when the string actually changes,
+which for a given column is never. **A slot called inside a reactive expression is re-invoked whenever
+anything that expression reads changes, so what it reads has to be narrowed to what it actually needs.**
+
+### Controls: `TimePicker`, and the trailing slot carrying two controls
+
+**It is `DatePicker`'s arrangement, part for part**: the field, the surface, a `Popover` between them, the
+open state a `SignalMirror` so a consumer may own it, `Escape` returning focus to the input and an outside
+press leaving it alone. Nothing here was decided again.
+
+**The one thing `DatePicker` did not have to solve is that the trailing slot was already taken.** On a
+twelve-hour field the am/pm control lives there. `DatePicker` could give the trigger a slot of its own —
+`renderTrigger` — because a date field's trailing slot was empty. Rather than add a second slot,
+`TimePicker` widens the existing one a third time: `renderTrailing` becomes
+`(getFlags, meridiem, trigger)` and the painter draws both, or neither, or only the trigger on a
+twenty-four-hour field. This is the arrangement the am/pm decision already anticipated — one slot lets a
+painter place a unit and a control together, and the physical position both want is the same.
+
+**Both pickers forward a per-item disabled predicate, and `DatePicker` gained its one here.** `Calendar`
+had always taken `computeIsDayDisabled` and `DatePicker` never passed it through, so a consumer wanting to
+grey out weekends had to drop down to `Calendar` and build the popup themselves. The bounds a picker takes
+are a range, and a range cannot express "not on a Sunday" — closing that was the user's call, taken
+separately from the work that surfaced it rather than carried along inside it.
+
+### `Button` can be named, and the label wins over the painter
+
+Settled, closing the gap `Calendar`'s paging buttons exposed: a painter drawing only a glyph
+left the button announcing "black left-pointing triangle".
+
+**`ariaLabel` joins `InteractionControlProps`**, so it is the wrapper's to hand every leaf rather than each
+leaf's to invent, and `ButtonProps` picks it up through the same pass-through `id` and `renderContent` use.
+Only `Button` applies it so far; a leaf with its own naming story keeps it (`BinarySwitch` reads the `Label`
+context, `TextField` names its input).
+
+**It goes through `LabelUtils.resolveAriaLabel`, so the `Label` rule is inherited rather than restated.**
+Inside a `Label` the prop is suppressed and warned about.
+
+**Against painter text, the label wins, and that is the platform's rule rather than a choice.** An
+`aria-label` overrides descendant text as the accessible name. There is no way to detect that a painter drew
+words, so this cannot be warned about; the requirement that a painter mark decorative glyphs `aria-hidden` is
+the other half. The Playground briefly used a visually-hidden span instead, which worked and is gone: it made
+every icon button carry a clip-rect idiom the consumer had to know.
+
+### The 0..1 guarantee belongs to `computeCellWeights`, not to each formula
+
+Three formulas leave the range a weight is defined on, and always for the same reason: they are built for
+whole-number distances, and a centred origin on an even count makes the farthest bound a half-integer. `spiral`
+subtracts its raw result from 1 and divides, so a result below 1 lifts the weight above it. `radar` divides by
+`maxWeight - 1`, and measured on an eight-by-eight grid with a centred origin `radarSingle` reached -0.019,
+`radarDouble` -0.038 and `radarQuad` -0.083. `checkeredConvergent` reached -0.071 on the same grid and -0.25 on
+every cell of a two-by-two.
+
+**So the clamp sits in `computeCellWeights`, once, on the user's call.** It is the only place that knows a
+weight is contractually a position on the timeline between 0 and 1, and per-formula clamps had already been
+added twice while a third case sat unnoticed. The two that existed are gone, so no formula clamps its own
+return any more, and a new sample cannot forget to.
+
+**What the clamp deliberately does not do is re-derive the formulas.** Dividing `radar` by `maxWeight`, or
+rounding `spiral`'s distances before it runs, would be the principled fix in each case and would move every
+measured weight on every grid, including the ones nobody complained about — and measured values are the user's
+call, not something to re-bless while closing a range violation. So the extremes stay shared where two cells
+share them, and the tests pin the range across every deterministic entry on the grids that overshoot rather
+than pinning the old out-of-range numbers.
+
+### The form story: the library wires, the consumer validates
+
+Settled, on the user's call. It closes the largest open item, and the decision is the whole of
+it.
+
+**Validation is not the library's.** No validator prop, no required / min / max / pattern, no rule language.
+Validation is application logic — schemas, async server checks, rules spanning fields — and a library that
+owns it ends up with a half-built rule language nobody can extend, plus two sources of truth the moment a rule
+needs another field's value. `hasError` stays what it was: a prop the owner sets. What changes is that it now
+has somewhere to go.
+
+**What the library owns is association and announcement.** `FormField` generates the ids and wires a control
+to its message; `Form` collects what its fields **report** and never computes anything. Those two are the
+whole surface.
+
+**`FormField` publishes a context and the control reads it, which is `Label`'s shape reused.**
+`FormFieldUtils.resolveAriaDescribedBy` sits beside `LabelUtils.resolveAriaLabel` and merges the context's
+message id with any `aria-describedby` the consumer passed, so the consumer wires nothing. The alternative —
+handing ids out through a render prop to thread — puts an accessibility relationship in application code where
+a missing attribute fails silently.
+
+**An error message is a live region; a hint is not.** The message element takes `role="alert"` only while the
+field reports an error, so an error that appears is read out and a standing hint is not re-read on every
+render. A message that empties takes the description reference with it, so a control is never described by
+nothing.
+
+**`Form` collects entries the way `RadioGroup` collects radios.** Each `FormField` registers
+`{ getHasError }` during setup and cleans itself up; `getIsValid` is the memo over all of them. A submit
+button reads it through the context, so disabling itself needs no state of its own. Registration rather than a
+data-driven list, because a form's fields are written as markup rather than enumerated as records.
+
+**`Form` renders a real `<form>` with `noValidate`, and prevents the default on both events.** The element
+gives Enter-to-submit and reset for free; `noValidate` keeps the browser's own bubble from competing with the
+messages the consumer draws. `hasSubmitted` is exposed because "show the errors only after the first attempt"
+is the one piece of form state that is not a field's.
+
+**A control does not hold its own error back until submit, and `hasSubmitted` is not for the errors it
+raises.** Stated by the user. The split is by _who can answer the question_, not by when the
+reader would rather hear it. A format, range or mask error is answerable from the field's own text the moment
+it is typed, so hiding it until submit is a control keeping a secret from its reader. `hasSubmitted` exists
+for the other kind: an answer only a server has — whether credentials are accepted, whether a name is taken.
+So `DateInput` and `TimeInput` raising `hasError` from their own text is the other half of the same rule
+rather than a conflict.
+
+**`Button` gained `getType`.** A submit button has to be `<button type="submit">` and the leaf hardcoded
+`"button"`. It defaults to `"button"`, so nothing changed for existing call sites.
+
+**Every field reads the description context, and so does `SlideButton`.** `TextField` and `BinarySwitch` cover
+`TextInput`, `TextArea`, `NumberInput`, `CurrencyInput`, `DateInput`, `TimeInput`, `Checkbox`, `Toggle` and
+`Radio`; `Select`, `ColorInput`, `FileInput` and `Range` each make the same one-line call. `SlideButton` is the
+one control that is not a field and reads it anyway — see the entry under its own heading. The plain `Button`,
+`Menu` and the navigational controls do not, and nothing has asked.
+
+### `FormSection`: the collecting stops at the nearest one
+
+The piece item 6 had left of the form story. `Form` collected every field on the page and there was no way to
+say that a run of fields belongs together, which left two things with nowhere to go: a heading over a group,
+and a rule that is true of a group rather than of any one field in it.
+
+**A section provides a `FormContext` of its own and registers itself with the one outside it.** That is the
+whole implementation, and it is why neither `Form` nor `FormField` changed by a line. A field registers with
+the nearest collector — its section if it is inside one, the form otherwise — and a section reports one
+verdict upward to whatever is collecting above it. Sections nest for free by the same rule, and nothing is
+counted twice, because a field is only ever heard by one collector.
+
+**What a section reports is `!isValid`, and `isValid` is its own rule plus every entry inside it.** The own
+rule is `hasError`, set by the owner exactly as it is on `FormField` — validation is still not the library's.
+This is the half that could not be expressed before: "these two passwords do not match" is answerable from
+neither field alone, so neither field can carry it, and both are individually fine while the form still has
+to refuse.
+
+**`getHasSubmitted` passes straight through from the enclosing form.** A section is not submitted, so it has
+no state of its own to report there; a submit button inside a section reads the section's validity and the
+form's submitted flag, which is the honest answer to both questions. In practice nothing hits that case,
+because `Form` hands its own state to `renderContent` and a submit button reads it from there.
+
+**It renders a real `<fieldset>` and a real `<legend>`, and the legend is the whole naming mechanism.** A
+`<fieldset>` is `role="group"` already, so the library adds no role; the legend names the group with no
+generated id and no `aria-labelledby`, which is the same argument `FormField` makes about ids — an
+accessibility relationship threaded through consumer markup fails silently when a strand is dropped.
+`ariaLabel` is there for a section with no visible caption; a legend, when present, is what names it.
+
+**A section cannot mark itself invalid, and that is a fact about ARIA rather than a choice.** `aria-invalid`
+is not global: it is supported on `checkbox`, `combobox`, `gridcell`, `listbox`, `radiogroup`, `slider`,
+`spinbutton`, `textbox`, `tree` and `application`, and `group` is not among them — which is why `RadioGroup`
+may carry it and this may not. So the only route to a section-level rule is the text of it, and the message
+is wired both ways: `role="alert"` while the section reports an error, so it is read out when it appears, and
+`aria-describedby` on the fieldset, so it is still reachable to someone navigating into the group afterwards.
+Without that pair, `hasError` on a section would be a state with no accessible surface at all, which
+WCAG 3.3.1 asks for in text.
+
+**The UA paint is stripped, and it is the only element in the library that needs stripping.** A `<fieldset>`
+arrives with a border, padding, margin and `min-inline-size: min-content`, none of which the library chose;
+`<legend>` arrives with padding. Both are reset with `!important`, for the reason the `TextField` resets carry
+it — element-level styling is what every reset stylesheet ships, and a blank slate that loses to an element
+selector is broken. The consequence worth stating: the border-with-a-gap-for-the-legend look a fieldset is
+known for is the UA's, and it is gone, so a consumer wanting a box paints one inside `renderContent`. A
+`<div role="group" aria-labelledby>` was the alternative — it is what `Select` already does for an option
+group — and it was not taken, because it buys the same box back at the cost of generating an id and wiring a
+label reference that the platform will do for nothing.
+
+**The legend is not a flex item.** A `<fieldset>` with `display: flex` puts its content in an anonymous flex
+box and leaves the legend outside it, so `dir` and `gap` lay out the fields and the message while the caption
+always sits above them. That differs from `FormField`, where the caption is a flex item and `dir: "row"`
+puts it beside the control, and it is the platform's arrangement rather than a decision.
+
+### `Button` reports the pointer, and `NumberInput` repeats while held
+
+Settled, on the user's call.
+
+**`ButtonCbs` gained `onPointerDown` and `onPointerUp`**, both gated on disabled like every other callback
+there. `pointercancel` is routed to `onPointerUp` as well: a drag that leaves the button, a touch the browser
+takes over for scrolling, or a context menu all cancel rather than release, and a control that started
+repeating on down must stop in every case or it never stops. Pointer events rather than mouse ones because they
+cover touch and pen without a second pair.
+
+**The repeat itself is the library's, not the painter's.** `NumberInputStepper` grew `startSteppingUp`,
+`startSteppingDown` and `stopStepping`; the painter calls them from the pointer events and owns no timer. A
+painter running its own interval would be four lines of behaviour duplicated in every consumer's stepper, and
+behaviour is the shell's — the argument that put the auto-dismiss clock inside `Toasts`.
+
+**Both timings are props with defaults, because they are tuned values.** `getRepeatDelayMs` at 400 and
+`getRepeatIntervalMs` at 60 match a native spin button, and they are exposed rather than baked because a
+consumer with a slow store or a coarse step wants different numbers.
+
+**A tap still steps exactly once.** `startStepping` steps immediately and only then arms the delay, so the
+first step is not deferred and releasing before the delay leaves that single step behind. Both halves are
+pinned in `numberInput.spec.ts`, since a repeat that starts too eagerly is indistinguishable from a working one
+until someone taps.
+
+**The painter also stops on `mouseleave`.** Pointer capture is not used here, so dragging off the button would
+otherwise keep repeating with nothing under the cursor. That is the painter's call rather than the library's,
+and the one part of the arrangement the shell does not enforce.
+
+### `SignalMirror`, and the form wiring finished
+
+Settled, closing two unblocked items in one pass.
+
+**Every control here owns its value as a `*Signal`, and a consumer holding a getter plus a callback had to
+build the same mirror by hand.** `PageTextField`, `PageSelectField`, `PageCheckField`, `PageNumberField` and
+`PageColorField` were five copies, and the colour picker's hue slider made a sixth.
+`SignalMirror.createMirror(getOuter, setOuter, opts)` is that mirror once, with `createValueMirror` for the
+common case where nothing converts.
+
+**It takes a getter and a setter rather than a `Signal`**, the escape hatch `backlog.md` named as the
+alternative to a signal-only surface. A consumer with a signal passes its two halves; one with a store field,
+route param or callback passes those. The first attempt took a `Signal` and could not express any of the
+Playground's own wrappers.
+
+**Each direction reads the far side `untrack`ed**, which is the whole reason this is worth extracting: the two
+colour-picker bugs were both a mirror whose guard tracked the other side, so an unrelated change re-ran it and
+wrote a stale half back.
+
+**It converts only when the value changes, so a half-written inner value survives.** Typing `7.0` into a
+field mirroring a number leaves the text alone, because the number did not change — the rule the hex and date
+fields needed, now free for anything built on it.
+
+**It is not unit tested, deliberately.** A mirror is two effects and a scheduler, not a function of its
+arguments. Its four consumers are driven in `e2e/`, where its behaviour is observable.
+
+**The form wiring is complete.** `Select`, `ColorInput`, `FileInput` and `Range` now read the description
+context alongside `TextField` and `BinarySwitch`, so every control that can sit in a `FormField` points at its
+message without the consumer wiring anything.
+
+### A `Viewport` is a region, and it is terminal for everything inside it
+
+Settled, from `ViewportPage`. A viewport fits the size it is designed for into **the space it
+is given**: the root's space is the window, a nested one's is the box the page puts it in. The app's own
+viewport is not a special kind — it is the one whose region happens to be everything.
+
+**The host is what clips.** Each viewport renders a host box (`overflow: hidden`, filling its container) with
+the scaled design box inside. Since every layer opened inside a viewport is portalled into _that_ viewport's
+own portal, one `overflow: hidden` is the whole of "nothing inside a viewport paints outside it": a dropdown
+from a control in a nested viewport is clipped by that viewport, not by the window. A nested one measures its
+host with a `ResizeObserver`, so the consumer sizes it with ordinary CSS and nothing is passed in.
+
+**Scale multiplies through and the rect is carried into window pixels.** A child was handed the innermost
+scale while the screen showed every enclosing scale multiplied, so `getAdjustedBoundingClientRect` — and
+through it every anchored layer — was wrong by the outer factor. `getScale` is now the parent's times its own,
+and `getScaledRect` composes the host's client rect with the local fit through
+`ViewportUtils.composeScaledRect`, which is unit-tested as plain arithmetic on plain rects. That one is read
+rather than memoised: the host moves whenever anything above it scrolls, and it is what every anchored layer
+measures against, once per frame.
+
+**The transform stays local.** CSS already composes an ancestor's transform, so each root writes its own
+`translate` and `scale` in its host's coordinates and nothing accumulates twice.
+
+**That the two factors multiply is now driven rather than only unit-tested**, and the trick is to shrink the
+window. The Playground's own viewport is drawn at `1` whenever the window's height matches the size it
+anchors to, which is every machine it has ever run on — its fit works out to the window's height over that
+anchor whichever way the aspect ratio falls, because the design size is derived from the ratio too. So
+`viewport.spec.ts` sets the inner square to half, halves the window, and reads a quarter back off both the
+viewport's own report and a control measured two levels in: its painted height over its layout height.
+Without the resize the outer factor is `1` and any product looks like the inner factor alone.
+
+**A stack of toasts raised inside a nested viewport stays inside it**, examined rather than assumed. It
+portals into that viewport's own portal like every other layer, is clipped by the same `overflow: hidden`,
+and is the thing painted at its own position — so its fixed `z-index`, chosen against `Modal`'s and never put
+through the anchor-relative rule the popups use, costs nothing here: the region is a child of the portal, and
+what a portal paints over is decided by the portal's own place in the tree rather than by a number inside it.
+`ViewportPage` raises one so the case stays driven.
+
+**An earlier attempt had a nested viewport fill its parent instead**, mounted into the parent's content box by
+a portal. It was wrong for the case that matters: a viewport you cannot place cannot be the boundary of
+anything smaller than the window, and the boundary is the point.
+
+### The viewport is terminal, and an anchored layer tracks its anchor rather than polling for it
+
+Settled, from three defects seen on `ViewportPage`.
+
+**When perfect placement is impossible, the layer is clipped — never shrunk and never moved over the
+anchor.** Three things could give: the layer's size, its distance from the anchor, or the part of it you can
+see. The library gives up the last. `AnchorUtils.getBand` gives an `out` placement only the space between the
+anchor and the edge it faces, and `clampToBand` pins the edge touching the anchor, letting the far edge run
+past the viewport where `overflow: hidden` cuts it. An `in` or centred placement is deliberately over the
+anchor and gets the whole viewport.
+
+Pinning the other end — `Math.max(band.start, ...)` in both directions, the obvious clamp — is what makes a
+list with nowhere to go slide down over the field it belongs to. Capping the layer's height to the band, tried
+first, is the same mistake in the other axis: a list that quietly becomes a third of itself has answered a
+question nobody asked. A layer keeps the size its painter chose.
+
+**Scrolling is listened for as well as polled.** `createViewportRectObserver` measured once per animation
+frame, leaving a portalled layer a frame behind an anchor being scrolled. It now also repositions from a
+`scroll` listener in the capture phase — the event does not bubble, so capture is what hears a scrollable
+ancestor — and from `resize`. The frame poll stays, because an anchor can also move under a CSS animation,
+which no event reports.
+
+**A portalled layer is placed by `transform`, not by `top` / `left`.** Writing offsets forced layout on every
+frame of a scroll; a translate is composited. Both roots pin to `top: 0; left: 0` — an absolutely positioned
+box with `auto` offsets would otherwise fall at its static position, which for the second layer in a portal is
+not the first layer's.
+
+**A nested viewport is opaque.** `viewportNestedRoot` carries a `z-index` above the parent's own portal layer,
+so nothing behind a nested viewport paints through it or can be pointed at. Together with the root's
+`overflow: hidden` and each viewport portalling into itself, that is the whole of "a viewport is a black box".
+`viewport.spec.ts` drives all three.
+
+### The date value carries its calendar system, and every bound is asked of it
+
+Settled by the user, choosing to take `@internationalized/date` as a dependency rather than
+read the calendars out of `Intl` by hand, and to support as many calendar systems as the package really
+implements. The measured reasoning — what the platform contains, what the reverse conversion costs, why
+`chinese` cannot be done this way — is in the entry below.
+
+**`DateValue` is `CalendarDate`, aliased rather than wrapped.** A value carries its calendar, an era, a **year
+within that era**, a month index and a day. The old `{ year, month, day }` record with a signed year is gone,
+and with it every constant the library held about what a year is made of: month count, month length, month
+names, grid row count and year ceiling are now questions asked of the value's own calendar through
+`DateValueUtils`. Aliasing rather than wrapping is deliberate — a wrapper would have to re-expose `add`, `set`,
+`cycle` and `compare` to be useful, and would then be a second date library.
+
+**Thirteen calendars, and the list is explicit rather than the package's own.** `createCalendar` does not
+refuse an identifier it has no implementation for: asked for `chinese`, `dangi`, `islamic` or `islamic-rgsa` it
+returns a **Gregorian** calendar, so a consumer would get Gregorian dates labelled as something else with no
+indication. `DateValueCalendarId` names the thirteen that map to themselves, and `getCalendarIds` is what a
+consumer offers in a picker. The lunisolar calendars are excluded rather than half-supported — the same call as
+`Table` being out of scope: a thing that looks supported and is not costs more than a thing that is absent.
+
+**An era is a list the calendar reports, never a pair.** `getEras` returns `{ id, name }` for each — two for
+Gregorian, one for Hebrew, five for Japanese. The names are not in the package, so they are read out of `Intl`
+by formatting a date inside each era with `era: "long"`; finding a date inside era _n_ is a bisection over the
+ISO year, since era index is monotone in time, and the result is cached per calendar and locale. A BC/AD toggle
+was proposed and withdrawn: it is one calendar's model, and hardcoding it would put a Western assumption into
+a control's API.
+
+**The era is a control in `DateInput`'s leading slot, not a slot in the mask** — the am/pm arrangement in the
+trailing slot, for the same reason: the mask carries digits only, an era identifier is not digits, and a
+consumer paints it. `DateInput` hands `renderLeading` a `DateInputEra` with `getValue`, `getOptions` and `set`,
+so the painter can draw a cycle button, a select, or nothing when the calendar reports a single era. The
+Playground draws a cycle button and hides it below two eras, which is what React Aria does with its era
+segment.
+
+**The signed year is gone, and that is a gain.** A year before the common era is `era: "BC", year: 44` — no
+negative numbers, and no off-by-one at the origin, because ISO's astronomical numbering is the package's
+problem and stays inside `toIso` / `fromIso`. The cost is that a year past the end of an era, 12026 AD, can no
+longer be _held_: the constructor constrains it to 9999 silently, so `fromIso` and `fromParts` compare the
+built fields back against what was asked for and return `undefined` rather than passing a different date on.
+**Anything built over this package must do that comparison** — `new CalendarDate(2026, 2, 31)` is February
+28th, not an error.
+
+**`getMonthGrid` takes an anchor value rather than a year and a month number**, because a month index means
+nothing without the calendar it indexes. It still returns **six** week rows for every month of every supported
+calendar — the fixed height predates this work, so paging never reflows the page — and six is enough because
+no supported calendar has a month longer than 31 days.
+
+**Two dates are the same day if they denote the same day, whatever calendar each is in.** `isSame` and
+`compare` go through absolute day, so a Gregorian `min` bounds a Hebrew value and a date held in one system is
+found in another system's grid. `DateInput` converts a value into the calendar it is configured for rather
+than refusing it, so a consumer may hold Gregorian and show a Hebrew field over the same signal.
+
+### `MaskedField`: the half every field over a typed value shares
+
+Extracted, once `DateInput` and `TimeInput` had written the same thing twice and a formatted
+number was about to write it a third time. `Abstracts/MaskedField` owns the private text signal, the effects
+keeping it and the value in step, and the three moments at which a field reports a problem. What stays in each
+control is what differs: its codec, its bounds, and whatever control it puts in a slot.
+
+**The value arrives as a getter and a setter, not a `Signal`.** A control may not hand its own prop through
+unchanged — `DateInput` converts the value into the calendar the field types in first — so the field cannot own
+the signal. Same shape as `SignalMirror`, same reason.
+
+**Completeness is counted in digits, and may be absent.** Only digits are typed, so a half-typed value is one
+whose digit run is short; measuring the _text_ agrees while every group is a fixed width and stops agreeing the
+moment one is not. `getDigitCount` returning `undefined` says the field has no notion of half-typed at all,
+which is the honest answer for an amount.
+
+**A value the codec refuses is reported to nobody, and the owner keeps the one it holds.** The commit effect
+used to hand `undefined` outward whenever a complete digit run yielded nothing — the 31st of February, a 24th
+hour, an amount over a field's maximum — so a field that had held a date all along spent a few keystrokes
+telling its owner it was empty, and whatever read that value acted on it. It now commits only what the codec
+accepts, plus the empty field itself: no digits still means no value, because that is what an empty field
+means, and everything else waits. Two things fall out of it. The half-typed guard is gone, because a codec
+that needs all its digits already answers `undefined` without them, which leaves `getDigitCount` to
+`getHasIssue` alone. And blur restores the text from the held value, which is what a half-typed value already
+did and what a refused one now does too — the field cannot clamp arbitrary text the way `NumberInput` clamps a
+number, so going back to the last accepted value is the only settling available.
+
+**The spelling follows the formatting as well as the value, and that needs its own effect.** Nothing else
+catches a change of format on its own: switching an amount field's locale leaves the value and the digits
+exactly as they were, so the effect comparing them stays quiet and the field goes on showing the old
+punctuation. The text is rebuilt **from the value** rather than from the digits on screen, because the same six
+digits are `1,234.56` at two decimal places and `123,456` at none.
+
+**A control must not keep a second copy of something the value already carries.** `DateInput`'s era signal is
+state _only_ for the empty field, and `fromDigits` reads the era off the held value. Reading the signal instead
+made the two fight: moving the era commits a new date, the new date re-spells the text, and the text-to-value
+effect re-derived a date from those digits and the signal — which had not caught up — committing the old era
+back. Duplicated state plus two effects is a loop.
+
+### `TextField` takes a mask transform, not a pattern
+
+Changed, when the grouped number became the third consumer.
+`computeMaskedText(previous, next, caret)` replaces `getMask`: a pattern mask and a grouped number are the same
+function with a different body, and a grouped number has no pattern to state because it has as many separators
+as its value needs. The transform stays where `getMask` was — inside `TextSync.createValueSync` — because _"a
+mask owns the caret"_ is unchanged.
+
+### `TextSyncUtils` is public, so the mask is a contract rather than an implementation
+
+Settled by the user, choosing to export it over leaving it internal. `TextSync.utils` now leaves through
+`index.ts` beside `TextSync` itself: `applyMask`, `applyGroupedMask`, `getGroupSizes`, the two `formatWith*`
+helpers, the digit readers and both types.
+
+**The argument that decided it is what a consumer is left with otherwise.** Three fields in this library are
+built on it and a fourth kind — a phone number, a card number, a postcode — is an ordinary thing to want. A
+consumer who cannot reach the mask reaches for a package instead, and the caret arithmetic is the part that
+is hard to get right and easy to get subtly wrong: which digit a backspace over a separator takes, where the
+caret lands when the groups shift under it. Withholding it does not stop that field being built; it only
+stops it being built on the answer already tested here.
+
+**What that commits to, stated so the next change to it is a deliberate one.** The caret rules are now
+observable behaviour: where the caret lands after an insertion, a deletion or a paste is part of the
+contract, not an internal detail. So is the mask vocabulary — `#` as the digit slot, a minus as the only
+sign, group sizes read from the decimal point outwards. Changing any of those is a change a consumer can
+see, and belongs in the same class as changing a prop's meaning.
+
+**Nothing is annotated on the way out.** A utility's contract here is its signature, which is the rule for
+this repo rather than for `ss-utils`; exporting it does not change that, and the entry above is where the
+reasoning lives.
+
+### Controls: `CurrencyInput`, and why it is not `NumberInput` with grouping
+
+Settled by the user, choosing a separate control over widening `NumberInput`.
+
+**The two fields are typed differently, not styled differently.** `NumberInput` refuses characters one
+keystroke at a time and keeps `-`, `1.`, `1e` and `1e-` typeable. `CurrencyInput` accepts digits only and
+fills a fixed fraction from the right, so `1`, `2`, `3` walk `0.01`, `0.12`, `1.23`. Neither is a mode of the
+other, and moving `NumberInput` onto the mask path to get grouping would have risked a shipped control for a
+field it is not.
+
+**The digits are the value in its smallest unit, and the shift is done on the decimal spelling.** Multiplying
+rounds the wrong way at exactly the cases a money field exists for: `1.005 * 100` is `100.49999999999999`, so a
+rounded product loses the penny and `toFixed` inherits the fault. `${value}` prints the shortest decimal that
+reads back as the same number, so moving the point along that string rounds on what the consumer wrote rather
+than on its binary approximation. A magnitude printing in exponential form falls back to multiplying; an amount
+field is not where `1e21` belongs.
+
+**The separators come from the locale, not from props**, and so does the grouping. `Intl.NumberFormat`
+already knows both and the consumer has already said which locale they are in; asking twice invites the two to
+disagree. The grouping used to be the exception — a `groupSize` prop defaulting to three, on the grounds that
+how wide a group is is a layout choice rather than a locale fact. That reasoning was wrong in the one place it
+mattered: `en-IN` writes `12,34,567`, three digits nearest the point and twos above it, so a field that took
+that locale's comma and grouped in threes anyway was spelling the locale wrong in the very place it had been
+told what the locale is. `TextSyncUtils.getGroupSizes` reads the answer out of `Intl` beside the separators,
+and `groupSizes` is now an override rather than the source.
+
+**The override is a list of sizes because a single number cannot say what a locale can.** A prop meant for a
+consumer who wants something other than their locale's grouping would otherwise be strictly less expressive
+than the default it replaces, which is the argument for the shape rather than any current call site.
+
+**There is no sign and no currency symbol.** The mask is digits-only, so a negative amount cannot be typed;
+the symbol is paint in a leading slot, because a library holding no colours does not hold currencies either.
+
+### An era is named from year 2, not from its first day
+
+Settled, from a defect that survived two wrong fixes. `getEras` needs a date to format each
+era's name from, and the era's own first day is the one date that does not work: the package puts Meiji 1 at
+1868-09-08 while ICU switches on the proclamation date weeks later, so formatting the first day reports the era
+_before_ it and Meiji came out named "Keiō (1865–1868)". Year 2 is a full year clear of the boundary and works
+whichever way an era counts — forward for Meiji, backward for BC, where year 2 is earlier.
+
+**Every instant handed to `Intl` is taken at midday.** A `CalendarDate` becomes an instant at local midnight,
+and midnight is the one moment that does not survive the trip: a daylight-saving change can put it on the
+previous day, and a pre-standard-time zone offset is not even a whole number of minutes. The pre-package
+`DateValue` did this, it was dropped in the rewrite, and it is back.
+
+**An era carries a long name and a short one.** `DateValueEra` is `{ id, name, shortName }`: the identifier is
+the package's and is not display text — `BC`, `meiji`, `before_minguo`, with no casing convention and an
+underscore in one — while both names come from `Intl` and are the locale's. A compact control shows `shortName`
+and labels itself with `name`. Nothing may render `id`.
+
+### A list the consumer has not finished handing over: `getHasMoreOptions`, `onReachEnd`, and a marker
+
+Settled, after the published virtualization design was tried and reverted (`backlog.md` item
+5). This is the other half of the same problem with a different answer, so both are worth stating together:
+**virtualization keeps the whole list and mounts a window onto it; this keeps only what has arrived and mounts
+all of it.**
+
+**`Select` takes `getHasMoreOptions` and `onReachEnd`, and never a batch size.** A batch size would put the
+library in charge of slicing the consumer's data, and the floor a batch size wants — "at least as many as fit"
+— is not computable here anyway: the element that scrolls is the **consumer's** popup surface, since the
+`max-height` and `overflow-y` live in their paint, and `Select` holds no ref to it. So the library reports an
+event and reads a flag; the consumer decides what a batch is, where it comes from, and when there is no more.
+An in-memory array sliced by the consumer and a paged HTTP endpoint become the same mechanism.
+
+**The end is marked by a one-pixel element and watched with an intersection observer, not measured.** The
+alternative — a `scroll` listener comparing `scrollTop + clientHeight` against `scrollHeight` — loses on three
+counts: it needs the scrolling element, which is the consumer's; it needs a "how close counts" threshold,
+which is wrong for some row height; and it is silent when the first batch does not fill the box, because
+nothing has scrolled. `ElementObserver.createViewportIntersectionObserver` observes against the viewport, and
+an observer computes intersection through every ancestor's overflow clip, so it reports the marker hidden
+without being told what is hiding it. "The list is too short to scroll" and "you have scrolled to the bottom"
+become the same condition, which is what makes it converge with no startup path.
+
+**The marker overlaps the last option rather than following it, and the keyboard is the reason.** A negative
+top margin equal to its own height puts it on the last pixel _of_ the list instead of the first pixel _after_
+it, so it costs no layout. It shipped as a plain trailing element, which does not work for
+anyone not using a mouse: an option scrolls itself into view with `block: "nearest"`, which stops the moment
+that option is fully visible, so a marker beyond the last option is exactly what `End` and the last
+`ArrowDown` can never reveal — the highlight lands on the last option held and no batch is ever asked for.
+Overlapping makes "the last option is on screen" and "the marker is on screen" the same fact, and the mouse
+path is unchanged.
+
+Why the suite missed it: at a scale of exactly 1 the marker's top edge lands on the scroll box's bottom edge to
+the pixel, and Chrome reports that zero-area contact as an intersection, so the batch arrives and the spec
+passes. The Playground is scaled by `Viewport` and is almost never at 1, and at any other scale the contact
+misses by a fraction. **A behaviour that depends on two edges being equal is not a behaviour**, so the spec now
+asserts the overlap itself rather than the batch that follows.
+
+**The Playground does not skip painting off-screen options, because it moves the list under the reader.** The
+option paint carried `content-visibility: auto` with an estimated row height behind a panel switch. The
+estimate is a single number and the rows are not one height — a title alone is short, a title with a wrapped
+description is not — so the moment a jump to the end forces the skipped rows to be laid out for real, every
+height above the highlight is corrected at once and the scroll offset no longer points where it did. `End` then
+leaves the highlighted option below the visible box. The user removed the switch. What it
+bought was the cost of _painting_ options, which is a different and smaller cost than _mounting_ them;
+`backlog.md` item 3 holds what is left.
+
+**The marker is keyed on the options array, and that is load-bearing.** An intersection observer reports only
+_changes_, so a batch too small to push the marker off screen would deliver no callback and the list would
+stall. Rebuilding the marker whenever the array identity changes forces a fresh observation of fresh geometry;
+`createViewportIntersectionObserver` sets its flag back to `false` on every re-registration for the same
+reason, so the answer is never carried over from an element that no longer exists. Reading the flag
+synchronously after a batch arrives — what the earlier attempt did — fetched one batch more than it needed
+every time.
+
+**The guard holds the options array itself, not its length, and it is a plain variable rather than a signal.**
+Nothing renders from it. Its job is to stop a marker that leaves and re-enters while a request is in flight
+from asking twice for the same list, and the array's identity is exactly what "the same list" means. Length is
+not: a **filtered** list is replaced rather than appended to, so a new query whose result happens to be as long
+as the last would be read as already asked and the list would never load. Reachable the moment autocomplete
+and batches are combined, which the Playground now demonstrates. The guard clears when the popup closes.
+
+**Filtering and batching compose without either knowing about the other.** The query is the consumer's, the
+batches are the consumer's, and the library only reports that the end of what it holds is on screen. A
+consumer wanting the server to filter runs a new search on a query change and replaces the array; `onReachEnd`
+then pages within that query. Note that `Home` and `End` are already suppressed on a filterable field, so the
+wrap rule below is the only keyboard behaviour applying to a fetched autocomplete.
+
+**An incomplete list does not wrap, and that is `Select`'s call rather than `NavigatorUtils`'s.** The 1D walk
+still answers _which position is next_ and still wraps; `Select` answers _whether to go there_, and refuses
+when the step would carry off either end while more options exist. No option was added to
+`computeNextPosition`, because three of its four callers are closed rings and would gain a mode they can never
+use. `Home` and `End` needed no change — they resolve against the array the library was handed, which is
+exactly "the first and last held".
+
+**What this does not do is make a complete list cheap.** A consumer holding 100,000 options in memory and
+slicing them gets a list that opens quickly and grows as it is read, at the cost of `End` meaning "the last one
+loaded" — the library declining to know something it knows. The user took that trade for the
+incomplete case, which is the case this is built for.
+
+### A list too long to mount: `computeEstimatedOptionHeight` and `Abstracts/Virtualizer`
+
+Settled, on the second attempt. **On-demand loading answers a list that has not all arrived;
+this answers a list that has all arrived and is too long to build.** They compose, and neither knows about the
+other.
+
+**Passing an estimated height is what turns it on, and a list short enough not to need it should not pass
+one.** The user's rule: under a couple of hundred options there is nothing to win, and the cost is real — a
+windowed list is placed from measurements that arrive late, so it accepts imprecision to buy back time that was
+never being spent. No boolean and no automatic threshold, because a threshold would be the library guessing at
+a row height it has never seen.
+
+**The estimate belongs to the consumer because the height is a consequence of `renderOption`.** It is per index
+rather than one number, so rows in two known shapes can be answered separately. It is consulted only for rows
+nobody can see — every row on screen is measured for real — so what it buys is an honest scrollbar before
+anything has been scrolled. TanStack's advice is to estimate the **largest** plausible row so the guess errs
+one way and the list only ever settles upward.
+
+**`@tanstack/solid-virtual` is a runtime dependency, marked external rather than bundled.** The first attempt
+took a package out again; this one keeps it, on the user's call that a dependency is acceptable
+for exactly this kind of functionality — the call `colorthief` already carries. External rather than bundled
+follows `colorthief` too: a package both inlined into `dist` and declared in `dependencies` makes a consumer
+install a copy they never load. `@internationalized/date` is still bundled while being declared, the older half
+of that inconsistency, and has not been argued.
+
+**The windower lives inside `Select`, and that is the whole difference from the attempt that failed.** The
+design had the **consumer** window the list and hand over only the visible slice, so `Select` walked
+the slice: `Home`, `End` and the arrows were confined to whatever happened to be mounted. Holding the whole
+array and mounting a window onto it leaves `getFlatOptions`, the navigable set and the whole keyboard model
+untouched — only what is in the document changes.
+
+**A grouped list is not windowed, and that is a boundary rather than a preference.** A group's box wraps the
+options inside it, so a window opening halfway down one would have to draw a box for a group whose header is
+above the window and whose end is below it, and repeat the header as the reader scrolls. Passing an estimate
+for a list containing a group mounts everything, silently and correctly.
+
+**Row heights are taken as fractions, which is one line of the package's default replaced.** TanStack's own
+`measureElement` rounds the observed border box to a whole pixel. A row is rarely a whole number of pixels
+tall — a two-line option here measures 97.5 — so every rounded row gives its slot half a pixel the row does
+not fill, and consecutive rows sit with a hairline between them: invisible against an unpainted row, obvious
+the moment a consumer gives their options a background. The override returns the unrounded `blockSize` when a
+`ResizeObserver` entry is present and delegates to the package's own function otherwise, so every fallback
+path — the cache lookup, the estimate, the synchronous first measure — behaves exactly as before. The
+observed box is in layout pixels, so this is also the one measurement `Viewport`'s scale cannot distort.
+
+**Four things the package's documentation does not cover, all from one root: this library is a guest inside
+somebody else's popup.**
+
+- **Solid runs a `ref` while the element is still being built.** The measurer identifies a row by reading an
+  index attribute off the node it is handed, and at `ref` time the attribute is not on it and the node is not
+  in the document — so measuring from the `ref` reads an unnamed, unlaid-out element and silently keeps the
+  estimate. Rows then tile on the estimate rather than their real heights, and a row taller than its slot
+  paints over the one below. The index is written onto the element and the measurement deferred to mount.
+  React's adapter never meets this because React runs refs after commit; nothing warns about it.
+- **The rows' container does not start where the scrolling starts.** Row offsets are measured from the top of
+  the container the library owns, a scroll position from the top of whatever is scrolling, and between them
+  sits however much border and padding the consumer put on their popup. Unset, every scroll target lands short
+  by that inset, which reads as an arrow key stopping one option early. `scrollMargin` is the package's own
+  answer; the offset has to be worked out in layout space rather than off raw client rects, because `Viewport`
+  scales the page.
+- **A highlighted row must be mounted whether or not it is in view.** `aria-activedescendant` names an element
+  by id, and scrolling to a row is not the same instant as mounting it, so the name refers to nothing until the
+  window catches up. The row carrying the highlight is pinned into the range.
+- **An option can no longer scroll itself into view**, because until the window reaches it there is nothing to
+  scroll. The move belongs to whatever owns the window, and it hangs off the highlight as an effect rather than
+  off the key handler, so a highlight arriving any other way is carried the same way.
+
+**What it is worth, measured on the Playground's stress card at 10,000 options**: 792 ms from click to the
+first painted frame with every option mounted, against 71 ms with a window of four. Frame rate while open was
+never the problem and is unchanged. The remaining cost at open is linear but has no DOM in it — building the
+records, flattening them, finding the navigable ones — and that is the floor a windower cannot lower.
+
+### Controls: `Tree`, and the group box that could not be a child
+
+`Tree` is `role="tree"` with expand and collapse, one selected value, and a keyboard
+where the two axes mean different things. Most of it is `Select`'s model applied a second time; the parts that
+are not are here.
+
+**A node is one record with optional children, and a branch is a node that has at least one — or one that
+says it will.** `TreeNode<T>` carries `value`, `children`, and the same `isDisabled` /
+`isReachableWhenDisabled` / `tooltipDefs` trio every other item record carries. `TreeUtils.getIsBranch` was
+`(node.children?.length ?? 0) > 0`, `Menu`'s test for a submenu character for character; it is now that **or**
+`hasMoreChildren`. See the next section for why the second field turned out not to be the contradiction this
+entry once predicted.
+
+**Render from the nesting, walk the flat order.** `TreeUtils.getVisibleRows` takes the nodes and a predicate
+and returns a rendering tree with collapsed branches already removed; `getFlatRows` collapses that into walking
+order. Same split as `SelectUtils.getFlatOptions`, for the same reason: the arrows, the edge keys and the
+roving tab stop index into the flat list and never learn that nesting happened. Each row carries its own flat
+`index`, so the two views agree without anything being kept in step.
+
+**The `role="group"` box is a sibling of the branch's row, not its child, and that is forced rather than
+preferred.** The published markup puts the group inside the `treeitem` it belongs to. Here every row is an
+`InteractionWrapper`, which listens for `mouseenter`, `mousedown` and `keydown` on the element it was handed —
+all three of which reach an ancestor. A row nested inside another row would report its ancestor as hovered
+while the pointer was over the child, and as pressed while the child was being clicked. Fixing that means
+teaching `wrapElement` that a descendant's hover is not its own, which is false for every other control, where
+the descendants are the painter's own markup.
+
+So the groups nest but the rows do not. Depth still computes correctly from the markup — one group per level —
+and `aria-level`, `aria-posinset` and `aria-setsize` are written on every row as well, which the published
+pattern asks for whenever the DOM is not the whole hierarchy. The one thing given up is the formal ownership of
+a group by the `treeitem` above it; `aria-owns` would restore it on paper and was rejected for the reason
+recorded under the presentational wrapper.
+
+**A roving tab stop, not `aria-activedescendant`, because there is no second element to put it on.** `Select`
+can name its highlighted option from the combobox because the combobox is a separate, always-present element
+holding real focus. A tree has only its rows, so the focused row is the focused element and the tab order has
+to be roving — `Tabs`' arrangement, down to the roving position falling back to the selection and then to the
+first navigable row.
+
+**Focus moves by id rather than through a ref array, because a tree's indexes move under it.** `Tabs` and
+`Accordion` keep an array of refs indexed by position, which works because their lists are flat and fixed.
+Expanding a branch renumbers every row below it while the elements stay put, and a `ref` callback does not run
+again to say so — so an array keyed by index would silently point at the wrong rows. Each row carries
+`${treeId}-node-${index}` as its id and moving focus is a `getElementById`. The same id tells the key handler
+which row is focused, which is how a click and an arrow key end up on the same footing.
+
+**The focus rescue on a collapse is a guard over the visible rows, not a step inside `collapse`.** Corrected
+. It began as a check inside `collapse` — is focus on a descendant, and if so move it to the
+branch — and that check could never be true: `ArrowLeft` and a click both act on the branch, which is already
+focused and stays mounted. The case it was written for is a **consumer** writing `expandedSignal` themselves,
+the only way a focused row can vanish, and which never enters `collapse`. So the guard watches the visible
+rows: it remembers the last row focused inside this tree from a `focusin` on the root, and when a collapse
+leaves that row out of the visible set **and** focus has fallen to the document body, it moves focus to the
+branch that closed.
+
+All three conditions carry weight. Without the remembered row, a tree nobody has touched would steal focus
+whenever a consumer collapsed anything. Without checking that the row actually left, a collapse elsewhere in
+the tree would do the same. And without focus genuinely sitting on the body, the guard would fight a consumer
+who moved focus on purpose — which is why a button that collapses on the spot cannot exercise it: the button
+holds focus, so there is nothing to rescue.
+
+**One press both selects and toggles, because the library paints no twisty.** A consumer draws the branch
+marker inside `renderNode`, so the component cannot tell a press on the marker from a press on the label — and
+if a press did not toggle, a mouse user could not open a branch at all. `Enter` and `Space` do exactly what a
+click does. A consumer wanting "the chevron opens, the label selects" has no route to it; see `backlog.md`.
+
+**A disabled node is not a disabled subtree.** The arrows skip it and nothing selects or opens it, but its
+children stay navigable if it was already open. A disabled branch is a statement about that node; a consumer
+who means the whole subtree disables the nodes in it.
+
+**A collapsed branch's children are not built**, the opposite of `Accordion`, because nothing needs measuring:
+an accordion panel animates to a height it can only learn by building the content, while a tree's rows just
+appear.
+
+**Not windowed, and it is the same boundary a grouped `Select` hits.** A window opening halfway down a subtree
+would have to draw a `role="group"` whose start is above the window and whose end is below it. The flat walking
+order is exactly what a windower wants and the row records already carry it, so the missing half is the markup
+rather than the arithmetic.
+
+**The walk wraps, as every other list in this library does.** The published tree pattern stops at the ends.
+Wrapping is what `Select`, `Menu`, `Tabs` and `RadioGroup` all do through `computeNextPosition`, and a tree
+that stopped would be the one list here behaving differently — consistency inside the library won over the
+published behaviour, recorded here rather than being discoverable only by pressing `ArrowUp` on the first row.
+
+### A branch whose children have not arrived: `hasMoreChildren`, and where the waiting is painted
+
+The gap this closes was recorded as hard for two reasons, and only one of them survived contact.
+
+**The field cannot contradict the children, because it can only add.** The objection on record was that the
+fix would be "a second field whose only job is to contradict the first" — which is what `isBranch?: boolean`
+would have been, since `isBranch: false` on a node with children is a state the component would have to pick a
+winner for. `hasMoreChildren` is the other shape: `getIsBranch` is `children.length > 0 || hasMoreChildren`, so
+setting it on a node that already has children changes nothing and there is no disagreement to resolve. The
+name is `Select`'s — `getHasMoreOptions` says the same thing about a list, and this says it about a node's
+children, so a consumer meeting the second has already met the first.
+
+**Nothing new tells the consumer to fetch, and that is deliberate.** No `loadChildren` prop and no
+`onExpandBranch`. Opening a branch writes its value into `expandedSignal`, which is the **consumer's** signal —
+they already see every expansion, so a callback would report a change they were handed anyway. Ark UI takes
+`loadChildren` plus `onLoadChildrenComplete` and React Aria has a loading item, but both of those own the list;
+here the nodes are a prop, so the arrival is a new `nodes` value and nothing else. The library reports and the
+consumer decides, which is the same split `getHasMoreOptions` / `onReachEnd` took for `Select`.
+
+**Where "loading" is painted was the half this was blocked on, and the answer is a render prop into the box the
+library owns.** `renderPendingChildren` is called for a branch that is expanded and has no rows, and it is
+given the branch's node and **the depth its children would have had** — without that second argument a consumer
+cannot line the placeholder up with the rows it stands in for, since the indent is theirs to draw. It is
+optional, and a tree that does not pass it renders no group box at all rather than an empty one.
+
+**A branch reports `aria-busy`, not a fabricated child row.** `aria-busy` is global, so it is valid on a
+`treeitem`, and it says exactly what is true: this element's contents are being updated. The alternative was a
+placeholder row carrying `role="treeitem"`, React Aria's shape — rejected because a row that is not a node
+would have to be given an `aria-posinset` and an `aria-setsize` it does not have, and would land in the
+walking order the arrows and typeahead use. **The consequence to know:** a consumer who sets `hasMoreChildren`
+and never delivers leaves a branch permanently busy. That is the consumer stating something untrue rather than
+something for the library to time out.
+
+**It works in a windowed tree, which took one extra placement rather than a second design.** A windowed tree
+emits no `role="group"` boxes at all, so the placeholder is rendered inside the branch row's own positioned box
+instead, after the row. The virtualizer measures each row rather than trusting the estimate, so a row that grows
+by a placeholder is measured at its new height and the ones below it move down. `isPending` is on
+`TreeNodeFlags` besides, so a painter can put a spinner on the twisty itself in either rendering.
+
+### A windowed `Tree` is flat, and that is the opposite of a windowed `Select`
+
+**`computeEstimatedNodeHeight` opts a tree into windowing**, over the flat walking order `TreeUtils.getFlatRows`
+already produced for the keyboard. Both renderings share one `renderRow`, so a windowed tree and a mounted one
+differ only in what wraps the rows.
+
+**The windowed rendering emits no `role="group"` at all.** This is the reverse of the grouped `Select`
+decision recorded above, and the difference is worth holding onto. A `Select` group box is a sibling of
+nothing — it carries the group's name on `aria-label`, so a box around part of a group is still a correct,
+named box. A tree's group box means something only as the child of the treeitem that owns it; a box for a
+subtree whose parent is outside the window would be **detached** rather than partial, which is worse than
+having none. The published pattern answers this case directly: when the nodes are not all in the DOM because
+the reader is scrolling, every node states `aria-level`, `aria-posinset` and `aria-setsize`. Every treeitem
+here already did, for the keyboard's sake, so windowing needed no new attribute.
+
+**The roving row is pinned, and focus scrolls before it moves.** `focusRow` asks the window to bring the row
+in before calling `focus`, and the roving row is in `getPinnedRows` so it stays mounted once reached —
+otherwise arrowing to a row outside the window would call `focus` on an element that does not exist and
+silently drop focus to the body.
+
+### `Tree` nodes can be links, on `Tab<T>`'s terms
+
+Added, at the user's request, after the left menu was weighed as a tree. A hierarchical menu is
+the obvious use for a tree and the rows were `div`s: a consumer could route from `onSelectionChange`, but the
+entries would not have been links — no middle-click, no open-in-new-tab, no copy-link-address, no destination
+in the status bar. None of that is reachable from a click handler.
+
+**`href` is a field on the node and it chooses the element**, exactly as `Tab<T>`'s does. A row with one
+renders an `<a role="treeitem">` through `Dynamic`, a row without one stays a `div`, and both take the same
+`commonProps` object of getters so the ARIA cannot drift. `TreeProps` also takes a `linkComponent`, for the
+reason `Tabs` takes one: an `<a>` reloads the application.
+
+**`TreeLinkProps` is declared in `Tree.types.ts` rather than imported from `Tabs.types.ts`.** The two are the
+same shape today, but they are two components' public prop types, and importing one control's type into
+another's surface would mean a consumer of `Tree` reading `Tabs`' documentation, and would make a future
+divergence a breaking change for the wrong component.
+
+**Keyboard: a link row hands its activation to the element.** `Enter` is left alone, because an anchor fires
+its own click from `Enter` and that click already runs the row's activation — so selecting, toggling and
+navigating happen through one path, and calling `preventDefault` would have selected the row while refusing to
+go anywhere. `Space` is the case an anchor does not answer: the row cancels the page scroll and clicks the
+element itself, so the two keys stay interchangeable.
+
+**A disabled link row cancels the navigation rather than just skipping the callback.** The click handler calls
+`preventDefault` before returning, which is `TabsItem`'s arrangement and is not optional here: on a `div` an
+early return is enough, while an anchor would have followed its `href` regardless.
+
+### Controls: `SlideButton`, and why the gesture is the only thing it owns
+
+Settled, when the user named a slide-to-activate control as a gap. It is a `Button` whose
+activation is a drag from one end of a track to the other, for the case where an accidental press would be
+expensive — send, arm, delete.
+
+**It is a real `<button>`, and it does not listen for a click.** Listening for `click` would defeat the
+control, because a press and a release is a click whether or not anything slid — a tap would activate, and so
+would a slide dragged back and abandoned. So the element carries the button's semantics and its name, and every
+activation route is written by hand.
+
+**There are two routes, and neither is a tap: drag the thumb to the end, or hold a press until it fills.** The
+hold drives the same `progressRatio`, so the paint is identical and a person who cannot drag sees what a person
+who drags sees. It answers three things at once:
+
+- **WCAG 2.2's 2.5.7 Dragging Movements**, Level AA: _"All functionality that uses a dragging movement for
+  operation can be achieved by a single pointer without dragging, unless dragging is essential."_ A keyboard
+  route does not satisfy it — 2.5.7 is about **pointers** — so a mouse or touch user who cannot drag needed
+  their own route. The published list of conforming alternatives names long press explicitly, and it is the
+  only entry that does not throw away the deliberateness the control exists for.
+- **WCAG 2.1.1 Keyboard**, answered by the same hold starting on `Enter` or `Space` held down. A tap of either
+  does nothing.
+- **The reason the control exists.** A stray `Enter` on a focused button is the keyboard's version of the
+  accidental press a slide resists.
+
+What does **not** bite, though it looks as though it should: **2.5.1 Pointer Gestures** is about path-based
+gestures, and its Understanding document is explicit that a slider using pointer capture — which is what
+`trackDrag` does — counts as dragging only. So the drag route is on the right side of 2.5.1 by construction.
+
+**Apple's own answer is the shape of this, arrived at from the other end.** Asked whether a swipe-to-confirm
+harms VoiceOver users, Apple's guidance is to override `accessibilityActivate` so a single activation runs the
+same logic **without** the swipe; the iOS lock screen behaves that way. What is built here is that answer with
+the timing put back in — the part their platform gets from the assistive technology's own confirmation step and
+a web control does not.
+
+**What a screen reader is told is the field's hint, said once, and the library invents no words.** A person
+who cannot see the fill hears the button's name and then nothing — so the gap was never a running commentary
+on the bar, it was not being told what the control wants before starting. `SlideButton` reads the `FormField`
+description context like every input does, so wrapping it in a field with "hold or slide to send" makes that
+the button's description, read after its name when it takes focus. Nothing is announced during the gesture:
+speech inside a one-second hold is the stutter `LiveAnnouncer` exists to avoid, and it would still be talking
+when the action fired.
+
+**Why that is the whole of what is owed here, rather than a compromise.** The gesture exists to resist an
+_accidental_ activation, and a screen reader already supplies that protection by construction: reaching a
+control and then activating it are two separate deliberate acts, which is not the case for a stray click or a
+misplaced tap. Apple's guidance for the pattern says the same thing from the other end — collapse the swipe to
+a single activation for VoiceOver — and the iOS lock screen does exactly that. So the assistive route wants
+_less_ gesture, not a described one, and a consumer who agrees already has the switch: `getHoldDurationMs` of
+`0` makes the first frame complete the hold, so a plain press activates. The library cannot make that choice
+itself, because detecting a screen reader is neither possible nor something to attempt.
+
+**The progress is a flag and a signal, and the signal is optional.** `progressSignal` is the ratio the fill
+is drawn from, taken through `SignalMirror.createOptional` exactly as a popup's `visibilitySignal` is: with no
+prop the control keeps the number to itself, and with one the consumer holds the same variable the painter
+reads. It exists because a flag only reaches `renderContent` — a readout beside the control, a second control
+that reacts half-way, or a warning that appears at eighty per cent is outside that slot and had no route to
+the number at all. A consumer write lands, and the next frame of a hold or a drag overwrites it, which is the
+same bargain `Select` makes when it writes `false` back into a visibility signal it did not open.
+
+**A press on the thumb starts both, and movement decides which.** A hold begins on every press; a press that
+landed on the thumb converts to a drag once the pointer travels past a few pixels, and the abandoned hold snaps
+back at that moment. Pressing the thumb and holding still therefore confirms, which matters because the thumb
+is the obvious thing to press and a dead zone there would fail exactly the people 2.5.7 is for. The travel
+threshold is a jitter guard rather than a tuned value and is a module constant; if it ever needs to move it
+should become a prop.
+
+**The press must land on the thumb for a drag.** `trackDrag` reports from `pointerdown` onward, which is what a
+slider wants — press the track and the value jumps there — and is exactly wrong here, since pressing at 90% and
+nudging right would be the shortcut the control exists to prevent. The first report of each drag is hit-tested
+against the thumb's current span, and a drag that did not begin on the thumb is ignored for its whole length
+rather than cancelled part-way. The grab offset inside the thumb is kept and subtracted from every later report,
+so the thumb does not jump under the pointer.
+
+**The thumb's size is the library's to know and the painter's to draw, which is `Range`'s cost paid again.**
+`getThumbSize` feeds the hit test and the painter positions its own thumb with
+`calc(ratio * (100% - thumbSize))`; nothing enforces agreement, and the Playground keeps them honest with one
+shared `SLIDE_BUTTON_THUMB_SIZE`. Handing the size out through the flags was dropped for consistency with
+`Range`, which had the choice first.
+
+**The track is measured with `clientWidth` rather than `getBoundingClientRect`.** The thumb size arrives in
+plain CSS pixels, so the width it is divided by has to be in the same space; a client rect carries a
+`Viewport`'s scale baked in. The same hazard the drag ratio avoids by being a fraction of two same-space
+measurements — but the thumb size is not one of those measurements, so it has to be handled rather than divided
+out.
+
+**Releasing is what activates a drag, and releasing short of the end cancels the gesture.** Firing the moment
+the thumb touches the end takes away the ability to change your mind mid-slide, which is worth more here than
+the earlier feedback. **A hold is the other way round**: it fires the moment it fills, because there is nothing
+to change your mind about once the bar is full and waiting for a release would leave a completed hold looking
+broken.
+
+**`getHoldDurationMs` defaults to 1000 and is a prop because it is a tuned value.** Long enough to be
+deliberate, short enough not to feel stuck; nobody has measured it, and a consumer with a heavier consequence
+should be able to set it without forking the control.
+
+**The control returns to rest on release, always, including after a successful slide.** A slide is a way of
+pressing a button, and a button is not still pressed while the consumer's handler runs; anything outliving the
+gesture — in flight, succeeded, failed — is the consumer's state, exactly as for `Button`. A consumer wanting
+the thumb to stay at the end already has the route without a new prop: pass `getIsPressed`, and the painter
+reads `isPressed` and draws the thumb at 1. The Playground's second variant is that composition, so the
+omission is not re-derived as a gap.
+
+**A drag does not focus the control, a departure from a native button and the lesser evil.** `trackDrag` calls
+`preventDefault` on `pointerdown` — it must, or the press starts a text selection — and that suppresses the
+compatibility `mousedown` whose default action is the focus. Calling `focus()` back was tried and reverted the
+same day: a scripted focus is not a pointer focus as far as the engine is concerned, so `:focus-visible`
+matched and every mouse drag drew the ring. `ColorArea` does call `focus()` and should keep doing so — its axis
+sliders are useless unless the arrow keys reach them — while here there is nothing focus enables that the drag
+has not already done.
+
+**`isDragging` and `isHolding` are two flags rather than one, and a painter almost always wants both.** They
+are separate facts — one is a pointer carrying the thumb, the other a press filling it — and a painter that
+wants to say "keep holding" needs to tell them apart. The Playground's painter takes the union and calls it
+tracking, which is the common case: while either is true the value is being driven live and a CSS transition
+would lag a frame behind.
+
+**`isDragging` means the thumb is being dragged, not that a pointer is down.** `trackDrag`'s own signal turns
+on for a press anywhere on the track, including one the hit test refused, so the flag a painter reads is that
+signal and a live grab together. A painter keyed on the raw one would drop its transition on a press that moves
+nothing.
+
+### The Playground: an example's source is a folder view, and a sample is a file
+
+Settled with the user. `PageComponents/Examples` exists to put a source-code button next to a
+demo, and what that button showed was always incomplete: an example imports its samples, its styled components
+and its page's own types, and only the example's own text was displayed — the half that was already obvious.
+
+**What is shown is a set of tabs, and a tab is a folder rather than a file.** One tab for the example itself,
+then one per thing it imports; inside a tab, an `Accordion` with the imported file open and its `.css.ts` and
+`.types.ts` siblings collapsed beside it. The sections are whichever of those files exist — four of the 37
+`StyledComponents` folders are missing one of the two, and "the files that are there" costs nothing and never
+needs a special case.
+
+**A tab is not every file in the folder**, the version that looks simpler and is wrong: a page folder would
+drag in a 600-line props panel. It is the file that was imported, plus its style and types siblings.
+
+**Only `playground/src` imports become tabs; everything from `components/src` stays opaque.** The line is what the
+consumer has to write: the Playground half is theirs to reproduce, the library half is already written for
+them. `@thewaver/ss-utils` and `solid-js` are on the library side for the same reason.
+
+**Depth stops where the code stops being consumer-shaped.** Tabs follow imports transitively through
+`StyledComponents`, and one level everywhere else. Not arbitrary: _"The three trees"_ defines
+`PageComponents` as what the Playground would still need if the library did not exist, which is exactly the code
+nobody copies. Following everything would put `Theme.css` on every example in the app.
+
+**A page's own types and stylesheet are behind a flag, defaulting on.** An example importing `ShapePage.types`
+is importing the shared prop type that lets one props panel drive seven examples — real, and not something a
+consumer would write. Whether it belongs in the tab list was a hard call, so the mechanism resolves it like any
+other folder and one constant decides whether it survives, in the shape `SHOW_COMPOSITES` uses in `App.tsx`.
+**The default is not the user's call, it is this file's** — on, so the path stays exercised and the question
+gets answered by looking at a real page.
+
+### Samples: one file per key, and the key is the file's name
+
+The same decision from the other end, and why `Samples/` had to be reorganised first.
+
+**A sample is a file, and the registry is an index that imports them.** `SVGDefs.const.tsx` was 2534 lines
+holding three registries; a tab showing it would have been useless whatever it cost to load. Splitting was
+never about weight — the source is fetched on demand — but about a tab a person can read. That tab is gone now
+that the samples ship from the library, and the split earns its keep on a second ground it did not have at the
+time: one file is what a consumer can import on its own. See _"Samples live in the library"_.
+
+**The key is the file's name, which is what lets a runtime selection find its source.** The example imports the
+whole registry and indexes it with a key from the props panel, so nothing in its own imports says which sample
+is showing. Rather than tracing that, the modal resolves the key to `<Registry>/<key>.ts` by name. Two
+mechanisms that never have to know about each other: the example's imports give the general tabs, the current
+key gives the sample tab. It also makes renaming a sample and renaming its file the same act.
+
+**Keys collide across registries, so the samples sit one folder down per registry.** `plain` exists in both
+`Pattern` and `Gradient`; `Samples/SVGDefs/Gradient/plain.tsx` keeps the name-is-the-key rule intact.
+
+**Nothing is folded into a factory.** `circle("grid")` produced three of the pattern samples from one helper,
+and a file whose whole content is that call teaches nobody anything — the reader still has to open a second
+tab. Each sample is written out. The line, taken from what `Gradient` already did: the sample's own **shape** is
+explicit, while small shared helpers that are not the point of any sample — a base colour, a diagonal offset —
+stay shared and get a tab of their own when opened. The total line count goes up, deliberately.
+
+**A registry is only split when a tab of it would be unreadable, which is not every registry.** The tab is
+gone; the line it drew is kept, now read as "unreadable in one file". Which registries are split has not moved.
+`CellAnimationZones` and `CellAnimationOrigins` are 71 and 31 lines of one-line entries, and splitting those
+produces files shorter than their own import headers — the same emptiness that unfolding the pattern factories
+avoided, from the other direction. They get a folder and keep their registry whole. The rule is the goal
+restated: split until a tab reads, and stop. Split so far: `SVGDefs` (2534 lines), `CellAnimation` (600),
+`CellAnimationWeights` (515). Left whole: `CellAnimationZones`, `CellAnimationOrigins`,
+`CellAnimation/Breakpoints`, `ScanlineAnimation/Keyframes`, the largest at 123 lines.
+
+**A Playground namespace may not share a name with a library one, and the source view is what makes that a
+rule.** The keyframe helpers were `CellAnimationUtils`, which `Lib/Exotics` already exports for something else
+entirely. Two namespaces of one name is legal and nothing imported both, so the collision cost nothing while the
+code was only ever read in an editor that could tell you which was which. A tab is read **out of context**,
+which is exactly the confusion a tab cannot resolve. The Playground one is now `CellAnimationKeyframeUtils`.
+
+Two smaller rules fell out, both house style everywhere else and broken only in the files this split created.
+**A `.utils.ts` exports a namespace**, like `InteractionTracker`, `TreeUtils` and `SelectUtils`; `SVGDefsUtils`
+and `CellAnimationWeightUtils` were bare exports and are not any more. And **the folder path names the
+namespace it exports** — the keyframes folder was `CellAnimation/` while exporting `CellAnimationKeyframes`.
+Since the restructure the path carries it in two parts rather than one: `CellAnimation/Keyframes` exports
+`CellAnimationKeyframes`, and the file inside still holds the whole name. See _"How Samples is laid out"_.
+
+**What is not shipping, and why it looks as though it should.** `fromStops` and the 3×3 matrix maths beside it
+turn a list of keyframe stops into the evaluation function `CellAnimation` asks for, so a consumer wanting
+keyframes rather than a formula writes their own. That is real, and it is still not the library's: the
+component's contract is already the smaller and more general thing — a function from timeline to result — and a
+stop list with `at`, `depth` and origin keys is one **opinion about how to author** such a function. Shipping it
+would freeze that opinion as API for a consumer nobody has met, which is the layer item 8 in `backlog.md`
+plans. The matrix half is a different case: it needs only the language to work, which is the `ss-utils` test,
+and that package has `Vec2d` and `Vec4d` but no matrix — noted as a candidate rather than moved, because one
+consumer is a thin case for an export in another repo.
+
+**Types move to `<Name>.types.ts`, and they stop being a namespace.** A sample file needs the config type and
+the registry needs the sample files, which is a cycle, so the types have to come out. They cannot come out into
+a namespace of the same name, because a `namespace` does not merge across ES modules and any file wanting both
+would import one identifier twice. Plain exported type names are what the rest of the repo uses (see _"House style"_ in
+`conventions.md`), and the namespace stays on the value side only.
+
+### A sample registry and the machinery that runs it are separate modules
+
+The rule: **a module a consumer imports for behaviour may not import the samples.** Machinery takes the sample
+itself; the registry that maps a name to a sample is its own export in the `.const.ts`, and only code driven by
+a runtime string — the Playground's dropdowns — touches it.
+
+**Why file layout alone did not achieve this.** The samples were already one file each, and that made no
+difference to what a consumer pays for: `CellAnimationWeights.const.ts` imported all sixty back into a
+`Record<WeightType, WeightFn>` and `computeCellWeights` looked its entry up by a string. A bundler cannot know
+which string arrives, so it keeps every entry — the lookup table, not the file count, is what defeats
+tree-shaking. Splitting the registries was for the source-view tabs and remains justified on that ground alone.
+
+**What moved.** `computeCellWeights` (with its private `normalizeWeights` / `makeWeightsUnique`) went to
+`CellAnimationWeights.utils.ts` and now takes a `WeightFn`. `computeAnimation` went to
+`CellAnimationKeyframes.utils.ts` and now takes a `CellAnimationFn`. Each `.const.ts` exports its registry as
+`SAMPLE_WEIGHTS` / `SAMPLE_ANIMATIONS`, matching the `SAMPLE_CONFIGS` / `SAMPLE_LAYOUTS` / `SAMPLE_INDENTS`
+names the other registries already used.
+
+**The key-based call is kept, as a one-line forwarder in the registry module.** `CellAnimationWeights.computeCellWeights("lineRow", …)` still works and every Playground call site is unchanged. This is not two APIs
+competing: the forwarder lives in the module that already costs the whole collection, so anyone paying for the
+registry keeps the ergonomic call, and anyone who wants one sample imports the sample and the utils module.
+
+**Measured, bundled with esbuild, minified / gzipped.** Weights: 19.4K / 6.0K for the registry path against
+5.7K / 2.5K for one sample. Keyframes: 27.3K / 7.1K against 13.7K / 4.8K.
+
+**Two shapes needed nothing.** `SVGDefs` was already correct — `SVGDefs.const.ts` holds only `SAMPLE_COLORS`
+and the three `SAMPLE_CONFIGS` registries, no sample imports the registry, and every helper the samples use
+(`SVGDefs.utils`, `SVGPatterns.const`, `SVGAnimations.const`, `SVGAnimationTracks.const`) is sample-free. The
+registries left whole under the split rule — `CellAnimation/Zones`, `CellAnimation/Origins`,
+`CellAnimation/Breakpoints`, `ScanlineAnimation/Keyframes`, `Formation/Layouts` and `Staircase/Indents` —
+define their samples inline in the same file, so there is no lighter path to offer without
+splitting them, which _"a registry is only split when a tab of it would be unreadable"_ already decided
+against.
+
+**A `namespace` compiles to one object, so it is opaque to tree-shaking.** This is why the utils modules are
+the right home for machinery and the wrong home for a collection: everything in one is kept together. The
+measurement above already includes each utils namespace whole.
+
+### Controls: `Paginator`, where the arithmetic is the component
+
+Built, at the user's request, from the `backlog.md` entry that had argued it out of the
+"compositions" list: the visible page range, where the gaps fall and how many pages sit either side of the
+current one is arithmetic, and arithmetic is the library's half of the contract.
+
+**`PaginatorUtils.getEntries` is a pure function with its own unit tests, and the component is a thin wrapper
+over it.** Same split as `TreeUtils.getVisibleRows` and `SelectUtils.getFlatOptions`. Sixteen cases cover both
+ends, both knobs, a page beyond the end, and no pages at all.
+
+**A gap carries the pages it stands for, rather than being a bare ellipsis.** `{ kind: "gap", from, to }`
+against Ark UI's `{ type: "ellipsis" }`. The library has computed those numbers on its way to deciding a gap
+belongs there, so throwing them away makes the consumer's painter unable to say anything true — a tooltip
+reading "pages 5 to 19" is free here and impossible there.
+
+**A gap that would hide one page is spelled as that page.** Replacing `4` with `…` saves no room and costs a
+destination. Arithmetic rather than paint, so it belongs in the function.
+
+**The window is exactly `2 × siblings + 1` wide, and the boundaries do not reserve a slot for an ellipsis that
+would hide nothing.** MUI keeps a slot free next to each boundary, which is why its list at page 1 is a page
+longer than the same call here. The wasted slot is only ever visible as an ellipsis standing between page 1 and
+page 2.
+
+**The gap is `aria-hidden`.** It is not a control, and the pages behind it cannot be reached by naming them, so
+announcing "pages 5 to 19" tells a screen reader user about something they cannot act on. Ark UI hides its
+ellipsis for the same reason.
+
+**`computeHref` is a function, where `Tab<T>` has an `href` field, and the difference is who authors the
+list.** A consumer writes their own tabs, so a field is reachable; here the library generates the entries, so a
+field would have nowhere to come from. The consumer knows the address shape and the library knows the page
+numbers.
+
+**The page is one-way — `getPage` plus `onPageChange` — following `Tabs` rather than `Select`.** _"Signal tuples for two-way
+state"_ in `conventions.md` takes the pair only where the component genuinely writes, and its recorded exception
+is a value derived from a route with no setter to hand over. A page number is that value more often than not,
+and pages that are links make it certain. A consumer who does hold a signal spends two props on it, the cheaper
+direction to adapt.
+
+**Every item is its own tab stop, with no roving.** `Accordion`'s position rather than `Tabs`': a tab list is
+one control with several states, a paginator is a row of independent destinations. `aria-current="page"` marks
+the one you are on.
+
+**A step with nowhere to go is `aria-disabled` and carries no `href`.** The target is computed first and the
+control is disabled when it equals the current page, so "previous on page one" needs no special case. Dropping
+the address as well matters only for the link form, where an anchor would otherwise still be followable by
+every route that is not a click.
+
+**The painted number is `aria-hidden` and the name comes from `computePageLabel`.** Exactly `Calendar`'s day
+cells: a painter drawing a bare digit gives a reader "7" with no idea what of. The default names are English,
+and the compute hook is the escape from that rather than a locale the library pretends to know.
+
+### Controls: `Table`, a grid rather than a table, and why the markup could not be `<table>`
+
+Built at the user's request, off the `backlog.md` entry that had put it last. That entry named the scope and
+the build kept to it exactly: **sorting, selection, column sizing, sticky headers and virtualization**, plus
+the keyboard and ARIA layer without which none of the five is conformant. Nothing outside that list was
+added — see the gaps at the foot of this entry.
+
+**The five features are what a `Table` component is _for_, and the argument is worth stating once.** A
+`<table>` gives the semantics free: the row and column relationships are in the elements, so a reader
+announces "column 3 of 7, Price, row 12" without being told. It gives no behaviour, and its layout is
+auto-computed, which resizing and pinning fight. A `display: grid` of divs is the mirror image: total layout
+control, and no semantics at all — `role="table"`, `role="row"`, `role="columnheader"`, `aria-rowcount` and
+`aria-colindex` all have to be written by hand and kept correct as rows come and go. **The component is the
+thing that reconciles the two**, and that reconciliation, not any single feature, is the work.
+
+**Divs won, because virtualization decides it.** A virtualized row is absolutely positioned inside a sizer of
+the total height, and a `<tr>` cannot be. Two consequences follow and both are load-bearing. The row element
+is _itself_ the positioned element — no wrapper between `rowgroup` and `row`, because `role="row"` must be a
+child of `role="rowgroup"` and a positioned div in between would break the tree. And every index a reader
+would otherwise count is published instead: `aria-rowcount` on the grid, `aria-rowindex` on each row,
+`aria-colcount` and `aria-colindex` on each cell. **Fifty thousand rows with thirty in the document is the
+case those attributes exist for**, and it is why they are not optional here the way they are in a small table.
+
+**Column widths are one CSS variable and one grid template.** `TableUtils.getColumnTemplate` builds a
+`grid-template-columns` string from the columns and the stored widths; the root carries it as a variable
+through `assignInlineVars`, and the header row and every body row read it. So header and body cannot drift
+apart — they are laid out by the same string — and a resize is one signal write rather than a sweep of cells.
+A column with a stored or declared width is a fixed `px` track; one without is `minmax(min, 1fr)` or
+`minmax(min, max)`. **The root sets no `overflow` of its own**, deliberately: a non-visible overflow on one
+axis forces the other, so `overflow-x` on the root would make the root the scroll parent and take both the
+sticky header and the `Virtualizer`'s scroll element away from the consumer's own scrolling box.
+
+**The header is a sticky rowgroup, which is why the consumer's box has to be the thing that scrolls.** Sticky
+resolves against the nearest scrolling ancestor, and `Virtualizer.createScrollParent` walks up looking for the
+same element, so both land on the consumer's container and stay in step. A consumer wanting horizontal scroll
+puts it on that same box; scrolling both ways in one element is the arrangement everything here is built for.
+
+**One tab stop for the whole grid, and the header row is row zero of the walk.** This is what separates a grid
+from a list of focusable cells: sixty cells in the tab order would take sixty presses of Tab to pass. The
+roving cell is a `{ x, y }` signal, clamped against the current column and row counts by a memo rather than
+written back — so a table whose rows shrink under it still has exactly one tabbable cell and never traps a
+reader outside the grid. `NavigatorUtils.computeNextCell` already carried the arithmetic, including the carry
+at a row's end and the page keys, so no second implementation was written.
+
+**Putting the header in the walk is what makes sorting reachable without a mouse.** The `columnheader` is
+itself the control — `aria-sort` on the cell, Enter or Space to cycle it — rather than a `<button>` inside the
+cell, because a button inside would be a second tab stop in a pattern whose whole point is having one. This is
+the ARIA data-grid arrangement rather than the sortable-table one, and the two differ precisely on that.
+
+**Sorting cycles ascending, descending, then off.** Three states rather than two: without the third, the order
+the rows arrived in is unreachable once anything has been sorted, and that order is often the meaningful one.
+`TableUtils.getNextSort` is pure and tested.
+
+**Whether the table sorts is decided by the comparator, not by a mode prop.** A column with `compare` is
+sorted by the component; a column marked `isSortable` without one has its sort _reported_ through
+`sortSignal` and `onSortChange` and its rows left alone, which is the server-side case. The alternative —
+an `isServerSorted` switch — puts the same fact in two places and lets them disagree. `getSortedRows` returns
+**the very same array** when there is nothing to do, so an unsorted table hands no new reference downstream.
+
+**Selection lives on the row and is painted by the cells.** `aria-selected` goes on `role="row"`, because a
+row is the thing being picked; the cells only show it, which is why `isSelected` is on the cell flags. Space
+toggles the focused row, Shift with an arrow extends from the anchor, Ctrl or Cmd with a click toggles one,
+Shift with a click extends, and Ctrl-A takes everything. The anchor is a plain `let` rather than a signal —
+nothing paints from it.
+
+**One component for both selection modes, where `Select` and `MultiSelect` are two.** The split there exists
+because the _trigger_ paints differently — one option against a row of chips — so `renderContent` has a
+different signature in each. A table row's paint does not change with the mode; only which rows carry
+`aria-selected` changes. So `selectionMode` is a prop, defaulting to `"multiple"` when a `selectionSignal` is
+given and `"none"` when it is not — the presence of the signal is what turns selection on, so a consumer
+cannot hand over a selection and silently get nothing.
+
+**Resizing is pointer-dragged on a handle and keyboard-driven from the cell, and the handle is
+`aria-hidden`.** A focusable handle would be the second tab stop the pattern cannot have, so the handle is a
+pointer affordance and `Ctrl` with the left and right arrows on the focused header cell is its keyboard
+equal — 2.1.1 is met without the tab order growing by one per column. The handle takes no paint of its own:
+`renderResizer` hands it to the consumer, the way `SplitPane` hands over its gutter. Widths are clamped to the
+column's own `minWidthPx` / `maxWidthPx` by `TableUtils.getResizedWidth`, and a drag that starts on a column
+with no stored width reads the header cell's `offsetWidth` as its starting point.
+
+**`InteractionWrapper` is not used, and this is the one control where that is right.** Its root is a real
+element, and inside a row laid out by `grid-template-columns` the grid item has to be the `gridcell` itself —
+a wrapper would become the item and the template would place the wrappers instead of the cells. The flags a
+painter needs are computed directly instead: hover is tracked per row and per header column, focus comes from
+the roving cell, and selection comes from the signal.
+
+**A click inside a cell that lands on a control does not select the row.** The handler asks whether the click
+target has an interactive ancestor within the cell — anchors, buttons, form fields and the ARIA roles that
+stand for them — and stands down if so. Not a heuristic about what the consumer probably meant: it is the
+same test the platform uses to decide what a click is for.
+
+**Disabled is `aria-disabled` on the grid, and nothing else changes.** Cells keep their roles, their indices
+and their tab stop, so the table still reads; sorting, selection and resizing all return early. Same mechanism
+as everywhere else here.
+
+**What was deliberately left out.** No column pinning — it needs a resolved pixel width per pinned column to
+compute the sticky offsets, and a pin that silently does nothing on an unsized column is the "looks supported
+and is not" failure this repo has refused twice already; it was also not in the scope the user set. No
+grouping or aggregate rows, no expandable rows, no inline cell editing, no filtering, and no `F2`-style
+interaction mode for a cell whose contents are focusable. The last of these is the one with an accessibility
+cost: a cell containing several controls can be reached, but there is no defined key that steps _into_ it.
+
+**The one gap inside the built scope is the resizer's discoverability, and the user chose to keep it.** The
+handle is `aria-hidden`, so nothing announces that a column can be resized; a reader who does not already know
+to try `Ctrl` with an arrow on a header cell will not find it. Two ways out were put to them and both were
+declined: injecting a word like "resizable" into the header's accessible name, which the library cannot do
+without writing into content the consumer paints, and React Aria's visually-hidden slider, which buys the
+announcement at the price of one extra tab stop per resizable column — the exact cost the single-tab-stop grid
+exists to avoid. **Their call was to leave it**, on the grounds that 2.1.1 is met and the tab order stays one
+stop. It is recorded in `backlog.md` under _"Accepted limits"_ so it is not rediscovered as an oversight.
+
+### Controls: `Scroller`, and why it renders no button of its own
+
+Settled with the user. A strip too wide for its box, paged by a previous and a next button
+rather than a scrollbar. The user asked for it as a `Carousel`; the name was corrected before anything was
+built, because **a carousel is a different pattern with an accessibility contract this does not implement** —
+one slide at a time, wrapping, `aria-roledescription` of `carousel` and `slide`, and a pause control the moment
+it rotates by itself. Naming a component after what it resembles is the trap already recorded for the segmented
+control. The real carousel is `Carousel`, which has since been built.
+
+**The track holds arbitrary children, and that is the user's call.** It renders nothing and types nothing: the
+consumer's markup goes in as `children` and comes out untouched. A list of records — `Tabs`' shape — was
+rejected because the first consumer is a `Tabs`, which would then have been rendered twice over, and because
+everything the component needs it can measure. Focus centring works by watching for focus reaching **any**
+descendant. Paging lands on item boundaries by reading the track's own child elements, and where there is only
+one child — the `Tabs` case — the rule degrades to a full page with no special case, because there is no
+boundary inside the page to prefer.
+
+**It never claims the arrow keys.** A `Tabs` inside it already walks its tabs with them, and two owners of one
+key is a bug found later rather than sooner. The component listens; it never moves focus itself.
+
+**A focused child is revealed, not centred, and the pointer counts the same as the keyboard.** Settled with the
+user after the first attempt centred on keyboard focus alone: an item already fully in view does not move the
+strip, and one cut off by an edge scrolls by the least that shows it whole. Centring is worse in both
+directions — it drags a half-clicked item out from under the cursor, and it moves the strip when nothing needed
+moving. Distinguishing pointer from keyboard was my patch for the first of those and it bought a second
+behaviour to remember; revealing removes the cause instead, so one rule covers both. What it gives up is the
+look-ahead a centred item has: a child revealed at an edge sits flush against it, with nothing of the next one
+showing.
+
+**It renders no `<button>`, which is the `NumberInput` shape rather than the `Tabs` one.** `renderButton` is
+called once per button with which step it is and with a `ScrollerStepper` — `getIsAtStart`, `getIsAtEnd`,
+`stepToPrevious`, `stepToNext` — exactly as `NumberInput` hands its steppers to `renderTrailing`. So the
+consumer composes with `Button` and inherits naming, the focus ring, tooltips and the disabled treatment, and
+the library owns only what nobody else can know: how far a step goes and whether there is anywhere left to go.
+`getButtonPlacement` is `split`, `start` or `end`, since "together" cannot be placed without saying which side.
+
+**The position is reported as a ratio, and a written ratio scrolls the strip.** `progressSignal` is optional
+and goes through `SignalMirror.createOptional` like every other `*Signal`, and it carries `scrollLeft` divided
+by the distance there is to travel — zero when nothing overflows. Reporting it is what the stepper cannot do:
+page dots, a progress bar or a "3 of 12" readout all sit outside `renderButton`, and none of them could reach
+the number. Accepting a write is the other half of the same variable, and it is what makes those dots
+pressable rather than decorative.
+
+**Which way a change came from is remembered rather than inferred**, because the track scrolls smoothly and
+every intermediate frame reports itself. The component keeps the last ratio it wrote and ignores exactly that
+value coming back; anything else is the consumer's and is scrolled to. Without it a consumer's write would be
+cancelled by the first frame of its own animation — the report would land back in the signal, look like a new
+instruction, and scroll to where the strip had got to instead of where it was sent.
+
+**`getPadding` exists because a scroll container clips a focus ring, and only the consumer knows how big the
+ring is.** A ring is drawn outside the border box and a scrolling box clips at its own edges, so a focused
+child at either end loses part of its ring — and so does every child at the top and bottom, because a
+horizontal scroller clips the cross axis too. The library paints no ring and cannot guess its width; the
+Playground's is one exported constant, `FOCUS_RING_WIDTH`, used both by the `:focus-visible` rule and by every
+`Scroller` that has to leave room for it.
+
+Three things follow from that number, and all three are needed — leaving any one out clips a ring somewhere.
+The track takes it as `padding-block` and `padding-inline-start`. **The end side cannot be padding**, because a
+scroll container's end-side padding is still not interoperable — Firefox does not count `padding-right` as
+scrollable space — so the component renders one element of its own after the consumer's children, sized to the
+same number. And **the reveal leaves that room free**: a child is scrolled to sit the padding's width clear of
+the edge rather than flush against it.
+
+**`overflow-y: clip` with `overflow-clip-margin` is the purpose-built answer and cannot be used here.** Read on
+MDN: when either axis is neither `visible` nor `clip`, a `clip` on the other axis computes to
+`hidden`. The horizontal axis has to scroll, so the vertical `clip` would become `hidden` and
+`overflow-clip-margin` would be ignored. Recorded so it is not re-proposed.
+
+**The buttons leave when there is nothing to scroll; the track never does.** Asked for by the user on
+as "just return the contents when there is nothing to scroll", and the smaller version shipped,
+because the track is the only thing the component can measure. Whether there is anything to scroll is
+`scrollWidth > clientWidth` **on the track**; unmount it and the children lay out in a box the component does
+not own, so it can neither tell that they have started to overflow nor put itself back. A track with nothing
+overflowing is also indistinguishable from a plain flex row — the scrollbar is hidden, nothing is clipped,
+nothing is interactive — so the only visible things were two dead buttons and the gap they sat in.
+
+**Removing them widens the track, and that is deliberate hysteresis rather than a loop.** With the buttons
+present the content has the track's width to fit in; without them it has that plus their width and the gaps. So
+content between those two widths settles wherever it currently is and stays there, instead of flickering
+between the two states on every resize frame. The first measurement happens with no buttons rendered, so a
+strip only gains them by genuinely exceeding its full width.
+
+**The track hides its scrollbar and keeps its scrolling.** Wheel and touch still work — taking them away would
+make the buttons the only route, worse than the scrollbar it replaced. `scroll-behavior` is smooth in CSS
+rather than per call, so `prefers-reduced-motion` turns it off without the component asking.
+
+**Horizontal only.** The axis is one variable rather than a redesign, but nothing has asked for a column and
+`SlideButton`'s precedent is to build the axis that exists.
+
+### Controls: `Carousel`, and the first component that acts without being asked
+
+Built, alongside `Paginator`, from the description `backlog.md` had carried since the `Scroller`
+naming argument. It shows one slide at a time, wraps at both ends, and can rotate on its own.
+
+**One slide at a time, and a page of several slides is not built.** The description allowed either. One slide
+is the reading with a published pattern behind it, and a page of several is `Scroller`'s territory the moment
+the arithmetic starts asking how many fit — the boundary the two components were separated along. Recorded in
+`backlog.md` as a gap rather than left implicit.
+
+**Wrapping is the difference that makes it a different component.** `Scroller` stops at each end and disables
+the step with nowhere to go; `Carousel` comes round, so neither step is ever the dead one. That single line is
+why a shared implementation with a `wraps` flag was not attempted: the two disagree about what the ends mean,
+and everything they appear to share — a track, a step pair — they hold for different reasons.
+
+**The rotation is why this is a component rather than paint, and the holds are conformance.** WCAG 2.2.2
+applies to anything moving by itself for more than five seconds beside other content: it must be stoppable, and
+the published pattern adds that it must not move under the pointer or while it holds focus. So the holds are
+not a courtesy that could be dropped for a tighter API. `getIsHeld` is `hovered || focus within || page
+hidden`, which is `Toasts`' expression character for character. The explicit stop is separate from the holds
+and outranks them: a stopped carousel stays stopped when the pointer leaves.
+
+**The consumer arranges the controls; the library still owns every button.** `renderControls` receives a
+`CarouselControls` object whose `renderStep`, `renderPick` and `renderRotationControl` **return elements**
+rather than taking callbacks, so a consumer writes the bar — order, wrapper, position — while each control is
+still a real `<button>` with a real name, built by the library. Deliberately not `Scroller`'s arrangement,
+where the consumer renders the button and `backlog.md` records the consequence: a library that renders no
+button cannot promise one is reachable or named. Here the split is along the line that matters — the library
+owns what the control _is_, the consumer owns where it _sits_ and what it looks like. A consumer passing no
+`renderControls` gets a carousel with no controls at all, right for one driven from elsewhere through its
+`indexSignal`.
+
+**Slides are plain values, not records.** Every other collection here takes records — `Tab<T>`, `TreeNode<T>`,
+`Toast<T>` — because each has per-item capabilities the library acts on. A slide has none: its position is
+arithmetic, not a field. The records convention was written against **parallel arrays** indexed at each other,
+which a single list of values is not.
+
+**The index is a two-way signal, and this is the clearest case in the library for it.** A rotating carousel
+writes its own index on a timer with nobody having asked, which no consumer callback can be expected to mirror
+back. `SignalMirror.createOptional` keeps it private until a consumer wants it.
+
+**The announcement goes through `LiveAnnouncer` rather than a live region on the track.** The published pattern
+makes the slide container a live region, which works when the slides that are away are removed from the page.
+Here they stay — the track translates — and a live region over content that never changes announces nothing.
+The shared announcer is already the answer for `Calendar`'s month change. It announces only when the carousel
+is **not** rotating, because narrating a slide every few seconds is the noise WCAG 2.2.2 exists to prevent.
+
+**The slides that are away are `inert` as well as `aria-hidden`**, for `Collapsible`'s reason: a control
+scrolled off the side is still in the tab order without it, so a keyboard user would tab into a slide nobody
+can see and drag the track after them.
+
+**Both directions ship, as a `dir` prop of `"row" | "column"` defaulting to `"row"`** — the name and the union
+`Tabs`, `Stepper`, `RadioGroup` and `SplitPane` already carry. Four things read it: the track's flex direction,
+the slide's basis (a flex basis of `100%` is measured along the main axis, so one declaration means width in a
+row and height in a column), the axis the transform translates on, and the swipe axis handed to
+`InteractionTracker`, which already had a vertical mode for `Modal`. The step a committed swipe takes is now
+one expression covering all four directions — left and up bring the next slide in, right and down the previous
+— rather than a comparison per direction.
+
+**Nothing in the markup names an axis, and that is the pattern's own position.** The published carousel pattern
+defines a carousel as sequential display of slides and never mentions orientation; its controls are "previous"
+and "next", which are sequence words rather than compass ones. `aria-orientation` is not among the attributes
+`role="region"` supports, so there is nothing to set even if there were something to say. A column carousel is
+therefore announced exactly as a row one is.
+
+**A column carousel has no height of its own and takes it from the box around it, rather than from a prop.** A
+row carousel gets its width from the page for nothing; a column one cannot get a height the same way, because
+the track must be exactly one slide tall for a translation of `100%` to mean one step, and slides stacked in
+normal flow make the track as tall as all of them together. So in column mode the root is `height: 100%`, the
+viewport takes what is left of it after the controls, and the consumer's own element carries the number. That
+is `SplitPane`'s arrangement — fill the box you are given, state no size. A `height` prop was the alternative
+and was refused for the reason `DrumWheel` can require `wedgeSize` and this cannot: a prop mandatory in one
+direction and meaningless in the other is a shape the type cannot state, which is the same objection that
+keeps a drum carousel out of `Carousel`'s own props.
+
+### `TrackCarousel` and `DrumCarousel`: one behaviour, two ways of showing it
+
+A carousel and a drum wheel are the same picture driven by different arithmetic, which is what `Barrel` was
+lifted out to make usable twice. The wheel spins to a wedge nobody chose; a carousel steps to a slide somebody
+did. So the barrel is now shown by two components — one turned by `Rotator`, one turned by an index — and the
+carousel's own behaviour, all of it, is shared between its two presentations.
+
+**The shell is `Carousel` and it is not exported; the presets are.** Same arrangement as `Spotlight` and as
+`OverheadWheel` / `DrumWheel`, and for the same reason: `slideSize` is required on the drum and meaningless on
+the track, `renderSlideBack` likewise, and a single component with a variant prop could state neither. The
+public names are `TrackCarousel` and `DrumCarousel`.
+
+**The user took this knowing it reads worse than the sets it copies.** `Spotlight` and `Wheel` were shells from
+the start, so no name was taken away when their presets arrived; here the plain `Carousel` was already the
+component people rendered, and it is now the family name instead. `Track` was chosen over `Slide` because both
+kinds have slides — naming a preset after the half they share is the fault `Flat` had, recorded above.
+
+**`dir` belongs to the track and `axis` to the drum, and they are not the same word for the same thing.**
+`dir` is a flex direction: it says whether the slides sit in a row or a column, exactly as it does on `Tabs` and
+`Stepper`. `axis` is the line the barrel turns about, which is `DrumWheel`'s word for the same idea and takes
+the same `"row" | "column"` values for the same reason — a row of faces turns about the upright axis. One prop
+each, on the preset that has the concept, rather than one prop meaning two things.
+
+**The drum keeps a running angle and turns the short way; the track slides straight to the index.** A face's
+transform is derived from an angle, and an angle taken as `index × step` jumps from `0°` to `270°` on the first
+forward step of a four-slide drum — a quarter turn that animates as three quarters backwards. So the shell
+holds the angle itself, moves it by the signed shorter number of steps on each index change
+(`CarouselUtils.getTurnSteps`), and resets it when the slide count changes underneath it. The track has no such
+choice to make: its transform is `index × 100%` along one axis, which is already continuous, and it rewinds
+visibly when a step wraps from the last slide to the first. **The two therefore disagree at the wrap**, and the
+disagreement is not resolved here: making the track wrap the short way means moving a slide before it is shown,
+which is a different mechanism rather than a different constant.
+
+**A partial swipe turns the barrel by that fraction of a step**, the same way it drags the track by that
+fraction of a slide, and it is written once: the swipe ratio times the step angle for the drum, times a slide
+width for the track. What commits, what is thrown away, and what a hold does are all the shared shell's.
+
+**`CarouselSlideState` gained a `face`, and the track's is always `"front"`.** A drum face can be the back of a
+slide, which the consumer renders through `renderSlideBack`; the field is on the shared state rather than on a
+drum-only one, exactly as `WheelWedgeState.face` is shared by a wheel that never has a back.
+
+### `FlipCard`: the smallest thing that can turn a barrel
+
+**A card is not a carousel, and inheriting the carousel's contract was the alternative that got refused.** The
+options were a Playground example of a two-slide `DrumCarousel`, a preset over the carousel shell, and a
+component of its own over `Barrel`; the user took the third. A card has no sequence — nothing wraps, there is no
+picker, nothing rotates on a timer, and there is nothing to announce as "1 of 2". What it needs is two faces, a
+side to show and a duration, and everything else the carousel holds would arrive as vocabulary a consumer has
+to ignore.
+
+**A flip card is the degenerate barrel rather than a special case of one.** At two faces the apothem works out
+to zero, so the pair sits back to back with nothing between them, and the existing rule that a barrel prints no
+reverse below three faces already covers it. Nothing was added to `Barrel` to make this component: two faces, an
+angle of `0°` or `-180°`, and the same `computeFaceDefs` every other consumer uses. That it needed nothing is
+the evidence the abstract was drawn in the right place.
+
+**The barrel's own front and back are not the card's two sides.** A barrel slot has a front and a reverse; this
+card's sides are two _slots_, at `0°` and `180°`. The distinction matters only when reading the code, and it is
+why `FlipCardFace` is a different idea from `BarrelFace` despite being the same two words.
+
+**The angle reverses rather than accumulating.** Flipping back turns the card the way it came, which is what a
+hand does with a card. Nothing accumulates, so there is no running angle to keep — unlike the drum carousel,
+which does keep one because it has more than two faces to reach.
+
+**`flippedSignal` is required, and the card renders no control at all.** Two reasons, and the first is the
+hard one: a card's faces hold arbitrary content, which may itself be interactive, so the card cannot be a
+`<button>` without swallowing whatever is inside it. The second is `Carousel`'s recorded exposure — a library
+that renders no button cannot promise one is reachable or named — which means the page must own the control
+either way. The signal is required rather than optional because an internal one nobody can set is a card that
+can never turn.
+
+**It sits in `Exotics`, and it took two passes to get there.** The first placement was `Fundamentals` beside
+`ImageSwitcher`, derived rather than asked: it swaps one piece of content for another with a transition, which
+is what `ImageSwitcher` does for a single image. The user moved it. The `Exotics` test — renders DOM, holds no
+value, lays elements out or turns them — takes it, and **turning is the part that decides**, which is the same
+line `Cuboid` was placed on. Where the two folders divide was the user's call and now has an answer for the
+turning components: a thing that rotates in space is an `Exotic` whatever else it also does.
+
+### `Cuboid`: a box of six faces, and two counts that drive it
+
+Asked for as "like the drum, but two axes of control, and not necessarily even faces". It shares the barrel's
+perspective and its projection formula and none of its arithmetic, which is the honest split rather than a
+missed reuse.
+
+**Named `Cuboid` and placed in `Exotics`, both on the user's call.** It was built as `Cube` and the name was
+put to them, since a component whose point is that the three extents differ is only a cube by accident; they
+took the exact word. `Exotics` is where they put it, which also settles that the turning components belong
+there rather than beside the carousels. `FlipCard` was left in `Fundamentals` at the time and has since been
+moved across on the user's call, so the rule now reaches every turning component; the user noted that
+`DrumCarousel` would fit `Exotics` too but that splitting the two carousels across folders is not worth doing
+now. That last point is recorded in `backlog.md` under _Open discussion_ rather than settled here.
+
+**What a screen reader is told is `box`, not `cuboid`.** `aria-roledescription` is read aloud, and the word it
+replaces the role with should be the ordinary one — a listener meets "box, group" rather than a term they may
+have to stop and parse. The exact word is right for the API, where the reader is a developer choosing a
+component, and the plain one is right for the page.
+
+**A barrel derives one radius; a box is told three extents.** Every face of a barrel is the same size, so the
+distance from the axis follows from the face count by trigonometry. A box has a width, a height and a depth,
+each face sits at half of one of them, and each face's own size is the two extents it spans — the sides take
+the depth as their width, the lid and the floor take it as their height. There is no trigonometry anywhere in
+`CuboidUtils`.
+
+**The rotation is on the box; a barrel's is on each face.** A box turns as one about two axes, so one transform
+on the body says everything: push back by half the depth, then pitch, then yaw. A barrel cannot do that,
+because each of its faces sits at its own angle around a single axis. This is why `Cuboid` renders its own
+markup rather than going through `Barrel`.
+
+**Two counts of quarter turns, not a named face.** `yawSignal` and `pitchSignal` are unbounded integers, and
+the angle is the count times ninety degrees. Three things fall out of that. The box always turns the way it was
+pushed, because a count of `+1` is a quarter turn in that direction whatever the count already was. There is no
+wrapping problem to solve — the drum carousel had to keep a running angle for exactly this reason, and here the
+running total _is_ the API. And naming a face instead would have required the component to choose a route to it,
+of which there are several, none obviously right.
+
+**Turning over the top leaves the far side upside down, and that is kept rather than prevented.** The strategy
+put to the user said the pitch would be clamped at a quarter turn either way, on the grounds that the two axes
+collide there — on the lid, turning across spins the lid in place instead of bringing a new face. Built, that
+argument does not hold up: clamping makes a second press of "up" do nothing, where a real box tips over its top
+and shows its back inverted. So pitch cycles like yaw, the inverted states are reachable, and `cuboid.spec.ts`
+pins the sequence. What is genuinely degenerate — turning across while on the lid — is left as it is, because
+it is what a box does.
+
+**The room it reserves is the silhouette of the sphere the box sits inside.** `BarrelUtils.getProjectedExtent`
+is now the shared piece: it takes a circumradius and how far the centre sits behind the screen, and returns the
+extent the projection can reach — `getGirth` is expressed through it and its numbers are unchanged, which the
+existing wheel tests prove. `Cuboid` passes the half-diagonal of the whole box, so the reservation is correct at
+every orientation including the ones that combine both turns. It over-reserves for a slab — a box 400 wide, 40
+tall and 400 deep reserves a square of its diagonal — and that was chosen deliberately: the drum's reservation
+shipped wrong twice, both times by being tight and self-consistent, and a box that paints outside its room
+overlaps whatever sits beside it.
+
+### The source view, as built, and the four calls the mechanism forced
+
+Built against the two entries above. Where a rule had to be derived rather than read off, it is
+marked as such.
+
+**An example declares its own file, as a path from the Playground package's root.** `ExampleDefs.src` — a string of
+already-highlighted HTML built at module scope — is now `path`, and the highlighting happens when the modal
+opens; the `?raw` imports and `highlighter.codeToHtml` calls are gone from all six pages that had them. The
+path is a plain literal rather than anything derived: `import.meta.glob` keys are relative to the Vite root, which is `playground/`, so
+`/src/App/Pages/ShapePage/Examples/Default.tsx` is the same string the resolver looks up, and a typo
+produces an empty tab rather than a wrong one.
+
+**The sample-key mechanism is gone, along with the samples it addressed.** `sampleKeys` on `ExampleDefs`,
+the `<Registry>/Samples/` resolver and the skip rule that stopped a registry dragging in sixty tabs all went
+when the samples moved into the library, where the "everything from `components/src` stays opaque" rule covers
+them for free. See _"Samples live in the library"_.
+
+**Derived: a tab is a name, not a file, so `.const`, `.utils`, `.types` and `.css` collapse into one.** The
+settled rule says the imported file plus its `.css.ts` and `.types.ts` siblings. Applied literally to
+`SVGDefs.const.ts` it produces a tab called `SVGDefs.const` whose types sibling would have to be
+`SVGDefs.const.types.ts`, plus a second tab called `SVGDefs` for the types file the const imports — two tabs
+for one folder. The stem is therefore the file name with `.const`, `.utils`, `.types` or `.css` removed, so one
+`SVGDefs` tab carries the const, the types and the utils. **What is displayed is still only what the settled
+rule allows**: a file appears either because it was imported or because it is the stem's `.types.ts` or
+`.css.ts`. A `.utils.ts` nobody imported does not appear.
+
+**A sibling is displayed but never traversed.** A stylesheet reached only through another stylesheet is not
+followed, which is the mechanism `Theme.css` was already meant to be kept out by.
+
+**`Theme.css` is excluded by name as well, and it is the only file that is.** Settled with the user on
+, after the mechanism gave `Card` a `Theme` tab honestly — the example does import the theme by
+name. The user's reason generalises: **the theme holds no logic that helps build the component**, it is a
+palette, and a tab of colour tokens teaches a reader nothing. The exclusion is a single path constant rather
+than a pattern, so it stays a named exception rather than the start of a filter list.
+
+**Forced: `?raw` cannot read a `.css.ts`, so the Playground's Vite config carries a nine-line plugin.** The
+vanilla-extract plugin claims every `*.css.ts` by file name and discards the query, so a stylesheet requested
+as text comes back compiled and with no default export — `codeToHtml` then receives `undefined` and the modal
+renders nothing. `?source` resolves to an id no other plugin recognises (a null-byte prefix and a `.source`
+extension) and is read off disk by the plugin itself. The only part of the feature living outside `src`.
+
+**An example is given the key rather than the resolved sample, and three pages changed to do it.** Still true
+of what the example's own body shows, though the tab that displayed the resolved sample is gone. `Shape`
+passed `getStrokeConfig`, `getFillConfig` and `getIterationConfig` already looked up; `CellAnimation` passed a
+`computeCellWeights` closure and a resolved origin; `ScanlineAnimation` passed a `computeCellWeights` closure.
+All three now pass keys and the example does the lookup in its own body, which is the line the reader came to
+see. `CellAnimation`'s stress test gains a correctness fix on the way: the origin is computed from the cell
+count actually in force rather than from the page's.
+
+**The code box's height cap is a per-call-site parameter.** A standalone box keeps its 800; the source view
+passes 500, because a tab shows a list of section headers above the open one and the modal has to hold both.
+Neither number moved.
+
+**The scroll container is the modal, edge to edge, and the padding lives inside it.** Asked for by the user on
+, so the scrollbar sits against the modal's edge rather than floating twenty pixels inside it.
+`PageModalPanel` takes a `getPadding` that overrides its own, defaulting to what it always had — the
+parameter-with-per-call-site-defaults rule, since the stress test and the modal page still want the padding.
+The source modal passes zero and is the panel's only child. The "tap outside to close" hint went with it: the
+panel is now one thing rather than two, and Escape and an overlay click were never spelled out on any other
+modal.
+
+**The padding then belongs to the scroller's children rather than to the scroller, because of the sticky
+strip.** A tab strip inset by the container's padding leaves a band either side of it, and code scrolling
+upward passes through those bands in plain view. A strip that spans the whole scrollport and pads itself covers
+everything going under it. Its `z-index` also has to beat the code box's inset border, which otherwise wins by
+sitting later in the document at the same level.
+
+**A page's description lives on its tab config.** The title under which a page renders comes from `TAB_CONFIGS`
+in `App.tsx`, so the sentence under it does too — one place, one entry per page, and a page without a component
+keeps neither.
+
+### Turning a page's variants into examples, settled on the four `Exotics` pages
+
+`Formation`, `Satellite`, `Staircase` and `Wheel` were the first pages whose demos moved from `PageVariants` to
+`PageExamples`, which was the first slice of the Playground rollout `backlog.md` used to carry as its own item.
+The question that item left open — where a variant's file lives and what it is given — is answered here, and the answer is the shape
+`ShapePage`, `TypewriterPage` and `ScanlineAnimationPage` already had rather than a new one.
+
+**The split is the library call on one side and the Playground's furniture on the other.** The example file
+holds the library component and the styled components it paints with, and nothing else. `PageMeasureBox`, any
+local props panel and the width the demo is stated at stay on the page, in an `<Name>ExampleWrapper` beside
+`getExamples`. That line is the same one the tab rule draws: what a consumer would write becomes a tab, what
+the Playground needs for its own sake does not.
+
+**What closed over the page's signals becomes one props type per page**, `<Name>ExampleProps` in
+`<Name>Page.types.ts`, built with `AccessorProps` and handed to every example on the page as `commonProps`.
+One type per page rather than one per example is what lets a single props panel drive all of them, which is
+the rule the panel already worked to.
+
+**A knob whose value has a unit names it in the label, in parentheses.** `Width (px)`, `Turn duration (ms)`,
+`Shift (%)`, `Skew (deg)`. Asked for by the user after a page shipped with bare `Width` and `Turn`, and it is
+the whole rule: a count has no unit and takes none, so `Slide count`, `Wedges` and `Items` stay as they are.
+The field's own `ariaLabel` spells the unit in words instead — "width in pixels" — because the panel's label is
+a plain `div` rather than a `<label>`, so the accessible name is whatever the field carries and a screen reader
+never hears the visible text. The one place left without a unit on purpose is `Toasts`' duration: its values
+are a select whose options print their own `ms`, and one of them is `sticky`, which is not a duration at all.
+
+**A page may hold two components, and then the page's type is what the global panel drives rather than what an
+example takes.** `ElementMosaic` and `ImageMosaic` had a page each and now share `MosaicPage`, one example
+apiece. Three knobs mean the same thing to both — how many items, the gap, and which side is fixed — so those
+stay global behind a single `MosaicExampleProps`, while each example file keeps its own props type for what it
+actually receives: tiles on one side, image sources on the other. **What only one of them has goes in that
+example's own local panel** — a target shape means nothing to an element mosaic, so it sits under the image
+demo instead of in the global row. The user's instruction when merging the pages, and it generalises: share
+what can be shared, make the rest local.
+
+**The image mosaic's second demo became a knob on the first**, which is the rule above rather than a new one.
+The decorated version differed from the plain one only in whether each image is wrapped in an element of the
+consumer's own, so it is a checkbox in that example's local panel now. `imageMosaic.spec.ts` turns it on before
+the one test that needs it, and addresses its demo by the example key `images` rather than by the page.
+
+**Two demos differing by one prop are one example and a panel knob, never two files.** Corrected by the user,
+four times now, and the fourth went further than the first three, in two steps. A carousel demo turned on its
+side was built as its own example on the argument that a column also needs a box with a height around it, so
+the two differed by more than the prop; that does not survive, because the box is the page's furniture. The
+correction to _that_ was the second step and is the part worth keeping: **a knob that means the same thing to
+every demo on the page belongs in the global panel, not in a local one per example.** Direction is one global
+select now, and it drives the tracks' `dir` and the drum's `axis` together — a local knob per demo would have
+been the same choice asked four times.
+
+**Furniture that only one direction needs is still sized for both, so a card does not resize when a knob
+changes.** The user's objection, and it is about the page rather than the component: the box round each
+carousel demo was `height: 320` for a column and nothing for a row, so switching direction made every card
+jump. It is one fixed height for both now, with the demo centred in it — a row carousel leaves slack under
+itself and a column one fills it, and the card stays put either way. The first three corrections: `Formation`'s pair differed only in `getIsStackedInReverse`,
+`Satellite`'s first two only in `getIsBehindSubject`, and `Staircase`'s only in `getDir`, and each was first
+built as two example files with the value written into each. Every one of them is now a single example with
+that prop wired to a control in the global panel — a `PageCheckField` for a boolean, a `PageSelectField` for
+an enum. This is the same rule as _"a props-panel control drives every instance"_ read from the other end: a
+value the panel could own is not a reason for a second demo, and two demos over one differing literal are two
+copies of one example rather than two examples. **A second example has to be a different call**, as
+`Wheel`'s three are — `OverheadWheel` against `DrumWheel`, and a drum handed the prize list twice over to prove it
+can carry the same prizes round more than once.
+
+**Dropping a demo drops its spec, and that is the trade to state rather than work around.** `Satellite`'s
+third demo — the component with no satellite at all — was excluded on the user's instruction, so
+`with nothing to attach there is no wrapper either` went with it. The behaviour is still covered by unit
+tests; what is gone is the browser's confirmation of it.
+
+**Where a sample registry is not split, the key is still the example's to resolve.** `Formation/Layouts` and
+`Staircase/Indents` are 80 and 46 lines and stay whole. The example is handed `getLayoutKey` / `getIndentKey`
+and does the lookup in its own body, because that is the line the reader came for. `sampleKeys` and the tab it
+produced are both gone; see _"Samples live in the library"_.
+
+**The turn count is a panel knob, and a spin style is handed it rather than owning one.** Asked for by the
+user: the page exposed how long a spin lasts but not how far it goes in that time, so the only thing the
+duration knob could change was the pace. `WheelSpinStyleFn` takes a third argument for it, after the two the
+library's own `computeSpinDefs` passes, and the page closes over the signal at the call site rather than each
+style reading it — which keeps the styles pure page constants that can be read whole in the source view.
+
+**The two styles read the knob differently and both are right.** `rigid` uses it exactly. `bouncy` picks a
+whole number between one and it, because randomness is what that style is for and a knob that fixed the count
+would leave it randomising nothing but the jitter. So the knob is a ceiling for one and a setting for the
+other, which is why it is labelled _"Turns per spin"_ rather than named after either reading. At the starting
+value of 3 both reproduce the constants they replaced — `PLAIN_TURNS` was 3 and the lively range was 1 to 3 —
+so nothing about the page's default behaviour moved.
+
+**`WheelExampleProps.computeSpinDefs` is the library's two-argument shape, not `WheelSpinStyleFn`.** An
+example spreads its props straight onto a wheel, so what it receives has to be what the wheel accepts; the
+three-argument form is the page's catalogue signature and stops at the page. The two were the same type until
+the knob arrived and the difference was invisible, which is worth knowing before merging them back.
+
+**`Wheel` passes `computeSpinDefs` resolved rather than as a key**, which is the one place this departs from
+_"An example is given the key rather than the resolved sample"_. Its two spin styles are page constants and not
+a `Samples/` registry, so there is nothing for a key to resolve to; making them one is a separate change and
+has not been argued.
+
+**An example carries no readout, for now.** Stated by the user when these four converted. `ExampleDefs.readout`
+stays on the type and `PageExamples` still renders one when given it — nothing was removed — but no example on
+these pages sets it. Two specs read a readout and had to find the same fact elsewhere: `wheel.spec.ts` now
+reads the wedge's name out of the `LiveAnnouncer` region, which is the library's own report rather than the
+page's, and `satellite.spec.ts` used the readout only as a way to walk back to the demo and now locates the
+wrapper directly.
+
+**The attribute the interaction suite reads changes with the component.** `PageVariants` stamps `data-variant`
+and `PageExamples` stamps `data-example`, so a converted page's spec swaps `variant()` for `example()` in
+`e2e/helpers.ts`. One assertion had to move with it rather than being renamed: `wheel.spec.ts` counted the
+buttons inside the whole card to prove the wheel renders exactly one, and an example card carries the source
+button too, so the count is now scoped to the element carrying `aria-roledescription="wheel"`. That is the
+honest reading of what the test was always claiming.
+
+### Every Playground page is examples now, and two things had to change to finish it
+
+The rollout `backlog.md` used to carry as its own item is done: all thirty-three pages that still used `PageVariants`
+carry the source-code button, and `PageVariants` itself has no consumers left. What the four `Exotics` pages
+settled held for the rest; two things they never exercised did not.
+
+**An example card now marks its demo, because the source button is a button in the card.** `PageExamples`
+wraps the demo in a `data-demo` element and `e2e/helpers.ts` gains `demo(key)` beside `example(key)`. Without
+a marker a spec asking for "the first button in this card" found the `</>` button and opened the source viewer
+instead of the control it meant — which is how a colour-dropdown test came to assert against a code listing.
+
+**That marker is `display: contents`, and the first attempt at it broke six pages.** It was given
+`PageVariants`' demo box — a centred flex row — which changed how every card lays its own contents out: the
+pages that were already on `PageExamples` had always put a demo's children straight into the card's column, so
+`CellAnimation` and `ScanlineAnimation` suddenly showed their local props panels **beside** their demos rather
+than below. A marker exists to be found by a selector, not to lay anything out, so it generates no box at all.
+Nothing inside a card can then move because of it, which is a guarantee rather than something to re-check per
+page. The cost is that the element has no box to measure: `stepper.spec.ts` asked its parent how wide it was
+and got zero, and now asks the card's content box instead.
+
+**`readout` sits outside that box, and a spec that builds its selector from `demo(key)` finds nothing.** The
+card holds the title, the demo and the readout as siblings, so a readout lookup is scoped to `example(key)`
+and a control lookup to `demo(key)`. Both spellings are correct and they are not interchangeable.
+
+**A readout is laid out at zero width with a minimum of the full box, so it never decides how wide its
+example is.** Asked for by the user, and it is a testing requirement as much as a visual one. A readout is a
+line of text about the control, and text is exactly as wide as whatever it happens to say — so a card sized
+to fit it is a card that changes width every time the words change. On the wheel page that is several times
+a second, because all three wheels report the wedge passing their marker while they idle, and the vertical
+drum's card was measured at 376px when the drum inside it is 160px wide. A demo whose box moves under a spec
+is a demo whose coordinates cannot be relied on, which is the half that matters beyond the look of it.
+
+`width: 0` is what the browser uses when it works out how wide the card should be, so the readout counts for
+nothing there; `min-width: 100%` is what it uses once the card has a width, so the text still renders across
+the whole of it. Percentage minimums resolve to nothing during intrinsic sizing and to the real value
+afterwards, which is exactly the split needed, and it is why the pair is not a contradiction. Note that this
+also stops the readout stretching the demo beside it — `exampleContainer` stretches its children, so a wide
+readout used to widen the demo box too, and the drum was being handed 336px of room it did not want.
+
+`e2e/playgroundExamples.spec.ts` guards it without writing down a width for any control: it measures each
+card, hides its readout, measures again, and the two have to match. Every card on every page with a readout
+answers the same question, so a page added later is covered by adding its route to the list.
+
+**A spec belongs to the route it visits, not to the file it is named after.** `tooltip.spec.ts` exercises
+tooltips on the **button** page and `modal.spec.ts` covers both the modal and the drawer — so converting a
+page turns specs red that carry another component's name, and converting one half of a two-page spec means
+renaming only that half. The check before touching a page is `grep` for the route, never the filename.
+
+**Demos kept their readouts, against what the four `Exotics` pages chose.** Those four set none, and
+`ExampleDefs.readout` stays optional — but dropping the readouts here would have taken the fact each spec
+reads with them, so every converted page still sets one. Whether they go is a separate pass.
+
+**Every demo was carried across one-to-one, and the deduplication is deliberately not done.** Where two demos
+differ by a single prop they now share one example file with two entries — `Accordion`'s two expand modes,
+`Select`'s eleven country lists — which is the rule those four pages settled. What has **not** happened is
+collapsing two demos into one plus a panel knob, because that removes demos and the specs covering them; the
+user holds that as a separate pass.
+
+**One demo needed pinning down rather than converting.** `SplitPane`'s bounded demo stretched until a pane's
+160px floor stopped being reachable — with a wide enough frame the neighbour never reaches it, so the spec
+proving the floor is honoured had nothing to bump into. `PageSplitPaneFrame` now caps at 380px, which is the
+width it used to get. The alternative was to weaken the assertion.
+
+### `PageExamples` lays out on a grid, with the column width per page and a span per example
+
+Asked for by the user after the rollout: the cards went back to `PageVariants`' grid rather than the
+wrapping flex row, since a row leaves cards of different heights sitting unevenly and gives a page no way to
+say how wide its demos want to be.
+
+**The root has to state `width: 100%`, which the flex row it replaced did not need.** Several page roots are
+flex columns with `align-items: start`, which sizes a child to its content — so an auto-filling grid resolved
+to a single column and stacked cards that had room to sit side by side. `CellAnimation` showed two rows in a
+1280px area with two 630px columns available. A wrapping flex row hid this by sizing itself to max-content.
+
+**The column floor is the page's, because it follows from the demo rather than from the layout.**
+`getMinColumnWidth` defaults to the 320 `PageVariants` used, and a page that states a width for its demo
+states a floor of that width plus the card's own padding — `SplitPane` 420 for its 380px frame, `Scroller`
+460, `TextArea` 340. Where a page's demos have no declared width the default stands. It is a prop rather than
+something derived because the demo's own width is often inside a styled component the page never names.
+
+**An example may take more than one column, and the grid's floor is divided by the widest span on the page.**
+`ExampleDefs.span` is a column count; `Tabs`' two demos that carry a panel and `Select`'s virtualized demo
+with its own props panel take two. The floor becomes `min(100% / widest span, floor)` — so a page with a
+two-column example never resolves to a single column, and the spanning card therefore never needs a track the
+grid has not got.
+
+**Two pages had been getting their sizes from the old row, and both showed it.** A wrapping row sizes a card
+to its content, which had been hiding two things. `Shape`'s demo is a fixed, resizable 320px box with a `Shape`
+around it tracing its outline — and `Shape`'s own root has no width, so under a card that stretches its
+children it grew to the column while the box it traces stayed 320: the outline and the content came apart. The
+box is what the demo is about, so the page now wraps it in a `width: fit-content` host and the `Shape` hugs it
+again. `ViewportPage` builds its own cards rather than using `PageExamples`, and had capped them at the host's
+width; it now uses the same grid, with a floor of the host plus the card's padding, and its fixed-size hosts
+centre inside a column that can be wider.
+
+**Which is the general lesson: a card stretches its children, so a demo that must match a fixed-size child has
+to say so.** The old row let a demo of unstated width agree with a fixed-size sibling by accident, because
+both ended up as wide as the card. Nothing about the grid makes that true.
+
+**That division is what keeps a span from overflowing, and it was measured rather than assumed.** With the
+plain `min(100%, floor)` a two-column card in a one-column grid lands one gap wider than the row: the grid
+allocates a zero-width implicit track and the gap before it is still spent. Halving the floor removes the case
+entirely — checked at container widths from 280px up, the row now overflows by nothing at any of them, and the
+column count at ordinary widths is unchanged.
+
+### `PageExamples` takes one layout switch, because the two questions turned out to be one
+
+Settled with the user after the grid had been running for a while. The grid fixed what it was brought in for —
+cards of a size, and a long readout no longer stretching one card wider than its neighbours — and broke two
+things on the pages whose demos come at a fixed size. `Shape`'s card and its stress-test card were handed the
+same track, which is right for two text fields and absurd for a 320px box beside three buttons; and neither
+card was flush with what it held, so the page could no longer be read as "this is the room the component asks
+for".
+
+**Two dimensions were in play and they collapse into one.** How the demo sits inside its card, and how the
+cards sit on the page. Once a card hugs its content there is nothing left to align inside it — the card _is_
+the content — so hugging implies a wrapping row, and a wrapping row is only worth having if the cards hug.
+`getLayout` is therefore a single prop with `grid` (the default) and `flow`, and no page states both.
+
+**The rule for which is whether the demo owns its width.** A demo the page hands a size to is being shown for
+its footprint, so the card has to be flush with it: `Shape`'s `fit-content` host, `Wheel`'s 340px overhead wheel,
+every measure box that is given a width. A control that takes whatever width it is given — a field, a tree, a
+tab strip — has no size of its own, any width is as arbitrary as any other, and an even column beats a ragged
+one. Argued from ownership rather than from how the pages happen to look: a demo with no width cannot be
+flush with anything, because there is nothing to be flush with.
+
+**`grid` centres its demo rather than stretching it, and a demo that must fill says so itself.** The card was
+a column that stretched its children, which was invisible while cards hugged their content and became a demo
+pinned to the left edge once they did not. The demo slot is now a centred row. The alternative — keep
+stretching and have the fixed-size demos centre themselves — was rejected by the user: it leaves the rule in
+each demo's CSS, where a new example forgets it silently. Nothing had to be swept in for the change, because
+a demo that has to fill already declares its own width and a declared width still fills a flex line:
+`Progress`'s bar, `ColorArea`'s surface and `Tabs`' panels came through untouched. What moved is what should
+have — `Tree`, `Breadcrumbs`, `DatePicker` and the link-shaped `Tabs` demos now sit at their natural width in
+the middle of the card instead of being pulled to its edges.
+
+**`ScanlineAnimation` uses measure boxes and stays on the grid, which is what sharpens the rule.** Its demo is
+an image beside a local props panel, and that pair re-flows: inside a column it stacks, and freed of one it
+lays out in a single 657px row, at which point two cards no longer fit a 1320px area and the page becomes one
+card per row. So the test is the demo having a fixed size, not the page using a `PageMeasureBox` — a demo that
+merely adapts to its container has no footprint to be flush with. `Shape`, `Wheel`, `CellAnimation`,
+`ElementMosaic`, `Formation`, `ImageMosaic`, `ImageSwitcher`, `Satellite`, `Staircase` and `Typewriter` flow;
+everything else stays on the grid. A flowing page drops `getMinColumnWidth`, since a hugging row has no
+columns to put a floor under.
+
+**The known cost of `flow` is that the readout and the title contribute their own width to a hugging card**,
+which is precisely the unevenness the grid was brought in to remove. It does not bite in practice: a readout
+and a measure box are near-disjoint across the pages — `ImageSwitcher` is the only page with both, and its
+readout is narrower than its image. Worth stating because the first flowing page to grow a long readout will
+show it, and the fix is to stop the readout contributing rather than to reach back for the grid.
+
+### Controls: `Spotlight`, and three presets because a mode cannot move at runtime
+
+Settled with the user, renaming `ElementHighlight` on the way. A spotlight cuts a hole in an
+overlay around one element; what differs between uses is **what the page is still allowed to do**, and that
+turned out to be three answers rather than a boolean.
+
+**`SpotlightHint` points, `SpotlightPrompt` insists, `SpotlightGuide` explains.** A hint yields to anything — a
+click anywhere dismisses it and so does any key that is not a bare modifier. A prompt makes the highlighted
+element the only reachable thing and waits. A guide seals the page entirely, shows the element rather than
+offering it, and puts the live controls in a popup beside it.
+
+**They are three presets over an unexported base, and the reason is the user's rather than mine.** My argument
+was that `renderPopup` is required on one and meaningless on the other two, which a mode prop cannot say in
+types. Theirs subsumes it: **one variant can never become another while it is open**, so the choice is not a
+runtime value and has no business being a runtime prop. `Checkbox` / `Toggle` / `Radio` over `BinarySwitch`
+again, and `Drawer` over `Modal`.
+
+**Escape stays live in every mode, and that is a conformance requirement rather than a kindness.** WCAG 2.1.2
+No Keyboard Trap is Level A: _"If keyboard focus can be moved to a component of the page using a keyboard
+interface, then focus can be moved away from that component using only a keyboard interface"_ — trapping is
+allowed only _"as long as the user knows how to 'untrap' the focus"_, and Escape is a standard exit. So the
+honest description of `SpotlightPrompt` is **"click it, or press Escape"**, and nobody may harden that away.
+
+**`prompt` and `guide` seal the page by opposite mechanisms, because `inert` is inherited.** There is no "seal
+everything except this one control": `inert` cannot be lifted off a descendant. So `guide`, whose hole is dead,
+sets `inert` and gets hit testing, tab order and the accessibility tree in one attribute; `prompt`, whose hole
+must stay live, keeps the overlay segments for the pointer and pulls focus back on `focusin` for the keyboard.
+The cost is in `backlog.md`: `prompt` cannot hide the page from a screen reader.
+
+**The seal climbs to the body rather than sitting on a root, because there is no root.** The content a
+`Viewport` wraps is not a single node — the portal and the children are siblings inside it — and `Portal` nests
+its own container inside the mount, so the page is two levels above anything this component holds. The walk
+goes from the portal container up to `document.body`, inerting each ancestor's other children, which is the
+same shape with a `Viewport` and without one. Elements already `inert` are skipped, or the cleanup would hand
+back something that was never ours.
+
+**Autofocus waits for the placement and then latches, and both halves were bugs first.** The popup is
+`visibility: hidden` until `Anchor` has measured it, and a hidden element takes no focus — so autofocusing on
+mount silently did nothing and left a sealed page with focus on the body. Then, because the position changes on
+every step, an autofocus that kept following it threw focus back to the first control each time: press `Next`,
+and the next press lands on `Skip all`. Both are pinned in `spotlight.spec.ts`.
+
+**Every mode scrolls to what it highlights, and the mode makes no difference to that.** The user's call, over
+the alternative of leaving `hint` out. The argument for leaving it out was that a hint points at something you
+are already looking at, so moving the page under someone who did not ask is worse than not pointing; the
+argument that won is that a spotlight aimed at something off-screen is useless in every mode, and that a rule
+with one mode-shaped exception is a rule nobody remembers. So the effect reads the element and the visibility
+and nothing else — it does not read `getMode`.
+
+**It is `scrollIntoView({ block: "nearest", inline: "nearest" })`, which is what the highlighted-row controls
+already use.** `Select`, `Menu` and `Clock` all scroll their highlighted row with `block: "nearest"`, so the
+smallest movement that brings the thing into view is the house answer rather than a new one. "Nearest" also
+means an element already fully visible is not moved at all, which is what keeps a hint from twitching the page
+in the common case. No `behavior: "smooth"`: the rect is re-read every frame while the spotlight is open, so a
+smooth scroll would work, but an instant one has no reduced-motion question to answer and matches the three
+controls above.
+
+**A step change is announced, and the words are the consumer's.** Focus deliberately stays where the reader
+put it when a step changes — moving it is worse, for the reasons above — but that leaves a screen reader
+hearing nothing at all as the popup's content is replaced under held focus. `announcement` is a string the
+consumer sets per step, spoken politely through `LiveAnnouncer` whenever it changes while the spotlight is
+open. The library owns neither the step count nor the title, exactly as it owns no toast's text, so it holds
+no wording of its own; and the announcer's region is reserved on mount for the same reason `Toasts` reserves
+its two, since a live region created by its first message may be silent for that message.
+
+**It is announced on a change and never on the first show**, because the popup takes focus once it is placed
+and a reader is already reading it there. Announcing the first step as well would say it twice, which is the
+stutter this mechanism exists to avoid rather than cause.
+
+**The Playground's guide example holds its steps in a strip one step tall, and that is deliberate.** The demo
+page is short enough that both tour steps were always on screen, which made the scroll unobservable and the
+spec unwritable. The strip is what reproduces a long page inside a card, and `spotlight.spec.ts` reads its
+`scrollTop` — the same shape as `viewport.spec.ts` driving `[data-scroll-box]`.
+
+### The hint example's moving buttons are bounded by a `PageMeasureBox`
+
+The user's call, after the sliding buttons walked out of the example card — the vertical one worst, because a
+column of two buttons reserves only their own height and the second then travelled a further two of its own
+heights past the bottom.
+
+**The travel was a fraction of the button, and it needed to be a fraction of a box.** Each wrapper slid
+`translate(200%)`, which is 200% of the moving element, so the distance was set by how wide the words
+"Highlight Me" happen to render and the container had no say in it. Both buttons now sit absolutely inside a
+`PageMeasureBox` of a stated width and height, and each keyframe travels `calc(<box>px - 100%)` — the box's
+size less the element's own — so the far edge of the travel is the far edge of the box exactly, whatever the
+button measures. The checkered box is also the honest wrapper for this example under the Playground's own
+rule: something moves inside its bounds, which is what `PageMeasureBox` is for.
+
+**The two get separate lanes, because they would otherwise cross.** The horizontal one runs along the top and
+the vertical one hangs from the right below it, so the horizontal one reaching the right-hand edge passes
+above the vertical one rather than through it. The lane height is what the vertical one's travel is measured
+down from, which is why the three numbers live together in `SpotlightPage.css.ts` and the component reads two
+of them back for the box's props.
+
+**240 by 200, because the narrowest column the examples grid produces is 320.** The card's own padding takes
+40 of that, so anything wider than 280 overflows on a narrow viewport; the button measures 136 by 40, which
+leaves a little over 100 pixels of travel on each axis.
+
+**The `border-width` the keyframes used to animate was deleted with them.** Nothing set a `border-style`, so
+the used width was zero at every step and the declaration painted nothing on any frame.
+
+### `Abstracts/Elevation`: a height an element has without carrying a z-index
+
+Built after a tooltip added to the hint example's sliding button turned up blurred and greyed while the
+spotlight was open on that very button — the one element the spotlight exists to keep readable.
+
+**Anchor already worked out its own height, and the method was right.** `AnchorUtils.getStackingBase` walks
+from the anchor to the root, takes the largest `z-index` it passes, and the popup sits one above it. That is
+why a hovered button's tooltip lands at 3: `interactionRoot` goes to 2 on hover. What the walk cannot see is
+an overlay that is **not on the walk** — `Spotlight` portals its layers into the `Viewport`'s portal, so they
+are siblings of the tooltip rather than ancestors of the button, and nothing in the button's chain says the
+page has been covered.
+
+**So the height is published rather than discovered.** A module-level registry holds element-and-z-index
+pairs, the `DismisserStack` shape again: `Elevation.createElevation` registers on an effect and drops the
+entry on cleanup, and `Elevation.getBase(element)` returns the largest registered height whose element
+contains the one asked about. `Anchor`'s z-index is now the larger of the DOM walk and the registry, plus one.
+`Spotlight` registers its highlighted element at `SPOTLIGHT_Z_INDEX` while it is open, which is the same
+constant its four layers are styled with — it was a literal `10` written four times and is now one export, so
+the paint and the registration cannot drift apart.
+
+**Nothing is written onto the consumer's element.** The alternative was setting an inline `z-index` on the
+highlighted element, which needs a `position` as well, mutates markup the library does not own, and — because
+an element painting above the overlay is no longer part of its backdrop — would lift the element's own shadow
+and focus ring out of the blur wherever they reach past the hole. The registry is a fact held beside the DOM
+instead of a change made to it.
+
+**The registry carries a revision signal, and that is not decoration.** The case that needs it is the ordinary
+one: you hover the button, the tooltip opens, and _then_ you press it and the spotlight arrives. The z-index
+memo has already run by that point, so without something reactive to depend on it would keep the height it
+worked out before the page was covered. `spotlight.spec.ts` asserts the lift without hovering a second time
+for exactly that reason.
+
+**It is in `Anchor` rather than in `Tooltip`, so everything anchored to the highlighted element rises.** A
+select's popup or a menu opened on it is as much part of "this element is still usable" as its tooltip, and
+all of them come through `createPortalPosition`.
+
+**The scale it lands in.** The house runs 1–2 for local lifts, 10 for overlays, 100 for a modal, 200 for
+toasts. An elevated tooltip is 11, so it clears the spotlight and still sits under a modal opened over it —
+confirmed as the wanted order by the user.
+
+**Only the spotlight grants the lift; tooltips do not outrank overlays in general.** A `guide` seals the page
+precisely so that nothing behind it can be read, and a blanket rule would have floated a sharp tooltip over
+the elements it is sealing. The spec pins both halves: below the overlay's height on the plain page, above it
+once the spotlight is on that element.
+
+### `Spotlight`'s overlay is one masked layer and one clipped layer, not a ring of eight boxes
+
+The user's suggestion, made while looking at `Reveal`, and taken as the option that keeps the pointer honest.
+The first build cut the screen into the eight rectangles around the highlighted element and rendered the
+consumer's overlay into every one of them, so the hole was a genuine gap in the DOM.
+
+**A mask decides what is painted and nothing else, so it cannot replace the eight boxes on its own.** Hit
+testing does not read `mask-image`: a single masked overlay looks right and then swallows every click over
+the hole, which breaks `prompt` — the mode whose whole promise is that the highlighted control is still
+usable — and makes the dark area of a `hint` include the one place a click must pass through. So the paint
+and the pointer are now two layers rather than one: an overlay carrying the mask, `pointer-events: none`, and
+a transparent blocker under it carrying a `clip-path` with the same rectangle cut out. `clip-path` **does**
+take a region out of hit testing, which is what makes the blocker a real hole rather than a painted one.
+
+**The blocker is transparent on purpose, and that is what keeps it out of the browser bug.** Chromium handles
+`clip-path` and filters on the same element badly; the masked layer is where the `backdrop-filter` lives and it
+carries no clip, and the clipped layer paints nothing at all, so the two never meet on one element. This is the
+same shape as the rule the `Reveal` entry records for masks and filters, arrived at from the other side.
+
+**One polygon with `evenodd` and a seam, because `clip-path: polygon()` is a single closed path.** There is no
+way to give it two subpaths, so the outer ring returns to the origin, runs a zero-width segment out to the
+hole's first corner, traces the hole, and runs the same segment back. Crossing a doubled segment changes
+nothing under either fill rule, so the seam is invisible; `evenodd` is stated explicitly rather than left to
+`nonzero` so a later edit that reorders the points cannot quietly fill the hole in. It is Baseline widely
+available and has been since January 2020. `path()` would have allowed two honest subpaths and no seam, but it
+takes no percentages, so the layer's own size would have had to be observed to write it.
+
+**`renderOverlay` gained a third argument and now renders once.** The signature is
+`renderOverlay(getVisibilityTarget, getTransitionDurationMs, getMaskStyle)`, and the consumer spreads the mask
+onto the element it was already returning — the same handout `Reveal` makes to `renderCover` and `Shape` makes
+to `renderChildren`, with the same cost attached: an overlay that ignores the style covers the hole as well as
+the page, and nothing can detect the omission. The overlay container took `display: grid` so the one child
+still fills it, which is what the individual segments used to do.
+
+**What visibly changed, both ways.** Eight adjacent `backdrop-filter` elements each blur their own patch and
+each clamps at its own edge, so the four lines running out from the highlight carried a faint seam; one layer
+blurs continuously and they are gone, and it is one filter pass per frame rather than eight while the
+highlighted element moves. Against that, the blur now samples across the hole's edge, so the highlighted
+element's colour bleeds a little way into the darkened ring around it. That is inherent to blurring the whole
+backdrop and then punching a hole in the result, and it is what `Reveal`'s frosted cover has always done.
+
+**The mask itself is `Abstracts/Cutout`, shared with `Reveal`.** `CutoutUtils.getMaskStyle(hole, holeImage?)`
+composes the full-coverage layer, the hole layer, their positions and sizes, and `mask-composite: exclude` with
+its prefixed twin — a dozen property names that were about to be written twice. `Reveal` passes the SVG it
+builds from its shape props as `holeImage`; `Spotlight` passes none and gets a plain `linear-gradient` layer,
+which is a hard-edged rectangle and is exactly the hole it had before. **Softness and shape were deliberately
+not added to `Spotlight`**: the generalisation makes them reachable, but a soft or rounded spotlight is a
+design decision nobody has taken, and adding props under a refactor's justification is the thing that must not
+ride along. Both pages now list `Cutout` in their derived Abstracts row, which is the mechanism working.
+
+### `Anchor` positions against a rect when it is given one
+
+Settled, and it is the virtual anchor `backlog.md` has wanted since `Menu`.
+`createPortalPosition` takes an optional `getAnchorRect`; when present it replaces the observed rect and the
+element observer is not attached at all. Everything downstream is unchanged, because the placement maths only
+ever saw a rect.
+
+Two consumers arrived together, which is what made it worth doing rather than inventing privately inside one of
+them: a spotlight positions its popup against the **padded hole** it cut rather than against the element
+inside it, and a right-click menu would anchor to the point that was pressed. The second is not built; the seam
+it needs now exists.
+
+### Four components arrived from a React codebase, and all four are `Exotics`
+
+Placed there by the user, who wrote the originals: `Satellite`, `Staircase`, `Formation` and the two wheels.
+Recorded because `Exotics` had no written definition and now has four more members, so the next arrival will
+look for the rule.
+
+**Derived rather than stated, and marked as such**: the four have in common that they render DOM, hold no
+user-editable value, and are not compositions of `Fundamentals` — which is what would separate the folder from
+its neighbours if a rule were written, rather than anything about how unusual a thing looks. All four lay
+elements out or turn them; none is a control, and none is a `Surface`-style assembly of other components. The
+user's call was where these four go; whether that is the general test is theirs to make.
+
+**None of the original names survived unchanged, and two could not have.** `Tree` was already taken by the
+`Fundamentals` control, and `DecorationWrapper` would have given the library a second meaning for
+"decoration" — `InteractionWrapper.renderDecoration` is the full-box overlay behind a control, which is a
+different mechanism. `Staircase` was kept, `Satellite` and `Formation` chosen with the user, and `TopWheel` /
+`SideWheel` first became `FlatWheel` / `DrumWheel` on the argument that "top" and "side" describe where the
+camera is rather than what the object is.
+
+**That argument was overturned by the user, and the wheel is now `OverheadWheel`.** Where the camera stands is
+exactly what distinguishes these two, and "flat" named the absence of perspective rather than the view — a
+property of the drawing, not of the thing. `OverheadWheel` was taken over `TopWheel` because "top" reads as
+topmost or best for a moment before it reads as a viewpoint, at the price of a longer name than the library
+usually carries. `DrumWheel` keeps its name: "drum" names the object and needs no viewpoint to be understood,
+so the pair is deliberately mixed rather than forced into `OverheadWheel` / `SideWheel`.
+
+**What came across as paint stayed out of the library.** The originals shipped a leaf painter with five SVG
+shapes, a wedge painter, a pointer, a banner and a starfield. `Shape` and `ShapeConst.getDefaultShapePoints`
+already draw the first, and the rest are the consumer's half — they live in `StyledComponents` and are what
+the Playground pages are made of. Nothing was lost: every one of them is on a page and reachable from source.
+
+### `Satellite`: two elements, and a box that covers both
+
+**The problem it solves is layout, not positioning.** A badge on a corner is easy to place with
+`position: absolute`; what is hard is that the pair then measures as the subject alone, so the badge either
+gets clipped by an ancestor or overlaps whatever sits beside it. `Satellite` grows its own box until both
+elements are inside it, which is the whole reason it exists and the thing `satellite.spec.ts` pins.
+
+**The placement vocabulary is `Anchor`'s, and this is where the in-variants pay.** The original took
+`left | center | right` and derived the offset from half-widths, which can only express "outside that edge".
+`AnchorPlacement` already had five values per axis, so a satellite can sit flush **inside** a corner —
+the ordinary case for a badge on a card — and `AnchorUtils.getHPlacementShift` computes the position for both
+families. The union arithmetic left over is nine lines in `SatelliteUtils.computeLayout`, with unit tests
+against hand-computed numbers per placement.
+
+**The wrapper grows by padding, and the subject stays in flow.** The first build absolutely positioned both
+elements and wrote a measured pixel width and height onto the root, which is what the React original did. It
+means the root has no size of its own until two `ResizeObserver` callbacks have run, so the first painted frame
+is a 0×0 box with the subject spilling out of it, and a subject that wanted to size itself from the parent
+could not. Padding inverts it: the root's box is the subject's box plus the overhang on each side, an
+absolutely positioned satellite is placed against the **padding box** so its offset needs no correction, and
+before anything is measured the padding is zero and the layout is simply the subject. Nothing flashes.
+
+**The wrapper shrinks to its subject, because otherwise it measures a box nobody drew.** The padding
+scheme only works if the number fed to `computeLayout` as the subject's size is the subject's size. What is
+observed is not the child the consumer passed but the `satelliteSubject` div wrapped around it, and that div
+is an ordinary block: it takes the full width of whatever contains it. A 140px subject inside a 260px parent
+therefore measured 232px wide, and `right-out` put the satellite 92px past the subject's right edge, floating
+in space. `satelliteRoot` carries `width: fit-content`, so the root shrinks to the subject's own width, the
+wrapper reports that width, and the placement lands on the corner. The horizontal case is the only one that
+was ever wrong — a block already shrinks to its content vertically, which is why the growth up and down looked
+correct all along.
+
+The subject still fills the root: `satelliteSubject` has no width of its own, so it takes the whole content
+box, and the root's width is the subject's intrinsic width plus the overhang. What the root will not do is
+stretch to a parent wider than the pair, which is the premise rather than a cost — the component exists to
+hand the parent a box that is exactly the pair, and a box that grows to fill cannot also be a measurement of
+what is inside it. Where a satellite needs to sit somewhere the placement vocabulary does not name, the
+offset reaches it. Confirmed by the user as working as designed.
+
+**The offset is a nudge in screen space, and that differs from `Anchor` on purpose.** For a floating layer the
+offset means a **gap**, so `AnchorUtils.getHPlacementOffset` signs it by the placement and discards it entirely
+on a centred axis. A consumer placing a badge is aligning it rather than clearing a gutter, and "nudge it two
+to the right" must not become "two to the left" because the placement flipped, nor be silently dropped because
+the axis is centred. So `computeLayout` adds the offset raw. Stated because the two components share the
+placement type and disagree here.
+
+**With no satellite there is no wrapper.** `renderSatellite` is optional and the component renders its children
+bare when it is absent, so a consumer whose badge is conditional does not pay a positioned box for the case
+where there is nothing to position. Lifted from the original, which did the same thing for the same reason.
+
+### `Staircase`: the direction is the component's, and the curve is the consumer's
+
+**A step's indent comes from a function of its index**, and the four curves the original shipped —
+linear, a broken bilinear, repeating, alternating — are `CellAnimation`'s weights again: one opinion about how
+to author the function the component actually asks for. They are samples under
+`Samples/Staircase/Indents`, and only the linear default lives in the component, because a component with a
+required function and no default cannot be written down in one line.
+
+**The direction knob hands the steps back to front instead of being passed down.** Every one of the original
+functions took a `direction` argument and half of them ignored it, named `_direction` to say so. Reversing the
+index before the function sees it puts the flip in one place, and the function's defs shrink to the three
+fields all of them use. The e2e spec asserts the two staircases on the page are each other's mirror, which is
+the property that arrangement buys.
+
+**Indents are physical padding on a wrapper, not a logical property.** `padding-left` and `padding-right`
+rather than `padding-inline`, per the field convention: the value is symmetric so the two are equivalent
+today, and physical throughout stays honest while nothing else here is RTL-aware.
+
+### `Formation`: positions written as fractions of the width, and nothing measured
+
+**The original measured its own width with a `ResizeObserver`, computed pixel insets from it and carried a
+comment saying to remove all of that once container query units existed.** They exist. Every inset a layout
+function returns is a fraction of the formation's inline size, the component writes them as `cqw`, and the
+browser resolves them — so there is no observer, no state, no frame of wrong layout on mount, and no
+arithmetic to redo when the container changes size. `formation.spec.ts` checks a written position against the
+root's measured width, because the failure mode is silent: with no query container in scope `cqw` falls back to
+the small viewport width and every item lands somewhere plausible and wrong.
+
+**The root's own height comes from a spacer child, because an element cannot query itself.**
+`container-type: inline-size` makes the root a container for its **descendants**, so a `min-height` in `cqw` on
+the root would resolve against whatever container sits above it. A single in-flow spacer whose height is the
+layout's `heightRatio` in `cqw` gives the root its height instead. There is no circularity: inline-size
+containment leaves the block axis free, which is exactly the case that unit was designed for.
+
+**The podium arrangement sat unevenly in its box, and the fault was vertical rather than horizontal.** The
+sideways offsets are deliberate — first place at 0.4375 of the width with the other two at +0.25 and -0.125
+from it, which leaves an equal margin at each side even though the three are not symmetric about first place.
+What was wrong is that the first row started a quarter-and-a-bit down while the last row ended flush with the
+bottom, so the arrangement had a gap above it and none below. It now starts at its own half-height, the way
+the whorl arrangements already did, and `formation.spec.ts` measures the four margins rather than any one
+coordinate — which is the assertion that would have caught it, and the one that does not have to be rewritten
+when a sample's numbers change. Corrected by the user after a first attempt moved the horizontal offsets, which
+were never the problem.
+
+**Width-relative rather than height-relative, so a taller parent leaves space instead of stretching.**
+`top` and `height` are in `cqw` too, not in percentages — a percentage `top` resolves against the height, and
+an arrangement stretched vertically by a parent that happened to be tall is a distorted podium. Every number
+in a `FormationLayout` is therefore in one unit, and `heightRatio` is the honest bottom edge of the lowest
+item rather than the original's hand-tuned trims.
+
+**This is the first use of container query units in `components/src`, and it carries no fallback.** Argued on the
+terms _"Compatibility arguments cite `components/src` and nothing else"_ sets: caniuse puts the units at 94.05%
+globally, from Chrome 105, Safari 16 and Firefox 110. `InteractionWrapper.css.ts` already depends on `:has()` with no
+fallback — 94.07%, and Firefox 121, which is **ten months later than the unit being added here**. So the
+published package already requires a strictly newer browser than this does, in the one component every control
+passes through.
+
+### `Rotator`: the behaviour both wheels share, with no DOM of its own
+
+**A wheel that spins to an index is arithmetic plus a small state machine, and neither is markup.** The
+original had a `useRotationEffect` hook shared by its two wheels and left everything else — where to stop, how
+far to overshoot, whether to idle — in a consumer hook beside the styled components. `Abstracts/Rotator` takes
+the whole of it: `RotationUtils` is the pure angle maths with unit tests, and `createRotator(ref, disabled,
+defs)` holds the phase, the timers and the holds.
+
+**The angle only ever increases.** `getSpinAngle` rounds the current angle up to a whole turn, adds the turns
+asked for and then the target index's angle, so a spin is always forward however many times the wheel has been
+spun. Testable in one line, and the property a consumer would otherwise discover by watching a wheel unwind
+backwards.
+
+**A spin overshoots and then settles, which is two turns rather than one.** Landing dead centre on the
+wedge looks mechanical, so `computeSpinDefs` may return a `jitterRatio`: the wheel spins to the target plus
+that fraction of a wedge, then corrects to the centre over the settle duration. `getJitterAngle` clamps the
+ratio to half a wedge, because past that the wheel would come to rest on a different wedge from the one the
+index names — the clamp exists to protect that correspondence, not to be tasteful.
+
+**Nothing random is in the library.** Turn counts and jitter are the consumer's, defaulting to three turns and
+no jitter, which makes the component deterministic and its e2e spec possible. The lively version — random
+turns, random jitter — is a Playground sample, the same line `CellAnimation` draws around its weights.
+
+**The index is the settled selection, so it is published at the end rather than the start.** A consumer bound
+to `indexSignal` is showing what was won; writing it when the spin begins would reveal the answer three seconds
+early. The target is held privately until the settle, which is what the original's `prizeIndexRef` was doing.
+`onSpinEnd` fires there too, and so does the announcement.
+
+**Where the target comes from is the consumer's, and the wheel asks for it.** `computeSpinTarget` may return a
+promise, because the real case fetches a prize from a server. While it is outstanding the wheel is not
+spinnable and says so, or a second press would start a second fetch — the original guarded this with a
+`canSpin` flag and the guard has to be reactive, since the spin control's disabled state is drawn from it.
+
+**A spin is a command, not a state.** `spin()` arrives through the `onMount` handle, per _"Playback is a signal; a
+rewind is a command"_ in `conventions.md`. Whether the wheel is turning by itself **is** state, so it is
+`autoSpinSignal`, and so is the settled index.
+
+**The abstract publishes no handle of its own.** `RotationController` existed and was passed straight
+through by `Wheel`; it is gone, and `WheelController` is the only one. An abstract with no DOM has no
+consumer to hand anything to — the component that owns the element owns the handle, and one handle in wheel
+vocabulary beats two in two vocabularies for the same thing.
+
+**The wheel computes its own angle every frame; CSS no longer interpolates anything.** This replaced the
+original arrangement, in which `Rotator` set a target angle, published a duration and a timing-function name,
+and let a `transition` on the wedge do the moving while a `setTimeout` of the same length stood in for "the
+turn has finished". The user asked for the change, and the reason is that the browser was the only thing that
+knew where the wheel actually was. Mid-transition the angle signal already held the destination, so nothing in
+the library could answer "which wedge is under the marker right now" — the question only had an answer at the
+two ends. Now `turnTo` walks the angle from where it is to where it is going, one `requestAnimationFrame` at a
+time, through `EasingUtils.ease`, and the angle signal is the truth at every instant.
+
+**Three things came out of it beyond the live index.** The spin no longer takes its starting angle from the
+destination of an idle step that had not finished. The turn ends when the turn ends, rather than when a timer
+guesses it has. And nothing on a wedge interpolates any more, so a change to any input the transform is built
+from — the wedge count above all — applies on the next frame rather than being animated to. Measured on a
+turning two-wedge drum, the faces now sit inside the width the component reserves at every angle of the turn.
+
+**The idle turn became continuous rather than a step per delay.** It used to set the angle one wedge forward
+and let a linear transition of `idleDelayMs` carry it there, which is a sawtooth of targets that happens to
+look smooth. The frame loop advances by `stepAngle / idleDelayMs` degrees per elapsed millisecond, which is
+the same motion described directly. `idleDelayMs` keeps its meaning exactly — how long one wedge takes to pass
+— so the panel knob still reads the way it did. It also means the turn stops where it is when idling ends,
+rather than running on to the step it had already committed to.
+
+**The spin carries a starvation fallback and the idle turn does not, and the split is the point.** A page that
+is not painting — a background tab, a throttled window — hands out no frames, so a loop built on them alone
+stops advancing while timers carry on. `ElementFader` already answered this once, and the answer here is the
+same shape: `turnTo` arms a `setTimeout` for the duration plus `FRAME_STARVATION_SLACK_MS` beside the frame
+loop, and whichever arrives first lands the angle and runs the arrival. Without it a visitor who starts a spin
+and switches tabs comes back to a wheel stopped part-way round, no prize announced, `onSpinEnd` never fired
+and the spin control disabled for good. The idle turn gets no such fallback, deliberately: it owes nobody an
+answer, it is already suppressed for a hidden page and for `prefers-reduced-motion`, and arming a timer to
+shuffle a wheel nobody can see would be worse than doing nothing. `e2e/noAnimationFrames.spec.ts` drives both
+halves.
+
+**`isSelected` says the wheel has picked this wedge out, which is not the same as the wedge being at the
+marker.** The user's sequence, and it is the one to keep: a wheel turning by itself has picked nothing, a
+wheel spinning has picked whatever is passing the marker right now and moves the pick as it turns, a wheel
+that has settled has picked the prize and holds it for the rest, and when the rest runs out and the turn
+resumes the pick goes away again. So `isSelected` is the live index everywhere except while idling, where it
+is nothing at all. Painting the passing wedge during an idle turn would tell a visitor the wheel had chosen
+something it has not, and the first build had the opposite failure — `isSelected` was the settled index, so
+one wedge was lit from page load and never moved, including all the way through a spin.
+
+**That is deliberately not the same rule as `onSelectedWedgeChange`, which fires during the idle turn too.**
+The two answer different questions. `isSelected` is paint, and a wheel with nothing selected must paint
+nothing. The callback is position, and position exists whenever the wheel is moving — a consumer wanting a
+tick per wedge as it passes needs it exactly while the wheel is idling, which is when a gated callback would
+be silent.
+
+**The drum's `aria-hidden` and `inert` stay on the settled index rather than following the pick.** They mark
+which face a screen reader may reach, and moving that with the turn would rewrite the accessibility tree
+tens of times a second while the drum idles, for a face nobody is going to stop on. Paint may follow the
+angle; what assistive technology is offered should not.
+
+**The wedge under the marker is reported through a callback, not published as a signal, and it is not the
+index.** `getIndex` stays what it always was — the settled selection, written when the spin ends, because a
+consumer bound to `indexSignal` is showing what was won and writing it at the start would give the answer away
+three seconds early. What the frame loop makes newly available is a different quantity: which wedge happens to
+be at the marker at this instant, which during a spin is a stream of values and none of them the result. The
+user's call on its shape: `onStepChange` on the abstract, surfaced by `Wheel` as `onSelectedWedgeChange`, and
+a callback rather than a signal because the wheel reports and nothing writes back — there is no second owner
+for a two-way binding to serve. `RotationUtils.getAngleIndex` is the arithmetic, the exact inverse of
+`getIndexAngle`, and it rounds, so a wedge holds the marker until the halfway point of the gap to the next.
+It fires on every change including during the idle turn, which is what a consumer wanting a tick per wedge
+needs.
+
+**The idle turn runs indefinitely, and rests only after a spin. This replaced an arrangement built on holds,
+and the replacement is the user's.** The first build stopped turning whenever the pointer was over the wheel,
+whenever anything inside it had focus, and for good once a spin had settled. All of that is gone. The wheel now
+turns by itself for as long as it is on the page, with one exception: a hidden tab stops it. **Reduced motion
+was a second exception and is not any more** — see the entry below.
+
+**After a user spin settles, the wheel rests for `restDurationMs` and then picks up again; `-1` rests for
+good.** The rest is its own private state, deliberately not the same thing as the auto-spin switch, because the
+two have different owners — the rest is the component saying "let them read the prize", the switch is the
+consumer saying "not now". Folding them into one flag meant a consumer's pause being cancelled by a rest timer
+they never started. `DEFAULT_REST_DURATION_MS` is 3000 and is mine, not measured; change it freely.
+
+**A pause on hover is now the consumer's to build, and `autoSpinSignal` is the door.** This is the settled
+`playbackSignal` rule applied again — whether the passive turn is running is state a consumer can read and
+write, so it is a two-way signal rather than a `pause()` on the mount handle. A consumer wanting the old
+behaviour writes `false` on pointer enter and `true` on leave, over their own box, which is also the only way
+to cover a control that sits **on top of** the wheel rather than inside it. The library cannot do that for
+them: the hold it used to keep listened for the pointer arriving on the wheel's own element, and a button
+overlapping the wheel is a neighbour rather than something nested inside, so it took the pointer away from the
+wheel instead of holding it.
+
+**`getIsHeld` is gone from the handle, and `getIsPlaying` is now two getters.** `isHeld` existed for one
+purpose — deciding whether to suspend the idle turn — and with the holds gone it had no consumer. The
+playing flag was doing two jobs at once, so it is split at the seam the user named: `getIsAutoSpinning` is true
+while the wheel turns by itself, `getIsUserSpinning` while it is fetching a target, spinning to it or settling
+on it. Both are views of `getPhase`, which remains for anyone wanting the four states apart.
+
+**`createRotator` no longer takes an element.** The hold was its only use for one, so the abstract is now what
+its own heading claimed: a state machine with no DOM whatsoever. `InteractionTracker.trackPageHidden` was split
+out of `trackHold` so the page-visibility half could be used without the pointer and focus halves; `trackHold`
+composes it and is unchanged for `Carousel` and `Toasts`.
+
+**WCAG 2.2.2 Pause, Stop, Hide (Level A), and the user's answer to it.** The normative line: _"For any moving, blinking or scrolling information that (1) starts
+automatically, (2) lasts more than five seconds, and (3) is presented in parallel with other content, there is a
+mechanism for the user to pause, stop, or hide it unless the movement, blinking, or scrolling is part of an
+activity where it is essential"_. All three conditions now hold with nothing to answer them. The earlier reading
+recorded here — that the motion is essential to the control — was written when the wheel came to rest on a spin
+and stopped under the pointer; an attract-mode turn that never ends is a harder thing to call essential, since
+the essential activity is the spin and this is what happens while nobody is spinning. What is left is
+`prefers-reduced-motion`, which is a real user-side control but is not among the criterion's sufficient
+techniques, and `autoSpinSignal`, which is a capability handed to the author rather than a mechanism offered to
+the visitor.
+
+**The user's position is that the criterion's own exemption applies: the motion is essential, because spinning
+is what a wheel is, and "essential" is a subjective qualifier the criterion leaves to judgement.** Put to them
+with the analysis above and answered directly; recorded as their reading, which is the standing the earlier
+version of this note had too. A consumer who wants a pause control still has `autoSpinSignal` to build one
+against.
+
+The user-initiated spin is outside the criterion in any case — it does not start automatically — and it is the
+essential activity, which is what 2.3.3 Animation from Interactions exempts at AAA.
+
+**The wheel no longer reads `prefers-reduced-motion` at all, and this is a deliberate reversal.** It used to be
+one of the five conditions on the idle turn, so a visitor asking for less motion got a wheel that waited to be
+spun. The user's call, taken when `PointerTracker` raised the same question: the library reports and the
+consumer decides, and the door is already open — `autoSpinSignal` and an absent `idleDelayMs` both stop the
+idle turn, and either can be driven from the preference in a line at the call site. Nothing was resting on the
+internal check: the analysis above already records that `prefers-reduced-motion` is not among 2.2.2's
+sufficient techniques and that the user's answer to that criterion is the essential-activity exemption, so
+removing it changes no conformance claim. **The Playground is now the consumer that answers it** — `WheelPage`
+reads the query and returns no `idleDelayMs` under reduce, which is what keeps `e2e/wheel.spec.ts`'s
+reduced-motion expectation true. That spec is testing the Playground's behaviour, not the library's, and its
+prose still reads correctly.
+
+`Carousel` and `Toasts` keep the three-part hold; the wheel no longer has one at all, so what they share now is
+only `trackPageHidden`.
+
+**The result is announced through `LiveAnnouncer`, only on settling.** Same argument as `Carousel`: the wedges
+are all still on the page, so a live region over them announces nothing, and narrating an idle wheel every few
+seconds is the noise 2.2.2 exists to prevent.
+
+### `OverheadWheel` and `DrumWheel`: two presets, because a wheel cannot become a drum
+
+**They share behaviour and no markup at all.** One rotates in the plane of the screen; the other is a barrel
+seen edge-on, with a front and a back face per wedge, a perspective ancestor and a size derived from the
+wedge's own extent. A single component with a mode prop would be `Scroller` and `Carousel` again —
+everything they appear to share, they hold for different reasons.
+
+**So the split is `Spotlight`'s exactly**: an unexported `Wheel` shell holds both markups behind one variant
+prop, each preset is a one-line pass of that variant, and only `Wheel.types` and `Wheel.utils` are exported.
+The public API cannot express a variant change at runtime, which is the point, and the props each preset needs
+differ in a way a mode prop could not state — `renderWedgeBack` and `wedgeSize` are required on the drum and
+meaningless on the flat one.
+
+**The drum's geometry is the component's; the wedge's shape is the consumer's.** `WheelUtils` computes the
+apothem, the circumdiameter and the girth, because the shell cannot lay a barrel out without them; it does not
+compute the pie-slice path, because a wedge could be a card, an image or a label on a ring, and the shell never
+needs to know. That is the same line `Paginator` draws from the other side: its entries are arithmetic the
+component needs to render, so it owns them.
+
+**A wedge's content is sized from the slice it sits in, in container query units, and nothing is measured.**
+The original's wedge content was authored against a 600px wheel: it watched the wheel with a `ResizeObserver`,
+divided the measured height by that base size, and multiplied the content's `scale` by the result — then
+multiplied again by `min(12 / wedgeCount, 1)` so the content shrank once the wedges outnumbered twelve. Both
+multiplications are gone, replaced the way `Formation`'s insets were and for the same reasons: the label's box
+and its type size are fractions of the wheel's own width written as `cqw`, so the browser resolves them and
+there is no observer, no base size, and no frame of wrong layout on mount. `wheelWedge` carries
+`container-type: inline-size`, which makes one `cqw` a hundredth of the wheel's width — the same unit the
+wedge path's `viewBox` is drawn in, which is why one geometry function returns numbers that serve both the
+path and the label.
+
+**The room a label has is the width of the slice at the radius where the label starts, bounded twice.** The
+two straight edges bound it as `radius × tan(halfAngle)`, and the arc bounds it as
+`√(wheelRadius² − radius²)`; the narrower of the two is the one that applies. Taking only the first puts the
+label's top corners outside the circle at low counts — at four wedges the straight edges are 45° off vertical
+and give a half-width larger than the circle has left at that radius. Taking only the second is the
+original's `paintedSize.width`, the chord between the slice's two rim corners, which is wider than the slice
+is anywhere the label actually sits. The half-angle is clamped to a right angle so that two wedges, where the
+edges are parallel and the tangent is unbounded, fall to the arc bound rather than to infinity.
+
+**The count-based shrink was inert on the page, which is why the labels collided.** `min(12 / wedgeCount, 1)`
+is exactly 1 at every count the props panel offers, since the panel stops at twelve — so the mechanism the
+original had could never be seen, and the label box was the full width of the wheel rather than the width of
+the slice, so at twelve wedges each label ran across its neighbours. Sizing the type from the slice bites at
+every count instead of only past a threshold, and it needs no reference count to be kept in step with the
+length of the prize list.
+
+**Two paint constants carry it, and they are ratios rather than sizes.** `LABEL_RADIUS` is how far out from
+the middle the label's top edge sits, in `viewBox` units, and `LABEL_TYPE_RATIO` is the type size as a
+fraction of the slice's width there. Both are the consumer's half — a wedge could be a card or an image, and
+the library never sees either number.
+
+**Type size rather than a `scale` transform, which is what the original used.** A scaled box lays out at its
+unscaled width and paints at the scaled one, so clamping the box to the slice and then scaling it down leaves
+the paint narrower than the slice — the room would have to be divided back out by the same factor to come out
+even. Setting the type size instead keeps layout and paint in one space, and the gap between lines is in `em`
+so it follows without a second rule.
+
+**The girth is the diameter after perspective, and the constant it replaced was a fudge that broke.**
+Foreshortening means the barrel needs less room than the circle it turns in, and the original took a flat 1% off
+per wedge to approximate that. Within the counts it was written for — eight to twelve portrait faces — it lands
+within a few percent of the truth; at sixteen faces it takes 16% off and the drum paints outside the box it
+reserved, which is the rule `InteractionWrapper` states as _"the wrapper's box has to equal the painted box"_.
+So the approximation is gone and the arithmetic it was approximating is in its place:
+the width at which the eye's line of sight **grazes** the drum, which is
+`2 × perspective × circumradius ÷ √((perspective + apothem)² − circumradius²)`. `DRUM_PERSPECTIVE_PX` is
+exported and applied as the inline `perspective`, so the number the CSS uses and the number the box is computed
+from cannot drift apart.
+
+**The obvious formula is wrong, and it was shipped once before being caught.** Measuring at the axis —
+`circumdiameter × perspective ÷ (perspective + apothem)` — reads the width of the drum where its axis sits. But
+the silhouette is not there: the tangent points are **nearer the eye** than the axis, so they project wider. The
+error is the factor `(perspective + apothem) ÷ √((perspective + apothem)² − circumradius²)`, which is a fraction
+of a percent on a narrow drum and grows with the ring, reaching 2.6% at twelve faces 150px wide — twelve pixels,
+visible against a dashed outline, and worse at higher counts. **This is the second wrong answer here**, after the
+original's flat percentage per wedge, and both failed the same way: right in the middle of the range they were
+checked in, increasingly short outside it. The user caught both by eye.
+
+**What the geometry is checked against is the rendered result, not the derivation.** The reserved box is measured
+against the union of the faces' own boxes, at every count from two to twelve, at rest and sampled forty times
+through a continuous turn. That is the assertion that would have caught either wrong formula, and neither unit
+test would have. Two faces back to back have no depth at all and one face has no barrel, so the apothem
+is zero below two wedges rather than the infinity the tangent gives.
+
+**A drum turns about either axis, and the Playground shows both.** `axis: "row"` rotates about the upright
+axis so the faces travel left and right — the original's arrangement — and `axis: "column"` rotates about the
+level one so they travel up and over, which is a reel. The extent the geometry works from is the wedge's width
+in the first case and its height in the second, which is why a landscape face makes a compact reel and a wide
+drum: the same card is the small dimension one way round and the large one the other. **The reel carried each
+prize round twice at first, and the user took that out** — nothing on the page now demonstrates that a wheel's
+wedges need not be one per option, and the component still allows it.
+
+**The wheel renders no control at all, and hands out a handle instead. This reverses `Carousel`, and the
+reversal is the user's.** `renderSpin`, `renderControls`, `computeSpinLabel` and the `<button>` behind them are
+gone. What replaces them is `onMount(controller)`, carrying `spin()` plus `getIndex`, `getPhase`,
+`getIsSpinnable`, `getIsAutoSpinning` and `getIsUserSpinning` — so a control **anywhere on the page** can spin
+the wheel and can disable itself while a spin is outstanding, which is the whole of what the built-in button
+knew.
+
+**Nothing the consumer already holds is on the handle.** A `getWedgeCount` was there and the user took it off:
+the wedge array is the consumer's own prop, so its length is theirs to read and the wheel repeating it back is
+a second source for one fact. The test for a member is whether the wheel is the only place it can be
+known — `getPhase` and its two derived spinning flags are internal outright, and `getIndex` stays private when
+no `indexSignal` is passed.
+
+**`Carousel`'s argument does not carry over, and it is worth being exact about why, since the two now sit on
+opposite sides.** There the library owns every button because the rotation is automatic and WCAG 2.2.2 requires
+a stop mechanism that is not the author's to omit — a carousel with no controls is one nobody can stop. A wheel
+has nothing to stop: the idle turn is ended by the spin and by the consumer's own switch, both recorded above,
+and the spin itself only ever happens because someone asked for it. So the button the wheel rendered was
+carrying no conformance load, and what is left is `Scroller`'s trade — the consumer renders the button, inherits
+naming and the focus ring and the disabled treatment from `Button`, and the library keeps only what nobody else
+can know.
+
+**The cost is stated rather than mitigated: a library that renders no button cannot promise one is reachable or
+named.** A consumer who wires up no control has a wheel that can only be driven from elsewhere through
+`indexSignal`, exactly as `Carousel` with no `renderControls` has no keyboard route. That is the same exposure
+item 18 records for `Scroller` and it is now the wheel's too.
+
+**No slot survives either, and the one that briefly did was kept for a bad reason.** A `renderHub` was left on
+the overhead wheel out of deference to an earlier choice — that an overhead wheel has one control slot and it is the
+hub. The user axed it. That choice was about where a **button** goes and there is no button
+now; intrinsically the slot contributed one number, `inset: 35%`, which is paint, and a consumer who wraps the
+wheel in a positioned box writes it themselves. The Playground does exactly that. `OverheadWheel` renders wedges
+and nothing else, `DrumWheel` renders a barrel and nothing else.
+
+**The handle arrives after the first render, which is a real consequence rather than a wrinkle.** A control
+reading `getController()?.getIsSpinnable()` sees `undefined` for the first tick and paints as disabled, because
+`onMount` fires after the tree is built. `Typewriter`'s `getController()?.update(…)` has the same shape and the
+same tick. Nothing on screen has moved by then, so no consumer has yet been able to press anything.
+
+**The overhead wheel exposes every wedge; the drum hides the ones that have turned away.** All of an overhead wheel's
+wedges are painted at once, so all of them are real content. A drum's are not — `backface-visibility` removes
+them from the picture — and `Carousel`'s rule applies: a control nobody can see is still in the tab order, so
+the faces that are not at the marker are `aria-hidden` and `inert`, and the back faces always are.
+
+**A drum of two wedges renders no backs, because it has no barrel to have an inside.** At three faces and up
+the apothem is positive, the faces stand off the axis, and a face that has turned away shows the reverse
+printed on its own card — which is what `renderWedgeBack` is for. At two the apothem is zero: the faces are
+flat against one another with nothing between them, and the reverse of one _is_ the other. Rendering backs as
+well puts a blank card in exactly the same plane as a prize, and since they are coplanar the paint order
+decides, so the drum showed a back where a front belonged. `WheelUtils.getHasWedgeBacks` is the guard and it
+is a count test rather than an apothem test on purpose — the apothem is also zero while a consumer's wedge
+size is still being measured, and backs must not flicker in and out during a measurement.
+
+**A picked wedge and a picked drum face wear the same treatment, and the colour is decided by contrast
+rather than by taste.** Asked for by the user, who found the drums had no visible highlight at all: the card
+changed its border from `primary.main` to `primary.light` and nothing else, which is not something anyone
+notices on a barrel that is turning. Both now take a `secondary.dark` to `secondary.light` gradient behind `secondary.contrast` text — the
+flat wedge as a `fill` on its shape, the drum face as a `backgroundImage` on its card, because one is SVG and
+the other is a div, and that is the whole of the difference.
+
+**The purple failed WCAG 1.4.3 and the theme was moved rather than the component.** The wheel's picked
+wedge was reported as a warning, not patched — see _"A contrast finding in the Playground's own look is a
+warning"_ in `CLAUDE.md` — and the user answered by editing the palette itself, which is the right layer:
+every consumer of `secondary` gets the correction rather than the one component that happened to be measured.
+What moved was `secondary.light` from 60% to 50% lightness and the family's `contrast` token from a pale
+lavender to plain white.
+
+Measured on the built page afterwards, so nobody has to take them again:
+
+- **The overhead wheel's label**, 17.35px regular on a 340px wheel, so normal text needing 4.5:1: **7.04:1**, up
+  from 3.41:1.
+- **The drum card's text**, 14px regular, the same pairing: **7.04:1**, up from 3.41:1.
+- **The drum card's rank badge**, `primary.main` at 24px, which is large text needing 3:1: **4.10:1**, up from
+  2.61:1 — clearing the normal-text bar too, so it is safe if the badge ever shrinks.
+
+**A palette pairing that nothing renders is not a finding.** `info.contrast` on `info.main` is 4.03:1 and on
+`info.light` 4.15:1, both short of 4.5:1 — and neither is reached, because `info.contrast` has no consumer
+anywhere in the Playground. `info.light` is used, but as a foreground on `surface`, which is a different sum.
+Worth knowing before that token is first used for text, and not worth changing on its own.
+
+**Only the front faces can be picked, and the back's stripes are left alone.** A back face carries the same
+index as its front, so it is flagged as picked at the same moment — but `backface-visibility` means a back is
+visible exactly when its front has turned away, and a face that has turned away is not at the marker. The two
+conditions cannot both hold, so nothing was needed to keep the highlight off the striped side.
+
+**The marker is drawn by the Playground, not by the wheel, and it needs no arithmetic at all.** All three
+demos put a `PageWheelPip` — a filled triangle — against the edge of the box that the wedge at rest fills, so
+whatever the wheel has stopped on has the pip touching it. The wheel never has to say where that is, because
+the resting position is fixed by the geometry already recorded above: `getIndexAngle` turns the chosen wedge
+to zero degrees, and at zero degrees an overhead wheel's wedge is drawn straight up and a drum's face is the one
+squarely in front. So the pip is a static piece of paint at a known edge, and nothing about it moves or is
+measured.
+
+**Which edge it sits on follows the direction of travel, not the variant.** Faces that travel sideways — a
+overhead wheel's rim and a drum on the upright axis — take the pip above, pointing down; the reel's faces travel
+up and over, so it takes the pip at the left, pointing in. `PageWheelPip` accepts that as `getSide`, one of
+`"top"` or `"left"`, and the same class both places the box and turns the glyph. It hangs 70% of its own size
+outside the edge, so the tip crosses onto the wedge and the body reads as sitting outside it.
+
+**The drums needed a box of their own to be measured against, and `PageWheelStack` could not be it.** The flat
+demo's stack is a full-width block because `OverheadWheel` is `width: 100%` inside it, and a box that shrinks to
+its content cannot give a percentage width anything to resolve against. A drum's own girth box is definite
+pixels, so `PageWheelMount` is `width: fit-content` with automatic side margins: it ends up exactly the girth
+box, whose top edge is the front face's top edge and whose left edge is the front face's left edge. That is
+the whole difference between the two wrappers, and it is why there are two.
+
+**The pip is outside the wheel's element, which is what keeps the drum's geometry assertion honest.** The
+Playwright check compares the box a drum reserves against the boxes its faces occupy, reading both from inside
+`[aria-roledescription="wheel"]`. The pip is a sibling of that element rather than a child, so it can hang over
+the edge without the check reading the overhang as a drum painting outside its room.
+
+### `Barrel`: the drum, lifted out of the wheel so a second component can turn one
+
+A drum and a carousel are the same picture driven by different arithmetic — a barrel of faces seen through a
+perspective, turned to bring one of them to the front. What differs is where the angle comes from: `Rotator`'s
+spin, overshoot and settle for a wheel, an index and a step for a carousel. So the barrel is now an abstract
+and the angle is its caller's.
+
+**The abstract renders, which most of `Abstracts` does not.** `Rotator`, `Anchor` and `Virtualizer` are state
+with no DOM at all. `Barrel` is four nested elements — a girth box, a perspective box, the barrel itself, and
+one absolutely positioned element per face — and lifting only the arithmetic would have left both consumers
+holding the same markup and the same four class names. The split is drawn where it costs nothing: the abstract
+owns the box, the depth and every face's `transform`; the consumer owns the element around it, what goes inside
+each face, and every word said about them.
+
+**Each face's name and hidden-ness come back through `computeFaceDefs`, because the vocabulary is the
+consumer's.** A wheel's faces are wedges and a carousel's are slides, and the two disagree about what is
+hidden — a wheel hides everything but the wedge at the front, and only its own rules say so. `Barrel` takes
+`faceRoleDescription` and asks per face for a label and whether it is away, then writes `aria-hidden` and
+`inert` from the answer. It never decides either.
+
+**The geometry moved and the names stayed, which is what proves the move changed nothing.** `WheelUtils.getApothem`,
+`getCircumdiameter`, `getGirth`, `getWedgeExtent` and `getHasWedgeBacks` are now aliases of `BarrelUtils`, so
+`Wheel.utils.test.ts` still exercises the same functions through the same published names, and the wheel's own
+Playwright suite — including the drum's "paints inside the room it reserves" checks — is unchanged and passes.
+That is the same standard the `RotationUtils` conversion was held to.
+
+**The face transform is a function now, rather than a template literal inside the markup.** It was the one
+piece of the drum with no test around it: an axis, a face, an angle, an index, a count and an apothem in;
+`rotateY(-120deg) translateZ(50px)` out, with a half-turn appended for a back. `BarrelUtils.getFaceTransform`
+is unit-tested against those strings, which is cheaper than reading them off a rendered page.
+
+**A barrel carries a transition duration it does not use by default.** The wheel animates its angle frame by
+frame and wants no transition at all, so the property is declared and the duration left unset, which is a
+transition of zero. A carousel steps its angle in one jump and asks for the duration it already publishes.
+Both behaviours live side by side rather than one winning.
+
+### `ElementObserver` reports a size, and the height observer is a view of it
+
+`createBorderBoxSizeObserver` was added for `Satellite`, which needs both axes of both of its elements.
+`createBorderBoxHeightObserver` stays exported — it is published API and `Collapsible` uses it — and is now
+two lines over the new one, with a `createMemo` so a width-only change does not wake a height consumer. Border
+box rather than a client rect, deliberately: a rect measured inside a `Viewport` is the layout value times the
+scale factor, and layout numbers are what a positioner has to write back out.
+
+### The hold is one function, and all three consumers call it
+
+**Three components pause while somebody is looking at them, and each had written the test out.** `Toasts`
+stops its countdowns, `Carousel` stops advancing, and a wheel stops turning by itself; all three meant
+`hovered || focus within || page hidden`, and all three carried their own four handlers, their own
+`visibilitychange` effect and their own copy of a `getHasLeft` guard. `InteractionTracker.trackHold(ref)` is now
+the only copy, and the user's call was to convert the two existing components rather than leave them pointing
+at it.
+
+**It sits in `InteractionTracker` rather than in a folder of its own.** `InteractionTracker.wrapElement` already turns an
+element's pointer and keyboard events into state; this is the same job one level out — the region rather than
+the control — and `trackDrag` had already established the `track*` verb for "attach listeners, hand back a
+signal". A folder for one function would have been discoverable only by someone who already knew it existed.
+
+**Why it carries a Level A requirement rather than being a nicety**: see 2.2.2 under `Rotator`. That is the
+argument for one copy. Three copies of a conformance behaviour can drift apart silently, and the fourth
+component to want it copies whichever it finds first.
+
+**`mouseenter` / `mouseleave` replaced `mouseover` / `mouseout` plus a containment check.** The pair that does
+not bubble already ignores movement between descendants, which is exactly what the guard was reconstructing by
+hand. Focus still needs the guard: `focusout` fires on the region when focus moves from one child to another,
+and `relatedTarget` is the only way to tell that from focus actually leaving. So the guard survives, used once,
+for one of the two axes.
+
+**What proves the conversion changed nothing is the existing specs, not new ones.** `carousel.spec.ts` covers
+the hold under the pointer and the hold while a child has focus; `toasts.spec.ts` covers hovering, a hidden tab
+and the arithmetic of a countdown resumed half way through. Those were written against the hand-rolled
+version and pass unchanged against the shared one.
+
+### One index wrapper, under the name that was already published
+
+**`CarouselUtils.wrapIndex` and `RotationUtils` had the same function**, character for character: bring an
+index into range, wrapping at both ends, and answer `0` when there is nothing to index. `CarouselUtils.wrapIndex`
+is now that function rather than a second copy of it, which is legal in that direction — a `Fundamental` may
+read an `Abstract`. The published name won over the `getWrappedIndex` the wheel work had invented, and the
+export stays where consumers already find it.
+
+**Two objections were raised against this and only one of them held.** That `Carousel` would lean on a namespace
+named for something it is not: it does not hold, because a carousel's own vocabulary is already rotation —
+`getIsRotating`, `renderRotationControl`, `CarouselRotationFlags`. That the old export has to stay: it does not
+hold either, since a one-line re-export is a cost every arrangement but "leave both" would pay.
+
+**What held is that the function is not angular arithmetic, so `RotationUtils` was not strictly its home
+either.** It is now `MathUtils.wrapIndex` in `ss-utils`, and `RotationUtils` — which lives in that package too
+these days — reaches for it like any other caller. See _"What went to `ss-utils`"_. The published
+`CarouselUtils.wrapIndex` alias is unchanged and now points there.
+
+### A Playground page returns a fragment, and its demos sit in a `PageMeasureBox`
+
+Both corrected by the user after the four migrated components arrived with neither.
+
+**A page has no root element of its own.** `App.css.ts`'s `tabPanelBody` is a column flex with a gap, and the
+things it spaces are the page's own children — the props panel and the variants. A page that wraps them in a
+div becomes one child, the gap disappears, and the panel sits flush against the demos. `CarouselPage` is the
+shape to copy: `return (<>…</>)`. `ShapePage` gets away with a root because it re-declares the same column and
+gap on it, which is the exception rather than the pattern.
+
+**A demo sits in `PageMeasureBox`, not in a box the page invented.** It draws the checkerboard and the dashed
+outline that say "this is the space the component asked for", which is exactly what a page hand-rolling a
+bordered `host` div is trying to say and says less well. Three of the four pages had their own.
+
+**The outline paints behind the demo, not over it.** It was at `z-index: 1` and drew across whatever it
+contained, which stayed invisible for as long as every demo left a margin inside its box — `ElementMosaic`
+is the first that fills one edge to edge, and the dashes ran straight over the tiles. A measurement drawn on
+top of the thing it measures is the wrong way round. The box now isolates itself and the outline sits at
+`z-index: -1`, which puts it above the checkerboard and below everything the page renders into it.
+
+**The box has no padding, and that is the whole point of it.** Stated by the user, twice: the content hugs the
+box, so the outline is a measurement rather than a frame. It was defaulting to 20px, which quietly made every
+demo on every page smaller than the thing being measured, and three pages had grown a
+`size + MEASURE_BOX_PADDING * 2` expression to cancel it back out. The default is now zero and those
+expressions are gone. **`TypewriterPage` is the one exception and opts in**, because unpadded text is hard to
+read; `MEASURE_BOX_PADDING` stays exported for it.
+
+**The box hugs its content, and that is the same point from the other end.** It reports what the component asked for and
+nothing else, so the outline around a demo is a measurement rather than a frame. That was intent and not yet
+code: `measureBoxRoot` was a plain block, so a box given no `getWidth` stretched to its card and the outline
+was drawn wider than the thing it measured. `width: fit-content` on the class makes it true, and it reaches
+only the boxes that pass no width, since an inline `getWidth` overrides it. The consequence, stated by the
+user when this was written up the other way round: a component that asks for a share of its parent —
+`Formation` and `Staircase` both size themselves as a fraction of their container — has no appetite of its own,
+and collapses to nothing inside a box that only grants appetite. That is the box being truthful, not being in
+the way. What it forces is that **the page has to state the width it is demonstrating at**, which is what
+`getWidth` is for and what `CellAnimationPage` already used it for. Worth naming because the symptom is a demo
+that renders and measures as zero rather than one that errors.
+
+### `Mosaic`: one side comes from the parent, the other is what the arrangement costs
+
+Settled with the user across one conversation, from "a grid of sorts that occupies the minimum possible
+size". The name is theirs, chosen from three sets — a mosaic is unequal pieces set into a rectangle with
+grout between them, and the gap prop is the grout.
+
+**"Minimum possible size" does not define itself, and the size anchor is what fixed that.** Minimum by area,
+minimum against a target shape and minimum height for a given width are three different arrangements, and
+the first two can come out wider than the parent and spill. `sizeAnchor: "width" | "height"` is
+`CellAnimation`'s prop and its vocabulary: one side is taken from the parent, the other is whatever the
+arrangement costs, and the objective is to make that second side as small as it goes. Nothing can overflow
+the side that was given, and there is no number to tune.
+
+**The two anchors are one algorithm and a transpose, not two.** Sizes go in swapped, placements come back
+swapped, and everything between works in one space where the anchored axis is `x` and the free axis is `y`.
+`MosaicUtils.transposeSize` and `transposePlacement` are the whole of it.
+
+**The presets differ on exactly one thing: whether an item keeps its size or only its shape.** That is what
+made two presets over an unexported base the right shape rather than one component with a mode — a mosaic of
+fixed-size elements can never become a mosaic of rescaled images while it is mounted, so the choice is not a
+runtime value. Same reasoning as `SpotlightHint` / `SpotlightPrompt` / `SpotlightGuide`, and as `Checkbox` /
+`Toggle` / `Radio` over `BinarySwitch`. The base takes the packing function from the preset, which is why
+`computePlacements` exists at all; `getIsItemSized` says whether the placement's width and height are written
+to the DOM or only its position.
+
+**The packer is a skyline, and the gap is baked into the cell rather than added afterwards.** Every item is
+inflated by the gap on its right and bottom edges and packed into a container one gap wider than the real
+one. Two neighbours then have exactly one gap between them and the outermost items sit flush against the
+edges, with no special case for the first column or the last row. The placement written out is the inflated
+cell minus the gap again.
+
+**Items are packed tallest first, and that is what fills the holes.** A short item leaves room under it that
+a plain row layout can never reclaim; the skyline records the free space and the next item that fits drops
+into it. `elementMosaic.spec.ts` pins the invariant that says so — a tile's top edge is either the top of
+the mosaic or exactly one gap below some other tile's bottom edge — because a packer that quietly fell back
+to rows would still pass a no-overlap check.
+
+**An item wider than the container overhangs rather than being shrunk.** Shrinking it is the other preset's
+job, and silently distorting something the consumer gave a fixed size to is worse than showing that it does
+not fit. It reserves the full container width, so nothing is placed beside it.
+
+**The reading order is derived from the finished geometry, and the DOM is rendered in it.** The user's call,
+over the safer option of forbidding hole-filling so that placement order and reading order agree by
+construction — their reasoning was that a mosaic which leaves its holes open is not a mosaic. So the
+arrangement is cut recursively: find a horizontal line no item straddles and the mosaic splits into bands;
+within a band find a vertical line and it splits into columns; recurse, alternating. This is how reading
+order is recovered from a scanned page. An arrangement that decomposes on neither axis falls back to sorting
+by top edge then left edge.
+
+**Which makes the accessibility answer the DOM itself, with no `tabindex` and no ARIA.** WCAG 1.3.2
+Meaningful Sequence and 2.4.3 Focus Order are both Level A, and both are satisfied by putting the elements
+in the order they read: Tab and a screen reader then follow the eye by construction. The property that
+survives every arrangement, and the one the spec asserts, is that an item announced later never sits above
+**and** to the left of one announced earlier — announcement may move right and it may move down, and it
+never goes back.
+
+**`<For>` runs over the item indices, not over the placements.** A placement is a fresh object on every
+pass, so `<For>` would key on nothing stable and rebuild every tile whenever the container resized. Indices
+are primitives, `<For>` compares them by value, and reordering therefore moves the existing nodes — which is
+what keeps focus on whatever the user was on while the mosaic reflows underneath them. The order memo
+compares element by element so an unchanged order does not re-diff at all.
+
+**`readingIndex` is on the item state because nothing else can work it out.** The consumer knows its own
+array order and the component decides the announcement order, so a consumer staggering an animation along
+the reading order has no other way to ask. Everything else on `MosaicItemState` mirrors `Formation`'s.
+
+**An unplaced item is rendered and hidden, never left out.** Where the sizes come from mounted elements —
+which is `ElementMosaic` — an item that is not in the DOM can never be measured and would never earn a
+placement, so leaving it out is a deadlock rather than an optimisation. It renders at the origin with `visibility: hidden`, which still measures,
+and takes its place on the next pass. That is also what covers the first frame, where nothing has been
+measured yet.
+
+**The measuring wrapper is `width: max-content`, and that is what stops the height anchor eating itself.**
+An ordinary block inside the positioned wrapper would shrink to fit the container, so its measured width
+would depend on the container's width — which, when the height is the anchored side, is itself computed
+from the measurements. `max-content` breaks the circle by making an item's width its own business, and it
+is the same rule that lets an oversized item overhang.
+
+**Sizes are read with `ElementObserver.createBorderBoxSizeObserver` rather than from a client rect.** A
+bounding client rect is the transformed size, so inside a `Viewport` it is the layout value times the scale
+factor and the whole mosaic packs against numbers that are wrong by a constant. `ResizeObserver`'s
+`borderBoxSize` is the layout box and no transform touches it.
+
+### `ImageMosaic`: no smallest to aim at, so it is given a shape to aim at instead
+
+**"Make the free side as small as possible" is degenerate once the component picks the sizes.** With fixed
+elements the objective has an answer; with images it does not, because the smallest arrangement is always one
+row with everything scaled down — sixty images across a 380px column is sixty slivers, technically minimal
+and useless. So the preset needs a second thing to aim at, and three were weighed: a target thickness for a
+row in pixels, a floor under how small an image may get, and a target shape for the finished mosaic. The
+user took the shape.
+
+**The target is a width and a height, not one number, and that is theirs.** `{ width: 16, height: 9 }` says
+which way round it goes at the call site; a bare `1.78` does not, and the reader has to know whether the
+library divides width by height or the other way. It defaults to `{ width: 1, height: 1 }`, so a consumer
+who has no opinion gets something close to a square.
+
+**The row count is not asked for and not guessed: it is scanned for.** Splitting the images into more rows
+makes each row shorter and the mosaic taller, so the finished height rises with the row count. The scan runs
+the count upward from one, stops at the first count whose mosaic overshoots the target height, and keeps
+whichever of that count and the one before it lands nearer. Nothing is tuned and there is no window
+constant to defend.
+
+**Within a row count, the split is a dynamic program rather than a greedy fill.** For a candidate count the
+target height divides into an ideal thickness per row, and the program picks the split minimising the summed
+squared deviation from it — the standard way a justified image wall is laid out. A greedy pass closing each
+row as soon as it is full is cheaper and visibly worse: it pushes all the slack into the last row. The cost
+is the honest one for a dynamic program, quadratic in the images per row count tried, so a mosaic of several
+hundred images is doing real work on every resize.
+
+**Rows run over the order given, and nothing is reordered.** The element preset reorders because reordering
+is how a hole gets filled; here every row fills its side exactly by construction, so there is no waste to
+reclaim and reordering would only shuffle the images for nothing. The reading order derived from the
+geometry therefore comes back equal to the order passed in, which costs nothing and keeps the two presets on
+one mechanism.
+
+**The preset transposes the target shape, not the base.** The base swaps the axes so that one packer serves
+both anchors, and a target shape stated by the consumer is in the consumer's axes — so with the height
+anchored, a 16:9 target has to reach the packer as 9:16. `ImageMosaic` does that swap itself because it is
+the only thing that knows the target exists; `computePlacements` stays "whatever the preset wants" and the
+base stays a mechanism with no opinion about what is being packed.
+
+**Every source carries a text alternative, because WCAG 1.1.1 Non-text Content is Level A.** A wall of
+images with no alternatives fails outright, so the array is `{ src, alt }` rather than bare strings and a
+deliberately decorative wall says so by passing an empty string. Not a house preference — the criterion
+leaves no room, and it outranks any argument about how tidy `string[]` would have been.
+
+**The measuring copy of an image is never mounted.** `new Image()` with a `src` fires `load` and reports
+`naturalWidth` without ever being in the document, so the component learns every shape without owning
+anything the consumer can see. The first build mounted a hidden `<img>` per source instead and concluded
+from that that the consumer could never be given the element to render — a wrong conclusion, corrected by
+the user, and the reason the render slot below exists at all.
+
+**Which also means every source is fetched up front, and there is no lazy path.** The layout cannot start
+until every shape is known, so deferring a file defers the whole arrangement rather than one tile. The
+visible image and the measuring copy share a URL, so the browser serves the second from cache and only one
+request leaves the machine. Attributes that split the cache — a `crossorigin` or a `referrerpolicy` a
+consumer sets on their own markup — would cost a second fetch, which is the one case where the two copies
+stop being free.
+
+**An image that fails to load keeps a square box.** Dropping it would take its alternative text out of the
+document along with it, so a reader who cannot see the wall would not be told the picture was ever there.
+A square is the honest guess when the shape is unknowable.
+
+**`renderItem` hands over the image, and the cell keeps the size.** Without it the component renders its own
+`<img>` and the preset behaves as before. With it the consumer receives `renderImage` — the library's
+element, built and ready to place — plus the item state, and returns whatever they want around it: an
+anchor, a `<figure>` with a caption, a `<picture>` with a srcset. Same shape as `DatePicker`'s
+`renderCalendar`, `TimePicker`'s `renderClock` and `Select`'s `renderOptions`: the library builds, the
+consumer places.
+
+**The size is forced by the cell being a one-cell grid, not by asking the consumer to honour a number.**
+Publishing the computed size as a prop was weighed and dropped: it hands over a decision the component has
+already taken, cannot revise and cannot verify, so a consumer who quietly ignores it gets overlapping tiles
+that nothing detects. The cell carries the pixel width and height, `display: grid` puts every direct child
+into the single cell, and a grid item is blockified — so a bare inline `<a>` becomes a full-size click
+target with no CSS from the consumer at all, and several returned elements each fill the cell instead of
+splitting it into rows. An explicit width or height on their element still beats the stretch, which is
+deliberate: it is what lets `ElementMosaic`'s `max-content` measuring box keep its own size inside the same
+wrapper, so one mechanism serves both presets.
+
+**The cell does not clip, and that is the user's call.** `overflow: hidden` was proposed to stop a long
+caption spilling across the gap and rejected on the case it forecloses — an image that grows on hover. What
+happens to paint inside or outside the box is the consumer's half, the same line the library draws around
+`Shape` and around the `Toasts` painter; the box's job is only to be the right size. The consequence worth
+knowing is that a grown tile paints **under** the tiles after it, since later siblings win ties, and the
+cell wrapper is deliberately not a stacking context — so `position: relative` plus a `z-index` on the
+consumer's own element reaches past its neighbours and lifts it clear.
+
+### `RichText`: a tag name is what you could write after a dot in JavaScript
+
+The parser used to accept letters and nothing else, so `[tag1]` and `[h1]` were not tags — they came out as
+the characters they were typed as. The user asked for digits, and for the widest set that still makes sense,
+which raised the question the answer is easy to get wrong: **an object key is not a limit.** Every property
+key in JavaScript is a string, so `""`, `"hello world"` and `"[b]"` are all valid keys, and the class map
+here is a `Record<string, string>` that would take any of them. Nothing about the map constrains the syntax.
+
+What does constrain it is that the text around a tag is ordinary prose, and prose contains square brackets.
+So the rule chosen is the **identifier** rule — the subset JavaScript itself accepts after a dot: a letter or
+an underscore first, then letters, digits and underscores. `[tag1]`, `[h1]` and `[my_tag]` are tags;
+`[123]`, `[b-c]`, `[$5]` and `[2024-01]` are not, and pass through as text.
+
+**The hyphen is the interesting exclusion**, because a markup vocabulary would usually take one. It is out
+for the same reason it is out of an identifier, and the practical benefit is that a date-shaped or
+reference-shaped bracket in someone's text cannot become a tag. `$` is out too, despite being legal in an
+identifier, because `[$5]` is a plausible thing to have written on purpose.
+
+**What was already decided and is unchanged:** tags are found case-insensitively and matched
+case-sensitively, so `[B]bold[/B]` is recognised as a tag, finds no class under `"B"` and prints its own
+brackets. Both halves are pinned by name in `RichText.utils.test.ts`, as is the exclusion of `[123]` and
+`[b-c]`.
+
+### `RichText`: the class map is handed over whole, and the diff example is what proves it
+
+`computeClassNames` is given the library's own map and returns the one to paint with, so a consumer choosing
+to keep the defaults spreads them and a consumer choosing to replace them simply does not. That is the whole
+contract, and the shape it takes was never visible from the page until an example reached the prop: the page
+took the defaults, so a map that failed to arrive at all would have looked identical.
+
+**The example that reaches it is an inline diff**, over two tags the library has never heard of — `[add]` and
+`[sub]`. A diff is the case that makes the argument on its own: nobody would expect a component to ship an
+insertion or a deletion colour, the two tags are obviously the page's rather than the library's, and the
+sentence being diffed can carry a `[b]` inside an `[add]` to show that the default map came through the same
+call unchanged. The tags are named after what they mark rather than after what they look like, which is why
+they are not `green` and `red`.
+
+**How the two runs are drawn is the user's, and the spec does not touch it.** The correction that fixed this
+file: the first version struck the deletion through and underlined the insertion, argued it from WCAG 1.4.1
+Use of Color, and wrote both into `richText.spec.ts`. The user removed the underline, and the spec went red —
+which is the failure mode to learn from, because nothing was broken. A spec that pins the decoration or the
+colour of a Playground run has made the user's own styling a thing they cannot change without a red run, and
+the paint on that page is theirs. The grounds are `success.dark` and `error.dark` with each family's own
+`contrast` for the text, under the rule that a container changing its own background owns the colour of the
+text inside it; beyond that, nothing here states what the diff must look like.
+
+**`richText.spec.ts` reads no computed style at all, and that is the general rule rather than a quirk of this
+page** — see _"An assertion reads the mapping, not the value"_ below. What `computeClassNames` promises is a
+lookup: a tag comes back carrying the class it was mapped to. So the legend's check is that all five default
+tags reach a class and that no two reach the same one; the diff's is that `[add]` and `[sub]` reach classes of
+their own; and the check that the defaults survived the page's spread is that the `[b]` inside an `[add]` run
+carries **the same class** as the `[b]` in the legend. Not one of those says what a class draws, so all of them
+survive a restyle on either side.
+
+### `PointerTracker`: one reading of where the pointer is relative to one element
+
+The abstract answers a single question — where is the pointer, relative to this box — and everything a
+consumer paints from it is arithmetic on that answer. The brief was a grid of squares that light as the pointer
+nears, a card whose cast shadow swings away from the pointer, and a surface under a veil with a hole at the
+pointer; the veil became the `Reveal` `Exotic` and left the abstract's page, and the shadow turned out to need
+no second element at all — a `box-shadow` whose offset, blur and alpha come from the reading does it, which is
+the honest version of the demo and one fewer div in the tree.
+
+**The page's examples are the user's pick, and two were cut after they ran them.** A card that started
+fetching when the pointer came within three radii, and the veil the `Exotic` replaced. Recorded so neither is
+re-proposed: the fetch-on-approach one was making a point about the reading being data rather than paint, and
+that point did not survive contact with a demo where nothing visible happens.
+
+**The magnet's reach is in pixels, not in radii, and that is the example's whole lesson.** It first used the
+edge ratio like the lamps, and on a wide, short button that made the vertical reach about twenty pixels — the
+element's own radius upwards is half its height. A magnet's field is a distance, so it reads `distance`
+against a pixel range, eased so the pull is already visible at the far end of it rather than creeping in over
+the last few pixels. The lamps keep the edge ratio because a lamp's glow really is a property of its shape.
+Both numbers are in the reading precisely so a consumer can pick the one that matches what it is modelling.
+
+**The magnet tracks the box it sits in, not itself, and this is the feedback trap `trackSwipe` already
+documents.** An element that leans towards the pointer moves the very box its reading is measured from, so the
+next reading is taken from the displaced position and the direction wanders as the pointer closes in. The fix
+here is not a frozen rect but a different subject: the tracker watches the stage, which never moves, and the
+transform goes on the button inside it. That is also the truer model — a magnet's pull is a property of where
+the thing rests, not of where it has already been dragged to.
+
+**The lean is a fraction of the offset, capped — not a fixed length along the direction.** The first two
+versions multiplied a unit direction by a constant scaled by the falloff, which is wrong in the way that is
+easiest to miss: the falloff is strongest at the centre, so the button jumped its full travel towards a pointer
+sitting almost on top of it and only snapped back to nothing at the exact centre, where the direction
+degenerates. Reported by the user as the button not being centred when the pointer is. The reading was not at
+fault — the compass on the same page reads `distance: 0px` at its own centre — the arithmetic on top of it was.
+Taking `distance × follow ratio × pull` gives the behaviour the name promises: nothing at the centre, and a
+reach that grows as the pointer approaches without ever overshooting it.
+
+**What limits the reach is the room the box leaves, not a constant.** A fixed maximum was the first answer and
+it was visibly wrong in the way the user reported next: the button stopped short of the edges with no
+explanation, because thirty-four pixels is less than the travel a two-hundred-and-eighty-pixel stage allows a
+button half its width. The cap is now `(stage − button) ÷ 2` per axis, from two
+`ElementObserver.createBorderBoxSizeObserver` calls, and it is clamped per axis rather than along the
+direction — so a pointer off one corner slides the button along the edge it has already reached instead of
+stopping in mid-air. Measured flush on all four sides.
+
+**The reading carries pixels _and_ a ratio, because the two answer different questions.** A pixel offset from
+the element's centre is isotropic, so the angle derived from it is the true direction on any shape; a ratio of
+the box says where inside the box the pointer sits, which is what a mask position wants and what
+`trackDrag` already reports. Reporting only the ratio would have distorted the angle on a non-square element —
+a bar 400 by 40 would call a shallow approach 45° — and reporting only pixels would have left every
+mask-positioning consumer dividing by a size it has to measure again. Both fall out of one measurement, so
+carrying both costs nothing.
+
+**The user's contribution, and the part that makes the reading shape-aware: `edgeOffset`.** Draw the line from
+the element's centre through the pointer and record where it leaves the box. `distance / edgeDistance` is then
+one number that means the same thing on any element: below `1` the pointer is inside, `1` is on the edge, `2`
+is a further element-radius away. A wide bar reports a short reach sideways and a long one along its length,
+so a falloff written against it lights the way a bar-shaped lamp actually would, with no consumer arithmetic
+about aspect ratio. It is also scale-free by construction — both lengths are measured in the same space, so an
+ancestor scale divides out, the same immunity `trackDrag`'s ratio has.
+
+**The boundary is the element's rectangle, so a rounded element over-reports its corners** — a circle made
+with a 50% radius says its diagonal reaches about 1.4 times as far as it is drawn. Left alone: none of the
+three consumers is round, and teaching the abstract about shapes means either reading `border-radius` back out
+of computed style or taking a shape argument, both of which are a lot to carry for a decoration.
+
+**The arithmetic went to `ss-utils` as `RectUtils.getEdgePointTowards`.** It needs only the language, which is
+the line for that package, and the degenerate case follows a rule already recorded there: the centre has no
+direction to leave in, so it reports the middle of the right-hand edge, matching `Point2dUtils.getAngle`
+reporting `0` for the origin.
+
+**One document listener and one frame, shared by every consumer, because an element cannot hear a pointer that
+never touches it.** The listener has to be on the document, and the lamp grid alone calls `create` twelve
+times, so a listener per consumer would be twelve listeners and twelve `getBoundingClientRect` calls per
+pointer event. Instead the module holds the client point and a subscriber set, `pointermove` marks the frame
+dirty, and one `requestAnimationFrame` recomputes every subscriber — the `DismisserStack` shape, which
+attaches on the first consumer and detaches on the last. Scroll and resize mark the same frame dirty, since a
+page moving under a still pointer changes every reading.
+
+**`getIsPointerPresent` is returned from every `create` call even though it is module state**, so a consumer
+reads one thing and never has to know which parts of the reading are shared.
+
+**A resting reading rather than an absent one, and it rests infinitely far away.** The reading is never
+`undefined`: before the first pointer event, and on a touch device where the pointer only exists while a
+finger is down, it reports `distance` and `edgeRatio` of `Infinity` with a zero offset. That is the honest
+statement — infinitely far away, in no particular direction — and it means the arithmetic path never branches:
+a falloff clamps to nothing lit, an offset multiplied by a normalised zero direction displaces nothing. Zeros
+would have been the wrong resting value, since a zero distance is the pointer at the centre, which is every
+effect at full strength. **After a pointer has been seen the last reading is kept**, and
+`getIsPointerPresent` goes false, so a consumer can fade out from where it was rather than snapping — which
+is what leaving a room looks like. A consumer ignoring the flag gets an effect frozen mid-strength; that was
+weighed and accepted as the price of not making the reading optional.
+
+**Reduced motion is the consumer's to answer, and the abstract does not touch it — see
+`MediaQueryMonitor` below for where the preference is read.** Considered and rejected: the abstract
+suppressing the reading itself. It cannot do the thing the preference actually asks
+for. The platform preference is to "remove, **reduce, or replace**" motion, and success criterion 2.3.3
+Animation from Interactions (AAA) covers only motion animation triggered by interaction — its own definition
+excludes changes of colour and opacity that do not change perceived size, shape or position, with an erratum
+amending it to no longer exclude blurring. So the lamp's brightness is outside the criterion entirely, while
+the shadow's offset and blur and the reveal's travelling hole are inside it. An abstract that stops reporting
+can only delete, and it would delete the brightness along with the movement; only the consumer knows which of
+its own responses is motion, and only the consumer can substitute. The three examples each answer differently:
+the lamp keeps its brightness and drops its glow, the shadow pins its offset and blur and keeps responding
+through opacity alone, and the reveal replaces the travelling hole with the whole veil fading.
+
+**The abstract briefly published the preference alongside the reading, and does not any more.** The user's
+question closed it: a consumer can read a media query in CSS with no JavaScript at all, or in about ten lines
+of signal and listener, so publishing it bought a saved listener rather than a capability the consumer lacked.
+What survived the question is the observation that made it non-trivial — a `PointerTracker` consumer paints
+from computed numbers as inline styles, and a CSS media query cannot withdraw an inline style without
+`!important` — and that is an argument for the preference being reachable from JavaScript, not for a pointer
+abstract being the one to hand it out.
+
+**The Playground gained an `Abstracts` category for it**, ahead of `Exotics`. Nothing that renders no DOM had
+a page before; the alternative was filing it under `Exotics`, which is the folder for things that do render.
+
+### `MediaQueryMonitor`: a media query as an accessor, shared per query
+
+Extracted on the user's call, from the flag `PointerTracker` briefly published and the ten lines `WheelPage`
+briefly held: the reduced-motion preference should be reachable from plain JavaScript by anything that needs
+it, rather than riding on an abstract that measures something else.
+
+**It is a media query rather than a preference, because the mechanism is the general one.**
+`MediaQueryMonitor.create(query)` returns an accessor of whether the query matches, and
+`createReducedMotion()` is the one named shortcut over it, so the query string is written once in the library
+and nowhere else. Naming the general thing was the choice over a `ReducedMotionMonitor`: the next preference
+worth reading — forced colours, reduced transparency, a colour scheme — is the same code with a different
+string, and a monitor per preference would be a file each.
+
+**One `MediaQueryList` and one listener per distinct query, however many consumers ask.** A module-level map
+keyed by the query string holds the signal and a subscriber count; the first consumer opens the listener and
+the last closes it, the `DismisserStack` shape again. The lamp grid is the case that makes it matter —
+twelve consumers on one page, which as a listener each is what `Rotator` used to do with one wheel and would
+have done badly with twelve. The signal stays in the map after the last consumer leaves, so a page mounting
+the same query again reuses it rather than flickering from a stale `false`.
+
+**Nothing in the library reads it internally.** `Rotator` stopped consulting the preference when the wheel's
+enforcement was removed, and `PointerTracker` never did anything with it. Every consumer is a Playground page
+or example, which is the point: the library reports, the consumer decides.
+
+### The Playground's `Abstracts` category, and which four earn a page
+
+The category exists because `PointerTracker` had nowhere honest to go: `Exotics` is things that render DOM, and
+it renders none. The user's call was to keep the category rather than file it wrongly or ship no page at all —
+the one Abstract with no component consumer would otherwise be the only thing in the library you cannot look
+at.
+
+**Four Abstracts earn a page, and the test is whether anything already shows them.** `PointerTracker` has no
+component consumer at all. `InteractionTracker` is seen today only through a colour surface, a drawer and a
+carousel, which show what it is used for rather than what it reports. `Virtualizer` was visible only inside a
+stress-test modal buried in the Select page. Everything else is either already on screen through the component
+that consumes it — `Rotator` through the wheels, `ElementFader` through every overlay, `Dismisser` and
+`FocusManager` through the modal, `Typeahead` through select, `MaskedField` through the inputs, `ColorExtractor`
+through the colour input — or would be a page of numbers changing, which is `ElementObserver`, `SignalMirror`,
+`TextSync`, `MediaQueryMonitor`, `LiveAnnouncer` and `FrameRateMonitor`.
+
+**`Anchor` was argued for and rejected by the user: it is already everywhere.** Tooltips, menus, selects and
+the spotlight all position through it, so a page would be a fourth showing of a thing three pages already show.
+
+**This is a Playground answer, not a documentation answer.** The user's note, recorded because it changes the
+shape of the question later: the site is a showcase today and will likely become documentation, and at that
+point every Abstract needs a page whether or not it has anything to demonstrate. The four-page rule is about
+what is worth demonstrating, not about what is worth documenting.
+
+**Also raised by the user and not built: listing, in each component page's description, which Abstracts it
+uses.** The objection they raised themselves is maintenance — a hand-written list rots the moment a component
+gains an import. Worth knowing before anyone attempts it: the dependency is already in the import graph, and
+the Playground already runs a build-time plugin over its own source for the source viewer, so the list is
+derivable rather than curated. Nothing has been decided.
+
+### `Reveal`: a cover with a hole where the pointer is
+
+The user's suggestion, made while looking at the `PointerTracker` example that does the same thing by hand.
+Both now exist and that is deliberate: the example on the abstract's page shows the reading is enough to build
+this yourself, and the `Exotic` is the packaged one.
+
+**The cover is the consumer's and the hole is the component's.** `renderContent` is what is hidden,
+`renderCover` is what hides it, and the component contributes only the mask that cuts the hole and the
+positioning that lays one over the other. The mask is computed here and applied there — see _"The mask is
+handed to `renderCover`"_ below. This follows `Spotlight`'s split — that component owns the hole in an
+overlay and hands the overlay's paint to `renderOverlay` — and it is why the frosted, opaque and text-carrying
+covers on the Playground page are all the same component with nothing switched. The two now share the mask
+builder as well as the shape of the handout: see _"`Spotlight`'s overlay is one masked layer and one clipped
+layer"_ for `Abstracts/Cutout` and for what a mask cannot do about the pointer.
+
+**`renderCover` is handed whether a reveal is happening.** A cover that says "nothing to see here" until the
+pointer arrives needs to know, and the alternative — the consumer tracking the pointer a second time to find
+out — would make the component the harder way to do it. The flag is true only while the pointer is inside the
+element, which is also what the reduced-motion path keys off.
+
+**The cover takes no pointer events.** Its text was selectable, which is wrong twice over: a cover is paint
+rather than content, and a caret dragged across it is a pointer interaction the thing has no business
+answering. `pointer-events: none` on the cover layer settles it. The consequence, stated rather than fixed:
+the content underneath then takes those events instead, so a determined visitor can select the hidden text
+through the cover. Hiding it from selection as well is the consumer's to decide, and it is not something a
+mask could ever have promised — the content is in the document either way.
+
+**The hole is a small SVG image, not a gradient.** A `radial-gradient` can only be a circle or an ellipse,
+which is what shut the door on every other shape, so the hole is drawn as an SVG blurred by `softness` and
+composited against a full-coverage layer with `mask-composite: exclude`, which is Baseline widely available
+since December 2023. **The image depends only on the three shape props, never on the position**, so it is
+built once per shape change and moved with `mask-position`; regenerating a data URI every frame would have
+been an image decode per pointer move. Following the pointer in pixels needs the element's own size, which the
+reading deliberately does not carry, so the component observes it with `ElementObserver` — visible now in the
+page's derived dependency row, which is the mechanism working as intended.
+
+**`radius` and `softness` rather than a gradient string.** Softness is the fraction of the radius that is fully
+clear before the mask starts fading back to opaque, so `1` is a hard-edged hole at the full radius and `0` is
+all fade — the drawn shape shrinks as the blur grows, until only the very centre comes close to fully clear.
+The Playground labels the field _Clear fraction_ for that reason.
+Handing the consumer the gradient instead would have made the hole's geometry their arithmetic rather
+than the component's, and `radius` and `softness` name the effect where a gradient string names the mechanism.
+That the hole is a mask is no longer hidden — the paragraph below says why — but building it is still the
+component's job and only the finished style crosses the boundary.
+
+**An arbitrary hole is `computePoints`, the same callback `Shape` takes**, and `joinRadii` and
+`lameExponents` come with it. The component passes the points to `ShapeUtils.getPaths` — which lives in
+`@thewaver/ss-utils` rather than inside `Shape`, so nothing had to be extracted to reach it — and drops the
+resulting outline into the mask image in place of the built-in shape. A consumer who wants a hexagon writes
+the callback every `Shape` consumer already writes, and rounded or bevelled or scooped corners are the same
+two props they would use there.
+
+**`roundness` was deleted rather than kept beside it.** It ran the hole from a square to a circle, which is
+a four-point outline with a join radius said a second way — and the second way only worked while no points
+were given, so a page carrying both would have shown a control that silently stopped mattering. A rounded
+square now comes from four points and a `joinRadii`, and the Playground's _Corner radius_ and _Corner style_
+fields are disabled while the shape is the default circle, which is the honest form of the same fact.
+
+**With no `computePoints`, the hole is a circle drawn as a `<circle>`**, decided by the user. The alternative
+was a polygon standing in for one, which is worse at every count the component cares about: more points to
+blur, a visible facet count at large radii, and arithmetic in the common case that the SVG element does
+exactly. The points are computed in the image's inner box rather than its full square — the blur needs room
+inside the image or it clips at the edges — and the outline is then translated by that same inset.
+
+**The mask is handed to `renderCover`, not applied by the component.** The signature is
+`renderCover(getIsRevealing, getMaskStyle)` and the consumer spreads that style onto its own cover element;
+the component's cover layer keeps only its positioning and `pointer-events: none`. The idiom already existed
+one component over — `Shape` hands `renderChildren` a `getClipPath` for the consumer to put on its own
+element, and `Surface` is the in-library consumer that does exactly that.
+
+**What forced the change is a browser rule about filters.** An element carrying a mask becomes a _backdrop
+root_: it seals whatever is painted behind it off from `backdrop-filter` on anything inside it. While the
+component owned the mask, a frosted cover — the consumer's element, sitting inside the component's masked
+layer — had nothing left to blur the moment the pointer arrived and the mask appeared. So the blur existed
+only at rest and vanished on the first pointer move, which is the opposite of the effect the example claimed.
+Mask and filter on the same element and both hold together. This is what makes the whole family reachable:
+content greyed or blurred everywhere with colour and detail restored inside the hole is a `backdrop-filter`
+on the cover and nothing else.
+
+**The cost, accepted rather than mitigated.** `Shape`'s handout is optional — ignore `getClipPath` and the
+shape still draws correctly, since the clip only matters to children that must sit inside the outline.
+`Reveal`'s is the entire product: a cover that never applies the style shows no hole at all, and nothing can
+detect the omission to warn about it. The alternative weighed against it was keeping the mask on the
+component's layer _and_ handing it out, which masks a filtering cover twice and makes one `softness` value
+produce two different edges depending on which path the consumer took. A silent divergence in what a prop
+means was judged worse than a silent omission, and the user took the call on the grounds that nothing here is
+irreversible yet.
+
+**It reads no preference of any kind, and reduced motion is the consumer's to answer.** The first build had
+the component substituting for itself — under reduce, no travelling hole and the whole cover fading instead —
+on the argument that the motion is not incidental here but is the entire component. The user rejected it: the
+rule set with the wheel holds for a component too, so the library reports and the consumer decides.
+
+**What made that answerable rather than a refusal is `radius`.** A radius of zero cuts no hole while the
+tracking carries on, so `getIsRevealing` still reports whether the pointer is inside. A consumer answering the
+preference therefore writes one expression — zero radius under reduce — and fades its own cover on the flag it
+is already handed, which is the substitution the preference actually asks for rather than the deletion
+`isDisabled` would give. **The general rule this settled: a component or abstract that reports rather than
+enforces has to leave the consumer a way to express the answer, or "the consumer decides" is a refusal wearing
+a rule's clothes.** A Playground example demonstrating exactly that was built and then cut on the user's call,
+so the door is recorded here rather than shown there.
+
+**`transitionDurationMs` went with the substitution.** It existed to time the cover's fade; with the fade now
+the consumer's, the transition belongs in the consumer's own stylesheet, and a prop timing a transition the
+component no longer performs is dead API.
+
+### Which Abstracts a page's component uses, derived rather than curated
+
+Asked for by the user, and built only because the maintenance objection they raised themselves turned out to
+be answerable: a hand-written list of each component's Abstracts rots the moment a component gains an import,
+and nobody will re-check fifty pages after every commit.
+
+**The dependency is already in the import graph, so nothing is typed twice.** A Vite plugin walks
+`components/src` at build time, follows relative imports transitively from each component's entry file, and
+classifies every file it reaches by the folder that owns it — `Abstracts/<Name>` is an abstract, anything under
+`Fundamentals`, `Composites` or `Exotics` is a component. The result reaches the Playground as a virtual module
+and renders under each page's description. In the dev server the plugin watches `components/src` and reloads
+the module, so the list is right without a restart.
+
+**Transitive rather than direct, deliberately.** `Wheel` lists `Barrel`, `InteractionTracker`, `LiveAnnouncer`,
+`Rotator` and `SignalMirror` — `Rotator` is imported by the wheel itself, `LiveAnnouncer` through the shell it
+wraps. Direct imports would have answered "which files does this one file name", which is a fact about the code
+layout; the reader's question is which abstracts are running when this component runs, and that is the
+transitive set.
+
+**Type-only imports do not count.** `import type` names a type and runs nothing, so counting it would list an
+abstract a component merely borrows a shape from.
+
+**Internal components are listed alongside exported ones.** `Select` names `InteractionWrapper` and `FormField`,
+neither of which a consumer can import. The alternative — filtering to what `index.ts` exports — would have
+made the list a partial truth for the sake of tidiness, and the list is describing what runs, not what can be
+bought.
+
+**A name links to its page when one exists.** The matching is case-insensitive, because the Playground's
+display names and the folder names disagree in a couple of places (`TypeWriter` against `Typewriter`), and a
+name with no page renders as plain text rather than a dead link.
+
+### Colour in the Playground: two rules, both the user's
+
+Stated after a review of the pages built for the `Abstracts`. They are house rules for the Playground's own
+paint, not library behaviour, and they are recorded because every new page will otherwise re-invent an answer.
+
+**A background always runs from a family's `dark` to its `light`.** `linear-gradient(135deg, X.dark, X.light)`
+with both stops from the same family — not two families mixed, and not a `.main` used as a stop. What went in
+before the rule: a card gradient from `primary.dark` to `secondary.main`, and a drag pad from `surface.dark` to
+`info.dark`, both of which read as arbitrary because they are.
+
+**`color.background.*` is the page's, and nothing else may use it.** Stated by the user after the first pass
+painted every example's stage with a `background.dark` to `background.light` gradient: that family names the
+page's own ground, so an example borrowing it is claiming to be the page. The cast-shadow demo is the one
+exception, and only because a black shadow needs a light ground to read against; it carries a `secondary.dark`
+to `secondary.light` stage of its own.
+
+**What replaces it depends on what the example is showing, and there are three answers.** The correction came
+after a second pass wrapped everything in `PageMeasureBox`, which was as wrong as painting everything.
+
+- **`PageMeasureBox`** — the checkered, dash-bordered wrapper — is for an example whose **outer shell matters**:
+  something is measured, something moves inside its bounds, or the point is where the component's box ends.
+  The compass, lamps, magnet and tilt qualify, because every one of them is about a reading taken against a
+  box; so does the swipe, which travels a fraction of its own width. **The interaction flags do not** — nothing
+  moves, nothing is measured, and a box around a hover state is decoration pretending to be information.
+- **`color.control.background.main`** is for anything that should read as a control's own surface. The
+  virtualizer's lists take it, because a scrolling list of rows is what a select's popup is, and the two
+  looking alike is the useful signal.
+- **A surface-family card** for everything else.
+
+**Text on a background is that family's `contrast`, and a highlight colour has to be checked against the
+background it actually lands on.** A highlight is allowed — `primary.main` on a dark surface is fine — but it
+travels with the element, and the failure the user caught is what happens when the background moves out from
+under it: the virtualizer's row index is `primary.main`, and a pinned row painted itself `secondary.dark`,
+leaving teal on warm brown with almost nothing between them. The fix is that the pinned row's own paint claims
+the text inside it — a `globalStyle` on the index within a pinned row sets `color: inherit`, so the highlight
+gives way to the row's `contrast` rather than surviving into a background it was never checked against.
+**The general form: when a container can change its own background, it owns the colour of the text inside
+it.**
+
+### Controls: `Sortable`, and why a drag is the least important of its three routes
+
+Asked for by the user as the first piece of game-shaped work. A list whose items can be picked up and put
+down, in place or in a sibling list.
+
+**A drag is one route in, and the one that had to be built last.** Success criterion 2.5.7 asks that anything
+operated by dragging also be operable by a single pointer **without** dragging, and 2.1.1 asks that it be
+operable from the keyboard. So there are three ways in and they are one state machine: a press that moves
+beyond the slop starts a drag; a press that does not is a click, and a click picks the item up and the next
+click puts it down; `Enter` picks up, arrows choose a place, `Tab` changes list, `Enter` drops and `Escape`
+cancels. Building the drag first and bolting the others on afterwards is what produces two state machines that
+disagree, which is the shape this avoided rather than discovered.
+
+**Lists find each other through a module-level registry keyed by a group id, not through a wrapper.** Two
+lists that exchange items routinely have no useful common ancestor — a hand at the foot of the screen and a
+board in the middle, or one of the two inside a `Popover` that is portalled elsewhere — so requiring a shared
+parent element would put a layout constraint on the page for a bookkeeping reason. `DismisserStack` is the
+precedent and the shape is the same: a module array, `onCleanup` removing the entry. **The registry stays in
+the component's own folder rather than under `Abstracts/`**, per the standing rule that a thing is private
+until a second consumer asks for it.
+
+**The carried item stays where it is until the drop commits.** The alternative — moving it live, so it is
+already in the target while the pointer is still down — reads better and costs two arrays churning against
+each other on every pointer move, with the index bookkeeping having to be exactly right at every intermediate
+step or an item is lost. Instead the item does not move; the flags say which item is being carried and where
+it would land, and the consumer paints a marker at the landing place through `renderMarker`, which the library
+positions. Same division as `RadioGroup`'s floater.
+
+**What the library owes the marker is a box, and getting only half of that box right hid the other half.**
+The library places the marker and spans it across the axis it is _not_ marking — full width for a column
+list, full height for a row — and the consumer paints inside it. The first build made that box a flex row in
+both directions, so in a column the consumer's bar had no width to inherit and drew nothing at all: the
+landing place existed, was correct, and was invisible, which reads as a control that does not respond. The
+wrapper's flex direction now follows the list's, so the child stretches across the right axis.
+
+**The marker sits midway between its two neighbours, and the list is padded by half a gap all round so the
+outermost two have a neighbour to be midway from.** The landing place before the first card and after the
+last one are the only ones that ever went wrong, and they went wrong twice for the same reason: a list whose
+box stops exactly where its cards stop has nowhere to draw a bar. The first build put the end marker a half
+gap past the last card, outside the list, over whatever sat beside it; the second clamped it back inside,
+which put it _on_ that card. Neither is a position — there was no room, and the fix is to make room. The
+padding matches the gap's half, so the space at the ends reads the same as the space between, and the offset
+is then the midpoint of the two edges either side of it, with the list's own edges standing in at the
+extremes.
+
+**The padding is on all four sides, not only the axis the list runs along, and the marker is inset to match.**
+The cross axis needs it for a different reason: a list scrolls, so it clips, and a focus ring is drawn
+_outside_ the element it belongs to. Without room on that axis a ring loses its left and right edges. The
+marker is inset by the same half gap rather than spanning the padding box, so it is as wide as the list's
+content rather than sticking out past it.
+
+**The offset it is placed at is divided by the viewport scale, and this is the fault the whole control took
+longest to find.** It is derived from rect differences, which are on-screen, and written as a `top`, which is
+layout — see _"A measured rect and a written offset are in different spaces inside a `Viewport`"_ in
+`conventions.md`, which this is the entry that produced. Every check passed for as long as it was only ever
+driven headless, where the Playground's viewport scale is exactly 1.
+
+**The Playground paints no focus ring of its own, and painting one was a mistake worth recording.** The theme
+already carries a global `:focus-visible` outline, so a card was showing three rings at once: the app's, a
+solid one the painter drew from the `isFocused` flag, and the dashed border that means _lifted_. The flag one
+also fired on plain focus rather than keyboard focus, so it appeared on a click and not on a tab — the
+opposite of what a focus ring is for. A painter should reach for `isFocused` only where the app has no ring
+of its own.
+
+**How wide a card is stays the consumer's business.** The item element is a flex container, so a painter that
+states no width is as wide as its own content and a column of cards comes out ragged. That was briefly
+"fixed" by making the element a block so the painter had to fill it — rejected by the user, and rightly: a
+list that forces every row to one width is a decision about paint, and the library does not have one. A
+consumer who wants even cards writes `width: 100%` in their painter.
+
+**That marker is positioned, never laid out, and the reason is a feedback loop rather than a preference.** The
+first build put it in the flex flow between two items, which is the obvious way to draw an insertion point and
+is wrong: a marker between two items pushes every item after it along, and the rects it pushed are the ones
+the drag measures to decide where the marker belongs. So the answer changed, so the marker moved, so the
+answer changed again. A column list spent the whole drag oscillating and read as a control that painted
+nothing at all — which is exactly how it was reported. `position: absolute` with the offset computed from the
+item rects takes the marker out of the geometry it is describing, and `computeMarkerIndex` converts the
+settled index back into the gap it should sit in.
+
+**A drag ends with a click the browser sends unasked, and it has to be swallowed.** Press and release on one
+spot is a click; press, move and release is a click as well, on the nearest common ancestor. The first build
+let it reach the handler that picks an item up, so releasing a drag immediately picked the same item back up
+in tap-to-place mode: it stayed dimmed, the list stayed lit, and every later press was answered by a state
+machine the user did not know was running. `trackSwipe` had already met this and its answer is copied — a
+capture-phase `click` listener on the list root that swallows exactly one click after a pointer gesture. Worth
+holding onto as the general shape: **any gesture built on pointer events owes the click a decision**, because
+the browser will send one whether or not the gesture wanted it.
+
+**`renderCarried` is handed the item and nothing else.** The user's call, and the reasoning is theirs: a
+consumer may want the card under the cursor, or an outline, or a box, or a count, so what to draw cannot be
+the library's decision. It takes no flags — the first build passed some, and having to decide what
+`isCarried` should say to a slot that _is_ the carried thing was the sign the argument did not belong there.
+Nothing about the copy is interactive: it is not hovered, not focused, not a landing place, and whether it
+is disabled is on the item already. A consumer whose painter wants flags supplies a resting set, which is
+what the Playground does in one line.
+
+It is portalled into the `Viewport` layer like every other floating element, positioned by transform, sized
+from the item it copied, and offset so the card does not jump to its own corner on the first move. Its
+pointer position comes from a document-level listener rather than the drag's own moves, so a tap-to-place
+carry gets a preview too — the pointer is still there, it is simply not held down.
+
+**That listener also does the aiming, and a tap-carry is what proved it has to.** A carry knows which of
+three ways it began — `drag`, `tap` or `key` — because the three differ in what may drive them, not only in
+how they read out. A tap-carry has no button held, so its moves never reach the item and the first build
+aimed only on the drag's own moves: the copy followed the cursor while the landing place stayed where the
+card had been picked up, and the drop then landed somewhere the page had never marked. The document listener
+re-aims for `drag` and `tap` and leaves `key` alone, since a stray mouse must not overrule an arrow key.
+**With the pointer aiming, the click that drops must not aim again** — it used to re-aim at the centre of
+whatever card was clicked, which is a second source of truth and quietly beat the first. **It is `pointer-events:
+none`, and that is load-bearing rather than tidy**: the drop target is resolved by asking what sits under
+the pointer, and this element sits exactly there, so a hit-testable preview would answer for every drop.
+
+**A row sizes its items to their content and scrolls; a column stretches them and does not.** The first
+build passed `sizing="fill"` to every item whatever the direction, copying `Select`'s options — which are
+always stacked. In a row that is `width: 100%` on each of several items in one flex line, so they were
+squeezed under one another's content and the text spilled out of the list. Sizing is direction-aware now,
+list children are `flex: 0 0 auto` so nothing is compressed below what it says, and the list scrolls on its
+own main axis when the items do not fit. **The marker offset therefore adds the list's scroll position**,
+because it is written as a `left` or `top` against the padding box while the rects it is derived from are
+viewport-relative — the two only agree at a scroll of nought, which is the only place it was ever tested
+before this.
+
+**A move inside one list is a single write, and a move between two is batched.** The commit used to take the
+item out of one array and put it into another as two separate signal writes, which renders once with the item
+missing — `<Index>` disposes and rebuilds a slot around that gap for no reason. `moveAt` does a same-list move
+in one write and `batch` covers the cross-list pair.
+
+**The index the state machine holds is where the item will end up, not where it would be inserted, and that is
+the whole of a bug that shipped once.** The two landing places either side of an item are the same place: an
+item put "after itself" has not moved. Counting in landing places therefore spends the first press of an arrow
+key going nowhere, which reads as a broken control. So the carry holds a **settled** index — the position in
+the list once the item is out of it — and `computeSettledIndex` converts a pointer's landing place into one on
+the way in, while `computeMarkerIndex` converts back on the way out so the marker draws between the right two
+items. Two presses move two places, which is the only behaviour anybody expects.
+
+**Pointer capture is why the target is found by hit-testing rather than by `pointerenter`.** The drag captures
+the pointer on the item so that moves keep arriving after the pointer leaves it — which is also why no other
+element ever receives an enter or a leave for the rest of the gesture. The target is therefore resolved by
+asking `document.elementsFromPoint` what is under the pointer and matching against the registered lists.
+**By containment, not by identity**: the topmost element at a point is whatever the consumer painted, and a
+list that only recognised itself when the point landed on its own box recognised itself almost never. That was
+the second bug, and it presented as a drag that did nothing at all.
+
+**A list refuses an item before it is offered as a destination, not at the drop.** `computeCanAccept` is
+consulted when `Tab` builds the ring of destinations, so a keyboard user is never taken somewhere that will
+turn them away and told so only on pressing `Enter`. `isLocked` is the coarse form of the same thing — a list
+that can be reordered from inside but takes nothing from outside.
+
+**`InteractionWrapper` owns `tabIndex`, so the roving stop goes through `isTabbable` and nowhere else.** The
+first build wrote `tabindex` on the item element in JSX **and** passed `isTabbable={false}` to the wrapper,
+copying `Select`'s options — where an option is never a tab stop because the combobox is. Here the roving item
+**is** the tab stop, and the wrapper's write landed after the JSX one, so every item ended at `-1` and the
+whole list was unreachable by `Tab`. Nothing on screen showed it: every spec that drove the keyboard had
+focused an item programmatically first. One writer for a DOM property, the same rule `BinarySwitch` states for
+`checked`.
+
+**The list root and the items both set `pointer-events: all`.** `interactionRoot` sets `none` and expects a
+control to opt back in, which `Select`'s options already record. Missing it here produced a drag that never
+started, with a keyboard route that worked perfectly — the failure mode that rule exists to warn about.
+
+**Every example on the Playground page carries its own group id, which is not a detail.** They shared one at
+first, so `Tab` while carrying cycled through the lists of _other examples on the same page_ and a card could
+be carried out of the demo it belonged to and dropped somewhere off-screen. A group id is a namespace, and a
+page mounting several independent instances has to say so.
+
+**_Elsewhere._** React Aria is the only one of the three with drag and drop, through `useDragAndDrop` shared
+with its lists, and its keyboard route is the same pick-move-drop this one implements. Radix and Ark UI ship
+nothing in this family, which matches item 15's note that nothing had asked for it. The packages that own the
+problem outright — SortableJS, dnd-kit — are pointer-first: dnd-kit ships a keyboard sensor and SortableJS has
+no keyboard route at all, which is the same gap `SlideButton`'s entry records for swipe-to-confirm widgets.
+
+### Controls: stateful `Menu` rows, and the run that makes a radio group
+
+The user's call, in their words: extended functionality rather than a `Select` wearing menu paint. `Menu`
+had one kind of row — a command you press, which does something and closes the menu. It now has three.
+
+**The kind is a field on the record, not a second component.** `MenuItem<T>` gains `kind?: "command" |
+"checkbox" | "radio"`, absent meaning command, so every list written before this is unchanged and a list can
+mix all three. A discriminated union in `SelectItem`'s shape was the alternative and buys nothing here: the
+three kinds carry the same fields and differ only in what pressing one does, where a `Select` group differs
+from an option in having children at all.
+
+**A run of adjacent radio rows is one group, derived rather than declared.** Nothing names a group; the
+component walks the list and treats consecutive `radio` rows as a set, boxing them in `role="group"` the way
+the published pattern asks. The alternative — a `radioGroup: string` field on each row — is a second thing to
+keep in step with the order the rows are written in, and a group whose members are not adjacent is not a
+thing a menu can draw anyway. `MenuUtils.getRuns` is the walk; everything that is not a radio is a run of
+one, so the render is flat whatever the list holds.
+
+**One signal holds every checked value, radios included.** `checkedSignal: Signal<T[]>` is `MultiSelect`'s
+shape, and a radio pick is expressed as set arithmetic over it: drop whatever else in this row's own run is
+in the list, then add this one. So a consumer reads one array rather than one array plus a value per group,
+and the library needs no notion of a group identity to write it — the run it was handed is enough.
+
+**A tick keeps the menu open and a pick closes it, because that is the split `Select` already made.** A
+multi list stays open across a pick and a single one closes; ticking is a thing you do several times and
+picking one of a set is a thing you do once. Following the existing decision rather than inventing a third
+answer also means the two controls cannot drift apart. Radix arrives at the same behaviour by a different
+route — its items close on select unless the consumer prevents it.
+
+**`aria-checked` goes on the two stateful roles and nowhere near a command.** The attribute is what tells a
+reader a thing is checkable at all, so a command carrying `aria-checked="false"` would announce one that can
+never be checked. `MenuItemFlags` gains `isChecked`; the painter reads the kind off the record it already
+has, which is why no `kind` flag was added beside it.
+
+**What the level owes the top and what the top owes back.** A submenu is another `MenuLevel`, so the checked
+values are handed down as a read-only accessor and the pick is handed up: `onPick(item, radioGroupValues)`
+replaced `onActivate(value)` on the level, because the level is the only place that knows which run a row
+belongs to and the top is the only place that owns the signal and can close. The public `onActivate(value)`
+is unchanged.

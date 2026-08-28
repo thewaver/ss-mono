@@ -6,7 +6,7 @@ export type CurrencyInputExampleProps = AccessorProps<{
     locale: string;
     decimals: number;
     hasSign: boolean;
+    valueSignal: Signal<number | undefined>;
 }> & {
     groupSizes: MaybeAccessor<number[] | undefined>;
-    valueSignal: Signal<number | undefined>;
 };

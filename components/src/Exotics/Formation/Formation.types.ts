@@ -22,8 +22,8 @@ export type FormationItemState = {
 
 export type FormationProps<T> = AccessorProps<{
     isStackedInReverse?: boolean;
+    computeLayout: (itemCount: number) => FormationLayout;
 }> & {
     items: MaybeAccessor<T[]>;
-    computeLayout: (itemCount: number) => FormationLayout;
     renderItem: (getItem: Accessor<T>, getState: Accessor<FormationItemState>) => JSX.Element;
 };

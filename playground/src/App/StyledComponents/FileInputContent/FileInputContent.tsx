@@ -16,7 +16,7 @@ export const PageFileInputContent = (props: FileInputContentProps) => {
                 [styles.isDisabled]: access(props.flags).isDisabled,
                 [styles.hasError]: access(props.flags).hasError,
             }}
-            aria-hidden
+            aria-hidden="true"
         >
             <div class={styles.fileInputPrompt}>{PICK_FILE_MARK}</div>
 

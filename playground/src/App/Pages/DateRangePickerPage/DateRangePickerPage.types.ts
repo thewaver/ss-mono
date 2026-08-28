@@ -4,6 +4,5 @@ import type { AccessorProps, DateValueCalendarId, DateValueRange } from "@thewav
 
 export type DateRangeExampleProps = AccessorProps<{
     calendar: DateValueCalendarId;
-}> & {
     valueSignal: Signal<DateValueRange | undefined>;
-};
+}>;

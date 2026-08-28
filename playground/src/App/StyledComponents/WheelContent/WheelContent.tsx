@@ -108,7 +108,7 @@ export const PageWheelMount = (props: ParentProps) => <div class={styles.wheelMo
 
 export const PageWheelPip = (props: PageWheelPipProps) => {
     return (
-        <div class={PIP_SIDE_STYLES[access(props.side)]} aria-hidden>
+        <div class={PIP_SIDE_STYLES[access(props.side)]} aria-hidden="true">
             <svg class={styles.wheelPipShape} viewBox="0 0 20 20">
                 <path d={PIP_PATH} />
             </svg>
@@ -129,7 +129,7 @@ export const PageWheelSpin = (props: PageWheelSpinProps) => {
                 [styles.isActive]: access(props.flags).isActive,
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}
-            aria-hidden
+            aria-hidden="true"
         >
             {access(props.phase) === "spinning" || access(props.phase) === "settling" ? "…" : "Spin"}
         </div>

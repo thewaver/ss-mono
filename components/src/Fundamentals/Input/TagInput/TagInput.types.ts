@@ -34,10 +34,9 @@ export type TagInputProps = Omit<InteractionWrapperProps<TagInputFlags>, "render
             Pick<InteractionControlProps<TagInputFlags>, "id" | "renderContent"> &
             TagInputState & {
                 valueSignal: Signal<string[]>;
+                textSignal?: Signal<string>;
+                computeTextStyle?: (getFlags: () => InteractionFlags<TagInputFlags>) => TextFieldTextStyle;
+                renderTag: (getTag: Accessor<string>, getFlags: () => InteractionFlags) => JSX.Element;
+                renderPlaceholder?: (getFlags: () => InteractionFlags<TagInputFlags>) => JSX.Element;
             }
-    > & {
-        textSignal?: Signal<string>;
-        computeTextStyle?: (getFlags: () => InteractionFlags<TagInputFlags>) => TextFieldTextStyle;
-        renderTag: (getTag: Accessor<string>, getFlags: () => InteractionFlags) => JSX.Element;
-        renderPlaceholder?: (getFlags: () => InteractionFlags<TagInputFlags>) => JSX.Element;
-    };
+    >;

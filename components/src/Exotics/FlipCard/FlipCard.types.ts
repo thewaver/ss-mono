@@ -20,8 +20,7 @@ export type FlipCardProps = AccessorProps<{
     transitionDurationMs?: number;
     ariaLabel: string;
     computeFaceLabel?: (face: FlipCardFace) => string;
-}> & {
     flippedSignal: Signal<boolean>;
     renderFront: (getState: Accessor<FlipCardState>) => JSX.Element;
     renderBack: (getState: Accessor<FlipCardState>) => JSX.Element;
-};
+}>;

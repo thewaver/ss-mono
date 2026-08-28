@@ -24,7 +24,7 @@ export const PageScrollerButton = (props: ScrollerButtonProps) => {
                         [styles.isActive]: getFlags().isActive,
                         [styles.isDisabled]: getFlags().isDisabled,
                     }}
-                    aria-hidden
+                    aria-hidden="true"
                 >
                     {getIsPrevious() ? "‹" : "›"}
                 </div>

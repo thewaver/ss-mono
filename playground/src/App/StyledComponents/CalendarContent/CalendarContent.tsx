@@ -23,7 +23,7 @@ export const PageCalendarDay = (props: CalendarDayProps) => {
             data-in-range={access(props.flags).isInRange || undefined}
             data-range-start={access(props.flags).isRangeStart || undefined}
             data-range-end={access(props.flags).isRangeEnd || undefined}
-            aria-hidden
+            aria-hidden="true"
         >
             {access(props.flags).day.day}
         </div>
@@ -31,14 +31,18 @@ export const PageCalendarDay = (props: CalendarDayProps) => {
 };
 
 export const PageCalendarWeekday = (props: ParentProps) => (
-    <div class={styles.calendarWeekday} aria-hidden>
+    <div class={styles.calendarWeekday} aria-hidden="true">
         {props.children}
     </div>
 );
 
 export const PageCalendarTitle = (props: ParentProps<CalendarTitleProps>) => {
     return (
-        <div class={styles.calendarTitle} classList={{ [styles.isHovered]: access(props.flags).isHovered }} aria-hidden>
+        <div
+            class={styles.calendarTitle}
+            classList={{ [styles.isHovered]: access(props.flags).isHovered }}
+            aria-hidden="true"
+        >
             {props.children}
         </div>
     );

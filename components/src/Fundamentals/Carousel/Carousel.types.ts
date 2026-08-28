@@ -42,10 +42,9 @@ export type CarouselRotationFlags = {
 export type CarouselControlProps = AccessorProps<
     InteractionControlProps & {
         isCurrent: boolean;
+        onActivate: () => void;
     }
-> & {
-    onActivate: () => void;
-};
+>;
 
 export type CarouselControls = {
     getIndex: Accessor<number>;

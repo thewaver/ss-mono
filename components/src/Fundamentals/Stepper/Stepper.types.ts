@@ -26,6 +26,7 @@ export type StepperProps<TValue, TState> = AccessorProps<{
     dir?: StepperDir;
     gap?: number;
     ariaLabel?: string;
+    renderConnector?: () => JSX.Element;
 }> & {
     steps: MaybeAccessor<Step<TValue, TState>[]>;
     currentValue: MaybeAccessor<TValue | undefined>;
@@ -39,6 +40,5 @@ export type StepperProps<TValue, TState> = AccessorProps<{
         getFlags: () => InteractionFlags<StepperFlags>,
     ) => JSX.Element;
     renderBody?: (getStep: Accessor<Step<TValue, TState>>, index: number) => JSX.Element;
-    renderConnector?: () => JSX.Element;
     onCurrentChange?: (value: TValue) => void;
 };

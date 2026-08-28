@@ -31,11 +31,10 @@ export type CalendarWeekdayRenderer = (name: string, index: number) => JSX.Eleme
 export type CalendarDayProps = AccessorProps<
     Omit<InteractionControlProps<CalendarFlags>, "renderContent"> & {
         ariaLabel: string;
+        renderContent: (getFlags: () => InteractionFlags<CalendarFlags>) => JSX.Element;
+        onSelect: () => void;
     }
-> & {
-    renderContent: (getFlags: () => InteractionFlags<CalendarFlags>) => JSX.Element;
-    onSelect: () => void;
-};
+>;
 
 export type CalendarBaseProps = AccessorProps<{
     ariaLabel?: string;
@@ -48,11 +47,10 @@ export type CalendarBaseProps = AccessorProps<{
     isDisabled?: boolean;
     gap?: number;
     computeIsDayDisabled?: (day: DateValue) => boolean;
-}> & {
     monthSignal: Signal<DateValue>;
     renderDay: CalendarDayRenderer;
     renderWeekday?: CalendarWeekdayRenderer;
-};
+}>;
 
 export type CalendarCompositeProps = CalendarBaseProps & {
     computeIsSelected: (day: DateValue) => boolean;

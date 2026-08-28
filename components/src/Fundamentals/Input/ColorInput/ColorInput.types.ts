@@ -51,15 +51,14 @@ export type ColorInputProps = Omit<InteractionWrapperProps<ColorInputFlags>, "re
             Pick<InteractionControlProps<ColorInputFlags>, "id" | "renderContent"> &
             ColorInputState & {
                 valueSignal: Signal<string>;
+                visibilitySignal?: Signal<boolean>;
+                renderArea: (getFlags: () => InteractionFlags<ColorAreaFlags>) => JSX.Element;
+                renderHue: (getFlags: () => InteractionFlags<RangeFlags>) => JSX.Element;
+                renderPopup: (
+                    renderSurface: () => JSX.Element,
+                    hsvSignal: Signal<Color.HSVA>,
+                    getVisibilityTarget: () => 0 | 1,
+                    getTransitionDurationMs: () => number,
+                ) => JSX.Element;
             }
-    > & {
-        visibilitySignal?: Signal<boolean>;
-        renderArea: (getFlags: () => InteractionFlags<ColorAreaFlags>) => JSX.Element;
-        renderHue: (getFlags: () => InteractionFlags<RangeFlags>) => JSX.Element;
-        renderPopup: (
-            renderSurface: () => JSX.Element,
-            hsvSignal: Signal<Color.HSVA>,
-            getVisibilityTarget: () => 0 | 1,
-            getTransitionDurationMs: () => number,
-        ) => JSX.Element;
-    };
+    >;

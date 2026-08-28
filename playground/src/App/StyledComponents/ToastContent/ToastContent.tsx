@@ -26,7 +26,7 @@ export const PageToastContent = (props: ToastContentProps) => {
             <div class={styles.toastBody}>
                 <div class={styles.toastMessage}>{access(props.toast).value.message}</div>
 
-                <div class={styles.toastMeta} aria-hidden>
+                <div class={styles.toastMeta} aria-hidden="true">
                     {access(props.state).index + POSITION_OFFSET} of {access(props.state).count}
                     {access(props.toast).durationMs === undefined && " · stays until dismissed"}
                     {access(props.state).isPaused && " · paused"}

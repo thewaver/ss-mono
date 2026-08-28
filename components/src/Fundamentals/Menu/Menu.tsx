@@ -1,5 +1,5 @@
 import type { JSX } from "solid-js";
-import { Index, Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
+import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
 import { Rect } from "@thewaver/ss-utils";
 
@@ -18,13 +18,18 @@ import { Popover } from "../Popover/Popover";
 import type {
     ContextMenuProps,
     MenuHighlightPosition,
+    MenuItem,
+    MenuItemKind,
     MenuItemViewProps,
     MenuLevelProps,
     MenuProps,
     MenuTriggerProps,
 } from "./Menu.types";
+import { MenuUtils } from "./Menu.utils";
 
 import * as styles from "./Menu.css";
+
+const EMPTY_CHECKED: never[] = [];
 
 const DEFAULT_SUBMENU_PLACEMENT: AnchorPlacement = { x: "right-out", y: "top-in" };
 const SUBMENU_OPEN_KEY = "ArrowRight";
@@ -60,6 +65,12 @@ const MenuTrigger = (props: MenuTriggerProps) => {
     );
 };
 
+const MENU_ITEM_ROLES: Record<MenuItemKind, "menuitem" | "menuitemcheckbox" | "menuitemradio"> = {
+    command: "menuitem",
+    checkbox: "menuitemcheckbox",
+    radio: "menuitemradio",
+};
+
 const MenuItemView = (props: MenuItemViewProps) => {
     const [getElementRef, setElementRef] = createSignal<HTMLElement>();
 
@@ -83,8 +94,9 @@ const MenuItemView = (props: MenuItemViewProps) => {
                 props.ref?.(element);
             }}
             class={styles.menuItem}
-            role="menuitem"
+            role={MENU_ITEM_ROLES[access(props.kind)]}
             aria-disabled={getIsDisabled() || undefined}
+            aria-checked={access(props.kind) === "command" ? undefined : access(props.flags).isChecked}
             aria-haspopup={getHasSubmenu() ? "menu" : undefined}
             aria-expanded={getHasSubmenu() ? getIsOpen() : undefined}
             aria-controls={getIsOpen() ? access(props.submenuId) : undefined}
@@ -185,7 +197,9 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
             return;
         }
 
-        props.onActivate(access(props.items)[index].value);
+        const items = access(props.items);
+
+        props.onPick(items[index], MenuUtils.getRadioGroupValues(items, index));
     };
 
     createEffect(() => {
@@ -261,70 +275,90 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         highlightIndex(navigable[position]);
     };
 
+    const renderItemAt = (getItem: () => MenuItem<T>, index: number) => {
+        const [getItemRef, setItemRef] = createSignal<HTMLElement>();
+
+        const getIsSubmenuOpen = () => computeHasSubmenu(index) && getOpenValue() === getItem().value;
+
+        return (
+            <InteractionWrapper
+                sizing={"fill"}
+                isDisabled={() => getItem().isDisabled ?? false}
+                isReachableWhenDisabled={() => getItem().isReachableWhenDisabled ?? false}
+                isTabbable={false}
+                tooltipDefs={() => getItem().tooltipDefs}
+                extraFlags={() => ({
+                    isHighlighted: index === getHighlightedIndex(),
+                    hasSubmenu: computeHasSubmenu(index),
+                    isOpen: getIsSubmenuOpen(),
+                    isChecked: access(props.checkedValues).includes(getItem().value),
+                })}
+                renderControl={(setElementRef, getFlags) => (
+                    <>
+                        <MenuItemView
+                            kind={() => MenuUtils.getKind(getItem())}
+                            ref={(element) => {
+                                setElementRef(element);
+                                setItemRef(element);
+                            }}
+                            id={() => getItemId(index)}
+                            submenuId={() => getSubmenuId(index)}
+                            flags={getFlags}
+                            renderContent={(getItemFlags) => props.renderItem(getItem, getItemFlags)}
+                            onActivate={() => activateIndex(index)}
+                            onHover={() => hoverIndex(index)}
+                        />
+
+                        <Show when={computeHasSubmenu(index)}>
+                            <MenuLevel
+                                id={() => getSubmenuId(index)}
+                                labelledBy={() => getItemId(index)}
+                                items={() => getItem().items!}
+                                isOpen={getIsSubmenuOpen}
+                                isSubmenu={true}
+                                anchorRef={getItemRef}
+                                triggerRef={props.triggerRef}
+                                placement={props.submenuPlacement}
+                                offset={props.submenuOffset}
+                                submenuPlacement={props.submenuPlacement}
+                                submenuOffset={props.submenuOffset}
+                                reservedScreenSize={props.reservedScreenSize}
+                                transitionDurationMs={props.transitionDurationMs}
+                                openerFlags={getFlags}
+                                checkedValues={props.checkedValues}
+                                computeCustomText={props.computeCustomText}
+                                renderItem={props.renderItem}
+                                renderPopup={props.renderPopup}
+                                onPick={props.onPick}
+                                onClose={() => setOpenValue(() => undefined)}
+                                onDismiss={props.onDismiss}
+                            />
+                        </Show>
+                    </>
+                )}
+            />
+        );
+    };
+
+    /**
+     * A run of adjacent radio rows is one set, and the published pattern asks for it to be a group. Everything
+     * else is a run of one, so the walk below is flat whatever the list holds.
+     */
     const renderItems = () => (
-        <Index each={access(props.items)}>
-            {(getItem, index) => {
-                const [getItemRef, setItemRef] = createSignal<HTMLElement>();
-
-                const getIsSubmenuOpen = () => computeHasSubmenu(index) && getOpenValue() === getItem().value;
-
-                return (
-                    <InteractionWrapper
-                        sizing={"fill"}
-                        isDisabled={() => getItem().isDisabled ?? false}
-                        isReachableWhenDisabled={() => getItem().isReachableWhenDisabled ?? false}
-                        isTabbable={false}
-                        tooltipDefs={() => getItem().tooltipDefs}
-                        extraFlags={() => ({
-                            isHighlighted: index === getHighlightedIndex(),
-                            hasSubmenu: computeHasSubmenu(index),
-                            isOpen: getIsSubmenuOpen(),
-                        })}
-                        renderControl={(setElementRef, getFlags) => (
-                            <>
-                                <MenuItemView
-                                    ref={(element) => {
-                                        setElementRef(element);
-                                        setItemRef(element);
-                                    }}
-                                    id={() => getItemId(index)}
-                                    submenuId={() => getSubmenuId(index)}
-                                    flags={getFlags}
-                                    renderContent={(getItemFlags) => props.renderItem(getItem, getItemFlags)}
-                                    onActivate={() => activateIndex(index)}
-                                    onHover={() => hoverIndex(index)}
-                                />
-
-                                <Show when={computeHasSubmenu(index)}>
-                                    <MenuLevel
-                                        id={() => getSubmenuId(index)}
-                                        labelledBy={() => getItemId(index)}
-                                        items={() => getItem().items!}
-                                        isOpen={getIsSubmenuOpen}
-                                        isSubmenu={true}
-                                        anchorRef={getItemRef}
-                                        triggerRef={props.triggerRef}
-                                        placement={props.submenuPlacement}
-                                        offset={props.submenuOffset}
-                                        submenuPlacement={props.submenuPlacement}
-                                        submenuOffset={props.submenuOffset}
-                                        reservedScreenSize={props.reservedScreenSize}
-                                        transitionDurationMs={props.transitionDurationMs}
-                                        openerFlags={getFlags}
-                                        computeCustomText={props.computeCustomText}
-                                        renderItem={props.renderItem}
-                                        renderPopup={props.renderPopup}
-                                        onActivate={props.onActivate}
-                                        onClose={() => setOpenValue(() => undefined)}
-                                        onDismiss={props.onDismiss}
-                                    />
-                                </Show>
-                            </>
-                        )}
-                    />
-                );
-            }}
-        </Index>
+        <For each={MenuUtils.getRuns(access(props.items))}>
+            {(run) => (
+                <Show
+                    when={run.isRadioGroup}
+                    fallback={
+                        <Index each={run.items}>{(getItem, index) => renderItemAt(getItem, run.from + index)}</Index>
+                    }
+                >
+                    <div role="group">
+                        <Index each={run.items}>{(getItem, index) => renderItemAt(getItem, run.from + index)}</Index>
+                    </div>
+                </Show>
+            )}
+        </For>
     );
 
     return (
@@ -383,6 +417,29 @@ export const Menu = <T,>(props: MenuProps<T>) => {
         setIsOpen(false);
     };
 
+    const getCheckedValues = createMemo(() => props.checkedSignal?.[0]() ?? EMPTY_CHECKED);
+
+    const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
+        const kind = MenuUtils.getKind(item);
+        const checkedSignal = props.checkedSignal;
+
+        if (kind !== "command" && checkedSignal) {
+            const checked = checkedSignal[0]();
+
+            checkedSignal[1](() =>
+                kind === "checkbox"
+                    ? checked.includes(item.value)
+                        ? checked.filter((value) => value !== item.value)
+                        : [...checked, item.value]
+                    : [...checked.filter((value) => !radioGroupValues.includes(value)), item.value],
+            );
+        }
+
+        props.onActivate(item.value);
+
+        if (kind !== "checkbox") close();
+    };
+
     createEffect(() => {
         if (getIsOpen()) return;
 
@@ -436,14 +493,11 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         reservedScreenSize={props.reservedScreenSize}
                         transitionDurationMs={props.transitionDurationMs}
                         openerFlags={getFlags}
+                        checkedValues={getCheckedValues}
                         computeCustomText={props.computeCustomText}
                         renderItem={props.renderItem}
                         renderPopup={props.renderPopup}
-                        onActivate={(value) => {
-                            props.onActivate(value);
-
-                            close();
-                        }}
+                        onPick={pick}
                         onClose={close}
                         onDismiss={close}
                     />
@@ -464,6 +518,29 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
 
     const close = () => {
         setIsOpen(false);
+    };
+
+    const getCheckedValues = createMemo(() => props.checkedSignal?.[0]() ?? EMPTY_CHECKED);
+
+    const pick = (item: MenuItem<T>, radioGroupValues: T[]) => {
+        const kind = MenuUtils.getKind(item);
+        const checkedSignal = props.checkedSignal;
+
+        if (kind !== "command" && checkedSignal) {
+            const checked = checkedSignal[0]();
+
+            checkedSignal[1](() =>
+                kind === "checkbox"
+                    ? checked.includes(item.value)
+                        ? checked.filter((value) => value !== item.value)
+                        : [...checked, item.value]
+                    : [...checked.filter((value) => !radioGroupValues.includes(value)), item.value],
+            );
+        }
+
+        props.onActivate(item.value);
+
+        if (kind !== "checkbox") close();
     };
 
     createEffect(() => {
@@ -511,14 +588,11 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
             reservedScreenSize={props.reservedScreenSize}
             transitionDurationMs={props.transitionDurationMs}
             openerFlags={() => ({ isOpen: getIsOpen() })}
+            checkedValues={getCheckedValues}
             computeCustomText={props.computeCustomText}
             renderItem={props.renderItem}
             renderPopup={props.renderPopup}
-            onActivate={(value) => {
-                props.onActivate(value);
-
-                close();
-            }}
+            onPick={pick}
             onClose={close}
             onDismiss={close}
         />

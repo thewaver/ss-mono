@@ -17,7 +17,7 @@ export const PageMeridiemToggle = (props: MeridiemToggleProps) => {
                         [styles.isHovered]: getFlags().isHovered,
                         [styles.isDisabled]: getFlags().isDisabled,
                     }}
-                    aria-hidden
+                    aria-hidden="true"
                 >
                     {access(props.meridiem) === "am" ? "AM" : "PM"}
                 </div>

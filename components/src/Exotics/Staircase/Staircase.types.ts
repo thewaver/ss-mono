@@ -18,8 +18,8 @@ export type StaircaseProps<T> = AccessorProps<{
     indent: number;
     gap?: number;
     dir?: StaircaseDir;
+    computeStepIndent?: (defs: StaircaseStepDefs) => number;
 }> & {
     steps: MaybeAccessor<T[]>;
-    computeStepIndent?: (defs: StaircaseStepDefs) => number;
     renderStep: (getStep: Accessor<T>, getState: Accessor<StaircaseStepState>) => JSX.Element;
 };

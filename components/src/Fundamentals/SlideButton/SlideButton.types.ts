@@ -40,7 +40,7 @@ export type SlideButtonProps = Omit<InteractionWrapperProps<SlideButtonFlags>, "
     AccessorProps<
         SlideButtonCbs &
             Pick<InteractionControlProps<SlideButtonFlags>, "id" | "ariaLabel" | "renderContent"> &
-            SlideButtonState
-    > & {
-        progressSignal?: Signal<number>;
-    };
+            SlideButtonState & {
+                progressSignal?: Signal<number>;
+            }
+    >;

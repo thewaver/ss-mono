@@ -14,7 +14,7 @@ export const PageTextFieldPlaceholder = (props: ParentProps<TextFieldPlaceholder
                 [styles.isTopAligned]: access(props.isTopAligned),
                 [styles.isEmpty]: access(props.flags).isEmpty,
             }}
-            aria-hidden
+            aria-hidden="true"
         >
             {props.children}
         </div>

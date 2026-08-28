@@ -26,7 +26,7 @@ export const PagePaginatorPage = (props: PaginatorPageContentProps) => {
                 [styles.isActive]: access(props.flags).isActive,
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}
-            aria-hidden
+            aria-hidden="true"
         >
             {access(props.flags).page}
         </div>
@@ -42,7 +42,7 @@ export const PagePaginatorStep = (props: PaginatorStepContentProps) => {
                 [styles.isActive]: access(props.flags).isActive,
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}
-            aria-hidden
+            aria-hidden="true"
         >
             {STEP_GLYPHS[access(props.flags).step]}
         </div>

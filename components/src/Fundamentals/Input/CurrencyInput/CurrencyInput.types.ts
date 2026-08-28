@@ -23,7 +23,7 @@ export type CurrencyInputProps = Omit<
         decimals?: number;
         locale?: string;
         hasSign?: boolean;
+        valueSignal: Signal<number | undefined>;
     }> & {
         groupSizes?: MaybeAccessor<number[] | undefined>;
-        valueSignal: Signal<number | undefined>;
     };

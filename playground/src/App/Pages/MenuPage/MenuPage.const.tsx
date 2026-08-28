@@ -19,6 +19,18 @@ export const ACTIONS: MenuItem<Action>[] = [
     { value: { name: "Delete", shortcut: "Del" } },
 ];
 
+export const VIEW_OPTIONS: MenuItem<Action>[] = [
+    { value: { name: "Word wrap" }, kind: "checkbox" },
+    { value: { name: "Show whitespace" }, kind: "checkbox" },
+    { value: { name: "Minimap" }, kind: "checkbox" },
+    { value: { name: "Small" }, kind: "radio" },
+    { value: { name: "Medium" }, kind: "radio" },
+    { value: { name: "Large" }, kind: "radio" },
+    { value: { name: "Reset view" } },
+];
+
+export const VIEW_DEFAULTS: Action[] = [VIEW_OPTIONS[0].value, VIEW_OPTIONS[4].value];
+
 export const ACTIONS_WITH_DISABLED: MenuItem<Action>[] = [
     { value: { name: "Cut", shortcut: "Ctrl+X" } },
     { value: { name: "Copy", shortcut: "Ctrl+C" } },
@@ -101,7 +113,7 @@ export const renderMenuItem = (
     getItem: Accessor<MenuItem<Action>>,
     getFlags: () => InteractionFlags<MenuItemFlags>,
 ) => (
-    <PageMenuItemContent flags={getFlags} shortcut={() => getItem().value.shortcut ?? ""}>
+    <PageMenuItemContent flags={getFlags} kind={() => getItem().kind} shortcut={() => getItem().value.shortcut ?? ""}>
         {getItem().value.name}
     </PageMenuItemContent>
 );

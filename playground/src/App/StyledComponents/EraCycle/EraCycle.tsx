@@ -33,7 +33,7 @@ export const PageEraCycle = (props: EraCycleProps) => {
                             [styles.isHovered]: getFlags().isHovered,
                             [styles.isDisabled]: getFlags().isDisabled,
                         }}
-                        aria-hidden
+                        aria-hidden="true"
                     >
                         {getCurrent()?.shortName ?? access(props.era)}
                     </div>

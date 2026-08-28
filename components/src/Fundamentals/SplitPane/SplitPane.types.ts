@@ -1,7 +1,7 @@
 import type { Accessor, JSX, Signal } from "solid-js";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
+import type { AccessorProps } from "../../Utils/typeUtils";
 
 export type SplitPaneDir = "row" | "column";
 
@@ -22,9 +22,8 @@ export type SplitPaneProps = AccessorProps<{
     keyStep?: number;
     ariaLabel?: string;
     isDisabled?: boolean;
-}> & {
-    panes: MaybeAccessor<SplitPaneEntry[]>;
+    panes: SplitPaneEntry[];
     ratiosSignal: Signal<number[]>;
     renderPane: (getPane: Accessor<SplitPaneEntry>, index: number) => JSX.Element;
     renderGutter: (getFlags: () => InteractionFlags<SplitPaneGutterFlags>) => JSX.Element;
-};
+}>;

@@ -17,14 +17,18 @@ export type MenuFlags = {
 
 export type MenuHighlightPosition = "first" | "last";
 
+export type MenuItemKind = "command" | "checkbox" | "radio";
+
 export type MenuItemFlags = {
     isHighlighted: boolean;
     hasSubmenu: boolean;
     isOpen: boolean;
+    isChecked: boolean;
 };
 
 export type MenuItem<T> = {
     value: T;
+    kind?: MenuItemKind;
     items?: MenuItem<T>[];
     isDisabled?: boolean;
     isReachableWhenDisabled?: boolean;
@@ -35,19 +39,24 @@ export type MenuTriggerProps = AccessorProps<
     InteractionControlProps<MenuFlags> & {
         menuId: string;
         ariaLabel?: string;
+        onToggle: () => void;
+        onKeyDown: (e: KeyboardEvent) => void;
     }
-> & {
-    onToggle: () => void;
-    onKeyDown: (e: KeyboardEvent) => void;
-};
+>;
 
 export type MenuItemViewProps = AccessorProps<
     InteractionControlProps<MenuItemFlags> & {
+        kind: MenuItemKind;
         submenuId?: string;
+        onActivate: () => void;
+        onHover: () => void;
     }
-> & {
-    onActivate: () => void;
-    onHover: () => void;
+>;
+
+export type MenuRun<T> = {
+    from: number;
+    items: MenuItem<T>[];
+    isRadioGroup: boolean;
 };
 
 export type MenuRenderItem<T> = (
@@ -79,15 +88,16 @@ export type MenuLevelProps<T> = AccessorProps<{
     reservedScreenSize?: Size2d;
     transitionDurationMs?: number;
     openerFlags: InteractionFlags<MenuFlags>;
+    renderPopup: MenuRenderPopup;
+    onClose: () => void;
+    onDismiss: () => void;
 }> & {
     anchorRect?: MaybeAccessor<Rect | undefined>;
     items: MaybeAccessor<MenuItem<T>[]>;
+    checkedValues: MaybeAccessor<T[]>;
     computeCustomText?: (item: MenuItem<T>) => string;
     renderItem: MenuRenderItem<T>;
-    renderPopup: MenuRenderPopup;
-    onActivate: (value: T) => void;
-    onClose: () => void;
-    onDismiss: () => void;
+    onPick: (item: MenuItem<T>, radioGroupValues: T[]) => void;
 };
 
 export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderControl" | "extraFlags"> &
@@ -100,14 +110,15 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         submenuOffset?: Point2d;
         reservedScreenSize?: Size2d;
         transitionDurationMs?: number;
-    }> & {
         visibilitySignal?: Signal<boolean>;
+        renderContent: (getFlags: () => InteractionFlags<MenuFlags>) => JSX.Element;
+        renderPopup: MenuRenderPopup;
+    }> & {
         anchorRef?: MaybeAccessor<HTMLElement | undefined>;
         items: MaybeAccessor<MenuItem<T>[]>;
+        checkedSignal?: Signal<T[]>;
         computeCustomText?: (item: MenuItem<T>) => string;
-        renderContent: (getFlags: () => InteractionFlags<MenuFlags>) => JSX.Element;
         renderItem: MenuRenderItem<T>;
-        renderPopup: MenuRenderPopup;
         onActivate: (value: T) => void;
     };
 
@@ -120,12 +131,13 @@ export type ContextMenuProps<T> = AccessorProps<{
     submenuOffset?: Point2d;
     reservedScreenSize?: Size2d;
     transitionDurationMs?: number;
-}> & {
     visibilitySignal?: Signal<boolean>;
+    renderPopup: MenuRenderPopup;
+}> & {
     regionRef: MaybeAccessor<HTMLElement | undefined>;
     items: MaybeAccessor<MenuItem<T>[]>;
+    checkedSignal?: Signal<T[]>;
     computeCustomText?: (item: MenuItem<T>) => string;
     renderItem: MenuRenderItem<T>;
-    renderPopup: MenuRenderPopup;
     onActivate: (value: T) => void;
 };

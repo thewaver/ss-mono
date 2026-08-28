@@ -15,6 +15,8 @@ import {
 
 const LISTBOX = '[role="listbox"]';
 const OPTION = '[role="listbox"] [role="option"]';
+const GROUP_HEADER = '[role="listbox"] [role="group"] [data-checked-state]';
+const CHECKED_STATE = "data-checked-state";
 
 const field = (key: string) => `${demo(key)} [role="combobox"]`;
 
@@ -153,6 +155,43 @@ test("a multi list stays open, accumulates and toggles back out", async ({ page 
 
     await page.locator(OPTION, { hasText: "Belgium" }).first().click();
     expect(await readout(page, "multiSelect"), "picking it again toggles it back out").not.toContain("Belgium");
+});
+
+/**
+ * The header of a group is painted by the consumer, so the library hands it a `checkedState` rather than
+ * drawing anything itself. The Playground's header puts that value on `data-checked-state`, which is what
+ * this reads — the paint beside it is the Playground's business and is deliberately not asserted.
+ *
+ * Nordics holds Denmark, a disabled Finland and Sweden. Finland cannot be picked, so that group can never
+ * report `true` from the list alone; picking both of the others still leaves one option unselected, which
+ * is exactly what mixed means. Benelux is the group that can go all the way.
+ */
+test("a group header summarises its own options as unchecked, mixed or checked", async ({ page }) => {
+    await openedWithHighlight(page, "multiSelectGrouped");
+
+    expect(
+        await attributesOf(page, GROUP_HEADER, CHECKED_STATE),
+        "with nothing picked, every header reads unchecked",
+    ).toEqual(["false", "false"]);
+
+    await page.locator(OPTION, { hasText: "Belgium" }).first().click();
+    expect(
+        await attributesOf(page, GROUP_HEADER, CHECKED_STATE),
+        "picking one option in a group takes only that group to mixed",
+    ).toEqual(["false", "mixed"]);
+
+    await page.locator(OPTION, { hasText: "Netherlands" }).first().click();
+    expect(
+        await attributesOf(page, GROUP_HEADER, CHECKED_STATE),
+        "and picking the rest of it takes that group to checked",
+    ).toEqual(["false", "true"]);
+
+    await page.locator(OPTION, { hasText: "Denmark" }).first().click();
+    await page.locator(OPTION, { hasText: "Sweden" }).first().click();
+    expect(
+        await attributesOf(page, GROUP_HEADER, CHECKED_STATE),
+        "a group holding an unpickable option stays mixed however much of it is picked",
+    ).toEqual(["mixed", "true"]);
 });
 
 test("a disabled field opens nothing by pointer or by key", async ({ page }) => {

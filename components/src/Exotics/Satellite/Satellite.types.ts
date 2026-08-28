@@ -14,6 +14,5 @@ export type SatelliteProps = AccessorProps<{
     placement?: AnchorPlacement;
     offset?: Point2d;
     isBehindSubject?: boolean;
-}> & {
     renderSatellite?: () => JSX.Element;
-};
+}>;

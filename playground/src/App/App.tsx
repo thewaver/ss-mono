@@ -49,11 +49,13 @@ import { ScrollerPage } from "./Pages/ScrollerPage/ScrollerPage";
 import { SelectPage } from "./Pages/SelectPage/SelectPage";
 import { ShapePage } from "./Pages/ShapePage/ShapePage";
 import { SlideButtonPage } from "./Pages/SlideButtonPage/SlideButtonPage";
+import { SortablePage } from "./Pages/SortablePage/SortablePage";
 import { SplitPanePage } from "./Pages/SplitPanePage/SplitPanePage";
 import { SpotlightPage } from "./Pages/SpotlightPage/SpotlightPage";
 import { StaircasePage } from "./Pages/StaircasePage/StaircasePage";
 import { StepperPage } from "./Pages/StepperPage/StepperPage";
 import { SurfacePage } from "./Pages/SurfacePage/SurfacePage";
+import { TablePage } from "./Pages/TablePage/TablePage";
 import { TabsPage } from "./Pages/TabsPage/TabsPage";
 import { TagInputPage } from "./Pages/TagInputPage/TagInputPage";
 import { TextAreaPage } from "./Pages/TextAreaPage/TextAreaPage";
@@ -409,6 +411,18 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 description:
                     "A progress strip whose per-step states are the consumer's to invent — the library owns only which step is current, and insists that whatever a state means reaches the step's name as words rather than as paint alone.",
                 component: () => <StepperPage />,
+            },
+            {
+                name: "Sortable",
+                description:
+                    "Lists whose items can be picked up and put down, in place or in a sibling list. Three ways in — a drag, a tap to pick and a tap to place, and a keyboard pick-move-drop — because a control operated only by dragging is one a good many people cannot operate at all. The library owns the carry, the landing place and the announcements; the item, the list's surface and the insertion marker are all painted by the consumer.",
+                component: () => <SortablePage />,
+            },
+            {
+                name: "Table",
+                description:
+                    "A grid rather than a table: one tab stop for the whole thing, arrows walking cell to cell, and the row and column indices published so a screen reader can still count fifty thousand rows when only thirty of them exist. Sorting, selection, column widths and the scroll window are each a signal the consumer owns, and every cell is painted by the column that declared it.",
+                component: () => <TablePage />,
             },
             {
                 name: "Tabs",

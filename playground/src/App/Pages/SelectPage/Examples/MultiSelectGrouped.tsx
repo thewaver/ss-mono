@@ -31,7 +31,9 @@ export const MultiSelectGroupedExample = (props: Props) => {
                     {getSelectedOptions().length ? `${getSelectedOptions().length} selected` : PLACEHOLDER}
                 </PageSelectContent>
             )}
-            renderGroup={(getGroup) => <PageSelectGroupContent>{getGroup().label}</PageSelectGroupContent>}
+            renderGroup={(getGroup, getFlags) => (
+                <PageSelectGroupContent flags={getFlags}>{getGroup().label}</PageSelectGroupContent>
+            )}
             renderOption={(getOption, getFlags) => (
                 <PageSelectOptionContent flags={getFlags}>{getOption().value}</PageSelectOptionContent>
             )}

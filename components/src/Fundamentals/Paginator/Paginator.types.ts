@@ -1,7 +1,7 @@
 import type { Accessor, Component, JSX } from "solid-js";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
+import type { AccessorProps } from "../../Utils/typeUtils";
 import type { InteractionControlProps } from "../InteractionWrapper/InteractionWrapper.types";
 
 export type PaginatorStep = "first" | "previous" | "next" | "last";
@@ -42,10 +42,9 @@ export type PaginatorItemProps = AccessorProps<
         href: string | undefined;
         isCurrent: boolean;
         linkComponent?: Component<PaginatorLinkProps>;
+        onActivate: () => void;
     }
-> & {
-    onActivate: () => void;
-};
+>;
 
 export type PaginatorProps = AccessorProps<{
     pageCount: number;
@@ -59,8 +58,7 @@ export type PaginatorProps = AccessorProps<{
     computeHref?: (page: number) => string;
     computePageLabel?: (page: number, pageCount: number) => string;
     computeStepLabel?: (step: PaginatorStep, targetPage: number) => string;
-}> & {
-    page: MaybeAccessor<number>;
+    page: number;
     renderPage: (
         getEntry: Accessor<PaginatorPageEntry>,
         getFlags: () => InteractionFlags<PaginatorPageFlags>,
@@ -68,4 +66,4 @@ export type PaginatorProps = AccessorProps<{
     renderGap: (getEntry: Accessor<PaginatorGapEntry>) => JSX.Element;
     renderStep: (getStep: Accessor<PaginatorStep>, getFlags: () => InteractionFlags<PaginatorStepFlags>) => JSX.Element;
     onPageChange?: (page: number) => void;
-};
+}>;

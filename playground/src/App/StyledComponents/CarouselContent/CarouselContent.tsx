@@ -48,7 +48,7 @@ export const PageCarouselStep = (props: CarouselStepProps) => {
                 [styles.isActive]: access(props.flags).isActive,
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}
-            aria-hidden
+            aria-hidden="true"
         >
             {STEP_GLYPHS[access(props.flags).step]}
         </div>
@@ -64,7 +64,7 @@ export const PageCarouselRotation = (props: CarouselRotationProps) => {
                 [styles.isActive]: access(props.flags).isActive,
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}
-            aria-hidden
+            aria-hidden="true"
         >
             {access(props.flags).isPlaying ? ROTATION_GLYPHS.playing : ROTATION_GLYPHS.stopped}
         </div>
@@ -81,7 +81,7 @@ export const PageCarouselPick = (props: CarouselPickProps) => {
                 [styles.isActive]: access(props.flags).isActive,
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}
-            aria-hidden
+            aria-hidden="true"
         />
     );
 };

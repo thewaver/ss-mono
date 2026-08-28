@@ -1,5 +1,6 @@
 import type { Signal } from "solid-js";
 
+import type { CheckedState } from "../../../Abstracts/CheckedState/CheckedState.types";
 import type { AccessorProps } from "../../../Utils/typeUtils";
 import type {
     InteractionControlProps,
@@ -7,8 +8,6 @@ import type {
 } from "../../InteractionWrapper/InteractionWrapper.types";
 
 export type BinarySwitchType = "checkbox" | "radio";
-
-export type CheckedState = boolean | "mixed";
 
 export type BinarySwitchFlags = {
     checkedState: CheckedState;

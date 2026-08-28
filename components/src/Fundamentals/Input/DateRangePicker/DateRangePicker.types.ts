@@ -19,7 +19,6 @@ export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "valu
         locale?: string;
         weekStartsOn?: DateValueWeekStart;
         computeIsDayDisabled?: (day: DateValue) => boolean;
-    }> & {
         valueSignal: Signal<DateValueRange | undefined>;
         visibilitySignal?: Signal<boolean>;
         renderTrigger: (getIsOpen: () => boolean, onToggle: () => void) => JSX.Element;
@@ -32,4 +31,4 @@ export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "valu
             getVisibilityTarget: () => 0 | 1,
             getTransitionDurationMs: () => number,
         ) => JSX.Element;
-    };
+    }>;

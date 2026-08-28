@@ -7,6 +7,5 @@ export type ScrollerExampleProps = AccessorProps<{
 export type ScrollerTabbedExampleProps = AccessorProps<{
     tabs: Tab<string>[];
     selectedValue: string;
-}> & {
     onSelectionChange: (value: string) => void;
-};
+}>;

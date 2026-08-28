@@ -17,10 +17,10 @@ export type RotatorDefs = AccessorProps<{
     computeSpinTarget: () => number | Promise<number>;
     computeSpinDefs?: (index: number, stepCount: number) => RotatorSpinDefs;
     computeStepLabel?: (index: number, stepCount: number) => string;
-}> & {
-    idleDelayMs?: MaybeAccessor<number | undefined>;
     indexSignal?: Signal<number>;
     autoSpinSignal?: Signal<boolean>;
     onStepChange?: (index: number) => void;
     onSpinEnd?: (index: number) => void;
+}> & {
+    idleDelayMs?: MaybeAccessor<number | undefined>;
 };

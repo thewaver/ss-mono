@@ -6,13 +6,11 @@ export type SlideButtonExampleProps = {
 
 export type SlideButtonHeldExampleProps = AccessorProps<{
     isArmed: boolean;
-}> & {
     onActivate: () => void;
     onReset: () => void;
-};
+}>;
 
 export type SlideButtonErroredExampleProps = AccessorProps<{
     hasError: boolean;
-}> & {
     onActivate: () => void;
-};
+}>;

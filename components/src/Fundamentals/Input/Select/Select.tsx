@@ -3,6 +3,7 @@ import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueI
 
 import { CSSUtils, StringUtils } from "@thewaver/ss-utils";
 
+import { CheckedStateUtils } from "../../../Abstracts/CheckedState/CheckedState.utils";
 import { ElementObserver } from "../../../Abstracts/ElementObserver/ElementObserver";
 import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
@@ -20,6 +21,7 @@ import { LabelUtils } from "../Label/Label.utils";
 import type {
     SelectCompositeProps,
     SelectFieldProps,
+    SelectGroupFlags,
     SelectItem,
     SelectOption,
     SelectOptionGroup,
@@ -416,6 +418,12 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
         setHighlightedValue(() => nextValue);
     };
 
+    const computeGroupFlags = (group: SelectOptionGroup<T>): SelectGroupFlags => ({
+        checkedState: CheckedStateUtils.fromMembers(
+            group.options.map((option) => props.computeIsSelected(option.value)),
+        ),
+    });
+
     const renderOptionSlot = (getOption: Accessor<SelectOption<T>>, getFlatIndex: Accessor<number>) => (
         <InteractionWrapper
             sizing={"fill"}
@@ -451,7 +459,10 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                     )}
                 >
                     <div role="group" aria-label={(getItem() as SelectOptionGroup<T>).label}>
-                        {props.renderGroup?.(() => getItem() as SelectOptionGroup<T>)}
+                        {props.renderGroup?.(
+                            () => getItem() as SelectOptionGroup<T>,
+                            () => computeGroupFlags(getItem() as SelectOptionGroup<T>),
+                        )}
 
                         <Index each={(getItem() as SelectOptionGroup<T>).options}>
                             {(getOption, groupIndex) =>
@@ -475,7 +486,10 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
             >
                 <Show
                     when={getRow().option !== undefined}
-                    fallback={props.renderGroup?.(() => getRow().group as SelectOptionGroup<T>)}
+                    fallback={props.renderGroup?.(
+                        () => getRow().group as SelectOptionGroup<T>,
+                        () => computeGroupFlags(getRow().group as SelectOptionGroup<T>),
+                    )}
                 >
                     {renderOptionSlot(
                         () => getRow().option as SelectOption<T>,
@@ -532,7 +546,9 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
             </Show>
 
             <Show when={getHasMoreOptions() && access(props.options)} keyed>
-                {(_items: SelectItem<T>[]) => <div ref={setEndMarkerRef} class={styles.selectEndMarker} aria-hidden />}
+                {(_items: SelectItem<T>[]) => (
+                    <div ref={setEndMarkerRef} class={styles.selectEndMarker} aria-hidden="true" />
+                )}
             </Show>
         </>
     );

@@ -74,7 +74,7 @@ export const PageColorChannelGrid = (props: ParentProps) => <div class={styles.c
 
 export const PageColorChannel = (props: ParentProps<{ label: string }>) => (
     <div class={styles.colorChannel}>
-        <div class={styles.colorChannelLabel} aria-hidden>
+        <div class={styles.colorChannelLabel} aria-hidden="true">
             {props.label}
         </div>
 

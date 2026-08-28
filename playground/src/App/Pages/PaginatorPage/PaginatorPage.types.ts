@@ -6,6 +6,5 @@ export type PaginatorExampleProps = AccessorProps<{
     siblingCount: number;
     boundaryCount: number;
     isDisabled: boolean;
-}> & {
     onPageChange: (page: number) => void;
-};
+}>;

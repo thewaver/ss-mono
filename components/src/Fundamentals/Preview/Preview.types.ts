@@ -19,11 +19,10 @@ export type PreviewTriggerProps = AccessorProps<
     Omit<InteractionControlProps<PreviewFlags>, "renderContent"> & {
         contentId: string;
         isExpanded: boolean;
+        renderTrigger: (getFlags: () => InteractionFlags<PreviewFlags>) => JSX.Element;
+        onToggle: () => void;
     }
-> & {
-    renderTrigger: (getFlags: () => InteractionFlags<PreviewFlags>) => JSX.Element;
-    onToggle: () => void;
-};
+>;
 
 export type PreviewProps = Omit<
     InteractionWrapperProps<PreviewFlags>,
@@ -35,9 +34,8 @@ export type PreviewProps = Omit<
         collapsedHeight: number;
         isScrolledIntoViewOnCollapse?: boolean;
         transitionDurationMs?: number;
-    }> & {
         expandedSignal: Signal<boolean>;
         renderContent: () => JSX.Element;
         renderTrigger: (getFlags: () => InteractionFlags<PreviewFlags>) => JSX.Element;
         renderOverlay?: PreviewOverlayRenderer;
-    };
+    }>;

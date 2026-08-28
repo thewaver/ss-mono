@@ -50,3 +50,11 @@ export const menuItemSubmenuMark = style({
     fontSize: themeVars.fontSize.medium,
     lineHeight: 1,
 });
+
+export const menuItemMark = style({
+    width: "1ch",
+    color: themeVars.color.primary.main,
+    fontSize: themeVars.fontSize.small,
+    lineHeight: 1,
+    textAlign: "center",
+});

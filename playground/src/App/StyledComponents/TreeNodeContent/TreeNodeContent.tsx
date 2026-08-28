@@ -25,7 +25,7 @@ export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) =>
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}
         >
-            <div class={styles.treeNodeMarker} aria-hidden>
+            <div class={styles.treeNodeMarker} aria-hidden="true">
                 {access(props.flags).isBranch ? "▶" : "·"}
             </div>
 
@@ -45,7 +45,7 @@ export const PageTreeNodePending = (props: ParentProps<TreeNodePendingProps>) =>
             "padding-left": `calc(${themeVars.spacing.half} + ${access(props.depth) * INDENT_PER_DEPTH}px)`,
         }}
     >
-        <div class={styles.treeNodeMarker} aria-hidden>
+        <div class={styles.treeNodeMarker} aria-hidden="true">
             {"·"}
         </div>
 

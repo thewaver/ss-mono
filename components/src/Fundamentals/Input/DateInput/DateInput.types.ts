@@ -38,7 +38,6 @@ export type DateInputProps = Omit<
         format?: DateInputFormat;
         calendar?: DateValueCalendarId;
         locale?: string;
-    }> & {
         valueSignal: Signal<DateValue | undefined>;
         renderLeading?: (getFlags: () => InteractionFlags<TextFieldFlags>, era: DateInputEra) => JSX.Element;
-    };
+    }>;

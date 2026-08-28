@@ -26,7 +26,7 @@ export const PageSelectOptionContent = (props: ParentProps<SelectOptionContentPr
                 </Show>
             </div>
 
-            <div class={styles.selectOptionMark} aria-hidden>
+            <div class={styles.selectOptionMark} aria-hidden="true">
                 ✓
             </div>
         </div>

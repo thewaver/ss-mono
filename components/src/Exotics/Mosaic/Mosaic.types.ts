@@ -28,11 +28,14 @@ export type MosaicState = {
     gap?: number;
 };
 
-export type MosaicProps = AccessorProps<MosaicState & { isItemSized: boolean }> & {
-    sizes: MaybeAccessor<Size2d[]>;
-    computePlacements: (defs: MosaicPackDefs) => MosaicPlacement[];
-    renderItem: (index: number, getState: Accessor<MosaicItemState>) => JSX.Element;
-};
+export type MosaicProps = AccessorProps<
+    MosaicState & {
+        isItemSized: boolean;
+        sizes: Size2d[];
+        computePlacements: (defs: MosaicPackDefs) => MosaicPlacement[];
+        renderItem: (index: number, getState: Accessor<MosaicItemState>) => JSX.Element;
+    }
+>;
 
 export type MosaicImageSource = {
     src: string;

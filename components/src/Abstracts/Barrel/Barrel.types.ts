@@ -20,8 +20,8 @@ export type BarrelProps<T> = AccessorProps<{
     hasBacks?: boolean;
     transitionDurationMs?: number;
     faceRoleDescription: string;
+    computeFaceDefs: (index: number, face: BarrelFace) => BarrelFaceDefs;
 }> & {
     faces: MaybeAccessor<T[]>;
-    computeFaceDefs: (index: number, face: BarrelFace) => BarrelFaceDefs;
     renderFace: (getFace: Accessor<T>, index: number, face: BarrelFace) => JSX.Element;
 };

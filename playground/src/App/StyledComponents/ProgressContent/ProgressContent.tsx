@@ -19,7 +19,7 @@ export const PageProgressContent = (props: ProgressContentProps) => {
                 <div class={styles.progressFill} style={{ width: `${(access(props.state).ratio ?? 0) * PERCENT}%` }} />
             </div>
 
-            <div class={styles.progressReadout} aria-hidden>
+            <div class={styles.progressReadout} aria-hidden="true">
                 {access(props.state).ratio === undefined
                     ? "working…"
                     : `${Math.round(access(props.state).ratio! * PERCENT)}% of ${access(props.state).max}`}

@@ -29,9 +29,9 @@ export type BreadcrumbsProps<T> = AccessorProps<{
     gap?: number;
     ariaLabel?: string;
     linkComponent?: Component<TabLinkProps>;
+    renderSeparator?: () => JSX.Element;
 }> & {
     crumbs: MaybeAccessor<Breadcrumb<T>[]>;
     renderCrumb: (getCrumb: Accessor<Breadcrumb<T>>, getFlags: () => InteractionFlags<BreadcrumbsFlags>) => JSX.Element;
-    renderSeparator?: () => JSX.Element;
     onSelect?: (value: T) => void;
 };

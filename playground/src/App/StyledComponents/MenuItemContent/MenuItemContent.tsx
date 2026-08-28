@@ -8,6 +8,8 @@ import type { MenuItemContentProps } from "./MenuItemContent.types";
 import * as styles from "./MenuItemContent.css";
 
 const SUBMENU_MARK = "›";
+const CHECKED_MARK = "✓";
+const PICKED_MARK = "●";
 
 export const PageMenuItemContent = (props: ParentProps<MenuItemContentProps>) => {
     return (
@@ -21,6 +23,12 @@ export const PageMenuItemContent = (props: ParentProps<MenuItemContentProps>) =>
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}
         >
+            <Show when={access(props.kind) !== undefined && access(props.kind) !== "command"}>
+                <div class={styles.menuItemMark} aria-hidden="true">
+                    {access(props.flags).isChecked ? (access(props.kind) === "radio" ? PICKED_MARK : CHECKED_MARK) : ""}
+                </div>
+            </Show>
+
             <div>{props.children}</div>
 
             <Show when={access(props.shortcut)}>
@@ -28,7 +36,7 @@ export const PageMenuItemContent = (props: ParentProps<MenuItemContentProps>) =>
             </Show>
 
             <Show when={access(props.flags).hasSubmenu}>
-                <div class={styles.menuItemSubmenuMark} aria-hidden>
+                <div class={styles.menuItemSubmenuMark} aria-hidden="true">
                     {SUBMENU_MARK}
                 </div>
             </Show>

@@ -41,20 +41,19 @@ export type TreeNodeItemProps = AccessorProps<
         setSize: number;
         href: string | undefined;
         linkComponent?: Component<TreeLinkProps>;
+        onActivate: () => void;
     }
-> & {
-    onActivate: () => void;
-};
+>;
 
 export type TreeProps<T> = AccessorProps<{
     ariaLabel?: string;
     linkComponent?: Component<TreeLinkProps>;
+    computeEstimatedNodeHeight?: (index: number) => number;
 }> & {
     nodes: MaybeAccessor<TreeNode<T>[]>;
     valueSignal: Signal<T | undefined>;
     expandedSignal: Signal<T[]>;
     computeCustomText?: (node: TreeNode<T>) => string;
-    computeEstimatedNodeHeight?: (index: number) => number;
     renderNode: (getNode: Accessor<TreeNode<T>>, getFlags: () => InteractionFlags<TreeNodeFlags>) => JSX.Element;
     renderPendingChildren?: (getNode: Accessor<TreeNode<T>>, getDepth: () => number) => JSX.Element;
     onSelectionChange?: (value: T) => void;

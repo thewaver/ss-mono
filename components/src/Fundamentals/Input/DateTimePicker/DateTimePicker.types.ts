@@ -20,7 +20,6 @@ export type DateTimePickerProps = Omit<DatePickerProps, "valueSignal" | "ariaLab
         clockSteps?: ClockSteps;
         clockGap?: number;
         computeIsTimeDisabled?: (time: TimeValue) => boolean;
-    }> & {
         valueSignal: Signal<DateTimeValue | undefined>;
         dateVisibilitySignal?: Signal<boolean>;
         timeVisibilitySignal?: Signal<boolean>;
@@ -30,4 +29,4 @@ export type DateTimePickerProps = Omit<DatePickerProps, "valueSignal" | "ariaLab
         renderUnit?: ClockUnitRenderer;
         renderColumn?: ClockColumnRenderer;
         renderTimePopup: TimePickerProps["renderPopup"];
-    };
+    }>;

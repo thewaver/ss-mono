@@ -7,8 +7,9 @@ import { DisabledExample } from "./Examples/Disabled";
 import { DrivenExample } from "./Examples/Driven";
 import { PlacedAboveExample } from "./Examples/PlacedAbove";
 import { ReachableExample } from "./Examples/Reachable";
+import { StatefulExample } from "./Examples/Stateful";
 import { SubmenusExample } from "./Examples/Submenus";
-import { ACTIONS_WITH_DISABLED, ACTIONS_WITH_REACHABLE, LAYERS, NOTHING_RUN } from "./MenuPage.const";
+import { ACTIONS_WITH_DISABLED, ACTIONS_WITH_REACHABLE, LAYERS, NOTHING_RUN, VIEW_DEFAULTS } from "./MenuPage.const";
 
 const EXAMPLES_ROOT = "/src/App/Pages/MenuPage/Examples";
 
@@ -23,6 +24,8 @@ export const MenuPage = () => {
     const [getLastContextAction, setLastContextAction] = createSignal(NOTHING_RUN);
 
     const drivenVisibility = createSignal(false);
+    const viewSignal = createSignal(VIEW_DEFAULTS);
+    const [getLastViewAction, setLastViewAction] = createSignal(NOTHING_RUN);
 
     const getExamples = createMemo(() => [
         {
@@ -103,6 +106,21 @@ export const MenuPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,
+        },
+        {
+            key: "stateful",
+            name: "Rows that hold a state",
+            readout: () =>
+                `${getLastViewAction()} — ticked: [${viewSignal[0]()
+                    .map((action) => action.name)
+                    .join(", ")}]`,
+            component: () => (
+                <StatefulExample
+                    checkedSignal={viewSignal}
+                    onActivate={(action) => setLastViewAction(`ran ${action.name}`)}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Stateful.tsx`,
         },
         {
             key: "disabled",

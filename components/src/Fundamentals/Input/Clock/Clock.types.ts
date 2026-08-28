@@ -35,11 +35,10 @@ export type ClockColumnRenderer = (renderOptions: () => JSX.Element, unit: Clock
 export type ClockOptionProps = AccessorProps<
     Omit<InteractionControlProps<ClockFlags>, "renderContent"> & {
         ariaLabel: string;
+        renderContent: (getFlags: () => InteractionFlags<ClockFlags>) => JSX.Element;
+        onSelect: () => void;
     }
-> & {
-    renderContent: (getFlags: () => InteractionFlags<ClockFlags>) => JSX.Element;
-    onSelect: () => void;
-};
+>;
 
 export type ClockProps = AccessorProps<{
     ariaLabel?: string;
@@ -53,9 +52,8 @@ export type ClockProps = AccessorProps<{
     isDisabled?: boolean;
     gap?: number;
     computeIsTimeDisabled?: (time: TimeValue) => boolean;
-}> & {
     valueSignal: Signal<TimeValue | undefined>;
     renderOption: ClockOptionRenderer;
     renderUnit?: ClockUnitRenderer;
     renderColumn?: ClockColumnRenderer;
-};
+}>;

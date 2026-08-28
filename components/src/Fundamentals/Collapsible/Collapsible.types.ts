@@ -19,11 +19,10 @@ export type CollapsibleTriggerProps = AccessorProps<
     Omit<InteractionControlProps<CollapsibleFlags>, "renderContent"> & {
         panelId: string;
         isExpanded: boolean;
+        renderTrigger: (getFlags: () => InteractionFlags<CollapsibleFlags>) => JSX.Element;
+        onToggle: () => void;
     }
-> & {
-    renderTrigger: (getFlags: () => InteractionFlags<CollapsibleFlags>) => JSX.Element;
-    onToggle: () => void;
-};
+>;
 
 export type CollapsibleProps = Omit<
     InteractionWrapperProps<CollapsibleFlags>,
@@ -37,8 +36,7 @@ export type CollapsibleProps = Omit<
         isScrolledIntoViewOnExpand?: boolean;
         panelRole?: JSX.HTMLAttributes<HTMLElement>["role"];
         panelAriaAttributes?: JSX.AriaAttributes;
-    }> & {
         expandedSignal: Signal<boolean>;
         renderTrigger: (getFlags: () => InteractionFlags<CollapsibleFlags>) => JSX.Element;
         renderPanel: CollapsiblePanelRenderer;
-    };
+    }>;

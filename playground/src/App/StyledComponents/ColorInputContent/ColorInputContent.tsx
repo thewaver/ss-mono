@@ -15,7 +15,7 @@ export const PageColorInputContent = (props: ColorInputContentProps) => {
                 [styles.isDisabled]: access(props.flags).isDisabled,
                 [styles.hasError]: access(props.flags).hasError,
             }}
-            aria-hidden
+            aria-hidden="true"
         >
             <div class={styles.colorInputSwatch} style={{ "background-color": access(props.flags).value }} />
 

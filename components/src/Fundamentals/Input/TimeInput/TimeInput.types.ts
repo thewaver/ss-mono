@@ -37,7 +37,6 @@ export type TimeInputProps = Omit<
         maxTime?: TimeValue;
         hasSeconds?: boolean;
         isTwelveHour?: boolean;
-    }> & {
         valueSignal: Signal<TimeValue | undefined>;
         renderTrailing?: (getFlags: () => InteractionFlags<TextFieldFlags>, meridiem: TimeInputMeridiem) => JSX.Element;
-    };
+    }>;

@@ -19,7 +19,7 @@ export const PageTimePickerTrigger = (props: TimePickerTriggerProps) => {
                         [styles.isOpen]: access(props.isOpen),
                         [styles.isDisabled]: getFlags().isDisabled,
                     }}
-                    aria-hidden
+                    aria-hidden="true"
                 >
                     ◷
                 </div>

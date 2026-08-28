@@ -1,6 +1,7 @@
 # Working with this user
 
-How to work here. Project and repo specifics are in [`conventions.md`](conventions.md); outstanding work is
+How to work here. Library-wide rules are in [`conventions.md`](conventions.md) and per-component decisions in
+[`decisions.md`](decisions.md); outstanding work is
 in [`backlog.md`](backlog.md). Both sit at the repo root, beside this file. Read both before starting anything.
 
 ## How work gets reviewed
@@ -16,12 +17,12 @@ observed behaviour, so an explanation only decodable by someone who already know
 change ships on trust rather than understanding.
 
 **Anything with no observable behaviour passes through unexamined.** Their gate catches whatever a user
-could see. It cannot catch this file, `conventions.md`, `backlog.md`, `e2e/`, or build config —
+could see. It cannot catch this file, `conventions.md`, `decisions.md`, `backlog.md`, `e2e/`, or build config —
 nothing there changes what the Playground does. Keep such changes small, and say plainly in the reply when
 one lands there, so they can choose to look.
 
-**The four documents split by audience, and that decides how freely to write in each.** Stated by the user
-. **This file and `conventions.md` are read by Claude, not by them** — so write in them
+**The five documents split by audience, and that decides how freely to write in each.** Stated by the user
+. **This file, `conventions.md` and `decisions.md` are read by Claude, not by them** — so write in them
 freely, in whatever wording is clearest to a future session, and do **not** ask permission first. Reporting
 the edit is still worth a line; requesting sanction for it is not. **`brief.md` and `backlog.md` are theirs**,
 and everything under _"Writing replies"_ applies to the text in them as much as to chat.
@@ -37,7 +38,7 @@ conversation and then deleted outright once they understood it — the item was 
 was polish on something already destined for the bin. Explain in chat first, in plain language, and wait for
 assent; then record. An explanation that has not landed yet may be describing the wrong thing entirely.
 This does not touch _"fix on sight"_, which is about defects in code — a broken thing still gets fixed
-immediately, and it does not slow edits to this file or `conventions.md` either.
+immediately, and it does not slow edits to this file, `conventions.md` or `decisions.md` either.
 
 ## Writing replies
 
@@ -82,14 +83,15 @@ A one-character answer is what makes the list usable when they are replying by v
 unambiguous: `backlog.md` items are numbered, so a numbered option means a bare "5" could be either the fifth
 option or item 4. This applies to any list they might answer by its labels, not only to a pros-and-cons list.
 
-The reasoning that would have gone into those paragraphs goes into `backlog.md` or `conventions.md`, which is
+The reasoning that would have gone into those paragraphs goes into `backlog.md`, `conventions.md` or
+`decisions.md`, which is
 where length is wanted.
 
 **Surface one decision at a time.** A long batched list of issues does not land; a single well-argued
 question does. They often work by voice and read in short bursts, so a bundled reply means the important
 item competes with three others and none land. When several decisions genuinely exist, say there are N
 pending and present only the first. This governs the reply, not the work — still do the whole task, and
-still write the full reasoning into `conventions.md` and `backlog.md`, where length is wanted.
+still write the full reasoning into `conventions.md`, `decisions.md` and `backlog.md`, where length is wanted.
 
 **When asked what work is outstanding, answer in their recorded order, not by size.** `backlog.md` carries the
 ordering already: item 8 says in its own text not to list it, and item 5's **_Bottom of the list_** section
@@ -107,7 +109,7 @@ by them has nothing load-bearing behind it. State the intrinsic rule first, then
 code — and say so plainly when the rule does not cleanly acquit the current design. Concede a weak opening
 argument rather than defending it.
 
-**WCAG outranks anything written here or in `conventions.md`.** Stated by the user. A house
+**WCAG outranks anything written here, in `conventions.md` or in `decisions.md`.** Stated by the user. A house
 convention is a decision taken in the absence of a rule; a success criterion is the rule. When the two
 conflict, the convention is the thing that is wrong, and fixing it is the work — not documenting the tension,
 not weighing them against each other, and not asking whether this case is special. Cite the criterion, say
@@ -219,7 +221,7 @@ inside a function body, not a `/** */` block above a declaration, not on a compo
 This has been asked for repeatedly and in several wordings; the count reached 108 blocks anyway, every one
 of them written by Claude rather than by the user, and they were all deleted. There is
 therefore no precedent left to copy: a comment appearing in either tree is new and is a defect. Reasoning
-that needs recording goes in `conventions.md` — _"method X does Y rather than Z, because…"_ is exactly what
+that needs recording goes in `decisions.md` — _"method X does Y rather than Z, because…"_ is exactly what
 that file is for — or in the reply. If a change seems to need an inline comment to be understood, that is a
 signal the code should be clearer instead.
 
@@ -236,10 +238,10 @@ like everything else.**
 carry them, so a new spec should read like its neighbours.
 
 **Read a neighbouring component before writing a new one.** House style is tight and consistent, and
-`conventions.md` records the parts of it that were argued rather than assumed. Copy the neighbour's shape
+`conventions.md` and `decisions.md` record the parts of it that were argued rather than assumed. Copy the neighbour's shape
 rather than writing generically idiomatic Solid: code that reads as if they wrote it costs nothing to
 review, code that does not forces a translation pass on every line. When a new API needs a convention that
-does not exist yet, derive it from the closest existing one and record it in `conventions.md` rather than
+does not exist yet, derive it from the closest existing one and record it rather than
 inventing freely.
 
 **Do not bundle a judgment call into a bug fix.** Ship the defect fix on its own; do not carry a subjective
@@ -253,15 +255,22 @@ with per-call-site defaults — rather than picking a winner.
 **Treat anything measured as the user's call.** Cache sizes, thresholds, epsilons and similar tuned values
 are decisions backed by benchmarks you cannot see. Flag a concern; do not change one unsupervised.
 
-## The four documents
+## The five documents
 
-The first two are written for Claude and the last two for the user; see _"The four documents split by
+The first three are written for Claude and the last two for the user; see _"The five documents split by
 audience"_ above for what that changes.
 
 - **This file** — how to work with the user. Behaviour, not code.
-- **`conventions.md`** — settled decisions about the project and the reasoning behind them. It is the
-  record of arguments already had, so they are not re-litigated. Before making an architectural call,
-  check whether it is already there; after making a new one, add it.
+- **`conventions.md`** — rules that hold across the whole library, and the reasoning behind them. **The test
+  for whether something belongs here: would it be written again from scratch in another project built on the
+  same backbone — SolidJS, vanilla-extract, Vite?** If yes it is a convention; if it explains one component,
+  one abstract's internals, the shape of this repo or the Playground, it is a decision about this codebase and
+  goes in `decisions.md`. Set by the user, who wants this file portable. It is short on purpose — check it
+  before making an architectural call, and add to it only when the new rule passes the same test.
+- **`decisions.md`** — the same kind of content at the local level: why one control, one abstract or one
+  corner of the repo is the way it is. It is the record of arguments already had, so they are not
+  re-litigated, and it is where `backlog.md`'s numbered items point for the reasoning behind what exists.
+  Most new writing lands here rather than in `conventions.md`.
 - **`backlog.md`** — outstanding work: bugs, smells, missing implementation, pending decisions. Numbered
   and contiguous from 1. **Two sections at the end are the exception**, both unnumbered and outside the index:
   **_Accepted limits_**, faults consciously left alone, and **_Open discussion_**, ideas nobody has committed to
@@ -270,16 +279,17 @@ audience"_ above for what that changes.
   the recorded reasoning wrong. Moving an item into or out of either section is the user's decision to take,
   never a way to retire an item that has gone quiet.
 
-    **An idea, a sketch or a suggestion goes in _Open discussion_, never in `conventions.md`.** Stated by the
-    user after a graded list of sample-collection ideas was written into `conventions.md`: that file is for
-    decisions already taken, so an idea sitting in it reads as settled when nobody has committed to it. What does
-    belong in `conventions.md` is the part that got built and the reasoning that fixed its shape. An entry carrying
+    **An idea, a sketch or a suggestion goes in _Open discussion_, never in `conventions.md` or `decisions.md`.**
+    Stated by the user after a graded list of sample-collection ideas was written into `conventions.md`: those
+    files are for decisions already taken, so an idea sitting in one reads as settled when nobody has committed
+    to it. What does belong there is the part that got built and the reasoning that fixed its shape. An entry carrying
     the user's verdict is still recorded here rather than there, so the same sketch is not put to them twice.
 
 - **`brief.md`** — the same outstanding work as `backlog.md`, one line per fault, grouped by kind
   rather than by component: missing components, pending abstractions, blockers and known issues,
-  accessibility gaps, planned projects. Asked for by the user so that the state of the
-  project can be read in one screen. It carries no reasoning — the argument for why a gap is still a gap
+  things deliberately not built, accessibility gaps, planned projects. Asked for by the user so that the state
+  of the project can be read at a glance. **One line per fault means every fault**, not a selection — the
+  claim was untrue once and four items had silently fallen out. It carries no reasoning — the argument for why a gap is still a gap
   stays in `backlog.md`, and every line here is a pointer to a numbered item there.
 
 **`backlog.md` and `brief.md` change together, always.** Closing an item, opening one, or moving one
@@ -288,13 +298,14 @@ because it is the one that gets read. `backlog.md` is the source of truth, so wh
 is what gets corrected.
 
 **When an item in `backlog.md` is done or dropped, delete it outright** and renumber the rest. Nothing is
-marked "resolved" in place. If closing it settled a decision that drives future work, that decision moves
-to `conventions.md`; the record of having done the work does not go anywhere.
+marked "resolved" in place. If closing it settled a decision that drives future work, that decision moves to
+`conventions.md` when it is a library-wide rule and to `decisions.md` when it is about one component; the
+record of having done the work does not go anywhere.
 
-**No changelogs, in any of the four.** Nothing records "what landed", "what just shipped", or how many
-assertions passed. Once a thing is done, its only traces are the code and its `conventions.md` entry.
+**No changelogs, in any of the five.** Nothing records "what landed", "what just shipped", or how many
+assertions passed. Once a thing is done, its only traces are the code and its `decisions.md` entry.
 
-**No dates, in any of the four.** Stated by the user: what matters is the conclusion and the reasoning
+**No dates, in any of the five.** Stated by the user: what matters is the conclusion and the reasoning
 behind it, not when it was taken — this is not a court. So no "settled on yyyy-mm-dd" stamps and no
 "asked for on" prefixes. Where the order of two decisions is part of the argument, say it in words
 ("the first build did X, corrected afterwards"). A real date inside the subject matter — a calendar

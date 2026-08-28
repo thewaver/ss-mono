@@ -28,11 +28,11 @@ export type AccordionSectionProps<T> = AccessorProps<{
     isScrolledIntoViewOnExpand?: boolean;
     transitionDurationMs?: number;
     ref?: (element: HTMLElement) => void;
+    onToggle: () => void;
 }> & {
     item: MaybeAccessor<AccordionItem<T>>;
     renderHeader: AccordionHeaderRenderer<T>;
     renderPanel: AccordionPanelRenderer<T>;
-    onToggle: () => void;
 };
 
 export type AccordionProps<T> = AccessorProps<{
