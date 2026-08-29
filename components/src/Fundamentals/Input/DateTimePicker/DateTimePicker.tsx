@@ -1,5 +1,5 @@
 import { DateTimeValueUtils } from "../../../Abstracts/DateTimeValue/DateTimeValue.utils";
-import { access } from "../../../Utils/propUtils";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import { DatePicker } from "../DatePicker/DatePicker";
 import { TimePicker } from "../TimePicker/TimePicker";
 import type { DateTimePickerProps } from "./DateTimePicker.types";
@@ -10,7 +10,7 @@ const DEFAULT_DATE_TIME_PICKER_DATE_LABEL = "Date";
 const DEFAULT_DATE_TIME_PICKER_TIME_LABEL = "Time";
 
 export const DateTimePicker = (props: DateTimePickerProps) => {
-    const { dateSignal, timeSignal } = DateTimeValueUtils.createSplit(props.valueSignal);
+    const { dateSignal, timeSignal } = DateTimeValueUtils.createSplit(accessSignal(() => props.valueSignal));
 
     return (
         <div class={styles.dateTimePickerRoot}>

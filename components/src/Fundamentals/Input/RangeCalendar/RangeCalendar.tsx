@@ -2,26 +2,29 @@ import { createSignal } from "solid-js";
 
 import type { DateValue } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
+import { accessSignal } from "../../../Utils/propUtils";
 import { CalendarComposite } from "../Calendar/Calendar";
 import type { RangeCalendarProps } from "../Calendar/Calendar.types";
 
 export const RangeCalendar = (props: RangeCalendarProps) => {
+    const valueSignal = accessSignal(() => props.valueSignal);
+
     const [getPendingStart, setPendingStart] = createSignal<DateValue | undefined>();
 
-    const getRange = () => props.valueSignal[0]();
+    const getRange = () => valueSignal[0]();
 
     const pick = (day: DateValue) => {
         const pending = getPendingStart();
 
         if (!pending) {
             setPendingStart(() => day);
-            props.valueSignal[1](() => undefined);
+            valueSignal[1](() => undefined);
 
             return;
         }
 
         setPendingStart(() => undefined);
-        props.valueSignal[1](() => DateValueUtils.orderRange(pending, day));
+        valueSignal[1](() => DateValueUtils.orderRange(pending, day));
     };
 
     return (

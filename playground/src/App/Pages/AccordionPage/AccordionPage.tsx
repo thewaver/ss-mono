@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { DeferredExample } from "./Examples/Deferred";
 import { GrowingExample } from "./Examples/Growing";
 import { ScrolledExample } from "./Examples/Scrolled";
 import { SectionsExample } from "./Examples/Sections";
@@ -14,10 +15,12 @@ export const AccordionPage = () => {
     const requiredSignal = createSignal<string[]>(["Shipping"]);
     const growingSignal = createSignal<string[]>(["Shipping"]);
     const scrolledSignal = createSignal<string[]>([]);
+    const deferredSignal = createSignal<string[]>([]);
 
     const showMoreSignal = createSignal(false);
 
     const [getExtraLines, setExtraLines] = createSignal(0);
+    const [getBuilt, setBuilt] = createSignal<string[]>([]);
 
     const getExamples = createMemo(() => [
         {
@@ -58,6 +61,19 @@ export const AccordionPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Growing.tsx`,
+        },
+        {
+            key: "deferred",
+            name: "Panels built on first open",
+            readout: () =>
+                `built: ${JSON.stringify(getBuilt())} — a section's content is not in the page until it is opened once, and stays there afterwards`,
+            component: () => (
+                <DeferredExample
+                    expandedSignal={deferredSignal}
+                    onBuild={(value) => setBuilt((prev) => (prev.includes(value) ? prev : [...prev, value]))}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Deferred.tsx`,
         },
         {
             key: "scrolled",

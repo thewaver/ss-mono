@@ -114,9 +114,15 @@ because the child's own prop accepts both forms.
 produces the plain name, because the skip test is unchanged.** Read `getX` below as the prop's plain name and
 `Accessor<V>` as `MaybeAccessor<V>`; the shape of each hole is the same, only the spelling differs.
 
-Skips **only** functions and symbols. Everything else — arrays, `Set`, `Map`, `Date`, `Node` /
-`HTMLElement`, plain objects — is accessorized. Refs are declared as
+Skips **only** functions, symbols and the two signal forms. Everything else — arrays, `Set`, `Map`,
+`Date`, `Node` / `HTMLElement`, plain objects — is accessorized. Refs are declared as
 `elementRef: HTMLElement | undefined`.
+
+**`SignalPair<T>` is named in the skip test beside `Signal<T>`, and it has to be.** A `SignalPair` is a
+tuple of two functions rather than a function, so the "is it a function" arm does not catch it; and
+`IsSkippable` distributes over the `SignalSource<T>` union, so a test naming only `Signal<any>` resolves
+to `true | false`, which is `boolean`, which is not `true` — and the prop is silently accessorized into
+something no consumer can satisfy. Both members are named, so both arms answer `true`.
 
 **A generic prop cannot pass through it.** `AccessorProps<{ value: T }>` produces no `getValue`: the
 key filter depends on `IsSkippable<T>`, which cannot resolve while `T` is unbound, so the key is
@@ -208,9 +214,35 @@ function, so the prop keeps its plain name. One variable, both sides write, owne
 disagree, and there is no handler to forget. Callers that only open the thing drop the getter:
 `const [, setModalOpen] = modalVisibility`.
 
-Use it only where the component genuinely writes. One-way data stays `get*`. The accepted cost: the
-owner has to _have_ a signal — visibility derived from a memo, a store field or a route param has no
-setter to hand over.
+Use it only where the component genuinely writes. One-way data stays `get*`.
+
+**A `*Signal` prop takes a getter and a plain setter as readily as a `Signal`, and that removes the
+cost this entry used to accept.** The cost was that the owner had to _have_ a signal, so state living
+in a memo, a store field, a route param or a pair of callbacks had to be wrapped in a mirror before a
+control would take it — one indirection, written once per consumer wrapper. The prop type is
+`SignalSource<T>`, which is `Signal<T> | SignalPair<T>` where `SignalPair<T>` is
+`[get: () => T, set: (value: T) => void]`, so a consumer holding the two halves passes them straight in:
+`valueSignal={[() => access(props.value), props.onInput]}`.
+
+**The two forms differ in exactly one way, and the control absorbs it.** A real `Setter<T>` also accepts
+an updater function and resolves it against the current value; a plain setter takes a value. So a control
+declaring `SignalSource<T>` cannot call `[1]` with an updater until it has normalised the prop, and
+`accessSignal(() => props.xSignal)` beside `access` in `propUtils` is that normalisation: it returns a
+real `Signal<T>` that reads through the getter, resolves an updater against the untracked current value,
+skips a write that would not change anything, and calls the plain setter. **It takes an accessor of the
+prop rather than the prop**, so the returned pair stays correct if the consumer swaps the source, and it
+owns no state of its own — one line at the top of the control, and the rest of the body is unchanged.
+
+**A mirror is still the answer when the consumer's setter refuses values.** `accessSignal` is a
+pass-through: what the control shows comes from the getter, so a setter that drops some writes leaves the
+control showing the old value. That is right for a consumer who is filtering, and wrong for a field that
+must be able to hold a half-written value the owner has not accepted yet — which is what `SignalMirror`'s
+inner signal is for. `createOptional` and `createPassThrough` are both `accessSignal` underneath, so the
+family has one definition of how a pair becomes a signal.
+
+**A signal handed _out_ stays a real `Signal`.** Where the library gives a consumer a signal to drive — a
+picker's `hsvSignal`, a calendar's `monthSignal` inside a render callback — widening it would take the
+updater form away from the consumer for nothing. The widening is on what a control _accepts_.
 
 ### Asking for a state a thing is already in does nothing
 
@@ -790,7 +822,7 @@ click outside would leave it.
 **What this does not buy is an opener the dismiss layer knows about.** A consumer's own button sits outside the
 popup, so pressing it while open dismisses the popup and the handler then re-opens it: a toggle button appears
 not to close. The Playground demonstrates open and close as two separate buttons for that reason. Fixing it
-means `Menu` accepting an anchor and an opener, which is what `backlog.md` item 4 asks for next.
+means `Menu` accepting an anchor and an opener, which is what `backlog.md` item 3 asks for next.
 
 ### Playback is a signal; a rewind is a command
 
@@ -845,7 +877,7 @@ half does its own work, and the consumer's own signal opens the menu.
 
 **A right-click context menu is still not possible**: it opens at the pointer rather than against an element,
 and `Anchor` positions against a ref only. That needs a virtual anchor — a rect standing in for an element —
-which is a change to `Anchor` rather than to `Menu`, and it is the last piece. `backlog.md` item 4.
+which is a change to `Anchor` rather than to `Menu`, and it is the last piece. `backlog.md` item 3.
 
 ## Layout and styling
 

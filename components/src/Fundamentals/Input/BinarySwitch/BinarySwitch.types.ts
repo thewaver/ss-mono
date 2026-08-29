@@ -1,7 +1,5 @@
-import type { Signal } from "solid-js";
-
 import type { CheckedState } from "../../../Abstracts/CheckedState/CheckedState.types";
-import type { AccessorProps } from "../../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type {
     InteractionControlProps,
     InteractionWrapperProps,
@@ -38,4 +36,4 @@ export type BinarySwitchProps = Omit<InteractionWrapperProps<BinarySwitchFlags>,
     >;
 
 export type BinarySwitchPresetProps = Omit<BinarySwitchProps, "type" | "isSwitch" | "name" | "isChecked"> &
-    AccessorProps<{ checkedSignal: Signal<boolean> }>;
+    AccessorProps<{ checkedSignal: SignalSource<boolean> }>;

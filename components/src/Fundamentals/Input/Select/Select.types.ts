@@ -1,11 +1,12 @@
-import type { Accessor, JSX, Signal } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 
 import { type CSSPadding, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { CheckedState } from "../../../Abstracts/CheckedState/CheckedState.types";
+import type { FlatRow } from "../../../Abstracts/Flattener/Flattener.types";
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, MaybeAccessor } from "../../../Utils/typeUtils";
+import type { AccessorProps, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
 import type {
     InteractionControlProps,
     InteractionTooltipDefs,
@@ -42,12 +43,7 @@ export type SelectOptionGroup<T> = {
 
 export type SelectItem<T> = SelectOption<T> | SelectOptionGroup<T>;
 
-export type SelectRow<T> = {
-    group: SelectOptionGroup<T> | undefined;
-    groupIndex: number | undefined;
-    option: SelectOption<T> | undefined;
-    optionIndex: number | undefined;
-};
+export type SelectRow<T> = FlatRow<SelectItem<T>>;
 
 export type SelectFieldProps = AccessorProps<
     InteractionControlProps<SelectFlags> & {
@@ -83,8 +79,8 @@ export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>,
         isMultiple?: boolean;
         hasMoreOptions?: boolean;
         computeTextStyle?: (getFlags: () => InteractionFlags<SelectFlags>) => TextFieldTextStyle;
-        visibilitySignal?: Signal<boolean>;
-        querySignal?: Signal<string>;
+        visibilitySignal?: SignalSource<boolean>;
+        querySignal?: SignalSource<string>;
         computeEstimatedOptionHeight?: (index: number) => number;
         computeEstimatedGroupHeight?: (index: number) => number;
         renderPopup: (
@@ -118,7 +114,7 @@ export type SelectPresetProps<T> = Omit<
 >;
 
 export type SelectProps<T> = SelectPresetProps<T> & {
-    valueSignal: Signal<T | undefined>;
+    valueSignal: SignalSource<T | undefined>;
     renderContent: (
         getSelectedOption: Accessor<SelectOption<T> | undefined>,
         getFlags: () => InteractionFlags<SelectFlags>,

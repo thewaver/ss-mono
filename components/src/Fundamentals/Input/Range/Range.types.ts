@@ -1,6 +1,4 @@
-import type { Signal } from "solid-js";
-
-import type { AccessorProps } from "../../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type {
     InteractionControlProps,
     InteractionWrapperProps,
@@ -60,7 +58,7 @@ export type RangeProps = Omit<InteractionWrapperProps<RangeFlags>, "renderContro
         RangeCbs &
             Pick<InteractionControlProps<RangeFlags>, "id" | "renderContent"> &
             RangeState & {
-                valueSignal?: Signal<number>;
-                rangeSignal?: Signal<RangeValues>;
+                valueSignal?: SignalSource<number>;
+                rangeSignal?: SignalSource<RangeValues>;
             }
     >;

@@ -426,7 +426,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
         if (kind !== "command" && checkedSignal) {
             const checked = checkedSignal[0]();
 
-            checkedSignal[1](() =>
+            checkedSignal[1](
                 kind === "checkbox"
                     ? checked.includes(item.value)
                         ? checked.filter((value) => value !== item.value)
@@ -529,7 +529,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
         if (kind !== "command" && checkedSignal) {
             const checked = checkedSignal[0]();
 
-            checkedSignal[1](() =>
+            checkedSignal[1](
                 kind === "checkbox"
                     ? checked.includes(item.value)
                         ? checked.filter((value) => value !== item.value)

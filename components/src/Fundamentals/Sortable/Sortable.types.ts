@@ -1,7 +1,7 @@
-import type { Accessor, JSX, Signal } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps } from "../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 import type { InteractionTooltipDefs, InteractionWrapperProps } from "../InteractionWrapper/InteractionWrapper.types";
 
 export type SortableDir = "row" | "column";
@@ -86,7 +86,7 @@ export type SortableProps<T> = Omit<InteractionWrapperProps<SortableFlags>, "ren
         isLocked?: boolean;
         renderMarker?: (getDir: () => SortableDir) => JSX.Element;
     }> & {
-        itemsSignal: Signal<SortableItem<T>[]>;
+        itemsSignal: SignalSource<SortableItem<T>[]>;
         computeItemKey: (value: T) => string;
         computeItemLabel: (value: T) => string;
         computeCanAccept?: (value: T, fromLabel: string) => boolean;

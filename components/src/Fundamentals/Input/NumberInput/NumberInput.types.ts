@@ -1,7 +1,7 @@
-import type { JSX, Signal } from "solid-js";
+import type { JSX } from "solid-js";
 
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { MaybeAccessor } from "../../../Utils/typeUtils";
+import type { MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
 import type { TextFieldFlags, TextFieldPresetProps } from "../TextField/TextField.types";
 
 export type NumberInputRangeDefs = {
@@ -29,7 +29,7 @@ export type NumberInputProps = Omit<
 > & {
     repeatDelayMs?: MaybeAccessor<number>;
     repeatIntervalMs?: MaybeAccessor<number>;
-    valueSignal: Signal<number | undefined>;
+    valueSignal: SignalSource<number | undefined>;
     renderTrailing?: (getFlags: () => InteractionFlags<TextFieldFlags>, stepper: NumberInputStepper) => JSX.Element;
     onInput?: (value: number | undefined) => void | Promise<void>;
 };

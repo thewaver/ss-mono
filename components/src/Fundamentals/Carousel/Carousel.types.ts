@@ -1,10 +1,10 @@
-import type { Accessor, JSX, Signal } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
 import type { BarrelAxis, BarrelFace } from "../../Abstracts/Barrel/Barrel.types";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
+import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 import type { InteractionControlProps } from "../InteractionWrapper/InteractionWrapper.types";
 
 export type CarouselVariant = "track" | "drum";
@@ -72,8 +72,8 @@ export type CarouselLabels = {
 
 export type CarouselSlots<T> = {
     slides: MaybeAccessor<T[]>;
-    indexSignal?: Signal<number>;
-    playingSignal?: Signal<boolean>;
+    indexSignal?: SignalSource<number>;
+    playingSignal?: SignalSource<boolean>;
     renderSlide: (getSlide: Accessor<T>, getState: Accessor<CarouselSlideState>) => JSX.Element;
     renderStep?: (getStep: Accessor<CarouselStep>, getFlags: () => InteractionFlags<CarouselStepFlags>) => JSX.Element;
     renderPick?: (getIndex: Accessor<number>, getFlags: () => InteractionFlags<CarouselPickFlags>) => JSX.Element;

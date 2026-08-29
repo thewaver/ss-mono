@@ -6,6 +6,11 @@ import { Bounds, type Point2d, type Rect, Size2d } from "@thewaver/ss-utils";
 import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
 import { ViewportUtils } from "../../Exotics/Viewport/Viewport.utils";
 
+const EMPTY_SIZES: Size2d[] = [];
+
+const isSameSizeList = (a: Size2d[], b: Size2d[]) =>
+    a.length === b.length && a.every((size, index) => Size2d.isSame(size, b[index]));
+
 export namespace ElementObserver {
     export const createBorderBoxSizeObserver = (
         getRef: Accessor<HTMLElement | undefined>,
@@ -35,6 +40,40 @@ export namespace ElementObserver {
         });
 
         return getSize;
+    };
+
+    export const createBorderBoxSizeListObserver = (
+        getRefs: Accessor<Array<HTMLElement | undefined>>,
+        getIsEnabled?: Accessor<boolean>,
+    ) => {
+        const [getSizes, setSizes] = createSignal<Size2d[]>(EMPTY_SIZES, { equals: isSameSizeList });
+
+        createEffect(() => {
+            const refs = getRefs();
+
+            if (getIsEnabled?.() === false) {
+                setSizes(EMPTY_SIZES);
+
+                return;
+            }
+
+            const measure = () =>
+                setSizes(refs.map((ref) => ({ width: ref?.offsetWidth ?? 0, height: ref?.offsetHeight ?? 0 })));
+
+            measure();
+
+            const observer = new ResizeObserver(measure);
+
+            for (const ref of refs) {
+                if (ref) observer.observe(ref);
+            }
+
+            onCleanup(() => {
+                observer.disconnect();
+            });
+        });
+
+        return getSizes;
     };
 
     export const createBorderBoxHeightObserver = (

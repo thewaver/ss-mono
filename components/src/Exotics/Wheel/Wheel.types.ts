@@ -1,10 +1,10 @@
-import type { Accessor, JSX, Signal } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
 import type { BarrelAxis, BarrelFace } from "../../Abstracts/Barrel/Barrel.types";
 import type { RotatorPhase, RotatorSpinDefs } from "../../Abstracts/Rotator/Rotator.types";
-import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
+import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 
 export type WheelVariant = "overhead" | "drum";
 
@@ -43,8 +43,8 @@ export type WheelLabels = {
 export type WheelSlots<T> = {
     wedges: MaybeAccessor<T[]>;
     idleDelayMs?: MaybeAccessor<number | undefined>;
-    indexSignal?: Signal<number>;
-    autoSpinSignal?: Signal<boolean>;
+    indexSignal?: SignalSource<number>;
+    autoSpinSignal?: SignalSource<boolean>;
     computeSpinTarget: () => number | Promise<number>;
     computeSpinDefs?: (index: number, wedgeCount: number) => RotatorSpinDefs;
     renderWedge: (getWedge: Accessor<T>, getState: Accessor<WheelWedgeState>) => JSX.Element;

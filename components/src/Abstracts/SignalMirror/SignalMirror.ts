@@ -1,6 +1,9 @@
 import type { Signal } from "solid-js";
 import { createEffect, createSignal, untrack } from "solid-js";
 
+import { accessSignal } from "../../Utils/propUtils";
+import type { SignalSource } from "../../Utils/typeUtils";
+
 export namespace SignalMirror {
     export const createMirror = <TOuter, TInner>(
         getOuter: () => TOuter,
@@ -40,23 +43,14 @@ export namespace SignalMirror {
         return inner;
     };
 
-    export const createOptional = <T>(getSignal: () => Signal<T> | undefined, initial: T): Signal<T> => {
+    export const createOptional = <T>(getSource: () => SignalSource<T> | undefined, initial: T): Signal<T> => {
         const fallback = createSignal<T>(initial);
-        const pick = () => getSignal() ?? fallback;
 
-        return [() => pick()[0](), (...args: unknown[]) => (pick()[1] as (...a: unknown[]) => T)(...args)] as Signal<T>;
+        return accessSignal(() => getSource() ?? fallback);
     };
 
-    export const createPassThrough = <T>(getValue: () => T, setValue: (value: T) => void): Signal<T> => [
-        getValue,
-        ((value: unknown) => {
-            const next = typeof value === "function" ? (value as (prev: T) => T)(untrack(getValue)) : (value as T);
-
-            if (!Object.is(next, untrack(getValue))) setValue(next);
-
-            return untrack(getValue);
-        }) as Signal<T>[1],
-    ];
+    export const createPassThrough = <T>(getValue: () => T, setValue: (value: T) => void): Signal<T> =>
+        accessSignal(() => [getValue, setValue]);
 
     export const createValueMirror = <T>(
         getOuter: () => T,

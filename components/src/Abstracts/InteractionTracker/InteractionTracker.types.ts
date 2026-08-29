@@ -8,6 +8,12 @@ export type InternalInteractionFlags = {
     isHovered?: boolean;
     isActive?: boolean;
     isFocused?: boolean;
+    activation?: InteractionActivation;
+};
+
+export type InteractionActivation = {
+    ratio: InteractionDragRatio;
+    count: number;
 };
 
 export type InteractionFlags<TExtra extends object = {}> = InternalInteractionFlags & ExternalInteractionFlags & TExtra;

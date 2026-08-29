@@ -1,6 +1,6 @@
-import type { JSX, ParentProps, Signal } from "solid-js";
+import type { JSX, ParentProps } from "solid-js";
 
-import type { AccessorProps } from "../../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 
 export type RadioGroupDir = "column" | "row";
 
@@ -13,7 +13,7 @@ export type RadioGroupProps<T> = ParentProps<
         hasError?: boolean;
         transitionDurationMs?: number;
     }> & {
-        valueSignal: Signal<T>;
+        valueSignal: SignalSource<T>;
         renderFloater?: (getVisibilityTarget: () => 0 | 1, getTransitionDurationMs: () => number) => JSX.Element;
     }
 >;

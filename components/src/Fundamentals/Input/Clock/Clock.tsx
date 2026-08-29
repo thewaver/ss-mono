@@ -5,7 +5,7 @@ import { TimeUtils } from "@thewaver/ss-utils";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
-import { access } from "../../../Utils/propUtils";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../InteractionWrapper/InteractionWrapper";
 import type { ClockFlags, ClockOption, ClockOptionProps, ClockProps, ClockSteps, ClockUnit } from "./Clock.types";
 import { ClockUtils } from "./Clock.utils";
@@ -55,6 +55,8 @@ const ClockOptionControl = (props: ClockOptionProps) => {
 };
 
 export const Clock = (props: ClockProps) => {
+    const valueSignal = accessSignal(() => props.valueSignal);
+
     const groupId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
@@ -73,7 +75,7 @@ export const Clock = (props: ClockProps) => {
     const withShape = (time: TimeValue) => (getHasSeconds() ? { ...time, second: time.second ?? 0 } : time);
 
     const getBase = createMemo(() =>
-        withShape(props.valueSignal[0]() ?? TimeUtils.clamp(getNow(), access(props.min), access(props.max))),
+        withShape(valueSignal[0]() ?? TimeUtils.clamp(getNow(), access(props.min), access(props.max))),
     );
 
     const getUnits = createMemo<ClockUnit[]>(() => {
@@ -141,11 +143,11 @@ export const Clock = (props: ClockProps) => {
 
         setHighlighted(() => option.time);
         setHighlightedUnit(option.unit);
-        props.valueSignal[1](() => option.time);
+        valueSignal[1](() => option.time);
     };
 
     createEffect(() => {
-        const value = props.valueSignal[0]();
+        const value = valueSignal[0]();
 
         if (!value) return;
 
@@ -228,7 +230,7 @@ export const Clock = (props: ClockProps) => {
                         isTabbable={getIsHighlighted}
                         extraFlags={(): ClockFlags => ({
                             option: getOption(),
-                            isSelected: getIsAt(props.valueSignal[0]()),
+                            isSelected: getIsAt(valueSignal[0]()),
                             isNow: getIsAt(getNow()),
                             isHighlighted: getIsHighlighted(),
                         })}

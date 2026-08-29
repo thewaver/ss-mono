@@ -2,7 +2,7 @@ import { Show, createEffect, createMemo, createSignal, createUniqueId, on, onCle
 
 import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
 import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
-import { access } from "../../Utils/propUtils";
+import { access, accessSignal } from "../../Utils/propUtils";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import type { PreviewFlags, PreviewProps, PreviewSizing, PreviewTriggerProps } from "./Preview.types";
 
@@ -35,6 +35,8 @@ const PreviewTrigger = (props: PreviewTriggerProps) => {
 };
 
 export const Preview = (props: PreviewProps) => {
+    const expandedSignal = accessSignal(() => props.expandedSignal);
+
     const contentId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
@@ -42,7 +44,7 @@ export const Preview = (props: PreviewProps) => {
     const [getContentRef, setContentRef] = createSignal<HTMLElement>();
     const [getIsAwaitingScroll, setIsAwaitingScroll] = createSignal(false);
 
-    const getIsExpanded = () => props.expandedSignal[0]();
+    const getIsExpanded = () => expandedSignal[0]();
 
     const getTransitionDurationMs = createMemo(
         () => access(props.transitionDurationMs) ?? DEFAULT_PREVIEW_TRANSITION_DURATION_MS,
@@ -131,7 +133,7 @@ export const Preview = (props: PreviewProps) => {
                             flags={getFlags}
                             isExpanded={getIsExpanded}
                             renderTrigger={props.renderTrigger}
-                            onToggle={() => props.expandedSignal[1]((prev) => !prev)}
+                            onToggle={() => expandedSignal[1]((prev) => !prev)}
                         />
                     )}
                 />

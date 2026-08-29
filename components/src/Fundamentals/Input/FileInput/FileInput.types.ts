@@ -1,6 +1,4 @@
-import type { Signal } from "solid-js";
-
-import type { AccessorProps } from "../../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type {
     InteractionControlProps,
     InteractionWrapperProps,
@@ -32,6 +30,6 @@ export type FileInputProps = Omit<InteractionWrapperProps<FileInputFlags>, "rend
         FileInputCbs &
             Pick<InteractionControlProps<FileInputFlags>, "id" | "renderContent"> &
             FileInputState & {
-                filesSignal: Signal<File[]>;
+                filesSignal: SignalSource<File[]>;
             }
     >;

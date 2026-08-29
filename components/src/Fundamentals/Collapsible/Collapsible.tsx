@@ -5,7 +5,7 @@ import { MathUtils } from "@thewaver/ss-utils";
 
 import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
 import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
-import { access } from "../../Utils/propUtils";
+import { access, accessSignal } from "../../Utils/propUtils";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import type {
     CollapsibleFlags,
@@ -45,6 +45,8 @@ const CollapsibleTrigger = (props: CollapsibleTriggerProps) => {
 };
 
 export const Collapsible = (props: CollapsibleProps) => {
+    const expandedSignal = accessSignal(() => props.expandedSignal);
+
     const triggerId = createUniqueId();
     const panelId = createUniqueId();
 
@@ -53,7 +55,7 @@ export const Collapsible = (props: CollapsibleProps) => {
     const [getContentRef, setContentRef] = createSignal<HTMLElement>();
     const [getIsAwaitingScroll, setIsAwaitingScroll] = createSignal(false);
 
-    const getIsExpanded = () => props.expandedSignal[0]();
+    const getIsExpanded = () => expandedSignal[0]();
 
     const getTransitionDurationMs = createMemo(
         () => access(props.transitionDurationMs) ?? DEFAULT_COLLAPSIBLE_TRANSITION_DURATION_MS,
@@ -61,7 +63,12 @@ export const Collapsible = (props: CollapsibleProps) => {
 
     const getSizing = createMemo(() => access(props.sizing) ?? DEFAULT_COLLAPSIBLE_SIZING);
 
-    const getContentHeight = ElementObserver.createBorderBoxHeightObserver(getContentRef);
+    const getHasPanelContent = createMemo(
+        (hasContent: boolean) => hasContent || access(props.isPanelBuiltOnExpand) !== true || getIsExpanded(),
+        false,
+    );
+
+    const getContentHeight = ElementObserver.createBorderBoxHeightObserver(getContentRef, getHasPanelContent);
 
     const { getTransitionTarget, getHasTransitionFinished } = ElementFader.createFader(getIsExpanded, {
         getTransitionDurationMs,
@@ -116,7 +123,7 @@ export const Collapsible = (props: CollapsibleProps) => {
                     flags={getFlags}
                     isExpanded={getIsExpanded}
                     renderTrigger={props.renderTrigger}
-                    onToggle={() => props.expandedSignal[1]((prev) => !prev)}
+                    onToggle={() => expandedSignal[1]((prev) => !prev)}
                 />
             )}
         />
@@ -144,7 +151,11 @@ export const Collapsible = (props: CollapsibleProps) => {
                 {...(access(props.panelAriaAttributes) ?? {})}
                 inert={!getIsExpanded()}
             >
-                <div ref={setContentRef}>{props.renderPanel(getTransitionTarget, getTransitionDurationMs)}</div>
+                <div ref={setContentRef}>
+                    <Show when={getHasPanelContent()}>
+                        {props.renderPanel(getTransitionTarget, getTransitionDurationMs)}
+                    </Show>
+                </div>
             </div>
         </div>
     );

@@ -2,12 +2,13 @@ import type { Accessor, JSX } from "solid-js";
 import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueId } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
+import { FlattenerUtils } from "../../Abstracts/Flattener/Flattener.utils";
 import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { Typeahead } from "../../Abstracts/Typeahead/Typeahead";
 import { TypeaheadUtils } from "../../Abstracts/Typeahead/Typeahead.utils";
 import { Virtualizer } from "../../Abstracts/Virtualizer/Virtualizer";
-import { access } from "../../Utils/propUtils";
+import { access, accessSignal } from "../../Utils/propUtils";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import type { TreeNodeItemProps, TreeProps, TreeRow } from "./Tree.types";
 import { TreeUtils } from "./Tree.utils";
@@ -82,6 +83,9 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
 };
 
 export const Tree = <T,>(props: TreeProps<T>) => {
+    const valueSignal = accessSignal(() => props.valueSignal);
+    const expandedSignal = accessSignal(() => props.expandedSignal);
+
     const treeId = createUniqueId();
 
     const [getFocusedValue, setFocusedValue] = createSignal<T | undefined>();
@@ -89,10 +93,10 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     const typeahead = Typeahead.createBuffer();
 
     const getRows = createMemo(() =>
-        TreeUtils.getVisibleRows(access(props.nodes), (value) => props.expandedSignal[0]().includes(value)),
+        TreeUtils.getVisibleRows(access(props.nodes), (value) => expandedSignal[0]().includes(value)),
     );
 
-    const getFlatRows = createMemo(() => TreeUtils.getFlatRows(getRows()));
+    const getFlatRows = createMemo(() => FlattenerUtils.getFlatRows(getRows()));
 
     const computeIsNavigable = (row: TreeRow<T>) => {
         const isReachable = InteractionTracker.computeIsReachable(
@@ -120,7 +124,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
         if (focusedRow) return focusedRow;
 
-        const selectedValue = props.valueSignal[0]();
+        const selectedValue = valueSignal[0]();
 
         return navigable.find((row) => row.node.value === selectedValue) ?? navigable[0];
     });
@@ -138,7 +142,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     });
 
     createEffect(() => {
-        props.valueSignal[0]();
+        valueSignal[0]();
 
         setFocusedValue(() => undefined);
     });
@@ -154,7 +158,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     let lastExpanded: T[] = [];
 
     createEffect(() => {
-        const expanded = props.expandedSignal[0]();
+        const expanded = expandedSignal[0]();
         const collapsed = lastExpanded.filter((value) => !expanded.includes(value));
         const visible = getFlatRows();
 
@@ -178,24 +182,19 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         document.getElementById(getRowId(row))?.focus();
     };
 
-    const findParentRow = (row: TreeRow<T>) => {
-        const flat = getFlatRows();
-
-        for (let index = row.index - 1; index >= 0; index--) {
-            if (flat[index].depth < row.depth) return flat[index];
-        }
-    };
+    const findParentRow = (row: TreeRow<T>) =>
+        row.parentIndex === undefined ? undefined : getFlatRows()[row.parentIndex];
 
     const expand = (row: TreeRow<T>) => {
         if (row.node.isDisabled) return;
 
-        props.expandedSignal[1]((prev) => (prev.includes(row.node.value) ? prev : [...prev, row.node.value]));
+        expandedSignal[1]((prev) => (prev.includes(row.node.value) ? prev : [...prev, row.node.value]));
     };
 
     const collapse = (row: TreeRow<T>) => {
         if (row.node.isDisabled) return;
 
-        props.expandedSignal[1]((prev) => prev.filter((value) => value !== row.node.value));
+        expandedSignal[1]((prev) => prev.filter((value) => value !== row.node.value));
     };
 
     const toggle = (row: TreeRow<T>) => {
@@ -212,7 +211,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         const parent = findParentRow(row);
         const siblings = parent ? parent.rows : getRows();
 
-        props.expandedSignal[1]((prev) => [
+        expandedSignal[1]((prev) => [
             ...prev,
             ...siblings
                 .filter(
@@ -226,9 +225,9 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     };
 
     const select = (value: T) => {
-        if (value === props.valueSignal[0]()) return;
+        if (value === valueSignal[0]()) return;
 
-        props.valueSignal[1](() => value);
+        valueSignal[1](() => value);
 
         void props.onSelectionChange?.(value);
     };
@@ -304,7 +303,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                 return;
             }
 
-            const child = TreeUtils.getFlatRows(current.rows).find(computeIsNavigable);
+            const child = FlattenerUtils.getFlatRows(current.rows).find(computeIsNavigable);
 
             if (child) focusRow(child);
 
@@ -351,7 +350,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                 isBranch: TreeUtils.getIsBranch(getRow().node),
                 isExpanded: getRow().isExpanded,
                 isPending: getIsPending(getRow()),
-                isSelected: getRow().node.value === props.valueSignal[0](),
+                isSelected: getRow().node.value === valueSignal[0](),
                 depth: getRow().depth,
             })}
             renderControl={(setElementRef, getFlags) => (

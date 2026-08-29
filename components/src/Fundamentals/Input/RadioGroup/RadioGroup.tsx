@@ -2,7 +2,7 @@ import { createEffect, createMemo, createSignal, createUniqueId, onCleanup } fro
 
 import { ElementFader } from "../../../Abstracts/ElementFader/ElementFader";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
-import { access } from "../../../Utils/propUtils";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import { RadioGroupContextProvider } from "./RadioGroup.context";
 import type { RadioGroupContextType, RadioGroupEntry } from "./RadioGroup.context.types";
 import type { RadioGroupDir, RadioGroupProps } from "./RadioGroup.types";
@@ -14,6 +14,8 @@ const DEFAULT_RADIO_GROUP_GAP = 0;
 const DEFAULT_RADIO_GROUP_TRANSITION_DURATION_MS = 200;
 
 export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
+    const valueSignal = accessSignal(() => props.valueSignal);
+
     const fallbackName = createUniqueId();
 
     const [getEntries, setEntries] = createSignal<RadioGroupEntry[]>([]);
@@ -45,13 +47,13 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
 
     const getRovingEntry = createMemo(() => {
         const navigable = getNavigableEntries();
-        const value = props.valueSignal[0]();
+        const value = valueSignal[0]();
 
         return navigable.find((entry) => entry.getValue() === value) ?? navigable[0];
     });
 
     const getSelectedEntry = createMemo(() =>
-        getOrderedEntries().find((entry) => entry.getValue() === props.valueSignal[0]()),
+        getOrderedEntries().find((entry) => entry.getValue() === valueSignal[0]()),
     );
 
     const getIsFloaterShown = createMemo(() => getSelectedEntry() !== undefined && getFloaterBounds() !== undefined);
@@ -93,8 +95,8 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
 
     const context: RadioGroupContextType = {
         getName: () => access(props.name) ?? fallbackName,
-        getValue: () => props.valueSignal[0](),
-        setValue: (value) => props.valueSignal[1](() => value as T),
+        getValue: () => valueSignal[0](),
+        setValue: (value) => valueSignal[1](() => value as T),
         computeIsTabbable: (value) => getRovingEntry()?.getValue() === value,
         register: (entry) => {
             setEntries((prev) => [...prev, entry]);

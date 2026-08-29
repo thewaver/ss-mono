@@ -1,7 +1,7 @@
-import type { Accessor, JSX, Signal } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps } from "../../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type {
     InteractionControlProps,
     InteractionWrapperProps,
@@ -33,8 +33,8 @@ export type TagInputProps = Omit<InteractionWrapperProps<TagInputFlags>, "render
         TagInputCbs &
             Pick<InteractionControlProps<TagInputFlags>, "id" | "renderContent"> &
             TagInputState & {
-                valueSignal: Signal<string[]>;
-                textSignal?: Signal<string>;
+                valueSignal: SignalSource<string[]>;
+                textSignal?: SignalSource<string>;
                 computeTextStyle?: (getFlags: () => InteractionFlags<TagInputFlags>) => TextFieldTextStyle;
                 renderTag: (getTag: Accessor<string>, getFlags: () => InteractionFlags) => JSX.Element;
                 renderPlaceholder?: (getFlags: () => InteractionFlags<TagInputFlags>) => JSX.Element;

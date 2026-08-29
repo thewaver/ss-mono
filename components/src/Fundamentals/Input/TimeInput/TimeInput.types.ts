@@ -1,9 +1,9 @@
-import type { JSX, Signal } from "solid-js";
+import type { JSX } from "solid-js";
 
 import type { TimeValue, TimeValueMeridiem } from "@thewaver/ss-utils";
 
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps } from "../../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { TextFieldFlags, TextFieldProps } from "../TextField/TextField.types";
 
 export type TimeInputMeridiem = {
@@ -37,6 +37,6 @@ export type TimeInputProps = Omit<
         maxTime?: TimeValue;
         hasSeconds?: boolean;
         isTwelveHour?: boolean;
-        valueSignal: Signal<TimeValue | undefined>;
+        valueSignal: SignalSource<TimeValue | undefined>;
         renderTrailing?: (getFlags: () => InteractionFlags<TextFieldFlags>, meridiem: TimeInputMeridiem) => JSX.Element;
     }>;

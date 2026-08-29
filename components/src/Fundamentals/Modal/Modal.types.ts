@@ -1,8 +1,8 @@
-import type { JSX, Signal } from "solid-js";
+import type { JSX } from "solid-js";
 
 import type { CSSMargin } from "@thewaver/ss-utils";
 
-import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
+import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 
 export type ModalRole = "dialog" | "alertdialog";
 
@@ -15,7 +15,7 @@ export type ModalProps = AccessorProps<{
     role?: ModalRole;
     alignment?: ModalAlignment;
     isDismissableOnOverlayClick?: boolean;
-    visibilitySignal: Signal<boolean>;
+    visibilitySignal: SignalSource<boolean>;
     transitionDurationMs?: number;
     margins?: CSSMargin;
     onShow?: () => void;

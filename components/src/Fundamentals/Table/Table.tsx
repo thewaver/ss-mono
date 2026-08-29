@@ -116,7 +116,7 @@ export const Table = <T,>(props: TableProps<T>) => {
 
         const next = TableUtils.getNextSort(getSort(), column.id);
 
-        props.sortSignal?.[1](() => next);
+        props.sortSignal?.[1](next);
 
         void props.onSortChange?.(next);
     };
@@ -124,7 +124,7 @@ export const Table = <T,>(props: TableProps<T>) => {
     let anchorRowIndex = 0;
 
     const setSelection = (rows: T[]) => {
-        props.selectionSignal?.[1](() => rows);
+        props.selectionSignal?.[1](rows);
 
         void props.onSelectionChange?.(rows);
     };
@@ -179,7 +179,7 @@ export const Table = <T,>(props: TableProps<T>) => {
 
         const next = TableUtils.getResizedWidth(column, width);
 
-        props.widthsSignal?.[1]((prev) => ({ ...prev, [column.id]: next }));
+        props.widthsSignal?.[1]({ ...getWidths(), [column.id]: next });
     };
 
     let resizeStartX = 0;

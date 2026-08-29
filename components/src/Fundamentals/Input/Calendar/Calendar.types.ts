@@ -1,4 +1,4 @@
-import type { Accessor, JSX, Signal } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 
 import type {
     DateValue,
@@ -7,7 +7,7 @@ import type {
     DateValueWeekdayWidth,
 } from "../../../Abstracts/DateValue/DateValue.types";
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps } from "../../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { InteractionControlProps } from "../../InteractionWrapper/InteractionWrapper.types";
 
 export type CalendarFlags = {
@@ -47,7 +47,7 @@ export type CalendarBaseProps = AccessorProps<{
     isDisabled?: boolean;
     gap?: number;
     computeIsDayDisabled?: (day: DateValue) => boolean;
-    monthSignal: Signal<DateValue>;
+    monthSignal: SignalSource<DateValue>;
     renderDay: CalendarDayRenderer;
     renderWeekday?: CalendarWeekdayRenderer;
 }>;
@@ -60,9 +60,9 @@ export type CalendarCompositeProps = CalendarBaseProps & {
 };
 
 export type CalendarProps = CalendarBaseProps & {
-    valueSignal: Signal<DateValue | undefined>;
+    valueSignal: SignalSource<DateValue | undefined>;
 };
 
 export type RangeCalendarProps = CalendarBaseProps & {
-    valueSignal: Signal<DateValueRange | undefined>;
+    valueSignal: SignalSource<DateValueRange | undefined>;
 };

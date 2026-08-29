@@ -8,7 +8,7 @@ import { Elevation } from "../../Abstracts/Elevation/Elevation";
 import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
 import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
 import { ViewportUtils } from "../../Exotics/Viewport/Viewport.utils";
-import { access } from "../../Utils/propUtils";
+import { access, accessSignal } from "../../Utils/propUtils";
 import { LabelUtils } from "../Input/Label/Label.utils";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import type {
@@ -56,6 +56,8 @@ const SortableItemSlot = (props: SortableItemSlotProps) => {
 };
 
 export const Sortable = <T,>(props: SortableProps<T>) => {
+    const itemsSignal = accessSignal(() => props.itemsSignal);
+
     const listId = createUniqueId();
 
     const viewportContext = useViewportContext();
@@ -76,7 +78,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
     const getDir = createMemo(() => access(props.dir) ?? DEFAULT_SORTABLE_DIR);
 
-    const getItems = createMemo(() => props.itemsSignal[0]());
+    const getItems = createMemo(() => itemsSignal[0]());
 
     const getGroupId = createMemo(() => access(props.groupId));
 
@@ -117,12 +119,12 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
             return props.computeCanAccept?.(item.value, carry.groupId) ?? true;
         },
         takeAt: (index) => {
-            props.itemsSignal[1]((items) => items.filter((_unused, itemIndex) => itemIndex !== index));
+            itemsSignal[1]((items) => items.filter((_unused, itemIndex) => itemIndex !== index));
         },
         putAt: (index, carry, origin) => {
             const item = carry.value as SortableItem<T>;
 
-            props.itemsSignal[1]((items) => [...items.slice(0, index), item, ...items.slice(index)]);
+            itemsSignal[1]((items) => [...items.slice(0, index), item, ...items.slice(index)]);
 
             props.onTransfer?.({
                 value: item.value,
@@ -135,7 +137,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         moveAt: (fromIndex, toIndex) => {
             let moved: SortableItem<T> | undefined;
 
-            props.itemsSignal[1]((items) => {
+            itemsSignal[1]((items) => {
                 const rest = items.filter((_unused, index) => index !== fromIndex);
 
                 moved = items[fromIndex];

@@ -1,7 +1,7 @@
-import type { JSX, Signal } from "solid-js";
+import type { JSX } from "solid-js";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps } from "../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 import type { InteractionControlProps, InteractionWrapperProps } from "../InteractionWrapper/InteractionWrapper.types";
 
 export type CollapsibleSizing = "fit-content" | "fill";
@@ -34,9 +34,10 @@ export type CollapsibleProps = Omit<
         transitionDurationMs?: number;
         headingLevel?: number;
         isScrolledIntoViewOnExpand?: boolean;
+        isPanelBuiltOnExpand?: boolean;
         panelRole?: JSX.HTMLAttributes<HTMLElement>["role"];
         panelAriaAttributes?: JSX.AriaAttributes;
-        expandedSignal: Signal<boolean>;
+        expandedSignal: SignalSource<boolean>;
         renderTrigger: (getFlags: () => InteractionFlags<CollapsibleFlags>) => JSX.Element;
         renderPanel: CollapsiblePanelRenderer;
     }>;

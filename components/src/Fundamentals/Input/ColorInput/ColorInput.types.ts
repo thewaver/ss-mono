@@ -5,7 +5,7 @@ import type { Point2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps } from "../../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type {
     InteractionControlProps,
     InteractionWrapperProps,
@@ -50,8 +50,8 @@ export type ColorInputProps = Omit<InteractionWrapperProps<ColorInputFlags>, "re
         ColorInputCbs &
             Pick<InteractionControlProps<ColorInputFlags>, "id" | "renderContent"> &
             ColorInputState & {
-                valueSignal: Signal<string>;
-                visibilitySignal?: Signal<boolean>;
+                valueSignal: SignalSource<string>;
+                visibilitySignal?: SignalSource<boolean>;
                 renderArea: (getFlags: () => InteractionFlags<ColorAreaFlags>) => JSX.Element;
                 renderHue: (getFlags: () => InteractionFlags<RangeFlags>) => JSX.Element;
                 renderPopup: (

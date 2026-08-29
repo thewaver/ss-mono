@@ -1,4 +1,4 @@
-import type { JSX, Signal } from "solid-js";
+import type { JSX } from "solid-js";
 import { createSignal } from "solid-js";
 
 import type { AnchorPlacement } from "@thewaver/ss-components";
@@ -89,11 +89,9 @@ export const PageNumberField = (props: PageNumberFieldProps) => {
 };
 
 export const PageTextField = (props: PageTextFieldProps) => {
-    const textSignal = SignalMirror.createValueMirror(() => access(props.value), props.onInput);
-
     return (
         <TextInput
-            valueSignal={textSignal}
+            valueSignal={[() => access(props.value), props.onInput]}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
             padding={() => FIELD_PADDING}
@@ -116,15 +114,15 @@ export const PageTextField = (props: PageTextFieldProps) => {
 export const PageSelectField = <T,>(props: PageSelectFieldProps<T>) => {
     const getValue = () => access(props.value);
 
-    const valueSignal: Signal<T | undefined> = SignalMirror.createValueMirror<T | undefined>(getValue, (value) => {
+    const setValue = (value: T | undefined) => {
         if (value === undefined) return;
 
         props.onChange(value);
-    });
+    };
 
     return (
         <Select
-            valueSignal={valueSignal}
+            valueSignal={[getValue, setValue]}
             options={() => access(props.values).map((value) => ({ value }))}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
@@ -148,15 +146,15 @@ export const PageSelectField = <T,>(props: PageSelectFieldProps<T>) => {
 export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>) => {
     const getValue = () => access(props.value);
 
-    const valueSignal: Signal<T | undefined> = SignalMirror.createValueMirror<T | undefined>(getValue, (value) => {
+    const setValue = (value: T | undefined) => {
         if (value === undefined) return;
 
         props.onChange(value);
-    });
+    };
 
     return (
         <Select
-            valueSignal={valueSignal}
+            valueSignal={[getValue, setValue]}
             options={() =>
                 access(props.groups).map(([label, values]) => ({ label, options: values.map((value) => ({ value })) }))
             }
@@ -181,11 +179,9 @@ export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>
 };
 
 export const PageCheckField = (props: PageCheckFieldProps) => {
-    const checkedSignal = SignalMirror.createValueMirror(() => access(props.value), props.onChange);
-
     return (
         <Checkbox
-            checkedSignal={checkedSignal}
+            checkedSignal={[() => access(props.value), props.onChange]}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
             renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
@@ -194,11 +190,9 @@ export const PageCheckField = (props: PageCheckFieldProps) => {
 };
 
 export const PageColorField = (props: PageColorFieldProps) => {
-    const valueSignal = SignalMirror.createValueMirror(() => access(props.value), props.onInput);
-
     return (
         <ColorInput
-            valueSignal={valueSignal}
+            valueSignal={[() => access(props.value), props.onInput]}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
             renderContent={(getFlags) => <PageColorInputContent flags={getFlags} isCompact={true} />}

@@ -1,7 +1,7 @@
-import type { Accessor, JSX, Signal } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
+import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 import type { CollapsibleFlags } from "../Collapsible/Collapsible.types";
 
 export type AccordionSizing = "fit-content" | "fill";
@@ -26,6 +26,7 @@ export type AccordionSectionProps<T> = AccessorProps<{
     headingLevel: number;
     isExpanded: boolean;
     isScrolledIntoViewOnExpand?: boolean;
+    isPanelBuiltOnExpand?: boolean;
     transitionDurationMs?: number;
     ref?: (element: HTMLElement) => void;
     onToggle: () => void;
@@ -42,10 +43,11 @@ export type AccordionProps<T> = AccessorProps<{
     isSingleExpand?: boolean;
     isExpandRequired?: boolean;
     isScrolledIntoViewOnExpand?: boolean;
+    isPanelBuiltOnExpand?: boolean;
     transitionDurationMs?: number;
 }> & {
     items: MaybeAccessor<AccordionItem<T>[]>;
-    expandedSignal: Signal<T[]>;
+    expandedSignal: SignalSource<T[]>;
     renderHeader: AccordionHeaderRenderer<T>;
     renderPanel: AccordionPanelRenderer<T>;
 };

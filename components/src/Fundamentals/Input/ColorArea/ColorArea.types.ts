@@ -1,8 +1,6 @@
-import type { Signal } from "solid-js";
-
 import type { Color } from "@thewaver/ss-utils";
 
-import type { AccessorProps } from "../../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type {
     InteractionControlProps,
     InteractionWrapperProps,
@@ -47,6 +45,6 @@ export type ColorAreaProps = Omit<InteractionWrapperProps<ColorAreaFlags>, "rend
         ColorAreaCbs &
             Pick<InteractionControlProps<ColorAreaFlags>, "id" | "renderContent"> &
             ColorAreaState & {
-                hsvSignal: Signal<Color.HSVA>;
+                hsvSignal: SignalSource<Color.HSVA>;
             }
     >;

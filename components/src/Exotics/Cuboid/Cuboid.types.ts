@@ -1,6 +1,6 @@
-import type { Accessor, JSX, Signal } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 
-import type { AccessorProps } from "../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
 export type CuboidFace = "front" | "right" | "back" | "left" | "top" | "bottom";
 
@@ -20,7 +20,7 @@ export type CuboidProps = AccessorProps<{
     transitionDurationMs?: number;
     ariaLabel: string;
     computeFaceLabel?: (face: CuboidFace) => string;
-    yawSignal: Signal<number>;
-    pitchSignal: Signal<number>;
+    yawSignal: SignalSource<number>;
+    pitchSignal: SignalSource<number>;
     renderFace: (getFace: Accessor<CuboidFace>, getState: Accessor<CuboidFaceState>) => JSX.Element;
 }>;

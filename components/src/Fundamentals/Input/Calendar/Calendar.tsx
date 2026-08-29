@@ -8,7 +8,7 @@ import type {
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
 import { LiveAnnouncer } from "../../../Abstracts/LiveAnnouncer/LiveAnnouncer";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
-import { access } from "../../../Utils/propUtils";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../InteractionWrapper/InteractionWrapper";
 import type { CalendarCompositeProps, CalendarDayProps, CalendarFlags, CalendarProps } from "./Calendar.types";
 
@@ -53,6 +53,8 @@ const CalendarDay = (props: CalendarDayProps) => {
 };
 
 export const CalendarComposite = (props: CalendarCompositeProps) => {
+    const monthSignal = accessSignal(() => props.monthSignal);
+
     const gridId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
@@ -61,7 +63,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
 
     const getWeekStartsOn = createMemo(() => access(props.weekStartsOn) ?? DEFAULT_CALENDAR_WEEK_STARTS_ON);
 
-    const getMonth = createMemo(() => props.monthSignal[0]());
+    const getMonth = createMemo(() => monthSignal[0]());
 
     const getToday = createMemo(() =>
         DateValueUtils.withCalendar(
@@ -130,7 +132,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
         setHighlighted(() => clamped);
 
         if (!DateValueUtils.isSame(month, DateValueUtils.getStartOfMonth(getMonth()))) {
-            props.monthSignal[1](() => month);
+            monthSignal[1](() => month);
         }
     };
 
@@ -286,11 +288,15 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
     );
 };
 
-export const Calendar = (props: CalendarProps) => (
-    <CalendarComposite
-        {...props}
-        computeIsSelected={(day) => DateValueUtils.isSame(day, props.valueSignal[0]())}
-        computeAnchorDay={() => props.valueSignal[0]()}
-        onPick={(day) => props.valueSignal[1](() => day)}
-    />
-);
+export const Calendar = (props: CalendarProps) => {
+    const valueSignal = accessSignal(() => props.valueSignal);
+
+    return (
+        <CalendarComposite
+            {...props}
+            computeIsSelected={(day) => DateValueUtils.isSame(day, valueSignal[0]())}
+            computeAnchorDay={() => valueSignal[0]()}
+            onPick={(day) => valueSignal[1](() => day)}
+        />
+    );
+};

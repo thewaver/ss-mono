@@ -5,6 +5,7 @@ import { CSSUtils, StringUtils } from "@thewaver/ss-utils";
 
 import { CheckedStateUtils } from "../../../Abstracts/CheckedState/CheckedState.utils";
 import { ElementObserver } from "../../../Abstracts/ElementObserver/ElementObserver";
+import { FlattenerUtils } from "../../../Abstracts/Flattener/Flattener.utils";
 import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
@@ -13,7 +14,7 @@ import { Typeahead } from "../../../Abstracts/Typeahead/Typeahead";
 import { TypeaheadUtils } from "../../../Abstracts/Typeahead/Typeahead.utils";
 import { Virtualizer } from "../../../Abstracts/Virtualizer/Virtualizer";
 import type { VirtualizerRow } from "../../../Abstracts/Virtualizer/Virtualizer.types";
-import { access } from "../../../Utils/propUtils";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../Popover/Popover";
 import { FormFieldUtils } from "../FormField/FormField.utils";
@@ -192,11 +193,11 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 
     const getTextInset = createMemo(() => CSSUtils.spreadableToStyle(getSpreadPadding(), StringUtils.camelToKebabCase));
 
-    const getItemOffsets = createMemo(() => SelectUtils.getItemOffsets(access(props.options)));
+    const getItemRows = createMemo(() => SelectUtils.getItemRows(access(props.options)));
 
     const getFlatOptions = createMemo(() => SelectUtils.getFlatOptions(access(props.options)));
 
-    const getRows = createMemo(() => SelectUtils.getRows(access(props.options)));
+    const getRows = createMemo(() => FlattenerUtils.getFlatRows(getItemRows()));
 
     const getIsVirtualized = createMemo(() => props.computeEstimatedOptionHeight !== undefined);
 
@@ -258,18 +259,18 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
         computeEstimatedSize: (index) => {
             const row = getRows()[index];
 
-            return row?.option === undefined
-                ? (props.computeEstimatedGroupHeight?.(row?.groupIndex ?? 0) ??
+            return row?.isEntry !== true
+                ? (props.computeEstimatedGroupHeight?.(row?.position ?? 0) ??
                       props.computeEstimatedOptionHeight?.(0) ??
                       0)
-                : (props.computeEstimatedOptionHeight?.(row.optionIndex ?? 0) ?? 0);
+                : (props.computeEstimatedOptionHeight?.(row.entryOffset) ?? 0);
         },
         getPinnedRows: () => {
             const highlightedIndex = getHighlightedIndex();
 
             if (highlightedIndex === undefined) return EMPTY_SELECTION;
 
-            const rowIndex = SelectUtils.getRowIndexOfOption(getRows(), highlightedIndex);
+            const rowIndex = FlattenerUtils.getEntryRowIndex(getRows(), highlightedIndex);
 
             return rowIndex === -1 ? EMPTY_SELECTION : [rowIndex];
         },
@@ -335,7 +336,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 
         if (highlightedIndex === undefined) return;
 
-        const rowIndex = SelectUtils.getRowIndexOfOption(getRows(), highlightedIndex);
+        const rowIndex = FlattenerUtils.getEntryRowIndex(getRows(), highlightedIndex);
 
         if (rowIndex === -1) return;
 
@@ -455,7 +456,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                     when={SelectUtils.getIsGroup(getItem())}
                     fallback={renderOptionSlot(
                         () => getItem() as SelectOption<T>,
-                        () => getItemOffsets()[index],
+                        () => getItemRows()[index].entryOffset,
                     )}
                 >
                     <div role="group" aria-label={(getItem() as SelectOptionGroup<T>).label}>
@@ -466,7 +467,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 
                         <Index each={(getItem() as SelectOptionGroup<T>).options}>
                             {(getOption, groupIndex) =>
-                                renderOptionSlot(getOption, () => getItemOffsets()[index] + groupIndex)
+                                renderOptionSlot(getOption, () => getItemRows()[index].entryOffset + groupIndex)
                             }
                         </Index>
                     </div>
@@ -485,15 +486,15 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                 ref={(element) => rowWindow.measureRow(element, row.index)}
             >
                 <Show
-                    when={getRow().option !== undefined}
+                    when={getRow().isEntry}
                     fallback={props.renderGroup?.(
-                        () => getRow().group as SelectOptionGroup<T>,
-                        () => computeGroupFlags(getRow().group as SelectOptionGroup<T>),
+                        () => getRow().node as SelectOptionGroup<T>,
+                        () => computeGroupFlags(getRow().node as SelectOptionGroup<T>),
                     )}
                 >
                     {renderOptionSlot(
-                        () => getRow().option as SelectOption<T>,
-                        () => getRow().optionIndex as number,
+                        () => getRow().node as SelectOption<T>,
+                        () => getRow().entryOffset,
                     )}
                 </Show>
             </div>
@@ -509,15 +510,20 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 
         for (const row of rowWindow.getRows()) {
             const source = getRows()[row.index];
+            const groupIndex = source === undefined ? undefined : SelectUtils.getGroupRowIndex(source);
             const last = runs[runs.length - 1];
 
-            if (last && last.groupIndex === source?.groupIndex) {
+            if (last && last.groupIndex === groupIndex) {
                 last.rows.push(row);
 
                 continue;
             }
 
-            runs.push({ groupIndex: source?.groupIndex, group: source?.group, rows: [row] });
+            runs.push({
+                groupIndex,
+                group: groupIndex === undefined ? undefined : (getRows()[groupIndex].node as SelectOptionGroup<T>),
+                rows: [row],
+            });
         }
 
         return runs;
@@ -621,8 +627,10 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 };
 
 export const Select = <T,>(props: SelectProps<T>) => {
+    const valueSignal = accessSignal(() => props.valueSignal);
+
     const getSelectedOptions = createMemo(() => {
-        const selectedValue = props.valueSignal[0]();
+        const selectedValue = valueSignal[0]();
         const selectedOption = SelectUtils.getFlatOptions(access(props.options)).find(
             (option) => option.value === selectedValue,
         );
@@ -634,14 +642,14 @@ export const Select = <T,>(props: SelectProps<T>) => {
         <SelectComposite
             {...props}
             selectedOptions={getSelectedOptions}
-            computeIsSelected={(value) => value === props.valueSignal[0]()}
+            computeIsSelected={(value) => value === valueSignal[0]()}
             renderContent={(getSelectedOptions, getFlags) =>
                 props.renderContent(() => getSelectedOptions()[0], getFlags)
             }
             onPick={(value) => {
-                if (value === props.valueSignal[0]()) return;
+                if (value === valueSignal[0]()) return;
 
-                props.valueSignal[1](() => value);
+                valueSignal[1](() => value);
 
                 void props.onSelectionChange?.(value);
             }}

@@ -1,9 +1,9 @@
-import type { Accessor, JSX, Signal } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 
 import type { TimeValue, TimeValueUnit } from "@thewaver/ss-utils";
 
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps } from "../../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { InteractionControlProps } from "../../InteractionWrapper/InteractionWrapper.types";
 
 export type ClockUnit = TimeValueUnit | "meridiem";
@@ -52,7 +52,7 @@ export type ClockProps = AccessorProps<{
     isDisabled?: boolean;
     gap?: number;
     computeIsTimeDisabled?: (time: TimeValue) => boolean;
-    valueSignal: Signal<TimeValue | undefined>;
+    valueSignal: SignalSource<TimeValue | undefined>;
     renderOption: ClockOptionRenderer;
     renderUnit?: ClockUnitRenderer;
     renderColumn?: ClockColumnRenderer;

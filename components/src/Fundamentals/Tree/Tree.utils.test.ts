@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { FlattenerUtils } from "../../Abstracts/Flattener/Flattener.utils";
 import type { TreeNode } from "./Tree.types";
 import { TreeUtils } from "./Tree.utils";
 
@@ -18,7 +19,7 @@ const expandAll = () => true;
 const expandNone = () => false;
 
 const valuesOf = (nodes: TreeNode<string>[], computeIsExpanded: (value: string) => boolean) =>
-    TreeUtils.getFlatRows(TreeUtils.getVisibleRows(nodes, computeIsExpanded)).map((row) => row.node.value);
+    FlattenerUtils.getFlatRows(TreeUtils.getVisibleRows(nodes, computeIsExpanded)).map((row) => row.node.value);
 
 describe("getIsBranch", () => {
     it("tells a branch from a leaf by whether it carries children", () => {
@@ -45,7 +46,7 @@ describe("getVisibleRows", () => {
     });
 
     it("numbers each row by where it sits in the flat walk rather than among its siblings", () => {
-        const flat = TreeUtils.getFlatRows(TreeUtils.getVisibleRows(NODES, expandAll));
+        const flat = FlattenerUtils.getFlatRows(TreeUtils.getVisibleRows(NODES, expandAll));
 
         expect(flat.map((row) => row.index)).toEqual([0, 1, 2, 3, 4]);
         expect(flat.map((row) => row.depth)).toEqual([0, 1, 1, 2, 0]);

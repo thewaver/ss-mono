@@ -1,8 +1,8 @@
-import type { JSX, Signal } from "solid-js";
+import type { JSX } from "solid-js";
 
 import type { DateValue, DateValueCalendarId, DateValueEra } from "../../../Abstracts/DateValue/DateValue.types";
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps } from "../../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { TextFieldFlags, TextFieldProps } from "../TextField/TextField.types";
 
 export type DateInputFormat = "iso" | "day-month-year" | "month-day-year";
@@ -38,6 +38,6 @@ export type DateInputProps = Omit<
         format?: DateInputFormat;
         calendar?: DateValueCalendarId;
         locale?: string;
-        valueSignal: Signal<DateValue | undefined>;
+        valueSignal: SignalSource<DateValue | undefined>;
         renderLeading?: (getFlags: () => InteractionFlags<TextFieldFlags>, era: DateInputEra) => JSX.Element;
     }>;

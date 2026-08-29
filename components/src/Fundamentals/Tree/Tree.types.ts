@@ -1,7 +1,8 @@
-import type { Accessor, Component, JSX, Signal } from "solid-js";
+import type { Accessor, Component, JSX } from "solid-js";
 
+import type { FlatRow } from "../../Abstracts/Flattener/Flattener.types";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
+import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 import type { InteractionControlProps, InteractionTooltipDefs } from "../InteractionWrapper/InteractionWrapper.types";
 
 export type TreeNodeFlags = {
@@ -24,15 +25,7 @@ export type TreeNode<T> = {
     tooltipDefs?: InteractionTooltipDefs<TreeNodeFlags>;
 };
 
-export type TreeRow<T> = {
-    node: TreeNode<T>;
-    index: number;
-    depth: number;
-    position: number;
-    setSize: number;
-    isExpanded: boolean;
-    rows: TreeRow<T>[];
-};
+export type TreeRow<T> = FlatRow<TreeNode<T>>;
 
 export type TreeNodeItemProps = AccessorProps<
     InteractionControlProps<TreeNodeFlags> & {
@@ -51,8 +44,8 @@ export type TreeProps<T> = AccessorProps<{
     computeEstimatedNodeHeight?: (index: number) => number;
 }> & {
     nodes: MaybeAccessor<TreeNode<T>[]>;
-    valueSignal: Signal<T | undefined>;
-    expandedSignal: Signal<T[]>;
+    valueSignal: SignalSource<T | undefined>;
+    expandedSignal: SignalSource<T[]>;
     computeCustomText?: (node: TreeNode<T>) => string;
     renderNode: (getNode: Accessor<TreeNode<T>>, getFlags: () => InteractionFlags<TreeNodeFlags>) => JSX.Element;
     renderPendingChildren?: (getNode: Accessor<TreeNode<T>>, getDepth: () => number) => JSX.Element;

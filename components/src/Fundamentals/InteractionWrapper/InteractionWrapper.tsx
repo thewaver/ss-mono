@@ -33,8 +33,15 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
         getIsTabbable: props.isTabbable === undefined ? undefined : () => access(props.isTabbable)!,
     });
 
+    const getIsActivationUntracked = createMemo(
+        () => getIsDisabled() || (access(props.isActivationTracked) ?? false) === false,
+    );
+
+    const getActivation = InteractionTracker.trackActivation(getElementRef, getIsActivationUntracked);
+
     const getFlags = createMemo((): InteractionFlags<TExtra> => ({
         ...getInternalFlags(),
+        activation: getActivation(),
         isDisabled: getIsDisabled(),
         isPressed: access(props.isPressed),
         hasError: access(props.hasError),

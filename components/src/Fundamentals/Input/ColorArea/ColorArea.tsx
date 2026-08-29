@@ -3,7 +3,7 @@ import { For, createRenderEffect, createSignal } from "solid-js";
 import { Color, MathUtils } from "@thewaver/ss-utils";
 
 import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
-import { access } from "../../../Utils/propUtils";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../InteractionWrapper/InteractionWrapper";
 import { LabelUtils } from "../Label/Label.utils";
 import type { ColorAreaAxis, ColorAreaElementProps, ColorAreaFlags, ColorAreaProps } from "./ColorArea.types";
@@ -120,15 +120,17 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
 };
 
 export const ColorArea = (props: ColorAreaProps) => {
+    const hsvSignal = accessSignal(() => props.hsvSignal);
+
     const [getFocusedAxis, setFocusedAxis] = createSignal<ColorAreaAxis>();
     const [getIsDragging, setIsDragging] = createSignal(false);
 
     const setAxis = (axis: ColorAreaAxis, ratio: number) => {
         const clamped = MathUtils.clamp01(ratio);
-        const hsv = props.hsvSignal[0]();
+        const hsv = hsvSignal[0]();
         const next = axis === "saturation" ? { ...hsv, s: clamped } : { ...hsv, v: clamped };
 
-        props.hsvSignal[1](() => next);
+        hsvSignal[1](() => next);
 
         void props.onInput?.(next);
     };
@@ -137,7 +139,7 @@ export const ColorArea = (props: ColorAreaProps) => {
         <InteractionWrapper
             {...props}
             extraFlags={(): ColorAreaFlags => ({
-                hsv: props.hsvSignal[0](),
+                hsv: hsvSignal[0](),
                 isDragging: getIsDragging(),
                 focusedAxis: getFocusedAxis(),
             })}
@@ -150,7 +152,7 @@ export const ColorArea = (props: ColorAreaProps) => {
                     axisLabels={() => access(props.axisLabels) ?? DEFAULT_COLOR_AREA_AXIS_LABELS}
                     step={() => access(props.step) ?? DEFAULT_COLOR_AREA_STEP}
                     flags={getFlags}
-                    hsv={() => props.hsvSignal[0]()}
+                    hsv={() => hsvSignal[0]()}
                     isTabbable={props.isTabbable}
                     renderContent={props.renderContent}
                     setAxis={setAxis}

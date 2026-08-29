@@ -1,7 +1,7 @@
 import { Index, Show, createMemo } from "solid-js";
 
 import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
-import { access } from "../../../Utils/propUtils";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../InteractionWrapper/InteractionWrapper";
 import type { TagInputProps } from "./TagInput.types";
 
@@ -11,6 +11,8 @@ const DEFAULT_TAG_INPUT_GAP = 5;
 const DEFAULT_TAG_INPUT_PADDING = 0;
 
 export const TagInput = (props: TagInputProps) => {
+    const valueSignal = accessSignal(() => props.valueSignal);
+
     let fieldRef: HTMLInputElement | undefined;
     let tagRefs: (HTMLElement | undefined)[] = [];
 
@@ -18,12 +20,12 @@ export const TagInput = (props: TagInputProps) => {
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
-    const getTags = () => props.valueSignal[0]();
+    const getTags = () => valueSignal[0]();
 
     const getIsEmpty = createMemo(() => textSignal[0]().length < 1);
 
     const setTags = (tags: string[]) => {
-        props.valueSignal[1](() => tags);
+        valueSignal[1](() => tags);
 
         void props.onTagsChange?.(tags);
     };

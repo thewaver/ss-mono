@@ -5,7 +5,7 @@ import type { TimeValue, TimeValueMeridiem, TimeValueUnit } from "@thewaver/ss-u
 
 import { MaskedField } from "../../../Abstracts/MaskedField/MaskedField";
 import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
-import { access } from "../../../Utils/propUtils";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import { TextField } from "../TextField/TextField";
 import type { TimeInputMeridiem, TimeInputProps } from "./TimeInput.types";
 
@@ -54,11 +54,13 @@ const getHasImpossibleSegment = (digits: string, segmentCount: number, isTwelveH
 };
 
 export const TimeInput = (props: TimeInputProps) => {
+    const valueSignal = accessSignal(() => props.valueSignal);
+
     const getIsTwelveHour = () => access(props.isTwelveHour) ?? false;
 
     const [getMeridiem, setMeridiem] = createSignal<TimeValueMeridiem>(
         untrack(() => {
-            const value = props.valueSignal[0]();
+            const value = valueSignal[0]();
 
             return value ? TimeUtils.getMeridiem(value) : DEFAULT_MERIDIEM;
         }),
@@ -85,8 +87,8 @@ export const TimeInput = (props: TimeInputProps) => {
     };
 
     const field = MaskedField.createField<TimeValue>({
-        getValue: () => props.valueSignal[0](),
-        setValue: (next) => props.valueSignal[1](() => next),
+        getValue: () => valueSignal[0](),
+        setValue: (next) => valueSignal[1](() => next),
         formatDigits: (digits) => TextSyncUtils.formatWithMask(getMask(), digits),
         getDigitCount: () => getSegmentCount() * SEGMENT_LENGTH,
         toDigits: (value) => TextSyncUtils.getMaskedDigits(toText(value)),
@@ -96,7 +98,7 @@ export const TimeInput = (props: TimeInputProps) => {
     });
 
     createEffect(() => {
-        const value = props.valueSignal[0]();
+        const value = valueSignal[0]();
 
         if (value) setMeridiem(TimeUtils.getMeridiem(value));
     });
@@ -106,7 +108,7 @@ export const TimeInput = (props: TimeInputProps) => {
         set: (next) => {
             setMeridiem(next);
 
-            const value = untrack(() => props.valueSignal[0]());
+            const value = untrack(() => valueSignal[0]());
 
             if (!value) return;
 
@@ -122,7 +124,7 @@ export const TimeInput = (props: TimeInputProps) => {
     const handleKeyDown = (e: KeyboardEvent) => {
         const delta = STEP_KEYS[e.key];
         const element = e.currentTarget as HTMLInputElement | null;
-        const value = props.valueSignal[0]();
+        const value = valueSignal[0]();
 
         if (delta === undefined || !element || !value) return;
 
@@ -135,7 +137,7 @@ export const TimeInput = (props: TimeInputProps) => {
 
         e.preventDefault();
 
-        props.valueSignal[1](() => stepped);
+        valueSignal[1](() => stepped);
         field.textSignal[1](field.formatValue(stepped));
         element.setSelectionRange(segment.start, segment.start + SEGMENT_LENGTH);
     };

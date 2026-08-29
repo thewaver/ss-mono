@@ -2,7 +2,7 @@ import { Index, createMemo, createSignal, createUniqueId } from "solid-js";
 
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
-import { access } from "../../Utils/propUtils";
+import { access, accessSignal } from "../../Utils/propUtils";
 import { Collapsible } from "../Collapsible/Collapsible";
 import type { AccordionProps, AccordionSectionProps, AccordionSizing } from "./Accordion.types";
 
@@ -27,6 +27,7 @@ const AccordionSection = <T,>(props: AccordionSectionProps<T>) => {
             isDisabled={() => access(props.item).isDisabled ?? false}
             headingLevel={props.headingLevel}
             isScrolledIntoViewOnExpand={props.isScrolledIntoViewOnExpand}
+            isPanelBuiltOnExpand={props.isPanelBuiltOnExpand}
             transitionDurationMs={props.transitionDurationMs}
             panelRole={"region"}
             panelAriaAttributes={() => ({ "aria-labelledby": headerId })}
@@ -40,6 +41,8 @@ const AccordionSection = <T,>(props: AccordionSectionProps<T>) => {
 };
 
 export const Accordion = <T,>(props: AccordionProps<T>) => {
+    const expandedSignal = accessSignal(() => props.expandedSignal);
+
     const [getHeaderRefs, setHeaderRefs] = createSignal<(HTMLElement | undefined)[]>([]);
 
     const getHeadingLevel = createMemo(() => access(props.headingLevel) ?? DEFAULT_ACCORDION_HEADING_LEVEL);
@@ -65,7 +68,7 @@ export const Accordion = <T,>(props: AccordionProps<T>) => {
     );
 
     const handleToggle = (value: T) => {
-        props.expandedSignal[1]((prev) => {
+        expandedSignal[1]((prev) => {
             const isExpanded = prev.includes(value);
             const isLastExpanded = isExpanded && prev.length === 1;
 
@@ -104,8 +107,9 @@ export const Accordion = <T,>(props: AccordionProps<T>) => {
                         ref={(element) => setHeaderRef(index, element)}
                         item={getItem}
                         headingLevel={getHeadingLevel}
-                        isExpanded={() => props.expandedSignal[0]().includes(getItem().value)}
+                        isExpanded={() => expandedSignal[0]().includes(getItem().value)}
                         isScrolledIntoViewOnExpand={props.isScrolledIntoViewOnExpand}
+                        isPanelBuiltOnExpand={props.isPanelBuiltOnExpand}
                         transitionDurationMs={props.transitionDurationMs}
                         renderHeader={props.renderHeader}
                         renderPanel={props.renderPanel}

@@ -1,6 +1,6 @@
-import type { Accessor, JSX, Signal } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 
-import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
+import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 
 export type TableSortDirection = "ascending" | "descending";
 
@@ -58,15 +58,15 @@ export type TableProps<T> = AccessorProps<{
     pageRows?: number;
     resizerWidthPx?: number;
     isDisabled?: boolean;
-    sortSignal?: Signal<TableSort | undefined>;
-    widthsSignal?: Signal<Record<string, number>>;
+    sortSignal?: SignalSource<TableSort | undefined>;
+    widthsSignal?: SignalSource<Record<string, number>>;
     computeEstimatedRowHeight?: (index: number) => number;
     renderResizer?: (getFlags: () => TableColumnFlags) => JSX.Element;
     onSortChange?: (sort: TableSort | undefined) => void;
 }> & {
     columns: MaybeAccessor<TableColumn<T>[]>;
     rows: MaybeAccessor<T[]>;
-    selectionSignal?: Signal<T[]>;
+    selectionSignal?: SignalSource<T[]>;
     computeRowAriaLabel?: (row: T, index: number) => string;
     onRowActivate?: (row: T, index: number) => void;
     onSelectionChange?: (rows: T[]) => void;

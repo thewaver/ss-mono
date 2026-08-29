@@ -1,10 +1,10 @@
-import type { Accessor, JSX, Signal } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 
 import { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
+import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 import type {
     InteractionControlProps,
     InteractionTooltipDefs,
@@ -110,13 +110,13 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         submenuOffset?: Point2d;
         reservedScreenSize?: Size2d;
         transitionDurationMs?: number;
-        visibilitySignal?: Signal<boolean>;
+        visibilitySignal?: SignalSource<boolean>;
         renderContent: (getFlags: () => InteractionFlags<MenuFlags>) => JSX.Element;
         renderPopup: MenuRenderPopup;
     }> & {
         anchorRef?: MaybeAccessor<HTMLElement | undefined>;
         items: MaybeAccessor<MenuItem<T>[]>;
-        checkedSignal?: Signal<T[]>;
+        checkedSignal?: SignalSource<T[]>;
         computeCustomText?: (item: MenuItem<T>) => string;
         renderItem: MenuRenderItem<T>;
         onActivate: (value: T) => void;
@@ -131,12 +131,12 @@ export type ContextMenuProps<T> = AccessorProps<{
     submenuOffset?: Point2d;
     reservedScreenSize?: Size2d;
     transitionDurationMs?: number;
-    visibilitySignal?: Signal<boolean>;
+    visibilitySignal?: SignalSource<boolean>;
     renderPopup: MenuRenderPopup;
 }> & {
     regionRef: MaybeAccessor<HTMLElement | undefined>;
     items: MaybeAccessor<MenuItem<T>[]>;
-    checkedSignal?: Signal<T[]>;
+    checkedSignal?: SignalSource<T[]>;
     computeCustomText?: (item: MenuItem<T>) => string;
     renderItem: MenuRenderItem<T>;
     onActivate: (value: T) => void;

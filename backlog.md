@@ -32,33 +32,31 @@ reading.
 
 ### Index
 
-1. One-shot positioned effects still have nowhere to go — _open_
-2. Neither animation component can reveal its own children — _open_
-3. `Select` — four things deliberately not built — _open_
-4. `Menu` — two things deliberately not built — _open_
-5. Other core controls the library does not have — _open, ordered by the user_
-6. Machinery those controls need, none of which exists — _open_
-7. What the verification suite still cannot see — _open_
-8. Planned: a consumer-facing layer of controls above the library — _planned, not a focus_
-9. `Toasts` — two things deliberately not built — _open_
-10. `Calendar` — two things deliberately not built — _open_
-11. `ColorInput` — two things deliberately not built — _open_
-12. `Accordion` — two things deliberately not built — _open_
-13. `Tabs` — a pairing the consumer can still skip — _open_
-14. `Viewport` as a region: what is settled and what is not — _open_
-15. `Tree` — two things deliberately not built, and one extraction to decide — _open_
-16. `SlideButton` — three things deliberately not built — _open_
-17. `Spotlight` — one thing deliberately not built — _open_
-18. `Scroller` — four things deliberately not built — _open_
-19. `Paginator` — four things deliberately not built — _open_
-20. The carousels — four things deliberately not built — _open_
-21. The four components ported from React — what did not settle — _open_
-22. An anchored layer is always a frame behind — _postponed until the platform catches up_
-23. `Table` — six things deliberately not built — _open_
+1. Neither animation component can reveal its own children — _open_
+2. `Select` — four things deliberately not built — _open_
+3. `Menu` — two things deliberately not built — _open_
+4. Other core controls the library does not have — _open, ordered by the user_
+5. What the verification suite still cannot see — _open_
+6. Planned: a consumer-facing layer of controls above the library — _planned, not a focus_
+7. `Toasts` — one thing deliberately not built — _open_
+8. `Calendar` — two things deliberately not built — _open_
+9. `ColorInput` — two things deliberately not built — _open_
+10. `Accordion` — one thing deliberately not built — _open_
+11. `Tabs` — a pairing the consumer can still skip — _open_
+12. `Viewport` as a region: what is settled and what is not — _open_
+13. `Tree` — two things deliberately not built — _open_
+14. `SlideButton` — three things deliberately not built — _open_
+15. `Spotlight` — one thing deliberately not built — _open_
+16. `Scroller` — four things deliberately not built — _open_
+17. `Paginator` — four things deliberately not built — _open_
+18. The carousels — four things deliberately not built — _open_
+19. The four components ported from React — what did not settle — _open_
+20. An anchored layer is always a frame behind — _postponed until the platform catches up_
+21. `Table` — six things deliberately not built — _open_
 
 ### Build order
 
-Covers the unbuilt controls in items 5 and 6. The ordering principle is **how much of the existing base
+Covers the unbuilt controls in item 4. The ordering principle is **how much of the existing base
 a thing reuses**: anything that is a preset or a composition of what already works comes before anything
 that needs a new primitive, and anything blocked on an architectural decision comes last, so the
 decision is made once with several consumers in view rather than inferred from the first one.
@@ -85,36 +83,7 @@ privately inside them.
 
 ---
 
-## 1. One-shot positioned effects still have nowhere to go
-
-`InteractionTracker.trackDrag` now reports pointer position, so the primitive this item asked for exists —
-but it reports a **ratio while a drag lasts**, which is not the same thing as an event with an origin.
-A ripple needs to know where a single click landed and then run once from there; the flags a painter
-receives still describe state only, and `trackDrag` is something a control opts into rather than something
-a decoration can read.
-
-What remains is the smaller half: getting a one-shot origin from the control to `renderDecoration`. The
-shape is probably a flag carrying the last activation ratio, since that reuses the extensible-flags
-mechanism and stays opt-in — a control that never calls `trackDrag` emits nothing.
-
-Not worth building until something asks for it, which is where this item started.
-
-**_Elsewhere._** A positioned one-shot effect arrives as an event everywhere, never as state. MUI's
-button ripple is handed the pointer event itself — the ripple component exposes `start(event)` and
-`stop()`, reads the coordinates off the event, and takes a `center` prop for the case where the origin
-should be ignored — so what the paint layer receives is the event, not a flag. Radix and React Aria
-ship no ripple at all: pressed-ness arrives as data (`data-pressed`, `isPressed`) and anything
-positional is the consumer's, which is where this library already stands.
-
-Worth knowing before the flag is designed: MUI's ripple has a long-standing bug (mui#22068) where the
-origin lands in the wrong place under an ancestor `transform: scale()`, because pointer coordinates and
-`getBoundingClientRect` are being mixed. `trackDrag` reports a ratio of two same-space measurements and
-cannot express that failure, so a flag carrying the last activation ratio inherits the immunity rather
-than having to earn it again.
-
----
-
-## 2. Neither animation component can reveal its own children
+## 1. Neither animation component can reveal its own children
 
 **The half this item used to be mostly about is closed.** A fill that is not a photograph — a gradient, a
 solid, a pattern — is a source like any other: an SVG string as a `data:image/svg+xml,` URI, which the
@@ -142,7 +111,7 @@ the one both components have.
 
 ---
 
-## 3. `Select` — four things deliberately not built
+## 2. `Select` — four things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under the three `Select` headings. These are
 the gaps, each with the reason it is still a gap.
@@ -191,17 +160,17 @@ the gaps, each with the reason it is still a gap.
 
 ---
 
-## 4. `Menu` — two things deliberately not built
+## 3. `Menu` — two things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"`Popover` extracted, and `Menu` as the
 second consumer"_ and _"`Menu` submenus: a level per popup, focus moving between them"_. These are the
 gaps, each with the reason it is still a gap.
 
 - **There are no groups and no separators.** `SelectItem<T>`'s discriminated record would carry them
-  unchanged, but a second copy of `getFlatOptions` plus `getItemOffsets` would come with it — and that
-  is the duplication `NavigatorUtils` deliberately did _not_ absorb, since it walks positions and has
-  no opinion about what produced them. Flattening a nested list into a navigable one is now written twice —
-  `SelectUtils.getFlatOptions` and `TreeUtils.getVisibleRows` — and whether the two become one is item 15.
+  unchanged, and the walk that would number them is no longer a thing to write: `Abstracts/Flattener` owns it
+  and `Select` and `Tree` both read it, so a grouped menu is a `computeChildren` and a `computeIsEntry` rather
+  than a third copy. What that does **not** decide is the paint and the keyboard — whether a separator is a
+  row the walk emits or a thing the painter draws between runs, and whether a group header is reachable.
   A consumer that needs sections today paints them into `renderPopup` around a flat list.
 - **`Tab` closes the menu and returns focus to the trigger rather than moving past it.** APG says move
   to the next element after the trigger. The menu is portalled to the end of the document, so letting
@@ -225,7 +194,7 @@ gaps, each with the reason it is still a gap.
 
 ---
 
-## 5. Other core controls the library does not have
+## 4. Other core controls the library does not have
 
 `Fundamentals/Input` covers `TextInput`, `TextArea`, `NumberInput`, `CurrencyInput`, `Checkbox`, `Toggle`, `Radio`,
 `RadioGroup`, `Select`, `MultiSelect`, `FileInput`, `ColorInput`, `Label`, `Calendar`, `DateInput`,
@@ -280,7 +249,7 @@ control.
   narrow a list is what the autocomplete does. What separates it from `Menu` is that it is opened by a
   shortcut rather than by a button, and holds every action in the application rather than the few that relate
   to one element. Two pieces are missing: results gathered from several sources and shown in labelled groups,
-  which is the grouped-and-windowed case item 3 leaves open, and a document-level hotkey, which wants the
+  which is the grouped-and-windowed case item 2 leaves open, and a document-level hotkey, which wants the
   register-and-stack shape `DismisserStack` has rather than a listener per consumer.
 
 **_Elsewhere._** Ark UI's set is the widest of the headless libraries and is the most useful scope check
@@ -313,66 +282,7 @@ outstanding.
 
 ---
 
-## 6. Machinery those controls need, none of which exists
-
-Grouped here because each one is shared by several of the controls in item 5, and because building
-any of those without first deciding these would bake the decision in by accident.
-
-- **Pointer drag capture ships; one-shot pointer geometry does not.** `InteractionTracker.trackDrag` is in
-  `decisions.md` and `Range` and `ColorArea` are both built over it, so nothing is blocked here any more. What is
-  still missing is the origin of a **single activation** — see item 1, which also argues it is not worth building
-  until something asks.
-- **Masking and formatting is built, shared, and public.** `applyMask`, `applyGroupedMask` and
-  `Abstracts/MaskedField` are all in `decisions.md`, with `DateInput`, `TimeInput` and `CurrencyInput` over
-  them; a typed sign and a locale's own grouping are in it, and `TextSyncUtils` now leaves through `index.ts`.
-  Nothing here is outstanding.
-- **Virtualization is built, and both consumers it was made an `Abstract` for now use it.** `Abstracts/Virtualizer`
-  wraps `@tanstack/solid-virtual`; `Select` windows a flat or a grouped list and `Tree` windows its flat walking
-  order, each answering the `role="group"` question its own way; see `decisions.md`. Note that the on-demand loading that shipped for `Select` is
-  **not** it and did not reduce the need for it — that answers a list which is incomplete, this one answers
-  a list which is complete and large, and the two compose.
-- **The form story is decided, wired and now grouped.** `Form` and `FormField` ship and every control reads
-  the description context; see `decisions.md`, which also records which errors wait for a submit and which
-  do not. `FormSection` closed the last piece — a run of fields can be a group with a name and a verdict of
-  its own, and a rule that is true of the group rather than of any field in it now has somewhere to live.
-  Nothing here is outstanding.
-- **Dismissal is one stack, and paint order comes from the anchor.** `DismisserStack` holds the open layers
-  and `Popover` registers one, so all five controls dismiss through the same mechanism; a portalled layer's
-  z-index is one above the highest on its anchor's ancestor chain, so a popup opened inside a `Modal` paints
-  above it. Both are in `decisions.md`. Nothing here is outstanding.
-- **The `Signal` mirror is now `Abstracts/SignalMirror`**, taking a getter and a setter so a consumer without a
-  signal is served too, and `createOptional` beside it so a control's state can be private until a consumer asks
-  for it; see `decisions.md`. What remains is that no library control accepts the getter-plus-setter pair
-  directly — a consumer still wraps it in a mirror to hand a control its `*Signal`, which is one indirection
-  rather than none.
-
-**_Elsewhere._**
-
-- **Pointer geometry** — see item 1.
-- **Masking and formatting** — no component library owns a mask: the implementations are their own packages
-  and get integrated per field, which is what made exporting this one worth doing. See `decisions.md`.
-- **Virtualization** — see item 3. `@tanstack/virtual` is the shared dependency across libraries and
-  frameworks; React Aria's `Virtualizer` is the only in-library one found.
-- **A field group is a real `<fieldset>` that broadcasts downward, not one that collects upward.** Ark
-  UI's `Fieldset` renders `<fieldset>` plus `<legend>` with helper-text and error-text parts, and its
-  `invalid` and `disabled` are props the consumer sets which then reach every field inside through
-  context. Nothing aggregates the contained fields' own validity. That is the opposite direction from
-  `Form`'s registration, and the two do not conflict — one distributes state, the other collects it.
-  `FormSection` is the collecting one, and it renders the same `<fieldset>` plus `<legend>`; see
-  `decisions.md`. The distributing half is not built and nobody has asked for it.
-- **"Errors only after the first attempt" is two flags, not one.** React Hook Form validates on submit
-  by default, and the per-field gate people actually write is `touchedFields[name] || isSubmitted` —
-  the field's own touched flag or the form's submitted flag. So `hasSubmitted` is half of the published
-  shape and the missing half is per-field, which no control here tracks.
-- **Every library takes a getter plus a callback, including the SolidJS one.** Radix, Ark UI and Kobalte
-  all expose a controlled value, a change callback and an uncontrolled default; Kobalte could have taken
-  signal pairs in Solid and did not. Recorded as what the field does, not as an argument against
-  `*Signal` — the trade `conventions.md` states (one variable, both sides write, no handler to forget)
-  is untouched by this, and `SignalMirror` is what serves the other kind of consumer.
-
----
-
-## 7. What the verification suite still cannot see
+## 5. What the verification suite still cannot see
 
 `e2e/` drives real clicks and keystrokes in a real browser through Playwright, and `npm run verify:dom`
 runs it. What is worth stating is the shape of its blind spots, because a green run reads as broader
@@ -421,7 +331,7 @@ fakes frames as a 16ms timer and advancing time to reach a fallback fires the fr
 
 - **`ElementFader`'s 100ms fallback is real and is now driven.** With no frames at all a `Modal` still
   reaches its visible target, which is the whole reason the fallback was written.
-- **Starving the frames showed the positioner opening a layer a frame behind, and that is item 22.** What
+- **Starving the frames showed the positioner opening a layer a frame behind, and that is item 20.** What
   the test proves is narrower than the sentence it first produced: with no frames, a layer opens 30px out on
   `ViewportPage`'s scrolled anchor and the first scroll still lands it exactly, so the capture-phase
   listener carries a scroll on its own. It does **not** prove the poll has no other job — the test only ever
@@ -441,7 +351,7 @@ stub above rather than a fake clock — the two look interchangeable and are not
 
 ---
 
-## 8. Planned: a consumer-facing layer of controls above the library — _not a focus_
+## 6. Planned: a consumer-facing layer of controls above the library — _not a focus_
 
 **Deferred indefinitely by the user on 2026-08-15, and it is the lowest-priority item in this file.** Nothing
 is blocked on it, nothing is missing because of it, and it is very doubtful it becomes a focus any time soon.
@@ -497,25 +407,18 @@ same example.
 
 ---
 
-## 9. `Toasts` — two things deliberately not built
+## 7. `Toasts` — one thing deliberately not built
 
-The decisions behind what exists are in `decisions.md` under the two `Toasts` headings. These are the
-gaps, each with the reason it is still a gap.
+The decisions behind what exists are in `decisions.md` under the two `Toasts` headings. This is the
+gap, with the reason it is still a gap.
 
-- **A pile cannot overlap by measured height.** `index` and `count` are enough for a fixed peek
-  distance, but a painter that wants each card offset by the height of the one in front of it needs its
-  neighbours' measured heights and can only measure itself. **This is now the only thing asking for a shared
-  measuring `Abstract`.** It used to be half of a pair with auto-height animation, but that half is built and
-  keeps its measurement to itself — `Accordion` and `Collapsible` measure their own panel, recorded in
-  `decisions.md` under _"Controls: `Accordion`, and where auto-height measurement lives"_. So one consumer
-  is asking, and the standing rule is that an `Abstract` waits for the second.
 - **An id re-added while it is leaving fades back in** rather than restarting as a new entry, because the
   id never left the rendered list. It is the reasonable behaviour and it is not obvious, so it is written
   down rather than left to be rediscovered.
 
 A hidden tab now holds every countdown, so that gap is closed — see `decisions.md`, and note the signal is
 `document.hidden` rather than window focus, which is the narrower of the two published choices. The pause
-arithmetic is covered on a fake clock too, per item 7, so what is left in this item is the two gaps above
+arithmetic is covered on a fake clock too, per item 5, so what is left in this item is the gap above
 and nothing about verification.
 
 **_Elsewhere._** Every bullet above has a published answer, and two of them are answers this item did not
@@ -530,12 +433,6 @@ have.
 - **The keyboard route is a hotkey, and it is `F8` rather than `F6`.** Radix's viewport takes a `hotkey`
   prop defaulting to `["F8"]`; from there it is `Tab` within the region and `Escape` on a focused toast.
   Built, with `Escape` returning focus to wherever the hotkey was pressed rather than acting on a toast.
-- **Measured-height stacking is the container's job, and one library does exactly it.** sonner measures
-  each toast with `getBoundingClientRect` and keeps the heights in the toaster, so an entry's offset is
-  the gap times its index plus the sum of the heights in front of it; the collapsed pile also scales each
-  card by `0.05 × index` and pads the shorter cards to the height of the front one so they stick out
-  evenly. The neighbours' heights a painter cannot reach are held one level up — the same level `index`
-  and `count` already come from.
 - **Both mainstream toasts stop the clock when you look away.** sonner pauses while the document is
   hidden; Radix pauses on window `blur` alongside pointer and focus, which covers switching windows but
   not a hidden tab inside a focused window. So neither treats this as a product decision to be deferred —
@@ -545,12 +442,12 @@ have.
   transition boundaries, not the reason for the second one. Splitting the callback rather than widening the
   state a painter reads is the shape to copy if anything ever asks.
 - **The pause arithmetic is the same arithmetic.** Radix subtracts elapsed from remaining on each pause,
-  exactly as here — and per item 7, Playwright's clock API is what would let the remainder be asserted
+  exactly as here — and per item 5, Playwright's clock API is what would let the remainder be asserted
   rather than eyeballed.
 
 ---
 
-## 10. `Calendar` — two things deliberately not built
+## 8. `Calendar` — two things deliberately not built
 
 Item 8 covers the missing components. These are `Calendar`'s own gaps, each with the reason it is still
 one. The decisions behind what exists are in `decisions.md` under _"Controls: `Calendar`, and the date
@@ -592,7 +489,7 @@ value the library owns"_.
 
 ---
 
-## 11. `ColorInput` — two things deliberately not built
+## 9. `ColorInput` — two things deliberately not built
 
 `ColorInput` is the custom picker now; the decisions are in `decisions.md` under the `ColorArea` heading.
 These are the gaps.
@@ -647,29 +544,21 @@ every other layer and takes a `visibilitySignal` like every other popup; both ar
 
 ---
 
-## 12. `Accordion` — two things deliberately not built
+## 10. `Accordion` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Accordion`, and where
-auto-height measurement lives"_.
+auto-height measurement lives"_ and _"A panel built on first expansion"_.
 
-- **A collapsed panel's content is still built.** `inert` plus a zero height is what makes the panel
-  measurable and animatable, so an accordion of a hundred expensive panels builds all hundred. A
-  `getIsLazy` that withholds the panel until first expansion would cost the open animation on that first
-  expansion, since there would be nothing to measure yet. This now belongs to `Collapsible` rather than to
-  `Accordion` — see `decisions.md` — so whatever is decided lands in one place for both.
 - **The height animates, and nothing else can.** A consumer wanting the panel to slide in from the side
   gets it from `renderPanel`'s visibility target, but the panel box itself only ever animates `height`.
   Animating width instead — a horizontal accordion — would need the observer's twin and a direction prop.
 
 **_Elsewhere._**
 
-- **The published trade is the opposite one: unmount, and measure in a pass.** Radix's accordion unmounts
-  collapsed content unless `forceMount` is set, and publishes `--radix-accordion-content-height` from its
-  own measurement so that CSS can animate to a pixel value. React Aria's `DisclosureGroup` keeps the panel
-  in the DOM but uses `hidden="until-found"` where supported, so find-in-page can reveal a collapsed
-  section. Both keep the measurement library-side and differ only on whether the content stays built, so
-  a `getIsLazy` here would land in Radix's position — animation cost on first expansion included — rather
-  than somewhere new.
+- **React Aria's `DisclosureGroup` keeps the panel in the DOM** but uses `hidden="until-found"` where
+  supported, so find-in-page can reveal a collapsed section. That is the one thing the built panel does not
+  do, and it is orthogonal to whether the content is there — worth knowing if a collapsed section ever needs
+  to be findable.
 - **A horizontal accordion is an `orientation` prop plus a second CSS variable.** Radix's
   `orientation="horizontal"` swaps the arrow-key axis and exposes the content _width_ beside the height,
   which is the direction prop this bullet describes, with the measurement doubled rather than generalised.
@@ -680,7 +569,7 @@ auto-height measurement lives"_.
 
 ---
 
-## 13. `Tabs` — a pairing the consumer can still skip
+## 11. `Tabs` — a pairing the consumer can still skip
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Tabs` as records"_ and
 _"`TabPanel`: the pairing is written on the record"_.
@@ -707,7 +596,7 @@ _"`TabPanel`: the pairing is written on the record"_.
 
 ---
 
-## 14. `Viewport` as a region: what is settled and what is not
+## 12. `Viewport` as a region: what is settled and what is not
 
 A viewport now fits its design size into the box the page gives it, clips everything inside it, and keeps
 its own layers within its own bounds; see `decisions.md`. `ViewportPage` is two 400px squares — a control
@@ -719,14 +608,14 @@ inside a nested viewport stays inside it. What is left:
   box, so a container with no height gives it a zero-sized region and it renders nothing visible. A warning
   would be the obvious kindness; whether the library should warn at all is the same question `Label` already
   answered for itself, and it went the other way.
-- **A fast scroll can still show a frame of drift — see item 22**, which now holds it. It is not a
+- **A fast scroll can still show a frame of drift — see item 20**, which now holds it. It is not a
   `Viewport` fault: the same frame is lost by every anchored layer on the page, and the scrolled anchor here
   is only where it is easiest to see. `viewport.spec.ts` asserts the layer lands exactly on its anchor once
   the scroll settles, which is what a spec can see.
 
 ---
 
-## 15. `Tree` — two things deliberately not built, and one extraction to decide
+## 13. `Tree` — two things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Tree`, and the group box that
 could not be a child"_. These are the gaps, each with the reason it is still one.
@@ -750,14 +639,6 @@ way to collapse a branch out from under a focused row, never passes through `col
 watches the visible rows and fires when a remembered focused row leaves the set while focus has fallen to the
 document body; `tree.spec.ts` drives it through a Playground button that defers the collapse, since a button
 that collapsed on the spot would be holding focus itself.
-
-**The extraction, which is a decision rather than a gap.** Flattening a nested list into a navigable one now
-exists twice: `SelectUtils.getFlatOptions`, which flattens one level of groups and needs `getItemOffsets`
-beside it to hand each slot a flat index, and `TreeUtils.getVisibleRows`, which flattens any number of levels
-and writes the index onto the row. The second is the general case of the first. Merging them means `Select`
-adopting `TreeRow` — a change to a shipped control's internals in order to delete a two-line function — so it
-was deliberately not done under `Tree`'s justification. The question is whether the shared thing is worth
-having before a third consumer asks.
 
 **_Elsewhere_**, read off the published documentation on **2026-08-13**.
 
@@ -787,7 +668,7 @@ having before a third consumer asks.
 
 ---
 
-## 16. `SlideButton` — three things deliberately not built
+## 14. `SlideButton` — three things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `SlideButton`, and why the gesture
 is the only thing it owns"_, including which WCAG criteria were read and what they decided. These are the
@@ -811,7 +692,7 @@ gaps, each with the reason it is still one.
 
 - **No headless library ships one, so there is nothing to copy either way.** Radix's thirty-odd primitives,
   Base UI's thirty-five at its December 2025 stable release, React Aria and Ark UI all have a slider and a
-  button and nothing between them. That is the same finding as the animation components in item 2: the
+  button and nothing between them. That is the same finding as the animation components in item 1: the
   omission is the field's, not this library's.
 - **The packages that do ship one have no keyboard route at all**, which is worse than the decision taken here
   rather than different from it. `react-swipeable-button`'s whole documented surface is `onSuccess`,
@@ -830,7 +711,7 @@ gaps, each with the reason it is still one.
 
 ---
 
-## 17. `Spotlight` — one thing deliberately not built
+## 15. `Spotlight` — one thing deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Spotlight`, and three presets
 because a mode cannot move at runtime"_. These are the gaps, each with the reason it is still one.
@@ -843,7 +724,7 @@ because a mode cannot move at runtime"_. These are the gaps, each with the reaso
 
 ---
 
-## 18. `Scroller` — four things deliberately not built
+## 16. `Scroller` — four things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Scroller`, and why it renders no
 button of its own"_. These are the gaps, each with the reason it is still one.
@@ -869,7 +750,7 @@ button of its own"_. These are the gaps, each with the reason it is still one.
 
 ---
 
-## 19. `Paginator` — four things deliberately not built
+## 17. `Paginator` — four things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Paginator`, where the arithmetic
 is the component"_. These are the gaps, each with the reason it is still one.
@@ -892,7 +773,7 @@ is the component"_. These are the gaps, each with the reason it is still one.
 
 ---
 
-## 20. The carousels — four things deliberately not built
+## 18. The carousels — four things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Carousel`, and the first component
 that acts without being asked"_ and _"`TrackCarousel` and `DrumCarousel`: one behaviour, two ways of showing
@@ -922,7 +803,7 @@ have them unless the entry says otherwise.
 
 ---
 
-## 21. The four components ported from React — what did not settle
+## 19. The four components ported from React — what did not settle
 
 `Satellite`, `Staircase`, `Formation`, `OverheadWheel` and `DrumWheel` came in from a React codebase; what the port
 settled is in `decisions.md`. What did not settle is below, and both entries are decisions taken rather than
@@ -965,7 +846,7 @@ pressable until it opts back in with `pointer-events: auto`.
 
 **An overhead wheel has one slot for its controls and it is the hub, chosen by the user over two alternatives.** A
 drum's controls sit under the barrel; an overhead wheel's sit in the middle of it, and there is no second slot. The
-cost is the one item 18 already records for `Scroller`: a consumer who wants the control somewhere else renders
+cost is the one item 16 already records for `Scroller`: a consumer who wants the control somewhere else renders
 their own button, and a library that renders no button cannot promise it is named or reachable. The two
 alternatives were a second slot beneath the wheel, rejected because the overhead wheel is a square and anything
 under it changes the box it reserves, and a slot with a position prop, rejected because `Toasts` had already
@@ -973,9 +854,9 @@ settled that a component does not fully delegate position. Recorded so it is not
 
 ---
 
-## 22. An anchored layer is always a frame behind — _postponed until the platform catches up_
+## 20. An anchored layer is always a frame behind — _postponed until the platform catches up_
 
-Folded together from item 7 and item 14 on the user's call, after they pointed out that the drag they see
+Folded together from item 5 and item 12 on the user's call, after they pointed out that the drag they see
 while scrolling is the same inaccuracy the opening placement shows. It was written up as two faults — a layer
 that opens a frame behind, and a fast scroll that shows a frame of drift — and it is one: **the position an
 anchored layer paints at is the position its anchor was in one frame ago.** At rest the last frame catches up,
@@ -1021,7 +902,7 @@ the coverage did.
   takes an `anchor-name`, the layer a `position-anchor`, and the layer writes its edges against the anchor's
   with `anchor()`; the browser then keeps the two glued in its own layout pass, which is why no frame can be
   lost. Choosing another side when there is no room is `position-try-fallbacks` — alternatives in order, the
-  browser takes the first that fits. The note in item 14 calling this Chromium-only was out of date.
+  browser takes the first that fits. The note in item 12 calling this Chromium-only was out of date.
 - **D — measure where the frame is actually lost before choosing.** Done, and it is what ruled B out.
 
 **What C would have to answer, worked out before the postponement so it is not re-derived.** Two shapes, and
@@ -1063,7 +944,7 @@ neither was tried.
 
 ---
 
-## 23. `Table` — six things deliberately not built
+## 21. `Table` — six things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Table`, a grid rather than a
 table, and why the markup could not be `<table>`"_. These are the gaps, each with the reason it is still one.

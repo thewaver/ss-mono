@@ -6,6 +6,7 @@ const MULTI = demo("multi");
 const SINGLE = demo("single");
 const REQUIRED = demo("required");
 const GROWING = demo("growing");
+const DEFERRED = demo("deferred");
 
 /**
  * The panel is measured through two boxes on purpose: the one carrying `role="region"` is the constrained
@@ -278,4 +279,61 @@ test("a section taller than the box keeps the pressed header in view rather than
     expect(pressed.y, "and sits at its top, so as much of the panel as fits is showing").toBeLessThan(
         box.y + pressed.height,
     );
+});
+
+/**
+ * The lazy panel, and the reason it is worth having rather than being the same trade twice. A panel is kept
+ * mounted at zero height so it stays measurable, which is what lets the height animate; the cost is that a
+ * hundred sections build a hundred panels to show one. `isPanelBuiltOnExpand` withholds the content until
+ * the first expansion, and the animation survives because the measurement lands before the transition
+ * starts: opening mounts the content into a box still at zero height, the height observer reads it in the
+ * same update, and the fader flips its target a frame later.
+ *
+ * Nothing here asserts a pixel count. The three assertions are the three claims: nothing is built at load,
+ * opening one builds only that one, and the growth is gradual rather than a jump — the last read as a
+ * height that is above zero and below its final value while the transition is running.
+ */
+test("a lazy section builds nothing until it is opened, and still animates when it is", async ({ page }) => {
+    await expect(page.locator(`${DEFERRED} [data-built]`), "no panel is in the page to begin with").toHaveCount(0);
+
+    const target = await offsetHeight(page.locator(panel(DEFERRED)).nth(0).locator("> *"));
+
+    expect(target, "and the collapsed panel has nothing to measure, which is the point").toBe(0);
+
+    await page.locator(header(DEFERRED)).nth(0).click();
+
+    const midway = await offsetHeight(page.locator(panel(DEFERRED)).nth(0));
+
+    await expect
+        .poll(() => offsetHeight(page.locator(panel(DEFERRED)).nth(0)), { timeout: TRANSITION_TIMEOUT_MS })
+        .toBeGreaterThan(0);
+
+    const opened = await offsetHeight(page.locator(panel(DEFERRED)).nth(0));
+
+    expect(midway, "the first frame is still short of the height it is heading for").toBeLessThan(opened);
+    expect(await readout(page, "deferred"), "and only the opened section was built").toContain('["Shipping"]');
+});
+
+test("and keeps it once built, so closing a lazy section does not discard what is inside it", async ({ page }) => {
+    await page.locator(header(DEFERRED)).nth(0).click();
+
+    await expect(page.locator(`${DEFERRED} [data-built="Shipping"]`).first()).toBeVisible();
+
+    const built = await page.locator(`${DEFERRED} [data-built]`).count();
+
+    await page.locator(header(DEFERRED)).nth(0).click();
+
+    await expect
+        .poll(() => offsetHeight(page.locator(panel(DEFERRED)).nth(0)), { timeout: TRANSITION_TIMEOUT_MS })
+        .toBe(0);
+
+    await expect(
+        page.locator(`${DEFERRED} [data-built]`),
+        "the content is still there behind the collapsed panel, so anything in it survives",
+    ).toHaveCount(built);
+
+    await expect(
+        page.locator(`${DEFERRED} [data-built="Returns"]`),
+        "and a section nobody opened is still unbuilt",
+    ).toHaveCount(0);
 });

@@ -1,7 +1,7 @@
-import type { JSX, Signal } from "solid-js";
+import type { JSX } from "solid-js";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps } from "../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 import type { InteractionControlProps, InteractionWrapperProps } from "../InteractionWrapper/InteractionWrapper.types";
 
 export type PreviewSizing = "fit-content" | "fill";
@@ -34,7 +34,7 @@ export type PreviewProps = Omit<
         collapsedHeight: number;
         isScrolledIntoViewOnCollapse?: boolean;
         transitionDurationMs?: number;
-        expandedSignal: Signal<boolean>;
+        expandedSignal: SignalSource<boolean>;
         renderContent: () => JSX.Element;
         renderTrigger: (getFlags: () => InteractionFlags<PreviewFlags>) => JSX.Element;
         renderOverlay?: PreviewOverlayRenderer;

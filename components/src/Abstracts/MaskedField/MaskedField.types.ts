@@ -1,4 +1,4 @@
-import type { Signal } from "solid-js";
+import type { SignalSource } from "../../Utils/typeUtils";
 
 export type MaskedFieldDefs<T> = {
     getValue: () => T | undefined;
@@ -13,7 +13,7 @@ export type MaskedFieldDefs<T> = {
 };
 
 export type MaskedFieldHandle<T> = {
-    textSignal: Signal<string>;
+    textSignal: SignalSource<string>;
     getDigits: () => string;
     getHasIssue: () => boolean;
     formatValue: (value: T) => string;

@@ -1,7 +1,7 @@
-import type { JSX, Signal } from "solid-js";
+import type { JSX } from "solid-js";
 
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
-import type { AccessorProps } from "../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
 export type SpotlightMode = "hint" | "prompt" | "guide";
 
@@ -17,7 +17,7 @@ export type SpotlightOverlayRenderer = (
 ) => JSX.Element;
 
 export type SpotlightState = {
-    visibilitySignal: Signal<boolean>;
+    visibilitySignal: SignalSource<boolean>;
     padding?: number;
     transitionDurationMs?: number;
     elementRef: HTMLElement | undefined;

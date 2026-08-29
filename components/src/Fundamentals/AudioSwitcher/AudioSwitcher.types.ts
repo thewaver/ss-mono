@@ -1,6 +1,4 @@
-import type { Signal } from "solid-js";
-
-import type { AccessorProps } from "../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
 export type AudioSwitcherController = {
     reset: () => boolean;
@@ -10,6 +8,6 @@ export type AudioSwitcherProps = AccessorProps<{
     src: string;
     crossfadeMs?: number;
     volume?: number;
-    playbackSignal?: Signal<boolean>;
+    playbackSignal?: SignalSource<boolean>;
     onMount?: (controller: AudioSwitcherController) => void;
 }>;

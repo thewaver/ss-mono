@@ -37,6 +37,7 @@ const SCALE_STEP = 10;
 const PERCENT = 100;
 
 const SCROLL_SIZE = { width: styles.HOST_SIZE, height: styles.HOST_SIZE };
+const INNER_TOAST_GAP = 10;
 const INNER_TOAST_MARGIN = 10;
 const INNER_TOAST_MESSAGE = "Raised inside the square.";
 
@@ -199,6 +200,9 @@ export const ViewportPage = () => {
                                     toast={getToast}
                                     state={getState}
                                     animation={"fade"}
+                                    stacking={"flow"}
+                                    dir={"column"}
+                                    gap={INNER_TOAST_GAP}
                                     visibilityTarget={getVisibilityTarget}
                                     transitionDurationMs={getTransitionDurationMs}
                                     onDismiss={() => {

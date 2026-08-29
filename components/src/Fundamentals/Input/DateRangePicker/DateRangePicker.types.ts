@@ -4,7 +4,7 @@ import type { Point2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { DateValue, DateValueRange, DateValueWeekStart } from "../../../Abstracts/DateValue/DateValue.types";
-import type { AccessorProps } from "../../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { CalendarDayRenderer, CalendarWeekdayRenderer } from "../Calendar/Calendar.types";
 import type { DateInputProps } from "../DateInput/DateInput.types";
 
@@ -19,8 +19,8 @@ export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "valu
         locale?: string;
         weekStartsOn?: DateValueWeekStart;
         computeIsDayDisabled?: (day: DateValue) => boolean;
-        valueSignal: Signal<DateValueRange | undefined>;
-        visibilitySignal?: Signal<boolean>;
+        valueSignal: SignalSource<DateValueRange | undefined>;
+        visibilitySignal?: SignalSource<boolean>;
         renderTrigger: (getIsOpen: () => boolean, onToggle: () => void) => JSX.Element;
         renderSeparator?: () => JSX.Element;
         renderDay: CalendarDayRenderer;

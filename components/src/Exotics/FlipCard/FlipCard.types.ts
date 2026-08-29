@@ -1,9 +1,9 @@
-import type { Accessor, JSX, Signal } from "solid-js";
+import type { Accessor, JSX } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
 import type { BarrelAxis, BarrelFace } from "../../Abstracts/Barrel/Barrel.types";
-import type { AccessorProps } from "../../Utils/typeUtils";
+import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
 export type FlipCardAxis = BarrelAxis;
 
@@ -20,7 +20,7 @@ export type FlipCardProps = AccessorProps<{
     transitionDurationMs?: number;
     ariaLabel: string;
     computeFaceLabel?: (face: FlipCardFace) => string;
-    flippedSignal: Signal<boolean>;
+    flippedSignal: SignalSource<boolean>;
     renderFront: (getState: Accessor<FlipCardState>) => JSX.Element;
     renderBack: (getState: Accessor<FlipCardState>) => JSX.Element;
 }>;

@@ -4,10 +4,11 @@ import { Portal } from "solid-js/web";
 import { CSSUtils, StringUtils } from "@thewaver/ss-utils";
 
 import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
+import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
 import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
 import { LiveAnnouncer } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer";
 import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
-import { access } from "../../Utils/propUtils";
+import { access, accessSignal } from "../../Utils/propUtils";
 import type {
     Toast,
     ToastState,
@@ -44,6 +45,7 @@ const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
         index: access(props.index),
         count: access(props.count),
         isPaused: access(props.isPaused),
+        sizes: access(props.sizes),
     }));
 
     let clockDurationMs: number | undefined;
@@ -78,7 +80,7 @@ const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
     });
 
     return (
-        <div class={styles.toastsItem}>
+        <div class={styles.toastsItem} ref={(element) => props.ref(element)}>
             {props.renderToast(
                 () => access(props.toast),
                 getTransitionTarget,
@@ -90,10 +92,13 @@ const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
 };
 
 export const Toasts = <T,>(props: ToastsProps<T>) => {
+    const toastsSignal = accessSignal(() => props.toastsSignal);
+
     const viewportContext = useViewportContext();
 
     const [getEntryIds, setEntryIds] = createSignal<string[]>([]);
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
+    const [getEntryRefs, setEntryRefs] = createSignal<Record<string, HTMLElement>>({});
 
     const getTransitionDurationMs = createMemo(
         () => access(props.transitionDurationMs) ?? DEFAULT_TOASTS_TRANSITION_DURATION_MS,
@@ -111,6 +116,14 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
 
     const getIsPaused = InteractionTracker.trackHold(getRootRef);
 
+    const getEntrySizes = ElementObserver.createBorderBoxSizeListObserver(() =>
+        getEntryIds().map((id) => getEntryRefs()[id]),
+    );
+
+    const setEntryRef = (id: string, element: HTMLElement) => {
+        setEntryRefs((prev) => (prev[id] === element ? prev : { ...prev, [id]: element }));
+    };
+
     const getHotkey = createMemo(() => access(props.hotkey) ?? DEFAULT_TOASTS_HOTKEY);
 
     const getAnnouncementPoliteness = createMemo(() => access(props.ariaLive) ?? DEFAULT_TOASTS_ARIA_LIVE);
@@ -123,7 +136,7 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
     });
 
     const getAdmitted = createMemo(() => {
-        const toasts = props.toastsSignal[0]();
+        const toasts = toastsSignal[0]();
         const limit = access(props.limit);
 
         if (limit === undefined || toasts.length <= limit) return toasts;
@@ -132,7 +145,7 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
     });
 
     const dismiss = (id: string) => {
-        props.toastsSignal[1]((prev) => {
+        toastsSignal[1]((prev) => {
             const next = prev.filter((toast) => toast.id !== id);
 
             return next.length === prev.length ? prev : next;
@@ -143,6 +156,15 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
         if (getAdmitted().some((toast) => toast.id === id)) return;
 
         setEntryIds((prev) => prev.filter((entryId) => entryId !== id));
+        setEntryRefs((prev) => {
+            if (!(id in prev)) return prev;
+
+            const next = { ...prev };
+
+            delete next[id];
+
+            return next;
+        });
     };
 
     createEffect(() => {
@@ -208,7 +230,7 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
     });
 
     createEffect(() => {
-        const [getToasts, setToasts] = props.toastsSignal;
+        const [getToasts, setToasts] = toastsSignal;
         const limit = access(props.limit);
         const toasts = getToasts();
 
@@ -253,6 +275,8 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
                                 isExiting={() => findToast() === undefined}
                                 isPaused={getIsPaused}
                                 transitionDurationMs={getTransitionDurationMs}
+                                sizes={getEntrySizes}
+                                ref={(element) => setEntryRef(id, element)}
                                 renderToast={props.renderToast}
                                 onElapse={() => dismiss(id)}
                                 onExitEnd={() => handleExitEnd(id)}

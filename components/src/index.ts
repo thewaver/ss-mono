@@ -19,6 +19,8 @@ export * from "./Abstracts/Dismisser/Dismisser.utils";
 export * from "./Abstracts/ElementFader/ElementFader";
 export * from "./Abstracts/ElementObserver/ElementObserver";
 export * from "./Abstracts/Elevation/Elevation";
+export type * from "./Abstracts/Flattener/Flattener.types";
+export * from "./Abstracts/Flattener/Flattener.utils";
 export * from "./Abstracts/FrameRateMonitor/FrameRateMonitor";
 export * from "./Abstracts/FocusManager/FocusManager";
 export type * from "./Abstracts/InteractionTracker/InteractionTracker.types";

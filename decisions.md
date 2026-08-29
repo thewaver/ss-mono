@@ -1074,8 +1074,8 @@ is its own input, absolutely positioned `inset: 0` over the same painter, so a p
 rendered twice and the two modes cannot diverge in paint, keyboard or ARIA. Native also keeps `step`,
 `Home`/`End`, `PageUp`/`PageDown`, drag and the track-click jump.
 
-`Range` therefore did **not** need `backlog.md` #2's pointer primitive, and item 1 stays open for the
-thing that does — a two-dimensional colour surface, which has no native equivalent.
+`Range` therefore did **not** need `backlog.md` #2's pointer primitive. What did was a two-dimensional
+colour surface, which has no native equivalent; `ColorArea` is built over `trackDrag` and that item is closed.
 
 **Crossing is prevented by the inputs' own `min` and `max`, not by JS.** Thumb `n`'s `min` is thumb
 `n-1`'s value and its `max` is thumb `n+1`'s, so the browser clamps drag and keypress identically and no
@@ -1480,10 +1480,60 @@ changed. `Select.utils.test.ts` pins the walk directly — including that an emp
 the offsets repeat rather than leaving a hole — and that the option indexes on the rows are the same sequence
 `getFlatOptions` produces, which is the agreement that used to be implicit.
 
-**Note what is not shared: the row index and the option index are different numbers**, and
-`getRowIndexOfOption` is the bridge. A group header is a row and is not an option, so the two spaces diverge
-the moment a list is grouped. `Tree` has no such split — every row is a node — which is the difference that
-makes the two components' flatteners less alike than they look.
+**Note what is not shared: the row index and the option index are different numbers**, and the bridge from
+one to the other is what `getRowIndexOfOption` was. A group header is a row and is not an option, so the two
+spaces diverge the moment a list is grouped. `Tree` has no such split — every row is a node — and that
+difference was read at the time as what made the two components' flatteners less alike than they look. It
+turned out to be one default on a shared walk instead; see _"`Abstracts/Flattener`"_ below, which is where
+`getItemOffsets`, `getRows` and `getRowIndexOfOption` went and which now holds the numbering these
+paragraphs describe.
+
+### `Abstracts/Flattener`: one walk, and the counter that is what `Select` and `Tree` disagreed about
+
+Settled on the user's instruction, closing the extraction `backlog.md` held open under `Tree`. Flattening a
+nested list into the flat one a keyboard walks existed twice — `SelectUtils.getRows` with `getItemOffsets`
+beside it, and `TreeUtils.getVisibleRows` — and the entry above argued the two were "less alike than they
+look" because a group header is a row and is not an option, so `Select` has two index spaces and `Tree` has
+one. **That difference is what the shared walk now expresses rather than what stops it being shared.**
+
+**`FlattenerUtils.getRows(nodes, defs)` walks depth first and hands back a `FlatRow<T>` per node**, carrying
+`index` (position in the flat walk), `depth`, `position` and `setSize` among its siblings, `isExpanded`, the
+nested `rows`, and the two fields the merge turned on: `isEntry` and `entryOffset`.
+
+**`isEntry` is "does this row take a number", and `entryOffset` is how many entries precede it.** `Select`
+passes `computeIsEntry: (item) => !getIsGroup(item)`, so a header row is not an entry and the options keep
+counting past it — `entryOffset` on an option is its flat option index, and `entryOffset` on a header is
+where its run starts, which is exactly what `getItemOffsets` used to compute in its own loop. `Tree` passes
+nothing, so every row is an entry and `entryOffset === index`. **The "two index spaces or one" difference is
+one default**, and `FlattenerUtils.getEntryRowIndex` is the bridge `getRowIndexOfOption` used to be.
+
+**Four defs, and each earned its place from a consumer.** `computeChildren` is the walk itself.
+`computeIsExpanded` gates descent, defaulting to always-open, which is why `Select` — whose groups are never
+collapsed — passes none. `computeIsBranch` defaults to "has children" but is overridable, because `Tree`'s
+`hasMoreChildren` makes a node with an empty child list still openable, and because `Select` counts an empty
+group as a group so its header still renders. `computeIsEntry` is above.
+
+**`parentIndex` is the field neither had and both wanted.** `Tree.findParentRow` was a backwards scan for the
+first row of lower depth; `Select`'s windowed path needed each option's group in order to cut the visible
+rows into runs of one group. Both are now a lookup. It is an **index rather than a reference** so the row
+structure stays acyclic — a parent's `rows` already holds the child, and a back-reference would make the
+structure impossible to compare in a spec or to serialise.
+
+**`TreeRow<T>` is `FlatRow<TreeNode<T>>` and `SelectRow<T>` is `FlatRow<SelectItem<T>>`**, both plain
+aliases, so neither component's vocabulary changed at its call sites. What `Select` gave up is the projected
+row record with `group` / `groupIndex` / `option` / `optionIndex`: it read as four fields where two were
+always `undefined`, and the code around it was already casting `row.option as SelectOption<T>`, so the record
+was not buying the safety its shape implied. `SelectUtils.getGroupRowIndex` replaces `groupIndex` and answers
+"which row is this row's group header" — itself for a header, `parentIndex` for an option.
+
+**One number kept its old meaning deliberately.** `computeEstimatedGroupHeight` is still called with the
+group's **written item index**, which is a group row's `position` at depth 0, not its row index. Changing
+which number a consumer's callback receives would be an API change riding along inside a refactor.
+
+**The tests moved with the behaviour rather than being dropped.** `Flattener.utils.test.ts` holds the walk's
+own assertions — the depth-first order, the numbering, `parentIndex`, and that an empty uncounted branch
+leaves no hole in `entryOffset` — and `Select.utils.test.ts` keeps the ones that are about `Select`'s
+numbering in particular, which is what the entry above called the agreement that used to be implicit.
 
 ### Grouping and windowing compose, and the group box is what makes it possible
 
@@ -2966,8 +3016,9 @@ different corners depending on `getDir`. The function flips the main axis alone 
 enums, and the one part of this component reachable from `npm test`.
 
 **Flow stacking is the geometry props; an overlapping pile is the painter's**, offsetting and scaling itself
-off `index` and `count`, which works for a fixed peek distance. Overlapping by each card's own measured
-height does not work and is in `backlog.md` rather than half-solved.
+off `index` and `count`, which works for a fixed peek distance. Overlapping by each card's own **measured**
+height needs the neighbours' heights, which a painter cannot take; `ToastState.sizes` hands them over, and
+_"Measuring the element in front"_ is where that was settled. The arithmetic is still the painter's.
 
 **Toasts sit above dialogs** — `z-index` 200 against `Modal`'s 100 — because a toast routinely reports the
 outcome of the action a dialog just took.
@@ -3047,7 +3098,8 @@ scale never enters.
 `display: none` would make the content unmeasurable and the animation impossible. `inert` takes the subtree
 out of the tab order and the accessibility tree while leaving it laid out, as `Popover` does with its root.
 The cost is that a collapsed panel's content is still built, so an accordion of a hundred expensive panels
-builds all hundred.
+builds all hundred — which `isPanelBuiltOnExpand` now lets a consumer opt out of; see _"A panel built on
+first expansion"_, which also corrects what this paragraph implied about the animation.
 
 **"Always exactly one open" is a second boolean, not a third state on the first one.** `isSingleExpand`
 allows zero expanded — pressing the open header closes it — and `isExpandRequired` is what refuses that last
@@ -3114,6 +3166,50 @@ a timer started a frame before the CSS transition does, so it can report "over" 
 growth are still to paint; scrolling on that frame alone lands a few pixels short. A second pass on the next
 frame corrects it. It is not a frame **instead** of the immediate call: a frame may be a long time coming on a
 loaded machine, and the suite failed exactly that way while the whole of it ran at once.
+
+### A panel built on first expansion, and why the animation survives it
+
+Settled with the user, on their call between keeping a lazily built panel afterwards and unmounting it again
+on close. **`isPanelBuiltOnExpand` withholds `renderPanel`'s output until the first expansion and keeps it
+from then on**, so a section nobody opens costs nothing and a section opened once keeps whatever is inside
+it. It lives on `Collapsible`, so `Accordion` passes it through and both get one behaviour.
+
+**Discarding state was the whole of the argument against unmounting on close.** The alternative — track what
+is open right now — is the smaller footprint, and it silently throws away a half-filled form, a scroll
+position, a part-written comment, every time a section closes. A saving nobody asked for cannot be worth a
+loss nobody was warned about. What is left of the cost is honest and stated: open all hundred sections and
+all hundred are built.
+
+**The recorded reason against building this at all was wrong, and the correction is the interesting part.**
+`backlog.md` held that withholding the panel would cost the animation on that first expansion, "since there
+would be nothing to measure yet" — which assumes the measuring and the opening happen at the same instant.
+They do not. `ElementFader.setTarget` already defers the flip of `transitionTarget` to a `requestAnimationFrame`,
+with the 100ms fallback recorded above, precisely so the browser paints a start value before a transition
+begins. **That deferral is a gap, and the measurement lands inside it.**
+
+In order: the press writes `expandedSignal`; in the same update the latch memo turns true and the content
+mounts inside a panel box still at `height: 0`; still in that update the height observer re-runs and reads
+`offsetHeight` synchronously; a frame later the fader flips the target and the height animates from zero to
+the number already published. Driven in `accordion.spec.ts`, which asserts that the height read immediately
+after the press is above zero and below where it ends up — a gradual growth rather than a jump, without
+pinning a pixel.
+
+**The latch is a `createMemo` carrying its own previous value, not an effect.** `Toasts` has the same shape
+for holding the last known record. A memo settles during the update phase, ahead of the render effect that
+mounts the content, where an effect would run after it and cost an extra pass; and it cannot be got into a
+state where the content is mounted but the latch says otherwise.
+
+**The measurement is gated on the latch rather than on the ref.** `createBorderBoxHeightObserver` takes the
+latch as its `getIsEnabled`, so the flip re-runs the observer's effect and its synchronous
+`offsetWidth`/`offsetHeight` read is what publishes the first height — the `ResizeObserver` alone would not
+do, because the content wrapper is mounted from the start and only its children change, and a resize
+observation is broadcast _after_ animation-frame callbacks in the same frame. It would arrive a beat late,
+after the fader had already flipped against a height of zero.
+
+**What is unchanged is the default.** With the prop off, the panel is built and mounted exactly as before —
+`inert` at zero height, measurable, animatable — because that is what a consumer with four sections wants and
+they should not have to ask for it. The prop is for the accordion with a hundred expensive panels, which is
+the case `backlog.md` had recorded as the unpaid cost.
 
 ### Controls: `Preview`, which shortens rather than hides
 
@@ -3538,9 +3634,9 @@ Settled, closing the primitive `backlog.md` #2 asked for.
 `InteractionTracker.trackDrag(ref, disabled, opts)` reports where a pointer is inside an element for as long as
 a drag lasts.
 
-**It is a separate call rather than part of `wrapElement`**, as item 1 asked: most controls want no listener
-at all, and a two-dimensional surface is the one shape that cannot borrow a native input the way `Range`
-borrows one per thumb.
+**It is a separate call rather than part of `wrapElement`**, as `backlog.md` asked: most controls want no
+listener at all, and a two-dimensional surface is the one shape that cannot borrow a native input the way
+`Range` borrows one per thumb. `trackActivation` beside it took the same shape for the same reason.
 
 **It reports a ratio of the element's own box, not a position**, which keeps it out of the coordinate-space
 trap: pointer coordinates and the element's rect are both client-space, so `Viewport`'s scale divides out of
@@ -3554,6 +3650,39 @@ away.
 
 **`pointerdown` reports immediately**, so a click positions the value without a drag — what a colour surface
 and any track-clicking slider need.
+
+### The one-shot activation origin: a flag with a count, and opt-in for the same reason `trackDrag` is
+
+Settled on the user's instruction, closing the item `backlog.md` had left as "not worth building until
+something asks". `trackDrag` reports a **ratio while a drag lasts**, which is not an event with an origin: a
+ripple has to know where one press landed and then run once from there.
+
+**`InteractionTracker.trackActivation(ref, disabled)` is that**, and it returns `{ ratio, count }` or
+nothing. The ratio is of the element's own box, for `trackDrag`'s reason — pointer coordinates and the rect
+are the same space, so `Viewport`'s scale divides out of the fraction and the `transform: scale()` bug that
+has been open against MUI's ripple for years cannot be written here.
+
+**`count` is what makes it one-shot.** A ratio alone cannot tell a second press at the same point from the
+first, so a painter watching only the position would draw nothing on the repeat. The count rises on every
+activation, so a painter compares it with the one it last drew and starts a new effect when they differ.
+That is the same information an event carries without being one: it is state a painter can read at any time
+and compare, rather than a callback it has to have been mounted to receive.
+
+**The keyboard gets the centre.** `Enter` and `Space` produce `{ x: 0.5, y: 0.5 }`, with `e.repeat` ignored
+so holding the key does not fire a stream of activations. A press has no point when it did not come from a
+pointer, and reporting nothing would mean a decoration that exists for mouse users only.
+
+**It is a separate call and an opt-in prop**, not part of `wrapElement`. `InteractionWrapper` takes
+`isActivationTracked` and folds it into the disabled accessor it hands the tracker, so a control nobody asked
+to track attaches no listener and measures no rect — the cost is a `getBoundingClientRect` per press, which
+is a forced layout, and paying it on every control in the library for a decoration almost none of them draw
+is the wrong default. Same argument as `trackDrag`'s.
+
+**It reaches the painter as a flag, through the mechanism that already existed.** `activation` is on
+`InternalInteractionFlags`, so it arrives in `renderDecoration`'s `getFlags` beside `isHovered` and
+`isPressed` with no new argument anywhere, and a painter that ignores it is unaffected. The Playground's
+`PageRipple` is the first consumer: it sits in the decoration layer, which is `position: absolute; inset: 0`
+over the control, so a ratio is a percentage and no measuring happens on the painter's side at all.
 
 ### The swipe: one gesture over the drag machinery, an axis it claims, and a verdict at the end
 
@@ -4275,7 +4404,7 @@ one control that is not a field and reads it anyway — see the entry under its 
 
 ### `FormSection`: the collecting stops at the nearest one
 
-The piece item 6 had left of the form story. `Form` collected every field on the page and there was no way to
+The last piece of the form story. `Form` collected every field on the page and there was no way to
 say that a run of fields belongs together, which left two things with nowhere to go: a heading over a group,
 and a rule that is true of a group rather than of any one field in it.
 
@@ -4368,6 +4497,15 @@ common case where nothing converts.
 alternative to a signal-only surface. A consumer with a signal passes its two halves; one with a store field,
 route param or callback passes those. The first attempt took a `Signal` and could not express any of the
 Playground's own wrappers.
+
+**Every control now takes that pair directly, so the mirror is no longer the way in.** A `*Signal` prop is
+typed `SignalSource<T>` and `accessSignal` normalises it — see _"Signal tuples for two-way state"_ in
+`conventions.md`, which carries the rule and the reasoning. `createOptional` and `createPassThrough` are both
+`accessSignal` underneath. What `SignalMirror` still owns, and what the Playground's `PageNumberField` still
+uses it for, is the case a pass-through cannot serve: an **inner** value that survives the outer refusing a
+write, which is what lets a field hold `7.` or a half-typed date while the number behind it has not changed.
+`PageTextField`, `PageCheckField`, `PageColorField` and both select fields dropped their mirrors and pass the
+two halves.
 
 **Each direction reads the far side `untrack`ed**, which is the whole reason this is worth extracting: the two
 colour-picker bugs were both a mirror whose guard tracked the other side, so an unrelated change re-ran it and
@@ -4677,7 +4815,7 @@ description is not — so the moment a jump to the end forces the skipped rows t
 height above the highlight is corrected at once and the scroll offset no longer points where it did. `End` then
 leaves the highlighted option below the visible box. The user removed the switch. What it
 bought was the cost of _painting_ options, which is a different and smaller cost than _mounting_ them;
-`backlog.md` item 3 holds what is left.
+`backlog.md` item 2 holds what is left.
 
 **The marker is keyed on the options array, and that is load-bearing.** An intersection observer reports only
 _changes_, so a batch too small to push the marker off screen would deliver no callback and the list would
@@ -5159,7 +5297,7 @@ turn a list of keyframe stops into the evaluation function `CellAnimation` asks 
 keyframes rather than a formula writes their own. That is real, and it is still not the library's: the
 component's contract is already the smaller and more general thing — a function from timeline to result — and a
 stop list with `at`, `depth` and origin keys is one **opinion about how to author** such a function. Shipping it
-would freeze that opinion as API for a consumer nobody has met, which is the layer item 8 in `backlog.md`
+would freeze that opinion as API for a consumer nobody has met, which is the layer item 6 in `backlog.md`
 plans. The matrix half is a different case: it needs only the language to work, which is the `ss-utils` test,
 and that package has `Vec2d` and `Vec4d` but no matrix — noted as a candidate rather than moved, because one
 consumer is a thin case for an export in another repo.
@@ -6638,7 +6776,7 @@ can know.
 **The cost is stated rather than mitigated: a library that renders no button cannot promise one is reachable or
 named.** A consumer who wires up no control has a wheel that can only be driven from elsewhere through
 `indexSignal`, exactly as `Carousel` with no `renderControls` has no keyboard route. That is the same exposure
-item 18 records for `Scroller` and it is now the wheel's too.
+item 16 records for `Scroller` and it is now the wheel's too.
 
 **No slot survives either, and the one that briefly did was kept for a bad reason.** A `renderHub` was left on
 the overhead wheel out of deference to an earlier choice — that an overhead wheel has one control slot and it is the
@@ -6767,6 +6905,40 @@ Both behaviours live side by side rather than one winning.
 two lines over the new one, with a `createMemo` so a width-only change does not wake a height consumer. Border
 box rather than a client rect, deliberately: a rect measured inside a `Viewport` is the layout value times the
 scale factor, and layout numbers are what a positioner has to write back out.
+
+`createBorderBoxSizeListObserver` joined them for a set of elements rather than one; the entry below it is
+why, and it is the same coordinate space for the same reason.
+
+### Measuring the element in front: a list observer, and the whole list handed to the painter
+
+Settled on the user's instruction. `Toasts` was the one consumer asking, and the standing rule is that an
+`Abstract` waits for the second; the user's call was to extract it anyway, so the rule is not repealed —
+this is an exception taken deliberately rather than a precedent.
+
+**The gap.** A painter drawing an overlapping pile wants each card offset by the real height of the one in
+front of it. `index` and `count` are enough for a fixed peek distance, and everything else a painter can
+measure is itself — a card cannot reach its neighbour's height, and the flow layout has already positioned
+it using exactly those heights.
+
+**`ElementObserver.createBorderBoxSizeListObserver(refs, enabled)` is the observer for a set rather than one
+element.** It takes an accessor of the element list, publishes a `Size2d` per position in the same order, and
+re-observes when the list changes. Border box, layout pixels, so the name carries the coordinate space like
+its siblings and `Viewport`'s scale never enters. **The caller owns the keying**: `Toasts` holds a ref per
+entry id and hands the observer that list in queue order, because ids are what survives an entry being
+removed from the middle; `Accordion` keys its header refs by position. An abstract that picked one would have
+served one of them.
+
+**Any change re-reads every element rather than threading the observer's entries through.** A pile's
+arithmetic needs the whole list anyway, so a partial update would be assembled back into a whole one at the
+only call site. The published signal compares element-wise, so a resize that changes nothing notifies nobody.
+
+**`ToastState` gains `sizes`, and it is the whole array rather than a computed offset.** The stacking rule is
+the painter's — that is what _"`Toasts`: what the painter gets, and why position is not fully delegated"_
+settled when it kept flow stacking as geometry and an overlapping pile as paint — so the component's job is to hand over the measurements a painter cannot take,
+not to decide what they mean. sonner holds the same numbers at the same level, one above the card.
+`ToastsItem` reports its own root element up, and the Playground's `stacking` prop is what shows it working:
+`flow` is the flex layout untouched, `pile` cancels each card's flow offset from the summed extents in front
+of it and replaces it with a peek and a scale, which lands every card of differing height on the front one.
 
 ### The hold is one function, and all three consumers call it
 
@@ -7591,7 +7763,7 @@ page mounting several independent instances has to say so.
 
 **_Elsewhere._** React Aria is the only one of the three with drag and drop, through `useDragAndDrop` shared
 with its lists, and its keyboard route is the same pick-move-drop this one implements. Radix and Ark UI ship
-nothing in this family, which matches item 15's note that nothing had asked for it. The packages that own the
+nothing in this family, which matches item 13's note that nothing had asked for it. The packages that own the
 problem outright — SortableJS, dnd-kit — are pointer-first: dnd-kit ships a keyboard sensor and SortableJS has
 no keyboard route at all, which is the same gap `SlideButton`'s entry records for swipe-to-confirm widgets.
 

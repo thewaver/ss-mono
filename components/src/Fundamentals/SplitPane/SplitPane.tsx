@@ -2,7 +2,7 @@ import { Index, Show, createMemo, createSignal } from "solid-js";
 
 import { MathUtils } from "@thewaver/ss-utils";
 
-import { access } from "../../Utils/propUtils";
+import { access, accessSignal } from "../../Utils/propUtils";
 import type { SplitPaneDir, SplitPaneProps } from "./SplitPane.types";
 
 import * as styles from "./SplitPane.css";
@@ -14,6 +14,8 @@ const NO_GUTTER_DRAGGING = -1;
 const PERCENT = 100;
 
 export const SplitPane = (props: SplitPaneProps) => {
+    const ratiosSignal = accessSignal(() => props.ratiosSignal);
+
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getDraggingIndex, setDraggingIndex] = createSignal(NO_GUTTER_DRAGGING);
 
@@ -27,7 +29,7 @@ export const SplitPane = (props: SplitPaneProps) => {
 
     const getRatios = createMemo(() => {
         const panes = access(props.panes);
-        const stored = props.ratiosSignal[0]();
+        const stored = ratiosSignal[0]();
 
         return panes.map((_, index) => stored[index] ?? 1 / panes.length);
     });
@@ -85,7 +87,7 @@ export const SplitPane = (props: SplitPaneProps) => {
         ratios[index] = next - before;
         ratios[index + 1] = before + span - next;
 
-        props.ratiosSignal[1](() => ratios);
+        ratiosSignal[1](() => ratios);
     };
 
     const computePointerBoundary = (e: PointerEvent, index: number) => {

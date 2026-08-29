@@ -35,6 +35,7 @@ export type InteractionWrapperProps<TExtra extends object = {}> = AccessorProps<
         minHeight?: number;
         isReachableWhenDisabled?: boolean;
         isTabbable?: boolean;
+        isActivationTracked?: boolean;
         ref?: (element: HTMLElement) => void;
     }
 > & {

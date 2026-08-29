@@ -5,12 +5,14 @@ import { GestureUtils, MathUtils } from "@thewaver/ss-utils";
 import type { SwipeAxis, SwipeDirection } from "@thewaver/ss-utils";
 
 import type {
+    InteractionActivation,
     InteractionDragEndReason,
     InteractionDragRatio,
     InternalInteractionFlags,
 } from "./InteractionTracker.types";
 
 const SWIPE_SLOP_RATIO = 0.02;
+const CENTER_RATIO: InteractionDragRatio = { x: 0.5, y: 0.5 };
 const SCROLL_EDGE_PX = 1;
 const SWIPE_TOUCH_ACTIONS: Record<SwipeAxis, string> = {
     horizontal: "pan-y",
@@ -345,6 +347,50 @@ export namespace InteractionTracker {
         });
 
         return createMemo(() => getIsHovered() || getHasFocusWithin() || getIsPageHidden());
+    };
+
+    export const trackActivation = (getRef: () => HTMLElement | undefined, getIsDisabled: () => boolean) => {
+        const [getActivation, setActivation] = createSignal<InteractionActivation | undefined>();
+
+        let count = 0;
+
+        createEffect(() => {
+            const ref = getRef();
+
+            if (!ref || getIsDisabled()) {
+                setActivation(undefined);
+
+                return;
+            }
+
+            const activate = (ratio: InteractionDragRatio) => {
+                count += 1;
+
+                setActivation({ ratio, count });
+            };
+
+            const onPointerDown = (e: PointerEvent) => {
+                if (e.button !== 0) return;
+
+                activate(clampRatio(computeRatio(ref.getBoundingClientRect(), e.clientX, e.clientY)));
+            };
+
+            const onKeyDown = (e: KeyboardEvent) => {
+                if (e.repeat || (e.key !== "Enter" && e.key !== " ")) return;
+
+                activate(CENTER_RATIO);
+            };
+
+            ref.addEventListener("pointerdown", onPointerDown);
+            ref.addEventListener("keydown", onKeyDown);
+
+            onCleanup(() => {
+                ref.removeEventListener("pointerdown", onPointerDown);
+                ref.removeEventListener("keydown", onKeyDown);
+            });
+        });
+
+        return getActivation;
     };
 
     export const trackDrag = (

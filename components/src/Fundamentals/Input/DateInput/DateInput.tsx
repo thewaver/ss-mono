@@ -4,7 +4,7 @@ import type { DateValue, DateValueCalendarId } from "../../../Abstracts/DateValu
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
 import { MaskedField } from "../../../Abstracts/MaskedField/MaskedField";
 import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
-import { access } from "../../../Utils/propUtils";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import { TextField } from "../TextField/TextField";
 import type { DateInputEra, DateInputFormat, DateInputProps } from "./DateInput.types";
 
@@ -88,6 +88,8 @@ const toDigits = (value: DateValue, format: DateInputFormat) =>
     FORMATS[format].parts.map((part) => `${value[part]}`.padStart(PART_LENGTHS[part], "0")).join("");
 
 export const DateInput = (props: DateInputProps) => {
+    const valueSignal = accessSignal(() => props.valueSignal);
+
     const getFormat = createMemo(() => access(props.format) ?? DEFAULT_DATE_INPUT_FORMAT);
 
     const getCalendar = createMemo(() => access(props.calendar) ?? DEFAULT_DATE_INPUT_CALENDAR);
@@ -95,7 +97,7 @@ export const DateInput = (props: DateInputProps) => {
     const getMask = createMemo(() => computeMask(getFormat()));
 
     const getFieldValue = () => {
-        const value = props.valueSignal[0]();
+        const value = valueSignal[0]();
 
         return value ? DateValueUtils.withCalendar(value, getCalendar()) : undefined;
     };
@@ -136,7 +138,7 @@ export const DateInput = (props: DateInputProps) => {
 
     const field = MaskedField.createField<DateValue>({
         getValue: getFieldValue,
-        setValue: (next) => props.valueSignal[1](() => next),
+        setValue: (next) => valueSignal[1](() => next),
         formatDigits: (digits) => TextSyncUtils.formatWithMask(getMask(), digits),
         getDigitCount: () => DIGIT_COUNT,
         toDigits: (value) => toDigits(value, getFormat()),

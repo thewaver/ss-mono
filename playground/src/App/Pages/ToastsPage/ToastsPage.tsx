@@ -8,7 +8,12 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { PageToastContent } from "../../StyledComponents/ToastContent/ToastContent";
-import type { ToastAnimation, ToastDefs, ToastKind } from "../../StyledComponents/ToastContent/ToastContent.types";
+import type {
+    ToastAnimation,
+    ToastDefs,
+    ToastKind,
+    ToastStacking,
+} from "../../StyledComponents/ToastContent/ToastContent.types";
 
 import * as styles from "./ToastsPage.css";
 
@@ -26,6 +31,7 @@ const ALIGNMENTS: ToastsAlignment[] = [
 const DIRS: ToastsDir[] = ["column", "column-reverse", "row", "row-reverse"];
 const OVERFLOWS: ToastsOverflow[] = ["dismiss-oldest", "hold-newest"];
 const ANIMATIONS: ToastAnimation[] = ["zoom", "slide", "fade"];
+const STACKINGS: ToastStacking[] = ["flow", "pile"];
 const LIMITS = [0, 1, 2, 3, 5];
 const DURATIONS_MS = [0, 2000, 4000, 8000];
 const NO_LIMIT = 0;
@@ -76,6 +82,7 @@ export const ToastsPage = () => {
     const [getDir, setDir] = createSignal<ToastsDir>("column");
     const [getOverflow, setOverflow] = createSignal<ToastsOverflow>("dismiss-oldest");
     const [getAnimation, setAnimation] = createSignal<ToastAnimation>("zoom");
+    const [getStacking, setStacking] = createSignal<ToastStacking>("flow");
     const [getLimit, setLimit] = createSignal(STARTING_LIMIT);
     const [getDurationMs, setDurationMs] = createSignal(STARTING_DURATION_MS);
     const [getGap, setGap] = createSignal(STARTING_GAP);
@@ -141,6 +148,15 @@ export const ToastsPage = () => {
                         values={() => ANIMATIONS}
                         ariaLabel={"Animation"}
                         onChange={(animation) => setAnimation(() => animation)}
+                    />
+                </PageProp>
+
+                <PageProp key={"stacking"} label={"Stacking"}>
+                    <PageSelectField
+                        value={getStacking}
+                        values={() => STACKINGS}
+                        ariaLabel={"Stacking"}
+                        onChange={(stacking) => setStacking(() => stacking)}
                     />
                 </PageProp>
 
@@ -237,6 +253,9 @@ export const ToastsPage = () => {
                         toast={getToast}
                         state={getState}
                         animation={getAnimation}
+                        stacking={getStacking}
+                        dir={getDir}
+                        gap={getGap}
                         visibilityTarget={getVisibilityTarget}
                         transitionDurationMs={getToastTransitionDurationMs}
                         onDismiss={() => setToasts((prev) => prev.filter((toast) => toast.id !== getToast().id))}
