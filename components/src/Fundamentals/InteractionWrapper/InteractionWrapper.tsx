@@ -25,6 +25,7 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
             getIsDisabled(),
             access(props.isReachableWhenDisabled) ?? false,
             getTooltipDefs() !== undefined,
+            access(props.isFocusableWhenDisabled) ?? false,
         ),
     );
 
@@ -33,15 +34,14 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
         getIsTabbable: props.isTabbable === undefined ? undefined : () => access(props.isTabbable)!,
     });
 
-    const getIsActivationUntracked = createMemo(
-        () => getIsDisabled() || (access(props.isActivationTracked) ?? false) === false,
-    );
+    const getIsActivationUntracked = createMemo(() => getIsDisabled() || props.onActivation === undefined);
 
-    const getActivation = InteractionTracker.trackActivation(getElementRef, getIsActivationUntracked);
+    InteractionTracker.trackActivation(getElementRef, getIsActivationUntracked, (activation) =>
+        props.onActivation?.(activation),
+    );
 
     const getFlags = createMemo((): InteractionFlags<TExtra> => ({
         ...getInternalFlags(),
-        activation: getActivation(),
         isDisabled: getIsDisabled(),
         isPressed: access(props.isPressed),
         hasError: access(props.hasError),

@@ -8,9 +8,12 @@ import { access } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../InteractionWrapper/InteractionWrapper";
 import { FormFieldUtils } from "../FormField/FormField.utils";
 import { LabelUtils } from "../Label/Label.utils";
-import type { RangeElementProps, RangeFlags, RangeOrientation, RangeProps, RangeSpan } from "./Range.types";
+import type { RangeElementProps, RangeOrientation, RangeProps, RangeRenderProps, RangeSpan } from "./Range.types";
 
 import * as styles from "./Range.css";
+
+const readFocusVisibleThumb = (element: HTMLElement, index: number) =>
+    InteractionTracker.computeIsFocusVisible(element) ? index : undefined;
 
 const DEFAULT_RANGE_ORIENTATION: RangeOrientation = "horizontal";
 const DEFAULT_RANGE_MIN = 0;
@@ -114,8 +117,9 @@ const RangeElement = (props: RangeElementProps) => {
                         onPointerMove={(e) => {
                             if (e.buttons === 0) raiseNearestThumb(e, e.currentTarget);
                         }}
-                        onFocus={() => props.setFocusedThumb(index)}
-                        onBlur={() => props.setFocusedThumb(undefined)}
+                        onFocus={(e) => props.setFocusVisibleThumb(readFocusVisibleThumb(e.currentTarget, index))}
+                        onKeyDown={(e) => props.setFocusVisibleThumb(readFocusVisibleThumb(e.currentTarget, index))}
+                        onBlur={() => props.setFocusVisibleThumb(undefined)}
                         onInput={(e) => {
                             const element = e.currentTarget;
 
@@ -150,7 +154,7 @@ export const Range = (props: RangeProps) => {
         );
     }
 
-    const [getFocusedThumb, setFocusedThumb] = createSignal<number>();
+    const [getFocusVisibleThumb, setFocusVisibleThumb] = createSignal<number>();
 
     const getOrientation = createMemo(() => access(props.orientation) ?? DEFAULT_RANGE_ORIENTATION);
 
@@ -193,14 +197,14 @@ export const Range = (props: RangeProps) => {
     return (
         <InteractionWrapper
             {...props}
-            extraFlags={(): RangeFlags => ({
+            extraFlags={(): RangeRenderProps => ({
                 orientation: getOrientation(),
                 values: getValues(),
                 ratios: getRatios(),
                 fill: getFill(),
-                focusedThumb: getFocusedThumb(),
+                focusVisibleThumb: getFocusVisibleThumb(),
             })}
-            renderControl={(setElementRef, getFlags) => (
+            renderControl={(setElementRef, getRenderProps) => (
                 <RangeElement
                     ref={setElementRef}
                     id={props.id}
@@ -212,11 +216,11 @@ export const Range = (props: RangeProps) => {
                     max={getMax}
                     step={getStep}
                     thumbSize={getThumbSize}
-                    flags={getFlags}
+                    flags={getRenderProps}
                     values={getValues}
                     isTabbable={props.isTabbable}
                     setValue={setValue}
-                    setFocusedThumb={setFocusedThumb}
+                    setFocusVisibleThumb={setFocusVisibleThumb}
                     renderContent={props.renderContent}
                     onMouseEnter={props.onMouseEnter}
                     onMouseLeave={props.onMouseLeave}

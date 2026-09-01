@@ -11,6 +11,6 @@ export const DefaultExample = (props: Props) => (
         {...pageColorPickerSlots}
         valueSignal={props.valueSignal}
         ariaLabel={"Brand colour"}
-        renderContent={(getFlags) => <PageColorInputContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageColorInputContent renderProps={getRenderProps} />}
     />
 );

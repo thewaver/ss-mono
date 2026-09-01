@@ -45,7 +45,7 @@ export const DefaultExample = ({
                         ...getIterationConfig().computeDefs(access(animationDurationMs)),
                     });
 
-                    if (getFlags().isFocused) {
+                    if (getFlags().isFocusVisible) {
                         strokes.push({ color: "#FF00FF" });
                     }
 
@@ -54,7 +54,7 @@ export const DefaultExample = ({
                 strokeGeom={() => {
                     const result = [{ thicknesses: access(edgeThicknesses) }];
 
-                    if (getFlags().isFocused) {
+                    if (getFlags().isFocusVisible) {
                         result.push({ thicknesses: [2] });
                     }
 

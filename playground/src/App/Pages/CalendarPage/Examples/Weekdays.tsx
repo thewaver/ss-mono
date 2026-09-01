@@ -24,7 +24,7 @@ export const WeekdaysExample = (props: Props) => {
                 weekStartsOn={props.weekStartsOn}
                 ariaLabel={"Choose a working day"}
                 computeIsDayDisabled={(day) => WEEKEND_DAYS.includes(DateValueUtils.toDate(day).getDay())}
-                renderDay={(_unused, getFlags) => <PageCalendarDay flags={getFlags} />}
+                renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}
                 renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
             />
         </PageCalendarFrame>

@@ -44,13 +44,13 @@ export const PageCarouselStep = (props: CarouselStepProps) => {
         <div
             class={styles.carouselButton}
             classList={{
-                [styles.isHovered]: access(props.flags).isHovered,
-                [styles.isActive]: access(props.flags).isActive,
-                [styles.isDisabled]: access(props.flags).isDisabled,
+                [styles.isHovered]: access(props.renderProps).isHovered,
+                [styles.isActive]: access(props.renderProps).isActive,
+                [styles.isDisabled]: access(props.renderProps).isDisabled,
             }}
             aria-hidden="true"
         >
-            {STEP_GLYPHS[access(props.flags).step]}
+            {STEP_GLYPHS[access(props.renderProps).step]}
         </div>
     );
 };
@@ -76,10 +76,10 @@ export const PageCarouselPick = (props: CarouselPickProps) => {
         <div
             class={styles.carouselPick}
             classList={{
-                [styles.isCurrent]: access(props.flags).isCurrent,
-                [styles.isHovered]: access(props.flags).isHovered,
-                [styles.isActive]: access(props.flags).isActive,
-                [styles.isDisabled]: access(props.flags).isDisabled,
+                [styles.isCurrent]: access(props.renderProps).isCurrent,
+                [styles.isHovered]: access(props.renderProps).isHovered,
+                [styles.isActive]: access(props.renderProps).isActive,
+                [styles.isDisabled]: access(props.renderProps).isDisabled,
             }}
             aria-hidden="true"
         />

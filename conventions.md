@@ -37,6 +37,48 @@ the Playground paints — the tree's `▶`, the select's `✓`, a drag handle's 
 the text it decorates. **Write `aria-hidden="true"`.** The same holds for any other true/false ARIA
 attribute: give it the string.
 
+### `isFocused` is focus and `isFocusVisible` is the ring
+
+Both are on `InternalInteractionFlags`, both reach every painter, and confusing them draws a focus ring on a
+control somebody clicked.
+
+**`isFocused` answers "does this hold focus".** It is what a text field wants: a field clicked into is
+focused, and it should look it — a caret is blinking in it.
+
+**`isFocusVisible` answers "should the focus be advertised", and it is the browser's answer rather than
+ours.** `wrapElement` reads `element.matches(":focus-visible")` on `focus` and again on `keydown`, and clears
+it on `blur`. Nothing here reimplements the heuristic: the browser already tracks the input modality, already
+makes a text field focus-visible when it is clicked and a button not, and already keeps the keyboard verdict
+across a programmatic `.focus()` — which is what a roving widget's arrow keys do, so a walked-to item still
+gets its ring. It is re-read on `keydown` because a control focused by pointer becomes focus-visible the
+moment somebody types into it.
+
+**A ring, an outline or a halo reads `isFocusVisible`; anything else about being focused reads `isFocused`.**
+This came out of `TileBoard`, whose tile drew its ring on every click, and the user's call was that every
+painter follows: `SlideButton`, `TagInput`'s chips, `Range`'s thumbs, `ColorArea`'s marker and the `Shape`
+page's example all read the focus-visible half now. Nothing in the library reads `isFocused` for paint any
+more; it is there for a painter that wants the other question.
+
+**A control that focuses something itself has to say so, or the browser will guess wrong.** The heuristic
+reads the input modality, and a programmatic `.focus()` inherits whatever the last interaction was — which is
+right for a roving widget's arrow keys and wrong for a drag. `ColorArea` focuses its saturation axis from the
+drag handler so the keyboard carries on from where you pressed, and `trackPointer` has already called
+`preventDefault()` by then, so the browser cannot see the pointer and reports focus-visible. The component
+suppresses it while `getIsDragging()` is true. **Anywhere a component calls `.focus()` in response to a
+pointer, check what the browser then says about it.**
+
+**Where the focus is a descendant's, the flag cannot answer and the component publishes its own.** `wrapElement`
+watches one element, so a control whose real focus lands on one of several children — `Range`'s thumbs,
+`ColorArea`'s two axes — has to track it. Both did already, as `focusedThumb` and `focusedAxis`; both now
+answer the focus-visible question instead and are named for it, **`focusVisibleThumb` and `focusVisibleAxis`**.
+A prop that says "focused" and means "focus-visible" is the confusion this whole entry exists to prevent, so
+the rename was not optional. They are re-read on `keydown` for the same reason the flag is.
+
+**Do not gate it on disabled.** `isHovered` and `isActive` are forced false while a control is disabled,
+because a disabled control is not being hovered or pressed in any sense that matters. Focus is different: a
+disabled item that is still reachable — `isFocusableWhenDisabled` below — must keep its ring, or focus lands
+somewhere invisible.
+
 ### Consult WCAG before settling any interaction, and say what it said
 
 Asked for, after checking WCAG on `SlideButton` turned a settled decision into a
@@ -309,6 +351,51 @@ defs and opts is desirable later but is a deeper refactor. Examples:
 `computeLinearGradient(defs, custom?)`, `add*Filter(defs, custom?)`, `computeSVGDefs(id, flags, defs)`,
 `computeBreakpoints(type, idx, lineCount, defs, opts?)`.
 
+### One aggregated object per painter, named `*Flags` only when it is all flags
+
+Stated by the user. A painter receives **one** object, never a run of positional arguments — the reason being
+that positional arguments make a consumer declare and ignore three of them to reach the fourth. So data a
+painter needs goes **into** the aggregate beside the booleans, rather than into an argument of its own.
+
+What changes is the **name**, and the name is decided by what the object holds.
+
+- **`*Flags`** when every member is a boolean or a choice from a fixed set — `isFocused`, `isDisabled`,
+  `isPressed`, `sortDirection`, `orientation`, `checkedState`. A collection of flags is what the word means,
+  and a type named that way is telling a reader there is nothing else in it. `ButtonFlags` is the shape this
+  is right for.
+- **`*RenderProps`** the moment it also carries a payload — an index, a value, an array, a date, a colour, a
+  position. The object is then not a set of flags, and calling it one misdescribes it.
+
+A component's own contribution keeps its own name under this test, independently of what it is combined with:
+a boolean-only extras type stays `*Flags` even where the merged object the painter actually receives is a
+`*RenderProps`, because the merged type is a different type and gets named on its own merits.
+
+### A grid index names its space and its axis, never `x` and `y`
+
+Stated by the user. Anywhere a row-and-column index reaches a consumer it names both which axis it counts and
+which ordering it counts in: **`dataRow`, `dataCol`, `layoutRow`, `layoutCol`**. Never an `x` / `y` pair, and
+never a bare `rowIndex` / `columnIndex`. It travels as its own argument, never inside the flags record — see
+the rule above.
+
+Two separate faults are being closed. **`x` and `y` do not say which is which**: a reader has to know that
+`y` counts rows and `x` counts columns, and the two are the same type, so swapping them compiles and produces
+a plausible wrong cell. **`rowIndex` alone does not say which ordering it counts in.** A grid that sorts,
+filters, virtualizes or lets its columns be reordered has two different numbers for the same cell: where the
+record sits in the array the consumer handed over, and where the cell sits on screen. Naming only one of them
+means the component silently picks, and the consumer inherits the choice without being told.
+
+So `data*` is the index into the arrays as given, and `layout*` is the position as painted. A component that
+publishes these has to actually hold both — sorting an array of indices rather than an array of rows, so the
+original position survives the sort — rather than deriving the missing one by searching, which is a scan of
+the data per cell.
+
+`Count2d` in `@thewaver/ss-utils` is the pair type, keyed `row` and `col`. It carries no meaning of its own:
+a tally and a zero-based index are the same two numbers, and the name at the call site is what says which.
+
+This is the same rule as _"an observer's name carries its coordinate space"_ above, on a discrete axis instead
+of a continuous one, and it exists for the same reason: the wrong one fails silently, returning a number that
+looks right.
+
 ## Control architecture
 
 ### Controls: wrapper owns behaviour, leaf owns the element
@@ -384,10 +471,10 @@ caret suppression below nothing is drawn in that state, so it lands back on the 
 condition; the only catch-all — blurring from a `focus` handler — buys it with focus flicker and a jump
 to `<body>`.
 
-The reachable predicate is unchanged:
+The reachable predicate has two ways in, and the second one arrived with `TileBoard`:
 
 ```
-reachable = isDisabled && isReachableWhenDisabled && tooltipDefs !== undefined
+reachable = isDisabled && ((isReachableWhenDisabled && tooltipDefs !== undefined) || isFocusableWhenDisabled)
 ```
 
 Deriving the mode from `getTooltipDefs` presence _alone_ was rejected, and the distinction generalises:
@@ -399,6 +486,23 @@ earning its own prop if it shows up: an explanation living elsewhere on the page
 validation summary) needing only `aria-describedby`, and composite widgets where skipping disabled items
 makes the set read as incomplete. A control reachable while disabled must keep its focus ring — focus
 landing somewhere invisible is worse than being skipped.
+
+**The second of those two showed up, and `isFocusableWhenDisabled` is the prop it earned.** A grid whose
+items are disabled one at a time — `TileBoard`'s refused tiles — needs the arrows to reach them, because a
+walk that skips them leaves somebody reading with a screen reader unable to find out what shape the set is.
+Two things broke without it, and neither is about the tab order the tooltip clause was written to protect.
+The disabled branch of `wrapElement` attaches no listeners, so `isFocused` stays false for ever and the
+painter draws no ring — the focus-ring sentence above, failed. And `tabIndex` is forced to `-1` on every
+disabled element, so **a roving widget whose current item happens to be disabled has no tab stop at all**
+and cannot be entered from the keyboard.
+
+**It is unguarded, and that is not a loosening of the clause it sits beside.** The tooltip guard exists
+because a focusable disabled control with nothing to reveal pollutes the tab order; an item in a roving
+widget is `tabindex="-1"` unless it is the current one, so there is no tab order to pollute and nothing for
+a guard to protect. Hover and press are still forced false while disabled, so the only flag that gets
+through is `isFocused`, which is exactly the one a focus ring needs. **Set it only on an item inside a
+composite**, and gate it on the composite itself being enabled — `TileBoard` passes
+`isFocusableWhenDisabled={() => !isDisabled}`, so a board switched off as a whole is skipped entirely.
 
 **The third clause reads the value, not the prop — settled with `Select`.** It was
 `props.getTooltipDefs !== undefined`, now `props.getTooltipDefs?.() !== undefined`, which also decides

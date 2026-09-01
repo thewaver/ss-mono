@@ -12,7 +12,7 @@ export const ReachableExample = (props: Props) => (
         isDisabled={true}
         isReachableWhenDisabled={true}
         ariaLabel={"Disabled but reachable attachment"}
-        renderContent={(getFlags) => <PageFileInputContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageFileInputContent renderProps={getRenderProps} />}
         tooltipDefs={() => ({
             placement: () => ({ x: "center", y: "top-out" }),
             offset: () => ({ x: 0, y: 5 }),

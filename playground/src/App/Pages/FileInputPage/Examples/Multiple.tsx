@@ -10,6 +10,6 @@ export const MultipleExample = (props: Props) => (
         filesSignal={props.filesSignal}
         isMultiple={true}
         ariaLabel={"Attachments"}
-        renderContent={(getFlags) => <PageFileInputContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageFileInputContent renderProps={getRenderProps} />}
     />
 );

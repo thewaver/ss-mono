@@ -4,6 +4,9 @@ import { Portal } from "solid-js/web";
 import { Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { AnchorUtils } from "../../Abstracts/Anchor/Anchor.utils";
+import type { CarrierZone, Carry, CarryMode } from "../../Abstracts/Carrier/Carrier.types";
+import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
+import { CarrierStack } from "../../Abstracts/Carrier/CarrierStack";
 import { Elevation } from "../../Abstracts/Elevation/Elevation";
 import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
 import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
@@ -11,23 +14,12 @@ import { ViewportUtils } from "../../Exotics/Viewport/Viewport.utils";
 import { access, accessSignal } from "../../Utils/propUtils";
 import { LabelUtils } from "../Input/Label/Label.utils";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
-import type {
-    SortableCarry,
-    SortableCarryMode,
-    SortableDir,
-    SortableItem,
-    SortableItemSlotProps,
-    SortableProps,
-    SortableZone,
-} from "./Sortable.types";
-import { SortableUtils } from "./Sortable.utils";
-import { SortableStack } from "./SortableStack";
+import type { SortableDir, SortableItem, SortableItemSlotProps, SortableProps } from "./Sortable.types";
 
 import * as styles from "./Sortable.css";
 
 const DEFAULT_SORTABLE_DIR: SortableDir = "column";
 const DEFAULT_SORTABLE_GAP = 0;
-const CARRY_SLOP_PX = 4;
 
 const INTERACTIVE_SELECTOR =
     "a[href], button, input, select, textarea, [role='button'], [role='checkbox'], [role='link'], [role='switch']";
@@ -92,14 +84,14 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         });
     };
 
-    const computeCarry = (item: SortableItem<T>): SortableCarry => ({
+    const computeCarry = (item: SortableItem<T>): Carry => ({
         groupId: getGroupId(),
         key: props.computeItemKey(item.value),
         label: props.computeItemLabel(item.value),
         value: item,
     });
 
-    const zone: SortableZone = {
+    const zone: CarrierZone = {
         getGroupId,
         getLabel: () => access(props.ariaLabel),
         getRootRef,
@@ -157,20 +149,20 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         },
     };
 
-    SortableStack.registerZone(zone);
+    CarrierStack.registerZone(zone);
 
-    const getIsSource = createMemo(() => SortableStack.getSourceZone() === zone);
+    const getIsSource = createMemo(() => CarrierStack.getSourceZone() === zone);
 
-    const getIsReceiving = createMemo(() => SortableStack.getTargetZone() === zone);
+    const getIsReceiving = createMemo(() => CarrierStack.getTargetZone() === zone);
 
-    const getCarriedKey = createMemo(() => (getIsSource() ? SortableStack.getCarry()?.key : undefined));
+    const getCarriedKey = createMemo(() => (getIsSource() ? CarrierStack.getCarry()?.key : undefined));
 
     const getLandingIndex = createMemo(() => {
-        const settledIndex = SortableStack.getTargetIndex();
+        const settledIndex = CarrierStack.getTargetIndex();
 
         if (!getIsReceiving() || settledIndex === undefined) return;
 
-        return SortableUtils.computeMarkerIndex(settledIndex, SortableStack.getSourceIndex() ?? 0, getIsSource());
+        return CarrierUtils.computeMarkerIndex(settledIndex, CarrierStack.getSourceIndex() ?? 0, getIsSource());
     });
 
     const getEndRoom = createMemo(() => (access(props.gap) ?? DEFAULT_SORTABLE_GAP) / 2);
@@ -189,7 +181,6 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
         if (rects.length < 1) return span / 2;
 
-        // The rects are on-screen and the offset is written as layout, so a scaled Viewport divides them apart.
         const scale = viewportContext.getScale();
 
         const startOf = (rect: DOMRect) =>
@@ -232,7 +223,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
     let hasPendingClick = false;
 
-    const pickUp = (index: number, mode: SortableCarryMode, from?: Point2d) => {
+    const pickUp = (index: number, mode: CarryMode, from?: Point2d) => {
         if (getIsDisabled()) return;
 
         const item = getItems()[index];
@@ -255,66 +246,33 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
             setCarriedPoint(from ? ViewportUtils.getAdjustedClientPoint(from, viewportContext) : undefined);
         }
 
-        SortableStack.start(zone, index, computeCarry(item), mode);
+        CarrierStack.start(zone, index, computeCarry(item), mode);
     };
 
     const handlePointerDown = (index: number) => (e: PointerEvent) => {
         if (e.button !== 0 || getIsDisabled()) return;
         if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
-        if (SortableStack.getCarry()) return;
+        if (CarrierStack.getCarry()) return;
 
         const element = getItemRefs()[index];
 
         if (!element) return;
 
-        const startX = e.clientX;
-        const startY = e.clientY;
-
-        let hasStarted = false;
-
-        const handleMove = (moveEvent: PointerEvent) => {
-            if (moveEvent.pointerId !== e.pointerId) return;
-
-            if (!hasStarted) {
-                const distance = Math.hypot(moveEvent.clientX - startX, moveEvent.clientY - startY);
-
-                if (distance < CARRY_SLOP_PX) return;
-
-                hasStarted = true;
-                element.setPointerCapture(e.pointerId);
-                pickUp(index, "drag", { x: startX, y: startY });
-            }
-
-            moveEvent.preventDefault();
-            SortableStack.aimAtPoint(moveEvent.clientX, moveEvent.clientY);
-        };
-
-        const handleEnd = (endEvent: PointerEvent) => {
-            if (endEvent.pointerId !== e.pointerId) return;
-
-            element.removeEventListener("pointermove", handleMove);
-            element.removeEventListener("pointerup", handleEnd);
-            element.removeEventListener("pointercancel", handleEnd);
-
-            if (element.hasPointerCapture(e.pointerId)) element.releasePointerCapture(e.pointerId);
-
-            if (!hasStarted) return;
-
-            hasPendingClick = true;
-
-            SortableStack.end(endEvent.type === "pointercancel" ? "cancel" : "drop");
-        };
-
-        element.addEventListener("pointermove", handleMove);
-        element.addEventListener("pointerup", handleEnd);
-        element.addEventListener("pointercancel", handleEnd);
+        CarrierStack.dragFromPointer(
+            element,
+            e,
+            (from) => pickUp(index, "drag", from),
+            () => {
+                hasPendingClick = true;
+            },
+        );
     };
 
     const handleClick = (index: number) => (e: MouseEvent) => {
         if (getIsDisabled()) return;
         if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
 
-        const carry = SortableStack.getCarry();
+        const carry = CarrierStack.getCarry();
 
         if (!carry) {
             pickUp(index, "tap", { x: e.clientX, y: e.clientY });
@@ -323,27 +281,27 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
             return;
         }
 
-        if (SortableStack.getCarryMode() === "drag") return;
+        if (CarrierStack.getCarryMode() === "drag") return;
 
-        if (SortableStack.getCarryMode() === "key") {
+        if (CarrierStack.getCarryMode() === "key") {
             const rect = getItemRefs()[index]?.getBoundingClientRect();
 
-            if (rect) SortableStack.aimAtPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+            if (rect) CarrierStack.aimAtPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
         }
 
-        SortableStack.end("drop");
+        CarrierStack.end("drop");
     };
 
     const handleKeyDown = (index: number) => (e: KeyboardEvent) => {
         if (getIsDisabled()) return;
 
-        const isCarrying = SortableStack.getCarry() !== undefined && SortableStack.getCarryMode() !== "drag";
+        const isCarrying = CarrierStack.getCarry() !== undefined && CarrierStack.getCarryMode() !== "drag";
 
         if (e.key === "Escape") {
             if (!isCarrying) return;
 
             e.preventDefault();
-            SortableStack.end("cancel");
+            CarrierStack.end("cancel");
 
             return;
         }
@@ -352,7 +310,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
             e.preventDefault();
 
             if (isCarrying) {
-                SortableStack.end("drop");
+                CarrierStack.end("drop");
 
                 return;
             }
@@ -364,7 +322,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
         if (isCarrying && e.key === "Tab") {
             e.preventDefault();
-            SortableStack.aimAtNextZone(e.shiftKey ? -1 : 1);
+            CarrierStack.aimAtNextZone(e.shiftKey ? -1 : 1);
 
             return;
         }
@@ -376,7 +334,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
             if (!isForward && !isBackward) return;
 
             e.preventDefault();
-            SortableStack.aimAtIndex(isForward ? 1 : -1);
+            CarrierStack.aimAtIndex(isForward ? 1 : -1);
 
             return;
         }
@@ -401,14 +359,14 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     };
 
     const handleRootClick = (e: MouseEvent) => {
-        if (getIsDisabled() || !SortableStack.getCarry()) return;
-        if (SortableStack.getCarryMode() === "drag") return;
+        if (getIsDisabled() || !CarrierStack.getCarry()) return;
+        if (CarrierStack.getCarryMode() === "drag") return;
         if (e.target !== getRootRef()) return;
-        if (!zone.computeCanAccept(SortableStack.getCarry()!) && !getIsSource()) return;
+        if (!zone.computeCanAccept(CarrierStack.getCarry()!) && !getIsSource()) return;
 
-        if (SortableStack.getCarryMode() === "key") SortableStack.aimAtPoint(e.clientX, e.clientY);
+        if (CarrierStack.getCarryMode() === "key") CarrierStack.aimAtPoint(e.clientX, e.clientY);
 
-        SortableStack.end("drop");
+        CarrierStack.end("drop");
     };
 
     createEffect(() => {
@@ -422,9 +380,9 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         const trackPoint = (e: PointerEvent) => {
             setCarriedPoint(ViewportUtils.getAdjustedClientPoint({ x: e.clientX, y: e.clientY }, viewportContext));
 
-            if (SortableStack.getCarryMode() !== "tap") return;
+            if (CarrierStack.getCarryMode() !== "tap") return;
 
-            SortableStack.aimAtPoint(e.clientX, e.clientY);
+            CarrierStack.aimAtPoint(e.clientX, e.clientY);
         };
 
         document.addEventListener("pointermove", trackPoint, true);
@@ -464,21 +422,21 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     });
 
     createEffect(() => {
-        if (!getIsDisabled() || !SortableStack.getCarry()) return;
-        if (SortableStack.getSourceZone() !== zone) return;
+        if (!getIsDisabled() || !CarrierStack.getCarry()) return;
+        if (CarrierStack.getSourceZone() !== zone) return;
 
-        SortableStack.end("cancel");
+        CarrierStack.end("cancel");
     });
 
     onCleanup(() => {
-        if (SortableStack.getSourceZone() === zone) SortableStack.end("cancel");
+        if (CarrierStack.getSourceZone() === zone) CarrierStack.end("cancel");
     });
 
     const renderList = () => (
         <InteractionWrapper
             {...props}
             extraFlags={() => ({
-                isCarrying: SortableStack.getCarry() !== undefined,
+                isCarrying: CarrierStack.getCarry() !== undefined,
                 isReceiving: getIsReceiving(),
                 isSource: getIsSource(),
                 isEmpty: getItems().length < 1,
@@ -563,7 +521,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         />
     );
 
-    const getCarriedItem = () => SortableStack.getCarry()?.value as SortableItem<T> | undefined;
+    const getCarriedItem = () => CarrierStack.getCarry()?.value as SortableItem<T> | undefined;
 
     const getCarriedZIndex = () => {
         const root = getRootRef();

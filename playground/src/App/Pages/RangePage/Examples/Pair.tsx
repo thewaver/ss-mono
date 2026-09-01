@@ -13,6 +13,6 @@ export const PairExample = (props: Props) => (
         ariaLabel={"Price range"}
         thumbLabels={() => ["Lowest price", "Highest price"]}
         thumbSize={() => RANGE_THUMB_SIZE}
-        renderContent={(getFlags) => <PageRangeContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
     />
 );

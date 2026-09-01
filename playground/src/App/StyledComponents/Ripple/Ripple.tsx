@@ -13,7 +13,7 @@ export const PageRipple = (props: RippleProps) => {
     const [getMarks, setMarks] = createSignal<RippleMark[]>([]);
 
     createEffect<number | undefined>((previousCount) => {
-        const activation = access(props.flags).activation;
+        const activation = access(props.activation);
 
         if (activation === undefined || activation.count === previousCount) return activation?.count;
 

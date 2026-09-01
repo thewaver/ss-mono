@@ -1,7 +1,7 @@
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 import type { InteractionControlProps, InteractionWrapperProps } from "../InteractionWrapper/InteractionWrapper.types";
 
-export type SlideButtonFlags = {
+export type SlideButtonRenderProps = {
     progressRatio: number;
     isDragging: boolean;
     isHolding: boolean;
@@ -25,7 +25,7 @@ export type SlideButtonPress = {
 
 export type SlideButtonElementProps = AccessorProps<
     SlideButtonCbs &
-        InteractionControlProps<SlideButtonFlags> &
+        InteractionControlProps<SlideButtonRenderProps> &
         Required<SlideButtonState> & {
             progressRatio: number;
             setProgressRatio: (ratio: number) => void;
@@ -34,10 +34,10 @@ export type SlideButtonElementProps = AccessorProps<
         }
 >;
 
-export type SlideButtonProps = Omit<InteractionWrapperProps<SlideButtonFlags>, "renderControl" | "extraFlags"> &
+export type SlideButtonProps = Omit<InteractionWrapperProps<SlideButtonRenderProps>, "renderControl" | "extraFlags"> &
     AccessorProps<
         SlideButtonCbs &
-            Pick<InteractionControlProps<SlideButtonFlags>, "id" | "ariaLabel" | "renderContent"> &
+            Pick<InteractionControlProps<SlideButtonRenderProps>, "id" | "ariaLabel" | "renderContent"> &
             SlideButtonState & {
                 progressSignal?: SignalSource<number>;
             }

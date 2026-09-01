@@ -10,6 +10,6 @@ export const ErroredExample = (props: Props) => (
         filesSignal={props.filesSignal}
         hasError={() => props.filesSignal[0]().length < 1}
         ariaLabel={"Required attachment"}
-        renderContent={(getFlags) => <PageFileInputContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageFileInputContent renderProps={getRenderProps} />}
     />
 );

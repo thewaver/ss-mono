@@ -109,3 +109,9 @@ export const tableResizerHandle = style({
         },
     },
 });
+
+export const tableMarker = style({
+    width: 2,
+    height: "100%",
+    backgroundColor: themeVars.color.primary.main,
+});

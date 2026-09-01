@@ -11,16 +11,16 @@ export const PageColorInputContent = (props: ColorInputContentProps) => {
         <div
             class={styles.colorInputContent}
             classList={{
-                [styles.isHovered]: access(props.flags).isHovered,
-                [styles.isDisabled]: access(props.flags).isDisabled,
-                [styles.hasError]: access(props.flags).hasError,
+                [styles.isHovered]: access(props.renderProps).isHovered,
+                [styles.isDisabled]: access(props.renderProps).isDisabled,
+                [styles.hasError]: access(props.renderProps).hasError,
             }}
             aria-hidden="true"
         >
-            <div class={styles.colorInputSwatch} style={{ "background-color": access(props.flags).value }} />
+            <div class={styles.colorInputSwatch} style={{ "background-color": access(props.renderProps).value }} />
 
             <Show when={!access(props.isCompact)}>
-                <div class={styles.colorInputValue}>{access(props.flags).value}</div>
+                <div class={styles.colorInputValue}>{access(props.renderProps).value}</div>
             </Show>
         </div>
     );

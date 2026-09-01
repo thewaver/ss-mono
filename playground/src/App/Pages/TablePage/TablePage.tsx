@@ -6,6 +6,7 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { ConsumerSortedExample } from "./Examples/ConsumerSorted";
 import { DisabledExample } from "./Examples/Disabled";
 import { PartsExample } from "./Examples/Parts";
+import { ReorderableExample } from "./Examples/Reorderable";
 import { ResizableExample } from "./Examples/Resizable";
 import { SingleSelectionExample } from "./Examples/SingleSelection";
 import { VirtualizedExample } from "./Examples/Virtualized";
@@ -29,6 +30,10 @@ export const TablePage = () => {
     const resizableSortSignal = createSignal<TableSort | undefined>();
     const resizableSelectionSignal = createSignal<Part[]>([]);
     const resizableWidthsSignal = createSignal<Record<string, number>>({});
+
+    const reorderableSortSignal = createSignal<TableSort | undefined>();
+    const reorderableSelectionSignal = createSignal<Part[]>([]);
+    const reorderableOrderSignal = createSignal<string[]>([]);
 
     const consumerSortSignal = createSignal<TableSort | undefined>();
     const consumerSelectionSignal = createSignal<Part[]>([]);
@@ -74,6 +79,21 @@ export const TablePage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Resizable.tsx`,
+        },
+        {
+            key: "reorderable",
+            span: 2,
+            name: "Reorderable columns",
+            readout: () =>
+                `order: ${reorderableOrderSignal[0]().join(", ") || "as declared"} — drag a header sideways, or focus a header cell and hold Shift with the left and right arrows`,
+            component: () => (
+                <ReorderableExample
+                    sortSignal={reorderableSortSignal}
+                    selectionSignal={reorderableSelectionSignal}
+                    orderSignal={reorderableOrderSignal}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Reorderable.tsx`,
         },
         {
             key: "consumerSorted",

@@ -10,7 +10,7 @@ import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/Int
 import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { InteractionControlProps } from "../../InteractionWrapper/InteractionWrapper.types";
 
-export type CalendarFlags = {
+export type CalendarRenderProps = {
     day: DateValue;
     isSelected: boolean;
     isToday: boolean;
@@ -23,15 +23,15 @@ export type CalendarFlags = {
 
 export type CalendarDayRenderer = (
     getDay: Accessor<DateValue>,
-    getFlags: () => InteractionFlags<CalendarFlags>,
+    getRenderProps: () => InteractionFlags<CalendarRenderProps>,
 ) => JSX.Element;
 
 export type CalendarWeekdayRenderer = (name: string, index: number) => JSX.Element;
 
 export type CalendarDayProps = AccessorProps<
-    Omit<InteractionControlProps<CalendarFlags>, "renderContent"> & {
+    Omit<InteractionControlProps<CalendarRenderProps>, "renderContent"> & {
         ariaLabel: string;
-        renderContent: (getFlags: () => InteractionFlags<CalendarFlags>) => JSX.Element;
+        renderContent: (getRenderProps: () => InteractionFlags<CalendarRenderProps>) => JSX.Element;
         onSelect: () => void;
     }
 >;

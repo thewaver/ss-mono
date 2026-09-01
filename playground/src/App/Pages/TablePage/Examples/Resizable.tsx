@@ -23,7 +23,7 @@ export const ResizableExample = (props: Props) => {
                 selectionSignal={props.selectionSignal}
                 widthsSignal={props.widthsSignal}
                 ariaLabel={"Parts with resizable columns"}
-                renderResizer={(getFlags) => <PageTableResizer flags={getFlags} />}
+                renderResizer={(getRenderProps) => <PageTableResizer renderProps={getRenderProps} />}
             />
         </div>
     );

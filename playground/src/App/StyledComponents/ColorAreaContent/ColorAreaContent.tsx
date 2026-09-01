@@ -21,15 +21,15 @@ export const PageColorAreaContent = (props: ColorAreaContentProps) => {
         <div
             class={styles.colorAreaSquare}
             classList={{
-                [styles.isDragging]: access(props.flags).isDragging,
-                [styles.isFocused]: access(props.flags).focusedAxis !== undefined,
-                [styles.isDisabled]: access(props.flags).isDisabled,
+                [styles.isDragging]: access(props.renderProps).isDragging,
+                [styles.isFocused]: access(props.renderProps).focusVisibleAxis !== undefined,
+                [styles.isDisabled]: access(props.renderProps).isDisabled,
             }}
             style={{
                 ...assignInlineVars({
-                    [styles.hueVar]: `${access(props.flags).hsv.h}deg`,
-                    [styles.thumbXVar]: `${access(props.flags).hsv.s * PERCENT}%`,
-                    [styles.thumbYVar]: `${(1 - access(props.flags).hsv.v) * PERCENT}%`,
+                    [styles.hueVar]: `${access(props.renderProps).hsv.h}deg`,
+                    [styles.thumbXVar]: `${access(props.renderProps).hsv.s * PERCENT}%`,
+                    [styles.thumbYVar]: `${(1 - access(props.renderProps).hsv.v) * PERCENT}%`,
                 }),
                 height: `${access(props.size)}px`,
             }}
@@ -50,12 +50,12 @@ export const PageHueSlider = (props: HueSliderProps) => {
 
             <div
                 class={styles.hueThumb}
-                classList={{ [styles.isFocused]: access(props.flags).focusedThumb === 0 }}
+                classList={{ [styles.isFocused]: access(props.renderProps).focusVisibleThumb === 0 }}
                 style={{
                     ...assignInlineVars({
-                        [styles.swatchVar]: `hsl(${access(props.flags).values[0] % HUE_MAX} 100% 50%)`,
+                        [styles.swatchVar]: `hsl(${access(props.renderProps).values[0] % HUE_MAX} 100% 50%)`,
                     }),
-                    left: `calc(${access(props.flags).ratios[0]} * (100% - ${HUE_THUMB_SIZE}px))`,
+                    left: `calc(${access(props.renderProps).ratios[0]} * (100% - ${HUE_THUMB_SIZE}px))`,
                 }}
             />
         </div>
@@ -109,10 +109,12 @@ export const PageColorPreview = (props: ColorSwatchProps) => {
 };
 
 export const pageColorPickerSlots = {
-    renderArea: (getFlags: Parameters<typeof PageColorAreaContent>[0]["flags"]) => (
-        <PageColorAreaContent flags={getFlags} size={() => AREA_SIZE} />
+    renderArea: (getRenderProps: Parameters<typeof PageColorAreaContent>[0]["renderProps"]) => (
+        <PageColorAreaContent renderProps={getRenderProps} size={() => AREA_SIZE} />
     ),
-    renderHue: (getFlags: Parameters<typeof PageHueSlider>[0]["flags"]) => <PageHueSlider flags={getFlags} />,
+    renderHue: (getRenderProps: Parameters<typeof PageHueSlider>[0]["renderProps"]) => (
+        <PageHueSlider renderProps={getRenderProps} />
+    ),
     renderPopup: (renderSurface: () => JSX.Element, hsvSignal: Signal<Color.HSVA>) => (
         <PageColorPickerPopup>
             <PageColorPreview value={() => Color.RGBA.toCss(Color.HSVA.toRgba(hsvSignal[0]()))} />

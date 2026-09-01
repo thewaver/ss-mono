@@ -353,7 +353,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                 isSelected: getRow().node.value === valueSignal[0](),
                 depth: getRow().depth,
             })}
-            renderControl={(setElementRef, getFlags) => (
+            renderControl={(setElementRef, getRenderProps) => (
                 <TreeNodeItem
                     ref={setElementRef}
                     id={() => getRowId(getRow())}
@@ -361,7 +361,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                     level={() => getRow().depth + 1}
                     position={() => getRow().position + 1}
                     setSize={() => getRow().setSize}
-                    flags={getFlags}
+                    flags={getRenderProps}
                     linkComponent={props.linkComponent}
                     renderContent={(getNodeFlags) => props.renderNode(() => getRow().node, getNodeFlags)}
                     onActivate={() => activate(getRow())}

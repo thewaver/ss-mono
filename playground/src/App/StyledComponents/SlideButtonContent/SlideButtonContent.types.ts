@@ -1,6 +1,6 @@
-import type { AccessorProps, InteractionFlags, SlideButtonFlags } from "@thewaver/ss-components";
+import type { AccessorProps, InteractionFlags, SlideButtonRenderProps } from "@thewaver/ss-components";
 
 export type SlideButtonContentProps = AccessorProps<{
-    flags: InteractionFlags<SlideButtonFlags>;
+    renderProps: InteractionFlags<SlideButtonRenderProps>;
     width?: number;
 }>;

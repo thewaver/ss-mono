@@ -15,15 +15,15 @@ export const HeldExample = (props: Props) => {
             <SlideButton
                 isPressed={props.isArmed}
                 thumbSize={() => SLIDE_BUTTON_THUMB_SIZE}
-                renderContent={(getFlags) => (
-                    <PageSlideButtonContent flags={getFlags}>Slide or hold to arm</PageSlideButtonContent>
+                renderContent={(getRenderProps) => (
+                    <PageSlideButtonContent renderProps={getRenderProps}>Slide or hold to arm</PageSlideButtonContent>
                 )}
                 onActivate={props.onActivate}
             />
 
             <Button
                 isDisabled={() => !access(props.isArmed)}
-                renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Reset</PageButtonContent>}
+                renderContent={(getRenderProps) => <PageButtonContent flags={getRenderProps}>Reset</PageButtonContent>}
                 onClick={props.onReset}
             />
         </PageControlColumn>

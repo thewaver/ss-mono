@@ -7,7 +7,7 @@ import type { TimeValue } from "@thewaver/ss-utils";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../InteractionWrapper/InteractionWrapper";
-import type { ClockFlags, ClockOption, ClockOptionProps, ClockProps, ClockSteps, ClockUnit } from "./Clock.types";
+import type { ClockOption, ClockOptionProps, ClockProps, ClockRenderProps, ClockSteps, ClockUnit } from "./Clock.types";
 import { ClockUtils } from "./Clock.utils";
 
 import * as styles from "./Clock.css";
@@ -228,18 +228,18 @@ export const Clock = (props: ClockProps) => {
                         sizing={"fill"}
                         isDisabled={() => getIsTimeDisabled(getOption().time)}
                         isTabbable={getIsHighlighted}
-                        extraFlags={(): ClockFlags => ({
+                        extraFlags={(): ClockRenderProps => ({
                             option: getOption(),
                             isSelected: getIsAt(valueSignal[0]()),
                             isNow: getIsAt(getNow()),
                             isHighlighted: getIsHighlighted(),
                         })}
                         ref={(element) => setOptionRef(getColumn().unit, optionIndex, element)}
-                        renderControl={(setElementRef, getFlags) => (
+                        renderControl={(setElementRef, getRenderProps) => (
                             <ClockOptionControl
                                 ref={setElementRef}
                                 id={() => `${groupId}-${getColumn().unit}-${optionIndex}`}
-                                flags={getFlags}
+                                flags={getRenderProps}
                                 ariaLabel={() => getOption().label}
                                 renderContent={(getOptionFlags) => props.renderOption(getOption, getOptionFlags)}
                                 onSelect={() => pick(getOption())}

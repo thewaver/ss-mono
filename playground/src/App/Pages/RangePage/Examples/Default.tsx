@@ -12,6 +12,6 @@ export const DefaultExample = (props: Props) => (
         valueSignal={props.valueSignal}
         ariaLabel={"Volume"}
         thumbSize={() => RANGE_THUMB_SIZE}
-        renderContent={(getFlags) => <PageRangeContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
     />
 );

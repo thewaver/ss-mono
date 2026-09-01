@@ -14,8 +14,8 @@ export const FilesExample = (props: Props) => {
             valueSignal={props.valueSignal}
             expandedSignal={props.expandedSignal}
             ariaLabel={"Repository"}
-            renderNode={(getNode, getFlags) => (
-                <PageTreeNodeContent flags={getFlags}>{getNode().value}</PageTreeNodeContent>
+            renderNode={(getNode, getRenderProps) => (
+                <PageTreeNodeContent renderProps={getRenderProps}>{getNode().value}</PageTreeNodeContent>
             )}
         />
     );

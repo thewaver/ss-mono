@@ -1,9 +1,9 @@
 import type {
     AccessorProps,
-    CarouselPickFlags,
+    CarouselPickRenderProps,
     CarouselRotationFlags,
     CarouselSlideState,
-    CarouselStepFlags,
+    CarouselStepRenderProps,
     InteractionFlags,
 } from "@thewaver/ss-components";
 
@@ -12,11 +12,11 @@ export type CarouselSlideProps = AccessorProps<{
 }>;
 
 export type CarouselStepProps = AccessorProps<{
-    flags: InteractionFlags<CarouselStepFlags>;
+    renderProps: InteractionFlags<CarouselStepRenderProps>;
 }>;
 
 export type CarouselPickProps = AccessorProps<{
-    flags: InteractionFlags<CarouselPickFlags>;
+    renderProps: InteractionFlags<CarouselPickRenderProps>;
 }>;
 
 export type CarouselRotationProps = AccessorProps<{

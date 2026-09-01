@@ -110,7 +110,7 @@ export const ViewportPage = () => {
                         id={"roamerX"}
                         ariaLabel={"Horizontal position"}
                         thumbSize={() => RANGE_THUMB_SIZE}
-                        renderContent={(getFlags) => <PageRangeContent flags={getFlags} />}
+                        renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
                     />
 
                     <div>Down</div>
@@ -119,7 +119,7 @@ export const ViewportPage = () => {
                         id={"roamerY"}
                         ariaLabel={"Vertical position"}
                         thumbSize={() => RANGE_THUMB_SIZE}
-                        renderContent={(getFlags) => <PageRangeContent flags={getFlags} />}
+                        renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
                     />
 
                     <div>Scale</div>
@@ -131,7 +131,7 @@ export const ViewportPage = () => {
                         max={() => SCALE_MAX}
                         step={() => SCALE_STEP}
                         thumbSize={() => RANGE_THUMB_SIZE}
-                        renderContent={(getFlags) => <PageRangeContent flags={getFlags} />}
+                        renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
                     />
                 </div>
 

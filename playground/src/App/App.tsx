@@ -60,6 +60,7 @@ import { TabsPage } from "./Pages/TabsPage/TabsPage";
 import { TagInputPage } from "./Pages/TagInputPage/TagInputPage";
 import { TextAreaPage } from "./Pages/TextAreaPage/TextAreaPage";
 import { TextInputPage } from "./Pages/TextInputPage/TextInputPage";
+import { TileBoardPage } from "./Pages/TileBoardPage/TileBoardPage";
 import { ToastsPage } from "./Pages/ToastsPage/ToastsPage";
 import { TogglePage } from "./Pages/TogglePage/TogglePage";
 import { TreePage } from "./Pages/TreePage/TreePage";
@@ -192,6 +193,12 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 component: () => <StaircasePage />,
             },
             {
+                name: "TileBoard",
+                description:
+                    "A board of tiles that interlock, and every built-in shape tessellates: the offset rows and short alternate row a hexagon or a lozenge needs, the half-tile overlap and turned-over neighbours a triangle needs, or neither for a square. The board owns the geometry and the keyboard — a transparent layer wearing the tile's own shape takes the pointer, so a press lands on the tile you can see rather than on its rectangle while a piece standing taller than its tile still hangs over the row above, and the arrows walk every tile whether it will take a press or not. What a tile looks like, and what it means, are the consumer's.",
+                component: () => <TileBoardPage />,
+            },
+            {
                 name: "TypeWriter",
                 description:
                     "Reveals text one character at a time without flattening it first, so a bold run or a nested element still animates in place.",
@@ -214,12 +221,6 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
     {
         name: "Fundamentals",
         components: [
-            /*
-            {
-                name: "AudioSwitcher",
-                component: () => null,
-            },
-            */
             {
                 name: "Accordion",
                 description:

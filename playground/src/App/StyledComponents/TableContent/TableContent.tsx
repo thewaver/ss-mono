@@ -29,17 +29,17 @@ export const PageTableHeaderContent = (props: ParentProps<TableHeaderContentProp
     <div
         class={[styles.tableHeaderContent, styles.alignVariants[access(props.align) ?? DEFAULT_ALIGN]].join(" ")}
         classList={{
-            [styles.isSortable]: access(props.flags).isSortable,
-            [styles.isSorted]: access(props.flags).sortDirection !== undefined,
-            [styles.isHovered]: access(props.flags).isHovered,
-            [styles.isDisabled]: access(props.flags).isDisabled,
+            [styles.isSortable]: access(props.renderProps).isSortable,
+            [styles.isSorted]: access(props.renderProps).sortDirection !== undefined,
+            [styles.isHovered]: access(props.renderProps).isHovered,
+            [styles.isDisabled]: access(props.renderProps).isDisabled,
         }}
     >
         <div class={styles.tableText}>{props.children}</div>
 
-        <Show when={access(props.flags).isSortable}>
+        <Show when={access(props.renderProps).isSortable}>
             <div class={styles.tableSortMarker} aria-hidden="true">
-                {getSortMarker(access(props.flags).sortDirection)}
+                {getSortMarker(access(props.renderProps).sortDirection)}
             </div>
         </Show>
     </div>
@@ -49,9 +49,9 @@ export const PageTableCellContent = (props: ParentProps<TableCellContentProps>) 
     <div
         class={[styles.tableCellContent, styles.alignVariants[access(props.align) ?? DEFAULT_ALIGN]].join(" ")}
         classList={{
-            [styles.isHovered]: access(props.flags).isHovered,
-            [styles.isSelected]: access(props.flags).isSelected,
-            [styles.isDisabled]: access(props.flags).isDisabled,
+            [styles.isHovered]: access(props.renderProps).isHovered,
+            [styles.isSelected]: access(props.renderProps).isSelected,
+            [styles.isDisabled]: access(props.renderProps).isDisabled,
         }}
     >
         <div class={styles.tableText}>{props.children}</div>
@@ -61,7 +61,9 @@ export const PageTableCellContent = (props: ParentProps<TableCellContentProps>) 
 export const PageTableResizer = (props: TableResizerProps) => (
     <div
         class={styles.tableResizerHandle}
-        classList={{ [styles.isResizing]: access(props.flags).isResizing }}
+        classList={{ [styles.isResizing]: access(props.renderProps).isResizing }}
         aria-hidden="true"
     />
 );
+
+export const PageTableMarker = () => <div class={styles.tableMarker} />;

@@ -4,7 +4,7 @@ import { access } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../InteractionWrapper/InteractionWrapper";
 import { FormFieldUtils } from "../FormField/FormField.utils";
 import { LabelUtils } from "../Label/Label.utils";
-import type { FileInputElementProps, FileInputFlags, FileInputProps } from "./FileInput.types";
+import type { FileInputElementProps, FileInputProps, FileInputRenderProps } from "./FileInput.types";
 
 import * as styles from "./FileInput.css";
 
@@ -84,8 +84,8 @@ export const FileInput = (props: FileInputProps) => {
     return (
         <InteractionWrapper
             {...props}
-            extraFlags={(): FileInputFlags => ({ files: props.filesSignal[0]() })}
-            renderControl={(setElementRef, getFlags) => (
+            extraFlags={(): FileInputRenderProps => ({ files: props.filesSignal[0]() })}
+            renderControl={(setElementRef, getRenderProps) => (
                 <FileInputElement
                     ref={setElementRef}
                     id={props.id}
@@ -93,7 +93,7 @@ export const FileInput = (props: FileInputProps) => {
                     ariaLabel={props.ariaLabel}
                     accept={props.accept}
                     isMultiple={props.isMultiple}
-                    flags={getFlags}
+                    flags={getRenderProps}
                     files={() => props.filesSignal[0]()}
                     renderContent={props.renderContent}
                     onChange={(files) => {

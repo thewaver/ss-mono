@@ -19,6 +19,6 @@ export const SteppedExample = (props: Props) => (
         max={() => MAX}
         step={() => STEP}
         thumbSize={() => RANGE_THUMB_SIZE}
-        renderContent={(getFlags) => <PageRangeContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
     />
 );

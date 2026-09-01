@@ -13,8 +13,8 @@ export const DefaultExample = (props: Props) => (
     <SlideButton
         thumbSize={() => SLIDE_BUTTON_THUMB_SIZE}
         progressSignal={props.progressSignal}
-        renderContent={(getFlags) => (
-            <PageSlideButtonContent flags={getFlags}>Slide or hold to send</PageSlideButtonContent>
+        renderContent={(getRenderProps) => (
+            <PageSlideButtonContent renderProps={getRenderProps}>Slide or hold to send</PageSlideButtonContent>
         )}
         onActivate={props.onActivate}
     />

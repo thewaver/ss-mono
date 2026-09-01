@@ -11,27 +11,27 @@ export type TableSort = {
 
 export type TableSelectionMode = "none" | "single" | "multiple";
 
-export type TableCellPosition = {
-    x: number;
-    y: number;
-};
-
-export type TableColumnFlags = {
+export type TableColumnRenderProps = {
     columnId: string;
-    columnIndex: number;
+    dataCol: number;
+    layoutCol: number;
     sortDirection: TableSortDirection | undefined;
     isSortable: boolean;
+    isReorderable: boolean;
     isResizable: boolean;
     isResizing: boolean;
+    isCarried: boolean;
     isFocused: boolean;
     isHovered: boolean;
     isDisabled: boolean;
 };
 
-export type TableCellFlags = {
+export type TableCellRenderProps = {
     columnId: string;
-    columnIndex: number;
-    rowIndex: number;
+    dataCol: number;
+    layoutCol: number;
+    dataRow: number;
+    layoutRow: number;
     isSelected: boolean;
     isFocused: boolean;
     isHovered: boolean;
@@ -46,9 +46,10 @@ export type TableColumn<T> = {
     maxWidthPx?: number;
     isSortable?: boolean;
     isResizable?: boolean;
+    isReorderable?: boolean;
     compare?: (a: T, b: T) => number;
-    renderHeader: (getFlags: () => TableColumnFlags) => JSX.Element;
-    renderCell: (getRow: Accessor<T>, getFlags: () => TableCellFlags) => JSX.Element;
+    renderHeader: (getRenderProps: () => TableColumnRenderProps) => JSX.Element;
+    renderCell: (getRow: Accessor<T>, getRenderProps: () => TableCellRenderProps) => JSX.Element;
 };
 
 export type TableProps<T> = AccessorProps<{
@@ -60,9 +61,12 @@ export type TableProps<T> = AccessorProps<{
     isDisabled?: boolean;
     sortSignal?: SignalSource<TableSort | undefined>;
     widthsSignal?: SignalSource<Record<string, number>>;
+    orderSignal?: SignalSource<string[]>;
     computeEstimatedRowHeight?: (index: number) => number;
-    renderResizer?: (getFlags: () => TableColumnFlags) => JSX.Element;
+    renderResizer?: (getRenderProps: () => TableColumnRenderProps) => JSX.Element;
+    renderMarker?: () => JSX.Element;
     onSortChange?: (sort: TableSort | undefined) => void;
+    onOrderChange?: (order: string[]) => void;
 }> & {
     columns: MaybeAccessor<TableColumn<T>[]>;
     rows: MaybeAccessor<T[]>;

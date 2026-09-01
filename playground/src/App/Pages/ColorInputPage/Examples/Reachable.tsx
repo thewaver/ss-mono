@@ -14,7 +14,7 @@ export const ReachableExample = (props: Props) => (
         isDisabled={true}
         isReachableWhenDisabled={true}
         ariaLabel={"Disabled but reachable colour"}
-        renderContent={(getFlags) => <PageColorInputContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageColorInputContent renderProps={getRenderProps} />}
         tooltipDefs={() => ({
             placement: () => ({ x: "center", y: "top-out" }),
             offset: () => ({ x: 0, y: 5 }),

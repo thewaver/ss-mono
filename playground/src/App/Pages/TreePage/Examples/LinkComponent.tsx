@@ -16,8 +16,8 @@ export const LinkComponentExample = (props: Props) => (
         expandedSignal={props.expandedSignal}
         ariaLabel={"Routed documentation"}
         linkComponent={PageTreeLink}
-        renderNode={(getNode, getFlags) => (
-            <PageTreeNodeContent flags={getFlags}>{getNode().value}</PageTreeNodeContent>
+        renderNode={(getNode, getRenderProps) => (
+            <PageTreeNodeContent renderProps={getRenderProps}>{getNode().value}</PageTreeNodeContent>
         )}
     />
 );

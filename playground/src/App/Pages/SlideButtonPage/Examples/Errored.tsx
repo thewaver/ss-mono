@@ -12,8 +12,8 @@ export const ErroredExample = (props: Props) => {
         <SlideButton
             hasError={props.hasError}
             thumbSize={() => SLIDE_BUTTON_THUMB_SIZE}
-            renderContent={(getFlags) => (
-                <PageSlideButtonContent flags={getFlags}>Slide or hold to retry</PageSlideButtonContent>
+            renderContent={(getRenderProps) => (
+                <PageSlideButtonContent renderProps={getRenderProps}>Slide or hold to retry</PageSlideButtonContent>
             )}
             onActivate={props.onActivate}
         />

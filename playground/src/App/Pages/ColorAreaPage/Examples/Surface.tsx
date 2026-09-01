@@ -14,7 +14,9 @@ export const SurfaceExample = (props: Props) => {
             sizing={"fill"}
             isDisabled={() => access(props.isDisabled) ?? false}
             ariaLabel={"Saturation and brightness"}
-            renderContent={(getFlags) => <PageColorAreaContent flags={getFlags} size={() => AREA_SIZE} />}
+            renderContent={(getRenderProps) => (
+                <PageColorAreaContent renderProps={getRenderProps} size={() => AREA_SIZE} />
+            )}
         />
     );
 };

@@ -15,18 +15,18 @@ export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) =>
         <div
             class={styles.treeNodeContent}
             style={{
-                "padding-left": `calc(${themeVars.spacing.half} + ${access(props.flags).depth * INDENT_PER_DEPTH}px)`,
+                "padding-left": `calc(${themeVars.spacing.half} + ${access(props.renderProps).depth * INDENT_PER_DEPTH}px)`,
             }}
             classList={{
-                [styles.isBranch]: access(props.flags).isBranch,
-                [styles.isExpanded]: access(props.flags).isExpanded,
-                [styles.isHovered]: access(props.flags).isHovered,
-                [styles.isSelected]: access(props.flags).isSelected,
-                [styles.isDisabled]: access(props.flags).isDisabled,
+                [styles.isBranch]: access(props.renderProps).isBranch,
+                [styles.isExpanded]: access(props.renderProps).isExpanded,
+                [styles.isHovered]: access(props.renderProps).isHovered,
+                [styles.isSelected]: access(props.renderProps).isSelected,
+                [styles.isDisabled]: access(props.renderProps).isDisabled,
             }}
         >
             <div class={styles.treeNodeMarker} aria-hidden="true">
-                {access(props.flags).isBranch ? "▶" : "·"}
+                {access(props.renderProps).isBranch ? "▶" : "·"}
             </div>
 
             <div>{props.children}</div>

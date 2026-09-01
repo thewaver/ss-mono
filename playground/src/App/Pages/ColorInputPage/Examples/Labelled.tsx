@@ -16,7 +16,7 @@ export const LabelledExample = (props: Props) => (
         <ColorInput
             {...pageColorPickerSlots}
             valueSignal={props.valueSignal}
-            renderContent={(getFlags) => <PageColorInputContent flags={getFlags} />}
+            renderContent={(getRenderProps) => <PageColorInputContent renderProps={getRenderProps} />}
         />
     </Label>
 );

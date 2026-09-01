@@ -38,35 +38,69 @@ const SIZED: TableColumn<Person> = {
 
 const namesOf = (rows: Person[]) => rows.map((row) => row.name).join(" ");
 
-describe("getSortedRows", () => {
-    it("orders by the column's own comparator", () => {
-        expect(namesOf(TableUtils.getSortedRows(ROWS, NAME, { columnId: "name", direction: "ascending" }))).toBe(
-            "Ada Alan Grace",
-        );
+describe("getSortedOrder", () => {
+    it("gives the positions the rows would take, ascending", () => {
+        expect(TableUtils.getSortedOrder(ROWS, NAME, { columnId: "name", direction: "ascending" })).toEqual([0, 2, 1]);
     });
 
-    it("reverses that comparator rather than asking for a second one", () => {
-        expect(namesOf(TableUtils.getSortedRows(ROWS, NAME, { columnId: "name", direction: "descending" }))).toBe(
-            "Grace Alan Ada",
-        );
+    it("gives them reversed when the direction is descending", () => {
+        expect(TableUtils.getSortedOrder(ROWS, NAME, { columnId: "name", direction: "descending" })).toEqual([1, 2, 0]);
     });
 
-    it("hands back the very same array when nothing is sorted, so no consumer re-renders on a copy", () => {
-        expect(TableUtils.getSortedRows(ROWS, NAME, undefined)).toBe(ROWS);
+    it("gives nothing when there is no sort, so the caller keeps the array it already had", () => {
+        expect(TableUtils.getSortedOrder(ROWS, NAME, undefined)).toBeUndefined();
     });
 
-    it("leaves the order alone when the column carries no comparator, which is what defers sorting to the consumer", () => {
-        expect(TableUtils.getSortedRows(ROWS, UNCOMPARED, { columnId: "notes", direction: "ascending" })).toBe(ROWS);
+    it("gives nothing for a column with no comparator, which is the server-sorted case", () => {
+        expect(
+            TableUtils.getSortedOrder(ROWS, UNCOMPARED, { columnId: "notes", direction: "ascending" }),
+        ).toBeUndefined();
     });
 
-    it("leaves the order alone when the sort names a different column", () => {
-        expect(TableUtils.getSortedRows(ROWS, NAME, { columnId: "age", direction: "ascending" })).toBe(ROWS);
+    it("gives nothing when the sort names a different column", () => {
+        expect(TableUtils.getSortedOrder(ROWS, NAME, { columnId: "age", direction: "ascending" })).toBeUndefined();
     });
 
-    it("does not disturb the array it was given", () => {
-        TableUtils.getSortedRows(ROWS, NAME, { columnId: "name", direction: "ascending" });
+    it("leaves the rows it was handed untouched", () => {
+        const before = namesOf(ROWS);
 
-        expect(namesOf(ROWS)).toBe("Ada Grace Alan");
+        TableUtils.getSortedOrder(ROWS, NAME, { columnId: "name", direction: "ascending" });
+
+        expect(namesOf(ROWS)).toBe(before);
+    });
+});
+
+describe("getColumnOrder", () => {
+    const COLUMNS = [NAME, { ...NAME, id: "age" }, UNCOMPARED];
+
+    it("gives the declared positions in the order the ids name them", () => {
+        expect(TableUtils.getColumnOrder(COLUMNS, ["notes", "name", "age"])).toEqual([2, 0, 1]);
+    });
+
+    it("gives nothing when the order is the declared one, so the caller keeps its array", () => {
+        expect(TableUtils.getColumnOrder(COLUMNS, ["name", "age", "notes"])).toBeUndefined();
+    });
+
+    it("gives nothing when no order was stored at all", () => {
+        expect(TableUtils.getColumnOrder(COLUMNS, [])).toBeUndefined();
+    });
+
+    it("puts a column the order does not name after the ones it does, in declared order", () => {
+        expect(TableUtils.getColumnOrder(COLUMNS, ["notes"])).toEqual([2, 0, 1]);
+    });
+
+    it("ignores an id that names no column", () => {
+        expect(TableUtils.getColumnOrder(COLUMNS, ["gone", "age"])).toEqual([1, 0, 2]);
+    });
+});
+
+describe("getReordered", () => {
+    it("hands back the very same array when there is no order to apply", () => {
+        expect(TableUtils.getReordered(ROWS, undefined)).toBe(ROWS);
+    });
+
+    it("reads the entries through the order it was given", () => {
+        expect(namesOf(TableUtils.getReordered(ROWS, [1, 2, 0]))).toBe("Grace Alan Ada");
     });
 });
 

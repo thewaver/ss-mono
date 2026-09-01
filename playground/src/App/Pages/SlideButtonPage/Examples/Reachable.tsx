@@ -13,8 +13,8 @@ export const ReachableExample = (props: Props) => (
         isDisabled={true}
         isReachableWhenDisabled={true}
         thumbSize={() => SLIDE_BUTTON_THUMB_SIZE}
-        renderContent={(getFlags) => (
-            <PageSlideButtonContent flags={getFlags}>Slide or hold to send</PageSlideButtonContent>
+        renderContent={(getRenderProps) => (
+            <PageSlideButtonContent renderProps={getRenderProps}>Slide or hold to send</PageSlideButtonContent>
         )}
         tooltipDefs={() => ({
             placement: () => ({ x: "center", y: "top-out" }),

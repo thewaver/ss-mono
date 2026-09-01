@@ -1,8 +1,8 @@
-import type { AccessorProps, InteractionActivation, InteractionFlags } from "@thewaver/ss-components";
+import type { AccessorProps, InteractionActivation } from "@thewaver/ss-components";
 
 export type RippleMark = InteractionActivation;
 
 export type RippleProps = AccessorProps<{
-    flags: InteractionFlags;
+    activation: InteractionActivation | undefined;
     color?: string;
 }>;

@@ -1,18 +1,21 @@
 import type { Accessor } from "solid-js";
 import { For, Index, Show, createMemo, createSignal, createUniqueId } from "solid-js";
 
-import { MathUtils } from "@thewaver/ss-utils";
+import { type Count2d, MathUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
+import type { CarrierZone } from "../../Abstracts/Carrier/Carrier.types";
+import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
+import { CarrierStack } from "../../Abstracts/Carrier/CarrierStack";
+import { LiveAnnouncer } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { Virtualizer } from "../../Abstracts/Virtualizer/Virtualizer";
 import type { VirtualizerRow } from "../../Abstracts/Virtualizer/Virtualizer.types";
 import { access } from "../../Utils/propUtils";
 import type {
-    TableCellFlags,
-    TableCellPosition,
+    TableCellRenderProps,
     TableColumn,
-    TableColumnFlags,
+    TableColumnRenderProps,
     TableProps,
     TableSelectionMode,
 } from "./Table.types";
@@ -31,6 +34,7 @@ const NO_RESIZING = "";
 
 const EMPTY_PINNED_ROWS: number[] = [];
 const EMPTY_WIDTHS: Record<string, number> = {};
+const EMPTY_ORDER: string[] = [];
 const EMPTY_SELECTION: never[] = [];
 
 const INTERACTIVE_SELECTOR =
@@ -40,12 +44,21 @@ export const Table = <T,>(props: TableProps<T>) => {
     const tableId = createUniqueId();
 
     const [getBodyRef, setBodyRef] = createSignal<HTMLElement>();
-    const [getFocusedCell, setFocusedCell] = createSignal<TableCellPosition>({ x: 0, y: HEADER_ROW_INDEX });
+    const [getHeaderRef, setHeaderRef] = createSignal<HTMLElement>();
+    const [getFocusedCell, setFocusedCell] = createSignal<Count2d>({ row: HEADER_ROW_INDEX, col: 0 });
     const [getHoveredRow, setHoveredRow] = createSignal<number>();
     const [getHoveredColumn, setHoveredColumn] = createSignal<number>();
     const [getResizingColumnId, setResizingColumnId] = createSignal(NO_RESIZING);
 
-    const getColumns = createMemo(() => access(props.columns));
+    const getDeclaredColumns = createMemo(() => access(props.columns));
+
+    const getColumnOrder = createMemo(() =>
+        TableUtils.getColumnOrder(getDeclaredColumns(), props.orderSignal?.[0]() ?? EMPTY_ORDER),
+    );
+
+    const getColumns = createMemo(() => TableUtils.getReordered(getDeclaredColumns(), getColumnOrder()));
+
+    const getDataCol = (layoutCol: number) => getColumnOrder()?.[layoutCol] ?? layoutCol;
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
@@ -65,7 +78,11 @@ export const Table = <T,>(props: TableProps<T>) => {
         return sort === undefined ? undefined : getColumns().find((column) => column.id === sort.columnId);
     });
 
-    const getRows = createMemo(() => TableUtils.getSortedRows(access(props.rows), getSortedColumn(), getSort()));
+    const getRowOrder = createMemo(() => TableUtils.getSortedOrder(access(props.rows), getSortedColumn(), getSort()));
+
+    const getRows = createMemo(() => TableUtils.getReordered(access(props.rows), getRowOrder()));
+
+    const getDataRow = (layoutRow: number) => getRowOrder()?.[layoutRow] ?? layoutRow;
 
     const getTemplate = createMemo(() => TableUtils.getColumnTemplate(getColumns(), getWidths()));
 
@@ -80,8 +97,8 @@ export const Table = <T,>(props: TableProps<T>) => {
         if (grid.width < 1) return cell;
 
         return {
-            x: MathUtils.clamp(cell.x, 0, grid.width - 1),
-            y: MathUtils.clamp(cell.y, HEADER_ROW_INDEX, grid.height - 1),
+            row: MathUtils.clamp(cell.row, HEADER_ROW_INDEX, grid.height - 1),
+            col: MathUtils.clamp(cell.col, 0, grid.width - 1),
         };
     });
 
@@ -91,22 +108,22 @@ export const Table = <T,>(props: TableProps<T>) => {
         getPinnedRows: () => {
             const cell = getRovingCell();
 
-            return cell.y === HEADER_ROW_INDEX ? EMPTY_PINNED_ROWS : [cell.y - 1];
+            return cell.row === HEADER_ROW_INDEX ? EMPTY_PINNED_ROWS : [cell.row - 1];
         },
     });
 
-    const getCellId = (cell: TableCellPosition) => `${tableId}-cell-${cell.y}-${cell.x}`;
+    const getCellId = (cell: Count2d) => `${tableId}-cell-${cell.row}-${cell.col}`;
 
-    const getIsRoving = (cell: TableCellPosition) => {
+    const getIsRoving = (cell: Count2d) => {
         const roving = getRovingCell();
 
-        return roving.x === cell.x && roving.y === cell.y;
+        return roving.col === cell.col && roving.row === cell.row;
     };
 
-    const focusCell = (cell: TableCellPosition) => {
+    const focusCell = (cell: Count2d) => {
         setFocusedCell(cell);
 
-        if (cell.y > HEADER_ROW_INDEX && rowWindow.getIsLive()) rowWindow.scrollToRow(cell.y - 1);
+        if (cell.row > HEADER_ROW_INDEX && rowWindow.getIsLive()) rowWindow.scrollToRow(cell.row - 1);
 
         document.getElementById(getCellId(cell))?.focus();
     };
@@ -168,7 +185,7 @@ export const Table = <T,>(props: TableProps<T>) => {
 
     const getCurrentWidth = (column: TableColumn<T>, columnIndex: number) =>
         TableUtils.getColumnWidth(column, getWidths()) ??
-        document.getElementById(getCellId({ x: columnIndex, y: HEADER_ROW_INDEX }))?.offsetWidth ??
+        document.getElementById(getCellId({ row: HEADER_ROW_INDEX, col: columnIndex }))?.offsetWidth ??
         0;
 
     const getIsResizable = (column: TableColumn<T>) =>
@@ -213,13 +230,93 @@ export const Table = <T,>(props: TableProps<T>) => {
         setResizingColumnId(NO_RESIZING);
     };
 
+    const getIsReorderable = (column: TableColumn<T> | undefined) =>
+        column !== undefined && (column.isReorderable ?? false) && props.orderSignal !== undefined;
+
+    const moveColumn = (fromIndex: number, toIndex: number) => {
+        const columns = getColumns();
+
+        if (!getIsReorderable(columns[fromIndex]) || getIsDisabled()) return;
+        if (toIndex < 0 || toIndex >= columns.length) return;
+
+        const next = CarrierUtils.computeMovedOrder(
+            columns.map((column) => column.id),
+            fromIndex,
+            toIndex,
+        );
+
+        props.orderSignal?.[1](next);
+
+        void props.onOrderChange?.(next);
+    };
+
+    const zone: CarrierZone = {
+        getGroupId: () => tableId,
+        getLabel: () => access(props.ariaLabel) ?? "",
+        getRootRef: getHeaderRef,
+        getDir: () => "row",
+        getIsDisabled: () => getIsDisabled() || props.orderSignal === undefined,
+        getLength: () => getColumns().length,
+        getItemRects: () =>
+            getColumns().reduce<DOMRect[]>((acc, _unused, columnIndex) => {
+                const element = document.getElementById(getCellId({ row: HEADER_ROW_INDEX, col: columnIndex }));
+
+                if (element) acc.push(element.getBoundingClientRect());
+
+                return acc;
+            }, []),
+        computeCanAccept: () => !getIsDisabled() && props.orderSignal !== undefined,
+        takeAt: () => undefined,
+        putAt: () => undefined,
+        moveAt: moveColumn,
+    };
+
+    CarrierStack.registerZone(zone);
+
+    const getCarriedColumnId = createMemo(() =>
+        CarrierStack.getSourceZone() === zone ? CarrierStack.getCarry()?.key : undefined,
+    );
+
+    const getLandingCol = createMemo(() => {
+        const settledIndex = CarrierStack.getTargetIndex();
+
+        if (CarrierStack.getTargetZone() !== zone || settledIndex === undefined) return;
+
+        return CarrierUtils.computeMarkerIndex(settledIndex, CarrierStack.getSourceIndex() ?? 0, true);
+    });
+
+    let hasCarriedClick = false;
+
+    const handleHeaderPointerDown = (e: PointerEvent, columnIndex: number) => {
+        const column = getColumns()[columnIndex];
+
+        if (e.button !== 0 || getIsDisabled() || !getIsReorderable(column)) return;
+        if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
+        if (CarrierStack.getCarry()) return;
+
+        CarrierStack.dragFromPointer(
+            e.currentTarget as HTMLElement,
+            e,
+            () =>
+                CarrierStack.start(
+                    zone,
+                    columnIndex,
+                    { groupId: tableId, key: column.id, label: column.header, value: column.id },
+                    "drag",
+                ),
+            () => {
+                hasCarriedClick = true;
+            },
+        );
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
         const grid = getGrid();
 
         if (grid.width < 1 || getIsDisabled()) return;
 
         const from = getRovingCell();
-        const column = getColumns()[from.x];
+        const column = getColumns()[from.col];
 
         if (e.key === "a" && (e.ctrlKey || e.metaKey)) {
             e.preventDefault();
@@ -232,12 +329,14 @@ export const Table = <T,>(props: TableProps<T>) => {
         if (e.ctrlKey && (e.key === "Home" || e.key === "End")) {
             e.preventDefault();
 
-            focusCell(e.key === "Home" ? { x: 0, y: HEADER_ROW_INDEX } : { x: grid.width - 1, y: grid.height - 1 });
+            focusCell(
+                e.key === "Home" ? { row: HEADER_ROW_INDEX, col: 0 } : { row: grid.height - 1, col: grid.width - 1 },
+            );
 
             return;
         }
 
-        if (from.y === HEADER_ROW_INDEX) {
+        if (from.row === HEADER_ROW_INDEX) {
             if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
 
@@ -251,12 +350,29 @@ export const Table = <T,>(props: TableProps<T>) => {
 
                 const step = access(props.resizeStepPx) ?? DEFAULT_RESIZE_STEP_PX;
 
-                resizeColumn(column, getCurrentWidth(column, from.x) + (e.key === "ArrowLeft" ? -step : step));
+                resizeColumn(column, getCurrentWidth(column, from.col) + (e.key === "ArrowLeft" ? -step : step));
+
+                return;
+            }
+
+            if (e.shiftKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+                e.preventDefault();
+
+                if (!getIsReorderable(column)) return;
+
+                const to = from.col + (e.key === "ArrowLeft" ? -1 : 1);
+
+                if (to < 0 || to >= grid.width) return;
+
+                moveColumn(from.col, to);
+                focusCell({ row: HEADER_ROW_INDEX, col: to });
+
+                LiveAnnouncer.announce(`${column.header} moved to column ${to + FIRST_ARIA_INDEX} of ${grid.width}.`);
 
                 return;
             }
         } else {
-            const rowIndex = from.y - 1;
+            const rowIndex = from.row - 1;
 
             if (e.key === "Enter") {
                 e.preventDefault();
@@ -275,7 +391,7 @@ export const Table = <T,>(props: TableProps<T>) => {
             }
         }
 
-        const next = NavigatorUtils.computeNextCell(e.key, from, grid, {
+        const next = NavigatorUtils.computeNextCell(e.key, { x: from.col, y: from.row }, grid, {
             pageRows: access(props.pageRows) ?? DEFAULT_PAGE_ROWS,
         });
 
@@ -284,16 +400,16 @@ export const Table = <T,>(props: TableProps<T>) => {
         e.preventDefault();
 
         const cell = {
-            x: MathUtils.clamp(next.x, 0, grid.width - 1),
-            y: MathUtils.clamp(next.y, HEADER_ROW_INDEX, grid.height - 1),
+            row: MathUtils.clamp(next.y, HEADER_ROW_INDEX, grid.height - 1),
+            col: MathUtils.clamp(next.x, 0, grid.width - 1),
         };
 
         focusCell(cell);
 
-        if (e.shiftKey && cell.y > HEADER_ROW_INDEX) selectRow(cell.y - 1, { isExtending: true });
+        if (e.shiftKey && cell.row > HEADER_ROW_INDEX) selectRow(cell.row - 1, { isExtending: true });
     };
 
-    const handleCellClick = (e: MouseEvent, cell: TableCellPosition) => {
+    const handleCellClick = (e: MouseEvent, cell: Count2d) => {
         if (getIsDisabled()) return;
 
         const interactive = (e.target as HTMLElement).closest(INTERACTIVE_SELECTOR);
@@ -302,43 +418,48 @@ export const Table = <T,>(props: TableProps<T>) => {
 
         focusCell(cell);
 
-        if (cell.y === HEADER_ROW_INDEX) {
-            toggleSort(getColumns()[cell.x]);
+        if (cell.row === HEADER_ROW_INDEX) {
+            toggleSort(getColumns()[cell.col]);
 
             return;
         }
 
-        selectRow(cell.y - 1, { isToggling: e.ctrlKey || e.metaKey, isExtending: e.shiftKey });
+        selectRow(cell.row - 1, { isToggling: e.ctrlKey || e.metaKey, isExtending: e.shiftKey });
     };
 
-    const getColumnFlags = (columnIndex: number): TableColumnFlags => {
-        const column = getColumns()[columnIndex];
+    const getColumnRenderProps = (layoutCol: number): TableColumnRenderProps => {
+        const column = getColumns()[layoutCol];
         const sort = getSort();
         const roving = getRovingCell();
 
         return {
             columnId: column.id,
-            columnIndex,
+            dataCol: getDataCol(layoutCol),
+            layoutCol,
             sortDirection: sort?.columnId === column.id ? sort.direction : undefined,
             isSortable: column.isSortable ?? false,
+            isReorderable: getIsReorderable(column),
             isResizable: getIsResizable(column),
             isResizing: getResizingColumnId() === column.id,
-            isFocused: roving.y === HEADER_ROW_INDEX && roving.x === columnIndex,
-            isHovered: getHoveredColumn() === columnIndex,
+            isCarried: getCarriedColumnId() === column.id,
+            isFocused: roving.row === HEADER_ROW_INDEX && roving.col === layoutCol,
+            isHovered: getHoveredColumn() === layoutCol,
             isDisabled: getIsDisabled(),
         };
     };
 
-    const getCellFlags = (columnIndex: number, rowIndex: number): TableCellFlags => {
+    const getCellRenderProps = (layoutCol: number, layoutRow: number): TableCellRenderProps => {
         const roving = getRovingCell();
 
         return {
-            columnId: getColumns()[columnIndex].id,
-            columnIndex,
-            rowIndex,
-            isSelected: getSelection().includes(getRows()[rowIndex]),
-            isFocused: roving.y === rowIndex + 1 && roving.x === columnIndex,
-            isHovered: getHoveredRow() === rowIndex,
+            columnId: getColumns()[layoutCol].id,
+            dataCol: getDataCol(layoutCol),
+            layoutCol,
+            dataRow: getDataRow(layoutRow),
+            layoutRow,
+            isSelected: getSelection().includes(getRows()[layoutRow]),
+            isFocused: roving.row === layoutRow + 1 && roving.col === layoutCol,
+            isHovered: getHoveredRow() === layoutRow,
             isDisabled: getIsDisabled(),
         };
     };
@@ -353,13 +474,21 @@ export const Table = <T,>(props: TableProps<T>) => {
             onPointerCancel={(e) => handleResizerPointerUp(e, getColumn())}
             onClick={(e) => e.stopPropagation()}
         >
-            {props.renderResizer?.(() => getColumnFlags(columnIndex))}
+            {props.renderResizer?.(() => getColumnRenderProps(columnIndex))}
         </div>
     );
 
+    const renderMarker = (columnIndex: number) => (
+        <Show when={getLandingCol() === columnIndex}>
+            <div class={columnIndex < getColumns().length ? styles.tableMarkerBefore : styles.tableMarkerAfter}>
+                {props.renderMarker?.()}
+            </div>
+        </Show>
+    );
+
     const renderHeaderCell = (getColumn: Accessor<TableColumn<T>>, columnIndex: number) => {
-        const cell = { x: columnIndex, y: HEADER_ROW_INDEX };
-        const getFlags = () => getColumnFlags(columnIndex);
+        const cell = { row: HEADER_ROW_INDEX, col: columnIndex };
+        const getRenderProps = () => getColumnRenderProps(columnIndex);
 
         return (
             <div
@@ -367,16 +496,29 @@ export const Table = <T,>(props: TableProps<T>) => {
                 class={styles.tableCell}
                 role="columnheader"
                 aria-colindex={columnIndex + FIRST_ARIA_INDEX}
-                aria-sort={getColumn().isSortable === true ? (getFlags().sortDirection ?? "none") : undefined}
+                aria-sort={getColumn().isSortable === true ? (getRenderProps().sortDirection ?? "none") : undefined}
                 aria-disabled={getIsDisabled() || undefined}
                 tabindex={getIsRoving(cell) ? 0 : -1}
-                onClick={(e) => handleCellClick(e, cell)}
+                onPointerDown={(e) => handleHeaderPointerDown(e, columnIndex)}
+                onClick={(e) => {
+                    if (hasCarriedClick) {
+                        hasCarriedClick = false;
+
+                        return;
+                    }
+
+                    handleCellClick(e, cell);
+                }}
                 onPointerEnter={() => setHoveredColumn(columnIndex)}
                 onPointerLeave={() => setHoveredColumn(undefined)}
             >
-                {getColumn().renderHeader(getFlags)}
+                {getColumn().renderHeader(getRenderProps)}
 
-                <Show when={getFlags().isResizable}>{renderResizer(getColumn, columnIndex)}</Show>
+                <Show when={getRenderProps().isResizable}>{renderResizer(getColumn, columnIndex)}</Show>
+
+                {renderMarker(columnIndex)}
+
+                <Show when={columnIndex === getColumns().length - 1}>{renderMarker(getColumns().length)}</Show>
             </div>
         );
     };
@@ -387,7 +529,7 @@ export const Table = <T,>(props: TableProps<T>) => {
         columnIndex: number,
         rowIndex: number,
     ) => {
-        const cell = { x: columnIndex, y: rowIndex + 1 };
+        const cell = { row: rowIndex + 1, col: columnIndex };
 
         return (
             <div
@@ -399,7 +541,7 @@ export const Table = <T,>(props: TableProps<T>) => {
                 tabindex={getIsRoving(cell) ? 0 : -1}
                 onClick={(e) => handleCellClick(e, cell)}
             >
-                {getColumn().renderCell(getRow, () => getCellFlags(columnIndex, rowIndex))}
+                {getColumn().renderCell(getRow, () => getCellRenderProps(columnIndex, rowIndex))}
             </div>
         );
     };
@@ -447,7 +589,7 @@ export const Table = <T,>(props: TableProps<T>) => {
             })}
             onKeyDown={handleKeyDown}
         >
-            <div class={styles.tableHeader} role="rowgroup">
+            <div ref={setHeaderRef} class={styles.tableHeader} role="rowgroup">
                 <div class={styles.tableRow} role="row" aria-rowindex={FIRST_ARIA_INDEX}>
                     <Index each={getColumns()}>{renderHeaderCell}</Index>
                 </div>

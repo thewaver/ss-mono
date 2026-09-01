@@ -57,7 +57,7 @@ export const PickedExample = (props: Props) => {
             renderTrigger={(getIsOpen, onToggle) => (
                 <PageDatePickerTrigger key={props.key} isOpen={getIsOpen} onToggle={onToggle} />
             )}
-            renderDay={(_unused, getFlags) => <PageCalendarDay flags={getFlags} />}
+            renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}
             renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
             renderPopup={(renderCalendar, monthSignal) => (
                 <PageCalendarFrame>
@@ -84,7 +84,7 @@ export const PickedExample = (props: Props) => {
                     />
                 </>
             )}
-            renderOption={(_unused, getFlags) => <PageClockOption flags={getFlags} />}
+            renderOption={(_unused, getRenderProps) => <PageClockOption renderProps={getRenderProps} />}
             renderUnit={(name) => <PageClockUnit>{name}</PageClockUnit>}
             renderColumn={(renderOptions) => <PageClockColumn>{renderOptions()}</PageClockColumn>}
             renderTimePopup={(renderClock) => <PageClockFrame>{renderClock()}</PageClockFrame>}

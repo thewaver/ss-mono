@@ -4,7 +4,7 @@ import type {
     InteractionWrapperProps,
 } from "../../InteractionWrapper/InteractionWrapper.types";
 
-export type FileInputFlags = {
+export type FileInputRenderProps = {
     files: File[];
 };
 
@@ -22,13 +22,13 @@ export type FileInputState = {
 };
 
 export type FileInputElementProps = AccessorProps<
-    FileInputCbs & InteractionControlProps<FileInputFlags> & FileInputState & { files: File[] }
+    FileInputCbs & InteractionControlProps<FileInputRenderProps> & FileInputState & { files: File[] }
 >;
 
-export type FileInputProps = Omit<InteractionWrapperProps<FileInputFlags>, "renderControl" | "extraFlags"> &
+export type FileInputProps = Omit<InteractionWrapperProps<FileInputRenderProps>, "renderControl" | "extraFlags"> &
     AccessorProps<
         FileInputCbs &
-            Pick<InteractionControlProps<FileInputFlags>, "id" | "renderContent"> &
+            Pick<InteractionControlProps<FileInputRenderProps>, "id" | "renderContent"> &
             FileInputState & {
                 filesSignal: SignalSource<File[]>;
             }

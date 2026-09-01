@@ -24,12 +24,12 @@ export type CarouselSlideState = {
     isCurrent: boolean;
 };
 
-export type CarouselStepFlags = {
+export type CarouselStepRenderProps = {
     step: CarouselStep;
     targetIndex: number;
 };
 
-export type CarouselPickFlags = {
+export type CarouselPickRenderProps = {
     index: number;
     isCurrent: boolean;
 };
@@ -75,8 +75,14 @@ export type CarouselSlots<T> = {
     indexSignal?: SignalSource<number>;
     playingSignal?: SignalSource<boolean>;
     renderSlide: (getSlide: Accessor<T>, getState: Accessor<CarouselSlideState>) => JSX.Element;
-    renderStep?: (getStep: Accessor<CarouselStep>, getFlags: () => InteractionFlags<CarouselStepFlags>) => JSX.Element;
-    renderPick?: (getIndex: Accessor<number>, getFlags: () => InteractionFlags<CarouselPickFlags>) => JSX.Element;
+    renderStep?: (
+        getStep: Accessor<CarouselStep>,
+        getRenderProps: () => InteractionFlags<CarouselStepRenderProps>,
+    ) => JSX.Element;
+    renderPick?: (
+        getIndex: Accessor<number>,
+        getRenderProps: () => InteractionFlags<CarouselPickRenderProps>,
+    ) => JSX.Element;
     renderRotationControl?: (getFlags: () => InteractionFlags<CarouselRotationFlags>) => JSX.Element;
     renderControls?: (controls: CarouselControls) => JSX.Element;
     onIndexChange?: (index: number) => void;

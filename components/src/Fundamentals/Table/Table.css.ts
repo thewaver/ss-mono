@@ -36,6 +36,17 @@ export const tableCell = style({
     minWidth: 0,
 });
 
+const tableMarker = style({
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    pointerEvents: "none",
+});
+
+export const tableMarkerBefore = style([tableMarker, { left: 0 }]);
+
+export const tableMarkerAfter = style([tableMarker, { right: 0 }]);
+
 export const tableResizer = style({
     position: "absolute",
     top: 0,

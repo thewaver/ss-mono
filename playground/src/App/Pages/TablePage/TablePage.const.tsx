@@ -45,10 +45,13 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
         maxWidthPx: 260,
         isSortable: true,
         isResizable: defs.isResizable,
+        isReorderable: defs.isReorderable,
         compare: (a, b) => a.sku.localeCompare(b.sku),
-        renderHeader: (getFlags) => <PageTableHeaderContent flags={getFlags}>{"SKU"}</PageTableHeaderContent>,
-        renderCell: (getPart, getFlags) => (
-            <PageTableCellContent flags={getFlags}>{getPart().sku}</PageTableCellContent>
+        renderHeader: (getRenderProps) => (
+            <PageTableHeaderContent renderProps={getRenderProps}>{"SKU"}</PageTableHeaderContent>
+        ),
+        renderCell: (getPart, getRenderProps) => (
+            <PageTableCellContent renderProps={getRenderProps}>{getPart().sku}</PageTableCellContent>
         ),
     },
     {
@@ -57,10 +60,13 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
         minWidthPx: 140,
         isSortable: true,
         isResizable: defs.isResizable,
+        isReorderable: defs.isReorderable,
         compare: (a, b) => a.name.localeCompare(b.name),
-        renderHeader: (getFlags) => <PageTableHeaderContent flags={getFlags}>{"Name"}</PageTableHeaderContent>,
-        renderCell: (getPart, getFlags) => (
-            <PageTableCellContent flags={getFlags}>{getPart().name}</PageTableCellContent>
+        renderHeader: (getRenderProps) => (
+            <PageTableHeaderContent renderProps={getRenderProps}>{"Name"}</PageTableHeaderContent>
+        ),
+        renderCell: (getPart, getRenderProps) => (
+            <PageTableCellContent renderProps={getRenderProps}>{getPart().name}</PageTableCellContent>
         ),
     },
     {
@@ -71,10 +77,13 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
         maxWidthPx: 240,
         isSortable: true,
         isResizable: defs.isResizable,
+        isReorderable: defs.isReorderable,
         compare: (a, b) => a.category.localeCompare(b.category),
-        renderHeader: (getFlags) => <PageTableHeaderContent flags={getFlags}>{"Category"}</PageTableHeaderContent>,
-        renderCell: (getPart, getFlags) => (
-            <PageTableCellContent flags={getFlags}>{getPart().category}</PageTableCellContent>
+        renderHeader: (getRenderProps) => (
+            <PageTableHeaderContent renderProps={getRenderProps}>{"Category"}</PageTableHeaderContent>
+        ),
+        renderCell: (getPart, getRenderProps) => (
+            <PageTableCellContent renderProps={getRenderProps}>{getPart().category}</PageTableCellContent>
         ),
     },
     {
@@ -85,14 +94,15 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
         maxWidthPx: 200,
         isSortable: true,
         isResizable: defs.isResizable,
+        isReorderable: defs.isReorderable,
         compare: (a, b) => a.stock - b.stock,
-        renderHeader: (getFlags) => (
-            <PageTableHeaderContent flags={getFlags} align={"end"}>
+        renderHeader: (getRenderProps) => (
+            <PageTableHeaderContent renderProps={getRenderProps} align={"end"}>
                 {"In stock"}
             </PageTableHeaderContent>
         ),
-        renderCell: (getPart, getFlags) => (
-            <PageTableCellContent flags={getFlags} align={"end"}>
+        renderCell: (getPart, getRenderProps) => (
+            <PageTableCellContent renderProps={getRenderProps} align={"end"}>
                 {getPart().stock.toLocaleString("en-GB")}
             </PageTableCellContent>
         ),
@@ -105,14 +115,15 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
         maxWidthPx: 220,
         isSortable: true,
         isResizable: defs.isResizable,
+        isReorderable: defs.isReorderable,
         compare: (a, b) => a.pricePence - b.pricePence,
-        renderHeader: (getFlags) => (
-            <PageTableHeaderContent flags={getFlags} align={"end"}>
+        renderHeader: (getRenderProps) => (
+            <PageTableHeaderContent renderProps={getRenderProps} align={"end"}>
                 {"Price"}
             </PageTableHeaderContent>
         ),
-        renderCell: (getPart, getFlags) => (
-            <PageTableCellContent flags={getFlags} align={"end"}>
+        renderCell: (getPart, getRenderProps) => (
+            <PageTableCellContent renderProps={getRenderProps} align={"end"}>
                 {formatPrice(getPart().pricePence)}
             </PageTableCellContent>
         ),

@@ -15,7 +15,7 @@ export const ReachableExample = (props: Props) => (
         isDisabled={true}
         isReachableWhenDisabled={true}
         thumbSize={() => RANGE_THUMB_SIZE}
-        renderContent={(getFlags) => <PageRangeContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
         tooltipDefs={() => ({
             placement: () => ({ x: "center", y: "top-out" }),
             offset: () => ({ x: 0, y: 5 }),

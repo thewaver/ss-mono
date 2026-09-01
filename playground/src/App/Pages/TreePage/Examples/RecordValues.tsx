@@ -12,8 +12,8 @@ export const RecordValuesExample = (props: Props) => (
         valueSignal={props.valueSignal}
         expandedSignal={props.expandedSignal}
         ariaLabel={"Assets"}
-        renderNode={(getNode, getFlags) => (
-            <PageTreeNodeContent flags={getFlags} detail={() => getNode().value.kind}>
+        renderNode={(getNode, getRenderProps) => (
+            <PageTreeNodeContent renderProps={getRenderProps} detail={() => getNode().value.kind}>
                 {getNode().value.name}
             </PageTreeNodeContent>
         )}

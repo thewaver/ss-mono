@@ -1,6 +1,8 @@
 import { expect, test } from "@playwright/test";
 
-import { demo, readout } from "./helpers";
+import { demo, inputValue, readout } from "./helpers";
+
+const DAYS_APART = 4;
 
 const PICKED = demo("picked");
 const BOUNDED = demo("bounded");
@@ -86,11 +88,21 @@ test("a span picked in the calendar fills both fields", async ({ page }) => {
 
     await expect(grid).toBeVisible();
 
-    await grid.locator('[role="gridcell"][aria-label="10 August 2026"]').click();
-    await grid.locator('[role="gridcell"][aria-label="14 August 2026"]').click();
+    const days = grid.locator('[role="gridcell"]:not([aria-disabled="true"])');
 
-    await expect(page.locator(field(PICKED, 0)), "the start field takes the earlier end").toHaveValue("2026-08-10");
-    await expect(page.locator(field(PICKED, 1)), "and the end field takes the later one").toHaveValue("2026-08-14");
+    expect(await days.count(), "the open month offers days to pick between").toBeGreaterThan(DAYS_APART);
+
+    await days.nth(0).click();
+    await days.nth(DAYS_APART).click();
+
+    const start = await inputValue(page.locator(field(PICKED, 0)));
+    const end = await inputValue(page.locator(field(PICKED, 1)));
+
+    expect(start, "the start field takes an end of the span").not.toBe("");
+    expect(end.localeCompare(start), "and the later click lands in the end field").toBeGreaterThan(0);
+    expect(await readout(page, "picked"), "the owner holds the span the two fields show").toContain(
+        `${start} to ${end}`,
+    );
 });
 
 test("a bounded picker refuses a day outside its range", async ({ page }) => {
@@ -100,9 +112,13 @@ test("a bounded picker refuses a day outside its range", async ({ page }) => {
 
     await expect(grid).toBeVisible();
 
-    await grid.locator('[role="gridcell"][aria-label="1 August 2026"]').dispatchEvent("click");
+    const refused = grid.locator('[role="gridcell"][aria-disabled="true"]').first();
+
+    await expect(refused, "the calendar marks the days its own bounds exclude").toBeAttached();
+
+    await refused.dispatchEvent("click");
 
     await expect
-        .poll(() => readout(page, "bounded"), { message: "a day before the minimum starts nothing" })
+        .poll(() => readout(page, "bounded"), { message: "a day outside the bounds starts nothing" })
         .toContain("none");
 });

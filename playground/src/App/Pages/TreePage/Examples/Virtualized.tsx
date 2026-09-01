@@ -19,8 +19,8 @@ export const VirtualizedExample = (props: Props) => {
                 expandedSignal={props.expandedSignal}
                 ariaLabel={"Generated repository"}
                 computeEstimatedNodeHeight={() => STRESS_NODE_HEIGHT}
-                renderNode={(getNode, getFlags) => (
-                    <PageTreeNodeContent flags={getFlags}>{getNode().value}</PageTreeNodeContent>
+                renderNode={(getNode, getRenderProps) => (
+                    <PageTreeNodeContent renderProps={getRenderProps}>{getNode().value}</PageTreeNodeContent>
                 )}
             />
         </div>

@@ -1,6 +1,6 @@
-import type { AccessorProps, ColorInputFlags, InteractionFlags } from "@thewaver/ss-components";
+import type { AccessorProps, ColorInputRenderProps, InteractionFlags } from "@thewaver/ss-components";
 
 export type ColorInputContentProps = AccessorProps<{
-    flags: InteractionFlags<ColorInputFlags>;
+    renderProps: InteractionFlags<ColorInputRenderProps>;
     isCompact?: boolean;
 }>;

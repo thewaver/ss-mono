@@ -3,6 +3,7 @@ import type { JSX } from "solid-js";
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
 import type {
     ExternalInteractionFlags,
+    InteractionActivation,
     InteractionFlags,
 } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
@@ -34,12 +35,13 @@ export type InteractionWrapperProps<TExtra extends object = {}> = AccessorProps<
         minWidth?: number;
         minHeight?: number;
         isReachableWhenDisabled?: boolean;
+        isFocusableWhenDisabled?: boolean;
         isTabbable?: boolean;
-        isActivationTracked?: boolean;
         ref?: (element: HTMLElement) => void;
     }
 > & {
     extraFlags?: MaybeAccessor<TExtra>;
+    onActivation?: (activation: InteractionActivation) => void;
     tooltipDefs?: MaybeAccessor<InteractionTooltipDefs<TExtra> | undefined>;
     renderDecoration?: (getFlags: () => InteractionFlags<TExtra>) => JSX.Element;
     renderControl: (

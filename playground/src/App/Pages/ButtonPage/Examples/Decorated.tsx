@@ -1,4 +1,6 @@
-import { Button, Corners } from "@thewaver/ss-components";
+import { createSignal } from "solid-js";
+
+import { Button, Corners, type InteractionActivation } from "@thewaver/ss-components";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageRipple } from "../../../StyledComponents/Ripple/Ripple";
@@ -8,15 +10,17 @@ import type { ButtonPressedExampleProps } from "../ButtonPage.types";
 type Props = ButtonPressedExampleProps;
 
 export const DecoratedExample = (props: Props) => {
+    const [getActivation, setActivation] = createSignal<InteractionActivation>();
+
     return (
         <Button
             isPressed={props.isPressed}
             renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Toggle Me</PageButtonContent>}
-            isActivationTracked={true}
+            onActivation={setActivation}
             renderDecoration={(getFlags) => (
                 <>
                     <Corners color={() => (getFlags().isPressed ? "yellow" : "transparent")} />
-                    <PageRipple flags={getFlags} color={"yellow"} />
+                    <PageRipple activation={getActivation} color={"yellow"} />
                 </>
             )}
             tooltipDefs={() => ({

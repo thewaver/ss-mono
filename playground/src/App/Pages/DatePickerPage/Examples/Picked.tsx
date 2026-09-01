@@ -55,7 +55,7 @@ export const PickedExample = (props: Props) => {
             renderTrigger={(getIsOpen, onToggle) => (
                 <PageDatePickerTrigger key={props.key} isOpen={getIsOpen} onToggle={onToggle} />
             )}
-            renderDay={(_unused, getFlags) => <PageCalendarDay flags={getFlags} />}
+            renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}
             renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
             renderPopup={(renderCalendar, monthSignal) => (
                 <PageCalendarFrame>

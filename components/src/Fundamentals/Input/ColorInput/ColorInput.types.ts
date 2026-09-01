@@ -10,10 +10,10 @@ import type {
     InteractionControlProps,
     InteractionWrapperProps,
 } from "../../InteractionWrapper/InteractionWrapper.types";
-import type { ColorAreaFlags } from "../ColorArea/ColorArea.types";
-import type { RangeFlags } from "../Range/Range.types";
+import type { ColorAreaRenderProps } from "../ColorArea/ColorArea.types";
+import type { RangeRenderProps } from "../Range/Range.types";
 
-export type ColorInputFlags = {
+export type ColorInputRenderProps = {
     value: string;
     hsv: Color.HSVA;
     isOpen: boolean;
@@ -37,7 +37,7 @@ export type ColorInputState = {
 
 export type ColorInputFieldProps = AccessorProps<
     ColorInputCbs &
-        InteractionControlProps<ColorInputFlags> &
+        InteractionControlProps<ColorInputRenderProps> &
         Pick<ColorInputState, "ariaLabel"> & {
             popupId: string;
             isOpen: boolean;
@@ -45,15 +45,15 @@ export type ColorInputFieldProps = AccessorProps<
         }
 >;
 
-export type ColorInputProps = Omit<InteractionWrapperProps<ColorInputFlags>, "renderControl" | "extraFlags"> &
+export type ColorInputProps = Omit<InteractionWrapperProps<ColorInputRenderProps>, "renderControl" | "extraFlags"> &
     AccessorProps<
         ColorInputCbs &
-            Pick<InteractionControlProps<ColorInputFlags>, "id" | "renderContent"> &
+            Pick<InteractionControlProps<ColorInputRenderProps>, "id" | "renderContent"> &
             ColorInputState & {
                 valueSignal: SignalSource<string>;
                 visibilitySignal?: SignalSource<boolean>;
-                renderArea: (getFlags: () => InteractionFlags<ColorAreaFlags>) => JSX.Element;
-                renderHue: (getFlags: () => InteractionFlags<RangeFlags>) => JSX.Element;
+                renderArea: (getRenderProps: () => InteractionFlags<ColorAreaRenderProps>) => JSX.Element;
+                renderHue: (getRenderProps: () => InteractionFlags<RangeRenderProps>) => JSX.Element;
                 renderPopup: (
                     renderSurface: () => JSX.Element,
                     hsvSignal: Signal<Color.HSVA>,

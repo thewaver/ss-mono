@@ -27,9 +27,9 @@ export const LinkComponentExample = (props: Props) => {
             linkComponent={PagePaginatorLink}
             computeHref={(page) => `#paginator-routed-${page}`}
             onPageChange={props.onPageChange}
-            renderPage={(_getEntry, getFlags) => <PagePaginatorPage flags={getFlags} />}
+            renderPage={(_getEntry, getRenderProps) => <PagePaginatorPage renderProps={getRenderProps} />}
             renderGap={(getEntry) => <PagePaginatorGap entry={getEntry} />}
-            renderStep={(_getStep, getFlags) => <PagePaginatorStep flags={getFlags} />}
+            renderStep={(_getStep, getRenderProps) => <PagePaginatorStep renderProps={getRenderProps} />}
         />
     );
 };

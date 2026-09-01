@@ -1,7 +1,7 @@
-import type { AccessorProps, InteractionFlags, TreeNodeFlags } from "@thewaver/ss-components";
+import type { AccessorProps, InteractionFlags, TreeNodeRenderProps } from "@thewaver/ss-components";
 
 export type TreeNodeContentProps = AccessorProps<{
-    flags: InteractionFlags<TreeNodeFlags>;
+    renderProps: InteractionFlags<TreeNodeRenderProps>;
     detail?: string;
 }>;
 

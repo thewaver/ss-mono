@@ -8,10 +8,10 @@ import type {
     PaginatorGapEntry,
     PaginatorItemProps,
     PaginatorPageEntry,
-    PaginatorPageFlags,
+    PaginatorPageRenderProps,
     PaginatorProps,
     PaginatorStep,
-    PaginatorStepFlags,
+    PaginatorStepRenderProps,
 } from "./Paginator.types";
 import { PaginatorUtils } from "./Paginator.utils";
 
@@ -114,18 +114,18 @@ export const Paginator = (props: PaginatorProps) => {
         const getIsStepDisabled = () => getIsDisabled() || getTargetPage() === access(props.page);
 
         return (
-            <InteractionWrapper<PaginatorStepFlags>
+            <InteractionWrapper<PaginatorStepRenderProps>
                 isDisabled={getIsStepDisabled}
                 extraFlags={() => ({ step: getStep(), targetPage: getTargetPage() })}
-                renderControl={(setElementRef, getFlags) => (
+                renderControl={(setElementRef, getRenderProps) => (
                     <PaginatorItem
                         ref={setElementRef}
                         href={() => (getIsStepDisabled() ? undefined : props.computeHref?.(getTargetPage()))}
                         isCurrent={false}
                         ariaLabel={() => props.computeStepLabel?.(getStep(), getTargetPage()) ?? STEP_LABELS[getStep()]}
-                        flags={getFlags}
+                        flags={getRenderProps}
                         linkComponent={props.linkComponent}
-                        renderContent={() => props.renderStep(getStep, getFlags)}
+                        renderContent={() => props.renderStep(getStep, getRenderProps)}
                         onActivate={() => goTo(getTargetPage())}
                     />
                 )}
@@ -134,23 +134,23 @@ export const Paginator = (props: PaginatorProps) => {
     };
 
     const renderPageControl = (getEntry: Accessor<PaginatorPageEntry>) => (
-        <InteractionWrapper<PaginatorPageFlags>
+        <InteractionWrapper<PaginatorPageRenderProps>
             isDisabled={getIsDisabled}
             extraFlags={() => ({
                 page: getEntry().page,
                 isCurrent: getEntry().page === access(props.page),
             })}
-            renderControl={(setElementRef, getFlags) => (
+            renderControl={(setElementRef, getRenderProps) => (
                 <PaginatorItem
                     ref={setElementRef}
                     href={() => props.computeHref?.(getEntry().page)}
-                    isCurrent={() => getFlags().isCurrent}
+                    isCurrent={() => getRenderProps().isCurrent}
                     ariaLabel={() =>
                         props.computePageLabel?.(getEntry().page, getPageCount()) ?? `Page ${getEntry().page}`
                     }
-                    flags={getFlags}
+                    flags={getRenderProps}
                     linkComponent={props.linkComponent}
-                    renderContent={() => props.renderPage(getEntry, getFlags)}
+                    renderContent={() => props.renderPage(getEntry, getRenderProps)}
                     onActivate={() => goTo(getEntry().page)}
                 />
             )}

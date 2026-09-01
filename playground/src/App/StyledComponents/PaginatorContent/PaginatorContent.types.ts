@@ -2,16 +2,16 @@ import type {
     AccessorProps,
     InteractionFlags,
     PaginatorGapEntry,
-    PaginatorPageFlags,
-    PaginatorStepFlags,
+    PaginatorPageRenderProps,
+    PaginatorStepRenderProps,
 } from "@thewaver/ss-components";
 
 export type PaginatorPageContentProps = AccessorProps<{
-    flags: InteractionFlags<PaginatorPageFlags>;
+    renderProps: InteractionFlags<PaginatorPageRenderProps>;
 }>;
 
 export type PaginatorStepContentProps = AccessorProps<{
-    flags: InteractionFlags<PaginatorStepFlags>;
+    renderProps: InteractionFlags<PaginatorStepRenderProps>;
 }>;
 
 export type PaginatorGapContentProps = AccessorProps<{

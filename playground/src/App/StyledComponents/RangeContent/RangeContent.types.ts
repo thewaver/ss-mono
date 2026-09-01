@@ -1,6 +1,6 @@
-import type { AccessorProps, InteractionFlags, RangeFlags } from "@thewaver/ss-components";
+import type { AccessorProps, InteractionFlags, RangeRenderProps } from "@thewaver/ss-components";
 
 export type RangeContentProps = AccessorProps<{
-    flags: InteractionFlags<RangeFlags>;
+    renderProps: InteractionFlags<RangeRenderProps>;
     length?: number;
 }>;

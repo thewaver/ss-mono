@@ -5,6 +5,7 @@ import { activeMatches, demo, readout, tabIndex } from "./helpers";
 const DEFAULT = demo("default");
 const SINGLE = demo("singleSelection");
 const RESIZABLE = demo("resizable");
+const REORDERABLE = demo("reorderable");
 const CONSUMER_SORTED = demo("consumerSorted");
 const VIRTUALIZED = demo("virtualized");
 const DISABLED = demo("disabled");
@@ -296,4 +297,87 @@ test("a disabled grid reads out but does not act", async ({ page }) => {
     await page.locator(at(DISABLED, 2, 1)).click({ force: true });
 
     await expect(page.locator(row(DISABLED)).nth(1)).toHaveAttribute("aria-selected", "false");
+});
+
+/**
+ * Reordering has two ways in and they must agree. The pointer half drags a header past the middle of its
+ * neighbour, which is where `CarrierUtils.computeDropIndex` flips the landing place. The keyboard half is
+ * Shift with an arrow on the focused header cell, chosen because the header already spends Enter and Space
+ * on sorting and Ctrl with the arrows on resizing.
+ *
+ * Both assert the order through the header text rather than through the readout, because the order is the
+ * thing being changed and reading it back off the page's own summary would only prove the summary agrees
+ * with itself.
+ */
+test("a header dragged past its neighbour's middle swaps the two columns", async ({ page }) => {
+    const first = page.locator(header(REORDERABLE)).nth(0);
+    const second = page.locator(header(REORDERABLE)).nth(1);
+
+    await expect(first).toContainText("SKU");
+    await expect(second).toContainText("Name");
+
+    const from = await first.boundingBox();
+    const to = await second.boundingBox();
+
+    if (!from || !to) throw new Error("the reorderable demo drew no header boxes");
+
+    await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(to.x + to.width * 0.75, to.y + to.height / 2, { steps: 12 });
+    await page.mouse.up();
+
+    await expect(page.locator(header(REORDERABLE)).nth(0)).toContainText("Name");
+    await expect(page.locator(header(REORDERABLE)).nth(1)).toContainText("SKU");
+});
+
+test("a drag that reorders does not also sort the column it started on", async ({ page }) => {
+    const first = page.locator(header(REORDERABLE)).nth(0);
+
+    await expect(first).toHaveAttribute("aria-sort", "none");
+
+    const from = await first.boundingBox();
+    const to = await page.locator(header(REORDERABLE)).nth(1).boundingBox();
+
+    if (!from || !to) throw new Error("the reorderable demo drew no header boxes");
+
+    await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(to.x + to.width * 0.75, to.y + to.height / 2, { steps: 12 });
+    await page.mouse.up();
+
+    await expect(page.locator(header(REORDERABLE)).nth(1)).toHaveAttribute("aria-sort", "none");
+});
+
+test("shift with an arrow moves the focused column and focus travels with it", async ({ page }) => {
+    const first = page.locator(header(REORDERABLE)).nth(0);
+
+    await expect(first).toContainText("SKU");
+
+    await first.click();
+    await page.keyboard.press("Shift+ArrowRight");
+
+    await expect(page.locator(header(REORDERABLE)).nth(0)).toContainText("Name");
+    await expect(page.locator(header(REORDERABLE)).nth(1)).toContainText("SKU");
+    await expect(page.locator(`${header(REORDERABLE)}:focus`)).toContainText("SKU");
+});
+
+test("a column at the end of the row does not move past it", async ({ page }) => {
+    const first = page.locator(header(REORDERABLE)).nth(0);
+
+    await first.click();
+    await page.keyboard.press("Shift+ArrowLeft");
+
+    await expect(page.locator(header(REORDERABLE)).nth(0)).toContainText("SKU");
+});
+
+test("a table with no order signal ignores the reorder key entirely", async ({ page }) => {
+    const first = page.locator(header(DEFAULT)).nth(0);
+
+    await first.click();
+
+    const before = (await first.textContent()) ?? "";
+
+    await page.keyboard.press("Shift+ArrowRight");
+
+    await expect(page.locator(header(DEFAULT)).nth(0)).toHaveText(before);
 });

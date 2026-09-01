@@ -11,21 +11,21 @@ export const PageCalendarDay = (props: CalendarDayProps) => {
         <div
             class={styles.calendarDay}
             classList={{
-                [styles.isSelected]: access(props.flags).isSelected,
-                [styles.isToday]: access(props.flags).isToday,
-                [styles.isOutsideMonth]: access(props.flags).isOutsideMonth,
-                [styles.isHovered]: access(props.flags).isHovered,
-                [styles.isDisabled]: access(props.flags).isDisabled,
-                [styles.isInRange]: access(props.flags).isInRange,
-                [styles.isRangeStart]: access(props.flags).isRangeStart,
-                [styles.isRangeEnd]: access(props.flags).isRangeEnd,
+                [styles.isSelected]: access(props.renderProps).isSelected,
+                [styles.isToday]: access(props.renderProps).isToday,
+                [styles.isOutsideMonth]: access(props.renderProps).isOutsideMonth,
+                [styles.isHovered]: access(props.renderProps).isHovered,
+                [styles.isDisabled]: access(props.renderProps).isDisabled,
+                [styles.isInRange]: access(props.renderProps).isInRange,
+                [styles.isRangeStart]: access(props.renderProps).isRangeStart,
+                [styles.isRangeEnd]: access(props.renderProps).isRangeEnd,
             }}
-            data-in-range={access(props.flags).isInRange || undefined}
-            data-range-start={access(props.flags).isRangeStart || undefined}
-            data-range-end={access(props.flags).isRangeEnd || undefined}
+            data-in-range={access(props.renderProps).isInRange || undefined}
+            data-range-start={access(props.renderProps).isRangeStart || undefined}
+            data-range-end={access(props.renderProps).isRangeEnd || undefined}
             aria-hidden="true"
         >
-            {access(props.flags).day.day}
+            {access(props.renderProps).day.day}
         </div>
     );
 };

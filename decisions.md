@@ -5397,6 +5397,44 @@ every route that is not a click.
 cells: a painter drawing a bare digit gives a reader "7" with no idea what of. The default names are English,
 and the compute hook is the escape from that rather than a locale the library pretends to know.
 
+### The painter's object: `activation` left the flags, and only the mixed ones became `RenderProps`
+
+Every control hands its painter **one** object rather than a run of arguments, because positional arguments
+make a consumer declare and ignore three of them to reach the fourth. The naming rule that object follows is
+in `conventions.md` under _"one aggregated object per painter"_; this entry records how the library was made
+to fit it.
+
+**`InteractionFlags` was the blocker, and it was the whole of the decision.** It is the type every painter in
+the library receives, and it carried `activation` — a pointer position as a ratio, plus a count that steps up
+on each press. That is a payload, so while it sat there the merged object was a `RenderProps` for _every_
+control, `Button` included, and the `Flags` name could never be right anywhere. Its only reader in the repo
+was the Playground's `Ripple`, which needs the position to place a ripple and the count to notice a new press.
+
+**Three ways out were weighed and the third was taken.** Renaming the shared base to `InteractionRenderProps`
+was honest but made every painter's argument a `RenderProps`, so the distinction stopped distinguishing
+anything. Leaving `activation` in place and calling it interaction state was the cheapest and was rejected as
+the fault itself — a tally and a position called flags. What was taken instead: `InteractionWrapper` reports
+activation through an **`onActivation` callback**, so the shared base is booleans only and a control whose own
+extras are booleans really does hand its painter a set of flags. No argument was added to any painter to do
+it — the callback is a prop on the wrapper, which is why it does not reintroduce the cost the aggregate exists
+to avoid.
+
+**`onActivation`, not `onActivate`, because `Menu` already owns the shorter name** for the different event of
+an item being chosen. **`isActivationTracked` is gone**: tracking is on when a handler is given, the same
+presence-turns-it-on rule `Table` uses for `selectionSignal`. `InteractionTracker.trackActivation` no longer
+holds a signal at all — it calls the handler and returns nothing.
+
+**Fourteen types then split off as `*RenderProps`** — `CarouselStep`, `CarouselPick`, `Calendar`, `Clock`,
+`ColorArea`, `ColorInput`, `FileInput`, `Range`, `PaginatorPage`, `PaginatorStep`, `SlideButton`,
+`TableColumn`, `TableCell`, `TreeNode` — each carrying an index, a value, an array, a date or a colour. The
+other seventeen keep `*Flags`. `checkedState` is `boolean | "mixed"`, a choice from a fixed set, so
+`BinarySwitchFlags` and `SelectGroupFlags` stayed as they were.
+
+**`InteractionControlProps.flags` was deliberately left alone.** It is the internal contract between a control
+and its own leaf element — `ButtonElement`, `CalendarDay` — and a consumer never writes it. One generic type
+serves both kinds, so its member can only be named once, and naming it for the pure case keeps the misnaming
+out of the sixteen controls that are pure.
+
 ### Controls: `Table`, a grid rather than a table, and why the markup could not be `<table>`
 
 Built at the user's request, off the `backlog.md` entry that had put it last. That entry named the scope and
@@ -5507,6 +5545,57 @@ without writing into content the consumer paints, and React Aria's visually-hidd
 announcement at the price of one extra tab stop per resizable column — the exact cost the single-tab-stop grid
 exists to avoid. **Their call was to leave it**, on the grounds that 2.1.1 is met and the tab order stays one
 stop. It is recorded in `backlog.md` under _"Accepted limits"_ so it is not rediscovered as an oversight.
+
+### `Table` columns reorder, and the carry engine became `Abstracts/Carrier` to do it
+
+**The engine was already separate from `Sortable`'s paint, so the work was a move rather than an
+extraction.** `SortableStack` and the three drop-index functions knew nothing about JSX,
+`InteractionWrapper` or items; `SortableZone` was a plain interface of getters and three mutators. They now
+live in `Abstracts/Carrier` as `CarrierStack`, `CarrierUtils` and `CarrierZone`, beside `DismisserStack`,
+which is the same shape of thing — a module-level registry many components sign up to. The names changed
+with the move because `Sortable*` inside an abstract that `Table` also uses reads as the component's
+private property, and there is no precedent here for an abstract sharing a name with a control.
+`Sortable` keeps its own public types; `SortableDir` is an alias of `CarryDir`.
+
+**One thing genuinely was extracted: `CarrierStack.dragFromPointer`.** The press-move-release loop that
+waits four pixels before deciding a press is a drag, captures the pointer and feeds `aimAtPoint` was inline
+in `Sortable` and `Table`'s header needed exactly it. `GestureUtils` in `ss-utils` was checked first and
+covers swipes only — progress, direction, offset — so this is not a re-implementation of something that
+already existed.
+
+**The keyboard did not extract, and that is the design rather than a shortfall.** `Sortable`'s keys assume
+every item is focusable and that `Tab` walks between lists. A grid is one tab stop, so `Table` drives the
+stack from its own header handler. It also means the two controls answer the same question differently and
+both are right: `Sortable` enters a carry mode, `Table` moves directly.
+
+**`Shift` with an arrow, because the header cell's other two keys were taken.** Enter and Space cycle the
+sort and `Ctrl` with the arrows resizes, both already on that cell. `Shift` with an arrow moves the focused
+column one place immediately — no mode to enter or leave — which mirrors the resize idiom rather than
+`Sortable`'s pick-up-and-place one. Focus follows the column, since the cell id is positional. **The move
+announces itself through `LiveAnnouncer`**: order is what a reader navigates by, so moving a column silently
+would be a worse omission than resizing one silently.
+
+**Reordering turns on when an `orderSignal` is handed over, and a column opts in with `isReorderable`.**
+Same presence-turns-it-on rule as `selectionSignal`, so a consumer cannot hand over an order and silently
+get nothing. The signal holds column ids rather than indices, which is what lets it survive a change to the
+column list — `TableUtils.getColumnOrder` ranks the declared columns by that list and leaves any column the
+order does not name in its declared place, after the ones it does.
+
+**The drop marker is painted inside a header cell, not positioned by measurement.** `Sortable` computes a
+marker offset from item rects and has to divide out the `Viewport` scale to do it — the failure that
+`conventions.md` records under measured rects and written offsets. A grid cell _is_ the grid item, so the
+boundary the marker wants is that cell's own leading edge: the marker renders inside the cell at the
+landing index, and inside the last cell for the place past the end. No rects, no scale, no chance of the
+two spaces disagreeing.
+
+**Both index spaces are now published, which is what the naming rule in `conventions.md` demanded.** A
+column can sit somewhere other than where it was declared and a row somewhere other than where it arrived,
+so the render props carry `dataCol`, `layoutCol`, `dataRow` and `layoutRow`. Making that honest meant
+`getSortedRows` becoming `getSortedOrder`, which sorts an array of indices so the original position survives
+the sort; `getReordered` then reads either list through either order and hands back **the very same array**
+when there is no order to apply, which is the property the old function had and had to keep. The roving cell
+is a `Count2d` from `ss-utils` rather than an `x` / `y` pair, and `NavigatorUtils.computeNextCell` is adapted
+at the one call site rather than changed, since other controls read it.
 
 ### Controls: `Scroller`, and why it renders no button of its own
 
@@ -7806,3 +7895,237 @@ values are handed down as a read-only accessor and the pick is handed up: `onPic
 replaced `onActivate(value)` on the level, because the level is the only place that knows which run a row
 belongs to and the top is the only place that owns the signal and can close. The public `onActivate(value)`
 is unchanged.
+
+### `TileBoard`, ported from a React game, and the tiling table each shape needs
+
+The second arrival from the user's own earlier codebase, after the four that became `Exotics`. It came in
+through `external/` as `BoardTiles`, was named with the user, and is `Exotics/TileBoard`.
+
+**It is an `Exotic`, placed there by the user.** It was first built as a `Fundamental` on the reading that
+the four earlier arrivals hold no user-editable value and are not compositions of `Fundamentals`, and that a
+board of `InteractionWrapper` tiles fails both. The user's reason overrides it and is about the folder's
+purpose rather than its members: **a game board is not the kind of component a component library normally
+ships.** That is a better test than the derived one, because it is about what a consumer expects to find,
+and `Exotics` is where the things nobody expects already live. The derived rule stands for anything that is
+plainly a control.
+
+**The keyboard walk, the refusal and the roving tab stop are still a control's, and none of that moved.**
+Where it sits says nothing about what it owes: `Calendar` is what it was written against, line for line.
+
+#### Every built-in shape tiles, and the numbers are a table rather than a derivation
+
+The first build read the row spacing off the shape's own corners — the topmost corner on its left edge,
+divided by the height — and claimed no constant was needed. **That is true only for the shapes whose rows
+interlock by a half-tile shift, and it was wrong to generalise from them.** `hexagon-flat-top` tiles through
+the other axis entirely, with its rows half a tile apart and its columns one and a half tiles apart, and no
+reading of the left edge produces that. Triangles do not tile by translation at all.
+
+So `TILING_RATIOS` names, per `ShapeConst.DefaultShape`, the pitch as a fraction of the tile box and two
+questions about how the rows and tiles sit:
+
+| Shape                   | Pitch across | Pitch down | Offset rows | Turned-over tiles |
+| ----------------------- | ------------ | ---------- | ----------- | ----------------- |
+| `square`                | 1            | 1          | no          | no                |
+| `lozenge`               | 1            | 1/2        | yes         | no                |
+| `hexagon-pointy-top`    | 1            | 3/4        | yes         | no                |
+| `hexagon-flat-top`      | 1 1/2        | 1/2        | yes         | no                |
+| `triangle-up` / `-down` | 1/2          | 1          | no          | yes               |
+
+**Offset rows** shift every other row half a pitch across and give it one tile fewer, which is what puts it
+in the notches; **turned-over tiles** mirror a tile vertically when `row + col` is odd, which is what makes a
+triangle's base meet a base rather than two half-bases. Both together never happen, and a square needs
+neither — it is the one shape here that does not interlock at all.
+
+**The numbers are the shapes' own corner fractions, so they can go stale where a derivation could not.** The
+unit tests read the corners back out of `getDefaultShapePoints` and compare, so a shape redrawn in `ss-utils`
+turns the table red rather than quietly tiling with gaps. That is the honest cost of the table and the reason
+it is worth naming here.
+
+**Which is why the shape is a name again and `computeTilePoints` is gone.** A consumer cannot supply a
+tiling for an arbitrary polygon without supplying the lattice as well, and two props that must agree is a
+trap. `tileShape` defaults to `hexagon-pointy-top`, the board derives the points and the tiling from it, and
+the points it worked out — turned over or not — are handed to `renderTile` in its render props, so the
+painter never needs to know which shape it is drawing. `triangle-down` is not a second implementation: it is
+the same tiling with the starting orientation inverted, which the unit tests pin by asserting a turned-over
+`triangle-up` equals `triangle-down`'s own points.
+
+**`hasShortFirstRow` inverts which rows are short.** Asked for by the user. It has no effect on a shape whose
+rows are not offset; a triangle board that should start the other way round asks for `triangle-down` instead,
+which is what the two names are for.
+
+**A tile's neighbours differ per family and the board owns all three.** Six for the offset shapes, four for a
+square, three for a triangle — and for the triangle, which vertical one depends on the way it points, which
+depends on the shape name and the turn together. `getNeighbourTiles` answers them clockwise from the top,
+filtered to what is on the board. A consumer re-deriving this gets a plausible board with the wrong adjacency,
+which is the failure that never announces itself.
+
+#### The shape is worn by a hit layer, so the pointer follows the drawing and the paint is free
+
+A tile is a rectangle in the DOM. A pointy-top hexagon's box overlaps the boxes around it by a quarter of
+its height, a triangle's box overlaps its neighbour's by half its width — about a quarter of every hexagon
+box is corner that belongs to a neighbour and is drawn by one. A press there has to reach the tile that is
+drawn there, or the board's one promise, that these things interlock, is false to the pointer.
+
+**The first build clipped the cell itself, and the user rejected it: content has to be able to hang out of
+its tile, as it did in the original project.** A piece standing taller than the tile it occupies is the
+ordinary case on a game board, and the clip cut its head off — along with any glow, and along with the
+Playground's global `:focus-visible` ring. Their instruction settles it, and "clip the face and let the
+consumer paint a second layer outside it" was not offered as a compromise, because the same board would then
+own two renderers to answer one question.
+
+**So the shape moved off the cell and onto a layer of its own.** A tile is three elements: the cell, which
+carries `role="gridcell"`, the name, the tab stop and the click handler and is `pointer-events: none`; a
+paint layer holding whatever `renderTile` returns, unclipped and overflowing freely; and a transparent hit
+layer over both, `inset: 0`, `aria-hidden`, wearing the `polygon()` clip and the only thing in the tile that
+is `pointer-events: all`. The rows, the cells and the root are all `pointer-events: none`, so a press
+landing outside every hit layer falls through to the tile beneath rather than stopping on a box.
+
+**A `pointer-events: none` element still sees what its descendants are pressed with**, which is the whole
+reason the cell can stay the focusable element while the layer inside it takes the pointer. Checked in
+Chromium rather than recalled: with a clipped `pointer-events: all` child as the hit target, the cell
+receives `mouseover`, `mouseenter`, `mousedown`, `click` and `mouseleave` and takes focus, and a press in the
+clipped-away corner hits nothing at all. That is the defined behaviour — `pointer-events: none` stops an
+element being a hit _target_; it does not stop events propagating through it — but it is load-bearing enough
+here to be worth having watched happen.
+
+**`Shape` would have taken the corners straight back, and that is what the descendant rule is for.**
+`shapeRoot` carries `pointer-events: visiblePainted`, and a hit test in the empty corner walks past the
+clipped-away hit layer and lands on it. `TileBoard.css.ts` therefore writes
+`globalStyle(`${tileBoardTile} ${tileBoardPaint} *`, { pointerEvents: "none" })`. **The doubled ancestor is
+specificity, not tidiness**: at one class it would tie with `shapeRoot`'s own rule and be settled by
+stylesheet order, and at two it wins outright without an `!important` the property's type will not take.
+The consequence to know: **nothing a consumer paints inside a tile can take the pointer**, so an interactive
+control inside a tile is not a thing this board supports. The tile is the control.
+
+**What the consumer clips is now the consumer's business, and the face is the case that shows it.** The
+Playground's tile paints a CSS gradient, which without a clip is a rectangle behind a hexagon outline —
+`PageTileBoardTile` passes `Shape`'s own `getClipPath` to it, which is what `ShapePage` already does. The
+piece and the glow are outside that clip and hang over the row above.
+
+**Unclipping the paint let a second focus ring through, and the box one is the wrong one.** With the clip
+gone the Playground's global `:focus-visible` rule started painting a rectangle around the cell, beside the
+stroke the painter draws on the shape — two rings for one focus. Which to keep is not a matter of taste:
+**the cell's box is not the tile.** For a hexagon it is a tight bounding box and merely looks wrong; for a
+triangle the box is twice the pitch, so the rectangle covers the focused triangle and half of each
+neighbour, and an indicator that marks out three tiles is not identifying the focused one. The stroke
+follows the polygon exactly and is what stays.
+
+**And the ring it does draw only shows when it should.** The tile's stroke reads `isFocusVisible` rather
+than `isFocused`, so a tile pressed with the pointer holds focus without advertising it and the next arrow
+key brings the ring back. The flag was added for this and is the browser's own verdict; see
+_"`isFocused` is focus and `isFocusVisible` is the ring"_ in `conventions.md`.
+
+**The suppression is the Playground's, not the library's, and the reason is what a fallback is worth.** The
+board draws no focus of its own — `renderTile` gets `isFocused` like every other painter here — so removing
+the box outline inside `components/src` would take away the one indicator a consumer gets for free and make
+an invisible focus ring the default. Instead `TileBoardContent.css.ts` scopes it out for the cells this
+painter is inside: `[role="gridcell"]:has(<painter class>):focus-visible { outline: 0 none }`. **A consumer
+with their own global focus rule will see the same double ring and wants the same one line** — and a board
+of triangles wants it most, for the reason above. `tileBoard.spec.ts` pins that one ring is drawn and that
+it is not the box's.
+
+**Two things follow that a consumer should know.** The board's own box no longer bounds what it draws, so a
+board packed against something else can overlap it. And paint order is row order, so a piece overhanging
+_downwards_ is covered by the row below while one overhanging upwards is not — which is the right way round
+for a piece standing on a tile, and is why nothing lifts a z-index to correct it.
+
+**Rows are absolutely positioned and so is every cell, because a flex gap cannot go negative.** The first
+build spaced the tiles with the row's own `gap`, which works while the pitch is at least a tile wide and
+breaks for triangles, whose pitch is half a tile: the tiles have to overlap, and `gap` clamps at zero. A cell
+positioned by `left: col x pitch` has no such floor, and the row keeps `role="row"` while carrying no size of
+its own.
+
+#### A piece that is not a tile's content: `getTileCenter`
+
+The paint being free settles where a piece _may_ be drawn; it does not answer where to draw it. A game piece
+usually belongs to the board rather than to a tile — it moves between tiles, it should animate while it moves,
+and it should not be rebuilt because the tile under it re-rendered. That consumer renders it as a sibling of
+the board and needs one thing from the library: **where is tile 2,3 on screen.**
+
+`TileBoardUtils.getTileCenter(tile, layout)` answers it, and the `layout` a consumer needs is the same
+`getLayout(shape, count, tileSize, hasShortFirstRow)` they already build for `getNeighbourTiles`. It carries
+the short row's half-tile shift and steps by the **pitch** rather than the tile, which is what makes it right
+for a flat-top hexagon at one and a half tiles across and a triangle at half a tile.
+
+**The gap does not enter it, which is worth knowing rather than deriving twice.** A gap insets the row by half
+and shrinks the tile by a whole, and the two cancel: the centre of the tile's box is where it would be with no
+gap at all. So a consumer positioning a piece never passes the gap, and a piece does not shuffle when the gap
+changes.
+
+**It is the middle of the tile's box, not the shape's centroid.** For a triangle those differ — a triangle's
+weight sits a third of the way up from its base — and the box is the honest, predictable answer that a
+consumer can offset from. Saying which one it is matters because both are defensible and only one is what the
+function returns.
+
+**The board opens its own stacking context, and that is what makes a layer above it possible at all.**
+`InteractionWrapper` lifts a hovered tile to `z-index: 2` and a focused one to `1`, which is right inside the
+board and wrong outside it: a piece drawn as the board's next sibling was painted **under** the tile it stood
+on, and only under the one the pointer happened to be over, which reads as a piece that vanishes when you
+touch it. `tileBoardRoot` carries `z-index: 0` on top of its `position: relative`, which opens a stacking
+context, so those lifts order the tiles against each other and stop at the board's edge. The alternative —
+telling the consumer to outrank a number the library chose — is asking them to know an internal, and it goes
+stale the day the internal changes.
+
+**It was written as `isolation: isolate` first, and that silently deleted the whole stylesheet.** The build
+reported success, printed no warning, and emitted **none** of `TileBoard.css.ts` — not the property, the
+file. Every rule in it vanished: the rows stopped being positioned, so the board collapsed into one column of
+overlapping tiles, and the hit layer stopped taking the pointer, so the consumer's paint took presses again
+and nothing could be clicked. Bisected by removing the one line and rebuilding, which brought all seven rules
+back. **The lesson is about the failure mode rather than the property: a `.css.ts` file can disappear whole,
+with a green build, and the first symptom is a component that looks unstyled rather than a build error.** If
+a component suddenly has no styles at all, check its own stylesheet is in the bundle before looking anywhere
+else — grep the built CSS for one of its class names. `z-index: 0` opens the same stacking context and emits
+fine.
+
+**Both Playground examples put their pieces on that layer**, one piece or several, and the piece stands on
+the tile's middle rather than being centred on it: `translate(-50%, -100%)` puts its base on the point
+`getTileCenter` returns, which is how a piece on a board is drawn. The board is unaware of any of it.
+
+**The Playground's second example is the proof, and it is deliberately not a tile's content.** The piece is a
+sibling of the board, positioned from `getTileCenter`, `pointer-events: none` so the tile beneath it is still
+pressable, and it transitions between positions — which is exactly what a piece owned by a tile could not do,
+since moving it would mean unmounting it from one tile and mounting it in another. `tileBoard.spec.ts`
+measures the piece's middle against the tile's own measured middle rather than against a written coordinate.
+
+#### A refused tile still takes focus, and `InteractionWrapper` had to learn how
+
+The original's walk stepped in a straight line until it found a **selectable** tile and skipped everything
+else; with no selectable list at all it also disabled every tile, so the keyboard could not move. On a board
+where three tiles of fifty are legal moves, skipping means somebody reading with a screen reader can never
+find out what shape the board is. So the arrows walk every tile, and a refused one is `aria-disabled`, takes
+focus, and refuses `Enter`.
+
+**That is the composite-widget case the disabled-mechanism convention had knowingly shut out**, and it has
+now shown up, so it took the prop that entry said it would earn. See
+_"Disabled is one mechanism for every control"_ in `conventions.md` for the widened predicate. Two things
+were broken without it and both are pinned by the spec: a refused tile reported `isFocused: false` for ever,
+so the painter drew no ring and focus landed somewhere invisible — a 2.4.7 failure the board introduced by
+making refused tiles focusable — and, worse, `tabIndex` was forced to `-1` on every disabled element, so a
+board whose roving tile happened to be refused **had no tab stop at all** and could not be entered from the
+keyboard.
+
+**The board asks for it only while the board itself is on**: `isFocusableWhenDisabled={() => !isDisabled}`.
+A board disabled as a whole is skipped entirely, which is what a disabled composite should do.
+
+#### The rest of the port
+
+**Up and down keep the column rather than choosing a diagonal.** Six neighbours do not fit on four arrows.
+Left and right walk the row; up and down go to the row above or below at the same column index, clamped into
+it when that row is the shorter kind — which lands on the nearer of the two diagonals and zigzags with the
+tiles, the same walk a plain grid does. Home and End are the ends of the row and Ctrl with either is the
+first or last tile of the board, per the `grid` pattern. Nothing wraps and nothing carries between rows: a
+board's left edge is an edge, not a route to the row above.
+
+**A tile is a `Count2d`, so the axes name themselves.** The original addressed tiles as `{ x, y }` with `y`
+counting rows, which is the pair _"a grid index names its space and its axis"_ exists to stop. There is one
+ordering here and no sorting, so nothing is a `data*` or a `layout*`. `Count2d.toString` also gives the tile a
+key — `ROW2_COL3` — which is what the refs map and the element ids use, so a board that changes size does not
+shift a row of stale indices.
+
+**Rows alternate full and short, and the first row is the full one by default.** The original made the
+**even** rows short, so a board declared four columns wide opened with a row of three.
+
+**Nothing of the game came with it.** The `external/` drop also carried that project's battle logic, boards,
+creatures and journeys, as the reference for what `BoardTiles` depended on. What was needed was `Point2d`,
+`Count2d`, `Size2d` and `MathUtils`, all of which are `ss-utils` already; the rest is a game and belongs in
+one.

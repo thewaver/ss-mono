@@ -5,7 +5,7 @@ import type { InteractionFlags } from "../../Abstracts/InteractionTracker/Intera
 import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 import type { InteractionControlProps, InteractionTooltipDefs } from "../InteractionWrapper/InteractionWrapper.types";
 
-export type TreeNodeFlags = {
+export type TreeNodeRenderProps = {
     isBranch: boolean;
     isExpanded: boolean;
     isPending: boolean;
@@ -22,13 +22,13 @@ export type TreeNode<T> = {
     hasMoreChildren?: boolean;
     isDisabled?: boolean;
     isReachableWhenDisabled?: boolean;
-    tooltipDefs?: InteractionTooltipDefs<TreeNodeFlags>;
+    tooltipDefs?: InteractionTooltipDefs<TreeNodeRenderProps>;
 };
 
 export type TreeRow<T> = FlatRow<TreeNode<T>>;
 
 export type TreeNodeItemProps = AccessorProps<
-    InteractionControlProps<TreeNodeFlags> & {
+    InteractionControlProps<TreeNodeRenderProps> & {
         level: number;
         position: number;
         setSize: number;
@@ -47,7 +47,10 @@ export type TreeProps<T> = AccessorProps<{
     valueSignal: SignalSource<T | undefined>;
     expandedSignal: SignalSource<T[]>;
     computeCustomText?: (node: TreeNode<T>) => string;
-    renderNode: (getNode: Accessor<TreeNode<T>>, getFlags: () => InteractionFlags<TreeNodeFlags>) => JSX.Element;
+    renderNode: (
+        getNode: Accessor<TreeNode<T>>,
+        getRenderProps: () => InteractionFlags<TreeNodeRenderProps>,
+    ) => JSX.Element;
     renderPendingChildren?: (getNode: Accessor<TreeNode<T>>, getDepth: () => number) => JSX.Element;
     onSelectionChange?: (value: T) => void;
 };

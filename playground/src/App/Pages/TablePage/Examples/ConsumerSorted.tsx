@@ -20,9 +20,11 @@ const COLUMNS: TableColumn<Part>[] = [
         header: "SKU",
         widthPx: 110,
         isSortable: true,
-        renderHeader: (getFlags) => <PageTableHeaderContent flags={getFlags}>{"SKU"}</PageTableHeaderContent>,
-        renderCell: (getPart, getFlags) => (
-            <PageTableCellContent flags={getFlags}>{getPart().sku}</PageTableCellContent>
+        renderHeader: (getRenderProps) => (
+            <PageTableHeaderContent renderProps={getRenderProps}>{"SKU"}</PageTableHeaderContent>
+        ),
+        renderCell: (getPart, getRenderProps) => (
+            <PageTableCellContent renderProps={getRenderProps}>{getPart().sku}</PageTableCellContent>
         ),
     },
     {
@@ -30,18 +32,22 @@ const COLUMNS: TableColumn<Part>[] = [
         header: "Name",
         minWidthPx: 140,
         isSortable: true,
-        renderHeader: (getFlags) => <PageTableHeaderContent flags={getFlags}>{"Name"}</PageTableHeaderContent>,
-        renderCell: (getPart, getFlags) => (
-            <PageTableCellContent flags={getFlags}>{getPart().name}</PageTableCellContent>
+        renderHeader: (getRenderProps) => (
+            <PageTableHeaderContent renderProps={getRenderProps}>{"Name"}</PageTableHeaderContent>
+        ),
+        renderCell: (getPart, getRenderProps) => (
+            <PageTableCellContent renderProps={getRenderProps}>{getPart().name}</PageTableCellContent>
         ),
     },
     {
         id: "category",
         header: "Category",
         widthPx: 140,
-        renderHeader: (getFlags) => <PageTableHeaderContent flags={getFlags}>{"Category"}</PageTableHeaderContent>,
-        renderCell: (getPart, getFlags) => (
-            <PageTableCellContent flags={getFlags}>{getPart().category}</PageTableCellContent>
+        renderHeader: (getRenderProps) => (
+            <PageTableHeaderContent renderProps={getRenderProps}>{"Category"}</PageTableHeaderContent>
+        ),
+        renderCell: (getPart, getRenderProps) => (
+            <PageTableCellContent renderProps={getRenderProps}>{getPart().category}</PageTableCellContent>
         ),
     },
 ];

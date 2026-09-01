@@ -8,10 +8,10 @@ import type {
 
 export type ColorAreaAxis = "saturation" | "brightness";
 
-export type ColorAreaFlags = {
+export type ColorAreaRenderProps = {
     hsv: Color.HSVA;
     isDragging: boolean;
-    focusedAxis?: ColorAreaAxis;
+    focusVisibleAxis?: ColorAreaAxis;
 };
 
 export type ColorAreaCbs = {
@@ -29,21 +29,21 @@ export type ColorAreaState = {
 
 export type ColorAreaElementProps = AccessorProps<
     ColorAreaCbs &
-        InteractionControlProps<ColorAreaFlags> &
+        InteractionControlProps<ColorAreaRenderProps> &
         Required<Omit<ColorAreaState, "name" | "ariaLabel">> &
         Pick<ColorAreaState, "name" | "ariaLabel"> & {
             hsv: Color.HSVA;
             isTabbable?: boolean;
             setAxis: (axis: ColorAreaAxis, ratio: number) => void;
-            setFocusedAxis: (axis?: ColorAreaAxis) => void;
+            setFocusVisibleAxis: (axis?: ColorAreaAxis) => void;
             setIsDragging: (isDragging: boolean) => void;
         }
 >;
 
-export type ColorAreaProps = Omit<InteractionWrapperProps<ColorAreaFlags>, "renderControl" | "extraFlags"> &
+export type ColorAreaProps = Omit<InteractionWrapperProps<ColorAreaRenderProps>, "renderControl" | "extraFlags"> &
     AccessorProps<
         ColorAreaCbs &
-            Pick<InteractionControlProps<ColorAreaFlags>, "id" | "renderContent"> &
+            Pick<InteractionControlProps<ColorAreaRenderProps>, "id" | "renderContent"> &
             ColorAreaState & {
                 hsvSignal: SignalSource<Color.HSVA>;
             }

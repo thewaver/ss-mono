@@ -8,9 +8,9 @@ import { LabelUtils } from "../Input/Label/Label.utils";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import type {
     SlideButtonElementProps,
-    SlideButtonFlags,
     SlideButtonPress,
     SlideButtonProps,
+    SlideButtonRenderProps,
 } from "./SlideButton.types";
 import { SlideButtonUtils } from "./SlideButton.utils";
 
@@ -203,19 +203,19 @@ export const SlideButton = (props: SlideButtonProps) => {
     return (
         <InteractionWrapper
             {...props}
-            extraFlags={(): SlideButtonFlags => ({
+            extraFlags={(): SlideButtonRenderProps => ({
                 progressRatio: getProgressRatio(),
                 isDragging: getIsDragging(),
                 isHolding: getIsHolding(),
             })}
-            renderControl={(setElementRef, getFlags) => (
+            renderControl={(setElementRef, getRenderProps) => (
                 <SlideButtonElement
                     ref={setElementRef}
                     id={props.id}
                     ariaLabel={props.ariaLabel}
                     thumbSize={getThumbSize}
                     holdDurationMs={getHoldDurationMs}
-                    flags={getFlags}
+                    flags={getRenderProps}
                     progressRatio={getProgressRatio}
                     renderContent={props.renderContent}
                     setProgressRatio={setProgressRatio}

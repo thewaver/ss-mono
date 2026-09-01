@@ -1,8 +1,15 @@
 import { expect, test } from "@playwright/test";
 
-import { demo, readout } from "./helpers";
+import { demo, inputValue, readout } from "./helpers";
 
 const PAIRED = demo("paired");
+/**
+ * The day the calendar itself marks as today, rather than a date written down here. A picker with no value
+ * opens on the machine's current month, so any date spelled out in this file is right only until the clock
+ * passes it — which is a red that says "the picker broke" when it means "the month rolled over".
+ */
+const TODAY_CELL = '[role="gridcell"][aria-current="date"]';
+
 const SEEDED = demo("seeded");
 const PICKED = demo("picked");
 
@@ -94,9 +101,9 @@ test("the calendar fills only the date half, so the value is still incomplete", 
 
     await expect(dialog).toBeVisible();
 
-    await dialog.locator('[role="gridcell"][aria-label="10 August 2026"]').click();
+    await dialog.locator(TODAY_CELL).click();
 
-    await expect(page.locator(`${PICKED} input`).first(), "the date field takes the pick").toHaveValue("2026-08-10");
+    await expect(page.locator(`${PICKED} input`).first(), "the date field takes the pick").not.toHaveValue("");
 
     await expect
         .poll(() => readout(page, "picked"), { message: "but a date without a time is not a date-time" })
@@ -108,7 +115,10 @@ test("the clock completes the value the calendar started", async ({ page }) => {
 
     const dialog = page.locator('[role="dialog"]');
 
-    await dialog.locator('[role="gridcell"][aria-label="10 August 2026"]').click();
+    await dialog.locator(TODAY_CELL).click();
+
+    const date = await inputValue(page.locator(`${PICKED} input`).first());
+
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
 
@@ -119,7 +129,7 @@ test("the clock completes the value the calendar started", async ({ page }) => {
 
     await expect
         .poll(() => readout(page, "picked"), { message: "both popups write into the one value" })
-        .toContain("2026-08-10 at 09");
+        .toContain(`${date} at 09`);
 });
 
 test("the two popups are separate layers, so opening one closes nothing of the other's", async ({ page }) => {

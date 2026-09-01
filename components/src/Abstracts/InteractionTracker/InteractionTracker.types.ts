@@ -8,7 +8,7 @@ export type InternalInteractionFlags = {
     isHovered?: boolean;
     isActive?: boolean;
     isFocused?: boolean;
-    activation?: InteractionActivation;
+    isFocusVisible?: boolean;
 };
 
 export type InteractionActivation = {

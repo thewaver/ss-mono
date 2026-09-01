@@ -10,7 +10,7 @@ import { LiveAnnouncer } from "../../../Abstracts/LiveAnnouncer/LiveAnnouncer";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../InteractionWrapper/InteractionWrapper";
-import type { CalendarCompositeProps, CalendarDayProps, CalendarFlags, CalendarProps } from "./Calendar.types";
+import type { CalendarCompositeProps, CalendarDayProps, CalendarProps, CalendarRenderProps } from "./Calendar.types";
 
 import * as styles from "./Calendar.css";
 
@@ -251,7 +251,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
                                     sizing={"fill"}
                                     isDisabled={() => getIsDayDisabled(getDay())}
                                     isTabbable={() => DateValueUtils.isSame(getDay(), getRovingDay())}
-                                    extraFlags={(): CalendarFlags => ({
+                                    extraFlags={(): CalendarRenderProps => ({
                                         day: getDay(),
                                         isSelected: props.computeIsSelected(getDay()),
                                         isToday: DateValueUtils.isSame(getDay(), getToday()),
@@ -262,11 +262,11 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
                                         isRangeEnd: DateValueUtils.isSame(getDay(), getPaintedRange()?.end),
                                     })}
                                     ref={(element) => setDayRef(weekIndex * DAYS_PER_WEEK + dayIndex, element)}
-                                    renderControl={(setElementRef, getFlags) => (
+                                    renderControl={(setElementRef, getRenderProps) => (
                                         <CalendarDay
                                             ref={setElementRef}
                                             id={() => `${gridId}-day-${DateValueUtils.toIso(getDay())}`}
-                                            flags={getFlags}
+                                            flags={getRenderProps}
                                             ariaLabel={() =>
                                                 DateValueUtils.format(
                                                     getDay(),

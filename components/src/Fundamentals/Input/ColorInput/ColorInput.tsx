@@ -12,7 +12,7 @@ import { ColorArea } from "../ColorArea/ColorArea";
 import { FormFieldUtils } from "../FormField/FormField.utils";
 import { LabelUtils } from "../Label/Label.utils";
 import { Range } from "../Range/Range";
-import type { ColorInputFieldProps, ColorInputFlags, ColorInputProps } from "./ColorInput.types";
+import type { ColorInputFieldProps, ColorInputProps, ColorInputRenderProps } from "./ColorInput.types";
 
 import * as styles from "./ColorInput.css";
 
@@ -154,7 +154,7 @@ export const ColorInput = (props: ColorInputProps) => {
         <>
             <InteractionWrapper
                 {...props}
-                extraFlags={(): ColorInputFlags => ({
+                extraFlags={(): ColorInputRenderProps => ({
                     value: props.valueSignal[0](),
                     hsv: getHsv(),
                     isOpen: getIsOpen(),
@@ -163,14 +163,14 @@ export const ColorInput = (props: ColorInputProps) => {
                     setFieldRef(element);
                     props.ref?.(element);
                 }}
-                renderControl={(setElementRef, getFlags) => (
+                renderControl={(setElementRef, getRenderProps) => (
                     <ColorInputField
                         ref={setElementRef}
                         id={props.id}
                         ariaLabel={props.ariaLabel}
                         popupId={() => popupId}
                         isOpen={getIsOpen}
-                        flags={getFlags}
+                        flags={getRenderProps}
                         renderContent={props.renderContent}
                         onToggle={() => setIsOpen((prev) => !prev)}
                         onMouseEnter={props.onMouseEnter}

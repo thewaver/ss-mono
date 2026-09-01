@@ -27,12 +27,12 @@ export type PaginatorRange = {
     boundaryCount: number;
 };
 
-export type PaginatorPageFlags = {
+export type PaginatorPageRenderProps = {
     page: number;
     isCurrent: boolean;
 };
 
-export type PaginatorStepFlags = {
+export type PaginatorStepRenderProps = {
     step: PaginatorStep;
     targetPage: number;
 };
@@ -61,9 +61,12 @@ export type PaginatorProps = AccessorProps<{
     page: number;
     renderPage: (
         getEntry: Accessor<PaginatorPageEntry>,
-        getFlags: () => InteractionFlags<PaginatorPageFlags>,
+        getRenderProps: () => InteractionFlags<PaginatorPageRenderProps>,
     ) => JSX.Element;
     renderGap: (getEntry: Accessor<PaginatorGapEntry>) => JSX.Element;
-    renderStep: (getStep: Accessor<PaginatorStep>, getFlags: () => InteractionFlags<PaginatorStepFlags>) => JSX.Element;
+    renderStep: (
+        getStep: Accessor<PaginatorStep>,
+        getRenderProps: () => InteractionFlags<PaginatorStepRenderProps>,
+    ) => JSX.Element;
     onPageChange?: (page: number) => void;
 }>;

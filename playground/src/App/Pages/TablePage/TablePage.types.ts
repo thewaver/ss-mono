@@ -11,7 +11,8 @@ export type Part = {
 };
 
 export type PartColumnDefs = {
-    isResizable: boolean;
+    isResizable?: boolean;
+    isReorderable?: boolean;
 };
 
 export type TableExampleProps = {

@@ -12,6 +12,6 @@ export const DisabledExample = (props: Props) => (
         valueSignal={props.valueSignal}
         isDisabled={true}
         ariaLabel={"Disabled colour"}
-        renderContent={(getFlags) => <PageColorInputContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageColorInputContent renderProps={getRenderProps} />}
     />
 );

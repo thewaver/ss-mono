@@ -31,8 +31,8 @@ export const SteppedExample = (props: Props) => {
             gap={() => CAROUSEL_GAP}
             ariaLabel={"Sampler"}
             renderSlide={(getSlide, getState) => <PageCarouselSlide state={getState}>{getSlide()}</PageCarouselSlide>}
-            renderStep={(_getStep, getFlags) => <PageCarouselStep flags={getFlags} />}
-            renderPick={(_getIndex, getFlags) => <PageCarouselPick flags={getFlags} />}
+            renderStep={(_getStep, getRenderProps) => <PageCarouselStep renderProps={getRenderProps} />}
+            renderPick={(_getIndex, getRenderProps) => <PageCarouselPick renderProps={getRenderProps} />}
             renderControls={renderBar}
         />
     );

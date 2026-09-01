@@ -14,6 +14,6 @@ export const DisabledPairExample = (props: Props) => (
         thumbLabels={() => ["Locked floor", "Locked ceiling"]}
         isDisabled={true}
         thumbSize={() => RANGE_THUMB_SIZE}
-        renderContent={(getFlags) => <PageRangeContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
     />
 );

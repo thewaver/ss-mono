@@ -18,7 +18,9 @@ export const VerticalExample = (props: Props) => (
             ariaLabel={"Vertical volume"}
             orientation={"vertical"}
             thumbSize={() => RANGE_THUMB_SIZE}
-            renderContent={(getFlags) => <PageRangeContent flags={getFlags} length={() => VERTICAL_LENGTH} />}
+            renderContent={(getRenderProps) => (
+                <PageRangeContent renderProps={getRenderProps} length={() => VERTICAL_LENGTH} />
+            )}
         />
 
         <PageControlRowLabel>and a pair</PageControlRowLabel>
@@ -29,7 +31,9 @@ export const VerticalExample = (props: Props) => (
             thumbLabels={() => ["Band floor", "Band ceiling"]}
             orientation={"vertical"}
             thumbSize={() => RANGE_THUMB_SIZE}
-            renderContent={(getFlags) => <PageRangeContent flags={getFlags} length={() => VERTICAL_LENGTH} />}
+            renderContent={(getRenderProps) => (
+                <PageRangeContent renderProps={getRenderProps} length={() => VERTICAL_LENGTH} />
+            )}
         />
     </PageControlRow>
 );

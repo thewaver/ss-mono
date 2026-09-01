@@ -16,12 +16,12 @@ import type {
     CarouselControls,
     CarouselDir,
     CarouselFace,
-    CarouselPickFlags,
+    CarouselPickRenderProps,
     CarouselProps,
     CarouselRotationFlags,
     CarouselSlideState,
     CarouselStep,
-    CarouselStepFlags,
+    CarouselStepRenderProps,
 } from "./Carousel.types";
 import { CarouselUtils } from "./Carousel.utils";
 
@@ -198,16 +198,16 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         const getTargetIndex = () => CarouselUtils.getStepTarget(step, getCurrentIndex(), getCount());
 
         return (
-            <InteractionWrapper<CarouselStepFlags>
+            <InteractionWrapper<CarouselStepRenderProps>
                 isDisabled={() => getIsDisabled() || getCount() < MIN_ROTATABLE_COUNT}
                 extraFlags={() => ({ step, targetIndex: getTargetIndex() })}
-                renderControl={(setElementRef, getFlags) => (
+                renderControl={(setElementRef, getRenderProps) => (
                     <CarouselControl
                         ref={setElementRef}
                         isCurrent={false}
                         ariaLabel={() => props.computeStepLabel?.(step) ?? STEP_LABELS[step]}
-                        flags={getFlags}
-                        renderContent={() => props.renderStep?.(() => step, getFlags)}
+                        flags={getRenderProps}
+                        renderContent={() => props.renderStep?.(() => step, getRenderProps)}
                         onActivate={() => goTo(getTargetIndex())}
                     />
                 )}
@@ -216,16 +216,16 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     };
 
     const renderPickControl = (index: number): JSX.Element => (
-        <InteractionWrapper<CarouselPickFlags>
+        <InteractionWrapper<CarouselPickRenderProps>
             isDisabled={getIsDisabled}
             extraFlags={() => ({ index, isCurrent: index === getCurrentIndex() })}
-            renderControl={(setElementRef, getFlags) => (
+            renderControl={(setElementRef, getRenderProps) => (
                 <CarouselControl
                     ref={setElementRef}
-                    isCurrent={() => getFlags().isCurrent}
+                    isCurrent={() => getRenderProps().isCurrent}
                     ariaLabel={() => getSlideLabel(index)}
-                    flags={getFlags}
-                    renderContent={() => props.renderPick?.(() => index, getFlags)}
+                    flags={getRenderProps}
+                    renderContent={() => props.renderPick?.(() => index, getRenderProps)}
                     onActivate={() => goTo(index)}
                 />
             )}

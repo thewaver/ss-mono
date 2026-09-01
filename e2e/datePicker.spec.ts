@@ -18,6 +18,13 @@ const trigger = (key: string) => `#${key}Trigger`;
 const day = (label: string) => `${POPUP} [role="gridcell"][aria-label="${label}"]`;
 
 /**
+ * The day the calendar itself marks as today, rather than a date written down here. A picker with no value
+ * opens on the machine's current month, so any date spelled out in this file is right only until the clock
+ * passes it — which is a red that says "the calendar broke" when it means "the month rolled over".
+ */
+const TODAY_CELL = `${POPUP} [role="gridcell"][aria-current="date"]`;
+
+/**
  * The field is typed in ISO order, which is the one format `DateValueUtils.fromIso` accepts and refuses
  * precisely. Typing is driven character by character rather than filled, because the interesting cases are
  * the partial ones — a date is not a value until the last digit lands.
@@ -147,10 +154,12 @@ test("the trigger opens a calendar over the field", async ({ page }) => {
 
 test("picking a day writes the field and the owner together", async ({ page }) => {
     await page.locator(trigger("picked")).click();
-    await page.locator(day("18 August 2026")).click();
+    await page.locator(TODAY_CELL).click();
 
-    expect(await readout(page, "picked")).toContain("value: 2026-08-18");
-    expect(await inputValue(page.locator(field(PICKED))), "and the text follows the pick").toBe("2026-08-18");
+    const picked = await inputValue(page.locator(field(PICKED)));
+
+    expect(picked, "the field takes the day that was clicked").not.toBe("");
+    expect(await readout(page, "picked"), "and the owner holds the very same date").toContain(`value: ${picked}`);
 });
 
 test("typing moves the calendar to the month it lands in", async ({ page }) => {
@@ -165,11 +174,14 @@ test("typing moves the calendar to the month it lands in", async ({ page }) => {
 
 test("Escape closes the calendar and leaves the value alone", async ({ page }) => {
     await page.locator(trigger("picked")).click();
-    await page.locator(day("18 August 2026")).click();
+    await page.locator(TODAY_CELL).click();
+
+    const picked = await inputValue(page.locator(field(PICKED)));
+
     await page.keyboard.press("Escape");
 
     await expect(page.locator(POPUP)).toHaveCount(0);
-    expect(await readout(page, "picked")).toContain("value: 2026-08-18");
+    expect(await readout(page, "picked"), "the pick survives the dismissal").toContain(`value: ${picked}`);
 });
 
 test("bounds refuse a date whether it is typed or picked", async ({ page }) => {

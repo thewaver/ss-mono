@@ -26,7 +26,7 @@ export const PageTagContent = (props: ParentProps<TagContentProps>) => {
             class={styles.tagContent}
             classList={{
                 [styles.isHovered]: access(props.flags).isHovered,
-                [styles.isFocused]: access(props.flags).isFocused,
+                [styles.isFocused]: access(props.flags).isFocusVisible,
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}
         >

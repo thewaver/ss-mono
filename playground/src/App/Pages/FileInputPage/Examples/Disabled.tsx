@@ -10,6 +10,6 @@ export const DisabledExample = (props: Props) => (
         filesSignal={props.filesSignal}
         isDisabled={true}
         ariaLabel={"Disabled attachment"}
-        renderContent={(getFlags) => <PageFileInputContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageFileInputContent renderProps={getRenderProps} />}
     />
 );

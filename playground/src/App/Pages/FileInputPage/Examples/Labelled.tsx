@@ -14,7 +14,7 @@ export const LabelledExample = (props: Props) => (
 
         <FileInput
             filesSignal={props.filesSignal}
-            renderContent={(getFlags) => <PageFileInputContent flags={getFlags} />}
+            renderContent={(getRenderProps) => <PageFileInputContent renderProps={getRenderProps} />}
         />
     </Label>
 );

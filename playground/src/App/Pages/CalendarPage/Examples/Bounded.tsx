@@ -25,7 +25,7 @@ export const BoundedExample = (props: Props) => {
                 min={() => MIN_DATE}
                 max={() => MAX_DATE}
                 ariaLabel={"Choose a date within August"}
-                renderDay={(_unused, getFlags) => <PageCalendarDay flags={getFlags} />}
+                renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}
                 renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
             />
         </PageCalendarFrame>

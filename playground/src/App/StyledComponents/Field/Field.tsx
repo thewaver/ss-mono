@@ -195,7 +195,7 @@ export const PageColorField = (props: PageColorFieldProps) => {
             valueSignal={[() => access(props.value), props.onInput]}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
-            renderContent={(getFlags) => <PageColorInputContent flags={getFlags} isCompact={true} />}
+            renderContent={(getRenderProps) => <PageColorInputContent renderProps={getRenderProps} isCompact={true} />}
             {...pageColorPickerSlots}
         />
     );
@@ -210,7 +210,7 @@ export const PageFileField = (props: PageFileFieldProps) => {
             accept={props.accept}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
-            renderContent={(getFlags) => <PageFileInputContent flags={getFlags} />}
+            renderContent={(getRenderProps) => <PageFileInputContent renderProps={getRenderProps} />}
             onChange={(files) => {
                 if (!files.length) return;
 

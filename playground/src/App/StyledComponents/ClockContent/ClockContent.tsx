@@ -11,14 +11,14 @@ export const PageClockOption = (props: ClockOptionProps) => {
         <div
             class={styles.clockOption}
             classList={{
-                [styles.isSelected]: access(props.flags).isSelected,
-                [styles.isNow]: access(props.flags).isNow,
-                [styles.isHovered]: access(props.flags).isHovered,
-                [styles.isDisabled]: access(props.flags).isDisabled,
+                [styles.isSelected]: access(props.renderProps).isSelected,
+                [styles.isNow]: access(props.renderProps).isNow,
+                [styles.isHovered]: access(props.renderProps).isHovered,
+                [styles.isDisabled]: access(props.renderProps).isDisabled,
             }}
             aria-hidden="true"
         >
-            {access(props.flags).option.label}
+            {access(props.renderProps).option.label}
         </div>
     );
 };

@@ -10,6 +10,6 @@ export const ImagesExample = (props: Props) => (
         filesSignal={props.filesSignal}
         accept={"image/*"}
         ariaLabel={"Avatar"}
-        renderContent={(getFlags) => <PageFileInputContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageFileInputContent renderProps={getRenderProps} />}
     />
 );

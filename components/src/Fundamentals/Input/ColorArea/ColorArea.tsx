@@ -6,9 +6,12 @@ import { InteractionTracker } from "../../../Abstracts/InteractionTracker/Intera
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../InteractionWrapper/InteractionWrapper";
 import { LabelUtils } from "../Label/Label.utils";
-import type { ColorAreaAxis, ColorAreaElementProps, ColorAreaFlags, ColorAreaProps } from "./ColorArea.types";
+import type { ColorAreaAxis, ColorAreaElementProps, ColorAreaProps, ColorAreaRenderProps } from "./ColorArea.types";
 
 import * as styles from "./ColorArea.css";
+
+const readFocusVisibleAxis = (element: HTMLElement, axis: ColorAreaAxis) =>
+    InteractionTracker.computeIsFocusVisible(element) ? axis : undefined;
 
 const DEFAULT_COLOR_AREA_STEP = 0.01;
 const DEFAULT_COLOR_AREA_AXIS_LABELS: Record<ColorAreaAxis, string> = {
@@ -110,8 +113,13 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
 
                             syncAxis(element, axis);
                         }}
-                        onFocus={() => props.setFocusedAxis(axis)}
-                        onBlur={() => props.setFocusedAxis(undefined)}
+                        onFocus={(e) =>
+                            props.setFocusVisibleAxis(
+                                getIsDragging() ? undefined : readFocusVisibleAxis(e.currentTarget, axis),
+                            )
+                        }
+                        onKeyDown={(e) => props.setFocusVisibleAxis(readFocusVisibleAxis(e.currentTarget, axis))}
+                        onBlur={() => props.setFocusVisibleAxis(undefined)}
                     />
                 )}
             </For>
@@ -122,7 +130,7 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
 export const ColorArea = (props: ColorAreaProps) => {
     const hsvSignal = accessSignal(() => props.hsvSignal);
 
-    const [getFocusedAxis, setFocusedAxis] = createSignal<ColorAreaAxis>();
+    const [getFocusVisibleAxis, setFocusVisibleAxis] = createSignal<ColorAreaAxis>();
     const [getIsDragging, setIsDragging] = createSignal(false);
 
     const setAxis = (axis: ColorAreaAxis, ratio: number) => {
@@ -138,12 +146,12 @@ export const ColorArea = (props: ColorAreaProps) => {
     return (
         <InteractionWrapper
             {...props}
-            extraFlags={(): ColorAreaFlags => ({
+            extraFlags={(): ColorAreaRenderProps => ({
                 hsv: hsvSignal[0](),
                 isDragging: getIsDragging(),
-                focusedAxis: getFocusedAxis(),
+                focusVisibleAxis: getFocusVisibleAxis(),
             })}
-            renderControl={(setElementRef, getFlags) => (
+            renderControl={(setElementRef, getRenderProps) => (
                 <ColorAreaElement
                     ref={setElementRef}
                     id={props.id}
@@ -151,12 +159,12 @@ export const ColorArea = (props: ColorAreaProps) => {
                     ariaLabel={props.ariaLabel}
                     axisLabels={() => access(props.axisLabels) ?? DEFAULT_COLOR_AREA_AXIS_LABELS}
                     step={() => access(props.step) ?? DEFAULT_COLOR_AREA_STEP}
-                    flags={getFlags}
+                    flags={getRenderProps}
                     hsv={() => hsvSignal[0]()}
                     isTabbable={props.isTabbable}
                     renderContent={props.renderContent}
                     setAxis={setAxis}
-                    setFocusedAxis={setFocusedAxis}
+                    setFocusVisibleAxis={setFocusVisibleAxis}
                     setIsDragging={setIsDragging}
                     onMouseEnter={props.onMouseEnter}
                     onMouseLeave={props.onMouseLeave}

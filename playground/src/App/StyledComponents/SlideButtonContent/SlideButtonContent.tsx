@@ -16,17 +16,17 @@ const covered = (ratio: number) =>
 export const PageSlideButtonContent = (props: ParentProps<SlideButtonContentProps>) => {
     const getWidth = () => access(props.width) ?? DEFAULT_SLIDE_BUTTON_CONTENT_WIDTH;
 
-    const getRatio = () => (access(props.flags).isPressed ? 1 : access(props.flags).progressRatio);
+    const getRatio = () => (access(props.renderProps).isPressed ? 1 : access(props.renderProps).progressRatio);
 
-    const getIsTracking = () => access(props.flags).isDragging || access(props.flags).isHolding;
+    const getIsTracking = () => access(props.renderProps).isDragging || access(props.renderProps).isHolding;
 
     return (
         <div
             class={styles.slideButtonContent}
             style={{ width: `${getWidth()}px` }}
             classList={{
-                [styles.isDisabled]: access(props.flags).isDisabled,
-                [styles.hasError]: access(props.flags).hasError,
+                [styles.isDisabled]: access(props.renderProps).isDisabled,
+                [styles.hasError]: access(props.renderProps).hasError,
             }}
         >
             <div
@@ -43,7 +43,7 @@ export const PageSlideButtonContent = (props: ParentProps<SlideButtonContentProp
                 class={styles.slideButtonThumb}
                 classList={{
                     [styles.isTracking]: getIsTracking(),
-                    [styles.isFocused]: access(props.flags).isFocused,
+                    [styles.isFocused]: access(props.renderProps).isFocusVisible,
                 }}
                 style={{ left: travel(getRatio()) }}
             >

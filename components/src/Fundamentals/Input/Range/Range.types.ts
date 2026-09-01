@@ -16,12 +16,12 @@ export type RangeSpan = {
     end: number;
 };
 
-export type RangeFlags = {
+export type RangeRenderProps = {
     orientation: RangeOrientation;
     values: number[];
     ratios: number[];
     fill: RangeSpan;
-    focusedThumb?: number;
+    focusVisibleThumb?: number;
 };
 
 export type RangeCbs = {
@@ -43,20 +43,20 @@ export type RangeState = {
 
 export type RangeElementProps = AccessorProps<
     RangeCbs &
-        InteractionControlProps<RangeFlags> &
+        InteractionControlProps<RangeRenderProps> &
         Required<Omit<RangeState, "name" | "ariaLabel" | "thumbLabels">> &
         Pick<RangeState, "name" | "ariaLabel" | "thumbLabels"> & {
             values: number[];
             isTabbable?: boolean;
             setValue: (index: number, value: number) => void;
-            setFocusedThumb: (index?: number) => void;
+            setFocusVisibleThumb: (index?: number) => void;
         }
 >;
 
-export type RangeProps = Omit<InteractionWrapperProps<RangeFlags>, "renderControl" | "extraFlags"> &
+export type RangeProps = Omit<InteractionWrapperProps<RangeRenderProps>, "renderControl" | "extraFlags"> &
     AccessorProps<
         RangeCbs &
-            Pick<InteractionControlProps<RangeFlags>, "id" | "renderContent"> &
+            Pick<InteractionControlProps<RangeRenderProps>, "id" | "renderContent"> &
             RangeState & {
                 valueSignal?: SignalSource<number>;
                 rangeSignal?: SignalSource<RangeValues>;

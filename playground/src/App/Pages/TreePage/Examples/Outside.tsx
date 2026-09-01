@@ -15,14 +15,14 @@ export const OutsideExample = (props: Props) => (
             valueSignal={props.valueSignal}
             expandedSignal={props.expandedSignal}
             ariaLabel={"Repository, collapsed from outside"}
-            renderNode={(getNode, getFlags) => (
-                <PageTreeNodeContent flags={getFlags}>{getNode().value}</PageTreeNodeContent>
+            renderNode={(getNode, getRenderProps) => (
+                <PageTreeNodeContent renderProps={getRenderProps}>{getNode().value}</PageTreeNodeContent>
             )}
         />
 
         <Button
-            renderContent={(getFlags) => (
-                <PageButtonContent flags={getFlags}>
+            renderContent={(getRenderProps) => (
+                <PageButtonContent flags={getRenderProps}>
                     {`Collapse Lib in ${OUTSIDE_COLLAPSE_DELAY_MS}ms`}
                 </PageButtonContent>
             )}

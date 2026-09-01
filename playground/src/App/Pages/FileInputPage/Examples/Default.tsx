@@ -9,6 +9,6 @@ export const DefaultExample = (props: Props) => (
     <FileInput
         filesSignal={props.filesSignal}
         ariaLabel={"Attachment"}
-        renderContent={(getFlags) => <PageFileInputContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageFileInputContent renderProps={getRenderProps} />}
     />
 );

@@ -12,7 +12,7 @@ export const RejectingSetterExample = (props: Props) => {
             filesSignal={props.filesSignal}
             hasError={() => access(props.rejection) !== ""}
             ariaLabel={"Small attachment"}
-            renderContent={(getFlags) => <PageFileInputContent flags={getFlags} />}
+            renderContent={(getRenderProps) => <PageFileInputContent renderProps={getRenderProps} />}
             onChange={(files) => {
                 const tooBig = files.filter((file) => file.size > MAX_ATTACHMENT_BYTES);
 

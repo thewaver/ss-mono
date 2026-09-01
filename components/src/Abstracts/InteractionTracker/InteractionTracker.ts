@@ -14,6 +14,7 @@ import type {
 const SWIPE_SLOP_RATIO = 0.02;
 const CENTER_RATIO: InteractionDragRatio = { x: 0.5, y: 0.5 };
 const SCROLL_EDGE_PX = 1;
+const FOCUS_VISIBLE_SELECTOR = ":focus-visible";
 const SWIPE_TOUCH_ACTIONS: Record<SwipeAxis, string> = {
     horizontal: "pan-y",
     vertical: "pan-x",
@@ -146,8 +147,14 @@ const trackPointer = (
 };
 
 export namespace InteractionTracker {
-    export const computeIsReachable = (isDisabled: boolean, isReachableWhenDisabled: boolean, hasTooltip: boolean) =>
-        isDisabled && isReachableWhenDisabled && hasTooltip;
+    export const computeIsFocusVisible = (element: HTMLElement) => element.matches(FOCUS_VISIBLE_SELECTOR);
+
+    export const computeIsReachable = (
+        isDisabled: boolean,
+        isReachableWhenDisabled: boolean,
+        hasTooltip: boolean,
+        isFocusableWhenDisabled = false,
+    ) => isDisabled && ((isReachableWhenDisabled && hasTooltip) || isFocusableWhenDisabled);
 
     export const wrapExtraControls = (
         getRefs: () => Array<HTMLElement | undefined>,
@@ -203,12 +210,17 @@ export namespace InteractionTracker {
             return flags;
         });
 
-        const onFocus = () => {
+        const readFocusVisible = (element: HTMLElement) => {
+            setInternalFlags("isFocusVisible", computeIsFocusVisible(element));
+        };
+
+        const onFocus = (e: FocusEvent) => {
             setInternalFlags("isFocused", true);
+            readFocusVisible(e.currentTarget as HTMLElement);
         };
 
         const onBlur = () => {
-            setInternalFlags("isFocused", false);
+            setInternalFlags({ isFocused: false, isFocusVisible: false });
             setActiveByKey(false);
         };
 
@@ -230,6 +242,8 @@ export namespace InteractionTracker {
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
+            readFocusVisible(e.currentTarget as HTMLElement);
+
             if (e.key !== "Enter" && e.key !== " ") return;
 
             setActiveByKey(true);
@@ -260,7 +274,7 @@ export namespace InteractionTracker {
             }
 
             if (isDisabled && !isReachable) {
-                setInternalFlags({ isHovered: false, isFocused: false });
+                setInternalFlags({ isHovered: false, isFocused: false, isFocusVisible: false });
                 setActiveByKey(false);
                 setActiveByMouse(false);
 
@@ -349,24 +363,22 @@ export namespace InteractionTracker {
         return createMemo(() => getIsHovered() || getHasFocusWithin() || getIsPageHidden());
     };
 
-    export const trackActivation = (getRef: () => HTMLElement | undefined, getIsDisabled: () => boolean) => {
-        const [getActivation, setActivation] = createSignal<InteractionActivation | undefined>();
-
+    export const trackActivation = (
+        getRef: () => HTMLElement | undefined,
+        getIsDisabled: () => boolean,
+        onActivate: (activation: InteractionActivation) => void,
+    ) => {
         let count = 0;
 
         createEffect(() => {
             const ref = getRef();
 
-            if (!ref || getIsDisabled()) {
-                setActivation(undefined);
-
-                return;
-            }
+            if (!ref || getIsDisabled()) return;
 
             const activate = (ratio: InteractionDragRatio) => {
                 count += 1;
 
-                setActivation({ ratio, count });
+                onActivate({ ratio, count });
             };
 
             const onPointerDown = (e: PointerEvent) => {
@@ -389,8 +401,6 @@ export namespace InteractionTracker {
                 ref.removeEventListener("keydown", onKeyDown);
             });
         });
-
-        return getActivation;
     };
 
     export const trackDrag = (

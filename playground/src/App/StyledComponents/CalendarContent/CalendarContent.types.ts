@@ -1,7 +1,7 @@
-import type { AccessorProps, CalendarFlags, InteractionFlags } from "@thewaver/ss-components";
+import type { AccessorProps, CalendarRenderProps, InteractionFlags } from "@thewaver/ss-components";
 
 export type CalendarDayProps = AccessorProps<{
-    flags: InteractionFlags<CalendarFlags>;
+    renderProps: InteractionFlags<CalendarRenderProps>;
 }>;
 
 export type CalendarTitleProps = AccessorProps<{

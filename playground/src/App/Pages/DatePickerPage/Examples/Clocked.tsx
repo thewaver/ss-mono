@@ -69,7 +69,7 @@ export const ClockedExample = (props: Props) => {
                     />
                 </>
             )}
-            renderOption={(_unused, getFlags) => <PageClockOption flags={getFlags} />}
+            renderOption={(_unused, getRenderProps) => <PageClockOption renderProps={getRenderProps} />}
             renderUnit={(name) => <PageClockUnit>{name}</PageClockUnit>}
             renderColumn={(renderOptions) => <PageClockColumn>{renderOptions()}</PageClockColumn>}
             renderPopup={(renderClock) => <PageClockFrame>{renderClock()}</PageClockFrame>}

@@ -1,17 +1,17 @@
-import type { AccessorProps, TableCellFlags, TableColumnFlags } from "@thewaver/ss-components";
+import type { AccessorProps, TableCellRenderProps, TableColumnRenderProps } from "@thewaver/ss-components";
 
 export type TableAlign = "start" | "end";
 
 export type TableHeaderContentProps = AccessorProps<{
-    flags: TableColumnFlags;
+    renderProps: TableColumnRenderProps;
     align?: TableAlign;
 }>;
 
 export type TableCellContentProps = AccessorProps<{
-    flags: TableCellFlags;
+    renderProps: TableCellRenderProps;
     align?: TableAlign;
 }>;
 
 export type TableResizerProps = AccessorProps<{
-    flags: TableColumnFlags;
+    renderProps: TableColumnRenderProps;
 }>;

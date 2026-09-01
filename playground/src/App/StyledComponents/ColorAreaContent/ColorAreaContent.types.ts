@@ -1,7 +1,7 @@
-import type { AccessorProps, ColorAreaFlags, InteractionFlags, RangeFlags } from "@thewaver/ss-components";
+import type { AccessorProps, ColorAreaRenderProps, InteractionFlags, RangeRenderProps } from "@thewaver/ss-components";
 
 export type ColorAreaContentProps = AccessorProps<{
-    flags: InteractionFlags<ColorAreaFlags>;
+    renderProps: InteractionFlags<ColorAreaRenderProps>;
     size: number;
 }>;
 
@@ -14,5 +14,5 @@ export type ColorFieldTriggerProps = AccessorProps<{
 }>;
 
 export type HueSliderProps = AccessorProps<{
-    flags: InteractionFlags<RangeFlags>;
+    renderProps: InteractionFlags<RangeRenderProps>;
 }>;

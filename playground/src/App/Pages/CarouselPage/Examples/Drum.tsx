@@ -35,8 +35,8 @@ export const DrumExample = (props: Props) => {
             ariaLabel={"Barrel sampler"}
             renderSlide={(getSlide, getState) => <PageCarouselSlide state={getState}>{getSlide()}</PageCarouselSlide>}
             renderSlideBack={() => <PageCarouselSlideBack />}
-            renderStep={(_getStep, getFlags) => <PageCarouselStep flags={getFlags} />}
-            renderPick={(_getIndex, getFlags) => <PageCarouselPick flags={getFlags} />}
+            renderStep={(_getStep, getRenderProps) => <PageCarouselStep renderProps={getRenderProps} />}
+            renderPick={(_getIndex, getRenderProps) => <PageCarouselPick renderProps={getRenderProps} />}
             renderControls={renderBar}
         />
     );

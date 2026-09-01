@@ -16,7 +16,7 @@ export type ClockOption = {
     label: string;
 };
 
-export type ClockFlags = {
+export type ClockRenderProps = {
     option: ClockOption;
     isSelected: boolean;
     isNow: boolean;
@@ -25,7 +25,7 @@ export type ClockFlags = {
 
 export type ClockOptionRenderer = (
     getOption: Accessor<ClockOption>,
-    getFlags: () => InteractionFlags<ClockFlags>,
+    getRenderProps: () => InteractionFlags<ClockRenderProps>,
 ) => JSX.Element;
 
 export type ClockUnitRenderer = (name: string, unit: ClockUnit) => JSX.Element;
@@ -33,9 +33,9 @@ export type ClockUnitRenderer = (name: string, unit: ClockUnit) => JSX.Element;
 export type ClockColumnRenderer = (renderOptions: () => JSX.Element, unit: ClockUnit) => JSX.Element;
 
 export type ClockOptionProps = AccessorProps<
-    Omit<InteractionControlProps<ClockFlags>, "renderContent"> & {
+    Omit<InteractionControlProps<ClockRenderProps>, "renderContent"> & {
         ariaLabel: string;
-        renderContent: (getFlags: () => InteractionFlags<ClockFlags>) => JSX.Element;
+        renderContent: (getRenderProps: () => InteractionFlags<ClockRenderProps>) => JSX.Element;
         onSelect: () => void;
     }
 >;

@@ -5,13 +5,35 @@ import type { TableColumn, TableSort, TableSortDirection } from "./Table.types";
 const SORT_CYCLE: (TableSortDirection | undefined)[] = ["ascending", "descending", undefined];
 
 export namespace TableUtils {
-    export const getSortedRows = <T>(rows: T[], column: TableColumn<T> | undefined, sort: TableSort | undefined) => {
-        if (!column || !sort || !column.compare || column.id !== sort.columnId) return rows;
+    export const getSortedOrder = <T>(
+        rows: T[],
+        column: TableColumn<T> | undefined,
+        sort: TableSort | undefined,
+    ): number[] | undefined => {
+        if (!column || !sort || !column.compare || column.id !== sort.columnId) return undefined;
 
         const sign = sort.direction === "ascending" ? 1 : -1;
 
-        return [...rows].sort((a, b) => sign * column.compare!(a, b));
+        return rows.map((_unused, index) => index).sort((a, b) => sign * column.compare!(rows[a], rows[b]));
     };
+
+    export const getColumnOrder = <T>(columns: TableColumn<T>[], order: string[] | undefined): number[] | undefined => {
+        if (!order || order.length < 1) return undefined;
+
+        const rank = new Map(order.map((id, index) => [id, index]));
+        const placed = columns
+            .map((_unused, index) => index)
+            .sort(
+                (a, b) =>
+                    (rank.get(columns[a].id) ?? Number.MAX_SAFE_INTEGER) -
+                    (rank.get(columns[b].id) ?? Number.MAX_SAFE_INTEGER),
+            );
+
+        return placed.every((value, index) => value === index) ? undefined : placed;
+    };
+
+    export const getReordered = <T>(entries: T[], order: number[] | undefined) =>
+        order === undefined ? entries : order.map((index) => entries[index]);
 
     export const getNextSort = (current: TableSort | undefined, columnId: string): TableSort | undefined => {
         const position = current?.columnId === columnId ? SORT_CYCLE.indexOf(current.direction) : -1;

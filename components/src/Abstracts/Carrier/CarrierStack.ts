@@ -1,26 +1,30 @@
 import { batch, createSignal, onCleanup } from "solid-js";
 
-import { LiveAnnouncer } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer";
-import type { SortableCarry, SortableCarryMode, SortableEndReason, SortableZone } from "./Sortable.types";
-import { SortableUtils } from "./Sortable.utils";
+import type { Point2d } from "@thewaver/ss-utils";
+
+import { LiveAnnouncer } from "../LiveAnnouncer/LiveAnnouncer";
+import type { CarrierZone, Carry, CarryEndReason, CarryMode } from "./Carrier.types";
+import { CarrierUtils } from "./Carrier.utils";
 
 type CarryState = {
-    carry: SortableCarry;
-    from: SortableZone;
+    carry: Carry;
+    from: CarrierZone;
     fromIndex: number;
-    to: SortableZone;
+    to: CarrierZone;
     toIndex: number;
-    mode: SortableCarryMode;
+    mode: CarryMode;
 };
 
-const zones: SortableZone[] = [];
+const DRAG_SLOP_PX = 4;
+
+const zones: CarrierZone[] = [];
 
 const [getCarryState, setCarryState] = createSignal<CarryState | undefined>();
 
 const getGroupZones = (groupId: string) =>
     zones.filter((zone) => zone.getGroupId() === groupId && !zone.getIsDisabled());
 
-const computePlaceCount = (state: CarryState, zone: SortableZone) =>
+const computePlaceCount = (state: CarryState, zone: CarrierZone) =>
     zone === state.from ? zone.getLength() : zone.getLength() + 1;
 
 const getAcceptingZones = (state: CarryState) =>
@@ -40,8 +44,8 @@ const findZoneAt = (x: number, y: number, groupId: string) => {
     }
 };
 
-export namespace SortableStack {
-    export const registerZone = (zone: SortableZone) => {
+export namespace CarrierStack {
+    export const registerZone = (zone: CarrierZone) => {
         zones.push(zone);
 
         onCleanup(() => {
@@ -63,13 +67,23 @@ export namespace SortableStack {
 
     export const getSourceIndex = () => getCarryState()?.fromIndex;
 
-    export const start = (from: SortableZone, fromIndex: number, carry: SortableCarry, mode: SortableCarryMode) => {
+    export const start = (from: CarrierZone, fromIndex: number, carry: Carry, mode: CarryMode) => {
         setCarryState({ carry, from, fromIndex, to: from, toIndex: fromIndex, mode });
 
+        if (mode !== "key") {
+            LiveAnnouncer.announce(`${carry.label} picked up from ${from.getLabel()}.`);
+
+            return;
+        }
+
+        const hasOtherZones =
+            getAcceptingZones({ carry, from, fromIndex, to: from, toIndex: fromIndex, mode }).length > 1;
+        const keys = hasOtherZones
+            ? "Arrow keys choose a place, Tab changes list, Enter drops, Escape cancels."
+            : "Arrow keys choose a place, Enter drops, Escape cancels.";
+
         LiveAnnouncer.announce(
-            mode === "key"
-                ? `${carry.label} picked up from ${from.getLabel()}, position ${fromIndex + 1} of ${from.getLength()}. Arrow keys choose a place, Tab changes list, Enter drops, Escape cancels.`
-                : `${carry.label} picked up from ${from.getLabel()}.`,
+            `${carry.label} picked up from ${from.getLabel()}, position ${fromIndex + 1} of ${from.getLength()}. ${keys}`,
         );
     };
 
@@ -82,8 +96,8 @@ export namespace SortableStack {
 
         if (!zone || (zone !== state.from && !zone.computeCanAccept(state.carry))) return;
 
-        const dropIndex = SortableUtils.computeDropIndex(zone.getItemRects(), x, y, zone.getDir());
-        const toIndex = SortableUtils.computeSettledIndex(dropIndex, state.fromIndex, zone === state.from);
+        const dropIndex = CarrierUtils.computeDropIndex(zone.getItemRects(), x, y, zone.getDir());
+        const toIndex = CarrierUtils.computeSettledIndex(dropIndex, state.fromIndex, zone === state.from);
 
         if (zone === state.to && toIndex === state.toIndex) return;
 
@@ -123,7 +137,7 @@ export namespace SortableStack {
         LiveAnnouncer.announce(`${to.getLabel()}, place ${toIndex + 1} of ${computePlaceCount(state, to)}.`);
     };
 
-    export const end = (reason: SortableEndReason) => {
+    export const end = (reason: CarryEndReason) => {
         const state = getCarryState();
 
         setCarryState(undefined);
@@ -156,5 +170,52 @@ export namespace SortableStack {
         LiveAnnouncer.announce(
             `${state.carry.label} dropped in ${state.to.getLabel()}, place ${state.toIndex + 1} of ${state.to.getLength()}.`,
         );
+    };
+
+    export const dragFromPointer = (
+        element: HTMLElement,
+        e: PointerEvent,
+        onPickUp: (from: Point2d) => void,
+        onDrop?: () => void,
+    ) => {
+        const startX = e.clientX;
+        const startY = e.clientY;
+
+        let hasStarted = false;
+
+        const handleMove = (moveEvent: PointerEvent) => {
+            if (moveEvent.pointerId !== e.pointerId) return;
+
+            if (!hasStarted) {
+                if (Math.hypot(moveEvent.clientX - startX, moveEvent.clientY - startY) < DRAG_SLOP_PX) return;
+
+                hasStarted = true;
+                element.setPointerCapture(e.pointerId);
+                onPickUp({ x: startX, y: startY });
+            }
+
+            moveEvent.preventDefault();
+            aimAtPoint(moveEvent.clientX, moveEvent.clientY);
+        };
+
+        const handleEnd = (endEvent: PointerEvent) => {
+            if (endEvent.pointerId !== e.pointerId) return;
+
+            element.removeEventListener("pointermove", handleMove);
+            element.removeEventListener("pointerup", handleEnd);
+            element.removeEventListener("pointercancel", handleEnd);
+
+            if (element.hasPointerCapture(e.pointerId)) element.releasePointerCapture(e.pointerId);
+
+            if (!hasStarted) return;
+
+            onDrop?.();
+
+            end(endEvent.type === "pointercancel" ? "cancel" : "drop");
+        };
+
+        element.addEventListener("pointermove", handleMove);
+        element.addEventListener("pointerup", handleEnd);
+        element.addEventListener("pointercancel", handleEnd);
     };
 }

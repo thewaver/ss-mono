@@ -86,15 +86,12 @@ export namespace ScanlineAnimationKeyframes {
 
     export type HorizontalHueOpts = {};
 
-    // const DEFAULT_HORIZONTAL_HUE_OPTS: Required<HorizontalHueOpts> = {};
-
     export const computeHorizontalHue = (
         [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
         defs: ScanlineAnimationEvaluationDefs,
         t: number,
         opts?: HorizontalHueOpts,
     ): ScanlineAnimationEvaluationResult => {
-        // const mergedOpts = { ...DEFAULT_HORIZONTAL_HUE_OPTS, ...opts };
         const p = peak(b0, b2, t);
 
         return { "hue-rotate": 180 * p };
@@ -102,15 +99,12 @@ export namespace ScanlineAnimationKeyframes {
 
     export type HorizontalBrightnessOpts = {};
 
-    // const DEFAULT_HORIZONTAL_BRIGHTNESS_OPTS: Required<HorizontalBrightnessOpts> = {};
-
     export const computeHorizontalBrightness = (
         [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
         defs: ScanlineAnimationEvaluationDefs,
         t: number,
         opts?: HorizontalBrightnessOpts,
     ): ScanlineAnimationEvaluationResult => {
-        // const mergedOpts = { ...DEFAULT_HORIZONTAL_BRIGHTNESS_OPTS, ...opts };
         const p = peak(b0, b2, t);
 
         return { brightness: 150 * p };
@@ -118,15 +112,12 @@ export namespace ScanlineAnimationKeyframes {
 
     export type HorizontalGrayscaleOpts = {};
 
-    // const DEFAULT_HORIZONTAL_GRAYSCALE_OPTS: Required<HorizontalGrayscaleOpts> = {};
-
     export const computeHorizontalGrayscale = (
         [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
         defs: ScanlineAnimationEvaluationDefs,
         t: number,
         opts?: HorizontalGrayscaleOpts,
     ): ScanlineAnimationEvaluationResult => {
-        // const mergedOpts = { ...DEFAULT_HORIZONTAL_GRAYSCALE_OPTS, ...opts };
         const p = peak(b0, b2, t);
 
         return { grayscale: 100 * p };

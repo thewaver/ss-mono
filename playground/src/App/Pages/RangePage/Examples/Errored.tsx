@@ -15,6 +15,6 @@ export const ErroredExample = (props: Props) => (
         ariaLabel={"Errored range"}
         hasError={() => props.valueSignal[0]() > ERROR_ABOVE}
         thumbSize={() => RANGE_THUMB_SIZE}
-        renderContent={(getFlags) => <PageRangeContent flags={getFlags} />}
+        renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
     />
 );

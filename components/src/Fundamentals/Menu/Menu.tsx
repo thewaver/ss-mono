@@ -340,10 +340,6 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         );
     };
 
-    /**
-     * A run of adjacent radio rows is one set, and the published pattern asks for it to be a group. Everything
-     * else is a run of one, so the walk below is flat whatever the list holds.
-     */
     const renderItems = () => (
         <For each={MenuUtils.getRuns(access(props.items))}>
             {(run) => (
