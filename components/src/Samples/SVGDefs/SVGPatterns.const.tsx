@@ -68,6 +68,13 @@ export namespace SVGPatterns {
         renderCell: SVGPatternCellRenderer,
     ) => computeLayoutPattern("triangle", id, cellCount, cellSize, renderCell);
 
+    export const computeTriangleSidewaysPattern = (
+        id: string,
+        cellCount: SVGPatternCellCount,
+        cellSize: Size2d,
+        renderCell: SVGPatternCellRenderer,
+    ) => computeLayoutPattern("triangleSideways", id, cellCount, cellSize, renderCell);
+
     export const computeHexPointyTopPattern = (
         id: string,
         cellCount: SVGPatternCellCount,

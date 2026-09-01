@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { type TileBoardLayout, TileBoardUtils } from "@thewaver/ss-components";
-import { Count2d, type Count2dString, ShapeConst } from "@thewaver/ss-utils";
+import { Index2d, type Index2dString, ShapeConst } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -33,26 +33,26 @@ const STARTING_TILE_HEIGHT = 72;
 const STARTING_GAP = 4;
 const STARTING_REACH = 1;
 const STARTING_SHAPE: ShapeConst.DefaultShape = "hexagon-pointy-top";
-const STARTING_PIECE: Count2d = { row: 2, col: 2 };
+const STARTING_PIECE: Index2d = { row: 2, col: 2 };
 
-const NO_MARKS: Count2dString[] = [];
+const NO_MARKS: Index2dString[] = [];
 
-const describeTile = (tile: Count2d) => `row ${tile.row + 1}, tile ${tile.col + 1}`;
+const describeTile = (tile: Index2d) => `row ${tile.row + 1}, tile ${tile.col + 1}`;
 
-const computeTilesWithin = (from: Count2d, reach: number, layout: TileBoardLayout) => {
-    const seen = new Set([Count2d.toString(from)]);
-    const within: Count2d[] = [];
+const computeTilesWithin = (from: Index2d, reach: number, layout: TileBoardLayout) => {
+    const seen = new Set([Index2d.toString(from)]);
+    const within: Index2d[] = [];
 
     let edge = [from];
 
     for (let step = 0; step < reach; step += 1) {
-        const next: Count2d[] = [];
+        const next: Index2d[] = [];
 
         for (const tile of edge) {
             for (const neighbour of TileBoardUtils.getNeighbourTiles(tile, layout)) {
-                if (seen.has(Count2d.toString(neighbour))) continue;
+                if (seen.has(Index2d.toString(neighbour))) continue;
 
-                seen.add(Count2d.toString(neighbour));
+                seen.add(Index2d.toString(neighbour));
                 next.push(neighbour);
                 within.push(neighbour);
             }
@@ -74,10 +74,10 @@ export const TileBoardPage = () => {
     const [getHasShortFirstRow, setHasShortFirstRow] = createSignal(false);
     const [getReach, setReach] = createSignal(STARTING_REACH);
 
-    const [getMarked, setMarked] = createSignal<Count2dString[]>(NO_MARKS);
-    const [getPiece, setPiece] = createSignal<Count2d>(STARTING_PIECE);
+    const [getMarked, setMarked] = createSignal<Index2dString[]>(NO_MARKS);
+    const [getPiece, setPiece] = createSignal<Index2d>(STARTING_PIECE);
 
-    const getTileCount = createMemo((): Count2d => ({ row: getRows(), col: getCols() }));
+    const getTileCount = createMemo((): Index2d => ({ row: getRows(), col: getCols() }));
 
     const getTileSize = createMemo(() => ({ width: getTileWidth(), height: getTileHeight() }));
 
@@ -87,8 +87,8 @@ export const TileBoardPage = () => {
 
     const getReachable = createMemo(() => computeTilesWithin(getPiece(), getReach(), getLayout()));
 
-    const toggleMark = (tile: Count2d) => {
-        const key = Count2d.toString(tile);
+    const toggleMark = (tile: Index2d) => {
+        const key = Index2d.toString(tile);
 
         setMarked((previous) =>
             previous.includes(key) ? previous.filter((marked) => marked !== key) : [...previous, key],
@@ -136,7 +136,7 @@ export const TileBoardPage = () => {
                             isDisabled={false}
                             piece={getPiece}
                             computeIsTileDisabled={(tile) =>
-                                !getReachable().some((reachable) => Count2d.isSame(reachable, tile))
+                                !getReachable().some((reachable) => Index2d.isSame(reachable, tile))
                             }
                             onTileActivate={(tile) => setPiece(() => tile)}
                         />

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { type Count2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
+import { type Index2d, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { TileBoardUtils } from "./TileBoard.utils";
 
-const COUNT: Count2d = { row: 5, col: 4 };
+const COUNT: Index2d = { row: 5, col: 4 };
 const TILE: Size2d = { width: 80, height: 60 };
 
 const layoutOf = (shape: ShapeConst.DefaultShape, hasShortFirstRow = false) =>
@@ -15,17 +15,28 @@ const FLAT_HEXAGON = layoutOf("hexagon-flat-top");
 const LOZENGE = layoutOf("lozenge");
 const SQUARE = layoutOf("square");
 const TRIANGLE = layoutOf("triangle-up");
+const SIDEWAYS_TRIANGLE = layoutOf("triangle-right");
+
+const fromTopLeft = (points: Point2d[]) => {
+    const first = points.reduce((best, point) =>
+        point.y < best.y || (point.y === best.y && point.x < best.x) ? point : best,
+    );
+    const index = points.indexOf(first);
+
+    return [...points.slice(index), ...points.slice(0, index)];
+};
 
 describe("getTiling", () => {
     it("spaces pointy-top hexagons a whole tile across and three quarters of one down", () => {
         expect(HEXAGON.pitch).toEqual({ width: 80, height: 45 });
         expect(HEXAGON.hasOffsetRows).toBe(true);
-        expect(HEXAGON.hasFlippedTiles).toBe(false);
+        expect(HEXAGON.tileFlip).toBe("none");
     });
 
     it("turns a flat-top hexagon's spacing through the other axis", () => {
         expect(FLAT_HEXAGON.pitch).toEqual({ width: 120, height: 30 });
         expect(FLAT_HEXAGON.hasOffsetRows).toBe(true);
+        expect(FLAT_HEXAGON.neighbourhood, "and its two upright neighbours with it").toBe("diagonalAndDown");
     });
 
     it("packs lozenges twice as tightly down as squares, which do not interlock at all", () => {
@@ -37,7 +48,13 @@ describe("getTiling", () => {
     it("overlaps triangles by half a tile across and turns every other one over", () => {
         expect(TRIANGLE.pitch).toEqual({ width: 40, height: 60 });
         expect(TRIANGLE.hasOffsetRows).toBe(false);
-        expect(TRIANGLE.hasFlippedTiles).toBe(true);
+        expect(TRIANGLE.tileFlip).toBe("topToBottom");
+    });
+
+    it("turns a sideways triangle's overlap through the other axis and turns it over the other way", () => {
+        expect(SIDEWAYS_TRIANGLE.pitch).toEqual({ width: 80, height: 30 });
+        expect(SIDEWAYS_TRIANGLE.hasOffsetRows).toBe(false);
+        expect(SIDEWAYS_TRIANGLE.tileFlip).toBe("leftToRight");
     });
 });
 
@@ -74,6 +91,14 @@ describe("the tiling table against the shapes it was written for", () => {
 
         expect(apex.x).toBe(TRIANGLE.pitch.width);
     });
+
+    it("puts a sideways triangle's apex halfway down, which is the same overlap turned", () => {
+        const points = ShapeConst.getDefaultShapePoints("triangle-right", TILE);
+        const apex = points.find((point) => point.x === TILE.width)!;
+
+        expect(apex.y).toBe(SIDEWAYS_TRIANGLE.pitch.height);
+        expect(TILE.width).toBe(SIDEWAYS_TRIANGLE.pitch.width);
+    });
 });
 
 describe("getTilePoints", () => {
@@ -81,6 +106,12 @@ describe("getTilePoints", () => {
         const flipped = TileBoardUtils.getTilePoints("triangle-up", TILE, true);
 
         expect(flipped).toEqual(ShapeConst.getDefaultShapePoints("triangle-down", TILE));
+    });
+
+    it("turns a sideways triangle over the other way, so it lands on the one pointing back", () => {
+        const flipped = TileBoardUtils.getTilePoints("triangle-right", TILE, true);
+
+        expect(fromTopLeft(flipped)).toEqual(fromTopLeft(ShapeConst.getDefaultShapePoints("triangle-left", TILE)));
     });
 
     it("leaves a shape alone when nothing is turned over", () => {
@@ -170,6 +201,7 @@ describe("getBoardSize", () => {
         expect(TileBoardUtils.getBoardSize(HEXAGON)).toEqual({ width: 320, height: 240 });
         expect(TileBoardUtils.getBoardSize(SQUARE)).toEqual({ width: 320, height: 300 });
         expect(TileBoardUtils.getBoardSize(TRIANGLE)).toEqual({ width: 200, height: 300 });
+        expect(TileBoardUtils.getBoardSize(SIDEWAYS_TRIANGLE)).toEqual({ width: 320, height: 180 });
     });
 
     it("is one tile in each direction for a board of one, where nothing overlaps anything", () => {
@@ -221,6 +253,26 @@ describe("getNeighbourTiles", () => {
         ]);
     });
 
+    it("gives a lozenge its four, because the tiles beside it meet it at a corner only", () => {
+        expect(TileBoardUtils.getNeighbourTiles({ row: 2, col: 2 }, LOZENGE)).toEqual([
+            { row: 1, col: 1 },
+            { row: 1, col: 2 },
+            { row: 3, col: 2 },
+            { row: 3, col: 1 },
+        ]);
+    });
+
+    it("gives a flat-top hexagon the two tiles two rows away, which is where its flat edges point", () => {
+        expect(TileBoardUtils.getNeighbourTiles({ row: 2, col: 2 }, FLAT_HEXAGON)).toEqual([
+            { row: 0, col: 2 },
+            { row: 1, col: 2 },
+            { row: 3, col: 2 },
+            { row: 4, col: 2 },
+            { row: 3, col: 1 },
+            { row: 1, col: 1 },
+        ]);
+    });
+
     it("gives a square its four, because a square shares an edge with nothing diagonal", () => {
         expect(TileBoardUtils.getNeighbourTiles({ row: 2, col: 2 }, SQUARE)).toEqual([
             { row: 1, col: 2 },
@@ -241,6 +293,20 @@ describe("getNeighbourTiles", () => {
             { row: 1, col: 1 },
             { row: 2, col: 2 },
             { row: 2, col: 0 },
+        ]);
+    });
+
+    it("gives a sideways triangle its three, and the horizontal one depends on which way it points", () => {
+        expect(TileBoardUtils.getNeighbourTiles({ row: 2, col: 2 }, SIDEWAYS_TRIANGLE)).toEqual([
+            { row: 1, col: 2 },
+            { row: 3, col: 2 },
+            { row: 2, col: 1 },
+        ]);
+
+        expect(TileBoardUtils.getNeighbourTiles({ row: 2, col: 1 }, SIDEWAYS_TRIANGLE)).toEqual([
+            { row: 1, col: 1 },
+            { row: 2, col: 2 },
+            { row: 3, col: 1 },
         ]);
     });
 

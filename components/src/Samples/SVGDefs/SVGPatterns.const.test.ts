@@ -52,6 +52,14 @@ describe("SVGPatternLayouts.ALL", () => {
         expect(cols, "three quarters of a cell apart across, not down").toEqual([-15, 7.5, 30]);
     });
 
+    it("steps sideways triangles down by half a cell, which is the same overlap turned", () => {
+        const rows = positions("triangleSideways", 3, 2).map((row) => row[0].y);
+        const cols = positions("triangleSideways", 3, 2)[0].map((cell) => cell.x);
+
+        expect(rows, "half a cell apart, starting half a cell above the tile").toEqual([-15, 0, 15]);
+        expect(cols, "and a whole cell apart across, where the upright one is a half").toEqual([0, 30]);
+    });
+
     it("rounds the requested cell count the way each tiling needs", () => {
         expect(
             SVGPatternLayouts.ALL.grid.computeCellCount({ rows: 4, cols: 4 }),
@@ -69,6 +77,14 @@ describe("SVGPatternLayouts.ALL", () => {
             SVGPatternLayouts.ALL.halfDrop.computeCellCount({ rows: 4, cols: 5 }),
             "and a half drop wants the opposite",
         ).toEqual({ rows: 5, cols: 6 });
+        expect(
+            SVGPatternLayouts.ALL.triangle.computeCellCount({ rows: 5, cols: 4 }),
+            "a triangle wants even rows and odd columns",
+        ).toEqual({ rows: 6, cols: 5 });
+        expect(
+            SVGPatternLayouts.ALL.triangleSideways.computeCellCount({ rows: 4, cols: 5 }),
+            "and a sideways triangle wants the opposite",
+        ).toEqual({ rows: 5, cols: 6 });
     });
 
     it("sizes the tile so that the repeat lands on the seam", () => {
@@ -83,6 +99,10 @@ describe("SVGPatternLayouts.ALL", () => {
         expect(
             SVGPatternLayouts.ALL.triangle.computePatternSize({ rows: 2, cols: 5 }, CELL),
             "a triangle tile is half a cell per column",
+        ).toEqual({ width: 60, height: 60 });
+        expect(
+            SVGPatternLayouts.ALL.triangleSideways.computePatternSize({ rows: 5, cols: 2 }, CELL),
+            "and a sideways one is half a cell per row",
         ).toEqual({ width: 60, height: 60 });
     });
 

@@ -1,26 +1,32 @@
 import type { Accessor, JSX } from "solid-js";
 
-import type { Count2d, Point2d, ShapeConst, Size2d } from "@thewaver/ss-utils";
+import type { Index2d, Point2d, ShapeConst, Size2d } from "@thewaver/ss-utils";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { InteractionControlProps } from "../../Fundamentals/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps } from "../../Utils/typeUtils";
 
+export type TileBoardTileFlip = "none" | "topToBottom" | "leftToRight";
+
+export type TileBoardNeighbourhood =
+    "orthogonal" | "diagonal" | "diagonalAndAcross" | "diagonalAndDown" | "uprightTriangle" | "sidewaysTriangle";
+
 export type TileBoardTiling = {
     pitch: Size2d;
     hasOffsetRows: boolean;
-    hasFlippedTiles: boolean;
+    tileFlip: TileBoardTileFlip;
+    neighbourhood: TileBoardNeighbourhood;
 };
 
 export type TileBoardLayout = TileBoardTiling & {
     shape: ShapeConst.DefaultShape;
-    count: Count2d;
+    count: Index2d;
     tileSize: Size2d;
     hasShortFirstRow: boolean;
 };
 
 export type TileBoardRenderProps = {
-    tile: Count2d;
+    tile: Index2d;
     size: Size2d;
     points: Point2d[];
     isFlipped: boolean;
@@ -28,7 +34,7 @@ export type TileBoardRenderProps = {
 };
 
 export type TileBoardTileRenderer = (
-    getTile: Accessor<Count2d>,
+    getTile: Accessor<Index2d>,
     getRenderProps: () => InteractionFlags<TileBoardRenderProps>,
 ) => JSX.Element;
 
@@ -44,14 +50,14 @@ export type TileBoardTileProps = AccessorProps<
 
 export type TileBoardProps = AccessorProps<{
     ariaLabel?: string;
-    tileCount: Count2d;
+    tileCount: Index2d;
     tileSize: Size2d;
     tileShape?: ShapeConst.DefaultShape;
     gap?: number;
     hasShortFirstRow?: boolean;
     isDisabled?: boolean;
-    computeIsTileDisabled?: (tile: Count2d) => boolean;
-    computeTileAriaLabel?: (tile: Count2d) => string;
+    computeIsTileDisabled?: (tile: Index2d) => boolean;
+    computeTileAriaLabel?: (tile: Index2d) => string;
     renderTile: TileBoardTileRenderer;
-    onTileActivate: (tile: Count2d) => void;
+    onTileActivate: (tile: Index2d) => void;
 }>;

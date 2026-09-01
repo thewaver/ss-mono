@@ -3329,6 +3329,13 @@ the seam. A wrong tiling still tiles — that is the whole reason this arithmeti
 and now the pointy-top hexagon's rows can be asserted to sit at −15, 7.5 and 30 for a 30px cell, which is the
 three-quarter overlap that makes hexagons interlock rather than merely repeat.
 
+**`triangleSideways` is `triangle` transposed, and it is a second entry rather than a flag.** The upright
+tiling wants an even number of rows and an odd number of columns, steps half a cell across and a whole cell
+down, and marks the first and last column as the ones cut by the seam; the sideways one wants the opposite
+on every one of those four counts. Writing it as an axis flag inside the existing entry would put four
+conditionals into arithmetic whose whole value is that it can be read straight off, so the table gets a row
+instead, and `triangle_ts_2` is the sample that draws left- and right-pointing triangles through it.
+
 **One thing the extraction found immediately.** `computeGrowTracks` assumes its two ends are given in order;
 handed them reversed it walks outside the segment instead of mirroring. No call site does that, so it is a
 precondition rather than a defect, and it is pinned by a test rather than changed — the behaviour is what
@@ -5594,7 +5601,7 @@ so the render props carry `dataCol`, `layoutCol`, `dataRow` and `layoutRow`. Mak
 `getSortedRows` becoming `getSortedOrder`, which sorts an array of indices so the original position survives
 the sort; `getReordered` then reads either list through either order and hands back **the very same array**
 when there is no order to apply, which is the property the old function had and had to keep. The roving cell
-is a `Count2d` from `ss-utils` rather than an `x` / `y` pair, and `NavigatorUtils.computeNextCell` is adapted
+is an `Index2d` from `ss-utils` rather than an `x` / `y` pair, and `NavigatorUtils.computeNextCell` is adapted
 at the one call site rather than changed, since other controls read it.
 
 ### Controls: `Scroller`, and why it renders no button of its own
@@ -7923,18 +7930,30 @@ reading of the left edge produces that. Triangles do not tile by translation at 
 So `TILING_RATIOS` names, per `ShapeConst.DefaultShape`, the pitch as a fraction of the tile box and two
 questions about how the rows and tiles sit:
 
-| Shape                   | Pitch across | Pitch down | Offset rows | Turned-over tiles |
-| ----------------------- | ------------ | ---------- | ----------- | ----------------- |
-| `square`                | 1            | 1          | no          | no                |
-| `lozenge`               | 1            | 1/2        | yes         | no                |
-| `hexagon-pointy-top`    | 1            | 3/4        | yes         | no                |
-| `hexagon-flat-top`      | 1 1/2        | 1/2        | yes         | no                |
-| `triangle-up` / `-down` | 1/2          | 1          | no          | yes               |
+| Shape                      | Pitch across | Pitch down | Offset rows | Turned-over tiles | Neighbours          |
+| -------------------------- | ------------ | ---------- | ----------- | ----------------- | ------------------- |
+| `square`                   | 1            | 1          | no          | `none`            | `orthogonal`        |
+| `lozenge`                  | 1            | 1/2        | yes         | `none`            | `diagonal`          |
+| `hexagon-pointy-top`       | 1            | 3/4        | yes         | `none`            | `diagonalAndAcross` |
+| `hexagon-flat-top`         | 1 1/2        | 1/2        | yes         | `none`            | `diagonalAndDown`   |
+| `triangle-up` / `-down`    | 1/2          | 1          | no          | `topToBottom`     | `uprightTriangle`   |
+| `triangle-left` / `-right` | 1            | 1/2        | no          | `leftToRight`     | `sidewaysTriangle`  |
 
 **Offset rows** shift every other row half a pitch across and give it one tile fewer, which is what puts it
-in the notches; **turned-over tiles** mirror a tile vertically when `row + col` is odd, which is what makes a
-triangle's base meet a base rather than two half-bases. Both together never happen, and a square needs
-neither — it is the one shape here that does not interlock at all.
+in the notches; **turned-over tiles** mirror a tile when `row + col` is odd, which is what makes a triangle's
+base meet a base rather than two half-bases. Both together never happen, and a square needs neither — it is
+the one shape here that does not interlock at all.
+
+**`tileFlip` names the direction rather than answering yes or no, because the sideways triangles turn over
+through the other axis.** An upright triangle is mirrored top to bottom; a left- or right-pointing one is
+mirrored left to right, and a boolean cannot say which. So `TileBoardTiling` carries
+`tileFlip: "none" | "topToBottom" | "leftToRight"`, `getIsFlippedTile` asks whether it is anything but
+`"none"`, and `getTilePoints` reads it to pick the axis it mirrors across.
+
+**The sideways pair is the upright pair transposed, in every number.** Half a tile of overlap moves from
+across to down, the strip that ran along a row now runs down a column, and the vertical edge that a
+left-pointing tile shares with the right-pointing one beside it is what the upright pair share as a base.
+Nothing else about the board knows the difference.
 
 **The numbers are the shapes' own corner fractions, so they can go stale where a derivation could not.** The
 unit tests read the corners back out of `getDefaultShapePoints` and compare, so a shape redrawn in `ss-utils`
@@ -7947,15 +7966,41 @@ trap. `tileShape` defaults to `hexagon-pointy-top`, the board derives the points
 the points it worked out — turned over or not — are handed to `renderTile` in its render props, so the
 painter never needs to know which shape it is drawing. `triangle-down` is not a second implementation: it is
 the same tiling with the starting orientation inverted, which the unit tests pin by asserting a turned-over
-`triangle-up` equals `triangle-down`'s own points.
+`triangle-up` equals `triangle-down`'s own points. `triangle-left` and `triangle-right` stand in the same
+relation to each other, with one wrinkle the test has to allow for: `getDefaultShapePoints` promises corners
+clockwise **starting from the top**, and mirroring a right-pointing triangle lands its top corner in the
+middle of the list rather than at the front. The corners are the same corners in the same order round the
+outline, so the test rotates both lists to start at the topmost corner before comparing them.
 
 **`hasShortFirstRow` inverts which rows are short.** Asked for by the user. It has no effect on a shape whose
 rows are not offset; a triangle board that should start the other way round asks for `triangle-down` instead,
 which is what the two names are for.
 
-**A tile's neighbours differ per family and the board owns all three.** Six for the offset shapes, four for a
-square, three for a triangle — and for the triangle, which vertical one depends on the way it points, which
-depends on the shape name and the turn together. `getNeighbourTiles` answers them clockwise from the top,
+**A tile's neighbours are a sixth column in the table, because "the rows are offset" does not decide them.**
+The first build read them off `hasOffsetRows`, which handed the same six-tile list to every offset shape, and
+that is wrong for two of the three. A lozenge has four edges, so the tiles to its left and right — which the
+six-tile list claimed — meet it at a single corner and nowhere else. A flat-top hexagon has six edges, but
+its flat ones point up and down, and the tile they meet is **two rows away**, not one column across: rows two
+apart sit at the same offset and the same column positions, so `hexagon-flat-top` is the one shape whose
+neighbour steps are `row ± 2`. Both were reporting two tiles that touch nothing and, for the hexagon, missing
+two that do.
+
+Neither is derivable from the two questions already in the table, so `neighbourhood` names the family
+outright and `computeNeighbours` switches on it. The six families: `orthogonal` is a square's four;
+`diagonal` is the lozenge's four; `diagonalAndAcross` adds the two beside it, which is the pointy-top
+hexagon; `diagonalAndDown` adds the two `row ± 2` away, which is the flat-top one; `uprightTriangle` and
+`sidewaysTriangle` are three each. Every list is clockwise from the top, filtered to what is on the board.
+
+For a triangle, which three depends on the way the tile points, which is the shape name and the turn
+together — so `triangle-right` unturned and `triangle-left` turned over answer the same list. For an upright
+triangle the two beside it are always there and the vertical one depends; for a sideways one it is the two
+above and below that are always there and the horizontal one that depends.
+
+**A wrong neighbour list is the failure that never announces itself**, which is why this was checked by
+measurement rather than by reading: for every shape, every tile of a seven-by-six board and both row
+phasings, the tiles that genuinely share an edge were found by intersecting the actual polygons and compared
+against what `getNeighbourTiles` claims. That is what turned up the two faults above, and it now comes back
+clean. The unit tests pin one central tile per family, which is the part worth keeping cheap. `getNeighbourTiles` answers them clockwise from the top,
 filtered to what is on the board. A consumer re-deriving this gets a plausible board with the wrong adjacency,
 which is the failure that never announces itself.
 
@@ -8116,9 +8161,9 @@ tiles, the same walk a plain grid does. Home and End are the ends of the row and
 first or last tile of the board, per the `grid` pattern. Nothing wraps and nothing carries between rows: a
 board's left edge is an edge, not a route to the row above.
 
-**A tile is a `Count2d`, so the axes name themselves.** The original addressed tiles as `{ x, y }` with `y`
+**A tile is an `Index2d`, so the axes name themselves.** The original addressed tiles as `{ x, y }` with `y`
 counting rows, which is the pair _"a grid index names its space and its axis"_ exists to stop. There is one
-ordering here and no sorting, so nothing is a `data*` or a `layout*`. `Count2d.toString` also gives the tile a
+ordering here and no sorting, so nothing is a `data*` or a `layout*`. `Index2d.toString` also gives the tile a
 key — `ROW2_COL3` — which is what the refs map and the element ids use, so a board that changes size does not
 shift a row of stale indices.
 
@@ -8127,5 +8172,5 @@ shift a row of stale indices.
 
 **Nothing of the game came with it.** The `external/` drop also carried that project's battle logic, boards,
 creatures and journeys, as the reference for what `BoardTiles` depended on. What was needed was `Point2d`,
-`Count2d`, `Size2d` and `MathUtils`, all of which are `ss-utils` already; the rest is a game and belongs in
+`Index2d`, `Size2d` and `MathUtils`, all of which are `ss-utils` already; the rest is a game and belongs in
 one.

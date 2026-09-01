@@ -12,7 +12,7 @@ export type SVGPatternLayout = {
 };
 
 export type SVGPatternKind =
-    "grid" | "diagonal" | "halfShift" | "halfDrop" | "triangle" | "hexPointyTop" | "hexFlatTop";
+    "grid" | "diagonal" | "halfShift" | "halfDrop" | "triangle" | "triangleSideways" | "hexPointyTop" | "hexFlatTop";
 
 const toOdd = (value: number) => value + (MathUtils.isOdd(value) ? 0 : 1);
 
@@ -87,6 +87,18 @@ export namespace SVGPatternLayouts {
                 y: index.row * cellSize.height,
             }),
             computeIsSplit: (index, cellCount) => isFirstOrLastCol(index, cellCount),
+        },
+        triangleSideways: {
+            computeCellCount: (requested) => ({ rows: toOdd(requested.rows), cols: toEven(requested.cols) }),
+            computePatternSize: (cellCount, cellSize) => ({
+                width: cellSize.width * cellCount.cols,
+                height: cellSize.height * Math.round((cellCount.rows - 1) * 0.5),
+            }),
+            computeCellPos: (index, cellSize) => ({
+                x: index.col * cellSize.width,
+                y: (index.row - 1) * cellSize.height * 0.5,
+            }),
+            computeIsSplit: (index, cellCount) => isFirstOrLastRow(index, cellCount),
         },
         hexPointyTop: {
             computeCellCount: (requested) => ({ rows: toOdd(requested.rows), cols: toOdd(requested.cols) }),

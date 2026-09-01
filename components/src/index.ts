@@ -487,6 +487,7 @@ export * from "./Samples/SVGDefs/Pattern/hexagon_ft_2";
 export * from "./Samples/SVGDefs/Pattern/hexagon_pt_2";
 export * from "./Samples/SVGDefs/Pattern/lozenge_d_2";
 export * from "./Samples/SVGDefs/Pattern/triangle_t_2";
+export * from "./Samples/SVGDefs/Pattern/triangle_ts_2";
 export * from "./Samples/SVGDefs/Pattern/whirlCurved_2";
 export * from "./Samples/SVGDefs/Pattern/whirl_2";
 export * from "./Samples/ScanlineAnimation/Keyframes/ScanlineAnimationKeyframes.const";

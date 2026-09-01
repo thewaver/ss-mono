@@ -9,6 +9,8 @@ export namespace ShapeConst {
     export const DEFAULT_SHAPES = [
         "triangle-up",
         "triangle-down",
+        "triangle-left",
+        "triangle-right",
         "square",
         "lozenge",
         "hexagon-pointy-top",
@@ -57,6 +59,20 @@ export namespace ShapeConst {
                     { x: 0, y: 0 },
                     { x: width, y: 0 },
                     { x: width * 0.5, y: height },
+                ];
+
+            case "triangle-left":
+                return [
+                    { x: width, y: 0 },
+                    { x: width, y: height },
+                    { x: 0, y: height * 0.5 },
+                ];
+
+            case "triangle-right":
+                return [
+                    { x: 0, y: 0 },
+                    { x: width, y: height * 0.5 },
+                    { x: 0, y: height },
                 ];
 
             case "square":

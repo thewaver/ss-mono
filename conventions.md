@@ -389,8 +389,9 @@ publishes these has to actually hold both — sorting an array of indices rather
 original position survives the sort — rather than deriving the missing one by searching, which is a scan of
 the data per cell.
 
-`Count2d` in `@thewaver/ss-utils` is the pair type, keyed `row` and `col`. It carries no meaning of its own:
-a tally and a zero-based index are the same two numbers, and the name at the call site is what says which.
+`Index2d` in `@thewaver/ss-utils` is the pair type, keyed `row` and `col`. Its name leans towards an index,
+but a tally and a zero-based index are the same two numbers — `TileBoard`'s `tileCount` is an `Index2d` as
+much as the tile it addresses is — and the name at the call site is what says which is meant.
 
 This is the same rule as _"an observer's name carries its coordinate space"_ above, on a discrete axis instead
 of a continuous one, and it exists for the same reason: the wrong one fails silently, returning a number that

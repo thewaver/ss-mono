@@ -52,6 +52,8 @@ describe("ShapeConst.getDefaultShapePoints", () => {
     it("gives the expected corner counts", () => {
         expect(ShapeConst.getDefaultShapePoints("triangle-up", size)).toHaveLength(3);
         expect(ShapeConst.getDefaultShapePoints("triangle-down", size)).toHaveLength(3);
+        expect(ShapeConst.getDefaultShapePoints("triangle-left", size)).toHaveLength(3);
+        expect(ShapeConst.getDefaultShapePoints("triangle-right", size)).toHaveLength(3);
         expect(ShapeConst.getDefaultShapePoints("square", size)).toHaveLength(4);
         expect(ShapeConst.getDefaultShapePoints("lozenge", size)).toHaveLength(4);
         expect(ShapeConst.getDefaultShapePoints("hexagon-pointy-top", size)).toHaveLength(6);
@@ -69,6 +71,16 @@ describe("ShapeConst.getDefaultShapePoints", () => {
             { x: 50, y: 0 },
             { x: 100, y: 60 },
             { x: 0, y: 60 },
+        ]);
+        expect(ShapeConst.getDefaultShapePoints("triangle-right", size)).toEqual([
+            { x: 0, y: 0 },
+            { x: 100, y: 30 },
+            { x: 0, y: 60 },
+        ]);
+        expect(ShapeConst.getDefaultShapePoints("triangle-left", size)).toEqual([
+            { x: 100, y: 0 },
+            { x: 100, y: 60 },
+            { x: 0, y: 30 },
         ]);
     });
 });

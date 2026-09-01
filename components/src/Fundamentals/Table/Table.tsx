@@ -1,7 +1,7 @@
 import type { Accessor } from "solid-js";
 import { For, Index, Show, createMemo, createSignal, createUniqueId } from "solid-js";
 
-import { type Count2d, MathUtils } from "@thewaver/ss-utils";
+import { type Index2d, MathUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import type { CarrierZone } from "../../Abstracts/Carrier/Carrier.types";
@@ -45,7 +45,7 @@ export const Table = <T,>(props: TableProps<T>) => {
 
     const [getBodyRef, setBodyRef] = createSignal<HTMLElement>();
     const [getHeaderRef, setHeaderRef] = createSignal<HTMLElement>();
-    const [getFocusedCell, setFocusedCell] = createSignal<Count2d>({ row: HEADER_ROW_INDEX, col: 0 });
+    const [getFocusedCell, setFocusedCell] = createSignal<Index2d>({ row: HEADER_ROW_INDEX, col: 0 });
     const [getHoveredRow, setHoveredRow] = createSignal<number>();
     const [getHoveredColumn, setHoveredColumn] = createSignal<number>();
     const [getResizingColumnId, setResizingColumnId] = createSignal(NO_RESIZING);
@@ -112,15 +112,15 @@ export const Table = <T,>(props: TableProps<T>) => {
         },
     });
 
-    const getCellId = (cell: Count2d) => `${tableId}-cell-${cell.row}-${cell.col}`;
+    const getCellId = (cell: Index2d) => `${tableId}-cell-${cell.row}-${cell.col}`;
 
-    const getIsRoving = (cell: Count2d) => {
+    const getIsRoving = (cell: Index2d) => {
         const roving = getRovingCell();
 
         return roving.col === cell.col && roving.row === cell.row;
     };
 
-    const focusCell = (cell: Count2d) => {
+    const focusCell = (cell: Index2d) => {
         setFocusedCell(cell);
 
         if (cell.row > HEADER_ROW_INDEX && rowWindow.getIsLive()) rowWindow.scrollToRow(cell.row - 1);
@@ -409,7 +409,7 @@ export const Table = <T,>(props: TableProps<T>) => {
         if (e.shiftKey && cell.row > HEADER_ROW_INDEX) selectRow(cell.row - 1, { isExtending: true });
     };
 
-    const handleCellClick = (e: MouseEvent, cell: Count2d) => {
+    const handleCellClick = (e: MouseEvent, cell: Index2d) => {
         if (getIsDisabled()) return;
 
         const interactive = (e.target as HTMLElement).closest(INTERACTIVE_SELECTOR);

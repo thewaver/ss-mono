@@ -1,6 +1,6 @@
 import { Index, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
-import { Count2d, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
+import { Index2d, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { InteractionWrapper } from "../../Fundamentals/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
@@ -59,7 +59,7 @@ export const TileBoard = (props: TileBoardProps) => {
     const tileRefs = new Map<string, HTMLElement>();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
-    const [getHighlighted, setHighlighted] = createSignal<Count2d>(TileBoardUtils.getFirstTile());
+    const [getHighlighted, setHighlighted] = createSignal<Index2d>(TileBoardUtils.getFirstTile());
 
     const getGap = createMemo(() => access(props.gap) ?? DEFAULT_GAP);
 
@@ -91,15 +91,15 @@ export const TileBoard = (props: TileBoardProps) => {
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
-    const getIsTileDisabled = (tile: Count2d) => getIsDisabled() || (props.computeIsTileDisabled?.(tile) ?? false);
+    const getIsTileDisabled = (tile: Index2d) => getIsDisabled() || (props.computeIsTileDisabled?.(tile) ?? false);
 
     const getRovingTile = createMemo(() => TileBoardUtils.clampTile(getHighlighted(), getLayout()));
 
-    const moveTo = (tile: Count2d) => {
+    const moveTo = (tile: Index2d) => {
         setHighlighted(() => TileBoardUtils.clampTile(tile, getLayout()));
     };
 
-    const activateTile = (tile: Count2d) => {
+    const activateTile = (tile: Index2d) => {
         if (getIsTileDisabled(tile)) return;
 
         moveTo(tile);
@@ -112,7 +112,7 @@ export const TileBoard = (props: TileBoardProps) => {
 
         if (!root?.contains(document.activeElement) || root === document.activeElement) return;
 
-        tileRefs.get(Count2d.toString(tile))?.focus();
+        tileRefs.get(Index2d.toString(tile))?.focus();
     });
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -141,8 +141,8 @@ export const TileBoard = (props: TileBoardProps) => {
     };
 
     const renderTile = (row: number, col: number) => {
-        const tile: Count2d = { row, col };
-        const key = Count2d.toString(tile);
+        const tile: Index2d = { row, col };
+        const key = Index2d.toString(tile);
         const getTile = () => tile;
         const getIsFlipped = () => TileBoardUtils.getIsFlippedTile(tile, getLayout());
 
@@ -159,13 +159,13 @@ export const TileBoard = (props: TileBoardProps) => {
                 <InteractionWrapper
                     isDisabled={() => getIsTileDisabled(tile)}
                     isFocusableWhenDisabled={() => !getIsDisabled()}
-                    isTabbable={() => Count2d.isSame(tile, getRovingTile())}
+                    isTabbable={() => Index2d.isSame(tile, getRovingTile())}
                     extraFlags={(): TileBoardRenderProps => ({
                         tile,
                         size: getTileSize(),
                         points: getIsFlipped() ? getFlippedPoints() : getPoints(),
                         isFlipped: getIsFlipped(),
-                        isHighlighted: Count2d.isSame(tile, getRovingTile()),
+                        isHighlighted: Index2d.isSame(tile, getRovingTile()),
                     })}
                     ref={(element) => tileRefs.set(key, element)}
                     renderControl={(setElementRef, getRenderProps) => (

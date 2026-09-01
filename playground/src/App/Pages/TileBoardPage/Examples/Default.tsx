@@ -1,7 +1,7 @@
 import { For, createMemo } from "solid-js";
 
 import { TileBoard, TileBoardUtils, access } from "@thewaver/ss-components";
-import { Count2d, Count2dString } from "@thewaver/ss-utils";
+import { Index2d, Index2dString } from "@thewaver/ss-utils";
 
 import { PageTileBoardMeeple, PageTileBoardTile } from "../../../StyledComponents/TileBoardContent/TileBoardContent";
 import type { TileBoardExampleProps } from "../TileBoardPage.types";
@@ -29,7 +29,7 @@ export const DefaultExample = ({ shape, marked, ...otherProps }: Props) => {
                 renderTile={(getTile, getRenderProps) => (
                     <PageTileBoardTile
                         renderProps={getRenderProps}
-                        isMarked={() => access(marked).includes(Count2d.toString(getTile()))}
+                        isMarked={() => access(marked).includes(Index2d.toString(getTile()))}
                     />
                 )}
             />
@@ -37,7 +37,7 @@ export const DefaultExample = ({ shape, marked, ...otherProps }: Props) => {
             <For each={access(marked)}>
                 {(key) => (
                     <PageTileBoardMeeple
-                        center={() => TileBoardUtils.getTileCenter(Count2dString.fromString(key), getLayout())}
+                        center={() => TileBoardUtils.getTileCenter(Index2dString.fromString(key), getLayout())}
                         tileSize={otherProps.tileSize}
                     />
                 )}
