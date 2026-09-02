@@ -21,7 +21,7 @@ purpose: it answers "what is outstanding", and neither of them is.
 
 ## Missing components
 
-Whole controls the library does not have. Ordered by the user on 2026-08-15. A toolbar, a segmented control, a
+Whole controls the library does not have. Ordered by the user on 2026-08-15. A segmented control, a
 rating input, `Skeleton`, `Avatar`, `Badge`, `Card` and `Icon` were dropped on the same day and are not listed
 anywhere.
 

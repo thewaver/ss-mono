@@ -88,6 +88,31 @@ export const swipeCard = style({
     textAlign: "center",
 });
 
+export const stackArea = style({
+    position: "relative",
+    display: "grid",
+    placeItems: "center",
+    width: "100%",
+    height: "100%",
+    touchAction: "none",
+});
+
+export const stackCard = style({
+    position: "absolute",
+    display: "grid",
+    placeItems: "center",
+    width: "70%",
+    height: "70%",
+    borderRadius: themeVars.borderRadius.full,
+    backgroundImage: panel(themeVars.color.secondary.dark, themeVars.color.secondary.light),
+    color: themeVars.color.secondary.contrast,
+    fontSize: themeVars.fontSize.medium,
+    boxShadow: themeVars.shadow.medium,
+    userSelect: "none",
+    transitionProperty: "transform, opacity",
+    transitionTimingFunction: "ease-out",
+});
+
 export const swipeButton = style({
     padding: `2px ${themeVars.spacing.full}`,
     border: "1px solid currentColor",

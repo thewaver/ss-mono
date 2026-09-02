@@ -32,6 +32,8 @@ export const Barrel = <T,>(props: BarrelProps<T>) => {
 
         const getTransitionDurationMs = () => access(props.transitionDurationMs);
 
+        const getTransitionDelayMs = () => access(props.transitionDelayMs);
+
         return (
             <div
                 class={styles.barrelFace}
@@ -46,6 +48,8 @@ export const Barrel = <T,>(props: BarrelProps<T>) => {
                     ),
                     "transition-duration":
                         getTransitionDurationMs() === undefined ? undefined : `${getTransitionDurationMs()}ms`,
+                    "transition-delay":
+                        getTransitionDelayMs() === undefined ? undefined : `${getTransitionDelayMs()}ms`,
                 }}
                 role="group"
                 aria-roledescription={access(props.faceRoleDescription)}

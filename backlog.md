@@ -200,7 +200,7 @@ gaps, each with the reason it is still a gap.
 `RadioGroup`, `Select`, `MultiSelect`, `FileInput`, `ColorInput`, `Label`, `Calendar`, `DateInput`,
 `DatePicker`, `TagInput` and `TimeInput`; `Fundamentals` adds `Accordion`, `Breadcrumbs`, `Button`,
 `TrackCarousel`, `DrumCarousel`, `FlipCard`,
-`SlideButton`, `Scroller`, `Paginator`, `Sortable`, `SplitPane`, `Stepper`, `Tabs`, `Tooltip`, `Popover`, `Menu`, `Modal`, `Drawer`, `Progress`,
+`SlideButton`, `Scroller`, `Paginator`, `Sortable`, `SplitPane`, `Stepper`, `Tabs`, `Toolbar`, `Tooltip`, `Popover`, `Menu`, `Modal`, `Drawer`, `Progress`,
 `Range`, `Toasts` and `Tree`.
 Beyond the date and time family, this is what is missing. **The order below is the user's, taken on 2026-08-15 after reading a
 worked example of each**, and it replaces the old ordering by architectural cost — that principle still
@@ -216,13 +216,15 @@ Anything that wants a drawing surface is the consumer's, and which one they reac
 sprite sheet, a particle system and a renderer are all out of scope by construction rather than by priority,
 and a proposal that begins "the library could draw…" has already answered itself.
 
-**What was dropped on 2026-08-15, so it is not re-proposed:** a toolbar, a segmented control, a rating input,
+**What was dropped on 2026-08-15, so it is not re-proposed:** a segmented control, a rating input,
 and the pure-paint family of `Skeleton`, `Avatar`, `Badge`, `Card` and `Icon`. The paint family was never a
-component question — the Playground already builds three of them as `Surface` examples — and the toolbar was
-judged not worth having. The segmented control and the rating are now the **Segmented** and **Rating**
-variants on the Radio page, which is the whole of what each was; see `decisions.md`, which also records why
-the rating's hover preview needed no library change. None of these is an accepted limit, because none is a
-fault; they are simply not wanted.
+component question — the Playground already builds three of them as `Surface` examples. **The toolbar was
+dropped with them and has since been reopened by the user and built**: what changed is that the part worth
+having turned out to be the overflow rather than the row, and `decisions.md` records the cut, the roving
+walk and the two paintings of one action. The segmented control and the rating
+are now the **Segmented** and **Rating** variants on the Radio page, which is the whole of what each was;
+see `decisions.md`, which also records why the rating's hover preview needed no library change. None of
+these is an accepted limit, because none is a fault; they are simply not wanted.
 
 ### Next up, in the user's order
 
@@ -1044,6 +1046,31 @@ answer to "what is next for development"** — see the note at the top of this f
 commitment, and an entry that already carries the user's verdict is recorded here so that the same sketch is
 not put to them twice. An entry leaves this section in one of two directions: upward into a numbered item, which is the user's
 decision to take, or into `conventions.md` / `decisions.md` if building it settles something.
+
+### `HoloCard` and `CardFan`, built and then deleted
+
+Both were built as `Exotics` on the user's call and both were removed after they saw them. Recorded so the
+same two sketches are not put to them again, and because each left one finding worth keeping.
+
+**`HoloCard`: "doesn't really deserve to exist right now — it looks just like the example in PointerTracker."**
+Their verdict, and it is the answer to the question that was left open when it was built: whether a page
+example ever earns extraction is a decision for later, and this one did not. The tilt and the sheen live on
+the PointerTracker page, which is where the effect can be read from source. **What it proved and what the
+page kept**: the band of light has to travel against the tilt and further than it, because a reflection is of
+something that is not moving — that is in `decisions.md` under the PointerTracker examples, and it survives
+the component.
+
+**`CardFan`: "ultra-specific. I would delete the component."** Their verdict. **What it proved is worth more
+than the component was**, and is the part to reach for if a hand of overlapping things is ever built again:
+
+- **The card a person is aiming at is not the card under the pointer.** Every card but the last shows only a
+  strip, so the topmost rectangle at a point is the wrong answer; the index has to come from where the pointer
+  falls along the row. That answer also survives a card being lifted, which changes the overlap.
+- **A click handler per card is delivered to whichever box is on top**, so clicking the sliver you can see
+  picks the neighbour — the same bug from the other side.
+- **Picking from a `PointerTracker` reading fails a tap.** That reading is flushed on an animation frame after
+  a `pointermove`, and a tap with no movement before it has nothing to read.
+  `InteractionTracker.trackDrag` reports a ratio on the press itself, which is what a pick should use.
 
 ### `DrumCarousel` in `Exotics`, and the cost of splitting the carousels
 

@@ -8,6 +8,7 @@ import type { Tab } from "@thewaver/ss-components";
 import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
 
 import { AccordionPage } from "./Pages/AccordionPage/AccordionPage";
+import { BracketPage } from "./Pages/BracketPage/BracketPage";
 import { BreadcrumbsPage } from "./Pages/BreadcrumbsPage/BreadcrumbsPage";
 import { ButtonPage } from "./Pages/ButtonPage/ButtonPage";
 import { CalendarPage } from "./Pages/CalendarPage/CalendarPage";
@@ -33,6 +34,7 @@ import { MenuPage } from "./Pages/MenuPage/MenuPage";
 import { ModalPage } from "./Pages/ModalPage/ModalPage";
 import { MosaicPage } from "./Pages/MosaicPage/MosaicPage";
 import { NumberInputPage } from "./Pages/NumberInputPage/NumberInputPage";
+import { OdometerPage } from "./Pages/OdometerPage/OdometerPage";
 import { PaginatorPage } from "./Pages/PaginatorPage/PaginatorPage";
 import { PointerTrackerPage } from "./Pages/PointerTrackerPage/PointerTrackerPage";
 import { PreviewPage } from "./Pages/PreviewPage/PreviewPage";
@@ -44,6 +46,8 @@ import { RevealPage } from "./Pages/RevealPage/RevealPage";
 import { RichTextPage } from "./Pages/RichTextPage/RichTextPage";
 import { SatellitePage } from "./Pages/SatellitePage/SatellitePage";
 import { ScanlineAnimationPage } from "./Pages/ScanLineAnimationPage/ScanLineAnimationPage";
+import { ScrambleTextPage } from "./Pages/ScrambleTextPage/ScrambleTextPage";
+import { ScratchCardPage } from "./Pages/ScratchCardPage/ScratchCardPage";
 import { ScreenWiperPage } from "./Pages/ScreenWiperPage/ScreenWiperPage";
 import { ScrollerPage } from "./Pages/ScrollerPage/ScrollerPage";
 import { SelectPage } from "./Pages/SelectPage/SelectPage";
@@ -64,6 +68,7 @@ import { TextInputPage } from "./Pages/TextInputPage/TextInputPage";
 import { TileBoardPage } from "./Pages/TileBoardPage/TileBoardPage";
 import { ToastsPage } from "./Pages/ToastsPage/ToastsPage";
 import { TogglePage } from "./Pages/TogglePage/TogglePage";
+import { ToolbarPage } from "./Pages/ToolbarPage/ToolbarPage";
 import { TreePage } from "./Pages/TreePage/TreePage";
 import { TypewriterPage } from "./Pages/TypewriterPage/TypewriterPage";
 import { ViewportPage } from "./Pages/ViewportPage/ViewportPage";
@@ -122,6 +127,12 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
         name: "Exotics",
         components: [
             {
+                name: "Bracket",
+                description:
+                    "A tree drawn in layers with elbow connectors between a node and the nodes that feed it — a knockout draw being the arrangement it was asked for, and an org chart or a skill tree the same component with a different tree. A node sits centred between the ones it feeds from, which propagates upward and is the whole of the layout; a node with one child sits level with it, which is what a bye looks like. The arrows walk a layer and step between layers, on one tab stop.",
+                component: () => <BracketPage />,
+            },
+            {
                 name: "CellAnimation",
                 description:
                     "Cuts an image into a grid and animates the cells on a stagger, where a cell's turn comes from a weight rather than from its index. The animations, weights and origins on this page are Playground samples — the component itself only asks for a function from timeline to result.",
@@ -152,6 +163,12 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 component: () => <MosaicPage />,
             },
             {
+                name: "Odometer",
+                description:
+                    "A number where each digit is a column that turns to its new value, so a change reads as travel rather than a swap. The columns turn the way the number is going, so nine to zero keeps going forward instead of rewinding, and a column waits for every column to its right that is also carrying. It takes the text rather than the number, so a separator is a slot that never turns and the component owns no locale.",
+                component: () => <OdometerPage />,
+            },
+            {
                 name: "Reveal",
                 description:
                     "A cover with a hole cut where the pointer is. The cover is the consumer's — opaque, frosted, or something that reads what it is told — and the component hands it the mask that cuts the hole and whether a reveal is happening.",
@@ -174,6 +191,18 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 description:
                     "The same staggering applied to horizontal lines instead of a grid, so an image can be swept, split or glitched a row at a time. The seven examples differ only in the function they hand it.",
                 component: () => <ScanlineAnimationPage />,
+            },
+            {
+                name: "ScrambleText",
+                description:
+                    "Text that arrives as noise and settles into itself, one position at a time. Each character sits over the one it is going to become, so nothing changes width and the line cannot rewrap while it churns; the spaces are left alone, which is what keeps the line breaks where they were. Which glyph the noise is drawn from and the order the positions settle in are both the consumer's, the second as a weight per character in the same 0..1 vocabulary the animation samples use.",
+                component: () => <ScrambleTextPage />,
+            },
+            {
+                name: "ScratchCard",
+                description:
+                    "A cover the pointer rubs off, exposing what is under it and reporting how much has gone. The cover is a grid of cells rather than a canvas, so what has been scratched is an exact count rather than a sampled estimate and the resolution is the consumer's; crossing a threshold takes the rest of it away. Pressing it with the keyboard reveals the lot, because a control that only answers to dragging cannot be operated without a pointer.",
+                component: () => <ScratchCardPage />,
             },
             {
                 name: "ScreenWiper",
@@ -467,6 +496,12 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 description:
                     "A preset over the shared binary switch. What separates it from a checkbox is what it announces and when the change takes effect, not what it stores.",
                 component: () => <TogglePage />,
+            },
+            {
+                name: "Toolbar",
+                description:
+                    "A row of actions that measures itself and moves whatever does not fit into a menu at the end. The row is one tab stop with the arrows walking it, and an action that leaves the row leaves that walk with it. Each action is described once and painted twice — as a button in the row and as a row in the menu — and can refuse to collapse, or insist on it.",
+                component: () => <ToolbarPage />,
             },
             {
                 name: "Tree",

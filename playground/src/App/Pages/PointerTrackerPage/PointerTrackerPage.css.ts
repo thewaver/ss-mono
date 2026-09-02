@@ -114,10 +114,12 @@ export const tiltStage = style({
 });
 
 export const tiltCard = style({
+    position: "relative",
     display: "grid",
     placeItems: "center",
     width: 180,
     height: 120,
+    overflow: "hidden",
     borderRadius: themeVars.borderRadius.full,
     backgroundImage: panel(themeVars.color.primary.dark, themeVars.color.primary.light),
     color: themeVars.color.primary.contrast,
@@ -126,6 +128,39 @@ export const tiltCard = style({
     transitionProperty: "transform",
     transitionDuration: "80ms",
     transitionTimingFunction: "linear",
+});
+
+export const tiltSheen = style({
+    position: "absolute",
+    inset: 0,
+    pointerEvents: "none",
+    mixBlendMode: "screen",
+    transitionProperty: "opacity",
+    transitionDuration: "150ms",
+    transitionTimingFunction: "linear",
+});
+
+export const dockStage = style({
+    display: "grid",
+    placeItems: "center",
+    width: "100%",
+    height: "100%",
+});
+
+export const dockRow = style({
+    position: "relative",
+});
+
+export const dockItem = style({
+    position: "absolute",
+    bottom: 0,
+    display: "grid",
+    placeItems: "center",
+    borderRadius: themeVars.borderRadius.full,
+    backgroundImage: panel(themeVars.color.primary.dark, themeVars.color.primary.light),
+    color: themeVars.color.primary.contrast,
+    boxShadow: themeVars.shadow.small,
+    userSelect: "none",
 });
 
 export const compassStage = style({

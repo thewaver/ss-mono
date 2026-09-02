@@ -19,6 +19,7 @@ export type BarrelProps<T> = AccessorProps<{
     faceSize?: Size2d;
     hasBacks?: boolean;
     transitionDurationMs?: number;
+    transitionDelayMs?: number;
     faceRoleDescription: string;
     computeFaceDefs: (index: number, face: BarrelFace) => BarrelFaceDefs;
 }> & {

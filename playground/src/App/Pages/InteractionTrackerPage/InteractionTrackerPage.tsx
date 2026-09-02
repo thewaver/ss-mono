@@ -8,6 +8,7 @@ import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
+import { CardStackExample } from "./Examples/CardStack";
 import { DragExample } from "./Examples/Drag";
 import { FlagsExample } from "./Examples/Flags";
 import { SwipeExample } from "./Examples/Swipe";
@@ -22,6 +23,7 @@ const FIELD_WIDTH = 110;
 const BOX_WIDTH = 300;
 const BOX_PADDING = 10;
 const SWIPE_HEIGHT = 140;
+const STACK_HEIGHT = 200;
 
 export const InteractionTrackerPage = () => {
     const [getIsDisabled, setIsDisabled] = createSignal(false);
@@ -33,6 +35,8 @@ export const InteractionTrackerPage = () => {
     const [getDragEndReason, setDragEndReason] = createSignal<InteractionDragEndReason>();
     const [getSwipeProgress, setSwipeProgress] = createSignal(0);
     const [getSwipeVerdict, setSwipeVerdict] = createSignal<SwipeDirection | "nothing">();
+    const [getStackProgress, setStackProgress] = createSignal(0);
+    const [getStackVerdict, setStackVerdict] = createSignal<SwipeDirection | "nothing">();
 
     const getExamples = createMemo(() => [
         {
@@ -82,6 +86,26 @@ export const InteractionTrackerPage = () => {
                 </PageMeasureBox>
             ),
             path: `${EXAMPLES_ROOT}/Swipe.tsx`,
+        },
+        {
+            key: "cardStack",
+            name: "Card stack",
+            readout: () =>
+                `travel: ${getStackProgress().toFixed(RATIO_DIGITS)} of the card's own width — last verdict: ${getStackVerdict() ?? "none yet"} — the deck re-deals once it is empty`,
+            component: () => (
+                <PageMeasureBox width={() => BOX_WIDTH} height={() => STACK_HEIGHT} padding={() => BOX_PADDING}>
+                    <CardStackExample
+                        isDisabled={getIsDisabled}
+                        commitRatio={getCommitRatio}
+                        onSwipe={setStackProgress}
+                        onSwipeEnd={(direction) => {
+                            setStackProgress(0);
+                            setStackVerdict(direction ?? "nothing");
+                        }}
+                    />
+                </PageMeasureBox>
+            ),
+            path: `${EXAMPLES_ROOT}/CardStack.tsx`,
         },
     ]);
 

@@ -4929,6 +4929,73 @@ first painted frame with every option mounted, against 71 ms with a window of fo
 never the problem and is unchanged. The remaining cost at open is linear but has no DOM in it — building the
 records, flattening them, finding the navigable ones — and that is the floor a windower cannot lower.
 
+### Controls: `Toolbar`, and why the overflow is the component
+
+The toolbar was dropped once, on the reading that it is a flex row of buttons — which was right about the
+toolbar and wrong about the problem. A real one has more actions than room, and what happens to the ones that
+do not fit is behaviour rather than paint. `backlog.md` records the reopening; this records what got built.
+
+**Every action is rendered whether or not it fits, and the ones that do not are taken out of the flow.** They
+keep `position: absolute` at the row's origin with `visibility: hidden`, `pointer-events: none`, `inert` and
+`aria-hidden`, which leaves them measurable at their natural width while removing them from the layout, from
+the pointer, from the tab order and from the accessibility tree. A `display: none` action has no width to
+measure, so the cut could only ever be computed from what is already showing — which is the shape that
+oscillates.
+
+**The cut is two questions asked once each, in a fixed order, and never a loop.** First: does the whole row
+fit with no overflow button at all? If it does, everything shows and there is no button. If it does not, the
+button is now certain to exist, so its width comes off the budget and the remaining actions are filled in
+greedily from the front. Iterating instead — add the button, re-measure, discover one more action now fits,
+remove the button, discover it does not — is the failure this ordering exists to prevent, and a single pixel
+of container resize is enough to start it. `toolbar.utils.test.ts` pins that going from a width where
+everything fits, to one pixel less, and back, returns the first answer again.
+
+**The greedy fill stops at the first action that does not fit rather than skipping to a narrower one.** A
+skip would show the first, third and fourth actions and hide the second, which reorders the row from the
+reader's point of view; a toolbar's row is a prefix of its list.
+
+**`collapse` is per action, and `"never"` is reserved before anything else is fitted.** The default is
+`"auto"`; `"never"` keeps an action in the row whatever it costs the ones around it — including when there is
+no room for it at all, since an action that refuses to collapse and then collapses is worse than an
+overflowing row; `"always"` keeps it out of the row however much room there is. Without this the most
+important action in a narrow toolbar is the first to disappear, because importance and position are
+unrelated.
+
+**An action is described once and painted twice.** `renderAction` paints it as a button in the row and
+`renderOverflowItem` paints it as a row in the menu, and both are driven by the same `ToolbarAction` record
+with one `onActivate`. The overflow is a real `Menu` rather than a private popup, so the submenu machinery,
+the dismissal stack and the highlight all come with it; the toolbar hands it the collapsed actions as
+`MenuItem`s and forwards its own `onActivate`.
+
+**The row is one tab stop, and an action that leaves the row leaves the walk with it.** The published toolbar
+pattern is a single tab stop with the arrows moving along the row, focus landing on the first control that is
+not disabled; wrapping and `Home` / `End` are optional and both are provided through
+`NavigatorUtils.computeNextPosition`. What is unusual here is that the set of stops changes with the
+container's width, so the roving index is derived from the cut rather than stored: the stops are the shown,
+enabled actions plus the overflow button, and the overflow button is the last of them. An effect catches the
+case where the action currently holding focus is collapsed by a resize and moves focus to the overflow
+button, which is where that action has just gone.
+
+**Disabled actions are skipped by the walk rather than kept in it.** The pattern allows either and notes that
+keeping them focusable helps where discoverability of a function is crucial; the library's existing answer is
+`Tabs`, which skips them, and there was no argument for the toolbar differing from its neighbour. A disabled
+action that collapses is still handed to the menu as a disabled item, so it is discoverable there.
+
+**The toolbar is invisible until it has measured, which is one or two frames.** Measuring after mounting means
+the first paint would otherwise show every action at full width before the cut lands, and that flash only
+shows up on a slow machine. `visibility: hidden` on the root until the root's width and every action's width
+have arrived is the whole of it.
+
+**The Playground's bar is resizable by dragging, and the drag writes back into the width field.** A demo
+whose whole subject is what happens as the container changes width is not demonstrated by a number field
+alone. The container carries CSS `resize: horizontal` and an `ElementObserver` on it feeds its measured width
+back into the same signal the field drives, so there is one width rather than two that must agree, and the
+field is also the way to put the demo back where it started.
+
+**The button inside each action takes `buttonElement` from `Button.css`.** `InteractionWrapper`'s root sets
+`pointer-events: none` and the control inside re-enables it — `Tabs` composes the same style for the same
+reason. A control that forgets it renders correctly, measures correctly, and cannot be clicked.
+
 ### Controls: `Tree`, and the group box that could not be a child
 
 `Tree` is `role="tree"` with expand and collapse, one selected value, and a keyboard
@@ -7345,6 +7412,299 @@ their own; and the check that the defaults survived the page's spread is that th
 carries **the same class** as the `[b]` in the legend. Not one of those says what a class draws, so all of them
 survive a restyle on either side.
 
+### `Odometer`: the columns turn the way the number is going, and the arithmetic above the barrel is the component
+
+`Abstracts/Barrel` already turns a stack of faces to an angle and is what both drum wheels are made of, so a
+digit column needed nothing new: ten faces, `0` to `9`, and an angle. What had to be decided is everything
+above it, and each of these was a real call rather than a detail.
+
+**The angle is cumulative and is never wrapped back into a circle.** A column going from nine to zero is a
+tenth of a turn forward or nine tenths back, and wrapping the angle into 0–360 forces the browser to take the
+short way — so an odometer counting up rewinds its units on every carry. Keeping a running total that only
+moves in the direction the number is going is the whole of the fix, and the spec compares two readings rather
+than a value for that reason.
+
+**The direction follows the number, not the digit.** Going up turns every column forward, including the one
+whose digit fell; going down turns every column back. That is what a geared mechanism does, and it is what
+makes 199 → 200 read as travel rather than one column rewinding while two go on.
+
+**A column waits one beat for every column to its right that is also carrying.** Not a fixed stagger: a
+column whose neighbour is standing still does not wait for it, so 123 → 223 moves the hundreds immediately
+while 199 → 200 cascades from the units up. The delay is per column and reaches the faces through
+`Barrel`'s new `transitionDelayMs`, which is the one thing the abstract gained.
+
+**It takes the formatted text, not the number, and that is what keeps a locale out of it.** Any character
+that is not a digit is a slot that never turns — a grouping separator, a decimal point, a currency sign — and
+the consumer decides what the number looks like.
+
+**The sign is a slot like any other, and the columns follow the magnitude rather than the number.** This was
+built the other way first — reading the sign and inverting the comparison below zero, on the argument that a
+bigger digit is a smaller number there — and it looks absurd: going from −1 to −2 sends the units nine steps
+backwards to arrive at the digit next door. What the columns actually show is the magnitude, so the direction
+that reads correctly is the one the digits are going: −1 to −2 turns forward one step, −2 to −1 turns back
+one, a change of sign alone turns nothing because no digit changed, and 2 to −1 turns back because the
+magnitude fell. Comparing the digit sequences and ignoring the sign gives all four, which is why there is no
+sign handling in the component at all.
+
+**A column has to be windowed, and the window has to centre the drum explicitly.** `Barrel` is as tall as the
+whole drum looks, because a drum wheel is meant to show several faces; an odometer shows one. The window is
+one digit tall with the barrel absolutely positioned at its centre — `place-items: center` on an item taller
+than its box was tried first and lands one face out, which reads as every column showing the digit above the
+right one.
+
+**It shows its value on the first paint rather than animating into it.** The angles are seeded from the first
+text before the first render, and the effect that turns them is deferred, so nothing rolls on mount. Without
+that, every column spins up from zero when the page loads and the value is unreadable for the length of a
+turn.
+
+**The columns are keyed by digit and placed by flex `order`, so a sign appearing does not rebuild them.**
+Rendering one element per slot in slot order looks obvious and is wrong: a minus sign arriving in front of a
+number shifts every digit one position along, so the element that was showing the units becomes the sign and
+the units get a brand-new element created at rest — which cannot animate, and 0 to −1 sat still while 1 to 0
+turned. The fixed slots and the digit columns are therefore two separate lists, each keyed by its own index,
+and each carries the `order` its slot has in the row. A digit column then survives anything happening to its
+left, and the row still reads the way the text does.
+
+**A drum's backs are turned off.** `Barrel` renders a back for every face by default, which is what a wheel
+with a visible reverse needs; an odometer's faces are never seen from behind, so this halves the elements per
+column.
+
+**What a screen reader gets is the number, once.** Every face is handed `isHidden`, which `Barrel` turns into
+`aria-hidden` and `inert`, and the value sits beside them in a visually-hidden span. Without that, a column
+announces all ten of its digits.
+
+**The split-flap seam is still just a seam.** `backlog.md` recorded that a departure board is the same
+mechanism with a window of two recycled faces, and that a barrel rendering every face is the special case
+where the window is as long as the list. Nothing here forecloses it: the window would go on `Barrel`, and
+whether a split-flap is then a second component or a mode on this one is the user's call, still open.
+
+### `Bracket`: a layered tree with connectors, and a knockout draw is one arrangement of it
+
+**The props describe a tree, not a tournament, and that is the user's decision.** It was put to them as
+bracket-shaped versus tree-shaped — a bracket-shaped API is a subset of a tree-shaped one and the two do not
+converge later — and they took the tree. So the same component draws a knockout draw, an org chart and a
+skill tree, and `root` is a node with children rather than a list of rounds.
+
+**The name stays `Bracket`, and that is the user's call rather than an oversight.** It names the arrangement
+it was asked for rather than the thing that got built, which was put to them along with five alternatives —
+`LayerTree`, `Lineage`, `Cascade`, `Trellis` and keeping it — and they rejected all five and kept the name
+for now. Recorded so the same list is not put to them twice; a better name is still welcome, but it has to be
+one nobody has already turned down.
+
+**A node sits centred between the outermost of the nodes that feed it, and that propagates upward.** The mean
+of the first and last child rather than of all of them, so an uneven fan-out still lands the parent between
+the ends instead of being dragged toward whichever side has more children — the org chart example is three
+children under one node, two under another and one leaf, and exists to show exactly that. A node with one
+child sits level with it, which is what a bye looks like and costs nothing extra.
+
+**Rows are counted in leaves and layers in depth, both before any pixel exists.** `computeLayout` returns a
+row per leaf and a layer per depth as plain numbers; the component multiplies by the node size and the two
+gaps. That is what lets the node size, the layer gap and the row gap all be the consumer's without the
+arithmetic knowing about any of them, and it is what the unit tests can check without a browser.
+
+**`orientation` and `rootSide` between them cover four boards, and the layout is computed once.** The
+arithmetic runs in layers and rows; `orientation` decides which screen axis each of those two is, and
+`rootSide` decides which end of the layer axis the root sits at. So a knockout draw is horizontal with the
+root at the end, an org chart is vertical with the root at the start, and nothing about the tree walk or the
+centring changes between them. The Playground's org chart is **pinned** upright rather than following the
+page's controls, because that is what an org chart is; the other two examples follow the controls, which is
+what makes the pair of them worth having. Only two functions know about the screen at all — the one that turns a layer
+and a row into a `left` and a `top`, and the one that writes a connector point.
+
+**The connectors are one SVG overlay rather than bordered divs.** `ScreenWiper` chose CSS boxes over SVG
+because several hundred independent transforms composite better than one viewport-sized drawing; a bracket
+has one path per node and no animation, so the argument does not reach it and a path is far less plumbing
+than three positioned divs per connector. The overlay carries `aria-hidden` and no pointer events: it is a
+picture of a relationship the list already states.
+
+**The consumer draws the connectors, and the component only says where they go.** The first build took a
+width and a colour and drew a plain stroke itself, which is the one place this component departed from the
+rest of the library — `renderNode` sits beside it, `ScratchCard` takes a `renderCell`, `Shape` takes its fill
+and stroke defs. `renderConnector` now receives one `BracketConnectorDefs` per edge and returns whatever SVG
+it likes inside the component's overlay, and the two colour and width props are gone.
+
+**The defs stop at the two endpoints and the axis, and deliberately do not name the bend.** Each one carries
+the parent's facing edge point, the child's facing edge point, which orientation the board is in, and the two
+node ids. Where the line turns is nobody's business but the painter's: the middle of the gap is simply the
+midpoint of those two points along the layer axis, because a child is always exactly one layer away. Handing
+over a spine position instead would have made the elbow a contract, and an elbow is a drawing rather than a
+layout.
+
+**The elbow is therefore sample vocabulary, not behaviour**, which is the rule the SVG defs move already
+settled. `Samples/Bracket/Connectors` holds `BracketConnectorPaths` — `elbow`, `roundedElbow` and `curve`,
+pure functions returning a `d` string, in a file with no JSX so the unit tests can reach them — and
+`BracketConnectors`, the painters built on top: `flat`, `rounded`, `curved` and `ballAndArrow`. A consumer
+who wants the usual thing calls one of those; a consumer who wants something else has the numbers.
+
+**A painter is called inside a JSX expression, and getting that wrong looks like a dead control.** The call
+was first made straight from the `Index` callback, which runs once per row — so a consumer choosing between
+painters from a signal got the first one forever and nothing re-rendered. Wrapping the call in a fragment puts
+it in a tracking scope. Worth recording because every other painter in the library is already called from
+inside markup and so never showed the problem.
+
+**A gradient stroke needs an id that is unique in the document, and the defs carry one.** Each painter emits
+its own `<linearGradient>`, and the first build keyed it on the two node ids — which are unique within a tree
+and identical across three of them, so every board on the page resolved `url(#…)` to the **first** board's
+gradient and inherited geometry belonging to a picture somewhere else entirely. Thirty gradients, sixteen
+distinct ids. `BracketConnectorDefs.id` is now the component's own `createUniqueId` joined to the two node
+ids, so a painter has something document-unique to key on without inventing it.
+
+**The gradient runs corner to corner, along the connector's own diagonal.** Anchoring it to the layer axis
+alone is also correct, but the axis then spans only the gap between two layers while most of a connector's
+length is the run across it — so nine tenths of every line sits at one flat mid-colour. Anchoring it from the
+parent's edge point to the child's makes each connector ramp along its whole length, and stays consistent
+between siblings because every connector's axis is anchored to its own two ends.
+
+**The stops set `stop-color` through `style` rather than as an attribute**, because a presentation attribute
+does not resolve a CSS custom property and the Playground's colours are theme tokens. And the two colours are
+one family's `dark` and `light`, which is the recorded rule for a gradient in the Playground rather than
+anything about this component.
+
+**The ball marks where the line starts and the arrow where it arrives, which is at the parent.** Children feed
+a node, so the arrow points the way the tree reads — a seed advancing to the final, a report reporting to a
+manager — and the component's own vocabulary already says so with `childIds` and `toRoot`.
+
+**A connector stops at the edge of the box it joins, and getting that backwards is invisible until a node
+fades.** The first build asked for a node's facing edge with the test inverted, so a parent's line began at
+the edge pointing away from its children and a child's ended at the edge pointing away from the root: every
+line ran the full width of both boxes it joined. Nothing showed, because a node's own background hid it — the
+user found it on the one node drawn at half opacity, where the line was visible straight through it. The test
+is now `BracketUtils.getFacingEdge`, which is where a unit test can reach it, and `bracket.spec.ts` walks
+every point of every path against every node's rectangle so the same mistake cannot hide behind an opaque
+box again.
+
+**The nodes are a list, and the connectors are not in it.** Every node is an `li` positioned absolutely, so
+what a screen reader gets is the nodes in layer order with nothing about the lines. A bracket read out line by
+line is meaningless; the structure is the content.
+
+**One tab stop, with the arrows walking two axes, and which arrow does what follows the picture.** The two
+keys along the layer axis step between layers and the two across it move within one, so turning the board
+upright turns the keys with it and the arrow always matches what the reader sees. Moving within a layer stops
+at the ends rather than wrapping into another one — wrapping there would land focus somewhere visually
+unrelated. Stepping toward the leaves lands on the middle of the nodes that feed this one, which is the one
+the eye is already on. `Home` and `End` jump to the ends of the layer, and disabled nodes are skipped as
+everywhere else in the library.
+
+**Ids are the path through the tree.** A node's id is its index path — `0.1.0` — so the layout is a pure
+function of the tree with no identity injected by the consumer and no map to keep in step. The cost is that
+reordering a node's children renames it, which matters only if a consumer holds an id across such a change;
+nothing in the component does.
+
+### `ScratchCard`: the holes stay, and that is a different component from `Reveal`
+
+`Reveal` cuts a hole where the pointer is and the hole travels with it, so the cover is whole again the moment
+the pointer leaves. Here the holes accumulate, and everything downstream of that is new: something has to hold
+what has been scratched, say how much of the box it covers, and decide when enough has gone. A flag on
+`Reveal` could not have carried any of it.
+
+**The cover is a grid of cells rather than a canvas, and that follows from the library's stated scope.** A
+canvas with destination-out compositing is how this is usually built, and a drawing surface is the consumer's
+by the scope statement in `backlog.md` item 4; an SVG mask path is the other usual answer and grows without
+bound as the stroke gets long. A grid of cells removed as the pointer passes is coarser than either, but it is
+DOM, it is the same slicing `Mosaic` and `CellAnimation` already do, and it makes "how much has gone" an exact
+count rather than a sampled estimate — which is what lets `onScratch` report a number a consumer can act on
+and a spec can check. The resolution is `cellCount`, and it is the consumer's.
+
+**A cell is brushed when the circle touches its box, not when it contains its centre.** The first build tested
+the cell's centre, which leaves dead spots: a pointer sitting exactly where four cells meet is more than a
+short radius from all four centres, so a small brush there rubs off nothing at all. The box test also gives
+the useful floor for free — with a radius of zero the cell under the pointer is still taken, because the
+distance from a point inside a rectangle to that rectangle is zero.
+
+**The brush is measured in pixels, not in cells.** A coin does not get bigger because the foil was printed
+finer, so the same radius over a finer grid takes more cells, and the cell size is derived from the measured
+box rather than assumed.
+
+**It can be operated with no pointer at all, and that was decided before it was built rather than after.**
+`SlideButton`'s recorded gap is a control that only answers to dragging; scratching is worse, because it is a
+path-based gesture. Success criterion 2.1.1 Keyboard (A) requires the functionality to be operable from a
+keyboard, and 2.5.1 Pointer Gestures (A) requires that anything operated by a path-based gesture also be
+operable with a single pointer without a path. So the cover is a `button` with a name, `Enter` and `Space`
+take the whole of it away, and a single press without a drag still rubs off one brush-width — which is the
+path-free pointer route the second criterion asks for.
+
+**Crossing the threshold clears the rest, because the last few cells are nobody's idea of fun.**
+`clearThreshold` defaults to 1, which means nothing happens until the cover is genuinely gone; a consumer who
+sets 0.6 gets the rest taken away the moment six tenths of it has been rubbed off. `onClear` fires once, when
+the cover has actually gone, rather than when the threshold was crossed.
+
+**A controller rather than a signal, because a reset is a command and not a state.** `onMount` hands back
+`reset` and `clear`, which is the shape `Typewriter` and `ScrambleText` already use. The Playground needs
+`reset` for the house rule that a demo a visitor can move must be a demo they can put back.
+
+### `ScrambleText`: the text is replaced rather than animated, and that decides the whole shape
+
+The sibling of `Typewriter` that item 24 argued for. `Typewriter` stages a CSS animation over text that never
+changes; this replaces the character a position is showing, on a timer, until the position's own moment
+arrives. Nothing about that is expressible as a keyframe, which is why it is a component rather than an entry
+in the Typewriter page's effect list — see the item for the two things that block the CSS route.
+
+**It takes a string rather than children, and `Typewriter` taking children is not a precedent it should
+follow.** `Typewriter` parses whatever is nested inside it, links and images included, because it only ever
+adds a stagger on top of what is there. This has to know what every position is going to become in order to
+scramble it, and a `<img>` has no character to settle on. A `text` prop states that contract in the type
+instead of failing on the first consumer who nests an element.
+
+**A position holds the width of the character it will settle on, and that is the whole of the layout
+problem.** The naive build swaps the character in place, so a proportional font reflows the line on every
+frame and the effect reads as broken rather than lively. Here every position is a box containing the real
+character — kept in the flow, painted `transparent` while it churns — with the noise glyph absolutely
+positioned over it. The box is therefore always the width of the answer, no measurement is needed, and the
+noise is free to be wider or narrower than what is under it.
+
+**`color: transparent` rather than `visibility: hidden`, and the difference is the whole accessibility
+story.** A hidden element leaves the accessibility tree, so a screen reader would have had nothing but the
+noise to read. Transparent text is still rendered and still announced, so the real string is what reaches
+assistive technology from the first frame, and every noise glyph carries `aria-hidden="true"`. The spec
+checks this as a relationship — the text read out mid-churn equals the text read out once it has settled —
+rather than by naming the demo's copy.
+
+**Characters are grouped into words, because an inline-block per character makes every gap a break
+opportunity.** Without the grouping a line breaks mid-word, which is the second way this effect looks
+broken. A word is one `inline-block` span, and an inline-block is an atomic inline box, so no line can break
+inside it; the whitespace between words stays a plain text node, which is what keeps the real break
+opportunities exactly where the text put them. `ScrambleTextUtils.getSegments` is that split, and it carries
+each segment's `startIndex` so a weight still reaches the character it was computed for.
+
+**The settle order is a weight per character, in the same 0..1 vocabulary the animation samples use.**
+`computeCharacterWeights(count)` returns one number per position and the position settles at
+`initialDelayMs + weight * settleDurationMs`, so left to right, right to left, outwards from the middle and a
+scatter are all the same component with a different function. It is the 1D form of
+`CellAnimation.computeCellWeights` deliberately, down to the guarantee living in the resolver rather than in
+each formula: `resolveWeights` clamps whatever it is handed and fills any position the caller skipped.
+
+**A character has three states, not two, and the third is what makes a sequential reveal possible.**
+`churnDurationMs` says how long one position churns before it settles; without it every position churns from
+the first frame and only the settle is staggered, which is the whole-line effect. With it, a position starts
+churning that long before its own settle time and renders nothing before that — so setting the churn window to
+the gap between two consecutive settle times gives a line that grows one character at a time, each arriving as
+noise and landing before the next appears. Asked for by the user as an example, and it needed the third state
+rather than a new weight.
+
+**A position that has not started yet holds its place, and this was got wrong first.** The first build took
+those positions out of the flow, so the line grew as the reveal passed along it — and a word narrower than it
+will be fits on a line it will not fit on once the rest arrives, so the word jumps to the next line
+mid-reveal. That is the exact fault `Typewriter` exists to avoid, and the user caught it on the sequential
+example. A not-yet-started position is now simply transparent: it takes its full width from the first frame,
+so every line break is settled before anything is revealed, and it is still announced because transparent
+text stays in the accessibility tree.
+
+**Reduced motion is the consumer's to answer, and the component does not read the preference.** That is the
+house line — the library reads `prefers-reduced-motion` in CSS in one place and never in JavaScript, and
+`WheelPage` rather than `Wheel` is what withdraws the idle turn. The route here is `settleDurationMs={0}`,
+which settles every position at once and produces no churn at all; `ScrambleTextPage` reads the preference
+and passes it, and disables the duration field so that the override is visible rather than mysterious.
+
+**`glyphs` is written out by hand, beside the accessorized block.** It is an optional prop whose meaningful
+"off" value is `undefined` — a consumer switching back to the built-in set at runtime has to be able to
+return it — which is the second hole in `AccessorProps` that `conventions.md` records, and the same position
+`getIdleDelayMs` is in. The Playground's own example props type takes the other way through the same hole,
+declaring `glyphs: string | undefined` as required so the mapped type keeps the union.
+
+**The noise never shows the character the position is going to settle on.** `pickGlyph` excludes it from the
+set before rolling. Without that, a position lands on its answer for a frame at random and reads as settled a
+beat early, which is invisible in review and obvious in a spec.
+
 ### `PointerTracker`: one reading of where the pointer is relative to one element
 
 The abstract answers a single question — where is the pointer, relative to this box — and everything a
@@ -7461,6 +7821,39 @@ abstract being the one to hand it out.
 
 **The Playground gained an `Abstracts` category for it**, ahead of `Exotics`. Nothing that renders no DOM had
 a page before; the alternative was filing it under `Exotics`, which is the folder for things that do render.
+
+#### The dock, the card stack and the tilt's sheen: three examples, and the two things that were not obvious
+
+Added to the `PointerTracker` and `InteractionTracker` pages. Two of the three needed a decision that the
+sketch did not contain, and both are the kind that would be got wrong a second time.
+
+**The dock sizes every tile from the row's layout at rest, never from where the tiles currently are.** A dock
+grows the tile under the pointer and its neighbours by less, which means the row's total width changes while
+the pointer is inside it. Size the tiles from their live positions and the row feeds back into itself: a tile
+growing shifts its neighbour sideways, which changes that neighbour's distance from a pointer that has not
+moved, which changes its size, which shifts the next one. The reading is taken as a ratio of the row's own
+box — which never changes, because the tiles are absolutely positioned inside it — and the resting centres
+are arithmetic rather than measurements. The row is then laid out by accumulating the grown widths and
+centring the result, so the whole row breathes symmetrically around the pointer.
+
+**Its footprint is the magnified spread, not the resting one.** Seven tiles at rest is 204px and the same
+seven at full magnification is 285px, so a box sized to the resting row has tiles hanging out of it. The
+constants were chosen against the magnified figure, which is the one worth computing before picking them.
+
+**The card stack empties and re-deals rather than cycling a card to the back.** Sending the flown card
+straight to the bottom of the stack is one line shorter and looks broken: the element survives, so its
+transform changes from off-screen to the back of the deck and the browser animates the difference — the card
+visibly slides back in from the side it just left. Cards are removed from the list instead, which destroys the
+element and leaves nothing to animate, and the deck refills once the last one has gone. That also satisfies
+the house rule that a demo a visitor can move must be a demo they can put back, with no reset button.
+
+**The tilt's sheen is a band positioned by its own colour stops, and it travels against the tilt.** A
+reflection is of something that is not moving, so it slides the opposite way to the surface and further than
+it — which is what separates foil from a sticker painted on the card. Two constructions were tried and
+abandoned before the third: `background-position` over an oversized image puts the band off the element at
+the extremes, because the gradient line is measured over the image rather than the box. Interpolating the
+stops themselves — `transparent`, white, `transparent` at a centre driven by the pointer — is exact, always
+within the element, and needs no second layer.
 
 ### `MediaQueryMonitor`: a media query as an accessor, shared per query
 
