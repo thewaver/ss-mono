@@ -30,7 +30,7 @@ export type SortableTransfer<T> = {
     value: T;
     fromLabel: string;
     toLabel: string;
-    fromIndex: number;
+    fromIndex?: number;
     toIndex: number;
 };
 

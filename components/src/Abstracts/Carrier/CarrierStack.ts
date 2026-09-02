@@ -3,15 +3,14 @@ import { batch, createSignal, onCleanup } from "solid-js";
 import type { Point2d } from "@thewaver/ss-utils";
 
 import { LiveAnnouncer } from "../LiveAnnouncer/LiveAnnouncer";
-import type { CarrierZone, Carry, CarryEndReason, CarryMode } from "./Carrier.types";
-import { CarrierUtils } from "./Carrier.utils";
+import type { CarrierZone, Carry, CarryEndReason, CarryMode, CarryNudge, CarryPlace } from "./Carrier.types";
 
 type CarryState = {
     carry: Carry;
     from: CarrierZone;
-    fromIndex: number;
+    fromPlace: CarryPlace;
     to: CarrierZone;
-    toIndex: number;
+    toPlace: CarryPlace;
     mode: CarryMode;
 };
 
@@ -21,11 +20,10 @@ const zones: CarrierZone[] = [];
 
 const [getCarryState, setCarryState] = createSignal<CarryState | undefined>();
 
+const startSentence = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
+
 const getGroupZones = (groupId: string) =>
     zones.filter((zone) => zone.getGroupId() === groupId && !zone.getIsDisabled());
-
-const computePlaceCount = (state: CarryState, zone: CarrierZone) =>
-    zone === state.from ? zone.getLength() : zone.getLength() + 1;
 
 const getAcceptingZones = (state: CarryState) =>
     getGroupZones(state.carry.groupId).filter((zone) => zone === state.from || zone.computeCanAccept(state.carry));
@@ -63,12 +61,20 @@ export namespace CarrierStack {
 
     export const getTargetZone = () => getCarryState()?.to;
 
-    export const getTargetIndex = () => getCarryState()?.toIndex;
+    export const getSourcePlace = () => getCarryState()?.fromPlace;
 
-    export const getSourceIndex = () => getCarryState()?.fromIndex;
+    export const getTargetPlace = () => getCarryState()?.toPlace;
 
-    export const start = (from: CarrierZone, fromIndex: number, carry: Carry, mode: CarryMode) => {
-        setCarryState({ carry, from, fromIndex, to: from, toIndex: fromIndex, mode });
+    export const getIsTargetAllowed = () => {
+        const state = getCarryState();
+
+        return state === undefined || state.to.computeIsPlaceAllowed(state.toPlace, state.carry);
+    };
+
+    export const start = (from: CarrierZone, place: CarryPlace, carry: Carry, mode: CarryMode) => {
+        const state: CarryState = { carry, from, fromPlace: place, to: from, toPlace: place, mode };
+
+        setCarryState(state);
 
         if (mode !== "key") {
             LiveAnnouncer.announce(`${carry.label} picked up from ${from.getLabel()}.`);
@@ -76,14 +82,8 @@ export namespace CarrierStack {
             return;
         }
 
-        const hasOtherZones =
-            getAcceptingZones({ carry, from, fromIndex, to: from, toIndex: fromIndex, mode }).length > 1;
-        const keys = hasOtherZones
-            ? "Arrow keys choose a place, Tab changes list, Enter drops, Escape cancels."
-            : "Arrow keys choose a place, Enter drops, Escape cancels.";
-
         LiveAnnouncer.announce(
-            `${carry.label} picked up from ${from.getLabel()}, position ${fromIndex + 1} of ${from.getLength()}. ${keys}`,
+            `${carry.label} picked up from ${from.getLabel()}, ${from.computePlaceLabel(place, carry)}. ${from.getKeyHint(getAcceptingZones(state).length > 1)}`,
         );
     };
 
@@ -96,27 +96,28 @@ export namespace CarrierStack {
 
         if (!zone || (zone !== state.from && !zone.computeCanAccept(state.carry))) return;
 
-        const dropIndex = CarrierUtils.computeDropIndex(zone.getItemRects(), x, y, zone.getDir());
-        const toIndex = CarrierUtils.computeSettledIndex(dropIndex, state.fromIndex, zone === state.from);
+        const place = zone.computePlaceAtPoint({ x, y }, state.carry);
 
-        if (zone === state.to && toIndex === state.toIndex) return;
+        if (place === undefined) return;
+        if (zone === state.to && zone.computeIsSamePlace(place, state.toPlace)) return;
 
-        setCarryState({ ...state, to: zone, toIndex });
+        setCarryState({ ...state, to: zone, toPlace: place });
     };
 
-    export const aimAtIndex = (step: number) => {
+    export const aimAtNudge = (nudge: CarryNudge) => {
         const state = getCarryState();
 
         if (!state) return;
 
-        const places = computePlaceCount(state, state.to);
-        const toIndex = Math.min(Math.max(state.toIndex + step, 0), places - 1);
+        const place = state.to.computeNudgedPlace(state.toPlace, nudge, state.carry);
 
-        if (toIndex === state.toIndex) return;
+        if (place === undefined || state.to.computeIsSamePlace(place, state.toPlace)) return;
 
-        setCarryState({ ...state, toIndex });
+        setCarryState({ ...state, toPlace: place });
 
-        LiveAnnouncer.announce(`Place ${toIndex + 1} of ${places} in ${state.to.getLabel()}.`);
+        LiveAnnouncer.announce(
+            `${startSentence(state.to.computePlaceLabel(place, state.carry))} in ${state.to.getLabel()}.`,
+        );
     };
 
     export const aimAtNextZone = (step: number) => {
@@ -130,11 +131,11 @@ export namespace CarrierStack {
 
         const from = accepting.indexOf(state.to);
         const to = accepting[(((from + step) % accepting.length) + accepting.length) % accepting.length];
-        const toIndex = to === state.from ? state.fromIndex : to.getLength();
+        const place = to.computeEntryPlace(state.carry);
 
-        setCarryState({ ...state, to, toIndex });
+        setCarryState({ ...state, to, toPlace: place });
 
-        LiveAnnouncer.announce(`${to.getLabel()}, place ${toIndex + 1} of ${computePlaceCount(state, to)}.`);
+        LiveAnnouncer.announce(`${to.getLabel()}, ${to.computePlaceLabel(place, state.carry)}.`);
     };
 
     export const end = (reason: CarryEndReason) => {
@@ -152,23 +153,31 @@ export namespace CarrierStack {
 
         const isSameZone = state.to === state.from;
 
-        if (isSameZone && state.toIndex === state.fromIndex) {
+        if (isSameZone && state.to.computeIsSamePlace(state.toPlace, state.fromPlace)) {
             LiveAnnouncer.announce(`${state.carry.label} left where it was.`);
 
             return;
         }
 
+        if (!state.to.computeIsPlaceAllowed(state.toPlace, state.carry)) {
+            LiveAnnouncer.announce(
+                `${state.carry.label} does not fit in ${state.to.getLabel()}, returned to ${state.from.getLabel()}.`,
+            );
+
+            return;
+        }
+
         if (isSameZone) {
-            state.to.moveAt(state.fromIndex, state.toIndex);
+            state.to.moveAt(state.fromPlace, state.toPlace, state.carry);
         } else {
             batch(() => {
-                state.from.takeAt(state.fromIndex);
-                state.to.putAt(state.toIndex, state.carry, { label: state.from.getLabel(), index: state.fromIndex });
+                state.from.takeAt(state.fromPlace, state.carry);
+                state.to.putAt(state.toPlace, state.carry, { label: state.from.getLabel(), place: state.fromPlace });
             });
         }
 
         LiveAnnouncer.announce(
-            `${state.carry.label} dropped in ${state.to.getLabel()}, place ${state.toIndex + 1} of ${state.to.getLength()}.`,
+            `${state.carry.label} dropped in ${state.to.getLabel()}, ${state.to.computePlaceLabel(state.toPlace, state.carry)}.`,
         );
     };
 

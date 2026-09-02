@@ -1,8 +1,18 @@
+import type { Point2d } from "@thewaver/ss-utils";
+
 export type CarryDir = "row" | "column";
 
 export type CarryMode = "drag" | "tap" | "key";
 
 export type CarryEndReason = "drop" | "cancel";
+
+export type CarryPlace = NonNullable<unknown>;
+
+export type CarryNudge = {
+    x?: number;
+    y?: number;
+    turn?: number;
+};
 
 export type Carry = {
     groupId: string;
@@ -13,19 +23,23 @@ export type Carry = {
 
 export type CarryOrigin = {
     label: string;
-    index: number;
+    place: CarryPlace;
 };
 
 export type CarrierZone = {
     getGroupId: () => string;
     getLabel: () => string;
     getRootRef: () => HTMLElement | undefined;
-    getItemRects: () => DOMRect[];
-    getDir: () => CarryDir;
     getIsDisabled: () => boolean;
-    getLength: () => number;
+    getKeyHint: (hasOtherZones: boolean) => string;
     computeCanAccept: (carry: Carry) => boolean;
-    takeAt: (index: number) => void;
-    putAt: (index: number, carry: Carry, origin: CarryOrigin) => void;
-    moveAt: (fromIndex: number, toIndex: number) => void;
+    computePlaceAtPoint: (point: Point2d, carry: Carry) => CarryPlace | undefined;
+    computeNudgedPlace: (place: CarryPlace, nudge: CarryNudge, carry: Carry) => CarryPlace | undefined;
+    computeEntryPlace: (carry: Carry) => CarryPlace;
+    computeIsSamePlace: (a: CarryPlace, b: CarryPlace) => boolean;
+    computeIsPlaceAllowed: (place: CarryPlace, carry: Carry) => boolean;
+    computePlaceLabel: (place: CarryPlace, carry: Carry) => string;
+    takeAt: (place: CarryPlace, carry: Carry) => void;
+    putAt: (place: CarryPlace, carry: Carry, origin: CarryOrigin) => void;
+    moveAt: (fromPlace: CarryPlace, toPlace: CarryPlace, carry: Carry) => void;
 };

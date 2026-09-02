@@ -46,8 +46,8 @@ import { hexagon_ft_2 } from "./Pattern/hexagon_ft_2";
 import { hexagon_pt_2 } from "./Pattern/hexagon_pt_2";
 import { lozenge_d_2 } from "./Pattern/lozenge_d_2";
 import { plain as patternPlain } from "./Pattern/plain";
+import { triangle_s_2 } from "./Pattern/triangle_s_2";
 import { triangle_t_2 } from "./Pattern/triangle_t_2";
-import { triangle_ts_2 } from "./Pattern/triangle_ts_2";
 import { whirlCurved_2 } from "./Pattern/whirlCurved_2";
 import { whirl_2 } from "./Pattern/whirl_2";
 import type { GradientConfig, IterationConfig, PatternConfig, SVGDefsColors } from "./SVGDefs.types";
@@ -81,7 +81,7 @@ export namespace SVGDefsSamples {
             lozenge_d_2,
             plain: patternPlain,
             triangle_t_2,
-            triangle_ts_2,
+            triangle_s_2,
             whirlCurved_2,
             whirl_2,
         } as const satisfies Record<string, PatternConfig>;

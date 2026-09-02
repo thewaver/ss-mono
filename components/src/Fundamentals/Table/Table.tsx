@@ -4,7 +4,7 @@ import { For, Index, Show, createMemo, createSignal, createUniqueId } from "soli
 import { type Index2d, MathUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-import type { CarrierZone } from "../../Abstracts/Carrier/Carrier.types";
+import type { CarrierZone, CarryPlace } from "../../Abstracts/Carrier/Carrier.types";
 import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
 import { CarrierStack } from "../../Abstracts/Carrier/CarrierStack";
 import { LiveAnnouncer } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer";
@@ -250,25 +250,50 @@ export const Table = <T,>(props: TableProps<T>) => {
         void props.onOrderChange?.(next);
     };
 
+    const asColumnIndex = (place: CarryPlace) => place as number;
+
+    const getHeaderRects = () =>
+        getColumns().reduce<DOMRect[]>((acc, _unused, columnIndex) => {
+            const element = document.getElementById(getCellId({ row: HEADER_ROW_INDEX, col: columnIndex }));
+
+            if (element) acc.push(element.getBoundingClientRect());
+
+            return acc;
+        }, []);
+
+    const getSourceColumnIndex = () => {
+        const place = CarrierStack.getSourcePlace();
+
+        return CarrierStack.getSourceZone() === zone && place !== undefined ? asColumnIndex(place) : undefined;
+    };
+
     const zone: CarrierZone = {
         getGroupId: () => tableId,
         getLabel: () => access(props.ariaLabel) ?? "",
         getRootRef: getHeaderRef,
-        getDir: () => "row",
         getIsDisabled: () => getIsDisabled() || props.orderSignal === undefined,
-        getLength: () => getColumns().length,
-        getItemRects: () =>
-            getColumns().reduce<DOMRect[]>((acc, _unused, columnIndex) => {
-                const element = document.getElementById(getCellId({ row: HEADER_ROW_INDEX, col: columnIndex }));
-
-                if (element) acc.push(element.getBoundingClientRect());
-
-                return acc;
-            }, []),
+        getKeyHint: () => "Enter drops, Escape cancels.",
         computeCanAccept: () => !getIsDisabled() && props.orderSignal !== undefined,
+        computePlaceAtPoint: (point) =>
+            CarrierUtils.computeSettledIndex(
+                CarrierUtils.computeDropIndex(getHeaderRects(), point.x, point.y, "row"),
+                getSourceColumnIndex() ?? 0,
+                true,
+            ),
+        computeNudgedPlace: (place, nudge) => {
+            const step = (nudge.x ?? 0) + (nudge.y ?? 0);
+
+            if (step === 0) return;
+
+            return Math.min(Math.max(asColumnIndex(place) + step, 0), getColumns().length - 1);
+        },
+        computeEntryPlace: () => getSourceColumnIndex() ?? 0,
+        computeIsSamePlace: (a, b) => a === b,
+        computeIsPlaceAllowed: () => true,
+        computePlaceLabel: (place) => `column ${asColumnIndex(place) + 1} of ${getColumns().length}`,
         takeAt: () => undefined,
         putAt: () => undefined,
-        moveAt: moveColumn,
+        moveAt: (fromPlace, toPlace) => moveColumn(asColumnIndex(fromPlace), asColumnIndex(toPlace)),
     };
 
     CarrierStack.registerZone(zone);
@@ -278,11 +303,11 @@ export const Table = <T,>(props: TableProps<T>) => {
     );
 
     const getLandingCol = createMemo(() => {
-        const settledIndex = CarrierStack.getTargetIndex();
+        const place = CarrierStack.getTargetPlace();
 
-        if (CarrierStack.getTargetZone() !== zone || settledIndex === undefined) return;
+        if (CarrierStack.getTargetZone() !== zone || place === undefined) return;
 
-        return CarrierUtils.computeMarkerIndex(settledIndex, CarrierStack.getSourceIndex() ?? 0, true);
+        return CarrierUtils.computeMarkerIndex(asColumnIndex(place), getSourceColumnIndex() ?? 0, true);
     });
 
     let hasCarriedClick = false;

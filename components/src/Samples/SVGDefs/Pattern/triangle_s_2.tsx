@@ -4,7 +4,7 @@ import type { PatternConfig } from "../SVGDefs.types";
 import { SVGDefsUtils } from "../SVGDefs.utils";
 import { SVGPatterns } from "../SVGPatterns.const";
 
-export const triangle_ts_2: PatternConfig = {
+export const triangle_s_2: PatternConfig = {
     computeSVGDefs: (id, __, defs) => {
         const splitValuesCache: Record<string, string> = {};
         const cellSize = defs.cellSize;

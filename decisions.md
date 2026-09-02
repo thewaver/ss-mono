@@ -3334,7 +3334,7 @@ tiling wants an even number of rows and an odd number of columns, steps half a c
 down, and marks the first and last column as the ones cut by the seam; the sideways one wants the opposite
 on every one of those four counts. Writing it as an axis flag inside the existing entry would put four
 conditionals into arithmetic whose whole value is that it can be read straight off, so the table gets a row
-instead, and `triangle_ts_2` is the sample that draws left- and right-pointing triangles through it.
+instead, and `triangle_s_2` is the sample that draws left- and right-pointing triangles through it.
 
 **One thing the extraction found immediately.** `computeGrowTracks` assumes its two ends are given in order;
 handed them reversed it walks outside the segment instead of mirroring. No call site does that, so it is a
@@ -8174,3 +8174,246 @@ shift a row of stale indices.
 creatures and journeys, as the reference for what `BoardTiles` depended on. What was needed was `Point2d`,
 `Index2d`, `Size2d` and `MathUtils`, all of which are `ss-utils` already; the rest is a game and belongs in
 one.
+
+### The carry engine stopped counting in indices, and holds a place the zone defines
+
+`SortableGrid` is what forced this, and the shape of the problem is worth stating before the answer. Every
+question `Sortable` asks of a carry has one number behind it: the item is at place 4 of 7, an arrow key makes
+that 5, the pointer's landing place is worked out by walking the item rects until one's middle is passed. A
+grid has none of that. An item there holds an area rather than a slot, positions are a pair of coordinates
+plus a footprint, nothing closes ranks when an item leaves, and — the part with no equivalent at all in a
+list — the place being aimed at can be one that cannot be taken.
+
+**Three ways to have both, and the middle one is the one that was rejected out loud.** A grid could register
+as an ordinary zone and count its cells row by row, which costs nothing up front and cannot say "does not
+fit" at any price: an index has no room for a footprint, a turn changes which cells the same index covers, and
+every piece of the settled-index arithmetic would need a bypass, leaving an engine shared in name only. Or a
+grid could have its own stack beside `CarrierStack`, which keeps its rules to itself and produces the second
+state machine the whole of _"why a drag is the least important of its three routes"_ was written to avoid —
+and forecloses a list and a grid ever exchanging an item, since neither registry can see the other. So the
+engine was generalised instead. **The user chose this, with the three set out as they are here.**
+
+**A place is opaque to the engine, and the zone answers every question about one.** `CarryState` holds
+`fromPlace` and `toPlace` as `CarryPlace`, which is `NonNullable<unknown>` rather than plain `unknown` so that
+`CarryPlace | undefined` still means something — a zone returns `undefined` to refuse. The zone gained the
+seven questions the stack used to answer for itself: where a point lands, what a nudge does to a place, where
+`Tab` arrives, whether two places are the same, whether a place may be committed, what a place reads as out
+loud, and what the keys are. `Sortable` and `Table` define their place as a number and are otherwise
+unchanged; `SortableGrid` defines it as a spot and a turn.
+
+**Each zone casts at its own boundary rather than the engine carrying a type parameter.** A module-level
+registry of zones with different place types cannot be typed without either a generic that erases at the
+array or the bivariance trick of writing the members as methods, and both cost more to read than
+`const asIndex = (place: CarryPlace) => place as number` at the top of the zone that owns the meaning. The
+precedent is already there: `carry.value` has always been `unknown` and every zone has always cast it.
+
+**An arrow key sends a nudge rather than a step, and that is what kept rotation off the engine.**
+`aimAtIndex(±1)` became `aimAtNudge({ x, y, turn })`, all three optional. A list adds `x` and `y` — it has one
+axis, so only one of them is ever set — and ignores `turn` by returning the place it was given, which the
+stack reads as no change. A grid uses all three. The alternative was a second call on the stack for turning,
+which would have put a notion the engine has no use for into the engine.
+
+**The zone owns all of its keyboard words, because "Tab changes list" is wrong in a grid.** `getKeyHint` is
+handed one fact the zone cannot know — whether there is anywhere else to Tab to — and returns the whole
+sentence. The stack composing a hint out of clauses would have to know what kind of container each zone is,
+which is exactly the knowledge this change removed from it.
+
+**A place that cannot be committed is still a place you may aim at.** The refusal happens at the drop and
+nowhere earlier: aiming freely is what lets the grid paint the footprint in red where it will not go, and a
+control that silently slid the aim to the nearest legal spot would be answering a question the person did not
+ask. `getIsTargetAllowed` is what a painter reads, and `end` turns a refused drop into the announcement
+_"X does not fit in Y, returned to Z"_ with nothing written.
+
+**A foreign list has one landing place more than it has items, but only while something is being carried into
+it.** The count used to come from `computePlaceCount`, which the stack held; it now comes from the zone's own
+place label. The drop announcement is composed after the commit — it always was, so that it reads the list's
+new length — so a place count that still added one for a carry would say "place 2 of 4" of a list holding
+three. Reading it off whether a carry is in flight at all is correct at both moments and needs no argument
+passed in.
+
+**Two things about `Sortable` changed with it, and only one is a rename.** `computeCanAccept`'s second
+argument is documented as the label of the list an item is coming from and was being handed `carry.groupId`,
+which is the namespace the lists share — every consumer filtering by origin was reading the same string for
+all of them. It now gets the source zone's label. And `SortableTransfer.fromIndex` is optional, because an
+item arriving from a grid has no index to report; a list-to-list transfer is unchanged.
+
+### `SortableGrid`: an inventory board, where the space left over is the game
+
+Asked for by the user as an exotic in the shape of a game inventory — the pack in an action RPG, where a
+sword is one cell by three, a shield two by two, and whether the next thing fits depends on the shape of what
+is already in there. It sits in `Exotics` beside `TileBoard`, which is the other board that owns its own
+geometry and hands the paint to the consumer.
+
+**A footprint is a set of whole cells, and a rectangle is the shorthand for the common one.** `footprint` is
+either a `{ width, height }` or a list of cell offsets, so an L, a Z and a T are all sayable and a plain box
+stays two numbers. It is one field with two spellings rather than a box plus an optional mask, because the
+two could then disagree about which cells an item holds and something would have to decide who wins. The
+user set the bound: orthogonally adjacent squares, nothing finer — no points, no angles — which is what
+keeps every calculation here integer. Everything downstream works on the expanded cell list, so fit is "are
+all of these cells free" rather than a rectangle intersection, and an L can nest into another shape's notch.
+
+**Turns are counted from nought to three rather than flagged, because clockwise and anticlockwise are only
+the same thing for a rectangle.** Turn a 2×1 either way and it covers the same two cells; turn an L one way
+and its foot goes left, the other way and it goes right. A boolean cannot say which, so the item carries
+`turns` and a quarter turn sends every cell at (x, y) to (height − 1 − y, x), the counter-clockwise one to
+(y, width − 1 − x). Four orientations also serve the rectangle case properly, since a consumer's artwork
+has an up even when the cells do not. `Cuboid` already counts quarter turns for the same reason.
+
+**The turn belongs to the aim rather than to the item until the drop commits.** The place is
+`{ x, y, turns }`, so turning while carrying changes where the item would land and nothing else — `Escape`
+puts back an item that was never turned, and a turn that leaves the footprint hanging off the edge is
+clamped back in by the same code that clamps a movement. Turning the item itself and untangling it
+afterwards was the alternative, and it has a cancel path that has to remember one more thing.
+
+**Where you took hold of it is remembered, because an inventory that snapped to its own corner would be
+unusable.** Grab a three-by-two pack by its bottom right cell and the footprint follows that cell. The grab
+is a cell offset held in one module-level record alongside the zone it was taken from, not in the carry:
+the zone that needs it is the one being _aimed at_, which may be a different grid from the one the item came
+from, and a carry that did not begin in a grid at all — from a list, say — has no grab to speak of and takes
+hold at the top left. Only one carry exists at a time, which is what makes a single module-level record
+enough; the zone comparison is what stops a stale one being read after a list started the carry.
+
+**Items are positioned by arithmetic, and only the empty cells are laid out by CSS grid.** The cell layer is
+a real grid of `columns × rows` decorative divs; every item is placed absolutely at
+`gap + cell × (cellSize + gap)`. Two reasons, and the second is the one that decided it. `InteractionWrapper`
+renders the element that would have to carry `grid-column`, and it takes no style — so an item in the grid
+flow would need a wrapper div of its own anyway. And the same arithmetic run backwards is how a pointer
+becomes a cell, so a layout that came from somewhere else would mean two sources of truth for one geometry.
+The pointer conversion divides the measured rect by the viewport scale, per _"a measured rect and a written
+offset are in different spaces inside a `Viewport`"_.
+
+**The cell size is a number of pixels the consumer states, not a fraction of anything.** Everything here is
+arithmetic between cells and pixels — the item boxes, the landing box, the carried copy's size, the pointer's
+cell — and a cell that sized itself to its container would turn every one of those into a measurement taken
+after layout. An inventory has a fixed cell in every game that has one, so the constraint costs nothing that
+was wanted.
+
+**It is a list of items, not a grid of cells, as far as a screen reader is concerned.** The `grid` role wants
+rows of cells that are mostly addressable and mostly full; this is a board that is mostly empty, whose
+occupied regions span irregular rectangles, and where the only things worth reaching are the items. So the
+root is `role="list"`, the items are `listitem`, the cell layer is `aria-hidden`, and the component appends
+the footprint and the coordinates to the consumer's own label — _"Kite Shield, 2 by 2, column 2, row 1"_ —
+because a position on a board cannot be inferred from anything else that is spoken. `aria-posinset` counts in
+reading order, top row first and left to right within it, which is also what `Home` and `End` go to.
+
+**The arrows walk to the nearest item in the direction pressed, not to the next one in the array.** Two items
+on the same row are next to each other whatever order they were declared in, so `getNeighbourIndex` scores
+candidates by how far along the direction they are plus twice how far off to the side, and takes the lowest.
+Array order is what a list uses because a list has only one axis; using it here would send the right arrow to
+an item three rows down.
+
+**The bug that survived the first build, because its symptom pointed at the wrong thing.** Turning an item
+without also moving it did nothing at all, while turning and then moving worked — which reads as a broken
+turn key. It was neither: `end` clears the carry state _before_ it asks the target whether the place may be
+committed, and the check for what is already in the way excluded the carried item only while this zone was
+the source of a live carry. With the carry gone, the item was compared against its own old footprint, so any
+new footprint touching the old one — which turning in place always does — was refused for overlapping itself.
+The filter now drops the carried key unconditionally, which is right at every moment: a grid being aimed
+into from outside does not hold that item anyway, so there is nothing to exclude. Worth keeping as the
+general shape: **anything the zone is asked after `end` has begun is being asked with no carry in flight.**
+
+**A list and a grid exchange items, and that is the payment for generalising the engine.** A
+`SortableGridItem` is structurally a `SortableItem`, so a grid item dropped into a list is one; an item
+arriving from a list carries no footprint and is given a single cell, which is the smallest honest thing to
+say about something that has never had a size. Where it lands is the first free spot scanned row by row,
+since a keyboard carry arriving by `Tab` has no pointer to take a position from.
+
+**The carried copy, the landing box and the surface are all the consumer's paint.** The library positions a
+box the size of the aimed footprint and hands over whether that place is allowed; `renderLanding` decides
+what green and red look like, `renderCell` paints the empty board, and `renderCarried` is handed the item
+exactly as `Sortable` hands it over. The Playground's own painters draw the landing as a dashed box, filled
+in the theme's primary when it fits and its error colour when it does not — colour is not the only channel,
+since the announcement says "no room" in the same breath.
+
+**Turning is a command on a handle, and the component binds no gesture for it at all.** The user's call,
+against the alternative of keeping a built-in key beside the handle. `onMount(controller)` carries
+`turnCw`, `turnCcw` and `getIsCarrying`, which is the shape `Wheel`, `Typewriter` and `AudioSwitcher`
+already use and the one `conventions.md` names — and it is the right side of the boundary recorded there,
+since a turn is a command about a carry in flight rather than state anyone can read. What the consumer
+binds it to is theirs: a button, the wheel, a right-click, a gamepad.
+
+**The argument against was 2.1.1, and the user's answer is why it did not win.** A handle alone lets a
+consumer build a grid that turns only by mouse. Their reading: that is the same kind of exposure as an
+`ariaLabel` a consumer fills in badly — the library supplies the mechanism and cannot supply the judgement.
+It holds better than the objection did, because the default costs nothing: a consumer who binds nothing has
+a grid that never turns, which conforms perfectly well. The failure needs a consumer to add a pointer
+gesture and stop there.
+
+**What the consumer has to know, and the Playground shows it rather than saying it.** A carry claims `Tab`
+while it is in flight, so nothing else on the page can be focused mid-carry — which means a turn button is
+unreachable from the keyboard exactly when it is wanted, and a consumer who wants the keyboard route has to
+bind a key of their own on the window. The examples bind `R` and `Shift` with `R`, and the wheel to the same
+pair, with the buttons as the pointer route. Anyone copying that page copies a conforming control.
+
+**A command that arrives as a call rather than as a key removed the special case a key had needed.** The
+first build owned the key, which meant a held drag — deaf to the keyboard on purpose, so that an arrow
+cannot fight the pointer for the aim — needed one key let through, listened for on the document because a
+drag captures the pointer and the element that started it may not hold focus. None of that exists now: a
+`turnCw()` mid-drag is a call, and the carry's deafness has nothing to say about it. `isTurnable` stays, and
+is now the only gate: it is asked of the grid being aimed **into**, so a grid can accept items without
+accepting turned ones.
+
+**The command is refused unless this grid is the one the carry started in.** Every mounted grid hands out
+its own controller, and a stray `turnCw()` on an uninvolved one would otherwise turn somebody else's carry.
+So the guard is `getIsCarrying`, which is also what a consumer's button reads to know whether to be
+disabled — `WheelController.getIsSpinnable` is the same idea.
+
+**A painter is handed the geometry and picks its own way of drawing a shape.** The user asked for both
+routes and the answer is one slot with both in it: `renderItem` receives the item, its flags, and a geometry
+carrying the bounding size in cells, a pixel rectangle per occupied cell, and the outline of the whole shape
+as a point list. A painter that wants tiles maps over the rectangles; one that wants a single continuous
+piece uses the outline as an SVG polygon or a clip path. Neither has to know the cell size or the gap, which
+is the arithmetic that would otherwise be copied into every consumer. The Playground draws both: most
+examples use the outline, one uses the cells, and they are the same items either way.
+
+**The outline bridges the gaps inside an item and stops short of them at its edges, which is the whole
+difficulty.** Two cells of one item are one object, so the board's gap between them has to be filled; the
+item's outer edge, though, has to stop where the cell stops or the shape is a gap too wide. So the walk is
+done in cell units, where a shape is a union of unit squares and shared edges cancel, and only the finished
+vertices are converted: a vertical edge running down is a right-hand boundary and lands at `u × pitch − gap`,
+one running up is a left-hand boundary and lands at `u × pitch`, with the same rule on the other axis. That
+is exact for every rectilinear shape and needs no polygon insetting. A footprint enclosing a hole yields its
+outer boundary only, since a polygon cannot express a hole anyway — such a shape is one to paint by cells.
+**An item answers for the cells it holds, not for the rectangle it is drawn inside.** Reported by the user
+and it was a real defect: the item element spans the bounding box, so a press in an L's notch — inside the
+box, no part of the L — picked the L up, and the board never saw the click. The fix is a transparent square
+per occupied cell inside the item element, with the element itself set to `pointer-events: none` and the
+squares opting back in. That is `interactionRoot`'s own arrangement, and it is `TileBoard`'s answer to the
+same problem without needing `TileBoard`'s clip path: a polyomino is squares, so squares are enough.
+
+**Two orderings are load-bearing there.** The hit squares are rendered **before** the consumer's paint, so a
+consumer's own interactive child — which has to opt back into pointer events, as everything under an
+`interactionRoot` does — sits above them and still takes its own press. And the notch now falls through to
+the grid root, which is what makes a click in it a drop into that cell rather than nothing at all. Clipping
+the item element to the outline was the alternative and was rejected: it would clip the consumer's paint as
+well, so a glow, a badge or a shadow hanging past the shape would be cut off by a decision the library took
+for a hit-testing reason.
+
+**The geometry carries the largest solid rectangle inside the shape, because a shape with a notch has no
+usable middle.** Reported by the user as an icon drawn off-centre on a two-by-two: the painter had been
+choosing the cell nearest the shape's centre, which for an even rectangle is a corner and looks like a
+mistake. `block` is the largest run of filled cells that is itself a rectangle, so a rectangle's block is the
+whole of it and an L's is its long arm, and a painter centres on that. A bare centre point was the simpler
+answer and is wrong for a U, whose centre of mass is in the hole; a rectangle is also more useful than a
+point, since a label needs a width to sit in. Ties are broken by whichever candidate is nearest the shape's
+centre of mass, which is what puts a Z's block on its middle pair rather than on an end.
+
+**The Playground's cell-by-cell example colours each item's squares by a hue derived from its key.** Also
+the user's: drawn as bare squares, two items side by side read as one field of tiles. The outline example
+did not need it because the shape's own edge says where an item ends, so this is the one thing the per-cell
+route has to solve for itself — which is worth a demo showing it rather than a note saying it.
+
+**A shape drawn into an SVG must be given a viewBox of its own proportions, and the Playground's was not.**
+Reported by the user, who noticed it worst on a one-by-three and a one-by-four and — the part that made it
+hard to name — not at all on the Z. The painter inset the viewBox by two units on every side so the stroke
+would have room, which changes the ratio of the box, not just its size. An SVG whose viewBox is a different
+shape from its element scales the drawing down uniformly to fit and centres what is left, so the outline
+came out short of the cells it was supposed to cover: a 44 by 140 sword was given a 48 by 144 viewBox and
+drawn at 91 per cent, while a 140 by 92 Z was given 144 by 96 and drawn at 96 — near enough to look right.
+The room for the stroke was never needed, since the element is `overflow: visible` and the half that falls
+outside is drawn anyway. So the viewBox is exactly the shape's own box and one user unit is one pixel.
+
+**The spec for it asserts the painted shape covers its box, and nothing tighter.** `getBBox` was the obvious
+call and is useless here: it reports the geometry before the viewBox is applied, so it would have gone on
+passing throughout. `getBoundingClientRect` sees what was actually drawn. Only the lower bound is pinned,
+because a stroke sits half outside the shape and how thick it is belongs to the painter.

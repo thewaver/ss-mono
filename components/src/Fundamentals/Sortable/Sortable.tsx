@@ -4,7 +4,7 @@ import { Portal } from "solid-js/web";
 import { Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { AnchorUtils } from "../../Abstracts/Anchor/Anchor.utils";
-import type { CarrierZone, Carry, CarryMode } from "../../Abstracts/Carrier/Carrier.types";
+import type { CarrierZone, Carry, CarryMode, CarryPlace } from "../../Abstracts/Carrier/Carrier.types";
 import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
 import { CarrierStack } from "../../Abstracts/Carrier/CarrierStack";
 import { Elevation } from "../../Abstracts/Elevation/Elevation";
@@ -91,30 +91,67 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         value: item,
     });
 
+    const asIndex = (place: CarryPlace) => place as number;
+
+    const getItemRects = () =>
+        getItemRefs()
+            .slice(0, getItems().length)
+            .filter((element): element is HTMLElement => element !== undefined)
+            .map((element) => element.getBoundingClientRect());
+
+    const getSourceIndex = () => {
+        const place = CarrierStack.getSourcePlace();
+
+        return CarrierStack.getSourceZone() === zone && place !== undefined ? asIndex(place) : undefined;
+    };
+
+    const getPlaceCount = () =>
+        getItems().length + (CarrierStack.getCarry() !== undefined && CarrierStack.getSourceZone() !== zone ? 1 : 0);
+
     const zone: CarrierZone = {
         getGroupId,
         getLabel: () => access(props.ariaLabel),
         getRootRef,
-        getDir,
         getIsDisabled,
-        getLength: () => getItems().length,
-        getItemRects: () =>
-            getItemRefs()
-                .slice(0, getItems().length)
-                .filter((element): element is HTMLElement => element !== undefined)
-                .map((element) => element.getBoundingClientRect()),
+        getKeyHint: (hasOtherZones) =>
+            hasOtherZones
+                ? "Arrow keys choose a place, Tab changes list, Enter drops, Escape cancels."
+                : "Arrow keys choose a place, Enter drops, Escape cancels.",
         computeCanAccept: (carry) => {
             if (getIsDisabled() || getIsLocked()) return false;
 
             const item = carry.value as SortableItem<T>;
 
-            return props.computeCanAccept?.(item.value, carry.groupId) ?? true;
+            return props.computeCanAccept?.(item.value, CarrierStack.getSourceZone()?.getLabel() ?? "") ?? true;
         },
-        takeAt: (index) => {
+        computePlaceAtPoint: (point) => {
+            const sourceIndex = getSourceIndex();
+
+            return CarrierUtils.computeSettledIndex(
+                CarrierUtils.computeDropIndex(getItemRects(), point.x, point.y, getDir()),
+                sourceIndex ?? 0,
+                sourceIndex !== undefined,
+            );
+        },
+        computeNudgedPlace: (place, nudge) => {
+            const step = (nudge.x ?? 0) + (nudge.y ?? 0);
+
+            if (step === 0) return;
+
+            return Math.min(Math.max(asIndex(place) + step, 0), getPlaceCount() - 1);
+        },
+        computeEntryPlace: () => getSourceIndex() ?? getItems().length,
+        computeIsSamePlace: (a, b) => a === b,
+        computeIsPlaceAllowed: () => true,
+        computePlaceLabel: (place) => `place ${asIndex(place) + 1} of ${getPlaceCount()}`,
+        takeAt: (place) => {
+            const index = asIndex(place);
+
             itemsSignal[1]((items) => items.filter((_unused, itemIndex) => itemIndex !== index));
         },
-        putAt: (index, carry, origin) => {
+        putAt: (place, carry, origin) => {
             const item = carry.value as SortableItem<T>;
+            const index = asIndex(place);
 
             itemsSignal[1]((items) => [...items.slice(0, index), item, ...items.slice(index)]);
 
@@ -122,11 +159,14 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
                 value: item.value,
                 fromLabel: origin.label,
                 toLabel: access(props.ariaLabel),
-                fromIndex: origin.index,
+                fromIndex: typeof origin.place === "number" ? origin.place : undefined,
                 toIndex: index,
             });
         },
-        moveAt: (fromIndex, toIndex) => {
+        moveAt: (fromPlace, toPlace) => {
+            const fromIndex = asIndex(fromPlace);
+            const toIndex = asIndex(toPlace);
+
             let moved: SortableItem<T> | undefined;
 
             itemsSignal[1]((items) => {
@@ -158,11 +198,11 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     const getCarriedKey = createMemo(() => (getIsSource() ? CarrierStack.getCarry()?.key : undefined));
 
     const getLandingIndex = createMemo(() => {
-        const settledIndex = CarrierStack.getTargetIndex();
+        const place = CarrierStack.getTargetPlace();
 
-        if (!getIsReceiving() || settledIndex === undefined) return;
+        if (!getIsReceiving() || place === undefined) return;
 
-        return CarrierUtils.computeMarkerIndex(settledIndex, CarrierStack.getSourceIndex() ?? 0, getIsSource());
+        return CarrierUtils.computeMarkerIndex(asIndex(place), getSourceIndex() ?? 0, getIsSource());
     });
 
     const getEndRoom = createMemo(() => (access(props.gap) ?? DEFAULT_SORTABLE_GAP) / 2);
@@ -173,7 +213,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
         if (markerIndex === undefined || !root) return;
 
-        const rects = zone.getItemRects();
+        const rects = getItemRects();
         const rootRect = root.getBoundingClientRect();
         const isRow = getDir() === "row";
         const scrolled = isRow ? root.scrollLeft : root.scrollTop;
@@ -334,7 +374,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
             if (!isForward && !isBackward) return;
 
             e.preventDefault();
-            CarrierStack.aimAtIndex(isForward ? 1 : -1);
+            CarrierStack.aimAtNudge(getDir() === "row" ? { x: isForward ? 1 : -1 } : { y: isForward ? 1 : -1 });
 
             return;
         }

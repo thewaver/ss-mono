@@ -49,6 +49,7 @@ import { ScrollerPage } from "./Pages/ScrollerPage/ScrollerPage";
 import { SelectPage } from "./Pages/SelectPage/SelectPage";
 import { ShapePage } from "./Pages/ShapePage/ShapePage";
 import { SlideButtonPage } from "./Pages/SlideButtonPage/SlideButtonPage";
+import { SortableGridPage } from "./Pages/SortableGridPage/SortableGridPage";
 import { SortablePage } from "./Pages/SortablePage/SortablePage";
 import { SplitPanePage } from "./Pages/SplitPanePage/SplitPanePage";
 import { SpotlightPage } from "./Pages/SpotlightPage/SpotlightPage";
@@ -185,6 +186,12 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 description:
                     "Draws a border and a fill around arbitrary children, from a point list rather than a CSS box. It only reaches for SVG when the paint needs it and stays a plain div when it does not.",
                 component: () => <ShapePage />,
+            },
+            {
+                name: "SortableGrid",
+                description:
+                    "An inventory board: items cover a rectangle of cells rather than a place in a line, they stay exactly where they are put, and the shape of the space left over is what decides whether the next thing fits. It shares its carry with Sortable — the same drag, the same tap to pick and tap to place, the same keyboard pick-move-drop — with an aim that can be refused, so a landing over an occupied cell or off the edge is shown and then declined rather than silently corrected.",
+                component: () => <SortableGridPage />,
             },
             {
                 name: "Staircase",
