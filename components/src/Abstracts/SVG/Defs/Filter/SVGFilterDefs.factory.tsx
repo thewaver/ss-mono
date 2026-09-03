@@ -7,14 +7,16 @@ import type {
     SVGColorFilterDefs,
     SVGContrastFilterDefs,
     SVGDropShadowFilterDefs,
+    SVGFilterMethod,
     SVGGaussianBlurFilterDefs,
     SVGHueRotationFilterDefs,
     SVGInversionFilterDefs,
     SVGSaturationFilterDefs,
+    SVGTurbulenceFilterDefs,
 } from "./SVGFilterDefs.types";
 
 type SVGPrimitiveDefs = {
-    method?: "chain" | "isolate";
+    method?: SVGFilterMethod;
 };
 
 const SVG_PRIMITIVE_DEFS: SVGPrimitiveDefs = {
@@ -32,6 +34,7 @@ export class SVGFilterDefsFactory {
     private filterPrimitives: Record<string, (srcIn: string) => { element: JSX.Element; resultGraphic: string }> = {};
     private dropShadowCount = 0;
     private gaussianBlurCount = 0;
+    private turbulenceCount = 0;
     private hueRotationCount = 0;
     private saturationCount = 0;
     private brightnessCount = 0;
@@ -126,6 +129,57 @@ export class SVGFilterDefsFactory {
                 <feGaussianBlur in={srcIn} {...defs} result={key}>
                     {custom}
                 </feGaussianBlur>
+            ),
+            resultGraphic: key,
+        });
+
+        return this;
+    };
+
+    public addTurbulenceFilter = (defs: SVGTurbulenceFilterDefs, custom?: JSX.Element) => {
+        if (defs.scale === 0) return this;
+
+        const key = `${this.filterId}_turbulence_${this.turbulenceCount++}`;
+        const noiseKey = `${key}_noise`;
+        const {
+            baseFrequency,
+            scale,
+            type = "fractalNoise",
+            numOctaves = 1,
+            seed = 0,
+            stitchTiles = "noStitch",
+            xChannelSelector = "R",
+            yChannelSelector = "G",
+        } = defs;
+
+        this.maxOffset = Math.max(this.maxOffset, Math.abs(scale) / 2);
+        this.filterPrimitives[key] = (srcIn: string) => ({
+            element: (
+                <>
+                    <feTurbulence
+                        type={type}
+                        baseFrequency={
+                            typeof baseFrequency === "number"
+                                ? `${baseFrequency}`
+                                : `${baseFrequency.x} ${baseFrequency.y}`
+                        }
+                        numOctaves={numOctaves}
+                        seed={seed}
+                        stitchTiles={stitchTiles}
+                        result={noiseKey}
+                    >
+                        {custom}
+                    </feTurbulence>
+
+                    <feDisplacementMap
+                        in={srcIn}
+                        in2={noiseKey}
+                        scale={scale}
+                        xChannelSelector={xChannelSelector}
+                        yChannelSelector={yChannelSelector}
+                        result={key}
+                    />
+                </>
             ),
             resultGraphic: key,
         });

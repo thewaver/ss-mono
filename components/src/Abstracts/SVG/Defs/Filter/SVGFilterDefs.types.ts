@@ -1,4 +1,8 @@
+import type { Point2d } from "@thewaver/ss-utils";
+
 type SVGBaseFilterDefs = {};
+
+export type SVGFilterMethod = "chain" | "isolate";
 
 export type SVGDropShadowFilterDefs = SVGBaseFilterDefs & {
     dx: number;
@@ -10,6 +14,19 @@ export type SVGDropShadowFilterDefs = SVGBaseFilterDefs & {
 
 export type SVGGaussianBlurFilterDefs = SVGBaseFilterDefs & {
     stdDeviation: number;
+};
+
+export type SVGDisplacementChannel = "R" | "G" | "B" | "A";
+
+export type SVGTurbulenceFilterDefs = SVGBaseFilterDefs & {
+    baseFrequency: number | Point2d;
+    scale: number;
+    type?: "fractalNoise" | "turbulence";
+    numOctaves?: number;
+    seed?: number;
+    stitchTiles?: "stitch" | "noStitch";
+    xChannelSelector?: SVGDisplacementChannel;
+    yChannelSelector?: SVGDisplacementChannel;
 };
 
 export type SVGSaturationFilterDefs = SVGBaseFilterDefs & {

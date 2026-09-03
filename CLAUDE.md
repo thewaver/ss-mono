@@ -67,6 +67,16 @@ chat.
 nothing, because the editor and git show every edit better. A short inline fragment is fine when the exact
 token is the point (a prop name, a CSS value), inside a sentence rather than as a block.
 
+**A visual aid is built when they ask for one, never by default.** Stated by the user after a published page of
+four interactive sketches was used to explain a set of proposed components: the page worked and they said so,
+but they do not want an explanation reaching for a picture on its own initiative. So the reply stays prose
+unless they ask to see something, and the offer to draw one is not made unprompted either.
+
+**When they ask for a link, find one before drawing one.** Stated by the user in the same breath. A request to
+"see" a thing is answered first by pointing at work already published by somebody else — a demo, a library's
+own page, an article — and only by a hand-built sketch when they ask for a sketch in those words. Building one
+costs a great deal more than finding one, and they will say when the effort is wanted.
+
 **Short.** They have asked for shorter output more than once. Cut the survey of alternatives and give the
 recommendation. An acknowledgement or a decision is one or two lines. Do not recap work already reported,
 do not re-list open items they have already seen, and do not close by offering next steps unless asked.

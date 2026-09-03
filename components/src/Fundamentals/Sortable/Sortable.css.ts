@@ -2,6 +2,7 @@ import { globalStyle, style } from "@vanilla-extract/css";
 
 const sortableRoot = style({
     display: "flex",
+    flex: "1 1 auto",
     position: "relative",
     margin: 0,
     padding: 0,

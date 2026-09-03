@@ -1121,3 +1121,17 @@ different kind of change from a new dropdown entry and wants deciding on its own
   sets, rather than staggering N independent cells.
 - **The root animation moving against the cells** — the whole picture drifting one way while its cells move
   the other. `computeRootAnimation` exists and only the Glitch example on the ScanlineAnimation page uses it.
+
+### Exotics put up as candidates, and what became of each
+
+Four were sketched for the user. **`PatchBoard`** and **`Trail`** were chosen and are built; the reasoning
+that fixed their shape is in `decisions.md`, and nothing about either is outstanding.
+
+**Turned down, so do not re-propose either without a new argument.** **`Minimap`** — a shrunken picture of a
+large area with a frame you drag to move the view, its machinery being the two-way sync between the frame and
+the area. **`ExplodedView`** — an assembly separating along one axis with label lines that reach each part
+without crossing.
+
+**Named and not discussed: `Flipbook`**, a two-page spread that turns with a fold at the spine. The user said
+they understood that one from its description, and it was not among the two they picked; it has never been
+argued either way.

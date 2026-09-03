@@ -3301,6 +3301,107 @@ cases the restart is owned by an identity that changes, and in both cases the th
 happens by accident somewhere up the tree. The difference is which document owns the clock — a `Shape` on the
 page rebuilds its own elements, while a serialised source gets a new clock only by being a new image.
 
+### `addTurbulenceFilter` emits two primitives, because a lone `feTurbulence` cannot chain
+
+Asked for as a turbulence entry in `SVGFilterDefsFactory`, and it could not be one on its own.
+
+**Every other primitive in the factory transforms the running graphic; `feTurbulence` generates and ignores
+its input.** That breaks both of the factory's assembly modes rather than one. Under `chain` a bare turbulence
+would hand noise to whatever came next and silently discard everything upstream of it, so a blur followed by a
+turbulence would lose the blur. Under `isolate` the closing `feMerge` would lay an opaque rectangle of noise
+over the source graphic, covering it completely — the merge has no opacity or compositing of its own. There is
+no defs object that makes either of those useful, so the generator is not a primitive this factory can hold.
+
+**What is a primitive here is the displacement, and the noise is its map.** The method registers one entry
+that emits `feTurbulence` to a private result and `feDisplacementMap` taking `in` from the running graphic and
+`in2` from that result. One graphic in, one graphic out, which is the contract the chain and the merge both
+rely on, and `resultGraphic` is the displacement's key so a following primitive reads the bent image rather
+than the noise. The name follows the consumer's vocabulary rather than the elements: it is the same call the
+existing methods make — `addHueRotationFilter` is an `feColorMatrix` and `addDropShadowFilter` names an
+effect, not a tag.
+
+**The region grows by half the scale, which is the whole of the arithmetic.** `P′(x, y) ← P(x + scale ×
+(XC − 0.5), y + scale × (YC − 0.5))`, so a channel at either extreme reaches `scale / 2` away and the filter
+region must carry that much on every side or the edges are cut off flat. `maxOffset` takes
+`Math.abs(scale) / 2` — absolute, because a negative scale is legal and simply mirrors the direction. The
+no-op guard is `scale === 0` rather than `<= 0` for the same reason, matching `deg` and `amount` rather than
+`stdDeviation`.
+
+**Three of the defaults deviate from the spec's, deliberately.** SVG defaults `type` to `turbulence` and both
+channel selectors to `A`; the factory defaults to `fractalNoise`, `R` and `G`. The spec's own defaults are the
+two documented traps of this primitive — `turbulence` sums absolute values so its channels sit dark and most
+of the displacement pulls one way, which reads as marbling rather than the even ripple almost everyone is
+after, and displacing both axes from alpha slides the image diagonally instead of rippling at all. Defaults
+that produce the surprising result are worth less than defaults that produce the expected one, and both are
+one word to override.
+
+**`baseFrequency` takes a `Point2d` as well as a number**, because the axes are independently useful: a low x
+against a high y is the vertical draw of old window glass, and there is no way to reach it with one value. The
+single number stays the common case and is written straight through.
+
+**`custom` goes to the `feTurbulence`, not the displacement.** It is the animation slot every other method
+carries, and the attributes worth animating on this pair — `baseFrequency` and `seed` — are the noise's.
+
+### The `SVGFilters` page is the factory's, and it is filed under `Abstracts`
+
+Asked for as a page to test the filter defs factory. It is the fourth entry in `Abstracts`, beside
+`InteractionTracker`, `PointerTracker` and `Virtualizer`, on the same test those three answer to: it renders no
+component of its own, and what the page shows is a consumer built on top of something the library only hands
+out. Nothing here is a `Fundamental` or an `Exotic` to demonstrate.
+
+**It is named for what is on it, not for the folder it comes from.** The first build was `SVGDefs`, on the
+reasoning that a gradient or a pattern example would be the same page's next section rather than its own menu
+entry. The user renamed it: `Gradient`, `Pattern` and `Animation` sit beside `Filter` under one folder, but
+the page holds the filter factory and nothing else, and a name promising the other three is a name that has
+to be believed rather than read. If those arrive they get their own entries, and the menu says plainly which
+is which.
+
+**One subject, six examples, and every method of the factory appears exactly once.** The subject is a striped
+card carrying a word, chosen because it answers three questions at once: stripes show a displacement, the
+word's edges show a blur or a shadow, and a saturated fill shows the colour matrix family. The examples are
+the five primitive families — blur, drop shadow, turbulence, hue and tone — plus one that stacks four of them,
+which is the only one where `method` is visible. Hue carries hue rotation, saturation and the colour channels;
+tone carries brightness, contrast and inversion; splitting them that way keeps either panel to a readable
+number of knobs and still leaves nothing untested.
+
+**The stacked example's four primitives are two `Sortable` lists rather than four checkboxes.** The user's
+call, on the observation that the order genuinely changes the result: a blur before a displacement is not a
+blur after one, and under `chain` the list reads exactly as the pipeline does. The first build was four tick
+boxes in a local props panel, which could say whether a primitive was in but had nothing to say about where.
+Two lists sharing one `groupId` — **Applied** and **Left out** — do both jobs with one mechanism: the position
+in the first list is the position in the chain, and dragging into the second is the off switch. Emptying
+Applied altogether is worth a try, because it is the state the stage's own guard exists for.
+
+**A checkbox could not have lived inside a sortable item anyway.** The item slot already owns `pointerdown`
+and `click` for the carry — tap to pick up, tap to place — so a control nested inside it would be fighting
+the drag for the same gestures. Moving between lists is the toggle precisely because it does not need a
+second gesture.
+
+**The order lives on the page rather than in the example**, like `TrailPage`'s progress signals, because the
+readout under the example names the order and the page is what writes readouts. `sizing={"fill"}` is on both
+lists: an `InteractionWrapper` is `fit-content` by default, so an empty list collapses to the width of its
+placeholder text and reads as a sliver rather than a target.
+
+**`method` and the region are global props, because they are the factory's own two ideas** rather than any
+primitive's. The region toggle is what `computeFilterPrimitives` does with `elementSize`: given one it writes
+a `userSpaceOnUse` box grown by `maxOffset` on every side, and given nothing it falls back to the
+`-50% / 200%` region. Turning it off with a large displacement or a long shadow is the fastest way to see the
+fallback run out.
+
+**The stage refuses to reference a filter that does not exist, and that is a real trap rather than a
+nicety.** Every `add…` method has a no-op guard — a blur of zero, a saturation of one — so a factory whose
+every call was an identity produces no primitives at all and `computeFilterPrimitives` answers `undefined`.
+An element still carrying `filter: url(#id)` at that point does not render **at all**: a CSS filter
+referencing a missing filter element takes the element off the screen rather than leaving it unfiltered. So
+`PageFilterStage` memoises the defs element and writes the `filter` style only when there is one, and pulling
+the blur down to zero shows the card unfiltered instead of showing nothing. `SVGDefsUtils.getBaseBlur` already
+sidesteps this from the other end by answering `undefined` for the whole entry when there is no blur width.
+
+**`SVGFilterMethod` was exported for the page.** The union lived inline on the factory's private
+`SVGPrimitiveDefs`, so a consumer holding the choice in a signal had no name for it and would have had to
+write `"chain" | "isolate"` again. It now sits in `SVGFilterDefs.types` beside the defs types, which the index
+re-exports wholesale.
+
 ### The SVG defs vocabulary is sample code, and the arithmetic is a file with no JSX in it
 
 Settled by the user, applying the `CellAnimation` ownership rule to the one place it had not reached.
@@ -8630,6 +8731,37 @@ which is the namespace the lists share — every consumer filtering by origin wa
 all of them. It now gets the source zone's label. And `SortableTransfer.fromIndex` is optional, because an
 item arriving from a grid has no index to report; a list-to-list transfer is unchanged.
 
+#### A `Sortable` under `sizing="fill"` painted a bigger target than it would accept
+
+Found on the `SVGFilters` page, where the two step lists sit in equal columns and the empty one is a wide, short
+box. Dragging into it worked from some approaches and not others, which is the shape of a hit area that does
+not match what is drawn.
+
+**The list and the box around it are two different elements, and only one of them was filling.**
+`InteractionWrapper` renders the root, and the control it wraps comes back from `renderControl` — for
+`Sortable` that is the `<ul>`-equivalent carrying the items. `sizing` is set on the **root**, and so is
+`renderDecoration`, which is what paints the dashed empty-list surface. The root is `display: flex`, so a
+child stretches on the cross axis and is content-sized on the main one; the list had no flex properties of
+its own and therefore defaulted to `flex: 0 1 auto`. Under `fill` the root and the decoration went to the
+full column width and the list stayed at its content width — eight pixels when it holds nothing. The
+consumer sees a wide dashed rectangle and can only drop inside a sliver at its left edge.
+
+**`CarrierStack.findZoneAt` is what made it directional.** It reads `document.elementsFromPoint` and takes
+the first element that is, or sits inside, a registered zone root — and the zone root is the list, not the
+wrapper. So the painted area outside the list belongs to no zone at all: crossing the sliver registers, and
+approaching the same rectangle anywhere else never does.
+
+**The fix is `flex: 1 1 auto` on the sortable root**, so the list fills the box the decoration already
+fills. It changes nothing under `fit-content`, where the root shrink-wraps its content and growing has
+nowhere to go — which is why the `Sortable` page never showed this, its lists all being `fit-content` and
+therefore honest about their own size, including the empty one at eight pixels wide. The root already had
+`flex-shrink: 1` by default, so only growing was added.
+
+**The general rule this settles: a control that fills its wrapper has to fill it too, not just be painted
+into it.** Anything using `InteractionWrapper` with `sizing="fill"` and a decoration is exposed to the same
+mismatch, and for a carrier zone it is not cosmetic — the decoration is the only thing telling a person
+where they may drop.
+
 ### `SortableGrid`: an inventory board, where the space left over is the game
 
 Asked for by the user as an exotic in the shape of a game inventory — the pack in an action RPG, where a
@@ -8810,3 +8942,164 @@ outside is drawn anyway. So the viewBox is exactly the shape's own box and one u
 call and is useless here: it reports the geometry before the viewBox is applied, so it would have gone on
 passing throughout. `getBoundingClientRect` sees what was actually drawn. Only the lower bound is pinned,
 because a stroke sits half outside the shape and how thick it is belongs to the painter.
+
+### `Trail`: a path, one traveller, and a frame loop chosen over the CSS the platform already has
+
+Asked for by the user as the travelling half of a sketch that had spaced a list evenly along a curve: the
+distribution was not the point, the travelling was. Three shapes were put to them — the component places and
+the consumer moves it, the component travels, or both — and they chose the component travelling, with a
+controller that pauses, resumes and sets the position.
+
+**The frames are the user's call, made against the platform's own answer.** `offset-path` with
+`offset-distance` and `offset-rotate` has been widely available across browsers since March 2022, moves
+ordinary elements rather than only SVG ones, and would have run the whole animation off a stylesheet with no
+per-frame JavaScript. Their reason for `requestAnimationFrame` instead — "just like with wheel and
+CellAnimation, precisely to answer questions like that" — is that a CSS animation's current position is not a
+value anything can read, so a consumer wanting to hang a label off the traveller, spawn something where it is,
+or ask which way it is facing has nowhere to ask. The frame loop makes the place an ordinary signal, and every
+other question about the component follows from that.
+
+**The component owns an invisible path and hands the visible one to the consumer.** `getPointAtLength` needs a
+real `SVGPathElement`, so there is one in the component's own `<svg>` with no fill and no stroke, and
+`renderTrack` is called with the same `d` string beside it for whoever wants the track drawn. Two paths for one
+curve is redundant and was chosen over both alternatives: a detached element created with `createElementNS` is
+a browser-support gamble on geometry the spec does not require to work unrendered, and measuring the
+consumer's own painted path would make the arithmetic depend on what they happened to draw — a track drawn as
+two strokes, or not drawn at all, would break the travelling.
+
+**The direction is sampled either side of the point rather than ahead of it.** One pixel back and one pixel on,
+clamped to the ends of the path, so a traveller parked at 0 or at 1 still has a direction — sampling only
+forwards leaves the last point with nothing to compare against and the angle collapses to zero exactly where a
+looping trail is most often seen.
+
+**A lap carries its overshoot into the next one.** A frame that took longer than the whole duration would
+otherwise be truncated to the end and the trail would lose ground every time the tab was busy; looping takes
+the remainder, and not looping stops at the end and writes `isPlaying` false so the consumer's own button
+reads the truth. The controller is `getPlace`, `getIsPlaying`, `play`, `pause` and `seek`, and both of the
+signals behind it are `SignalMirror.createOptional`, exactly as `Rotator` takes its index and its auto-spin —
+pass nothing and the trail simply runs.
+
+**The loop stops while the page is hidden**, through `InteractionTracker.trackPageHidden`, for the same reason
+`Rotator` does it: frames in a background tab are throttled to something that reads as a stutter when the tab
+comes back.
+
+**Reduced motion is the consumer's, which is the house pattern rather than a new decision.** Nothing in the
+component reads the media query; `WheelPage` and `ScrambleTextPage` both read it themselves and hand the
+component a different number, and the Trail page does the same by starting the circuit stopped. **Checked
+2.2.2 Pause, Stop, Hide** — "for any moving, blinking or scrolling information that starts automatically,
+lasts more than five seconds, and is presented in parallel with other content, there is a mechanism for the
+user to pause, stop, or hide it". A looping trail is exactly that, so the mechanism has to exist: the
+controller is it, and the circuit example carries Play, Pause and Back to start rather than leaving the demo
+without one. `isTurning` defaults to false, since an element that keeps its own orientation is the less
+surprising of the two.
+
+### `PatchBoard`: boxes placed by hand, sockets, and cables that are the data rather than a drawing of it
+
+The user asked whether this could be `Bracket` with a draggable prop and then answered it themselves — a node
+can be patched in from several earlier nodes. That is the whole answer. `Bracket` is handed one root and
+derives every position from the shape of the tree; here the positions come from the person dragging, a box has
+more than one parent and therefore no layer to be placed in, and the cables **are** the data rather than
+something read off it. A draggable prop would have had to switch off the layout, which is the only thing
+`Bracket` owns, swap `root` for a list of boxes plus a list of links, and add sockets, which `Bracket` has no
+notion of; the keyboard walk would go too, since `toRoot` and `toLeaves` mean nothing once a box has two
+parents. What the two genuinely share is drawing a curve between two points, and `renderConnector` already
+hands that to the consumer — a seam that is already the consumer's is the sign these are two components.
+
+**Both interactions are carries, and they share one zone.** Moving a box and drawing a cable are the same
+shape of thing — take something, aim it somewhere, drop it or put it back — so both go through `CarrierStack`,
+with the carry's value saying which it is and the place being a union of a spot on the board, a socket, and a
+free point for a cable in flight over nothing. Writing a private drag instead would have meant writing the
+keyboard route, the tap route, the cancel and the announcements again: **checked 2.5.7 Dragging Movements** —
+"all functionality that uses a dragging movement for operation can be achieved by a single pointer without
+dragging" — which the tap carry answers, and 2.1.1 Keyboard, which the key carry answers. Both come with the
+abstract rather than being built here.
+
+**A carried box is rendered at the place being aimed at, not at the place it was taken from.** The placements
+memo reads the aim, so the sockets move with the box mid-drag and every cable hanging off them is redrawn
+against the new socket positions — which is the behaviour the whole component exists for. Nothing is written
+back to the consumer's list until the drop commits, so an escape puts the box back with one signal read rather
+than an undo.
+
+**A node's box is given rather than measured.** `spot` and `size` are both the consumer's, so socket positions
+are arithmetic on numbers the component already has and the cables are correct on the first painted frame. The
+alternative is a `ResizeObserver` per node, which buys a box that sizes itself to its content at the cost of a
+frame where every cable is drawn to the origin.
+
+**What refuses a cable, and where each rule lives.** The component's own: an input already holding a cable
+refuses a second, two sockets of the same kind cannot be joined, a node cannot be wired to itself, a disabled
+socket or a disabled node takes nothing, and the same pair cannot be joined twice. An **output fans out** —
+one source can feed several inputs, which is why "taken" is only a refusal on the input side. On top of that
+`computeCanLink` is the consumer's, and the Playground's mixing desk uses it for a rule the component could
+never know: only the desk may feed the amplifier.
+
+**Unplugging is a press on a connected input.** A cable has to be removable or a wrong connection is
+permanent, and the socket that has exactly one cable is the one that can name it without ambiguity — pressing
+it removes that cable and announces it. `Delete` and `Backspace` on any socket clear every cable at it, which
+is the answer for an output feeding four inputs.
+
+**The board is one tab stop and the arrows walk it.** Left and right step through the stops in reading order —
+a box, then its own sockets, then the next box — and up and down step between boxes, so a person can reach a
+socket without walking through every box's sockets on the way. `Enter` picks up, the arrows then aim (a box
+moves by a step, a cable steps from socket to socket), `Enter` drops and `Escape` puts back.
+
+#### Three things the build found, and what each cost
+
+**A reactive read inside an event-handler prop rebuilds the element under the pointer.** This one is in
+`conventions.md`, under _"An event handler prop is bound once, so reading a signal in it rebuilds the
+element"_, because it is a Solid rule rather than a fact about this component. Here it read as the keyboard
+route being dead: picking a cable up worked, and every arrow press afterwards did nothing, because the socket
+element had been replaced the moment the carry started and focus had fallen to the body.
+
+**`CarrierStack.dragFromPointer` cannot be given a small element.** It listens for the move on the element it
+is handed and only takes pointer capture once the pointer has travelled the four-pixel slop that means a drag
+— so an element smaller than that journey never sees the move that would start it. A fourteen-pixel socket is
+exactly that element, and dragging from one did nothing at all while dragging a whole box worked. `PatchBoard`
+hands it the **board root** for both carries instead, which sees every move over the board and captures the
+pointer for the rest of the drag. The abstract was left alone: `Sortable` and `SortableGrid` both pass items
+large enough for the slop and both work, and changing where capture is taken would change what `click` sees in
+two components that are already right.
+
+**A refusal has to be worded while the carry is still in flight.** The drop announcement is composed after the
+commit, so a cable that had just been connected was announced as "dropped in Signal chain, Lamp signal, cannot
+connect" — the link it had itself just made was now a duplicate, which is one of the refusal rules. The label
+asks whether a carry is in hand at all before it says anything about a refusal, and says nothing about the
+socket a cable was taken from, which trivially cannot take it back. Same defect and same fix as the place
+count under `SortableGrid`, one component along.
+
+#### What the first review of `Trail` and `PatchBoard` found
+
+**The traveller was not on its path, and the transform order was why.** Reported by the user against the
+circuit demo. The rule is in `conventions.md` under _"A rotation and a centring offset on one element have to
+be ordered"_ — the half-its-own-size shift that centres the traveller was being turned along with it, so the
+box swung off the curve wherever the direction was not straight. Their guess was `Viewport` scaling and it was
+not: the whole subtree scales together, and the traveller and the path stay in step at any scale. What made it
+survive the build is that every check had been made at a window height that happens to give a scale of one and
+on the straight top edge of the loop, where the fault is exactly zero.
+
+**A range's paint is a fixed length, so `sizing="fill"` needs a length to match.** Also the user's, on the
+timeline demo: the pointer at the right-hand end of the painted track read about seventy per cent rather than
+a hundred. `PageRangeContent` draws a track of `RANGE_LENGTH`, 220 pixels, whatever box it is given; the
+control had been told to fill a 320-wide box, so the hit area was 320 and the paint was 220 and the arithmetic
+was right about a track nobody could see. Nothing in the library is wrong here — a painter that draws its own
+size is the whole point of the split — but **a `Range` given `sizing="fill"` has to be given `length` as
+well**, and the timeline slider now passes the trail's own width so the two agree. Worth remembering as the
+shape of the mistake: a control whose hit area and paint disagree looks like a bug in the control.
+
+#### `PatchBoard` stands up as well as lying down
+
+Asked for by the user. `orientation` takes `horizontal` or `vertical`, the same vocabulary and the same two
+values `Bracket` already uses, and it moves the sockets to the other pair of edges: inputs on the left and
+outputs on the right when the board lies across, inputs along the top and outputs along the bottom when it
+stands up. Each kind still spreads along its own edge without counting the other, so a box with three inputs
+and one output puts the three at thirds of one edge and the one in the middle of the other.
+
+**The cable defs carry the orientation, because the painter has to know which way to bow.** A bezier whose
+control points lean sideways is right for a board that flows left to right and wrong for one that flows top to
+bottom, where it makes an S lying on its side. The component does not draw the cable, so the fact has to reach
+the consumer rather than being used privately — it sits beside `fromKind`, which the painter already needed
+for the same reason.
+
+**Nothing else changes, and that is the point of where the prop went.** Placement is the only thing that reads
+it: the refusal rules, the carry, the walk and the announcements are all about which sockets exist rather than
+where they are drawn, so they were untouched. The Playground shows one board of each — the signal chain lies
+across, the mixing desk stands up with its three sources in a row above the desk and the amplifier under it.

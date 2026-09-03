@@ -37,6 +37,49 @@ the Playground paints — the tree's `▶`, the select's `✓`, a drag handle's 
 the text it decorates. **Write `aria-hidden="true"`.** The same holds for any other true/false ARIA
 attribute: give it the string.
 
+### An event handler prop is bound once, so reading a signal in it rebuilds the element
+
+`onClick={handle(getItem())}` and `onKeyDown={handle(getKey(), getRow())}` look like the attribute forms
+beside them and behave completely differently. The compiler wraps an **attribute** expression in its own
+effect, so `aria-label={getLabel()}` re-runs on its own and updates one attribute. An **event handler** prop is
+assigned once, from the surrounding render expression — so the call in it is evaluated while that expression is
+being tracked, and every signal it touches becomes a dependency of the whole insert. When one of them changes,
+the insert re-runs and the element is **replaced**, taking its focus, its pointer capture and anything else the
+platform was holding on it.
+
+Found in `PatchBoard`, where a socket's handlers were bound as `handleSocketClick(getPlaced())`: `getPlaced()`
+is an object that changes identity whenever the board's geometry is recomputed, which is every time a carry
+starts. Picking up a cable therefore rebuilt the socket the person had just pressed, focus fell to the body,
+and every arrow key afterwards went nowhere — the component looked as though its keyboard route had never been
+written.
+
+**Write the handler as an arrow that reads inside itself**: `onClick={(e) => handleSocketClick(getPlaced(), e)}`.
+The arrow is a constant, nothing is tracked at bind time, and the reads happen when the event fires. The same
+applies to a `ref` callback, which also runs inside the insert's tracking scope.
+
+**A string-valued memo is safe and does not need the treatment**, because a memo that recomputes to an equal
+string notifies nobody — so binding on a stable key costs nothing. It is the object-valued and array-valued
+reads that bite, since a fresh object is never equal to the last one.
+
+### A rotation and a centring offset on one element have to be ordered, or the element leaves its point
+
+`transform: translate(x, y) rotate(a) translate(-50%, -50%)` reads as "put it there, turn it, and pull it back
+by half itself", and does not do that. The list applies right to left, so the `-50%` shift happens **before**
+the rotation and is turned along with the element: the box then sits half its own width away from the point it
+was placed at, in whatever direction it happens to be facing. At nought degrees it looks perfect, which is why
+it survives review.
+
+Order it `translate(x, y) translate(-50%, -50%) rotate(a)`. The rotation applies first, about the element's own
+centre — `transform-origin` is `50% 50%` by default and applies to the whole list, not per function — and the
+centring shift is then a fixed vector the rotation cannot reach, so the centre lands on the point at every
+angle.
+
+**A square element hides this and an oblong shows it**, by half the difference between its sides. Found in
+`Trail`, whose traveller wandered off the curve on the bends of a closed loop while looking exactly right along
+the straights: the demo marker is a circle and never showed it, and the demo vehicle is a chevron and did.
+`e2e/trail.spec.ts` now asks how far the traveller is from the nearest point of the path rather than from the
+point at the reported progress, which is the only form of the question that has an answer at every angle.
+
 ### `isFocused` is focus and `isFocusVisible` is the ring
 
 Both are on `InternalInteractionFlags`, both reach every painter, and confusing them draws a focus ring on a

@@ -36,6 +36,7 @@ import { MosaicPage } from "./Pages/MosaicPage/MosaicPage";
 import { NumberInputPage } from "./Pages/NumberInputPage/NumberInputPage";
 import { OdometerPage } from "./Pages/OdometerPage/OdometerPage";
 import { PaginatorPage } from "./Pages/PaginatorPage/PaginatorPage";
+import { PatchBoardPage } from "./Pages/PatchBoardPage/PatchBoardPage";
 import { PointerTrackerPage } from "./Pages/PointerTrackerPage/PointerTrackerPage";
 import { PreviewPage } from "./Pages/PreviewPage/PreviewPage";
 import { ProgressPage } from "./Pages/ProgressPage/ProgressPage";
@@ -44,6 +45,7 @@ import { RangeCalendarPage } from "./Pages/RangeCalendarPage/RangeCalendarPage";
 import { RangePage } from "./Pages/RangePage/RangePage";
 import { RevealPage } from "./Pages/RevealPage/RevealPage";
 import { RichTextPage } from "./Pages/RichTextPage/RichTextPage";
+import { SVGFiltersPage } from "./Pages/SVGFiltersPage/SVGFiltersPage";
 import { SatellitePage } from "./Pages/SatellitePage/SatellitePage";
 import { ScanlineAnimationPage } from "./Pages/ScanLineAnimationPage/ScanLineAnimationPage";
 import { ScrambleTextPage } from "./Pages/ScrambleTextPage/ScrambleTextPage";
@@ -69,6 +71,7 @@ import { TileBoardPage } from "./Pages/TileBoardPage/TileBoardPage";
 import { ToastsPage } from "./Pages/ToastsPage/ToastsPage";
 import { TogglePage } from "./Pages/TogglePage/TogglePage";
 import { ToolbarPage } from "./Pages/ToolbarPage/ToolbarPage";
+import { TrailPage } from "./Pages/TrailPage/TrailPage";
 import { TreePage } from "./Pages/TreePage/TreePage";
 import { TypewriterPage } from "./Pages/TypewriterPage/TypewriterPage";
 import { ViewportPage } from "./Pages/ViewportPage/ViewportPage";
@@ -114,6 +117,12 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 description:
                     "Reports where the pointer is relative to one element: the offset from its centre, the angle, the distance, and the point where that same line leaves the element. Dividing the two distances gives one shape-aware number — below 1 inside, 1 on the edge, 2 a further element-radius away. It renders nothing at all; every example on this page is a consumer built on top of it.",
                 component: () => <PointerTrackerPage />,
+            },
+            {
+                name: "SVGFilters",
+                description:
+                    "The builder behind every filter the library paints with: primitives are added one call at a time and the assembly decides what they see. Chained, each one is handed what the one before it produced; isolated, every one reads the original and the results are merged back over it. The region is the other half — a blur, a shadow or a displacement all reach outside the element's box, and the builder works out how far and reserves it.",
+                component: () => <SVGFiltersPage />,
             },
             {
                 name: "Virtualizer",
@@ -167,6 +176,12 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 description:
                     "A number where each digit is a column that turns to its new value, so a change reads as travel rather than a swap. The columns turn the way the number is going, so nine to zero keeps going forward instead of rewinding, and a column waits for every column to its right that is also carrying. It takes the text rather than the number, so a separator is a slot that never turns and the component owns no locale.",
                 component: () => <OdometerPage />,
+            },
+            {
+                name: "PatchBoard",
+                description:
+                    "Boxes a person places by hand, sockets on their edges, and cables dragged from one socket to another. The board owns the geometry and the wiring rules: a cable stays fixed to its socket while the box it hangs off is dragged, an input already carrying a cable refuses a second, a node cannot be wired to itself, and the consumer can refuse a pair on top of that. Everything a pointer does is also a tap and a keystroke — pick up, aim, drop, Escape to put back — so a graph can be wired without a mouse.",
+                component: () => <PatchBoardPage />,
             },
             {
                 name: "Reveal",
@@ -233,6 +248,12 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 description:
                     "A board of tiles that interlock, and every built-in shape tessellates: the offset rows and short alternate row a hexagon or a lozenge needs, the half-tile overlap and turned-over neighbours a triangle needs, or neither for a square. The board owns the geometry and the keyboard — a transparent layer wearing the tile's own shape takes the pointer, so a press lands on the tile you can see rather than on its rectangle while a piece standing taller than its tile still hangs over the row above, and the arrows walk every tile whether it will take a press or not. What a tile looks like, and what it means, are the consumer's.",
                 component: () => <TileBoardPage />,
+            },
+            {
+                name: "Trail",
+                description:
+                    "One element travelling a path the consumer draws, on a frame loop rather than a CSS animation, so where it is right now is a value anything can read. It reports the point and the direction of travel at every frame and can turn the traveller to face along it; the controller plays, pauses and seeks, which is what lets a slider put it anywhere on the path.",
+                component: () => <TrailPage />,
             },
             {
                 name: "TypeWriter",
