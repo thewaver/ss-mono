@@ -16,7 +16,7 @@ const DEFAULT_THEME_VALUES = {
         secondary: {
             dark: "hsl(30, 75%, 50%)",
             main: "hsl(30, 100%, 50%)",
-            light: "hsl(45, 75%, 60%)",
+            light: "hsl(60, 75%, 60%)",
             contrast: "rgb(0, 0, 0)",
         },
         info: {
@@ -46,17 +46,17 @@ const DEFAULT_THEME_VALUES = {
         background: {
             dark: "hsl(0, 10%, 10%)",
             light: "hsl(30, 10%, 20%)",
-            contrast: "hsl(30, 25%, 90%)",
+            contrast: "hsl(30, 100%, 90%)",
         },
         surface: {
-            dark: "hsl(215, 10%, 10%)",
+            dark: "hsl(225, 10%, 10%)",
             light: "hsl(195, 10%, 20%)",
-            contrast: "hsl(195, 25%, 90%)",
+            contrast: "hsl(195, 100%, 90%)",
         },
         tooltip: {
             dark: "rgba(16, 16, 16, 0.75)",
             light: "rgba(32, 32, 32, 0.75)",
-            contrast: "rgba(240, 240, 240, 1)",
+            contrast: "rgb(255, 255, 255)",
         },
         control: {
             background: {
