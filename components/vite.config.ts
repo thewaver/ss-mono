@@ -3,7 +3,13 @@ import solid from "vite-plugin-solid";
 
 import { vanillaExtractPlugin } from "@vanilla-extract/vite-plugin";
 
-const EXTERNAL_PACKAGES = ["solid-js", "@thewaver/ss-utils", "colorthief", "@tanstack/solid-virtual"];
+const EXTERNAL_PACKAGES = [
+    "solid-js",
+    "@thewaver/ss-utils",
+    "colorthief",
+    "@tanstack/solid-virtual",
+    "@internationalized/date",
+];
 
 const isExternal = (id: string) => EXTERNAL_PACKAGES.some((pkg) => id === pkg || id.startsWith(`${pkg}/`));
 

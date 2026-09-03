@@ -1,7 +1,7 @@
 {
     "name": "@thewaver/ss-utils",
     "type": "module",
-    "version": "0.0.22",
+    "version": "0.0.23",
     "description": "Geometry, CSS, SVG and DOM helpers for building shaped UI.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -43,12 +43,11 @@
         "format": "prettier --write .",
         "typecheck": "tsc --noEmit -p tsconfig.test.json",
         "test": "vitest run",
-        "test:watch": "vitest",
-        "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+        "test:watch": "vitest"
     },
     "dependencies": {
         "csstype": "^3.2.3",
-        "fast-equals": "^6.0.2"
+        "fast-equals": "^6.0.3"
     },
     "devDependencies": {
         "tsup": "^8.5.1"

@@ -8,5 +8,6 @@ export default defineConfig({
         // deliberately; they need a browser-like environment wired up first.
         environment: "node",
         include: ["test/**/*.test.ts"],
+        fsModuleCache: true,
     },
 });
