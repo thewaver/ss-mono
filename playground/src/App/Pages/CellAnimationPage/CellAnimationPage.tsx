@@ -5,6 +5,7 @@ import {
     CellAnimationBreakpoints,
     CellAnimationKeyframes,
     CellAnimationOrigins,
+    CellAnimationPlayback,
     CellAnimationWeights,
     SVGDefsSamples,
     access,
@@ -77,6 +78,8 @@ const MAX_DURATION_MS = 10000;
 const DURATION_STEP_MS = 100;
 const MIN_ITERATION_DELAY_MS = 0;
 const MAX_ITERATION_DELAY_MS = 5000;
+const MIN_HOLD_MS = 0;
+const MAX_HOLD_MS = 5000;
 
 const computeContainerWidth = (size: Size2d) => (IMAGE_CONTAINER_SIZE * size.width) / Math.max(size.width, size.height);
 
@@ -138,7 +141,10 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
                             SVGDefsSources.computeGradientSource(
                                 getKey(),
                                 getSize(),
-                                access(props.animationDurationMs),
+                                CellAnimationPlayback.computeCycleDurationMs(
+                                    access(props.animationDurationMs),
+                                    access(props.playbackOpts),
+                                ),
                                 access(props.animationIterationDelayMs),
                             )
                         }
@@ -182,7 +188,14 @@ const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
                     <DefaultExample
                         {...props}
                         src={() =>
-                            SVGDefsSources.computePatternSource(getKey(), getSize(), access(props.animationDurationMs))
+                            SVGDefsSources.computePatternSource(
+                                getKey(),
+                                getSize(),
+                                CellAnimationPlayback.computeCycleDurationMs(
+                                    access(props.animationDurationMs),
+                                    access(props.playbackOpts),
+                                ),
+                            )
                         }
                     />
                 </PageMeasureBox>
@@ -258,6 +271,10 @@ export const CellAnimationPage = () => {
         smoothness: 0.25,
         easing: "linear",
     });
+    const [playbackOpts, setPlaybackOpts] = createStore<CellAnimationPlayback.PlaybackOpts>({
+        dir: "normal",
+        holdMs: 1000,
+    });
 
     const getExamples = createMemo(() => {
         const commonProps: CellAnimationExampleProps = {
@@ -267,6 +284,7 @@ export const CellAnimationPage = () => {
             weightType: getWeightType,
             weightOpts: () => weightOpts,
             breakpointOpts: () => breakpointOpts,
+            playbackOpts: () => playbackOpts,
             animationType: getAnimationType,
             animationDurationMs: getAnimationDurationMs,
             animationIterationDelayMs: getAnimationIterationDelayMs,
@@ -419,6 +437,27 @@ export const CellAnimationPage = () => {
                         step={() => DURATION_STEP_MS}
                         ariaLabel={"Iteration delay"}
                         onInput={setAnimationIterationDelayMs}
+                    />
+                </PageProp>
+
+                <PageProp key={"playbackDir"} label={"Playback direction"}>
+                    <PageSelectField
+                        value={() => playbackOpts.dir!}
+                        values={() => CellAnimationPlayback.DIRECTIONS}
+                        ariaLabel={"Playback direction"}
+                        onChange={(dir) => setPlaybackOpts("dir", dir)}
+                    />
+                </PageProp>
+
+                <PageProp key={"holdMs"} label={"Hold at far end (ms)"}>
+                    <PageNumberField
+                        value={() => playbackOpts.holdMs!}
+                        min={() => MIN_HOLD_MS}
+                        max={() => MAX_HOLD_MS}
+                        step={() => DURATION_STEP_MS}
+                        isDisabled={() => !playbackOpts.dir?.startsWith("alternate")}
+                        ariaLabel={"Hold at far end"}
+                        onInput={(value) => setPlaybackOpts("holdMs", value)}
                     />
                 </PageProp>
             </PagePropsPanel>

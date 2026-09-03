@@ -2866,6 +2866,53 @@ while it was under review, rather than in a group of its own — which is the co
 make possible. Nothing in the `CellAnimation` collections carries it now; the `ScanlineAnimation` keyframe
 builders still do.
 
+### `CellAnimationPlayback`: which way a pass runs, and why the duration it is given is one-way
+
+**Running a pass out and back is not a breakpoint, so it is not in `BreakpointOpts`.** `computeBreakpoints`
+turns one cell's weight into the slice of the global timeline that cell animates in; playback direction decides
+how that global timeline itself runs, before any cell's window is consulted. The two compose — reversing the
+global timeline unwinds the whole staggered sequence, so the cell that arrived first is the last to leave — but
+they answer different questions. The practical half of the argument is that `ScanlineAnimation` imports
+`BreakpointOpts` for every one of its examples and has no use for playback, so widening it would have put inert
+fields in front of every reader of that page. It is therefore its own namespace under `CellAnimation/Playback`,
+and it composes at the Playground's call site rather than inside `computeAnimation`: the example transforms the
+timeline it was handed and passes the result on, which leaves the keyframe helper's signature alone and puts
+both halves of the pipeline in view together.
+
+**The four names are CSS's `animation-direction`, taken deliberately.** `normal`, `reverse`, `alternate` and
+`alternate-reverse` mean here exactly what they mean there, so the idea needs no second vocabulary. The user
+asked for the CSS names by name. `alternate-reverse` is one negation over `alternate` and was included for that
+reason rather than because a use for it was named.
+
+**The Playground's duration field is the one-way trip, and the component is handed the whole cycle.**
+`CellAnimation`'s `animationDurationMs` is the length of one iteration and still is; `computeCycleDurationMs`
+turns the leg into that iteration — the leg unchanged when the direction does not alternate, twice the leg plus
+the hold when it does. The alternative, splitting the given duration between the two legs, makes the same
+number mean two different speeds depending on a dropdown elsewhere: switching to `alternate` would silently
+double the pace of the part already being watched. The user set this one directly.
+
+**The hold is milliseconds, not a share of the cycle.** A share is not a length — twenty per cent means one
+thing at half a second and another at ten — so a ratio cannot be carried from one animation to the next, while
+"park for four hundred milliseconds" survives every other change on the panel. It also sits beside two fields
+already in milliseconds. Converting it to the ratio the timeline mapping actually needs takes both the hold and
+the leg, which is why `computeCycleDurationMs` and `computeGlobalTimeline` both take the one-way duration as an
+argument rather than reading a duration out of the options bag.
+
+**The hold is at the far end only, because the near end already has a name.** `animationIterationDelayMs` is
+the pause between iterations, and for a pass that returns to where it started, that pause falls exactly at the
+near end. A second control for it would be two knobs over one gap.
+
+**Two things are called direction, and the collision is worth the CSS names.**
+`CellAnimationBreakpoints.Direction` is `asc`/`desc` and says which cell goes first;
+`CellAnimationPlayback.Direction` is the CSS set and says which way the pass runs. Both are namespaced, and the
+Playground labels them _Direction_ and _Playback direction_.
+
+**The drawn gradient and pattern sources are timed to the cycle, not to the leg.** Those two examples serialise
+`Shape`'s own gradients and patterns into a source with their animation written into the markup, timed so that
+they run at the same length and rhythm as the cells — which is what their readout claims. Handing them the leg
+would leave them looping at the old period while the cells take twice as long, so they take
+`computeCycleDurationMs`'s answer too.
+
 ### Controls: `Toasts`, and a queue the consumer owns
 
 The shape question `backlog.md` parked toasts on rested on a premise that does not

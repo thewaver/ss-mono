@@ -1092,14 +1092,17 @@ structural — a weight that falls away from a point is always a wipe, a per-cel
 always an entrance. So the ideas below are all machinery that recombines the collection rather than extending
 it, and each was put to the user as a sketch. Their gradings, in their own terms:
 
-**Attractive, unbuilt.** The weight driving **how far** a cell travels rather than **when** it starts. Every
-cell would move at once and a heavy one would go further, so a stagger becomes a depth field and any existing
-animation reads completely differently without being rewritten. This was the second of the two they picked out;
-dispatch by zone was the first and is built, as `fromZones`.
+**Rejected.** Two of them, and neither is to be re-proposed without a new argument.
 
-**Rejected.** Composing two animations in sequence inside one cell's own window — fly in, then settle with a
-shake. Judged interesting in theory and likely too jarring in practice. Do not re-propose it without a new
-argument.
+- **The weight driving how far a cell travels rather than when it starts.** Every cell moves at once and a
+  heavy one goes further, so a stagger becomes a depth field and any existing animation reads differently
+  without being rewritten. It was one of the two the user picked out — dispatch by zone was the other, and is
+  built as `fromZones` — and it is the one item here that was settled by building it rather than by argument:
+  every cell was given the whole timeline and the weight was spent on how much of the move it made, taken as a
+  blend between the animation's settled state and its current one. Their verdict on seeing it run was that it
+  does not look good, and the code came out again in full.
+- **Composing two animations in sequence inside one cell's own window** — fly in, then settle with a shake.
+  Judged interesting in theory and likely too jarring in practice.
 
 **Deferred as knobs rather than entries.** Quantising a weight into bands so a smooth wipe arrives as thick
 blocks; jittering a weight so a machined edge becomes ragged; smoothing a weight so cells arrive in loose
@@ -1115,8 +1118,6 @@ different kind of change from a new dropdown entry and wants deciding on its own
   the weights callback belongs to the consumer, who holds the source.
 - **Cells starting in each other's slots and sliding home**, so the picture arrives scrambled and resolves
   rather than assembling out of nothing. Needs each cell to know its partner's slot, which the defs carry.
-- **Animations that match themselves at both ends**, run with no iteration delay — a perpetual drift or breath
-  rather than an entrance. A whole category the collection does not have.
 - **The weight treated as height**, tilting the grid as one object in the perspective the container already
   sets, rather than staggering N independent cells.
 - **The root animation moving against the cells** — the whole picture drifting one way while its cells move

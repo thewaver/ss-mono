@@ -5,6 +5,7 @@ import type {
     CellAnimationBreakpoints,
     CellAnimationKeyframes,
     CellAnimationOrigins,
+    CellAnimationPlayback,
     CellAnimationWeights,
     WeightOpts,
 } from "@thewaver/ss-components";
@@ -16,6 +17,7 @@ export type CellAnimationExampleProps = AccessorProps<{
     weightType: CellAnimationWeights.WeightType;
     weightOpts: WeightOpts;
     breakpointOpts: CellAnimationBreakpoints.BreakpointOpts;
+    playbackOpts: CellAnimationPlayback.PlaybackOpts;
     animationType: CellAnimationKeyframes.AnimationType;
     animationDurationMs: number;
     animationIterationDelayMs: number;

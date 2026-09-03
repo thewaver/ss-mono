@@ -382,6 +382,7 @@ export * from "./Samples/CellAnimation/Keyframes/Samples/tumbleUp";
 export * from "./Samples/CellAnimation/Keyframes/Samples/zoomIn";
 export * from "./Samples/CellAnimation/Keyframes/Samples/zoomOut";
 export * from "./Samples/CellAnimation/Origins/CellAnimationOrigins.const";
+export * from "./Samples/CellAnimation/Playback/CellAnimationPlayback.const";
 export * from "./Samples/CellAnimation/Weights/CellAnimationWeights.const";
 export * from "./Samples/CellAnimation/Weights/CellAnimationWeights.utils";
 export * from "./Samples/CellAnimation/Weights/Samples/checkeredConvergent";

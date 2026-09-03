@@ -5,6 +5,7 @@ import {
     CellAnimationBreakpoints,
     CellAnimationKeyframes,
     CellAnimationOrigins,
+    CellAnimationPlayback,
     CellAnimationWeights,
     access,
 } from "@thewaver/ss-components";
@@ -14,6 +15,7 @@ import type { CellAnimationSourcedExampleProps } from "../CellAnimationPage.type
 export const DefaultExample = ({
     animationType,
     breakpointOpts,
+    playbackOpts,
     originType,
     weightType,
     weightOpts,
@@ -26,6 +28,12 @@ export const DefaultExample = ({
     return (
         <CellAnimation
             {...otherProps}
+            animationDurationMs={() =>
+                CellAnimationPlayback.computeCycleDurationMs(
+                    access(otherProps.animationDurationMs),
+                    access(playbackOpts),
+                )
+            }
             computeCellWeights={(count) =>
                 CellAnimationWeights.computeCellWeights(access(weightType), count, getOrigin(), access(weightOpts))
             }
@@ -34,7 +42,11 @@ export const DefaultExample = ({
                     access(animationType),
                     CellAnimationBreakpoints.computeBreakpoints(defs.weight, access(breakpointOpts)),
                     { ...defs, origin: getOrigin() },
-                    timeline,
+                    CellAnimationPlayback.computeGlobalTimeline(
+                        timeline,
+                        access(otherProps.animationDurationMs),
+                        access(playbackOpts),
+                    ),
                     access(breakpointOpts).easing,
                 )
             }
