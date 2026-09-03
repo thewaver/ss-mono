@@ -20,7 +20,7 @@ export const tableHeaderContent = style({
     gap: themeVars.spacing.half,
     height: "100%",
     padding: themeVars.spacing.half,
-    borderBottom: `2px solid rgb(from ${themeVars.color.surface.contrast} r g b / 30%)`,
+    borderBottom: `2px solid rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
     backgroundColor: themeVars.color.surface.dark,
     color: themeVars.color.surface.contrast,
     fontSize: themeVars.fontSize.small,
@@ -71,7 +71,7 @@ export const tableCellContent = style({
     alignItems: "center",
     height: "100%",
     padding: themeVars.spacing.half,
-    borderBottom: `1px solid rgb(from ${themeVars.color.surface.contrast} r g b / 12%)`,
+    borderBottom: `1px solid rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
     fontSize: themeVars.fontSize.small,
     lineHeight: 1.25,
     whiteSpace: "nowrap",
@@ -81,14 +81,14 @@ export const tableCellContent = style({
 
     selectors: {
         [`&.${isHovered}`]: {
-            backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 8%)`,
+            backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
         },
         [`&.${isSelected}`]: {
-            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 22%)`,
+            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
             color: themeVars.color.primary.light,
         },
         [`&.${isSelected}.${isHovered}`]: {
-            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 30%)`,
+            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 35%)`,
         },
         [`&.${isDisabled}`]: {
             filter: themeVars.disabled.filter,

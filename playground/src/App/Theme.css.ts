@@ -45,13 +45,13 @@ const DEFAULT_THEME_VALUES = {
         },
         background: {
             dark: "hsl(0, 10%, 10%)",
-            light: "hsl(30, 10%, 20%)",
-            contrast: "hsl(30, 100%, 90%)",
+            light: "hsl(30, 10%, 15%)",
+            contrast: "hsl(30, 100%, 95%)",
         },
         surface: {
             dark: "hsl(225, 10%, 10%)",
-            light: "hsl(195, 10%, 20%)",
-            contrast: "hsl(195, 100%, 90%)",
+            light: "hsl(195, 10%, 15%)",
+            contrast: "hsl(195, 100%, 95%)",
         },
         tooltip: {
             dark: "rgba(16, 16, 16, 0.75)",
@@ -112,7 +112,10 @@ export const defaultTheme = createTheme(themeVars, DEFAULT_THEME_VALUES);
 globalStyle("*", {
     boxSizing: "border-box",
     scrollbarWidth: "thin",
-    scrollbarColor: `${themeVars.color.primary.main} rgb(from ${themeVars.color.background.dark} r g b / 25%)`,
+    scrollbarColor: [
+        `${themeVars.color.primary.main} ${themeVars.color.background.dark}`,
+        `${themeVars.color.primary.main} rgb(from ${themeVars.color.background.dark} r g b / 25%)`,
+    ],
 });
 
 globalStyle(":focus", {
@@ -139,7 +142,7 @@ globalStyle("::-webkit-scrollbar-corner", {
 });
 
 globalStyle("::-webkit-scrollbar-track", {
-    backgroundColor: `rgb(from ${themeVars.color.background.dark} r g b / 25%)`,
+    backgroundColor: [themeVars.color.background.dark, `rgb(from ${themeVars.color.background.dark} r g b / 25%)`],
 });
 
 globalStyle("::-webkit-scrollbar-thumb", {

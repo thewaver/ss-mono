@@ -13,7 +13,7 @@ export const sortableItemContent = style({
     alignItems: "center",
     gap: themeVars.spacing.full,
     padding: themeVars.spacing.full,
-    border: `1px solid rgb(from currentColor r g b / 20%)`,
+    border: `1px solid rgb(from currentColor r g b / 25%)`,
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: themeVars.color.surface.dark,
     fontSize: themeVars.fontSize.medium,
@@ -24,13 +24,13 @@ export const sortableItemContent = style({
 
     selectors: {
         [`&.${isHovered}`]: {
-            borderColor: `rgb(from currentColor r g b / 45%)`,
+            borderColor: `rgb(from currentColor r g b / 50%)`,
         },
         [`&.${isCarried}`]: {
             borderStyle: "dashed",
             borderColor: themeVars.color.primary.main,
             backgroundColor: "transparent",
-            color: `rgb(from currentColor r g b / 40%)`,
+            color: `rgb(from currentColor r g b / 50%)`,
             boxShadow: "none",
             cursor: "grabbing",
         },
@@ -61,18 +61,18 @@ export const sortableSurface = style({
     position: "absolute",
     inset: `calc(-1 * ${themeVars.spacing.full})`,
     zIndex: -1,
-    border: `1px dashed rgb(from currentColor r g b / 20%)`,
+    border: `1px dashed rgb(from currentColor r g b / 25%)`,
     borderRadius: themeVars.borderRadius.full,
     pointerEvents: "none",
     transition: `border-color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
 
     selectors: {
         [`&.${isCarrying}`]: {
-            borderColor: `rgb(from currentColor r g b / 45%)`,
+            borderColor: `rgb(from currentColor r g b / 50%)`,
         },
         [`&.${isReceiving}`]: {
             borderColor: themeVars.color.primary.main,
-            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 12%)`,
+            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
         },
         [`&.${isDisabled}`]: {
             filter: themeVars.disabled.filter,

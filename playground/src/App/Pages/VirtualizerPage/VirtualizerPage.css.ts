@@ -36,7 +36,7 @@ export const row = style({
     gap: themeVars.spacing.full,
     alignItems: "center",
     padding: `0 ${themeVars.spacing.full}`,
-    borderBottom: `1px solid rgb(from ${themeVars.color.control.background.contrast} r g b / 20%)`,
+    borderBottom: `1px solid rgb(from ${themeVars.color.control.background.contrast} r g b / 25%)`,
     color: themeVars.color.control.background.contrast,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xSmall,

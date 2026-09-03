@@ -13,7 +13,7 @@ export const eraCycle = style({
     height: 22,
     padding: `0 ${themeVars.spacing.half}`,
     borderRadius: themeVars.borderRadius.half,
-    color: `rgb(from currentColor r g b / 60%)`,
+    color: `rgb(from currentColor r g b / 65%)`,
     fontSize: themeVars.fontSize.xSmall,
     fontWeight: 600,
     letterSpacing: 0.5,
@@ -24,7 +24,7 @@ export const eraCycle = style({
     selectors: {
         [`&.${isHovered}`]: {
             color: "inherit",
-            backgroundColor: `rgb(from currentColor r g b / 15%)`,
+            backgroundColor: `rgb(from currentColor r g b / 10%)`,
         },
         [`&.${isDisabled}`]: {
             filter: themeVars.disabled.filter,

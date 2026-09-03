@@ -12,7 +12,7 @@ export const meridiemToggle = style({
     width: 28,
     height: 22,
     borderRadius: themeVars.borderRadius.half,
-    color: `rgb(from currentColor r g b / 60%)`,
+    color: `rgb(from currentColor r g b / 65%)`,
     fontSize: themeVars.fontSize.xSmall,
     fontWeight: 600,
     letterSpacing: 0.5,
@@ -22,7 +22,7 @@ export const meridiemToggle = style({
     selectors: {
         [`&.${isHovered}`]: {
             color: "inherit",
-            backgroundColor: `rgb(from currentColor r g b / 15%)`,
+            backgroundColor: `rgb(from currentColor r g b / 10%)`,
         },
         [`&.${isDisabled}`]: {
             filter: themeVars.disabled.filter,

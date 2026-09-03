@@ -34,7 +34,7 @@ export const fieldSurface = style({
 
     selectors: {
         [`&.${isReadOnly}`]: {
-            backgroundColor: `rgb(from currentColor r g b / 12.5%)`,
+            backgroundColor: `rgb(from currentColor r g b / 10%)`,
         },
         [`&.${hasError}`]: {
             borderColor: themeVars.color.error.main,

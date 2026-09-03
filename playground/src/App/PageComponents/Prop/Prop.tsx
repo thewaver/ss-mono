@@ -12,9 +12,7 @@ export const PageProp = (props: ParentProps<PagePropProps>) => {
 
     return (
         <div
-            class={
-                styles.propsScopeVariants[(propsPanelScope ? access(propsPanelScope.scope) : undefined) ?? "unknown"]
-            }
+            class={styles.propScopeVariants[(propsPanelScope ? access(propsPanelScope.scope) : undefined) ?? "unknown"]}
             data-prop
             data-testid={access(props.key)}
         >

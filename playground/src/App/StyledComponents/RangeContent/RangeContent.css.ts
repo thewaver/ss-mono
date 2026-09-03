@@ -34,7 +34,7 @@ export const rangeContentVariants = styleVariants({
 export const rangeTrack = style({
     position: "absolute",
     borderRadius: RANGE_TRACK_THICKNESS,
-    backgroundColor: `rgb(from currentColor r g b / 20%)`,
+    backgroundColor: `rgb(from currentColor r g b / 25%)`,
     boxShadow: themeVars.shadow.small,
 });
 

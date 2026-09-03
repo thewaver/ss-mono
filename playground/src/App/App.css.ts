@@ -133,8 +133,9 @@ export const dependencyLabel = style({
 });
 
 export const dependencyName = style({
-    padding: `1px ${themeVars.spacing.half}`,
+    padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `rgb(from ${themeVars.color.surface.light} r g b / 50%)`,
+    backgroundImage: `linear-gradient(45deg, ${themeVars.color.tooltip.dark}, ${themeVars.color.tooltip.light})`,
+    color: themeVars.color.tooltip.contrast,
     fontFamily: "monospace",
 });

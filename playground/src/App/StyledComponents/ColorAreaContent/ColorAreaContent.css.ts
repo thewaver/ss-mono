@@ -105,7 +105,7 @@ export const colorSwatch = style({
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: swatchVar,
     backgroundClip: "padding-box",
-    boxShadow: `inset 0 0 0 1px rgb(from ${themeVars.color.surface.contrast} r g b / 40%)`,
+    boxShadow: `inset 0 0 0 1px rgb(from ${themeVars.color.surface.contrast} r g b / 35%)`,
 });
 
 export const colorPickerPopup = style({
@@ -208,5 +208,5 @@ export const colorPreview = style({
     height: "100%",
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: swatchVar,
-    boxShadow: `inset 0 0 0 1px rgb(from ${themeVars.color.surface.contrast} r g b / 40%)`,
+    boxShadow: `inset 0 0 0 1px rgb(from ${themeVars.color.surface.contrast} r g b / 35%)`,
 });

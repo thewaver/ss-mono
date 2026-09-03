@@ -14,13 +14,13 @@ export const tileHue = createVar();
 
 export const sortableGridCell = style({
     flex: "1 1 auto",
-    border: `1px solid rgb(from currentColor r g b / 12%)`,
+    border: `1px solid rgb(from currentColor r g b / 15%)`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `rgb(from currentColor r g b / 4%)`,
+    backgroundColor: `rgb(from currentColor r g b / 5%)`,
 
     selectors: {
         [`&.${isOdd}`]: {
-            backgroundColor: `rgb(from currentColor r g b / 8%)`,
+            backgroundColor: `rgb(from currentColor r g b / 10%)`,
         },
     },
 });
@@ -119,14 +119,14 @@ export const sortableGridLanding = style({
 });
 
 export const sortableGridLandingOutline = style({
-    fill: `rgb(from ${themeVars.color.error.main} r g b / 20%)`,
+    fill: `rgb(from ${themeVars.color.error.main} r g b / 25%)`,
     stroke: themeVars.color.error.main,
     strokeWidth: 2,
     strokeDasharray: "5 4",
 
     selectors: {
         [`.${isAllowed} &`]: {
-            fill: `rgb(from ${themeVars.color.primary.main} r g b / 20%)`,
+            fill: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
             stroke: themeVars.color.primary.main,
         },
     },
@@ -139,18 +139,18 @@ export const sortableGridSurface = style({
     position: "absolute",
     inset: `calc(-1 * ${themeVars.spacing.half})`,
     zIndex: -1,
-    border: `1px dashed rgb(from currentColor r g b / 20%)`,
+    border: `1px dashed rgb(from currentColor r g b / 25%)`,
     borderRadius: themeVars.borderRadius.full,
     pointerEvents: "none",
     transition: `border-color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
 
     selectors: {
         [`&.${isCarrying}`]: {
-            borderColor: `rgb(from currentColor r g b / 45%)`,
+            borderColor: `rgb(from currentColor r g b / 50%)`,
         },
         [`&.${isReceiving}`]: {
             borderColor: themeVars.color.primary.main,
-            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 8%)`,
+            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 10%)`,
         },
         [`&.${isDisabled}`]: {
             filter: themeVars.disabled.filter,

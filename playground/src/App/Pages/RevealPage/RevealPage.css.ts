@@ -39,7 +39,7 @@ export const frostedCover = style({
     width: "100%",
     height: "100%",
     backdropFilter: "blur(8px) saturate(0.4)",
-    backgroundColor: `rgb(from ${themeVars.color.surface.dark} r g b / 50%)`,
+    backgroundColor: [themeVars.color.surface.dark, `rgb(from ${themeVars.color.surface.dark} r g b / 50%)`],
 });
 
 export const promptCover = style({

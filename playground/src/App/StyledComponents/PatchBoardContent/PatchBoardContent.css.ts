@@ -21,7 +21,7 @@ export const patchNode = style({
     gap: themeVars.spacing.half,
     minWidth: 0,
     padding: themeVars.spacing.full,
-    border: `1px solid rgb(from ${themeVars.color.primary.main} r g b / 40%)`,
+    border: `1px solid rgb(from ${themeVars.color.primary.main} r g b / 50%)`,
     borderRadius: themeVars.borderRadius.half,
     background: `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
     color: themeVars.color.surface.contrast,

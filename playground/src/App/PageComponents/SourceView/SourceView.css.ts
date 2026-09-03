@@ -20,7 +20,7 @@ export const sourceViewTabs = style({
     flexShrink: 0,
     paddingBlock: themeVars.spacing.double,
     marginInline: themeVars.spacing.double,
-    backgroundColor: `rgba(from ${themeVars.color.surface.light} r g b / 25%)`,
+    backgroundColor: [themeVars.color.surface.light, `rgb(from ${themeVars.color.surface.light} r g b / 25%)`],
     backdropFilter: "blur(10px)",
 });
 

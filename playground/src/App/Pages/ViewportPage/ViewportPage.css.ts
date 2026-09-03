@@ -54,8 +54,11 @@ export const host = style({
     width: HOST_SIZE,
     height: HOST_SIZE,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `rgb(from ${themeVars.color.background.dark} r g b / 50%)`,
-    outline: `1px dashed rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
+    backgroundColor: [themeVars.color.background.dark, `rgb(from ${themeVars.color.background.dark} r g b / 50%)`],
+    outline: [
+        `1px dashed ${themeVars.color.surface.contrast}`,
+        `1px dashed rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
+    ],
     outlineOffset: -1,
 });
 

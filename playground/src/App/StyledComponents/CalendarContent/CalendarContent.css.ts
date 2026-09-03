@@ -38,7 +38,7 @@ export const calendarDay = style({
         },
         [`&.${isInRange}`]: {
             borderRadius: 0,
-            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 18%)`,
+            backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 15%)`,
         },
         [`&.${isRangeStart}`]: {
             borderStartStartRadius: themeVars.borderRadius.half,

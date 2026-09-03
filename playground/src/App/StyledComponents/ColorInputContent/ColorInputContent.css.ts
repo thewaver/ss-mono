@@ -38,7 +38,7 @@ export const colorInputSwatch = style({
     width: SWATCH_SIZE,
     height: SWATCH_SIZE,
     borderRadius: themeVars.borderRadius.half,
-    boxShadow: `inset 0 0 0 1px rgb(from currentColor r g b / 30%)`,
+    boxShadow: `inset 0 0 0 1px rgb(from currentColor r g b / 35%)`,
 });
 
 export const colorInputValue = style({

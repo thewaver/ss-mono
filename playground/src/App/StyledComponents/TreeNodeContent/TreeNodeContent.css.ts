@@ -21,7 +21,7 @@ export const treeNodeContent = style({
 
     selectors: {
         [`&.${isHovered}`]: {
-            backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 20%)`,
+            backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
         },
         [`&.${isSelected}`]: {
             color: themeVars.color.primary.main,

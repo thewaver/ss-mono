@@ -25,10 +25,10 @@ export const menuItemContent = style({
             backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
         },
         [`&.${isOpen}`]: {
-            backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 20%)`,
+            backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
         },
         [`&.${isHovered}`]: {
-            backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 20%)`,
+            backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
         },
         [`&.${isActive}`]: {
             filter: themeVars.active.filter,

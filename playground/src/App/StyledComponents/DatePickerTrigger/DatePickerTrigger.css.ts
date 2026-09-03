@@ -13,7 +13,7 @@ export const datePickerTrigger = style({
     width: 22,
     height: 22,
     borderRadius: themeVars.borderRadius.half,
-    color: `rgb(from currentColor r g b / 60%)`,
+    color: `rgb(from currentColor r g b / 65%)`,
     fontSize: themeVars.fontSize.xSmall,
     lineHeight: 1,
     transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
@@ -21,7 +21,7 @@ export const datePickerTrigger = style({
     selectors: {
         [`&.${isHovered}, &.${isOpen}`]: {
             color: "inherit",
-            backgroundColor: `rgb(from currentColor r g b / 15%)`,
+            backgroundColor: `rgb(from currentColor r g b / 10%)`,
         },
         [`&.${isDisabled}`]: {
             filter: themeVars.disabled.filter,

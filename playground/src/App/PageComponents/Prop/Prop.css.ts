@@ -13,19 +13,22 @@ export const propScopeBase = style({
     boxShadow: themeVars.shadow.small,
 });
 
-export const propsScopeVariants = styleVariants({
+export const propScopeVariants = styleVariants({
     global: [
         propScopeBase,
         {
             color: themeVars.color.background.contrast,
-            backgroundColor: themeVars.color.background.dark,
+            backgroundColor: [
+                themeVars.color.background.dark,
+                `rgb(from ${themeVars.color.background.dark} r g b / 75%)`,
+            ],
         },
     ],
     local: [
         propScopeBase,
         {
             color: themeVars.color.surface.contrast,
-            backgroundColor: themeVars.color.surface.dark,
+            backgroundColor: [themeVars.color.surface.dark, `rgb(from ${themeVars.color.surface.dark} r g b / 75%)`],
         },
     ],
     unknown: {},

@@ -12,7 +12,7 @@ const gutterBase = {
     justifyContent: "center",
     alignItems: "center",
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `rgb(from currentColor r g b / 15%)`,
+    backgroundColor: `rgb(from currentColor r g b / 10%)`,
     transition: `background-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
     selectors: {

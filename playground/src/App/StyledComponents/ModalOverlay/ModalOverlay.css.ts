@@ -11,7 +11,7 @@ export const overlayOff = style({
 });
 
 const overlayScrim = style({
-    backgroundColor: `rgb(from ${themeVars.color.surface.dark} r g b / 60%)`,
+    backgroundColor: [themeVars.color.surface.dark, `rgb(from ${themeVars.color.surface.dark} r g b / 65%)`],
 });
 
 export const overlayScrimOn = style([overlayScrim, { opacity: 1 }]);
