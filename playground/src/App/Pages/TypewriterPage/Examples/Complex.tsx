@@ -14,7 +14,7 @@ export const ComplexExample = (props: Props) => {
             <b>
                 text that appears
                 <div class={styles.textHighlight} style={{ color: "red" }} title="ONE MEANS ONE!">
-                    one
+                    <i>one</i>
                 </div>
             </b>
             <span>single</span>

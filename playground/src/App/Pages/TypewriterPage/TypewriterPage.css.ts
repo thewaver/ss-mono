@@ -82,4 +82,6 @@ export const root = style({
 export const textHighlight = style({
     textTransform: "uppercase",
     lineHeight: 2,
+    paintOrder: "stroke fill",
+    WebkitTextStroke: "4px black",
 });

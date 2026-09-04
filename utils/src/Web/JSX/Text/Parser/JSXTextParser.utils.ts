@@ -57,15 +57,17 @@ let wordSegmenter: Intl.Segmenter | undefined;
 
 const getWordSegmenter = () => (wordSegmenter ??= new Intl.Segmenter(undefined, { granularity: "word" }));
 
-const getComputedStyles = (element: Element) => {
-    const parent = element.parentElement;
-    const computed = getComputedStyle(element);
-    const parentComputed = parent ? getComputedStyle(parent) : undefined;
-
-    return { computed, parentComputed };
-};
-
-const splitComputedStyle = (style: CSSStyleDeclaration, parentStyle?: CSSStyleDeclaration) => {
+/**
+ * Splits one element's computed style into what a measurement needs and what a
+ * rendering needs.
+ *
+ * `baselineStyle` is the style the parsed text will be redrawn under, not the element's
+ * own parent. An inherited property is only safe to leave out when the destination
+ * already resolves it to the same value, and the destination sits outside the tree being
+ * walked — comparing against the immediate parent instead drops a colour or a shadow set
+ * two or more levels up, which then never arrives.
+ */
+const splitComputedStyle = (style: CSSStyleDeclaration, baselineStyle?: CSSStyleDeclaration) => {
     const metrics: TextMetricsStyle = {};
     const nonMetrics: TextNonMetricStyle = {};
 
@@ -83,16 +85,21 @@ const splitComputedStyle = (style: CSSStyleDeclaration, parentStyle?: CSSStyleDe
             !CSSUtils.isCssKeyExcludedForDisplayInline(cssKey) &&
             !CSSUtils.isCssKeyExcludedForCanvasTextMeasuring(cssKey)
         ) {
-            const parentValue = parentStyle?.[key as keyof CSSStyleDeclaration];
+            const baselineValue = baselineStyle?.[key as keyof CSSStyleDeclaration];
 
-            if (parentValue !== value || !CSSUtils.isInheritedCssKey(cssKey)) {
+            if (baselineValue !== value || !CSSUtils.isInheritedCssKey(cssKey)) {
                 nonMetrics[cssKey as keyof TextNonMetricStyle] = value;
             }
         }
     }
 
+    // Forced rather than read. Each piece is redrawn inline whatever its source was, and
+    // the tree being walked hides itself and holds every line unwrapped so that spaces
+    // survive measurement. The baseline shares those last two, so the comparison above
+    // would drop them and leave the redrawn text collapsing whitespace that was measured.
     nonMetrics.display = "inline";
     nonMetrics.visibility = "visible";
+    nonMetrics["white-space"] = "pre";
 
     return { metrics, nonMetrics };
 };
@@ -117,16 +124,22 @@ export namespace JSXTextParser {
      * become breaks around their contents; `<br>` and newlines become breaks in place;
      * childless elements such as images are carried through whole as a copy.
      *
+     * Inherited properties are weighed against `el` itself rather than against each
+     * piece's own parent, since `el` is the context the result will be redrawn in — so a
+     * colour or a shadow set anywhere between the two is carried, however deep.
+     *
      * Browser only — it reads computed styles, so the element must already be in the
      * document.
      *
-     * @param el The element to flatten.
+     * @param el The element to flatten. Its own styles stand in for the ones the result
+     * will be drawn under, so it should be a sibling of wherever that happens.
      * @returns The pieces in reading order, or an empty list if there is no element.
      */
     export const getSegmentTokens = (el: Node): readonly ElementSegment[] => {
         if (!el) return EMPTY_ARRAY;
 
         const tokens: ElementSegment[] = [];
+        const baselineStyle = el.nodeType === Node.ELEMENT_NODE ? getComputedStyle(el as Element) : undefined;
 
         // Structural breaks only, which is what this collapse was written for: two blocks in
         // a row would otherwise close one and open the next, producing a stray blank line
@@ -149,8 +162,7 @@ export namespace JSXTextParser {
 
                 if (!parent) return;
 
-                const { computed, parentComputed } = getComputedStyles(parent);
-                const { metrics, nonMetrics } = splitComputedStyle(computed, parentComputed);
+                const { metrics, nonMetrics } = splitComputedStyle(getComputedStyle(parent), baselineStyle);
 
                 for (const part of StringUtils.splitByLinebreaks(text)) {
                     const parsedPart = StringUtils.replaceTabs(part);

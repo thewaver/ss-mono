@@ -9150,3 +9150,46 @@ for the same reason.
 it: the refusal rules, the carry, the walk and the announcements are all about which sockets exist rather than
 where they are drawn, so they were untouched. The Playground shows one board of each — the signal chain lies
 across, the mixing desk stands up with its three sources in a row above the desk and the amplifier under it.
+
+### `JSXTextParser`: an inherited style is weighed against where the text lands, not against its own parent
+
+`getSegmentTokens` reads the computed style off each piece of text and copies it onto the run it emits, and it
+leaves out the properties CSS inherits on the grounds that the copy will pick them up for free. That reasoning
+only holds against the right baseline, and the first version used the wrong one: it compared a piece against
+its own parent element.
+
+Nothing the parser produces stays where it was read from. `Typewriter` keeps a hidden copy of the children to
+measure, walks that, and builds the visible characters somewhere else entirely — a sibling of the hidden copy,
+under the same root. So the question is never "does my parent already say this", it is "will the place this
+text is going to say this", and the two differ the moment a value is set more than one level up. A red set on
+a `<div>` reached a `<b>` inside it by inheritance, both computed to red, they matched, and the colour was
+dropped — and the destination, which had no red anywhere above it, drew the text in the page's colour. The
+same went for `text-shadow`, `text-align` and `direction`, every inherited property that is also one the parser
+carries. One level worked by luck, because the value's own element and its parent still disagreed.
+
+**The baseline is now the element the walk started from**, which is the sibling of the destination and so
+resolves every inherited property to the same value the destination will. Everything between it and the piece
+of text stops mattering, which is the point: the whole chain is judged at once instead of one link of it.
+
+**Three properties are forced rather than compared, because that root is not a neutral baseline.** It is the
+measuring copy, and it hides itself and holds its content on one line so that every space is counted, so
+`visibility` and `white-space` would compare equal against it and be dropped — leaving the redrawn text
+collapsing whitespace the measurement had already paid for. `display` joins them for an unrelated reason: a
+piece is redrawn inline whatever it was cut from. `white-space` is pinned to `pre`, matching what the text was
+measured under, and a run never needs to wrap because the line breaks were decided before it was emitted.
+
+#### Text stroke was missing from the list, and text fill is deliberately still missing
+
+`-webkit-text-stroke` and its two longhands are now carried, and they are inherited so they sit in both lists
+beside `color` and `text-shadow`. The tell that the omission was an oversight rather than a decision is
+`paint-order`, which was already in the render list: that property does nothing except choose whether a stroke
+paints over the fill or under it, so a list holding it and not the stroke itself was incomplete.
+
+**`-webkit-text-fill-color` stays out, and that is the decision rather than the oversight.** Its initial value
+is `currentcolor`, so a computed style always resolves it to whatever `color` resolves to — meaning it would be
+written onto every run whose colour differs from the baseline, which is every coloured run, saying nothing that
+`color` had not already said. That redundancy is not the problem; the problem is that an explicitly set
+`-webkit-text-fill-color` beats `color` for the glyph fill. A consumer animating `color` in their keyframes
+would find the text frozen at the colour it was parsed with, and the property they would have to know about to
+explain it is one they never wrote. So a fill colour set inside a `Typewriter` is lost, and that is the cheaper
+of the two failures.
