@@ -14,7 +14,7 @@ purpose: it answers "what is outstanding", and neither of them is.
 | [Missing components](#missing-components)               |     2 |
 | [Blockers and known issues](#blockers-and-known-issues) |    11 |
 | [Deliberately not built](#deliberately-not-built)       |    28 |
-| [Accessibility gaps](#accessibility-gaps)               |     6 |
+| [Accessibility gaps](#accessibility-gaps)               |     7 |
 | [Planned projects](#planned-projects)                   |     1 |
 
 ---
@@ -87,14 +87,15 @@ A capability a built control does not have, where the reason it does not is sett
 
 They cluster, and no single item owns them.
 
-| #   | Where               | What is missing                                                                                                                 |
-| --- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| 15  | **`Spotlight`**     | A prompt cannot hide the rest of the page from a screen reader: `inert` marks a subtree and cannot be lifted off one part of it |
-| 18  | **Carousels**       | A carousel given no `renderControls` has no keyboard route into it whatsoever                                                   |
-| 21  | **`Table`**         | A cell holding two controls can be reached but not stepped into — there is no key that moves between them                       |
-| 16  | **`Scroller`**      | The buttons are the consumer's, so the library cannot promise one is named, reachable or in the tab order                       |
-| 19  | **`OverheadWheel`** | The same again for the hub's control, with the same promise unmade                                                              |
-| 14  | **`SlideButton`**   | A fixed hold duration is itself an assumption about dexterity, in a control that exists partly to avoid one                     |
+| #   | Where               | What is missing                                                                                                                                |
+| --- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| 22  | **`Timeline`**      | It pans by dragging and zooms by pinching, and the library ships no pointer route that is neither — the consumer's buttons are the only answer |
+| 15  | **`Spotlight`**     | A prompt cannot hide the rest of the page from a screen reader: `inert` marks a subtree and cannot be lifted off one part of it                |
+| 18  | **Carousels**       | A carousel given no `renderControls` has no keyboard route into it whatsoever                                                                  |
+| 21  | **`Table`**         | A cell holding two controls can be reached but not stepped into — there is no key that moves between them                                      |
+| 16  | **`Scroller`**      | The buttons are the consumer's, so the library cannot promise one is named, reachable or in the tab order                                      |
+| 19  | **`OverheadWheel`** | The same again for the hub's control, with the same promise unmade                                                                             |
+| 14  | **`SlideButton`**   | A fixed hold duration is itself an assumption about dexterity, in a control that exists partly to avoid one                                    |
 
 ## Planned projects
 

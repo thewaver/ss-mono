@@ -2,7 +2,7 @@ import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
-import type { SplitPaneGutterProps } from "./SplitPaneContent.types";
+import type { SplitPaneCompareProps, SplitPaneGutterProps } from "./SplitPaneContent.types";
 
 import * as styles from "./SplitPaneContent.css";
 
@@ -24,3 +24,17 @@ export const PageSplitPaneGutter = (props: SplitPaneGutterProps) => {
 export const PageSplitPaneBox = (props: ParentProps) => <div class={styles.splitPaneBox}>{props.children}</div>;
 
 export const PageSplitPaneFrame = (props: ParentProps) => <div class={styles.splitPaneFrame}>{props.children}</div>;
+
+export const PageSplitPaneCompareFrame = (props: ParentProps) => (
+    <div class={styles.compareFrame}>{props.children}</div>
+);
+
+export const PageSplitPaneCompareBox = (props: SplitPaneCompareProps) => (
+    <div class={styles.compareBox}>
+        <img
+            class={access(props.side) === "start" ? styles.compareStartImage : styles.compareEndImage}
+            src={access(props.src)}
+            alt={access(props.alt)}
+        />
+    </div>
+);

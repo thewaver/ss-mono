@@ -71,6 +71,7 @@ import { TileBoardPage } from "./Pages/TileBoardPage/TileBoardPage";
 import { ToastsPage } from "./Pages/ToastsPage/ToastsPage";
 import { TogglePage } from "./Pages/TogglePage/TogglePage";
 import { ToolbarPage } from "./Pages/ToolbarPage/ToolbarPage";
+import { TimelinePage } from "./Pages/TimelinePage/TimelinePage";
 import { TrailPage } from "./Pages/TrailPage/TrailPage";
 import { TreePage } from "./Pages/TreePage/TreePage";
 import { TypewriterPage } from "./Pages/TypewriterPage/TypewriterPage";
@@ -248,6 +249,12 @@ const CATEGORY_CONFIGS: CategoryConfig[] = [
                 description:
                     "A board of tiles that interlock, and every built-in shape tessellates: the offset rows and short alternate row a hexagon or a lozenge needs, the half-tile overlap and turned-over neighbours a triangle needs, or neither for a square. The board owns the geometry and the keyboard — a transparent layer wearing the tile's own shape takes the pointer, so a press lands on the tile you can see rather than on its rectangle while a piece standing taller than its tile still hangs over the row above, and the arrows walk every tile whether it will take a press or not. What a tile looks like, and what it means, are the consumer's.",
                 component: () => <TileBoardPage />,
+            },
+            {
+                name: "Timeline",
+                description:
+                    "Items with a start and an end, laid on a window over a range that can be zoomed and moved. The component owns the arithmetic — where a span lands as a share of the window, which lane it goes in when it overlaps its neighbours, and which round numbers the ticks fall on at the width it currently has — and the keyboard, where the arrows walk the items in time order and bring the window with them. It moves the window only when it is asked to: the wheel, the drag and the buttons that do the asking are the consumer's.",
+                component: () => <TimelinePage />,
             },
             {
                 name: "Trail",

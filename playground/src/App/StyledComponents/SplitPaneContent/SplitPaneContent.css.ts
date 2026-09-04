@@ -3,6 +3,7 @@ import { style } from "@vanilla-extract/css";
 import { themeVars } from "../../Theme.css";
 
 const FRAME_MAX_WIDTH = 380;
+const PICTURE_ASPECT = 1;
 
 export const isDragging = style({});
 export const isDisabled = style({});
@@ -58,3 +59,28 @@ export const splitPaneFrame = style({
     borderRadius: themeVars.borderRadius.full,
     backgroundColor: themeVars.color.background.dark,
 });
+
+export const compareFrame = style([
+    splitPaneFrame,
+    { containerType: "inline-size", height: "auto", aspectRatio: `${PICTURE_ASPECT}` },
+]);
+
+export const compareBox = style({
+    position: "relative",
+    width: "100%",
+    height: "100%",
+    borderRadius: themeVars.borderRadius.half,
+    overflow: "hidden",
+});
+
+const compareImageBase = {
+    position: "absolute",
+    top: 0,
+    width: "100cqw",
+    height: "100%",
+    objectFit: "cover",
+} as const;
+
+export const compareStartImage = style({ ...compareImageBase, left: 0 });
+
+export const compareEndImage = style({ ...compareImageBase, right: 0 });

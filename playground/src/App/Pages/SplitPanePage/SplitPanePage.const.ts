@@ -20,3 +20,8 @@ export const TRIPLE: SplitPaneEntry[] = [
     { id: "split-triple-middle", minPx: 80, gutterAriaLabel: "Resize second" },
     { id: "split-triple-end", minPx: 80 },
 ];
+
+export const COMPARE: SplitPaneEntry[] = [
+    { id: "split-compare-start", gutterAriaLabel: "Move the comparison line" },
+    { id: "split-compare-end" },
+];

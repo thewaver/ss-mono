@@ -8,6 +8,7 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
 import { BoundedExample } from "./Examples/Bounded";
+import { CompareExample } from "./Examples/Compare";
 import { CrampedExample } from "./Examples/Cramped";
 import { PairExample } from "./Examples/Pair";
 import { StackedExample } from "./Examples/Stacked";
@@ -28,6 +29,7 @@ const STARTING_BOUNDED = [0.3, 0.7];
 const STARTING_CRAMPED = [0.5, 0.5];
 const STARTING_TRIPLE = [0.25, 0.5, 0.25];
 const STARTING_COLUMN = [0.4, 0.6];
+const STARTING_COMPARE = [0.5, 0.5];
 
 const percent = (ratios: number[]) => ratios.map((ratio) => `${Math.round(ratio * PERCENT)}%`).join(" / ");
 
@@ -40,6 +42,7 @@ export const SplitPanePage = () => {
     const crampedSignal = createSignal(STARTING_CRAMPED);
     const tripleSignal = createSignal(STARTING_TRIPLE);
     const columnSignal = createSignal(STARTING_COLUMN);
+    const compareSignal = createSignal(STARTING_COMPARE);
 
     const reset = () => {
         pairSignal[1](STARTING_PAIR);
@@ -47,6 +50,7 @@ export const SplitPanePage = () => {
         crampedSignal[1](STARTING_CRAMPED);
         tripleSignal[1](STARTING_TRIPLE);
         columnSignal[1](STARTING_COLUMN);
+        compareSignal[1](STARTING_COMPARE);
     };
 
     const getExamples = createMemo(() => {
@@ -85,6 +89,14 @@ export const SplitPanePage = () => {
                 readout: () => `ratios: ${percent(columnSignal[0]())} — the same control on the other axis`,
                 component: () => <StackedExample {...commonProps} ratiosSignal={columnSignal} />,
                 path: `${EXAMPLES_ROOT}/Stacked.tsx`,
+            },
+            {
+                key: "compare",
+                name: "Two pictures",
+                readout: () =>
+                    `ratios: ${percent(compareSignal[0]())} — both pictures are drawn at the full width of the frame, so the gutter wipes between them instead of squeezing them`,
+                component: () => <CompareExample {...commonProps} ratiosSignal={compareSignal} />,
+                path: `${EXAMPLES_ROOT}/Compare.tsx`,
             },
             {
                 key: "cramped",

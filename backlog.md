@@ -53,6 +53,7 @@ reading.
 19. The four components ported from React — what did not settle — _open_
 20. An anchored layer is always a frame behind — _postponed until the platform catches up_
 21. `Table` — six things deliberately not built — _open_
+22. `Timeline` — the pointer routes the library cannot promise — _open_
 
 ### Build order
 
@@ -972,6 +973,31 @@ _Accepted limits_ instead.
 
 ---
 
+## 22. `Timeline` — the pointer routes the library cannot promise
+
+The component takes the gestures itself: a drag moves the window, the wheel and a pinch zoom it, and both can
+be switched off. The reasoning, the evidence for the wheel behaving as it does and the press-versus-drag rule
+are in `decisions.md` under _"`Timeline`: a window over a range"_. What is outstanding is the consequence.
+
+- **Moving and zooming are reachable by dragging, pinching and the keyboard, and by nothing else the library
+  ships.** WCAG **2.5.7 Dragging Movements** wants panning to be achievable "by a single pointer without
+  dragging", and its own worked example is a map that must therefore offer directional buttons; **2.5.1
+  Pointer Gestures** wants the same of the pinch, which is multipoint. A keyboard route answers neither —
+  both criteria are about pointers. So a consumer who drops the component in and wires nothing has a control
+  that fails two Level A / AA criteria, and the library cannot tell them so.
+- **The reason it cannot be closed from inside is the no-controls rule.** What satisfies both criteria is a
+  button, a field or a click target, and this component renders none — the same position `Scroller` and
+  `OverheadWheel` are in, both already recorded. The Playground's tracks example is what discharging it looks
+  like, and its meetings example deliberately has none, so the two sit side by side.
+- **There is a route that would close it without painting anything, and nobody has argued it yet.** A plain
+  click on the axis strip could centre the window on the point clicked, which is a single pointer and no
+  dragging; a double-click could zoom in a step. Both are gestures the component already has the arithmetic
+  for, neither adds a control, and neither has been put to the user — the objection to expect is that a
+  click on the axis is a seek in every video editor that has one, which is a different meaning from the one
+  proposed here.
+
+---
+
 ## Accepted limits
 
 Faults that have been looked at and consciously left alone. Not outstanding work, not numbered, and not part
@@ -1122,6 +1148,26 @@ different kind of change from a new dropdown entry and wants deciding on its own
   sets, rather than staggering N independent cells.
 - **The root animation moving against the cells** — the whole picture drifting one way while its cells move
   the other. `computeRootAnimation` exists and only the Glitch example on the ScanlineAnimation page uses it.
+
+### A second round of Exotics candidates, and what became of each
+
+Six were sketched for the user. **`Timeline`** was chosen and is built — items with a start and an end laid
+on a window that zooms and moves; the reasoning that fixed its shape is in `decisions.md`, and nothing about
+it is outstanding. **A before-and-after comparison slider** was answered by their own suggestion: it is
+`SplitPane` with a picture in each pane rather than a component, and the SplitPane page now carries the
+example, so nothing is pending there either.
+
+**Turned down. Do not re-propose any of these without a new argument.**
+
+- **A split-flap board**, the airport departure display whose characters flip through the alphabet one card
+  at a time. Their verdict: the drum is already a component and this is that drum again, so it would be a
+  second way to spell what `Odometer` and `DrumWheel` do.
+- **A magnifying strip**, the macOS dock's swell around the pointer. Their verdict: it already exists as an
+  example on the `PointerTracker` page, which is the same answer `HoloCard` got.
+- **A ticker**, a strip of content looping seamlessly past. Their verdict: the carousels cover it.
+- **A marquee selection layer**, dragging a rectangle across a board to pick up everything it touches.
+  **This one was not turned down on its merits** — "interesting but can't think of a use" — so what it lacks
+  is a use rather than an argument, and a real one would reopen it.
 
 ### Exotics put up as candidates, and what became of each
 
