@@ -100,7 +100,7 @@ export const sortableGridItemGlyph = style({
 
     selectors: {
         [`.${isCarried} &`]: {
-            opacity: 0.4,
+            opacity: 0.5,
         },
     },
 });
@@ -109,7 +109,7 @@ export const sortableGridItemName = style({
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",
     whiteSpace: "nowrap",
-    opacity: 0.7,
+    opacity: 0.75,
 });
 
 export const sortableGridLanding = style({

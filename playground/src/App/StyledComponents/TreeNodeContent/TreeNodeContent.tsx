@@ -23,6 +23,7 @@ export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) =>
                 [styles.isHovered]: access(props.renderProps).isHovered,
                 [styles.isSelected]: access(props.renderProps).isSelected,
                 [styles.isDisabled]: access(props.renderProps).isDisabled,
+                [styles.isCategory]: access(props.renderProps).depth === 0,
             }}
         >
             <div class={styles.treeNodeMarker} aria-hidden="true">

@@ -32,7 +32,7 @@ export const selectOptionContent = style({
         },
         [`&.${isDisabled}`]: {
             filter: themeVars.disabled.filter,
-            opacity: 0.4,
+            opacity: 0.5,
         },
     },
 });
@@ -47,7 +47,7 @@ export const selectOptionDescription = style({
     maxWidth: "36ch",
     whiteSpace: "normal",
     fontSize: themeVars.fontSize.small,
-    opacity: 0.6,
+    opacity: 0.75,
 });
 
 export const selectOptionMark = style({

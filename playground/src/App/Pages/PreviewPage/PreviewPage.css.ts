@@ -31,5 +31,5 @@ export const afterwards = style({
     display: "flex",
     flexDirection: "column",
     gap: themeVars.spacing.full,
-    opacity: 0.6,
+    opacity: 0.75,
 });

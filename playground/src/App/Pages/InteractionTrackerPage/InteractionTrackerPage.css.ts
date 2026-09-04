@@ -36,7 +36,7 @@ export const flagChip = style({
     borderRadius: themeVars.borderRadius.half,
     backgroundImage: panel(themeVars.color.surface.dark, themeVars.color.surface.light),
     color: themeVars.color.surface.contrast,
-    opacity: 0.4,
+    opacity: 0.5,
 });
 
 export const flagChipOn = style({

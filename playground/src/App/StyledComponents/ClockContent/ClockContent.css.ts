@@ -35,7 +35,7 @@ export const clockOption = style({
             color: themeVars.color.primary.contrast,
         },
         [`&.${isDisabled}`]: {
-            opacity: 0.2,
+            opacity: 0.25,
         },
     },
 });
@@ -49,7 +49,7 @@ export const clockUnit = style({
     color: themeVars.color.surface.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textTransform: "uppercase",
-    opacity: 0.6,
+    opacity: 0.5,
 });
 
 export const clockColumn = style({

@@ -19,7 +19,7 @@ export const formFieldCaption = style({
 export const formFieldMessage = style({
     maxWidth: 240,
     fontSize: themeVars.fontSize.xSmall,
-    opacity: 0.6,
+    opacity: 0.5,
 
     selectors: {
         [`&.${hasError}`]: {

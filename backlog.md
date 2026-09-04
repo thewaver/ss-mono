@@ -306,7 +306,7 @@ source, a cleared source) report nothing. The shape is what to keep: reaching a 
 page a reason to consume it first.
 
 **Components with no Playground page at all**, so nothing can drive them until one exists: `AudioSwitcher`
-alone, still commented out of `CATEGORY_CONFIGS` in `playground/src/App/App.tsx`. Its play and pause moved from
+alone, still left out of `MENU_CONFIGS` in `playground/src/App/App.tsx`. Its play and pause moved from
 a mount handle to a `playbackSignal` and that change has never been run, because there is nothing to run it. The
 fades it drives are the part most likely to be wrong.
 

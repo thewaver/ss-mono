@@ -28,7 +28,7 @@ export const calendarDay = style({
 
     selectors: {
         [`&.${isOutsideMonth}`]: {
-            opacity: 0.35,
+            opacity: 0.5,
         },
         [`&.${isHovered}`]: {
             backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
@@ -53,7 +53,7 @@ export const calendarDay = style({
             color: themeVars.color.primary.contrast,
         },
         [`&.${isDisabled}`]: {
-            opacity: 0.2,
+            opacity: 0.25,
         },
     },
 });
@@ -67,7 +67,7 @@ export const calendarWeekday = style({
     color: themeVars.color.surface.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textTransform: "uppercase",
-    opacity: 0.6,
+    opacity: 0.75,
 });
 
 export const calendarTitle = style({

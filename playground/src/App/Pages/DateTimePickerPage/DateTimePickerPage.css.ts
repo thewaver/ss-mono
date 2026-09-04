@@ -12,5 +12,5 @@ export const dateTimeSeparator = style({
     paddingInline: themeVars.spacing.half,
     color: themeVars.color.surface.contrast,
     fontSize: themeVars.fontSize.small,
-    opacity: 0.6,
+    opacity: 0.75,
 });

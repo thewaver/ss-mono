@@ -1235,37 +1235,69 @@ furniture — adding a page or renaming a category used to break the keyboard sp
 regression, which happened once. The page carries a row, a column, links, a consumer link component and an
 all-disabled list.
 
-### The left menu is one tab list per category
+### The left menu is one tree, and the categories are its top three branches
 
-Settled, on the user's call between three options. The menu was a single `role="tablist"`
-holding every entry, with `Exotics`, `Fundamentals` and `Composites` inside it as disabled tabs. A tab list
-may own tabs and nothing else, and those three were never destinations. They are now `<h2>` elements
-outside the lists, and each category gets its own `Tabs` named by `getAriaLabel` with the same text.
+Settled on the user's call between three options, once the abstract pages took the menu to ninety-seven
+entries: collapsible category sections, a `Tree`, or more and smaller categories each with its own tab list.
+The tree won on grouping — `Inputs` and `Date pickers` are things a person looks for, and neither of the
+other two could hold them without either leaving `Fundamentals` forty-two rows long or paying a tab stop per
+group.
 
-**The cost is one tab stop per category rather than one for the menu**, accepted rather than overlooked:
-arrows walk within a category and `Tab` crosses between them. The rejected alternative — dropping the
-category names from the markup — keeps one stop but tells a screen reader user nothing about a grouping the
-sighted user can see.
+**The whole menu is now one tab stop rather than one per category**, which is the part that made the choice
+easy: the arrangement it replaced cost three stops and the tab-list-per-group alternative would have cost
+about eleven. The arrows walk the rows that are visible, `Right` and `Left` open and close a branch, and the
+tree's own typeahead jumps to a row by its first letters.
 
-**The `Tab<T>` `id` / `panelId` pairing is wired here too.** Each component config derives both from its
-own name and the routed page is wrapped in `TabPanel`, so the menu stopped being the standing example of a
-tab list naming a panel nobody wrote. The `backlog.md` bullet this fixes is about the library, not the
-menu: nothing still forces a consumer to do it.
+**What went with the tab list.** The `<h2>` per category is now a branch row, so the categories are inside
+the widget instead of beside it; `renderFloater` and the `ElementFader` marker are gone, since a tree row
+paints its own selected state; and the `Tab` `id` / `panelId` pairing that wrapped the routed page in a
+`TabPanel` is gone with it, replaced by a `<main>` landmark and an `<h1>` for the page title, with the menu
+in a `<nav>`. **`TabsPage` and the source viewer still demonstrate the panel pairing**, so nothing lost its
+only consumer; what the menu stopped being is the standing example.
 
-**A category whose entries are all filtered out disappears, heading and all** — an empty heading over an
-empty list is furniture with nothing under it. The rule that survived untouched, and the one the `Select`
-autocomplete argument rests on: the currently selected entry stays visible even when it does not match.
+**Selection is read from the route and never written back.** The value signal handed to the tree is a pair
+whose setter does nothing: a leaf carries an `href` and navigates through the router's `A`, the route effect
+sets the selected config, and the tree paints from that. This is what neutralises the first gap in
+`backlog.md`'s `Tree` item — a press on a branch both selects it and toggles it, so without the dead setter
+opening `Overlays` would move the highlight off the page you are reading. The effect also opens the
+ancestors of whatever route arrives, so a link followed from a dependency chip reveals its own row.
 
-**`Tabs` stopped orphaning its floater as part of this.** With one list the marker could never be stranded;
-with several, the list that used to hold the selection kept drawing its own, because the positioning effect
-returned early on "no selected item" instead of acting on it. The first fix cleared the stored bounds and
-was superseded a day later by the fader below — the bounds are what the exit animation draws from.
+**Expansion is two signals, and which one the tree sees depends on the search box.** Browsing expands what
+the user opened, seeded with the three categories; searching expands every branch that survived the filter,
+so a match is never hidden behind a closed group. Handing the tree one signal that switched underneath it
+would have made a search discard what was open, and made a toggle during a search stick around afterwards.
+
+**Filtering rebuilds the nodes and keeps the values.** `filterTreeNode` copies a branch when any descendant
+matches and drops it otherwise; the copy carries the same `value` object, which is what the tree compares by,
+so selection and expansion survive a filter that has rebuilt every node around them. The old rule survives
+too: the selected entry stays visible even when it does not match what was typed.
+
+**A branch row carries the number of pages under it**, through the `detail` slot `PageTreeNodeContent`
+already had. It doubles as the search readout — `Dates and times 5` becomes `Dates and times 3` when three
+of the five match.
+
+**The three category rows are uppercase, and the depth that decides it was already in the render props.**
+`TreeNodeRenderProps` has carried `depth` since the component was written — `PageTreeNodeContent` indents
+by it — so telling one level from another needed no library change, only a class on the name in the menu's
+own painter. It is set there rather than in `PageTreeNodeContent` because that painter is the `Tree` page's
+too, and a file tree has no reason to shout its top row.
+
+**The menu is 320px rather than 240px**, at the user's request, because three levels of indent plus a
+marker leaves less room for a name like `MediaQueryMonitor` than the flat list needed.
+
+**The theme paints every anchor in the primary colour, and the menu now overrides that.** Tree leaves are
+anchors; the tab rows they replaced were not painted that way, so every leaf arrived in the accent green and
+the selected row was distinguishable only by being bold. A `globalStyle` scoped to the menu's own class puts
+anchor colour back to `inherit`, which is a Playground fix rather than a theme change — nothing outside the
+`<nav>` is touched.
 
 ### The floater appears and disappears through `ElementFader`, like every other library element that comes and goes
 
-Settled, at the user's request, once the menu split made a floater that comes and goes
-normal. A tab list with no selection has no marker, and that was a hard cut: in the document one frame,
-gone the next, with no way for a consumer to fade, shrink or slide it.
+Settled, at the user's request, back when the left menu was several tab lists and a floater could be
+stranded on a list that had lost its selection. The menu is a `Tree` now and no longer a consumer, but the
+rule this settled is `Tabs`' and `RadioGroup`'s and still holds. A tab list with no selection has no
+marker, and that was a hard cut: in the document one frame, gone the next, with no way for a consumer to
+fade, shrink or slide it.
 
 **`renderFloater` now takes the same pair every appearing element's painter takes** — a visibility target
 of `0` or `1` and the transition duration — which is `Tooltip`, `Popover`, `Modal`, `Toasts` and
@@ -1294,6 +1326,127 @@ assertion fail by 106 pixels.
 **`TabsPage` grew a variant whose selection can be cleared**, since none of the other five can lose theirs.
 It sets a longer duration on purpose: the middle of a 200ms transition is neither watchable by eye nor
 readable by a spec without a race.
+
+### Every abstract has a menu entry, and a page with no examples is a config entry rather than a file
+
+Asked for by the user: a page for each abstract, description and dependencies only, no examples. The four
+that already had pages — `InteractionTracker`, `PointerTracker`, `SVGFilters`, `Virtualizer` — keep theirs;
+the other twenty-three are new entries in the `Abstracts` category and nothing else, and the three new SVG
+defs pages below bring it to thirty.
+
+**`ComponentConfig.component` is optional, and an entry without one routes to `EmptyPage`.** The alternative
+was twenty-three directories each holding a file that returns `null`, plus twenty-three imports at the top of
+`App.tsx`, which is noise standing in for nothing. `AppContent` already draws the title, the description and
+the dependency chips from the config; the page component only ever supplied the examples under them. So an
+abstract with nothing to demonstrate needs no file, and the day one earns examples it gets a page directory
+like any other and the `component` field comes back.
+
+**What this buys is not the pages themselves.** `ROUTES_BY_KEY` is built from the same configs, so a
+dependency chip is a link when the name has an entry and plain text when it does not. Before this, a page
+saying it rests on `Anchor`, `Dismisser` and `FocusManager` printed three dead words; every abstract chip in
+the Playground is now a link to the thing it names.
+
+**The `SVG` folder became four entries rather than one.** `SVGFilters` was the only page over a folder that
+holds four families, so a component resting on a gradient or a tiling showed a chip reading `SVG` that led
+nowhere. `SVGAnimations`, `SVGGradients` and `SVGPatterns` now sit beside it under a `SVG defs` group, which
+is what _"The `SVGFilters` page is the factory's, and it is filed under `Abstracts`"_ said would happen if the
+other three ever arrived. **They are plural to match the page that was already there** — the request named
+them in the singular, and the existing name is a rename the user made deliberately, so matching it was the
+change that moved nothing.
+
+### The dependency map takes a whole abstract folder as its entry when no file carries the folder's name
+
+The `componentDependencies` plugin finds a component's entry file by looking for the one whose basename
+matches its directory — `Anchor/Anchor.ts`, `Barrel/Barrel.tsx` — and walks the imports out from there.
+Ten abstracts have no such file: `Carrier` is `CarrierStack.ts` plus two more, `CheckedState` is a types file
+and a utils file, `Dismisser`, `Flattener`, `Navigator`, `Cutout`, `ColorExtractor`, `DateValue`,
+`DateTimeValue` and `SVG` are all the same shape. They were absent from the map altogether, which nothing
+noticed while no page bore their names.
+
+**An abstract with no same-named file now takes every file in its own folder as an entry**, and the walk
+starts from all of them at once. The same-named file still wins where there is one, so nothing that already
+had a map entry changed.
+
+**Test files are excluded from the walk entirely.** They were harmless while entries were single named files,
+because nothing imports a test — but a folder-wide entry set would have made `Carrier.utils.test.ts` an entry
+and counted whatever it imports as a dependency of `Carrier`.
+
+**The `SVG` folder is the one place where a folder name is not the unit name**, and it is a table of four
+prefixes rather than a rule. `Abstracts/SVG/Defs/Filter` is `SVGFilters` and its three siblings likewise,
+because the folder holds four independent families and the pages are named for them rather than for it.
+Deriving those names from the file names — `SVGFilterDefs.factory.tsx` — was rejected as string surgery over
+a naming convention nothing enforces; four literal rows say the same thing and fail loudly if a folder moves.
+
+### `usedBy` is the same map read backwards, and the layer of the consumer decides which list it lands in
+
+Asked for by the user: pages already said what they rest on, and should also say what rests on them. The
+walk is unchanged — it is the `uses` map inverted once it is complete, so `usedBy` is transitive in exactly
+the way `uses` is. A consumer is filed under `Abstracts` or `Components` by **its own** layer rather than
+the layer of the thing it uses, which is why `Rotator` appears under abstracts in `InteractionTracker`'s
+list and everything else under components.
+
+**A unit outside the three component layers and `Abstracts` is not a consumer.** `Samples` is walked for
+`uses`, because a component reaching sample code really does depend on it, but it is not recorded as a user
+of anything: a sample is vocabulary the Playground draws on, not a thing the library is built out of.
+
+**Some lists are long, which is the finding rather than a fault, and it is why both are disclosures.**
+`Anchor` is used by fifty-three units, which is what a shared abstract looks like drawn out — and six wrapped
+rows of chips above every page's examples is a wall to scroll past on the way to what you came for. Each
+section is a `Collapsible`, collapsed on arrival, with `isPanelBuiltOnExpand` so the chips of a list nobody
+opens are never built. `LIST_PAGELESS_COMPONENTS` decides whether names with no page of their
+own — `BinarySwitch`, `Popover`, `TextField`, `Clock` — appear at all, and it is off, which takes `Anchor`
+from fifty-three to thirty-seven and from six wrapped rows to four. The filter is applied once where
+`DEPENDENCIES_BY_KEY` is built rather than at each render site, so the summary counts, the group rows and
+the section itself all follow from it: a section left with nothing does not appear, and the trigger never
+counts a chip it will not show.
+
+**The trigger is a chip that stays put, rather than a chip that is replaced by the list.** The suggested
+shape was a summary button swapped out for the lists when pressed, with an `x` at the far end to put it
+back. Two controls, and both vanish at the moment they are used: pressing the button removes the element
+that has focus, so focus falls to the document body, and reaching the `x` afterwards means tabbing through
+every chip in both lists — then it too is removed and focus is lost a second time. One control that stays
+where it is has neither problem: `aria-expanded` lives on the thing that was pressed, the caret turns, the
+list opens underneath, and a second press on the same still-focused button closes it. The `x` is then
+redundant rather than rejected — its job is done by the control the reader's hand is already on.
+
+**The summary counts and pluralises, and says nothing when a side is empty.** `2 Abstracts and 1 Component`
+on `Anchor`'s `Uses`, `53 Components` on its `Used by`. The button has no `ariaLabel` — `Collapsible` does
+not offer one — so its name is that text, read straight after the `USES` or `USED BY` label beside it,
+which is the same pairing the eye gets.
+
+**Expansion resets when the page changes.** `PageDependencies` is not remounted between pages, since the
+`Show` around it never toggles, so an effect on the page name clears the open sections; without it, opening
+`Used by` on one page would silently open it on the next.
+
+**The trigger is pressable across the chip and no further, and getting there needed a rule of the menu's
+own.** `Collapsible` puts the trigger and the panel in one column-flex root and paints the trigger
+`width: 100%`, so the trigger is as wide as whichever of the two is wider. With a 53-chip panel that is 890
+pixels against a 121-pixel chip: the whole line reads as pressable, and — because `isPanelBuiltOnExpand`
+keeps the panel once built — it stays that way after the list is closed again. The disclosure is therefore
+`sizing="fill"`, so the panel gets the column and the chips wrap where they should, with one `globalStyle`
+scoped to the menu's wrapper putting the trigger back to `fit-content`. It keys on `[aria-expanded]`, which
+is the disclosure's own contract, rather than on `Collapsible`'s hashed class.
+
+**Whether `sizing="fit-content"` should stop the trigger stretching is a library question, and it is open.**
+It is arguably what that value already promises, but changing it would shrink `AccordionPage`'s single-panel
+header to the width of its words, and that is a look the user chose.
+
+**A chip that is a link is painted primary, a chip that is only a name is painted white, and before this the
+browser's history decided which.** `dependencyName` painted every chip white and the theme paints `a` and
+`a:visited` primary — and `a:visited` carries a class and a pseudo-class against the chip's single class, so
+it won on specificity while plain `a` lost. A link chip was therefore white until it had been followed and
+primary afterwards, which is a colour nobody chose, cannot be undone once a link has been visited, and says
+something about the reader's history rather than about the page.
+
+**The split is now two classes over one shared chip.** `dependencyName` keeps white for a name with no page
+of its own — which is only on screen when `LIST_PAGELESS_COMPONENTS` is on — and `dependencyLink` is primary
+in both states — it declares `:visited` explicitly rather than
+relying on the theme's rule happening to name the same colour. `hsl(165, 100%, 50%)` on the chip's ground
+measures 14.1:1, so nothing is given up for it.
+
+**The menu tree does not follow that rule, and the difference is the point.** Every row there is a link, so
+painting links differently would say nothing; the accent is spent on the selected row instead. In a
+dependency list the chips are a mix, and the accent says which ones go somewhere.
 
 ### `Anchor`: a placement may fall back within its family and never outside it
 

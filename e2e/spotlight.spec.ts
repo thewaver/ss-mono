@@ -157,7 +157,21 @@ test("a prompt still answers Escape, which is what keeps it out of a keyboard tr
     expect(await readout(page, "prompt"), "without the highlighted control ever being used").toContain("bought: 0");
 });
 
+/**
+ * A guide seals by walking from its own portal up to the body and marking every sibling inert, so what it
+ * seals is not inside the demo — it is the whole page around it, and there is nothing narrower to point at.
+ * What can be narrowed is the question: a bare count of `[inert]` over the document answers "did the guide
+ * seal the page" and "is anything else on this page inert for its own reasons" at the same time, and the
+ * second reading is live, because the page header's dependency lists are collapsed disclosures and a
+ * collapsed disclosure is inert. Both assertions therefore compare against what was already inert before
+ * the tour started, which leaves one question each: the guide sealed more than it found, and afterwards it
+ * left exactly what it found.
+ */
+const inertCount = (page: Page) => page.locator("[inert]").count();
+
 test("a guide seals the page and puts focus in its own popup", async ({ page }) => {
+    const alreadyInert = await inertCount(page);
+
     await page.locator(button(GUIDE, "Take the tour")).click();
     await expect(page.locator(POPUP)).toBeVisible();
     await page.waitForTimeout(SETTLE_MS);
@@ -165,14 +179,15 @@ test("a guide seals the page and puts focus in its own popup", async ({ page }) 
     await expect(page.locator(POPUP), "the popup names itself as a modal dialog").toHaveAttribute("aria-modal", "true");
     expect(await isFocusInsidePopup(page), "and focus lands inside it").toBe(true);
 
-    const inertCount = await page.locator("[inert]").count();
-
-    expect(inertCount, "everything beside the portal is inert, so the page is out of reach entirely").toBeGreaterThan(
-        0,
-    );
+    expect(
+        await inertCount(page),
+        "everything beside the portal is inert, so the page is out of reach entirely",
+    ).toBeGreaterThan(alreadyInert);
 });
 
 test("a guide steps between elements and reports how it ended", async ({ page }) => {
+    const alreadyInert = await inertCount(page);
+
     await page.locator(button(GUIDE, "Take the tour")).click();
     await expect(page.locator(POPUP)).toBeVisible();
 
@@ -192,7 +207,7 @@ test("a guide steps between elements and reports how it ended", async ({ page })
 
     await expect(page.locator(POPUP), "finishing closes it").toHaveCount(0);
     expect(await readout(page, "guide")).toContain("finished");
-    await expect(page.locator("[inert]"), "and the page is handed back").toHaveCount(0);
+    await expect(page.locator("[inert]"), "and the page is handed back").toHaveCount(alreadyInert);
 });
 
 /**

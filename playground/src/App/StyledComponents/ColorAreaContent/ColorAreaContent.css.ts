@@ -157,7 +157,7 @@ export const colorChannelLabel = style({
     color: themeVars.color.surface.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textTransform: "uppercase",
-    opacity: 0.6,
+    opacity: 0.5,
 });
 
 export const colorPickerRow = style({

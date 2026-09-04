@@ -7,6 +7,7 @@ export const isExpanded = style({});
 export const isHovered = style({});
 export const isSelected = style({});
 export const isDisabled = style({});
+export const isCategory = style({});
 
 export const treeNodeContent = style({
     display: "flex",
@@ -20,16 +21,21 @@ export const treeNodeContent = style({
     transition: `background-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
     selectors: {
+        [`&.${isCategory}`]: {
+            textTransform: "uppercase",
+            fontWeight: "bold",
+            color: `hsl(from ${themeVars.color.surface.contrast} h 50% 75%)`,
+        },
         [`&.${isHovered}`]: {
             backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
         },
         [`&.${isSelected}`]: {
             color: themeVars.color.primary.main,
-            fontWeight: 700,
+            fontWeight: "bold",
         },
         [`&.${isDisabled}`]: {
             filter: themeVars.disabled.filter,
-            opacity: 0.4,
+            opacity: themeVars.disabled.opacity,
         },
     },
 });
@@ -52,7 +58,7 @@ export const treeNodeMarker = style({
 
 export const treeNodeDetail = style({
     fontSize: themeVars.fontSize.small,
-    opacity: 0.6,
+    opacity: 0.75,
 });
 
 export const treeNodePending = style({
@@ -63,5 +69,5 @@ export const treeNodePending = style({
     fontSize: themeVars.fontSize.small,
     fontStyle: "italic",
     whiteSpace: "nowrap",
-    opacity: 0.6,
+    opacity: 0.75,
 });

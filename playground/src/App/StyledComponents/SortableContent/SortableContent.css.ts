@@ -44,14 +44,14 @@ export const sortableItemContent = style({
 
 export const sortableItemGrip = style({
     fontSize: themeVars.fontSize.medium,
-    opacity: 0.4,
+    opacity: 0.5,
 });
 
 export const sortableItemDetail = style({
     marginLeft: "auto",
     paddingLeft: themeVars.spacing.full,
     fontSize: themeVars.fontSize.small,
-    opacity: 0.6,
+    opacity: 0.75,
 });
 
 export const sortableSurface = style({

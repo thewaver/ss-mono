@@ -11,5 +11,5 @@ export const dateRangeRow = style({
 export const dateRangeSeparator = style({
     color: themeVars.color.surface.contrast,
     fontSize: themeVars.fontSize.small,
-    opacity: 0.6,
+    opacity: 0.75,
 });

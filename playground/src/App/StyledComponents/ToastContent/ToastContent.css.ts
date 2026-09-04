@@ -57,7 +57,7 @@ export const toastMeta = style({
     color: themeVars.color.surface.contrast,
     fontSize: themeVars.fontSize.xSmall,
     fontVariantNumeric: "tabular-nums",
-    opacity: 0.6,
+    opacity: 0.5,
 });
 
 export const toastCountdown = style({

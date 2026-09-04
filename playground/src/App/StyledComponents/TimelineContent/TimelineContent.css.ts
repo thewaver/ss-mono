@@ -46,7 +46,7 @@ export const timelineLaneName = style({
     paddingRight: themeVars.spacing.half,
     color: themeVars.color.background.contrast,
     fontSize: themeVars.fontSize.xSmall,
-    opacity: 0.6,
+    opacity: 0.5,
     whiteSpace: "nowrap",
 });
 
@@ -79,7 +79,7 @@ export const timelineTickLabel = style({
     fontSize: themeVars.fontSize.xSmall,
     fontVariantNumeric: "tabular-nums",
     lineHeight: `${AXIS_HEIGHT}px`,
-    opacity: 0.7,
+    opacity: 0.75,
     whiteSpace: "nowrap",
 });
 
@@ -141,7 +141,7 @@ export const timelineBlockName = style({
 export const timelineBlockNote = style({
     color: themeVars.color.surface.contrast,
     fontSize: themeVars.fontSize.xSmall,
-    opacity: 0.7,
+    opacity: 0.75,
     whiteSpace: "nowrap",
     overflow: "hidden",
     textOverflow: "ellipsis",

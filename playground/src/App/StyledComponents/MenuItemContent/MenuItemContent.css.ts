@@ -35,18 +35,18 @@ export const menuItemContent = style({
         },
         [`&.${isDisabled}`]: {
             filter: themeVars.disabled.filter,
-            opacity: 0.4,
+            opacity: 0.5,
         },
     },
 });
 
 export const menuItemShortcut = style({
-    opacity: 0.4,
+    opacity: 0.5,
     fontSize: themeVars.fontSize.xSmall,
 });
 
 export const menuItemSubmenuMark = style({
-    opacity: 0.6,
+    opacity: 0.75,
     fontSize: themeVars.fontSize.medium,
     lineHeight: 1,
 });
