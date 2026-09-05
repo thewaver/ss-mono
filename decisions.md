@@ -8461,6 +8461,14 @@ with less to see. What settled it is that weight should follow substance, so the
 more behind it. Size separates at this scale where fill does not, and it did not cost the nav any weight on
 the 87 rows that have examples.
 
+**The nav can be asked to drop the pages with nothing to look at.** A checkbox under the search field,
+checked on arrival so nothing changes for somebody who does not want it, and unchecking it takes the 26
+description-only entries out of the tree. Two exceptions keep it from hiding what is being looked for: the
+page currently open always stays, so the tree never loses its own selection, and a name matching the search
+stays whatever the checkbox says, because a search that quietly refuses to find something is worse than a
+long list. Both fall out of one predicate over the existing filter, so the branch pruning that empties a
+category with nothing left in it was already there.
+
 **A name links to its page when one exists.** The matching is case-insensitive, because the Playground's
 display names and the folder names disagree in a couple of places (`TypeWriter` against `Typewriter`), and a
 name with no page renders as plain text rather than a dead link.

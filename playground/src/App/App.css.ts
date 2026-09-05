@@ -35,6 +35,13 @@ export const leftMenu = style({
 export const isExpanded = style({});
 export const isHovered = style({});
 
+export const filterContainer = style({
+    display: "flex",
+    alignItems: "center",
+    fontSize: themeVars.fontSize.small,
+    opacity: 0.75,
+});
+
 export const menuTree = style({});
 
 globalStyle(`${menuTree} a, ${menuTree} a:visited`, {

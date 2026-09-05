@@ -4,7 +4,7 @@ import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
 
 import { A, Route, type RouteSectionProps, Router } from "@solidjs/router";
-import { Collapsible, Tree, Viewport } from "@thewaver/ss-components";
+import { Checkbox, Collapsible, Label, Tree, Viewport } from "@thewaver/ss-components";
 import type { SignalPair, TreeNode } from "@thewaver/ss-components";
 import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
 
@@ -95,7 +95,9 @@ import { ViewportPage } from "./Pages/ViewportPage/ViewportPage";
 import { VirtualizerPage } from "./Pages/VirtualizerPage/VirtualizerPage";
 import { DrumWheelPage } from "./Pages/Wheels/DrumWheelPage/DrumWheelPage";
 import { OverheadWheelPage } from "./Pages/Wheels/OverheadWheelPage/OverheadWheelPage";
+import { PageCheckboxContent } from "./StyledComponents/CheckboxContent/CheckboxContent";
 import { PageTextField } from "./StyledComponents/Field/Field";
+import { PageLabelCaption } from "./StyledComponents/LabelCaption/LabelCaption";
 import { PageTreeNodeContent } from "./StyledComponents/TreeNodeContent/TreeNodeContent";
 
 import * as styles from "./App.css";
@@ -1039,23 +1041,32 @@ const PageDependencies = (props: { name: string }) => {
 export function AppContent(props: RouteSectionProps) {
     const [getSelectedConfig, setSelectedConfig] = createSignal<ComponentConfig>();
     const [getSearchTerm, setSearchTerm] = createSignal("");
+    const showsDescriptionOnlySignal = createSignal(false);
     const [getBrowseExpanded, setBrowseExpanded] = createSignal<MenuNodeConfig[]>(VISIBLE_MENU_CONFIGS);
     const [getSearchExpanded, setSearchExpanded] = createSignal<MenuNodeConfig[]>([]);
 
     const getIsSearching = createMemo(() => getSearchTerm().trim().length > 0);
 
     const getVisibleNodes = createMemo(() => {
-        if (!getIsSearching()) return MENU_NODES;
+        const isSearching = getIsSearching();
+        const showsDescriptionOnly = showsDescriptionOnlySignal[0]();
+
+        if (!isSearching && showsDescriptionOnly) return MENU_NODES;
 
         const searchTerm = getSearchTerm().trim().toLocaleLowerCase();
         const selectedConfig = getSelectedConfig();
 
-        return MENU_NODES.map((node) =>
-            filterTreeNode(
-                node,
-                (config) => config === selectedConfig || config.name.toLocaleLowerCase().includes(searchTerm),
-            ),
-        ).filter((node): node is TreeNode<MenuNodeConfig> => node !== undefined);
+        const getIsKept = (config: ComponentConfig) => {
+            if (config === selectedConfig) return true;
+
+            if (isSearching) return config.name.toLocaleLowerCase().includes(searchTerm);
+
+            return showsDescriptionOnly || config.component !== undefined;
+        };
+
+        return MENU_NODES.map((node) => filterTreeNode(node, getIsKept)).filter(
+            (node): node is TreeNode<MenuNodeConfig> => node !== undefined,
+        );
     });
 
     createEffect(() => {
@@ -1097,6 +1108,17 @@ export function AppContent(props: RouteSectionProps) {
                         ariaLabel={"Search components"}
                         onInput={setSearchTerm}
                     />
+                </div>
+
+                <div class={styles.filterContainer}>
+                    <Label>
+                        <Checkbox
+                            checkedSignal={showsDescriptionOnlySignal}
+                            renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
+                        />
+
+                        <PageLabelCaption>Show pages without examples</PageLabelCaption>
+                    </Label>
                 </div>
 
                 <div class={styles.menuTree}>
