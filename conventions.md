@@ -1029,15 +1029,16 @@ which is a change to `Anchor` rather than to `Menu`, and it is the last piece. `
 
 ## Layout and styling
 
-### Folder layout: `Fundamentals/Input`
+### Folder layout: `Essentials/Input`
 
-`BinarySwitch`, `Checkbox`, `Toggle`, `Radio`, `RadioGroup`, `TextInput` and `Label` live under
-`Fundamentals/Input/`. Grouped by what a component is _for_ — carrying a value the user edits — not by what
-it is built from. `Button` and `InteractionWrapper` stay at the `Fundamentals` level: `Button` is an
-interaction with no value, and `InteractionWrapper` is shared by both families.
+`Checkbox`, `Toggle`, `Radio`, `RadioGroup`, `TextInput` and `Label` live under `Essentials/Input/`.
+Grouped by what a component is _for_ — carrying a value the user edits — not by what it is built from.
+`Button` stays at the `Essentials` level, being an interaction with no value. The shared bodies those
+controls are built out of — `BinarySwitch`, `TextField` and `InteractionWrapper` — are not in `Essentials`
+at all: they live in `Primitives/`, described in `decisions.md`.
 
-`index.ts` still enumerates every export path individually and stays sorted, so the group is a directory
-convention rather than a barrel — `Input` sorts between `ImageSwitcher` and `InteractionWrapper`.
+`index.ts` still enumerates every export path individually, so the group is a directory convention rather
+than a barrel — `Input` sorts between `ImageSwitcher` and `Menu`.
 
 ### The Playground's element selectors are scoped, and the library keeps its `!important`
 

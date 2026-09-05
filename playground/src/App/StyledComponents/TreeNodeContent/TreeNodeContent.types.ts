@@ -3,6 +3,7 @@ import type { AccessorProps, InteractionFlags, TreeNodeRenderProps } from "@thew
 export type TreeNodeContentProps = AccessorProps<{
     renderProps: InteractionFlags<TreeNodeRenderProps>;
     detail?: string;
+    hasExamples?: boolean;
 }>;
 
 export type TreeNodePendingProps = AccessorProps<{

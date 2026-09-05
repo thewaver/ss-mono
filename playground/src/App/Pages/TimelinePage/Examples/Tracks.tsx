@@ -13,7 +13,7 @@ import {
     PageTimelineTick,
     PageTimelineTrack,
 } from "../../../StyledComponents/TimelineContent/TimelineContent";
-import { CLIPS, REEL, SECOND_STEPS, TRACKS, formatStopwatch } from "../TimelinePage.const";
+import { CLIPS, LANE_SIZE, REEL, SECOND_STEPS, TRACKS, formatStopwatch } from "../TimelinePage.const";
 import type { Clip, TimelineExampleProps } from "../TimelinePage.types";
 
 import { AXIS_HEIGHT } from "../../../StyledComponents/TimelineContent/TimelineContent.css";
@@ -24,7 +24,7 @@ const LANE_GAP = 6;
 const ZOOM_IN = 0.6;
 const ZOOM_OUT = 1 / ZOOM_IN;
 const PAN_STEP = 0.4;
-const TONES = ["primary", "secondary", "info"] as const;
+const TONES = ["info", "alert", "success", "error"] as const;
 
 export const TracksExample = (props: Props) => {
     const [getController, setController] = createSignal<TimelineController>();
@@ -34,17 +34,16 @@ export const TracksExample = (props: Props) => {
     return (
         <PageTimelineFrame>
             <PageTimelineRow>
-                <PageTimelineLanes names={() => TRACKS} laneSize={props.laneSize} laneGap={() => LANE_GAP} />
+                <PageTimelineLanes names={() => TRACKS} laneSize={() => LANE_SIZE} laneGap={() => LANE_GAP} />
 
                 <PageTimelineTrack>
                     <Timeline<Clip>
                         range={() => REEL}
                         items={() => CLIPS}
-                        laneSize={props.laneSize}
+                        laneSize={() => LANE_SIZE}
                         axisSize={() => AXIS_HEIGHT}
                         laneGap={() => LANE_GAP}
                         laneCount={() => TRACKS.length}
-                        minTickGap={props.minTickGap}
                         tickSteps={() => SECOND_STEPS}
                         isPannable={props.isPannable}
                         isZoomable={props.isZoomable}

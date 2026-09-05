@@ -8,8 +8,8 @@ import type { CarrierZone, Carry, CarryMode, CarryNudge, CarryPlace } from "../.
 import { CarrierStack } from "../../Abstracts/Carrier/CarrierStack";
 import { Elevation } from "../../Abstracts/Elevation/Elevation";
 import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
-import { LabelUtils } from "../../Fundamentals/Input/Label/Label.utils";
-import { InteractionWrapper } from "../../Fundamentals/InteractionWrapper/InteractionWrapper";
+import { LabelUtils } from "../../Essentials/Input/Label/Label.utils";
+import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../Utils/propUtils";
 import { useViewportContext } from "../Viewport/Viewport.context";
 import { ViewportUtils } from "../Viewport/Viewport.utils";

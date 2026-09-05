@@ -58,17 +58,28 @@ const stopSliding = (page: Page) =>
         }
     });
 
-test.beforeEach(async ({ page }) => {
-    await page.goto("/spotlight");
-    await expect(page.locator(button(HINT, "Highlight Me")).first()).toBeVisible();
-});
+/**
+ * The three presets now sit on pages of their own, so each test opens the one it is about. The first two
+ * tests are about the overlay every preset lays down rather than about any one of them, and use the hint's
+ * page because it is the smallest.
+ */
+const open = async (page: Page, route: string, scope: string) => {
+    await page.goto(route);
+    await expect(page.locator(scope).first()).toBeVisible();
+};
+
+const openHint = (page: Page) => open(page, "/spotlight-hint", HINT);
+const openPrompt = (page: Page) => open(page, "/spotlight-prompt", PROMPT);
+const openGuide = (page: Page) => open(page, "/spotlight-guide", GUIDE);
 
 test("nothing is portalled before anything is highlighted", async ({ page }) => {
+    await openHint(page);
     await expect(page.locator(BLOCKER), "nothing is holding the pointer off the page").toHaveCount(0);
     await expect(page.locator(CORNERS), "and no highlight decoration").toHaveCount(0);
 });
 
 test("opening lays one clipped layer over the page with the element cut out of it", async ({ page }) => {
+    await openHint(page);
     await pressByKeyboard(page, button(HINT, "Highlight Me"));
 
     await expect(page.locator(BLOCKER), "one layer rather than a ring of boxes").toHaveCount(1);
@@ -88,6 +99,7 @@ test("opening lays one clipped layer over the page with the element cut out of i
  * that needs the registry to be reactive rather than merely read once on show.
  */
 test("a tooltip on the highlighted element rises above the overlay, and only there", async ({ page }) => {
+    await openHint(page);
     const readTooltipZIndex = () =>
         page.locator(TOOLTIP).evaluate((element) => Number.parseInt(getComputedStyle(element).zIndex, 10));
 
@@ -115,6 +127,7 @@ test("a tooltip on the highlighted element rises above the overlay, and only the
  * otherwise kill the hint before it was read.
  */
 test("a hint is dismissed by a real key and survives a bare modifier", async ({ page }) => {
+    await openHint(page);
     await pressByKeyboard(page, button(HINT, "Highlight Me"));
     expect(await readout(page, "hint")).toContain("open: true");
 
@@ -127,6 +140,7 @@ test("a hint is dismissed by a real key and survives a bare modifier", async ({ 
 });
 
 test("a prompt refuses every other control until the highlighted one is used", async ({ page }) => {
+    await openPrompt(page);
     await page.locator(button(PROMPT, "Insist")).click();
     await expect(page.locator(BLOCKER)).toHaveCount(1);
 
@@ -148,6 +162,7 @@ test("a prompt refuses every other control until the highlighted one is used", a
  * whole promise is that you cannot do anything else still has to answer Escape. This is that guarantee.
  */
 test("a prompt still answers Escape, which is what keeps it out of a keyboard trap", async ({ page }) => {
+    await openPrompt(page);
     await page.locator(button(PROMPT, "Insist")).click();
     await expect(page.locator(BLOCKER)).toHaveCount(1);
 
@@ -170,6 +185,7 @@ test("a prompt still answers Escape, which is what keeps it out of a keyboard tr
 const inertCount = (page: Page) => page.locator("[inert]").count();
 
 test("a guide seals the page and puts focus in its own popup", async ({ page }) => {
+    await openGuide(page);
     const alreadyInert = await inertCount(page);
 
     await page.locator(button(GUIDE, "Take the tour")).click();
@@ -186,6 +202,7 @@ test("a guide seals the page and puts focus in its own popup", async ({ page }) 
 });
 
 test("a guide steps between elements and reports how it ended", async ({ page }) => {
+    await openGuide(page);
     const alreadyInert = await inertCount(page);
 
     await page.locator(button(GUIDE, "Take the tour")).click();
@@ -217,6 +234,7 @@ test("a guide steps between elements and reports how it ended", async ({ page })
  * because the popup takes focus when the tour opens and the first step is read there already.
  */
 test("a step change is announced, and opening the tour is not announced twice", async ({ page }) => {
+    await openGuide(page);
     const announcer = '[role="log"][aria-live="polite"]';
 
     await page.locator(button(GUIDE, "Take the tour")).click();
@@ -247,6 +265,7 @@ test("a step change is announced, and opening the tour is not announced twice", 
  * the first.
  */
 test("a guide scrolls a step that is out of sight into view", async ({ page }) => {
+    await openGuide(page);
     const strip = page.locator(`${GUIDE} [data-scroll-box]`);
 
     await page.locator(button(GUIDE, "Take the tour")).click();
@@ -264,6 +283,7 @@ test("a guide scrolls a step that is out of sight into view", async ({ page }) =
 });
 
 test("a guide can be abandoned, and says so", async ({ page }) => {
+    await openGuide(page);
     await page.locator(button(GUIDE, "Take the tour")).click();
     await expect(page.locator(POPUP)).toBeVisible();
 

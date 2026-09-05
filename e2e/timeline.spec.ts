@@ -169,8 +169,6 @@ test("a block the page marked as off limits is stepped over rather than landed o
  * block being walked to has to be brought into view, or focus lands on something nobody can see.
  */
 test("walking to a block that is off screen brings the window to it", async ({ page }) => {
-    await page.locator(`${prop("minTickGap")} input`).fill("24");
-
     const box = (await page.locator(surface(MEETINGS)).first().boundingBox())!;
 
     await page.mouse.move(box.x + box.width / 2, box.y + box.height - 4);

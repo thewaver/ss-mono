@@ -5,8 +5,8 @@ import type { Point2d } from "@thewaver/ss-utils";
 import type { CarrierZone, Carry, CarryMode, CarryNudge, CarryPlace } from "../../Abstracts/Carrier/Carrier.types";
 import { CarrierStack } from "../../Abstracts/Carrier/CarrierStack";
 import { LiveAnnouncer } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer";
-import { LabelUtils } from "../../Fundamentals/Input/Label/Label.utils";
-import { InteractionWrapper } from "../../Fundamentals/InteractionWrapper/InteractionWrapper";
+import { LabelUtils } from "../../Essentials/Input/Label/Label.utils";
+import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../Utils/propUtils";
 import { useViewportContext } from "../Viewport/Viewport.context";
 import type {

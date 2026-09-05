@@ -3,7 +3,7 @@ import type { Accessor, JSX } from "solid-js";
 import type { Index2d, Point2d, ShapeConst, Size2d } from "@thewaver/ss-utils";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { InteractionControlProps } from "../../Fundamentals/InteractionWrapper/InteractionWrapper.types";
+import type { InteractionControlProps } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps } from "../../Utils/typeUtils";
 
 export type TileBoardTileFlip = "none" | "topToBottom" | "leftToRight";

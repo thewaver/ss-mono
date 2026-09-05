@@ -1,7 +1,7 @@
 import type { JSX } from "solid-js";
 import { createEffect, createMemo, createSignal, on } from "solid-js";
 
-import { FrameRateMonitor, SelectUtils } from "@thewaver/ss-components";
+import { FrameRateMonitor } from "@thewaver/ss-components";
 import type { SelectOption } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -12,8 +12,6 @@ import { CountriesExample } from "./Examples/Countries";
 import { DeliveriesExample } from "./Examples/Deliveries";
 import { HoursExample } from "./Examples/Hours";
 import { LabelledExample } from "./Examples/Labelled";
-import { MultiSelectCountriesExample } from "./Examples/MultiSelectCountries";
-import { MultiSelectGroupedExample } from "./Examples/MultiSelectGrouped";
 import { OnDemandExample } from "./Examples/OnDemand";
 import { ReachableExample } from "./Examples/Reachable";
 import { VirtualizedExample } from "./Examples/Virtualized";
@@ -63,9 +61,6 @@ export const SelectPage = () => {
     const filterQuerySignal = createSignal("");
     const filterSignal = createSignal<Airport | undefined>();
     const groupedSignal = createSignal<string | undefined>();
-    const multiSignal = createSignal<string[]>(["Denmark"]);
-    const everythingQuerySignal = createSignal("");
-    const everythingSignal = createSignal<string[]>([]);
     const defaultSignal = createSignal<string | undefined>();
     const preselectedSignal = createSignal<string | undefined>("Portugal");
     const disabledOptionSignal = createSignal<string | undefined>();
@@ -160,23 +155,6 @@ export const SelectPage = () => {
             (option) =>
                 option.value.city.toLocaleLowerCase().includes(query) ||
                 option.value.code.toLocaleLowerCase().includes(query),
-        );
-    });
-
-    const getFilteredGroups = createMemo(() => {
-        const query = everythingQuerySignal[0]().toLocaleLowerCase();
-
-        if (!query) return GROUPED_COUNTRIES;
-
-        return GROUPED_COUNTRIES.map((item) =>
-            SelectUtils.getIsGroup(item)
-                ? {
-                      ...item,
-                      options: item.options.filter((option) => option.value.toLocaleLowerCase().includes(query)),
-                  }
-                : item,
-        ).filter((item) =>
-            SelectUtils.getIsGroup(item) ? item.options.length > 0 : item.value.toLocaleLowerCase().includes(query),
         );
     });
 
@@ -346,27 +324,6 @@ export const SelectPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/AutocompleteOnDemand.tsx`,
-        },
-        {
-            key: "multiSelect",
-            name: "Multi-select",
-            readout: () => `values: [${multiSignal[0]().join(", ")}] — picking keeps the list open`,
-            component: () => <MultiSelectCountriesExample valuesSignal={multiSignal} />,
-            path: `${EXAMPLES_ROOT}/MultiSelectCountries.tsx`,
-        },
-        {
-            key: "multiSelectGrouped",
-            name: "Multi-select, grouped, autocomplete",
-            readout: () =>
-                `values: [${everythingSignal[0]().join(", ")}] | query: "${everythingQuerySignal[0]()}" — the page drops groups it has emptied`,
-            component: () => (
-                <MultiSelectGroupedExample
-                    valuesSignal={everythingSignal}
-                    querySignal={everythingQuerySignal}
-                    options={getFilteredGroups}
-                />
-            ),
-            path: `${EXAMPLES_ROOT}/MultiSelectGrouped.tsx`,
         },
         {
             key: "errored",

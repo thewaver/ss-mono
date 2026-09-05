@@ -23,7 +23,7 @@ const confirmField = (page: Page) => page.locator(`${FORM} input`).nth(2);
  * Everything here is written against that, because it is the only behaviour a consumer can be surprised by.
  */
 test.beforeEach(async ({ page }) => {
-    await page.goto("/form");
+    await page.goto("/form-section");
     await expect(page.locator(FORM)).toBeVisible();
 });
 

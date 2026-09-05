@@ -126,7 +126,7 @@ const wedgeTransform = (page: import("@playwright/test").Page) =>
  * thing lost is the turning itself, which nobody was watching.
  */
 test("a spin still lands on its prize when no frame ever arrives", async ({ page }) => {
-    await page.goto("/wheel");
+    await page.goto("/overhead-wheel");
     await expect(page.locator(`${OVERHEAD_WHEEL} [aria-roledescription="wheel"]`)).toBeVisible();
 
     await setDuration(page, "spinDurationMs", WHEEL_DURATION_MS);
@@ -148,7 +148,7 @@ test("a spin still lands on its prize when no frame ever arrives", async ({ page
  * than a gap — and arming a timer to shuffle a wheel nobody can see would be worse than doing nothing.
  */
 test("but the idle turn simply stops, because it owes nobody an answer", async ({ page }) => {
-    await page.goto("/wheel");
+    await page.goto("/overhead-wheel");
     await expect(page.locator(`${OVERHEAD_WHEEL} [aria-roledescription="wheel"]`)).toBeVisible();
 
     await setDuration(page, "idleDelayMs", WHEEL_IDLE_DELAY_MS);

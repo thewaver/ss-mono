@@ -165,9 +165,15 @@ test("a disabled header carries no native attribute and cannot open its panel", 
  * claims about a section belonging to a set. A "show more" in the middle of a paragraph is none of those
  * things, so it must be able to have none of them — which is what these assert.
  */
-const SINGLE_PANEL = demo("singlePanel");
+const SINGLE_PANEL = demo("panel");
+
+const openCollapsible = async (page: Page) => {
+    await page.goto("/collapsible");
+    await expect(page.locator(SINGLE_PANEL).first()).toBeVisible();
+};
 
 test("a lone Collapsible is a trigger and a panel and nothing else", async ({ page }) => {
+    await openCollapsible(page);
     const trigger = page.locator(`${SINGLE_PANEL} button`);
 
     await expect(trigger, "collapsed to begin with").toHaveAttribute("aria-expanded", "false");
@@ -184,20 +190,22 @@ test("a lone Collapsible is a trigger and a panel and nothing else", async ({ pa
 });
 
 test("it opens and closes itself, writing the boolean its owner handed over", async ({ page }) => {
+    await openCollapsible(page);
     const trigger = page.locator(`${SINGLE_PANEL} button`);
 
     await trigger.click();
 
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
-    expect(await readout(page, "singlePanel"), "the owner's own signal is what moved").toContain("expanded: true");
+    expect(await readout(page, "panel"), "the owner's own signal is what moved").toContain("expanded: true");
 
     await trigger.click();
 
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
-    expect(await readout(page, "singlePanel")).toContain("expanded: false");
+    expect(await readout(page, "panel")).toContain("expanded: false");
 });
 
 test("the panel animates to its content's measured height, and is inert while closed", async ({ page }) => {
+    await openCollapsible(page);
     const panel = page.locator(`${SINGLE_PANEL} button`).evaluate((element) => element.getAttribute("aria-controls"));
     const panelId = await panel;
     const panelLocator = page.locator(`#${panelId}`);
@@ -221,6 +229,7 @@ test("the panel animates to its content's measured height, and is inert while cl
 });
 
 test("arrow keys do nothing to a lone panel, because it is not part of a set", async ({ page }) => {
+    await openCollapsible(page);
     const trigger = page.locator(`${SINGLE_PANEL} button`);
 
     await trigger.focus();

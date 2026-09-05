@@ -16,8 +16,6 @@ export type Clip = {
 };
 
 export type TimelineExampleProps = AccessorProps<{
-    laneSize: number;
-    minTickGap: number;
     isPannable: boolean;
     isZoomable: boolean;
     isDisabled: boolean;

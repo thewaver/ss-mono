@@ -6,7 +6,7 @@ import type { InteractionFlags } from "../../Abstracts/InteractionTracker/Intera
 import type {
     InteractionTooltipDefs,
     InteractionWrapperProps,
-} from "../../Fundamentals/InteractionWrapper/InteractionWrapper.types";
+} from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
 export type SortableGridSpot = {

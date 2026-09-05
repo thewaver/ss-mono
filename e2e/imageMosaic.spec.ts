@@ -71,7 +71,7 @@ const pick = async (page: import("@playwright/test").Page, key: string, name: st
 };
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/mosaic");
+    await page.goto("/image-mosaic");
     await expect(page.locator(`${MOSAIC} img`).first()).toBeVisible();
 });
 

@@ -24,7 +24,7 @@ const openClock = async (page: import("@playwright/test").Page, key: string) => 
 };
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/date-picker");
+    await page.goto("/time-picker");
     await expect(page.locator(field(CLOCKED))).toBeVisible();
 });
 

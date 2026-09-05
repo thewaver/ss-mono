@@ -9,6 +9,9 @@ import { themeVars } from "../../Theme.css";
 import * as styles from "./TreeNodeContent.css";
 
 const INDENT_PER_DEPTH = 20;
+const BRANCH_MARKER = "▶";
+const LEAF_MARKER = "•";
+const DESCRIPTION_ONLY_MARKER = "·";
 
 export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) => {
     return (
@@ -27,7 +30,11 @@ export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) =>
             }}
         >
             <div class={styles.treeNodeMarker} aria-hidden="true">
-                {access(props.renderProps).isBranch ? "▶" : "·"}
+                {access(props.renderProps).isBranch
+                    ? BRANCH_MARKER
+                    : (access(props.hasExamples) ?? true)
+                      ? LEAF_MARKER
+                      : DESCRIPTION_ONLY_MARKER}
             </div>
 
             <div>{props.children}</div>
@@ -47,7 +54,7 @@ export const PageTreeNodePending = (props: ParentProps<TreeNodePendingProps>) =>
         }}
     >
         <div class={styles.treeNodeMarker} aria-hidden="true">
-            {"·"}
+            {LEAF_MARKER}
         </div>
 
         <div>{props.children}</div>

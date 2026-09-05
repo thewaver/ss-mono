@@ -8,7 +8,7 @@ const IMPORT_PATTERN = /^import\s+(?!type\s)[^;]*?["']([^"']+)["'];?\s*$/gm;
 const SOURCE_PATTERN = /\.tsx?$/;
 const TEST_PATTERN = /\.test\.tsx?$/;
 const ABSTRACTS_LAYER = "Abstracts";
-const COMPONENT_LAYERS = new Set(["Fundamentals", "Composites", "Exotics"]);
+const COMPONENT_LAYERS = new Set(["Essentials", "Composites", "Exotics"]);
 const UNIT_NAME_OVERRIDES: [folder: string, name: string][] = [
     ["Abstracts/SVG/Defs/Animation", "SVGAnimations"],
     ["Abstracts/SVG/Defs/Filter", "SVGFilters"],

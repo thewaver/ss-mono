@@ -197,9 +197,9 @@ gaps, each with the reason it is still a gap.
 
 ## 4. Other core controls the library does not have
 
-`Fundamentals/Input` covers `TextInput`, `TextArea`, `NumberInput`, `CurrencyInput`, `Checkbox`, `Toggle`, `Radio`,
+`Essentials/Input` covers `TextInput`, `TextArea`, `NumberInput`, `CurrencyInput`, `Checkbox`, `Toggle`, `Radio`,
 `RadioGroup`, `Select`, `MultiSelect`, `FileInput`, `ColorInput`, `Label`, `Calendar`, `DateInput`,
-`DatePicker`, `TagInput` and `TimeInput`; `Fundamentals` adds `Accordion`, `Breadcrumbs`, `Button`,
+`DatePicker`, `TagInput` and `TimeInput`; `Essentials` adds `Accordion`, `Breadcrumbs`, `Button`,
 `TrackCarousel`, `DrumCarousel`, `FlipCard`,
 `SlideButton`, `Scroller`, `Paginator`, `Sortable`, `SplitPane`, `Stepper`, `Tabs`, `Toolbar`, `Tooltip`, `Popover`, `Menu`, `Modal`, `Drawer`, `Progress`,
 `Range`, `Toasts` and `Tree`.
@@ -305,13 +305,13 @@ spec asserts both that a successful load is reported and that the two swap paths
 source, a cleared source) report nothing. The shape is what to keep: reaching a callback means giving the
 page a reason to consume it first.
 
-**Components with no Playground page at all**, so nothing can drive them until one exists: `AudioSwitcher`
-alone, still left out of `MENU_CONFIGS` in `playground/src/App/App.tsx`. Its play and pause moved from
-a mount handle to a `playbackSignal` and that change has never been run, because there is nothing to run it. The
-fades it drives are the part most likely to be wrong.
-
-**Deprioritised by the user**, after being offered as the next piece of work and passed over. It stays here
-because the exposure is real and unchanged; it is not next, and it is not to be proposed as next.
+**`AudioSwitcher` has left both groups.** It has a page, and `audioSwitcher.spec.ts` drives the fades that
+were the exposure. The component renders nothing and keeps its two `Audio` elements out of the document, so
+the spec records `play` and `pause` on the prototype before the app runs — the same trick
+`noAnimationFrames.spec.ts` uses on `requestAnimationFrame` — and reads the rest off the caption the page
+paints from `playbackSignal`, which the component now writes. What that bought immediately: the source
+arriving at mount is no longer played uninvited, and a control painted from the signal is right even where
+the browser has refused to start.
 
 **`RichText` has left both groups.** It has a page and now a spec, and the prop that had nowhere to be
 driven from is driven. `RichTextPage` mounts three examples — a legend naming the five tags the component
@@ -1101,12 +1101,12 @@ than the component was**, and is the part to reach for if a hand of overlapping 
 ### `DrumCarousel` in `Exotics`, and the cost of splitting the carousels
 
 `Cuboid` went to `Exotics` when it was built, and the user observed that `DrumCarousel` would fit there by the
-same test — it turns elements in perspective and is not a composition of `Fundamentals`. **Their verdict was to
+same test — it turns elements in perspective and is not a composition of `Essentials`. **Their verdict was to
 leave it where it is for now**, because moving it alone would put the two carousels in different folders while
 they share one shell, one set of props and one page.
 
 What would make this worth revisiting is a reason to separate them that is not about folders — a second drum
-consumer, or a shell that stops being shared. Until then the pair stays in `Fundamentals` together, and the
+consumer, or a shell that stops being shared. Until then the pair stays in `Essentials` together, and the
 inconsistency is known rather than overlooked.
 
 ### The animation sample collections: what to add instead of more entries

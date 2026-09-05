@@ -115,22 +115,29 @@ export const timelineBlock = style({
 });
 
 export const timelineBlockTones = styleVariants({
-    primary: {
-        border: `1px solid ${themeVars.color.primary.dark}`,
-        background: `linear-gradient(180deg, ${themeVars.color.primary.dark}, ${themeVars.color.surface.dark})`,
+    success: {
+        color: themeVars.color.success.contrast,
+        border: `1px solid ${themeVars.color.success.dark}`,
+        background: `linear-gradient(180deg, ${themeVars.color.success.dark}, ${themeVars.color.success.light})`,
     },
-    secondary: {
-        border: `1px solid ${themeVars.color.secondary.dark}`,
-        background: `linear-gradient(180deg, ${themeVars.color.secondary.dark}, ${themeVars.color.surface.dark})`,
+    error: {
+        color: themeVars.color.error.contrast,
+        border: `1px solid ${themeVars.color.error.dark}`,
+        background: `linear-gradient(180deg, ${themeVars.color.error.dark}, ${themeVars.color.error.light})`,
+    },
+    alert: {
+        color: themeVars.color.alert.contrast,
+        border: `1px solid ${themeVars.color.alert.dark}`,
+        background: `linear-gradient(180deg, ${themeVars.color.alert.dark}, ${themeVars.color.alert.light})`,
     },
     info: {
-        border: `1px solid ${themeVars.color.info.main}`,
-        background: `linear-gradient(180deg, ${themeVars.color.info.main}, ${themeVars.color.surface.dark})`,
+        color: themeVars.color.info.contrast,
+        border: `1px solid ${themeVars.color.info.dark}`,
+        background: `linear-gradient(180deg, ${themeVars.color.info.dark}, ${themeVars.color.info.light})`,
     },
 });
 
 export const timelineBlockName = style({
-    color: themeVars.color.surface.contrast,
     fontSize: themeVars.fontSize.xSmall,
     fontWeight: "bold",
     whiteSpace: "nowrap",
@@ -139,7 +146,6 @@ export const timelineBlockName = style({
 });
 
 export const timelineBlockNote = style({
-    color: themeVars.color.surface.contrast,
     fontSize: themeVars.fontSize.xSmall,
     opacity: 0.75,
     whiteSpace: "nowrap",

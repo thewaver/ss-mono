@@ -7,8 +7,9 @@ const OTHER = `${demo("default")} button`;
 const TOOLTIP = '[role="tooltip"]';
 
 /**
- * `Tooltip` has no page of its own — it only exists anchored to something — so it is driven through the
- * `Button` page, which is where both a plain tooltip and a disabled control's explanation live.
+ * `Tooltip` now has a page of its own, but this run stays on the `Button` page: what is under test here
+ * is the `tooltipDefs` route into it, where a control asks for a tooltip rather than being handed one, and
+ * the `Button` page is where both a plain tooltip and a disabled control's explanation live.
  */
 test.beforeEach(async ({ page }) => {
     await page.goto("/button");

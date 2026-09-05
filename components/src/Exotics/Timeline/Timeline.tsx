@@ -13,7 +13,7 @@ import {
 
 import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
 import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
-import { InteractionWrapper } from "../../Fundamentals/InteractionWrapper/InteractionWrapper";
+import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
 import type {
     TimelineController,

@@ -31,12 +31,22 @@ const currentSlide = (page: import("@playwright/test").Page, scope: string) =>
     page.locator(`${slide(scope)}:not([aria-hidden="true"])`).getAttribute("aria-label");
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/carousel");
+    await page.goto("/track-carousel");
     await expect(page.locator(region(MANUAL))).toBeVisible();
     await page.locator(field("delayMs")).fill(String(DELAY_MS));
     await page.locator(field("delayMs")).blur();
     await page.mouse.move(0, 0);
 });
+
+/**
+ * The drum sits on a page of its own, with the same knobs minus the rotator delay it has no use for, so the
+ * tests about turning open that page over the top of the track page this file starts on.
+ */
+const openDrum = async (page: import("@playwright/test").Page) => {
+    await page.goto("/drum-carousel");
+    await expect(page.locator(region(DRUM))).toBeVisible();
+    await page.mouse.move(0, 0);
+};
 
 test("the region and every slide say what they are, beyond what their roles alone convey", async ({ page }) => {
     await expect(page.locator(region(MANUAL))).toHaveAttribute("role", "region");
@@ -268,6 +278,7 @@ const faceTransform = (page: import("@playwright/test").Page, scope: string) =>
         .evaluate((element) => (element as HTMLElement).style.transform);
 
 test("a drum steps by turning, and its slides ride the faces round", async ({ page }) => {
+    await openDrum(page);
     const before = await faceTransform(page, DRUM);
 
     expect(before, "a face carries its angle and its distance from the axis in one transform").toContain("translateZ(");
@@ -279,12 +290,14 @@ test("a drum steps by turning, and its slides ride the faces round", async ({ pa
 });
 
 test("a swipe turns the drum the way the finger went", async ({ page }) => {
+    await openDrum(page);
     await swipeAcross(page, DRUM, 0.8, 0.3);
 
     expect(await currentSlide(page, DRUM), "pushing the faces leftwards turns the next one round").toBe("2 of 4");
 });
 
 test("the faces of a drum that have turned away are out of reach, not merely out of sight", async ({ page }) => {
+    await openDrum(page);
     const away = page.locator(`${slide(DRUM)}[aria-hidden="true"]`);
 
     await expect(away.first()).toHaveAttribute("inert", "");
@@ -305,6 +318,7 @@ const pickOption = async (page: import("@playwright/test").Page, key: string, na
 };
 
 test("a drum on the other axis turns end over end, and takes its swipe the same way", async ({ page }) => {
+    await openDrum(page);
     expect(await faceTransform(page, DRUM), "on the upright axis by default").toContain("rotateY(");
 
     await pickOption(page, "dir", "Up and down");

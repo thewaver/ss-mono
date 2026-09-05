@@ -1,0 +1,68 @@
+import type { Accessor, JSX } from "solid-js";
+
+import type {
+    DateValue,
+    DateValueRange,
+    DateValueWeekStart,
+    DateValueWeekdayWidth,
+} from "../../../Abstracts/DateValue/DateValue.types";
+import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
+import type { InteractionControlProps } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
+
+export type CalendarRenderProps = {
+    day: DateValue;
+    isSelected: boolean;
+    isToday: boolean;
+    isOutsideMonth: boolean;
+    isHighlighted: boolean;
+    isInRange: boolean;
+    isRangeStart: boolean;
+    isRangeEnd: boolean;
+};
+
+export type CalendarDayRenderer = (
+    getDay: Accessor<DateValue>,
+    getRenderProps: () => InteractionFlags<CalendarRenderProps>,
+) => JSX.Element;
+
+export type CalendarWeekdayRenderer = (name: string, index: number) => JSX.Element;
+
+export type CalendarDayProps = AccessorProps<
+    Omit<InteractionControlProps<CalendarRenderProps>, "renderContent"> & {
+        ariaLabel: string;
+        renderContent: (getRenderProps: () => InteractionFlags<CalendarRenderProps>) => JSX.Element;
+        onSelect: () => void;
+    }
+>;
+
+export type CalendarBaseProps = AccessorProps<{
+    ariaLabel?: string;
+    locale?: string;
+    weekStartsOn?: DateValueWeekStart;
+    weekdayWidth?: DateValueWeekdayWidth;
+    today?: DateValue;
+    min?: DateValue;
+    max?: DateValue;
+    isDisabled?: boolean;
+    gap?: number;
+    computeIsDayDisabled?: (day: DateValue) => boolean;
+    monthSignal: SignalSource<DateValue>;
+    renderDay: CalendarDayRenderer;
+    renderWeekday?: CalendarWeekdayRenderer;
+}>;
+
+export type CalendarCompositeProps = CalendarBaseProps & {
+    computeIsSelected: (day: DateValue) => boolean;
+    computeAnchorDay?: () => DateValue | undefined;
+    computeRange?: (highlighted: DateValue) => DateValueRange | undefined;
+    onPick: (day: DateValue) => void;
+};
+
+export type CalendarProps = CalendarBaseProps & {
+    valueSignal: SignalSource<DateValue | undefined>;
+};
+
+export type RangeCalendarProps = CalendarBaseProps & {
+    valueSignal: SignalSource<DateValueRange | undefined>;
+};

@@ -6,7 +6,7 @@ import {
     PageTimelineTick,
     PageTimelineTrack,
 } from "../../../StyledComponents/TimelineContent/TimelineContent";
-import { DAY, MEETINGS, MINUTE_STEPS, formatClock } from "../TimelinePage.const";
+import { DAY, LANE_SIZE, MEETINGS, MINUTE_STEPS, formatClock } from "../TimelinePage.const";
 import type { Meeting, TimelineExampleProps } from "../TimelinePage.types";
 
 import { AXIS_HEIGHT } from "../../../StyledComponents/TimelineContent/TimelineContent.css";
@@ -20,9 +20,8 @@ export const MeetingsExample = (props: Props) => {
                 <Timeline<Meeting>
                     range={() => DAY}
                     items={() => MEETINGS}
-                    laneSize={props.laneSize}
+                    laneSize={() => LANE_SIZE}
                     axisSize={() => AXIS_HEIGHT}
-                    minTickGap={props.minTickGap}
                     tickSteps={() => MINUTE_STEPS}
                     isPannable={props.isPannable}
                     isZoomable={props.isZoomable}
@@ -40,7 +39,7 @@ export const MeetingsExample = (props: Props) => {
                     renderItem={(getMeeting, getFlags) => (
                         <PageTimelineBlock
                             flags={getFlags}
-                            tone={"primary"}
+                            tone={"info"}
                             name={() => getMeeting().name}
                             note={() => `${formatClock(getMeeting().from)} · ${getMeeting().room}`}
                         />

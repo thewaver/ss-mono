@@ -36,7 +36,6 @@ Something that misbehaves, or a cost nobody has paid down.
 
 | #   | Where                    | What happens                                                                                                                                          |
 | --- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 5   | **`AudioSwitcher`**      | **Deprioritised.** It has no Playground page, so its `playbackSignal` has never once been run                                                         |
 | 20  | **Every anchored layer** | **Postponed until browser support exists.** A popup paints where its anchor was one frame ago, so it trails during a scroll                           |
 | 12  | **`Viewport`, nested**   | Put one inside a box with no height of its own and it draws nothing at all, with no warning to say why                                                |
 | 2   | **`Select`, filtered**   | While filtering, the highlight goes to the first option — so a filter that keeps an option that did not match highlights that one                     |

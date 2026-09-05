@@ -49,7 +49,7 @@ export const PageTimelineTick = (props: PageTimelineTickProps) => (
     <>
         <div class={styles.timelineRule} classList={{ [styles.isMajor]: access(props.tick).isMajor }} />
 
-        {access(props.tick).isMajor && <div class={styles.timelineTickLabel}>{access(props.label)}</div>}
+        <div class={styles.timelineTickLabel}>{access(props.label)}</div>
     </>
 );
 

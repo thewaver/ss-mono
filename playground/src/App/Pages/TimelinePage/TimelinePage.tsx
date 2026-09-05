@@ -6,7 +6,7 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
-import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
+import { PageCheckField } from "../../StyledComponents/Field/Field";
 import { MeetingsExample } from "./Examples/Meetings";
 import { TracksExample } from "./Examples/Tracks";
 import { DAY, REEL, formatClock, formatStopwatch } from "./TimelinePage.const";
@@ -14,20 +14,9 @@ import type { TimelineExampleProps } from "./TimelinePage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/TimelinePage/Examples";
 
-const MIN_LANE_SIZE = 20;
-const MAX_LANE_SIZE = 64;
-const LANE_SIZE_STEP = 2;
-const STARTING_LANE_SIZE = 32;
-const MIN_TICK_GAP = 24;
-const MAX_TICK_GAP = 200;
-const TICK_GAP_STEP = 4;
-const STARTING_TICK_GAP = 72;
-const FIELD_WIDTH = 90;
 const MIN_COLUMN_WIDTH = 520;
 
 export const TimelinePage = () => {
-    const [getLaneSize, setLaneSize] = createSignal(STARTING_LANE_SIZE);
-    const [getMinTickGap, setMinTickGap] = createSignal(STARTING_TICK_GAP);
     const [getIsPannable, setIsPannable] = createSignal(true);
     const [getIsZoomable, setIsZoomable] = createSignal(true);
     const [getIsDisabled, setIsDisabled] = createSignal(false);
@@ -44,8 +33,6 @@ export const TimelinePage = () => {
 
     const getExamples = createMemo(() => {
         const commonProps: Omit<TimelineExampleProps, "viewSignal"> = {
-            laneSize: getLaneSize,
-            minTickGap: getMinTickGap,
             isPannable: getIsPannable,
             isZoomable: getIsZoomable,
             isDisabled: getIsDisabled,
@@ -75,30 +62,6 @@ export const TimelinePage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"laneSize"} label={"Lane size (px)"}>
-                    <PageNumberField
-                        value={getLaneSize}
-                        min={() => MIN_LANE_SIZE}
-                        max={() => MAX_LANE_SIZE}
-                        step={() => LANE_SIZE_STEP}
-                        width={() => FIELD_WIDTH}
-                        ariaLabel={"Lane size in pixels"}
-                        onInput={setLaneSize}
-                    />
-                </PageProp>
-
-                <PageProp key={"minTickGap"} label={"Smallest tick gap (px)"}>
-                    <PageNumberField
-                        value={getMinTickGap}
-                        min={() => MIN_TICK_GAP}
-                        max={() => MAX_TICK_GAP}
-                        step={() => TICK_GAP_STEP}
-                        width={() => FIELD_WIDTH}
-                        ariaLabel={"Smallest tick gap in pixels"}
-                        onInput={setMinTickGap}
-                    />
-                </PageProp>
-
                 <PageProp key={"isPannable"} label={"Drag to move"}>
                     <PageCheckField value={getIsPannable} ariaLabel={"Drag to move"} onChange={setIsPannable} />
                 </PageProp>

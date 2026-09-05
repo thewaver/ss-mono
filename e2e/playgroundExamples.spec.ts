@@ -11,7 +11,7 @@ import { type Page, expect, test } from "@playwright/test";
  * The readout is kept out of the sizing by being laid out at zero width with a minimum of the full box, so
  * it renders across the box it is given and contributes nothing to working out how wide that box should be.
  */
-const PAGES_WITH_READOUTS = ["/wheel", "/accordion", "/button"];
+const PAGES_WITH_READOUTS = ["/drum-wheel", "/accordion", "/button"];
 
 const SAMPLE_COUNT = 12;
 const SAMPLE_GAP_MS = 150;
@@ -74,7 +74,7 @@ for (const path of PAGES_WITH_READOUTS) {
  * page would find the ground moving under it.
  */
 test("and a readout that rewrites itself several times a second moves nothing", async ({ page }) => {
-    await page.goto("/wheel");
+    await page.goto("/drum-wheel");
     await expect(page.locator("[data-example]").first()).toBeVisible();
 
     const first = await exampleWidths(page);

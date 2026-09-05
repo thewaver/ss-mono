@@ -145,14 +145,100 @@ because its three sub-registry folders already do that job and a folder called `
 **What belongs in `Samples` at all, which is the line the restructure drew.** A sample is something a consumer
 might plausibly reach for to get something working quickly. `MosaicImages` was not — the mosaic shapes and
 their generated placeholders exist only to give one Playground page something to draw — so it left for
-`playground/src/App/Pages/MosaicPage`, is exported from nowhere, and the page imports it as a local file.
+`playground/src/App/Pages/Mosaics/ImageMosaicPage`, is exported from nowhere, and the page imports it as a
+local file.
 
 ### Layering
 
-`Abstracts/` renders no DOM (namespaced utils, hook-like factories). `Fundamentals/` renders DOM.
-`Composites/` combines Fundamentals. `Fundamentals/Input/` groups controls carrying a user-editable
-value (see _"Folder layout"_ in `conventions.md`). `components/src/index.ts` enumerates every export path individually and stays
-sorted — not a barrel.
+`Abstracts/` renders no DOM (namespaced utils, hook-like factories). `Essentials/` renders DOM.
+`Primitives/` also renders DOM but holds only the shared bodies other components are built out of, which
+are not meaningful on their own. `Composites/` combines Essentials. `Essentials/Input/` groups controls
+carrying a user-editable value (see _"Folder layout"_ in `conventions.md`). `components/src/index.ts` enumerates every export path individually — not a
+barrel. **Its blocks run in order of what is built on what** — `Abstracts`, `Primitives`, `Essentials`,
+`Exotics`, `Composites`, then `Samples` and `Utils` — with the paths inside a block still sorted. The
+user's call, taking structural precedence over the alphabetical block order it used to have. It is also the
+order the stylesheet is emitted in, so a foundational sheet now lands before the things that override it.
+
+**`Primitives/` was split out of `Essentials/`, and `Fundamentals/` was renamed to make room for it.**
+Three components render DOM but mean nothing on their own: `BinarySwitch` is the shared body of `Checkbox`,
+`Radio` and `Toggle`; `TextField` is the shared body of `TextInput`, `TextArea`, `NumberInput`,
+`CurrencyInput`, `DateInput` and `TimeInput`; `InteractionWrapper` sits inside twenty-seven other units.
+Two of the three were already half-private — only `BinarySwitch.types` and `TextField.types` ship — so the
+folder records a split that `index.ts` had already made. **The layer earns its keep in the Playground**: the
+dependency scanner counts a unit only when its top folder is `Essentials`, `Composites` or `Exotics`, so
+these three stop appearing in the Uses and Used by lists, where they were names a reader could do nothing
+with. What they import is still attributed, because the walk passes through them.
+
+**The rename was the price of the name.** `Primitives` beside `Fundamentals` says nothing about which sits
+under which — both are claims about level — so the other layer had to be named by kind instead. `Essentials`
+against `Exotics` is the ones you need against the ones you might want, and it makes no claim to be the
+bottom of the stack, which leaves `Primitives` underneath it uncontested.
+
+**`Corners` is an `Exotic` rather than an `Essential`.** Nothing in the library uses it — the five
+Playground pages that draw it are painters of the Playground's own — so the shared-body test that sent the
+other three to `Primitives` does not catch it. It renders DOM and it is public, which rules out `Abstracts`
+too. What it is, is a decoration with a look of its own, which is what `Exotics` holds. The user's call, and
+it took a page with it.
+
+**`AudioSwitcher` plays every source it is handed except the first, which waits to be asked.** Handing it a
+source has always meant "play this", and that is wanted — a switch of track should sound without a second
+instruction. The one that arrives at mount is the exception, because nobody has asked for anything yet: it
+starts a sound on arrival, which a browser then refuses and warns about, and where autoplay is permitted it
+simply plays uninvited. `shouldAutoPlayOnMount` is the exception's name, and it is optional and falsey by
+default, so silence on arrival is what a consumer gets without saying anything. An explicit playback signal
+still wins: a switcher told it is playing plays whatever it is first handed.
+
+**`should*` is a prefix this library already uses**, on `shouldMakeUnique` and `shouldNormalize` in
+`Samples` and on `shouldPadChildren` and `shouldClipChildren` in the Playground. Recorded because a review of
+the prefix table in `conventions.md` suggested otherwise and was wrong: the table covers reactive data,
+factories, events, JSX producers and signal pairs, and says nothing about booleans, which do not all take
+`is*` or `has*`.
+
+**`AudioSwitcher` has a page because the demonstration is audible rather than visible.** It renders nothing —
+the track buttons, the play control and the start-over button on its page are the page's own — and what there
+is to experience is the crossfade between two ten-second loops, which no amount of markup would convey. The
+two loops sit beside the knight images in `playground/src/App`, supplied by the user.
+
+**`AudioSwitcher`'s playback signal reports what is true rather than only what it was told.** It used to be
+written by the consumer and never by the component, so a switcher that started playing on its own — which it
+does the moment it is given a source — left the signal saying stopped, and any control painted from it said
+"Play" while sound was coming out. Pressing it then did nothing, because the effect saw an element already
+playing. Now the component writes `true` when a `play()` actually resolves for the element that is current,
+and `false` when the browser refuses one. The signal is the component's account of itself, so a control
+painted from it is right under either autoplay policy.
+
+**`FormSection` went the same way as `FormField`, for the same reasons.** Nothing in the library renders one
+either, it is exported whole, and it had something no page showed: it opens a form context of its own while
+registering with the one around it, so fields report to their section and a form hears one answer per section
+rather than one per field — and sections nest, so that verdict can travel up more than one level. The Form
+page's `Sections` example moved onto it, since that example's subject was the section rather than the form.
+
+**`FormField` is not a `Primitive`, and the test that settled it was whether anything extends it.** Nothing
+does: no component in `components/src` renders a `<FormField>`, and the seven that looked as though they did
+are importing `FormField.utils` and its context. What it offers is its own — the frame round a control the
+consumer supplies, the message id handed down so the control inside points `aria-describedby` at it, and the
+registration that lets a `Form` know one of its fields is in error. It is also exported whole, where
+`BinarySwitch` and `TextField` ship only their types. So it sits beside `Label` and earned a page instead of
+a folder move.
+
+**A family is a folder, in the library and in the Playground alike.** `Carousels`, `Wheels`, `Mosaics`,
+`Accordions` and `Spotlights` each hold their members side by side rather than one folder per component at the layer's top
+level, and `playground/src/App/Pages` mirrors that. The user's call, and the reason is that the members were
+sharing a page: splitting them into a page each without a folder would have scattered constants and a
+ten-knob panel across sibling directories with nothing saying they belonged together.
+
+**Four bases went to `Primitives` with the first three.** `Carousel`, `Wheel`, `Mosaic` and `Spotlight`
+turned out to be exactly the `BinarySwitch` shape — unexported shells with presets built on them, shipping
+only their types and utils — so `Carousels`, `Wheels`, `Mosaics` and `Spotlights` hold only the presets, and
+the shells sit beside `BinarySwitch`, `TextField` and `InteractionWrapper`. `Accordions` is the odd one out and keeps both its
+members, because `Accordion` composes `Collapsible` rather than extending it and both are exported whole.
+
+**A layer's name must be a category word that could never name a component.** Stated by the user, against
+`Staples`, which was the front-runner until they pointed out that a staple is an object and a component
+called `Staple` is arguable. `Staples/Staple` reads as a mistake whether or not it is one, and the
+dependency scanner takes unit names straight from folder names, so it would sit in the graph as a thing
+named after the layer holding it. Every other layer already passes the test — nobody will build an
+`Abstract`, a `Composite`, an `Exotic`, an `Essential`, a `Primitive`, a `Sample` or a `Util`.
 
 **`Utils/typeUtils.ts` holds type transformers and nothing else.** Stated by the user: it is for things in
 the shape of `Omit`, `Exclude` and `Pick` — generics that take a type and give back another one. Everything in
@@ -219,7 +305,7 @@ reason from the other side: that package names a namespace `<Subject>Utils` and 
 arithmetic, not an agent.
 
 **`Composites/` ships; `BinarySwitch` does not.** The composites were held back on the argument that a
-composite demonstrates how Fundamentals combine rather than owning a contract, so shipping one freezes a
+composite demonstrates how Essentials combine rather than owning a contract, so shipping one freezes a
 composition the consumer is better off writing, and that `Surface` being reachable from the Playground's
 source was its whole audience. **The user reversed it**, so `Surface` and `SurfaceProps` are enumerated in
 `index.ts` like anything else. What has not changed is the inside: `SurfaceSVG` and `SurfaceDiv` stay
@@ -500,10 +586,10 @@ the hidden-native-input leaf plus change gating plus the single-writer DOM sync,
 Radio shared about nine tenths of their leaf, including `syncElement` — the one piece that must not be
 copy-pasted, because the second copy is where the bug comes back.
 
-It lives in `Fundamentals/Input/BinarySwitch/` and is **absent from `index.ts`**; only
+It lives in `Primitives/BinarySwitch/` and is **absent from `index.ts`**; only
 `BinarySwitch.types` is exported, because `CheckboxProps` and `ToggleProps` alias
-`BinarySwitchPresetProps` and the emitted `.d.ts` has to resolve it. A folder under `Fundamentals`
-shipping no component is unusual and honest: it renders DOM so it is not an `Abstract`, and consumers
+`BinarySwitchPresetProps` and the emitted `.d.ts` has to resolve it. Shipping no component is what
+`Primitives/` is for: it renders DOM so it is not an `Abstract`, and consumers
 should reach for the presets so it is not public. Promoting it later is one line; the reason not to is
 that a public `BinarySwitch` is the union of three controls and invites use over intent.
 
@@ -540,7 +626,7 @@ standing _private until a second consumer_ rule fired the moment `Select`'s grou
 three states — a header summarising a group of options is the same shape as a parent box summarising a group
 of children, and two controls each declaring their own `boolean | "mixed"` would agree by luck rather than by
 construction. It is a type and one fold, not a component, so it sits beside `DateValue` — the other abstract
-that is a vocabulary rather than a behaviour — rather than under `Fundamentals`.
+that is a vocabulary rather than a behaviour — rather than under `Essentials`.
 
 `CheckedStateUtils.fromMembers` takes the booleans and returns `true` only if every member is checked, `false`
 only if none is, and `"mixed"` the moment they disagree. **An empty set is `false`, not `"mixed"`**: mixed means
@@ -922,7 +1008,7 @@ Settled, on the terms `TextInput` had already written down: a private shared lea
 parameterised by its element, presets that `Omit` what does not apply, in the `BinarySwitch` shape — and
 **not** a `"textarea"` member of the type union, which would be a type that silently changes the element.
 
-**Nothing about `TextInput` changed except where it lives.** `Fundamentals/Input/TextField/` holds the
+**Nothing about `TextInput` changed except where it lives.** `Primitives/TextField/` holds the
 base; `TextInput` is `<TextField {...props} getElement={() => "input"} />` and `TextArea` the same with
 `"textarea"`. The base is absent from `index.ts`; only `TextField.types` ships. The types moved with it
 and the old names are gone rather than aliased: `TextFieldFlags`, `TextFieldTextStyle`, `TextFieldType`,
@@ -1240,7 +1326,7 @@ all-disabled list.
 Settled on the user's call between three options, once the abstract pages took the menu to ninety-seven
 entries: collapsible category sections, a `Tree`, or more and smaller categories each with its own tab list.
 The tree won on grouping — `Inputs` and `Date pickers` are things a person looks for, and neither of the
-other two could hold them without either leaving `Fundamentals` forty-two rows long or paying a tab stop per
+other two could hold them without either leaving `Essentials` forty-two rows long or paying a tab stop per
 group.
 
 **The whole menu is now one tab stop rather than one per category**, which is the part that made the choice
@@ -1394,11 +1480,18 @@ of anything: a sample is vocabulary the Playground draws on, not a thing the lib
 rows of chips above every page's examples is a wall to scroll past on the way to what you came for. Each
 section is a `Collapsible`, collapsed on arrival, with `isPanelBuiltOnExpand` so the chips of a list nobody
 opens are never built. `LIST_PAGELESS_COMPONENTS` decides whether names with no page of their
-own — `BinarySwitch`, `Popover`, `TextField`, `Clock` — appear at all, and it is off, which takes `Anchor`
+own — `Popover`, `Clock`, `MultiSelect`, `DrumCarousel` — appear at all, and it is off, which takes `Anchor`
 from fifty-three to thirty-seven and from six wrapped rows to four. The filter is applied once where
 `DEPENDENCIES_BY_KEY` is built rather than at each render site, so the summary counts, the group rows and
 the section itself all follow from it: a section left with nothing does not appear, and the trigger never
 counts a chip it will not show.
+
+**A component with no page is one of two things, and they are answered differently.** A shared body that
+means nothing alone belongs in `Primitives/`, where the scanner never names it. Anything else is a component
+a consumer can reach for that simply has nowhere to be seen, and the answer there is a page: `Tooltip` was
+the first taken that way, on the user's call, and it is why the Playground demonstrates the standalone
+component while `e2e/tooltip.spec.ts` stays on the `Button` page, where what is under test is the
+`tooltipDefs` route into it.
 
 **The trigger is a chip that stays put, rather than a chip that is replaced by the list.** The suggested
 shape was a summary button swapped out for the lists when pressed, with an `x` at the far end to put it
@@ -1813,7 +1906,7 @@ and a closing popup lets a click through.
 ### Controls: `Popover` extracted, and `Menu` as the second consumer
 
 The standing "private until a second consumer" rule fired: `Select`'s floating layer
-became `Fundamentals/Popover/`.
+became `Essentials/Popover/`.
 
 **This does not reverse _"What stays duplicated is the dozen lines of `<Show><Portal><div>`"_ — it is the
 same argument reaching the opposite answer on different inputs.** That entry refused to share markup between
@@ -2029,7 +2122,7 @@ without an animation, which is correct on a page that is not painting.
 
 ### Controls: `Progress`, and what a non-interactive Fundamental looks like
 
-The first `Fundamentals` component that is neither an interaction nor a composition
+The first `Essentials` component that is neither an interaction nor a composition
 of one, so it settles the shape by being it.
 
 **No `InteractionWrapper`, and no flags.** Nothing to hover, focus or activate. The root is a bare
@@ -6216,7 +6309,7 @@ that renders no button cannot promise one is reachable or named — which means 
 either way. The signal is required rather than optional because an internal one nobody can set is a card that
 can never turn.
 
-**It sits in `Exotics`, and it took two passes to get there.** The first placement was `Fundamentals` beside
+**It sits in `Exotics`, and it took two passes to get there.** The first placement was `Essentials` beside
 `ImageSwitcher`, derived rather than asked: it swaps one piece of content for another with a transition, which
 is what `ImageSwitcher` does for a single image. The user moved it. The `Exotics` test — renders DOM, holds no
 value, lays elements out or turns them — takes it, and **turning is the part that decides**, which is the same
@@ -6232,7 +6325,7 @@ missed reuse.
 **Named `Cuboid` and placed in `Exotics`, both on the user's call.** It was built as `Cube` and the name was
 put to them, since a component whose point is that the three extents differ is only a cube by accident; they
 took the exact word. `Exotics` is where they put it, which also settles that the turning components belong
-there rather than beside the carousels. `FlipCard` was left in `Fundamentals` at the time and has since been
+there rather than beside the carousels. `FlipCard` was left in `Essentials` at the time and has since been
 moved across on the user's call, so the rule now reaches every turning component; the user noted that
 `DrumCarousel` would fit `Exotics` too but that splitting the two carousels across folders is not worth doing
 now. That last point is recorded in `backlog.md` under _Open discussion_ rather than settled here.
@@ -6374,14 +6467,14 @@ a plain `div` rather than a `<label>`, so the accessible name is whatever the fi
 never hears the visible text. The one place left without a unit on purpose is `Toasts`' duration: its values
 are a select whose options print their own `ms`, and one of them is `sticky`, which is not a duration at all.
 
-**A page may hold two components, and then the page's type is what the global panel drives rather than what an
-example takes.** `ElementMosaic` and `ImageMosaic` had a page each and now share `MosaicPage`, one example
-apiece. Three knobs mean the same thing to both — how many items, the gap, and which side is fixed — so those
-stay global behind a single `MosaicExampleProps`, while each example file keeps its own props type for what it
-actually receives: tiles on one side, image sources on the other. **What only one of them has goes in that
-example's own local panel** — a target shape means nothing to an element mosaic, so it sits under the image
-demo instead of in the global row. The user's instruction when merging the pages, and it generalises: share
-what can be shared, make the rest local.
+**A family shares a folder, its constants and its panel, and splits everything else.** `ElementMosaic` and
+`ImageMosaic` shared one page for a while and now have one each under `Pages/Mosaics/`, which is the shape the
+user settled on for every family: the folder holds the constants, the types and a `create…Controls` factory
+paired with a panel component, and each page calls the factory and renders the panel, so ten knobs are not
+written out twice. Three knobs mean the same thing to both mosaics — how many items, the gap, and which side is
+fixed — and live in that shared panel. **What only one of them has stays in that page's own local panel** — a
+target shape means nothing to an element mosaic, so it sits under the image demo rather than in the shared row.
+It generalises: share what can be shared, make the rest local.
 
 **The image mosaic's second demo became a knob on the first**, which is the rule above rather than a new one.
 The decorated version differed from the plain one only in whether each image is wrapped in an element of the
@@ -6824,13 +6917,13 @@ Recorded because `Exotics` had no written definition and now has four more membe
 look for the rule.
 
 **Derived rather than stated, and marked as such**: the four have in common that they render DOM, hold no
-user-editable value, and are not compositions of `Fundamentals` — which is what would separate the folder from
+user-editable value, and are not compositions of `Essentials` — which is what would separate the folder from
 its neighbours if a rule were written, rather than anything about how unusual a thing looks. All four lay
 elements out or turn them; none is a control, and none is a `Surface`-style assembly of other components. The
 user's call was where these four go; whether that is the general test is theirs to make.
 
 **None of the original names survived unchanged, and two could not have.** `Tree` was already taken by the
-`Fundamentals` control, and `DecorationWrapper` would have given the library a second meaning for
+`Essentials` control, and `DecorationWrapper` would have given the library a second meaning for
 "decoration" — `InteractionWrapper.renderDecoration` is the full-box overlay behind a control, which is a
 different mechanism. `Staircase` was kept, `Satellite` and `Formation` chosen with the user, and `TopWheel` /
 `SideWheel` first became `FlatWheel` / `DrumWheel` on the argument that "top" and "side" describe where the
@@ -8334,7 +8427,8 @@ and nobody will re-check fifty pages after every commit.
 **The dependency is already in the import graph, so nothing is typed twice.** A Vite plugin walks
 `components/src` at build time, follows relative imports transitively from each component's entry file, and
 classifies every file it reaches by the folder that owns it — `Abstracts/<Name>` is an abstract, anything under
-`Fundamentals`, `Composites` or `Exotics` is a component. The result reaches the Playground as a virtual module
+`Essentials`, `Composites` or `Exotics` is a component, and anything under `Primitives` is neither, so it is
+walked through without ever being named. The result reaches the Playground as a virtual module
 and renders under each page's description. In the dev server the plugin watches `components/src` and reloads
 the module, so the list is right without a restart.
 
@@ -8347,10 +8441,25 @@ transitive set.
 **Type-only imports do not count.** `import type` names a type and runs nothing, so counting it would list an
 abstract a component merely borrows a shape from.
 
-**Internal components are listed alongside exported ones.** `Select` names `InteractionWrapper` and `FormField`,
-neither of which a consumer can import. The alternative — filtering to what `index.ts` exports — would have
-made the list a partial truth for the sake of tidiness, and the list is describing what runs, not what can be
-bought.
+**Internal components are listed alongside exported ones.** `Select` names `FormField`, whose context it
+reads without a consumer ever putting one there. The alternative — filtering to what `index.ts` exports —
+would have made the list a partial truth for the sake of tidiness, and the list is describing what runs, not
+what can be bought. **`Primitives` is the one exception**, and on different grounds: those units are not
+things a reader can go and look at, so naming them offers a name and nowhere to take it.
+
+**The nav marker says whether there is anything to look at, and its weight follows what is there.** A branch
+keeps the heaviest mark, ▶, because it holds the most; a leaf with examples takes a •; and a leaf carrying
+only a description takes the lightest, · — 26 of the 113 entries, every one of them an `Abstract`. The user's call, chosen over fading the row to 75%: opacity already means disabled on
+that row, and one signal carrying two meanings is worse than a glyph nobody guesses but everybody learns
+once. The fade was measured before it was rejected rather than after — 9.6:1 against the dark end of the
+nav's gradient and 8.4:1 against the light end, so contrast was never the objection.
+
+**The glyphs took two passes, and the second one is the rule.** The first pair was a filled · against a hollow
+◦, which is the wrong axis at 12px and half opacity — the hole is a pixel or two wide. The second was a dot
+against a dash, legible but pointing the wrong way: the dash is the wider mark and it was sitting on the page
+with less to see. What settled it is that weight should follow substance, so the mark gets heavier as there is
+more behind it. Size separates at this scale where fill does not, and it did not cost the nav any weight on
+the 87 rows that have examples.
 
 **A name links to its page when one exists.** The matching is case-insensitive, because the Playground's
 display names and the folder names disagree in a couple of places (`TypeWriter` against `Typewriter`), and a
@@ -8612,7 +8721,7 @@ The second arrival from the user's own earlier codebase, after the four that bec
 through `external/` as `BoardTiles`, was named with the user, and is `Exotics/TileBoard`.
 
 **It is an `Exotic`, placed there by the user.** It was first built as a `Fundamental` on the reading that
-the four earlier arrivals hold no user-editable value and are not compositions of `Fundamentals`, and that a
+the four earlier arrivals hold no user-editable value and are not compositions of `Essentials`, and that a
 board of `InteractionWrapper` tiles fails both. The user's reason overrides it and is about the folder's
 purpose rather than its members: **a game board is not the kind of component a component library normally
 ships.** That is a better test than the derived one, because it is about what a consumer expects to find,

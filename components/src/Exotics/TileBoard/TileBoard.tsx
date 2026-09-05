@@ -2,7 +2,7 @@ import { Index, createEffect, createMemo, createSignal, createUniqueId, onCleanu
 
 import { Index2d, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-import { InteractionWrapper } from "../../Fundamentals/InteractionWrapper/InteractionWrapper";
+import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
 import type { TileBoardProps, TileBoardRenderProps, TileBoardTileProps } from "./TileBoard.types";
 import { TileBoardUtils } from "./TileBoard.utils";

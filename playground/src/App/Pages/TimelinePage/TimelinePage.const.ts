@@ -7,6 +7,8 @@ const TENS = 10;
 
 const at = (hour: number, minute = 0) => hour * MINUTES_PER_HOUR + minute;
 
+export const LANE_SIZE = 48;
+
 export const DAY: TimelineSpan = { start: at(8), end: at(19) };
 
 export const MINUTE_STEPS = [5, 15, 30, at(1), at(2), at(4)];

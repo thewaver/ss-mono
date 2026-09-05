@@ -33,6 +33,15 @@ const openedWithHighlight = async (page: Page, key: string) => {
     await expect(page.locator(field(key))).toHaveAttribute("aria-activedescendant", /.+/);
 };
 
+/**
+ * The two multi-value lists moved to a page of their own; the demo keys are unchanged, so those two tests
+ * open that page over the top of this one's.
+ */
+const openMultiSelect = async (page: Page) => {
+    await page.goto("/multi-select");
+    await expect(page.locator("[data-example]").first()).toBeVisible();
+};
+
 test.beforeEach(async ({ page }) => {
     await page.goto("/select");
     await expect(page.locator("[data-example]").first()).toBeVisible();
@@ -138,6 +147,7 @@ test("a grouped list owns its group roles and the walk crosses them", async ({ p
 });
 
 test("a multi list stays open, accumulates and toggles back out", async ({ page }) => {
+    await openMultiSelect(page);
     await page.locator(field("multiSelect")).click();
     await expect(page.locator(LISTBOX), "a multi list says it is multi").toHaveAttribute(
         "aria-multiselectable",
@@ -167,6 +177,7 @@ test("a multi list stays open, accumulates and toggles back out", async ({ page 
  * is exactly what mixed means. Benelux is the group that can go all the way.
  */
 test("a group header summarises its own options as unchecked, mixed or checked", async ({ page }) => {
+    await openMultiSelect(page);
     await openedWithHighlight(page, "multiSelectGrouped");
 
     expect(

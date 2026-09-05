@@ -2,7 +2,7 @@ import type { ParentProps } from "solid-js";
 
 import type { AccessorProps, InteractionFlags, TimelineItemRenderProps, TimelineTick } from "@thewaver/ss-components";
 
-export type TimelineBlockTone = "primary" | "secondary" | "info";
+export type TimelineBlockTone = "success" | "error" | "alert" | "info";
 
 export type PageTimelineTickProps = AccessorProps<{
     tick: TimelineTick;
