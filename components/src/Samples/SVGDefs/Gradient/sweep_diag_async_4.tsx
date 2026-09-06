@@ -4,7 +4,7 @@ import type { GradientConfig } from "../SVGDefs.types";
 import { SVGDefsUtils } from "../SVGDefs.utils";
 
 export const sweep_diag_async_4: GradientConfig = {
-    computeSVGDefs: (id, __, defs) => [
+    computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
         },

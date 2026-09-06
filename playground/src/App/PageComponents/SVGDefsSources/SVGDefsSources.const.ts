@@ -94,7 +94,7 @@ export namespace SVGDefsSources {
         SVGDefsUri.toDataUri(
             toSourceSvg(
                 size,
-                SVGDefsSamples.Gradient.SAMPLE_CONFIGS[key].computeSVGDefs(`cell-gradient`, undefined, {
+                SVGDefsSamples.Gradient.SAMPLE_CONFIGS[key].computeSVGDefs(`cell-gradient`, undefined, undefined, {
                     getSize: () => size,
                     animationDurationMs,
                     colors: SVGDefsSamples.SAMPLE_COLORS,
@@ -112,7 +112,7 @@ export namespace SVGDefsSources {
         SVGDefsUri.toDataUri(
             toSourceSvg(
                 size,
-                SVGDefsSamples.Pattern.SAMPLE_CONFIGS[key].computeSVGDefs(`cell-pattern`, undefined, {
+                SVGDefsSamples.Pattern.SAMPLE_CONFIGS[key].computeSVGDefs(`cell-pattern`, undefined, undefined, {
                     getSize: () => size,
                     cellSize: SOURCE_CELL_SIZE,
                     animationDurationMs,

@@ -6,7 +6,7 @@ import type { GradientConfig } from "../SVGDefs.types";
 import { SVGDefsUtils } from "../SVGDefs.utils";
 
 export const hue_rot_3: GradientConfig = {
-    computeSVGDefs: (id, __, defs) => [
+    computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
         },

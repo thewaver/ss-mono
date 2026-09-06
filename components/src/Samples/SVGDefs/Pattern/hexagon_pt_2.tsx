@@ -5,7 +5,7 @@ import { SVGDefsUtils } from "../SVGDefs.utils";
 import { SVGPatterns } from "../SVGPatterns.const";
 
 export const hexagon_pt_2: PatternConfig = {
-    computeSVGDefs: (id, __, defs) => {
+    computeSVGDefs: (id, __, ___, defs) => {
         const splitValuesCache: Record<string, string> = {};
         const cellSize = defs.cellSize;
         const cellCount = { rows: 8, cols: 8 };

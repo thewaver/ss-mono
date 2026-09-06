@@ -13,6 +13,7 @@ import * as styles from "./Surface.css";
 
 const MOCK_SIZE: Size2d = { width: 0, height: 0 };
 const MOCK_GET_SIZE = () => MOCK_SIZE;
+const MOCK_GET_REF = () => undefined;
 const IS_COMPLEX_SVG_DEFS = (v: SVGDefs) => !!v.blend || !!v.clipPath || !!v.filter || !!v.gradientOrPattern;
 
 const SurfaceSVG = (props: ParentProps<SurfaceProps>) => {
@@ -67,8 +68,12 @@ const SurfaceSVG = (props: ParentProps<SurfaceProps>) => {
 };
 
 const SurfaceDiv = (props: ParentProps<SurfaceProps>) => {
-    const getFillColorDef = createMemo(() => props.computeFillDefs?.(MOCK_GET_SIZE)?.find((v) => !!v.color));
-    const getStrokeColorDef = createMemo(() => props.computeStrokeDefs?.(MOCK_GET_SIZE)?.find((v) => !!v.color));
+    const getFillColorDef = createMemo(() =>
+        props.computeFillDefs?.(MOCK_GET_SIZE, MOCK_GET_REF)?.find((v) => !!v.color),
+    );
+    const getStrokeColorDef = createMemo(() =>
+        props.computeStrokeDefs?.(MOCK_GET_SIZE, MOCK_GET_REF)?.find((v) => !!v.color),
+    );
 
     const getHasBorder = createMemo(
         () => !!getStrokeColorDef() && Object.values(access(props.borderWidths)).some((v) => v > 0),
@@ -114,8 +119,8 @@ const SurfaceDiv = (props: ParentProps<SurfaceProps>) => {
 
 export const Surface = (props: SurfaceProps) => {
     const getIsComplex = () => {
-        const fillDefs = props.computeFillDefs?.(MOCK_GET_SIZE);
-        const strokeDefs = props.computeStrokeDefs?.(MOCK_GET_SIZE);
+        const fillDefs = props.computeFillDefs?.(MOCK_GET_SIZE, MOCK_GET_REF);
+        const strokeDefs = props.computeStrokeDefs?.(MOCK_GET_SIZE, MOCK_GET_REF);
         const lameExponents = access(props.lameExponents);
 
         return (

@@ -1,5 +1,8 @@
 import { createTheme, createThemeContract, globalStyle } from "@vanilla-extract/css";
 
+export const BORDER_RADIUS_HALF = 5;
+export const BORDER_RADIUS_FULL = 10;
+
 const SHADOW_SMALL = "0 2px 2px 0px rgba(0, 0, 0, 1)";
 const SHADOW_MEDIUM = "0 4px 8px 0px rgba(0, 0, 0, 0.75)";
 const SHADOW_LARGE = "0 16px 64px 0px rgba(0, 0, 0, 0.5)";
@@ -82,8 +85,8 @@ const DEFAULT_THEME_VALUES = {
         xLarge: "2rem",
     },
     borderRadius: {
-        half: "5px",
-        full: "10px",
+        half: `${BORDER_RADIUS_HALF}px`,
+        full: `${BORDER_RADIUS_FULL}px`,
     },
     shadow: {
         small: SHADOW_SMALL,

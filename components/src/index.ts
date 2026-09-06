@@ -27,6 +27,9 @@ export * from "./Abstracts/Flattener/Flattener.utils";
 export * from "./Abstracts/FrameRateMonitor/FrameRateMonitor";
 export * from "./Abstracts/FocusManager/FocusManager";
 export type * from "./Abstracts/InteractionTracker/InteractionTracker.types";
+export * from "./Abstracts/Glass/Glass.const";
+export type * from "./Abstracts/Glass/Glass.types";
+export * from "./Abstracts/Glass/Glass.utils";
 export * from "./Abstracts/InteractionTracker/InteractionTracker";
 export * from "./Abstracts/LiveAnnouncer/LiveAnnouncer";
 export * from "./Abstracts/MaskedField/MaskedField";
@@ -261,6 +264,8 @@ export type * from "./Exotics/Viewport/Viewport.types";
 export * from "./Exotics/Wheels/DrumWheel/DrumWheel";
 export * from "./Exotics/Wheels/OverheadWheel/OverheadWheel";
 
+export * from "./Composites/GlassSurface/GlassSurface";
+export type * from "./Composites/GlassSurface/GlassSurface.types";
 export * from "./Composites/Surface/Surface";
 export type * from "./Composites/Surface/Surface.types";
 

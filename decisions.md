@@ -5785,6 +5785,287 @@ a namespace of the same name, because a `namespace` does not merge across ES mod
 would import one identifier twice. Plain exported type names are what the rest of the repo uses (see _"House style"_ in
 `conventions.md`), and the namespace stays on the value side only.
 
+### A sample reaches its host through a ref, and gets there under its own steam
+
+**`computeSVGDefs` takes a third argument: an accessor for the element the defs are painted onto.** The
+signature is `(id, getInteractionFlags, getRef, defs)`. It was weighed against folding the flags and the ref
+into one object in the second slot, which would have spared all forty-eight samples a third `___` placeholder
+and made a fourth kind of context free to add later. The user chose the positional argument knowing that.
+
+**Two channels, because they carry different kinds of fact.** The ref reaches everything physically
+observable — pointer position, the element's box, its computed styles, any event on it. The flags reach what
+the app knows and the DOM does not: `hasError` is nothing a measurement can find, and neither is a progress
+ratio or a selection. Neither channel substitutes for the other, which is why the ref did not replace the
+flags and did not replace `getSize` either.
+
+**`getSize` stays even though a ref could yield a size.** `computeSVGDefs` is called where no element exists:
+the Playground's gallery serialises each sample against a synthetic 1200×1200 box that never enters the
+layout, and `Surface` probes it three times against a mock 0×0 to decide whether the result is a plain colour,
+in which case it draws a div and no SVG at all. Size is a parameter of the drawing; the ref is a handle on a
+host that may not be there. Both are therefore optional-tolerant, and `PointerTracker` already rests when its
+ref accessor returns nothing.
+
+**A sample subscribes for itself, inside `renderDefsElement`, never inside `computeSVGDefs`.** That top level
+is called speculatively — the three `Surface` probes throw the result away after reading one field — so
+anything with a lifecycle created there would be built and discarded for nothing. `renderDefsElement` runs
+under a real owner in both places that call it, which is what `createAnimateDefs` has always relied on for its
+signal and its `onCleanup`. The consequence the user accepted: a sample dropped somewhere that supplies
+neither ref nor flags draws its resting frame and says nothing about it. The gallery is exactly that case, and
+its still image is the resting frame by construction.
+
+**Structure is fixed when the element is built; values vary afterwards.** `SVGLinearGradientDefs` and
+`SVGRadialGradientDefs` now take accessors for geometry and for the colour array, and those reach the DOM as
+attribute-level updates — `cx`, `r`, `offset`, `stop-color` change in place on a live element. What stays
+plain is anything that decides how many nodes exist: `spreadKind`, and the length of the colour array, read
+once through `untrack`. The reason is not taste. Reading a varying value in the body of `renderDefsElement`
+re-runs the enclosing expression, Solid rebuilds the whole `<linearGradient>`, every `<animate>` inside it
+gets its `ref` callback again and `beginElementAt` restarts the animation from zero — a visible jump on every
+hover. The same rule explains the stop ids: `SVGAnimations.Gradient.cycleSmoothColors` targets
+`#<id>-stop-<i>` by `href`, so a stop that could appear or vanish would leave an animation aimed at nothing.
+
+**The coordinates handed to the `custom` callback are the initial ones, read through `untrack`.** They feed
+SMIL `values` lists, and a running SMIL animation given a new `values` does not agree with itself across
+browsers. So an animated sample and a state-reactive sample are the same mechanism at different depths: the
+animation owns the attribute it drives, and anything reactive drives a different one.
+
+### Lighting primitives: the surface is turbulence, and the light is what moves
+
+**`feSpecularLighting` and `feDiffuseLighting` each arrive as a whole four- or three-step chain, not as one
+primitive.** Both read one channel — transparency, treated as height — and both produce something that cannot
+be drawn on its own. Specular output is not opaque and has to be added back with
+`feComposite operator="arithmetic"` at k2 and k3 of 1, after being clipped to `SourceAlpha`; merging it like an
+ordinary layer makes it vanish. Diffuse output is opaque and multiplies instead, k1 of 1 and the rest zero.
+Hiding that behind one `add…Filter` call is the point: a consumer asks for lighting and gets lighting, rather
+than four primitives they have to wire in the right order.
+
+**The height map is turbulence, and its settings ride with the lighting defs rather than being a separate
+call.** Lighting a flat opaque shape produces nothing at all, so a surface is not optional and there is no
+sensible default that is "none" — asked for by the user in exactly those terms, that some degree of turbulence
+comes along with the filter's own options. The alternative surface, a blurred copy of the alpha, is what turns
+an edge into a bevel rather than a texture; it is not built, and adding it would mean the surface becomes a
+choice between two shapes rather than a set of numbers.
+
+**These two set `color-interpolation-filters` to sRGB and nothing else in the factory does.** Filters run in
+linearRGB unless told otherwise, which makes a highlight noticeably hotter than the same colour anywhere else
+on the page. Setting it on the whole `<filter>` would change how every existing filter in the library paints,
+so it is set on the elements of these two chains alone. Nothing already built moves.
+
+**Nothing reserves extra filter region for them.** A blur or a displacement grows outside the element's box and
+`maxOffset` exists to pay for that. Specular is clipped to `SourceAlpha` and diffuse is multiplied into the
+source, so both stay inside the shape, and neither touches the region arithmetic.
+
+### `sheen_1`: the same idea with no filter at all
+
+**A radial gradient whose origin is the pointer reading, and nothing else.** `boxRatio` is already 0–1 and a
+radial gradient's `cx`/`cy` are object-bounding-box units, so the origin is the reading passed straight
+through — where the specular version has to multiply by the element's size every frame to place a point light
+in pixels. There is no filter, so no turbulence pass and no lighting pass: the whole sample is four colour
+stops and an accessor.
+
+**The falloff is a stop list, which is the point.** The lighting version steers one fixed curve with four
+numbers — light height, exponent, constant, surface scale — and cannot produce a small hot core with a long
+soft tail, because a single specular lobe has one width. Stops place the core, the mid and the transparent
+edge wherever they are wanted, independently. That is why the user asked for this one after seeing how much
+work the filter needed to approximate the same shape.
+
+**It stays in the registry where the glass sheen no longer does.** It is a gradient, interchangeable with
+every other gradient, and it needs nothing beyond the uniform `defs` bag — which is exactly the test the glass
+sheen failed. See _"The sheen left `Samples/SVGDefs/Gradient`"_.
+
+### `glass_sheen_1`, and what a pointer-driven sample looks like
+
+**It is a gradient sample whose filter slot carries the moving part.** The colour ramp is an ordinary vertical
+linear gradient; what follows the pointer is an `fePointLight` inside a specular chain, positioned from
+`PointerTracker`'s `boxRatio` times the element's own size. When no pointer is present — and in the gallery,
+where the sample is serialised against a detached SVG with no element at all — the ratio rests at the centre,
+which is what the still image shows.
+
+**The tracker is created inside `renderDefsElement`, and the light's x and y are accessors.** Both follow from
+the rules recorded under _"A sample reaches its host through a ref"_: the top level of `computeSVGDefs` is
+called speculatively and must stay free of lifecycle, and a value read in the body of `renderDefsElement` would
+rebuild the filter on every pointer frame.
+
+**The distortion and the blur are applied to the lit image, not to the source, and the order is the whole
+trick.** The three primitives run chained — specular lighting, then displacement, then blur — because the
+shape being filtered is a flat translucent white. Warping a uniform colour changes nothing that can be seen,
+so displacing the source first would be invisible; displacing the _highlight_ is what makes the light look as
+though it is coming through rippled glass. The blur last is the fog, and it softens the edge the displacement
+has just made irregular. The ripple is a coarser, slower noise than the lighting surface — frequency 0.012
+against 0.05 — so the pane warps in broad waves while the sheen keeps its fine grain.
+
+**It does not distort what is behind it, and cannot.** An SVG filter can only reach the element it is applied
+to; bending a real backdrop needs `backdrop-filter: url(#…)`, which Chromium honours and Firefox and Safari
+ignore outright. So this is a pane that ripples its own light rather than the page beneath it, and a sample
+that had to bend a real background would have to put that background inside the filtered element.
+
+**Its numbers were chosen against a fill, not against a stroke, and that is a real limitation.** A specular
+pool is a wide soft thing; on a four-pixel border it is a sliver and reads as a faint tint however it is tuned,
+while on a filled box it reads as a lamp. The settled values — light height 28, surface scale 1.6, specular
+constant 1.7, exponent 8, grain frequency 0.02 over two octaves — came from a sweep of that space rendered as a
+grid and read by eye. They are deliberately gentler than the sketch the user pointed at, which uses a coarser
+surface and reads as hammered metal rather than as a sheen.
+
+### `GlassSurface`, and the two things that decide its shape
+
+**It is built on `Shape`, not on `Surface`.** `Surface` exists to make two decisions — plain div or SVG, and
+which defs the consumer wants — and `GlassSurface` has already made both. Wrapping it would inherit a branch
+that can never be taken and a props shape built around defs it does not accept. What it actually wants is
+`Shape`: the point list, the corner radii and lamé exponents, the measured size, and the clip path handed to
+`renderChildren`, which is what makes the backdrop layers' corners follow a squircle exactly instead of
+approximating it with `border-radius`.
+
+**The backdrop is two layers, not one declaration with a fallback.** `backdrop-filter: url(#…)` is honoured
+by Chromium and ignored by Firefox and Safari, both of which support `backdrop-filter` with the CSS functions
+and both of which parse the `url()` form as perfectly valid. That last part is what rules out
+vanilla-extract's `[fallback, desired]` array: the array works by the browser _rejecting_ the second
+declaration, which is why `backgroundColor: [dark, "rgb(from …)"]` works elsewhere in the Playground, and
+here nothing is rejected — the value parses and the effect is simply missing, so the blur would be discarded
+in favour of a url() that does nothing. Two elements instead: a lower layer carrying only the blur and an
+upper one carrying only the `url()`. Chromium composes both; the other two get the blur and an inert second
+layer. No feature detection anywhere, and none is possible — `CSS.supports` returns true in all three.
+
+**The layers sit at negative z-index inside a stacking context the component makes for itself, and both
+halves of that are load-bearing.** They must paint below the tint and the sheen, which `Shape` renders at
+`z-index: -1`, so they are lower still at `-3` and `-2`. But a negative-z child of an element that forms no
+stacking context is hoisted to the nearest ancestor that does, and paints in that ancestor's _negative_ step
+— before the ancestor's own in-flow content. The backdrop it then samples is empty, and the effect silently
+does nothing, which is exactly what the first build did. Wrapping `Shape` in a `position: relative;
+z-index: 0` div contains the negative-z children in a context of the component's own, so everything outside
+the component has already painted by the time they do.
+
+**`isolation: isolate` would have made a stacking context too, and would have broken it again.** Isolating
+blending forms a Backdrop Root, and a backdrop root is the boundary of what `backdrop-filter` can see — the
+page behind the component would have been outside it. A bare `z-index: 0` stacking context forms no such
+boundary, which is why it is the one used.
+
+**The ripple samples outside the pane, so the displacement is faded to nothing at the edges.**
+`feDisplacementMap` at scale _k_ reaches up to _k_/2 pixels away, and for a `backdrop-filter` those pixels are
+outside the element, where the browser has nothing real to give it. The Playground's shadow exposed this
+first — `themeVars.shadow.large` is offset sixteen pixels downward, so the bottom was the only edge with
+anything to pull and it alone grew a smeared band — but a large corner radius showed the true extent: at 150px
+on a 300px pane the visible boundary is a circle touching the rectangle's edges, and the whole rim was chewed.
+
+`edgeFade` on `SVGTurbulenceFilterDefs` is the fix, and it builds a displacement map that is neutral near the
+border rather than trying to clamp the sampling. `SourceAlpha` in a backdrop filter is an opaque rectangle the
+size of the element, so eroding it by the fade distance and blurring the result gives an inset mask; the
+turbulence is forced opaque with an `feColorMatrix`, composited `in` that mask, then laid `over` an `feFlood`
+of `#808080`. Mid-grey is zero displacement in both channels, so the map lerps from noise in the middle to no
+movement at all at the edge, and nothing is ever sampled from outside. `GlassUtils` derives the fade from the
+ripple scale rather than exposing it, because it is a correctness constraint and not a matter of taste.
+
+**A layer only carries a `backdrop-filter` when there is a filter for it to name.** The factory's `add*`
+methods decline to register a primitive that would do nothing — `addTurbulenceFilter` returns early at a scale
+of zero — and `computeFilterPrimitives` then returns nothing at all, so no `<filter>` is emitted. A layer that
+names it by id anyway is pointing at something that does not exist, and Chromium does not treat that as a
+no-op: the pane grew a dark ring hugging its rim, which reads as an edge artifact and is nothing of the sort.
+`GlassSurface` now renders each backdrop layer only when its filter exists, which is also why the blur layer
+disappears at a blur radius of zero rather than sitting there forming a stacking context for nothing. The
+general trap is worth naming: **anything referencing a factory-built filter by id has to account for the
+factory having built nothing**, because the id is composed independently of whether the filter was emitted.
+
+**The shadow moved anyway, and for a second reason.** It now paints on an overlay sibling that comes _after_
+the glass in paint order rather than on a wrapper that comes before it, which keeps it out of the backdrop
+entirely instead of leaning on the fade to hide it.
+
+**The blur has an edge artifact of its own, and it is a different fault entirely.** A `backdrop-filter`
+samples a backdrop image bounded by the element, so a blur near that boundary averages in nothing and the
+result darkens and desaturates — a vignette hugging the rim that grows with the blur radius and is absent at
+zero. Nothing about the displacement causes it. The layers are therefore inset by a negative margin of three
+times the blur radius plus the ripple scale, which puts the blur's own falloff outside the visible shape, and
+each clips itself to `GlassUtils.computeMarginedClipPath` — the pane's own points translated by that margin,
+so the visible boundary is unchanged while the sampled area is larger.
+
+**The oversized layers still count as content, so the root hides its overflow.** `clip-path` decides what is
+painted and nothing about layout: a layer inset by a negative margin sticks out of the pane by that margin and
+enlarges the scrollable overflow of every ancestor, so an ancestor with `overflow: auto` grows scrollbars —
+which the Playground's resizable stage did, visibly, once the ripple was turned up. `overflow: hidden` on
+`glassSurfaceRoot` stops the overflow propagating and, unlike `clip-path`, does **not** form a Backdrop Root,
+so the blur still sees the page behind it. It also costs nothing visually, because the clip path cuts inside
+the root's box already.
+
+**The clipping cannot be done by a wrapper.** The obvious arrangement — one oversized layer inside a
+pane-shaped clipping parent — renders no backdrop at all, because `clip-path` forms a Backdrop Root and the
+page behind is then outside what the layer can see. It is the same trap as `isolation: isolate` above, and it
+is why each layer carries its own clip rather than sharing one.
+
+**What is left is a disagreement between the two backdrop layers, and it was measured rather than argued.**
+The ripple layer sits above the blur layer and both stop at the same shape, so where the displacement reaches
+past that shape it samples _unblurred_ page content and drags it inward, leaving a speckled fringe where sharp
+meets soft. Oversizing both by the same margin does not help, because they still end in the same place. It is
+invisible at the default ripple of 12 even at a 150px radius, shows around 20 and is obvious at 40.
+
+**Folding the blur into the ripple filter fixes it completely, was built, was looked at, and was reverted.**
+One filter doing displacement and then blur leaves no second layer to disagree, and the blur runs _after_ the
+displacement so it smooths over the sampling boundary rather than fighting it: at a ripple of 40 the chewed rim
+and chaotic interior became a clean edge and a coherent distortion. The cost is the whole reason the two
+layers exist — the blur then lives only inside the filter Firefox and Safari ignore, so a `GlassSurface` there
+would be a tint and a sheen over sharp, undistorted content. The user saw both and kept the fallback. Rebuild
+it by adding `addGaussianBlurFilter` to `computeBackdropFilterElement` and collapsing the two layers into one;
+that is the whole change in both directions.
+
+**The Playground's pane is dragged with `left` and `top`, never with `transform`.** A transform on an
+ancestor creates a stacking context and changes the containing block, and given how readily this arrangement
+breaks — `clip-path` killed the backdrop outright and `isolation: isolate` would have — it is not a coin worth
+flipping when plain offsets cost nothing. `InteractionTracker.trackDrag` on the stage supplies a clamped 0–1
+ratio, an offset captured on the gesture's first move turns it into a grab rather than a jump, and the
+position is a `clamp()` in CSS so the pane stays wholly inside the stage without anything measuring it. The
+drag exists for two reasons, both of them measurements: seeing the glass travel over a detailed background,
+and finding out what a blurred and displaced backdrop costs when it repaints every frame.
+
+**A `GlassSurface` is sized by what it contains, like every other `Shape` consumer.** `Shape` measures its
+own root with a `ResizeObserver` and the root is sized by its children, so a fixed box placed _around_ one
+collapses the SVG layers to zero height. The box goes inside.
+
+### The glass effect is a type in `Abstracts`, and the sheen stopped being a sample
+
+**`Theme.css.ts` exports its radii as bare numbers as well as CSS values.** `FOCUS_RING_WIDTH` was already
+the precedent: a Playground page that has to hand a number to a component — `Shape` wants join radii as
+numbers, not as `px` strings — otherwise invents one, and the first `GlassSurface` page invented 28. The
+literals now live in `BORDER_RADIUS_HALF` and `BORDER_RADIUS_FULL` and the theme is built from them, so there
+is one source of truth for both forms.
+
+**`GlassDefs` names four groups because the effect has four parts**: the backdrop blur every browser gets,
+the ripple only Chromium gets, the tint, and the sheen. Nothing beyond what the effect actually has was
+invented for it. It lives in `Abstracts`, which renders no DOM and is where shared vocabulary belongs, and
+`Glass.utils.tsx` builds JSX there the way `SVGFilterDefs.factory.tsx` already does.
+
+**The sheen left `Samples/SVGDefs/Gradient` because the registry's contract could not carry it.** Every
+sample in that registry has to be callable with the same `defs` bag — that is what lets a picker take any key
+and call it with one payload. A sample needing its own inputs cannot be, and widening the shared bag would
+put a field on all thirty-eight others that none of them read. Making the config type generic fails for the
+same reason from the other end: a config demanding more than the uniform bag is not assignable to one that
+does not, so it falls out of `Record<string, GradientConfig>` entirely. The user's call was that the glass
+sheen is not a gradient sample at all, which is right — it is one component's identity, and it should not
+appear in a dropdown of interchangeable options. Once it left the registry it also left the folder, whose
+contract is one file per key with the key as the filename and which the source view resolves by name.
+
+**This is why the factory rule does not apply to it.** _"Nothing is folded into a factory"_ governs sample
+files, and this stopped being one. What remains in `Samples` are samples; the glass sheen is a builder with
+one home that two callers use.
+
+### The gradient and pattern registries each get a page that paints them as a fill
+
+**Both were menu entries with no page, and now have one.** The reasoning for entries without pages is under
+_"Every abstract has a menu entry"_; these two earned a page because the only place either registry could be
+seen live was `Shape`'s stroke, which is a few pixels wide. A gradient meant to sweep across a surface and a
+tiling meant to repeat across one are both illegible at that width.
+
+**The gradients page can paint either way, and defaults to the fill.** A dropdown swaps between
+`computeFillDefs` and `computeStrokeDefs` on the same `Shape`, because the two read completely differently: a
+sweep across a surface needs the surface, while a border is where most of these actually get used. The stroke
+carries a fixed sixteen-pixel thickness rather than a control of its own — thick enough that a gradient reads,
+and `Shape`'s own page is where thickness is the subject. The patterns page has no such switch; a tiling on a
+sixteen-pixel band is a row of fragments.
+
+**The demo is a `Shape` painted through those callbacks, and the sized box is its child.** `Shape` measures
+itself from what it wraps rather than from a prop, so a fixed-size box placed around it collapses the SVG to
+zero height. The resizable box therefore goes inside `renderChildren` and stays transparent, since a child with
+a background of its own would cover the fill it is meant to show.
+
+**Neither page passes interaction flags.** They exist to show the defs, and wiring `InteractionTracker` to the
+demo would either make a display area focusable or hand it flags that never change. The ref reaches the sample
+either way, which is what a pointer-driven one needs.
+
 ### A sample registry and the machinery that runs it are separate modules
 
 The rule: **a module a consumer imports for behaviour may not import the samples.** Machinery takes the sample

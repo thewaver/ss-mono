@@ -36,6 +36,7 @@ import { FormFieldPage } from "./Pages/FormFieldPage/FormFieldPage";
 import { FormPage } from "./Pages/FormPage/FormPage";
 import { FormSectionPage } from "./Pages/FormSectionPage/FormSectionPage";
 import { FormationPage } from "./Pages/FormationPage/FormationPage";
+import { GlassSurfacePage } from "./Pages/GlassSurfacePage/GlassSurfacePage";
 import { ImageSwitcherPage } from "./Pages/ImageSwitcherPage/ImageSwitcherPage";
 import { InteractionTrackerPage } from "./Pages/InteractionTrackerPage/InteractionTrackerPage";
 import { LabelPage } from "./Pages/LabelPage/LabelPage";
@@ -57,6 +58,8 @@ import { RangePage } from "./Pages/RangePage/RangePage";
 import { RevealPage } from "./Pages/RevealPage/RevealPage";
 import { RichTextPage } from "./Pages/RichTextPage/RichTextPage";
 import { SVGFiltersPage } from "./Pages/SVGFiltersPage/SVGFiltersPage";
+import { SVGGradientsPage } from "./Pages/SVGGradientsPage/SVGGradientsPage";
+import { SVGPatternsPage } from "./Pages/SVGPatternsPage/SVGPatternsPage";
 import { SatellitePage } from "./Pages/SatellitePage/SatellitePage";
 import { ScanlineAnimationPage } from "./Pages/ScanLineAnimationPage/ScanLineAnimationPage";
 import { ScrambleTextPage } from "./Pages/ScrambleTextPage/ScrambleTextPage";
@@ -263,11 +266,13 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                                 name: "SVGGradients",
                                 description:
                                     "Linear and radial gradients written as a list of colours rather than as markup. A colour may name the stop it sits at or leave it to be spread evenly between the ones that do, and asking for bands rather than a blend emits each stop twice so the colours meet at a hard edge. Angle, origin, scale and offset belong to the gradient rather than to the colours, so the same list can be turned or squashed without being rewritten.",
+                                component: () => <SVGGradientsPage />,
                             },
                             {
                                 name: "SVGPatterns",
                                 description:
                                     "Places a number of cells inside one tile and repeats the tile, which is the whole of what turns a shape and a count into a tiling. Where a cell sits and what it draws are the consumer's two functions; the named tilings themselves — hexagons, triangles, lozenges — are sample code rather than library code, so what stays here is the placement and the repeat any tiling of one's own would be built on.",
+                                component: () => <SVGPatternsPage />,
                             },
                         ],
                     },
@@ -300,6 +305,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
         name: "Composites",
         hidden: !SHOW_COMPOSITES,
         children: [
+            {
+                name: "GlassSurface",
+                description:
+                    "A pane of frosted glass over whatever is behind it. The blur reaches every browser; the ripple that bends the backdrop is an SVG filter reference, which only Chromium honours, so the two sit on separate layers and the ripple layer is simply inert where it is not supported. The sheen on the surface is a specular highlight that follows the pointer.",
+                component: () => <GlassSurfacePage />,
+            },
             {
                 name: "Surface",
                 description:

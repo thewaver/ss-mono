@@ -6,7 +6,7 @@ import type { GradientConfig } from "../SVGDefs.types";
 import { SVGDefsUtils } from "../SVGDefs.utils";
 
 export const flow_diag_3: GradientConfig = {
-    computeSVGDefs: (id, __, defs) => [
+    computeSVGDefs: (id, __, ___, defs) => [
         {
             gradientOrPattern: {
                 id: `gradient1-${id}`,

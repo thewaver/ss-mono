@@ -98,6 +98,7 @@ They cluster, and no single item owns them.
 
 ## Planned projects
 
-| #   | What                                          | Standing                                                                                                    |
-| --- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| 6   | **A consumer-facing layer above the library** | **Deferred indefinitely, not a focus, do not raise it.** The `style.css` strip and the theme are both built |
+| #   | What                                          | Standing                                                                                                                                   |
+| --- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| 23  | **`GlassSurface` follow-ups**                 | Built and working. Outstanding: no border on the pane, the page unreachable while `SHOW_COMPOSITES` is false, and nothing adopting it yet. |
+| 6   | **A consumer-facing layer above the library** | **Deferred indefinitely, not a focus, do not raise it.** The `style.css` strip and the theme are both built                                |

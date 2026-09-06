@@ -6,7 +6,7 @@ import type { PatternConfig } from "../SVGDefs.types";
 import { SVGDefsUtils } from "../SVGDefs.utils";
 
 export const whirlCurved_2: PatternConfig = {
-    computeSVGDefs: (id, __, defs) => [
+    computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBackgroundColor(defs),
         },

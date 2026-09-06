@@ -54,6 +54,7 @@ reading.
 20. An anchored layer is always a frame behind — _postponed until the platform catches up_
 21. `Table` — six things deliberately not built — _open_
 22. `Timeline` — the pointer routes the library cannot promise — _open_
+23. `GlassSurface` and the sheen samples — what is built and what is not — _open_
 
 ### Build order
 
@@ -998,6 +999,26 @@ are in `decisions.md` under _"`Timeline`: a window over a range"_. What is outst
 
 ---
 
+## 23. `GlassSurface` and the sheen samples — what is built and what is not
+
+The component is built and works: two backdrop layers, the tint, and a specular sheen that follows the
+pointer, with a draggable pane on its page. `GlassDefs` names the four groups of settings, and the radial
+`sheen_1` counterpart is built and in the gradient registry. The reasoning is in `decisions.md` under
+_"`GlassSurface`, and the two things that decide its shape"_. Three things are outstanding.
+
+- **The page cannot be reached.** `GlassSurface` sits under `Composites`, which the Playground hides behind
+  `SHOW_COMPOSITES`, currently `false`. `Surface` is in the same position. Nothing is broken; the route
+  exists and works when opened directly, but neither component is in the menu.
+- **There is no border.** A pane of glass usually carries a hairline edge, and `Shape` already has the stroke
+  machinery for it — `GlassSurface` simply passes no `computeStrokeDefs`. Whether the edge belongs in
+  `GlassDefs` as a fifth group or stays the consumer's has not been argued.
+- **Nothing uses it yet.** The intent stated when it was commissioned was to replace the Playground's own
+  example boxes and left navigation panel with it. Both currently use a plain `backdrop-filter: blur()`. The
+  cost worth measuring first: a blurred _and_ displaced backdrop repaints whenever anything behind it moves,
+  and a nav panel is large and permanently on screen.
+
+---
+
 ## Accepted limits
 
 Faults that have been looked at and consciously left alone. Not outstanding work, not numbered, and not part
@@ -1072,6 +1093,14 @@ answer to "what is next for development"** — see the note at the top of this f
 commitment, and an entry that already carries the user's verdict is recorded here so that the same sketch is
 not put to them twice. An entry leaves this section in one of two directions: upward into a numbered item, which is the user's
 decision to take, or into `conventions.md` / `decisions.md` if building it settles something.
+
+### Further sheen shapes beyond the radial one
+
+The user's sketch, raised while agreeing the radial `sheen_1` and explicitly deferred: more sheens than the
+one. An angled linear band rather than a radial pool, of the kind the `PointerTracker` page's tilt example
+already draws. And a more complex pairing — two overlapped linear gradients, one travelling on the X axis and
+one on the Y, so the bright spot is where they cross rather than where a single gradient is centred. Neither
+has been costed. The radial one they would be variants of is now built, so nothing blocks either.
 
 ### `HoloCard` and `CardFan`, built and then deleted
 

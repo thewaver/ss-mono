@@ -3,7 +3,7 @@ import { SVGAnimations } from "../SVGAnimations.const";
 import type { GradientConfig } from "../SVGDefs.types";
 
 export const flow_2s: GradientConfig = {
-    computeSVGDefs: (id, __, defs) => [
+    computeSVGDefs: (id, __, ___, defs) => [
         {
             gradientOrPattern: {
                 id: `gradient1-${id}`,

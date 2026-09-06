@@ -21,6 +21,7 @@ export type PatternConfig = {
     computeSVGDefs: (
         id: string,
         getInteractionFlags: (() => InteractionFlags) | undefined,
+        getRef: (() => HTMLElement | undefined) | undefined,
         defs: PatternElementDefs,
     ) => SVGDefs[];
 };
@@ -35,6 +36,7 @@ export type GradientConfig = {
     computeSVGDefs: (
         id: string,
         getInteractionFlags: (() => InteractionFlags) | undefined,
+        getRef: (() => HTMLElement | undefined) | undefined,
         defs: GradientElementDefs,
     ) => SVGDefs[];
 };

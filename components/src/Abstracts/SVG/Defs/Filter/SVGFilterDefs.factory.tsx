@@ -2,16 +2,21 @@ import type { JSX } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
+import { access } from "../../../../Utils/propUtils";
 import type {
     SVGBrightnessFilterDefs,
     SVGColorFilterDefs,
     SVGContrastFilterDefs,
+    SVGDiffuseLightingFilterDefs,
     SVGDropShadowFilterDefs,
     SVGFilterMethod,
     SVGGaussianBlurFilterDefs,
     SVGHueRotationFilterDefs,
     SVGInversionFilterDefs,
+    SVGLightSourceDefs,
+    SVGLightSurfaceDefs,
     SVGSaturationFilterDefs,
+    SVGSpecularLightingFilterDefs,
     SVGTurbulenceFilterDefs,
 } from "./SVGFilterDefs.types";
 
@@ -30,6 +35,38 @@ const FALLBACK_FILTER_REGION: JSX.FilterSVGAttributes<SVGFilterElement> = {
     height: "200%",
 };
 
+const FILTER_COLOR_SPACE = "sRGB";
+
+const NEUTRAL_DISPLACEMENT_COLOR = "#808080";
+const OPAQUE_ALPHA_MATRIX = "1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 1";
+const EDGE_FADE_BLUR_RATIO = 0.5;
+
+const renderLightSource = (light: SVGLightSourceDefs) =>
+    light.kind === "point" ? (
+        <fePointLight x={access(light.x)} y={access(light.y)} z={access(light.z)} />
+    ) : (
+        <feDistantLight azimuth={access(light.azimuth)} elevation={access(light.elevation)} />
+    );
+
+const renderLightSurface = (surface: SVGLightSurfaceDefs, resultKey: string) => {
+    const getBaseFrequency = () => {
+        const value = access(surface.baseFrequency);
+
+        return typeof value === "number" ? `${value}` : `${value.x} ${value.y}`;
+    };
+
+    return (
+        <feTurbulence
+            type={access(surface.type) ?? "fractalNoise"}
+            baseFrequency={getBaseFrequency()}
+            numOctaves={access(surface.numOctaves) ?? 1}
+            seed={access(surface.seed) ?? 0}
+            stitchTiles={access(surface.stitchTiles) ?? "noStitch"}
+            result={resultKey}
+        />
+    );
+};
+
 export class SVGFilterDefsFactory {
     private filterPrimitives: Record<string, (srcIn: string) => { element: JSX.Element; resultGraphic: string }> = {};
     private dropShadowCount = 0;
@@ -41,6 +78,8 @@ export class SVGFilterDefsFactory {
     private contrastCount = 0;
     private inversionCount = 0;
     private colorCount = 0;
+    private specularLightingCount = 0;
+    private diffuseLightingCount = 0;
     private maxOffset = 0;
 
     constructor(private readonly filterId: string) {}
@@ -141,6 +180,11 @@ export class SVGFilterDefsFactory {
 
         const key = `${this.filterId}_turbulence_${this.turbulenceCount++}`;
         const noiseKey = `${key}_noise`;
+        const opaqueKey = `${key}_opaque`;
+        const flatKey = `${key}_flat`;
+        const erodedKey = `${key}_eroded`;
+        const maskKey = `${key}_mask`;
+        const mapKey = `${key}_map`;
         const {
             baseFrequency,
             scale,
@@ -150,6 +194,7 @@ export class SVGFilterDefsFactory {
             stitchTiles = "noStitch",
             xChannelSelector = "R",
             yChannelSelector = "G",
+            edgeFade = 0,
         } = defs;
 
         this.maxOffset = Math.max(this.maxOffset, Math.abs(scale) / 2);
@@ -171,9 +216,39 @@ export class SVGFilterDefsFactory {
                         {custom}
                     </feTurbulence>
 
+                    {edgeFade > 0 && (
+                        <>
+                            <feColorMatrix
+                                in={noiseKey}
+                                type="matrix"
+                                values={OPAQUE_ALPHA_MATRIX}
+                                result={opaqueKey}
+                            />
+
+                            <feFlood flood-color={NEUTRAL_DISPLACEMENT_COLOR} result={flatKey} />
+
+                            <feMorphology
+                                {...{ in: "SourceAlpha" }}
+                                operator="erode"
+                                radius={edgeFade}
+                                result={erodedKey}
+                            />
+
+                            <feGaussianBlur
+                                in={erodedKey}
+                                stdDeviation={edgeFade * EDGE_FADE_BLUR_RATIO}
+                                result={maskKey}
+                            />
+
+                            <feComposite in={opaqueKey} in2={maskKey} operator="in" result={`${maskKey}_in`} />
+
+                            <feComposite in={`${maskKey}_in`} in2={flatKey} operator="over" result={mapKey} />
+                        </>
+                    )}
+
                     <feDisplacementMap
                         in={srcIn}
-                        in2={noiseKey}
+                        in2={edgeFade > 0 ? mapKey : noiseKey}
                         scale={scale}
                         xChannelSelector={xChannelSelector}
                         yChannelSelector={yChannelSelector}
@@ -317,6 +392,98 @@ export class SVGFilterDefsFactory {
                 >
                     {custom}
                 </feColorMatrix>
+            ),
+            resultGraphic: key,
+        });
+
+        return this;
+    };
+
+    public addSpecularLightingFilter = (defs: SVGSpecularLightingFilterDefs, custom?: JSX.Element) => {
+        const key = `${this.filterId}_specularLighting_${this.specularLightingCount++}`;
+        const surfaceKey = `${key}_surface`;
+        const lightKey = `${key}_light`;
+        const maskKey = `${key}_mask`;
+
+        this.filterPrimitives[key] = (srcIn: string) => ({
+            element: (
+                <>
+                    {renderLightSurface(defs.surface, surfaceKey)}
+
+                    <feSpecularLighting
+                        in={surfaceKey}
+                        surfaceScale={`${access(defs.surfaceScale)}`}
+                        specularConstant={`${access(defs.specularConstant) ?? 1}`}
+                        specularExponent={`${access(defs.specularExponent) ?? 20}`}
+                        lighting-color={access(defs.lightingColor) ?? "#FFFFFF"}
+                        color-interpolation-filters={FILTER_COLOR_SPACE}
+                        result={lightKey}
+                    >
+                        {renderLightSource(defs.light)}
+                        {custom}
+                    </feSpecularLighting>
+
+                    <feComposite
+                        {...{ in: lightKey }}
+                        in2="SourceAlpha"
+                        operator="in"
+                        color-interpolation-filters={FILTER_COLOR_SPACE}
+                        result={maskKey}
+                    />
+
+                    <feComposite
+                        {...{ in: srcIn }}
+                        in2={maskKey}
+                        operator="arithmetic"
+                        k1={0}
+                        k2={1}
+                        k3={1}
+                        k4={0}
+                        color-interpolation-filters={FILTER_COLOR_SPACE}
+                        result={key}
+                    />
+                </>
+            ),
+            resultGraphic: key,
+        });
+
+        return this;
+    };
+
+    public addDiffuseLightingFilter = (defs: SVGDiffuseLightingFilterDefs, custom?: JSX.Element) => {
+        const key = `${this.filterId}_diffuseLighting_${this.diffuseLightingCount++}`;
+        const surfaceKey = `${key}_surface`;
+        const lightKey = `${key}_light`;
+
+        this.filterPrimitives[key] = (srcIn: string) => ({
+            element: (
+                <>
+                    {renderLightSurface(defs.surface, surfaceKey)}
+
+                    <feDiffuseLighting
+                        in={surfaceKey}
+                        surfaceScale={`${access(defs.surfaceScale)}`}
+                        diffuseConstant={`${access(defs.diffuseConstant) ?? 1}`}
+                        lighting-color={access(defs.lightingColor) ?? "#FFFFFF"}
+                        color-interpolation-filters={FILTER_COLOR_SPACE}
+                        result={lightKey}
+                    >
+                        {renderLightSource(defs.light)}
+                        {custom}
+                    </feDiffuseLighting>
+
+                    <feComposite
+                        {...{ in: lightKey }}
+                        in2={srcIn}
+                        operator="arithmetic"
+                        k1={1}
+                        k2={0}
+                        k3={0}
+                        k4={0}
+                        color-interpolation-filters={FILTER_COLOR_SPACE}
+                        result={key}
+                    />
+                </>
             ),
             resultGraphic: key,
         });

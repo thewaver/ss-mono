@@ -36,8 +36,8 @@ export const DefaultExample = ({
             <Shape
                 {...otherProps}
                 computePoints={(size) => ShapeConst.getDefaultShapePoints(access(shapeKind), size)}
-                computeStrokeDefs={(getSize) => {
-                    const strokes = getStrokeConfig().computeSVGDefs(`stroke-${id}`, getFlags, {
+                computeStrokeDefs={(getSize, getRef) => {
+                    const strokes = getStrokeConfig().computeSVGDefs(`stroke-${id}`, getFlags, getRef, {
                         getSize,
                         animationDurationMs: access(animationDurationMs),
                         colors: access(colors),
@@ -60,8 +60,8 @@ export const DefaultExample = ({
 
                     return result;
                 }}
-                computeFillDefs={(getSize) =>
-                    getFillConfig().computeSVGDefs(`fill-${id}`, undefined, {
+                computeFillDefs={(getSize, getRef) =>
+                    getFillConfig().computeSVGDefs(`fill-${id}`, undefined, getRef, {
                         getSize,
                         cellSize: access(cellSize),
                         animationDurationMs: access(animationDurationMs),

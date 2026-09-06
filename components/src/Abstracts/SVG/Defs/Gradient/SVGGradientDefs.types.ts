@@ -1,25 +1,30 @@
 import { Point2d, Size2d } from "@thewaver/ss-utils";
 
+import type { AccessorProps } from "../../../../Utils/typeUtils";
+
 type SVGBaseGradientDefs = {
     id: string;
-};
-
-type SVGGradientDefs = SVGBaseGradientDefs & {
-    colors: {
-        value: string;
-        stop?: number;
-    }[];
     spreadKind?: "smooth" | "banded";
     spreadMethod?: "pad" | "reflect" | "repeat";
 };
 
-export type SVGLinearGradientDefs = SVGGradientDefs & {
-    angle?: number;
-    scale?: Size2d;
-    offset?: Point2d;
-};
+type SVGGradientDefs = SVGBaseGradientDefs &
+    AccessorProps<{
+        colors: {
+            value: string;
+            stop?: number;
+        }[];
+    }>;
 
-export type SVGRadialGradientDefs = SVGGradientDefs & {
-    origin?: Point2d;
-    scale?: number;
-};
+export type SVGLinearGradientDefs = SVGGradientDefs &
+    AccessorProps<{
+        angle?: number;
+        scale?: Size2d;
+        offset?: Point2d;
+    }>;
+
+export type SVGRadialGradientDefs = SVGGradientDefs &
+    AccessorProps<{
+        origin?: Point2d;
+        scale?: number;
+    }>;

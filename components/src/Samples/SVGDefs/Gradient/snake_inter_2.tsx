@@ -6,7 +6,7 @@ import type { GradientConfig } from "../SVGDefs.types";
 import { SVGDefsUtils } from "../SVGDefs.utils";
 
 export const snake_inter_2: GradientConfig = {
-    computeSVGDefs: (id, __, defs) => [
+    computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
         },

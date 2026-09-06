@@ -15,7 +15,7 @@ export type ShapeProps = AccessorProps<{
     lameExponents?: number[];
     strokeGeom?: ShapeStrokeGeom[];
     computePoints: (size: Size2d) => Point2d[];
-    computeStrokeDefs?: (getSize: () => Size2d) => SVGDefs[];
-    computeFillDefs?: (getSize: () => Size2d) => SVGDefs[];
+    computeStrokeDefs?: (getSize: () => Size2d, getRef: () => HTMLElement | undefined) => SVGDefs[];
+    computeFillDefs?: (getSize: () => Size2d, getRef: () => HTMLElement | undefined) => SVGDefs[];
     renderChildren: (getSize: () => Size2d, getClipPath: () => string, getClipPoints: () => Point2d[]) => JSX.Element;
 }>;

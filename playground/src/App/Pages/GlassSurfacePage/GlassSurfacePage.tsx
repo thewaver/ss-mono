@@ -1,0 +1,267 @@
+import { createMemo, createSignal } from "solid-js";
+
+import { DEFAULT_GLASS_DEFS } from "@thewaver/ss-components";
+
+import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageProp } from "../../PageComponents/Prop/Prop";
+import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { PageColorField, PageNumberField } from "../../StyledComponents/Field/Field";
+import { DefaultExample } from "./Examples/Default";
+import type { GlassSurfaceExampleProps } from "./GlassSurfacePage.types";
+
+import { BORDER_RADIUS_FULL } from "../../Theme.css";
+
+const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/GlassSurfacePage/Examples/Default.tsx";
+
+const MIN_BORDER_RADIUS = 0;
+const MAX_BORDER_RADIUS = 160;
+const BORDER_RADIUS_STEP = 10;
+const MIN_BLUR_RADIUS = 0;
+const MAX_BLUR_RADIUS = 20;
+const BLUR_RADIUS_STEP = 1;
+const MIN_RIPPLE_SCALE = 0;
+const MAX_RIPPLE_SCALE = 80;
+const RIPPLE_SCALE_STEP = 1;
+const MIN_RIPPLE_OCTAVES = 1;
+const MAX_RIPPLE_OCTAVES = 10;
+const RIPPLE_OCTAVES_STEP = 1;
+const MIN_RIPPLE_FREQUENCY = 0;
+const MAX_RIPPLE_FREQUENCY = 0.25;
+const RIPPLE_FREQUENCY_STEP = 0.005;
+const MIN_SEED = 0;
+const MAX_SEED = 40;
+const SEED_STEP = 1;
+const MIN_LIGHT_HEIGHT = 0;
+const MAX_LIGHT_HEIGHT = 2000;
+const LIGHT_HEIGHT_STEP = 20;
+const MIN_SURFACE_SCALE = 0;
+const MAX_SURFACE_SCALE = 8;
+const SURFACE_SCALE_STEP = 0.05;
+const MIN_SPECULAR_CONSTANT = 0;
+const MAX_SPECULAR_CONSTANT = 4;
+const SPECULAR_CONSTANT_STEP = 0.05;
+const MIN_SPECULAR_EXPONENT = 1;
+const MAX_SPECULAR_EXPONENT = 300;
+const SPECULAR_EXPONENT_STEP = 1;
+const MIN_GRAIN_FREQUENCY = 0.005;
+const MAX_GRAIN_FREQUENCY = 0.3;
+const GRAIN_FREQUENCY_STEP = 0.005;
+const MIN_GRAIN_OCTAVES = 1;
+const MAX_GRAIN_OCTAVES = 5;
+const GRAIN_OCTAVES_STEP = 1;
+const MIN_TINT_OPACITY = 0;
+const MAX_TINT_OPACITY = 1;
+const TINT_OPACITY_STEP = 0.05;
+
+export const GlassSurfacePage = () => {
+    const [getBorderRadius, setBorderRadius] = createSignal(BORDER_RADIUS_FULL);
+    const [getBlurRadius, setBlurRadius] = createSignal(6);
+    const [getRippleScale, setRippleScale] = createSignal(12);
+    const [getRippleFrequency, setRippleFrequency] = createSignal(0.025);
+    const [getRippleOctaves, setRippleOctaves] = createSignal(2);
+    const [getRippleSeed, setRippleSeed] = createSignal(DEFAULT_GLASS_DEFS.ripple.seed);
+    const [getLightHeight, setLightHeight] = createSignal(DEFAULT_GLASS_DEFS.sheen.lightHeight);
+    const [getSurfaceScale, setSurfaceScale] = createSignal(DEFAULT_GLASS_DEFS.sheen.surfaceScale);
+    const [getSpecularConstant, setSpecularConstant] = createSignal(DEFAULT_GLASS_DEFS.sheen.specularConstant);
+    const [getSpecularExponent, setSpecularExponent] = createSignal(DEFAULT_GLASS_DEFS.sheen.specularExponent);
+    const [getGrainFrequency, setGrainFrequency] = createSignal(DEFAULT_GLASS_DEFS.sheen.grainFrequency);
+    const [getGrainOctaves, setGrainOctaves] = createSignal(DEFAULT_GLASS_DEFS.sheen.grainOctaves);
+    const [getGrainSeed, setGrainSeed] = createSignal(DEFAULT_GLASS_DEFS.sheen.grainSeed);
+    const [getTintColor, setTintColor] = createSignal("#FFFFFF");
+    const [getTintOpacity, setTintOpacity] = createSignal(0.2);
+
+    const getExamples = createMemo(() => {
+        const commonProps: GlassSurfaceExampleProps = {
+            borderRadius: getBorderRadius,
+            blurRadius: getBlurRadius,
+            rippleScale: getRippleScale,
+            rippleFrequency: getRippleFrequency,
+            rippleOctaves: getRippleOctaves,
+            rippleSeed: getRippleSeed,
+            lightHeight: getLightHeight,
+            surfaceScale: getSurfaceScale,
+            specularConstant: getSpecularConstant,
+            specularExponent: getSpecularExponent,
+            grainFrequency: getGrainFrequency,
+            grainOctaves: getGrainOctaves,
+            grainSeed: getGrainSeed,
+            tintColor: getTintColor,
+            tintOpacity: getTintOpacity,
+        };
+
+        return [
+            {
+                key: "default",
+                name: "Default",
+                component: () => <DefaultExample {...commonProps} />,
+                path: DEFAULT_EXAMPLE_PATH,
+            },
+        ];
+    });
+
+    return (
+        <>
+            <PagePropsPanel scope={"global"}>
+                <PageProp key={"borderRadius"} label={"Corner radius (px)"}>
+                    <PageNumberField
+                        value={getBorderRadius}
+                        min={() => MIN_BORDER_RADIUS}
+                        max={() => MAX_BORDER_RADIUS}
+                        step={() => BORDER_RADIUS_STEP}
+                        ariaLabel={"Corner radius"}
+                        onInput={setBorderRadius}
+                    />
+                </PageProp>
+
+                <PageProp key={"blurRadius"} label={"Backdrop blur (px)"}>
+                    <PageNumberField
+                        value={getBlurRadius}
+                        min={() => MIN_BLUR_RADIUS}
+                        max={() => MAX_BLUR_RADIUS}
+                        step={() => BLUR_RADIUS_STEP}
+                        ariaLabel={"Backdrop blur"}
+                        onInput={setBlurRadius}
+                    />
+                </PageProp>
+
+                <PageProp key={"rippleScale"} label={"Ripple bend (px)"}>
+                    <PageNumberField
+                        value={getRippleScale}
+                        min={() => MIN_RIPPLE_SCALE}
+                        max={() => MAX_RIPPLE_SCALE}
+                        step={() => RIPPLE_SCALE_STEP}
+                        ariaLabel={"Ripple bend"}
+                        onInput={setRippleScale}
+                    />
+                </PageProp>
+
+                <PageProp key={"rippleFrequency"} label={"Ripple scale"}>
+                    <PageNumberField
+                        value={getRippleFrequency}
+                        min={() => MIN_RIPPLE_FREQUENCY}
+                        max={() => MAX_RIPPLE_FREQUENCY}
+                        step={() => RIPPLE_FREQUENCY_STEP}
+                        ariaLabel={"Ripple scale"}
+                        onInput={setRippleFrequency}
+                    />
+                </PageProp>
+
+                <PageProp key={"rippleOctaves"} label={"Ripple octaves"}>
+                    <PageNumberField
+                        value={getRippleOctaves}
+                        min={() => MIN_RIPPLE_OCTAVES}
+                        max={() => MAX_RIPPLE_OCTAVES}
+                        step={() => RIPPLE_OCTAVES_STEP}
+                        ariaLabel={"Ripple octaves"}
+                        onInput={setRippleOctaves}
+                    />
+                </PageProp>
+
+                <PageProp key={"rippleSeed"} label={"Ripple seed"}>
+                    <PageNumberField
+                        value={getRippleSeed}
+                        min={() => MIN_SEED}
+                        max={() => MAX_SEED}
+                        step={() => SEED_STEP}
+                        ariaLabel={"Ripple seed"}
+                        onInput={setRippleSeed}
+                    />
+                </PageProp>
+
+                <PageProp key={"lightHeight"} label={"Light height"}>
+                    <PageNumberField
+                        value={getLightHeight}
+                        min={() => MIN_LIGHT_HEIGHT}
+                        max={() => MAX_LIGHT_HEIGHT}
+                        step={() => LIGHT_HEIGHT_STEP}
+                        ariaLabel={"Light height"}
+                        onInput={setLightHeight}
+                    />
+                </PageProp>
+
+                <PageProp key={"surfaceScale"} label={"Sheen relief"}>
+                    <PageNumberField
+                        value={getSurfaceScale}
+                        min={() => MIN_SURFACE_SCALE}
+                        max={() => MAX_SURFACE_SCALE}
+                        step={() => SURFACE_SCALE_STEP}
+                        ariaLabel={"Sheen relief"}
+                        onInput={setSurfaceScale}
+                    />
+                </PageProp>
+
+                <PageProp key={"specularConstant"} label={"Sheen brightness"}>
+                    <PageNumberField
+                        value={getSpecularConstant}
+                        min={() => MIN_SPECULAR_CONSTANT}
+                        max={() => MAX_SPECULAR_CONSTANT}
+                        step={() => SPECULAR_CONSTANT_STEP}
+                        ariaLabel={"Sheen brightness"}
+                        onInput={setSpecularConstant}
+                    />
+                </PageProp>
+
+                <PageProp key={"specularExponent"} label={"Shininess"}>
+                    <PageNumberField
+                        value={getSpecularExponent}
+                        min={() => MIN_SPECULAR_EXPONENT}
+                        max={() => MAX_SPECULAR_EXPONENT}
+                        step={() => SPECULAR_EXPONENT_STEP}
+                        ariaLabel={"Shininess"}
+                        onInput={setSpecularExponent}
+                    />
+                </PageProp>
+
+                <PageProp key={"grainFrequency"} label={"Grain scale"}>
+                    <PageNumberField
+                        value={getGrainFrequency}
+                        min={() => MIN_GRAIN_FREQUENCY}
+                        max={() => MAX_GRAIN_FREQUENCY}
+                        step={() => GRAIN_FREQUENCY_STEP}
+                        ariaLabel={"Grain scale"}
+                        onInput={setGrainFrequency}
+                    />
+                </PageProp>
+
+                <PageProp key={"grainOctaves"} label={"Grain octaves"}>
+                    <PageNumberField
+                        value={getGrainOctaves}
+                        min={() => MIN_GRAIN_OCTAVES}
+                        max={() => MAX_GRAIN_OCTAVES}
+                        step={() => GRAIN_OCTAVES_STEP}
+                        ariaLabel={"Grain octaves"}
+                        onInput={setGrainOctaves}
+                    />
+                </PageProp>
+
+                <PageProp key={"grainSeed"} label={"Grain seed"}>
+                    <PageNumberField
+                        value={getGrainSeed}
+                        min={() => MIN_SEED}
+                        max={() => MAX_SEED}
+                        step={() => SEED_STEP}
+                        ariaLabel={"Grain seed"}
+                        onInput={setGrainSeed}
+                    />
+                </PageProp>
+
+                <PageProp key={"tintOpacity"} label={"Tint opacity"}>
+                    <PageNumberField
+                        value={getTintOpacity}
+                        min={() => MIN_TINT_OPACITY}
+                        max={() => MAX_TINT_OPACITY}
+                        step={() => TINT_OPACITY_STEP}
+                        ariaLabel={"Tint opacity"}
+                        onInput={setTintOpacity}
+                    />
+                </PageProp>
+
+                <PageProp key={"tintColor"} label={"Tint colour"}>
+                    <PageColorField value={getTintColor} ariaLabel={"Tint colour"} onInput={setTintColor} />
+                </PageProp>
+            </PagePropsPanel>
+
+            <PageExamples items={getExamples} layout={"flow"} />
+        </>
+    );
+};

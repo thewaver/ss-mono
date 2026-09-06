@@ -24,6 +24,7 @@ import { scan_1 } from "./Gradient/scan_1";
 import { scan_1v1 } from "./Gradient/scan_1v1";
 import { scan_diag_1 } from "./Gradient/scan_diag_1";
 import { scan_diag_1v1 } from "./Gradient/scan_diag_1v1";
+import { sheen_1 } from "./Gradient/sheen_1";
 import { snake_1 } from "./Gradient/snake_1";
 import { snake_1v1 } from "./Gradient/snake_1v1";
 import { snake_2 } from "./Gradient/snake_2";
@@ -117,6 +118,7 @@ export namespace SVGDefsSamples {
             scan_1v1,
             scan_diag_1,
             scan_diag_1v1,
+            sheen_1,
             snake_1,
             snake_1v1,
             snake_2,

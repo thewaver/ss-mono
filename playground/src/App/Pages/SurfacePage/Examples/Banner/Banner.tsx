@@ -8,8 +8,8 @@ import knight from "../../../../knight.webp";
 
 import * as styles from "./Banner.css";
 
-const computeDefs = (getSize: () => Size2d, id: string) =>
-    SVGDefsSamples.Gradient.SAMPLE_CONFIGS["flow_diag_2s"].computeSVGDefs(id, undefined, {
+const computeDefs = (getSize: () => Size2d, getRef: () => HTMLElement | undefined, id: string) =>
+    SVGDefsSamples.Gradient.SAMPLE_CONFIGS["flow_diag_2s"].computeSVGDefs(id, undefined, getRef, {
         getSize,
         animationDurationMs: 4000,
         colors: {
@@ -23,9 +23,9 @@ const computeDefs = (getSize: () => Size2d, id: string) =>
 const getConfig = (id: string): SurfaceProps => ({
     borderRadii: () => CSSUtils.spreadRadius(styles.borderRadius),
     borderWidths: () => CSSUtils.spreadWidth(4),
-    computeStrokeDefs: (getSize) => computeDefs(getSize, id),
-    computeFillDefs: (getSize) => [
-        ...computeDefs(getSize, id),
+    computeStrokeDefs: (getSize, getRef) => computeDefs(getSize, getRef, id),
+    computeFillDefs: (getSize, getRef) => [
+        ...computeDefs(getSize, getRef, id),
         {
             color: "black",
             opacity: 0.5,

@@ -7,6 +7,6 @@ export type SurfaceProps = AccessorProps<{
     borderWidths: CSSBorderWidth;
     borderRadii: CSSBorderRadius;
     lameExponents?: CSSCornerShape;
-    computeStrokeDefs?: (getSize: () => Size2d) => SVGDefs[];
-    computeFillDefs?: (getSize: () => Size2d) => SVGDefs[];
+    computeStrokeDefs?: (getSize: () => Size2d, getRef: () => HTMLElement | undefined) => SVGDefs[];
+    computeFillDefs?: (getSize: () => Size2d, getRef: () => HTMLElement | undefined) => SVGDefs[];
 }>;

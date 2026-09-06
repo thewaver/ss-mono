@@ -14,11 +14,11 @@ export const Shape = (props: ShapeProps) => {
     const [getRootSize, setRootSize] = createSignal<Size2d>({ width: 0, height: 0 });
 
     const getFillDefs = createMemo(() => {
-        return props.computeFillDefs?.(getRootSize);
+        return props.computeFillDefs?.(getRootSize, getRootRef);
     });
 
     const getStrokeDefs = createMemo(() => {
-        return props.computeStrokeDefs?.(getRootSize);
+        return props.computeStrokeDefs?.(getRootSize, getRootRef);
     });
 
     const getPaths = createMemo(() => {

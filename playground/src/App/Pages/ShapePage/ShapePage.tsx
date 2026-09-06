@@ -8,6 +8,7 @@ import { assignInlineVars } from "@vanilla-extract/dynamic";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { splitEntriesIntoGroups } from "../../PageComponents/SampleGroups/SampleGroups.const";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import {
@@ -21,27 +22,6 @@ import { DefaultExample } from "./Examples/Default";
 import type { ShapeExampleProps } from "./ShapePage.types";
 
 import * as styles from "./ShapePage.css";
-
-const extractOptionGroupWord = (key: string) => {
-    const match = key.match(/^[a-z]+/);
-    return match ? match[0] : key;
-};
-
-const splitEntriesIntoGroups = <K, T extends Record<string, K>>(
-    o: T,
-    getGroupName: (key: string) => string = extractOptionGroupWord,
-) => {
-    const result: Record<string, Partial<T>> = {};
-
-    for (const [key, value] of Object.entries(o) as [keyof T, T[keyof T]][]) {
-        const group = getGroupName(key as string);
-
-        result[group] ??= {};
-        result[group][key] = value;
-    }
-
-    return result;
-};
 
 const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.SAMPLE_CONFIGS);
 const GROUPPED_PATTERNS = splitEntriesIntoGroups(SVGDefsSamples.Pattern.SAMPLE_CONFIGS);
@@ -132,8 +112,8 @@ const StressTestWrapper = ({
                         )
                     }
                     computePoints={(size) => ShapeConst.getDefaultShapePoints(access(shapeKind), size)}
-                    computeStrokeDefs={(getSize) =>
-                        getStrokeConfig().computeSVGDefs(`stroke-${id}`, undefined, {
+                    computeStrokeDefs={(getSize, getRef) =>
+                        getStrokeConfig().computeSVGDefs(`stroke-${id}`, undefined, getRef, {
                             getSize,
                             animationDurationMs: access(animationDurationMs),
                             colors: access(colors),
@@ -148,8 +128,8 @@ const StressTestWrapper = ({
                             ),
                         },
                     ]}
-                    computeFillDefs={(getSize) =>
-                        getFillConfig().computeSVGDefs(`fill-${id}`, undefined, {
+                    computeFillDefs={(getSize, getRef) =>
+                        getFillConfig().computeSVGDefs(`fill-${id}`, undefined, getRef, {
                             getSize,
                             cellSize: {
                                 width:

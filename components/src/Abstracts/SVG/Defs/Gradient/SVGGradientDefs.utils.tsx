@@ -1,11 +1,15 @@
 import type { JSX } from "solid-js";
+import { untrack } from "solid-js";
 
 import { SVGUtils } from "@thewaver/ss-utils";
 
+import { access } from "../../../../Utils/propUtils";
 import type { SVGLinearGradientDefs, SVGRadialGradientDefs } from "./SVGGradientDefs.types";
 
+type GradientColors = { value: string; stop?: number }[];
+
 export namespace SVGGradientDefsUtils {
-    const resolveStops = (colors: (SVGLinearGradientDefs | SVGRadialGradientDefs)["colors"]) =>
+    const resolveStops = (colors: GradientColors) =>
         colors.map((c, i) => {
             const prevIdx = colors.findLastIndex((x, j) => j <= i && x.stop != null);
             const nextIdx = colors.findIndex((x, j) => j >= i && x.stop != null);
@@ -21,27 +25,37 @@ export namespace SVGGradientDefsUtils {
             );
         });
 
-    const renderSmoothGradientStops = (colors: (SVGLinearGradientDefs | SVGRadialGradientDefs)["colors"], id: string) =>
-        resolveStops(colors).map((stop, i) => (
-            <stop id={`${id}-stop-${i}`} offset={`${stop}%`} stop-color={colors[i].value} />
+    const renderSmoothGradientStops = (getColors: () => GradientColors, id: string) =>
+        untrack(getColors).map((_unused, i) => (
+            <stop
+                id={`${id}-stop-${i}`}
+                offset={`${resolveStops(getColors())[i]}%`}
+                stop-color={getColors()[i].value}
+            />
         ));
 
-    const renderBandedGradientStops = (
-        colors: (SVGLinearGradientDefs | SVGRadialGradientDefs)["colors"],
-        id: string,
-    ) => {
-        if (!colors.length) return [];
+    const renderBandedGradientStops = (getColors: () => GradientColors, id: string) => {
+        const count = untrack(getColors).length;
 
-        const stops: JSX.Element[] = [];
-        const resolvedStops = resolveStops(colors);
+        if (!count) return [];
 
-        stops.push(<stop id={`${id}-stop-0-start`} offset="0%" stop-color={colors[0].value} />);
+        const stops: JSX.Element[] = [<stop id={`${id}-stop-0-start`} offset="0%" stop-color={getColors()[0].value} />];
 
-        for (let i = 1; i < colors.length; i++) {
-            const stop = resolvedStops[i];
-
-            stops.push(<stop id={`${id}-stop-${i - 1}-end`} offset={`${stop}%`} stop-color={colors[i - 1].value} />);
-            stops.push(<stop id={`${id}-stop-${i}-start`} offset={`${stop}%`} stop-color={colors[i].value} />);
+        for (let i = 1; i < count; i++) {
+            stops.push(
+                <stop
+                    id={`${id}-stop-${i - 1}-end`}
+                    offset={`${resolveStops(getColors())[i]}%`}
+                    stop-color={getColors()[i - 1].value}
+                />,
+            );
+            stops.push(
+                <stop
+                    id={`${id}-stop-${i}-start`}
+                    offset={`${resolveStops(getColors())[i]}%`}
+                    stop-color={getColors()[i].value}
+                />,
+            );
         }
 
         return stops;
@@ -52,14 +66,24 @@ export namespace SVGGradientDefsUtils {
         custom?: JSX.Element | ((x1: number, y1: number, x2: number, y2: number) => JSX.Element),
     ) => {
         const { id, angle, offset, scale, colors, spreadKind, ...baseProps } = defs;
-        const { x1, y1, x2, y2 } = SVGUtils.getLinearCoords({ angle, offset, scale });
+        const getColors = () => access(colors);
+        const getCoords = () =>
+            SVGUtils.getLinearCoords({ angle: access(angle), offset: access(offset), scale: access(scale) });
+        const initial = untrack(getCoords);
 
         return (
-            <linearGradient {...baseProps} id={id} x1={x1} y1={y1} x2={x2} y2={y2}>
-                {typeof custom === "function" ? custom(x1, y1, x2, y2) : custom}
+            <linearGradient
+                {...baseProps}
+                id={id}
+                x1={getCoords().x1}
+                y1={getCoords().y1}
+                x2={getCoords().x2}
+                y2={getCoords().y2}
+            >
+                {typeof custom === "function" ? custom(initial.x1, initial.y1, initial.x2, initial.y2) : custom}
                 {spreadKind === "banded"
-                    ? renderBandedGradientStops(colors, id)
-                    : renderSmoothGradientStops(colors, id)}
+                    ? renderBandedGradientStops(getColors, id)
+                    : renderSmoothGradientStops(getColors, id)}
             </linearGradient>
         );
     };
@@ -71,15 +95,18 @@ export namespace SVGGradientDefsUtils {
         custom?: JSX.Element | ((cx: number, cy: number, r: number) => JSX.Element),
     ) => {
         const { id, colors, origin, scale, spreadKind, ...baseProps } = defs;
-        const o = origin ?? DEFAULT_RADIAL_ORIGIN;
-        const r = 0.5 * (scale ?? 1);
+        const getColors = () => access(colors);
+        const getOrigin = () => access(origin) ?? DEFAULT_RADIAL_ORIGIN;
+        const getRadius = () => 0.5 * (access(scale) ?? 1);
+        const initialOrigin = untrack(getOrigin);
+        const initialRadius = untrack(getRadius);
 
         return (
-            <radialGradient {...baseProps} id={id} cx={o.x} cy={o.y} r={r}>
-                {typeof custom === "function" ? custom(o.x, o.y, r) : custom}
+            <radialGradient {...baseProps} id={id} cx={getOrigin().x} cy={getOrigin().y} r={getRadius()}>
+                {typeof custom === "function" ? custom(initialOrigin.x, initialOrigin.y, initialRadius) : custom}
                 {spreadKind === "banded"
-                    ? renderBandedGradientStops(colors, id)
-                    : renderSmoothGradientStops(colors, id)}
+                    ? renderBandedGradientStops(getColors, id)
+                    : renderSmoothGradientStops(getColors, id)}
             </radialGradient>
         );
     };
