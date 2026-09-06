@@ -6024,7 +6024,18 @@ numbers, not as `px` strings — otherwise invents one, and the first `GlassSurf
 literals now live in `BORDER_RADIUS_HALF` and `BORDER_RADIUS_FULL` and the theme is built from them, so there
 is one source of truth for both forms.
 
-**`GlassDefs` names four groups because the effect has four parts**: the backdrop blur every browser gets,
+**`GlassDefs` names five groups, and the first of them is shared.** The effect has four parts — the backdrop
+blur every browser gets, the ripple only Chromium gets, the tint, and the sheen — but the ripple and the sheen
+were each describing their own noise, so the highlight sat on bumps the distortion knew nothing about. One
+`noise` group carrying `frequency`, `octaves` and `seed` now feeds both, which is what makes the light respect
+the distortion rather than merely coexist with it. The user's call, and it collapsed six controls into three.
+
+**The two scales stayed apart, deliberately.** They look like the same knob and are not: the ripple's `scale`
+is how far the shared field pushes the backdrop, in pixels, while the sheen's `surfaceScale` is how tall that
+same field reads to the light. One field, two multipliers, two units. Merging them would have removed a degree
+of freedom the tuning sweeps had been using. Asked about and settled by the user in those terms.
+
+**`GlassDefs`'s remaining groups**: the backdrop blur every browser gets,
 the ripple only Chromium gets, the tint, and the sheen. Nothing beyond what the effect actually has was
 invented for it. It lives in `Abstracts`, which renders no DOM and is where shared vocabulary belongs, and
 `Glass.utils.tsx` builds JSX there the way `SVGFilterDefs.factory.tsx` already does.

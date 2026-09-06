@@ -1004,7 +1004,16 @@ are in `decisions.md` under _"`Timeline`: a window over a range"_. What is outst
 The component is built and works: two backdrop layers, the tint, and a specular sheen that follows the
 pointer, with a draggable pane on its page. `GlassDefs` names the four groups of settings, and the radial
 `sheen_1` counterpart is built and in the gradient registry. The reasoning is in `decisions.md` under
-_"`GlassSurface`, and the two things that decide its shape"_. Three things are outstanding.
+_"`GlassSurface`, and the two things that decide its shape"_. The ripple and the sheen now share one
+noise field. Three things are outstanding.
+
+- **The defaults should be the user's tuned values, in one place.** Also asked for. `DEFAULT_GLASS_DEFS` and
+  the Playground page have drifted apart — the page sits at a ripple frequency of 0.025 and a tint opacity of
+  0.2 against the component's 0.012 and 0.1, because the page's numbers were tuned by hand and the component's
+  were not. The component's defaults become whatever the user settles on, and the page seeds every control
+  from them rather than repeating any number. The sheen and seed controls already do this; the older ones do
+  not. **The user intends to fine-tune before this is done**, so the values to copy are the ones current at
+  that point, not today's.
 
 - **The page cannot be reached.** `GlassSurface` sits under `Composites`, which the Playground hides behind
   `SHOW_COMPOSITES`, currently `false`. `Surface` is in the same position. Nothing is broken; the route

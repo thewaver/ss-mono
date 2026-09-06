@@ -22,12 +22,6 @@ const BLUR_RADIUS_STEP = 1;
 const MIN_RIPPLE_SCALE = 0;
 const MAX_RIPPLE_SCALE = 80;
 const RIPPLE_SCALE_STEP = 1;
-const MIN_RIPPLE_OCTAVES = 1;
-const MAX_RIPPLE_OCTAVES = 10;
-const RIPPLE_OCTAVES_STEP = 1;
-const MIN_RIPPLE_FREQUENCY = 0;
-const MAX_RIPPLE_FREQUENCY = 0.25;
-const RIPPLE_FREQUENCY_STEP = 0.005;
 const MIN_SEED = 0;
 const MAX_SEED = 40;
 const SEED_STEP = 1;
@@ -57,16 +51,13 @@ export const GlassSurfacePage = () => {
     const [getBorderRadius, setBorderRadius] = createSignal(BORDER_RADIUS_FULL);
     const [getBlurRadius, setBlurRadius] = createSignal(6);
     const [getRippleScale, setRippleScale] = createSignal(12);
-    const [getRippleFrequency, setRippleFrequency] = createSignal(0.025);
-    const [getRippleOctaves, setRippleOctaves] = createSignal(2);
-    const [getRippleSeed, setRippleSeed] = createSignal(DEFAULT_GLASS_DEFS.ripple.seed);
+    const [getNoiseFrequency, setNoiseFrequency] = createSignal(DEFAULT_GLASS_DEFS.noise.frequency);
+    const [getNoiseOctaves, setNoiseOctaves] = createSignal(DEFAULT_GLASS_DEFS.noise.octaves);
+    const [getNoiseSeed, setNoiseSeed] = createSignal(DEFAULT_GLASS_DEFS.noise.seed);
     const [getLightHeight, setLightHeight] = createSignal(DEFAULT_GLASS_DEFS.sheen.lightHeight);
     const [getSurfaceScale, setSurfaceScale] = createSignal(DEFAULT_GLASS_DEFS.sheen.surfaceScale);
     const [getSpecularConstant, setSpecularConstant] = createSignal(DEFAULT_GLASS_DEFS.sheen.specularConstant);
     const [getSpecularExponent, setSpecularExponent] = createSignal(DEFAULT_GLASS_DEFS.sheen.specularExponent);
-    const [getGrainFrequency, setGrainFrequency] = createSignal(DEFAULT_GLASS_DEFS.sheen.grainFrequency);
-    const [getGrainOctaves, setGrainOctaves] = createSignal(DEFAULT_GLASS_DEFS.sheen.grainOctaves);
-    const [getGrainSeed, setGrainSeed] = createSignal(DEFAULT_GLASS_DEFS.sheen.grainSeed);
     const [getTintColor, setTintColor] = createSignal("#FFFFFF");
     const [getTintOpacity, setTintOpacity] = createSignal(0.2);
 
@@ -75,16 +66,13 @@ export const GlassSurfacePage = () => {
             borderRadius: getBorderRadius,
             blurRadius: getBlurRadius,
             rippleScale: getRippleScale,
-            rippleFrequency: getRippleFrequency,
-            rippleOctaves: getRippleOctaves,
-            rippleSeed: getRippleSeed,
+            noiseFrequency: getNoiseFrequency,
+            noiseOctaves: getNoiseOctaves,
+            noiseSeed: getNoiseSeed,
             lightHeight: getLightHeight,
             surfaceScale: getSurfaceScale,
             specularConstant: getSpecularConstant,
             specularExponent: getSpecularExponent,
-            grainFrequency: getGrainFrequency,
-            grainOctaves: getGrainOctaves,
-            grainSeed: getGrainSeed,
             tintColor: getTintColor,
             tintOpacity: getTintOpacity,
         };
@@ -124,6 +112,39 @@ export const GlassSurfacePage = () => {
                     />
                 </PageProp>
 
+                <PageProp key={"noiseFrequency"} label={"Noise scale"}>
+                    <PageNumberField
+                        value={getNoiseFrequency}
+                        min={() => MIN_GRAIN_FREQUENCY}
+                        max={() => MAX_GRAIN_FREQUENCY}
+                        step={() => GRAIN_FREQUENCY_STEP}
+                        ariaLabel={"Noise scale"}
+                        onInput={setNoiseFrequency}
+                    />
+                </PageProp>
+
+                <PageProp key={"noiseOctaves"} label={"Noise octaves"}>
+                    <PageNumberField
+                        value={getNoiseOctaves}
+                        min={() => MIN_GRAIN_OCTAVES}
+                        max={() => MAX_GRAIN_OCTAVES}
+                        step={() => GRAIN_OCTAVES_STEP}
+                        ariaLabel={"Noise octaves"}
+                        onInput={setNoiseOctaves}
+                    />
+                </PageProp>
+
+                <PageProp key={"noiseSeed"} label={"Noise seed"}>
+                    <PageNumberField
+                        value={getNoiseSeed}
+                        min={() => MIN_SEED}
+                        max={() => MAX_SEED}
+                        step={() => SEED_STEP}
+                        ariaLabel={"Noise seed"}
+                        onInput={setNoiseSeed}
+                    />
+                </PageProp>
+
                 <PageProp key={"rippleScale"} label={"Ripple bend (px)"}>
                     <PageNumberField
                         value={getRippleScale}
@@ -132,39 +153,6 @@ export const GlassSurfacePage = () => {
                         step={() => RIPPLE_SCALE_STEP}
                         ariaLabel={"Ripple bend"}
                         onInput={setRippleScale}
-                    />
-                </PageProp>
-
-                <PageProp key={"rippleFrequency"} label={"Ripple scale"}>
-                    <PageNumberField
-                        value={getRippleFrequency}
-                        min={() => MIN_RIPPLE_FREQUENCY}
-                        max={() => MAX_RIPPLE_FREQUENCY}
-                        step={() => RIPPLE_FREQUENCY_STEP}
-                        ariaLabel={"Ripple scale"}
-                        onInput={setRippleFrequency}
-                    />
-                </PageProp>
-
-                <PageProp key={"rippleOctaves"} label={"Ripple octaves"}>
-                    <PageNumberField
-                        value={getRippleOctaves}
-                        min={() => MIN_RIPPLE_OCTAVES}
-                        max={() => MAX_RIPPLE_OCTAVES}
-                        step={() => RIPPLE_OCTAVES_STEP}
-                        ariaLabel={"Ripple octaves"}
-                        onInput={setRippleOctaves}
-                    />
-                </PageProp>
-
-                <PageProp key={"rippleSeed"} label={"Ripple seed"}>
-                    <PageNumberField
-                        value={getRippleSeed}
-                        min={() => MIN_SEED}
-                        max={() => MAX_SEED}
-                        step={() => SEED_STEP}
-                        ariaLabel={"Ripple seed"}
-                        onInput={setRippleSeed}
                     />
                 </PageProp>
 
@@ -209,39 +197,6 @@ export const GlassSurfacePage = () => {
                         step={() => SPECULAR_EXPONENT_STEP}
                         ariaLabel={"Shininess"}
                         onInput={setSpecularExponent}
-                    />
-                </PageProp>
-
-                <PageProp key={"grainFrequency"} label={"Grain scale"}>
-                    <PageNumberField
-                        value={getGrainFrequency}
-                        min={() => MIN_GRAIN_FREQUENCY}
-                        max={() => MAX_GRAIN_FREQUENCY}
-                        step={() => GRAIN_FREQUENCY_STEP}
-                        ariaLabel={"Grain scale"}
-                        onInput={setGrainFrequency}
-                    />
-                </PageProp>
-
-                <PageProp key={"grainOctaves"} label={"Grain octaves"}>
-                    <PageNumberField
-                        value={getGrainOctaves}
-                        min={() => MIN_GRAIN_OCTAVES}
-                        max={() => MAX_GRAIN_OCTAVES}
-                        step={() => GRAIN_OCTAVES_STEP}
-                        ariaLabel={"Grain octaves"}
-                        onInput={setGrainOctaves}
-                    />
-                </PageProp>
-
-                <PageProp key={"grainSeed"} label={"Grain seed"}>
-                    <PageNumberField
-                        value={getGrainSeed}
-                        min={() => MIN_SEED}
-                        max={() => MAX_SEED}
-                        step={() => SEED_STEP}
-                        ariaLabel={"Grain seed"}
-                        onInput={setGrainSeed}
                     />
                 </PageProp>
 

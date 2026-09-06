@@ -1,11 +1,14 @@
+export type GlassNoiseDefs = {
+    frequency: number;
+    octaves: number;
+    seed: number;
+};
+
 export type GlassBackdropDefs = {
     blurRadius: number;
 };
 
 export type GlassRippleDefs = {
-    frequency: number;
-    octaves: number;
-    seed: number;
     scale: number;
 };
 
@@ -19,12 +22,10 @@ export type GlassSheenDefs = {
     surfaceScale: number;
     specularConstant: number;
     specularExponent: number;
-    grainFrequency: number;
-    grainOctaves: number;
-    grainSeed: number;
 };
 
 export type GlassDefs = {
+    noise: GlassNoiseDefs;
     backdrop: GlassBackdropDefs;
     ripple: GlassRippleDefs;
     tint: GlassTintDefs;

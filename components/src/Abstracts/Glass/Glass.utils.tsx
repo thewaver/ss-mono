@@ -13,6 +13,7 @@ const NO_EDGE_THICKNESSES = [0];
 
 export namespace GlassUtils {
     export const mergeDefs = (partial: PartialGlassDefs | undefined): GlassDefs => ({
+        noise: { ...DEFAULT_GLASS_DEFS.noise, ...partial?.noise },
         backdrop: { ...DEFAULT_GLASS_DEFS.backdrop, ...partial?.backdrop },
         ripple: { ...DEFAULT_GLASS_DEFS.ripple, ...partial?.ripple },
         tint: { ...DEFAULT_GLASS_DEFS.tint, ...partial?.tint },
@@ -73,9 +74,9 @@ export namespace GlassUtils {
                                     z: defs.sheen.lightHeight,
                                 },
                                 surface: {
-                                    baseFrequency: defs.sheen.grainFrequency,
-                                    numOctaves: defs.sheen.grainOctaves,
-                                    seed: defs.sheen.grainSeed,
+                                    baseFrequency: defs.noise.frequency,
+                                    numOctaves: defs.noise.octaves,
+                                    seed: defs.noise.seed,
                                 },
                                 surfaceScale: defs.sheen.surfaceScale,
                                 specularConstant: defs.sheen.specularConstant,
@@ -92,9 +93,9 @@ export namespace GlassUtils {
     export const computeBackdropFilterElement = (id: string, defs: GlassDefs) =>
         new SVGFilterDefsFactory(getBackdropFilterId(id))
             .addTurbulenceFilter({
-                baseFrequency: defs.ripple.frequency,
-                numOctaves: defs.ripple.octaves,
-                seed: defs.ripple.seed,
+                baseFrequency: defs.noise.frequency,
+                numOctaves: defs.noise.octaves,
+                seed: defs.noise.seed,
                 scale: defs.ripple.scale,
                 edgeFade: defs.ripple.scale,
             })

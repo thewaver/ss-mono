@@ -18,19 +18,16 @@ const toOffset = (ratio: number) =>
 export const DefaultExample = ({
     borderRadius,
     blurRadius,
+    noiseFrequency,
+    noiseOctaves,
+    noiseSeed,
     rippleScale,
-    rippleFrequency,
-    rippleOctaves,
-    rippleSeed,
     tintColor,
     tintOpacity,
     lightHeight,
     surfaceScale,
     specularConstant,
     specularExponent,
-    grainFrequency,
-    grainOctaves,
-    grainSeed,
 }: GlassSurfaceExampleProps) => {
     const [getStageRef, setStageRef] = createSignal<HTMLElement>();
     const [getRatio, setRatio] = createSignal(STARTING_RATIO);
@@ -61,22 +58,19 @@ export const DefaultExample = ({
                 <GlassSurface
                     borderRadii={() => CSSUtils.spreadRadius(access(borderRadius))}
                     glassDefs={() => ({
-                        backdrop: { blurRadius: access(blurRadius) },
-                        ripple: {
-                            scale: access(rippleScale),
-                            frequency: access(rippleFrequency),
-                            octaves: access(rippleOctaves),
-                            seed: access(rippleSeed),
+                        noise: {
+                            frequency: access(noiseFrequency),
+                            octaves: access(noiseOctaves),
+                            seed: access(noiseSeed),
                         },
+                        backdrop: { blurRadius: access(blurRadius) },
+                        ripple: { scale: access(rippleScale) },
                         tint: { color: access(tintColor), opacity: access(tintOpacity) },
                         sheen: {
                             lightHeight: access(lightHeight),
                             surfaceScale: access(surfaceScale),
                             specularConstant: access(specularConstant),
                             specularExponent: access(specularExponent),
-                            grainFrequency: access(grainFrequency),
-                            grainOctaves: access(grainOctaves),
-                            grainSeed: access(grainSeed),
                         },
                     })}
                 >

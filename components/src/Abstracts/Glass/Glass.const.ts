@@ -1,13 +1,15 @@
 import type { GlassDefs } from "./Glass.types";
 
 export const DEFAULT_GLASS_DEFS: GlassDefs = {
+    noise: {
+        frequency: 0.025,
+        octaves: 2,
+        seed: 9,
+    },
     backdrop: {
         blurRadius: 6,
     },
     ripple: {
-        frequency: 0.012,
-        octaves: 2,
-        seed: 9,
         scale: 12,
     },
     tint: {
@@ -19,8 +21,5 @@ export const DEFAULT_GLASS_DEFS: GlassDefs = {
         surfaceScale: 0.25,
         specularConstant: 1,
         specularExponent: 120,
-        grainFrequency: 0.05,
-        grainOctaves: 4,
-        grainSeed: 4,
     },
 };
