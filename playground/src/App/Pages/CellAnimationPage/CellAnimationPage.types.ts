@@ -3,6 +3,7 @@ import type { Signal } from "solid-js";
 import type {
     AccessorProps,
     CellAnimationBreakpoints,
+    CellAnimationFinalFrame,
     CellAnimationKeyframes,
     CellAnimationOrigins,
     CellAnimationPlayback,
@@ -20,7 +21,9 @@ export type CellAnimationExampleProps = AccessorProps<{
     playbackOpts: CellAnimationPlayback.PlaybackOpts;
     animationType: CellAnimationKeyframes.AnimationType;
     animationDurationMs: number;
+    animationIterationCount: number;
     animationIterationDelayMs: number;
+    finalFrame: CellAnimationFinalFrame;
     playbackSignal: Signal<boolean>;
 }>;
 

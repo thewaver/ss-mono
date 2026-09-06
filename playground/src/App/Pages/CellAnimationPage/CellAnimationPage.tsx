@@ -10,7 +10,7 @@ import {
     SVGDefsSamples,
     access,
 } from "@thewaver/ss-components";
-import type { WeightOpts } from "@thewaver/ss-components";
+import type { CellAnimationFinalFrame, WeightOpts } from "@thewaver/ss-components";
 import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -78,6 +78,10 @@ const MAX_DURATION_MS = 10000;
 const DURATION_STEP_MS = 100;
 const MIN_ITERATION_DELAY_MS = 0;
 const MAX_ITERATION_DELAY_MS = 5000;
+const MIN_ITERATION_COUNT = 0;
+const MAX_ITERATION_COUNT = 10;
+const ENDLESS_ITERATION_COUNT = 0;
+const FINAL_FRAMES: CellAnimationFinalFrame[] = ["source", "cells", "nothing"];
 const MIN_HOLD_MS = 0;
 const MAX_HOLD_MS = 5000;
 
@@ -261,6 +265,8 @@ export const CellAnimationPage = () => {
     const [getAnimationType, setAnimationType] = createSignal<CellAnimationKeyframes.AnimationType>("zoomIn");
     const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(2000);
     const [getAnimationIterationDelayMs, setAnimationIterationDelayMs] = createSignal(1000);
+    const [getAnimationIterationCount, setAnimationIterationCount] = createSignal(ENDLESS_ITERATION_COUNT);
+    const [getFinalFrame, setFinalFrame] = createSignal<CellAnimationFinalFrame>("cells");
     const [cellCount, setCellCount] = createStore<Point2d>({ ...STRESS_CELL_COUNT });
     const [weightOpts, setWeightOpts] = createStore<WeightOpts>({
         shouldMakeUnique: false,
@@ -272,7 +278,7 @@ export const CellAnimationPage = () => {
         easing: "linear",
     });
     const [playbackOpts, setPlaybackOpts] = createStore<CellAnimationPlayback.PlaybackOpts>({
-        dir: "normal",
+        dir: "alternate",
         holdMs: 1000,
     });
 
@@ -287,7 +293,10 @@ export const CellAnimationPage = () => {
             playbackOpts: () => playbackOpts,
             animationType: getAnimationType,
             animationDurationMs: getAnimationDurationMs,
+            animationIterationCount: () =>
+                getAnimationIterationCount() === ENDLESS_ITERATION_COUNT ? Infinity : getAnimationIterationCount(),
             animationIterationDelayMs: getAnimationIterationDelayMs,
+            finalFrame: getFinalFrame,
         };
 
         return [
@@ -437,6 +446,27 @@ export const CellAnimationPage = () => {
                         step={() => DURATION_STEP_MS}
                         ariaLabel={"Iteration delay"}
                         onInput={setAnimationIterationDelayMs}
+                    />
+                </PageProp>
+
+                <PageProp key={"animationIterationCount"} label={"Iteration count (0 = endless)"}>
+                    <PageNumberField
+                        value={getAnimationIterationCount}
+                        min={() => MIN_ITERATION_COUNT}
+                        max={() => MAX_ITERATION_COUNT}
+                        step={() => CELL_COUNT_STEP}
+                        ariaLabel={"Iteration count"}
+                        onInput={setAnimationIterationCount}
+                    />
+                </PageProp>
+
+                <PageProp key={"finalFrame"} label={"Final frame is"}>
+                    <PageSelectField
+                        value={getFinalFrame}
+                        values={() => FINAL_FRAMES}
+                        isDisabled={() => getAnimationIterationCount() === ENDLESS_ITERATION_COUNT}
+                        ariaLabel={"Final frame"}
+                        onChange={(frame) => setFinalFrame(() => frame)}
                     />
                 </PageProp>
 

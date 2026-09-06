@@ -11,6 +11,10 @@ export const cellAnimationAnchor = style({
     opacity: 0,
 });
 
+export const cellAnimationAnchorRevealed = style({
+    opacity: 1,
+});
+
 export const cellSrcVar = createVar();
 export const cellSizeVar = createVar();
 

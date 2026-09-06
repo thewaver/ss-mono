@@ -2,6 +2,8 @@ import type { CSSAnimationKey, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
+export type CellAnimationFinalFrame = "source" | "cells" | "nothing";
+
 export type CellAnimationEvaluationResult = Partial<Record<CSSAnimationKey, number | number[]>>;
 
 export type CellAnimationEvaluationDefs = {
@@ -20,6 +22,7 @@ export type CellAnimationProps = AccessorProps<{
     animationIterationCount?: number;
     animationIterationDelayMs?: number;
     playbackSignal?: SignalSource<boolean>;
+    finalFrame?: CellAnimationFinalFrame;
     computeCellWeights?: (count: Point2d) => number[][];
     computeRootAnimation?: (timeline: number) => CellAnimationEvaluationResult;
     computeCellAnimation: (defs: CellAnimationEvaluationDefs, timeline: number) => CellAnimationEvaluationResult;

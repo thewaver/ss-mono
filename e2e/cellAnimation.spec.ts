@@ -148,10 +148,34 @@ test("a serialised gradient keeps animating, having had its begin written in", a
     );
 });
 
+/** The pattern sample's own choice, and the one length here that no knob on the panel decides. */
+const PATTERN_CYCLE_MULTIPLE = 4;
+
+/**
+ * What the cells are handed for one iteration, worked out from the panel rather than written down. Three
+ * knobs decide it: a pass that alternates runs out and back with the hold parked between the legs, so its
+ * iteration is twice the duration plus the hold, and a pass that does not is the duration alone. The duration
+ * field is always the one-way trip.
+ */
+const cycleMs = async (page: import("@playwright/test").Page) => {
+    const durationMs = Number(await page.locator(`${prop("animationDurationMs")} input`).inputValue());
+    const holdMs = Number(await page.locator(`${prop("holdMs")} input`).inputValue());
+    const dir = ((await page.locator(`${prop("playbackDir")} [role="combobox"]`).textContent()) ?? "").trim();
+
+    return dir.startsWith("alternate") ? durationMs * 2 + holdMs : durationMs;
+};
+
 /**
  * A drawn source is built from the same registry the Shape page reads, so the two should not be able to drift
  * apart on the things a viewer would notice: the palette is the samples' own, and the animation lasts as long
  * as the cell animation it is being sliced by rather than a length of its own.
+ *
+ * Every length below is asked of the panel first and compared second, because a literal here cannot tell a
+ * break from somebody changing their mind: switching the page's opening direction from `normal` to
+ * `alternate` more than doubles every duration in the source without anything having gone wrong. What is
+ * asserted is the relationship — the source runs for exactly one cell iteration, whatever the knobs currently
+ * make that — and the direction is flipped at the end so the rule is exercised both ways rather than only in
+ * whichever state the page happens to open in.
  */
 test("a drawn source takes its palette from the samples and its duration from the page", async ({ page }) => {
     const sourceOf = async (key: string) =>
@@ -159,12 +183,17 @@ test("a drawn source takes its palette from the samples and its duration from th
             (await page.locator(`${demo(key)} img`).getAttribute("src"))!.replace("data:image/svg+xml,", ""),
         );
 
+    const delayMs = Number(await page.locator(`${prop("animationIterationDelayMs")} input`).inputValue());
+    const opening = await cycleMs(page);
+
     expect(await sourceOf("gradient"), "the Shape palette, not a second one").toContain("#FFFF00");
-    expect(await sourceOf("gradient"), "and the page's own duration").toContain('dur="2000ms"');
+    expect(await sourceOf("gradient"), "and the iteration the panel currently describes").toContain(
+        `dur="${opening}ms"`,
+    );
     expect(
         await sourceOf("pattern"),
         "a pattern sample is free to run at a multiple of what it is given, and this one takes four times",
-    ).toContain('dur="8000ms"');
+    ).toContain(`dur="${opening * PATTERN_CYCLE_MULTIPLE}ms"`);
     expect(
         await sourceOf("pattern"),
         "a repeating fill has no beat to be out of step with, so it flows on without the pause",
@@ -173,19 +202,36 @@ test("a drawn source takes its palette from the samples and its duration from th
     expect(
         await sourceOf("gradient"),
         "the pause between repeats is the page's too, expressed as a begin that refers to the animation's own end",
-    ).toMatch(/begin="0s;[^"]+\.end\+1000ms"/);
+    ).toMatch(new RegExp(`begin="0s;[^"]+\\.end\\+${delayMs}ms"`));
 
     const duration = page.locator(`${prop("animationDurationMs")} input`);
 
     await duration.fill("3000");
     await duration.press("Enter");
 
+    const stretched = await cycleMs(page);
+
+    expect(stretched, "the knob moved, so there is something to see").not.toBe(opening);
+
     await expect
         .poll(() => sourceOf("gradient"), { message: "changing the duration rebuilds the source at the new length" })
-        .toContain('dur="3000ms"');
+        .toContain(`dur="${stretched}ms"`);
     await expect
         .poll(() => sourceOf("pattern"), { message: "and the multiple follows it rather than staying put" })
-        .toContain('dur="12000ms"');
+        .toContain(`dur="${stretched * PATTERN_CYCLE_MULTIPLE}ms"`);
+
+    await page.locator(`${prop("playbackDir")} [role="combobox"]`).click();
+    await page.getByRole("option", { name: "normal", exact: true }).click();
+
+    const oneWay = await cycleMs(page);
+
+    expect(oneWay, "a pass that does not alternate drops the return leg and the hold with it").toBeLessThan(stretched);
+
+    await expect
+        .poll(() => sourceOf("gradient"), {
+            message: "and the source is rebuilt at the leg rather than the round trip",
+        })
+        .toContain(`dur="${oneWay}ms"`);
 });
 
 /**

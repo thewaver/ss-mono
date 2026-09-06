@@ -1,11 +1,11 @@
-import { For, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
 
 import { MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
 import { access } from "../../Utils/propUtils";
-import type { CellAnimationEvaluationDefs, CellAnimationProps } from "./CellAnimation.types";
+import type { CellAnimationEvaluationDefs, CellAnimationFinalFrame, CellAnimationProps } from "./CellAnimation.types";
 import { CellAnimationUtils } from "./CellAnimation.utils";
 
 import * as styles from "./CellAnimation.css";
@@ -14,6 +14,7 @@ const DEFAULT_CELL_ANIMATION_DURATION_MS = 2000;
 const DEFAULT_CELL_ANIMATION_ITERATION_COUNT = Infinity;
 const DEFAULT_CELL_ANIMATION_ITERATION_DELAY_MS = 0;
 const DEFAULT_CELL_ANIMATION_SIZE_ANCHOR = "width";
+const DEFAULT_CELL_ANIMATION_FINAL_FRAME: CellAnimationFinalFrame = "cells";
 const DEFAULT_CELL_ANIMATION_WEIGHT = 0;
 const CELL_ANIMATION_PERSPECTIVE_RATIO = 1.5;
 const CELL_ANIMATION_BLEED_PX = 1;
@@ -100,7 +101,17 @@ export const CellAnimation = (props: CellAnimationProps) => {
         });
     });
 
-    const getTimeline = createMemo(() => ({ source: access(props.src), iteration: getCurrentIteration() }));
+    const getSource = createMemo(() => access(props.src));
+
+    const getFinalFrame = createMemo(() => access(props.finalFrame) ?? DEFAULT_CELL_ANIMATION_FINAL_FRAME);
+
+    const getHasEnded = createMemo(() => getCurrentIteration() >= getAnimationIterationCount());
+
+    const getAreCellsMounted = createMemo(() => !getHasEnded() || getFinalFrame() === "cells");
+
+    const getIsSourceRevealed = createMemo(() => getHasEnded() && getFinalFrame() === "source");
+
+    const getTimeline = createMemo(() => ({ source: getSource(), iteration: getCurrentIteration() }));
 
     const getEvaluationDefs = createMemo<CellAnimationEvaluationDefs[]>(() =>
         getCellDefs().map((defs) => {
@@ -109,6 +120,8 @@ export const CellAnimation = (props: CellAnimationProps) => {
             return { ...defs, size: { width: bounds.width, height: bounds.height } };
         }),
     );
+
+    createEffect(on(getSource, () => setCurrentIteration(0)));
 
     createEffect(() => {
         let rafId: ReturnType<typeof requestAnimationFrame>;
@@ -150,6 +163,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
 
                 if (getCurrentIteration() + 1 >= maxIterations) {
                     props.onAnimationEnd?.();
+                    setCurrentIteration((v) => v + 1);
                 } else {
                     timeout = setTimeout(() => {
                         setCurrentIteration((v) => v + 1);
@@ -209,6 +223,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
                 ref={setImgRef}
                 src={access(props.src)}
                 class={styles.cellAnimationAnchor}
+                classList={{ [styles.cellAnimationAnchorRevealed]: getIsSourceRevealed() }}
                 width={getSizeAnchor() === "width" ? "100%" : "auto"}
                 height={getSizeAnchor() === "height" ? "100%" : "auto"}
                 aria-hidden="true"
@@ -227,26 +242,28 @@ export const CellAnimation = (props: CellAnimationProps) => {
                     perspective: getPerspective() > 0 ? `${getPerspective()}px` : "none",
                 }}
             >
-                <For each={getCellDefs()}>
-                    {(defs) => {
-                        const getBounds = createMemo(() => getCellBounds(defs.pos));
+                <Show when={getAreCellsMounted()}>
+                    <For each={getCellDefs()}>
+                        {(defs) => {
+                            const getBounds = createMemo(() => getCellBounds(defs.pos));
 
-                        return (
-                            <div
-                                class={styles.cellAnimationCell}
-                                style={{
-                                    "left": `${getBounds().x}px`,
-                                    "top": `${getBounds().y}px`,
-                                    "width": `${getBounds().width}px`,
-                                    "height": `${getBounds().height}px`,
-                                    "background-position": `${-getBounds().x}px ${-getBounds().y}px`,
-                                    "z-index": `${Math.floor((1 - defs.weight) * 100)}`,
-                                }}
-                                aria-hidden="true"
-                            />
-                        );
-                    }}
-                </For>
+                            return (
+                                <div
+                                    class={styles.cellAnimationCell}
+                                    style={{
+                                        "left": `${getBounds().x}px`,
+                                        "top": `${getBounds().y}px`,
+                                        "width": `${getBounds().width}px`,
+                                        "height": `${getBounds().height}px`,
+                                        "background-position": `${-getBounds().x}px ${-getBounds().y}px`,
+                                        "z-index": `${Math.floor((1 - defs.weight) * 100)}`,
+                                    }}
+                                    aria-hidden="true"
+                                />
+                            );
+                        }}
+                    </For>
+                </Show>
             </div>
         </div>
     );

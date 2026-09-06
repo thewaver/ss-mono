@@ -3168,6 +3168,66 @@ they run at the same length and rhythm as the cells — which is what their read
 would leave them looping at the old period while the cells take twice as long, so they take
 `computeCycleDurationMs`'s answer too.
 
+### `CellAnimation`: how a finite run stops, and why the counter runs one past the end
+
+**A finished run holds its last frame because nothing clears it.** The tick writes every cell's animation
+properties as inline styles, and the final frame is written at `t === 1` before the loop returns, so a run given
+`animationIterationCount={1}` ends on its own last pose and stays there. There is no separate "hold" mode and
+none is needed — the hold is the absence of anything undoing the last write.
+
+**The counter increments past the maximum on the last pass, even though no iteration follows it.** That looks
+redundant and is not: the animation effect re-runs whenever anything it reads changes — the window becoming
+visible again, the image resizing, the cell grid changing — and its only defence against re-running a run that
+has already finished is the `iteration >= maxIterations` guard. Incrementing only when another iteration is
+scheduled is what the first version did, which left the counter one below the maximum forever and made the
+guard unsatisfiable: tabbing away and back, or resizing the image, replayed a finished animation from the
+start. So the last pass increments too, purely so the guard can see it. A future reading that deletes the write
+because nothing consumes the value reintroduces the replay.
+
+**Which is why the source gets its own reset.** `getTimeline` pairs the source with the iteration so that a new
+`src` restarts the run; with a counter that now parks above the maximum, that pairing alone would leave a
+finite animation refusing to play for the second image. `createEffect(on(getSource, ...))` puts the counter back
+to zero when the source changes, and the pairing still covers the case where the source changes mid-run and the
+counter is already zero.
+
+**`finalFrame` is the consumer's word for what the last frame amounts to, and it is opt-in because the
+component cannot work it out.** Three values, the user's own three cases. `"source"` — the run lands on the
+untouched image, so reveal the `<img>` and unmount the cells. `"cells"` — the run lands on something only the
+grid can draw, whether partially assembled, transformed or filtered, so everything stays. This is the default,
+and it is what happens when the prop is absent. `"nothing"` — the run hides the picture, so unmount the cells
+and leave the `<img>` hidden too: an empty box of the right size.
+
+**Guessing it was considered and rejected.** Every animated value is a number against a known unit —
+`CSSConst.ANIMATION_UNITS` covers all 31 functions — so "did this land on identity" is one table of neutral
+values away, and `"source"` could in principle be detected. `"nothing"` cannot. A cell can be hidden by
+opacity, by scaling to zero, or by being translated past the container's clipped edge, and only the first two
+are readable without composing the full transform stack per cell against its box and the perspective, which
+would still be wrong under a 3D rotation. The argument that settles it is the cost of being wrong: the swap
+fires once, at the end of a run, and replaces the picture with a different picture. A detector right nineteen
+times in twenty produces a silent visual corruption at the moment least likely to be watched, which is worse
+than no detector at all. The consumer wrote the keyframes and always knows.
+
+**The root's transform and filter are deliberately left alone, including under `"source"`.** The first build
+cleared them, on the reasoning that "the final frame is the source image" cannot be true of a root that ends
+rotated. The user overruled it and kept the hatch: a consumer may want the cells gone for the cost saving while
+a filter still sits on the whole image, and clearing would take that away. So `"source"` means the cells reduce
+to the image, not that the root is untouched, and nothing the component does ever unwinds `computeRootAnimation`'s
+last write.
+
+**The name states a fact rather than issuing an order.** `finalFrame="source"` reads as a description of the
+animation the consumer wrote, which is what it is — the component's unmounting is the consequence, not the
+request. The rejected spellings were `shouldRevealSourceOnEnd`, a boolean that could not express the third
+case at all, and `endKind` with `"revealed" | "partial" | "hidden"`, where `"partial"` undersold a case that
+also covers fully visible but transformed. Values are inline in the union everywhere except the exported
+`CellAnimationFinalFrame` alias, which exists because the Playground stores one in a signal and enumerates
+them in a dropdown; `sizeAnchor` next door has no alias because nothing enumerates it.
+
+**A run held past its end does not re-evaluate on resize.** The cell boxes are laid out in the markup and
+follow the container, but the animation properties on top of them were computed against the sizes in force at
+`t === 1` and are not recomputed — anything reading `size` out of the evaluation defs will be holding a stale
+transform after a resize. Restarting instead would be worse: a held final frame that replays itself whenever a
+window changes width is not a held frame.
+
 ### Controls: `Toasts`, and a queue the consumer owns
 
 The shape question `backlog.md` parked toasts on rested on a premise that does not

@@ -42,6 +42,13 @@ immediately, and it does not slow edits to this file, `conventions.md` or `decis
 
 ## Writing replies
 
+**A hedged request is a request to discuss, not to build.** Stated by the user: _"perhaps"_, _"maybe"_,
+_"we could"_ and the like are their way of opening a design conversation, and a turn that answers one by
+shipping the thing has skipped the part they wanted. So when the ask arrives hedged, reply with the argument —
+whether the idea holds, what it would cost, what it leaves ambiguous — and wait. An unhedged instruction is
+still an instruction, and _"fix on sight"_ under **Writing code** is untouched: a defect found while answering
+gets fixed, because nobody hedged about that.
+
 **Plain English, concrete scenarios, no jargon walls.** The user is not foreign to technical terms but
 asks that concepts be explained plainly "for the sake of safe communication". Lead with what actually
 happens, as a sequence — "the user presses Escape, the modal hides, the parent variable still says open,
