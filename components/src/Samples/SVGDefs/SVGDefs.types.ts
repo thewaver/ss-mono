@@ -6,16 +6,20 @@ import type { SVGDefs } from "../../Abstracts/SVG/Defs/SVGDefs.types";
 
 export type SVGDefsColors = { [K in "primary" | "secondary" | "tertiary" | "background"]: string };
 
+export type SVGDefsBaseElementDefs = {
+    getSize: () => Size2d;
+    colors: SVGDefsColors;
+    blurWidth?: number;
+};
+
 export type IterationConfig = {
     computeDefs: (animationDurationMs: number) => Pick<SVGAnimationDefs, "animationIterationPatterns">;
 };
 
-export type PatternElementDefs = SVGAnimationDefs & {
-    getSize: () => Size2d;
-    cellSize: Size2d;
-    colors: SVGDefsColors;
-    blurWidth?: number;
-};
+export type PatternElementDefs = SVGAnimationDefs &
+    SVGDefsBaseElementDefs & {
+        cellSize: Size2d;
+    };
 
 export type PatternConfig = {
     computeSVGDefs: (
@@ -26,17 +30,24 @@ export type PatternConfig = {
     ) => SVGDefs[];
 };
 
-export type GradientElementDefs = SVGAnimationDefs & {
-    getSize: () => Size2d;
-    colors: SVGDefsColors;
-    blurWidth?: number;
-};
+export type TimedGradientElementDefs = SVGAnimationDefs & SVGDefsBaseElementDefs;
 
-export type GradientConfig = {
+export type TimedGradientConfig = {
     computeSVGDefs: (
         id: string,
         getInteractionFlags: (() => InteractionFlags) | undefined,
         getRef: (() => HTMLElement | undefined) | undefined,
-        defs: GradientElementDefs,
+        defs: TimedGradientElementDefs,
+    ) => SVGDefs[];
+};
+
+export type TrackedGradientElementDefs = SVGDefsBaseElementDefs;
+
+export type TrackedGradientConfig = {
+    computeSVGDefs: (
+        id: string,
+        getInteractionFlags: (() => InteractionFlags) | undefined,
+        getRef: (() => HTMLElement | undefined) | undefined,
+        defs: TrackedGradientElementDefs,
     ) => SVGDefs[];
 };

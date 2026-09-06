@@ -2,8 +2,11 @@ import type { Accessor, JSX } from "solid-js";
 
 import type { CarryDir } from "../../Abstracts/Carrier/Carrier.types";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type {
+    InteractionTooltipDefs,
+    InteractionWrapperProps,
+} from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
-import type { InteractionTooltipDefs, InteractionWrapperProps } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 
 export type SortableDir = CarryDir;
 

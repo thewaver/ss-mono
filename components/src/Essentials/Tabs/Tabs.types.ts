@@ -1,8 +1,8 @@
 import type { Accessor, Component, JSX, ParentProps } from "solid-js";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 import type { InteractionControlProps } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
+import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 
 export type TabsDir = "column" | "row";
 

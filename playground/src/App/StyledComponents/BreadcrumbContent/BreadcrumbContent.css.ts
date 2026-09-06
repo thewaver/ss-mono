@@ -19,7 +19,7 @@ export const breadcrumbContent = style({
 
     selectors: {
         [`&.${isCurrent}`]: {
-            color: themeVars.color.background.contrast,
+            color: "inherit",
             fontWeight: "bold",
         },
         [`&.${isHovered}`]: {

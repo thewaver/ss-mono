@@ -2,8 +2,11 @@ import type { Accessor, Component, JSX } from "solid-js";
 
 import type { FlatRow } from "../../Abstracts/Flattener/Flattener.types";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type {
+    InteractionControlProps,
+    InteractionTooltipDefs,
+} from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
-import type { InteractionControlProps, InteractionTooltipDefs } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 
 export type TreeNodeRenderProps = {
     isBranch: boolean;

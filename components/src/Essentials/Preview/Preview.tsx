@@ -2,8 +2,8 @@ import { Show, createEffect, createMemo, createSignal, createUniqueId, on, onCle
 
 import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
 import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
-import { access, accessSignal } from "../../Utils/propUtils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
+import { access, accessSignal } from "../../Utils/propUtils";
 import type { PreviewFlags, PreviewProps, PreviewSizing, PreviewTriggerProps } from "./Preview.types";
 
 import * as styles from "./Preview.css";
@@ -98,16 +98,18 @@ export const Preview = (props: PreviewProps) => {
 
     return (
         <div ref={setRootRef} class={[styles.previewRoot, styles.previewSizingVariants[getSizing()]].join(" ")}>
-            <div
-                id={contentId}
-                class={styles.previewContent}
-                style={{
-                    "height": `${getHeight()}px`,
-                    "transition-property": "height",
-                    "transition-duration": `${getTransitionDurationMs()}ms`,
-                }}
-            >
-                <div ref={setContentRef}>{props.renderContent()}</div>
+            <div class={styles.previewFrame}>
+                <div
+                    id={contentId}
+                    class={styles.previewContent}
+                    style={{
+                        "height": `${getHeight()}px`,
+                        "transition-property": "height",
+                        "transition-duration": `${getTransitionDurationMs()}ms`,
+                    }}
+                >
+                    <div ref={setContentRef}>{props.renderContent()}</div>
+                </div>
 
                 <Show when={props.renderOverlay && getIsOverflowing()}>
                     <div class={styles.previewOverlay}>

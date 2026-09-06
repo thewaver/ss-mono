@@ -3,8 +3,8 @@ import { Dynamic } from "solid-js/web";
 
 import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
-import { access } from "../../Utils/propUtils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
+import { access } from "../../Utils/propUtils";
 import type { TabPanelProps, TabsDir, TabsItemProps, TabsProps } from "./Tabs.types";
 
 import * as styles from "./Tabs.css";

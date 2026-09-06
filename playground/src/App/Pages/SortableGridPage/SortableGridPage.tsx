@@ -192,5 +192,5 @@ export const SortableGridPage = () => {
         },
     ]);
 
-    return <PageExamples items={getExamples} minColumnWidth={420} />;
+    return <PageExamples items={getExamples} minColumnWidth={400} />;
 };

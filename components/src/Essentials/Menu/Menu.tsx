@@ -11,9 +11,9 @@ import { Typeahead } from "../../Abstracts/Typeahead/Typeahead";
 import { TypeaheadUtils } from "../../Abstracts/Typeahead/Typeahead.utils";
 import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
 import { ViewportUtils } from "../../Exotics/Viewport/Viewport.utils";
+import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
 import { LabelUtils } from "../Input/Label/Label.utils";
-import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../Popover/Popover";
 import type {
     ContextMenuProps,

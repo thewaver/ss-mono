@@ -3,6 +3,7 @@ import { createMemo, createSignal, createUniqueId } from "solid-js";
 import { InteractionTracker, SVGDefsSamples, Shape, access } from "@thewaver/ss-components";
 import { ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
+import { NO_SAMPLE_KEY, computeNoSampleDefs } from "../../../PageComponents/SampleGroups/SampleGroups.const";
 import type { ShapeExampleProps } from "../ShapePage.types";
 
 import * as styles from "../ShapePage.css";
@@ -27,8 +28,8 @@ export const DefaultExample = ({
 
     const { getFlags } = InteractionTracker.wrapElement(getRootRef, () => false, { applyButtonSemantics: true });
 
-    const getStrokeConfig = () => SVGDefsSamples.Gradient.SAMPLE_CONFIGS[access(strokeConfigKey)];
-    const getFillConfig = () => SVGDefsSamples.Pattern.SAMPLE_CONFIGS[access(fillConfigKey)];
+    const getStrokeKey = () => access(strokeConfigKey);
+    const getFillKey = () => access(fillConfigKey);
     const getIterationConfig = () => SVGDefsSamples.Iteration.SAMPLE_CONFIGS[access(iterationConfigKey)];
 
     return (
@@ -37,13 +38,22 @@ export const DefaultExample = ({
                 {...otherProps}
                 computePoints={(size) => ShapeConst.getDefaultShapePoints(access(shapeKind), size)}
                 computeStrokeDefs={(getSize, getRef) => {
-                    const strokes = getStrokeConfig().computeSVGDefs(`stroke-${id}`, getFlags, getRef, {
-                        getSize,
-                        animationDurationMs: access(animationDurationMs),
-                        colors: access(colors),
-                        blurWidth: access(blurWidth),
-                        ...getIterationConfig().computeDefs(access(animationDurationMs)),
-                    });
+                    const strokeKey = getStrokeKey();
+                    const strokes =
+                        strokeKey === NO_SAMPLE_KEY
+                            ? computeNoSampleDefs(access(colors), "stroke")
+                            : SVGDefsSamples.Gradient.Timed.SAMPLE_CONFIGS[strokeKey].computeSVGDefs(
+                                  `stroke-${id}`,
+                                  getFlags,
+                                  getRef,
+                                  {
+                                      getSize,
+                                      animationDurationMs: access(animationDurationMs),
+                                      colors: access(colors),
+                                      blurWidth: access(blurWidth),
+                                      ...getIterationConfig().computeDefs(access(animationDurationMs)),
+                                  },
+                              );
 
                     if (getFlags().isFocusVisible) {
                         strokes.push({ color: "#FF00FF" });
@@ -61,14 +71,18 @@ export const DefaultExample = ({
                     return result;
                 }}
                 computeFillDefs={(getSize, getRef) =>
-                    getFillConfig().computeSVGDefs(`fill-${id}`, undefined, getRef, {
-                        getSize,
-                        cellSize: access(cellSize),
-                        animationDurationMs: access(animationDurationMs),
-                        colors: access(colors),
-                        blurWidth: access(blurWidth),
-                        ...getIterationConfig().computeDefs(access(animationDurationMs)),
-                    })
+                    getFillKey() === NO_SAMPLE_KEY
+                        ? computeNoSampleDefs(access(colors), "fill")
+                        : SVGDefsSamples.Pattern.SAMPLE_CONFIGS[
+                              getFillKey() as SVGDefsSamples.Pattern.SampleKey
+                          ].computeSVGDefs(`fill-${id}`, undefined, getRef, {
+                              getSize,
+                              cellSize: access(cellSize),
+                              animationDurationMs: access(animationDurationMs),
+                              colors: access(colors),
+                              blurWidth: access(blurWidth),
+                              ...getIterationConfig().computeDefs(access(animationDurationMs)),
+                          })
                 }
                 renderChildren={(getSize, getClipPath, getClipPoints) => {
                     const getStyle = createMemo(() => {

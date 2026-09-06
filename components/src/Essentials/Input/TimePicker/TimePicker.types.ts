@@ -4,9 +4,9 @@ import type { Point2d, TimeValue } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type { TextFieldFlags } from "../../../Primitives/TextField/TextField.types";
 import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { ClockColumnRenderer, ClockOptionRenderer, ClockSteps, ClockUnitRenderer } from "../Clock/Clock.types";
-import type { TextFieldFlags } from "../../../Primitives/TextField/TextField.types";
 import type { TimeInputMeridiem, TimeInputProps } from "../TimeInput/TimeInput.types";
 
 export type TimePickerTrigger = {

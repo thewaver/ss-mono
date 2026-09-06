@@ -8,7 +8,13 @@ import { assignInlineVars } from "@vanilla-extract/dynamic";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { splitEntriesIntoGroups } from "../../PageComponents/SampleGroups/SampleGroups.const";
+import {
+    NO_SAMPLE_KEY,
+    type WithNoSample,
+    computeNoSampleDefs,
+    splitEntriesIntoGroups,
+    toGroupEntriesWithNoSample,
+} from "../../PageComponents/SampleGroups/SampleGroups.const";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import {
@@ -23,7 +29,7 @@ import type { ShapeExampleProps } from "./ShapePage.types";
 
 import * as styles from "./ShapePage.css";
 
-const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.SAMPLE_CONFIGS);
+const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Timed.SAMPLE_CONFIGS);
 const GROUPPED_PATTERNS = splitEntriesIntoGroups(SVGDefsSamples.Pattern.SAMPLE_CONFIGS);
 
 const CORNER_FIELD_WIDTH = 80;
@@ -95,8 +101,8 @@ const StressTestWrapper = ({
 }: ShapeExampleProps) => {
     const id = createUniqueId();
 
-    const getStrokeConfig = () => SVGDefsSamples.Gradient.SAMPLE_CONFIGS[access(strokeConfigKey)];
-    const getFillConfig = () => SVGDefsSamples.Pattern.SAMPLE_CONFIGS[access(fillConfigKey)];
+    const getStrokeKey = () => access(strokeConfigKey);
+    const getFillKey = () => access(fillConfigKey);
     const getIterationConfig = () => SVGDefsSamples.Iteration.SAMPLE_CONFIGS[access(iterationConfigKey)];
 
     return (
@@ -112,15 +118,24 @@ const StressTestWrapper = ({
                         )
                     }
                     computePoints={(size) => ShapeConst.getDefaultShapePoints(access(shapeKind), size)}
-                    computeStrokeDefs={(getSize, getRef) =>
-                        getStrokeConfig().computeSVGDefs(`stroke-${id}`, undefined, getRef, {
-                            getSize,
-                            animationDurationMs: access(animationDurationMs),
-                            colors: access(colors),
-                            blurWidth: access(blurWidth),
-                            ...getIterationConfig().computeDefs(access(animationDurationMs)),
-                        })
-                    }
+                    computeStrokeDefs={(getSize, getRef) => {
+                        const strokeKey = getStrokeKey();
+
+                        if (strokeKey === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), "stroke");
+
+                        return SVGDefsSamples.Gradient.Timed.SAMPLE_CONFIGS[strokeKey].computeSVGDefs(
+                            `stroke-${id}`,
+                            undefined,
+                            getRef,
+                            {
+                                getSize,
+                                animationDurationMs: access(animationDurationMs),
+                                colors: access(colors),
+                                blurWidth: access(blurWidth),
+                                ...getIterationConfig().computeDefs(access(animationDurationMs)),
+                            },
+                        );
+                    }}
                     strokeGeom={() => [
                         {
                             thicknesses: access(edgeThicknesses).map(
@@ -128,22 +143,32 @@ const StressTestWrapper = ({
                             ),
                         },
                     ]}
-                    computeFillDefs={(getSize, getRef) =>
-                        getFillConfig().computeSVGDefs(`fill-${id}`, undefined, getRef, {
-                            getSize,
-                            cellSize: {
-                                width:
-                                    (access(cellSize).width * STRESS_ITEMS[getConfigIndex()].size) / styles.exampleSize,
-                                height:
-                                    (access(cellSize).height * STRESS_ITEMS[getConfigIndex()].size) /
-                                    styles.exampleSize,
+                    computeFillDefs={(getSize, getRef) => {
+                        const fillKey = getFillKey();
+
+                        if (fillKey === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), "fill");
+
+                        return SVGDefsSamples.Pattern.SAMPLE_CONFIGS[fillKey].computeSVGDefs(
+                            `fill-${id}`,
+                            undefined,
+                            getRef,
+                            {
+                                getSize,
+                                cellSize: {
+                                    width:
+                                        (access(cellSize).width * STRESS_ITEMS[getConfigIndex()].size) /
+                                        styles.exampleSize,
+                                    height:
+                                        (access(cellSize).height * STRESS_ITEMS[getConfigIndex()].size) /
+                                        styles.exampleSize,
+                                },
+                                animationDurationMs: access(animationDurationMs),
+                                colors: access(colors),
+                                blurWidth: access(blurWidth),
+                                ...getIterationConfig().computeDefs(access(animationDurationMs)),
                             },
-                            animationDurationMs: access(animationDurationMs),
-                            colors: access(colors),
-                            blurWidth: access(blurWidth),
-                            ...getIterationConfig().computeDefs(access(animationDurationMs)),
-                        })
-                    }
+                        );
+                    }}
                     renderChildren={(_, getClipPath) => {
                         return (
                             <div
@@ -178,8 +203,10 @@ export const ShapePage = () => {
     const [getEdgeThicknesses, setEdgeThicknesses] = createSignal<number[]>([4, 4, 4, 4, 4, 4]);
     const [getJoinRadii, setJoinRadii] = createSignal<number[]>([40, 40, 40, 40, 40, 40]);
     const [getLameExponents, setLameExponents] = createSignal<number[]>([1, 1, 1, 1, 1, 1]);
-    const [getStrokeConfigKey, setStrokeConfigKey] = createSignal<SVGDefsSamples.Gradient.SampleKey>("sweep_diag_1v1");
-    const [getFillConfigKey, setFillConfigKey] = createSignal<SVGDefsSamples.Pattern.SampleKey>("plain");
+    const [getStrokeConfigKey, setStrokeConfigKey] =
+        createSignal<WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>>("sweep_diag_1v1");
+    const [getFillConfigKey, setFillConfigKey] =
+        createSignal<WithNoSample<SVGDefsSamples.Pattern.SampleKey>>(NO_SAMPLE_KEY);
     const [getIterationConfigKey, setIterationConfigKey] = createSignal<SVGDefsSamples.Iteration.SampleKey>("constant");
     const [getCellSize, setCellSize] = createSignal(40);
     const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS });
@@ -338,15 +365,7 @@ export const ShapePage = () => {
                 <PageProp key={"strokeConfigKey"} label={"Stroke Pattern"}>
                     <PageGroupedSelectField
                         value={getStrokeConfigKey}
-                        groups={() =>
-                            Object.entries(GROUPPED_GRADIENTS).map(
-                                ([groupKey, groupValue]) =>
-                                    [groupKey, Object.keys(groupValue)] as [
-                                        string,
-                                        (keyof typeof SVGDefsSamples.Gradient.SAMPLE_CONFIGS)[],
-                                    ],
-                            )
-                        }
+                        groups={() => toGroupEntriesWithNoSample(GROUPPED_GRADIENTS)}
                         ariaLabel={"Stroke pattern"}
                         onChange={(config) => setStrokeConfigKey(() => config)}
                     />
@@ -355,15 +374,7 @@ export const ShapePage = () => {
                 <PageProp key={"fillConfigKey"} label={"Fill Pattern"}>
                     <PageGroupedSelectField
                         value={getFillConfigKey}
-                        groups={() =>
-                            Object.entries(GROUPPED_PATTERNS).map(
-                                ([groupKey, groupValue]) =>
-                                    [groupKey, Object.keys(groupValue)] as [
-                                        string,
-                                        (keyof typeof SVGDefsSamples.Pattern.SAMPLE_CONFIGS)[],
-                                    ],
-                            )
-                        }
+                        groups={() => toGroupEntriesWithNoSample(GROUPPED_PATTERNS)}
                         ariaLabel={"Fill pattern"}
                         onChange={(config) => setFillConfigKey(() => config)}
                     />

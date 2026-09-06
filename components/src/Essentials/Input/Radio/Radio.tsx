@@ -1,8 +1,8 @@
 import { createSignal } from "solid-js";
 
 import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
-import { access } from "../../../Utils/propUtils";
 import { BinarySwitch } from "../../../Primitives/BinarySwitch/BinarySwitch";
+import { access } from "../../../Utils/propUtils";
 import { useRadioGroupContext } from "../RadioGroup/RadioGroup.context";
 import type { RadioProps } from "./Radio.types";
 

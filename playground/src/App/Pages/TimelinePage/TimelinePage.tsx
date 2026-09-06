@@ -14,8 +14,6 @@ import type { TimelineExampleProps } from "./TimelinePage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/TimelinePage/Examples";
 
-const MIN_COLUMN_WIDTH = 520;
-
 export const TimelinePage = () => {
     const [getIsPannable, setIsPannable] = createSignal(true);
     const [getIsZoomable, setIsZoomable] = createSignal(true);
@@ -88,7 +86,7 @@ export const TimelinePage = () => {
                 </PageProp>
             </PagePropsPanel>
 
-            <PageExamples items={getExamples} minColumnWidth={() => MIN_COLUMN_WIDTH} />
+            <PageExamples items={getExamples} minColumnWidth={520} />
         </>
     );
 };

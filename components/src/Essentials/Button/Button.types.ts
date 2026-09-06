@@ -1,5 +1,8 @@
+import type {
+    InteractionControlProps,
+    InteractionWrapperProps,
+} from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps } from "../../Utils/typeUtils";
-import type { InteractionControlProps, InteractionWrapperProps } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 
 export type ButtonType = "button" | "submit" | "reset";
 

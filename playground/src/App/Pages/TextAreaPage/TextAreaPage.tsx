@@ -11,7 +11,6 @@ import { ReachableExample } from "./Examples/Reachable";
 import { ReadOnlyExample } from "./Examples/ReadOnly";
 import { LONG_TEXT, MAX_ROWS, MIN_ROWS, REVIEW_LIMIT } from "./TextAreaPage.const";
 
-const MIN_COLUMN_WIDTH = 340;
 const EXAMPLES_ROOT = "/src/App/Pages/TextAreaPage/Examples";
 
 export const TextAreaPage = () => {
@@ -84,5 +83,5 @@ export const TextAreaPage = () => {
         },
     ]);
 
-    return <PageExamples items={getExamples} minColumnWidth={() => MIN_COLUMN_WIDTH} />;
+    return <PageExamples items={getExamples} minColumnWidth={400} />;
 };

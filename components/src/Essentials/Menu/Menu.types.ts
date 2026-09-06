@@ -4,12 +4,12 @@ import { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 import type {
     InteractionControlProps,
     InteractionTooltipDefs,
     InteractionWrapperProps,
 } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
+import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 
 export type MenuFlags = {
     isOpen: boolean;

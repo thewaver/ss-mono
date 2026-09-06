@@ -1,8 +1,8 @@
 import { Index, Show, createMemo } from "solid-js";
 
 import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
-import { access, accessSignal } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import type { TagInputProps } from "./TagInput.types";
 
 import * as styles from "./TagInput.css";

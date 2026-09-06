@@ -1,7 +1,7 @@
 import { Index, Show, createMemo } from "solid-js";
 
-import { access } from "../../Utils/propUtils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
+import { access } from "../../Utils/propUtils";
 import type { StepperDir, StepperItemProps, StepperProps } from "./Stepper.types";
 
 import * as styles from "./Stepper.css";

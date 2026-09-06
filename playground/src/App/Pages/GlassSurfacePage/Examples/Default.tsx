@@ -1,9 +1,10 @@
-import { createSignal } from "solid-js";
+import { createSignal, createUniqueId } from "solid-js";
 
-import { GlassSurface, InteractionTracker, access } from "@thewaver/ss-components";
+import { GlassSurface, InteractionTracker, SVGDefsSamples, access } from "@thewaver/ss-components";
 import { CSSUtils, type Point2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
+import { NO_SAMPLE_KEY, computeNoSampleDefs } from "../../../PageComponents/SampleGroups/SampleGroups.const";
 import knight from "../../../knight.webp";
 import type { GlassSurfaceExampleProps } from "../GlassSurfacePage.types";
 
@@ -17,10 +18,13 @@ const toOffset = (ratio: number) =>
 
 export const DefaultExample = ({
     borderRadius,
+    borderWidth,
+    strokeConfigKey,
+    colors,
+    blurWidth,
     blurRadius,
     noiseFrequency,
     noiseOctaves,
-    noiseSeed,
     rippleScale,
     tintColor,
     tintOpacity,
@@ -29,6 +33,8 @@ export const DefaultExample = ({
     specularConstant,
     specularExponent,
 }: GlassSurfaceExampleProps) => {
+    const id = createUniqueId();
+
     const [getStageRef, setStageRef] = createSignal<HTMLElement>();
     const [getRatio, setRatio] = createSignal(STARTING_RATIO);
 
@@ -45,6 +51,8 @@ export const DefaultExample = ({
         },
     });
 
+    const getStrokeKey = () => access(strokeConfigKey);
+
     return (
         <div ref={setStageRef} class={styles.stage} style={{ "background-image": `url(${knight})` }}>
             <div
@@ -57,11 +65,27 @@ export const DefaultExample = ({
             >
                 <GlassSurface
                     borderRadii={() => CSSUtils.spreadRadius(access(borderRadius))}
+                    borderWidths={() => CSSUtils.spreadWidth(access(borderWidth))}
+                    computeStrokeDefs={(getSize, getRef) => {
+                        const strokeKey = getStrokeKey();
+
+                        if (strokeKey === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), "stroke");
+
+                        return SVGDefsSamples.Gradient.Tracked.SAMPLE_CONFIGS[strokeKey].computeSVGDefs(
+                            `stroke-${id}`,
+                            undefined,
+                            getRef,
+                            {
+                                getSize,
+                                colors: access(colors),
+                                blurWidth: access(blurWidth),
+                            },
+                        );
+                    }}
                     glassDefs={() => ({
                         noise: {
                             frequency: access(noiseFrequency),
                             octaves: access(noiseOctaves),
-                            seed: access(noiseSeed),
                         },
                         backdrop: { blurRadius: access(blurRadius) },
                         ripple: { scale: access(rippleScale) },

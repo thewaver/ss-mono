@@ -12,7 +12,7 @@ import { demo, prop, readout } from "./helpers";
  */
 const MANUAL = demo("manual");
 const ROTATING = demo("rotating");
-const DRUM = demo("drum");
+const DRUM = demo("stepped");
 const NO_CONTROLS = demo("noControls");
 
 const region = (scope: string) => `${scope} [aria-roledescription="carousel"]`;
@@ -39,8 +39,8 @@ test.beforeEach(async ({ page }) => {
 });
 
 /**
- * The drum sits on a page of its own, with the same knobs minus the rotator delay it has no use for, so the
- * tests about turning open that page over the top of the track page this file starts on.
+ * The drum sits on a page of its own, carrying the same three demos and the same knobs, so the tests about
+ * turning open that page over the top of the track page this file starts on.
  */
 const openDrum = async (page: import("@playwright/test").Page) => {
     await page.goto("/drum-carousel");

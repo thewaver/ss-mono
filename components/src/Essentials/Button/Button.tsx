@@ -1,6 +1,6 @@
+import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
 import { LabelUtils } from "../Input/Label/Label.utils";
-import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import type { ButtonElementProps, ButtonProps, ButtonType } from "./Button.types";
 
 import * as styles from "./Button.css";

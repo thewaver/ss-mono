@@ -4,7 +4,6 @@ import type { PointerReading } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
-import { CardGlowExample } from "./Examples/CardGlow";
 import { CastShadowExample } from "./Examples/CastShadow";
 import { CompassExample } from "./Examples/Compass";
 import { DockExample } from "./Examples/Dock";
@@ -15,7 +14,6 @@ import { TiltExample } from "./Examples/Tilt";
 const EXAMPLES_ROOT = "/src/App/Pages/PointerTrackerPage/Examples";
 const WHOLE_DIGITS = 0;
 const RATIO_DIGITS = 2;
-const WIDE_SPAN = 2;
 const BOX_WIDTH = 300;
 const BOX_PADDING = 10;
 const COMPASS_HEIGHT = 180;
@@ -98,14 +96,6 @@ export const PointerTrackerPage = () => {
                 </PageMeasureBox>
             ),
             path: `${EXAMPLES_ROOT}/Dock.tsx`,
-        },
-        {
-            key: "cardGlow",
-            name: "Card glow",
-            span: WIDE_SPAN,
-            readout: () => "three readings, one document listener — each card lights its own border",
-            component: () => <CardGlowExample />,
-            path: `${EXAMPLES_ROOT}/CardGlow.tsx`,
         },
     ]);
 

@@ -3,8 +3,8 @@ import type { Accessor, JSX } from "solid-js";
 import type { TimeValue, TimeValueUnit } from "@thewaver/ss-utils";
 
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { InteractionControlProps } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 
 export type ClockUnit = TimeValueUnit | "meridiem";
 

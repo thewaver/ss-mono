@@ -4,8 +4,8 @@ import type { DateValue, DateValueCalendarId } from "../../../Abstracts/DateValu
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
 import { MaskedField } from "../../../Abstracts/MaskedField/MaskedField";
 import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
-import { access, accessSignal } from "../../../Utils/propUtils";
 import { TextField } from "../../../Primitives/TextField/TextField";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import type { DateInputEra, DateInputFormat, DateInputProps } from "./DateInput.types";
 
 const DEFAULT_DATE_INPUT_FORMAT: DateInputFormat = "iso";

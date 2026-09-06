@@ -9,7 +9,7 @@ import knight from "../../../../knight.webp";
 import * as styles from "./Banner.css";
 
 const computeDefs = (getSize: () => Size2d, getRef: () => HTMLElement | undefined, id: string) =>
-    SVGDefsSamples.Gradient.SAMPLE_CONFIGS["flow_diag_2s"].computeSVGDefs(id, undefined, getRef, {
+    SVGDefsSamples.Gradient.Timed.SAMPLE_CONFIGS["flow_diag_2s"].computeSVGDefs(id, undefined, getRef, {
         getSize,
         animationDurationMs: 4000,
         colors: {

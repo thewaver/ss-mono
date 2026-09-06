@@ -226,7 +226,6 @@ export const SelectPage = () => {
         },
         {
             key: "virtualized",
-            span: 2,
             name: "Virtualized",
             readout: () =>
                 `${getStressCount().toLocaleString("en-GB")} options — ${
@@ -251,7 +250,6 @@ export const SelectPage = () => {
         },
         {
             key: "virtualizedGroups",
-            span: 2,
             name: "Virtualized, in groups",
             readout: () =>
                 `${getStressCount().toLocaleString("en-GB")} options in ${Math.ceil(getStressCount() / STRESS_GROUP_SIZE).toLocaleString("en-GB")} groups — ${

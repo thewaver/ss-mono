@@ -5,8 +5,8 @@ import type { TimeValue, TimeValueMeridiem, TimeValueUnit } from "@thewaver/ss-u
 
 import { MaskedField } from "../../../Abstracts/MaskedField/MaskedField";
 import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
-import { access, accessSignal } from "../../../Utils/propUtils";
 import { TextField } from "../../../Primitives/TextField/TextField";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import type { TimeInputMeridiem, TimeInputProps } from "./TimeInput.types";
 
 const SEGMENT_LENGTH = 2;

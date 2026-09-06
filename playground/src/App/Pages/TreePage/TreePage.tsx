@@ -132,7 +132,6 @@ export const TreePage = () => {
         },
         {
             key: "virtualized",
-            span: 2,
             name: "Virtualized",
             readout: () =>
                 `${(STRESS_BRANCH_COUNT * (STRESS_LEAF_COUNT + 1)).toLocaleString("en-GB")} rows when everything is open — expanded: ${stressExpandedSignal[0]().length} branches, value: ${stressSignal[0]() ?? "undefined"}`,

@@ -1,12 +1,12 @@
 import type { Accessor, JSX } from "solid-js";
 
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type {
     InteractionControlProps,
     InteractionWrapperProps,
 } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { TextFieldTextStyle } from "../../../Primitives/TextField/TextField.types";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 
 export type TagInputFlags = {
     isEmpty: boolean;

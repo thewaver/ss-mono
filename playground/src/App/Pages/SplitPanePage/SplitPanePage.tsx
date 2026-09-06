@@ -21,7 +21,6 @@ const GUTTER_STEP = 1;
 const STARTING_GUTTER = 8;
 const GUTTER_FIELD_WIDTH = 90;
 const PERCENT = 100;
-const MIN_COLUMN_WIDTH = 420;
 const EXAMPLES_ROOT = "/src/App/Pages/SplitPanePage/Examples";
 
 const STARTING_PAIR = [0.3, 0.7];
@@ -138,7 +137,7 @@ export const SplitPanePage = () => {
                 </PageProp>
             </PagePropsPanel>
 
-            <PageExamples items={getExamples} minColumnWidth={() => MIN_COLUMN_WIDTH} />
+            <PageExamples items={getExamples} minColumnWidth={400} />
         </>
     );
 };

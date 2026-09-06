@@ -70,41 +70,6 @@ export const magnetButton = style({
     transitionTimingFunction: "linear",
 });
 
-export const glowRow = style({
-    display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    gap: themeVars.spacing.full,
-});
-
-export const glowCard = style({
-    position: "relative",
-    display: "flex",
-    flexDirection: "column",
-    gap: themeVars.spacing.half,
-    padding: themeVars.spacing.full,
-    borderRadius: themeVars.borderRadius.full,
-    backgroundColor: themeVars.color.control.background.main,
-    color: themeVars.color.surface.contrast,
-    fontSize: themeVars.fontSize.xSmall,
-    overflow: "hidden",
-});
-
-export const glowCardTitle = style({
-    color: themeVars.color.primary.main,
-    fontSize: themeVars.fontSize.small,
-});
-
-export const glowCardBorder = style({
-    position: "absolute",
-    inset: 0,
-    borderRadius: themeVars.borderRadius.full,
-    padding: 2,
-    pointerEvents: "none",
-    transitionProperty: "opacity",
-    transitionDuration: "150ms",
-    transitionTimingFunction: "linear",
-});
-
 export const tiltStage = style({
     display: "grid",
     placeItems: "center",

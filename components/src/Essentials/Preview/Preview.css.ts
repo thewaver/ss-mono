@@ -1,5 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+const OVERLAY_OVERHANG = 1;
+
 export const previewSizingVariants = styleVariants({
     "fit-content": {
         width: "fit-content",
@@ -14,15 +16,18 @@ export const previewRoot = style({
     flexDirection: "column",
 });
 
-export const previewContent = style({
+export const previewFrame = style({
     position: "relative",
+});
+
+export const previewContent = style({
     overflow: "hidden",
 });
 
 export const previewOverlay = style({
     position: "absolute",
     right: 0,
-    bottom: 0,
+    bottom: -OVERLAY_OVERHANG,
     left: 0,
     pointerEvents: "none",
 });

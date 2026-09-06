@@ -8,8 +8,8 @@ import type {
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
 import { LiveAnnouncer } from "../../../Abstracts/LiveAnnouncer/LiveAnnouncer";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
-import { access, accessSignal } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import type { CalendarCompositeProps, CalendarDayProps, CalendarProps, CalendarRenderProps } from "./Calendar.types";
 
 import * as styles from "./Calendar.css";

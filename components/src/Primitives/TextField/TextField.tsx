@@ -6,10 +6,10 @@ import { CSSUtils, MathUtils, StringUtils } from "@thewaver/ss-utils";
 
 import type { TextSyncElement } from "../../Abstracts/TextSync/TextSync";
 import { TextSync } from "../../Abstracts/TextSync/TextSync";
-import { access } from "../../Utils/propUtils";
-import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import { FormFieldUtils } from "../../Essentials/Input/FormField/FormField.utils";
 import { LabelUtils } from "../../Essentials/Input/Label/Label.utils";
+import { access } from "../../Utils/propUtils";
+import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import type { TextFieldElementProps, TextFieldProps, TextFieldType } from "./TextField.types";
 
 import * as styles from "./TextField.css";

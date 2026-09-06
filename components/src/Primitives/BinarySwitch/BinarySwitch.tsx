@@ -1,9 +1,9 @@
 import { createRenderEffect, createSignal } from "solid-js";
 
-import { access } from "../../Utils/propUtils";
-import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import { FormFieldUtils } from "../../Essentials/Input/FormField/FormField.utils";
 import { LabelUtils } from "../../Essentials/Input/Label/Label.utils";
+import { access } from "../../Utils/propUtils";
+import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import type { BinarySwitchElementProps, BinarySwitchFlags, BinarySwitchProps } from "./BinarySwitch.types";
 
 import * as styles from "./BinarySwitch.css";

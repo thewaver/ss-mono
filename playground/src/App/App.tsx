@@ -58,7 +58,8 @@ import { RangePage } from "./Pages/RangePage/RangePage";
 import { RevealPage } from "./Pages/RevealPage/RevealPage";
 import { RichTextPage } from "./Pages/RichTextPage/RichTextPage";
 import { SVGFiltersPage } from "./Pages/SVGFiltersPage/SVGFiltersPage";
-import { SVGGradientsPage } from "./Pages/SVGGradientsPage/SVGGradientsPage";
+import { TimedGradientsPage } from "./Pages/SVGGradients/TimedGradientsPage/TimedGradientsPage";
+import { TrackedGradientsPage } from "./Pages/SVGGradients/TrackedGradientsPage/TrackedGradientsPage";
 import { SVGPatternsPage } from "./Pages/SVGPatternsPage/SVGPatternsPage";
 import { SatellitePage } from "./Pages/SatellitePage/SatellitePage";
 import { ScanlineAnimationPage } from "./Pages/ScanLineAnimationPage/ScanLineAnimationPage";
@@ -264,9 +265,20 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                             },
                             {
                                 name: "SVGGradients",
-                                description:
-                                    "Linear and radial gradients written as a list of colours rather than as markup. A colour may name the stop it sits at or leave it to be spread evenly between the ones that do, and asking for bands rather than a blend emits each stop twice so the colours meet at a hard edge. Angle, origin, scale and offset belong to the gradient rather than to the colours, so the same list can be turned or squashed without being rewritten.",
-                                component: () => <SVGGradientsPage />,
+                                children: [
+                                    {
+                                        name: "TimedGradients",
+                                        description:
+                                            "Linear and radial gradients written as a list of colours rather than as markup. A colour may name the stop it sits at or leave it to be spread evenly between the ones that do, and asking for bands rather than a blend emits each stop twice so the colours meet at a hard edge. Angle, origin, scale and offset belong to the gradient rather than to the colours, so the same list can be turned or squashed without being rewritten. Every sample here is driven by a clock, so a duration and an iteration pattern are what they answer to.",
+                                        component: () => <TimedGradientsPage />,
+                                    },
+                                    {
+                                        name: "TrackedGradients",
+                                        description:
+                                            "The same gradients, driven by the pointer rather than by a clock. Each one reads the element it is painting and turns the pointer's position inside that box into an origin or an offset, so there is no duration to set and no iteration to choose — the highlight simply is wherever the pointer is, and travels off the surface when the pointer leaves. A pool, a band, a pair of crossing bands and a lens flare are what the family covers.",
+                                        component: () => <TrackedGradientsPage />,
+                                    },
+                                ],
                             },
                             {
                                 name: "SVGPatterns",

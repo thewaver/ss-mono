@@ -126,7 +126,7 @@ const ImageExampleWrapper = (props: CellAnimationExampleProps) => {
 };
 
 const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
-    const [getKey, setKey] = createSignal<SVGDefsSamples.Gradient.SampleKey>("orbit_async_2v1");
+    const [getKey, setKey] = createSignal<SVGDefsSamples.Gradient.Timed.SampleKey>("orbit_async_2v1");
     const [getRatio, setRatio] = createSignal<SVGDefsSources.SourceRatio>(DEFAULT_SOURCE_RATIO);
 
     const getSize = createMemo(() => SVGDefsSources.computeSourceSize(getRatio()));

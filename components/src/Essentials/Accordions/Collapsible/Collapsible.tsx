@@ -5,8 +5,8 @@ import { MathUtils } from "@thewaver/ss-utils";
 
 import { ElementFader } from "../../../Abstracts/ElementFader/ElementFader";
 import { ElementObserver } from "../../../Abstracts/ElementObserver/ElementObserver";
-import { access, accessSignal } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import type {
     CollapsibleFlags,
     CollapsibleProps,

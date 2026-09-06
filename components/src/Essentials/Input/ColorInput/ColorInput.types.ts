@@ -5,11 +5,11 @@ import type { Point2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type {
     InteractionControlProps,
     InteractionWrapperProps,
 } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { ColorAreaRenderProps } from "../ColorArea/ColorArea.types";
 import type { RangeRenderProps } from "../Range/Range.types";
 

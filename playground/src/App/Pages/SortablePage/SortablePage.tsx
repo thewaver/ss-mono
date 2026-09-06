@@ -108,5 +108,5 @@ export const SortablePage = () => {
         },
     ]);
 
-    return <PageExamples items={getExamples} minColumnWidth={420} />;
+    return <PageExamples items={getExamples} minColumnWidth={400} />;
 };

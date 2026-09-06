@@ -123,7 +123,7 @@ export const PaginatorPage = () => {
                 </PageProp>
             </PagePropsPanel>
 
-            <PageExamples items={getExamples} />
+            <PageExamples items={getExamples} minColumnWidth={400} />
         </>
     );
 };

@@ -10,6 +10,8 @@ import type { GlassSurfaceProps } from "./GlassSurface.types";
 
 import * as styles from "./GlassSurface.css";
 
+const NO_BORDER_WIDTHS = [0];
+
 export const GlassSurface = (props: ParentProps<GlassSurfaceProps>) => {
     const id = createUniqueId();
 
@@ -23,6 +25,19 @@ export const GlassSurface = (props: ParentProps<GlassSurfaceProps>) => {
             namedRadii.borderTopRightRadius,
             namedRadii.borderBottomRightRadius,
             namedRadii.borderBottomLeftRadius,
+        ];
+    });
+
+    const getBorderWidths = createMemo(() => {
+        const namedWidths = access(props.borderWidths);
+
+        if (!namedWidths) return NO_BORDER_WIDTHS;
+
+        return [
+            namedWidths.borderTopWidth,
+            namedWidths.borderRightWidth,
+            namedWidths.borderBottomWidth,
+            namedWidths.borderLeftWidth,
         ];
     });
 
@@ -45,6 +60,8 @@ export const GlassSurface = (props: ParentProps<GlassSurfaceProps>) => {
                 computePoints={(size) => ShapeConst.getDefaultShapePoints("square", size)}
                 joinRadii={getJoinRadii}
                 lameExponents={getLameExponents}
+                computeStrokeDefs={props.computeStrokeDefs}
+                strokeGeom={props.computeStrokeDefs ? () => [{ thicknesses: getBorderWidths() }] : undefined}
                 computeFillDefs={(getSize, getRef) => GlassUtils.computeSheenDefs(id, getRef, getSize, getDefs())}
                 renderChildren={(getSize, getClipPath) => {
                     const getClip = () => ({ "clip-path": `path("${getClipPath()}")` });

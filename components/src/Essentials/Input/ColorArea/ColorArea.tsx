@@ -3,8 +3,8 @@ import { For, createRenderEffect, createSignal } from "solid-js";
 import { Color, MathUtils } from "@thewaver/ss-utils";
 
 import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
-import { access, accessSignal } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import { LabelUtils } from "../Label/Label.utils";
 import type { ColorAreaAxis, ColorAreaElementProps, ColorAreaProps, ColorAreaRenderProps } from "./ColorArea.types";
 

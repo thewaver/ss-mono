@@ -2,8 +2,8 @@ import type { Accessor, JSX } from "solid-js";
 import { Index, Show, createMemo } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { access } from "../../Utils/propUtils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
+import { access } from "../../Utils/propUtils";
 import type {
     PaginatorGapEntry,
     PaginatorItemProps,

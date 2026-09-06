@@ -1,5 +1,5 @@
-import type { AccessorProps, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
 import type { TextFieldProps } from "../../../Primitives/TextField/TextField.types";
+import type { AccessorProps, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
 
 export type CurrencyInputProps = Omit<
     TextFieldProps,

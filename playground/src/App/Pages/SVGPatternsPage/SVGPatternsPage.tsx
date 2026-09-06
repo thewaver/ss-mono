@@ -6,7 +6,11 @@ import { SVGDefsSamples } from "@thewaver/ss-components";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { splitEntriesIntoGroups, toGroupEntries } from "../../PageComponents/SampleGroups/SampleGroups.const";
+import {
+    type WithNoSample,
+    splitEntriesIntoGroups,
+    toGroupEntriesWithNoSample,
+} from "../../PageComponents/SampleGroups/SampleGroups.const";
 import {
     PageColorField,
     PageGroupedSelectField,
@@ -33,7 +37,7 @@ const MAX_DURATION_MS = 5000;
 const DURATION_STEP_MS = 100;
 
 export const SVGPatternsPage = () => {
-    const [getConfigKey, setConfigKey] = createSignal<SVGDefsSamples.Pattern.SampleKey>("hexagon_pt_2");
+    const [getConfigKey, setConfigKey] = createSignal<WithNoSample<SVGDefsSamples.Pattern.SampleKey>>("hexagon_pt_2");
     const [getIterationConfigKey, setIterationConfigKey] = createSignal<SVGDefsSamples.Iteration.SampleKey>("constant");
     const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(2000);
     const [getCellSize, setCellSize] = createSignal(60);
@@ -66,7 +70,7 @@ export const SVGPatternsPage = () => {
                 <PageProp key={"configKey"} label={"Pattern"}>
                     <PageGroupedSelectField
                         value={getConfigKey}
-                        groups={() => toGroupEntries(GROUPPED_PATTERNS)}
+                        groups={() => toGroupEntriesWithNoSample(GROUPPED_PATTERNS)}
                         ariaLabel={"Pattern"}
                         onChange={(config) => setConfigKey(() => config)}
                     />

@@ -1,7 +1,11 @@
-import { RandomUtils, type Size2d } from "@thewaver/ss-utils";
+import { MathUtils, RandomUtils, type Size2d } from "@thewaver/ss-utils";
 
+import type { PointerReading } from "../../Abstracts/PointerTracker/PointerTracker.types";
 import { SVGFilterDefsFactory } from "../../Abstracts/SVG/Defs/Filter/SVGFilterDefs.factory";
 import type { SVGDefsColors } from "./SVGDefs.types";
+
+const POINTER_FADE_START_RATIO = 1;
+const POINTER_FADE_END_RATIO = 2;
 
 export namespace SVGDefsUtils {
     export const DEBUG_SEAMS = false;
@@ -28,6 +32,13 @@ export namespace SVGDefsUtils {
 
     export const getBaseBorderColor = (defs: { colors: SVGDefsColors }) =>
         `hsl(from ${defs.colors.background} h s calc(l * 1.5) / 50%)`;
+
+    export const getPointerFade = (reading: PointerReading, isPointerPresent: boolean) =>
+        isPointerPresent
+            ? MathUtils.clamp01(
+                  MathUtils.normalize(reading.edgeRatio, POINTER_FADE_END_RATIO, POINTER_FADE_START_RATIO),
+              )
+            : 0;
 
     export const offsetDiagonally = (v: number, angle: number) => {
         const rad = (angle * Math.PI) / 180;

@@ -5,8 +5,8 @@ import { TimeUtils } from "@thewaver/ss-utils";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
-import { access, accessSignal } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
+import { access, accessSignal } from "../../../Utils/propUtils";
 import type { ClockOption, ClockOptionProps, ClockProps, ClockRenderProps, ClockSteps, ClockUnit } from "./Clock.types";
 import { ClockUtils } from "./Clock.utils";
 

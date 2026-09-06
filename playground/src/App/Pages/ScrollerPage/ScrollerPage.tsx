@@ -16,7 +16,6 @@ const MIN_ITEM_COUNT = 1;
 const MAX_ITEM_COUNT = 40;
 const ITEM_COUNT_STEP = 1;
 const STARTING_ITEM_COUNT = 12;
-const MIN_COLUMN_WIDTH = 460;
 const MIN_POSITION = 0;
 const POSITION_STEP = 10;
 const EXAMPLES_ROOT = "/src/App/Pages/ScrollerPage/Examples";
@@ -120,7 +119,7 @@ export const ScrollerPage = () => {
                 </PageProp>
             </PagePropsPanel>
 
-            <PageExamples items={getExamples} minColumnWidth={() => MIN_COLUMN_WIDTH} />
+            <PageExamples items={getExamples} minColumnWidth={400} />
         </div>
     );
 };

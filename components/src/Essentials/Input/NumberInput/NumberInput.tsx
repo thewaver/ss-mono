@@ -1,8 +1,8 @@
 import { createEffect, createMemo, createSignal, onCleanup, untrack } from "solid-js";
 
-import { access } from "../../../Utils/propUtils";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import type { TextFieldMode } from "../../../Primitives/TextField/TextField.types";
+import { access } from "../../../Utils/propUtils";
 import type { NumberInputProps, NumberInputStepDefs, NumberInputStepper } from "./NumberInput.types";
 import { NumberInputUtils } from "./NumberInput.utils";
 

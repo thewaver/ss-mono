@@ -1,9 +1,6 @@
 import type { CheckedState } from "../../Abstracts/CheckedState/CheckedState.types";
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
-import type {
-    InteractionControlProps,
-    InteractionWrapperProps,
-} from "../InteractionWrapper/InteractionWrapper.types";
+import type { InteractionControlProps, InteractionWrapperProps } from "../InteractionWrapper/InteractionWrapper.types";
 
 export type BinarySwitchType = "checkbox" | "radio";
 

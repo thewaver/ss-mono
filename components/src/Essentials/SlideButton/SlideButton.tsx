@@ -2,10 +2,10 @@ import { createMemo, createRenderEffect, createSignal, onCleanup } from "solid-j
 
 import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
 import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
+import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
 import { FormFieldUtils } from "../Input/FormField/FormField.utils";
 import { LabelUtils } from "../Input/Label/Label.utils";
-import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import type {
     SlideButtonElementProps,
     SlideButtonPress,

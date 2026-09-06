@@ -8,8 +8,8 @@ import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { Typeahead } from "../../Abstracts/Typeahead/Typeahead";
 import { TypeaheadUtils } from "../../Abstracts/Typeahead/Typeahead.utils";
 import { Virtualizer } from "../../Abstracts/Virtualizer/Virtualizer";
-import { access, accessSignal } from "../../Utils/propUtils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
+import { access, accessSignal } from "../../Utils/propUtils";
 import type { TreeNodeItemProps, TreeProps, TreeRow } from "./Tree.types";
 import { TreeUtils } from "./Tree.utils";
 

@@ -2,8 +2,8 @@ import type { JSX } from "solid-js";
 
 import type { DateValue, DateValueCalendarId, DateValueEra } from "../../../Abstracts/DateValue/DateValue.types";
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { TextFieldFlags, TextFieldProps } from "../../../Primitives/TextField/TextField.types";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 
 export type DateInputFormat = "iso" | "day-month-year" | "month-day-year";
 

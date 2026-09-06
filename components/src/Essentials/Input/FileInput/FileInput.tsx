@@ -1,7 +1,7 @@
 import { createRenderEffect, createSignal } from "solid-js";
 
-import { access } from "../../../Utils/propUtils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
+import { access } from "../../../Utils/propUtils";
 import { FormFieldUtils } from "../FormField/FormField.utils";
 import { LabelUtils } from "../Label/Label.utils";
 import type { FileInputElementProps, FileInputProps, FileInputRenderProps } from "./FileInput.types";

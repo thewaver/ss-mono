@@ -1,8 +1,8 @@
-import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type {
     InteractionControlProps,
     InteractionWrapperProps,
 } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 
 export type FileInputRenderProps = {
     files: File[];

@@ -3550,8 +3550,22 @@ overflows, never changes height at all.
 inverse of the open state.** It is the fade that says there is more, so it belongs to the shortened state;
 handing it the expanded target would mean every consumer writing the inversion themselves. The pair is
 `(getVisibilityTarget, getTransitionDurationMs)` as everywhere else, and the wrapper around it is positioned
-across the bottom of the clipped box — which is the library's element and unreachable from `renderContent`,
+across the bottom of the shortened box — which is the library's element and unreachable from `renderContent`,
 the same reason `InteractionWrapper` owns the box its `renderDecoration` paints into.
+
+**The overlay sits beside the clipped box rather than inside it, and hangs a pixel below it.** A `Preview`
+holds two elements whose bottom edges are the same line: the box that cuts the content off, and the fade drawn
+over the cut. When that line does not land on a whole screen pixel — which is the normal case in the
+Playground, where everything is inside a `Viewport` scaled by a fraction — the browser paints the last part-row
+by mixing what is under it with what is behind it, and it does that **once per drawing operation rather than
+once for the whole box**. So the fade covers three quarters of that row, the text underneath covers three
+quarters of it, and the quarter the fade misses is a quarter of the text: a hairline of clipped letter-tops
+along the bottom edge, right above the trigger. Pushing the overlay down while it is still inside the cut
+changes nothing, because the cut trims it back to the same line. **The overlay therefore lives in an unclipped
+frame wrapping the box, and its `bottom` is `-1px`**, so it covers that last row outright instead of sharing
+it. The trade is that the overlay is no longer trimmed to the box: an overlay taller than the collapsed height
+now spills above it rather than being cut, and it paints over the top pixel of whatever follows — the trigger —
+which is why it stays `pointer-events: none`.
 
 **The scroll is opt-in and fires on the way in, which is the opposite of `Accordion`'s.**
 `getIsScrolledIntoViewOnCollapse`, off by default, for the user. Opening pushes what is below further
@@ -6016,6 +6030,51 @@ and finding out what a blurred and displaced backdrop costs when it repaints eve
 own root with a `ResizeObserver` and the root is sized by its children, so a fixed box placed _around_ one
 collapses the SVG layers to zero height. The box goes inside.
 
+**The pane's edge is the consumer's, not a fifth `GlassDefs` group.** The question was open — a hairline edge
+is part of how glass reads, so it could have been described alongside the tint and the sheen — and the user
+settled it the other way: `GlassSurfaceProps` carries `computeStrokeDefs` and `borderWidths`, exactly the two
+`Surface` takes, and whatever paints the edge is chosen outside. `GlassDefs` stays the description of the
+optical effect; a border is a colour, a gradient or a pattern like any other stroke in the library, and
+routing it through the glass vocabulary would have meant a second, poorer copy of the defs contract.
+
+**The two are declared together or not at all, which the type enforces rather than the runtime.**
+`GlassSurfaceProps` is the common half intersected with a union: either both `borderWidths` and
+`computeStrokeDefs` are present, or neither is. Making them independently optional would compile a call that
+hands over stroke defs with no widths, and `Shape` draws that as a band of zero thickness — nothing visible,
+no error, and no clue which of the two was forgotten. `Surface` has no such union because its `borderWidths`
+is required outright; a glass pane usually has no edge, so requiring the widths from every consumer would be
+noise.
+
+**Everything else about the stroke is `Shape`'s already.** The widths become one `strokeGeom` entry, passed
+only when stroke defs exist, and `Shape` renders the band between its outer and inner outlines above the
+content. Thickness moves the inner outline only, so the fill, the clip handed to `renderChildren` and the
+margined backdrop clips are all unaffected by a border appearing.
+
+**The page's border knobs are `Shape`'s, not a colour and an opacity.** The first build gave the pane a flat
+colour with an opacity beside it, on the reasoning that a glass edge is a hairline and a registry picker would
+drag the colour bag, the animation duration and the iteration pattern onto a panel about glass. The user's
+answer was to look at the `Shape` page, and it settles the general rule: **a knob for a `computeStrokeDefs`
+prop is the gradient registry, the shared colours, the blur, the animation duration and the iteration
+pattern** — the same five every other page that paints a stroke carries, so the page shows what the prop can
+take rather than what one consumer would probably pass. A flat edge is still reachable, as the `plain` sample.
+Width zero is how the edge is turned off; both props are always passed, and `Shape` draws a band of no
+thickness as nothing.
+
+**The default is `sheen_flare_1`, and the six border knobs sit together at the top of the panel.** Both the
+user's call. `Shape` and the gradients page open on `sweep_diag_1v1`, which is the right choice where the
+subject is the registry; here the subject is glass, and `sheen_flare_1` is the radial counterpart of the
+component's own highlight, so the pane opens with an edge that catches the pointer the way the surface does.
+It was chosen when that sample was called `sheen_1`; the key moved to the vertical band later, and the page
+follows the sample rather than the name. Grouping the
+knobs matters because four of them are named for the border and two — the animation duration and the
+iteration pattern — feed nothing else on this page, so scattered among the noise and sheen controls they read
+as belonging to the glass.
+
+**The Playground page exposes every `GlassDefs` field except the noise seed.** The seed picks which
+arrangement of the same grain the ripple and the sheen share, so turning it changes the pattern without
+changing anything describable — the page settles on the component's default and the knob is gone. It stays a
+prop, so a consumer that wants two panes to differ can still set it.
+
 ### The glass effect is a type in `Abstracts`, and the sheen stopped being a sample
 
 **`Theme.css.ts` exports its radii as bare numbers as well as CSS values.** `FOCUS_RING_WIDTH` was already
@@ -6053,6 +6112,179 @@ contract is one file per key with the key as the filename and which the source v
 **This is why the factory rule does not apply to it.** _"Nothing is folded into a factory"_ governs sample
 files, and this stopped being one. What remains in `Samples` are samples; the glass sheen is a builder with
 one home that two callers use.
+
+### The defs registries are split by what drives a sample, not by what it looks like
+
+**`Pattern` and `Gradient` were named after their output and typed by their payload, and the two disagreed.**
+`PatternConfig` differed from `GradientConfig` by exactly one field — `cellSize` — so "Pattern" meant "needs a
+cell size" and "Gradient" meant "does not". Two samples sat in the wrong box under that rule. `whirl_2` is a
+radial gradient clipped by rotating wedges with no tiling in it at all, filed under Pattern because it borrows
+the cell size as a wedge radius. The `sheen` family took the gradient payload and ignored its clock half,
+consuming instead the one thing no other sample used — the element ref — so the picker offered them an
+animation duration and an iteration pattern that did nothing.
+
+**`Gradient` now nests `Timed` and `Tracked`, and the user chose that over a third sibling registry.** The
+alternative was `Gradient` plus a `Pointer` registry beside it, which names the driver on one side only and
+leaves "gradient" quietly meaning "the clock-driven ones". Nesting keeps the element kind as the kind and
+makes the driver the sub-axis, so `SVGDefsSamples.Gradient.Timed` and `SVGDefsSamples.Gradient.Tracked` each
+carry their own `SAMPLE_CONFIGS` and `SampleKey`, and a `Pattern.Tracked` would have an obvious home if one is
+ever wanted. `TimedGradientElementDefs` is the old gradient payload; `TrackedGradientElementDefs` is that
+minus the animation fields, which makes it a strict subset — a consumer holding the timed payload can call
+either, and nothing had to branch to keep that true.
+
+**The folders mirror the namespaces, because the left nav mirrors the folders.** `Samples/SVGDefs/Gradient`
+holds `Timed` and `Tracked` directories, and the menu's SVGGradients entry became a branch with a
+`TimedGradients` and a `TrackedGradients` child. This is the one branch of the SVG group whose nav shape
+follows the samples tree rather than `Abstracts/SVG/Defs`, which is where its siblings come from — named here
+because it was noticed and accepted rather than overlooked. Nothing in the plumbing depended on sample folder
+depth: the source view globs the Playground's own tree only, so the move was import paths and nothing else.
+
+**Two pages, because the knobs differ.** The timed page carries the animation duration and the iteration
+pattern; the tracked page carries neither, since nothing there reads a clock. What they share — how the defs
+are painted, the colours, the blur — lives in `SVGGradientsProps`, a fragment of `PageProp`s each page drops
+into its own panel, the shape `CarouselsPanel` already set. The consumer pages follow their knobs rather than
+their history: `Shape`'s stroke picker offers `Timed`, since every knob beside it is an animation knob, and
+`GlassSurface`'s border offers `Tracked`, which is why the animation duration and iteration knobs are gone
+from that page. Each page therefore offers exactly the samples its payload can drive.
+
+**`plain` stopped being a sample.** Both registries carried one, and neither was a gradient or a tiling — a
+flat colour is the absence of a def. They also disagreed: the gradient's was the base border colour and the
+pattern's the base background colour, so a single shared entry would have needed to be told which, and every
+sample would have carried a fill-or-stroke field for the benefit of one. Instead the pickers offer a `none`
+choice and the page paints the base colour itself, choosing fill or stroke because the page already knows
+which it is doing. `NO_SAMPLE_KEY`, `toGroupEntriesWithNoSample` and `computeNoSampleDefs` are the whole of
+it, and they live beside the group helpers the pickers already used.
+
+### A sample key is a sentence, and its number is a colour count
+
+The convention as the user stated it, and stated loosely on purpose: it was never designed, it is a habit
+that reads well enough, and they have said not to take it too seriously. It is written down because it has
+been guessed wrong twice, not because it is a law. **Do not rename existing keys to enforce it** — some of
+the `_4` samples would be `1v1v1v1` under a strict reading, and were left short because that is unreadable.
+
+**The trailing number is how many of the shared colours the sample paints with — never how many elements it
+draws.** `sheen_flare_3` puts ten gradients on the surface out of `primary`, `secondary` and `tertiary`, and
+that is a three. A ten-layer sample named `sheen_flare_10` was the mistake that produced the rule. The useful
+consequence: a sample can be made as elaborate as it likes without its name moving, and dropping a colour
+costs a hue rather than a chain, which is what let `sheen_flare_2` be a flare at all rather than a pool and a
+blob.
+
+**A number followed by `s` means those colours are laid down solid rather than blended.** `flow_2s`,
+`flow_3s` and `flow_diag_2s` are the banded counterparts of their smooth siblings, which is `spreadKind:
+"banded"` on the gradient — each stop emitted twice so the colours meet at a hard edge.
+
+**`N v M` means element groups that are not contiguous, with their own colour counts.** A horizontal line and
+a vertical line is `1v1`: two separate things, one colour each, not one two-coloured thing. `orbit_async_2v1`
+is a two-coloured group answering a one-coloured one. It is a statement about the composition rather than
+about the count, so a chain of ghosts strung along a single axis is not a `v` — it reads as one thing. Where
+the strict form would run to `1v1v1v1`, the short number is used instead.
+
+**The leading word is the family, and the picker groups by it.** `splitEntriesIntoGroups` takes the first run
+of lowercase letters, so everything named `sheen_…` arrives together in the dropdown. The words in between —
+`diag`, `inter`, `async`, `pulse`, `rot` — qualify the motion, and are descriptive rather than governed.
+
+### The `sheen` family in the gradient registry is what a pointer-driven sample looks like
+
+**The six of them are `Gradient.Tracked` in its entirety, and the prefix is the grouping inside it.** The
+picker groups by the first lowercase word of the key, so `sheen_1`, `sheen_1v1`, `sheen_diag_1`,
+`sheen_flare_1`, `sheen_flare_2` and `sheen_flare_3` arrive together — every one of them, since the registry
+holds nothing else yet. They are the samples that read the pointer rather than running on a clock: each calls
+`PointerTracker.create` inside `renderDefsElement`, hands over the `getRef` the registry already passes, and
+turns
+`boxRatio` — the pointer's position as a 0–1 pair inside the element — into a gradient's origin or offset.
+Their payload carries no animation fields at all, which is what the split bought: a page showing them has no
+clock knobs to offer.
+
+**The plainest one holds the plainest key, which is why the radial was renamed.** `sheen_1` is the vertical
+band that slides sideways under the pointer — the simplest thing the family does, and the one a reader
+opening the group first should meet. The radial pool that used to hold that key is `sheen_flare_1`. The user's
+call, and the renaming is the point of it: a numbered key with no qualifier reads as the family's base case,
+so the base case has to be the one that earns it.
+
+**What each one does with the reading.** `sheen_1` is a vertical band whose centre follows the pointer's
+horizontal position. `sheen_flare_1` is a radial pool centred on the pointer. `sheen_diag_1` is a band fixed
+at 45° whose centre slides along that diagonal by the pointer's projection onto it, so the tilt never changes
+and only the position does. `sheen_1v1` is two bands, one horizontal and one vertical,
+each following its own axis of the pointer, so they cross where the pointer is and the crossing is the
+brightest point — the `1v1` suffix, as elsewhere in the registry, is one colour answering another.
+`sheen_flare_2` is the pool plus a ghost mirrored through the centre: at the bottom-right corner the ghost is
+a small disc at the top-left, and as the pointer comes in the ghost grows and closes on the centre with it,
+because its origin is the pointer's reflection and its radius is interpolated by the pointer's distance from
+the centre. `sheen_flare_2` and `sheen_flare_3` are both the photographic thing — a source, two streaks and a chain of
+ghosts along the axis through the centre — and what separates them is how many colours the chain draws on.
+
+**The band samples leave the surface by travelling off it, and nothing about them fades.** The first
+build faded their alphas out over a window of pointer distance, and it looked wrong — a band lying still and
+dimming is not what a highlight does. The user's call was to drop the opacity entirely and let the movement
+carry the band off the painted area, and it needs no extra arithmetic at all: the pointer's position inside
+the box is read unclamped, so a pointer beyond the element keeps pushing the band beyond it too. Both bands
+travel one span per box, which puts their falloff clear of the surface at roughly one and a half radii out —
+the reach the user pointed at, taken from the card glow the `PointerTracker` page carried at the time. The radials keep their last position instead, which is why they were the ones that already
+read correctly.
+
+**The clamp was the thing making it look stuck.** Pinning `boxRatio` to 0 – 1 holds the band against the
+edge for as long as the pointer is anywhere outside, so every version of the fade had to hide a band that
+was still there. Removing the clamp is the whole fix, and it also means an untouched page shows the band
+centred, exactly as `sheen_1` shows its pool centred.
+
+**The family reads from the colours bag, and brightness comes from luminosity rather than from white.**
+The first build painted every core white on the reasoning that a highlight is the colour of the light; the
+user recoloured them, so each layer now takes `primary`, `secondary` or `tertiary` and the Border Colors
+knobs move all of it. What keeps a core reading as a source rather than as a flat disc is `hsl(from <colour>
+h s calc(l * 1.5))` at the innermost stop — the sample's own colour with its lightness lifted — which is the
+same relative-colour form `getBaseBorderColor` already uses. The ghosts lift theirs less, at 1.35, so the
+pool stays the brightest thing on the surface.
+
+**Three tries at the flare, and what each one got wrong.** The first was two saturated circles and read as
+painted blobs. The second added a third and made one a ring, which helped and was still not it. What settled
+it was the user naming the three faults together: the ghosts were too solid, there were too few of them, and
+the source was a broad haze rather than a light. All three are true of any flare built from a couple of
+strong circles, and the fix for all three is the same — more elements, each much fainter.
+
+**The photograph and the renderer's manual said the same thing, and the streak was tried and cut.** The user
+pointed at a real lens flare, where the ghosts alternate between small filled discs and larger outline-only
+rings, and then at Shade3D's lens flare reference, which exposes exactly three ingredients: **flare**,
+**ghost** and **streak**. The streak was built — a radial gradient squashed to a fortieth of its height about
+its own origin is a horizontal spike, and the abstract grew an `aspect` prop to express it — and the user cut
+it: the primary element does not need spikes, and it reads better without. The `aspect` prop went with it,
+since an abstract with no consumer is dead API; **rebuilding it is a `gradientTransform` composed from a
+`Size2d` of multipliers, and the whole change was about fifteen lines** if the streaks are ever wanted back.
+
+**A flare is a table, not a dozen hand-written blocks.** Each sample's ghosts are rows of reach, scale,
+alpha, colour and a filled-or-ring flag, mapped into defs; the streaks are two more rows. That keeps the
+sample's own shape explicit in its own file, which is what _"nothing is folded into a factory"_ is protecting
+— the reader sees the whole chain as data rather than chasing a helper in another tab.
+
+**The satellites fade out with the pointer's distance, and that is a correctness fix rather than a taste
+one.** A ghost's origin is the pointer pushed toward the centre by its `reach`, so a ghost at a reach of one
+sits **on** the centre no matter where the pointer is — with the cursor a whole screen away, a couple of
+faint rings stayed parked in the middle of the surface. Every satellite's alpha is now multiplied by
+`SVGDefsUtils.getPointerFade`, full strength while the pointer is within the element and gone by twice that
+distance, which also takes them away when the pointer leaves the window. The source needs no such thing: it
+follows the pointer, so it leaves on its own.
+
+**What makes the chain read: alpha, count and spacing.** Ghost alphas run between 0.07 and 0.2 against the
+source's 0.9, saturation is cut to 55% and lightness lifted 25%, so each one is a pale veil rather than a
+coloured circle. Reaches are uneven — 0.36, 0.62, 0.95, 1.18, 1.44, 1.72, 2 along the line from the pointer
+through the centre — because evenly spaced ghosts read as a pattern, and sizes alternate between specks and
+wide faint rings for the same reason. `sheen_flare_2` keeps one filled satellite and one ring, which is the
+user's call: two colours should look simpler than three, not merely differ in hue. The source itself is a small bright core with a tight bloom and a long
+faint veil, four stops in, which is what separates a light from a haze.
+
+**The source is `sheen_flare_1`'s pool, unchanged, and every flare shares it.** The rebuilt
+flare had tightened it into a small bright core with a long faint veil, which is what separates a light from
+a haze — but the user's instruction was that the primary element stays exactly as the one-colour
+sample paints it, spikes and all removed. So all three now share one pool: scale 1.5,
+full alpha at the centre, 0.75 at five per cent, 0.25 at forty, gone by the edge, and no screen blend on that
+layer. **The cost is visible and is the reason it was asked for rather than assumed**: that pool is broad and
+bright, so with the pointer near the middle it floods a third of the surface and the ghosts sit inside the
+glow rather than against the dark. Reverting to the tighter source is the four constants at the top of each
+file.
+
+**A band that starts inside the box leaves a visible kink, and it is inherent.** A linear gradient pads its
+first stop outside its axis, so where the axis begins there is a change of slope from flat to ramping. It is
+transparent on both sides of that line, so nothing jumps; what the eye catches is the second derivative. The
+alternative is a span wide enough to always overhang the box, which costs the band its shape. Left as is.
 
 ### The gradient and pattern registries each get a page that paints them as a fill
 
@@ -6570,6 +6802,15 @@ width for the track. What commits, what is thrown away, and what a hold does are
 **`CarouselSlideState` gained a `face`, and the track's is always `"front"`.** A drum face can be the back of a
 slide, which the consumer renders through `renderSlideBack`; the field is on the shared state rather than on a
 drum-only one, exactly as `WheelWedgeState.face` is shared by a wheel that never has a back.
+
+**The two Playground pages carry the same three demos, because the shell they share is the thing being shown.**
+The drum page began with one demo against the track page's three, which read as the drum having less to it —
+but every behaviour the track page demonstrates lives in the shared shell, so the drum has all of it. Both pages
+now show the same trio under the same names: stepped by hand, rotating on its own, and no controls at all. The
+knob panel is the same on both, delay knob included, and the only thing that differs between the pages is which
+preset the examples render. **Where a family's presets are two views of one shell, a demo that exists on one
+page and not the other is a claim that the behaviour is missing**, and that claim should be true or the demo
+should be there.
 
 ### `FlipCard`: the smallest thing that can turn a barrel
 

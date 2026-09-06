@@ -1,8 +1,11 @@
 import type { JSX } from "solid-js";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type {
+    InteractionControlProps,
+    InteractionWrapperProps,
+} from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
-import type { InteractionControlProps, InteractionWrapperProps } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 
 export type PreviewSizing = "fit-content" | "fill";
 

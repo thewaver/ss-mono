@@ -107,7 +107,7 @@ export const stackCard = style({
     backgroundImage: panel(themeVars.color.secondary.dark, themeVars.color.secondary.light),
     color: themeVars.color.secondary.contrast,
     fontSize: themeVars.fontSize.medium,
-    boxShadow: themeVars.shadow.medium,
+    boxShadow: themeVars.shadow.small,
     userSelect: "none",
     transitionProperty: "transform, opacity",
     transitionTimingFunction: "ease-out",

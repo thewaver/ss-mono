@@ -2,8 +2,8 @@ import { Index, createEffect, createMemo, createSignal } from "solid-js";
 
 import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
-import { access } from "../../Utils/propUtils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
+import { access } from "../../Utils/propUtils";
 import { Menu } from "../Menu/Menu";
 import type { MenuItem } from "../Menu/Menu.types";
 import type { ToolbarProps } from "./Toolbar.types";

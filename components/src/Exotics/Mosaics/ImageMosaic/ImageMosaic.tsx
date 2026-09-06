@@ -2,10 +2,10 @@ import { createEffect, createMemo, createSignal, untrack } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
-import { access } from "../../../Utils/propUtils";
 import { Mosaic } from "../../../Primitives/Mosaic/Mosaic";
 import type { ImageMosaicProps } from "../../../Primitives/Mosaic/Mosaic.types";
 import { MosaicUtils } from "../../../Primitives/Mosaic/Mosaic.utils";
+import { access } from "../../../Utils/propUtils";
 
 import * as styles from "./ImageMosaic.css";
 

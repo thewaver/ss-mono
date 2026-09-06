@@ -6,8 +6,8 @@ import type {
     InteractionActivation,
     InteractionFlags,
 } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 import type { TooltipProps } from "../../Essentials/Tooltip/Tooltip.types";
+import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 
 export type InteractionSizing = "fit-content" | "fill";
 

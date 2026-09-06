@@ -1,30 +1,39 @@
-import { createMemo, createSignal } from "solid-js";
+import { For, createMemo, createSignal } from "solid-js";
+import { createStore } from "solid-js/store";
 
-import { DEFAULT_GLASS_DEFS } from "@thewaver/ss-components";
+import { DEFAULT_GLASS_DEFS, SVGDefsSamples } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageColorField, PageNumberField } from "../../StyledComponents/Field/Field";
+import {
+    type WithNoSample,
+    splitEntriesIntoGroups,
+    toGroupEntriesWithNoSample,
+} from "../../PageComponents/SampleGroups/SampleGroups.const";
+import { PageColorField, PageGroupedSelectField, PageNumberField } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import type { GlassSurfaceExampleProps } from "./GlassSurfacePage.types";
 
 import { BORDER_RADIUS_FULL } from "../../Theme.css";
+import * as styles from "./GlassSurfacePage.css";
+
+const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Tracked.SAMPLE_CONFIGS);
 
 const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/GlassSurfacePage/Examples/Default.tsx";
 
 const MIN_BORDER_RADIUS = 0;
 const MAX_BORDER_RADIUS = 160;
 const BORDER_RADIUS_STEP = 10;
+const MIN_BORDER_WIDTH = 0;
+const MAX_BORDER_WIDTH = 12;
+const BORDER_WIDTH_STEP = 1;
 const MIN_BLUR_RADIUS = 0;
 const MAX_BLUR_RADIUS = 20;
 const BLUR_RADIUS_STEP = 1;
 const MIN_RIPPLE_SCALE = 0;
 const MAX_RIPPLE_SCALE = 80;
 const RIPPLE_SCALE_STEP = 1;
-const MIN_SEED = 0;
-const MAX_SEED = 40;
-const SEED_STEP = 1;
 const MIN_LIGHT_HEIGHT = 0;
 const MAX_LIGHT_HEIGHT = 2000;
 const LIGHT_HEIGHT_STEP = 20;
@@ -46,29 +55,39 @@ const GRAIN_OCTAVES_STEP = 1;
 const MIN_TINT_OPACITY = 0;
 const MAX_TINT_OPACITY = 1;
 const TINT_OPACITY_STEP = 0.05;
+const MIN_BLUR_WIDTH = 0;
+const MAX_BLUR_WIDTH = 40;
+const BLUR_WIDTH_STEP = 1;
 
 export const GlassSurfacePage = () => {
     const [getBorderRadius, setBorderRadius] = createSignal(BORDER_RADIUS_FULL);
+    const [getBorderWidth, setBorderWidth] = createSignal(2);
+    const [getStrokeConfigKey, setStrokeConfigKey] =
+        createSignal<WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>>("sheen_flare_1");
+    const [getBlurWidth, setBlurWidth] = createSignal(0);
     const [getBlurRadius, setBlurRadius] = createSignal(6);
     const [getRippleScale, setRippleScale] = createSignal(12);
     const [getNoiseFrequency, setNoiseFrequency] = createSignal(DEFAULT_GLASS_DEFS.noise.frequency);
     const [getNoiseOctaves, setNoiseOctaves] = createSignal(DEFAULT_GLASS_DEFS.noise.octaves);
-    const [getNoiseSeed, setNoiseSeed] = createSignal(DEFAULT_GLASS_DEFS.noise.seed);
     const [getLightHeight, setLightHeight] = createSignal(DEFAULT_GLASS_DEFS.sheen.lightHeight);
     const [getSurfaceScale, setSurfaceScale] = createSignal(DEFAULT_GLASS_DEFS.sheen.surfaceScale);
     const [getSpecularConstant, setSpecularConstant] = createSignal(DEFAULT_GLASS_DEFS.sheen.specularConstant);
     const [getSpecularExponent, setSpecularExponent] = createSignal(DEFAULT_GLASS_DEFS.sheen.specularExponent);
     const [getTintColor, setTintColor] = createSignal("#FFFFFF");
     const [getTintOpacity, setTintOpacity] = createSignal(0.2);
+    const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS });
 
     const getExamples = createMemo(() => {
         const commonProps: GlassSurfaceExampleProps = {
             borderRadius: getBorderRadius,
+            borderWidth: getBorderWidth,
+            strokeConfigKey: getStrokeConfigKey,
+            colors: () => colors,
+            blurWidth: getBlurWidth,
             blurRadius: getBlurRadius,
             rippleScale: getRippleScale,
             noiseFrequency: getNoiseFrequency,
             noiseOctaves: getNoiseOctaves,
-            noiseSeed: getNoiseSeed,
             lightHeight: getLightHeight,
             surfaceScale: getSurfaceScale,
             specularConstant: getSpecularConstant,
@@ -98,6 +117,51 @@ export const GlassSurfacePage = () => {
                         step={() => BORDER_RADIUS_STEP}
                         ariaLabel={"Corner radius"}
                         onInput={setBorderRadius}
+                    />
+                </PageProp>
+
+                <PageProp key={"borderWidth"} label={"Border width (px)"}>
+                    <PageNumberField
+                        value={getBorderWidth}
+                        min={() => MIN_BORDER_WIDTH}
+                        max={() => MAX_BORDER_WIDTH}
+                        step={() => BORDER_WIDTH_STEP}
+                        ariaLabel={"Border width"}
+                        onInput={setBorderWidth}
+                    />
+                </PageProp>
+
+                <PageProp key={"strokeConfigKey"} label={"Border pattern"}>
+                    <PageGroupedSelectField
+                        value={getStrokeConfigKey}
+                        groups={() => toGroupEntriesWithNoSample(GROUPPED_GRADIENTS)}
+                        ariaLabel={"Border pattern"}
+                        onChange={(config) => setStrokeConfigKey(() => config)}
+                    />
+                </PageProp>
+
+                <PageProp key={"colors"} label={"Border Colors"}>
+                    <div class={styles.colorList}>
+                        <For each={Object.keys(colors)}>
+                            {(key) => (
+                                <PageColorField
+                                    value={() => colors[key as keyof typeof colors]}
+                                    ariaLabel={() => key}
+                                    onInput={(value) => setColors(key as keyof typeof colors, value)}
+                                />
+                            )}
+                        </For>
+                    </div>
+                </PageProp>
+
+                <PageProp key={"blurWidth"} label={"Border blur (px)"}>
+                    <PageNumberField
+                        value={getBlurWidth}
+                        min={() => MIN_BLUR_WIDTH}
+                        max={() => MAX_BLUR_WIDTH}
+                        step={() => BLUR_WIDTH_STEP}
+                        ariaLabel={"Border blur"}
+                        onInput={setBlurWidth}
                     />
                 </PageProp>
 
@@ -131,17 +195,6 @@ export const GlassSurfacePage = () => {
                         step={() => GRAIN_OCTAVES_STEP}
                         ariaLabel={"Noise octaves"}
                         onInput={setNoiseOctaves}
-                    />
-                </PageProp>
-
-                <PageProp key={"noiseSeed"} label={"Noise seed"}>
-                    <PageNumberField
-                        value={getNoiseSeed}
-                        min={() => MIN_SEED}
-                        max={() => MAX_SEED}
-                        step={() => SEED_STEP}
-                        ariaLabel={"Noise seed"}
-                        onInput={setNoiseSeed}
                     />
                 </PageProp>
 

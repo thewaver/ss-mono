@@ -1,5 +1,5 @@
-import type { MaybeAccessor } from "../../../Utils/typeUtils";
 import type { BinarySwitchProps } from "../../../Primitives/BinarySwitch/BinarySwitch.types";
+import type { MaybeAccessor } from "../../../Utils/typeUtils";
 
 export type RadioProps<T> = Omit<
     BinarySwitchProps,

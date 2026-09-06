@@ -86,7 +86,7 @@ export namespace SVGDefsSources {
     };
 
     export const computeGradientSource = (
-        key: SVGDefsSamples.Gradient.SampleKey,
+        key: SVGDefsSamples.Gradient.Timed.SampleKey,
         size: Size2d,
         animationDurationMs: number,
         animationIterationDelayMs: number,
@@ -94,12 +94,17 @@ export namespace SVGDefsSources {
         SVGDefsUri.toDataUri(
             toSourceSvg(
                 size,
-                SVGDefsSamples.Gradient.SAMPLE_CONFIGS[key].computeSVGDefs(`cell-gradient`, undefined, undefined, {
-                    getSize: () => size,
-                    animationDurationMs,
-                    colors: SVGDefsSamples.SAMPLE_COLORS,
-                    ...SVGDefsSamples.Iteration.SAMPLE_CONFIGS.constant.computeDefs(animationDurationMs),
-                }),
+                SVGDefsSamples.Gradient.Timed.SAMPLE_CONFIGS[key].computeSVGDefs(
+                    `cell-gradient`,
+                    undefined,
+                    undefined,
+                    {
+                        getSize: () => size,
+                        animationDurationMs,
+                        colors: SVGDefsSamples.SAMPLE_COLORS,
+                        ...SVGDefsSamples.Iteration.SAMPLE_CONFIGS.constant.computeDefs(animationDurationMs),
+                    },
+                ),
                 animationIterationDelayMs,
             ),
         );
@@ -124,8 +129,8 @@ export namespace SVGDefsSources {
         );
 
     export const GRADIENT_KEYS = Object.keys(
-        SVGDefsSamples.Gradient.SAMPLE_CONFIGS,
-    ) as SVGDefsSamples.Gradient.SampleKey[];
+        SVGDefsSamples.Gradient.Timed.SAMPLE_CONFIGS,
+    ) as SVGDefsSamples.Gradient.Timed.SampleKey[];
 
     export const PATTERN_KEYS = Object.keys(
         SVGDefsSamples.Pattern.SAMPLE_CONFIGS,

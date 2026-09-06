@@ -23,7 +23,6 @@ export const TabsPage = () => {
     const getExamples = createMemo(() => [
         {
             key: "row",
-            span: 2,
             name: "A row of tabs",
             readout: () => `selected: ${getRowValue()}`,
             component: () => <RowExample selectedValue={getRowValue} onSelectionChange={setRowValue} />,

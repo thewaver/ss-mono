@@ -5,8 +5,8 @@ import { DecimalUtils } from "@thewaver/ss-utils";
 import { MaskedField } from "../../../Abstracts/MaskedField/MaskedField";
 import type { TextSyncGroupDefs } from "../../../Abstracts/TextSync/TextSync.utils";
 import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
-import { access } from "../../../Utils/propUtils";
 import { TextField } from "../../../Primitives/TextField/TextField";
+import { access } from "../../../Utils/propUtils";
 import type { CurrencyInputProps } from "./CurrencyInput.types";
 
 const DEFAULT_CURRENCY_INPUT_DECIMALS = 2;

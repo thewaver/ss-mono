@@ -6,13 +6,13 @@ import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { CheckedState } from "../../../Abstracts/CheckedState/CheckedState.types";
 import type { FlatRow } from "../../../Abstracts/Flattener/Flattener.types";
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
 import type {
     InteractionControlProps,
     InteractionTooltipDefs,
     InteractionWrapperProps,
 } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { TextFieldTextStyle } from "../../../Primitives/TextField/TextField.types";
+import type { AccessorProps, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
 
 export type SelectFlags = {
     isOpen: boolean;

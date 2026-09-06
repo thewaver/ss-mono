@@ -2,8 +2,8 @@ import { Show, createMemo, createSignal } from "solid-js";
 
 import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import { access } from "../../Utils/propUtils";
 import { Tooltip } from "../../Essentials/Tooltip/Tooltip";
+import { access } from "../../Utils/propUtils";
 import type { InteractionSizing, InteractionWrapperProps } from "./InteractionWrapper.types";
 
 import * as styles from "./InteractionWrapper.css";

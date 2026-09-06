@@ -3,8 +3,8 @@ import type { JSX } from "solid-js";
 import type { TimeValue, TimeValueMeridiem } from "@thewaver/ss-utils";
 
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { TextFieldFlags, TextFieldProps } from "../../../Primitives/TextField/TextField.types";
+import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 
 export type TimeInputMeridiem = {
     getValue: () => TimeValueMeridiem;
