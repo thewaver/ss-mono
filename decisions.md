@@ -2810,7 +2810,9 @@ was removed once on the reasoning that exact tiling made it unnecessary and had 
 seams were visible on screen, and reasoning about sub-pixel rounding is not a substitute for looking. Only
 the drawn box grows: positions, `background-position` and the logical span stay exact, so the extra pixel
 repeats the neighbour's first column rather than shifting the slicing. `defs.size` reports the drawn box,
-because that is what a percentage `translateX` resolves against.
+because that is what a percentage `translateX` resolves against. The pixel has a cost the seams do not: where
+the source is partly transparent, the lapped strip is composited twice and every cell ends up boxed in a
+brighter line. That is recorded as an accepted limit in `backlog.md`, with the three fixes that were declined.
 
 **Whole-grid operations cannot live in a per-cell evaluator**, which is why weights are computed once per
 count rather than per frame: `shouldMakeUnique` and `shouldNormalize` rank every cell against every other,
@@ -4134,6 +4136,21 @@ away.
 
 **`pointerdown` reports immediately**, so a click positions the value without a drag — what a colour surface
 and any track-clicking slider need.
+
+**A drag is dropped when the tracked element is swapped, and only then.** The pointer's id and the measured
+rect live outside the effect that binds the listeners, so they used to survive that effect re-running. That is
+what a control needs while it is being dragged — flags change under it constantly and the listeners are rebound
+without the gesture noticing — but it also meant a control that unmounts mid-drag and comes back later carried
+the old pointer id into its new element, and a bare `pointermove` matched it. `ScratchCard` hit this: rub past
+the threshold while still holding the button, take a fresh ticket, and moving across it rubbed the whole thing
+off without a press, because the release had landed on an element that was already gone.
+
+The first fix cleared the state in the listener effect's cleanup, which is wrong and `ColorArea` caught it
+within a run: its drag handler focuses an axis input, that changes the interaction flags, the flags are what
+`getIsDisabled` reads, and so the effect re-runs on the first move of every drag — cancelling it. So the reset
+is its own effect, on the ref alone and deferred, and it fires when the element genuinely changes rather than
+whenever anything the binding effect happens to read has moved. **A drag surviving a rebind and a drag
+surviving a swap are different questions, and the binding effect can only answer the first.**
 
 ### The one-shot activation origin: a flag with a count, and opt-in for the same reason `trackDrag` is
 
@@ -7972,11 +7989,14 @@ highlighted element moves. Against that, the blur now samples across the hole's 
 element's colour bleeds a little way into the darkened ring around it. That is inherent to blurring the whole
 backdrop and then punching a hole in the result, and it is what `Reveal`'s frosted cover has always done.
 
-**The mask itself is `Abstracts/Cutout`, shared with `Reveal`.** `CutoutUtils.getMaskStyle(hole, holeImage?)`
-composes the full-coverage layer, the hole layer, their positions and sizes, and `mask-composite: exclude` with
-its prefixed twin — a dozen property names that were about to be written twice. `Reveal` passes the SVG it
-builds from its shape props as `holeImage`; `Spotlight` passes none and gets a plain `linear-gradient` layer,
-which is a hard-edged rectangle and is exactly the hole it had before. **Softness and shape were deliberately
+**The mask itself is `Abstracts/Cutout`, shared with `Reveal` and `ScratchCard`.**
+`CutoutUtils.getMaskStyle(holes)` composes the full-coverage layer, a layer per hole, their positions and
+sizes, and the `subtract` / `add` operators that turn them into holes — a dozen property names that were about
+to be written twice. Each hole carries its own optional image: `Reveal` passes the SVG it builds from its shape
+props, `ScratchCard` passes a feathered rectangle per merged run, and `Spotlight` passes none and gets a plain
+`linear-gradient` layer, which is a hard-edged rectangle and is exactly the hole it had before. It took a
+single hole when only `Reveal` and `Spotlight` used it; see `ScratchCard`'s entry for why the list, and why
+`mask-composite` lost its prefixed twin. **Softness and shape were deliberately
 not added to `Spotlight`**: the generalisation makes them reachable, but a soft or rounded spotlight is a
 design decision nobody has taken, and adding props under a refactor's justification is the thing that must not
 ride along. Both pages now list `Cutout` in their derived Abstracts row, which is the mechanism working.
@@ -9076,30 +9096,128 @@ function of the tree with no identity injected by the consumer and no map to kee
 reordering a node's children renames it, which matters only if a consumer holds an id across such a change;
 nothing in the component does.
 
-### `ScratchCard`: the holes stay, and that is a different component from `Reveal`
+### `ScratchCard` and `Reveal`: one mechanism, two components, one folder
 
-`Reveal` cuts a hole where the pointer is and the hole travels with it, so the cover is whole again the moment
-the pointer leaves. Here the holes accumulate, and everything downstream of that is new: something has to hold
-what has been scratched, say how much of the box it covers, and decide when enough has gone. A flag on
-`Reveal` could not have carried any of it.
+Both lay a cover over content and cut holes in it. `Reveal` cuts one hole where the pointer is and it travels
+with the pointer, so the cover is whole again the moment the pointer leaves. `ScratchCard`'s holes accumulate.
+They sit together in `Exotics/Reveals`, the way `OverheadWheel` and `DrumWheel` share `Exotics/Wheels` — and
+so do their Playground pages, under `Pages/Reveals` and behind one **Reveals** node in the left-hand tree.
+Grouping a page does not change its route: `/reveal` and `/scratch-card` stay flat, as `/drum-carousel` does
+under **Carousels**.
 
-**The cover is a grid of cells rather than a canvas, and that follows from the library's stated scope.** A
-canvas with destination-out compositing is how this is usually built, and a drawing surface is the consumer's
-by the scope statement in `backlog.md` item 4; an SVG mask path is the other usual answer and grows without
-bound as the stroke gets long. A grid of cells removed as the pointer passes is coarser than either, but it is
-DOM, it is the same slicing `Mosaic` and `CellAnimation` already do, and it makes "how much has gone" an exact
-count rather than a sampled estimate — which is what lets `onScratch` report a number a consumer can act on
-and a spec can check. The resolution is `cellCount`, and it is the consumer's.
+**They stayed two components, and the argument that nearly collapsed them into one is worth keeping.** From a
+consumer's side the only difference is permanence, which is a fair reading and was the user's. What decided it
+the other way is that permanence is not only a visual property: it is what creates state. A hole that tracks
+the pointer is a pure function of where the pointer is — nothing to remember, nothing to finish, nothing to put
+back. Once holes stay there is progress, a completion and a reset, and the thing stops being decoration and
+becomes something a person operates to get somewhere, which is where the keyboard obligation comes from. An
+`isIncremental` flag on one component was weighed seriously and could have been stated honestly as a
+discriminated union; two names were kept because nobody hunting for a scratch card searches for `Reveal`.
+**Two names are discoverable and one name is honest, and there is no version that is both** — the shared folder
+is the compromise the user asked for.
 
-**A cell is brushed when the circle touches its box, not when it contains its centre.** The first build tested
-the cell's centre, which leaves dead spots: a pointer sitting exactly where four cells meet is more than a
-short radius from all four centres, so a small brush there rubs off nothing at all. The box test also gives
-the useful floor for free — with a radius of zero the cell under the pointer is still taken, because the
-distance from a point inside a rectangle to that rectangle is zero.
+### `ScratchCard`: one path that grows, and why the grid it used to have is gone
 
-**The brush is measured in pixels, not in cells.** A coin does not get bigger because the foil was printed
-finer, so the same radius over a finer grid takes more cells, and the cell size is derived from the measured
-box rather than assumed.
+**The rubbed area is a single SVG path, and every rub appends a subpath to it.** The mask is an inline
+`<svg><mask>` in the component's own DOM — a white rectangle for the cover, a black `<path>` for what has gone,
+blurred by one `feGaussianBlur` — and the cover element points at it with `mask-image: url(#id)`. Baseline
+across browsers since December 2023, the same line `mask-composite` crossed. **No boolean union is computed
+anywhere**: subpaths under `fill-rule: nonzero` render as their union for free. The one condition is that every
+stamp winds the same way, which is automatic because they are one shape translated — two stamps wound against
+each other would cancel into a hole instead of merging.
+
+**Mutating the path beats regenerating a data URI by about seven times.** Measured in Chromium on a 600×300
+card: setting `d` on the live element costs 0.1ms median and 0.4ms at worst, where re-encoding the whole mask
+as a `data:` URI costs 0.7ms a stamp and 5.8ms once the card is fully rubbed, because every change is a new
+image for the browser to decode.
+
+**A stamp is refused when it would add nothing, which is what bounds the path by area rather than by time.**
+`SVGGeometryElement.isPointInFill` is asked about the brush's centre and four points a radius out, and the
+stamp is skipped only when all five are already inside. On a long back-and-forth scribble that is 150 stamps
+where stamping everything gives 401, **with the rubbed area identical to four decimal places**. Testing the
+centre alone is the tempting cheap version and it is wrong: it drops to 53 stamps but under-fills, because it
+refuses stamps whose outer half would still have widened the edge.
+
+**`cellCount` is gone, and with it rows, columns, run-merging and the layer ceiling.** The previous build cut
+the cover into a grid, hid cells as they were rubbed, then merged each row's runs into mask layers to keep the
+layer count off the cell count. All of it existed to make a quantised drawing model survive; none of it is
+needed when the drawing is one path. What the user said when the knobs survived the first rewrite is the whole
+argument: rows and columns beside softness, shape and radius is an incoherent set, and `cellCount` was a
+drawing-model leak. **The props that remain are `brushRadius`, `softness`, the three shape props,
+`clearThreshold`, `precision` and the render callbacks.**
+
+**Two things improved for free.** The rubbed area now carries one soft outline round the whole of it rather
+than a feather per row-run, so the rule that each hole's solid core had to be drawn a feather wider than its
+cell — to stop two neighbouring feathers meeting at three-quarter alpha and leaving a quarter of the foil
+behind — disappears entirely. And the edge is a real union rather than a staircase of axis-aligned boxes, at
+any softness.
+
+**What it cost: `onScratch` is a sampled estimate rather than an exact count.** The ratio comes from asking
+`isPointInFill` about a lattice of points. This overturns the previous entry, which argued the grid was worth
+keeping _because_ it made the number exact — that was true and is no longer available, since an exact count
+needs the drawing to be quantised and quantising the drawing is the thing being removed. `clearThreshold`
+rides on the estimate.
+
+**The lattice is a square count of samples, not a square spacing, and that is the aspect-ratio question the
+user raised.** A square count means each sample stands for an equal share of the area whatever shape the card
+is, so the estimate is unbiased and **the cost is fixed**. Equal pixel spacing is the version that assumes an
+aspect ratio: measured against a fine reference, `precision` 32 costs 1024 probes and 2–4ms on every card
+shape and errs by at most 0.28 percentage points, including on a 5:1 card — where equal spacing needs 5120
+probes and 16.8ms to do no better.
+
+**The measurement is throttled, and that is why `precision` costs nothing to raise.** Reported by the user:
+precision 32 lagged and 24 was smooth. Two things compound there — the probe count is the square of the
+precision, and `isPointInFill` gets dearer as the path lengthens, so the cost climbs through a stroke rather
+than sitting still. Measuring on every stamp ties that cost to the pointer's rate, and **the user's
+point is that it should never have been tied to it at all** — that is now a convention rather than a note
+here, under _"What a component reports runs at its own rate"_ in `conventions.md`. **Throttle rather than debounce, which was the user's call and is the right one**: somebody
+rubbing steadily never stops, so a debounce would report nothing until they lifted the pointer. So a
+measurement runs at once, then at most once every 100ms, with a trailing one so the final number always
+settles — and the user's own argument for why the delay is free is that nobody can tell whether a threshold
+was announced a tenth of a second late.
+
+Measured after: frame pacing over a three-pass scribble is identical at precision 16, 32 and 64 — same median,
+same 95th percentile, same count of frames over budget. **Precision no longer touches the frame budget**, only
+how exact the number is.
+
+**`precision` is the user's, optional, and defaults to 32.** It is samples per axis, so the cost is its square:
+24 gives 576 probes and errs by up to 0.9 points, 32 gives 1024 and errs by up to 0.28, 48 gives 2304 and buys
+almost nothing. A consumer who never sets it never thinks about it, which is the whole point of the prop that
+replaced the two it removed.
+
+**`renderBrush` draws a preview of the coin, and takes the `Sortable` family's shape.** Asked for by the user
+in those terms: an optional callback for an element showing how much is about to come off. The signature is
+`SortableGrid`'s `renderLanding` — optional, a boolean accessor and a geometry accessor, with the component
+mounting the result in an absolutely-positioned, `pointer-events: none` wrapper sized to the geometry's box,
+so a consumer paints and never positions.
+
+**The brush props are authoritative for what is drawn, and the two builds that got this wrong are worth
+recording.** The first reported only the cells that would _newly_ go — the more literal reading of "how much is
+about to be scratched", and wrong, because while a drag is in progress everything under the brush has just been
+scratched, so the set is empty for the whole gesture: the preview vanished on the press and `getIsRubbing`
+could never be observed true, making the flag in the signature a lie. The second sized the wrapper to the
+bounding box of the cells the brush covered, which meant **the brush changed size as the pointer crossed from
+one cell into the next** — the user's report. Both mistakes are the same one: deriving the brush from the grid.
+The brush is a property of the props. Its box is `2 × brushRadius` centred exactly on the pointer, and what
+actually comes off is allowed to differ, because the difference is sampling and the user said so explicitly.
+
+**It takes `Reveal`'s shape props, and they drive the rub as well as the drawing.** `computePoints`,
+`joinRadii` and `lameExponents` are the sibling's names and shapes, and `softness` was already shared. The
+geometry hands back a ready `clip-path` value built from the same points, which the consumer spreads onto the
+element it was already returning — `renderCover`, `renderChildren` and `renderOverlay` all make that same
+handout. `clip-path: path()` was ruled out for `Spotlight` because it takes no percentages and the layer's size
+would have had to be observed; here the size is `2 × brushRadius` and known outright, so the objection does not
+apply. **A shape that only changed the preview would be a prop that lies**, so the stamp appended to the mask
+is the shape's own outline, and the circle is drawn as two arcs rather than as a polygon so that the default
+is exact.
+
+**Where the pointer is comes from `PointerTracker`, not from `trackDrag`.** A preview has to follow a pointer
+that is only hovering, and `trackDrag` reports nothing until a press. The frame-late reading that
+`backlog.md`'s `CardFan` findings warn about is harmless here, because nothing is picked from it — the rub
+itself still comes from `trackDrag` on the press, which is what that finding is about. `Reveal` reads the same
+abstract for the same reason, and the same `edgeRatio <= 1` test: `getIsPointerPresent` means a pointer exists
+on the page, not that it is over this element, and taking the two for the same thing left the brush on screen
+after the pointer had left the card.
 
 **It can be operated with no pointer at all, and that was decided before it was built rather than after.**
 `SlideButton`'s recorded gap is a control that only answers to dragging; scratching is worse, because it is a
@@ -9109,14 +9227,50 @@ operable with a single pointer without a path. So the cover is a `button` with a
 take the whole of it away, and a single press without a drag still rubs off one brush-width — which is the
 path-free pointer route the second criterion asks for.
 
-**Crossing the threshold clears the rest, because the last few cells are nobody's idea of fun.**
-`clearThreshold` defaults to 1, which means nothing happens until the cover is genuinely gone; a consumer who
-sets 0.6 gets the rest taken away the moment six tenths of it has been rubbed off. `onClear` fires once, when
-the cover has actually gone, rather than when the threshold was crossed.
+**Crossing the threshold fades the rest out rather than taking it in one frame.** `clearThreshold` defaults to
+1, which means nothing happens until the cover is genuinely gone; a consumer who sets 0.6 gets the rest taken
+away the moment six tenths of it has been rubbed off. The remainder used to be marked scratched immediately,
+which cleared the whole mask between two frames and read as the cover blinking out of existence — the user
+named this as the clunky part, and the scratching itself as fine. So the threshold now starts a fade of the
+cover's opacity over `clearDurationMs`, and the cover is unmounted at the end of it. `onClear` still fires when
+the cover has actually gone rather than when the threshold was crossed. The controller's `clear` goes the same
+way for the same reason; `reset` cancels a fade in flight.
 
 **A controller rather than a signal, because a reset is a command and not a state.** `onMount` hands back
 `reset` and `clear`, which is the shape `Typewriter` and `ScrambleText` already use. The Playground needs
 `reset` for the house rule that a demo a visitor can move must be a demo they can put back.
+
+**The component states no size of its own, so a card is as tall as what is under it.** The root used to be
+`width: 100%; height: 100%`, which `Reveal` never did — and with the two of them in one folder, the same shape
+sizing itself two different ways was the odd part. **How tall a card is belongs to whoever wrote what is
+inside it**, and a component that pins itself to its parent takes that away with no route back: a card that
+grows with its content becomes impossible to build. So the root is `position: relative` and `overflow: hidden`
+and nothing else, the absolutely-positioned cover follows whatever box the content makes, and a consumer who
+does want a filled parent says so on the content, which is what `Reveal`'s own page does.
+
+**The page carries a second demo, and each one keeps its own tally.** `Reveal` has a frosted cover beside its
+opaque one — a cover that blurs rather than hides, so what is underneath sharpens instead of being uncovered —
+and the same cover works here because the mask is the only thing the component owns. The page used to hold one
+cleared-ratio signal, which two demos would have written over each other; it now keys progress by the example,
+so a third demo is a key rather than another pair of signals. The frosted card is much the taller of the two,
+and it got that way by having more to say rather than by being handed a bigger number — an earlier pass reached
+the same look with a `FROSTED_CARD_HEIGHT` constant, and the user asked whether the layout was adjusting or
+being told, which is what turned the constant up as a smell. **The page sets no height at all.** Do not tidy
+the two into matching boxes — **the Playground is there to show the component holding up and to put edge cases
+in front of somebody**, which is the user's standing reason and outranks a tidy row.
+
+**The spec reads the reported share, because there is nothing left to count.** The grid is gone, so the old
+assertions about hidden cell elements and merged mask layers went with it. One test reads the share twice at
+different `precision` values and expects them to agree: that is not a precision check but a check that the
+sampling is unbiased, which is the property that replaced the exact count. Another rubs the same ground three
+times and expects the number not to move, which pins the union. A test asserting that the fade carries a
+transition was written and deleted; it is an appearance check, it cannot tell a restyle from a break, and it
+raced the fade it was watching.
+
+**`Abstracts/Cutout` no longer has `ScratchCard` as a consumer.** It grew from one hole to a list of them for
+the grid build, and that build is gone; `Reveal` and `Spotlight` each pass a list of one. The list form is kept
+rather than reverted because it is tested and costs nothing, but it is now a generalisation with no second
+consumer, which is worth knowing before anything is built on it.
 
 ### `ScrambleText`: the text is replaced rather than animated, and that decides the whole shape
 

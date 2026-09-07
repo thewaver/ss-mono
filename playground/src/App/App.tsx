@@ -55,7 +55,8 @@ import { ProgressPage } from "./Pages/ProgressPage/ProgressPage";
 import { RadioPage } from "./Pages/RadioPage/RadioPage";
 import { RangeCalendarPage } from "./Pages/RangeCalendarPage/RangeCalendarPage";
 import { RangePage } from "./Pages/RangePage/RangePage";
-import { RevealPage } from "./Pages/RevealPage/RevealPage";
+import { RevealPage } from "./Pages/Reveals/RevealPage/RevealPage";
+import { ScratchCardPage } from "./Pages/Reveals/ScratchCardPage/ScratchCardPage";
 import { RichTextPage } from "./Pages/RichTextPage/RichTextPage";
 import { SVGFiltersPage } from "./Pages/SVGFiltersPage/SVGFiltersPage";
 import { TimedGradientsPage } from "./Pages/SVGGradients/TimedGradientsPage/TimedGradientsPage";
@@ -64,7 +65,6 @@ import { SVGPatternsPage } from "./Pages/SVGPatternsPage/SVGPatternsPage";
 import { SatellitePage } from "./Pages/SatellitePage/SatellitePage";
 import { ScanlineAnimationPage } from "./Pages/ScanLineAnimationPage/ScanLineAnimationPage";
 import { ScrambleTextPage } from "./Pages/ScrambleTextPage/ScrambleTextPage";
-import { ScratchCardPage } from "./Pages/ScratchCardPage/ScratchCardPage";
 import { ScreenWiperPage } from "./Pages/ScreenWiperPage/ScreenWiperPage";
 import { ScrollerPage } from "./Pages/ScrollerPage/ScrollerPage";
 import { SelectPage } from "./Pages/SelectPage/SelectPage";
@@ -755,10 +755,21 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 component: () => <PatchBoardPage />,
             },
             {
-                name: "Reveal",
-                description:
-                    "A cover with a hole cut where the pointer is. The cover is the consumer's — opaque, frosted, or something that reads what it is told — and the component hands it the mask that cuts the hole and whether a reveal is happening.",
-                component: () => <RevealPage />,
+                name: "Reveals",
+                children: [
+                    {
+                        name: "Reveal",
+                        description:
+                            "A cover with a hole cut where the pointer is, travelling with it, so the cover is whole again the moment the pointer leaves. The cover is the consumer's — opaque, frosted, or something that reads what it is told — and the component hands it the mask that cuts the hole and whether a reveal is happening.",
+                        component: () => <RevealPage />,
+                    },
+                    {
+                        name: "ScratchCard",
+                        description:
+                            "The same cover, except the holes stay. One element with a mask cut into it rather than a grid of tiles, so the rubbed area is a continuous surface with a soft edge and no seams; the grid behind it is bookkeeping, which is what makes how much has gone an exact count rather than a sampled estimate. Crossing a threshold fades the rest away, the brush can be previewed before it lands, and pressing it with the keyboard reveals the lot, because a control that only answers to dragging cannot be operated without a pointer.",
+                        component: () => <ScratchCardPage />,
+                    },
+                ],
             },
             {
                 name: "RichText",
@@ -783,12 +794,6 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 description:
                     "Text that arrives as noise and settles into itself, one position at a time. Each character sits over the one it is going to become, so nothing changes width and the line cannot rewrap while it churns; the spaces are left alone, which is what keeps the line breaks where they were. Which glyph the noise is drawn from and the order the positions settle in are both the consumer's, the second as a weight per character in the same 0..1 vocabulary the animation samples use.",
                 component: () => <ScrambleTextPage />,
-            },
-            {
-                name: "ScratchCard",
-                description:
-                    "A cover the pointer rubs off, exposing what is under it and reporting how much has gone. The cover is a grid of cells rather than a canvas, so what has been scratched is an exact count rather than a sampled estimate and the resolution is the consumer's; crossing a threshold takes the rest of it away. Pressing it with the keyboard reveals the lot, because a control that only answers to dragging cannot be operated without a pointer.",
-                component: () => <ScratchCardPage />,
             },
             {
                 name: "ScreenWiper",

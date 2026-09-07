@@ -57,6 +57,7 @@ reading.
 23. `GlassSurface` — what is built and what is not — _open_
 24. Cycling colour variants for the timed gradient samples — _open_
 25. Per-sample defs as a discriminated union, and knobs that follow the key — _open_
+26. Arbitrary placement across controls, and the picking that has to come with it — _open, in progress_
 
 ### Build order
 
@@ -1087,6 +1088,71 @@ further can.
   can read them rather than repeating any number, which is the same rule item 23 already asks for on
   `GlassSurface`. If it does not, the page and the sample drift, which is the fault item 23 exists to record.
 
+## 26. Arbitrary placement across controls, and the picking that has to come with it
+
+**The user's proposal, and the direction the library is going next.** A control's items should be placeable
+anywhere rather than only along a line: a `Menu` as a closed ring (a game weapon wheel), as a wide fan, or as a
+zig-zag; a `Paginator` drawn round a dial instead of along a row; `Tabs` as a honeycomb, or as page marks
+scattered down the edge of a dossier; a `RadioGroup`'s stars bent into a semicircle. **The list of controls is
+deliberately open** — the user named these as examples of the flexibility wanted, not as the set.
+
+**The decided approach is bottom-up, and it was chosen over building the abstraction first.** The wheel-shaped
+`Menu` is built first, the picking is put in its own abstract from the start rather than privately inside it,
+and the second consumer is expected **very shortly after** and is what corrects the abstract's signature.
+The user agreed to this ordering and stated the follow-up explicitly, so **the abstract is not finished when
+the menu ships** — the proving pass against other controls is the second half of the same job, not a
+someday-maybe.
+
+### What is actually shared, and it is not the layout
+
+Placement is the cheap half. A layout is a function from an item count to boxes, and four sample families
+already do it without wanting a common type: `Formation/Layouts` returns insets, `Staircase/Indents` returns a
+number, `Bracket` returns tree placements, `CellAnimation/Weights` returns a grid of weights. **The expensive
+half is the inverse** — going from a pointer back to an item once the boxes overlap or stop tiling.
+
+**This problem has been solved privately twice and thrown away twice.** `CardFan`, built and deleted, left
+three findings in _Open discussion_ and all three are about picking rather than placing: the card someone aims
+at is not the card under the pointer, a click handler per card is delivered to whichever box is on top so
+clicking a visible sliver picks its neighbour, and picking off a `PointerTracker` reading misses a tap because
+that reading lands a frame late — `InteractionTracker.trackDrag` reports on the press itself and is what a pick
+should use. The ring arrives at the same wall from the other side: its boxes do not overlap, they leave gaps,
+and a pointer between two wedges hits nothing. **Overlap and gaps are one bug.** A layout has an inverse, and
+hit-testing is not it.
+
+So the abstract takes placements and a pointer reading and answers which item is meant, with the rule
+swappable — by angle about a centre for a ring, by position along an axis for a fan or a row, by nearest centre
+for something scattered.
+
+### Decided already
+
+- **Arrow keys walk the item order, whatever the shape.** The user's call, on the grounds that menu items can
+  carry shortcuts anyway. The flick is the spatial route and the keyboard is the ordered one; making both
+  spatial gives two models that can disagree about the same menu. It also keeps a layout to nothing but
+  positions, which is what makes an arbitrary shape cheap to write.
+- **Picking is by direction or position within the layout, never by which box the pointer is over.** This is
+  what lets the item boxes stop being wedges, which is in turn what lets a layout be any shape at all.
+- **`Menu` keeps its column as the default layout.** The layout is a prop, not a new component, so nothing
+  changes for anything using `Menu` today.
+- **The hold-and-flick gesture ships with a click-to-open mode underneath it**, because a flick is a
+  path-based gesture and 2.5.1 Pointer Gestures (A) requires a single-pointer alternative without a path,
+  while 2.1.1 Keyboard (A) requires the keyboard route regardless. The second mode is not a compliance
+  ornament — it is the ordinary mouse route.
+- **Shipped layouts live in `Samples/Menu/Layouts`**, the way `Samples/Formation/Layouts` already does.
+
+### Open, and wanting answers before or during the proving pass
+
+- **The placement type is not `FormationInset`.** That is an axis-aligned rectangle with no rotation, no pivot
+  and no z-order, and a fan of cards needs all three. Whatever the shared type turns out to be, `Formation`
+  adopts it rather than donates it.
+- **Which control proves it second.** `Paginator` looks the strongest: the user corrected an earlier reading
+  of it here — the proposal is **the same elements in the same order**, ellipsis and step buttons included,
+  drawn round a dial instead of along a row, with nothing else changing. `Tabs` gains the least, because its
+  hard parts are the tab-to-panel relationship and the roving walk and both are layout-independent.
+- **Whether a fan of cards is a menu.** It is, if picking one does something and only one gets picked; the
+  test is whether the items are choices or content rather than what shape they are in. `CardFan` was deleted
+  for being ultra-specific, which is evidence that the fan is a layout rather than a component — but that is
+  an inference, not the user's verdict, and it should be put to them rather than assumed.
+
 ---
 
 ## Accepted limits
@@ -1153,6 +1219,27 @@ and even whether the machine is on battery, so a committed image is only stable 
 produced it. The hosted services (Chromatic, Argos) keep baselines off the repo entirely and put the diff in the
 pull request for approval, which is what libraries with a design system to protect generally use. Neither
 arrangement survives the two grounds above.
+
+**`CellAnimation` draws a brighter line around every cell when the source is see-through.** Accepted by the
+user. Each cell is drawn one pixel wider and taller than its slot so it laps over its right-hand and bottom
+neighbour — the reasoning is in `decisions.md`, and the pixel went back after being removed once. Where the
+source is partly transparent, that lapped strip is composited twice: 50% over 50% reads as 75%, and the result
+is a grid of denser lines boxing in each cell. Reachable on the Playground's `CellAnimation` page, in the
+gradient example with `sweep_diag_1` and in the pattern example with `hexagon_pt_2`. The two neighbouring
+samples show why it is about the artwork rather than the grid: `circle_hd_2` is solid circles on fully empty
+gaps, so doubling either is invisible, and `orbit_async_2v1` lays an opaque gradient over its half-transparent
+base, leaving nothing see-through to double.
+
+Three fixes were put up and the user chose to leave it, so none should be re-proposed without new grounds.
+Making the bleed a prop defaulting to 1 works but adds API surface whose only job is to name a rendering
+compromise, plus a Playground knob for it. Dropping the bleed to zero brings back the hairline seams on opaque
+sources, which is the fault the pixel exists for. Drawing every cell into one canvas removes the second paint
+entirely and is the only fix with no trade, but the whole animation is per-cell CSS transforms and filters, so
+it is a rewrite of how the component renders.
+
+Worth knowing if this is ever reopened: the seams the pixel fixes come from the Playground drawing inside
+`Viewport`'s scale transform, where whole-pixel layout edges land on fractional device pixels — while the
+outline it causes reaches any consumer with translucent artwork, scaled or not.
 
 ---
 

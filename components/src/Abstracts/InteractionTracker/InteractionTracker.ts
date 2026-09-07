@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, onCleanup } from "solid-js";
+import { createEffect, createMemo, createSignal, on, onCleanup } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { GestureUtils, MathUtils } from "@thewaver/ss-utils";
@@ -73,6 +73,19 @@ const trackPointer = (
 
     let pointerId: number | undefined;
     let startRect: DOMRect | undefined;
+
+    createEffect(
+        on(
+            getRef,
+            () => {
+                pointerId = undefined;
+                startRect = undefined;
+
+                setIsEngaged(false);
+            },
+            { defer: true },
+        ),
+    );
 
     createEffect(() => {
         const ref = getRef();

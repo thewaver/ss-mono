@@ -1029,6 +1029,23 @@ which is a change to `Anchor` rather than to `Menu`, and it is the last piece. `
 
 ## Layout and styling
 
+### What a component reports runs at its own rate, never at the gesture's
+
+Stated by the user, after `ScratchCard`'s `precision` knob was found to cost frames: **the measurement should
+never have been tied to the pace of the scratching in the first place.** A control driven by a continuous
+gesture has two jobs that look like one — change the thing, and tell the consumer what it now is — and the
+second is almost never wanted at the first's rate. Tying them makes every improvement to the reported number
+a tax on the input, which is how a knob that only controls accuracy ends up controlling smoothness.
+
+**Throttle, not debounce.** A debounce waits for a pause, and the person doing the gesture may not pause at
+all — somebody rubbing steadily would be told nothing until they lifted the pointer. A throttle reports at
+once, then at a bounded rate, with a trailing call so the final value always lands. Anything downstream that
+watches the report — a threshold, a completion callback — inherits the delay, which is the thing to check
+before choosing the interval rather than a reason to avoid one.
+
+The general test: if a value is derived from accumulated state rather than from the event, its cost belongs
+to the reporting rather than to the gesture, and it should be measured on a clock the input cannot move.
+
 ### Folder layout: `Essentials/Input`
 
 `Checkbox`, `Toggle`, `Radio`, `RadioGroup`, `TextInput` and `Label` live under `Essentials/Input/`.

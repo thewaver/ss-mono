@@ -54,12 +54,17 @@ asks that concepts be explained plainly "for the sake of safe communication". Le
 happens, as a sequence — "the user presses Escape, the modal hides, the parent variable still says open,
 so clicking the button to reopen does nothing". Introduce a term only after describing the thing it names.
 
-**A fault is a numbered walkthrough, not a paragraph about the cause.** Asked for by the user. Write
-the sequence when it goes right, one numbered step per thing that happens; then the same sequence with the
-fault, written out in full rather than referred back to; then a closing line naming which step is the actual
-defect and why the rest is tolerable. Steps are what a person does and sees, not what the code does — the
-mechanism comes after the walkthrough, if at all. Repeating the whole sequence is the point: "as above but
-step 3 does not happen" makes them hold two versions in their head at once.
+**A fault is explained in plain prose, and never as a working sequence paired with a broken one.** Asked
+for by the user, after an outline appearing around `CellAnimation`'s cells was written up as "when it goes
+right" in seven numbered steps followed by the same seven steps again with the fault in them: the prose that
+came after — what the thing does, why the two other samples do not show it — was enough on its own, and the
+paired walkthroughs were length without content. So describe what happens, concretely and in order if the
+order matters, and say which part is the actual defect. **This costs most when the fault is already fixed**:
+a defect found and repaired in the same turn is reported as what was wrong and what was done, not as a
+reconstruction of the broken behaviour the user will now never see.
+
+Whatever shape it takes, it stays in terms of what a person does and sees rather than what the code does —
+the mechanism comes after, if at all.
 
 They will use terminology they feel only semi-confident about. Take the intent rather than the label: do
 not correct their word choice, and do not mirror a technical term back just because they reached for it

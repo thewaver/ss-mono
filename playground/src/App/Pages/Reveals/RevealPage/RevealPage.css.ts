@@ -1,6 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
-import { themeVars } from "../../Theme.css";
+import { themeVars } from "../../../Theme.css";
 
 const panel = (from: string, to: string) => `linear-gradient(135deg, ${from}, ${to})`;
 

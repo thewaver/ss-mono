@@ -81,7 +81,7 @@ export const Spotlight = (props: SpotlightProps) => {
     const getMaskStyle = createMemo<JSX.CSSProperties>(() => {
         const rect = getElementRect();
 
-        return rect ? CutoutUtils.getMaskStyle(rect) : {};
+        return rect ? CutoutUtils.getMaskStyle([rect]) : {};
     });
 
     const getClipPath = createMemo(() => {

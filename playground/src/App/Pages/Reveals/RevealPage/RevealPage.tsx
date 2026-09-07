@@ -2,15 +2,15 @@ import { createMemo, createSignal } from "solid-js";
 
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { PageProp } from "../../PageComponents/Prop/Prop";
-import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
+import { PageExamples } from "../../../PageComponents/Examples/Examples";
+import { PageProp } from "../../../PageComponents/Prop/Prop";
+import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../../StyledComponents/Field/Field";
 import { FrostedExample } from "./Examples/Frosted";
 import { PromptExample } from "./Examples/Prompt";
 import { TorchExample } from "./Examples/Torch";
 
-const EXAMPLES_ROOT = "/src/App/Pages/RevealPage/Examples";
+const EXAMPLES_ROOT = "/src/App/Pages/Reveals/RevealPage/Examples";
 const CIRCLE = "circle";
 const SHAPES = [CIRCLE, ...ShapeConst.DEFAULT_SHAPES] as const;
 

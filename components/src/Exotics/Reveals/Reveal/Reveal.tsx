@@ -3,10 +3,10 @@ import type { JSX } from "solid-js";
 
 import { MathUtils, type Point2d, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
 
-import { CutoutUtils } from "../../Abstracts/Cutout/Cutout.utils";
-import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
-import { PointerTracker } from "../../Abstracts/PointerTracker/PointerTracker";
-import { access } from "../../Utils/propUtils";
+import { CutoutUtils } from "../../../Abstracts/Cutout/Cutout.utils";
+import { ElementObserver } from "../../../Abstracts/ElementObserver/ElementObserver";
+import { PointerTracker } from "../../../Abstracts/PointerTracker/PointerTracker";
+import { access } from "../../../Utils/propUtils";
 import type { RevealProps } from "./Reveal.types";
 
 import * as styles from "./Reveal.css";
@@ -82,7 +82,7 @@ export const Reveal = (props: RevealProps) => {
             height: diameter,
         };
 
-        return CutoutUtils.getMaskStyle(hole, getHoleImage());
+        return CutoutUtils.getMaskStyle([{ ...hole, image: getHoleImage() }]);
     });
 
     return (
