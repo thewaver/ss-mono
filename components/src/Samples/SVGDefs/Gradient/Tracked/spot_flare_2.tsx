@@ -20,13 +20,8 @@ const CORE_ALPHA = 0.75;
 const FALLOFF_ALPHA = 0.25;
 
 const GHOSTS: FlareGhost[] = [
-    { reach: 0.36, scale: 0.34, alpha: 0.1, colorKey: "primary" },
-    { reach: 0.62, scale: 0.13, alpha: 0.18, colorKey: "primary" },
-    { reach: 0.95, scale: 0.52, alpha: 0.08, colorKey: "secondary", isRing: true },
-    { reach: 1.18, scale: 0.19, alpha: 0.15, colorKey: "secondary" },
-    { reach: 1.44, scale: 0.1, alpha: 0.2, colorKey: "tertiary" },
-    { reach: 1.72, scale: 0.66, alpha: 0.07, colorKey: "tertiary", isRing: true },
-    { reach: 2, scale: 0.26, alpha: 0.13, colorKey: "tertiary" },
+    { reach: 0.8, scale: 0.16, alpha: 0.18, colorKey: "secondary" },
+    { reach: 1.6, scale: 0.58, alpha: 0.07, colorKey: "secondary", isRing: true },
 ];
 
 const GHOST_SATURATION = 0.55;
@@ -65,7 +60,7 @@ const computeGhostColors = (ghost: FlareGhost, color: string, fade: number) => {
     ];
 };
 
-export const sheen_flare_3: TrackedGradientConfig = {
+export const spot_flare_2: TrackedGradientConfig = {
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),

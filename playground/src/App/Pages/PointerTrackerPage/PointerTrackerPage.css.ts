@@ -127,36 +127,3 @@ export const dockItem = style({
     boxShadow: themeVars.shadow.small,
     userSelect: "none",
 });
-
-export const compassStage = style({
-    display: "grid",
-    placeItems: "center",
-    width: "100%",
-    height: "100%",
-});
-
-export const compassDial = style({
-    position: "relative",
-    display: "grid",
-    placeItems: "center",
-    width: 140,
-    height: 140,
-    border: `1px solid ${themeVars.color.primary.dark}`,
-    borderRadius: "50%",
-});
-
-export const compassNeedle = style({
-    position: "absolute",
-    left: "50%",
-    top: "50%",
-    width: 60,
-    height: 2,
-    backgroundColor: themeVars.color.primary.main,
-    transformOrigin: "0 50%",
-});
-
-export const compassAngle = style({
-    color: themeVars.color.primary.main,
-    fontFamily: "monospace",
-    fontSize: themeVars.fontSize.small,
-});

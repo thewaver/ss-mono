@@ -11,6 +11,8 @@ export const PAINT_KINDS: SVGGradientsPaintKind[] = ["fill", "stroke"];
 
 export const STROKE_THICKNESS = 16;
 
+export const TRACKED_CELLS = Array.from({ length: 4 }, (_unused, index) => index);
+
 export const MIN_BLUR_WIDTH = 0;
 export const MAX_BLUR_WIDTH = 40;
 export const BLUR_WIDTH_STEP = 1;

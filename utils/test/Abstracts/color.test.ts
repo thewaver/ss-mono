@@ -6,6 +6,7 @@ const RED: Color.Hex = "#ff0000";
 const GREEN: Color.Hex = "#00ff00";
 const BLUE: Color.Hex = "#0000ff";
 const GREY: Color.Hex = "#808080";
+const CYAN: Color.Hex = "#00ffff";
 const NAVY: Color.Hex = "#123456";
 
 const round = (rgb: Color.RGB) => ({
@@ -253,5 +254,96 @@ describe("Color toCss", () => {
         expect(Color.HSV.toCss({ h: 0, s: 0, v: 1 })).toBe("hwb(0 100% 0%)");
         expect(Color.HSV.toCss({ h: 0, s: 0, v: 0 })).toBe("hwb(0 0% 100%)");
         expect(Color.HSL.toCss({ h: 0, s: 0, l: 1 })).toBe("hsl(0 0% 100%)");
+    });
+});
+
+describe("Color.RGB.interpolate", () => {
+    it("returns the ends at the ends", () => {
+        expect(round(Color.RGB.interpolate({ r: 0, g: 0, b: 0 }, { r: 255, g: 255, b: 255 }, 0))).toEqual({
+            r: 0,
+            g: 0,
+            b: 0,
+        });
+        expect(round(Color.RGB.interpolate({ r: 0, g: 0, b: 0 }, { r: 255, g: 255, b: 255 }, 1))).toEqual({
+            r: 255,
+            g: 255,
+            b: 255,
+        });
+    });
+
+    it("sits halfway between the channels at half", () => {
+        expect(round(Color.RGB.interpolate({ r: 0, g: 100, b: 200 }, { r: 200, g: 100, b: 0 }, 0.5))).toEqual({
+            r: 100,
+            g: 100,
+            b: 100,
+        });
+    });
+
+    it("clamps a ratio outside the range instead of extrapolating", () => {
+        const from = { r: 0, g: 0, b: 0 };
+        const to = { r: 100, g: 100, b: 100 };
+
+        expect(Color.RGB.interpolate(from, to, -1)).toEqual(Color.RGB.interpolate(from, to, 0));
+        expect(Color.RGB.interpolate(from, to, 2)).toEqual(Color.RGB.interpolate(from, to, 1));
+    });
+});
+
+describe("Color.RGBA.interpolate", () => {
+    it("carries the opacity along with the channels", () => {
+        const mixed = Color.RGBA.interpolate({ r: 0, g: 0, b: 0, a: 0 }, { r: 0, g: 0, b: 0, a: 1 }, 0.25);
+
+        expect(mixed.a).toBeCloseTo(0.25);
+    });
+});
+
+describe("Color.HSL.interpolate", () => {
+    it("takes the shorter arc across zero rather than the long way round", () => {
+        expect(Color.HSL.interpolate({ h: 350, s: 1, l: 0.5 }, { h: 10, s: 1, l: 0.5 }, 0.5).h).toBe(0);
+    });
+
+    it("does not cross zero when the direct route is shorter", () => {
+        expect(Color.HSL.interpolate({ h: 10, s: 1, l: 0.5 }, { h: 110, s: 1, l: 0.5 }, 0.5).h).toBe(60);
+    });
+
+    it("goes the increasing way when the hues are exactly opposite", () => {
+        expect(Color.HSL.interpolate({ h: 0, s: 1, l: 0.5 }, { h: 180, s: 1, l: 0.5 }, 0.5).h).toBe(90);
+    });
+
+    it("holds saturation up across the blend, where a channel blend would not", () => {
+        const viaHue = Color.HSL.interpolate(Color.Hex.toHsl(RED), Color.Hex.toHsl(CYAN), 0.5);
+        const viaChannels = Color.RGB.toHsl(Color.RGB.interpolate(Color.Hex.toRgb(RED), Color.Hex.toRgb(CYAN), 0.5));
+
+        expect(viaHue.s).toBeGreaterThan(viaChannels.s);
+    });
+});
+
+describe("Color.HSV.interpolate", () => {
+    it("takes the shorter arc across zero", () => {
+        expect(Color.HSV.interpolate({ h: 340, s: 1, v: 1 }, { h: 20, s: 1, v: 1 }, 0.5).h).toBe(0);
+    });
+});
+
+describe("Color.Hex.interpolate", () => {
+    it("returns the ends at the ends", () => {
+        expect(Color.Hex.interpolate(RED, BLUE, 0)).toBe(RED);
+        expect(Color.Hex.interpolate(RED, BLUE, 1)).toBe(BLUE);
+    });
+
+    it("meets in the middle of the channels", () => {
+        expect(Color.Hex.interpolate("#000000", "#ffffff", 0.5)).toBe(GREY);
+    });
+
+    it("reads the short form on both sides", () => {
+        expect(Color.Hex.interpolate("#000", "#fff", 0.5)).toBe(Color.Hex.interpolate("#000000", "#ffffff", 0.5));
+    });
+});
+
+describe("Color.Hexa.interpolate", () => {
+    it("blends the alpha pair as well as the channels", () => {
+        expect(Color.Hexa.interpolate("#00000000", "#ffffffff", 0.5)).toBe("#80808080");
+    });
+
+    it("reads a value with no alpha pair as opaque", () => {
+        expect(Color.Hexa.interpolate("#000000", "#ffffff", 0.5)).toBe("#808080ff");
     });
 });

@@ -9,7 +9,11 @@ import type { TrackedGradientExampleProps } from "../../SVGGradients.types";
 
 import * as styles from "../../SVGGradients.css";
 
-export const DefaultExample = ({ configKey, paintKind, colors, blurWidth }: TrackedGradientExampleProps) => {
+type Props = TrackedGradientExampleProps & {
+    boxClass?: string;
+};
+
+export const TrackedShape = ({ configKey, paintKind, colors, blurWidth, boxClass }: Props) => {
     const id = createUniqueId();
 
     const computeDefs = (getSize: () => Size2d, getRef: () => HTMLElement | undefined) => {
@@ -35,7 +39,9 @@ export const DefaultExample = ({ configKey, paintKind, colors, blurWidth }: Trac
             computeFillDefs={access(paintKind) === "fill" ? computeDefs : undefined}
             computeStrokeDefs={access(paintKind) === "stroke" ? computeDefs : undefined}
             strokeGeom={access(paintKind) === "stroke" ? () => [{ thicknesses: [STROKE_THICKNESS] }] : undefined}
-            renderChildren={() => <div class={styles.example} />}
+            renderChildren={() => <div class={boxClass ?? styles.example} />}
         />
     );
 };
+
+export const DefaultExample = (props: TrackedGradientExampleProps) => <TrackedShape {...props} />;

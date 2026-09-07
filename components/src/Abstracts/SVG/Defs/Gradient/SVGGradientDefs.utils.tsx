@@ -94,15 +94,28 @@ export namespace SVGGradientDefsUtils {
         defs: SVGRadialGradientDefs,
         custom?: JSX.Element | ((cx: number, cy: number, r: number) => JSX.Element),
     ) => {
-        const { id, colors, origin, scale, spreadKind, ...baseProps } = defs;
+        const { id, colors, origin, scale, aspect, angle, spreadKind, ...baseProps } = defs;
         const getColors = () => access(colors);
         const getOrigin = () => access(origin) ?? DEFAULT_RADIAL_ORIGIN;
         const getRadius = () => 0.5 * (access(scale) ?? 1);
+        const getTransform = () =>
+            SVGUtils.getRadialTransform({
+                origin: getOrigin(),
+                aspect: access(aspect),
+                angle: access(angle),
+            });
         const initialOrigin = untrack(getOrigin);
         const initialRadius = untrack(getRadius);
 
         return (
-            <radialGradient {...baseProps} id={id} cx={getOrigin().x} cy={getOrigin().y} r={getRadius()}>
+            <radialGradient
+                {...baseProps}
+                id={id}
+                cx={getOrigin().x}
+                cy={getOrigin().y}
+                r={getRadius()}
+                gradientTransform={getTransform()}
+            >
                 {typeof custom === "function" ? custom(initialOrigin.x, initialOrigin.y, initialRadius) : custom}
                 {spreadKind === "banded"
                     ? renderBandedGradientStops(getColors, id)

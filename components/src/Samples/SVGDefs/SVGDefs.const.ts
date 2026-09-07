@@ -34,12 +34,37 @@ import { sweep_1v1 } from "./Gradient/Timed/sweep_1v1";
 import { sweep_diag_1 } from "./Gradient/Timed/sweep_diag_1";
 import { sweep_diag_1v1 } from "./Gradient/Timed/sweep_diag_1v1";
 import { sweep_diag_async_4 } from "./Gradient/Timed/sweep_diag_async_4";
-import { sheen_1 } from "./Gradient/Tracked/sheen_1";
-import { sheen_1v1 } from "./Gradient/Tracked/sheen_1v1";
-import { sheen_diag_1 } from "./Gradient/Tracked/sheen_diag_1";
-import { sheen_flare_1 } from "./Gradient/Tracked/sheen_flare_1";
-import { sheen_flare_2 } from "./Gradient/Tracked/sheen_flare_2";
-import { sheen_flare_3 } from "./Gradient/Tracked/sheen_flare_3";
+import { band_1 } from "./Gradient/Tracked/band_1";
+import { band_1v1 } from "./Gradient/Tracked/band_1v1";
+import { band_diag_1 } from "./Gradient/Tracked/band_diag_1";
+import { hand_1 } from "./Gradient/Tracked/hand_1";
+import { hand_trail_1 } from "./Gradient/Tracked/hand_trail_1";
+import { hand_trail_2 } from "./Gradient/Tracked/hand_trail_2";
+import { hand_trail_2c } from "./Gradient/Tracked/hand_trail_2c";
+import { hand_trail_3 } from "./Gradient/Tracked/hand_trail_3";
+import { hand_trail_3c } from "./Gradient/Tracked/hand_trail_3c";
+import { spot_1 } from "./Gradient/Tracked/spot_1";
+import { spot_flare_2 } from "./Gradient/Tracked/spot_flare_2";
+import { spot_flare_3 } from "./Gradient/Tracked/spot_flare_3";
+import { spot_ripple_1 } from "./Gradient/Tracked/spot_ripple_1";
+import { spot_ripple_1s } from "./Gradient/Tracked/spot_ripple_1s";
+import { spot_ripple_2 } from "./Gradient/Tracked/spot_ripple_2";
+import { spot_ripple_2c } from "./Gradient/Tracked/spot_ripple_2c";
+import { spot_ripple_2cs } from "./Gradient/Tracked/spot_ripple_2cs";
+import { spot_ripple_2s } from "./Gradient/Tracked/spot_ripple_2s";
+import { spot_ripple_3 } from "./Gradient/Tracked/spot_ripple_3";
+import { spot_ripple_3c } from "./Gradient/Tracked/spot_ripple_3c";
+import { spot_ripple_3cs } from "./Gradient/Tracked/spot_ripple_3cs";
+import { spot_ripple_3s } from "./Gradient/Tracked/spot_ripple_3s";
+import { spot_smear_2 } from "./Gradient/Tracked/spot_smear_2";
+import { spot_smear_2c } from "./Gradient/Tracked/spot_smear_2c";
+import { spot_smear_3 } from "./Gradient/Tracked/spot_smear_3";
+import { spot_smear_3c } from "./Gradient/Tracked/spot_smear_3c";
+import { spot_trail_1 } from "./Gradient/Tracked/spot_trail_1";
+import { spot_trail_2 } from "./Gradient/Tracked/spot_trail_2";
+import { spot_trail_2c } from "./Gradient/Tracked/spot_trail_2c";
+import { spot_trail_3 } from "./Gradient/Tracked/spot_trail_3";
+import { spot_trail_3c } from "./Gradient/Tracked/spot_trail_3c";
 import { constant } from "./Iteration/constant";
 import { repeat1_1 } from "./Iteration/repeat1_1";
 import { repeat2_1 } from "./Iteration/repeat2_1";
@@ -68,6 +93,13 @@ export namespace SVGDefsSamples {
         primary: "#FFFF00",
         secondary: "#00FFFF",
         tertiary: "#FF00FF",
+    };
+
+    export const SAMPLE_COLORS_MONO: SVGDefsColors = {
+        background: "#282420",
+        primary: "#F0F4F8",
+        secondary: "#D0D4D8",
+        tertiary: "#B0B4B8",
     };
 
     export namespace Iteration {
@@ -144,12 +176,37 @@ export namespace SVGDefsSamples {
 
         export namespace Tracked {
             export const SAMPLE_CONFIGS = {
-                sheen_1,
-                sheen_1v1,
-                sheen_diag_1,
-                sheen_flare_1,
-                sheen_flare_2,
-                sheen_flare_3,
+                band_1,
+                band_1v1,
+                band_diag_1,
+                hand_1,
+                hand_trail_1,
+                hand_trail_2,
+                hand_trail_2c,
+                hand_trail_3,
+                hand_trail_3c,
+                spot_1,
+                spot_flare_2,
+                spot_flare_3,
+                spot_ripple_1,
+                spot_ripple_1s,
+                spot_ripple_2,
+                spot_ripple_2c,
+                spot_ripple_2cs,
+                spot_ripple_2s,
+                spot_ripple_3,
+                spot_ripple_3c,
+                spot_ripple_3cs,
+                spot_ripple_3s,
+                spot_smear_2,
+                spot_smear_2c,
+                spot_smear_3,
+                spot_smear_3c,
+                spot_trail_1,
+                spot_trail_2,
+                spot_trail_2c,
+                spot_trail_3,
+                spot_trail_3c,
             } as const satisfies Record<string, TrackedGradientConfig>;
 
             export type SampleKey = keyof typeof SAMPLE_CONFIGS;

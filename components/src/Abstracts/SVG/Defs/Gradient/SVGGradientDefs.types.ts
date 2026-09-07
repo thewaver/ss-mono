@@ -27,4 +27,6 @@ export type SVGRadialGradientDefs = SVGGradientDefs &
     AccessorProps<{
         origin?: Point2d;
         scale?: number;
+        aspect?: Size2d;
+        angle?: number;
     }>;

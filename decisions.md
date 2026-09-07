@@ -5928,7 +5928,7 @@ so it is set on the elements of these two chains alone. Nothing already built mo
 `maxOffset` exists to pay for that. Specular is clipped to `SourceAlpha` and diffuse is multiplied into the
 source, so both stay inside the shape, and neither touches the region arithmetic.
 
-### `sheen_1`: the same idea with no filter at all
+### `spot_1`: the same idea with no filter at all
 
 **A radial gradient whose origin is the pointer reading, and nothing else.** `boxRatio` is already 0–1 and a
 radial gradient's `cx`/`cy` are object-bounding-box units, so the origin is the reading passed straight
@@ -6120,12 +6120,13 @@ take rather than what one consumer would probably pass. A flat edge is still rea
 Width zero is how the edge is turned off; both props are always passed, and `Shape` draws a band of no
 thickness as nothing.
 
-**The default is `sheen_flare_1`, and the six border knobs sit together at the top of the panel.** Both the
+**The default is `spot_1`, and the six border knobs sit together at the top of the panel.** Both the
 user's call. `Shape` and the gradients page open on `sweep_diag_1v1`, which is the right choice where the
-subject is the registry; here the subject is glass, and `sheen_flare_1` is the radial counterpart of the
+subject is the registry; here the subject is glass, and `spot_1` is the radial counterpart of the
 component's own highlight, so the pane opens with an edge that catches the pointer the way the surface does.
-It was chosen when that sample was called `sheen_1`; the key moved to the vertical band later, and the page
-follows the sample rather than the name. Grouping the
+It was chosen when that sample was called `sheen_1`, before the plainest key moved to the vertical band and
+before the whole registry was respelled; the page follows the sample rather than the name, which is why the
+default has been rewritten twice and never re-chosen. Grouping the
 knobs matters because four of them are named for the border and two — the animation duration and the
 iteration pattern — feed nothing else on this page, so scattered among the noise and sheen controls they read
 as belonging to the glass.
@@ -6223,15 +6224,27 @@ been guessed wrong twice, not because it is a law. **Do not rename existing keys
 the `_4` samples would be `1v1v1v1` under a strict reading, and were left short because that is unreadable.
 
 **The trailing number is how many of the shared colours the sample paints with — never how many elements it
-draws.** `sheen_flare_3` puts ten gradients on the surface out of `primary`, `secondary` and `tertiary`, and
-that is a three. A ten-layer sample named `sheen_flare_10` was the mistake that produced the rule. The useful
+draws.** `spot_flare_3` puts ten gradients on the surface out of `primary`, `secondary` and `tertiary`, and
+that is a three. A ten-layer sample named `flare_10` was the mistake that produced the rule. The useful
 consequence: a sample can be made as elaborate as it likes without its name moving, and dropping a colour
-costs a hue rather than a chain, which is what let `sheen_flare_2` be a flare at all rather than a pool and a
+costs a hue rather than a chain, which is what let `spot_flare_2` be a flare at all rather than a pool and a
 blob.
 
 **A number followed by `s` means those colours are laid down solid rather than blended.** `flow_2s`,
 `flow_3s` and `flow_diag_2s` are the banded counterparts of their smooth siblings, which is `spreadKind:
 "banded"` on the gradient — each stop emitted twice so the colours meet at a hard edge.
+
+**Suffix letters stack, and the order is `c` then `s`.** `spot_ripple_3cs` is three colours, cycled from a
+clock, laid down solid — the user's spelling, and the general rule it fixes is that each letter qualifies
+the number and they read in that order rather than in any other.
+
+**A number followed by `c` means the colours are cycled from a clock rather than each painting its own
+element.** `spot_trail_2c`, `spot_trail_3c`, `spot_ripple_2c` and `spot_ripple_3c` blend continuously through their colour list
+one second at a time, so at any instant the sample is showing one colour — or a mixture of two — rather than
+all of them at once. The user asked for the suffix form specifically, in place of the `_cycle_N` these were
+first named: a letter after the number is the shape the registry already had for `s`, and it keeps the
+colour count where a reader looks for it. **A suffix letter is therefore how the number is qualified, and a
+word between the family and the number is not the place for it.**
 
 **`N v M` means element groups that are not contiguous, with their own colour counts.** A horizontal line and
 a vertical line is `1v1`: two separate things, one colour each, not one two-coloured thing. `orbit_async_2v1`
@@ -6243,37 +6256,61 @@ the strict form would run to `1v1v1v1`, the short number is used instead.
 of lowercase letters, so everything named `sheen_…` arrives together in the dropdown. The words in between —
 `diag`, `inter`, `async`, `pulse`, `rot` — qualify the motion, and are descriptive rather than governed.
 
-### The `sheen` family in the gradient registry is what a pointer-driven sample looks like
+### A tracked sample key is a mark, then a treatment, then a colour count
 
-**The six of them are `Gradient.Tracked` in its entirety, and the prefix is the grouping inside it.** The
-picker groups by the first lowercase word of the key, so `sheen_1`, `sheen_1v1`, `sheen_diag_1`,
-`sheen_flare_1`, `sheen_flare_2` and `sheen_flare_3` arrive together — every one of them, since the registry
-holds nothing else yet. They are the samples that read the pointer rather than running on a clock: each calls
-`PointerTracker.create` inside `renderDefsElement`, hands over the `getRef` the registry already passes, and
-turns
-`boxRatio` — the pointer's position as a 0–1 pair inside the element — into a gradient's origin or offset.
-Their payload carries no animation fields at all, which is what the split bought: a page showing them has no
-clock knobs to offer.
+**The registry grew two axes and the keys only had room for one, which is what the rename fixed.** A
+sample makes a **mark** — a radial pool, a linear band, an angular wedge — and applies a **treatment** to it:
+leave a fading history, expand it into rings, hang a chain of ghosts off it. `flare_…`, `ripple_…` and
+`trail_…` were three prefixes for three treatments of the same mark, so the picker filed one family as
+three; and `hand_trail_1` was the first key that needed both axes at once, which is what surfaced it. The
+key is now **mark, treatment, colour count** — `spot_ripple_3cs`, `spot_trail_3c`, `hand_trail_3c` — and it
+needed no new rule, since the leading word was always the family and the words between it and the number
+always qualified.
 
-**The plainest one holds the plainest key, which is why the radial was renamed.** `sheen_1` is the vertical
-band that slides sideways under the pointer — the simplest thing the family does, and the one a reader
-opening the group first should meet. The radial pool that used to hold that key is `sheen_flare_1`. The user's
+**Three marks, three groups in the picker.** `splitEntriesIntoGroups` takes the first run of lowercase
+letters, so `band_…` are the bands, `hand_…` the wedges and `spot_…` the pools — three headings for
+however many entries the registry grows to, where the old spelling gave five and gained one on every new
+treatment. `sheen_…` became `band_…` in the same pass: it named
+a **look** where the other two name a mark, so it was the one family a reader could not predict from the
+effect. The user weighed keeping it — it was their word, and `sheen_1` carried the plainest-key status
+deliberately — and chose the consistency.
+
+**`flare_1` became `spot_1` because it was never a flare.** It is a bare radial pool with no ghosts at all;
+the flares proper are `spot_flare_2` and `spot_flare_3`, which add the chain. So the plainest key went to
+the plainest thing, which is the same principle applied when the radial gave up `sheen_1` in the first
+place.
+
+**`smear` is a treatment and swallows `trail`.** `spot_smear_2` and `spot_smear_3` rather than
+`spot_trail_smear_…`: a smear cannot be anything but a trail whose stamps are stretched, so spelling both
+buys nothing and costs a long key.
+
+**What they share is the driver.** They are the samples that read the pointer rather than running on a
+clock: each calls `PointerTracker.create` inside `renderDefsElement`, hands over the `getRef` the registry
+already passes, and turns `boxRatio` — the pointer's position as a 0–1 pair inside the element — into a
+gradient's origin or offset. Their payload carries no animation fields at all, which is what the split
+bought: a page showing them has no clock knobs to offer.
+
+**The plainest one holds the plainest key, which is why the radial was renamed.** `band_1` is the vertical
+band that slides sideways under the pointer — the simplest thing the bands do, and the one a reader
+opening the group first should meet. The radial pool that used to hold that key is `spot_1`. The user's
 call, and the renaming is the point of it: a numbered key with no qualifier reads as the family's base case,
 so the base case has to be the one that earns it.
 
-**What each one does with the reading.** `sheen_1` is a vertical band whose centre follows the pointer's
-horizontal position. `sheen_flare_1` is a radial pool centred on the pointer. `sheen_diag_1` is a band fixed
+**What each one does with the reading.** `band_1` is a vertical band whose centre follows the pointer's
+horizontal position. `spot_1` is a radial pool centred on the pointer. `band_diag_1` is a band fixed
 at 45° whose centre slides along that diagonal by the pointer's projection onto it, so the tilt never changes
-and only the position does. `sheen_1v1` is two bands, one horizontal and one vertical,
+and only the position does. `band_1v1` is two bands, one horizontal and one vertical,
 each following its own axis of the pointer, so they cross where the pointer is and the crossing is the
 brightest point — the `1v1` suffix, as elsewhere in the registry, is one colour answering another.
-`sheen_flare_2` is the pool plus a ghost mirrored through the centre: at the bottom-right corner the ghost is
+`spot_flare_2` is the pool plus a ghost mirrored through the centre: at the bottom-right corner the ghost is
 a small disc at the top-left, and as the pointer comes in the ghost grows and closes on the centre with it,
 because its origin is the pointer's reflection and its radius is interpolated by the pointer's distance from
-the centre. `sheen_flare_2` and `sheen_flare_3` are both the photographic thing — a source, two streaks and a chain of
+the centre. `spot_flare_2` and `spot_flare_3` are both the photographic thing — a source, two streaks and a chain of
 ghosts along the axis through the centre — and what separates them is how many colours the chain draws on.
 
-**The band samples leave the surface by travelling off it, and nothing about them fades.** The first
+### The bands leave the surface by travelling off it
+
+**The bands leave the surface by travelling off it, and nothing about them fades.** The first
 build faded their alphas out over a window of pointer distance, and it looked wrong — a band lying still and
 dimming is not what a highlight does. The user's call was to drop the opacity entirely and let the movement
 carry the band off the painted area, and it needs no extra arithmetic at all: the pointer's position inside
@@ -6285,15 +6322,22 @@ read correctly.
 **The clamp was the thing making it look stuck.** Pinning `boxRatio` to 0 – 1 holds the band against the
 edge for as long as the pointer is anywhere outside, so every version of the fade had to hide a band that
 was still there. Removing the clamp is the whole fix, and it also means an untouched page shows the band
-centred, exactly as `sheen_1` shows its pool centred.
+centred, exactly as `spot_1` shows its pool centred.
 
-**The family reads from the colours bag, and brightness comes from luminosity rather than from white.**
+**Every tracked sample reads from the colours bag, and brightness comes from luminosity rather than from white.**
 The first build painted every core white on the reasoning that a highlight is the colour of the light; the
 user recoloured them, so each layer now takes `primary`, `secondary` or `tertiary` and the Border Colors
 knobs move all of it. What keeps a core reading as a source rather than as a flat disc is `hsl(from <colour>
 h s calc(l * 1.5))` at the innermost stop — the sample's own colour with its lightness lifted — which is the
 same relative-colour form `getBaseBorderColor` already uses. The ghosts lift theirs less, at 1.35, so the
 pool stays the brightest thing on the surface.
+
+**A band that starts inside the box leaves a visible kink, and it is inherent.** A linear gradient pads its
+first stop outside its axis, so where the axis begins there is a change of slope from flat to ramping. It is
+transparent on both sides of that line, so nothing jumps; what the eye catches is the second derivative. The
+alternative is a span wide enough to always overhang the box, which costs the band its shape. Left as is.
+
+### The flares are a table of ghosts, arrived at over three tries
 
 **Three tries at the flare, and what each one got wrong.** The first was two saturated circles and read as
 painted blobs. The second added a third and made one a ring, which helped and was still not it. What settled
@@ -6307,8 +6351,10 @@ rings, and then at Shade3D's lens flare reference, which exposes exactly three i
 **ghost** and **streak**. The streak was built — a radial gradient squashed to a fortieth of its height about
 its own origin is a horizontal spike, and the abstract grew an `aspect` prop to express it — and the user cut
 it: the primary element does not need spikes, and it reads better without. The `aspect` prop went with it,
-since an abstract with no consumer is dead API; **rebuilding it is a `gradientTransform` composed from a
-`Size2d` of multipliers, and the whole change was about fifteen lines** if the streaks are ever wanted back.
+since an abstract with no consumer is dead API — and the estimate left here, that rebuilding it was a
+`gradientTransform` from a `Size2d` of multipliers and about fifteen lines, **held when `spot_smear_3`
+needed it.** It is back, described under _"a radial gradient can only be a circle"_ below, and the streaks
+are still not built: what wanted the prop was a smear along a direction of travel, not a spike.
 
 **A flare is a table, not a dozen hand-written blocks.** Each sample's ghosts are rows of reach, scale,
 alpha, colour and a filled-or-ring flag, mapped into defs; the streaks are two more rows. That keeps the
@@ -6327,11 +6373,11 @@ follows the pointer, so it leaves on its own.
 source's 0.9, saturation is cut to 55% and lightness lifted 25%, so each one is a pale veil rather than a
 coloured circle. Reaches are uneven — 0.36, 0.62, 0.95, 1.18, 1.44, 1.72, 2 along the line from the pointer
 through the centre — because evenly spaced ghosts read as a pattern, and sizes alternate between specks and
-wide faint rings for the same reason. `sheen_flare_2` keeps one filled satellite and one ring, which is the
+wide faint rings for the same reason. `spot_flare_2` keeps one filled satellite and one ring, which is the
 user's call: two colours should look simpler than three, not merely differ in hue. The source itself is a small bright core with a tight bloom and a long
 faint veil, four stops in, which is what separates a light from a haze.
 
-**The source is `sheen_flare_1`'s pool, unchanged, and every flare shares it.** The rebuilt
+**The source is `spot_1`'s pool, unchanged, and every flare shares it.** The rebuilt
 flare had tightened it into a small bright core with a long faint veil, which is what separates a light from
 a haze — but the user's instruction was that the primary element stays exactly as the one-colour
 sample paints it, spikes and all removed. So all three now share one pool: scale 1.5,
@@ -6341,10 +6387,438 @@ bright, so with the pointer near the middle it floods a third of the surface and
 glow rather than against the dark. Reverting to the tighter source is the four constants at the top of each
 file.
 
-**A band that starts inside the box leaves a visible kink, and it is inherent.** A linear gradient pads its
-first stop outside its axis, so where the axis begins there is a change of slope from flat to ramping. It is
-transparent on both sides of that line, so nothing jumps; what the eye catches is the second derivative. The
-alternative is a span wide enough to always overhang the box, which costs the band its shape. Left as is.
+### A radial gradient can only be a circle, so `aspect` and `angle` turn it into an ellipse
+
+**What was added.** `SVGRadialGradientDefs` grew `aspect` — a `Size2d` of multipliers for the two axes — and
+`angle`, which turns the stretched axis. `SVGUtils.getRadialTransform` composes them into the
+`gradientTransform` text, and `computeRadialGradient` passes it straight through. `angle` matches the name
+and the clockwise-degrees convention the linear gradient already used, so the two abstracts agree.
+
+**The transform is applied about the gradient's own origin, which is the part that matters.** A bare
+`scale()` on a gradient drags its centre toward the corner, so a stamp following the pointer would slide off
+it as soon as it stretched. Translating to the origin, turning, scaling and translating back leaves the
+centre exactly where the sample put it and changes only the shape around it.
+
+**It returns `undefined` for an untransformed circle rather than an identity transform.** Every existing
+sample passes no `aspect`, and emitting `gradientTransform="translate(…) rotate(0) scale(1 1) translate(…)"`
+on all of them would be a new attribute on hundreds of gradient elements for no effect. The guard is
+`aspect.width === 1 && aspect.height === 1`, so the markup those samples produce is byte-for-byte what it was.
+
+### `hand_1` is `snake_1` with the clock taken out, a third colour stop, and a narrower wedge
+
+**What it draws.** A quarter-turn wedge running from the middle of the element outward, its bisector pointing
+at the cursor, solid along that bisector and fading to nothing at both of its straight edges. The user's
+idea and the user's construction — they pointed at `snake_1` and named each change — and the attempt before
+this one was over-engineered enough that it is worth writing down what the sample actually is.
+
+**It is `snake_1` with three edits and nothing else.** That sample clips a linear gradient to a `180` degree
+pie slice from `SVGUtils.getArcPath` and animates the slice's rotation and the gradient's angle together off
+a clock. The edits are: the gradient's colours become transparent, `primary`, transparent — three stops with
+no positions, so they spread evenly and the solid one lands in the middle; both angles come from
+`PointerTracker`'s `angle` instead of from the animation; and `SWEEP_ARC` narrows the slice to `90`. No part
+of the geometry was rebuilt.
+
+**The gradient runs across the wedge, not along it, and that is the whole of why it reads.** With the
+gradient's axis a quarter turn off the bearing, its middle stop lands on the perpendicular through the
+centre — which is the wedge's own bisector — so the wedge is solid down its middle and falls off toward its
+two edges, the falloff growing with distance from the centre. The earlier build ran the gradient **along**
+the bearing instead, fading from hub to tip, and a pie slice has its point at the centre, so the end meant to
+fade in at the hub was squeezed into a tip with no width and the result was a tapered shard. Narrowing the
+arc was never the mistake; turning the gradient to face along it was.
+
+**Two leads, and at `180` degrees they coincided.** `getArcPath(arcSize, r)` sweeps from `r + arcSize + 180`
+back to `r + 180`, so its bisector sits at `r + 180 + arcSize / 2`; pointing that at a bearing means passing
+`angle - HALF_TURN - SWEEP_ARC / 2`. The gradient separately wants `angle + SWEEP_LEAD`, a quarter turn off,
+to put its middle stop across the wedge. At an arc of `180` those two expressions are the same number, which
+is why `snake_1` could feed one value to both and why the first version of this sample got away with it. At
+`90` they differ by `45` degrees, and feeding one value to both would leave the wedge brightest along one
+edge instead of down the middle. **Checked by pointing at three known bearings and looking**, at both arc
+widths, rather than derived and trusted.
+
+**It fades with the pointer's distance, which the first build forgot.** A hand is anchored at the element's
+centre and only turns, so unlike a band it can never travel off the surface — it kept painting at full
+strength with the pointer three hundred million pixels away, which is the fault the user reported. Its peak
+alpha is now multiplied by `SVGDefsUtils.getPointerFade`: full while the pointer is inside the element, gone
+by twice that distance, and gone when the pointer leaves the window. The same multiplication went on every
+`hand_trail_…` head; their stamps already captured the fade at birth, so only the live wedge was missing it.
+**This is the same correctness fix the flares' satellites needed** — see _"the satellites fade out with the
+pointer's distance"_ — and for the same reason: an element whose position does not follow the pointer cannot
+leave on its own.
+
+**It is still the cheapest sample in the registry, because a bearing needs no clock.** Nothing about `hand_1`
+fades in place or advances while still, so `PointerTracker`'s own invalidate-on-move is the whole of its
+animation and `SVGDefsFrames` is not involved.
+
+### `hand_trail_1` is the trail machinery with a bearing frozen instead of a position
+
+**What it draws.** `hand_1`'s wedge at the live bearing, and behind it a fan of wedges left at the bearings
+the pointer swung through, fading out over the same window the trails use. Swing the cursor round the centre
+and the hand drags a fading sweep behind it; hold still and the fan decays away to leave the hand alone.
+**It is a separate sample, not an edit of `hand_1`** — the user's instruction, and `hand_1` is untouched.
+
+**Everything is borrowed from the trails except what is frozen.** Same round-robin over `STAMP_COUNT` slots
+by clock tick, same `SVGDefsFrames` clock with the same lifetime, same alpha decay, same
+`SVGDefsUtils.getPointerFade` captured at birth so the fan retracts when the pointer leaves. The one
+substitution is that a stamp stores the `angle` from the reading rather than the `boxRatio`, and hands it to
+both the clip's rotation and the gradient's angle. The whole family difference is one field.
+
+**The gate is angular, so a pointer moving straight at the centre lays nothing down.** The trails wake and
+stamp on distance travelled; here the thing that changes is the bearing, so the gate is
+`MOTION_TURN_DEGREES` of turn. Moving radially — in or out along the same bearing — does not rotate the hand
+and correctly leaves no trail. The comparison has to take the shorter way round the circle, because a
+bearing crossing the `-180` / `180` seam otherwise reads as a `359` degree turn and stamps a whole fan from
+one frame; `getShortestTurn` is the same normalise-and-fold used for hue in `Color`.
+
+**One stamp per slot, shared by the clip and the gradient, and the first build got this wrong.** A slot has
+two `renderDefsElement` closures — one for the wedge, one for the gradient inside it — and calling
+`createHandStamp` in each gave the slot two independent states. They agree almost always, because both read
+the same clock frame and the same reading, but the motion gate compares against `performance.now()` read
+separately in each, so the two calls can straddle the grace boundary. When that happens the clip freezes a
+new bearing while the gradient keeps the old one, and the bright band sits outside its own wedge for a whole
+lifetime. The slot now creates the stamp lazily into a closure variable and both readers share it, which
+also halves the trackers and the signals.
+
+**The wedges have hard edges, and the cause is geometric rather than a tuning miss.** A wedge's sides are
+where the clip cuts, and the gradient inside it only reaches transparent at the ends of its own axis — which,
+for a `90` degree arc, sit well outside the wedge. So each wedge is cut off partway down its ramp. With a
+fan of them at slightly different bearings those cuts stack into visible banding, which reads as stepping
+rather than as a sweep. `SWEEP_SPAN` shortens the gradient's axis to `0.7` so it reaches transparent closer
+in and the sides soften from the middle of the element outward; near the hub, where the wedge is only a few
+pixels wide, they stay hard and it does not matter. **`hand_1` has the same hard sides for the same reason
+and has not been changed** — the user has already accepted how it looks, and softening it is a change to its
+appearance rather than a fix to a fault.
+
+**The colour variants are the trails' two treatments unchanged.** `hand_trail_2` and `hand_trail_3` band
+the colour by the stamp's age, with the same `AGE_COLOR_SPAN` compressing the bands into the part of the
+life that is still visible; `hand_trail_2c` and `hand_trail_3c` blend the live wedge through the colours on
+`CYCLE_MS` and freeze each stamp at the colour the wedge had when it was laid. Neither needed anything new —
+the treatments are written against a stamp's age and birth time, and a stamp storing a bearing has both.
+That the same two treatments dropped in unaltered is the clearest evidence that `trail` is a treatment
+rather than a family, which is the naming question recorded below.
+
+**Per-stamp alpha is far lower than the trails', because wedges stack where pools do not.** Near the hub
+every wedge in the fan overlaps every other, so at the trails' `0.25` the composite saturated to a solid
+sheet of colour — a fan, not a fading trail. `0.07` makes each one a veil and the fan reads as a sweep. The
+hub stays the brightest point no matter what, since it is the one place every wedge covers; that is inherent
+to a pie slice and is not worth fighting.
+
+### The trails leave stamps behind and fade them where they lie
+
+**What they draw.** A pool centred on the pointer, and behind it `STAMP_COUNT` radial stamps laid down along
+the path the pointer took. Each stamp is a frozen position: it is written once, and from then on it dims in
+place until it is overwritten. The pointer therefore leaves a smear behind it that fades away over
+`STAMP_COUNT * STAMP_INTERVAL_MS`, and a pointer holding still shows only the pool. The numbers are the
+user's — currently a stamp on every frame, so the trail is dense rather than beaded — and are named here
+rather than quoted so this entry does not rot the next time they are tuned.
+
+**Frozen positions are the whole idea, and the alternative was tried in the head first.** A chain of
+followers — each layer lerping toward the one ahead of it — is the cheaper build and is what a comet tail
+is, but it is not a trail: everything in it converges on the pointer the moment the pointer stops, so
+nothing is ever left _behind_. A stamp that keeps the coordinates it was born with does leave something
+behind, and it is also what makes the effect read correctly under a scroll: the coordinates are `boxRatio`,
+so a stamp stays on the part of the element it was painted on rather than sliding across it.
+
+**Round-robin by clock phase, so no layer needs to know about any other.** The registry hands each layer its
+own `renderDefsElement`, and there is no shared object between them; what replaces one is arithmetic on a
+shared clock. Slot `i` owns the ticks where `Math.floor(now / STAMP_INTERVAL_MS) % STAMP_COUNT === i`, so
+they re-stamp in turn, one stamp interval apart, and their ages are evenly spread across the lifetime
+without anybody co-ordinating it. A slot's alpha runs from full at birth to nothing at
+`STAMP_COUNT * STAMP_INTERVAL_MS`, which is why the jump back to the pointer at rebirth is invisible — the
+stamp it replaces had already reached zero.
+
+**Geometry is a function of age, never of the slot, and that is not a style preference.** The flares are
+tables of reach, scale and alpha because each of their ghosts is a different thing; here every slot plays
+the same part and differs only in when its turn comes. Giving the slots uneven alphas or sizes — the trick
+that keeps a flare's chain from reading as a pattern — would make the trail **shimmer**, because a given
+point on the path is drawn by a different slot on each pass. Scale and alpha are therefore derived from age
+alone. Colour is derived from age for the same reason, and the entry below on `AGE_COLOR_KEYS` is what
+happens when it is derived from the slot instead.
+
+**The fade is captured at stamp time rather than read live.** `SVGDefsUtils.getPointerFade` is called once,
+when the stamp is written, and stored with it. That is what makes the trail retract properly: when the
+pointer leaves, the stamps already down keep the strength they were born with and decay on their own
+schedule, while new stamps arrive at zero. Reading the fade live would instead dim the whole trail at once,
+which is the fault the band samples were corrected for under _"nothing about them fades"_.
+
+**It needs a frame clock, and it was the first sample in this family that did.** The other six are pure
+functions of the pointer's position, so `PointerTracker`'s own invalidate-on-move is all the clock they
+need; something fading _in place_ has to advance while nothing is moving. The loop is
+`SVGDefsFrames.createClock`, described below.
+
+**A stamp is only written while the pointer is actually moving, and the first build got this wrong.** It
+re-stamped on the clock alone, so a pointer holding still had twelve blobs piled on one spot re-firing in
+rotation, and because the alpha decay is a curve rather than a straight line their sum is not flat — the
+resting pool **pulsed**, which the user saw immediately. Two things fix it together and both are needed. The
+stamp is gated on the pointer having moved more than `MOTION_STEP_RATIO` of the box within the last two stamp
+intervals, so a still pointer lays nothing down and the trail already on the surface decays away to leave
+the pool alone. And the clock is woken by that same movement rather than by the pointer merely being over the
+element, so a still pointer does not just draw nothing — it stops the loop, and a pulse becomes impossible
+rather than merely invisible.
+
+**Measured in the preview build**: one second with the pointer parked over the element requests **zero**
+frames, where the first build requested about sixty. Restarting needs no help from the clock, because
+`PointerTracker` still invalidates on `pointermove` and the layer's effect re-runs from that; the cost is
+that the first frame of a new gesture is the one that establishes the direction, so the trail begins one
+frame late.
+
+**A stamp is the pool at a lower alpha, by the user's instruction, and `computePoolColors` is what makes
+that true by construction.** The first build gave the stamps their own scale, their own mid-stop and a
+shrink-with-age, so a stamp was a different shape from the head as well as a dimmer one. The user's call was
+that the stamps carry the same size and the same stops as the main element, and only their strength should
+differ. So one local function builds the four-stop pool table at a given peak alpha: the head asks for it at
+1, a stamp asks for it at its own faded alpha, and both use `POOL_SCALE`. `STAMP_SCALE`, `STAMP_SHRINK`,
+`STAMP_MID_STOP` and `STAMP_MID_ALPHA_RATIO` are gone. **The cost is real and was accepted**: at the pool's
+width, consecutive stamps overlap almost entirely, so the trail is a soft comet glow rather than the defined
+tapering tail the first build drew.
+
+**The colour follows the stamp's age, not its slot, and the first build got that backwards.** `spot_trail_2`
+alternates two of the shared colours and `spot_trail_3` runs all three, and the obvious way to do it — colour by
+`index % keys.length`, exactly as the ripples do — produced mud: an olive haze for the two-colour one and a
+grey-brown one for the three. Two things caused it together. Stamps are the pool's width and are laid one
+per frame, so no stamp is ever visible alone for its colour to be seen in; and none of them is opaque, so at
+any point the composite is an alpha-weighted average of every stamp covering it rather than the topmost one.
+Cycling by slot therefore averages all the colours everywhere. Cycling by **age** does not, because alpha is
+also a function of age: the young stamps that dominate a point near the pointer all carry the first colour,
+and the older, fainter ones further back carry the later ones. So the trail grades from the head backwards
+instead of averaging. The user chose this over screen-blending the stamps, shrinking them, or spacing them
+out, all three of which would have cost either the size-and-stops rule or their tuned count and interval.
+
+**`AGE_COLOR_SPAN` exists because the bands were landing where nothing is visible.** Spread evenly over the
+whole life, the last band starts at an age where `(1 - age) ** STAMP_DECAY_EXPONENT` has already taken the
+alpha near zero — `spot_trail_3`'s `tertiary` never appeared at all. The bands are therefore spread across the
+first 0.55 of the life and the last one holds everything past that, which is one constant rather than a
+change to the decay the user tuned.
+
+**It reads on a moving pointer and averages on a slow one, and that is inherent.** Sweep quickly and
+`spot_trail_3` grades yellow, through cyan, to magenta along the tail. Drag slowly and every stamp sits on
+roughly the same spot, so the three average to a pale green-white glow. Nothing about the colour scheme
+causes that — at the pool's width, stamps laid a frame apart at walking pace are simply on top of each
+other, and any scheme would average there. The way out is narrower stamps or wider spacing, both of which
+the user has already ruled out for this family.
+
+**The head is `spot_1`'s pool tightened, and that is a departure worth naming.** The flares share one
+broad source by the user's instruction, and the recorded cost of it is that the pool floods a third of the
+surface. In a sample whose subject is the trail, that cost is fatal rather than merely visible — the first
+build was a yellow flood with the tail lost inside it. So `POOL_SCALE` is 0.8 rather than 1.5 and the falloff
+stop is 30 rather than 40, which is exactly the "revert to the tighter source" the flare entry describes.
+The instruction it bends was about the flares, so the shared pool is untouched everywhere else; if the user
+would rather this one match its siblings, the two constants at the top of the file are the whole change.
+
+**`SVGAnimations.Gradient.cycleSmoothColors` does the same job for the timed samples and cannot do it
+here.** It emits a SMIL `animate` on each stop's `stop-color` with the colours as its `values` list, and the
+browser blends between them — which is exactly what the `hue_…` samples use and exactly what the head of a
+`c` sample wants. **It was not consulted when these were built, which was a miss**; the answer would still
+have come out the same, but by argument rather than by luck. Three things rule it out.
+
+**The payload having no clock is not the reason, and claiming it was is wrong.** `SVGAnimationDefs` is a
+duration and an optional iteration pattern, and a `c` sample already invents its own period in `CYCLE_MS` —
+so it could build that object locally and hand it over without the payload gaining a field. A tracked sample
+having no consumer-set clock does not mean it has no clock; these ones plainly do, which is how they cycle
+at all.
+
+**The reason is that the head and its stamps have to read one clock.** A stamp takes whatever colour the
+head was showing at the instant it was born and keeps it for its whole life. That needs the blend as a
+number in JavaScript at a known timestamp, and SMIL gives neither: it drives an attribute forward over time,
+nothing can ask it what value it held three hundred milliseconds ago, and nothing can freeze one element at
+another's current one. Driving the head with `cycleSmoothColors` and the stamps with `getCycleColor` would
+be two timelines — SMIL's starts when its element is created, `getCycleColor` reads `performance.now()` —
+so the stamps would freeze colours the head never showed.
+
+**Where it would work is a tracked sample that cycles and leaves nothing behind.** A colour-cycling `band_1`
+or `hand_1` has no stamps to agree with, so `cycleSmoothColors` would drive it with no frame clock at all
+and less code than any of this. That is the shape to reach for if one is ever wanted.
+
+**The `c` treatment applies to every trail, smear included.** `spot_smear_2c` and `spot_smear_3c` are the
+stretched stamps taking their colour from the clock instead of from their own age, which needed nothing
+beyond the swap the other pairs make: the cycle reads a stamp's `bornMs`, and a smeared stamp has one.
+
+**The `c` variants are the other answer to the same question, and both are kept.** `spot_trail_3` colours a
+stamp by how old it is, so the gradient from head to tail stands still while the trail moves through it.
+`spot_trail_2c` and `spot_trail_3c` colour the **head** from the wall clock — one second to run through the
+colours in the list — and a stamp simply keeps whatever colour the head had at the moment it was born. So a
+stamp never changes colour again, and the colour marches backwards along the trail rather than sitting at
+fixed distances from the pointer. The user's suggestion, and it was tried after the age-based one on their
+instruction. `spot_ripple_2c` and `spot_ripple_3c` are the same idea in the other family: the source cycles,
+and a ring keeps the source's colour from the instant it left it.
+
+**Neither the head nor a stamp is told the colour by the other, which is what keeps them agreeing.** One
+function maps a millisecond to a colour key. The head asks it about `clock.getFrameMs()`, a stamp asks it
+about the `bornMs` it already stores, and because both read the same clock the stamp is provably wearing the
+head's colour from its own birth instant. Nothing is passed between the layers, which is the same property
+the round-robin arithmetic buys everywhere else in this family.
+
+**This is the one sample where the clock has to run with the pointer standing still, and that is a real
+cost.** Everywhere else in the family a motionless pointer means a motionless picture, which is what lets
+the loop stop — see _"a stamp is only written while the pointer is actually moving"_. Here the head cycles
+whether or not anything moves, so `keepAwake` is called on the fade rather than on the movement, and the
+loop runs at frame rate for as long as the pointer is over the element. The stamp gate is untouched and still
+requires movement, so the pulse that gating fixed cannot come back — a still pointer keeps a running clock
+but lays nothing down.
+
+**The cycle is a blend rather than three steps, and that is what `Color.interpolate` was added for.** The
+first build picked whichever third of the second the clock was in and used that colour whole, so the head
+jumped between the three. The user asked whether it could actually cycle, and then that the blending live in
+`colorUtils` rather than in the sample. So `Color` grew an `interpolate` on every space it already had a
+`toCss` for, and the sample walks a position through the colour list, takes the two colours either side of
+it, and asks for the blend between them.
+
+**It interpolates through the channels rather than around the hue circle, and that is the user's choice
+between two looks rather than a default.** Picture the palette on a colour wheel, the three colours evenly
+spaced around the rim. `Color.Hex.interpolate` blends red, green and blue, which is a chord straight across
+the wheel — and the middle of the wheel is grey, so the halfway point is a milky version of the two ends
+rather than a colour of its own. `Color.HSL.interpolate` moves the hue itself, which is an arc along the rim,
+so it passes through everything between the two ends at full strength: vivid green between yellow and cyan,
+vivid blue between cyan and magenta, vivid red between magenta and yellow.
+
+**The arc was built first and the chord is what shipped, on the user's call.** The reasoning for the arc
+was that a chord makes two saturated colours "meet at a duller mixture", which is true and turned out to be
+the point: with the chord, only the three palette colours ever assert themselves and the transitions are
+quiet fades through nothing in particular, which is the character the effect wanted. **Their reason for
+preferring it is about the palette, and that is the part worth keeping.** The three defaults are 120° apart
+on the wheel, so an arc between them covers the entire circle — the cycle stops being three colours pulsing
+and becomes a rainbow, which buries the palette the Border Colors knobs are there to set. A palette of three
+neighbouring hues would arc without ever looking like a rainbow, so this is not a finding about hue
+interpolation being wrong; it is a finding about this palette. Do not swap it back as a correction. **Swapping back is one line in each of the four `c` files** —
+`Color.HSL.toCss(Color.HSL.interpolate(Color.Hex.toHsl(from), Color.Hex.toHsl(to), ratio))` in place of
+`Color.Hex.interpolate(from, to, ratio)`. Both functions exist and each says in its own documentation what
+the other is for, which is why the swap costs a line.
+
+**Blending needs the colours as hex, and that is a real limit rather than a hidden one.** `SVGDefsColors`
+holds plain strings, and every other sample treats them as opaque and hands them to relative colour syntax,
+which accepts any CSS colour. Blending in JavaScript needs the numbers, so `getCycleColor` guards with
+`Color.Hex.isHex` and falls back to the unblended colour when either end is not hex. The Playground's colour
+picker emits hex and `SAMPLE_COLORS` are hex, so the blend runs in practice; a consumer passing `oklch(…)`
+gets the stepping behaviour rather than a broken gradient. Tightening `SVGDefsColors` to `Color.Hex` would
+remove the guard and was not done — it would ripple through `GlassDefs` and every consumer for the benefit
+of four samples.
+
+**What it looks like, and the one knob.** The head sweeps continuously — parked in the middle it moves
+yellow, teal, dull gold and back — and the trail carries the sweep along its length. The hard band seams the
+stepped build had are gone entirely, because neighbouring stamps now differ by one frame's worth of blend
+rather than by a whole colour. `CYCLE_MS` is the lever: shorten it to fit more of the cycle inside one
+trail, at the cost of the head cycling faster than is comfortable to watch.
+
+**The `smear` trails stretch each stamp along the way the pointer was going, and they are the answer to
+the soft-glow limit.** Everywhere else in the family a stamp is a circle, and the recorded cost of matching the
+head's width is that consecutive circles overlap into a soft comet glow rather than a defined tail. A circle
+cannot express motion; an ellipse can. So a stamp stores the heading it was born on and a stretch factor,
+and hands both to the new `aspect` and `angle`, with the perpendicular axis divided by the same factor so
+the stamp keeps roughly its area and genuinely thins rather than simply growing. Dragged straight across the
+surface it draws a long thin streak where `spot_trail_3` draws a round blob, which is the whole difference and it
+is not subtle.
+
+**Speed is measured as a smoothed average, not as one frame's displacement, and the first build got this
+wrong.** The stretch wants to know how fast the pointer is going, and the obvious source — how far it moved
+since the previous frame — is far too spiky: pointer events do not arrive on every frame, so the reading
+alternates between a full step and zero, and a stamp born on a zero frame got no stretch at all. Each slot
+therefore keeps a running average, pulled toward the latest step by `SMEAR_SMOOTHING` each frame, which
+averages over about five frames and falls back toward zero when the pointer stops. The zero frames are part
+of the average rather than skipped, which is what makes a slow drag read as slow rather than as an
+intermittent fast one.
+
+**Speed drives shape here and must not be pointed at extent.** Pointing it at a stamp's lifetime — so a
+flick leaves a long tail and a slow drag a stub — was tried and does not read: at the pool's width the
+difference between nine and thirty-four overlapping circles is how far a soft halo reaches, not a change of
+shape. It is also redundant, which is the user's own argument and the better one: **a fast movement already
+elongates the ordinary trail**, because the pointer covers more ground inside the same lifetime, so a knob
+for it buys nothing. The stretch is where the same input pays off, and it pays immediately.
+
+### The ripples are a wake rather than a highlight, and they spawn on distance rather than on time
+
+**What it draws.** A small bright source under the pointer, and twelve rings, each born at a point the
+pointer passed through and then expanding outward from that point while fading. Drag across the surface and
+a wake of widening circles is left behind; hold still and only the source remains. It is the second sample
+built on frozen positions, and the reason is sharper here than in the trail: water does not follow a finger,
+so a ripple that tracked the pointer would not be a ripple at all.
+
+**The spawn rule is accumulated distance, not elapsed time, and that is the whole difference from the
+trail.** Each layer adds up how far the pointer's `boxRatio` has travelled and owns the milestones where
+`Math.floor(travel / RIPPLE_SPACING_RATIO) % RIPPLE_COUNT` equals its own index. So rings are spaced evenly
+**along the path** whatever the speed — a slow drag leaves two or three large ones, a fast sweep leaves a
+dozen — where a clock would bunch them up when the pointer slowed and string them out when it hurried. It
+also makes the motion gate free: no travel means no new milestone, so a still pointer cannot spawn anything
+and the pulse the trail had to be corrected for was never possible here.
+
+**Round-robin with no shared object, the same trick as the trail's clock phase.** Every layer runs its own
+`PointerTracker`, but they all read one global pointer position flushed on one animation frame against one
+element rect, so the travel each of them accumulates is the same number. That is what lets the modulo decide
+ownership: twelve independent layers agree on whose turn it is without anything passing between them. The
+milestone a layer was born at is a plain local, so re-entering the same milestone cannot re-fire it.
+
+**A ripple starts at the source's own size, not at a point.** `RIPPLE_START_SCALE` is defined as
+`SOURCE_SCALE` rather than as a number of its own, so the relationship survives a tweak to either. The first
+build started them at 0.08 — much smaller than the source — and the rings appeared to be born inside it and
+then punch out through it, which read as two unrelated things happening at the same place. Starting at the
+source's edge instead makes the ring look like the source expanding, which is what a ripple is: the
+disturbance leaves the thing that caused it.
+
+**The crest keeps its thickness as the ring grows, which is one lerp rather than a second gradient.** A
+radial gradient's stops are fractions of its own radius, so a fixed annulus gets absolutely fatter as the
+ring expands and reads as a spreading smear instead of a wave. The stops are therefore a peak at
+`CREST_STOP` with a spread either side that shrinks from `CREST_SPREAD_START` to `CREST_SPREAD_END` over the
+ripple's life, roughly cancelling the tenfold growth in radius. The outer shoulder is capped just under 100
+so it cannot collide with the final stop.
+
+**Expansion is `easeOutCubic` and the fade is a power curve, deliberately not the same function.** The ring
+should leap out and then slow, which is the easing; its brightness should hold for a moment and then go,
+which the exponent does. Tying both to one curve made the ring fade before it had finished growing.
+
+**The colour cycles by slot, and this is the family where that works.** `spot_ripple_1` paints every crest in
+`primary`; `spot_ripple_2` alternates `primary` and `secondary`, `spot_ripple_3` runs all three, in each case by
+`index % CREST_COLOR_KEYS.length`. Because the slots take their turns in order, consecutive rings carry
+consecutive colours, and because the crests are thin and spaced a spacing-ratio apart they hardly overlap —
+so each ring reads as its own colour rather than averaging with its neighbours. The source stays `primary`
+in all three, which is why the trailing number is still a straight colour count: two colours on the surface
+is a `_2`, three is a `_3`. The trails cannot cycle by slot — their stamps overlap far too much for it — and
+cycle by age instead, recorded under _"the colour follows the stamp's age"_ above. `spot_ripple_2c` and
+`spot_ripple_3c` are the third option: the source blends continuously and each ring keeps the colour the
+source had when it was born, so the wake grades along the path rather than repeating a fixed sequence.
+**The `c` variants pay for it with a clock that runs at rest**, because a cycling source animates whether
+or not the pointer moves — the same trade the trails' `c` variants make, and the reason the plain
+`ripple_…` three keep the loop that stops.
+
+**Every ripple has a banded twin, and it needed a suffix rather than a new word.** One prop —
+`spreadKind: "banded"` — emits each stop twice so the colours meet at a hard edge, which turns the soft
+crests into hard-edged solid rings and the wake into something closer to sonar or a contour map. The naming
+convention already had the form: a trailing `s` means the colours are laid down solid rather than blended,
+which is exactly what this is, so an invented `ripple_band_3` would have been a second spelling for a rule
+already written down. `spot_ripple_1s`, `spot_ripple_2s` and `spot_ripple_3s` are the twins of the plain three, and
+`spot_ripple_2cs` and `spot_ripple_3cs` of the cycling two — hard rings each frozen at the colour the source was
+blending through when it left, which is the most striking thing the family does.
+
+**The trails have no banded twins, and that is deliberate.** A trail's stamps are the head's own four-stop
+pool, whose whole job is to fall off softly; banding it would produce hard-edged discs, which is a different
+effect wearing the ripples' suffix rather than the same effect laid down solid.
+
+**A ring can be recycled before it has finished, and the numbers are chosen to make that rare rather than
+impossible.** Twelve slots at 0.15 of the box apart means a full recycle takes 1.8 box-widths of travel; at
+a brisk drag that is a little longer than the 700ms lifetime, so a slot is normally dead before its turn
+comes round again. Push the pointer faster than that and a half-grown ring will snap back to the centre. The
+fix if it ever matters is more slots, not a longer spacing — spacing is what makes the wake read.
+
+### `SVGDefsFrames.createClock` is the shared animation frame for samples that fade rather than follow
+
+**Why it exists.** Two tracked samples now advance while nothing is moving, and the loop they need is
+identical: one `requestAnimationFrame` shared by every layer of the sample, a signal each layer reads for
+the current time, and no frames at all when there is nothing to draw. Writing it twice would have been
+twenty-five lines of stateful loop duplicated in two sample files, which is the kind of thing that drifts.
+
+**Each sample gets its own clock, not one clock for the registry.** `createClock` is called once at the top
+of a sample's module with that sample's own grace period, so a trail whose stamps live 720ms and a ripple
+whose rings live 700ms each stop at the right moment for their own content. It is also what keeps the
+samples independent: a clock is alive only while layers of its own sample are mounted.
+
+**It mirrors `PointerTracker`'s shape rather than inventing one.** A signal every consumer reads, a
+`subscribe` that counts consumers and drops them on `onCleanup`, and a loop that stops when the count
+reaches zero. The extra piece is `keepAwake`, which a consumer calls when it knows there is something to
+animate; the loop then runs until the grace period has passed with nobody calling it again, which is exactly
+the time the last thing on the surface needs to finish fading.
+
+**It lives in `Samples/SVGDefs` rather than in `Abstracts`.** It is general enough to be an abstract, and an
+abstract is where a future consumer would look for it — but every abstract in this library carries a
+Playground entry, and promoting a frame loop to that status is a bigger call than two samples needed. It
+imports no sample, so it satisfies the registry-separation rule where it sits, and moving it later costs an
+import path.
 
 ### The gradient and pattern registries each get a page that paints them as a fill
 
@@ -6359,6 +6833,22 @@ sweep across a surface needs the surface, while a border is where most of these 
 carries a fixed sixteen-pixel thickness rather than a control of its own — thick enough that a gradient reads,
 and `Shape`'s own page is where thickness is the subject. The patterns page has no such switch; a tiling on a
 sixteen-pixel band is a row of fragments.
+
+**The tracked page carries two examples, and the second is a test rather than a gallery.** `Default` is the
+single large box every other defs page shows, which is what a sample is judged on. `Continuity` is four
+boxes in a 2x2 grid, and it exists because every tracked sample computes `boxRatio` against the element it
+is painting — a single demo can never show whether two neighbouring elements agree. Four of them can: park
+the pointer on the grid's centre and `spot_1`'s pool spans all four cells as one continuous circle, each
+quarter drawn by a different element from its own reading. `hand_1` in the same position lights the inner
+corner of each cell, four wedges each pointing at the cursor from its own centre — correct, and looking
+nothing like continuous. Seeing both is the point. Each cell keeps the resizable child, so the cells can be
+given different sizes and checked again.
+
+**The four cells are four of the first example, not a second copy of it.** `Default.tsx` exports the shape
+itself alongside its example, and `Continuity.tsx` renders four of them with a smaller box class. The
+alternative was duplicating the `computeSVGDefs` wiring into a second file, which would have meant two
+places to keep in step for the sake of a source tab; as it is, `Continuity`'s source reads as what it is —
+four of the thing next door.
 
 **The demo is a `Shape` painted through those callbacks, and the sized box is its child.** `Shape` measures
 itself from what it wraps rather than from a prop, so a fixed-size box placed around it collapses the SVG to
@@ -8734,7 +9224,8 @@ versions multiplied a unit direction by a constant scaled by the falloff, which 
 easiest to miss: the falloff is strongest at the centre, so the button jumped its full travel towards a pointer
 sitting almost on top of it and only snapped back to nothing at the exact centre, where the direction
 degenerates. Reported by the user as the button not being centred when the pointer is. The reading was not at
-fault — the compass on the same page reads `distance: 0px` at its own centre — the arithmetic on top of it was.
+fault — the readout on the same page shows `distance: 0px` at the element's own centre — the arithmetic on top
+of it was.
 Taking `distance × follow ratio × pull` gives the behaviour the name promises: nothing at the centre, and a
 reach that grows as the pointer approaches without ever overshooting it.
 
@@ -9087,7 +9578,7 @@ after a second pass wrapped everything in `PageMeasureBox`, which was as wrong a
 
 - **`PageMeasureBox`** — the checkered, dash-bordered wrapper — is for an example whose **outer shell matters**:
   something is measured, something moves inside its bounds, or the point is where the component's box ends.
-  The compass, lamps, magnet and tilt qualify, because every one of them is about a reading taken against a
+  The lamps, magnet and tilt qualify, because every one of them is about a reading taken against a
   box; so does the swipe, which travels a fraction of its own width. **The interaction flags do not** — nothing
   moves, nothing is measured, and a box around a hover state is decoration pretending to be information.
 - **`color.control.background.main`** is for anything that should read as a control's own surface. The

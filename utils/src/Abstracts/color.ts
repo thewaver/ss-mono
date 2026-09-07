@@ -1,5 +1,6 @@
 const CHANNEL_MAX = 255;
 const HUE_MAX = 360;
+const HUE_HALF = 180;
 const HUE_SECTORS = 6;
 const HEX_LENGTH = 7;
 const HEX_SHORT_LENGTH = 4;
@@ -28,6 +29,15 @@ const toPercent = (value: number) => `${Number((clamp(value, 0, 1) * PERCENT_MAX
 
 const toAlpha = (value: number) => Number(clamp(value, 0, ALPHA_OPAQUE).toFixed(ALPHA_DECIMALS));
 
+const mix = (from: number, to: number, ratio: number) => from + (to - from) * clamp(ratio, 0, 1);
+
+const mixHue = (from: number, to: number, ratio: number) => {
+    const gap = (((to - from) % HUE_MAX) + HUE_MAX) % HUE_MAX;
+    const delta = gap > HUE_HALF ? gap - HUE_MAX : gap;
+
+    return toHue(from + delta * clamp(ratio, 0, 1));
+};
+
 /**
  * Colour values and the conversions between them.
  *
@@ -39,6 +49,12 @@ const toAlpha = (value: number) => Number(clamp(value, 0, ALPHA_OPAQUE).toFixed(
  * `a` field, and only the `A` forms convert to each other. Inputs are clamped to their valid
  * range rather than rejected, so a nonsensical value produces the nearest sensible colour
  * instead of an error.
+ *
+ * Every space also carries an `interpolate`, which blends two of its own values. Blending is
+ * done in the space it is called on and the result is a value of that space, so the path taken
+ * between two colours is the caller's choice: `RGB.interpolate` walks a straight line through
+ * the channels, while `HSL.interpolate` and `HSV.interpolate` travel around the hue circle by
+ * the shorter arc and so keep saturated colours saturated on the way.
  */
 export namespace Color {
     /** Red, green and blue, each `0`–`255`. Values may be fractional; they are rounded on output. */
@@ -99,6 +115,20 @@ export namespace Color {
 
     /** Operations on {@link Color.RGB} values. */
     export namespace RGB {
+        /**
+         * Blends towards another colour, channel by channel.
+         *
+         * @param from The colour at a ratio of `0`.
+         * @param to The colour at a ratio of `1`.
+         * @param ratio How far to travel, clamped to `0`–`1`.
+         * @returns The blended colour. Channels may be fractional; they are rounded on output.
+         */
+        export const interpolate = (from: Color.RGB, to: Color.RGB, ratio: number): Color.RGB => ({
+            r: mix(from.r, to.r, ratio),
+            g: mix(from.g, to.g, ratio),
+            b: mix(from.b, to.b, ratio),
+        });
+
         /**
          * Formats the colour as a CSS `rgb()` string.
          *
@@ -164,6 +194,21 @@ export namespace Color {
     /** Operations on {@link Color.RGBA} values. */
     export namespace RGBA {
         /**
+         * Blends towards another colour, channel by channel, including the opacity.
+         *
+         * @param from The colour at a ratio of `0`.
+         * @param to The colour at a ratio of `1`.
+         * @param ratio How far to travel, clamped to `0`–`1`.
+         * @returns The blended colour. The opacity travels with the channels rather than being
+         * applied to the result, so fading between two half transparent colours stays half
+         * transparent throughout.
+         */
+        export const interpolate = (from: Color.RGBA, to: Color.RGBA, ratio: number): Color.RGBA => ({
+            ...RGB.interpolate(from, to, ratio),
+            a: mix(from.a, to.a, ratio),
+        });
+
+        /**
          * Formats the colour as a CSS `rgb()` string with an alpha component.
          *
          * @param rgba The colour to format.
@@ -206,6 +251,23 @@ export namespace Color {
 
     /** Operations on {@link Color.HSV} values. */
     export namespace HSV {
+        /**
+         * Blends towards another colour, taking the shorter way around the hue circle.
+         *
+         * @param from The colour at a ratio of `0`.
+         * @param to The colour at a ratio of `1`.
+         * @param ratio How far to travel, clamped to `0`–`1`.
+         * @returns The blended colour. Hue crosses `0` when that is the shorter arc, so blending
+         * from `350` to `10` passes through `0` rather than running back down through `180`. Where
+         * the two hues are exactly opposite, the increasing direction is taken, which is what CSS's own
+         * `shorter hue` interpolation does.
+         */
+        export const interpolate = (from: Color.HSV, to: Color.HSV, ratio: number): Color.HSV => ({
+            h: mixHue(from.h, to.h, ratio),
+            s: mix(from.s, to.s, ratio),
+            v: mix(from.v, to.v, ratio),
+        });
+
         /**
          * Formats the colour as a CSS `hwb()` string.
          *
@@ -282,6 +344,19 @@ export namespace Color {
         export const getClampedAlpha = (hsva: Color.HSVA) => clamp(hsva.a ?? ALPHA_OPAQUE, 0, ALPHA_OPAQUE);
 
         /**
+         * Blends towards another colour around the hue circle, including the opacity.
+         *
+         * @param from The colour at a ratio of `0`.
+         * @param to The colour at a ratio of `1`.
+         * @param ratio How far to travel, clamped to `0`–`1`.
+         * @returns The blended colour, with hue handled as {@link HSV.interpolate} describes.
+         */
+        export const interpolate = (from: Color.HSVA, to: Color.HSVA, ratio: number): Color.HSVA => ({
+            ...HSV.interpolate(from, to, ratio),
+            a: mix(from.a, to.a, ratio),
+        });
+
+        /**
          * Formats the colour as a CSS `hwb()` string with an alpha component.
          *
          * See {@link HSV.toCss} for why this is `hwb()` rather than an HSV notation.
@@ -330,6 +405,23 @@ export namespace Color {
     /** Operations on {@link Color.HSL} values. */
     export namespace HSL {
         /**
+         * Blends towards another colour, taking the shorter way around the hue circle.
+         *
+         * @param from The colour at a ratio of `0`.
+         * @param to The colour at a ratio of `1`.
+         * @param ratio How far to travel, clamped to `0`–`1`.
+         * @returns The blended colour. Hue crosses `0` when that is the shorter arc, so blending
+         * from `350` to `10` passes through `0` rather than running back down through `180`. Where
+         * the two hues are exactly opposite, the increasing direction is taken, which is what CSS's own
+         * `shorter hue` interpolation does.
+         */
+        export const interpolate = (from: Color.HSL, to: Color.HSL, ratio: number): Color.HSL => ({
+            h: mixHue(from.h, to.h, ratio),
+            s: mix(from.s, to.s, ratio),
+            l: mix(from.l, to.l, ratio),
+        });
+
+        /**
          * Formats the colour as a CSS `hsl()` string.
          *
          * @param hsl The colour to format.
@@ -371,6 +463,19 @@ export namespace Color {
     /** Operations on {@link Color.HSLA} values. */
     export namespace HSLA {
         /**
+         * Blends towards another colour around the hue circle, including the opacity.
+         *
+         * @param from The colour at a ratio of `0`.
+         * @param to The colour at a ratio of `1`.
+         * @param ratio How far to travel, clamped to `0`–`1`.
+         * @returns The blended colour, with hue handled as {@link HSL.interpolate} describes.
+         */
+        export const interpolate = (from: Color.HSLA, to: Color.HSLA, ratio: number): Color.HSLA => ({
+            ...HSL.interpolate(from, to, ratio),
+            a: mix(from.a, to.a, ratio),
+        });
+
+        /**
          * Formats the colour as a CSS `hsl()` string with an alpha component.
          *
          * @param hsla The colour to format.
@@ -409,6 +514,19 @@ export namespace Color {
 
     /** Operations on {@link Color.Hex} values. */
     export namespace Hex {
+        /**
+         * Blends towards another colour through {@link Color.RGB}.
+         *
+         * @param from A colour that has passed {@link isHex}, at a ratio of `0`.
+         * @param to A colour that has passed {@link isHex}, at a ratio of `1`.
+         * @param ratio How far to travel, clamped to `0`–`1`.
+         * @returns The blended colour as a six digit hex value. The blend runs through the channels
+         * rather than around the hue circle, so two saturated colours pass through a duller mixture
+         * between them; use {@link Color.HSL.interpolate} to keep the saturation up.
+         */
+        export const interpolate = (from: Color.Hex, to: Color.Hex, ratio: number): Color.Hex =>
+            RGB.toHex(RGB.interpolate(toRgb(from), toRgb(to), ratio));
+
         /**
          * Checks whether a string is a well formed hex colour without an alpha pair.
          *
@@ -480,6 +598,18 @@ export namespace Color {
 
     /** Operations on {@link Color.Hexa} values. */
     export namespace Hexa {
+        /**
+         * Blends towards another colour through {@link Color.RGBA}, including the opacity.
+         *
+         * @param from A colour that has passed {@link isHexa}, at a ratio of `0`.
+         * @param to A colour that has passed {@link isHexa}, at a ratio of `1`.
+         * @param ratio How far to travel, clamped to `0`–`1`.
+         * @returns The blended colour as an eight digit hex value, with the channels handled as
+         * {@link Color.Hex.interpolate} describes.
+         */
+        export const interpolate = (from: Color.Hexa, to: Color.Hexa, ratio: number): Color.Hexa =>
+            RGBA.toHexa(RGBA.interpolate(toRgba(from), toRgba(to), ratio));
+
         /**
          * Checks whether a string is a well formed hex colour, with or without an alpha pair.
          *

@@ -11,13 +11,14 @@ import { PageGroupedSelectField } from "../../../StyledComponents/Field/Field";
 import { GROUPPED_TRACKED_GRADIENTS } from "../SVGGradients.const";
 import type { SVGGradientsPaintKind, TrackedGradientExampleProps } from "../SVGGradients.types";
 import { PageSVGGradientsProps } from "../SVGGradientsProps";
+import { ContinuityExample } from "./Examples/Continuity";
 import { DefaultExample } from "./Examples/Default";
 
-const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/SVGGradients/TrackedGradientsPage/Examples/Default.tsx";
+const EXAMPLES_ROOT = "/src/App/Pages/SVGGradients/TrackedGradientsPage/Examples";
 
 export const TrackedGradientsPage = () => {
     const [getConfigKey, setConfigKey] =
-        createSignal<WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>>("sheen_flare_1");
+        createSignal<WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>>("spot_1");
     const paintKindSignal = createSignal<SVGGradientsPaintKind>("fill");
     const blurWidthSignal = createSignal(0);
     const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS });
@@ -35,7 +36,15 @@ export const TrackedGradientsPage = () => {
                 key: "default",
                 name: "Default",
                 component: () => <DefaultExample {...commonProps} />,
-                path: DEFAULT_EXAMPLE_PATH,
+                path: `${EXAMPLES_ROOT}/Default.tsx`,
+            },
+            {
+                key: "continuity",
+                name: "Continuity",
+                readout: () =>
+                    "four boxes, each reading the pointer against its own — a pool spans them, a hand does not",
+                component: () => <ContinuityExample {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/Continuity.tsx`,
             },
         ];
     });

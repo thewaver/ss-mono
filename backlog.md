@@ -54,7 +54,9 @@ reading.
 20. An anchored layer is always a frame behind — _postponed until the platform catches up_
 21. `Table` — six things deliberately not built — _open_
 22. `Timeline` — the pointer routes the library cannot promise — _open_
-23. `GlassSurface` and the sheen samples — what is built and what is not — _open_
+23. `GlassSurface` — what is built and what is not — _open_
+24. Cycling colour variants for the timed gradient samples — _open_
+25. Per-sample defs as a discriminated union, and knobs that follow the key — _open_
 
 ### Build order
 
@@ -999,14 +1001,12 @@ are in `decisions.md` under _"`Timeline`: a window over a range"_. What is outst
 
 ---
 
-## 23. `GlassSurface` and the sheen samples — what is built and what is not
+## 23. `GlassSurface` — what is built and what is not
 
 The component is built and works: two backdrop layers, the tint, and a specular sheen that follows the
-pointer, with a draggable pane on its page. `GlassDefs` names the four groups of settings, and the radial
-`sheen_flare_1` counterpart is built and in the gradient registry, alongside five more pointer-driven
-siblings — the six of them are what `Gradient.Tracked` holds. The reasoning is in `decisions.md` under
-_"`GlassSurface`, and the two things that decide its shape"_. The ripple and the sheen now share one
-noise field. Three things are outstanding.
+pointer, with a draggable pane on its page. `GlassDefs` names the four groups of settings, and the ripple and
+the sheen share one noise field. The reasoning is in `decisions.md` under _"`GlassSurface`, and the two
+things that decide its shape"_. Three things are outstanding.
 
 - **The defaults should be the user's tuned values, in one place.** Also asked for. `DEFAULT_GLASS_DEFS` and
   the Playground page have drifted apart — the page sits at a ripple frequency of 0.025 and a tint opacity of
@@ -1023,6 +1023,69 @@ noise field. Three things are outstanding.
   example boxes and left navigation panel with it. Both currently use a plain `backdrop-filter: blur()`. The
   cost worth measuring first: a blurred _and_ displaced backdrop repaints whenever anything behind it moves,
   and a nav panel is large and permanently on screen.
+
+---
+
+## 24. Cycling colour variants for the timed gradient samples
+
+`Gradient.Tracked` gained a `c` treatment — the colours blend continuously through the shared palette on a
+clock rather than each element painting one of them. The user's call is that a lot of `Gradient.Timed` can
+gain the same thing.
+
+- **They have to be taken one at a time, because some already cycle and cycling is their identity.** At
+  first glance that is the `hue_…`, `flow_…` and `elastic_…` samples, and the user's own note is that there
+  may be more. **The list has not been audited**, and the audit is the first piece of work: for each sample,
+  does its motion already carry a colour change, and if so is a second one meaningless or merely redundant.
+- **The implementation is cheap and already exists.** `SVGAnimations.Gradient.cycleSmoothColors` emits a
+  SMIL `animate` on each stop's `stop-color` and lets the browser blend, which is what the `hue_…` samples
+  use. A timed sample needs no frame clock and none of the machinery the tracked `c` variants needed — see
+  `decisions.md` under _"`SVGAnimations.Gradient.cycleSmoothColors` does the same job for the timed samples
+  and cannot do it here"_ for why the tracked ones could not take that route.
+- **Naming is open and deliberately not blocking.** The timed registry spells cycling as a **prefix** — the
+  `hue_` family — while the tracked registry spells it as the **suffix** `c`, and `hue_rot_3` already shows
+  the prefix composing with a motion word. So a cycling `flow_3` has two candidate spellings and the two
+  registries would disagree. **The user's position is that naming here is symbolic rather than scientific
+  and can be settled later**; do not let it hold up the audit, and do not rename anything on the strength of
+  the tracked registry's scheme alone.
+
+---
+
+## 25. Per-sample defs as a discriminated union, and knobs that follow the key
+
+The user's proposal. **The problem it answers:** the tracked samples carry far more internal constants than
+the timed ones — every tuned number is a module-level `const` that neither a consumer nor the Playground can
+reach, so the only way to try a different value is to edit the file. The count grew with every treatment.
+
+**The shape proposed** is a defs type discriminated on the sample's own key, so each sample declares what it
+takes:
+
+```
+T = ({ key: "potato" } & PotatoProps) | ({ key: "tomato" } & TomatoProps)
+```
+
+The Playground page then builds its knobs from the chosen key rather than offering one fixed panel. **The
+user notes it applies to `ScanlineAnimation` as well**, which would stop being a gallery of entries and
+become a single example with specialised knobs.
+
+**The constraint to respect, from a decision already taken.** A sample stays in the registry because it is
+interchangeable with every other one and needs nothing beyond the uniform `defs` bag — that is the test the
+glass sheen failed, recorded in `decisions.md` under _"The sheen left `Samples/SVGDefs/Gradient`"_.
+`Shape`'s stroke picker and `GlassSurface`'s border picker both choose a sample by a runtime string and pass
+only that bag, so a sample whose props were **required** would break them the moment the string changed.
+**Every per-sample prop therefore has to be optional with a sample-owned default**, making the union a
+widening rather than a narrowing: the base bag keeps working everywhere, and anything that wants to reach
+further can.
+
+**Two questions are open and both want deciding before any of it is built.**
+
+- **Are the knobs derived or hand-written?** Derived means each sample exports a description of its own
+  knobs — type, range, step — and the page builds controls generically, so adding a sample costs nothing and
+  every panel looks alike. Hand-written means a panel per sample, which is more code and a growing page but
+  lets a knob be a colour picker where a colour is wanted and a stepper where a count is. The choice shapes
+  the whole feature and applies identically to `ScanlineAnimation`.
+- **Where do the defaults live, and does the page seed from them?** If a sample owns its defaults the page
+  can read them rather than repeating any number, which is the same rule item 23 already asks for on
+  `GlassSurface`. If it does not, the page and the sample drift, which is the fault item 23 exists to record.
 
 ---
 
@@ -1101,13 +1164,20 @@ commitment, and an entry that already carries the user's verdict is recorded her
 not put to them twice. An entry leaves this section in one of two directions: upward into a numbered item, which is the user's
 decision to take, or into `conventions.md` / `decisions.md` if building it settles something.
 
-### Further sheen shapes beyond the radial one
+### A tracked sample that rewards holding still
 
-The user's sketch, raised while agreeing the radial `sheen_1` and explicitly deferred: more sheens than the
-one. An angled linear band rather than a radial pool, of the kind the `PointerTracker` page's tilt example
-already draws. And a more complex pairing — two overlapped linear gradients, one travelling on the X axis and
-one on the Y, so the bright spot is where they cross rather than where a single gradient is centred. Neither
-has been costed. The radial one they would be variants of is now built, so nothing blocks either.
+Every sample in `Gradient.Tracked` treats a motionless pointer as a motionless picture — that is what lets
+their frame clocks stop. A charge-up inverts it: no movement for a moment, and then rings converging inward
+onto the source while brightening, so holding the pointer somewhere reads as energy being drawn into it.
+
+**The user's verdict, having seen it working: cut.** It was built, it did what it claimed, and nothing about
+it was found wrong — it simply was not wanted. So this is not a gap and not outstanding work; it is here only
+so the same sketch is not put to them a second time.
+
+If it is ever wanted, the shape was: swap the ripples' start and end scales so a ring begins near the edge of
+the box and ends at the source's size, drop the `1 -` from the alpha curve so a ring is faintest at birth and
+brightest as it arrives, own slots by clock tick rather than by distance milestone since there is no travel to
+measure, and wake the clock on the fade the way the `c` variants do.
 
 ### `HoloCard` and `CardFan`, built and then deleted
 

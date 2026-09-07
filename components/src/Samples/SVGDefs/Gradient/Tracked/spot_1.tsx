@@ -1,20 +1,17 @@
-import type { Size2d } from "@thewaver/ss-utils";
-
 import { PointerTracker } from "../../../../Abstracts/PointerTracker/PointerTracker";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import type { TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-const BAND_SPAN: Size2d = { width: 0.8, height: 0.8 };
-const BAND_TRAVEL = 1;
-const CORE_STOP = 50;
-const FALLOFF_SPREAD = 25;
+const POOL_SCALE = 1.5;
+const CORE_STOP = 5;
+const FALLOFF_STOP = 40;
 const CORE_ALPHA = 0.75;
 const FALLOFF_ALPHA = 0.25;
 
 const NO_REF = () => undefined;
 
-export const sheen_1: TrackedGradientConfig = {
+export const spot_1: TrackedGradientConfig = {
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -25,22 +22,14 @@ export const sheen_1: TrackedGradientConfig = {
                 renderDefsElement: () => {
                     const { getReading } = PointerTracker.create(getRef ?? NO_REF);
 
-                    return SVGGradientDefsUtils.computeLinearGradient({
+                    return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient1-${id}`,
-                        angle: 0,
-                        scale: BAND_SPAN,
-                        offset: () => ({ x: (getReading().boxRatio.x - 0.5) * BAND_TRAVEL, y: 0 }),
+                        origin: () => getReading().boxRatio,
+                        scale: POOL_SCALE,
                         colors: [
-                            { value: `rgb(from ${defs.colors.primary} r g b / 0)` },
-                            {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${FALLOFF_ALPHA})`,
-                                stop: CORE_STOP - FALLOFF_SPREAD,
-                            },
+                            { value: `rgb(from ${defs.colors.primary} r g b / 1)` },
                             { value: `rgb(from ${defs.colors.primary} r g b / ${CORE_ALPHA})`, stop: CORE_STOP },
-                            {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${FALLOFF_ALPHA})`,
-                                stop: CORE_STOP + FALLOFF_SPREAD,
-                            },
+                            { value: `rgb(from ${defs.colors.primary} r g b / ${FALLOFF_ALPHA})`, stop: FALLOFF_STOP },
                             { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
                         ],
                     });

@@ -5,9 +5,8 @@ import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SV
 import type { TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-const BAND_ANGLE = 45;
 const BAND_SPAN: Size2d = { width: 0.8, height: 0.8 };
-const BAND_TRAVEL = 1.25;
+const BAND_TRAVEL = 1;
 const CORE_STOP = 50;
 const FALLOFF_SPREAD = 25;
 const CORE_ALPHA = 0.75;
@@ -15,7 +14,7 @@ const FALLOFF_ALPHA = 0.25;
 
 const NO_REF = () => undefined;
 
-export const sheen_diag_1: TrackedGradientConfig = {
+export const band_1: TrackedGradientConfig = {
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -26,14 +25,11 @@ export const sheen_diag_1: TrackedGradientConfig = {
                 renderDefsElement: () => {
                     const { getReading } = PointerTracker.create(getRef ?? NO_REF);
 
-                    const getTravel = () => {
-                        const ratio = getReading().boxRatio;
-
-                        return (ratio.x + ratio.y - 1) * BAND_TRAVEL * 0.5;
-                    };
-
                     return SVGGradientDefsUtils.computeLinearGradient({
                         id: `gradient1-${id}`,
+                        angle: 0,
+                        scale: BAND_SPAN,
+                        offset: () => ({ x: (getReading().boxRatio.x - 0.5) * BAND_TRAVEL, y: 0 }),
                         colors: [
                             { value: `rgb(from ${defs.colors.primary} r g b / 0)` },
                             {
@@ -47,9 +43,6 @@ export const sheen_diag_1: TrackedGradientConfig = {
                             },
                             { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
                         ],
-                        angle: BAND_ANGLE,
-                        scale: BAND_SPAN,
-                        offset: () => SVGDefsUtils.offsetDiagonally(getTravel(), BAND_ANGLE),
                     });
                 },
             },

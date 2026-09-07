@@ -49,6 +49,42 @@ export namespace SVGUtils {
         };
     };
 
+    /**
+     * Works out the `gradientTransform` that squashes and turns an SVG `radialGradient`
+     * about its own centre.
+     *
+     * A radial gradient is always a circle, so an ellipse — a streak, a smear along a
+     * direction of travel — has to come from a transform rather than from the gradient's
+     * own attributes. Because the transform is applied about the gradient's origin, the
+     * centre stays where it was put and only the shape around it changes.
+     *
+     * @param origin Where the gradient's centre sits, in the 0–1 range that
+     * `objectBoundingBox` gradients use. Defaults to the middle.
+     * @param aspect Multipliers for the two axes before turning. `{ width: 4, height: 1 }`
+     * stretches it four times along its own x axis; `{ width: 1, height: 1 }` leaves it
+     * circular.
+     * @param angle Which way the stretched axis points, in degrees, increasing clockwise
+     * to match {@link getLinearCoords}. Defaults to `0`.
+     * @returns Transform text for a `gradientTransform` attribute, or `undefined` when the
+     * arguments describe an untransformed circle and the attribute should be left off.
+     */
+    export const getRadialTransform = ({
+        origin = { x: 0.5, y: 0.5 },
+        aspect = { width: 1, height: 1 },
+        angle = 0,
+    }: {
+        origin?: Point2d;
+        aspect?: Size2d;
+        angle?: number;
+    }) => {
+        if (aspect.width === 1 && aspect.height === 1) return undefined;
+
+        return (
+            `translate(${origin.x} ${origin.y}) rotate(${angle}) ` +
+            `scale(${aspect.width} ${aspect.height}) translate(${-origin.x} ${-origin.y})`
+        );
+    };
+
     const CIRCLE_CENTER = { x: 0.5, y: 0.5 };
     const CIRCLE_RADIUS = 1;
 

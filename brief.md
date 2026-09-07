@@ -12,10 +12,10 @@ purpose: it answers "what is outstanding", and neither of them is.
 | Section                                                 | Count |
 | ------------------------------------------------------- | ----: |
 | [Missing components](#missing-components)               |     2 |
-| [Blockers and known issues](#blockers-and-known-issues) |    11 |
+| [Blockers and known issues](#blockers-and-known-issues) |    10 |
 | [Deliberately not built](#deliberately-not-built)       |    28 |
 | [Accessibility gaps](#accessibility-gaps)               |     7 |
-| [Planned projects](#planned-projects)                   |     1 |
+| [Planned projects](#planned-projects)                   |     4 |
 
 ---
 
@@ -98,7 +98,9 @@ They cluster, and no single item owns them.
 
 ## Planned projects
 
-| #   | What                                          | Standing                                                                                                                                                               |
-| --- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 23  | **`GlassSurface` follow-ups**                 | Built and working. Outstanding: defaults to be unified on the user's tuned values, the page unreachable while `SHOW_COMPOSITES` is false, and nothing adopting it yet. |
-| 6   | **A consumer-facing layer above the library** | **Deferred indefinitely, not a focus, do not raise it.** The `style.css` strip and the theme are both built                                                            |
+| #   | What                                                | Standing                                                                                                                                                                                                                                            |
+| --- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 23  | **`GlassSurface` follow-ups**                       | Built and working. Outstanding: defaults to be unified on the user's tuned values, the page unreachable while `SHOW_COMPOSITES` is false, and nothing adopting it yet.                                                                              |
+| 24  | **Cycling colour variants for the timed gradients** | The tracked samples gained a cycling treatment and the timed ones can too, one at a time — `hue_…`, `flow_…` and `elastic_…` already cycle and are excluded, and the full list is unaudited. Naming is open and not blocking.                       |
+| 25  | **Per-sample defs, and knobs that follow the key**  | Tracked samples hide their tuned numbers in module constants. Proposed: defs discriminated on the sample key, with the page building knobs per key, `ScanlineAnimation` included. Open: derived or hand-written knobs, and where the defaults live. |
+| 6   | **A consumer-facing layer above the library**       | **Deferred indefinitely, not a focus, do not raise it.** The `style.css` strip and the theme are both built                                                                                                                                         |

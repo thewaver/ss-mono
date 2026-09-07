@@ -5,7 +5,6 @@ import type { PointerReading } from "@thewaver/ss-components";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { CastShadowExample } from "./Examples/CastShadow";
-import { CompassExample } from "./Examples/Compass";
 import { DockExample } from "./Examples/Dock";
 import { LampsExample } from "./Examples/Lamps";
 import { MagnetExample } from "./Examples/Magnet";
@@ -16,7 +15,6 @@ const WHOLE_DIGITS = 0;
 const RATIO_DIGITS = 2;
 const BOX_WIDTH = 300;
 const BOX_PADDING = 10;
-const COMPASS_HEIGHT = 180;
 const MAGNET_HEIGHT = 160;
 const TILT_HEIGHT = 200;
 const DOCK_WIDTH = 320;
@@ -24,7 +22,6 @@ const DOCK_HEIGHT = 100;
 
 export const PointerTrackerPage = () => {
     const [getShadowReading, setShadowReading] = createSignal<PointerReading>();
-    const [getCompassReading, setCompassReading] = createSignal<PointerReading>();
 
     const describe = (reading: PointerReading | undefined) => {
         if (!reading) return "no reading yet";
@@ -33,17 +30,6 @@ export const PointerTrackerPage = () => {
     };
 
     const getExamples = createMemo(() => [
-        {
-            key: "compass",
-            name: "Compass",
-            readout: () => describe(getCompassReading()),
-            component: () => (
-                <PageMeasureBox width={() => BOX_WIDTH} height={() => COMPASS_HEIGHT} padding={() => BOX_PADDING}>
-                    <CompassExample onReadingChange={setCompassReading} />
-                </PageMeasureBox>
-            ),
-            path: `${EXAMPLES_ROOT}/Compass.tsx`,
-        },
         {
             key: "lamps",
             name: "Lamps",

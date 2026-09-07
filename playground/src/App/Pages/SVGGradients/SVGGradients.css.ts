@@ -19,3 +19,20 @@ export const example = style({
     width: exampleSize,
     height: exampleSize,
 });
+
+export const trackedCellSize = exampleSize / 2;
+
+export const trackedGrid = style({
+    display: "grid",
+    gridTemplateColumns: "auto auto",
+    justifyContent: "start",
+    alignItems: "start",
+    gap: themeVars.spacing.full,
+});
+
+export const trackedCell = style({
+    resize: "both",
+    overflow: "auto",
+    width: trackedCellSize,
+    height: trackedCellSize,
+});

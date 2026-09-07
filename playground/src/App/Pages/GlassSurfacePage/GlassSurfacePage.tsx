@@ -63,10 +63,10 @@ export const GlassSurfacePage = () => {
     const [getBorderRadius, setBorderRadius] = createSignal(BORDER_RADIUS_FULL);
     const [getBorderWidth, setBorderWidth] = createSignal(2);
     const [getStrokeConfigKey, setStrokeConfigKey] =
-        createSignal<WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>>("sheen_flare_1");
+        createSignal<WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>>("spot_1");
     const [getBlurWidth, setBlurWidth] = createSignal(0);
     const [getBlurRadius, setBlurRadius] = createSignal(6);
-    const [getRippleScale, setRippleScale] = createSignal(12);
+    const [getRippleScale, setRippleScale] = createSignal(24);
     const [getNoiseFrequency, setNoiseFrequency] = createSignal(DEFAULT_GLASS_DEFS.noise.frequency);
     const [getNoiseOctaves, setNoiseOctaves] = createSignal(DEFAULT_GLASS_DEFS.noise.octaves);
     const [getLightHeight, setLightHeight] = createSignal(DEFAULT_GLASS_DEFS.sheen.lightHeight);
@@ -75,7 +75,7 @@ export const GlassSurfacePage = () => {
     const [getSpecularExponent, setSpecularExponent] = createSignal(DEFAULT_GLASS_DEFS.sheen.specularExponent);
     const [getTintColor, setTintColor] = createSignal("#FFFFFF");
     const [getTintOpacity, setTintOpacity] = createSignal(0.2);
-    const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS });
+    const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS_MONO });
 
     const getExamples = createMemo(() => {
         const commonProps: GlassSurfaceExampleProps = {
