@@ -13,3 +13,8 @@ export const popoverRoot = style({
         },
     },
 });
+
+// declared after the root so it wins on source order, since both are a single class
+export const popoverTransparent = style({
+    pointerEvents: "none",
+});

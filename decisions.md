@@ -1974,6 +1974,80 @@ no document listener — while `Modal`'s is a different mechanism (document keyd
 explicit restore). Two identical siblings and one that does not fit is not the shape that wants an
 `Abstract`; the thing genuinely shared with `Modal` was `FocusManager.autoFocus`, which existed.
 
+### Arbitrary item placement: `Abstracts/Placement`, and `Menu` as the first consumer
+
+The first half of `backlog.md` item 26. A control's items can be placed anywhere rather than along a line, and
+the vocabulary for saying where lives in an abstract so the next control can use the same one.
+
+**A placement is a centre, a size, an optional turn and an optional depth, all in fractions of the container's
+width.** `Formation`'s trick, taken wholesale: measurements in container-query units resolve in CSS with no
+`ResizeObserver` and no measured size anywhere, and the layout declares its own `heightRatio` so the box knows
+its shape. The picking works in the same units, which is why none of this touches the DOM to decide anything.
+
+**A layout is data, and that is the whole idea.** `computeLayout` is a function from an item count to
+placements. `Menu` takes one and changes nothing without it — the column renders exactly as before, which is
+why every existing menu spec passed untouched through the whole of this. The user's framing, and the reason
+this beat a `variant` prop: a zig-zag is not a name a component could have shipped, so the shape has to be
+something a consumer writes.
+
+**The layout sizes itself, in pixels.** Decided by the user against the alternatives of a size prop on `Menu`
+and of deriving one from the invoker. The layout is the only thing that knows how many items must fit and how
+big they are: `ring` works out the circumference five 96px items need and grows its radius accordingly, which
+is the "a wheel of twenty is a bad idea" judgement made in the one place able to make it. The demo carried an
+arbitrary 340px box before this and the fan's outer items fell off the sides of it, which is what settled it.
+
+**Picking belongs to the flick, and hovering belongs to the pointer.** The abstract answers "which item is
+meant" from a point, by angle about an origin or by nearest centre, with the rule declared by the layout
+rather than by the component. It exists because `CardFan`'s three findings and the ring's gaps are the same
+bug — a layout has an inverse and hit-testing is not it. **But hover was wired to it and that was wrong**: the
+user opened a wheel, hovered the opener in the middle of it, and something across the ring lit up with no way
+to tell what a click would do. Direction only makes sense for a gesture where the pointer never travels to the
+item. So hover hit-tests as it always did, and `PlacementUtils.pickIndex` waits for the flick.
+
+**Three layouts ship, and the names came out of a correction.** `ring` is a closed circle round the invoker;
+`hemisphere` is half of one opening upward; `fan` is a narrow arc opening sideways with the items tilted along
+it, which is the shape a combat menu uses. What was first called `fan` was the hemisphere — the user's own
+word for it — and the real fan is a different thing: upright-ish labels reading outward from the thing that
+opened them, each turned by three quarters of its angular position so the outer two do not go as steep as the
+arc. A `zigzag` was built and its demo deleted at the user's word; **the layout is still exported with nothing
+demoing it, which by this repo's rule means nothing tests it either**.
+
+**A laid-out popup is not a box, and three things follow.** All were faults the user found by using it.
+
+- **It must not take the pointer.** `popoverRoot` sets `pointer-events: all`, so the gaps between the items of
+  a ring were still the popover's hit area, sitting over the trigger — clicking the opener to dismiss did
+  nothing. `Popover` gained `isTransparentToPointer` and the placed items re-enable themselves. The fix
+  silently did nothing at first because the new style was declared _above_ `popoverRoot` and lost on source
+  order; both are a single class, so the later one wins.
+- **It must not be nudged.** A ring is centred on its invoker, and `Anchor` moving it to keep it on screen
+  breaks exactly that. `getIsPinned` skips both adjustments it makes — choosing a safe placement from the
+  family, and clamping into the viewport bands.
+- **Pinned means it has to close.** A layer that does not follow its anchor is pointing at nothing once the
+  anchor scrolls away, so `Popover` dismisses with a new `"anchorGone"` reason. Only when pinned, so no
+  existing popover changed. **The anchor's rect is only observed while the layer is visible**, which produced
+  the nastiest bug of the batch: after an auto-close the last reading kept was the off-screen one, so the next
+  open read a stale rect, decided the anchor was already gone and dismissed inside a frame — indistinguishable
+  from the click doing nothing, and worse each time. A layer now has to have _seen_ its anchor before it can
+  decide the anchor has gone.
+
+**Restoring focus no longer scrolls the page.** Closing on scroll-out yanked the view back, because the layer
+focused its opener again and the browser scrolled to it. `FocusManager` already opened with
+`preventScroll: true` and the restore did not; the pair is symmetric now. This reaches `Modal`, `Drawer`,
+`Select` and the pickers, and is a no-op in all of them: it only changes anything where the restore target is
+off screen, which outside this case never happens.
+
+**A closed menu highlights nothing.** The highlight was cleared the instant `isOpen` flipped, while the popup
+was still fading out, so the memo fell back to the first item and the user watched the highlight jump home as
+it faded. `getHighlightedIndex` returns nothing while closed, which also lets `getActiveItemId` drop its own
+open check.
+
+**Item placement is what the demo's own painter had to catch up with, not the component.** Two of the user's
+reports were the Playground's fault and worth recording so the same conclusions are not drawn about the
+component: the ring "rendering over a black rectangle with scrollbars" was the example wrapping the layout in
+`PagePopoverSurface`, and the menu "snapping between 1 and 0 rather than fading" was the example throwing away
+the visibility target and duration that `renderPopup` hands it. A laid-out menu paints its own transition and
+its own chrome, or gets neither.
+
 ### `Menu` submenus: a level per popup, focus moving between them
 
 An item may carry `items`, and a level is drawn per popup all the way down.

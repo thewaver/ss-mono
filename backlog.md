@@ -1091,67 +1091,57 @@ further can.
 ## 26. Arbitrary placement across controls, and the picking that has to come with it
 
 **The user's proposal, and the direction the library is going next.** A control's items should be placeable
-anywhere rather than only along a line: a `Menu` as a closed ring (a game weapon wheel), as a wide fan, or as a
-zig-zag; a `Paginator` drawn round a dial instead of along a row; `Tabs` as a honeycomb, or as page marks
-scattered down the edge of a dossier; a `RadioGroup`'s stars bent into a semicircle. **The list of controls is
-deliberately open** — the user named these as examples of the flexibility wanted, not as the set.
+anywhere rather than only along a line: a `Menu` as a closed ring, a wide fan or a zig-zag; a `Paginator` drawn
+round a dial instead of along a row; `Tabs` as a honeycomb, or as page marks scattered down the edge of a
+dossier; a `RadioGroup`'s stars bent into a semicircle. **The list of controls is deliberately open** — the
+user named these as examples of the flexibility wanted, not as the set.
 
-**The decided approach is bottom-up, and it was chosen over building the abstraction first.** The wheel-shaped
-`Menu` is built first, the picking is put in its own abstract from the start rather than privately inside it,
-and the second consumer is expected **very shortly after** and is what corrects the abstract's signature.
-The user agreed to this ordering and stated the follow-up explicitly, so **the abstract is not finished when
-the menu ships** — the proving pass against other controls is the second half of the same job, not a
-someday-maybe.
+The approach is bottom-up and was chosen over building the abstraction first: `Menu` goes first, the picking
+sits in its own abstract from the start, and the second consumer corrects the abstract's signature. **The
+abstract is not finished when the menu ships** — the proving pass is the second half of the same job.
 
-### What is actually shared, and it is not the layout
+### What is built
 
-Placement is the cheap half. A layout is a function from an item count to boxes, and four sample families
-already do it without wanting a common type: `Formation/Layouts` returns insets, `Staircase/Indents` returns a
-number, `Bracket` returns tree placements, `CellAnimation/Weights` returns a grid of weights. **The expensive
-half is the inverse** — going from a pointer back to an item once the boxes overlap or stop tiling.
+`Abstracts/Placement` holds the vocabulary and the picking. `Menu` takes an optional `computeLayout` and is
+unchanged without one. `Samples/Menu/Layouts` ships `ring`, `hemisphere` and `fan`, all three demoed on the
+Menu page, and the reasoning behind every decision taken so far is in `decisions.md` under _"Arbitrary item
+placement"_ — including the pinning, the `"anchorGone"` dismissal, the focus-restore change and the three
+faults that were the Playground's rather than the library's.
 
-**This problem has been solved privately twice and thrown away twice.** `CardFan`, built and deleted, left
-three findings in _Open discussion_ and all three are about picking rather than placing: the card someone aims
-at is not the card under the pointer, a click handler per card is delivered to whichever box is on top so
-clicking a visible sliver picks its neighbour, and picking off a `PointerTracker` reading misses a tap because
-that reading lands a frame late — `InteractionTracker.trackDrag` reports on the press itself and is what a pick
-should use. The ring arrives at the same wall from the other side: its boxes do not overlap, they leave gaps,
-and a pointer between two wedges hits nothing. **Overlap and gaps are one bug.** A layout has an inverse, and
-hit-testing is not it.
+### What is left, in the order it was argued
 
-So the abstract takes placements and a pointer reading and answers which item is meant, with the rule
-swappable — by angle about a centre for a ring, by position along an axis for a fan or a row, by nearest centre
-for something scattered.
+- **The hold-and-flick gesture, with the click-open mode underneath it.** The fast path: hold, flick toward a
+  wedge, release, with the pointer never travelling to the item. It ships with the click-open mode because a
+  flick is a path-based gesture and 2.5.1 Pointer Gestures (A) requires a single-pointer alternative without a
+  path, while 2.1.1 Keyboard (A) requires the keyboard route regardless — and that mode is also the ordinary
+  mouse route, so nothing is built purely for compliance.
+- **Concentric submenus.** A submenu currently anchors to its own item, and `computeLayout` knows only the item
+  count, so "a second ring around the first" cannot be expressed. It needs the layout's depth in the signature
+  and submenus sharing the invoker's centre.
+- **The proving pass against another control.** `Paginator` looks the strongest: the user's proposal is **the
+  same elements in the same order**, ellipsis and step buttons included, drawn round a dial instead of along a
+  row, with nothing else changing. `Tabs` gains the least, because its hard parts are the tab-to-panel
+  relationship and the roving walk and both are layout-independent.
 
-### Decided already
+### Loose ends left deliberately, recorded at the user's request
 
-- **Arrow keys walk the item order, whatever the shape.** The user's call, on the grounds that menu items can
-  carry shortcuts anyway. The flick is the spatial route and the keyboard is the ordered one; making both
-  spatial gives two models that can disagree about the same menu. It also keeps a layout to nothing but
-  positions, which is what makes an arbitrary shape cheap to write.
-- **Picking is by direction or position within the layout, never by which box the pointer is over.** This is
-  what lets the item boxes stop being wedges, which is in turn what lets a layout be any shape at all.
-- **`Menu` keeps its column as the default layout.** The layout is a prop, not a new component, so nothing
-  changes for anything using `Menu` today.
-- **The hold-and-flick gesture ships with a click-to-open mode underneath it**, because a flick is a
-  path-based gesture and 2.5.1 Pointer Gestures (A) requires a single-pointer alternative without a path,
-  while 2.1.1 Keyboard (A) requires the keyboard route regardless. The second mode is not a compliance
-  ornament — it is the ordinary mouse route.
-- **Shipped layouts live in `Samples/Menu/Layouts`**, the way `Samples/Formation/Layouts` already does.
-
-### Open, and wanting answers before or during the proving pass
-
-- **The placement type is not `FormationInset`.** That is an axis-aligned rectangle with no rotation, no pivot
-  and no z-order, and a fan of cards needs all three. Whatever the shared type turns out to be, `Formation`
-  adopts it rather than donates it.
-- **Which control proves it second.** `Paginator` looks the strongest: the user corrected an earlier reading
-  of it here — the proposal is **the same elements in the same order**, ellipsis and step buttons included,
-  drawn round a dial instead of along a row, with nothing else changing. `Tabs` gains the least, because its
-  hard parts are the tab-to-panel relationship and the roving walk and both are layout-independent.
-- **Whether a fan of cards is a menu.** It is, if picking one does something and only one gets picked; the
-  test is whether the items are choices or content rather than what shape they are in. `CardFan` was deleted
-  for being ultra-specific, which is evidence that the fan is a layout rather than a component — but that is
-  an inference, not the user's verdict, and it should be put to them rather than assumed.
+- **`PlacementUtils.pickIndex` has no caller.** It is the reason the abstract exists — a layout has an inverse
+  and hit-testing is not it, which `CardFan`'s findings and the ring's gaps prove from opposite directions —
+  but hover went back to hit-testing once the user saw direction-picking light up an item from across the
+  ring, and the flick that will use it is unbuilt. **So the repo currently holds a tested generalisation with
+  nothing consuming it**, which is the shape it is normally suspicious of. It stays because the consumer is
+  named and queued, not hypothetical; if the flick is dropped, this goes with it.
+- **The `zigzag` layout is exported with no demo.** Its example was deleted at the user's word. By this repo's
+  own rule a dropped demo drops its spec, so nothing exercises it. Keep it or delete it, but it should not sit
+  untested indefinitely.
+- **A laid-out popup's size is the layout's, and it can overflow.** A ring is centred on its invoker and grows
+  with its item count, so nothing stops it reaching past the edge of the screen — pinning deliberately turned
+  off the clamping that would have moved it. What happens to a wheel opened next to the viewport edge has not
+  been decided.
+- **The first item is highlighted the moment a menu opens**, before the pointer touches anything. Standard menu
+  behaviour and `aria-activedescendant` has to point somewhere, but on a wheel it means something looks chosen
+  while the pointer is still on the opener. The user raised it; suppressing the visual highlight until the
+  pointer or keyboard engages would change `Menu` for every consumer, so it is theirs to call.
 
 ---
 

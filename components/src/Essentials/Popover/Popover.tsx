@@ -31,17 +31,15 @@ export const Popover = (props: PopoverProps) => {
         },
     );
 
-    const { getAnchorRect, getPlacement, getPosition, getZIndex, setContentRef } = Anchor.createPortalPosition(
-        () => access(props.anchorRef),
-        getIsVisible,
-        {
+    const { getAnchorRect, getIsAnchorOnScreen, getPlacement, getPosition, getZIndex, setContentRef } =
+        Anchor.createPortalPosition(() => access(props.anchorRef), getIsVisible, {
             getPlacement: () => access(props.placement) ?? DEFAULT_POPOVER_PLACEMENT,
             getOffset: props.offset === undefined ? undefined : () => access(props.offset)!,
             getReservedScreenSize:
                 props.reservedScreenSize === undefined ? undefined : () => access(props.reservedScreenSize)!,
+            getIsPinned: () => access(props.isPinned) === true,
             getAnchorRect: props.anchorRect === undefined ? undefined : () => access(props.anchorRect),
-        },
-    );
+        });
 
     const getMinWidth = createMemo(() =>
         access(props.hasAnchorMinWidth) ? `${getAnchorRect()?.width ?? 0}px` : undefined,
@@ -58,6 +56,29 @@ export const Popover = (props: PopoverProps) => {
     );
 
     FocusManager.autoFocus(getRootRef, getHasFocus, { getInitialRef: getRootRef });
+
+    // a pinned layer does not follow its anchor, so once the anchor has gone the layer is pointing at nothing.
+    // the anchor's rect is only observed while the layer is visible, so the first reading after opening can still
+    // be the stale one from last time — hence the latch: the anchor has to have been seen before it can be gone
+    let hasSeenAnchor = false;
+
+    createEffect(() => {
+        if (!access(props.isOpen) || access(props.isPinned) !== true) {
+            hasSeenAnchor = false;
+
+            return;
+        }
+
+        if (getIsAnchorOnScreen()) {
+            hasSeenAnchor = true;
+
+            return;
+        }
+
+        if (!hasSeenAnchor) return;
+
+        props.onDismiss?.("anchorGone");
+    });
 
     DismisserStack.createLayer(() => access(props.isOpen), {
         getRoots: () => [getRootRef(), props.anchorRect === undefined ? access(props.anchorRef) : undefined],
@@ -78,6 +99,7 @@ export const Popover = (props: PopoverProps) => {
                     }}
                     id={access(props.id)}
                     class={styles.popoverRoot}
+                    classList={{ [styles.popoverTransparent]: access(props.isTransparentToPointer) === true }}
                     style={{
                         "visibility": getPosition() ? "visible" : "hidden",
                         "transform": `translate(${getPosition()?.x ?? 0}px, ${getPosition()?.y ?? 0}px)`,

@@ -33,3 +33,27 @@ export const menuItem = style({
         },
     },
 });
+
+export const menuLayoutRoot = style({
+    position: "relative",
+    containerType: "inline-size",
+});
+
+export const menuLayoutSpacer = style({
+    width: "100%",
+    pointerEvents: "none",
+});
+
+// a radio run keeps its grouping element, and takes no part in the layout while one is in force
+export const menuLayoutGroup = style({
+    position: "absolute",
+    inset: 0,
+    pointerEvents: "none",
+});
+
+export const menuLayoutItem = style({
+    display: "grid",
+    position: "absolute",
+    transform: "translate(-50%, -50%)",
+    pointerEvents: "all",
+});

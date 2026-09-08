@@ -4,6 +4,7 @@ import { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type { PlacementLayoutFn } from "../../Abstracts/Placement/Placement.types";
 import type {
     InteractionControlProps,
     InteractionTooltipDefs,
@@ -95,6 +96,7 @@ export type MenuLevelProps<T> = AccessorProps<{
     anchorRect?: MaybeAccessor<Rect | undefined>;
     items: MaybeAccessor<MenuItem<T>[]>;
     checkedValues: MaybeAccessor<T[]>;
+    computeLayout?: PlacementLayoutFn;
     computeCustomText?: (item: MenuItem<T>) => string;
     renderItem: MenuRenderItem<T>;
     onPick: (item: MenuItem<T>, radioGroupValues: T[]) => void;
@@ -117,6 +119,7 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         anchorRef?: MaybeAccessor<HTMLElement | undefined>;
         items: MaybeAccessor<MenuItem<T>[]>;
         checkedSignal?: SignalSource<T[]>;
+        computeLayout?: PlacementLayoutFn;
         computeCustomText?: (item: MenuItem<T>) => string;
         renderItem: MenuRenderItem<T>;
         onActivate: (value: T) => void;
@@ -137,6 +140,7 @@ export type ContextMenuProps<T> = AccessorProps<{
     regionRef: MaybeAccessor<HTMLElement | undefined>;
     items: MaybeAccessor<MenuItem<T>[]>;
     checkedSignal?: SignalSource<T[]>;
+    computeLayout?: PlacementLayoutFn;
     computeCustomText?: (item: MenuItem<T>) => string;
     renderItem: MenuRenderItem<T>;
     onActivate: (value: T) => void;

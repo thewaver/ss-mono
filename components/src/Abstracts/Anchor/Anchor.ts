@@ -18,6 +18,7 @@ export namespace Anchor {
             getOffset?: () => Point2d;
             getReservedScreenSize?: () => Size2d;
             getAnchorRect?: () => Rect | undefined;
+            getIsPinned?: () => boolean;
         },
     ) => {
         const viewportContext = useViewportContext();
@@ -43,7 +44,7 @@ export namespace Anchor {
             const placement = opts.getPlacement();
             const reservedScreenSize = opts.getReservedScreenSize?.();
 
-            if (!contentSize || !anchorRect) return placement;
+            if (!contentSize || !anchorRect || opts.getIsPinned?.()) return placement;
 
             return {
                 x: AnchorUtils.getSafeHPlacement(
@@ -113,10 +114,27 @@ export namespace Anchor {
                 AnchorUtils.getVPlacementShift(placement.y, anchorRect, contentSize) +
                 AnchorUtils.getVPlacementOffset(placement.y, opts.getOffset?.().y ?? 0);
 
+            if (opts.getIsPinned?.()) return { x, y };
+
             return {
                 x: AnchorUtils.clampToBand(x, contentSize.width, bands.x, bands.kinds.x),
                 y: AnchorUtils.clampToBand(y, contentSize.height, bands.y, bands.kinds.y),
             };
+        });
+
+        const getIsAnchorOnScreen = createMemo(() => {
+            const anchorRect = getAnchorRect();
+
+            if (!anchorRect) return true;
+
+            const screenSize = viewportContext.getSize();
+
+            return (
+                anchorRect.x + anchorRect.width > 0 &&
+                anchorRect.y + anchorRect.height > 0 &&
+                anchorRect.x < screenSize.width &&
+                anchorRect.y < screenSize.height
+            );
         });
 
         const getZIndex = createMemo(() => {
@@ -150,6 +168,6 @@ export namespace Anchor {
             contentResizeObserver.observe(contentRef);
         });
 
-        return { getAnchorRect, getPlacement, getPosition, getZIndex, setContentRef };
+        return { getAnchorRect, getIsAnchorOnScreen, getPlacement, getPosition, getZIndex, setContentRef };
     };
 }

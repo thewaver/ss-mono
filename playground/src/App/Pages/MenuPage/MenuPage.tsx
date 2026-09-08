@@ -1,10 +1,13 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { MENU_LAYOUTS } from "@thewaver/ss-components";
+
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { ContextAreaExample } from "./Examples/ContextArea";
 import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
 import { DrivenExample } from "./Examples/Driven";
+import { LaidOutExample } from "./Examples/LaidOut";
 import { PlacedAboveExample } from "./Examples/PlacedAbove";
 import { ReachableExample } from "./Examples/Reachable";
 import { StatefulExample } from "./Examples/Stateful";
@@ -48,6 +51,47 @@ export const MenuPage = () => {
                 `${getLastContextAction()} — the menu opens where the pointer was, and there is no trigger button anywhere`,
             component: () => <ContextAreaExample onActivate={(action) => setLastContextAction(action.name)} />,
             path: `${EXAMPLES_ROOT}/ContextArea.tsx`,
+        },
+        {
+            key: "ring",
+            name: "Ring",
+            readout: () =>
+                `${getLastAction()} — the items are placed in a circle, and picked by the direction they lie in rather than by the box under the pointer`,
+            component: () => (
+                <LaidOutExample
+                    caption={"Wheel"}
+                    computeLayout={() => MENU_LAYOUTS.ring}
+                    onActivate={(action) => setLastAction(action.name)}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/LaidOut.tsx`,
+        },
+        {
+            key: "hemisphere",
+            name: "Hemisphere",
+            readout: () => `${getLastAction()} — half a ring opening upwards, with the items left upright`,
+            component: () => (
+                <LaidOutExample
+                    caption={"Fan"}
+                    computeLayout={() => MENU_LAYOUTS.hemisphere}
+                    onActivate={(action) => setLastAction(action.name)}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/LaidOut.tsx`,
+        },
+        {
+            key: "fan",
+            name: "Fan",
+            readout: () =>
+                `${getLastAction()} — a narrow arc opening sideways, the shape a combat menu uses: upright labels reading outward from the thing that opened them`,
+            component: () => (
+                <LaidOutExample
+                    caption={"Fan"}
+                    computeLayout={() => MENU_LAYOUTS.fan}
+                    onActivate={(action) => setLastAction(action.name)}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/LaidOut.tsx`,
         },
         {
             key: "default",

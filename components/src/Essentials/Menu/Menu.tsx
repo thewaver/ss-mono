@@ -32,6 +32,7 @@ import * as styles from "./Menu.css";
 const EMPTY_CHECKED: never[] = [];
 
 const DEFAULT_SUBMENU_PLACEMENT: AnchorPlacement = { x: "right-out", y: "top-in" };
+const NO_ANGLE = 0;
 const SUBMENU_OPEN_KEY = "ArrowRight";
 const SUBMENU_CLOSE_KEY = "ArrowLeft";
 
@@ -133,6 +134,9 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     );
 
     const getHighlightedIndex = createMemo(() => {
+        // a closed menu highlights nothing, so a reset while it is still fading out cannot flash the first item
+        if (!access(props.isOpen)) return undefined;
+
         const navigable = getNavigableIndexes();
         const items = access(props.items);
         const highlightedValue = getHighlightedValue();
@@ -149,7 +153,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     const getActiveItemId = createMemo(() => {
         const highlightedIndex = getHighlightedIndex();
 
-        if (!access(props.isOpen) || highlightedIndex === undefined) return;
+        if (highlightedIndex === undefined) return;
 
         return `${access(props.id)}-item-${highlightedIndex}`;
     });
@@ -163,6 +167,10 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     const getSubmenuId = (index: number) => `${access(props.id)}-submenu-${index}`;
 
     const computeHasSubmenu = (index: number) => (access(props.items)[index].items?.length ?? 0) > 0;
+
+    const getLayout = createMemo(() => props.computeLayout?.(access(props.items).length));
+
+    const toContainerWidth = (ratio: number) => `${ratio * 100}cqw`;
 
     const highlightIndex = (index: number | undefined) => {
         if (index === undefined) return;
@@ -326,6 +334,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                                 transitionDurationMs={props.transitionDurationMs}
                                 openerFlags={getFlags}
                                 checkedValues={props.checkedValues}
+                                computeLayout={props.computeLayout}
                                 computeCustomText={props.computeCustomText}
                                 renderItem={props.renderItem}
                                 renderPopup={props.renderPopup}
@@ -340,21 +349,69 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         );
     };
 
-    const renderItems = () => (
+    const renderPlaced = (index: number, element: JSX.Element) => {
+        const getPlacement = createMemo(() => getLayout()?.placements[index]);
+
+        return (
+            <Show when={getPlacement()} fallback={element}>
+                {(getRect) => (
+                    <div
+                        class={styles.menuLayoutItem}
+                        style={{
+                            "left": toContainerWidth(getRect().left),
+                            "top": toContainerWidth(getRect().top),
+                            "width": toContainerWidth(getRect().width),
+                            "height": toContainerWidth(getRect().height),
+                            "transform": `translate(-50%, -50%) rotate(${getRect().angle ?? NO_ANGLE}deg)`,
+                            "z-index": getRect().depth ?? index + 1,
+                        }}
+                    >
+                        {element}
+                    </div>
+                )}
+            </Show>
+        );
+    };
+
+    const renderRuns = () => (
         <For each={MenuUtils.getRuns(access(props.items))}>
             {(run) => (
                 <Show
                     when={run.isRadioGroup}
                     fallback={
-                        <Index each={run.items}>{(getItem, index) => renderItemAt(getItem, run.from + index)}</Index>
+                        <Index each={run.items}>
+                            {(getItem, index) =>
+                                renderPlaced(run.from + index, renderItemAt(getItem, run.from + index))
+                            }
+                        </Index>
                     }
                 >
-                    <div role="group">
-                        <Index each={run.items}>{(getItem, index) => renderItemAt(getItem, run.from + index)}</Index>
+                    <div role="group" class={getLayout() ? styles.menuLayoutGroup : undefined}>
+                        <Index each={run.items}>
+                            {(getItem, index) =>
+                                renderPlaced(run.from + index, renderItemAt(getItem, run.from + index))
+                            }
+                        </Index>
                     </div>
                 </Show>
             )}
         </For>
+    );
+
+    const renderItems = () => (
+        <Show when={getLayout()} fallback={renderRuns()}>
+            {(getResolved) => (
+                <div class={styles.menuLayoutRoot} style={{ width: `${getResolved().width}px` }}>
+                    <div
+                        class={styles.menuLayoutSpacer}
+                        style={{ height: toContainerWidth(getResolved().heightRatio) }}
+                        aria-hidden="true"
+                    />
+
+                    {renderRuns()}
+                </div>
+            )}
+        </Show>
     );
 
     return (
@@ -371,6 +428,8 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
             reservedScreenSize={props.reservedScreenSize}
             transitionDurationMs={props.transitionDurationMs}
             hasAutoFocus={true}
+            isTransparentToPointer={() => getLayout() !== undefined}
+            isPinned={() => getLayout() !== undefined}
             isOpen={props.isOpen}
             anchorRef={props.anchorRef}
             anchorRect={props.anchorRect}
@@ -490,6 +549,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         transitionDurationMs={props.transitionDurationMs}
                         openerFlags={getFlags}
                         checkedValues={getCheckedValues}
+                        computeLayout={props.computeLayout}
                         computeCustomText={props.computeCustomText}
                         renderItem={props.renderItem}
                         renderPopup={props.renderPopup}
@@ -585,6 +645,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
             transitionDurationMs={props.transitionDurationMs}
             openerFlags={() => ({ isOpen: getIsOpen() })}
             checkedValues={getCheckedValues}
+            computeLayout={props.computeLayout}
             computeCustomText={props.computeCustomText}
             renderItem={props.renderItem}
             renderPopup={props.renderPopup}
