@@ -2,9 +2,9 @@ import type { Accessor, JSX } from "solid-js";
 
 import type { AnchorPlacement, InteractionFlags, MenuItem, MenuItemFlags } from "@thewaver/ss-components";
 
-import { PageMenuItemContent } from "../../StyledComponents/MenuItemContent/MenuItemContent";
-import { PagePopoverSurface } from "../../StyledComponents/PopoverSurface/PopoverSurface";
-import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
+import { PageMenuItemContent } from "../../../StyledComponents/MenuItemContent/MenuItemContent";
+import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
+import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
 import type { Action } from "./MenuPage.types";
 
 const LAYER_COUNT = 20;

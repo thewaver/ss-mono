@@ -2,7 +2,7 @@ import type { Accessor, JSX } from "solid-js";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
-import type { MenuFlags, MenuRenderItem, MenuRenderPopup } from "../Menu/Menu.types";
+import type { MenuFlags, MenuRenderItem, MenuRenderPopup } from "../Menus/Menu/Menu.types";
 
 export type ToolbarCollapse = "auto" | "never" | "always";
 

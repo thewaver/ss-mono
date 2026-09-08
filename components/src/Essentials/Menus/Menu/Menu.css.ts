@@ -44,7 +44,6 @@ export const menuLayoutSpacer = style({
     pointerEvents: "none",
 });
 
-// a radio run keeps its grouping element, and takes no part in the layout while one is in force
 export const menuLayoutGroup = style({
     position: "absolute",
     inset: 0,
@@ -56,4 +55,8 @@ export const menuLayoutItem = style({
     position: "absolute",
     transform: "translate(-50%, -50%)",
     pointerEvents: "all",
+});
+
+export const menuItemRegion = style({
+    pointerEvents: "none",
 });

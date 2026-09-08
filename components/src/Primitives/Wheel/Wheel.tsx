@@ -15,6 +15,9 @@ const DEFAULT_WHEEL_WEDGE_SIZE: Size2d = { width: 0, height: 0 };
 
 const WHEEL_ROLE_DESCRIPTION = "wheel";
 const WEDGE_ROLE_DESCRIPTION = "wedge";
+const ROOT_PATH: number[] = [];
+const NO_PARENT_WIDTH = 0;
+const FIRST_WEDGE = 0;
 
 export const Wheel = <T,>(props: WheelProps<T>) => {
     const getWedgeCount = createMemo(() => access(props.wedges).length);
@@ -47,11 +50,16 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
         rotation.getPhase() === "idling" ? undefined : rotation.getSelectedIndex(),
     );
 
+    const getLayout = createMemo(() =>
+        props.computeLayout?.({ itemCount: getWedgeCount(), path: ROOT_PATH, parentWidth: NO_PARENT_WIDTH }),
+    );
+
     const getWedgeState = (index: number, face: WheelFace): WheelWedgeState => ({
         index,
         wedgeCount: getWedgeCount(),
         face,
         isSelected: index === getSelectedIndex(),
+        placement: getLayout()?.placements[FIRST_WEDGE],
     });
 
     const controller: WheelController = {

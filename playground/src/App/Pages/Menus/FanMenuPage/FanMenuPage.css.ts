@@ -1,21 +1,8 @@
 import { style } from "@vanilla-extract/css";
 
-import { themeVars } from "../../Theme.css";
+import { themeVars } from "../../../Theme.css";
 
-export const contextRegion = style({
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    height: 120,
-    padding: themeVars.spacing.double,
-    color: themeVars.color.surface.contrast,
-    border: `1px dashed currentColor`,
-    borderRadius: themeVars.borderRadius.full,
-    fontSize: themeVars.fontSize.small,
-    textAlign: "center",
-});
-
-export const laidOutItem = style({
+export const item = style({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -32,17 +19,21 @@ export const laidOutItem = style({
     transition: "background-color 120ms ease-out, color 120ms ease-out, transform 120ms ease-out",
 });
 
-export const laidOutItemHighlighted = style({
+export const itemBack = style({
+    backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 20%)`,
+});
+
+export const itemHighlighted = style({
     backgroundColor: themeVars.color.primary.main,
     color: themeVars.color.primary.contrast,
     transform: "scale(1.06)",
 });
 
-export const laidOutItemDisabled = style({
+export const itemDisabled = style({
     opacity: 0.4,
 });
 
-export const laidOutShortcut = style({
+export const shortcut = style({
     flex: "none",
     padding: `0 ${themeVars.spacing.half}`,
     borderRadius: themeVars.borderRadius.half,
@@ -52,19 +43,19 @@ export const laidOutShortcut = style({
     opacity: 0.75,
 });
 
-export const laidOutStage = style({
+export const stage = style({
     display: "grid",
     placeItems: "center",
     minHeight: 340,
 });
 
-export const laidOutLayer = style({
+export const layer = style({
     opacity: 0,
     transform: "scale(0.9)",
     transformOrigin: "center center",
 });
 
-export const laidOutLayerVisible = style({
+export const layerVisible = style({
     opacity: 1,
     transform: "scale(1)",
 });

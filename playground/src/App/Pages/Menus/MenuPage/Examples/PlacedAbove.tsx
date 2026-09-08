@@ -1,6 +1,6 @@
 import { Menu } from "@thewaver/ss-components";
 
-import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
+import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
 import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
 import type { MenuExampleProps } from "../MenuPage.types";
 

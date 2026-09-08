@@ -1,10 +1,10 @@
 import { Menu } from "@thewaver/ss-components";
 
-import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
+import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
 import { NESTED_ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
 import type { MenuExampleProps } from "../MenuPage.types";
 
-import { POPOVER_SURFACE_INSET } from "../../../StyledComponents/PopoverSurface/PopoverSurface.css";
+import { POPOVER_SURFACE_INSET } from "../../../../StyledComponents/PopoverSurface/PopoverSurface.css";
 
 type Props = MenuExampleProps;
 

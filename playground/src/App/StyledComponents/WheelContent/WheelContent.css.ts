@@ -28,8 +28,9 @@ export const wheelWedgeSVG = style({
 export const wheelWedgeShape = style({
     fill: themeVars.color.control.background.main,
     stroke: themeVars.color.primary.main,
-    strokeWidth: 0.5,
+    strokeWidth: 1,
     strokeLinejoin: "round",
+    vectorEffect: "non-scaling-stroke",
 });
 
 export const wheelWedgeGradientFrom = style({
@@ -42,11 +43,12 @@ export const wheelWedgeGradientTo = style({
 
 export const wheelWedgeLabel = style({
     position: "absolute",
-    bottom: "50cqw",
     display: "flex",
     flexDirection: "column",
+    justifyContent: "center",
     alignItems: "center",
     gap: "0.5em",
+    transform: "translate(-50%, -50%)",
     color: themeVars.color.control.background.contrast,
     lineHeight: 1.2,
     textAlign: "center",

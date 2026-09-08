@@ -4,8 +4,8 @@ import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
-import { Menu } from "../Menu/Menu";
-import type { MenuItem } from "../Menu/Menu.types";
+import { Menu } from "../Menus/Menu/Menu";
+import type { MenuItem } from "../Menus/Menu/Menu.types";
 import type { ToolbarProps } from "./Toolbar.types";
 import { ToolbarUtils } from "./Toolbar.utils";
 

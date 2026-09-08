@@ -20,6 +20,7 @@ export type PopoverProps = AccessorProps<{
     hasAutoFocus?: boolean;
     isTransparentToPointer?: boolean;
     isPinned?: boolean;
+    isCovered?: boolean;
     isOpen: boolean;
     anchorRef: HTMLElement | undefined;
     onKeyDown?: (e: KeyboardEvent) => void;

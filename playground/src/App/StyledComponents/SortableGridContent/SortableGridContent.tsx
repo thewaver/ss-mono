@@ -23,12 +23,6 @@ const getBox = (geometry: SortableGridGeometry) => ({
 const getPoints = (geometry: SortableGridGeometry) =>
     geometry.outline.map((point) => `${point.x},${point.y}`).join(" ");
 
-/**
- * One user unit is one pixel and nothing is inset, so the polygon lands on the cells it names. A viewBox
- * bigger than the element in one direction is scaled to fit and centred, which is a shape drawn short of
- * its own box — worst on a tall thin one, where the two ratios are furthest apart. The stroke's outer half
- * falls outside the box and is drawn because the element is `overflow: visible`.
- */
 const getViewBox = (geometry: SortableGridGeometry) => {
     const box = getBox(geometry);
 

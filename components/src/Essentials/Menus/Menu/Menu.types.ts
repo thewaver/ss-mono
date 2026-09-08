@@ -2,15 +2,15 @@ import type { Accessor, JSX } from "solid-js";
 
 import { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
-import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
-import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { PlacementLayoutFn } from "../../Abstracts/Placement/Placement.types";
+import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
+import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type { PlacementLayoutFn, PlacementRect } from "../../../Abstracts/Placement/Placement.types";
 import type {
     InteractionControlProps,
     InteractionTooltipDefs,
     InteractionWrapperProps,
-} from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
-import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
+} from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
+import type { AccessorProps, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
 
 export type MenuFlags = {
     isOpen: boolean;
@@ -20,15 +20,21 @@ export type MenuHighlightPosition = "first" | "last";
 
 export type MenuItemKind = "command" | "checkbox" | "radio";
 
+export type MenuSubmenuMode = "cascade" | "replace";
+
+export type MenuSubmenuTrigger = "hover" | "press";
+
 export type MenuItemFlags = {
     isHighlighted: boolean;
     hasSubmenu: boolean;
     isOpen: boolean;
     isChecked: boolean;
+    isBack: boolean;
 };
 
 export type MenuItem<T> = {
     value: T;
+    ariaLabel?: string;
     kind?: MenuItemKind;
     items?: MenuItem<T>[];
     isDisabled?: boolean;
@@ -49,8 +55,9 @@ export type MenuItemViewProps = AccessorProps<
     InteractionControlProps<MenuItemFlags> & {
         kind: MenuItemKind;
         submenuId?: string;
+        isRegion: boolean;
         onActivate: () => void;
-        onHover: () => void;
+        onHover: (e: MouseEvent) => void;
     }
 >;
 
@@ -63,6 +70,7 @@ export type MenuRun<T> = {
 export type MenuRenderItem<T> = (
     getItem: Accessor<MenuItem<T>>,
     getFlags: () => InteractionFlags<MenuItemFlags>,
+    getPlacement: () => PlacementRect | undefined,
 ) => JSX.Element;
 
 export type MenuRenderPopup = (
@@ -78,7 +86,8 @@ export type MenuLevelProps<T> = AccessorProps<{
     labelledBy?: string;
     ariaLabel?: string;
     isOpen: boolean;
-    isSubmenu: boolean;
+    path: number[];
+    parentWidth: number;
     initialHighlightPosition?: MenuHighlightPosition;
     anchorRef: HTMLElement | undefined;
     triggerRef: HTMLElement | undefined;
@@ -86,6 +95,8 @@ export type MenuLevelProps<T> = AccessorProps<{
     offset?: Point2d;
     submenuPlacement: AnchorPlacement;
     submenuOffset?: Point2d;
+    submenuMode: MenuSubmenuMode;
+    submenuOpensOn: MenuSubmenuTrigger;
     reservedScreenSize?: Size2d;
     transitionDurationMs?: number;
     openerFlags: InteractionFlags<MenuFlags>;
@@ -94,6 +105,9 @@ export type MenuLevelProps<T> = AccessorProps<{
     onDismiss: () => void;
 }> & {
     anchorRect?: MaybeAccessor<Rect | undefined>;
+    parentPlacement?: MaybeAccessor<PlacementRect | undefined>;
+    openerItem?: MaybeAccessor<MenuItem<T> | undefined>;
+    getPointerPoint: () => Point2d | undefined;
     items: MaybeAccessor<MenuItem<T>[]>;
     checkedValues: MaybeAccessor<T[]>;
     computeLayout?: PlacementLayoutFn;
@@ -110,6 +124,8 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         offset?: Point2d;
         submenuPlacement?: AnchorPlacement;
         submenuOffset?: Point2d;
+        submenuMode?: MenuSubmenuMode;
+        submenuOpensOn?: MenuSubmenuTrigger;
         reservedScreenSize?: Size2d;
         transitionDurationMs?: number;
         visibilitySignal?: SignalSource<boolean>;
@@ -132,6 +148,8 @@ export type ContextMenuProps<T> = AccessorProps<{
     offset?: Point2d;
     submenuPlacement?: AnchorPlacement;
     submenuOffset?: Point2d;
+    submenuMode?: MenuSubmenuMode;
+    submenuOpensOn?: MenuSubmenuTrigger;
     reservedScreenSize?: Size2d;
     transitionDurationMs?: number;
     visibilitySignal?: SignalSource<boolean>;

@@ -3,6 +3,7 @@ import type { Accessor, JSX } from "solid-js";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import type { BarrelAxis, BarrelFace } from "../../Abstracts/Barrel/Barrel.types";
+import type { PlacementLayoutFn, PlacementRect } from "../../Abstracts/Placement/Placement.types";
 import type { RotatorPhase, RotatorSpinDefs } from "../../Abstracts/Rotator/Rotator.types";
 import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 
@@ -17,6 +18,7 @@ export type WheelWedgeState = {
     wedgeCount: number;
     face: WheelFace;
     isSelected: boolean;
+    placement?: PlacementRect;
 };
 
 export type WheelController = {
@@ -62,10 +64,14 @@ export type WheelProps<T> = AccessorProps<
         }
 > &
     WheelSlots<T> & {
+        computeLayout?: PlacementLayoutFn;
         renderWedgeBack?: (getWedge: Accessor<T>, getState: Accessor<WheelWedgeState>) => JSX.Element;
     };
 
-export type OverheadWheelProps<T> = AccessorProps<WheelState & WheelLabels> & WheelSlots<T>;
+export type OverheadWheelProps<T> = AccessorProps<WheelState & WheelLabels> &
+    WheelSlots<T> & {
+        computeLayout?: PlacementLayoutFn;
+    };
 
 export type DrumWheelProps<T> = AccessorProps<
     WheelState &

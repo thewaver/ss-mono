@@ -113,7 +113,10 @@ describe("pickIndex, by nearest", () => {
 describe("pickIndex, with nothing to pick", () => {
     it("has no answer for a layout with no placements in it", () => {
         expect(
-            PlacementUtils.pickIndex({ layout: { placements: [], width: 300, heightRatio: 1 }, point: { x: 0.5, y: 0.5 } }),
+            PlacementUtils.pickIndex({
+                layout: { placements: [], width: 300, heightRatio: 1 },
+                point: { x: 0.5, y: 0.5 },
+            }),
         ).toBeUndefined();
     });
 

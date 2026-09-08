@@ -74,12 +74,6 @@ export const InventoryExample = (props: Props) => {
         />
     );
 
-    /**
-     * The library owns no turn gesture at all, so a consumer that wants one binds it. A carry claims Tab
-     * while it is in flight, so no button on the page can be reached from the keyboard mid-carry — a key of
-     * one's own is therefore what keeps turning operable without a pointer, and the buttons are the pointer
-     * route rather than the accessible one.
-     */
     createEffect(() => {
         if (!(access(props.isTurnable) ?? false)) return;
 

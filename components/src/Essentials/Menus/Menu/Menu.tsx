@@ -1,20 +1,21 @@
 import type { JSX } from "solid-js";
 import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
-import { Rect } from "@thewaver/ss-utils";
+import { Point2d, Rect } from "@thewaver/ss-utils";
 
-import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
-import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
-import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
-import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
-import { Typeahead } from "../../Abstracts/Typeahead/Typeahead";
-import { TypeaheadUtils } from "../../Abstracts/Typeahead/Typeahead.utils";
-import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
-import { ViewportUtils } from "../../Exotics/Viewport/Viewport.utils";
-import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
-import { access } from "../../Utils/propUtils";
-import { LabelUtils } from "../Input/Label/Label.utils";
-import { Popover } from "../Popover/Popover";
+import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
+import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
+import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
+import type { PlacementRect } from "../../../Abstracts/Placement/Placement.types";
+import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
+import { Typeahead } from "../../../Abstracts/Typeahead/Typeahead";
+import { TypeaheadUtils } from "../../../Abstracts/Typeahead/Typeahead.utils";
+import { useViewportContext } from "../../../Exotics/Viewport/Viewport.context";
+import { ViewportUtils } from "../../../Exotics/Viewport/Viewport.utils";
+import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
+import { access } from "../../../Utils/propUtils";
+import { LabelUtils } from "../../Input/Label/Label.utils";
+import { Popover } from "../../Popover/Popover";
 import type {
     ContextMenuProps,
     MenuHighlightPosition,
@@ -23,6 +24,8 @@ import type {
     MenuItemViewProps,
     MenuLevelProps,
     MenuProps,
+    MenuSubmenuMode,
+    MenuSubmenuTrigger,
     MenuTriggerProps,
 } from "./Menu.types";
 import { MenuUtils } from "./Menu.utils";
@@ -33,8 +36,36 @@ const EMPTY_CHECKED: never[] = [];
 
 const DEFAULT_SUBMENU_PLACEMENT: AnchorPlacement = { x: "right-out", y: "top-in" };
 const NO_ANGLE = 0;
+const ROOT_LEVEL = 0;
+const ROOT_PATH: number[] = [];
+const NO_PARENT_WIDTH = 0;
+const SAME_POINT_PX = 1;
+const DEFAULT_SUBMENU_MODE: MenuSubmenuMode = "cascade";
+const DEFAULT_SUBMENU_TRIGGER: MenuSubmenuTrigger = "hover";
+const BACK_INDEX = 0;
 const SUBMENU_OPEN_KEY = "ArrowRight";
 const SUBMENU_CLOSE_KEY = "ArrowLeft";
+
+/**
+ * Where the pointer last moved to, in client space, for as long as the menu exists. A menu whose items are
+ * laid out may cover its own opener, so the pointer can be sitting on an item without having gone there —
+ * and the browser reports that as a fresh `mouseenter` the moment anything else changes the layout. Reading
+ * the last real movement is what tells the two apart: an enter the pointer caused arrives before the move
+ * that follows it, so its point differs from the one on record, while an enter nothing caused matches it.
+ */
+const createPointerPointReader = () => {
+    let point: Point2d | undefined;
+
+    const handleMove = (e: PointerEvent) => {
+        point = { x: e.clientX, y: e.clientY };
+    };
+
+    document.addEventListener("pointermove", handleMove, { passive: true });
+
+    onCleanup(() => document.removeEventListener("pointermove", handleMove));
+
+    return () => point;
+};
 
 const MenuTrigger = (props: MenuTriggerProps) => {
     const getAriaLabel = LabelUtils.resolveAriaLabel(
@@ -95,7 +126,9 @@ const MenuItemView = (props: MenuItemViewProps) => {
                 props.ref?.(element);
             }}
             class={styles.menuItem}
+            classList={{ [styles.menuItemRegion]: access(props.isRegion) }}
             role={MENU_ITEM_ROLES[access(props.kind)]}
+            aria-label={access(props.ariaLabel) || undefined}
             aria-disabled={getIsDisabled() || undefined}
             aria-checked={access(props.kind) === "command" ? undefined : access(props.flags).isChecked}
             aria-haspopup={getHasSubmenu() ? "menu" : undefined}
@@ -106,7 +139,7 @@ const MenuItemView = (props: MenuItemViewProps) => {
 
                 props.onActivate();
             }}
-            onMouseEnter={() => props.onHover()}
+            onMouseEnter={(e) => props.onHover(e)}
         >
             {props.renderContent(() => access(props.flags))}
         </div>
@@ -119,8 +152,18 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 
     const typeahead = Typeahead.createBuffer();
 
+    const getHasBackEntry = () => access(props.submenuMode) === "replace" && access(props.openerItem) !== undefined;
+
+    const getIsBackAt = (index: number) => getHasBackEntry() && index === BACK_INDEX;
+
+    const getEntries = createMemo(() => {
+        const opener = access(props.openerItem);
+
+        return getHasBackEntry() && opener ? [opener, ...access(props.items)] : access(props.items);
+    });
+
     const getNavigableIndexes = createMemo(() =>
-        access(props.items).reduce<number[]>((acc, item, index) => {
+        getEntries().reduce<number[]>((acc, item, index) => {
             const isReachable = InteractionTracker.computeIsReachable(
                 item.isDisabled ?? false,
                 item.isReachableWhenDisabled ?? false,
@@ -134,11 +177,10 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     );
 
     const getHighlightedIndex = createMemo(() => {
-        // a closed menu highlights nothing, so a reset while it is still fading out cannot flash the first item
         if (!access(props.isOpen)) return undefined;
 
         const navigable = getNavigableIndexes();
-        const items = access(props.items);
+        const items = getEntries();
         const highlightedValue = getHighlightedValue();
 
         const highlightedIndex = navigable.find((index) => items[index].value === highlightedValue);
@@ -147,7 +189,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 
         if (access(props.initialHighlightPosition) === "last") return navigable[navigable.length - 1];
 
-        return navigable[0];
+        return navigable.find((index) => !getIsBackAt(index)) ?? navigable[0];
     });
 
     const getActiveItemId = createMemo(() => {
@@ -155,57 +197,83 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 
         if (highlightedIndex === undefined) return;
 
-        return `${access(props.id)}-item-${highlightedIndex}`;
+        return getItemId(highlightedIndex);
     });
 
     const getItemId = (index: number) => `${access(props.id)}-item-${index}`;
 
     const computeItemText = (index: number) =>
-        props.computeCustomText?.(access(props.items)[index]) ??
+        props.computeCustomText?.(getEntries()[index]) ??
         TypeaheadUtils.getElementText(document.getElementById(getItemId(index)));
 
     const getSubmenuId = (index: number) => `${access(props.id)}-submenu-${index}`;
 
-    const computeHasSubmenu = (index: number) => (access(props.items)[index].items?.length ?? 0) > 0;
+    const computeHasSubmenu = (index: number) => !getIsBackAt(index) && (getEntries()[index].items?.length ?? 0) > 0;
 
-    const getLayout = createMemo(() => props.computeLayout?.(access(props.items).length));
+    const getLayout = createMemo(() =>
+        props.computeLayout?.({
+            itemCount: getEntries().length,
+            path: access(props.path),
+            parentWidth: access(props.parentWidth),
+            parentPlacement: access(props.parentPlacement),
+        }),
+    );
+
+    const getIsLaidOut = () => getLayout() !== undefined;
+
+    const getIsCovered = () => access(props.submenuMode) === "replace" && getOpenValue() !== undefined;
+
+    const getPlacementAt = (index: number) => getLayout()?.placements[index];
 
     const toContainerWidth = (ratio: number) => `${ratio * 100}cqw`;
 
     const highlightIndex = (index: number | undefined) => {
         if (index === undefined) return;
 
-        setHighlightedValue(() => access(props.items)[index].value);
+        setHighlightedValue(() => getEntries()[index].value);
     };
 
     const openIndex = (index: number) => {
-        setHighlightedValue(() => access(props.items)[index].value);
-        setOpenValue(() => access(props.items)[index].value);
+        setHighlightedValue(() => getEntries()[index].value);
+        setOpenValue(() => getEntries()[index].value);
     };
 
-    const hoverIndex = (index: number) => {
+    const getIsPointerLed = (e: MouseEvent) => {
+        const point = props.getPointerPoint();
+
+        return (
+            point === undefined ||
+            Math.abs(point.x - e.clientX) >= SAME_POINT_PX ||
+            Math.abs(point.y - e.clientY) >= SAME_POINT_PX
+        );
+    };
+
+    const hoverIndex = (index: number, e: MouseEvent) => {
         if (!getNavigableIndexes().includes(index)) return;
 
-        const item = access(props.items)[index];
+        const item = getEntries()[index];
 
-        if (computeHasSubmenu(index) && !item.isDisabled) {
-            openIndex(index);
+        setHighlightedValue(() => item.value);
+
+        if (!getIsPointerLed(e) || access(props.submenuOpensOn) !== "hover") return;
+
+        setOpenValue(() => (computeHasSubmenu(index) && !item.isDisabled ? item.value : undefined));
+    };
+
+    const activateIndex = (index: number) => {
+        if (getIsBackAt(index)) {
+            props.onClose();
 
             return;
         }
 
-        setHighlightedValue(() => item.value);
-        setOpenValue(() => undefined);
-    };
-
-    const activateIndex = (index: number) => {
         if (computeHasSubmenu(index)) {
             openIndex(index);
 
             return;
         }
 
-        const items = access(props.items);
+        const items = getEntries();
 
         props.onPick(items[index], MenuUtils.getRadioGroupValues(items, index));
     };
@@ -220,7 +288,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     const handleKeyDown = (e: KeyboardEvent) => {
         if (!(e.target instanceof HTMLElement) || e.target.id !== access(props.id)) return;
 
-        const items = access(props.items);
+        const items = getEntries();
         const navigable = getNavigableIndexes();
         const highlightedIndex = getHighlightedIndex();
 
@@ -265,28 +333,32 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
             return;
         }
 
-        if (e.key === SUBMENU_CLOSE_KEY && access(props.isSubmenu)) {
+        if (e.key === SUBMENU_CLOSE_KEY && access(props.path).length > ROOT_LEVEL) {
             e.preventDefault();
             props.onClose();
 
             return;
         }
 
-        if (navigable.length < 1) return;
+        const positions = getNavigableIndexes();
 
-        const from = navigable.indexOf(highlightedIndex ?? navigable[0]);
-        const position = NavigatorUtils.computeNextPosition(e.key, from, navigable.length);
+        if (positions.length < 1) return;
+
+        const from = positions.indexOf(highlightedIndex ?? positions[0]);
+        const position = NavigatorUtils.computeNextPosition(e.key, from, positions.length);
 
         if (position === undefined) return;
 
         e.preventDefault();
-        highlightIndex(navigable[position]);
+        highlightIndex(positions[position]);
     };
 
     const renderItemAt = (getItem: () => MenuItem<T>, index: number) => {
         const [getItemRef, setItemRef] = createSignal<HTMLElement>();
 
         const getIsSubmenuOpen = () => computeHasSubmenu(index) && getOpenValue() === getItem().value;
+
+        const getRect = () => getPlacementAt(index);
 
         return (
             <InteractionWrapper
@@ -298,6 +370,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                 extraFlags={() => ({
                     isHighlighted: index === getHighlightedIndex(),
                     hasSubmenu: computeHasSubmenu(index),
+                    isBack: getIsBackAt(index),
                     isOpen: getIsSubmenuOpen(),
                     isChecked: access(props.checkedValues).includes(getItem().value),
                 })}
@@ -310,11 +383,13 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                                 setItemRef(element);
                             }}
                             id={() => getItemId(index)}
+                            ariaLabel={() => getItem().ariaLabel ?? ""}
                             submenuId={() => getSubmenuId(index)}
                             flags={getFlags}
-                            renderContent={(getItemFlags) => props.renderItem(getItem, getItemFlags)}
+                            isRegion={() => getRect()?.sector !== undefined}
+                            renderContent={(getItemFlags) => props.renderItem(getItem, getItemFlags, getRect)}
                             onActivate={() => activateIndex(index)}
-                            onHover={() => hoverIndex(index)}
+                            onHover={(e) => hoverIndex(index, e)}
                         />
 
                         <Show when={computeHasSubmenu(index)}>
@@ -323,19 +398,26 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                                 labelledBy={() => getItemId(index)}
                                 items={() => getItem().items!}
                                 isOpen={getIsSubmenuOpen}
-                                isSubmenu={true}
-                                anchorRef={getItemRef}
+                                path={() => [...access(props.path), index]}
+                                parentWidth={() => getLayout()?.width ?? NO_PARENT_WIDTH}
+                                parentPlacement={getRect}
+                                anchorRef={getIsLaidOut() ? props.anchorRef : getItemRef}
+                                anchorRect={getIsLaidOut() ? props.anchorRect : undefined}
                                 triggerRef={props.triggerRef}
-                                placement={props.submenuPlacement}
-                                offset={props.submenuOffset}
+                                placement={getIsLaidOut() ? props.placement : props.submenuPlacement}
+                                offset={getIsLaidOut() ? props.offset : props.submenuOffset}
                                 submenuPlacement={props.submenuPlacement}
                                 submenuOffset={props.submenuOffset}
+                                submenuMode={props.submenuMode}
+                                submenuOpensOn={props.submenuOpensOn}
+                                openerItem={getItem}
                                 reservedScreenSize={props.reservedScreenSize}
                                 transitionDurationMs={props.transitionDurationMs}
                                 openerFlags={getFlags}
                                 checkedValues={props.checkedValues}
                                 computeLayout={props.computeLayout}
                                 computeCustomText={props.computeCustomText}
+                                getPointerPoint={props.getPointerPoint}
                                 renderItem={props.renderItem}
                                 renderPopup={props.renderPopup}
                                 onPick={props.onPick}
@@ -349,23 +431,22 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         );
     };
 
+    const toBoxStyle = (rect: PlacementRect, stackAt: number) => ({
+        "left": toContainerWidth(rect.left),
+        "top": toContainerWidth(rect.top),
+        "width": toContainerWidth(rect.width),
+        "height": toContainerWidth(rect.height),
+        "transform": `translate(-50%, -50%) rotate(${rect.angle ?? NO_ANGLE}deg)`,
+        "z-index": rect.depth ?? stackAt,
+    });
+
     const renderPlaced = (index: number, element: JSX.Element) => {
-        const getPlacement = createMemo(() => getLayout()?.placements[index]);
+        const getPlacement = createMemo(() => getPlacementAt(index));
 
         return (
             <Show when={getPlacement()} fallback={element}>
                 {(getRect) => (
-                    <div
-                        class={styles.menuLayoutItem}
-                        style={{
-                            "left": toContainerWidth(getRect().left),
-                            "top": toContainerWidth(getRect().top),
-                            "width": toContainerWidth(getRect().width),
-                            "height": toContainerWidth(getRect().height),
-                            "transform": `translate(-50%, -50%) rotate(${getRect().angle ?? NO_ANGLE}deg)`,
-                            "z-index": getRect().depth ?? index + 1,
-                        }}
-                    >
+                    <div class={styles.menuLayoutItem} style={toBoxStyle(getRect(), index + 1)}>
                         {element}
                     </div>
                 )}
@@ -374,7 +455,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     };
 
     const renderRuns = () => (
-        <For each={MenuUtils.getRuns(access(props.items))}>
+        <For each={MenuUtils.getRuns(getEntries())}>
             {(run) => (
                 <Show
                     when={run.isRadioGroup}
@@ -428,8 +509,9 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
             reservedScreenSize={props.reservedScreenSize}
             transitionDurationMs={props.transitionDurationMs}
             hasAutoFocus={true}
-            isTransparentToPointer={() => getLayout() !== undefined}
-            isPinned={() => getLayout() !== undefined}
+            isTransparentToPointer={getIsLaidOut}
+            isPinned={getIsLaidOut}
+            isCovered={getIsCovered}
             isOpen={props.isOpen}
             anchorRef={props.anchorRef}
             anchorRect={props.anchorRect}
@@ -447,6 +529,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 export const Menu = <T,>(props: MenuProps<T>) => {
     const fallbackTriggerId = createUniqueId();
     const menuId = createUniqueId();
+    const getPointerPoint = createPointerPointReader();
 
     const [getTriggerRef, setTriggerRef] = createSignal<HTMLElement>();
     const [getIsOpen, setIsOpen] = SignalMirror.createOptional(() => props.visibilitySignal, false);
@@ -537,7 +620,8 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         labelledBy={getTriggerId}
                         items={props.items}
                         isOpen={getIsOpen}
-                        isSubmenu={false}
+                        path={ROOT_PATH}
+                        parentWidth={NO_PARENT_WIDTH}
                         initialHighlightPosition={getInitialHighlightPosition}
                         anchorRef={() => access(props.anchorRef) ?? getTriggerRef()}
                         triggerRef={getTriggerRef}
@@ -545,12 +629,15 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         offset={props.offset}
                         submenuPlacement={() => access(props.submenuPlacement) ?? DEFAULT_SUBMENU_PLACEMENT}
                         submenuOffset={props.submenuOffset}
+                        submenuMode={() => access(props.submenuMode) ?? DEFAULT_SUBMENU_MODE}
+                        submenuOpensOn={() => access(props.submenuOpensOn) ?? DEFAULT_SUBMENU_TRIGGER}
                         reservedScreenSize={props.reservedScreenSize}
                         transitionDurationMs={props.transitionDurationMs}
                         openerFlags={getFlags}
                         checkedValues={getCheckedValues}
                         computeLayout={props.computeLayout}
                         computeCustomText={props.computeCustomText}
+                        getPointerPoint={getPointerPoint}
                         renderItem={props.renderItem}
                         renderPopup={props.renderPopup}
                         onPick={pick}
@@ -566,6 +653,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
 export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
     const viewportContext = useViewportContext();
     const menuId = createUniqueId();
+    const getPointerPoint = createPointerPointReader();
 
     const [getAnchorRect, setAnchorRect] = createSignal<Rect | undefined>(undefined, { equals: Rect.isSame });
     const [getIsOpen, setIsOpen] = SignalMirror.createOptional(() => props.visibilitySignal, false);
@@ -633,7 +721,8 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
             ariaLabel={props.ariaLabel}
             items={props.items}
             isOpen={getIsOpen}
-            isSubmenu={false}
+            path={ROOT_PATH}
+            parentWidth={NO_PARENT_WIDTH}
             anchorRef={props.regionRef}
             anchorRect={getAnchorRect}
             triggerRef={props.regionRef}
@@ -641,12 +730,15 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
             offset={props.offset}
             submenuPlacement={() => access(props.submenuPlacement) ?? DEFAULT_SUBMENU_PLACEMENT}
             submenuOffset={props.submenuOffset}
+            submenuMode={() => access(props.submenuMode) ?? DEFAULT_SUBMENU_MODE}
+            submenuOpensOn={() => access(props.submenuOpensOn) ?? DEFAULT_SUBMENU_TRIGGER}
             reservedScreenSize={props.reservedScreenSize}
             transitionDurationMs={props.transitionDurationMs}
             openerFlags={() => ({ isOpen: getIsOpen() })}
             checkedValues={getCheckedValues}
             computeLayout={props.computeLayout}
             computeCustomText={props.computeCustomText}
+            getPointerPoint={getPointerPoint}
             renderItem={props.renderItem}
             renderPopup={props.renderPopup}
             onPick={pick}

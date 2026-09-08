@@ -1,5 +1,12 @@
 import type { Point2d } from "@thewaver/ss-utils";
 
+export type PlacementSector = {
+    innerRadius: number;
+    outerRadius: number;
+    fromAngle: number;
+    toAngle: number;
+};
+
 export type PlacementRect = {
     left: number;
     top: number;
@@ -7,6 +14,7 @@ export type PlacementRect = {
     height: number;
     angle?: number;
     depth?: number;
+    sector?: PlacementSector;
 };
 
 export type PlacementPickRule = "nearest" | "angle";
@@ -19,7 +27,14 @@ export type PlacementLayout = {
     origin?: Point2d;
 };
 
-export type PlacementLayoutFn = (itemCount: number) => PlacementLayout;
+export type PlacementLayoutDefs = {
+    itemCount: number;
+    path: number[];
+    parentWidth: number;
+    parentPlacement?: PlacementRect;
+};
+
+export type PlacementLayoutFn = (defs: PlacementLayoutDefs) => PlacementLayout;
 
 export type PlacementPickDefs = {
     layout: PlacementLayout;

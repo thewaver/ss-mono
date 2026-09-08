@@ -57,9 +57,6 @@ export const Popover = (props: PopoverProps) => {
 
     FocusManager.autoFocus(getRootRef, getHasFocus, { getInitialRef: getRootRef });
 
-    // a pinned layer does not follow its anchor, so once the anchor has gone the layer is pointing at nothing.
-    // the anchor's rect is only observed while the layer is visible, so the first reading after opening can still
-    // be the stale one from last time — hence the latch: the anchor has to have been seen before it can be gone
     let hasSeenAnchor = false;
 
     createEffect(() => {
@@ -119,7 +116,12 @@ export const Popover = (props: PopoverProps) => {
                         e.preventDefault();
                     }}
                 >
-                    {props.renderContent(getTransitionTarget, getTransitionDurationMs, getPlacement)}
+                    <div
+                        class={styles.popoverContent}
+                        classList={{ [styles.popoverContentCovered]: access(props.isCovered) === true }}
+                    >
+                        {props.renderContent(getTransitionTarget, getTransitionDurationMs, getPlacement)}
+                    </div>
                 </div>
             </Portal>
         </Show>

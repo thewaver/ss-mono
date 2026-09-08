@@ -1091,7 +1091,7 @@ further can.
 ## 26. Arbitrary placement across controls, and the picking that has to come with it
 
 **The user's proposal, and the direction the library is going next.** A control's items should be placeable
-anywhere rather than only along a line: a `Menu` as a closed ring, a wide fan or a zig-zag; a `Paginator` drawn
+anywhere rather than only along a line: a `Menu` as a closed ring or a wide fan; a `Paginator` drawn
 round a dial instead of along a row; `Tabs` as a honeycomb, or as page marks scattered down the edge of a
 dossier; a `RadioGroup`'s stars bent into a semicircle. **The list of controls is deliberately open** — the
 user named these as examples of the flexibility wanted, not as the set.
@@ -1102,11 +1102,24 @@ abstract is not finished when the menu ships** — the proving pass is the secon
 
 ### What is built
 
-`Abstracts/Placement` holds the vocabulary and the picking. `Menu` takes an optional `computeLayout` and is
-unchanged without one. `Samples/Menu/Layouts` ships `ring`, `hemisphere` and `fan`, all three demoed on the
-Menu page, and the reasoning behind every decision taken so far is in `decisions.md` under _"Arbitrary item
-placement"_ — including the pinning, the `"anchorGone"` dismissal, the focus-restore change and the three
-faults that were the Playground's rather than the library's.
+`Abstracts/Placement` holds the vocabulary, the picking and the sector path builder, and has a Playground page
+of its own where five knobs build one set of measurements that a `WheelMenu` and an `OverheadWheel` are both
+handed. `Menu` and the overhead `Wheel` each take an optional `computeLayout` and are unchanged without one; a
+layout is told the path down to the level it is drawing and the placement of the item that opened it, so it can
+aim a band at its own parent.
+
+Two controls are built on top of that. `WheelMenu` is a `Menu` whose items are wedges of a hollow wheel over a
+whole turn or half of one, with per-item arcs, concentric submenus aimed at their opener, and a close control in
+the hole that is an ordinary item — which is why `Menu` itself carries nothing about it. `FanMenu` is a `Menu`
+whose items are a narrow arc of cards and whose levels **replace** rather than stack: `Menu` gained
+`submenuMode`, a covered level is hidden rather than unmounted, and a replaced level offers its own opener as
+its first entry, which walks back. `Samples/Menu/Layouts` ships the arc and fan factories, and the Playground
+groups `Menu`, `WheelMenu` and `FanMenu` under one root.
+
+The reasoning behind every decision taken so far is in `decisions.md` under _"Arbitrary item placement"_,
+_"Concentric submenus"_, _"A wheel of wedges"_, _"The wheel as the ring's second consumer"_ and
+_"`WheelMenu`: the wheel becomes a component"_ — including the pinning, the `"anchorGone"` dismissal, the
+focus-restore change and the three faults that were the Playground's rather than the library's.
 
 ### What is left, in the order it was argued
 
@@ -1115,13 +1128,13 @@ faults that were the Playground's rather than the library's.
   flick is a path-based gesture and 2.5.1 Pointer Gestures (A) requires a single-pointer alternative without a
   path, while 2.1.1 Keyboard (A) requires the keyboard route regardless — and that mode is also the ordinary
   mouse route, so nothing is built purely for compliance.
-- **Concentric submenus.** A submenu currently anchors to its own item, and `computeLayout` knows only the item
-  count, so "a second ring around the first" cannot be expressed. It needs the layout's depth in the signature
-  and submenus sharing the invoker's centre.
 - **The proving pass against another control.** `Paginator` looks the strongest: the user's proposal is **the
   same elements in the same order**, ellipsis and step buttons included, drawn round a dial instead of along a
   row, with nothing else changing. `Tabs` gains the least, because its hard parts are the tab-to-panel
-  relationship and the roving walk and both are layout-independent.
+  relationship and the roving walk and both are layout-independent. **`OverheadWheel` is a second consumer but
+  not this pass**: it takes a `computeLayout` and draws from the sector it returns, which corrected the
+  abstract once — `labelRadiusRatio` — but it asks for one wedge rather than a place per item, so nothing about
+  ordering, picking or the walk was put under strain.
 
 ### Loose ends left deliberately, recorded at the user's request
 
@@ -1131,17 +1144,22 @@ faults that were the Playground's rather than the library's.
   ring, and the flick that will use it is unbuilt. **So the repo currently holds a tested generalisation with
   nothing consuming it**, which is the shape it is normally suspicious of. It stays because the consumer is
   named and queued, not hypothetical; if the flick is dropped, this goes with it.
-- **The `zigzag` layout is exported with no demo.** Its example was deleted at the user's word. By this repo's
-  own rule a dropped demo drops its spec, so nothing exercises it. Keep it or delete it, but it should not sit
-  untested indefinitely.
 - **A laid-out popup's size is the layout's, and it can overflow.** A ring is centred on its invoker and grows
   with its item count, so nothing stops it reaching past the edge of the screen — pinning deliberately turned
   off the clamping that would have moved it. What happens to a wheel opened next to the viewport edge has not
-  been decided.
+  been decided. **Concentric submenus make this louder rather than new**: each level encloses the one above it,
+  so the demo's third band is 664px across and runs off the right of the page at the width the Playground lays
+  its examples out in.
 - **The first item is highlighted the moment a menu opens**, before the pointer touches anything. Standard menu
   behaviour and `aria-activedescendant` has to point somewhere, but on a wheel it means something looks chosen
   while the pointer is still on the opener. The user raised it; suppressing the visual highlight until the
   pointer or keyboard engages would change `Menu` for every consumer, so it is theirs to call.
+- **`fan` places boxes rather than wedges, and that has never been argued either way.** The wedge vocabulary
+  is on `PlacementRect` and any layout may use it; the fan is the one layout whose items are tilted along the
+  arc rather than sitting in a band, so cards may well be right for it. It takes `FanDefs` like the others now.
+- **The arc factory lives in `Samples/Menu/Layouts` while `WheelMenu` is the thing that owns arcs.**
+  `OverheadWheel` and the `Placement` page use it directly, which is why it stayed sample code, but the
+  directory now names the wrong consumer. Moving it is cheap; where it should go has not been decided.
 
 ---
 

@@ -1987,8 +1987,8 @@ its shape. The picking works in the same units, which is why none of this touche
 **A layout is data, and that is the whole idea.** `computeLayout` is a function from an item count to
 placements. `Menu` takes one and changes nothing without it — the column renders exactly as before, which is
 why every existing menu spec passed untouched through the whole of this. The user's framing, and the reason
-this beat a `variant` prop: a zig-zag is not a name a component could have shipped, so the shape has to be
-something a consumer writes.
+this beat a `variant` prop: an arrangement nobody has thought of yet is not a name a component could have
+shipped, so the shape has to be something a consumer writes.
 
 **The layout sizes itself, in pixels.** Decided by the user against the alternatives of a size prop on `Menu`
 and of deriving one from the invoker. The layout is the only thing that knows how many items must fit and how
@@ -2004,13 +2004,13 @@ user opened a wheel, hovered the opener in the middle of it, and something acros
 to tell what a click would do. Direction only makes sense for a gesture where the pointer never travels to the
 item. So hover hit-tests as it always did, and `PlacementUtils.pickIndex` waits for the flick.
 
-**Three layouts ship, and the names came out of a correction.** `ring` is a closed circle round the invoker;
-`hemisphere` is half of one opening upward; `fan` is a narrow arc opening sideways with the items tilted along
-it, which is the shape a combat menu uses. What was first called `fan` was the hemisphere — the user's own
-word for it — and the real fan is a different thing: upright-ish labels reading outward from the thing that
-opened them, each turned by three quarters of its angular position so the outer two do not go as steep as the
-arc. A `zigzag` was built and its demo deleted at the user's word; **the layout is still exported with nothing
-demoing it, which by this repo's rule means nothing tests it either**.
+**Three layouts ship, and the names came out of a correction.** `ring` is a closed band round the invoker,
+drawn as wedges of a hollow pie chart; `hemisphere` is the same band over half a turn, opening upward; `fan`
+is a narrow arc of boxes opening sideways with them tilted along it, which is the shape a combat menu uses. What was
+first called `fan` was the hemisphere — the user's own word for it — and the real fan is a different thing:
+upright-ish labels reading outward from the thing that opened them, each turned by three quarters of its
+angular position so the outer two do not go as steep as the arc. All three grow outward with the level they
+are drawn at, which is what makes a submenu concentric with the level above it.
 
 **A laid-out popup is not a box, and three things follow.** All were faults the user found by using it.
 
@@ -2047,6 +2047,308 @@ component: the ring "rendering over a black rectangle with scrollbars" was the e
 `PagePopoverSurface`, and the menu "snapping between 1 and 0 rather than fading" was the example throwing away
 the visibility target and duration that `renderPopup` hands it. A laid-out menu paints its own transition and
 its own chrome, or gets neither.
+
+### Concentric submenus: `computeLayout` learns where it is, and a submenu borrows its parent's anchor
+
+The second piece of `backlog.md` item 26. A submenu of a laid-out menu is drawn as a wider ring round the
+same centre rather than hanging off the item that opened it, so a wheel stays one wheel however deep it goes.
+
+**`computeLayout` takes one object rather than a run of arguments, and the reason is the third one.**
+`PlacementLayoutFn` was `(itemCount) => layout` and is now `({ itemCount, level, parentWidth }) => layout`.
+A layout that wants only the width of the level above it would otherwise have to declare and ignore the two
+before it to reach it — the same fault the one-aggregated-object rule in `conventions.md` exists to prevent,
+arriving on a compute function rather than on a painter. Existing layouts destructure what they use and
+nothing else changes.
+
+**It is `level`, not `depth`, because `PlacementRect.depth` already means something else.** A rect's `depth`
+is its paint order — the z-index a layout can name for an item that has to sit over its neighbour. Two fields
+called `depth` in one abstract, one meaning "how far down the menu tree" and the other "how far forward",
+is the kind of collision that costs a future session an hour. The root level is `0`.
+
+**A level cannot work out its own radius from `level` alone, which is why `parentWidth` is there too.** A
+ring's radius grows with its item count, so the level above could be any size: a root of twenty items is a
+far bigger circle than a root of four, and a submenu placed at a fixed step per level would land inside it.
+The parent's box width is the one number that settles it, the parent already knows it, and half of it is
+exactly the outer edge the child has to clear — so each layout takes `max(what my own items need,
+parent's half-width + gap + half an item)`. At the root `parentWidth` is `0` and that second term falls below
+every layout's own minimum, so the arithmetic needs no special case for having no parent.
+
+**A laid-out submenu takes its parent's anchor, placement and offset; an ordinary one still takes its own
+item's.** Sharing a centre is the whole point, and the centre in question is whatever the root anchored to —
+a trigger, some other element the consumer named, or the point a right-click happened at. Passing the
+parent's own anchor down rather than reaching for the trigger keeps all three cases right, and it chains:
+level two inherits level one's anchor, which is already the root's. `submenuPlacement` and `submenuOffset`
+are untouched and still govern every menu without a layout.
+
+**`isSubmenu` is gone, because `level > 0` is the same fact and cannot disagree with itself.** It existed for
+one branch — `ArrowLeft` closes a level only when there is a level above it — and a second prop stating what
+`level` already states is a pair that can be passed inconsistently.
+
+**The demo is the nested action set on the ring layout, and the spec asserts the relationship rather than the
+radii.** Three bands come out at 296px, 480px and 664px across, but nothing in `e2e/menuLaidOut.spec.ts`
+names those numbers: it reads each level's centre and width off the element and checks that every level
+shares the root's centre and encloses the one above it. Re-tuning a gap then cannot arrive as a red run.
+
+### A wheel of wedges: sectors on the placement, and an X in the hole
+
+The user's redesign of the ring, after seeing it drawn as a circle of rounded squares. Three asks: real
+wedges rather than boxes, a hole in the middle so the band reads as a hollow pie chart, and a close control
+in that hole which the keyboard walk reaches — so the wheel may be drawn straight over its own opener.
+
+**The library places and wires; the painter paints the wedge.** `PlacementRect` gained an optional `sector` —
+inner radius, outer radius, and the two angles — and `renderItem` gained a third argument, the item's
+placement. Nothing in `components/src` knows what an annular sector looks like: the Playground reads the
+sector and emits one SVG path. The alternative, a `clip-path` the layout hands over for the component to
+apply, was rejected because it puts a CSS string in the vocabulary and still leaves the painter unable to
+draw a border, a gradient or anything else that follows the arc.
+
+**A sector's item element does not take the pointer, and the painted path does.** Wedge boxes overlap — a
+rectangle round an arc always covers its neighbours' rectangles — so a box that claimed the pointer would
+steal presses meant for the wedge beside it. `menuItemRegion` turns pointer events off on the `menuitem`
+element and the path turns them back on for itself, which is the same split `Popover`'s
+`isTransparentToPointer` already uses one level up. Hit-testing is then the drawn shape exactly, with no
+geometry in the component at all.
+
+**The placement box stays the label's box, and it is not the sector's bounding box — that was tried and it
+is wrong.** A bounding box looked tidier: the element would then contain the whole wedge and the label
+could simply centre in it. But the centre of an annular sector's bounding box is not on the sector. For a
+wide, thin band — the second level of a wheel is 117° of a band 84px thick — that centre lands **inside the
+hole**, so the label would float off the wedge and the element's own centre would not be a point a pointer
+could press. So `left` and `top` stay what they mean everywhere else, the mid-radius mid-angle point where
+the content goes, and the painter's SVG carries `overflow: visible` so a small box can paint a wedge much
+larger than itself.
+
+**The closer is the layout's decision and the consumer's paint.** `PlacementLayout` may return a `closer`
+placement, and `Menu` renders a close control there when the consumer also passes `closerDefs`. The layout
+is the only thing that knows there is a hole to put one in, which is why the switch lives there rather than
+on `Menu`; `ring` returns one at level zero only, so a submenu band does not stack a second X on top of the
+first. `closerDefs` pairs the painter with an `ariaLabel` in one object because an X glyph has no accessible
+name of its own, and a separate optional label prop could be left off — 4.1.2 Name, Role, Value is not
+something a consumer should be able to forget.
+
+**It is the last stop in the walk, and it is a position rather than an item.** The highlight was a value of
+`T`, and the closer has no value, so it is `CLOSER_POSITION` — a sentinel index of `-1` beside a boolean
+that says the closer holds the highlight. Arrow keys walk items then the closer and wrap, `Enter` on it
+dismisses, and typeahead ignores it, because typing a letter should never land on the thing that throws the
+menu away.
+
+**Hovering it takes the highlight, exactly as hovering a wedge does, and only one of them can hold it.**
+The user's rule: the closer is one of the items, so when it is chosen nothing else is. A first attempt gave
+it no hover at all and let the painter light it from `isHovered` instead — which put two things on screen
+looking chosen at once, and was the wrong reading of what "part of the items" means.
+
+**It closes an open band below it too, because that is what hovering a leaf does.** Reported by the user:
+hover a wedge, hover an item in the band it opened, then hover the X — and the band stayed open with its item
+still lit, so two things were chosen at once.
+
+**Making that work needed a hover the pointer did not cause to be thrown away first.** A laid-out menu covers
+its own opener, so the pointer can be sitting on the X without ever having gone there, and the browser
+reports that as a fresh `mouseenter` the moment anything else changes the layout — opening a submenu with
+`ArrowRight` fired one, which closed the submenu that had just opened. A pointer that never moved was undoing
+a keystroke. `Menu` now keeps the point of the last real `pointermove` for as long as it exists, and a hover
+is acted on only when its own point differs from that one: an enter the pointer caused arrives **before** the
+move that follows it, so it never matches the point on record, while an enter nothing caused matches it
+exactly. `movementX` was checked first and is zero in both cases, so it cannot tell them apart.
+
+**"The same point" has to mean within a pixel, not equal.** The two events report the same position at
+different precisions — a `pointermove` gives 959.98 where the `mouseover` that preceded it gives 959 — so an
+equality test on rounded numbers lets the stray enter through whenever the fraction rounds the other way. It
+is a real defect rather than a fussy one: it decides whether a submenu opened by the keyboard survives. The
+cost of the tolerance is that a hover which crosses into another item on a sub-pixel step is dropped, which
+no pointer a person is holding can do.
+
+**The guard is on every item, not only on the closer.** The same fault is already recorded against a menu
+that lands under the pointer that opened it — six specs failed on a highlight one item too far down — so a
+rule that only covered the X would have left the same bug in place one wedge over.
+
+**But it governs the levels only, never the choice.** A hover always moves the highlight; only opening or
+closing a level asks whether the pointer really moved. The guard cannot be exact — the two events report a
+position at different precisions, so it works to within a pixel — and a pointer inching across a boundary
+sub-pixel by sub-pixel therefore has a hover thrown away. Losing a level to that is a bug worth the
+tolerance; losing the choice under the pointer is not, and it reads as the thing not registering presses at
+all.
+
+**The hole is sized to swallow the opener rather than to fit the glyph.** The default hole radius is 64, so
+the closer's disc is 128 across, which covers the Playground's trigger button corners with room to spare. A
+smaller disc left the button's ends poking out either side of the X, which is the giveaway that the wheel is
+a layer over a button rather than a thing in its own right.
+
+**The ring is a factory, and the ready-made `ring` is what it builds with nothing asked for.** A layout is
+data, but a layout with its measurements welded shut is data a consumer can only copy: the wheel's hole, the
+thickness of a band, the gap between levels and the gap between wedges were module constants, so anybody
+wanting a fatter band had to fork the file. `createRing(defs)` takes all of them, every field optional, and
+`ring` is `createRing()` — one implementation, not a default beside a general case that could drift from it,
+which is what the first assertion in `MenuLayouts.const.test.ts` pins.
+
+**The close control's size follows the hole rather than a constant of its own.** `closerRadiusPx` defaults to
+`holeRadiusPx`, so a consumer who widens the hole gets a disc that still fills it and still covers the opener
+underneath — the thing the size is actually for. A flat default would have quietly left a ring of bare hole
+round the X the moment anybody touched the geometry.
+
+**There is no knob for where the first wedge sits, and that is deliberate rather than forgotten.** The
+factory exposes the numbers that were already constants and nothing more; a start angle, a direction of
+travel and per-level overrides are all plausible and none has been asked for. `fan` is still a bare constant
+for the same reason.
+
+**A hemisphere is the same band over half a turn, so one builder makes both.** Asked for by the user once the
+ring was wedges. `createArc` takes the spread in degrees and everything else the ring already had; `createRing`
+is that at 360 degrees and `createHemisphere` at 180, with `ring` and `hemisphere` the ready-made pair. The
+defs type is `ArcDefs` rather than `RingDefs` now that two shapes take it.
+
+**What the spread changes is where the first wedge sits, and that is the only branch in the builder.** A
+closed ring centres its first item straight up and the rest follow round; an open arc has two ends, so the
+items are spread symmetrically about straight up instead — first and last are mirror images, which is what
+`MenuLayouts.const.test.ts` asserts rather than any angle. The old hemisphere placed boxes on a 150-degree
+arc and sized its radius from how much room the items needed; none of that survived, so `toRadius` and the
+crowding factor it used went with it.
+
+**A half turn leaves each wedge half the angle, so the hemisphere ships from a wider hole.** Reported by the
+user as wedges too small for what was in them, and the arithmetic says why: a label's width is the chord
+across its wedge, which is the radius times the sine of half the wedge's angle. Halving the turn halves the
+angle, and the only thing left to win it back with is radius — so `createHemisphere` starts at a hole of 110
+and a band of 110 where the ring starts at 64 and 84. The two defaults being different is the point rather
+than an oversight, and the spec asserts the relationship — a hemisphere's hole is wider than a ring's —
+rather than either number.
+
+**Its close control does not fill that hole, which is the one place the two shapes disagree.** The rule for
+the ring is that the disc fills the hole so it always covers the opener; on a hemisphere the hole is wide
+because the labels needed room, not because the opener is, so a disc filling it would be a dinner plate over
+a button. The defaults name a closer radius of their own, which is what the knob was for.
+
+**The trigger's caption had to shrink when the wheel grew a hole.** The hemisphere demo's button said "Fan",
+which was wrong, and the honest replacement was long enough to poke out from behind the X that covers it. The
+Playground's captions are one short word by convention — "Wheel", "Fan", "Edit" — and the card's own title
+carries the full name, so the button says "Half". Worth writing down because it is a real constraint on any
+consumer of this layout: the hole is sized by the layout and the opener has to fit inside it.
+
+### `FanMenu`: levels that replace rather than stack, and the row that walks back
+
+The user's design, and the second control built on `Menu` rather than beside it. A fan shows one arc at a
+time: opening a submenu replaces the arc it came from, and the new arc's first card is the item you came in
+through, which takes you back.
+
+**It is a mode on `Menu`, not a trick played on it.** The first sketch had `FanMenu` hold a path and hand
+`Menu` a flat list of leaves, which would have needed `Menu` to be told not to close on them — the user's
+objection was that a branch never closes a menu, which is true and is exactly what flattening throws away. So
+the items stay nested, `Menu` keeps its recursion and its `aria-haspopup`, and `submenuMode: "replace"` says
+what to do with the levels. `FanMenu` is then the fan layout plus that mode, and nothing else.
+
+**A covered level is hidden, not unmounted, and the reason is structural.** A submenu is rendered inside the
+item that owns it, so unmounting a covered level would destroy the level that covered it — which would
+uncover it, which would mount it again. That nesting is deliberate elsewhere too: it is what gives a submenu
+an anchor and what makes a level unmount with its parent. Hiding costs nothing a screen reader can tell
+apart, since `display: none` removes a subtree from the accessibility tree as thoroughly as unmounting does,
+and it leaves the outgoing arc in place long enough to animate away.
+
+**What is hidden is the popup's content, not the popup, and that is a focus decision.** Hiding the whole
+layer would blur it the instant a submenu opened — before the child had taken focus, since a level takes
+focus only once positioned — so the child would record `<body>` as the thing to restore to and going back
+would land on nothing. `Popover` therefore wraps its content in a `display: contents` box and turns that box
+off instead: the level keeps its own focus until the child takes it and gets it back on the way out, exactly
+as in a stacked menu, while everything a person can see or hear is gone.
+
+**The back row is the opener re-rendered, which is why no new concept was needed.** In replace mode a level
+prepends its own opener to its entries, flagged `isBack` so a painter can mark it, and activating it closes
+that level — the same thing `ArrowLeft` already does. It is a real item: in the walk, in the arc's geometry,
+carrying the opener's own painted content and its name. It never opens a submenu of its own, and the
+highlight opens on the first entry below it rather than on the way out.
+
+**A submenu opens on a hover or on a press, and that is the menu's choice rather than an item's.** The user's
+call, and the fan sets it to press. It was left out of the first build and the fan was unusable for it: a
+pointer sweeping the arc drilled a level, the arc was replaced under the cursor, and the new arc drilled
+again — which reads as hit-testing gone wrong rather than as a hover rule, and is what the fault was
+reported as. Measured afterwards, each card owns exactly its own painted area and nothing else, so the
+geometry was never in it. Hovering still moves the choice under either setting; only the opening changes, and
+under `press` a hover no longer closes an open level either, since opening and closing should answer to the
+same gesture.
+
+**`createFan` came with it, on the same terms as `createRing`.** The fan's measurements — card size, spacing,
+gap and tilt — were module constants; they are `FanDefs` now and `fan` is `createFan()`. The factory ignores
+level and parent width, because in replace mode there is never a level to enclose.
+
+**A fan is given the angle between two cards, not the angle the whole arc covers.** The user's call, after a
+menu of five opened a submenu of three and the three were stretched across the same spread. A total arc makes
+spacing a function of how many items happen to be there; a step makes it a property of the fan, so five cards
+and fifteen sit the same distance apart and the arc simply grows. `maxSpreadDegrees` is the only thing
+holding it: past that the step is squeezed to fit, which is what stops a menu of two hundred from wrapping
+round on itself. The radius follows the effective step rather than the count, so the cards never crowd.
+
+### `WheelMenu`: the wheel becomes a component, and `Menu` forgets it ever knew
+
+The user's call, after the wheel's needs started leaking into `Menu`'s item list. A wheel is a menu whose
+items are angular; everything angular now lives in a thin component over `Menu`, and `Menu` is a menu again.
+
+**The close control is an ordinary item, which is what took the last of it out of `Menu`.** Everything the X
+needed — a place in the walk, a highlight that excludes every other, activation that closes the menu — a menu
+already does for every item it has. So `WheelMenu` appends one to the list it hands down and intercepts its
+activation so the consumer never sees it; `Menu` lost a sentinel index, a second highlight flag, a second view
+component, a second walk and the `closerDefs` prop. `PlacementLayout` lost its `closer` slot with them: the
+layout places one more item, in the hole, because the layout is what knows where the hole is.
+
+**One thing had to be added to `Menu` for that to work, and it is not about wheels.** An item whose painter
+draws a glyph has no accessible name, so `MenuItem` gained `ariaLabel`. That is a general want — an icon-only
+row in any menu has it — and it is what lets the X be an item rather than a special case. Typeahead is
+unaffected without a rule: the accessible text is read off the rendered row minus anything `aria-hidden`, and
+a hidden glyph leaves nothing to match.
+
+**A layout is told which branch it is laying out, not only how deep.** `PlacementLayoutDefs` traded `level`
+for `path`, the indexes from the root down to the item that opened this level, and gained that item's
+`parentPlacement`. Depth alone could not answer "whose children are these", so a component holding per-item
+hints had nowhere to look them up; and a submenu that wants to point at its opener needs the opener's angle.
+`path.length` is the old `level`, so nothing was lost and nothing is stated twice.
+
+**Arcs are sequential from one start angle, and an item asks only for its own share.** The user's
+simplification, and it removes a whole class of problem: no item names an absolute angle, so two items cannot
+collide, and there is no rule needed about who wins. An item may declare `arcDegrees`; the rest split what is
+left. Two protections finish it — the block is normalised down if it would exceed the level's spread, and its
+start is chosen so it sits inside that spread rather than being squashed to fit.
+
+**The root fills its spread; a deeper band is only as wide as its items need.** A band four levels out has a
+radius several times the root's, so the same angle there is a far longer arc — which is how a two-item
+submenu ended up sprawled across a half-circle. Below the root each wedge asks for a target arc _length_
+instead, converted to an angle at that band's radius, so a wedge is about the same size however deep it is.
+The block is then centred on the wedge that opened it, which is the thing that makes three bands legible.
+
+**Where the pieces live.** `components/src/Essentials/Menus` holds `Menu` and `WheelMenu`; the Playground
+mirrors it under `Pages/Menus` and the left-hand nav groups them. The arc factory itself stayed in
+`Samples/Menu/Layouts`, because `OverheadWheel` and the `Placement` page draw on it directly and it is sample
+code rather than component code — that placement is the one part of this that has not been argued.
+
+### The wheel as the ring's second consumer, and the `Placement` page
+
+The user's call, once the factory existed: the flat wheel had its own wedge trigonometry and should be
+drawing on the same layout the menu does.
+
+**`PlacementUtils.getSectorPath` is geometry, not paint, and the library already ships that kind of thing.**
+Two painters were about to write the same arc-and-back path string — the menu's wedge and the prize wheel's —
+so the builder moved into the abstract beside the picking. `BracketConnectorPaths` is the precedent: a path
+`d` is an expression of a shape in SVG's notation, which is the same kind of answer as "where does this item
+go". What stays outside is every choice about how it looks: fill, stroke, gradient, transition.
+
+**The overhead wheel asks the layout for one wedge and turns copies of it, rather than placing each one.**
+Placing each wedge was tried in thought and rejected on two counts. A wheel's wedges are identical by
+construction, so per-item placements would be the same shape computed N times; and the spin is a transform
+that changes every frame, while a layout is static geometry with no angle in its signature — so a placed
+wheel would have to rotate a container instead, which moves where the turn is written and breaks the
+`wheel.spec.ts` helper that reads it off the first wedge. The wedge divs keep their own rotation and each is
+handed `placements[0]`, the canonical wedge at twelve o'clock.
+
+**The placement travels inside `WheelWedgeState`, not as a third render argument.** `Menu` had to add one to
+`renderItem` because `MenuItemFlags` is all booleans and a rect in it would have made the name a lie. A
+wedge's state already carries an index and a count, so the aggregate rule applies the other way round here:
+data a painter needs goes into the object it already receives.
+
+**`labelRadiusRatio` is the knob the second consumer added.** A menu's label sits in the middle of its band;
+a prize wheel's sits out near the rim, with the middle left for the hub. Nothing else about the wheel needed
+saying, which is the shape of correction the bottom-up plan was expecting — the abstract grew one field
+because a real second use asked for it, not because the field seemed likely.
+
+**The `Placement` page is what a shared layout looks like from outside.** Five knobs build one `createRing`,
+and the same function is handed to a `Menu` and to an `OverheadWheel` side by side. The two controls have
+nothing else in common — one is a popup with levels and a keyboard walk, the other spins — so a knob moving
+both is the claim the page exists to make, and `e2e/placement.spec.ts` asserts exactly that rather than any
+measurement: widening the band widens the menu's own popup and redraws the wheel's wedge, and emptying the
+hole turns a two-arc band into a one-arc pie.
 
 ### `Menu` submenus: a level per popup, focus moving between them
 

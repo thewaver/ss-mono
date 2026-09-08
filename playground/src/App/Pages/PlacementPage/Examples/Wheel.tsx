@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 
-import { Button, OverheadWheel, access } from "@thewaver/ss-components";
+import { Button, OverheadWheel, createRing } from "@thewaver/ss-components";
 import type { WheelController } from "@thewaver/ss-components";
 
 import {
@@ -9,26 +9,22 @@ import {
     PageWheelSpin,
     PageWheelStack,
     PageWheelWedge,
-} from "../../../../StyledComponents/WheelContent/WheelContent";
-import { PRIZE_WHEEL_RING, pickPrizeIndex } from "../../Wheels.const";
-import type { WheelExampleProps } from "../../Wheels.types";
+} from "../../../StyledComponents/WheelContent/WheelContent";
+import type { PlacementExampleProps } from "../PlacementPage.types";
 
-type Props = WheelExampleProps;
+const PRIZES = ["Free spin", "Ten coins", "Nothing", "A hat", "Fifty coins", "A shrug"];
 
-export const OverheadExample = ({ wedges, ...otherProps }: Props) => {
-    const getWedges = () => access(wedges);
-
+export const WheelExample = (props: PlacementExampleProps) => {
     const [getController, setController] = createSignal<WheelController>();
 
     return (
         <PageWheelStack>
             <OverheadWheel
-                {...otherProps}
-                wedges={getWedges}
+                wedges={() => PRIZES}
                 ariaLabel={"Prize wheel"}
-                computeLayout={PRIZE_WHEEL_RING}
-                computeSpinTarget={() => pickPrizeIndex(getWedges().length)}
-                computeWedgeLabel={(index) => `${getWedges()[index]}, ${index + 1} of ${getWedges().length}`}
+                computeLayout={(defs) => createRing(props.getLayoutDefs())(defs)}
+                computeSpinTarget={() => Math.floor(Math.random() * PRIZES.length)}
+                computeWedgeLabel={(index) => `${PRIZES[index]}, ${index + 1} of ${PRIZES.length}`}
                 renderWedge={(getWedge, getState) => <PageWheelWedge state={getState}>{getWedge()}</PageWheelWedge>}
                 onMount={setController}
             />
@@ -37,7 +33,6 @@ export const OverheadExample = ({ wedges, ...otherProps }: Props) => {
 
             <PageWheelCentre>
                 <Button
-                    id={"overheadSpin"}
                     ariaLabel={"Spin the wheel"}
                     isDisabled={() => !getController()?.getIsSpinnable()}
                     renderContent={(getFlags) => (

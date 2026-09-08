@@ -2,8 +2,8 @@ import { createSignal } from "solid-js";
 
 import { Button, Menu } from "@thewaver/ss-components";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
+import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
 import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
 import type { MenuDrivenExampleProps } from "../MenuPage.types";
 

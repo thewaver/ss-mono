@@ -99,8 +99,6 @@ export namespace FocusManager {
                 if (!previouslyFocused?.isConnected) return;
 
                 runFocusRestore(() => {
-                    // the pair is symmetric with the focus above: a layer never moves the page on its own account,
-                    // and where the target is on screen — which is every ordinary close — this changes nothing
                     previouslyFocused.focus({ preventScroll: true });
                 });
             });

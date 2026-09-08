@@ -1,7 +1,7 @@
 import { Menu } from "@thewaver/ss-components";
 
-import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
-import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
+import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
+import { PageTooltipContent } from "../../../../StyledComponents/TooltipContent/TooltipContent";
 import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
 
 export const ReachableExample = () => (

@@ -2,7 +2,7 @@ import type { Signal } from "solid-js";
 
 import { Menu } from "@thewaver/ss-components";
 
-import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
+import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
 import { VIEW_OPTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
 import type { Action, MenuExampleProps } from "../MenuPage.types";
 

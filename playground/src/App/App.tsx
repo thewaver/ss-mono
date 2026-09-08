@@ -40,7 +40,9 @@ import { GlassSurfacePage } from "./Pages/GlassSurfacePage/GlassSurfacePage";
 import { ImageSwitcherPage } from "./Pages/ImageSwitcherPage/ImageSwitcherPage";
 import { InteractionTrackerPage } from "./Pages/InteractionTrackerPage/InteractionTrackerPage";
 import { LabelPage } from "./Pages/LabelPage/LabelPage";
-import { MenuPage } from "./Pages/MenuPage/MenuPage";
+import { FanMenuPage } from "./Pages/Menus/FanMenuPage/FanMenuPage";
+import { MenuPage } from "./Pages/Menus/MenuPage/MenuPage";
+import { WheelMenuPage } from "./Pages/Menus/WheelMenuPage/WheelMenuPage";
 import { ModalPage } from "./Pages/ModalPage/ModalPage";
 import { ElementMosaicPage } from "./Pages/Mosaics/ElementMosaicPage/ElementMosaicPage";
 import { ImageMosaicPage } from "./Pages/Mosaics/ImageMosaicPage/ImageMosaicPage";
@@ -49,6 +51,7 @@ import { NumberInputPage } from "./Pages/NumberInputPage/NumberInputPage";
 import { OdometerPage } from "./Pages/OdometerPage/OdometerPage";
 import { PaginatorPage } from "./Pages/PaginatorPage/PaginatorPage";
 import { PatchBoardPage } from "./Pages/PatchBoardPage/PatchBoardPage";
+import { PlacementPage } from "./Pages/PlacementPage/PlacementPage";
 import { PointerTrackerPage } from "./Pages/PointerTrackerPage/PointerTrackerPage";
 import { PreviewPage } from "./Pages/PreviewPage/PreviewPage";
 import { ProgressPage } from "./Pages/ProgressPage/ProgressPage";
@@ -234,6 +237,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 name: "Navigator",
                 description:
                     "The arithmetic behind every arrow-key walk: the next position along a line, and the next cell in a grid. The grid walk neither wraps nor clamps — it answers with nothing when the step leaves the grid — because a table, a calendar and a tile board all need to hear that the step went off the edge, and each does something different with it.",
+            },
+            {
+                name: "Placement",
+                description:
+                    "Where a control's items go when they are not in a row. A layout is a function from an item count, the path down to the level being drawn, the size of the level above it and the placement of the item that opened it, to a list of boxes in fractions of the arrangement's own width — so it resolves in CSS with nothing measured in JavaScript. A box may also name the wedge of a ring it occupies, which is what lets a control hand its painter a shape rather than a rectangle. The layouts themselves are sample code; what stays here is the vocabulary, the picking that answers which item a direction means, and the path builder both wheels on this page draw with.",
+                component: () => <PlacementPage />,
             },
             {
                 name: "PointerTracker",
@@ -566,10 +575,27 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 ],
             },
             {
-                name: "Menu",
-                description:
-                    "A popup list of commands, with a popup per submenu level rather than one list that redraws. Focus moves between the levels, and a dismissal closes them from the innermost out.",
-                component: () => <MenuPage />,
+                name: "Menus",
+                children: [
+                    {
+                        name: "FanMenu",
+                        description:
+                            "The same menu drawn as a narrow arc of cards opening sideways, and stepped through rather than stacked: opening a submenu replaces the level it came from instead of appearing beside it, and the row at the head of the new arc is the item you came in through, which takes you back. One level is ever on screen, so a fan never has to find room for a second one.",
+                        component: () => <FanMenuPage />,
+                    },
+                    {
+                        name: "Menu",
+                        description:
+                            "A popup list of commands, with a popup per submenu level rather than one list that redraws. Focus moves between the levels, and a dismissal closes them from the innermost out.",
+                        component: () => <MenuPage />,
+                    },
+                    {
+                        name: "WheelMenu",
+                        description:
+                            "The same menu with its items cut as wedges of a hollow wheel, over a whole turn or half of one. Everything a menu does it still does — the walk, the levels, the typeahead — and what this adds is angular: each item may ask for a share of the arc, a submenu is a wider band aimed at the wedge that opened it and only as wide as its own items need, and the close control in the hole is an ordinary item that happens to sit at the centre, which is why the menu underneath knows nothing about it.",
+                        component: () => <WheelMenuPage />,
+                    },
+                ],
             },
             {
                 name: "Modal",
