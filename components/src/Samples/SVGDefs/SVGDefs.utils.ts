@@ -1,9 +1,10 @@
-import { MathUtils, RandomUtils, type Size2d } from "@thewaver/ss-utils";
+import { Color, MathUtils, RandomUtils, type Size2d } from "@thewaver/ss-utils";
 
 import type { PointerReading } from "../../Abstracts/PointerTracker/PointerTracker.types";
 import { SVGFilterDefsFactory } from "../../Abstracts/SVG/Defs/Filter/SVGFilterDefs.factory";
 import type { SVGDefsColors } from "./SVGDefs.types";
 
+const TRANSPARENT_ALPHA = 0;
 const POINTER_FADE_START_RATIO = 1;
 const POINTER_FADE_END_RATIO = 2;
 
@@ -32,6 +33,11 @@ export namespace SVGDefsUtils {
 
     export const getBaseBorderColor = (defs: { colors: SVGDefsColors }) =>
         `hsl(from ${defs.colors.background} h s calc(l * 1.5) / 50%)`;
+
+    export const getTransparentColor = (color: string) =>
+        Color.Hex.isHex(color)
+            ? Color.RGBA.toCss({ ...Color.Hex.toRgb(color), a: TRANSPARENT_ALPHA })
+            : `rgb(from ${color} r g b / 0)`;
 
     export const getPointerFade = (reading: PointerReading, isPointerPresent: boolean) =>
         isPointerPresent

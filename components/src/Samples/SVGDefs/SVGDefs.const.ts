@@ -1,7 +1,7 @@
-import { elastic_circle_3 } from "./Gradient/Timed/elastic_circle_3";
-import { elastic_drip_3 } from "./Gradient/Timed/elastic_drip_3";
-import { elastic_inter_semicircle_3 } from "./Gradient/Timed/elastic_inter_semicircle_3";
-import { elastic_semicircle_3 } from "./Gradient/Timed/elastic_semicircle_3";
+import { elastic_circle_1c } from "./Gradient/Timed/elastic_circle_1c";
+import { elastic_drip_1c } from "./Gradient/Timed/elastic_drip_1c";
+import { elastic_inter_semicircle_1c } from "./Gradient/Timed/elastic_inter_semicircle_1c";
+import { elastic_semicircle_1c } from "./Gradient/Timed/elastic_semicircle_1c";
 import { flow_2s } from "./Gradient/Timed/flow_2s";
 import { flow_3 } from "./Gradient/Timed/flow_3";
 import { flow_3s } from "./Gradient/Timed/flow_3s";
@@ -13,27 +13,45 @@ import { hue_diag_inter_2 } from "./Gradient/Timed/hue_diag_inter_2";
 import { hue_pulse_2 } from "./Gradient/Timed/hue_pulse_2";
 import { hue_rot_3 } from "./Gradient/Timed/hue_rot_3";
 import { merge_1v1 } from "./Gradient/Timed/merge_1v1";
+import { merge_1v1c } from "./Gradient/Timed/merge_1v1c";
 import { merge_diag_1v1 } from "./Gradient/Timed/merge_diag_1v1";
+import { merge_diag_1v1c } from "./Gradient/Timed/merge_diag_1v1c";
 import { merge_diag_async_4 } from "./Gradient/Timed/merge_diag_async_4";
 import { orbit_1 } from "./Gradient/Timed/orbit_1";
+import { orbit_1c } from "./Gradient/Timed/orbit_1c";
 import { orbit_1v1 } from "./Gradient/Timed/orbit_1v1";
+import { orbit_1v1c } from "./Gradient/Timed/orbit_1v1c";
 import { orbit_async_2v1 } from "./Gradient/Timed/orbit_async_2v1";
 import { orbit_async_3 } from "./Gradient/Timed/orbit_async_3";
 import { scan_1 } from "./Gradient/Timed/scan_1";
+import { scan_1c } from "./Gradient/Timed/scan_1c";
 import { scan_1v1 } from "./Gradient/Timed/scan_1v1";
+import { scan_1v1c } from "./Gradient/Timed/scan_1v1c";
 import { scan_diag_1 } from "./Gradient/Timed/scan_diag_1";
+import { scan_diag_1c } from "./Gradient/Timed/scan_diag_1c";
 import { scan_diag_1v1 } from "./Gradient/Timed/scan_diag_1v1";
+import { scan_diag_1v1c } from "./Gradient/Timed/scan_diag_1v1c";
 import { snake_1 } from "./Gradient/Timed/snake_1";
+import { snake_1c } from "./Gradient/Timed/snake_1c";
 import { snake_1v1 } from "./Gradient/Timed/snake_1v1";
+import { snake_1v1c } from "./Gradient/Timed/snake_1v1c";
 import { snake_2 } from "./Gradient/Timed/snake_2";
+import { snake_2c } from "./Gradient/Timed/snake_2c";
 import { snake_4 } from "./Gradient/Timed/snake_4";
+import { snake_4c } from "./Gradient/Timed/snake_4c";
 import { snake_async_3 } from "./Gradient/Timed/snake_async_3";
 import { snake_inter_2 } from "./Gradient/Timed/snake_inter_2";
+import { snake_inter_2c } from "./Gradient/Timed/snake_inter_2c";
 import { sweep_1 } from "./Gradient/Timed/sweep_1";
+import { sweep_1c } from "./Gradient/Timed/sweep_1c";
 import { sweep_1v1 } from "./Gradient/Timed/sweep_1v1";
+import { sweep_1v1c } from "./Gradient/Timed/sweep_1v1c";
 import { sweep_diag_1 } from "./Gradient/Timed/sweep_diag_1";
+import { sweep_diag_1c } from "./Gradient/Timed/sweep_diag_1c";
 import { sweep_diag_1v1 } from "./Gradient/Timed/sweep_diag_1v1";
+import { sweep_diag_1v1c } from "./Gradient/Timed/sweep_diag_1v1c";
 import { sweep_diag_async_4 } from "./Gradient/Timed/sweep_diag_async_4";
+import { sweep_diag_async_4c } from "./Gradient/Timed/sweep_diag_async_4c";
 import { band_1 } from "./Gradient/Tracked/band_1";
 import { band_1v1 } from "./Gradient/Tracked/band_1v1";
 import { band_diag_1 } from "./Gradient/Tracked/band_diag_1";
@@ -133,10 +151,10 @@ export namespace SVGDefsSamples {
     export namespace Gradient {
         export namespace Timed {
             export const SAMPLE_CONFIGS = {
-                elastic_circle_3,
-                elastic_drip_3,
-                elastic_inter_semicircle_3,
-                elastic_semicircle_3,
+                elastic_circle_1c,
+                elastic_drip_1c,
+                elastic_inter_semicircle_1c,
+                elastic_semicircle_1c,
                 flow_2s,
                 flow_3,
                 flow_3s,
@@ -148,27 +166,45 @@ export namespace SVGDefsSamples {
                 hue_pulse_2,
                 hue_rot_3,
                 merge_1v1,
+                merge_1v1c,
                 merge_diag_1v1,
+                merge_diag_1v1c,
                 merge_diag_async_4,
                 orbit_1,
+                orbit_1c,
                 orbit_1v1,
+                orbit_1v1c,
                 orbit_async_2v1,
                 orbit_async_3,
                 scan_1,
+                scan_1c,
                 scan_1v1,
+                scan_1v1c,
                 scan_diag_1,
+                scan_diag_1c,
                 scan_diag_1v1,
+                scan_diag_1v1c,
                 snake_1,
+                snake_1c,
                 snake_1v1,
+                snake_1v1c,
                 snake_2,
+                snake_2c,
                 snake_4,
+                snake_4c,
                 snake_async_3,
                 snake_inter_2,
+                snake_inter_2c,
                 sweep_1,
+                sweep_1c,
                 sweep_1v1,
+                sweep_1v1c,
                 sweep_diag_1,
+                sweep_diag_1c,
                 sweep_diag_1v1,
+                sweep_diag_1v1c,
                 sweep_diag_async_4,
+                sweep_diag_async_4c,
             } as const satisfies Record<string, TimedGradientConfig>;
 
             export type SampleKey = keyof typeof SAMPLE_CONFIGS;
