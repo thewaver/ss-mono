@@ -5,7 +5,7 @@ import { SVGAnimations } from "../../SVGAnimations.const";
 import type { TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const elastic_semicircle_3: TimedGradientConfig = {
+export const elastic_semicircle_1c: TimedGradientConfig = {
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -14,15 +14,18 @@ export const elastic_semicircle_3: TimedGradientConfig = {
             gradientOrPattern: {
                 id: `gradient1-${id}`,
                 renderDefsElement: () =>
-                    SVGGradientDefsUtils.computeLinearGradient({
-                        id: `gradient1-${id}`,
-                        colors: [
-                            { value: defs.colors.primary },
-                            { value: defs.colors.secondary },
-                            { value: defs.colors.tertiary },
-                        ],
-                        angle: 90,
-                    }),
+                    SVGGradientDefsUtils.computeLinearGradient(
+                        {
+                            id: `gradient1-${id}`,
+                            colors: [{ value: defs.colors.primary }],
+                            angle: 90,
+                        },
+                        SVGAnimations.Gradient.cycleSmoothColors(
+                            `gradient1-${id}`,
+                            [[defs.colors.primary, defs.colors.secondary, defs.colors.tertiary, defs.colors.primary]],
+                            defs,
+                        ),
+                    ),
             },
             clipPath: {
                 id: `clip1-${id}`,
