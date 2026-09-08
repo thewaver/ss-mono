@@ -338,3 +338,45 @@ behind it, not when it was taken — this is not a court. So no "settled on yyyy
 "asked for on" prefixes. Where the order of two decisions is part of the argument, say it in words
 ("the first build did X, corrected afterwards"). A real date inside the subject matter — a calendar
 boundary, a browser-support year — is content and stays.
+
+## Staging documents, while two machines are running
+
+**While work is running on more than one machine, the five documents are not edited directly.** Stated by the
+user, who runs Claude on two machines at once on different features and merges both at the end. Each session
+writes its intended edits into `session-<machine name>.md` at the repo root — one file per machine, so the
+two files never collide — committed like any other document and deleted once the user has had it merged in.
+The merge is a thing they ask for, from either machine, once both sides are pushed.
+
+**The machine name is the one the user gave that machine, not its hostname.** They renamed the first staging
+file from the `ComputerName` it was built from, because they have several laptops and the hostname is not what
+distinguishes them in their head. So do not derive the name from `scutil` or `hostname`, and where an existing
+staging file disagrees with what the machine calls itself, that file is the right one — do not open a second.
+
+The reason is `backlog.md`. Its index is contiguous from 1 and `brief.md` points at it by number, so closing
+an item on both machines means both sides rewriting the same lines, and git reconciles that textually rather
+than semantically — two items with the same number, or one dropped without a trace. Staging converts two
+concurrent renumbers into one deliberate pass. It costs a session's conventions not reaching the other
+machine until the merge, which the user accepted as the smaller price.
+
+The rest of _"The five documents"_ is unchanged — the audience split, the numbering rule, the ban on
+changelogs and dates all still hold, and they hold for what is staged.
+
+**A staging file is a staging area, not a sixth document.** Everything that would have been written into
+`CLAUDE.md`, `conventions.md`, `decisions.md`, `backlog.md` or `brief.md` goes in it instead, under a heading
+naming its destination, in the exact words it should carry once it lands.
+
+**Entries are lift-and-paste ready.** Write the finished text, in the voice of the file it is going to, not a
+note describing what should be written. A `decisions.md` entry names the component and reads like its
+neighbours; a `backlog.md` entry says which numbered item it belongs under, or `new` if it is a new item; a
+`brief.md` entry is the one line, under the group it belongs to.
+
+**No numbering is invented in a staging file.** New `backlog.md` items are listed under `new` in the order
+they were argued, without numbers. Numbers are assigned once, on the machine where the merge happens, with
+both machines' entries visible at the same time — that is the whole point of the file. Git resolves two
+concurrent renumbers textually, and the result is duplicate items or items that quietly vanish.
+
+**The two rules that bite hardest still apply to staged text.** No changelog: nothing records what landed
+this session, what was fixed, or how many tests passed — only text bound for a core file goes in. And no
+fault gets written down before its explanation has landed, which covers text staged for `brief.md` and
+`backlog.md` as much as text already in them — explain it in chat, wait for assent, then stage it. Text
+bound for `CLAUDE.md`, `conventions.md` and `decisions.md` is still written freely.

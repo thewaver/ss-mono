@@ -55,7 +55,7 @@ reading.
 21. `Table` — six things deliberately not built — _open_
 22. `Timeline` — the pointer routes the library cannot promise — _open_
 23. `GlassSurface` — what is built and what is not — _open_
-24. Cycling colour variants for the timed gradient samples — _open_
+24. Renaming the `hue_…` family — _open_
 25. Per-sample defs as a discriminated union, and knobs that follow the key — _open_
 26. Arbitrary placement across controls, and the picking that has to come with it — _open, in progress_
 
@@ -1027,27 +1027,20 @@ things that decide its shape"_. Three things are outstanding.
 
 ---
 
-## 24. Cycling colour variants for the timed gradient samples
+## 24. Renaming the `hue_…` family
 
-`Gradient.Tracked` gained a `c` treatment — the colours blend continuously through the shared palette on a
-clock rather than each element painting one of them. The user's call is that a lot of `Gradient.Timed` can
-gain the same thing.
+The cycling work is done. Eighteen `…c` keys were added across `merge`, `orbit`, `scan`, `snake` and
+`sweep`, and the four `elastic_…` samples lost their static rainbow, now cycle in place, and were renamed
+from `…_3` to `…_1c`. See `decisions.md` under _"Cycling the timed gradients: which colour a stop takes,
+and why the transparent ones are concrete"_ for the rule, the naming reading the rename settled, and the
+two measurements behind the implementation.
 
-- **They have to be taken one at a time, because some already cycle and cycling is their identity.** At
-  first glance that is the `hue_…`, `flow_…` and `elastic_…` samples, and the user's own note is that there
-  may be more. **The list has not been audited**, and the audit is the first piece of work: for each sample,
-  does its motion already carry a colour change, and if so is a second one meaningless or merely redundant.
-- **The implementation is cheap and already exists.** `SVGAnimations.Gradient.cycleSmoothColors` emits a
-  SMIL `animate` on each stop's `stop-color` and lets the browser blend, which is what the `hue_…` samples
-  use. A timed sample needs no frame clock and none of the machinery the tracked `c` variants needed — see
-  `decisions.md` under _"`SVGAnimations.Gradient.cycleSmoothColors` does the same job for the timed samples
-  and cannot do it here"_ for why the tracked ones could not take that route.
-- **Naming is open and deliberately not blocking.** The timed registry spells cycling as a **prefix** — the
-  `hue_` family — while the tracked registry spells it as the **suffix** `c`, and `hue_rot_3` already shows
-  the prefix composing with a motion word. So a cycling `flow_3` has two candidate spellings and the two
-  registries would disagree. **The user's position is that naming here is symbolic rather than scientific
-  and can be settled later**; do not let it hold up the audit, and do not rename anything on the strength of
-  the tracked registry's scheme alone.
+- **`hue_…` is the one family left out of step.** Its samples cycle as their identity and carry no `c`,
+  which every other cycling key now does. `hue_1` shows one colour at a time and would read `hue_1c`;
+  `hue_rot_3` shows three at once and would read `hue_3c`; `hue_pulse_2` shows one at a time and would
+  collide with `hue_1c`, so the family cannot be renamed by rule alone.
+- **The user has said it may want a rename and has not taken the decision.** Nothing is blocked on it —
+  every sample works under its current key.
 
 ---
 

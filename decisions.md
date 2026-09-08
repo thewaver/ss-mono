@@ -6701,6 +6701,68 @@ because its origin is the pointer's reflection and its radius is interpolated by
 the centre. `spot_flare_2` and `spot_flare_3` are both the photographic thing — a source, two streaks and a chain of
 ghosts along the axis through the centre — and what separates them is how many colours the chain draws on.
 
+### Cycling the timed gradients: which colour a stop takes, and why the transparent ones are concrete
+
+**The rule the user stated covers two arities, and one sentence covers the rest.** They specified that a
+`_1` cycles through primary, secondary and tertiary, and that in a `_1v1` the first colour travels between
+primary and secondary while the second travels between secondary and tertiary. Both fall out of a single
+statement: **each gradient element cycles from the colour it already painted, and where a sample draws more
+than one element the cycle is a two-colour ping-pong rather than the full palette.** A lone element has
+nobody to distinguish itself from, so it takes the whole palette; two elements starting on primary and
+secondary land on exactly the pairs the user named. It needs no table of arities, and it keeps a sample's
+identity intact: `snake_4c` alternates the way `snake_4` does, because its arms still start on the colours
+they started on and each takes the colour after its own.
+
+**`background` never enters a cycle.** Stated by the user. The palette is four colours and the fourth is the
+surface behind the sample, so the walk is primary → secondary → tertiary → primary.
+
+**The `elastic_…` samples changed in place rather than gaining a variant, and were renamed `…_1c`.** They
+painted a static three-stop ramp of the whole palette; they now paint one flat colour that cycles, which is
+`hue_1`'s treatment. The rainbow is gone rather than optional, and `elastic_circle_3` became
+`elastic_circle_1c` — the user's call on both.
+
+**The cycle rides the same clock as the motion, because every `animate` shares one duration.**
+`SVGAnimationUtils.createAnimateDefs` reads `animationDurationMs` for every element it stamps, so one sweep
+across the surface is one full colour pass. Composition is a fragment in the `custom` slot of
+`computeLinearGradient`, which is what `hue_rot_3` already did.
+
+**A transparent stop must cycle too, and this is the part that decided the implementation.** The samples
+spell a faded stop as `rgb(from ${color} r g b / 0)`, and a gradient ramp between a transparent stop and an
+opaque one interpolates the two colours **without premultiplying** — so the hue of a fully transparent stop
+is visible in the middle of the ramp. Measured in Chromium: a ramp from transparent yellow to opaque cyan
+samples `rgb(175 255 175)` at its midpoint where transparent-cyan-to-opaque-cyan samples `rgb(0 255 255)`.
+Leaving the faded stops on the starting hue while the opaque one cycled would therefore wash every band
+through a muddy green for most of the cycle.
+
+**SMIL cannot animate a relative colour, which is why `SVGDefsUtils.getTransparentColor` exists.** An
+`animate` on `stop-color` whose `values` are `rgb(from … r g b / 0)` is ignored outright — measured in
+Chromium, the stop sits on its attribute value for the whole duration while a hex-valued control interpolates
+normally. SMIL's colour parser predates CSS relative colour syntax and does not resolve `from`. Concrete
+forms all work: `rgba(r,g,b,a)`, `#rrggbbaa`, and the space-separated `rgb(r g b / a)` that
+`Color.RGBA.toCss` emits. So `getTransparentColor` resolves a hex palette colour to that concrete form and
+falls back to the relative spelling for anything that is not a hex — a non-hex colour then behaves exactly as
+it does in the non-cycling sibling, which is to say the faded stops hold still. The guard mirrors the one the
+tracked `c` variants already use around `Color.Hex.isHex`.
+
+**Only the `c` variants use it.** The samples that do not animate their colours keep the relative spelling,
+which reads better and works for any colour string.
+
+**The number counts the colours on screen at once, and `c` says they move — which is what the
+`elastic_…` rename settles.** The keys were first read as a problem: under _"A sample key is a sentence, and
+its number is a colour count"_ a `scan_1c` walking three colours looked like it wanted to be `scan_3c`. The
+user's answer was to take `elastic_circle_3` to `elastic_circle_1c`, and that fixes the reading — **the
+number is what a viewer sees at any one instant, not how many colours the sample passes through over its
+cycle.** A cycled sample shows one colour where it used to show a ramp of three, so `elastic_…` had to drop
+from three to one; and every other key is right as it stands, because cycling does not change how many
+colours are visible simultaneously. `scan_1c` shows one, `scan_1v1c` shows one per group, `snake_4c` keeps
+its four arms.
+
+**`hue_…` is the family still out of step, and it is the user's call.** Those samples cycle as their
+identity and carry no `c` — `hue_1` shows one colour at a time and should read `hue_1c`, `hue_rot_3` shows
+three at once and should read `hue_3c`, and `hue_pulse_2` shows one at a time, so a strict pass would collide
+it with `hue_1`. The user has said the family may want a rename and has not taken it yet. Do not rename them
+without them saying so.
+
 ### The bands leave the surface by travelling off it
 
 **The bands leave the surface by travelling off it, and nothing about them fades.** The first
