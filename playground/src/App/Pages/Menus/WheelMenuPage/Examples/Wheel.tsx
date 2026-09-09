@@ -41,6 +41,7 @@ export const WheelExample = (props: WheelMenuExampleProps) => {
                 items={() => props.items}
                 ariaLabel={"Edit actions"}
                 spreadDegrees={props.spreadDegrees}
+                opensOnHold={props.opensOnHold}
                 layoutDefs={props.layoutDefs}
                 placement={() => ({ x: "center", y: "center" })}
                 closerDefs={{

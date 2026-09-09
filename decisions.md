@@ -2532,30 +2532,62 @@ placement are the same four numbers, so the name can stay pointing at the new ty
 shape, because `insets` became `placements`. That is the `WheelUtils.getApothem` precedent applied as far as
 it goes and no further.
 
-### The arc reserves the whole turn or snaps to what it draws, and the sector had to say where its centre is
+### The band and the arc are two placers, and `fit` was the seam between them
 
-The user's call, after the rating arc reserved a square box and painted in the top half of it. Both behaviours
-are wanted: a popup centred on its invoker needs a box symmetric about the circle's centre, because that is
-what keeps a `WheelMenu`'s bands concentric with the button that opened them; a control sitting in a page's
-flow wants a box that hugs what is drawn.
+The user's call, arrived at from the rating arc. One factory had grown a `fit` of `"turn"` or `"content"`,
+and it was not a knob: it flipped the same function between two different contracts. A **band** states the
+size it needs in pixels and hands that size down, which is what lets a `WheelMenu`'s levels sit concentric
+inside one another — a nested band works out its inner radius from `parentWidth`, and that only means
+anything while the parent's width _is_ the band's diameter. A snapped box's width means something else, so
+snapping and nesting could never both be true. The repo already had names for the two natures, `SizedLayout`
+and `FittedLayoutFn`; `fit` was a runtime flag flipping between them.
 
-**`ArcDefs.fit` is `"turn"` or `"content"`, and `"turn"` is the default so nothing that existed moved.** A
-snapped arc computes the extent of what it draws — exactly, not by sampling: the extremes of an annulus
-sector are at its two ends or where an axis crosses it, so those are the only angles worth asking about, and
-the label boxes are thrown in because a label may reach past the rim it names. A whole turn snapped to its
-content is the same box it always was, give or take that overhang.
+**The line between the two is wedges against boxes, not a whole turn against part of one.** Every caller that
+asked to snap places plain boxes — the rating's stars, the stepper's steps, the toolbar's palette, the
+sortable's cards — and every caller that nests paints wedges of a band. Two of the four go all the way round
+and still belong on the arc's side, which is why the arc takes a spread up to a full turn rather than being
+the partial one by definition.
 
-**A sector carries the point it turns about.** Snapping moves the circle's centre off the middle of the box,
-and a painter is handed a `PlacementRect` rather than the layout — so a wedge drawn about the middle would be
-drawn about the wrong point. `PlacementSector.origin` is optional and `getSectorPath` prefers an explicit
-argument, then the sector's own, then the middle, so every painter that existed is untouched and a snapped one
-needs to know nothing. `PlacementLayout.origin` still exists and holds the same value: that one is what the
-picking measures directions from, and a layout sets both from the same number.
+**So `createBand` keeps the wedges and `createArc` is new.** `createRing` and `createHemisphere` are the
+band's two presets and are unchanged apart from the name they call. `fit` is gone, and with it the recorded
+fault that a snapped arc could not nest — there is nothing left to snap.
 
-**A snapped arc cannot nest, and nothing says so at the call site.** A concentric band derives its inner
-radius from `parentWidth`, which a snapped arc no longer reports as its diameter. It is recorded in
-`backlog.md` rather than guarded, because the snap exists for flat controls and the guard would have to be a
-runtime warning of the kind `Label` already decided against.
+**A sector still carries the point it turns about.** That came out of snapping and outlived it: a painter is
+handed a `PlacementRect` rather than the layout, so a wedge drawn about the middle of the box would be drawn
+about the wrong point whenever the box is not centred on the circle. `getSectorPath` prefers an explicit
+argument, then the sector's own, then the middle.
+
+### The arc is given a width and a height, and spaces its items along the curve
+
+The user's proposal: an arc that can be flattened or stretched sideways, rather than one that is always a
+piece of a circle. It takes `widthPx` and `heightPx`, so the same call draws a circle, a wide shallow sweep,
+or anything between.
+
+**Equal angles are equal distances on a circle and nowhere else.** On an ellipse a step of angle covers less
+ground near the narrow ends, so five stars bent across a wide flat arc would crowd at both tips and spread
+across the middle. The user chose even spacing along the curve over the cheaper alternative, which was to take
+a circle's positions and scale them sideways — that is an affine squash, and it produces exactly the crowding
+just described while making the flattening knob double as a spacing knob.
+
+**It is measured rather than solved, and that is the right trade.** There is no closed form for the angle at
+a given arc length on an ellipse. `toEvenArcAngles` walks the curve in five hundred chords, keeps a running
+total, and reads back the angle at which that total reaches each item's share. A circle comes out exactly
+even, which is the case that proves the walk is not introducing error of its own; flattened, what unevenness
+survives is a fraction of what equal angles leave, and the spec asserts that ratio rather than either number.
+
+**The item keeps the size it was given.** Stretching the curve must not stretch what sits on it — only the
+centres move, so a star stays a star on a flat arc.
+
+**A run between two items needs the curve, not a radius, so `PlacementLayout` gained `radii`.** `getLinkPath`
+drew a circular arc between two centres about an origin, which is right only while the curve is a circle;
+`Stepper`'s connectors would otherwise cut across a flattened arc rather than following it. The layout now
+says what curve its items sit on, `StepperConnectorDefs` carries it through to the painter, and `getLinkPath`
+emits an elliptical arc when it is given one and behaves exactly as before when it is not.
+
+**Whether the band should take two dimensions as well is open.** It is a smaller change than it looks —
+every wedge painter goes through `getSectorPath`, so only that function and the sector type would move — but
+a band of constant thickness round an ellipse is not the gap between two concentric ellipses, so the wedges
+would read as uneven in a way they never do on a circle.
 
 ### A hover the pointer did not cause no longer moves the highlight
 
@@ -2747,6 +2779,62 @@ example's spilled into the card's padding. `PageSortableRoom` gives that unit to
 rather than repeated per example. The alternative was to stop the surface reaching outside its own bounds and
 let the list's end room be the halo, which would have been a smaller rule and a different look; the look the
 user pointed at as correct was the one with the overhang.
+
+### Hold and flick: the wheel's fast path, and the three criteria that shaped it
+
+`Menu` gained `opensOnHold`. With it on, pressing the opener brings the menu up straight away, moving a short
+way in the direction of an item highlights that item, and letting go runs it — the pointer never travels as
+far as the thing it picks. It is `PlacementUtils.pickIndex`'s second caller, after `Sortable`'s drop
+targeting, and the one the abstract was originally named for — a layout has an inverse, and hit-testing is
+not it.
+
+**The gesture may only exist because the two ordinary routes still do, and that is a conformance requirement
+rather than a courtesy.** 2.5.1 Pointer Gestures asks that "all functionality that uses multipoint or
+path-based gestures for operation can be operated with a single pointer without a path-based gesture", and its
+understanding document names flicking in a straight line as exactly such a gesture. 2.5.7 Dragging Movements
+asks the same of anything "that uses a dragging movement for operation". Both are answered by the same thing:
+a press that never travels leaves the menu standing, so the wheel can be clicked open and then clicked
+through, with no path and no drag. 2.1.1 Keyboard is untouched — the walk was already there.
+
+**2.5.2 Pointer Cancellation is the one that shaped the gesture itself.** Opening on the press means the
+down-event is doing part of the work, so the "No Down-Event" clause is out, and the wheel is not essential
+either. What is left is "completion of the function is on the up-event, and a mechanism is available to abort
+the function before completion". So the pick lands on release and never before, and coming back toward the
+middle before letting go clears the choice and runs nothing. **The abort is a real branch of the code and has
+a spec of its own**, because it is what the conformance rests on: an implementation that lit a wedge and kept
+it lit while the pointer came home would look the same and fail.
+
+**The threshold is a share of the layout's own width, not a pixel count.** `FLICK_TRAVEL_RATIO` is 0.1, so a
+wheel measuring 296px across asks for about 30px of travel and a bigger wheel asks for proportionally more,
+which is right — a wider ring is a longer reach. Under the threshold nothing is picked and the highlight falls
+back to where opening put it, so the display and what release would do never disagree. **The number is a first
+guess and not a measurement**, unlike the tuned constants elsewhere in the repo.
+
+**The level owns the gesture, because the level is what owns the layout.** `Menu` detects the press and hands
+down the point it started from; `MenuLevel` converts client coordinates into layout space off the box of its
+own layout root — divide by the measured width, which cancels whatever scale `Viewport` has applied — and
+`PlacementUtils.pickIndex` does the rest. Nothing about the wheel appears in either: a layout declares its own
+`pickRule`, so an arrangement nobody has drawn yet is picked from by the same code.
+
+**`pickIndex` had a defect that only a layout with something in the middle could reveal.** An item placed on
+the origin has no direction to be aimed at, and `Math.atan2(0, 0)` is zero, so the wheel's centre X scored as
+though it pointed due east and won any flick that went that way. The guard the query point already had is now
+on the placements too: under the `"angle"` rule a placement sitting within `NO_DIRECTION_RADIUS` of the origin
+is passed over entirely. `Sortable` reached the same function first and never saw it, because a sortable ring
+puts nothing in its hole; hover, the other way an item is chosen, hit-tests and cannot see it either.
+
+**A press on an open menu is the ordinary close, and the click that ends a gesture is swallowed.** Opening on
+the down-event means the `click` that follows would otherwise toggle the menu straight back shut, so the press
+that opened it marks the next toggle spent. A second press, on a menu that is already open, arms nothing and
+lets the click through — which is how the opener still closes what it opened.
+
+**Flicking onward through a submenu is not built.** A flick that lands on an item with children opens that
+level on release, and the pointer is up by then, so reaching the band underneath means pressing again. Nothing
+opens a level mid-gesture, because nothing hovers during a flick.
+**Two callers now turn a client point into a layout point, and each does it by hand.** `Sortable` divides by
+the box's height and hands the share to `toLayoutPoint`; the flick divides by the box's width and skips it.
+The two agree, since a layout's height is its `heightRatio` of its width, but the conversion is stated twice
+and the abstract owns neither spelling.
 
 ### `Menu` submenus: a level per popup, focus moving between them
 

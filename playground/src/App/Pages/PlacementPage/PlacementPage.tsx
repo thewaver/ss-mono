@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import type { ArcDefs } from "@thewaver/ss-components";
+import type { BandDefs } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
@@ -45,7 +45,7 @@ export const PlacementPage = () => {
     const [getWedgeGapDegrees, setWedgeGapDegrees] = createSignal(STARTING_WEDGE_GAP_DEGREES);
     const [getLabelRadiusPercent, setLabelRadiusPercent] = createSignal(STARTING_LABEL_RADIUS_PERCENT);
 
-    const getLayoutDefs = createMemo<ArcDefs>(() => ({
+    const getLayoutDefs = createMemo<BandDefs>(() => ({
         holeRadiusPx: getHoleRadiusPx(),
         bandWidthPx: getBandWidthPx(),
         levelGapPx: getLevelGapPx(),

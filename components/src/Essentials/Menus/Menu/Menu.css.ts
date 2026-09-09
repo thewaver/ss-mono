@@ -22,6 +22,11 @@ export const menuTrigger = style({
     },
 });
 
+export const menuTriggerHoldable = style({
+    touchAction: "none",
+    userSelect: "none",
+});
+
 export const menuItem = style({
     width: "100%",
     cursor: "pointer",

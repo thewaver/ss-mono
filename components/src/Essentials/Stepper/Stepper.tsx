@@ -70,6 +70,7 @@ export const Stepper = <TValue, TState>(props: StepperProps<TValue, TState>) => 
             from: getPlacementAt(index),
             to: getPlacementAt(index + 1),
             origin: getLayout()?.origin,
+            radii: getLayout()?.radii,
         }));
 
     const renderControl = (getStep: Accessor<Step<TValue, TState>>, index: number) => {

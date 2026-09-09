@@ -31,6 +31,7 @@ export type PlacementLayout = {
     heightRatio: number;
     pickRule?: PlacementPickRule;
     origin?: Point2d;
+    radii?: Point2d;
 };
 
 export type PlacementLayoutDefs = {

@@ -8,6 +8,7 @@ import { InteractionTracker } from "../../../Abstracts/InteractionTracker/Intera
 import type { NavigatorOrientation } from "../../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { PlacementBox, PlacementItem } from "../../../Abstracts/Placement/Placement";
+import { PlacementUtils } from "../../../Abstracts/Placement/Placement.utils";
 import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
 import { Typeahead } from "../../../Abstracts/Typeahead/Typeahead";
 import { TypeaheadUtils } from "../../../Abstracts/Typeahead/Typeahead.utils";
@@ -47,14 +48,10 @@ const SUBMENU_OPEN_KEY = "ArrowRight";
 const SUBMENU_CLOSE_KEY = "ArrowLeft";
 const LEVEL_CLOSE_KEY = "Escape";
 const PLACED_ORIENTATION: NavigatorOrientation = "both";
+const PRIMARY_BUTTON = 0;
+const NO_WIDTH = 0;
+const FLICK_TRAVEL_RATIO = 0.1;
 
-/**
- * Where the pointer last moved to, in client space, for as long as the menu exists. A menu whose items are
- * laid out may cover its own opener, so the pointer can be sitting on an item without having gone there —
- * and the browser reports that as a fresh `mouseenter` the moment anything else changes the layout. Reading
- * the last real movement is what tells the two apart: an enter the pointer caused arrives before the move
- * that follows it, so its point differs from the one on record, while an enter nothing caused matches it.
- */
 const createPointerPointReader = () => {
     let point: Point2d | undefined;
 
@@ -82,11 +79,17 @@ const MenuTrigger = (props: MenuTriggerProps) => {
             ref={(element) => props.ref?.(element)}
             type="button"
             class={styles.menuTrigger}
+            classList={{ [styles.menuTriggerHoldable]: access(props.isHoldable) }}
             aria-haspopup="menu"
             aria-label={getAriaLabel()}
             aria-disabled={getIsDisabled() || undefined}
             aria-expanded={access(props.flags).isOpen}
             aria-controls={access(props.flags).isOpen ? access(props.menuId) : undefined}
+            onPointerDown={(e) => {
+                if (getIsDisabled()) return;
+
+                props.onPress(e);
+            }}
             onClick={() => {
                 if (getIsDisabled()) return;
 
@@ -151,6 +154,7 @@ const MenuItemView = (props: MenuItemViewProps) => {
 const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     const [getHighlightedValue, setHighlightedValue] = createSignal<T | undefined>();
     const [getOpenValue, setOpenValue] = createSignal<T | undefined>();
+    const [getLayoutRootRef, setLayoutRootRef] = createSignal<HTMLElement>();
 
     const typeahead = Typeahead.createBuffer();
 
@@ -248,6 +252,41 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         );
     };
 
+    const toLayoutPoint = (point: Point2d) => {
+        const box = getLayoutRootRef()?.getBoundingClientRect();
+
+        if (box === undefined || box.width <= NO_WIDTH) return undefined;
+
+        return { x: (point.x - box.left) / box.width, y: (point.y - box.top) / box.width };
+    };
+
+    const pickFlickIndex = (point: Point2d) => {
+        const layout = getLayout();
+        const origin = access(props.flickOrigin);
+
+        if (layout === undefined || origin === undefined) return undefined;
+
+        const from = toLayoutPoint(origin);
+        const to = toLayoutPoint(point);
+
+        if (from === undefined || to === undefined) return undefined;
+        if (PlacementUtils.getDistance(from, to) < FLICK_TRAVEL_RATIO) return undefined;
+
+        return PlacementUtils.pickIndex({
+            layout,
+            point: to,
+            isPickable: (index) => getNavigableIndexes().includes(index),
+        });
+    };
+
+    const flickTo = (point: Point2d) => {
+        const index = pickFlickIndex(point);
+
+        setHighlightedValue(() => (index === undefined ? undefined : getEntries()[index].value));
+
+        return index;
+    };
+
     const hoverIndex = (index: number, e: MouseEvent) => {
         if (!getNavigableIndexes().includes(index)) return;
         if (!getIsPointerLed(e)) return;
@@ -284,6 +323,39 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 
         setHighlightedValue(() => undefined);
         setOpenValue(() => undefined);
+    });
+
+    createEffect(() => {
+        if (access(props.flickOrigin) === undefined) return;
+
+        const toPoint = (e: PointerEvent) => ({ x: e.clientX, y: e.clientY });
+
+        const handleMove = (e: PointerEvent) => {
+            flickTo(toPoint(e));
+        };
+
+        const handleUp = (e: PointerEvent) => {
+            const index = flickTo(toPoint(e));
+
+            props.onFlickEnd?.();
+
+            if (index !== undefined) activateIndex(index);
+        };
+
+        const handleCancel = () => {
+            setHighlightedValue(() => undefined);
+            props.onFlickEnd?.();
+        };
+
+        document.addEventListener("pointermove", handleMove, { passive: true });
+        document.addEventListener("pointerup", handleUp);
+        document.addEventListener("pointercancel", handleCancel);
+
+        onCleanup(() => {
+            document.removeEventListener("pointermove", handleMove);
+            document.removeEventListener("pointerup", handleUp);
+            document.removeEventListener("pointercancel", handleCancel);
+        });
     });
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -483,7 +555,11 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 
     const renderItems = () => (
         <Show when={getLayout()} fallback={renderRuns()}>
-            {(getResolved) => <PlacementBox layout={getResolved}>{renderRuns()}</PlacementBox>}
+            {(getResolved) => (
+                <PlacementBox layout={getResolved} ref={setLayoutRootRef}>
+                    {renderRuns()}
+                </PlacementBox>
+            )}
         </Show>
     );
 
@@ -526,8 +602,13 @@ export const Menu = <T,>(props: MenuProps<T>) => {
     const [getTriggerRef, setTriggerRef] = createSignal<HTMLElement>();
     const [getIsOpen, setIsOpen] = SignalMirror.createOptional(() => props.visibilitySignal, false);
     const [getInitialHighlightPosition, setInitialHighlightPosition] = createSignal<MenuHighlightPosition>("first");
+    const [getFlickOrigin, setFlickOrigin] = createSignal<Point2d | undefined>();
+
+    let isTogglePrevented = false;
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
+
+    const getIsHoldable = createMemo(() => access(props.opensOnHold) ?? false);
 
     const getTriggerId = createMemo(() => access(props.id) ?? fallbackTriggerId);
 
@@ -545,6 +626,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
 
     const close = () => {
         setIsOpen(false);
+        setFlickOrigin(() => undefined);
     };
 
     const getCheckedValues = createMemo(() => props.checkedSignal?.[0]() ?? EMPTY_CHECKED);
@@ -568,6 +650,26 @@ export const Menu = <T,>(props: MenuProps<T>) => {
         props.onActivate(item.value);
 
         if (kind !== "checkbox") close();
+    };
+
+    const handleTriggerPress = (e: PointerEvent) => {
+        if (!getIsHoldable() || e.button !== PRIMARY_BUTTON || getIsOpen()) return;
+
+        isTogglePrevented = true;
+
+        open("first");
+        setFlickOrigin(() => ({ x: e.clientX, y: e.clientY }));
+    };
+
+    const handleTriggerToggle = () => {
+        if (isTogglePrevented) {
+            isTogglePrevented = false;
+
+            return;
+        }
+
+        if (getIsOpen()) close();
+        else open("first");
     };
 
     createEffect(() => {
@@ -603,7 +705,9 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         menuId={() => menuId}
                         flags={getFlags}
                         renderContent={props.renderContent}
-                        onToggle={() => (getIsOpen() ? close() : open("first"))}
+                        isHoldable={getIsHoldable}
+                        onToggle={handleTriggerToggle}
+                        onPress={handleTriggerPress}
                         onKeyDown={handleTriggerKeyDown}
                     />
 
@@ -630,9 +734,11 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         computeLayout={props.computeLayout}
                         computeCustomText={props.computeCustomText}
                         getPointerPoint={getPointerPoint}
+                        flickOrigin={getFlickOrigin}
                         renderItem={props.renderItem}
                         renderPopup={props.renderPopup}
                         onPick={pick}
+                        onFlickEnd={() => setFlickOrigin(() => undefined)}
                         onClose={close}
                         onDismiss={close}
                     />

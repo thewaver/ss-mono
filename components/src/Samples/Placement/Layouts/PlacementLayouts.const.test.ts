@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { createHemisphere, createHoneycomb, createRing, ring } from "./PlacementLayouts.const";
+import { createArc, createHemisphere, createHoneycomb, createRing, ring } from "./PlacementLayouts.const";
 import type { SizedLayout } from "./PlacementLayouts.types";
 
 const ITEM_COUNT = 5;
@@ -52,58 +52,83 @@ describe("createHemisphere", () => {
     });
 });
 
-describe("arc fit", () => {
-    /**
-     * A band round a whole turn fills the square it is given, so there is nothing to snap and both fits
-     * agree. Half a turn draws in the top half only, and what the two fits disagree about is whether the
-     * empty half is reserved — which matters the moment an arc sits in a page's flow rather than floating
-     * over it as a popup.
-     */
-    it("reserves the whole turn by default and snaps to what is drawn when asked", () => {
-        const reserved = createHemisphere()(ROOT);
-        const snapped = createHemisphere({ fit: "content" })(ROOT);
+describe("createArc", () => {
+    const CIRCLE = { widthPx: 200, heightPx: 200, spreadDegrees: 180, itemWidthPx: 20, itemHeightPx: 20 };
+    const FLAT = { ...CIRCLE, heightPx: 80 };
 
-        expect(reserved.heightRatio, "a reserved arc is as tall as it is wide, drawn or not").toBeCloseTo(1);
+    /**
+     * The distance between neighbours, measured straight across rather than along the curve. Even spacing
+     * along an arc does not make these exactly equal — a chord cuts the corner, and it cuts more where the
+     * curve bends harder — so what a spec can ask of them is that they stay close to one another, which is
+     * the thing that fails outright when items are placed at equal angles on an ellipse.
+     */
+    const stepsOf = (layout: SizedLayout) =>
+        layout.placements.slice(1).map((placement, index) => {
+            const previous = layout.placements[index];
+
+            return Math.hypot(placement.left - previous.left, placement.top - previous.top);
+        });
+
+    const spread = (values: number[]) => Math.max(...values) / Math.min(...values);
+
+    /**
+     * Placing five items at equal angles on the same flattened ellipse is the fault the even spacing exists
+     * to avoid, so it is built here and measured beside the real thing rather than described. Neither number
+     * is pinned: what is asserted is that one stays far steadier than the other once the curve is stretched,
+     * and that on a circle — where the two approaches agree exactly — it comes out perfect.
+     */
+    const evenAngleSteps = (radiusX: number, radiusY: number) => {
+        const points = Array.from({ length: ITEM_COUNT }, (_unused, index) => {
+            const radians = (-180 + (180 * index) / (ITEM_COUNT - 1)) / (180 / Math.PI);
+
+            return { x: Math.cos(radians) * radiusX, y: Math.sin(radians) * radiusY };
+        });
+
+        return points.slice(1).map((point, index) => Math.hypot(point.x - points[index].x, point.y - points[index].y));
+    };
+
+    it("spaces items evenly along the curve, which equal angles only manage on a circle", () => {
+        expect(spread(stepsOf(createArc(CIRCLE)(ROOT))), "a circle comes out exactly even").toBeCloseTo(1);
         expect(
-            snapped.heightRatio * 2,
-            "a snapped half turn keeps the half it draws in and gives back the other",
-        ).toBeCloseTo(reserved.heightRatio);
-        expect(snapped.width, "the width is untouched, a half turn being as wide as a whole one").toBeCloseTo(
-            reserved.width,
+            spread(evenAngleSteps(CIRCLE.widthPx / 2, CIRCLE.heightPx / 2)),
+            "and equal angles agree with it there, which is why the fault hides until something is stretched",
+        ).toBeCloseTo(1);
+
+        const unevenness = (values: number[]) => spread(values) - 1;
+
+        expect(
+            unevenness(stepsOf(createArc(FLAT)(ROOT))),
+            "flattened, what unevenness is left is a small fraction of what equal angles would leave",
+        ).toBeLessThan(unevenness(evenAngleSteps(FLAT.widthPx / 2, FLAT.heightPx / 2)) / 5);
+    });
+
+    it("stretches only the curve, never the items on it", () => {
+        const round = createArc(CIRCLE)(ROOT);
+        const flat = createArc(FLAT)(ROOT);
+
+        expect(flat.heightRatio, "a flattened arc is a shallower box").toBeLessThan(round.heightRatio);
+        expect(
+            flat.placements[0].height * flat.width,
+            "while an item keeps the size it was given, in pixels",
+        ).toBeCloseTo(round.placements[0].height * round.width);
+    });
+
+    it("hands a painter the curve rather than a radius, so a run between two items can follow it", () => {
+        const flat = createArc(FLAT)(ROOT);
+
+        expect(flat.radii!.x / flat.radii!.y, "the two axes are as far apart as the arc was asked to be").toBeCloseTo(
+            FLAT.widthPx / FLAT.heightPx,
         );
     });
 
-    it("gives a whole turn back nothing in height, there being no unused half to reclaim", () => {
-        const reserved = createRing()(ROOT);
-        const snapped = createRing({ fit: "content" })(ROOT);
+    it("puts the first item straight up when it closes, and centres the run on straight up when it does not", () => {
+        const closed = createArc({ ...CIRCLE, spreadDegrees: 360 })(ROOT);
+        const open = createArc(CIRCLE)(ROOT);
 
-        expect(snapped.heightRatio * snapped.width, "a ring is as tall as the band is across").toBeCloseTo(
-            reserved.width,
-        );
-        expect(snapped.width, "and no narrower, since a label may reach past the rim it names").toBeGreaterThanOrEqual(
-            reserved.width,
-        );
-    });
-
-    /**
-     * Snapping moves the centre of the circle away from the middle of the box, so a wedge drawn about the
-     * middle would be wrong. The sector carries the point it turns about for exactly that reason, and this
-     * asks whether the two fits report different ones rather than what either of them is.
-     */
-    it("tells a painter where the circle went, since a snapped box no longer has it in the middle", () => {
-        const reserved = createHemisphere()(ROOT);
-        const snapped = createHemisphere({ fit: "content" })(ROOT);
-
-        expect(
-            snapped.origin!.y,
-            "both measure the centre from the same edge in the same units, so the number is the same",
-        ).toBeCloseTo(reserved.origin!.y);
-        expect(
-            snapped.origin!.y / snapped.heightRatio,
-            "so as a share of the box's own height the centre has moved down",
-        ).toBeGreaterThan(reserved.origin!.y / reserved.heightRatio);
-        expect(snapped.placements[0].sector!.origin, "and the sector says the same, for a painter").toEqual(
-            snapped.origin,
+        expect(closed.placements[0].left, "twelve o'clock is straight above the centre").toBeCloseTo(closed.origin!.x);
+        expect(closed.placements[0].top).toBeLessThan(closed.origin!.y);
+        expect(open.placements[0].left - open.origin!.x, "and an open run is symmetrical about it").toBeCloseTo(
+            -(open.placements[ITEM_COUNT - 1].left - open.origin!.x),
         );
     });
 });

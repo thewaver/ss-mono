@@ -1,6 +1,6 @@
 import { For } from "solid-js";
 
-import { Radio, RadioGroup, createHemisphere } from "@thewaver/ss-components";
+import { Radio, RadioGroup, createArc } from "@thewaver/ss-components";
 import type { ArcDefs } from "@thewaver/ss-components";
 
 import { PageRadioStarCell, PageRadioStarContent } from "../../../StyledComponents/RadioStarContent/RadioStarContent";
@@ -8,9 +8,9 @@ import type { RadioRatingExampleProps } from "../RadioPage.types";
 
 const RATING_OPTIONS = [1, 2, 3, 4, 5];
 
-const ARC_DEFS: ArcDefs = { fit: "content", holeRadiusPx: 72, bandWidthPx: 44, labelMaxWidthRatio: 0.75 };
+const ARC_DEFS: ArcDefs = { widthPx: 300, heightPx: 116, spreadDegrees: 160, itemWidthPx: 33, itemHeightPx: 36 };
 
-const ARC_LAYOUT = createHemisphere(ARC_DEFS);
+const ARC_LAYOUT = createArc(ARC_DEFS);
 
 type Props = RadioRatingExampleProps;
 

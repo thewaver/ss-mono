@@ -1,4 +1,4 @@
-import { Stepper, createHemisphere } from "@thewaver/ss-components";
+import { Stepper, createArc } from "@thewaver/ss-components";
 import type { ArcDefs } from "@thewaver/ss-components";
 
 import {
@@ -9,9 +9,9 @@ import {
 import { LABELS, ORDER } from "../StepperPage.const";
 import type { StepperExampleProps } from "../StepperPage.types";
 
-const ARC_DEFS: ArcDefs = { fit: "content", holeRadiusPx: 170, bandWidthPx: 64, labelMaxWidthRatio: 1.9 };
+const ARC_DEFS: ArcDefs = { widthPx: 404, heightPx: 404, spreadDegrees: 135, itemWidthPx: 122, itemHeightPx: 51 };
 
-const ARC_LAYOUT = createHemisphere(ARC_DEFS);
+const ARC_LAYOUT = createArc(ARC_DEFS);
 
 type Props = StepperExampleProps;
 

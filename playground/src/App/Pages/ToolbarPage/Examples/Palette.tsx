@@ -1,4 +1,4 @@
-import { Toolbar, createRing } from "@thewaver/ss-components";
+import { Toolbar, createArc } from "@thewaver/ss-components";
 import type { ArcDefs, ToolbarAction } from "@thewaver/ss-components";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
@@ -17,9 +17,9 @@ const ACTIONS: ToolbarAction<string>[] = [
     { value: "Zoom" },
 ];
 
-const PALETTE_DEFS: ArcDefs = { fit: "content", holeRadiusPx: 110, bandWidthPx: 68, labelMaxWidthRatio: 1.5 };
+const PALETTE_DEFS: ArcDefs = { widthPx: 288, heightPx: 288, spreadDegrees: 360, itemWidthPx: 102, itemHeightPx: 48 };
 
-const PALETTE_LAYOUT = createRing(PALETTE_DEFS);
+const PALETTE_LAYOUT = createArc(PALETTE_DEFS);
 
 type Props = ToolbarExampleProps;
 

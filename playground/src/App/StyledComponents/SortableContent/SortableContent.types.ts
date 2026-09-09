@@ -9,6 +9,7 @@ import type {
 export type SortableItemContentProps = AccessorProps<{
     flags: InteractionFlags<SortableItemFlags>;
     detail?: string;
+    isCentred?: boolean;
 }>;
 
 export type SortableSurfaceProps = AccessorProps<{

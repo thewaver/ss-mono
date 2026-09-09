@@ -1,4 +1,4 @@
-import type { AccessorProps, ArcDefs, WheelMenuItem } from "@thewaver/ss-components";
+import type { AccessorProps, BandDefs, WheelMenuItem } from "@thewaver/ss-components";
 
 export type WheelAction = {
     name: string;
@@ -8,8 +8,9 @@ export type WheelAction = {
 export type WheelMenuExampleProps = AccessorProps<{
     caption: string;
     spreadDegrees?: number;
+    opensOnHold?: boolean;
 }> & {
     items: WheelMenuItem<WheelAction>[];
-    layoutDefs?: ArcDefs;
+    layoutDefs?: BandDefs;
     onActivate: (action: WheelAction) => void;
 };

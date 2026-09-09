@@ -47,7 +47,7 @@ export const PageStepArcConnector = (props: StepArcConnectorProps) => {
 
         return defs.from === undefined || defs.to === undefined
             ? undefined
-            : PlacementUtils.getLinkPath(defs.from, defs.to, defs.origin);
+            : PlacementUtils.getLinkPath(defs.from, defs.to, defs.origin, defs.radii);
     };
 
     return (

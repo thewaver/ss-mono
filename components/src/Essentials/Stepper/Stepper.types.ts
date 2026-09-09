@@ -28,6 +28,7 @@ export type StepperConnectorDefs = {
     from?: PlacementRect;
     to?: PlacementRect;
     origin?: Point2d;
+    radii?: Point2d;
 };
 
 export type StepperItemProps<TValue, TState> = AccessorProps<Omit<InteractionControlProps<StepperFlags>, "id">> & {

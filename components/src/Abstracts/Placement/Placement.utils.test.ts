@@ -79,6 +79,18 @@ describe("pickIndex, by angle", () => {
         expect(pick(0.5, 0.5)).toBeUndefined();
     });
 
+    it("passes over an item sitting on the origin, because it is the one place with no direction to aim at", () => {
+        const withCentre: PlacementLayout = {
+            ...RING,
+            placements: [...RING.placements, { left: 0.5, top: 0.5, width: 0.4, height: 0.4 }],
+        };
+        const pickWithCentre = (x: number, y: number) =>
+            PlacementUtils.pickIndex({ layout: withCentre, point: { x, y } });
+
+        expect(pickWithCentre(0.9, 0.5), "aimed straight at the three o'clock item").toBe(1);
+        expect(pickWithCentre(0.7, 0.48), "and just off it, where a centre item scoring zero would have won").toBe(1);
+    });
+
     it("skips what it was told is not pickable, rather than picking it and being refused later", () => {
         const picked = PlacementUtils.pickIndex({
             layout: RING,

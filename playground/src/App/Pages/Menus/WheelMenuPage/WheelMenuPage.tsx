@@ -53,6 +53,7 @@ export const WheelMenuPage = () => {
     const [getLastHalfNestedAction, setLastHalfNestedAction] = createSignal(NOTHING_RUN);
     const [getLastTunedAction, setLastTunedAction] = createSignal(NOTHING_RUN);
     const [getLastWeightedAction, setLastWeightedAction] = createSignal(NOTHING_RUN);
+    const [getLastFlickedAction, setLastFlickedAction] = createSignal(NOTHING_RUN);
 
     const getExamples = createMemo(() => [
         {
@@ -119,6 +120,21 @@ export const WheelMenuPage = () => {
                     caption={"Wheel"}
                     items={WEIGHTED_ACTIONS}
                     onActivate={(action) => setLastWeightedAction(action.name)}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Wheel.tsx`,
+        },
+        {
+            key: "flick",
+            name: "Hold and flick",
+            readout: () =>
+                `${getLastFlickedAction()} — press and hold the button, move a short way toward a wedge and let go; coming back to the middle before letting go picks nothing, and a plain click leaves the wheel open to be clicked through instead`,
+            component: () => (
+                <WheelExample
+                    caption={"Hold"}
+                    items={ACTIONS}
+                    opensOnHold={true}
+                    onActivate={(action) => setLastFlickedAction(action.name)}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Wheel.tsx`,

@@ -57,7 +57,7 @@ reading.
 23. `GlassSurface` — what is built and what is not — _open_
 24. Renaming the `hue_…` family — _open_
 25. Per-sample defs as a discriminated union, and knobs that follow the key — _open_
-26. Arbitrary placement across controls, and the picking that has to come with it — _open, in progress_
+26. Arbitrary placement across controls, and the picking that has to come with it — _open_
 
 ### Build order
 
@@ -1106,17 +1106,18 @@ Eight controls take an optional `computeLayout` and are unchanged without one: `
 _"Arbitrary item placement"_, _"Concentric submenus"_, _"A wheel of wedges"_, _"The wheel as the ring's second
 consumer"_, _"`WheelMenu`: the wheel becomes a component"_, _"`Paginator` takes a layout"_, _"`RadioGroup` and
 `Tabs` take a layout too"_, _"Every layout sample lives in one place"_, _"`Formation` is the abstract's"_,
-_"The arc reserves the whole turn or snaps to what it draws"_, _"A hover the pointer did not cause"_, _"A
-placed menu walks on all four arrows"_, _"A group's radios are ordered by the document"_ and _"Five more
-controls take a layout"_.
+_"The band and the arc are two placers"_, _"The arc is given a width and a height"_, _"A hover the pointer
+did not cause"_, _"A
+placed menu walks on all four arrows"_, _"A group's radios are ordered by the document"_, _"Five more
+controls take a layout"_ and _"Hold and flick"_.
 
-### What is left
-
-- **The hold-and-flick gesture, with the click-open mode underneath it.** The fast path: hold, flick toward a
-  wedge, release, with the pointer never travelling to the item. It ships with the click-open mode because a
-  flick is a path-based gesture and 2.5.1 Pointer Gestures (A) requires a single-pointer alternative without a
-  path, while 2.1.1 Keyboard (A) requires the keyboard route regardless — and that mode is also the ordinary
-  mouse route, so nothing is built purely for compliance.
+The hold-and-flick gesture is built, as `Menu`'s `opensOnHold`: the press opens the menu, a short move in an
+item's direction highlights it, and release runs it, with the pointer never travelling as far as the thing it
+picks. It ships with the click-open mode underneath it and the keyboard walk beside it, which is what 2.5.1
+Pointer Gestures and 2.5.7 Dragging Movements require of a path-based, dragging gesture; and the pick lands on
+release with a return toward the middle aborting it, which is the clause of 2.5.2 Pointer Cancellation that a
+menu opening on the down-event is left with. It is the first caller `PlacementUtils.pickIndex` has had, which
+is what turned up the origin-placed item it scored as pointing due east.
 
 ### Faults the proving pass found and left open
 
@@ -1135,10 +1136,6 @@ controls take a layout"_.
 - **`Stepper` ignores `renderBody` when it is laid out.** A step's body is a panel beside a vertical
   connector, and a curve has nowhere to put one, so the placed path drops it without saying so. A prop that
   quietly does nothing is worse than one that is refused.
-- **A snapped arc cannot nest, and nothing says so at the call site.** `fit: "content"` makes the box's width
-  stop being the band's diameter, and a concentric band derives its inner radius from exactly that
-  `parentWidth`. So the snap is for flat controls, and a `WheelMenu` given one would draw its second band in
-  the wrong place.
 - **`Tree` has no connector slot, so a radial tree's structure reads only from the angles.** A child sits
   inside the angular slice its parent was given, which is enough to see but not enough to state. `Stepper` now
   has both the slot and the geometry — `PlacementUtils.getLinkPath` — so the work is small; what it costs is
@@ -1146,6 +1143,10 @@ controls take a layout"_.
 
 ### Loose ends left deliberately, recorded at the user's request
 
+- **The flick's travel threshold is a guess, not a measurement.** `FLICK_TRAVEL_RATIO` is 0.1 of the layout's
+  own width — about 30px on the demo wheel, and proportionally more on a bigger one. It reads well enough to
+  build on, but every other tuned constant in the repo is the user's, backed by something they measured, and
+  this one is not.
 - **The first item is highlighted the moment a menu opens**, before the pointer touches anything. Standard menu
   behaviour and `aria-activedescendant` has to point somewhere, but on a wheel it means something looks chosen
   while the pointer is still on the opener. The user raised it; suppressing the visual highlight until the

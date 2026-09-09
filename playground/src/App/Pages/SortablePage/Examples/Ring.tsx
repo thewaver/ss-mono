@@ -1,6 +1,6 @@
 import type { Accessor, Signal } from "solid-js";
 
-import { Sortable, createRing } from "@thewaver/ss-components";
+import { Sortable, createArc } from "@thewaver/ss-components";
 import type { ArcDefs, InteractionFlags, SortableItem, SortableItemFlags } from "@thewaver/ss-components";
 
 import {
@@ -11,14 +11,14 @@ import {
 import { LIST_GAP, computeCardKey, computeCardLabel } from "../SortablePage.const";
 import type { Card } from "../SortablePage.types";
 
-const RING_DEFS: ArcDefs = { fit: "content", holeRadiusPx: 118, bandWidthPx: 88, labelMaxWidthRatio: 2.4 };
+const RING_DEFS: ArcDefs = { widthPx: 324, heightPx: 324, spreadDegrees: 360, itemWidthPx: 211, itemHeightPx: 62 };
 
-const RING_LAYOUT = createRing(RING_DEFS);
+const RING_LAYOUT = createArc(RING_DEFS);
 
 const RESTING_FLAGS: InteractionFlags<SortableItemFlags> = { isCarried: false, isLandingBefore: false };
 
 const renderCard = (getItem: Accessor<SortableItem<Card>>, getFlags: () => InteractionFlags<SortableItemFlags>) => (
-    <PageSortableItemContent flags={getFlags} detail={() => `${getItem().value.cost}`}>
+    <PageSortableItemContent flags={getFlags} detail={() => `${getItem().value.cost}`} isCentred={true}>
         {getItem().value.name}
     </PageSortableItemContent>
 );

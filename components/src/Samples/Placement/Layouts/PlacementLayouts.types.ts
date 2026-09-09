@@ -15,10 +15,7 @@ export type SizedLayoutFn = (defs: PlacementLayoutDefs) => SizedLayout;
 
 export type FittedLayoutFn = PlacementLayoutFn;
 
-export type ArcFit = "turn" | "content";
-
-export type ArcDefs = {
-    fit?: ArcFit;
+export type BandDefs = {
     holeRadiusPx?: number;
     bandWidthPx?: number;
     levelGapPx?: number;
@@ -30,6 +27,14 @@ export type ArcDefs = {
     labelHeightRatio?: number;
     labelMaxWidthRatio?: number;
     computeItemArcs?: (path: number[]) => (number | undefined)[];
+};
+
+export type ArcDefs = {
+    widthPx?: number;
+    heightPx?: number;
+    spreadDegrees?: number;
+    itemWidthPx?: number;
+    itemHeightPx?: number;
 };
 
 export type FanDefs = {

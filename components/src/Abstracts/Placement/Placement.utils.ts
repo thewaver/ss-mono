@@ -155,21 +155,22 @@ export namespace PlacementUtils {
      * default; given the point the two turn about, it bends along the arc they sit on instead, which is
      * what keeps a chain of steps on a curve from being drawn as a chain of chords.
      */
-    export const getLinkPath = (from: PlacementRect, to: PlacementRect, origin?: Point2d) => {
+    export const getLinkPath = (from: PlacementRect, to: PlacementRect, origin?: Point2d, radii?: Point2d) => {
         const start = getCentre(from);
         const end = getCentre(to);
         const move = `M ${start.x} ${start.y}`;
 
         if (origin === undefined) return `${move} L ${end.x} ${end.y}`;
 
-        const radius = getDistance(origin, start);
+        const radiusX = radii?.x ?? getDistance(origin, start);
+        const radiusY = radii?.y ?? radiusX;
         const turned = getAngle(origin, end) - getAngle(origin, start);
         const wrapped = ((turned % FULL_TURN_DEGREES) + FULL_TURN_DEGREES) % FULL_TURN_DEGREES;
         const isClockwise = wrapped <= HALF_TURN_DEGREES;
         const sweep = isClockwise ? CLOCKWISE : COUNTER_CLOCKWISE;
         const arc = isClockwise ? wrapped : FULL_TURN_DEGREES - wrapped;
 
-        return `${move} A ${radius} ${radius} 0 ${arc > HALF_TURN_DEGREES ? LARGE_ARC : SMALL_ARC} ${sweep} ${end.x} ${end.y}`;
+        return `${move} A ${radiusX} ${radiusY} 0 ${arc > HALF_TURN_DEGREES ? LARGE_ARC : SMALL_ARC} ${sweep} ${end.x} ${end.y}`;
     };
 
     export const getAngle = toAngle;
@@ -256,6 +257,9 @@ export namespace PlacementUtils {
             if (!isPickable(index)) continue;
 
             const centre = getCentre(placements[index]);
+
+            if (rule === "angle" && getDistance(centre, origin) < NO_DIRECTION_RADIUS) continue;
+
             const score =
                 rule === "angle"
                     ? getAngleDelta(getAngle(origin, defs.point), getAngle(origin, centre))

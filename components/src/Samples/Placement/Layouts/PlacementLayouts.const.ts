@@ -1,7 +1,7 @@
 import type { PlacementRect } from "../../../Abstracts/Placement/Placement.types";
 import type {
     ArcDefs,
-    ArcFit,
+    BandDefs,
     FanDefs,
     FittedLayoutFn,
     HoneycombDefs,
@@ -23,12 +23,10 @@ const NO_PARENT_WIDTH = 0;
 const UPWARD_DEGREES = -90;
 const FULL_SHARE = 1;
 const AXIS_DEGREES = [-360, -270, -180, -90, 0, 90, 180, 270, 360];
-const DEFAULT_ARC_FIT: ArcFit = "turn";
 
-type ArcBase = Required<Omit<ArcDefs, "centreRadiusPx" | "computeItemArcs">> & Pick<ArcDefs, "centreRadiusPx">;
+type BandBase = Required<Omit<BandDefs, "centreRadiusPx" | "computeItemArcs">> & Pick<BandDefs, "centreRadiusPx">;
 
-const RING_BASE: ArcBase = {
-    fit: DEFAULT_ARC_FIT,
+const RING_BASE: BandBase = {
     holeRadiusPx: 64,
     bandWidthPx: 84,
     levelGapPx: 8,
@@ -40,7 +38,7 @@ const RING_BASE: ArcBase = {
     labelMaxWidthRatio: 1.6,
 };
 
-const HEMISPHERE_BASE: ArcBase = {
+const HEMISPHERE_BASE: BandBase = {
     ...RING_BASE,
     holeRadiusPx: 110,
     bandWidthPx: 110,
@@ -63,6 +61,13 @@ const HEX_HEIGHT_RATIO = 2 / Math.sqrt(3);
 const HEX_ROW_STEP_RATIO = 0.75;
 const EVEN_ROW = 0;
 const ROW_PARITY = 2;
+const ARC_WIDTH_PX = 320;
+const ARC_HEIGHT_PX = 320;
+const ARC_SPREAD_DEGREES = 180;
+const ARC_ITEM_WIDTH_PX = 96;
+const ARC_ITEM_HEIGHT_PX = 40;
+const ARC_SAMPLES = 512;
+
 const HEX_CLIP_PATH = "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)";
 
 const toArc = (itemCount: number, radius: number, spreadDegrees: number, from: number): number[] => {
@@ -118,17 +123,11 @@ const toTurnExtent = (outerRadius: number): ArcExtent => ({
 });
 
 /**
- * The extremes of an annulus sector are reached either at one of its two ends, at whichever radius is
- * further out in that direction, or where an axis crosses the arc — so those are the only angles worth
- * asking about, and the answer is exact rather than sampled.
+ * The extremes of an elliptical arc are reached either at one of its two ends or where an axis crosses it,
+ * so those are the only angles worth asking about and the answer is exact rather than sampled. The boxes
+ * placed along it are thrown in because an item overhangs the curve it sits on.
  */
-const toContentExtent = (
-    boxes: ArcBox[],
-    fromAngle: number,
-    toAngle: number,
-    innerRadius: number,
-    outerRadius: number,
-): ArcExtent => {
+const toArcExtent = (boxes: ArcBox[], fromAngle: number, toAngle: number, radiusX: number, radiusY: number) => {
     const angles = [fromAngle, toAngle, ...AXIS_DEGREES.filter((angle) => angle > fromAngle && angle < toAngle)];
     const xs: number[] = [];
     const ys: number[] = [];
@@ -136,10 +135,8 @@ const toContentExtent = (
     for (const angle of angles) {
         const radians = angle / DEGREES_PER_RADIAN;
 
-        for (const radius of [innerRadius, outerRadius]) {
-            xs.push(Math.cos(radians) * radius);
-            ys.push(Math.sin(radians) * radius);
-        }
+        xs.push(Math.cos(radians) * radiusX);
+        ys.push(Math.sin(radians) * radiusY);
     }
 
     for (const box of boxes) {
@@ -155,7 +152,62 @@ const toContentExtent = (
     };
 };
 
-export const createArc = (spreadDegrees: number, defs?: ArcDefs): SizedLayoutFn => {
+const toEllipsePoint = (radiusX: number, radiusY: number, degrees: number) => {
+    const radians = degrees / DEGREES_PER_RADIAN;
+
+    return { x: Math.cos(radians) * radiusX, y: Math.sin(radians) * radiusY };
+};
+
+/**
+ * Equal steps of angle are equal steps of distance on a circle and nowhere else: on an ellipse they crowd
+ * toward the narrow ends, so a rating bent across a wide flat arc would bunch at both tips. This walks the
+ * curve in small chords, keeps a running total of how far along each sample is, and then reads back the
+ * angles at which that total hits each item's share — so the items are evenly spaced along the curve
+ * whatever it has been stretched into, and a circle comes out exactly as equal angles would have left it.
+ */
+const toEvenArcAngles = (
+    itemCount: number,
+    radiusX: number,
+    radiusY: number,
+    fromAngle: number,
+    toAngle: number,
+    isClosed: boolean,
+): number[] => {
+    if (itemCount <= NO_ITEMS) return [];
+    if (itemCount === SINGLE_ITEM) return [(fromAngle + toAngle) * HALF];
+
+    const step = (toAngle - fromAngle) / ARC_SAMPLES;
+    const walked: number[] = [NO_ITEMS];
+    let previous = toEllipsePoint(radiusX, radiusY, fromAngle);
+    let total = NO_ITEMS;
+
+    for (let sample = SINGLE_ITEM; sample <= ARC_SAMPLES; sample++) {
+        const point = toEllipsePoint(radiusX, radiusY, fromAngle + step * sample);
+
+        total += Math.hypot(point.x - previous.x, point.y - previous.y);
+        walked.push(total);
+        previous = point;
+    }
+
+    const gaps = isClosed ? itemCount : itemCount - SINGLE_ITEM;
+    const angles: number[] = [];
+    let sample = NO_ITEMS;
+
+    for (let index = NO_ITEMS; index < itemCount; index++) {
+        const target = (total * index) / gaps;
+
+        while (sample < ARC_SAMPLES - SINGLE_ITEM && walked[sample + SINGLE_ITEM] < target) sample++;
+
+        const spanned = walked[sample + SINGLE_ITEM] - walked[sample];
+        const share = spanned <= NO_ITEMS ? NO_ITEMS : (target - walked[sample]) / spanned;
+
+        angles.push(fromAngle + step * (sample + share));
+    }
+
+    return angles;
+};
+
+export const createBand = (spreadDegrees: number, defs?: BandDefs): SizedLayoutFn => {
     const base = spreadDegrees >= FULL_TURN_DEGREES ? RING_BASE : HEMISPHERE_BASE;
     const holeRadiusPx = defs?.holeRadiusPx ?? base.holeRadiusPx;
     const bandWidthPx = defs?.bandWidthPx ?? base.bandWidthPx;
@@ -168,7 +220,6 @@ export const createArc = (spreadDegrees: number, defs?: ArcDefs): SizedLayoutFn 
     const labelHeightRatio = defs?.labelHeightRatio ?? base.labelHeightRatio;
     const labelMaxWidthRatio = defs?.labelMaxWidthRatio ?? base.labelMaxWidthRatio;
     const computeItemArcs = defs?.computeItemArcs;
-    const fit = defs?.fit ?? base.fit;
     const isClosed = spreadDegrees >= FULL_TURN_DEGREES;
 
     return ({ itemCount, path = ROOT_PATH, parentWidth = NO_PARENT_WIDTH, parentPlacement }): SizedLayout => {
@@ -228,10 +279,7 @@ export const createArc = (spreadDegrees: number, defs?: ArcDefs): SizedLayoutFn 
             boxes.push({ x: NO_ITEMS, y: NO_ITEMS, width: centreRadiusPx * 2, height: centreRadiusPx * 2 });
         }
 
-        const extent =
-            fit === "content"
-                ? toContentExtent(boxes, start, start + blockArc, innerRadius, outerRadius)
-                : toTurnExtent(outerRadius);
+        const extent = toTurnExtent(outerRadius);
         const width = extent.right - extent.left;
         const height = extent.bottom - extent.top;
         const origin = { x: -extent.left / width, y: -extent.top / width };
@@ -257,13 +305,63 @@ export const createArc = (spreadDegrees: number, defs?: ArcDefs): SizedLayoutFn 
     };
 };
 
-export const createRing = (defs?: ArcDefs) => createArc(FULL_TURN_DEGREES, defs);
+export const createRing = (defs?: BandDefs) => createBand(FULL_TURN_DEGREES, defs);
 
-export const createHemisphere = (defs?: ArcDefs) => createArc(HALF_TURN_DEGREES, defs);
+export const createHemisphere = (defs?: BandDefs) => createBand(HALF_TURN_DEGREES, defs);
 
 export const ring = createRing();
 
 export const hemisphere = createHemisphere();
+
+/**
+ * Boxes spaced evenly along an elliptical arc that is given its own width and height, so the same call
+ * draws a circle, a wide flat sweep or anything between. It places no wedges and nests into nothing,
+ * which is what separates it from the band: a band sizes itself from radii and hands that size down to
+ * the level inside it, and this one is told how big to be.
+ */
+export const createArc = (defs?: ArcDefs): SizedLayoutFn => {
+    const widthPx = defs?.widthPx ?? ARC_WIDTH_PX;
+    const heightPx = defs?.heightPx ?? ARC_HEIGHT_PX;
+    const spreadDegrees = defs?.spreadDegrees ?? ARC_SPREAD_DEGREES;
+    const itemWidthPx = defs?.itemWidthPx ?? ARC_ITEM_WIDTH_PX;
+    const itemHeightPx = defs?.itemHeightPx ?? ARC_ITEM_HEIGHT_PX;
+
+    return ({ itemCount }): SizedLayout => {
+        const radiusX = widthPx * HALF;
+        const radiusY = heightPx * HALF;
+        const isClosed = spreadDegrees >= FULL_TURN_DEGREES;
+        const fromAngle = isClosed ? UPWARD_DEGREES : UPWARD_DEGREES - spreadDegrees * HALF;
+        const toAngle = fromAngle + spreadDegrees;
+        const angles = toEvenArcAngles(itemCount, radiusX, radiusY, fromAngle, toAngle, isClosed);
+
+        const boxes = angles.map<ArcBox>((angle) => {
+            const point = toEllipsePoint(radiusX, radiusY, angle);
+
+            return { x: point.x, y: point.y, width: itemWidthPx, height: itemHeightPx };
+        });
+
+        const extent = toArcExtent(boxes, fromAngle, toAngle, radiusX, radiusY);
+        const width = extent.right - extent.left;
+        const height = extent.bottom - extent.top;
+        const origin = { x: -extent.left / width, y: -extent.top / width };
+
+        return {
+            placements: boxes.map<PlacementRect>((box) => ({
+                left: origin.x + box.x / width,
+                top: origin.y + box.y / width,
+                width: box.width / width,
+                height: box.height / width,
+            })),
+            width,
+            heightRatio: height / width,
+            pickRule: "angle",
+            origin,
+            radii: { x: radiusX / width, y: radiusY / width },
+        };
+    };
+};
+
+export const arc = createArc();
 
 export const createFan = (defs?: FanDefs): SizedLayoutFn => {
     const itemWidthPx = defs?.itemWidthPx ?? FAN_ITEM_WIDTH_PX;

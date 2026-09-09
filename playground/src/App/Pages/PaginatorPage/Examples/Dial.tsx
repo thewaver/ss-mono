@@ -1,5 +1,5 @@
 import { Paginator, createRing } from "@thewaver/ss-components";
-import type { ArcDefs, PaginatorStep } from "@thewaver/ss-components";
+import type { BandDefs, PaginatorStep } from "@thewaver/ss-components";
 
 import {
     PagePaginatorDemo,
@@ -12,7 +12,7 @@ import type { PaginatorExampleProps } from "../PaginatorPage.types";
 
 const DIAL_STEPS: PaginatorStep[] = ["first", "previous", "next", "last"];
 
-const DIAL_DEFS: ArcDefs = { holeRadiusPx: 60, bandWidthPx: 60, wedgeGapDegrees: 2 };
+const DIAL_DEFS: BandDefs = { holeRadiusPx: 60, bandWidthPx: 60, wedgeGapDegrees: 2 };
 
 const DIAL_LAYOUT = createRing(DIAL_DEFS);
 

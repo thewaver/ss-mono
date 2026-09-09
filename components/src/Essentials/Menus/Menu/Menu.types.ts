@@ -46,7 +46,9 @@ export type MenuTriggerProps = AccessorProps<
     InteractionControlProps<MenuFlags> & {
         menuId: string;
         ariaLabel?: string;
+        isHoldable: boolean;
         onToggle: () => void;
+        onPress: (e: PointerEvent) => void;
         onKeyDown: (e: KeyboardEvent) => void;
     }
 >;
@@ -112,8 +114,10 @@ export type MenuLevelProps<T> = AccessorProps<{
     checkedValues: MaybeAccessor<T[]>;
     computeLayout?: PlacementLayoutFn;
     computeCustomText?: (item: MenuItem<T>) => string;
+    flickOrigin?: MaybeAccessor<Point2d | undefined>;
     renderItem: MenuRenderItem<T>;
     onPick: (item: MenuItem<T>, radioGroupValues: T[]) => void;
+    onFlickEnd?: () => void;
 };
 
 export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderControl" | "extraFlags"> &
@@ -126,6 +130,7 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         submenuOffset?: Point2d;
         submenuMode?: MenuSubmenuMode;
         submenuOpensOn?: MenuSubmenuTrigger;
+        opensOnHold?: boolean;
         reservedScreenSize?: Size2d;
         transitionDurationMs?: number;
         visibilitySignal?: SignalSource<boolean>;
