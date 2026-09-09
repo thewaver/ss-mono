@@ -34,27 +34,10 @@ export const menuItem = style({
     },
 });
 
-export const menuLayoutRoot = style({
-    position: "relative",
-    containerType: "inline-size",
-});
-
-export const menuLayoutSpacer = style({
-    width: "100%",
-    pointerEvents: "none",
-});
-
 export const menuLayoutGroup = style({
     position: "absolute",
     inset: 0,
     pointerEvents: "none",
-});
-
-export const menuLayoutItem = style({
-    display: "grid",
-    position: "absolute",
-    transform: "translate(-50%, -50%)",
-    pointerEvents: "all",
 });
 
 export const menuItemRegion = style({

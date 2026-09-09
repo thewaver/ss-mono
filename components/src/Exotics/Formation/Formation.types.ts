@@ -1,28 +1,19 @@
 import type { Accessor, JSX } from "solid-js";
 
+import type { PlacementLayoutFn, PlacementRect } from "../../Abstracts/Placement/Placement.types";
 import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 
-export type FormationInset = {
-    top: number;
-    left: number;
-    width: number;
-    height: number;
-};
-
-export type FormationLayout = {
-    insets: FormationInset[];
-    heightRatio: number;
-};
+export type FormationInset = PlacementRect;
 
 export type FormationItemState = {
     index: number;
     itemCount: number;
-    inset: FormationInset;
+    placement: PlacementRect;
 };
 
 export type FormationProps<T> = AccessorProps<{
     isStackedInReverse?: boolean;
-    computeLayout: (itemCount: number) => FormationLayout;
+    computeLayout: PlacementLayoutFn;
 }> & {
     items: MaybeAccessor<T[]>;
     renderItem: (getItem: Accessor<T>, getState: Accessor<FormationItemState>) => JSX.Element;

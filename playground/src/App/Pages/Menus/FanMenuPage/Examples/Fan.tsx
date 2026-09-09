@@ -29,6 +29,8 @@ export const FanExample = (props: FanMenuExampleProps) => {
                             [styles.itemDisabled]: getFlags().isDisabled,
                         }}
                     >
+                        <div class={styles.itemFill} aria-hidden={"true"} />
+
                         <Show when={getFlags().isBack}>
                             <span aria-hidden={"true"}>{BACK_MARK}</span>
                         </Show>

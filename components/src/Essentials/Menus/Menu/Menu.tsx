@@ -5,8 +5,9 @@ import { Point2d, Rect } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
+import type { NavigatorOrientation } from "../../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
-import type { PlacementRect } from "../../../Abstracts/Placement/Placement.types";
+import { PlacementBox, PlacementItem } from "../../../Abstracts/Placement/Placement";
 import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
 import { Typeahead } from "../../../Abstracts/Typeahead/Typeahead";
 import { TypeaheadUtils } from "../../../Abstracts/Typeahead/Typeahead.utils";
@@ -35,7 +36,6 @@ import * as styles from "./Menu.css";
 const EMPTY_CHECKED: never[] = [];
 
 const DEFAULT_SUBMENU_PLACEMENT: AnchorPlacement = { x: "right-out", y: "top-in" };
-const NO_ANGLE = 0;
 const ROOT_LEVEL = 0;
 const ROOT_PATH: number[] = [];
 const NO_PARENT_WIDTH = 0;
@@ -45,6 +45,8 @@ const DEFAULT_SUBMENU_TRIGGER: MenuSubmenuTrigger = "hover";
 const BACK_INDEX = 0;
 const SUBMENU_OPEN_KEY = "ArrowRight";
 const SUBMENU_CLOSE_KEY = "ArrowLeft";
+const LEVEL_CLOSE_KEY = "Escape";
+const PLACED_ORIENTATION: NavigatorOrientation = "both";
 
 /**
  * Where the pointer last moved to, in client space, for as long as the menu exists. A menu whose items are
@@ -225,8 +227,6 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 
     const getPlacementAt = (index: number) => getLayout()?.placements[index];
 
-    const toContainerWidth = (ratio: number) => `${ratio * 100}cqw`;
-
     const highlightIndex = (index: number | undefined) => {
         if (index === undefined) return;
 
@@ -250,12 +250,13 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 
     const hoverIndex = (index: number, e: MouseEvent) => {
         if (!getNavigableIndexes().includes(index)) return;
+        if (!getIsPointerLed(e)) return;
 
         const item = getEntries()[index];
 
         setHighlightedValue(() => item.value);
 
-        if (!getIsPointerLed(e) || access(props.submenuOpensOn) !== "hover") return;
+        if (access(props.submenuOpensOn) !== "hover") return;
 
         setOpenValue(() => (computeHasSubmenu(index) && !item.isDisabled ? item.value : undefined));
     };
@@ -324,7 +325,15 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
             return;
         }
 
-        if (e.key === SUBMENU_OPEN_KEY && highlightedIndex !== undefined) {
+        if (e.key === LEVEL_CLOSE_KEY && getIsLaidOut() && access(props.path).length > ROOT_LEVEL) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            props.onClose();
+
+            return;
+        }
+
+        if (!getIsLaidOut() && e.key === SUBMENU_OPEN_KEY && highlightedIndex !== undefined) {
             if (items[highlightedIndex].isDisabled || !computeHasSubmenu(highlightedIndex)) return;
 
             e.preventDefault();
@@ -333,7 +342,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
             return;
         }
 
-        if (e.key === SUBMENU_CLOSE_KEY && access(props.path).length > ROOT_LEVEL) {
+        if (!getIsLaidOut() && e.key === SUBMENU_CLOSE_KEY && access(props.path).length > ROOT_LEVEL) {
             e.preventDefault();
             props.onClose();
 
@@ -345,7 +354,9 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         if (positions.length < 1) return;
 
         const from = positions.indexOf(highlightedIndex ?? positions[0]);
-        const position = NavigatorUtils.computeNextPosition(e.key, from, positions.length);
+        const position = NavigatorUtils.computeNextPosition(e.key, from, positions.length, {
+            orientation: getIsLaidOut() ? PLACED_ORIENTATION : undefined,
+        });
 
         if (position === undefined) return;
 
@@ -431,24 +442,15 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         );
     };
 
-    const toBoxStyle = (rect: PlacementRect, stackAt: number) => ({
-        "left": toContainerWidth(rect.left),
-        "top": toContainerWidth(rect.top),
-        "width": toContainerWidth(rect.width),
-        "height": toContainerWidth(rect.height),
-        "transform": `translate(-50%, -50%) rotate(${rect.angle ?? NO_ANGLE}deg)`,
-        "z-index": rect.depth ?? stackAt,
-    });
-
     const renderPlaced = (index: number, element: JSX.Element) => {
         const getPlacement = createMemo(() => getPlacementAt(index));
 
         return (
             <Show when={getPlacement()} fallback={element}>
                 {(getRect) => (
-                    <div class={styles.menuLayoutItem} style={toBoxStyle(getRect(), index + 1)}>
+                    <PlacementItem placement={getRect} stackAt={index + 1}>
                         {element}
-                    </div>
+                    </PlacementItem>
                 )}
             </Show>
         );
@@ -481,17 +483,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 
     const renderItems = () => (
         <Show when={getLayout()} fallback={renderRuns()}>
-            {(getResolved) => (
-                <div class={styles.menuLayoutRoot} style={{ width: `${getResolved().width}px` }}>
-                    <div
-                        class={styles.menuLayoutSpacer}
-                        style={{ height: toContainerWidth(getResolved().heightRatio) }}
-                        aria-hidden="true"
-                    />
-
-                    {renderRuns()}
-                </div>
-            )}
+            {(getResolved) => <PlacementBox layout={getResolved}>{renderRuns()}</PlacementBox>}
         </Show>
     );
 

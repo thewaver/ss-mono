@@ -118,5 +118,54 @@ test("the floater is measured from the selected radio and moves with it", async 
 test("each group generates its own name", async ({ page }) => {
     const names = await attributesOf(page, "input[type='radio']", "name");
 
-    expect(new Set(names).size, "each group generates its own name, so the browser cannot mix two of them").toBe(7);
+    expect(new Set(names).size, "each group generates its own name, so the browser cannot mix two of them").toBe(
+        await page.locator('[role="radiogroup"]').count(),
+    );
+});
+
+/**
+ * The arc rating is the same radios as the row rating, with a layout function added and nothing else
+ * changed. A group takes children rather than a list of records, so the placement cannot be handed down
+ * as a prop — each `Radio` asks the group's context for its own, keyed on the entry it registered — and
+ * these check that the answer arrives and that the group's own behaviour is untouched by it.
+ */
+const ARC = demo("arc");
+const RATING = demo("rating");
+
+const placedBox = (scope: string) => `${scope} [role="presentation"][style*="left"]`;
+
+const star = (scope: string, count: number) =>
+    `${scope} input[aria-label="${count === 1 ? "1 star" : `${count} stars`}"]`;
+
+test("every radio in a laid-out group gets a box, and one in a row gets none", async ({ page }) => {
+    await expect(page.locator(placedBox(ARC))).toHaveCount(await page.locator(`${ARC} input`).count());
+    await expect(page.locator(placedBox(RATING)), "the row rating places nothing").toHaveCount(0);
+});
+
+test("a placed radio is still a radio: the walk, the single tab stop and the selection all hold", async ({ page }) => {
+    expect(await attributesOf(page, `${ARC} input`, "tabindex"), "one tab stop, sitting on the selected star").toEqual([
+        "-1",
+        "-1",
+        "0",
+        "-1",
+        "-1",
+    ]);
+
+    await page.locator(star(ARC, 3)).focus();
+    await page.keyboard.press("ArrowRight");
+
+    expect(await readout(page, "arc"), "an arrow round the arc both moves and selects").toContain("value: 4");
+    expect(await activeMatches(page, star(ARC, 4)), "and focus follows it").toBe(true);
+});
+
+test("a placed radio is clicked where it is drawn, not where the row would have put it", async ({ page }) => {
+    await page.locator(star(ARC, 1)).click();
+
+    expect(await readout(page, "arc"), "the first star sits at one end of the arc and takes the press").toContain(
+        "value: 1",
+    );
+
+    await page.locator(star(ARC, 5)).click();
+
+    expect(await readout(page, "arc"), "and the last at the other").toContain("value: 5");
 });

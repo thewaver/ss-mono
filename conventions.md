@@ -1311,6 +1311,17 @@ re-blessed wholesale by any change.
   moment anyone fixes the bug, which is the point — both candidate fixes change output across every affected
   weight, so the test is re-blessed as part of the fix rather than quietly surviving it.
 
+### A green unit run is not a typechecked one
+
+`vitest` transforms with esbuild, which strips types without checking them, so a test file can hold a real
+type error and still report a pass. Two of the layout tests written in one sitting passed 955 assertions
+while `PlacementRect` was undefined in one and an optional `angle` was handed to a matcher expecting a number
+in the other — neither of which the run could see.
+
+**So `tsc --noEmit` is the gate, and it has to be run separately.** The build catches some of it by accident,
+because emitting declarations typechecks what the declarations reach, and test files are not among them.
+Nothing about a green run says the types hold; only the compiler does.
+
 ### The suite finds a demo by a key it was given, never by the caption it displays
 
 The fault `backlog.md` used to carry about locators built from caption text, for the part of it that is now
@@ -1321,9 +1332,9 @@ carries a key that is chosen once and never displayed.
 
 **A container states the kind it is as a bare attribute and its key in `data-testid`.** `data-variant`,
 `data-example` and `data-prop` survive with no value at all; the key is separate. Two reasons, and the first
-is the one that decided it: several specs read `[data-variant]` for presence — "the page has rendered
-something" in a `beforeEach` — and `surface.spec.ts` counts `[data-example]` to prove a page renders three
-examples, so a page that had no kind attribute left would have nothing honest to count. The second is that a
+is the one that decided it: several specs read `[data-variant]` and `[data-example]` for presence — "the page
+has rendered something" in a `beforeEach` — so a page that had no kind attribute left would have nothing
+honest to look for. The second is that a
 lookup is then only ever made among things of one kind, which is what lets `SplitPanePage` key a variant
 `pair` while some other page keys a props row the same word without either lookup becoming ambiguous.
 
@@ -1405,3 +1416,25 @@ contract, so a spec is meant to break when one changes; an accessible name that 
 because there the string is the thing under test; and a name the **library** owns rather than a page —
 `ColorInput`'s own default hue label, for instance — is contract too. Between those and the keys, no locator in `e2e/` now
 reads a string the Playground wrote as furniture.
+
+### A spec never counts the examples on a page
+
+Stated by the user, after an assertion pinning the number of radio groups on the Radio page at seven went red
+because a new example had been added: a guard like that should never exist in any spec, because examples are
+fluid. Anybody may add one, split one or drop one without touching a behaviour, so a census answers "has
+somebody added an example" in the same red as "has something broken" — the caption fault on another axis, and
+the same reason a demo is found by its key rather than by the words it displays.
+
+**What replaces it depends on whether there is a claim underneath the number.** The radio assertion had one —
+every group generates its own name, so no two radios in different groups share a `name` and the browser cannot
+mix them — and the count of groups was only the yardstick it was measured against, so it is read off the page
+instead of written down. `surface.spec.ts`' "the page renders all three examples" had none: take the number
+away and the assertion compares a count with itself, and the `beforeEach` above it already waits for the first
+example to be visible. It was deleted rather than rewritten, and a page's own presence check is what covers
+what it was reaching for.
+
+**A count inside one demo is a different thing and stays.** One `menuitem` per record over a list of five, or
+six weeks of seven days in a calendar, goes red only when that demo's data or the component's own arithmetic
+changes, which is the red worth having. This rule is about counting across a page, where what is being counted
+is editorial. Where a spec genuinely needs to know a page has examples at all, `toBeGreaterThan(0)` is the
+form, which is what `playgroundExamples.spec.ts` already does.

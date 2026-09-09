@@ -1,7 +1,7 @@
 import type { Accessor } from "solid-js";
 import { createMemo } from "solid-js";
 
-import { createArc } from "../../../Samples/Menu/Layouts/MenuLayouts.const";
+import { createArc } from "../../../Samples/Placement/Layouts/PlacementLayouts.const";
 import { access } from "../../../Utils/propUtils";
 import type { SignalSource } from "../../../Utils/typeUtils";
 import { Menu } from "../Menu/Menu";

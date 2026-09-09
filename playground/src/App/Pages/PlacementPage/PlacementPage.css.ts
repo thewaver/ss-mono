@@ -28,8 +28,19 @@ export const wedge = style({
     transition: "fill 120ms ease-out",
 });
 
-export const wedgeHighlighted = style({
-    fill: themeVars.color.primary.main,
+export const wedgeDefs = style({
+    position: "absolute",
+    width: 0,
+    height: 0,
+    pointerEvents: "none",
+});
+
+export const wedgeGradientFrom = style({
+    stopColor: themeVars.color.primary.dark,
+});
+
+export const wedgeGradientTo = style({
+    stopColor: themeVars.color.primary.light,
 });
 
 export const label = style({
@@ -62,7 +73,7 @@ export const closer = style({
 });
 
 export const closerHighlighted = style({
-    backgroundColor: themeVars.color.primary.main,
+    backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
     color: themeVars.color.primary.contrast,
 });
 

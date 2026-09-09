@@ -82,3 +82,44 @@ export const tabPanel = style({
     backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.dark})`,
     fontSize: themeVars.fontSize.small,
 });
+
+const HEX_CLIP = "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)";
+
+export const hexTab = style([
+    tabBase,
+    {
+        display: "grid",
+        placeItems: "center",
+        width: "100%",
+        height: "100%",
+        backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
+        fontSize: themeVars.fontSize.xSmall,
+        fontWeight: "bold",
+        transition: `color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
+
+        selectors: {
+            [`&.${isHovered}`]: {
+                backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
+            },
+            [`&.${isSelected}`]: {
+                color: themeVars.color.primary.contrast,
+                backgroundColor: "transparent",
+            },
+        },
+    },
+]);
+
+export const hexTabFloater = style({
+    width: "100%",
+    height: "100%",
+    clipPath: HEX_CLIP,
+    backgroundImage: `linear-gradient(215deg, ${themeVars.color.primary.light}, ${themeVars.color.primary.dark})`,
+    opacity: 0,
+    transitionProperty: "opacity",
+
+    selectors: {
+        [`&.${isVisible}`]: {
+            opacity: 1,
+        },
+    },
+});

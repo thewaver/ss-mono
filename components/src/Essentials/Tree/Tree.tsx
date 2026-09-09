@@ -5,6 +5,7 @@ import { Dynamic } from "solid-js/web";
 import { FlattenerUtils } from "../../Abstracts/Flattener/Flattener.utils";
 import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
+import { PlacementBox, PlacementItem } from "../../Abstracts/Placement/Placement";
 import { Typeahead } from "../../Abstracts/Typeahead/Typeahead";
 import { TypeaheadUtils } from "../../Abstracts/Typeahead/Typeahead.utils";
 import { Virtualizer } from "../../Abstracts/Virtualizer/Virtualizer";
@@ -110,7 +111,14 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     const getNavigableRows = createMemo(() => getFlatRows().filter(computeIsNavigable));
 
-    const getIsVirtualized = createMemo(() => props.computeEstimatedNodeHeight !== undefined);
+    /**
+     * Windowing is a one-dimensional device: it mounts a run of rows and moves them down a column. A
+     * layout places every visible node wherever it likes, so there is no run to window and the two cannot
+     * both be in force — a laid-out tree renders all of its open nodes.
+     */
+    const getIsVirtualized = createMemo(
+        () => props.computeEstimatedNodeHeight !== undefined && props.computeLayout === undefined,
+    );
 
     const getIsPending = (row: TreeRow<T>) => row.isExpanded && row.rows.length < 1;
 
@@ -339,36 +347,53 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         focusRow(navigable[position]);
     };
 
-    const renderRow = (getRow: Accessor<TreeRow<T>>): JSX.Element => (
-        <InteractionWrapper
-            sizing={"fill"}
-            isDisabled={() => getRow().node.isDisabled ?? false}
-            isReachableWhenDisabled={() => getRow().node.isReachableWhenDisabled ?? false}
-            isTabbable={() => getRow().node.value === getRovingRow()?.node.value}
-            tooltipDefs={() => getRow().node.tooltipDefs}
-            extraFlags={() => ({
-                isBranch: TreeUtils.getIsBranch(getRow().node),
-                isExpanded: getRow().isExpanded,
-                isPending: getIsPending(getRow()),
-                isSelected: getRow().node.value === valueSignal[0](),
-                depth: getRow().depth,
-            })}
-            renderControl={(setElementRef, getRenderProps) => (
-                <TreeNodeItem
-                    ref={setElementRef}
-                    id={() => getRowId(getRow())}
-                    href={() => getRow().node.href}
-                    level={() => getRow().depth + 1}
-                    position={() => getRow().position + 1}
-                    setSize={() => getRow().setSize}
-                    flags={getRenderProps}
-                    linkComponent={props.linkComponent}
-                    renderContent={(getNodeFlags) => props.renderNode(() => getRow().node, getNodeFlags)}
-                    onActivate={() => activate(getRow())}
-                />
-            )}
-        />
+    const getLayout = createMemo(() =>
+        props.computeLayout?.({
+            itemCount: getFlatRows().length,
+            itemParents: getFlatRows().map((row) => row.parentIndex),
+        }),
     );
+
+    const getPlacementAt = (index: number) => getLayout()?.placements[index];
+
+    const renderPlaced = (getRow: Accessor<TreeRow<T>>, element: JSX.Element) => (
+        <Show when={getPlacementAt(getRow().index)} fallback={element}>
+            {(getRect) => <PlacementItem placement={getRect}>{element}</PlacementItem>}
+        </Show>
+    );
+
+    const renderRow = (getRow: Accessor<TreeRow<T>>): JSX.Element =>
+        renderPlaced(
+            getRow,
+            <InteractionWrapper
+                sizing={"fill"}
+                isDisabled={() => getRow().node.isDisabled ?? false}
+                isReachableWhenDisabled={() => getRow().node.isReachableWhenDisabled ?? false}
+                isTabbable={() => getRow().node.value === getRovingRow()?.node.value}
+                tooltipDefs={() => getRow().node.tooltipDefs}
+                extraFlags={() => ({
+                    isBranch: TreeUtils.getIsBranch(getRow().node),
+                    isExpanded: getRow().isExpanded,
+                    isPending: getIsPending(getRow()),
+                    isSelected: getRow().node.value === valueSignal[0](),
+                    depth: getRow().depth,
+                })}
+                renderControl={(setElementRef, getRenderProps) => (
+                    <TreeNodeItem
+                        ref={setElementRef}
+                        id={() => getRowId(getRow())}
+                        href={() => getRow().node.href}
+                        level={() => getRow().depth + 1}
+                        position={() => getRow().position + 1}
+                        setSize={() => getRow().setSize}
+                        flags={getRenderProps}
+                        linkComponent={props.linkComponent}
+                        renderContent={(getNodeFlags) => props.renderNode(() => getRow().node, getNodeFlags)}
+                        onActivate={() => activate(getRow())}
+                    />
+                )}
+            />,
+        );
 
     const renderRows = (getLevelRows: Accessor<TreeRow<T>[]>): JSX.Element => (
         <Index each={getLevelRows()}>
@@ -389,6 +414,12 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                 </>
             )}
         </Index>
+    );
+
+    const renderTiers = () => (
+        <Show when={getIsVirtualized()} fallback={renderRows(getRows)}>
+            {renderWindowedRows()}
+        </Show>
     );
 
     const renderWindowedRows = () => (
@@ -423,8 +454,8 @@ export const Tree = <T,>(props: TreeProps<T>) => {
                 lastFocusedValue = findRowById((e.target as HTMLElement).id)?.node.value;
             }}
         >
-            <Show when={getIsVirtualized()} fallback={renderRows(getRows)}>
-                {renderWindowedRows()}
+            <Show when={getLayout()} fallback={renderTiers()}>
+                {(getResolved) => <PlacementBox layout={getResolved}>{renderTiers()}</PlacementBox>}
             </Show>
         </div>
     );

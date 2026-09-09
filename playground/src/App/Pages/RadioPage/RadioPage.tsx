@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { ArcExample } from "./Examples/Arc";
 import { DecoratedExample } from "./Examples/Decorated";
 import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
@@ -18,6 +19,8 @@ export const RadioPage = () => {
     const segmentedSignal = createSignal<SizeValue>("medium");
     const ratingSignal = createSignal(STARTING_RATING);
     const hoveredRatingSignal = createSignal<number | undefined>(undefined);
+    const arcSignal = createSignal(STARTING_RATING);
+    const hoveredArcSignal = createSignal<number | undefined>(undefined);
     const decoratedSignal = createSignal<SizeValue>("medium");
     const disabledSignal = createSignal<SizeValue>("small");
     const reachableSignal = createSignal<SizeValue>("small");
@@ -44,6 +47,13 @@ export const RadioPage = () => {
             readout: () => `value: ${ratingSignal[0]()}`,
             component: () => <RatingExample valueSignal={ratingSignal} hoveredSignal={hoveredRatingSignal} />,
             path: `${EXAMPLES_ROOT}/Rating.tsx`,
+        },
+        {
+            key: "arc",
+            name: "Rating, bent into an arc",
+            readout: () => `value: ${arcSignal[0]()} — the same radios, placed by a layout instead of laid in a row`,
+            component: () => <ArcExample valueSignal={arcSignal} hoveredSignal={hoveredArcSignal} />,
+            path: `${EXAMPLES_ROOT}/Arc.tsx`,
         },
         {
             key: "decorated",

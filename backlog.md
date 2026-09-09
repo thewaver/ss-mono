@@ -1090,71 +1090,74 @@ dossier; a `RadioGroup`'s stars bent into a semicircle. **The list of controls i
 user named these as examples of the flexibility wanted, not as the set.
 
 The approach is bottom-up and was chosen over building the abstraction first: `Menu` goes first, the picking
-sits in its own abstract from the start, and the second consumer corrects the abstract's signature. **The
-abstract is not finished when the menu ships** — the proving pass is the second half of the same job.
+sits in its own abstract from the start, and the second consumer corrects the abstract's signature.
 
 ### What is built
 
-`Abstracts/Placement` holds the vocabulary, the picking and the sector path builder, and has a Playground page
-of its own where five knobs build one set of measurements that a `WheelMenu` and an `OverheadWheel` are both
-handed. `Menu` and the overhead `Wheel` each take an optional `computeLayout` and are unchanged without one; a
-layout is told the path down to the level it is drawing and the placement of the item that opened it, so it can
-aim a band at its own parent.
+`Abstracts/Placement` holds the vocabulary, the picking, the sector, link and gap builders and the placed box
+itself, and has a Playground page of its own where five knobs build one set of measurements
+that a `WheelMenu` and an `OverheadWheel` are both handed. Every layout sample is in
+`Samples/Placement/Layouts`, none of them named for a consumer, and every one is a `PlacementLayoutFn` — so
+any of them can be handed to any placed control.
 
-Two controls are built on top of that. `WheelMenu` is a `Menu` whose items are wedges of a hollow wheel over a
-whole turn or half of one, with per-item arcs, concentric submenus aimed at their opener, and a close control in
-the hole that is an ordinary item — which is why `Menu` itself carries nothing about it. `FanMenu` is a `Menu`
-whose items are a narrow arc of cards and whose levels **replace** rather than stack: `Menu` gained
-`submenuMode`, a covered level is hidden rather than unmounted, and a replaced level offers its own opener as
-its first entry, which walks back. `Samples/Menu/Layouts` ships the arc and fan factories, and the Playground
-groups `Menu`, `WheelMenu` and `FanMenu` under one root.
+Eight controls take an optional `computeLayout` and are unchanged without one: `Menu` (with `WheelMenu` and
+`FanMenu` built over it), the overhead `Wheel`, `Paginator`, `RadioGroup`, `Tabs`, `Stepper`, `Toolbar`,
+`Sortable`, `Tree` and `Formation`. The reasoning behind every decision taken is in `decisions.md` under
+_"Arbitrary item placement"_, _"Concentric submenus"_, _"A wheel of wedges"_, _"The wheel as the ring's second
+consumer"_, _"`WheelMenu`: the wheel becomes a component"_, _"`Paginator` takes a layout"_, _"`RadioGroup` and
+`Tabs` take a layout too"_, _"Every layout sample lives in one place"_, _"`Formation` is the abstract's"_,
+_"The arc reserves the whole turn or snaps to what it draws"_, _"A hover the pointer did not cause"_, _"A
+placed menu walks on all four arrows"_, _"A group's radios are ordered by the document"_ and _"Five more
+controls take a layout"_.
 
-The reasoning behind every decision taken so far is in `decisions.md` under _"Arbitrary item placement"_,
-_"Concentric submenus"_, _"A wheel of wedges"_, _"The wheel as the ring's second consumer"_ and
-_"`WheelMenu`: the wheel becomes a component"_ — including the pinning, the `"anchorGone"` dismissal, the
-focus-restore change and the three faults that were the Playground's rather than the library's.
-
-### What is left, in the order it was argued
+### What is left
 
 - **The hold-and-flick gesture, with the click-open mode underneath it.** The fast path: hold, flick toward a
   wedge, release, with the pointer never travelling to the item. It ships with the click-open mode because a
   flick is a path-based gesture and 2.5.1 Pointer Gestures (A) requires a single-pointer alternative without a
   path, while 2.1.1 Keyboard (A) requires the keyboard route regardless — and that mode is also the ordinary
   mouse route, so nothing is built purely for compliance.
-- **The proving pass against another control.** `Paginator` looks the strongest: the user's proposal is **the
-  same elements in the same order**, ellipsis and step buttons included, drawn round a dial instead of along a
-  row, with nothing else changing. `Tabs` gains the least, because its hard parts are the tab-to-panel
-  relationship and the roving walk and both are layout-independent. **`OverheadWheel` is a second consumer but
-  not this pass**: it takes a `computeLayout` and draws from the sector it returns, which corrected the
-  abstract once — `labelRadiusRatio` — but it asks for one wedge rather than a place per item, so nothing about
-  ordering, picking or the walk was put under strain.
+
+### Faults the proving pass found and left open
+
+- **A placed item's box is guessed rather than measured.** A layout picks each item's size from numbers it is
+  given — `labelMaxWidthRatio`, `itemWidthPx` — while the painter's content has an intrinsic width the layout
+  never sees. Where the content is wider it simply overflows, and on a ring that means overlapping a
+  neighbour. Every one of the four arrangements built for `Stepper`, `Toolbar`, `Sortable` and `Tree` had to be
+  widened by hand until its labels fitted, which is what makes this the abstract's problem rather than each
+  demo's tuning.
+- **A laid-out control can overflow its container, and it is no longer only popups.** A ring is centred on its
+  invoker and grows with its item count, so nothing stops it reaching past the edge of the screen — pinning
+  deliberately turned off the clamping that would have moved it, and concentric submenus make it louder, each
+  level enclosing the one above it. In a page's flow the same thing bites differently: a placed `Toolbar` has
+  nothing to collapse into, so a layout that outgrows its column spills rather than adapting. What should
+  happen in either case has not been decided.
+- **`Stepper` ignores `renderBody` when it is laid out.** A step's body is a panel beside a vertical
+  connector, and a curve has nowhere to put one, so the placed path drops it without saying so. A prop that
+  quietly does nothing is worse than one that is refused.
+- **A snapped arc cannot nest, and nothing says so at the call site.** `fit: "content"` makes the box's width
+  stop being the band's diameter, and a concentric band derives its inner radius from exactly that
+  `parentWidth`. So the snap is for flat controls, and a `WheelMenu` given one would draw its second band in
+  the wrong place.
+- **`Tree` has no connector slot, so a radial tree's structure reads only from the angles.** A child sits
+  inside the angular slice its parent was given, which is enough to see but not enough to state. `Stepper` now
+  has both the slot and the geometry — `PlacementUtils.getLinkPath` — so the work is small; what it costs is
+  new API on a control that has none.
 
 ### Loose ends left deliberately, recorded at the user's request
 
-- **`PlacementUtils.pickIndex` has no caller.** It is the reason the abstract exists — a layout has an inverse
-  and hit-testing is not it, which `CardFan`'s findings and the ring's gaps prove from opposite directions —
-  but hover went back to hit-testing once the user saw direction-picking light up an item from across the
-  ring, and the flick that will use it is unbuilt. **So the repo currently holds a tested generalisation with
-  nothing consuming it**, which is the shape it is normally suspicious of. It stays because the consumer is
-  named and queued, not hypothetical; if the flick is dropped, this goes with it.
-- **A laid-out popup's size is the layout's, and it can overflow.** A ring is centred on its invoker and grows
-  with its item count, so nothing stops it reaching past the edge of the screen — pinning deliberately turned
-  off the clamping that would have moved it. What happens to a wheel opened next to the viewport edge has not
-  been decided. **Concentric submenus make this louder rather than new**: each level encloses the one above it,
-  so the demo's third band is 664px across and runs off the right of the page at the width the Playground lays
-  its examples out in.
 - **The first item is highlighted the moment a menu opens**, before the pointer touches anything. Standard menu
   behaviour and `aria-activedescendant` has to point somewhere, but on a wheel it means something looks chosen
   while the pointer is still on the opener. The user raised it; suppressing the visual highlight until the
-  pointer or keyboard engages would change `Menu` for every consumer, so it is theirs to call.
+  pointer or keyboard engages would change `Menu` for every consumer, so it is theirs to call. Unrelated to the
+  hover a stationary pointer used to cause, which is fixed.
 - **`fan` places boxes rather than wedges, and that has never been argued either way.** The wedge vocabulary
   is on `PlacementRect` and any layout may use it; the fan is the one layout whose items are tilted along the
   arc rather than sitting in a band, so cards may well be right for it. It takes `FanDefs` like the others now.
-- **The arc factory lives in `Samples/Menu/Layouts` while `WheelMenu` is the thing that owns arcs.**
-  `OverheadWheel` and the `Placement` page use it directly, which is why it stayed sample code, but the
-  directory now names the wrong consumer. Moving it is cheap; where it should go has not been decided.
-
----
+- **`PlacementLayout.origin` and `PlacementSector.origin` hold the same number.** One is what the picking
+  measures directions from and the other is what a wedge painter turns its arc about, and a layout sets both
+  from the same value. The duplication is deliberate — a painter is handed a `PlacementRect` and never sees
+  the layout — but it is a fact stated twice and nothing keeps the two in step.
 
 ## Accepted limits
 
@@ -1163,6 +1166,13 @@ of the answer to "what is left" — see the note at the top of this file. Each o
 reach it, and why it was accepted, so that nobody has to re-derive the argument in order to leave it alone
 again. An entry moves back up into the numbered items only if the user says so, or if something changes that
 makes the reasoning wrong.
+
+**A laid-out `Tree` renders every open node, windowing being a one-dimensional device.** A window mounts a run
+of rows and moves them down a column; a layout places every visible node wherever it likes, so there is no run
+to window. `Tree` turns virtualization off when it is given a layout, which means a placed tree of a thousand
+open nodes mounts a thousand of them. Reachable by handing `computeEstimatedNodeHeight` and `computeLayout` to
+the same tree: the first is ignored. Accepted because there is no fix, only a boundary — the two answer
+different questions about the same list, and a layout is the one that was asked for.
 
 **Converting a date into a calendar that cannot hold it clamps, silently.** Accepted **2026-08-11**.
 `DateValueUtils.withCalendar` is `toCalendar`, and 15 March 44 BC asked for in the Japanese calendar comes back

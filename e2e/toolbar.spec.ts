@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { example, prop } from "./helpers";
+import { activeText, attributesOf, demo, example, prop } from "./helpers";
 
 /**
  * The toolbar decides what fits by measuring, so nothing here writes down a width or a number of buttons:
@@ -205,4 +205,51 @@ test("the same action runs whether it is pressed in the row or picked in the men
         await page.locator(`${DEFAULT} [data-readout]`).textContent(),
         "and the menu row reports through the same callback, with no second description of the action",
     ).toContain(collapsed[0]);
+});
+
+/**
+ * A row's whole behaviour is the cut: it measures what fits and moves the tail into a menu. A layout sizes
+ * the bar itself, so there is no width to run out of and nothing to collapse — which is the one case in
+ * this pass where a layout removes a behaviour rather than relocating one. What has to survive is
+ * everything else the toolbar is: the role, the single tab stop and the roving walk.
+ */
+const PALETTE = demo("palette");
+
+const placedBox = (scope: string) => `${scope} [role="presentation"][style*="left"]`;
+
+test("a ring of tools shows every action and collapses none of them", async ({ page }) => {
+    await expect(page.locator(`${PALETTE} [role="toolbar"]`)).toHaveAttribute("aria-label", "Tools");
+
+    const buttons = page.locator(`${PALETTE} button`);
+    const placed = page.locator(placedBox(PALETTE));
+
+    await expect(placed, "a box for every action").toHaveCount(await placed.count());
+    expect(await placed.count(), "and one for each of them, so none went into a menu").toBe(
+        (await buttons.count()) - (await page.locator(`${PALETTE} [aria-haspopup="menu"]`).count()),
+    );
+
+    await expect(
+        page.locator(`${PALETTE} [aria-hidden="true"][inert] [aria-haspopup="menu"]`),
+        "the overflow trigger is there but has nothing to hold, so it stays out of the tree",
+    ).toHaveCount(1);
+});
+
+test("a ring keeps the single tab stop, and both pairs of arrows walk it", async ({ page }) => {
+    const buttons = page.locator(`${PALETTE} button:not([aria-haspopup])`);
+
+    expect(
+        (await attributesOf(page, `${PALETTE} button:not([aria-haspopup])`, "tabindex")).filter(
+            (value) => value === "0",
+        ).length,
+        "one stop for the whole ring",
+    ).toBe(1);
+
+    await buttons.first().focus();
+    await page.keyboard.press("ArrowRight");
+    expect(await activeText(page), "ArrowRight moves round the ring").toBe(await buttons.nth(1).textContent());
+
+    await page.keyboard.press("ArrowDown");
+    expect(await activeText(page), "and so does ArrowDown, a ring having no single axis").toBe(
+        await buttons.nth(2).textContent(),
+    );
 });

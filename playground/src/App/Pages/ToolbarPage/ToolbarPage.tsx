@@ -8,6 +8,7 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
+import { PaletteExample } from "./Examples/Palette";
 import { RefusingExample } from "./Examples/Refusing";
 import { NOTHING_RUN } from "./ToolbarPage.const";
 import type { ToolbarExampleProps } from "./ToolbarPage.types";
@@ -86,6 +87,14 @@ export const ToolbarPage = () => {
                     </ResizableBar>
                 ),
                 path: `${EXAMPLES_ROOT}/Refusing.tsx`,
+            },
+            {
+                key: "palette",
+                name: "A ring of tools",
+                readout: () =>
+                    `last run: ${getLastRun()} — a layout sizes the bar itself, so nothing runs out of room and the overflow menu has nothing to hold`,
+                component: () => <PaletteExample {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/Palette.tsx`,
             },
         ];
     });

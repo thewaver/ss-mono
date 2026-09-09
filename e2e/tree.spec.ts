@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { activeMatches, activeText, demo, readout, tabIndex } from "./helpers";
+import { activeMatches, activeText, attributesOf, demo, readout, tabIndex } from "./helpers";
 
 const DEFAULT = demo("default");
 const COLLAPSED = demo("collapsed");
@@ -392,4 +392,49 @@ test("a branch that arrives unfetched behaves like the one that delivered it", a
         timeout: REMOTE_LOAD_DELAY_MS * 4,
     }).toBeVisible();
     await expect(core).not.toHaveAttribute("aria-busy");
+});
+
+/**
+ * A radial tree is the one place in this pass where a layout needed to know more than how many items it is
+ * placing: where a node goes depends on which node it hangs from. `FlatRow` already carried that, so the
+ * tree hands the layout the parent of each visible row and the layout works the depths out from the chain.
+ *
+ * What has to survive is the part a screen reader uses, and none of it is positional: the nesting that
+ * carries the groups, the level on each node, and the walk. Windowing is the one thing that cannot survive,
+ * a window being a run of rows down a column.
+ */
+const RADIAL = demo("radial");
+
+const placedBox = (scope: string) => `${scope} [role="presentation"][style*="left"]`;
+
+test("a radial tree keeps its nesting, its levels and one box per open node", async ({ page }) => {
+    const items = page.locator(`${RADIAL} [role="treeitem"]`);
+
+    await expect(page.locator(`${RADIAL} [role="tree"]`)).toHaveAttribute("aria-label", "Orbits");
+    await expect(page.locator(placedBox(RADIAL)), "a box for every node that is open").toHaveCount(await items.count());
+
+    // A group's box collapses to nothing once its nodes are placed out of it, so what matters is that it is
+    // still there wrapping them: the nesting is what carries the structure, not the box.
+    await expect(
+        page.locator(`${RADIAL} [role="group"] [role="treeitem"]`).first(),
+        "the groups are still nested inside, and still hold their nodes",
+    ).toBeAttached();
+
+    const levels = await attributesOf(page, `${RADIAL} [role="treeitem"]`, "aria-level");
+
+    expect(new Set(levels).size, "and the nodes sit at more than one level").toBeGreaterThan(1);
+    expect(levels[0], "the root being the first of them").toBe("1");
+});
+
+test("a placed node is reached and chosen the same way as a row", async ({ page }) => {
+    const items = page.locator(`${RADIAL} [role="treeitem"]`);
+
+    await items.first().focus();
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("Enter");
+
+    expect(
+        await readout(page, "radial"),
+        "the walk still reaches the next node and Enter still takes it",
+    ).not.toContain("value: undefined");
 });

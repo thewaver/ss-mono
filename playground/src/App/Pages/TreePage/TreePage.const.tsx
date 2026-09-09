@@ -128,3 +128,17 @@ export const REMOTE_CHILDREN: Record<string, TreeNode<string>[]> = {
     ui: [{ value: "Button.tsx" }, { value: "Modal.tsx" }],
     docs: [{ value: "getting-started.md" }, { value: "api.md" }],
 };
+
+export const ORBITS: TreeNode<string>[] = [
+    {
+        value: "Sun",
+        children: [
+            { value: "Mercury" },
+            { value: "Venus" },
+            { value: "Earth", children: [{ value: "Moon" }] },
+            { value: "Mars", children: [{ value: "Phobos" }, { value: "Deimos" }] },
+        ],
+    },
+];
+
+export const ORBIT_ROOTS = ["Sun", "Earth", "Mars"];

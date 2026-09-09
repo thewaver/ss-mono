@@ -10,6 +10,7 @@ export const isCarrying = style({});
 
 export const sortableItemContent = style({
     display: "flex",
+    marginInline: "auto",
     alignItems: "center",
     gap: themeVars.spacing.full,
     padding: themeVars.spacing.full,
@@ -96,3 +97,16 @@ const sortableMarker = style({
 export const sortableMarkerRow = style([sortableMarker, { width: 3 }]);
 
 export const sortableMarkerColumn = style([sortableMarker, { height: 3 }]);
+
+export const sortableRingMarker = style({
+    width: 4,
+    height: "70%",
+    borderRadius: themeVars.borderRadius.half,
+    backgroundColor: themeVars.color.primary.main,
+    boxShadow: themeVars.shadow.small,
+});
+
+export const sortableRoom = style({
+    padding: themeVars.spacing.full,
+    minWidth: 0,
+});

@@ -1,17 +1,22 @@
-import { Index, type JSX, Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
+import { type Accessor, Index, type JSX, Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
 import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
+import { PlacementBox, PlacementItem } from "../../Abstracts/Placement/Placement";
+import type { PlacementRect } from "../../Abstracts/Placement/Placement.types";
+import { PlacementUtils } from "../../Abstracts/Placement/Placement.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
-import type { TabPanelProps, TabsDir, TabsItemProps, TabsProps } from "./Tabs.types";
+import type { Tab, TabPanelProps, TabsDir, TabsItemProps, TabsProps } from "./Tabs.types";
 
 import * as styles from "./Tabs.css";
 
 const DEFAULT_TABS_TRANSITION_DURATION_MS = 200;
 const DEFAULT_TABS_GAP = 0;
 const DEFAULT_TABS_DIR: TabsDir = "row";
+const NO_ANGLE = 0;
+const HALF = 0.5;
 
 export const TabPanel = (props: TabPanelProps) => {
     return (
@@ -76,7 +81,7 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getItemRefs, setItemRefs] = createSignal<(HTMLElement | undefined)[]>([]);
     const [getFocusedValue, setFocusedValue] = createSignal<T | undefined>();
-    const [getFloaterBounds, setFloaterBounds] = createSignal<
+    const [getMeasuredBounds, setMeasuredBounds] = createSignal<
         { [k in "top" | "left" | "width" | "height"]: string } | undefined
     >();
 
@@ -87,6 +92,10 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
     const getDir = createMemo(() => access(props.dir) ?? DEFAULT_TABS_DIR);
 
     const getTabGap = createMemo(() => access(props.tabGap) ?? DEFAULT_TABS_GAP);
+
+    const getLayout = createMemo(() => props.computeLayout?.({ itemCount: access(props.tabs).length }));
+
+    const getPlacementAt = (index: number) => getLayout()?.placements[index];
 
     const setItemRef = (index: number, element: HTMLElement) => {
         setItemRefs((prev) => {
@@ -112,6 +121,24 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
         }, []),
     );
 
+    const toPlacedBounds = (placement: PlacementRect) => ({
+        top: PlacementUtils.toContainerWidth(placement.top - placement.height * HALF),
+        left: PlacementUtils.toContainerWidth(placement.left - placement.width * HALF),
+        width: PlacementUtils.toContainerWidth(placement.width),
+        height: PlacementUtils.toContainerWidth(placement.height),
+        transform: `rotate(${placement.angle ?? NO_ANGLE}deg)`,
+    });
+
+    const getFloaterBounds = createMemo(() => {
+        const layout = getLayout();
+        const placement = getPlacementAt(getSelectedIndex());
+
+        if (layout === undefined) return getMeasuredBounds();
+        if (placement === undefined) return undefined;
+
+        return toPlacedBounds(placement);
+    });
+
     const getIsFloaterShown = createMemo(() => getSelectedIndex() >= 0 && getFloaterBounds() !== undefined);
 
     const floaterFader = ElementFader.createFader(getIsFloaterShown, { getTransitionDurationMs });
@@ -119,7 +146,7 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
     createEffect(() => {
         if (floaterFader.getIsVisible()) return;
 
-        setFloaterBounds(undefined);
+        setMeasuredBounds(undefined);
     });
 
     const getRovingIndex = createMemo(() => {
@@ -151,7 +178,7 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
             selectedItemObserver?.disconnect();
         });
 
-        if (!props.renderFloater) return;
+        if (!props.renderFloater || getLayout() !== undefined) return;
 
         const rootRef = getRootRef();
         const selectedItem = getItemRefs()[getSelectedIndex()];
@@ -160,7 +187,7 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
         if (!rootRef || !selectedWrapper) return;
 
         selectedItemObserver = new ResizeObserver(() => {
-            setFloaterBounds({
+            setMeasuredBounds({
                 top: `${selectedWrapper.offsetTop}px`,
                 left: `${selectedWrapper.offsetLeft}px`,
                 width: `${selectedWrapper.offsetWidth}px`,
@@ -197,6 +224,54 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
         props.onSelectionChange?.(nextValue);
     };
 
+    const renderTabAt = (getTab: Accessor<Tab<T>>, index: number) => {
+        const getPlacement = createMemo(() => getPlacementAt(index));
+
+        const element = (
+            <InteractionWrapper
+                sizing={"fill"}
+                isDisabled={() => getTab().isDisabled ?? false}
+                isTabbable={() => index === getRovingIndex()}
+                ref={(element) => setItemRef(index, element)}
+                renderControl={(setElementRef, getFlags) => (
+                    <TabsItem
+                        ref={setElementRef}
+                        tab={getTab}
+                        flags={getFlags}
+                        isSelected={() => index === getSelectedIndex()}
+                        linkComponent={props.linkComponent}
+                        renderContent={(getItemFlags) => props.renderTab(getTab, getItemFlags, getPlacement)}
+                        onSelect={(value) => {
+                            if (value === access(props.selectedValue)) return;
+
+                            props.onSelectionChange?.(value);
+                        }}
+                    />
+                )}
+            />
+        );
+
+        return (
+            <Show when={getPlacement()} fallback={element}>
+                {(getRect) => <PlacementItem placement={getRect}>{element}</PlacementItem>}
+            </Show>
+        );
+    };
+
+    const renderTabs = () => <Index each={access(props.tabs)}>{renderTabAt}</Index>;
+
+    const renderFloater = () =>
+        props.renderFloater &&
+        floaterFader.getIsVisible() &&
+        getFloaterBounds() && (
+            <div
+                class={styles.tabsFloater}
+                style={{ ...getFloaterBounds(), "transition-duration": `${getTransitionDurationMs()}ms` }}
+            >
+                {props.renderFloater(floaterFader.getTransitionTarget, getTransitionDurationMs)}
+            </div>
+        );
+
     return (
         <div
             ref={setRootRef}
@@ -208,40 +283,23 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
             onKeyDown={handleKeyDown}
         >
             {props.renderGutter && <div class={styles.tabsGutter}>{props.renderGutter()}</div>}
-            {props.renderFloater && floaterFader.getIsVisible() && getFloaterBounds() && (
-                <div
-                    class={styles.tabsFloater}
-                    style={{ ...getFloaterBounds(), "transition-duration": `${getTransitionDurationMs()}ms` }}
-                >
-                    {props.renderFloater(floaterFader.getTransitionTarget, getTransitionDurationMs)}
-                </div>
-            )}
 
-            <Index each={access(props.tabs)}>
-                {(getTab, index) => (
-                    <InteractionWrapper
-                        sizing={"fill"}
-                        isDisabled={() => getTab().isDisabled ?? false}
-                        isTabbable={() => index === getRovingIndex()}
-                        ref={(element) => setItemRef(index, element)}
-                        renderControl={(setElementRef, getFlags) => (
-                            <TabsItem
-                                ref={setElementRef}
-                                tab={getTab}
-                                flags={getFlags}
-                                isSelected={() => index === getSelectedIndex()}
-                                linkComponent={props.linkComponent}
-                                renderContent={(getItemFlags) => props.renderTab(getTab, getItemFlags)}
-                                onSelect={(value) => {
-                                    if (value === access(props.selectedValue)) return;
-
-                                    props.onSelectionChange?.(value);
-                                }}
-                            />
-                        )}
-                    />
+            <Show
+                when={getLayout()}
+                fallback={
+                    <>
+                        {renderFloater()}
+                        {renderTabs()}
+                    </>
+                }
+            >
+                {(getResolved) => (
+                    <PlacementBox layout={getResolved}>
+                        {renderFloater()}
+                        {renderTabs()}
+                    </PlacementBox>
                 )}
-            </Index>
+            </Show>
         </div>
     );
 };

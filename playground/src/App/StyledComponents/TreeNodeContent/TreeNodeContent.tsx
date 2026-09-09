@@ -60,3 +60,18 @@ export const PageTreeNodePending = (props: ParentProps<TreeNodePendingProps>) =>
         <div>{props.children}</div>
     </div>
 );
+
+export const PageTreeRadialNode = (props: ParentProps<TreeNodeContentProps>) => {
+    return (
+        <div
+            class={styles.treeRadialNode}
+            classList={{
+                [styles.isHovered]: access(props.renderProps).isHovered,
+                [styles.isSelected]: access(props.renderProps).isSelected,
+                [styles.isDisabled]: access(props.renderProps).isDisabled,
+            }}
+        >
+            {props.children}
+        </div>
+    );
+};

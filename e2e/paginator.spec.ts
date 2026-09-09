@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 
 import { accessibleText, demo, prop, readout, tagName } from "./helpers";
 
@@ -138,4 +138,87 @@ test("the disabled knob reaches every control in every list", async ({ page }) =
 
     await page.locator(pageItem(STEPS, 3)).click({ force: true });
     expect(await readout(page, "steps"), "and nothing moves the page").toContain("page 1 of 20");
+});
+
+/**
+ * The dial reads the same knobs as the straight rows and asks for the same four step controls `ENDS` does,
+ * so what separates the two is the layout function and nothing else — which is what makes them comparable
+ * name for name.
+ */
+const DIAL = demo("dial");
+
+const placedBox = (scope: string) => `${scope} nav [role="presentation"][style*="left"]`;
+
+const controlNames = (page: Page, scope: string) =>
+    page.locator(item(scope)).evaluateAll((elements) => elements.map((element) => element.ariaLabel));
+
+/**
+ * A placement is written in fractions of the container's width, so the pair of `cqw` offsets the component
+ * wrote onto the box is what a spec can read — layout space rather than the measured page, which is the
+ * space `playwright.config.ts` explains every geometric assertion here has to stay in.
+ */
+const placedAngles = async (page: Page, scope: string) => {
+    const styles = await page
+        .locator(placedBox(scope))
+        .evaluateAll((elements) => elements.map((element) => element.getAttribute("style") ?? ""));
+
+    return styles.map((style) => {
+        const at = (property: string) => Number((new RegExp(`${property}:\\s*([-\\d.]+)cqw`).exec(style) ?? [])[1]);
+        const centre = 50;
+
+        return (Math.atan2(at("top") - centre, at("left") - centre) * 180) / Math.PI;
+    });
+};
+
+/**
+ * Read clockwise from wherever the first item happens to sit, so the check is that the ring walks one way
+ * round rather than that it starts anywhere in particular — a start angle is the layout's to choose.
+ */
+const toTurnedBy = (angles: number[]) => {
+    const full = 360;
+
+    return angles.map((angle) => (((angle - angles[0]) % full) + full) % full);
+};
+
+test("a laid-out row is the same controls in the same order, moved rather than rebuilt", async ({ page }) => {
+    expect(
+        await controlNames(page, DIAL),
+        "the dial asks for the same steps as the row with end jumps, so the names should match in order",
+    ).toEqual(await controlNames(page, ENDS));
+
+    await expect(
+        page.locator(placedBox(DIAL)),
+        "and every element of it has a box of its own, gaps included",
+    ).toHaveCount((await page.locator(item(DIAL)).count()) + (await page.locator(gap(DIAL)).count()));
+
+    await expect(page.locator(placedBox(ENDS)), "while a row with no layout places nothing").toHaveCount(0);
+});
+
+test("the ring walks one way round, so the order a pointer sees is the order the keyboard walks", async ({ page }) => {
+    const turnedBy = toTurnedBy(await placedAngles(page, DIAL));
+
+    expect(turnedBy.length, "a wedge for every step, page and gap").toBe(
+        (await page.locator(item(DIAL)).count()) + (await page.locator(gap(DIAL)).count()),
+    );
+
+    for (let index = 1; index < turnedBy.length; index++) {
+        expect(turnedBy[index], `wedge ${index} sits further round than the one before it`).toBeGreaterThan(
+            turnedBy[index - 1],
+        );
+    }
+});
+
+test("the page moves from a wedge the same as from a cell, and the wedge that is current follows it", async ({
+    page,
+}) => {
+    await expect(page.locator(pageItem(DIAL, 1))).toHaveAttribute("aria-current", "page");
+
+    await page.locator(step(DIAL, "Last")).click();
+
+    expect(await readout(page, "dial"), "the end jump reaches the last page from a wedge").toContain("page 20 of 20");
+    await expect(page.locator(pageItem(DIAL, 20)), "and the mark moves with it").toHaveAttribute(
+        "aria-current",
+        "page",
+    );
+    await expect(page.locator(pageItem(DIAL, 1))).not.toHaveAttribute("aria-current");
 });

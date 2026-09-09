@@ -34,6 +34,15 @@ export const COLUMN_TABS = withIds("column", [
     { value: "Settings" },
 ]);
 
+export const HONEYCOMB_TABS = withIds("honeycomb", [
+    { value: "Overview" },
+    { value: "Layers" },
+    { value: "Assets", isDisabled: true },
+    { value: "Timing" },
+    { value: "Output" },
+    { value: "Notes" },
+]);
+
 export const LINK_TABS: Tab<string>[] = [
     { value: "Docs", href: "#tabs-docs" },
     { value: "Guides", href: "#tabs-guides" },
@@ -49,6 +58,11 @@ export const DISABLED_TABS: Tab<string>[] = [
 ];
 
 export const PANEL_BODIES: Record<string, string> = {
+    Layers: "A honeycomb is a tab list too, and this is the panel behind one cell of it.",
+    Assets: "Disabled, so the walk goes round it rather than through it.",
+    Timing: "The keys still walk the list in order, whatever shape the list is in.",
+    Output: "The floater sits behind the cell the layout put it on.",
+    Notes: "The last cell of the second row, which is where the stagger shows.",
     Render: "The component itself, drawn with whatever the props panel currently says.",
     Source: "The code behind it, which is a second panel over the same tab list.",
     Metrics: "Disabled, so the keyboard walks past it and a click does nothing.",

@@ -1,3 +1,5 @@
+import type { ParentProps } from "solid-js";
+
 import { access } from "@thewaver/ss-components";
 
 import type { RadioStarContentProps } from "./RadioStarContent.types";
@@ -19,3 +21,5 @@ export const PageRadioStarContent = (props: RadioStarContentProps) => {
         </div>
     );
 };
+
+export const PageRadioStarCell = (props: ParentProps) => <div class={styles.starCell}>{props.children}</div>;

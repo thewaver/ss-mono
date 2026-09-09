@@ -42,3 +42,21 @@ export const stepperBody = style({
 });
 
 export const stepperItem = style([buttonElement, {}]);
+
+export const stepperPlacedList = style({
+    position: "absolute",
+    inset: 0,
+    display: "block",
+});
+
+export const stepperLayer = style({
+    position: "absolute",
+    inset: 0,
+    pointerEvents: "none",
+});
+
+export const stepperLayerConnector = style({
+    position: "absolute",
+    inset: 0,
+    pointerEvents: "none",
+});

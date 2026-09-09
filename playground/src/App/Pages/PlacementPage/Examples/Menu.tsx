@@ -1,4 +1,4 @@
-import { Show } from "solid-js";
+import { Show, createUniqueId } from "solid-js";
 
 import { PlacementUtils, WheelMenu } from "@thewaver/ss-components";
 import type { PlacementRect, WheelMenuItem } from "@thewaver/ss-components";
@@ -23,8 +23,19 @@ const toViewBox = (rect: PlacementRect) =>
     `${rect.left - rect.width * HALF} ${rect.top - rect.height * HALF} ${rect.width} ${rect.height}`;
 
 export const MenuExample = (props: PlacementExampleProps) => {
+    const gradientId = createUniqueId();
+
     return (
         <div class={styles.stage}>
+            <svg class={styles.wedgeDefs} aria-hidden={"true"}>
+                <defs>
+                    <linearGradient id={gradientId} x1={"0"} y1={"1"} x2={"1"} y2={"0"}>
+                        <stop class={styles.wedgeGradientFrom} offset={"0%"} />
+                        <stop class={styles.wedgeGradientTo} offset={"100%"} />
+                    </linearGradient>
+                </defs>
+            </svg>
+
             <WheelMenu
                 items={() => ACTIONS}
                 ariaLabel={"File actions"}
@@ -52,7 +63,7 @@ export const MenuExample = (props: PlacementExampleProps) => {
                                 <svg class={styles.canvas} viewBox={toViewBox(getPlacement()!)} aria-hidden={"true"}>
                                     <path
                                         class={styles.wedge}
-                                        classList={{ [styles.wedgeHighlighted]: getFlags().isHighlighted }}
+                                        style={{ fill: getFlags().isHighlighted ? `url(#${gradientId})` : undefined }}
                                         d={PlacementUtils.getSectorPath(getSector())}
                                     />
                                 </svg>

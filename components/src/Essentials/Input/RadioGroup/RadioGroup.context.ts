@@ -11,6 +11,7 @@ const ORPHAN_RADIO_CONTEXT: RadioGroupContextType = {
     getValue: () => undefined,
     setValue: () => undefined,
     computeIsTabbable: () => true,
+    computePlacement: () => undefined,
     register: () => undefined,
 };
 

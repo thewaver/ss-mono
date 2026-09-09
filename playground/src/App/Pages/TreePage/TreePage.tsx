@@ -6,11 +6,13 @@ import { LazyExample } from "./Examples/Lazy";
 import { LinkComponentExample } from "./Examples/LinkComponent";
 import { LinksExample } from "./Examples/Links";
 import { OutsideExample } from "./Examples/Outside";
+import { RadialExample } from "./Examples/Radial";
 import { RecordValuesExample } from "./Examples/RecordValues";
 import { VirtualizedExample } from "./Examples/Virtualized";
 import {
     FILES_WITH_DISABLED,
     FILES_WITH_REACHABLE,
+    ORBIT_ROOTS,
     STRESS_BRANCH_COUNT,
     STRESS_LEAF_COUNT,
     createStressFiles,
@@ -47,6 +49,9 @@ export const TreePage = () => {
     const stressSignal = createSignal<string | undefined>();
     const stressExpandedSignal = createSignal<string[]>(["package-1", "package-2", "package-3"]);
     const stressFiles = createStressFiles();
+
+    const radialSignal = createSignal<string | undefined>();
+    const radialExpandedSignal = createSignal<string[]>(ORBIT_ROOTS);
 
     const recordSignal = createSignal<Asset | undefined>();
     const recordExpandedSignal = createSignal<Asset[]>([]);
@@ -143,6 +148,15 @@ export const TreePage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Virtualized.tsx`,
+        },
+        {
+            key: "radial",
+            span: 2,
+            name: "A tree drawn outward",
+            readout: () =>
+                `value: ${radialSignal[0]() ?? "undefined"} — the layout is told which node each node hangs from, so children share the slice their parent was given and every generation sits a ring further out`,
+            component: () => <RadialExample valueSignal={radialSignal} expandedSignal={radialExpandedSignal} />,
+            path: `${EXAMPLES_ROOT}/Radial.tsx`,
         },
         {
             key: "recordValues",

@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { type Page, expect, test } from "@playwright/test";
 
 import { activeText, computedStyle, demo, inlineStyle, readout, tabIndex, tagName } from "./helpers";
 
@@ -252,4 +252,115 @@ test("a list with nothing enabled holds no tab stop at all", async ({ page }) =>
 
     await page.locator(tab(DISABLED)).nth(1).click({ force: true });
     expect(await readout(page, "disabled"), "and clicking changes nothing").toContain("selected: Draft");
+});
+
+/**
+ * A honeycomb is the same tab list with a layout function added, and it is the first arrangement in the
+ * library with no angle in it — the others are all a radius and a bearing. What is worth checking is that
+ * the list is still a list: the pairing, the roving walk and the floater all belong to `Tabs` rather than
+ * to the row it used to be drawn as, so none of them should notice.
+ */
+const HONEYCOMB = demo("honeycomb");
+
+const placedBox = (scope: string) => `${scope} [role="presentation"][style*="left"]`;
+
+/**
+ * Placements are written as shares of the container's width, so the offsets can be read straight off the
+ * boxes and compared with each other. Nothing here compares one against a number: what makes a honeycomb
+ * a honeycomb is that the second row starts half a column in, and half is a relationship between the two
+ * rows rather than a measurement of either.
+ */
+const placedOffsets = (page: Page, scope: string) =>
+    page.locator(placedBox(scope)).evaluateAll((elements) =>
+        elements.map((element) => {
+            const style = element.getAttribute("style") ?? "";
+            const at = (property: string) => Number((new RegExp(`${property}:\\s*([-\\d.]+)cqw`).exec(style) ?? [])[1]);
+
+            return { left: at("left"), top: at("top") };
+        }),
+    );
+
+test("a honeycomb is a box per tab, and the rows interlock rather than stacking", async ({ page }) => {
+    await expect(page.locator(placedBox(HONEYCOMB))).toHaveCount(await page.locator(tab(HONEYCOMB)).count());
+    await expect(page.locator(placedBox(ROW)), "while a row places nothing").toHaveCount(0);
+
+    const offsets = await placedOffsets(page, HONEYCOMB);
+    const firstRow = offsets.filter((offset) => offset.top === offsets[0].top);
+    const secondRow = offsets.filter((offset) => offset.top !== offsets[0].top);
+
+    expect(firstRow.length, "the first row is filled before the second is started").toBeGreaterThan(1);
+    expect(secondRow.length, "and there is a second").toBeGreaterThan(0);
+    expect(
+        secondRow[0].left - firstRow[0].left,
+        "which starts half a column in, so each cell sits in the notch between the two above it",
+    ).toBeCloseTo((firstRow[1].left - firstRow[0].left) / 2, 3);
+});
+
+test("a placed tab list is still a tab list: the pairing, the walk and the skip all hold", async ({ page }) => {
+    const selected = page.locator(`${HONEYCOMB} [aria-selected="true"]`);
+
+    await expect(selected, "one cell is selected and points at its panel").toHaveCount(1);
+    await expect(page.locator(`${HONEYCOMB} [role="tabpanel"]`)).toHaveAttribute(
+        "aria-labelledby",
+        (await selected.getAttribute("id")) ?? "",
+    );
+
+    await page.locator(tab(HONEYCOMB)).first().focus();
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+
+    expect(await activeText(page), "two steps from the first cell lands past the disabled one rather than on it").toBe(
+        await page.locator(tab(HONEYCOMB)).nth(3).textContent(),
+    );
+});
+
+test("the floater lands on the cell the layout chose, in both axes", async ({ page }) => {
+    const box = page.locator(floater(HONEYCOMB)).locator("..");
+    const before = { left: await inlineStyle(box, "left"), top: await inlineStyle(box, "top") };
+
+    expect(before.left, "the floater is placed from the layout rather than left at zero").not.toBe("");
+
+    await page.locator(tab(HONEYCOMB)).nth(4).click();
+
+    await expect.poll(() => inlineStyle(box, "left"), { timeout: FLOATER_TIMEOUT_MS }).not.toBe(before.left);
+    expect(
+        await inlineStyle(box, "top"),
+        "a cell on the second row is down as well as across, which a row would never have asked of it",
+    ).not.toBe(before.top);
+});
+
+/**
+ * The visible cell is a hexagon and the element under it is a rectangle, so the rectangles of two
+ * interlocking rows overlap in the notches — a press in one would otherwise land on whichever cell
+ * happens to be later in the document rather than on the one it looks like. The layout hands the box its
+ * own shape and CSS Masking 1 says pointer events "must not be dispatched on the clipped-out (non-visible)
+ * regions", so this presses a corner inside the rectangle and outside the hexagon and asks who answers.
+ *
+ * The corner is named as shares of the box rather than in pixels because the box is measured through the
+ * `Viewport` scale. At `CORNER_DOWN` the cell's lower-left edge has travelled two thirds of the way across,
+ * so `CORNER_ACROSS` is well outside the drawn shape while staying inside the element.
+ */
+const CORNER_ACROSS = 0.08;
+const CORNER_DOWN = 0.92;
+
+test("a press in the notch between two cells lands on the one it looks like", async ({ page }) => {
+    const cells = page.locator(tab(HONEYCOMB));
+    const upper = cells.first();
+    const elsewhere = cells.last();
+
+    await elsewhere.click();
+    expect(await readout(page, "honeycomb"), "start from a cell other than the one being aimed past").toContain(
+        `selected: ${await elsewhere.textContent()}`,
+    );
+
+    const box = await upper.boundingBox();
+
+    expect(box, "the first cell has a box to aim at").not.toBeNull();
+
+    await page.mouse.click(box!.x + box!.width * CORNER_ACROSS, box!.y + box!.height * CORNER_DOWN);
+
+    expect(
+        await readout(page, "honeycomb"),
+        "the bottom-left corner of the first cell's rectangle is outside its hexagon, so nothing there selects it",
+    ).toContain(`selected: ${await elsewhere.textContent()}`);
 });

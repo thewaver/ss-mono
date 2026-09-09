@@ -2178,7 +2178,7 @@ data, but a layout with its measurements welded shut is data a consumer can only
 thickness of a band, the gap between levels and the gap between wedges were module constants, so anybody
 wanting a fatter band had to fork the file. `createRing(defs)` takes all of them, every field optional, and
 `ring` is `createRing()` — one implementation, not a default beside a general case that could drift from it,
-which is what the first assertion in `MenuLayouts.const.test.ts` pins.
+which is what the first assertion in `PlacementLayouts.const.test.ts` pins.
 
 **The close control's size follows the hole rather than a constant of its own.** `closerRadiusPx` defaults to
 `holeRadiusPx`, so a consumer who widens the hole gets a disc that still fills it and still covers the opener
@@ -2198,7 +2198,7 @@ defs type is `ArcDefs` rather than `RingDefs` now that two shapes take it.
 **What the spread changes is where the first wedge sits, and that is the only branch in the builder.** A
 closed ring centres its first item straight up and the rest follow round; an open arc has two ends, so the
 items are spread symmetrically about straight up instead — first and last are mirror images, which is what
-`MenuLayouts.const.test.ts` asserts rather than any angle. The old hemisphere placed boxes on a 150-degree
+`PlacementLayouts.const.test.ts` asserts rather than any angle. The old hemisphere placed boxes on a 150-degree
 arc and sized its radius from how much room the items needed; none of that survived, so `toRadius` and the
 crowding factor it used went with it.
 
@@ -2310,9 +2310,10 @@ instead, converted to an angle at that band's radius, so a wedge is about the sa
 The block is then centred on the wedge that opened it, which is the thing that makes three bands legible.
 
 **Where the pieces live.** `components/src/Essentials/Menus` holds `Menu` and `WheelMenu`; the Playground
-mirrors it under `Pages/Menus` and the left-hand nav groups them. The arc factory itself stayed in
-`Samples/Menu/Layouts`, because `OverheadWheel` and the `Placement` page draw on it directly and it is sample
-code rather than component code — that placement is the one part of this that has not been argued.
+mirrors it under `Pages/Menus` and the left-hand nav groups them. The arc factory itself is sample code
+rather than component code, and it lived in `Samples/Menu/Layouts` for as long as a menu was the only thing
+asking for one — see _"Every layout sample lives in one place, and none of them is a menu's"_ for where it
+went once that stopped being true.
 
 ### The wheel as the ring's second consumer, and the `Placement` page
 
@@ -2349,6 +2350,403 @@ nothing else in common — one is a popup with levels and a keyboard walk, the o
 both is the claim the page exists to make, and `e2e/placement.spec.ts` asserts exactly that rather than any
 measurement: widening the band widens the menu's own popup and redraws the wheel's wedge, and emptying the
 hole turns a two-arc band into a one-arc pie.
+
+### `Paginator` takes a layout, and the placed box moves into the abstract
+
+The proving pass of `backlog.md` item 26, against the control the item named as the strongest candidate. A
+paginator is arithmetic over a flat list, so a layout is the only thing that changes: the steps, the pages and
+the ellipses go round a dial in the order they already had, and nothing about the counting, the addresses or
+the labels is touched.
+
+**`path` and `parentWidth` describe a level, so a control with no levels states neither.** Both are optional on
+`PlacementLayoutDefs` now, and `createArc` defaults them to the root. They were required because `Menu` is the
+only thing that had ever asked for a layout and a menu always knows which band it is drawing; a paginator has
+no notion of either, and making it pass an empty path and a zero width would have been the caller's version of
+the declare-and-ignore fault the one-aggregated-object rule exists to prevent. `path.length === 0` is still
+what "root" means, so no layout had to learn a new spelling.
+
+**The placed box is the abstract's, because the translation from fractions to CSS is.** `Menu` held four class
+names and two functions that turned a `PlacementRect` into `left`/`top`/`width`/`height` in container-query
+units; a second consumer would have had to import a sibling's internals or write the same thing again.
+`PlacementBox` and `PlacementItem` are now in `Abstracts/Placement`, and `Barrel` is the precedent — an
+abstract that renders, because lifting only the arithmetic leaves every consumer holding the same markup. The
+split is the same one `Barrel` drew: the abstract owns the sizing box, the spacer that gives it its shape and
+each item's offset and turn; the consumer owns what goes inside an item and everything said about it.
+
+**Both wrappers carry `role="presentation"`**, which is the rule _"the wrapper between a container role and its
+items is presentational"_ reaching the second wrapper of that kind. It matters more here than it did for
+`InteractionWrapper`: `role="menu"` and `role="tablist"` own their items, and a laid-out control puts two
+generic divs in between. Neither is focusable and neither carries global ARIA, so the role is honoured rather
+than ignored.
+
+**`toContainerWidth` is `PlacementUtils`' now**, having been written by hand three times — in `Menu`, in
+`Formation`, and again in the Playground's wheel painter. `Formation` is the one still holding its own copy of
+the whole box, in its own vocabulary of insets rather than placements; whether it becomes a consumer of this
+abstract has not been argued.
+
+**A placement travels inside the painter's object where there is one, and as its own argument where there is
+not.** `PaginatorPageRenderProps` and `PaginatorStepRenderProps` already carried a payload — a page number, a
+target page — so a rect goes in beside them under the same rule that put one inside `WheelWedgeState`.
+`renderGap` is the exception: a gap is not a control, has no flags object of its own, and takes the placement
+as a second argument, which is the shape `Menu.renderItem` already has for the same reason.
+
+**A placed item has to be told to fill the box the layout gave it, and that is the pass's one real correction
+to a component.** `InteractionWrapper` sizes itself `fit-content` by default and the elements inside it ask for
+`width: 100%`, so a painter with no intrinsic width resolves against a parent that is resolving against the
+painter, and the whole chain comes out zero wide — a ring of wedges rendered as a ring of labels with no
+wedges. `Menu` had always passed `sizing="fill"` and so had never seen it. `Paginator` picks per item: `fill`
+where a placement exists, `fit-content` where one does not, because a page cell in a straight row is as wide as
+its digits and a wedge is as wide as the layout says.
+
+**The two demos make different claims on purpose.** The dial reads the sector off the placement and paints an
+annulus wedge per element, which is `WheelMenu`'s painter applied to a second control. The ring hands the same
+layout to the painter the straight rows already use, unchanged, which ignores the sector and draws its cell in
+the box. So the sector is vocabulary a layout offers and a painter may decline, rather than something a placed
+control has to understand.
+
+**What the pass did not strain, which is worth knowing before the next consumer.** `PlacementUtils.pickIndex`
+still has no caller — a paginator has no gesture that picks by direction, so the loose end item 26 records is
+untouched. Nor did anything about levels move: a paginator is one level and always will be, so the concentric
+machinery went unexercised.
+
+**WCAG, checked rather than assumed.** 2.4.3 Focus Order (A) asks that "focusable components receive focus in
+an order that preserves meaning and operability"; a ring is drawn from the document order outwards, so the
+angular order and the tab order are the same walk, and `paginator.spec.ts` asserts exactly that rather than any
+angle — each box sits further round than the one before it. 2.5.8 Target Size (Minimum) (AA) asks for "at least
+24 by 24 CSS pixels", measured on "the smallest enclosing rectangle aligned to the horizontal axis within which
+all the points of a shape lie", and the adjoining wedges of a ring cannot claim the Spacing exception. Measured
+at the widest the Playground's knobs go — twenty-six elements round the dial — the smallest wedge's enclosing
+rectangle is 53 by 57, so it conforms. The number that would break it is item count rather than any knob: past
+roughly thirty elements an axis-aligned wedge's rectangle narrows below 24, and a root band divides its spread
+evenly with no floor, unlike a deeper band which asks for a target arc length and grows its radius to get it.
+
+### `RadioGroup` and `Tabs` take a layout too, and the floater stops being measured
+
+The rest of the proving pass. Three controls now take a `computeLayout` and are unchanged without one, and
+each of the three arrived at it from a different direction, which is what the pass was for.
+
+**A group takes children, not records, so the placement travels down the context.** `RadioGroup` is the
+awkward one: `Menu`, `Paginator` and `Tabs` all hold their items as data and can wrap each one, and a group
+holds an opaque `props.children` and learns what is inside it only when each `Radio` registers itself. The
+alternatives were an `items` / `renderItem` group beside the existing one — a second component to keep in
+step, and `Tabs` is the record-shaped group already — or the group placing children it cannot see. So
+`RadioGroupContextType` gained `computePlacement`, keyed on the entry the radio registered rather than on its
+value, and `Radio` wraps itself. The ordering was already solved: the group sorts its entries by
+`compareDocumentPosition`, which is what the floater has always relied on, so the index a placement is looked
+up by is the document order rather than the registration order.
+
+**A placed floater is derived rather than observed, and the bug that forced it is worth recording.** Both
+floaters found their box by reading `offsetTop` and `offsetLeft` off the selected item's `offsetParent` under
+a `ResizeObserver`. A placed item is absolutely positioned, so it _becomes_ that `offsetParent`, and every
+offset came back zero — the marker would have sat in the corner of the list. The replacement is better than
+what it replaces rather than a patch on it: the layout already knows where the selected item is, in shares of
+its own width, so a placed floater multiplies that by the layout's width and observes nothing at all. The
+`ResizeObserver` is now skipped outright when a layout is in play. **The turn travels with the box**, so a
+floater behind an item the layout tilted is tilted with it.
+
+**`stackAt` is optional now.** Absolutely positioned siblings already paint in document order, so a control
+with no notion of depth states none and `PlacementItem` writes no `z-index` at all; a rect's own `depth`
+still overrides. `Menu` and `Paginator` keep passing an index, which is what they did before.
+
+**A placement reaches `Tabs`' painter as a third argument, and `Paginator`'s inside the object.** The
+difference is not a taste one: `Tabs.renderTab` is handed a bare `InteractionFlags`, all booleans, and a rect
+inside it would make the name a lie — the rule `Menu.renderItem` already follows. A paginator's painters
+receive `*RenderProps` carrying a page number, so theirs goes in beside it.
+
+**A placed tab list still declares an axis, deliberately.** `dir` stops laying anything out under a layout —
+so does `tabGap`, and so does a group's `gap` — but it still decides `aria-orientation` and which pair of
+arrows walks the list, and the consumer is the one who knows whether their arrangement reads as a row or a
+column. A group's walk was already `orientation: "both"` and stays that way. Neither was changed to match the
+other, because the two controls disagreed before any of this and for reasons of their own.
+
+**The honeycomb is the first layout with no angle in it, which is the point of building it.** Everything
+shipped until now is a radius and a bearing, so nothing had ever tested whether a placement's vocabulary is
+general or quietly polar. It is general: a honeycomb is rows of hexagons, staggered by half a column and
+stepping down by three quarters of a cell so the rows interlock, and it needs nothing the ring did not already
+have — plus one field, below. It picks by `"nearest"`, there being no centre to take a bearing from.
+
+**A placement carries the shape it occupies, because otherwise the target and the drawing disagree.** A
+hexagon drawn inside a rectangular box leaves the corners of that box live, and two interlocking rows overlap
+in exactly those corners — so a press in a notch would activate whichever cell came later in the document
+rather than the one under the pointer. The painter cannot fix it, because the element that takes the press is
+the library's `<button>`. So `PlacementRect` gained `clipPath` and `PlacementItem` applies it: CSS Masking 1
+says "pointer-events must not be dispatched on the clipped-out (non-visible) regions of a shape", so the hit
+area follows the drawing. This is `TileBoard`'s conclusion — _"the shape is worn by a hit layer, so the
+pointer follows the drawing"_ — reached again from the other end, and it is the same line `getSectorPath`
+already drew: the outline of the space an item occupies is geometry, and fill, stroke and transition remain
+paint. Only the honeycomb asks for one; a wedge's painter draws outside its box on purpose and must not be
+clipped.
+
+**WCAG, checked.** 2.5.8 Target Size (Minimum) (AA) is measured on "the smallest enclosing rectangle aligned
+to the horizontal axis": an arc star's box is 44 by 40 and a honeycomb cell's is 84 by 97, so both clear 24 by
+24 with room. The clip narrows what answers a press but not the rectangle the criterion measures, and the
+hexagons no longer overlap each other's targets, so the Spacing exception is not needed either way. 2.4.3
+Focus Order (A) holds for the same reason it does round the dial — the walk is the document order and the
+arrangement is drawn from it — and both suites assert the walk rather than any position.
+
+### Every layout sample lives in one place, and none of them is a menu's
+
+The user's call, taken while `backlog.md` item 26's proving pass was still open. `Samples/Menu/Layouts` was
+named when a menu was the only thing that had ever asked for a layout; by the end of the pass it held a
+honeycomb and a radial tree, and eleven consumers imported it of which three were menus. It is now
+`Samples/Placement/Layouts`, and the arrangements that came in with `Formation` are in it too.
+
+**One contract, so any layout works with any placed control.** `Formation`'s `computeLayout` took a bare item
+count while everything else took `PlacementLayoutDefs`, which is what kept the two families apart — the same
+divergence as the vocabulary of insets, one level up. `Formation` takes `PlacementLayoutFn` now, so a ring can
+be handed to a `Formation` and a whorl to a `Menu`, and neither knows the other exists.
+
+**What separates the two families is whether a layout knows its own size in pixels, and that is what their
+names say.** `SizedLayoutFn` returns a `SizedLayout`, which states a `width` — the arc, the fan, the honeycomb
+and the radial tree all work out how much room their items need. `FittedLayoutFn` is a plain
+`PlacementLayoutFn` whose layouts state no width, so the box takes it from whatever it is put in, which is
+what `Formation`'s podium and whorls have always done. Both are `PlacementLayoutFn`s and a control cannot
+tell them apart; the difference is only whether the box sizes itself.
+
+**Four exports went with the move rather than into a file that no longer names menus.** `MENU_LAYOUTS`,
+`MENU_LAYOUT_KEYS`, `MenuLayoutKey` and `NO_MENU_ITEMS` were a registry for a picker nothing had built:
+no consumer in the library, the Playground or the suite read any of them. Carrying a dead registry across a
+move and renaming it would have been worse than deleting it.
+
+### `Formation` is the abstract's, and the placed box became two things because of it
+
+Part of the same fold. `Formation` held a second copy of the machinery: a root with `containerType`, a spacer
+that gave it its shape, an absolutely positioned item per entry, and its own vocabulary of insets. All of it
+was `Abstracts/Placement` under different names.
+
+**A placement's box does not always size itself, and that is the one real correction `Formation` forced.**
+`PlacementLayout.width` is optional now, and `PlacementBox` falls back to filling its parent. This is not a
+concession: a layout that works in fractions has no pixel size to state, and one that works in pixels does.
+The alternative was making `Formation`'s arrangements invent a width, which would have turned a fluid
+component into a fixed one — the opposite of what _"one side comes from the parent"_ says about `Mosaic` and
+of what `Formation`'s own entry argues.
+
+**The floaters stopped multiplying by a width because of it.** `Tabs` and `RadioGroup` had been converting a
+placement into a pixel box by multiplying through `layout.width`, which only works for a layout that has one.
+Both now write the floater in the same container-query units the items use, which means the floater has to
+live inside the box rather than beside it — and that is simpler than what it replaces, since there is no
+conversion left to get wrong.
+
+**`FormationInset` survives as an alias of `PlacementRect` and `FormationLayout` does not.** An inset and a
+placement are the same four numbers, so the name can stay pointing at the new type; a layout is not the same
+shape, because `insets` became `placements`. That is the `WheelUtils.getApothem` precedent applied as far as
+it goes and no further.
+
+### The arc reserves the whole turn or snaps to what it draws, and the sector had to say where its centre is
+
+The user's call, after the rating arc reserved a square box and painted in the top half of it. Both behaviours
+are wanted: a popup centred on its invoker needs a box symmetric about the circle's centre, because that is
+what keeps a `WheelMenu`'s bands concentric with the button that opened them; a control sitting in a page's
+flow wants a box that hugs what is drawn.
+
+**`ArcDefs.fit` is `"turn"` or `"content"`, and `"turn"` is the default so nothing that existed moved.** A
+snapped arc computes the extent of what it draws — exactly, not by sampling: the extremes of an annulus
+sector are at its two ends or where an axis crosses it, so those are the only angles worth asking about, and
+the label boxes are thrown in because a label may reach past the rim it names. A whole turn snapped to its
+content is the same box it always was, give or take that overhang.
+
+**A sector carries the point it turns about.** Snapping moves the circle's centre off the middle of the box,
+and a painter is handed a `PlacementRect` rather than the layout — so a wedge drawn about the middle would be
+drawn about the wrong point. `PlacementSector.origin` is optional and `getSectorPath` prefers an explicit
+argument, then the sector's own, then the middle, so every painter that existed is untouched and a snapped one
+needs to know nothing. `PlacementLayout.origin` still exists and holds the same value: that one is what the
+picking measures directions from, and a layout sets both from the same number.
+
+**A snapped arc cannot nest, and nothing says so at the call site.** A concentric band derives its inner
+radius from `parentWidth`, which a snapped arc no longer reports as its diameter. It is recorded in
+`backlog.md` rather than guarded, because the snap exists for flat controls and the guard would have to be a
+runtime warning of the kind `Label` already decided against.
+
+### A hover the pointer did not cause no longer moves the highlight
+
+The user's call, on a finding that came out of painting a wheel's wedges with a gradient. Putting an SVG
+gradient definition inside the wheel's popup was enough to make the browser re-run hit-testing as the popup
+appeared, and it reports that as a fresh `mouseenter` — so a wheel, which opens centred on its own trigger,
+handed the highlight to the close control in its hole before anybody had touched anything.
+
+**The machinery to tell the two apart was already there and was only half-used.** `createPointerPointReader`
+exists because "a menu whose items are laid out may cover its own opener", and `getIsPointerLed` is the test:
+a real enter arrives with coordinates that differ from the last movement, an invented one matches. It gated
+whether a submenu opened and not whether the highlight moved, which reads as an oversight rather than a
+decision. `hoverIndex` now returns early for an enter nothing caused.
+
+**What proves it is a dispatched event rather than a browser quirk.** No real interaction produces the
+invented kind on demand — it depends on what the browser decides to re-test and when — so `menu.spec.ts`
+dispatches a `mouseenter` carrying the coordinates the pointer actually last had, which is the shape the guard
+is written to recognise, and checks that the same item entered properly still takes the highlight. The demo
+keeps its gradient definition in the page rather than in the popup all the same, which is where a definition
+shared by every wedge belongs.
+
+### A placed menu walks on all four arrows, so `Escape` steps out one band
+
+The user's call: a ring has no left and no right, so the pair of arrows that opens and closes a level in a
+straight menu should walk it instead. That leaves two functions needing keys, and 2.1.1 Keyboard is explicit
+that authors choose which — "deviating from these conventions does not fail the normative requirement of this
+success criterion" — but equally explicit that the functions have to stay reachable.
+
+**Activation opens a band and `Escape` leaves one.** Opening was already `Enter` and `Space`, since a wedge
+with children opens them when it is activated. Leaving was `ArrowLeft`, and is now `Escape`, which steps out a
+single band and closes the wheel only from the root. Both are scoped to a laid-out menu, so no straight menu
+changed: there `ArrowRight` and `ArrowLeft` still open and close, because there they mean something.
+
+**`Escape` had to be stopped from reaching the dismisser, and `stopPropagation` was not enough.** Solid
+delegates `keydown` at the document root, so the menu's handler and `DismisserStack`'s listener are both on
+`document` — a call that stops the event travelling further does nothing to a listener already attached to the
+same node. `stopImmediatePropagation` is what a level needs to keep a dismissal to itself.
+
+### A group's radios are ordered by the document, and only once every one of them has reported
+
+`RadioGroup` sorts its registered entries by `compareDocumentPosition`, which is how the roving walk and the
+floater find their order. The comparator answered "equal" for any pair whose element had not arrived yet,
+which makes it inconsistent — and `Array.prototype.sort` given an inconsistent comparator may return any
+permutation at all, including a reversed one.
+
+**It stayed invisible until a placement was looked up by that order.** A walk and a floater recover on the
+next render; a placement does not, because the index is what decides which radio is drawn where. The user saw
+a rating arc fill from the wrong end, which is that permutation. The memo now returns the registration order
+until every entry has an element and sorts only then, so the comparator is never asked a question it cannot
+answer.
+
+### Five more controls take a layout, and each one broke something different
+
+The rest of `backlog.md` item 26's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
+`Paginator`, `RadioGroup` and `Tabs`. The reason to keep going past the first was that each control was
+expected to strain a different part of the abstract, and each did.
+
+**A connector has to reach, which no amount of repositioning gives you.** `Stepper`'s run between two steps
+was a bar between two flex siblings: it has no idea where either of its neighbours is, because in a row it
+does not need to. A placed run is handed both placements and draws its own path, and
+`PlacementUtils.getLinkPath` is the geometry — straight between two placements, or bent along the arc they
+sit on when it is given the point they turn about. `BracketConnectorPaths` is the precedent for a connector
+as a path string rather than as a box, and this is the same answer reached from the other end.
+
+**A placed `li` stays a child of its `ol`, and becomes a layer rather than a box.** Wrapping it in the
+abstract's div would put a generic element between an `ol` and its `li`s, which stops the list counting;
+`display: contents` on the `li` would do the same in Chrome's tree. So each `li` is stretched over the whole
+box with `pointer-events: none`, the step sits in a placement inside it, and the run to the next step is
+drawn across it. That is `Menu`'s radio-group run pattern, and it is what makes a reaching connector possible
+at all — the connector needs a surface as wide as the box, which a placed item is not.
+
+**`Toolbar` is the one control where a layout removes a behaviour instead of moving it.** Its whole substance
+is the cut: it measures every action against the room it has and moves the tail into a menu. A layout sizes
+the toolbar itself, so there is no room to run out of — a placed toolbar collapses nothing, its overflow menu
+holds nothing, and its observers do not run. The 1-D arithmetic in `ToolbarUtils.computeCut` is not extended
+to two dimensions; it is simply not asked.
+
+**`Sortable` is what `PlacementUtils.pickIndex` was built for, and the first thing to call it.** A row decides
+a drop by walking its items in order and comparing one coordinate against each midpoint. A ring has no such
+coordinate — the item at twelve o'clock is neither before nor after the one at three — so a placed list asks
+which placement is nearest instead. `toLayoutPoint` converts the pointer through the box's own rect, which is
+also why the `Viewport` scale divides out: a ratio taken within one rect does not care what scale that rect
+was measured at. Item 26 recorded the picking as a tested generalisation with nothing consuming it, waiting on
+the flick; the flick is still unbuilt and this got there first.
+
+**`Tree` is the only layout that needed to know more than how many items it is placing.** Where a node goes
+depends on which node it hangs from, and no field in `PlacementLayoutDefs` could say so. `FlatRow` already
+carried `parentIndex`, so the defs gained `itemParents` — one optional field, general to anything tree-shaped,
+and enough for `createRadialTree` to work the depths out from the chain rather than being told them. The
+rejected alternative was a per-item depth array, which is the same fact stated less generally: parents give
+depths, depths do not give parents.
+
+**Windowing and a layout cannot both be in force.** A window mounts a run of rows and moves them down a
+column; a layout places every visible node wherever it likes. `Tree` turns virtualization off when it is given
+a layout, so a placed tree renders all of its open nodes. This is a boundary rather than a fault — there is no
+run to window — and it is recorded in `backlog.md` as an accepted limit.
+
+**Both pairs of arrows walk a placed control, and that is now the fourth control to reach it.** `Menu`,
+`Tabs`, `Toolbar` and `Sortable` all fall back to "both" when they are laid out, because none of them runs
+along an axis any more. `Tabs` is the exception and deliberately so: it keeps `dir` as the axis because
+`aria-orientation` has to say something and the consumer is the one who knows whether their arrangement reads
+as a row or a column.
+
+**A placement carries the shape it occupies, and that came out of the honeycomb rather than out of a wedge.**
+A hexagon drawn inside a rectangular box leaves its corners live, and two interlocking rows of them overlap in
+exactly those corners — so a press in a notch activated whichever cell came later in the document. The
+painter cannot fix it, because the element that takes the press is the library's own button. `PlacementRect`
+gained `clipPath`, and CSS Masking 1 settles what that buys: "pointer-events must not be dispatched on the
+clipped-out (non-visible) regions of a shape". `TileBoard` had already concluded that the shape belongs on the
+hit layer; this is the same rule arrived at from the opposite direction, and it stays geometry rather than
+paint for the reason `getSectorPath` gives.
+
+### A landing mark is placed like an item, and the gap between two placements is geometry
+
+The user's, on seeing that a placed `Sortable` marked nothing: the two neighbours a card would land between
+have borders, and the point midway between them is calculable however they are turned. So it is calculated,
+in the abstract, and the answer is a `PlacementRect` — which means the mark is placed exactly the way an item
+is and needs no second mechanism.
+
+**`PlacementUtils.getGapPlacement` takes the placements and an index, not two rects.** The index is the one a
+control already has — where the carried item would land — and the ends of the list are the reason the whole
+list is the argument: before the first and after the last there is only one neighbour, so the gap is aimed by
+the pair inside it and put on the far side of the outermost one. A list of one has no direction and gets
+nothing back.
+
+**It measures between the borders that face each other, which is not the midpoint of the two centres.** Those
+are the same point only while the neighbours are the same size. A placement may also be turned, so the
+distance from a centre to its own border along a direction is a ray against a box in that box's own frame
+rather than against the upright rectangle it would have been — and the length of the mark is the box's
+shadow across the join, which for a diagonal join is neither of its two sides.
+
+**The end of a run is found by carrying the run round its own curve, not along its last straight line.** The
+first attempt aimed the last gap by reversing the join before it, which is right for a row and a quarter turn
+out on a ring: the user found it by eye on the north-west gap of a ring of four, where the mark lay across
+the six-to-nine join instead of across nine-to-twelve. Three consecutive placements say how a run is curving
+and two say only which way it is heading, so the imagined neighbour past the end sits on the circle through
+the last three, one turn further round; where those three are in a line the circle has no centre and the
+straight continuation is all there is, which is the row's answer falling out of the same arithmetic. Both
+ends of a closed ring then describe the same gap, because on a ring they are the same place.
+
+**Four gaps a quarter turn apart is what the spec checks, rather than each mark on its own.** One wrong
+bearing among four looks plausible in isolation and is obvious the moment the set is compared, which is how
+the fault reached the user rather than the suite. `sortable.spec.ts` walks the carried card round all four
+and asserts the step between consecutive bearings; reverting the continuation to the straight line fails it.
+
+**A placement is a centre before it is a size, so what sits in one stays on that centre whether or not it
+fits.** The user's, on noticing that the item at the top of a ring and the item at the bottom did not share
+a centre. The boxes did — both were at `50cqw` — and what had moved was the card inside one of them: a card
+whose content needs more room than the box it was given pulls the box's only track out with it, and an
+`auto` track grows out of one side only. So the placed box pins its single track to itself and centres what
+it holds, and holds that child to at least the box's own size so a painter that draws the whole box still
+has one to draw. What does not fit is then squeezed rather than shifted, which is the honest failure: the
+item stays on its point and the too-small box shows up as clipped content rather than as a crooked ring.
+
+**The gap is the space, and how much of it to ink is the painter's.** The rect handed over is the whole gap,
+turned so its own width runs along the join and its height lies across it; the library centres whatever the
+painter draws inside that, rather than stretching it to fill. A painter that filled it drew a diamond the
+size of the gap, which is what settled the split — the same line `getSectorPath` draws between a shape and
+the paint on it.
+
+**The turn is what a spec can read, because a row's mark never had one.** `sortable.spec.ts` drags a card
+round the ring and checks that the box the library placed carries a real bearing rather than none, which
+separates a placed mark from a repositioned bar without measuring where either of them is.
+
+### The `Sortable` page's cards centre on their slot rather than filling it, and its surfaces are given room
+
+Two faults the user found in the placed `Sortable` demo, both in the Playground's paint rather than in the
+library, and worth recording because the first cost several rounds to locate.
+
+**A card drew itself at its own width and hugged one edge of its slot.** `sortableItemContent` had no width
+and the default `flex: 0 1 auto`, so a chip took the size of its text and sat at the left of whatever slot it
+was given. In a column that reads as a left-aligned list and nobody notices; on a ring the slot is the size
+the layout chose, so a long label pushed its own centre right and the items stopped sharing an axis. The
+library was correct throughout — box, wrapper and `listitem` were all exactly the slot's width — which is
+what made it hard to see: every measurement of the library's own geometry came back symmetric while the
+screen was visibly not.
+
+**Centred, not stretched, on the user's call.** `margin-inline: auto` on the chip, which centres a flex item
+along the main axis, so a card keeps its own width and sits on its point. Making it `flex: 1 1 auto` instead
+also fixed the geometry and was tried first; the user preferred the cards to stay their own size. It changes
+the column demo too, where the three shorter cards now centre in the width of the longest rather than lining
+up on the left.
+
+**The dashed surface is drawn outside the list, so every demo has to keep room for it.** `sortableSurface`
+sits at `inset: calc(-1 * spacing.full)` — deliberately a spacing unit beyond the list it belongs to, so the
+items look enclosed by it. The two-list example had that unit back all along, in the wrapper that holds its
+captions, which is why its surface landed neatly on the example card's content edge while every other
+example's spilled into the card's padding. `PageSortableRoom` gives that unit to the rest, in one place
+rather than repeated per example. The alternative was to stop the surface reaching outside its own bounds and
+let the list's end room be the halo, which would have been a smaller rule and a different look; the look the
+user pointed at as correct was the one with the overhang.
 
 ### `Menu` submenus: a level per popup, focus moving between them
 
@@ -8579,7 +8977,7 @@ were never the problem.
 **Width-relative rather than height-relative, so a taller parent leaves space instead of stretching.**
 `top` and `height` are in `cqw` too, not in percentages — a percentage `top` resolves against the height, and
 an arrangement stretched vertically by a parent that happened to be tall is a distorted podium. Every number
-in a `FormationLayout` is therefore in one unit, and `heightRatio` is the honest bottom edge of the lowest
+in a placement is therefore in one unit, and `heightRatio` is the honest bottom edge of the lowest
 item rather than the original's hand-tuned trims.
 
 **This is the first use of container query units in `components/src`, and it carries no fallback.** Argued on the

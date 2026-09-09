@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { PlacementLayout } from "./Placement.types";
+import type { PlacementLayout, PlacementRect } from "./Placement.types";
 import { PlacementUtils } from "./Placement.utils";
 
 // four items round a square box, at twelve, three, six and nine o'clock
@@ -123,6 +123,114 @@ describe("pickIndex, with nothing to pick", () => {
     it("has no answer when everything has been ruled out", () => {
         expect(
             PlacementUtils.pickIndex({ layout: SCATTER, point: { x: 0.5, y: 0.25 }, isPickable: () => false }),
+        ).toBeUndefined();
+    });
+});
+
+describe("getGapPlacement", () => {
+    /**
+     * Every number here is a share of the box's width, so the boxes are written as plain fractions and the
+     * assertions are relationships between them rather than measurements: the gap sits between the borders
+     * that face each other, it is as wide as the space actually left, and it lies across the join.
+     */
+    const box = (left: number, top: number, angle?: number): PlacementRect => ({
+        left,
+        top,
+        width: 0.2,
+        height: 0.1,
+        angle,
+    });
+
+    it("sits midway between the two borders rather than midway between the two centres", () => {
+        const gap = PlacementUtils.getGapPlacement([box(0.2, 0.5), box(0.8, 0.5)], 1)!;
+
+        expect(gap.left, "the centres are level, so the gap is level with them").toBeCloseTo(0.5);
+        expect(gap.top).toBeCloseTo(0.5);
+        expect(gap.width, "and it is as wide as what is left between the two facing edges").toBeCloseTo(0.4);
+    });
+
+    it("measures a smaller gap when the neighbours are wider, the centres being unmoved", () => {
+        const narrow = PlacementUtils.getGapPlacement([box(0.2, 0.5), box(0.8, 0.5)], 1)!;
+        const wide = PlacementUtils.getGapPlacement(
+            [
+                { ...box(0.2, 0.5), width: 0.4 },
+                { ...box(0.8, 0.5), width: 0.4 },
+            ],
+            1,
+        )!;
+
+        expect(wide.left, "the gap is still between the same two centres").toBeCloseTo(narrow.left);
+        expect(wide.width, "but there is less room left between them").toBeLessThan(narrow.width);
+    });
+
+    it("lies across the line joining the two, so a mark reads as a mark", () => {
+        const level = PlacementUtils.getGapPlacement([box(0.2, 0.5), box(0.8, 0.5)], 1)!;
+        const stacked = PlacementUtils.getGapPlacement([box(0.5, 0.2), box(0.5, 0.8)], 1)!;
+
+        expect(level.angle, "two side by side are joined along the horizontal").toBeCloseTo(0);
+        expect(stacked.angle, "and two stacked along the vertical, a quarter turn from it").toBeCloseTo(90);
+    });
+
+    it("reads a turned neighbour's own edge rather than the upright box it would have had", () => {
+        const upright = PlacementUtils.getGapPlacement([box(0.2, 0.5), box(0.8, 0.5)], 1)!;
+        const turned = PlacementUtils.getGapPlacement([box(0.2, 0.5, 90), box(0.8, 0.5)], 1)!;
+
+        expect(
+            turned.width,
+            "turned a quarter, the box presents its short side to the join, so more room is left",
+        ).toBeGreaterThan(upright.width);
+    });
+
+    it("puts the ends outside the outermost item, carrying a straight run straight on", () => {
+        const placements = [box(0.2, 0.5), box(0.5, 0.5), box(0.8, 0.5)];
+        const before = PlacementUtils.getGapPlacement(placements, 0)!;
+        const after = PlacementUtils.getGapPlacement(placements, placements.length)!;
+
+        expect(before.left, "the gap before the first sits on its far side").toBeLessThan(placements[0].left);
+        expect(after.left, "and the one after the last on its far side").toBeGreaterThan(
+            placements[placements.length - 1].left,
+        );
+        expect(after.angle, "a run in a line continues along it").toBeCloseTo(before.angle!);
+    });
+
+    /**
+     * The end of a run laid round a circle is not where the run's last straight line points. Four items at
+     * twelve, three, six and nine o'clock have their last gap between nine and twelve, and reversing the
+     * six-to-nine join aims a quarter turn away from it — which is the fault this exists to catch.
+     */
+    it("carries a curved run round its own curve, not along its last straight line", () => {
+        const ring = [box(0.5, 0.1), box(0.9, 0.5), box(0.5, 0.9), box(0.1, 0.5)];
+        const after = PlacementUtils.getGapPlacement(ring, ring.length)!;
+        const joinToFirst = PlacementUtils.getAngle(
+            { x: ring[3].left, y: ring[3].top },
+            { x: ring[0].left, y: ring[0].top },
+        );
+
+        expect(after.angle, "the last gap is aimed at where the ring comes back round to").toBeCloseTo(joinToFirst);
+        expect(
+            Math.abs(after.left - 0.3) + Math.abs(after.top - 0.3),
+            "so it sits north-west of the box, between nine o'clock and twelve",
+        ).toBeLessThan(0.1);
+    });
+
+    it("agrees with itself at the two ends of a closed run, both being the same gap", () => {
+        const ring = [box(0.5, 0.1), box(0.9, 0.5), box(0.5, 0.9), box(0.1, 0.5)];
+        const before = PlacementUtils.getGapPlacement(ring, 0)!;
+        const after = PlacementUtils.getGapPlacement(ring, ring.length)!;
+
+        expect(before.left, "before the first and after the last are one place on a ring").toBeCloseTo(after.left);
+        expect(before.top).toBeCloseTo(after.top);
+        expect(before.angle).toBeCloseTo(after.angle!);
+    });
+
+    it("has nothing to say about a list with no direction in it", () => {
+        expect(
+            PlacementUtils.getGapPlacement([box(0.5, 0.5)], 0),
+            "one item leaves no gap to describe",
+        ).toBeUndefined();
+        expect(
+            PlacementUtils.getGapPlacement([box(0.5, 0.5), box(0.5, 0.5)], 1),
+            "and two in the same place leave no line to lie across",
         ).toBeUndefined();
     });
 });

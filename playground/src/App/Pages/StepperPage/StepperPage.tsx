@@ -9,6 +9,7 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { PageCheckField } from "../../StyledComponents/Field/Field";
 import type { PageStepState } from "../../StyledComponents/StepContent/StepContent.types";
+import { ArcExample } from "./Examples/Arc";
 import { BareExample } from "./Examples/Bare";
 import { DetailedExample } from "./Examples/Detailed";
 import { FailedExample } from "./Examples/Failed";
@@ -30,12 +31,14 @@ export const StepperPage = () => {
     const [getFailedCurrent, setFailedCurrent] = createSignal<StepValue>(STARTING_FAILED);
     const [getStackedCurrent, setStackedCurrent] = createSignal<StepValue>(STARTING_STACKED);
     const [getDetailedCurrent, setDetailedCurrent] = createSignal<StepValue>(STARTING_DETAILED);
+    const [getArcCurrent, setArcCurrent] = createSignal<StepValue>(STARTING_LINEAR);
 
     const reset = () => {
         setLinearCurrent(STARTING_LINEAR);
         setFailedCurrent(STARTING_FAILED);
         setStackedCurrent(STARTING_STACKED);
         setDetailedCurrent(STARTING_DETAILED);
+        setArcCurrent(STARTING_LINEAR);
     };
 
     const computeState = (value: StepValue, current: StepValue): PageStepState => {
@@ -120,6 +123,22 @@ export const StepperPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Detailed.tsx`,
+        },
+        {
+            key: "arc",
+            span: 2,
+            name: "The same steps, bent along an arc",
+            readout: () =>
+                `current: ${getArcCurrent()} — one layout function, and the run between two steps follows the curve they sit on rather than cutting across it`,
+            component: () => (
+                <ArcExample
+                    steps={() => buildSteps(getArcCurrent())}
+                    currentValue={getArcCurrent}
+                    computeStepAriaLabel={describe}
+                    onCurrentChange={setArcCurrent}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Arc.tsx`,
         },
         {
             key: "bare",

@@ -1,6 +1,6 @@
 import { createMemo } from "solid-js";
 
-import { createFan } from "../../../Samples/Menu/Layouts/MenuLayouts.const";
+import { createFan } from "../../../Samples/Placement/Layouts/PlacementLayouts.const";
 import { Menu } from "../Menu/Menu";
 import type { FanMenuProps } from "./FanMenu.types";
 

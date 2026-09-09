@@ -201,3 +201,61 @@ test("a row strip stays inside the box it is given", async ({ page }) => {
     expect(fit.content, "and nothing inside it reaches past that either").toBeLessThanOrEqual(fit.list);
     expect(fit.left, "so no step is pushed off the near edge").toBeGreaterThanOrEqual(0);
 });
+
+/**
+ * A laid-out strip keeps its `ol` and one `li` per step, so the list still counts and `aria-current` still
+ * says where you are — what changes is that the `li` becomes a layer over the whole box and the step sits
+ * in a placement inside it. The connector is the part that could not simply be re-positioned: a bar
+ * between two flex siblings has nothing to reach for, so a placed run is handed both placements and draws
+ * the path itself.
+ */
+const ARC = demo("arc");
+
+const placedBox = (scope: string) => `${scope} [role="presentation"][style*="left"]`;
+
+const readOffsets = (style: string) => {
+    const at = (property: string) => Number((new RegExp(`${property}:\\s*([-\\d.]+)cqw`).exec(style) ?? [])[1]);
+
+    return { left: at("left"), top: at("top") };
+};
+
+test("a placed strip is still an ordered list, one entry per step", async ({ page }) => {
+    await expect(page.locator(`${ARC} ol`)).toHaveAttribute("aria-label", "Checkout, on an arc");
+    await expect(page.locator(step(ARC)), "one li per step, so the list still counts").toHaveCount(
+        await page.locator(step(LINEAR)).count(),
+    );
+    await expect(page.locator(`${ARC} [aria-current="step"]`), "and one of them is where you are").toHaveCount(1);
+    await expect(page.locator(placedBox(ARC)), "each step sitting in a box of its own").toHaveCount(
+        await page.locator(step(ARC)).count(),
+    );
+});
+
+/**
+ * The path is written in the same fractions of the container's width the boxes are, so the two can be
+ * compared directly: the run out of step N has to begin where step N was put. `cqw` is a percentage and
+ * the path is a fraction, which is the only conversion here.
+ */
+test("a connector begins where the step it leaves was placed", async ({ page }) => {
+    const boxes = await page
+        .locator(placedBox(ARC))
+        .evaluateAll((elements) => elements.map((element) => element.getAttribute("style") ?? ""));
+    const runs = await page
+        .locator(`${ARC} ol svg path`)
+        .evaluateAll((elements) => elements.map((element) => element.getAttribute("d") ?? ""));
+    const PERCENT = 100;
+
+    expect(runs.length, "a run between each pair of steps, so one fewer than the steps").toBe(boxes.length - 1);
+
+    for (let index = 0; index < runs.length; index++) {
+        const start = /^M\s+([-\d.]+)\s+([-\d.]+)/.exec(runs[index])!;
+        const box = readOffsets(boxes[index]);
+
+        expect(Number(start[1]), `run ${index} starts at its step's own offset across`).toBeCloseTo(
+            box.left / PERCENT,
+            3,
+        );
+        expect(Number(start[2]), "and at its offset down").toBeCloseTo(box.top / PERCENT, 3);
+    }
+
+    expect(runs[0], "and it curves, rather than cutting straight across the arc").toContain(" A ");
+});

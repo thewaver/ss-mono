@@ -84,14 +84,19 @@ test("a card with nothing under it still runs and closes the whole fan", async (
     expect(await readout(page, "submenus")).toContain("Project");
 });
 
-test("ArrowLeft steps back out, the same as it does in a stacked menu", async ({ page }) => {
+/**
+ * A fan is laid out, so its arrows all walk the arc and stepping out of a level is `Escape`'s job rather
+ * than `ArrowLeft`'s. The card at the head of the arc still walks back when it is activated, which is the
+ * route a pointer takes.
+ */
+test("Escape steps back out one level, leaving the arrows to walk the arc", async ({ page }) => {
     await page.locator(trigger("submenus")).click();
     await openedLevel(page, 0);
 
     await page.keyboard.press("Enter");
     await openedLevel(page, 1);
 
-    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("Escape");
     await expect(page.locator(MENU)).toHaveCount(1);
     expect(await highlightAt(page, 0), "landing back on the card that opened it").toContain("New");
 });

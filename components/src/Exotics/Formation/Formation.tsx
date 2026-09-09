@@ -1,49 +1,34 @@
 import { Index, createMemo } from "solid-js";
 
+import { PlacementBox, PlacementItem } from "../../Abstracts/Placement/Placement";
+import type { PlacementRect } from "../../Abstracts/Placement/Placement.types";
 import { access } from "../../Utils/propUtils";
-import type { FormationInset, FormationProps } from "./Formation.types";
+import type { FormationProps } from "./Formation.types";
 
-import * as styles from "./Formation.css";
-
-const EMPTY_INSET: FormationInset = { top: 0, left: 0, width: 0, height: 0 };
-
-const toContainerWidth = (ratio: number) => `${ratio * 100}cqw`;
+const EMPTY_PLACEMENT: PlacementRect = { top: 0, left: 0, width: 0, height: 0 };
 
 export const Formation = <T,>(props: FormationProps<T>) => {
     const getItemCount = createMemo(() => access(props.items).length);
 
-    const getLayout = createMemo(() => props.computeLayout(getItemCount()));
+    const getLayout = createMemo(() => props.computeLayout({ itemCount: getItemCount() }));
 
-    const getInset = (index: number) => getLayout().insets[index] ?? EMPTY_INSET;
+    const getPlacement = (index: number) => getLayout().placements[index] ?? EMPTY_PLACEMENT;
+
+    const getStackAt = (index: number) => (access(props.isStackedInReverse) ? getItemCount() - index : index + 1);
 
     return (
-        <div class={styles.formationRoot}>
-            <div
-                class={styles.formationSpacer}
-                style={{ height: toContainerWidth(getLayout().heightRatio) }}
-                aria-hidden="true"
-            />
-
+        <PlacementBox layout={getLayout}>
             <Index each={access(props.items)}>
                 {(getItem, index) => (
-                    <div
-                        class={styles.formationItem}
-                        style={{
-                            "left": toContainerWidth(getInset(index).left),
-                            "top": toContainerWidth(getInset(index).top),
-                            "width": toContainerWidth(getInset(index).width),
-                            "height": toContainerWidth(getInset(index).height),
-                            "z-index": access(props.isStackedInReverse) ? getItemCount() - index : index + 1,
-                        }}
-                    >
+                    <PlacementItem placement={() => getPlacement(index)} stackAt={() => getStackAt(index)}>
                         {props.renderItem(getItem, () => ({
                             index,
                             itemCount: getItemCount(),
-                            inset: getInset(index),
+                            placement: getPlacement(index),
                         }))}
-                    </div>
+                    </PlacementItem>
                 )}
             </Index>
-        </div>
+        </PlacementBox>
     );
 };

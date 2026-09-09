@@ -1,4 +1,4 @@
-import { Show } from "solid-js";
+import { Show, createUniqueId } from "solid-js";
 
 import { PlacementUtils, WheelMenu, access } from "@thewaver/ss-components";
 import type { PlacementRect } from "@thewaver/ss-components";
@@ -15,9 +15,28 @@ const CLOSER_MARK = "✕";
 const toViewBox = (rect: PlacementRect) =>
     `${rect.left - rect.width * HALF} ${rect.top - rect.height * HALF} ${rect.width} ${rect.height}`;
 
+type WedgeDefsProps = {
+    gradientId: string;
+};
+
+const WedgeDefs = (props: WedgeDefsProps) => (
+    <svg class={styles.wedgeDefs} aria-hidden={"true"}>
+        <defs>
+            <linearGradient id={props.gradientId} x1={"0"} y1={"1"} x2={"1"} y2={"0"}>
+                <stop class={styles.wedgeGradientFrom} offset={"0%"} />
+                <stop class={styles.wedgeGradientTo} offset={"100%"} />
+            </linearGradient>
+        </defs>
+    </svg>
+);
+
 export const WheelExample = (props: WheelMenuExampleProps) => {
+    const gradientId = createUniqueId();
+
     return (
         <div class={styles.stage}>
+            <WedgeDefs gradientId={gradientId} />
+
             <WheelMenu
                 items={() => props.items}
                 ariaLabel={"Edit actions"}
@@ -46,10 +65,8 @@ export const WheelExample = (props: WheelMenuExampleProps) => {
                                 <svg class={styles.canvas} viewBox={toViewBox(getPlacement()!)} aria-hidden={"true"}>
                                     <path
                                         class={styles.wedge}
-                                        classList={{
-                                            [styles.wedgeHighlighted]: getFlags().isHighlighted,
-                                            [styles.wedgeDisabled]: getFlags().isDisabled,
-                                        }}
+                                        classList={{ [styles.wedgeDisabled]: getFlags().isDisabled }}
+                                        style={{ fill: getFlags().isHighlighted ? `url(#${gradientId})` : undefined }}
                                         d={PlacementUtils.getSectorPath(getSector())}
                                     />
                                 </svg>

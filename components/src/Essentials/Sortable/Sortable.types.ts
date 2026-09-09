@@ -2,6 +2,7 @@ import type { Accessor, JSX } from "solid-js";
 
 import type { CarryDir } from "../../Abstracts/Carrier/Carrier.types";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type { PlacementLayoutFn } from "../../Abstracts/Placement/Placement.types";
 import type {
     InteractionTooltipDefs,
     InteractionWrapperProps,
@@ -61,6 +62,7 @@ export type SortableProps<T> = Omit<InteractionWrapperProps<SortableFlags>, "ren
         renderMarker?: (getDir: () => SortableDir) => JSX.Element;
     }> & {
         itemsSignal: SignalSource<SortableItem<T>[]>;
+        computeLayout?: PlacementLayoutFn;
         computeItemKey: (value: T) => string;
         computeItemLabel: (value: T) => string;
         computeCanAccept?: (value: T, fromLabel: string) => boolean;

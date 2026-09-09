@@ -46,3 +46,7 @@ export const PageSortableSurface = (props: SortableSurfaceProps) => (
 export const PageSortableMarker = (props: SortableMarkerProps) => (
     <div class={access(props.dir) === "row" ? styles.sortableMarkerRow : styles.sortableMarkerColumn} />
 );
+
+export const PageSortableRingMarker = () => <div class={styles.sortableRingMarker} data-marker />;
+
+export const PageSortableRoom = (props: ParentProps) => <div class={styles.sortableRoom}>{props.children}</div>;

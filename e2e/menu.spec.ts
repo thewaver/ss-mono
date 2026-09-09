@@ -1,4 +1,4 @@
-import { type Page, expect, test } from "@playwright/test";
+import { type Locator, type Page, expect, test } from "@playwright/test";
 
 import { activeDescendantText, activeMatches, demo, readout, tabIndex, tagName } from "./helpers";
 
@@ -432,4 +432,45 @@ test.describe("a menu opened by a right-click", () => {
             "a left-click in the same box, clear of the menu itself, is still outside it",
         ).toHaveCount(0);
     });
+});
+
+/**
+ * A hover the pointer did not cause must not move the highlight. The browser re-runs hit-testing whenever
+ * anything changes under a stationary cursor and reports the result as a fresh `mouseenter`, so a menu that
+ * covers its own opener — a wheel is centred on its trigger — would otherwise open and immediately hand the
+ * highlight to whatever happens to sit beneath the pointer. `Menu` tells the two apart by the point on
+ * record: a real enter arrives with coordinates that differ from the last movement, an invented one matches.
+ *
+ * There is no real interaction that produces the invented kind on demand — it depends on what the browser
+ * decides to re-test and when — so this dispatches one, with the coordinates the pointer actually last had,
+ * which is exactly the shape the guard is written to recognise. The second half is the control: the same
+ * item, entered properly, does move the highlight.
+ */
+const enterWithoutMoving = (page: Page, item: Locator, at: { x: number; y: number }) =>
+    item.evaluate((element, point) => {
+        element.dispatchEvent(
+            new MouseEvent("mouseenter", { clientX: point.x, clientY: point.y, bubbles: false, cancelable: true }),
+        );
+    }, at);
+
+test("a hover nothing caused leaves the highlight where it is", async ({ page }) => {
+    await openedWithHighlight(page, "default");
+
+    const hovered = itemAt(page, 0, "Copy");
+    const other = itemAt(page, 0, "Duplicate");
+
+    await hovered.hover();
+    expect(await highlightAt(page, 0), "a real hover takes the highlight").toContain("Copy");
+
+    const box = (await hovered.boundingBox())!;
+
+    await enterWithoutMoving(page, other, { x: box.x + box.width / 2, y: box.y + box.height / 2 });
+
+    expect(
+        await highlightAt(page, 0),
+        "an enter arriving at the point the pointer is already on is the browser re-testing, not a choice",
+    ).toContain("Copy");
+
+    await other.hover();
+    expect(await highlightAt(page, 0), "and moving there for real still moves it").toContain("Duplicate");
 });

@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, readout } from "./helpers";
+import { demo, inlineStyle, readout } from "./helpers";
 
 const list = (key: string, label: string) => `${demo(key)} [role="list"][aria-label="${label}"]`;
 const item = (key: string, label: string) => `${demo(key)} [role="listitem"][aria-label="${label}"]`;
@@ -447,4 +447,132 @@ test("a disabled item cannot be picked up, by any route", async ({ page }) => {
     expect(await readout(page, "reorder"), "and a tap on it starts nothing").toContain(
         "First, Second — locked, Third, Fourth",
     );
+});
+
+/**
+ * A row decides where a drop lands by comparing one coordinate against each item's midpoint. A ring has no
+ * such coordinate — the item at twelve o'clock is neither before nor after the one at three — so a placed
+ * list asks the layout which placement is nearest instead, which is what `PlacementUtils.pickIndex` was
+ * built for and what nothing had called until now.
+ *
+ * The check is a relationship rather than a position: drag the first card to where the third one is drawn
+ * and the third card's place is what it should take. Nothing here writes down a coordinate.
+ */
+const RING = demo("ring");
+
+const ringCards = (page: Page) =>
+    page.locator(`${RING} [role="listitem"]`).evaluateAll((elements) => elements.map((element) => element.ariaLabel));
+
+test("a ring picks the nearest place to drop into, having no axis to compare", async ({ page }) => {
+    const before = await ringCards(page);
+
+    expect(before.length, "the ring has cards to move").toBeGreaterThan(2);
+
+    await dragBetween(page, `${RING} [role="listitem"] >> nth=0`, `${RING} [role="listitem"] >> nth=2`, 0);
+
+    const after = await ringCards(page);
+
+    expect(after, "the same cards, in a different order").toHaveLength(before.length);
+    expect(after.indexOf(before[0]), "the card dragged onto the third place is no longer the first").toBeGreaterThan(0);
+});
+
+test("a placed list keeps the keyboard route, which never had an axis to lose", async ({ page }) => {
+    const before = await ringCards(page);
+
+    await page.locator(`${RING} [role="listitem"]`).first().focus();
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("Enter");
+
+    expect(await ringCards(page), "picking a place with the arrows still moves the card").not.toEqual(before);
+});
+
+/**
+ * A row can put a landing mark at an offset along itself. A ring has no offset to put one at, so the mark is
+ * placed like an item: the abstract works out the gap between the two neighbours the card would land
+ * between — measured from the borders that face each other rather than from the two centres — and turns it to
+ * lie across the line joining them. What a spec can read off that is the turn, which a row's mark never has.
+ */
+test("a ring marks the gap it would land in, turned to lie across it", async ({ page }) => {
+    const cards = page.locator(`${RING} [role="listitem"]`);
+    const marker = page.locator(`${RING} [data-marker]`);
+
+    await expect(marker, "nothing is marked while nothing is being carried").toHaveCount(0);
+
+    const from = (await cards.nth(0).boundingBox())!;
+    const to = (await cards.nth(2).boundingBox())!;
+
+    await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(from.x + from.width / 2 + 20, from.y + from.height / 2, { steps: 5 });
+    await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 10 });
+
+    await expect(marker, "one mark, for the one place it would land").toHaveCount(1);
+
+    // The mark's own element is the consumer's paint; the box the library placed is the one above it.
+    // Every presentational ancestor holds the mark, and the innermost of them is the box the layout placed.
+    const box = page
+        .locator(`${RING} [role="presentation"]`)
+        .filter({ has: page.locator("[data-marker]") })
+        .last();
+    const turn = await inlineStyle(box, "transform");
+
+    expect(turn, "the mark is placed the way an item is, and turned as well as moved").toContain("rotate(");
+    expect(turn, "and the turn is a real bearing rather than none at all").not.toContain("rotate(0deg)");
+
+    await page.mouse.up();
+    await expect(marker, "and it goes once the card is put down").toHaveCount(0);
+});
+
+/**
+ * Four items round a ring leave four gaps a quarter turn apart, so the marks for them should be a quarter
+ * turn apart too. Checking them as a set rather than one at a time is what catches a single wrong one: the
+ * gap at the end of the list is the only one with an imagined neighbour, and aiming it by reversing the last
+ * join instead of by carrying the ring round put it a quarter turn out — correct-looking on its own, and
+ * obvious the moment the four are compared.
+ */
+test("the four gaps of a ring are a quarter turn apart, the last one included", async ({ page }) => {
+    const box = (await page.locator(`${RING} [role="list"]`).boundingBox())!;
+    const cards = page.locator(`${RING} [role="listitem"]`);
+    const first = (await cards.nth(0).boundingBox())!;
+    const centre = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    const reach = Math.min(box.width, box.height) * 0.34;
+
+    await page.mouse.move(first.x + first.width / 2, first.y + first.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(first.x + first.width / 2 + 20, first.y + first.height / 2, { steps: 5 });
+
+    const placed = page.locator(`${RING} [role="presentation"]`).filter({ has: page.locator("[data-marker]") });
+    const bearings: number[] = [];
+
+    for (const spot of [
+        { x: reach, y: 0 },
+        { x: 0, y: reach },
+        { x: -reach, y: 0 },
+        { x: 0, y: -reach },
+    ]) {
+        await page.mouse.move(centre.x + spot.x, centre.y + spot.y, { steps: 6 });
+        await expect(placed.last()).toBeAttached();
+
+        const turn = await inlineStyle(placed.last(), "transform");
+        const degrees = Number(/rotate\((-?[\d.]+)deg\)/.exec(turn)?.[1]);
+
+        bearings.push(((degrees % 360) + 360) % 360);
+    }
+
+    await page.mouse.up();
+
+    expect(new Set(bearings).size, "four gaps, four different bearings").toBe(bearings.length);
+
+    const QUARTER_TURN = 90;
+    const TOLERANCE = 12;
+
+    for (let index = 1; index < bearings.length; index++) {
+        const step = (((bearings[index] - bearings[index - 1]) % 360) + 360) % 360;
+
+        expect(
+            Math.min(Math.abs(step - QUARTER_TURN), Math.abs(step - (360 - QUARTER_TURN))),
+            `gap ${index} is a quarter turn from the one before it`,
+        ).toBeLessThan(TOLERANCE);
+    }
 });

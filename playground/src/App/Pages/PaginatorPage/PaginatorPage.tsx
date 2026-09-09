@@ -4,6 +4,7 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
+import { DialExample } from "./Examples/Dial";
 import { EndsExample } from "./Examples/Ends";
 import { LinkComponentExample } from "./Examples/LinkComponent";
 import { LinksExample } from "./Examples/Links";
@@ -32,6 +33,7 @@ export const PaginatorPage = () => {
     const [getEndPage, setEndPage] = createSignal(STARTING_PAGE);
     const [getLinkPage, setLinkPage] = createSignal(STARTING_PAGE);
     const [getCustomLinkPage, setCustomLinkPage] = createSignal(STARTING_PAGE);
+    const [getDialPage, setDialPage] = createSignal(STARTING_PAGE);
 
     const getExamples = createMemo(() => {
         const commonProps: Omit<PaginatorExampleProps, "page" | "onPageChange"> = {
@@ -75,6 +77,14 @@ export const PaginatorPage = () => {
                     <LinkComponentExample {...commonProps} page={getCustomLinkPage} onPageChange={setCustomLinkPage} />
                 ),
                 path: `${EXAMPLES_ROOT}/LinkComponent.tsx`,
+            },
+            {
+                key: "dial",
+                name: "The same row, round a dial",
+                readout: () =>
+                    `page ${getDialPage()} of ${getPageCount()} — one layout function, and the steps, pages and gaps become wedges in the order they already had`,
+                component: () => <DialExample {...commonProps} page={getDialPage} onPageChange={setDialPage} />,
+                path: `${EXAMPLES_ROOT}/Dial.tsx`,
             },
         ];
     });

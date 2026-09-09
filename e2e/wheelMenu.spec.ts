@@ -155,16 +155,41 @@ test("a deeper band brings no second closer, so the hole keeps holding one", asy
     await expect(closerOf(page, 0)).toHaveCount(1);
 });
 
-test("the keyboard walks the bands the same as any other menu", async ({ page }) => {
+/**
+ * A ring has no left and no right, so all four arrows walk it and the pair that opens and closes a level
+ * in a straight menu is free for other work: a band is opened by activating the wedge that owns it, and
+ * left by `Escape`, which steps out one band at a time rather than dropping the whole wheel at once.
+ */
+test("all four arrows walk the ring, and a band is entered and left without them", async ({ page }) => {
     await page.locator(trigger("concentric")).click();
     await openedLevel(page, 0);
 
+    const first = await highlightAt(page, 0);
+
     await page.keyboard.press("ArrowRight");
-    await openedLevel(page, 1);
+    expect(await highlightAt(page, 0), "ArrowRight moves on rather than diving into a band").not.toBe(first);
+    await expect(page.locator(MENU), "and opens nothing").toHaveCount(1);
 
     await page.keyboard.press("ArrowLeft");
-    await expect(page.locator(MENU), "ArrowLeft drops the outer band rather than the whole wheel").toHaveCount(1);
+    expect(await highlightAt(page, 0), "and ArrowLeft comes back, the mirror of ArrowRight").toBe(first);
+
+    await page.keyboard.press("ArrowDown");
+    expect(await highlightAt(page, 0), "the other pair walks the same ring in the same direction").not.toBe(first);
+
+    await page.keyboard.press("ArrowUp");
+    expect(await highlightAt(page, 0)).toBe(first);
+});
+
+test("a band is entered by activating its wedge and left one at a time with Escape", async ({ page }) => {
+    await page.locator(trigger("concentric")).click();
+    await openedLevel(page, 0);
+
+    await page.keyboard.press("Enter");
+    await openedLevel(page, 1);
 
     await page.keyboard.press("Escape");
-    await expect(page.locator(MENU)).toHaveCount(0);
+    await expect(page.locator(MENU), "Escape drops the outer band rather than the whole wheel").toHaveCount(1);
+
+    await page.keyboard.press("Escape");
+    await expect(page.locator(MENU), "and the next one closes the wheel itself").toHaveCount(0);
 });

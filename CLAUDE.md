@@ -213,6 +213,29 @@ outside the project entirely; they would rather anything a task needs sit where 
 in `.gitignore`, so nothing there can reach a commit. Screenshots, throwaway scripts, spike pages,
 intermediate output — all of it lands there, and it gets deleted once the task that needed it is finished.
 
+**Never install anything without asking first.** Stated by the user, in those terms, after
+`npx playwright install firefox` put a 101MB browser into their cache to chase a hunch about which browser a
+screenshot came from. It does not matter that it landed in a tool's own cache rather than on the system, that
+it was one command, or that it was reversible: it is their disk. The same goes for a package, a global CLI, a
+formatter, a language server — anything that writes outside the repository. Name what would need installing
+and what it would buy, and wait. Where the question was "which browser are you in", the answer was to ask
+them.
+
+**A probe is cheaper than a theory: make the thing an obvious colour.** The user's technique, offered after
+several rounds of reasoning about why a layout looked wrong — _"quick way to test - make the dashed box
+background red"_. A garish `background`, `outline` or border on one named element answers, in one reload,
+which element is which, whether the file is even reaching the browser, and where the space is actually going.
+Two of them at once — one on the box, one on its child — bisects it. It settles what an argument cannot, so
+reach for it early rather than after the fourth hypothesis, and take the probes back out afterwards.
+
+**When they say it looks wrong, measure what is painted, not the model.** Learned the hard way in the same
+exchange: the user reported items on a ring not sharing a centre, and several rounds of measurement said the
+boxes were symmetric to the pixel — which was true, and irrelevant, because what they were looking at was the
+painter inside each box drawing itself at its own width and hugging one edge. Every number was right and the
+conclusion was wrong. So a report about appearance is answered by measuring the element that carries the
+paint, and by ruling out the consumer's own styling before the library's geometry; "the box is correct" is not
+an answer to "it looks crooked".
+
 **Never kill the user's processes.** No `pkill`, no killing a dev server, no stopping anything you did not
 start. They keep `npm start` running while working, and losing it interrupts them. `npm run verify:dom`
 serves a production preview on its own port and `reuseExistingServer` handles a stale one, so it never

@@ -1,6 +1,7 @@
 import type { Accessor, JSX } from "solid-js";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type { PlacementLayoutFn } from "../../Abstracts/Placement/Placement.types";
 import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 import type { MenuFlags, MenuRenderItem, MenuRenderPopup } from "../Menus/Menu/Menu.types";
 
@@ -32,6 +33,7 @@ export type ToolbarProps<T> = AccessorProps<{
     renderOverflowPopup: MenuRenderPopup;
 }> & {
     actions: MaybeAccessor<ToolbarAction<T>[]>;
+    computeLayout?: PlacementLayoutFn;
     renderAction: (getAction: Accessor<ToolbarAction<T>>, getFlags: () => InteractionFlags) => JSX.Element;
     renderOverflowTrigger: (getFlags: () => InteractionFlags<MenuFlags>) => JSX.Element;
     renderOverflowItem: MenuRenderItem<T>;

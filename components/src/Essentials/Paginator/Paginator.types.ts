@@ -1,6 +1,7 @@
 import type { Accessor, Component, JSX } from "solid-js";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type { PlacementLayoutFn, PlacementRect } from "../../Abstracts/Placement/Placement.types";
 import type { InteractionControlProps } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps } from "../../Utils/typeUtils";
 
@@ -30,11 +31,13 @@ export type PaginatorRange = {
 export type PaginatorPageRenderProps = {
     page: number;
     isCurrent: boolean;
+    placement?: PlacementRect;
 };
 
 export type PaginatorStepRenderProps = {
     step: PaginatorStep;
     targetPage: number;
+    placement?: PlacementRect;
 };
 
 export type PaginatorItemProps = AccessorProps<
@@ -58,12 +61,13 @@ export type PaginatorProps = AccessorProps<{
     computeHref?: (page: number) => string;
     computePageLabel?: (page: number, pageCount: number) => string;
     computeStepLabel?: (step: PaginatorStep, targetPage: number) => string;
+    computeLayout?: PlacementLayoutFn;
     page: number;
     renderPage: (
         getEntry: Accessor<PaginatorPageEntry>,
         getRenderProps: () => InteractionFlags<PaginatorPageRenderProps>,
     ) => JSX.Element;
-    renderGap: (getEntry: Accessor<PaginatorGapEntry>) => JSX.Element;
+    renderGap: (getEntry: Accessor<PaginatorGapEntry>, getPlacement: () => PlacementRect | undefined) => JSX.Element;
     renderStep: (
         getStep: Accessor<PaginatorStep>,
         getRenderProps: () => InteractionFlags<PaginatorStepRenderProps>,

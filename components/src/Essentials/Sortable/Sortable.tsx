@@ -1,4 +1,14 @@
-import { Index, Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
+import {
+    type Accessor,
+    Index,
+    type JSX,
+    Show,
+    createEffect,
+    createMemo,
+    createSignal,
+    createUniqueId,
+    onCleanup,
+} from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { Point2d, Size2d } from "@thewaver/ss-utils";
@@ -9,9 +19,13 @@ import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
 import { CarrierStack } from "../../Abstracts/Carrier/CarrierStack";
 import { Elevation } from "../../Abstracts/Elevation/Elevation";
 import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
+import { PlacementBox, PlacementItem } from "../../Abstracts/Placement/Placement";
+import type { PlacementRect } from "../../Abstracts/Placement/Placement.types";
+import { PlacementUtils } from "../../Abstracts/Placement/Placement.utils";
 import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
 import { ViewportUtils } from "../../Exotics/Viewport/Viewport.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
+import type { InteractionSizing } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import { access, accessSignal } from "../../Utils/propUtils";
 import { LabelUtils } from "../Input/Label/Label.utils";
 import type { SortableDir, SortableItem, SortableItemSlotProps, SortableProps } from "./Sortable.types";
@@ -20,6 +34,25 @@ import * as styles from "./Sortable.css";
 
 const DEFAULT_SORTABLE_DIR: SortableDir = "column";
 const DEFAULT_SORTABLE_GAP = 0;
+const NO_SIZE = 0;
+
+/**
+ * A row walks on one pair of arrows and a column on the other, because that is the axis the list runs
+ * along. A placed list runs along no axis at all, so it answers to both pairs — the same conclusion the
+ * placed menu, tab list and toolbar reached.
+ */
+const FORWARD_KEYS: Record<SortableDir | "both", string[]> = {
+    row: ["ArrowRight"],
+    column: ["ArrowDown"],
+    both: ["ArrowRight", "ArrowDown"],
+};
+
+const BACKWARD_KEYS: Record<SortableDir | "both", string[]> = {
+    row: ["ArrowLeft"],
+    column: ["ArrowUp"],
+    both: ["ArrowLeft", "ArrowUp"],
+};
+const PLACED_SIZING: InteractionSizing = "fill";
 
 const INTERACTIVE_SELECTOR =
     "a[href], button, input, select, textarea, [role='button'], [role='checkbox'], [role='link'], [role='switch']";
@@ -55,6 +88,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     const viewportContext = useViewportContext();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
+    const [getBoxRef, setBoxRef] = createSignal<HTMLElement>();
     const [getItemRefs, setItemRefs] = createSignal<Array<HTMLElement | undefined>>([]);
     const [getFocusedIndex, setFocusedIndex] = createSignal(0);
     const [getCarriedPoint, setCarriedPoint] = createSignal<Point2d | undefined>();
@@ -108,6 +142,36 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     const getPlaceCount = () =>
         getItems().length + (CarrierStack.getCarry() !== undefined && CarrierStack.getSourceZone() !== zone ? 1 : 0);
 
+    const getLayout = createMemo(() => props.computeLayout?.({ itemCount: getPlaceCount() }));
+
+    const getPlacementAt = (index: number) => getLayout()?.placements[index];
+
+    /**
+     * Which place a pointer is over, asked of the layout rather than of an axis. A row can compare one
+     * coordinate against each item's midpoint; a ring has no such coordinate, so the question becomes
+     * "which placement is nearest", which is what the abstract's picking is for. The point arrives in
+     * client space and the placements are fractions of the box's own width, so it is converted through the
+     * box's rect — a ratio within one rect, which is why the `Viewport` scale divides out of it.
+     */
+    const computePlacedPlace = (point: Point2d) => {
+        const layout = getLayout();
+        const box = getBoxRef();
+
+        if (layout === undefined || box === undefined) return undefined;
+
+        const rect = box.getBoundingClientRect();
+
+        if (rect.width <= NO_SIZE || rect.height <= NO_SIZE) return undefined;
+
+        return PlacementUtils.pickIndex({
+            layout,
+            point: PlacementUtils.toLayoutPoint(
+                { x: (point.x - rect.left) / rect.width, y: (point.y - rect.top) / rect.height },
+                layout.heightRatio,
+            ),
+        });
+    };
+
     const zone: CarrierZone = {
         getGroupId,
         getLabel: () => access(props.ariaLabel),
@@ -126,6 +190,9 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         },
         computePlaceAtPoint: (point) => {
             const sourceIndex = getSourceIndex();
+            const placed = computePlacedPlace(point);
+
+            if (placed !== undefined) return placed;
 
             return CarrierUtils.computeSettledIndex(
                 CarrierUtils.computeDropIndex(getItemRects(), point.x, point.y, getDir()),
@@ -206,6 +273,20 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     });
 
     const getEndRoom = createMemo(() => (access(props.gap) ?? DEFAULT_SORTABLE_GAP) / 2);
+
+    /**
+     * Where a landing mark goes once the items are placed. A row can put a bar at an offset along itself; a
+     * ring has no offset to put it at, so the mark is placed like anything else — the abstract works out the
+     * gap between the two neighbours it would land between, including which way that gap lies.
+     */
+    const getMarkerPlacement = createMemo(() => {
+        const layout = getLayout();
+        const markerIndex = getLandingIndex();
+
+        if (layout === undefined || markerIndex === undefined) return undefined;
+
+        return PlacementUtils.getGapPlacement(layout.placements, markerIndex);
+    });
 
     const getMarkerOffset = createMemo(() => {
         const markerIndex = getLandingIndex();
@@ -367,14 +448,17 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
             return;
         }
 
-        const isForward = e.key === (getDir() === "row" ? "ArrowRight" : "ArrowDown");
-        const isBackward = e.key === (getDir() === "row" ? "ArrowLeft" : "ArrowUp");
+        const isPlaced = getLayout() !== undefined;
+        const isForward = FORWARD_KEYS[isPlaced ? "both" : getDir()].includes(e.key);
+        const isBackward = BACKWARD_KEYS[isPlaced ? "both" : getDir()].includes(e.key);
 
         if (isCarrying) {
             if (!isForward && !isBackward) return;
 
             e.preventDefault();
-            CarrierStack.aimAtNudge(getDir() === "row" ? { x: isForward ? 1 : -1 } : { y: isForward ? 1 : -1 });
+            CarrierStack.aimAtNudge(
+                getDir() === "row" && !isPlaced ? { x: isForward ? 1 : -1 } : { y: isForward ? 1 : -1 },
+            );
 
             return;
         }
@@ -472,6 +556,56 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         if (CarrierStack.getSourceZone() === zone) CarrierStack.end("cancel");
     });
 
+    const renderItemAt = (getItem: Accessor<SortableItem<T>>, index: number) => (
+        <InteractionWrapper
+            sizing={() =>
+                getPlacementAt(index) !== undefined ? PLACED_SIZING : getDir() === "row" ? "fit-content" : "fill"
+            }
+            isDisabled={() => getItem().isDisabled ?? false}
+            isReachableWhenDisabled={() => getItem().isReachableWhenDisabled ?? false}
+            isTabbable={() => getRovingIndex() === index}
+            tooltipDefs={() => getItem().tooltipDefs}
+            extraFlags={() => ({
+                isCarried: getCarriedKey() === props.computeItemKey(getItem().value),
+                isLandingBefore: getLandingIndex() === index,
+            })}
+            renderControl={(setItemElementRef, getItemFlags) => (
+                <SortableItemSlot
+                    ref={(element) => {
+                        setItemRef(index, element);
+                        setItemElementRef(element);
+                    }}
+                    id={() => getItemId(index)}
+                    label={() => props.computeItemLabel(getItem().value)}
+                    position={() => index + 1}
+                    setSize={() => getItems().length}
+                    flags={getItemFlags}
+                    renderContent={(getContentFlags) => props.renderItem(getItem, getContentFlags)}
+                    onPointerDown={handlePointerDown(index)}
+                    onKeyDown={handleKeyDown(index)}
+                    onClick={handleClick(index)}
+                    onFocus={() => setFocusedIndex(index)}
+                />
+            )}
+        />
+    );
+
+    const renderPlacedItem = (index: number, element: JSX.Element) => (
+        <Show when={getPlacementAt(index)} fallback={element}>
+            {(getRect) => <PlacementItem placement={getRect}>{element}</PlacementItem>}
+        </Show>
+    );
+
+    const renderPlaced = (children: JSX.Element) => (
+        <Show when={getLayout()} fallback={children}>
+            {(getResolved) => (
+                <PlacementBox ref={setBoxRef} layout={getResolved}>
+                    {children}
+                </PlacementBox>
+            )}
+        </Show>
+    );
+
     const renderList = () => (
         <InteractionWrapper
             {...props}
@@ -499,41 +633,25 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
                     aria-disabled={getIsDisabled() || undefined}
                     onClick={handleRootClick}
                 >
-                    <Index each={getItems()}>
-                        {(getItem, index) => (
-                            <InteractionWrapper
-                                sizing={() => (getDir() === "row" ? "fit-content" : "fill")}
-                                isDisabled={() => getItem().isDisabled ?? false}
-                                isReachableWhenDisabled={() => getItem().isReachableWhenDisabled ?? false}
-                                isTabbable={() => getRovingIndex() === index}
-                                tooltipDefs={() => getItem().tooltipDefs}
-                                extraFlags={() => ({
-                                    isCarried: getCarriedKey() === props.computeItemKey(getItem().value),
-                                    isLandingBefore: getLandingIndex() === index,
-                                })}
-                                renderControl={(setItemElementRef, getItemFlags) => (
-                                    <SortableItemSlot
-                                        ref={(element) => {
-                                            setItemRef(index, element);
-                                            setItemElementRef(element);
-                                        }}
-                                        id={() => getItemId(index)}
-                                        label={() => props.computeItemLabel(getItem().value)}
-                                        position={() => index + 1}
-                                        setSize={() => getItems().length}
-                                        flags={getItemFlags}
-                                        renderContent={(getContentFlags) => props.renderItem(getItem, getContentFlags)}
-                                        onPointerDown={handlePointerDown(index)}
-                                        onKeyDown={handleKeyDown(index)}
-                                        onClick={handleClick(index)}
-                                        onFocus={() => setFocusedIndex(index)}
-                                    />
-                                )}
-                            />
-                        )}
-                    </Index>
+                    {renderPlaced(
+                        <>
+                            <Index each={getItems()}>
+                                {(getItem, index) => renderPlacedItem(index, renderItemAt(getItem, index))}
+                            </Index>
 
-                    <Show when={props.renderMarker && getMarkerOffset()} keyed>
+                            <Show when={props.renderMarker && getMarkerPlacement()} keyed>
+                                {(placement: PlacementRect) => (
+                                    <PlacementItem placement={() => placement}>
+                                        <div class={styles.sortableMarkerPlaced} aria-hidden="true">
+                                            {props.renderMarker?.(getDir)}
+                                        </div>
+                                    </PlacementItem>
+                                )}
+                            </Show>
+                        </>,
+                    )}
+
+                    <Show when={props.renderMarker && getLayout() === undefined && getMarkerOffset()} keyed>
                         {(offset: number) => (
                             <div
                                 class={getDir() === "row" ? styles.sortableMarkerRow : styles.sortableMarkerColumn}

@@ -1,7 +1,7 @@
 import type { JSX } from "solid-js";
 
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { ArcDefs } from "../../../Samples/Menu/Layouts/MenuLayouts.types";
+import type { ArcDefs } from "../../../Samples/Placement/Layouts/PlacementLayouts.types";
 import type { AccessorProps, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
 import type { MenuItem, MenuItemFlags, MenuProps } from "../Menu/Menu.types";
 

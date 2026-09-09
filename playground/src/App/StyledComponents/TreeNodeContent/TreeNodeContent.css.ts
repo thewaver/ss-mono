@@ -71,3 +71,31 @@ export const treeNodePending = style({
     whiteSpace: "nowrap",
     opacity: 0.75,
 });
+
+export const treeRadialNode = style({
+    display: "grid",
+    placeItems: "center",
+    width: "100%",
+    height: "100%",
+    borderRadius: themeVars.borderRadius.half,
+    backgroundColor: themeVars.color.surface.dark,
+    boxShadow: themeVars.shadow.small,
+    color: themeVars.color.surface.contrast,
+    fontSize: themeVars.fontSize.xSmall,
+    whiteSpace: "nowrap",
+    transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,
+
+    selectors: {
+        [`&.${isHovered}`]: {
+            color: themeVars.color.primary.main,
+        },
+        [`&.${isSelected}`]: {
+            backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
+            color: themeVars.color.primary.contrast,
+        },
+        [`&.${isDisabled}`]: {
+            opacity: themeVars.disabled.opacity,
+            filter: themeVars.disabled.filter,
+        },
+    },
+});

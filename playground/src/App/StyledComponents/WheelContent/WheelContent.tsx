@@ -20,8 +20,6 @@ const PIP_SIDE_STYLES: Record<PageWheelPipSide, string> = {
     left: styles.wheelPipLeft,
 };
 
-const toContainerWidth = (ratio: number) => `${ratio * 100}cqw`;
-
 export const PageWheelWedge = (props: ParentProps<PageWheelWedgeProps>) => {
     const gradientId = createUniqueId();
 
@@ -47,11 +45,11 @@ export const PageWheelWedge = (props: ParentProps<PageWheelWedgeProps>) => {
                     <div
                         class={styles.wheelWedgeLabel}
                         style={{
-                            "left": toContainerWidth(getRect().left),
-                            "top": toContainerWidth(getRect().top),
-                            "width": toContainerWidth(getRect().width),
-                            "height": toContainerWidth(getRect().height),
-                            "font-size": toContainerWidth(getRect().width * LABEL_TYPE_RATIO),
+                            "left": PlacementUtils.toContainerWidth(getRect().left),
+                            "top": PlacementUtils.toContainerWidth(getRect().top),
+                            "width": PlacementUtils.toContainerWidth(getRect().width),
+                            "height": PlacementUtils.toContainerWidth(getRect().height),
+                            "font-size": PlacementUtils.toContainerWidth(getRect().width * LABEL_TYPE_RATIO),
                         }}
                     >
                         {props.children}

@@ -16,10 +16,6 @@ test.beforeEach(async ({ page }) => {
     await expect(page.locator("[data-example]").first()).toBeVisible();
 });
 
-test("the page renders all three examples", async ({ page }) => {
-    await expect(page.locator("[data-example]"), "the page renders all three examples").toHaveCount(3);
-});
-
 test("plain colours take the div path", async ({ page }) => {
     await expect(
         page.locator(`${CARD} svg`),

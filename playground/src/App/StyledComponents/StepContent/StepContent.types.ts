@@ -1,4 +1,10 @@
-import type { AccessorProps, InteractionFlags, StepperDir, StepperFlags } from "@thewaver/ss-components";
+import type {
+    AccessorProps,
+    InteractionFlags,
+    StepperConnectorDefs,
+    StepperDir,
+    StepperFlags,
+} from "@thewaver/ss-components";
 
 export type PageStepState = "done" | "current" | "failed" | "skipped" | "ahead";
 
@@ -12,4 +18,8 @@ export type StepContentProps = AccessorProps<{
 export type StepConnectorProps = AccessorProps<{
     dir: StepperDir;
     isRail?: boolean;
+}>;
+
+export type StepArcConnectorProps = AccessorProps<{
+    defs: StepperConnectorDefs;
 }>;

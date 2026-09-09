@@ -2,7 +2,9 @@ import type { Accessor, JSX } from "solid-js";
 import { Index, Show, createMemo } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
+import { PlacementBox, PlacementItem } from "../../Abstracts/Placement/Placement";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
+import type { InteractionSizing } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import { access } from "../../Utils/propUtils";
 import type {
     PaginatorGapEntry,
@@ -22,6 +24,9 @@ const DEFAULT_PAGINATOR_SIBLING_COUNT = 1;
 const DEFAULT_PAGINATOR_BOUNDARY_COUNT = 1;
 const DEFAULT_PAGINATOR_GAP = 0;
 const DEFAULT_PAGINATOR_LABEL = "Pagination";
+
+const ROW_SIZING: InteractionSizing = "fit-content";
+const PLACED_SIZING: InteractionSizing = "fill";
 
 const LEADING_STEPS: PaginatorStep[] = ["first", "previous"];
 const TRAILING_STEPS: PaginatorStep[] = ["next", "last"];
@@ -102,21 +107,55 @@ export const Paginator = (props: PaginatorProps) => {
 
     const getTrailingSteps = createMemo(() => TRAILING_STEPS.filter((step) => getSteps().includes(step)));
 
+    const getLayout = createMemo(() =>
+        props.computeLayout?.({
+            itemCount: getLeadingSteps().length + getEntries().length + getTrailingSteps().length,
+        }),
+    );
+
+    const getPlacementAt = (index: number) => getLayout()?.placements[index];
+
+    const getSizingAt = (index: number) => (getPlacementAt(index) === undefined ? ROW_SIZING : PLACED_SIZING);
+
+    const getEntryAt = (index: number) => getLeadingSteps().length + index;
+
+    const getTrailingAt = (index: number) => getLeadingSteps().length + getEntries().length + index;
+
+    const renderPlaced = (getIndex: Accessor<number>, element: JSX.Element) => {
+        const getPlacement = createMemo(() => getPlacementAt(getIndex()));
+
+        return (
+            <Show when={getPlacement()} fallback={element}>
+                {(getRect) => (
+                    <PlacementItem placement={getRect} stackAt={() => getIndex() + 1}>
+                        {element}
+                    </PlacementItem>
+                )}
+            </Show>
+        );
+    };
+
     const goTo = (page: number) => {
         if (page === access(props.page)) return;
 
         void props.onPageChange?.(page);
     };
 
-    const renderStepControl = (getStep: Accessor<PaginatorStep>) => {
+    const renderStepControl = (getStep: Accessor<PaginatorStep>, getIndex: Accessor<number>) => {
         const getTargetPage = () => PaginatorUtils.getStepTarget(getStep(), access(props.page), getPageCount());
 
         const getIsStepDisabled = () => getIsDisabled() || getTargetPage() === access(props.page);
 
-        return (
+        return renderPlaced(
+            getIndex,
             <InteractionWrapper<PaginatorStepRenderProps>
+                sizing={() => getSizingAt(getIndex())}
                 isDisabled={getIsStepDisabled}
-                extraFlags={() => ({ step: getStep(), targetPage: getTargetPage() })}
+                extraFlags={() => ({
+                    step: getStep(),
+                    targetPage: getTargetPage(),
+                    placement: getPlacementAt(getIndex()),
+                })}
                 renderControl={(setElementRef, getRenderProps) => (
                     <PaginatorItem
                         ref={setElementRef}
@@ -129,38 +168,69 @@ export const Paginator = (props: PaginatorProps) => {
                         onActivate={() => goTo(getTargetPage())}
                     />
                 )}
-            />
+            />,
         );
     };
 
-    const renderPageControl = (getEntry: Accessor<PaginatorPageEntry>) => (
-        <InteractionWrapper<PaginatorPageRenderProps>
-            isDisabled={getIsDisabled}
-            extraFlags={() => ({
-                page: getEntry().page,
-                isCurrent: getEntry().page === access(props.page),
-            })}
-            renderControl={(setElementRef, getRenderProps) => (
-                <PaginatorItem
-                    ref={setElementRef}
-                    href={() => props.computeHref?.(getEntry().page)}
-                    isCurrent={() => getRenderProps().isCurrent}
-                    ariaLabel={() =>
-                        props.computePageLabel?.(getEntry().page, getPageCount()) ?? `Page ${getEntry().page}`
-                    }
-                    flags={getRenderProps}
-                    linkComponent={props.linkComponent}
-                    renderContent={() => props.renderPage(getEntry, getRenderProps)}
-                    onActivate={() => goTo(getEntry().page)}
-                />
-            )}
-        />
-    );
+    const renderPageControl = (getEntry: Accessor<PaginatorPageEntry>, getIndex: Accessor<number>) =>
+        renderPlaced(
+            getIndex,
+            <InteractionWrapper<PaginatorPageRenderProps>
+                sizing={() => getSizingAt(getIndex())}
+                isDisabled={getIsDisabled}
+                extraFlags={() => ({
+                    page: getEntry().page,
+                    isCurrent: getEntry().page === access(props.page),
+                    placement: getPlacementAt(getIndex()),
+                })}
+                renderControl={(setElementRef, getRenderProps) => (
+                    <PaginatorItem
+                        ref={setElementRef}
+                        href={() => props.computeHref?.(getEntry().page)}
+                        isCurrent={() => getRenderProps().isCurrent}
+                        ariaLabel={() =>
+                            props.computePageLabel?.(getEntry().page, getPageCount()) ?? `Page ${getEntry().page}`
+                        }
+                        flags={getRenderProps}
+                        linkComponent={props.linkComponent}
+                        renderContent={() => props.renderPage(getEntry, getRenderProps)}
+                        onActivate={() => goTo(getEntry().page)}
+                    />
+                )}
+            />,
+        );
 
-    const renderGapControl = (getEntry: Accessor<PaginatorGapEntry>) => (
-        <span class={styles.paginatorGap} aria-hidden="true">
-            {props.renderGap(getEntry)}
-        </span>
+    const renderGapControl = (getEntry: Accessor<PaginatorGapEntry>, getIndex: Accessor<number>) =>
+        renderPlaced(
+            getIndex,
+            <span class={styles.paginatorGap} aria-hidden="true">
+                {props.renderGap(getEntry, () => getPlacementAt(getIndex()))}
+            </span>,
+        );
+
+    const renderRow = () => (
+        <>
+            <Index each={getLeadingSteps()}>{(getStep, index) => renderStepControl(getStep, () => index)}</Index>
+
+            <Index each={getEntries()}>
+                {(getEntry, index) => {
+                    const getIndex = () => getEntryAt(index);
+
+                    return (
+                        <Show
+                            when={getEntry().kind === "page" ? (getEntry() as PaginatorPageEntry) : undefined}
+                            fallback={renderGapControl(() => getEntry() as PaginatorGapEntry, getIndex)}
+                        >
+                            {(getPageEntry) => renderPageControl(getPageEntry, getIndex)}
+                        </Show>
+                    );
+                }}
+            </Index>
+
+            <Index each={getTrailingSteps()}>
+                {(getStep, index) => renderStepControl(getStep, () => getTrailingAt(index))}
+            </Index>
+        </>
     );
 
     return (
@@ -169,20 +239,9 @@ export const Paginator = (props: PaginatorProps) => {
             style={{ gap: `${access(props.gap) ?? DEFAULT_PAGINATOR_GAP}px` }}
             aria-label={access(props.ariaLabel) ?? DEFAULT_PAGINATOR_LABEL}
         >
-            <Index each={getLeadingSteps()}>{renderStepControl}</Index>
-
-            <Index each={getEntries()}>
-                {(getEntry) => (
-                    <Show
-                        when={getEntry().kind === "page" ? (getEntry() as PaginatorPageEntry) : undefined}
-                        fallback={renderGapControl(() => getEntry() as PaginatorGapEntry)}
-                    >
-                        {renderPageControl}
-                    </Show>
-                )}
-            </Index>
-
-            <Index each={getTrailingSteps()}>{renderStepControl}</Index>
+            <Show when={getLayout()} fallback={renderRow()}>
+                {(getResolved) => <PlacementBox layout={getResolved}>{renderRow()}</PlacementBox>}
+            </Show>
         </nav>
     );
 };

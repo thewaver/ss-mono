@@ -15,3 +15,8 @@ export type TabFloaterProps = AccessorProps<{
     visibilityTarget: 0 | 1;
     transitionDurationMs: number;
 }>;
+
+export type TabCellProps = AccessorProps<{
+    flags: InteractionFlags;
+    isSelected: boolean;
+}>;

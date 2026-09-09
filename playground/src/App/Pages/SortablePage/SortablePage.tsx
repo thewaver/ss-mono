@@ -3,8 +3,10 @@ import { createMemo, createSignal } from "solid-js";
 import type { SortableItem } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageSortableRoom } from "../../StyledComponents/SortableContent/SortableContent";
 import { CardsExample } from "./Examples/Cards";
 import { PairExample } from "./Examples/Pair";
+import { RingExample } from "./Examples/Ring";
 import { BOARD, CHEAP_ONLY, HAND, QUEUE } from "./SortablePage.const";
 import type { Card } from "./SortablePage.types";
 
@@ -26,6 +28,7 @@ export const SortablePage = () => {
     const lockedBoardSignal = createSignal(BOARD);
 
     const disabledSignal = createSignal(HAND);
+    const ringSignal = createSignal(QUEUE);
 
     const getExamples = createMemo(() => [
         {
@@ -34,7 +37,14 @@ export const SortablePage = () => {
             readout: () =>
                 `order: ${names(queueSignal[0]())} — Second is disabled, so arrows skip it and it cannot be picked up`,
             component: () => (
-                <CardsExample groupId={"queue"} itemsSignal={queueSignal} ariaLabel={"Queue"} emptyText={"No cards"} />
+                <PageSortableRoom>
+                    <CardsExample
+                        groupId={"queue"}
+                        itemsSignal={queueSignal}
+                        ariaLabel={"Queue"}
+                        emptyText={"No cards"}
+                    />
+                </PageSortableRoom>
             ),
             path: `${EXAMPLES_ROOT}/Cards.tsx`,
         },
@@ -44,15 +54,29 @@ export const SortablePage = () => {
             readout: () =>
                 `order: ${names(rowSignal[0]())} — left and right walk it, because the direction decides the keys`,
             component: () => (
-                <CardsExample
-                    groupId={"row"}
-                    itemsSignal={rowSignal}
-                    ariaLabel={"Row"}
-                    emptyText={"No cards"}
-                    dir={"row"}
-                />
+                <PageSortableRoom>
+                    <CardsExample
+                        groupId={"row"}
+                        itemsSignal={rowSignal}
+                        ariaLabel={"Row"}
+                        emptyText={"No cards"}
+                        dir={"row"}
+                    />
+                </PageSortableRoom>
             ),
             path: `${EXAMPLES_ROOT}/Cards.tsx`,
+        },
+        {
+            key: "ring",
+            name: "Reordering round a ring",
+            readout: () =>
+                `order: ${names(ringSignal[0]())} — dropping picks the nearest place rather than comparing one axis, because a ring has no axis to compare`,
+            component: () => (
+                <PageSortableRoom>
+                    <RingExample itemsSignal={ringSignal} />
+                </PageSortableRoom>
+            ),
+            path: `${EXAMPLES_ROOT}/Ring.tsx`,
         },
         {
             key: "pair",
@@ -96,17 +120,19 @@ export const SortablePage = () => {
             name: "Disabled",
             readout: () => `order: ${names(disabledSignal[0]())} — nothing moves, by pointer or by key`,
             component: () => (
-                <CardsExample
-                    groupId={"disabled"}
-                    itemsSignal={disabledSignal}
-                    ariaLabel={"Disabled list"}
-                    emptyText={"No cards"}
-                    isDisabled={true}
-                />
+                <PageSortableRoom>
+                    <CardsExample
+                        groupId={"disabled"}
+                        itemsSignal={disabledSignal}
+                        ariaLabel={"Disabled list"}
+                        emptyText={"No cards"}
+                        isDisabled={true}
+                    />
+                </PageSortableRoom>
             ),
             path: `${EXAMPLES_ROOT}/Cards.tsx`,
         },
     ]);
 
-    return <PageExamples items={getExamples} minColumnWidth={400} />;
+    return <PageExamples items={getExamples} minColumnWidth={520} />;
 };

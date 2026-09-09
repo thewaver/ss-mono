@@ -3,7 +3,7 @@ import type { ParentProps } from "solid-js";
 import { TabPanel, access } from "@thewaver/ss-components";
 import type { TabPanelProps } from "@thewaver/ss-components";
 
-import type { TabContentProps, TabDecorationProps, TabFloaterProps } from "./TabContent.types";
+import type { TabCellProps, TabContentProps, TabDecorationProps, TabFloaterProps } from "./TabContent.types";
 
 import * as styles from "./TabContent.css";
 
@@ -22,8 +22,34 @@ export const PageTabContent = (props: ParentProps<TabContentProps>) => {
     );
 };
 
+export const PageTabCell = (props: ParentProps<TabCellProps>) => {
+    return (
+        <div
+            class={styles.hexTab}
+            classList={{
+                [styles.isSelected]: access(props.isSelected),
+                [styles.isHovered]: access(props.flags).isHovered,
+                [styles.isDisabled]: access(props.flags).isDisabled,
+            }}
+        >
+            {props.children}
+        </div>
+    );
+};
+
 export const PageTabGutter = (props: TabDecorationProps) => {
     return <div class={access(props.dir) === "row" ? styles.rowTabGutter : undefined} data-gutter />;
+};
+
+export const PageTabHexFloater = (props: TabFloaterProps) => {
+    return (
+        <div
+            class={styles.hexTabFloater}
+            classList={{ [styles.isVisible]: access(props.visibilityTarget) === 1 }}
+            style={{ "transition-duration": `${access(props.transitionDurationMs)}ms` }}
+            data-floater
+        />
+    );
 };
 
 export const PageTabFloater = (props: TabFloaterProps) => {

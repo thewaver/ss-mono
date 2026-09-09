@@ -108,3 +108,32 @@ export const stepBody = style({
     fontSize: themeVars.fontSize.small,
     opacity: 0.75,
 });
+
+export const arcCell = style({
+    display: "grid",
+    placeItems: "center",
+    width: "100%",
+    height: "100%",
+    borderRadius: themeVars.borderRadius.half,
+    backgroundColor: themeVars.color.surface.dark,
+    boxShadow: themeVars.shadow.small,
+});
+
+export const arcConnector = style({
+    position: "absolute",
+    insetBlockStart: 0,
+    insetInlineStart: 0,
+    width: "100cqw",
+    height: "100cqw",
+    overflow: "visible",
+    pointerEvents: "none",
+});
+
+export const arcConnectorPath = style({
+    fill: "none",
+    stroke: themeVars.color.surface.contrast,
+    strokeWidth: 2,
+    strokeOpacity: 0.35,
+    strokeLinecap: "round",
+    vectorEffect: "non-scaling-stroke",
+});

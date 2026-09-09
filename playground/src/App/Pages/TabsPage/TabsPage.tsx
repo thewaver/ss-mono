@@ -4,6 +4,7 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { AllDisabledExample } from "./Examples/AllDisabled";
 import { CLEARABLE_TRANSITION_DURATION_MS, ClearableExample } from "./Examples/Clearable";
 import { ColumnExample } from "./Examples/Column";
+import { HoneycombExample } from "./Examples/Honeycomb";
 import { LinkComponentExample } from "./Examples/LinkComponent";
 import { LinksExample } from "./Examples/Links";
 import { RowExample } from "./Examples/Row";
@@ -19,10 +20,12 @@ export const TabsPage = () => {
     const [getAutoValue, setAutoValue] = createSignal("Render");
     const [getDisabledValue, setDisabledValue] = createSignal("Draft");
     const [getClearableValue, setClearableValue] = createSignal<string | undefined>("One");
+    const [getHoneycombValue, setHoneycombValue] = createSignal("Overview");
 
     const getExamples = createMemo(() => [
         {
             key: "row",
+            span: 2,
             name: "A row of tabs",
             readout: () => `selected: ${getRowValue()}`,
             component: () => <RowExample selectedValue={getRowValue} onSelectionChange={setRowValue} />,
@@ -52,6 +55,17 @@ export const TabsPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Row.tsx`,
+        },
+        {
+            key: "honeycomb",
+            span: 2,
+            name: "A honeycomb of tabs",
+            readout: () =>
+                `selected: ${getHoneycombValue()} — the same tab list, placed by a layout that has no angle in it at all`,
+            component: () => (
+                <HoneycombExample selectedValue={getHoneycombValue} onSelectionChange={setHoneycombValue} />
+            ),
+            path: `${EXAMPLES_ROOT}/Honeycomb.tsx`,
         },
         {
             key: "links",

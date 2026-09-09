@@ -34,3 +34,10 @@ export const starContent = style({
         },
     },
 });
+
+export const starCell = style({
+    display: "grid",
+    placeItems: "center",
+    width: "100%",
+    height: "100%",
+});
