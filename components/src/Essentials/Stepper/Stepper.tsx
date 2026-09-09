@@ -54,6 +54,12 @@ const StepperItem = <TValue, TState>(props: StepperItemProps<TValue, TState>) =>
 };
 
 export const Stepper = <TValue, TState>(props: StepperProps<TValue, TState>) => {
+    if (props.computeLayout !== undefined && props.renderBody !== undefined) {
+        console.warn(
+            "Stepper: renderBody is ignored when computeLayout is given. A body is a panel beside a straight connector and a laid-out stepper has nowhere to put one — drop one of them.",
+        );
+    }
+
     const getDir = createMemo(() => access(props.dir) ?? DEFAULT_STEPPER_DIR);
 
     const getLastIndex = createMemo(() => access(props.steps).length - 1);
@@ -97,11 +103,6 @@ export const Stepper = <TValue, TState>(props: StepperProps<TValue, TState>) => 
         );
     };
 
-    /**
-     * A placed step keeps its `li` so the list still counts, and the `li` becomes a layer over the whole
-     * box rather than a box of its own: the step sits in a placement inside it and the run to the next
-     * step is drawn across it, which is the only way a connector can reach from one placement to another.
-     */
     const renderPlacedEntry = (getStep: Accessor<Step<TValue, TState>>, index: number) => (
         <li class={styles.stepperLayer}>
             <Show when={getHasConnector(index)}>

@@ -36,11 +36,6 @@ const DEFAULT_SORTABLE_DIR: SortableDir = "column";
 const DEFAULT_SORTABLE_GAP = 0;
 const NO_SIZE = 0;
 
-/**
- * A row walks on one pair of arrows and a column on the other, because that is the axis the list runs
- * along. A placed list runs along no axis at all, so it answers to both pairs — the same conclusion the
- * placed menu, tab list and toolbar reached.
- */
 const FORWARD_KEYS: Record<SortableDir | "both", string[]> = {
     row: ["ArrowRight"],
     column: ["ArrowDown"],
@@ -146,13 +141,6 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
     const getPlacementAt = (index: number) => getLayout()?.placements[index];
 
-    /**
-     * Which place a pointer is over, asked of the layout rather than of an axis. A row can compare one
-     * coordinate against each item's midpoint; a ring has no such coordinate, so the question becomes
-     * "which placement is nearest", which is what the abstract's picking is for. The point arrives in
-     * client space and the placements are fractions of the box's own width, so it is converted through the
-     * box's rect — a ratio within one rect, which is why the `Viewport` scale divides out of it.
-     */
     const computePlacedPlace = (point: Point2d) => {
         const layout = getLayout();
         const box = getBoxRef();
@@ -274,11 +262,6 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
     const getEndRoom = createMemo(() => (access(props.gap) ?? DEFAULT_SORTABLE_GAP) / 2);
 
-    /**
-     * Where a landing mark goes once the items are placed. A row can put a bar at an offset along itself; a
-     * ring has no offset to put it at, so the mark is placed like anything else — the abstract works out the
-     * gap between the two neighbours it would land between, including which way that gap lies.
-     */
     const getMarkerPlacement = createMemo(() => {
         const layout = getLayout();
         const markerIndex = getLandingIndex();

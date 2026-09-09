@@ -25,11 +25,6 @@ const FIRST_INDEX = 0;
 const SINGLE_STEP = 1;
 const PAIR = 2;
 
-/**
- * How far the centre of a placement is from its own border along a direction, the placement being a box that
- * may be turned. The direction is taken into the box's own frame first, so the answer is the box's edge
- * rather than the edge of the upright rectangle it would have been.
- */
 const toBorderDistance = (rect: PlacementRect, direction: Point2d) => {
     const radians = (rect.angle ?? NOTHING) / DEGREES_PER_RADIAN;
     const cos = Math.cos(radians);
@@ -42,7 +37,6 @@ const toBorderDistance = (rect: PlacementRect, direction: Point2d) => {
     return Math.min(toEdge(rect.width, along), toEdge(rect.height, across));
 };
 
-/** How wide a placement is across a direction, which for a turned box is not either of its two sides. */
 const toExtentAcross = (rect: PlacementRect, direction: Point2d) => {
     const radians = (rect.angle ?? NOTHING) / DEGREES_PER_RADIAN;
     const cos = Math.cos(radians);
@@ -59,11 +53,6 @@ const toAngle = (from: Point2d, to: Point2d) =>
 
 const toDistance = (from: Point2d, to: Point2d) => Math.hypot(from.x - to.x, from.y - to.y);
 
-/**
- * The circle through three points, or nothing when they are in a line. Used to carry an arrangement one step
- * past its own end: three consecutive items say how the run is curving, and two say only which way it is
- * heading.
- */
 const toCircumcentre = (first: Point2d, second: Point2d, third: Point2d): Point2d | undefined => {
     const twiceArea =
         PAIR * (first.x * (second.y - third.y) + second.x * (third.y - first.y) + third.x * (first.y - second.y));
@@ -86,12 +75,6 @@ const toCircumcentre = (first: Point2d, second: Point2d, third: Point2d): Point2
     };
 };
 
-/**
- * Where the item past the end of a run would sit, had there been one. A run laid along a line continues along
- * it; a run laid round a circle continues round the circle by the same turn, which is what stops the gap at
- * the end of a ring being aimed as though the ring were straight. `beyond` may be the same point as `near`
- * when the run is only two long, in which case there is no curve to read and the line is all there is.
- */
 const toContinuedCentre = (beyond: Point2d, near: Point2d, from: Point2d): Point2d => {
     const alongTheLine = { x: from.x + (from.x - near.x), y: from.y + (from.y - near.y) };
     const centre = toCircumcentre(beyond, near, from);
@@ -150,11 +133,6 @@ export namespace PlacementUtils {
         ].join(" ");
     };
 
-    /**
-     * The path from one placement to the next, for whatever draws the run between them. Straight by
-     * default; given the point the two turn about, it bends along the arc they sit on instead, which is
-     * what keeps a chain of steps on a curve from being drawn as a chain of chords.
-     */
     export const getLinkPath = (from: PlacementRect, to: PlacementRect, origin?: Point2d, radii?: Point2d) => {
         const start = getCentre(from);
         const end = getCentre(to);
@@ -184,17 +162,6 @@ export namespace PlacementUtils {
 
     export const getDistance = toDistance;
 
-    /**
-     * Where the gap at an index sits, as a placement of its own — so whatever draws a landing mark is placed
-     * the same way an item is. The gap is measured between the two borders that face each other rather than
-     * between the two centres, which are the same point only while the neighbours are the same size, and it
-     * is turned to lie across the line joining them so a mark reads as a mark rather than as a stray item.
-     *
-     * At either end of the list there is only one real neighbour, so the other is imagined by continuing the
-     * arrangement one step further — see `toContinuedCentre`. Everything after that is the same arithmetic
-     * the middle of the list uses, which is the point of doing it that way: there is one gap calculation,
-     * not one for the middle and another for the ends.
-     */
     export const getGapPlacement = (placements: PlacementRect[], index: number): PlacementRect | undefined => {
         if (placements.length < PAIR) return undefined;
 

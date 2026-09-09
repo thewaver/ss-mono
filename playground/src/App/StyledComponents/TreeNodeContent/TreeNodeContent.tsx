@@ -12,6 +12,8 @@ const INDENT_PER_DEPTH = 20;
 const BRANCH_MARKER = "▶";
 const LEAF_MARKER = "•";
 const DESCRIPTION_ONLY_MARKER = "·";
+const ROOT_RANK_DEPTH = 0;
+const INNER_RANK_DEPTH = 1;
 
 export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) => {
     return (
@@ -66,6 +68,8 @@ export const PageTreeRadialNode = (props: ParentProps<TreeNodeContentProps>) => 
         <div
             class={styles.treeRadialNode}
             classList={{
+                [styles.isRootRank]: access(props.renderProps).depth === ROOT_RANK_DEPTH,
+                [styles.isOuterRank]: access(props.renderProps).depth > INNER_RANK_DEPTH,
                 [styles.isHovered]: access(props.renderProps).isHovered,
                 [styles.isSelected]: access(props.renderProps).isSelected,
                 [styles.isDisabled]: access(props.renderProps).isDisabled,

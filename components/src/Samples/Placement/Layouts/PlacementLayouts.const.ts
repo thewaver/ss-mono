@@ -122,11 +122,6 @@ const toTurnExtent = (outerRadius: number): ArcExtent => ({
     bottom: outerRadius,
 });
 
-/**
- * The extremes of an elliptical arc are reached either at one of its two ends or where an axis crosses it,
- * so those are the only angles worth asking about and the answer is exact rather than sampled. The boxes
- * placed along it are thrown in because an item overhangs the curve it sits on.
- */
 const toArcExtent = (boxes: ArcBox[], fromAngle: number, toAngle: number, radiusX: number, radiusY: number) => {
     const angles = [fromAngle, toAngle, ...AXIS_DEGREES.filter((angle) => angle > fromAngle && angle < toAngle)];
     const xs: number[] = [];
@@ -158,13 +153,6 @@ const toEllipsePoint = (radiusX: number, radiusY: number, degrees: number) => {
     return { x: Math.cos(radians) * radiusX, y: Math.sin(radians) * radiusY };
 };
 
-/**
- * Equal steps of angle are equal steps of distance on a circle and nowhere else: on an ellipse they crowd
- * toward the narrow ends, so a rating bent across a wide flat arc would bunch at both tips. This walks the
- * curve in small chords, keeps a running total of how far along each sample is, and then reads back the
- * angles at which that total hits each item's share — so the items are evenly spaced along the curve
- * whatever it has been stretched into, and a circle comes out exactly as equal angles would have left it.
- */
 const toEvenArcAngles = (
     itemCount: number,
     radiusX: number,
@@ -313,12 +301,6 @@ export const ring = createRing();
 
 export const hemisphere = createHemisphere();
 
-/**
- * Boxes spaced evenly along an elliptical arc that is given its own width and height, so the same call
- * draws a circle, a wide flat sweep or anything between. It places no wedges and nests into nothing,
- * which is what separates it from the band: a band sizes itself from radii and hands that size down to
- * the level inside it, and this one is told how big to be.
- */
 export const createArc = (defs?: ArcDefs): SizedLayoutFn => {
     const widthPx = defs?.widthPx ?? ARC_WIDTH_PX;
     const heightPx = defs?.heightPx ?? ARC_HEIGHT_PX;
@@ -444,11 +426,6 @@ type RadialSpan = {
     depth: number;
 };
 
-/**
- * Children share the angular slice their parent was given, and each generation sits a ring further out.
- * The layout is told which item each item hangs from and works the rest out itself — depth is what the
- * chain of parents says it is, and a slice is what is left of the one above.
- */
 const toRadialSpans = (itemCount: number, itemParents: (number | undefined)[], spreadDegrees: number) => {
     const byParent = new Map<number | undefined, number[]>();
 
@@ -580,10 +557,6 @@ const zigzag: FittedLayoutFn = ({ itemCount }) => {
     );
 };
 
-/**
- * The arrangements that came in with `Formation`, which take their width from the box they are given rather
- * than stating one. They are `PlacementLayoutFn`s like the rest, so any placed control can be handed one.
- */
 export namespace FittedLayouts {
     export const SAMPLE_LAYOUTS = {
         podium,

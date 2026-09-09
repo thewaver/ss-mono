@@ -52,10 +52,6 @@ export const sortableCarried = style({
     willChange: "transform",
 });
 
-/**
- * The box a landing mark is given is the whole gap between the two neighbours, turned to lie across it. How
- * much of that space to ink is the painter's, so the mark is centred in it rather than stretched to fill it.
- */
 export const sortableMarkerPlaced = style({
     display: "grid",
     placeItems: "center",

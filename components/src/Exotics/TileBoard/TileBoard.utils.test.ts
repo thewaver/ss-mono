@@ -59,10 +59,6 @@ describe("getTiling", () => {
 });
 
 describe("the tiling table against the shapes it was written for", () => {
-    /**
-     * The pitches above are the shapes' own corner fractions, so a shape redrawn in `ss-utils` would leave
-     * them stale and the board would tile with gaps. These read the corners back out and go red first.
-     */
     it("puts a pointy-top hexagon's shoulders a quarter of the way down", () => {
         const points = ShapeConst.getDefaultShapePoints("hexagon-pointy-top", TILE);
         const shoulder = Math.min(...points.filter((point) => point.x === 0).map((point) => point.y));

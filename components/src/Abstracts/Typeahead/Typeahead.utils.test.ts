@@ -26,10 +26,6 @@ describe("TypeaheadUtils.getIsQueryKey", () => {
         expect(TypeaheadUtils.getIsQueryKey(key("a", { metaKey: true }), false)).toBe(false);
     });
 
-    /**
-     * Space activates an item in a menu and selects one in a list, so it can only join the query once there
-     * is a query for it to join — which is exactly when a two-word name is being typed.
-     */
     it("takes a space only while something is already being typed", () => {
         expect(TypeaheadUtils.getIsQueryKey(key(" "), false)).toBe(false);
         expect(TypeaheadUtils.getIsQueryKey(key(" "), true)).toBe(true);
@@ -46,18 +42,10 @@ describe("TypeaheadUtils.computeNextIndex", () => {
         expect(TypeaheadUtils.computeNextIndex("LIS", 0, CITIES.length, computeText)).toBe(1);
     });
 
-    /**
-     * A growing query keeps the item it is already on when that item still matches — otherwise typing "l",
-     * "i", "s" would walk away from Lisbon on the second keystroke and never come back.
-     */
     it("holds the current item while a longer query still matches it", () => {
         expect(TypeaheadUtils.computeNextIndex("li", 1, CITIES.length, computeText)).toBe(1);
     });
 
-    /**
-     * The same character pressed again means "the next one of these", which is the only way to reach the
-     * second and third item sharing a first letter.
-     */
     it("cycles through the items sharing a letter when that letter is repeated", () => {
         expect(TypeaheadUtils.computeNextIndex("l", 0, CITIES.length, computeText)).toBe(1);
         expect(TypeaheadUtils.computeNextIndex("ll", 1, CITIES.length, computeText)).toBe(2);

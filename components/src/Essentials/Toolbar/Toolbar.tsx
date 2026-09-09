@@ -58,10 +58,6 @@ export const Toolbar = <T,>(props: ToolbarProps<T>) => {
             (getRootSize().width > NO_WIDTH && getItemSizes().length === getActions().length),
     );
 
-    /**
-     * A layout sizes the toolbar itself, so there is no width left over to run out of and nothing to
-     * collapse: every action is placed, and the overflow menu that a row needs has nothing to hold.
-     */
     const getCut = createMemo(() =>
         getLayout() === undefined
             ? ToolbarUtils.computeCut({

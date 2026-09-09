@@ -169,11 +169,6 @@ export const PagePaginatorDialGap = (props: PaginatorDialGapContentProps) => {
     );
 };
 
-/**
- * The library counts pages and leaves the slice to whoever is paging, which is what this draws: the first
- * and last index on the page, worked out here from the page number, and a row for each. The summary is a
- * status rather than plain text, so a reader hears the page change instead of having to go looking for it.
- */
 export const PagePaginatorPanel = (props: PaginatorPanelProps) => {
     const getFirstIndex = () => (Math.max(access(props.page), FIRST_PAGE) - FIRST_PAGE) * PAGE_SIZE;
 

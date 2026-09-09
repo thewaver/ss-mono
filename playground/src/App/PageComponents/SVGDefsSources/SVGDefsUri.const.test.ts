@@ -2,12 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import { SVGDefsUri } from "./SVGDefsUri.const";
 
-/**
- * The encoding is the whole of what can be tested without a browser — building the markup out of a `Shape`
- * def needs a document to render into, so that half is driven by `cellAnimation.spec.ts`. This is the part
- * that decides whether a drawn source reaches the cells at all: what the escaping catches, and what it
- * deliberately leaves for CSS to deal with.
- */
 describe("SVGDefsUri", () => {
     const svg = '<svg xmlns="http://www.w3.org/2000/svg"><rect fill="hsl(190 80% 55%)"/></svg>';
 

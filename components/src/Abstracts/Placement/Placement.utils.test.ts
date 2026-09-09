@@ -3,7 +3,6 @@ import { describe, expect, it } from "vitest";
 import type { PlacementLayout, PlacementRect } from "./Placement.types";
 import { PlacementUtils } from "./Placement.utils";
 
-// four items round a square box, at twelve, three, six and nine o'clock
 const RING: PlacementLayout = {
     width: 300,
     heightRatio: 1,
@@ -140,11 +139,6 @@ describe("pickIndex, with nothing to pick", () => {
 });
 
 describe("getGapPlacement", () => {
-    /**
-     * Every number here is a share of the box's width, so the boxes are written as plain fractions and the
-     * assertions are relationships between them rather than measurements: the gap sits between the borders
-     * that face each other, it is as wide as the space actually left, and it lies across the join.
-     */
     const box = (left: number, top: number, angle?: number): PlacementRect => ({
         left,
         top,
@@ -205,11 +199,6 @@ describe("getGapPlacement", () => {
         expect(after.angle, "a run in a line continues along it").toBeCloseTo(before.angle!);
     });
 
-    /**
-     * The end of a run laid round a circle is not where the run's last straight line points. Four items at
-     * twelve, three, six and nine o'clock have their last gap between nine and twelve, and reversing the
-     * six-to-nine join aims a quarter turn away from it — which is the fault this exists to catch.
-     */
     it("carries a curved run round its own curve, not along its last straight line", () => {
         const ring = [box(0.5, 0.1), box(0.9, 0.5), box(0.5, 0.9), box(0.1, 0.5)];
         const after = PlacementUtils.getGapPlacement(ring, ring.length)!;

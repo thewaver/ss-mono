@@ -206,11 +206,6 @@ describe("applyGroupedMask", () => {
     });
 });
 
-/**
- * The sizes are read from the decimal point outwards and the last one repeats, so `[3]` is every locale that
- * groups in threes and `[3, 2]` is the Indian grouping — three digits nearest the point, twos above it. An
- * empty list is the third reading of the same rule: there is no size to repeat, so nothing is grouped at all.
- */
 describe("applyGroupedMask over a grouping that is not uniform", () => {
     it("repeats the last size rather than the first, so only the nearest group is three digits", () => {
         expect(typeGrouped(LAKH, "1234").text).toBe("1,234");
@@ -228,12 +223,6 @@ describe("applyGroupedMask over a grouping that is not uniform", () => {
     });
 });
 
-/**
- * The separators already come from `Intl` rather than from a prop, on the grounds that a consumer who has
- * named their locale has answered the question. The grouping is the same question: `en-IN` writes its commas
- * every two digits above the first three, and a field that took the locale's comma and grouped in threes
- * anyway would be spelling the locale wrong in the one place it had been told what the locale is.
- */
 describe("getGroupSizes", () => {
     it("reads threes for a locale that groups in threes", () => {
         expect(TextSyncUtils.getGroupSizes("en-GB")).toEqual([3]);
@@ -259,10 +248,6 @@ describe("formatWithGroups", () => {
     });
 });
 
-/**
- * The sign is opt-in because most masked fields cannot hold one: a date's ISO spelling already uses the hyphen
- * as a separator, so a mask that treated one as a sign would misread every date it was given.
- */
 describe("applyGroupedMask with a sign", () => {
     it("keeps a minus in front of the grouped amount", () => {
         expect(typeGrouped(SIGNED, "-123456").text).toBe("-1,234.56");

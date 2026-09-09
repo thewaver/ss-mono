@@ -129,16 +129,19 @@ export const REMOTE_CHILDREN: Record<string, TreeNode<string>[]> = {
     docs: [{ value: "getting-started.md" }, { value: "api.md" }],
 };
 
-export const ORBITS: TreeNode<string>[] = [
+export const RANKS: TreeNode<string>[] = [
     {
-        value: "Sun",
+        value: "Animalia",
         children: [
-            { value: "Mercury" },
-            { value: "Venus" },
-            { value: "Earth", children: [{ value: "Moon" }] },
-            { value: "Mars", children: [{ value: "Phobos" }, { value: "Deimos" }] },
+            {
+                value: "Chordata",
+                children: [{ value: "Mammalia" }, { value: "Aves" }, { value: "Reptilia" }],
+            },
+            { value: "Arthropoda", children: [{ value: "Insecta" }, { value: "Arachnida" }] },
+            { value: "Mollusca", children: [{ value: "Gastropoda" }, { value: "Bivalvia" }] },
+            { value: "Annelida", children: [{ value: "Clitellata" }] },
         ],
     },
 ];
 
-export const ORBIT_ROOTS = ["Sun", "Earth", "Mars"];
+export const RANK_ROOTS = ["Animalia", "Chordata", "Arthropoda", "Mollusca", "Annelida"];

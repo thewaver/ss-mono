@@ -14,11 +14,6 @@ const positions = (kind: SVGPatternKind, rows: number, cols: number) => {
     );
 };
 
-/**
- * A tiling that is wrong is still a tiling — it repeats seamlessly whatever the offsets are — so nothing about
- * these numbers is visible in a browser test, or to the eye at a glance. They are the reason this vocabulary
- * moved out of the library and into a sample: here it is plain arithmetic that `npm test` can call.
- */
 describe("SVGPatternLayouts.ALL", () => {
     it("lays a grid out in whole cells with nothing offset", () => {
         expect(positions("grid", 2, 2)).toEqual([

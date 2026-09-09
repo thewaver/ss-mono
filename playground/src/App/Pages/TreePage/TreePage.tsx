@@ -12,7 +12,7 @@ import { VirtualizedExample } from "./Examples/Virtualized";
 import {
     FILES_WITH_DISABLED,
     FILES_WITH_REACHABLE,
-    ORBIT_ROOTS,
+    RANK_ROOTS,
     STRESS_BRANCH_COUNT,
     STRESS_LEAF_COUNT,
     createStressFiles,
@@ -51,7 +51,7 @@ export const TreePage = () => {
     const stressFiles = createStressFiles();
 
     const radialSignal = createSignal<string | undefined>();
-    const radialExpandedSignal = createSignal<string[]>(ORBIT_ROOTS);
+    const radialExpandedSignal = createSignal<string[]>(RANK_ROOTS);
 
     const recordSignal = createSignal<Asset | undefined>();
     const recordExpandedSignal = createSignal<Asset[]>([]);
@@ -154,7 +154,7 @@ export const TreePage = () => {
             span: 2,
             name: "A tree drawn outward",
             readout: () =>
-                `value: ${radialSignal[0]() ?? "undefined"} — the layout is told which node each node hangs from, so children share the slice their parent was given and every generation sits a ring further out`,
+                `value: ${radialSignal[0]() ?? "undefined"} — the layout is told which node each node hangs from, so children share the slice their parent was given, and every rank sits a ring further out whoever it hangs from`,
             component: () => <RadialExample valueSignal={radialSignal} expandedSignal={radialExpandedSignal} />,
             path: `${EXAMPLES_ROOT}/Radial.tsx`,
         },

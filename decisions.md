@@ -6522,6 +6522,44 @@ element itself, so the two keys stay interchangeable.
 `preventDefault` before returning, which is `TabsItem`'s arrangement and is not optional here: on a `div` an
 early return is enough, while an anchor would have followed its `href` regardless.
 
+### A placed `Tree` can be given rings without `Tree` knowing, and what that costs
+
+The user's question: can a consumer already draw the rings a radial tree implies, or does everything that is
+not a node need a slot first. The answer is that it can, from outside the control, and the example now does
+it.
+
+**The subject changed because the rings made the old one assert something false.** The example was a solar
+system, and `createRadialTree`'s rule is that depth decides radius — so every node at depth two shared one
+circle whatever it hung from, which put Phobos, Deimos and the Moon on a single orbit round the Sun. Drawing
+the ring is what turned a layout convention into a claim, and the claim was wrong. The user's call was to
+change the subject rather than the layout, since the layout is a **generation ring** diagram and was only
+ever badly cast. It is now a taxonomy — Animalia, then phyla, then classes — where everything on a ring
+genuinely shares a rank no matter which parent it hangs from.
+
+**The layout puts the box's centre where the tree's root is, and the box is square.** `createRadialTree`
+reports `origin` at the middle and `heightRatio` of one, so a page that centres its own rings and the `Tree`
+in the same box has them line up with no measuring and no library change. The rings are plain divs with a
+`border-radius` of 50%, sized in pixels from the radii the page itself chose, and they sit before the tree in
+the document so they paint behind it.
+
+**What it costs is that the page restates the radius rule.** `innerRadiusPx + ringGapPx * depth` is the
+layout's formula and the example now spells it a second time, along with a walk of its own data to work out
+which depths are showing — because a ring must disappear when its generation collapses, and only the layout
+knows that today. So the escape hatch is real and the duplication is real with it, which is the argument for
+the slot recorded against item 26 rather than a reason to think nothing is missing.
+
+**The user's stated position on where this should land**, taken as their framing rather than as a rule
+anything has been changed to follow: a thing that belongs in a particular place should have a render slot of
+its own, and having one should not stop a consumer drawing other things beside it. The rings are the second
+half of that working; the first half, a named slot for the connector a radial tree wants, is still open.
+
+**A round painter inside a square focusable element gets a square focus ring, and the fix is the page's.**
+The rounded bodies exposed it: the outline is the Playground's global `:focus-visible` rule and an outline
+follows the radius of the element it is drawn on, which is the `treeitem` rather than the painter inside it.
+`TileBoard` had already met this and answered it the same way — a `globalStyle` selecting the role that
+`:has()` the painter. Nothing about it is the library's: the control owns focus and the page owns paint, so a
+page that paints a circle owns making the ring round.
+
 ### Controls: `SlideButton`, and why the gesture is the only thing it owns
 
 Settled, when the user named a slide-to-activate control as a gap. It is a `Button` whose

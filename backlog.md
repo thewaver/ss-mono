@@ -456,7 +456,7 @@ have.
 
 ## 8. `Calendar` — two things deliberately not built
 
-Item 8 covers the missing components. These are `Calendar`'s own gaps, each with the reason it is still
+Item 4 covers the missing components. These are `Calendar`'s own gaps, each with the reason it is still
 one. The decisions behind what exists are in `decisions.md` under _"Controls: `Calendar`, and the date
 value the library owns"_.
 

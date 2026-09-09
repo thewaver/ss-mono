@@ -111,11 +111,6 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     const getNavigableRows = createMemo(() => getFlatRows().filter(computeIsNavigable));
 
-    /**
-     * Windowing is a one-dimensional device: it mounts a run of rows and moves them down a column. A
-     * layout places every visible node wherever it likes, so there is no run to window and the two cannot
-     * both be in force — a laid-out tree renders all of its open nodes.
-     */
     const getIsVirtualized = createMemo(
         () => props.computeEstimatedNodeHeight !== undefined && props.computeLayout === undefined,
     );

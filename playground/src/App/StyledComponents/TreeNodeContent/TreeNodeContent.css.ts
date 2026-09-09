@@ -1,4 +1,4 @@
-import { style } from "@vanilla-extract/css";
+import { globalStyle, style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
 
@@ -72,12 +72,15 @@ export const treeNodePending = style({
     opacity: 0.75,
 });
 
+export const isRootRank = style({});
+export const isOuterRank = style({});
+
 export const treeRadialNode = style({
     display: "grid",
     placeItems: "center",
     width: "100%",
     height: "100%",
-    borderRadius: themeVars.borderRadius.half,
+    borderRadius: "50%",
     backgroundColor: themeVars.color.surface.dark,
     boxShadow: themeVars.shadow.small,
     color: themeVars.color.surface.contrast,
@@ -86,6 +89,10 @@ export const treeRadialNode = style({
     transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,
 
     selectors: {
+        [`&.${isOuterRank}`]: {
+            scale: "0.7",
+            fontSize: "0.625rem",
+        },
         [`&.${isHovered}`]: {
             color: themeVars.color.primary.main,
         },
@@ -93,9 +100,24 @@ export const treeRadialNode = style({
             backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
             color: themeVars.color.primary.contrast,
         },
+        [`&.${isRootRank}`]: {
+            backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
+            color: themeVars.color.secondary.contrast,
+            fontWeight: "bold",
+        },
+        [`&.${isRootRank}.${isHovered}`]: {
+            filter: themeVars.hover.filter,
+        },
+        [`&.${isRootRank}.${isSelected}`]: {
+            boxShadow: `0 0 0 3px ${themeVars.color.secondary.light}`,
+        },
         [`&.${isDisabled}`]: {
             opacity: themeVars.disabled.opacity,
             filter: themeVars.disabled.filter,
         },
     },
+});
+
+globalStyle(`[role="treeitem"]:has(> ${treeRadialNode})`, {
+    borderRadius: "50%",
 });

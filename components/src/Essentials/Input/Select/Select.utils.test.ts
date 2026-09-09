@@ -38,12 +38,6 @@ describe("getFlatOptions", () => {
     });
 });
 
-/**
- * The running option index is what the two rendering paths have to agree on: the mounted list walks the
- * written items and needs the flat index of each option inside them, while the windowed list walks rows and
- * needs the same number written on each row. Both now read it off one walk, which is `Abstracts/Flattener`;
- * these pin the numbering that walk hands back for a grouped list, since that is what `Select` relies on.
- */
 describe("getItemRows", () => {
     it("reports how many options precede each written item", () => {
         expect(SelectUtils.getItemRows(ITEMS).map((row) => row.entryOffset)).toEqual([0, 1]);

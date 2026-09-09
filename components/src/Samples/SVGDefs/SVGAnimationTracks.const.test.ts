@@ -2,12 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import { SVGAnimationTracks } from "./SVGAnimationTracks.const";
 
-/**
- * Each of these becomes a semicolon-separated list inside an `animate` element, and a list of numbers is a
- * valid list of numbers whichever direction it runs in — a sign flipped here makes a line shrink where it
- * should grow, with nothing to see but the animation looking wrong. That is what a browser test cannot
- * reach and this can.
- */
 describe("SVGAnimationTracks", () => {
     it("grows a line outwards from its own midpoint", () => {
         const tracks = SVGAnimationTracks.computeGrowTracks(0, 100, [0, 0.5, 1]);

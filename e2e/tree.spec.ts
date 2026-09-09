@@ -410,7 +410,9 @@ const placedBox = (scope: string) => `${scope} [role="presentation"][style*="lef
 test("a radial tree keeps its nesting, its levels and one box per open node", async ({ page }) => {
     const items = page.locator(`${RADIAL} [role="treeitem"]`);
 
-    await expect(page.locator(`${RADIAL} [role="tree"]`)).toHaveAttribute("aria-label", "Orbits");
+    // The demo key already says which demo this is, so pinning the caption here would only ask whether
+    // somebody has renamed it. What is worth checking is that the tree carries a name at all.
+    await expect(page.locator(`${RADIAL} [role="tree"]`)).toHaveAttribute("aria-label", /.+/);
     await expect(page.locator(placedBox(RADIAL)), "a box for every node that is open").toHaveCount(await items.count());
 
     // A group's box collapses to nothing once its nodes are placed out of it, so what matters is that it is

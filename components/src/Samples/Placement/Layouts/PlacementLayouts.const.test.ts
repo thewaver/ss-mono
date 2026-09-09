@@ -6,7 +6,6 @@ import type { SizedLayout } from "./PlacementLayouts.types";
 const ITEM_COUNT = 5;
 const ROOT = { itemCount: ITEM_COUNT, path: [], parentWidth: 0 };
 
-// every radius the layout works in comes back as a share of the box, so a spec reads it in pixels again
 const toPixels = (layout: SizedLayout, share: number) => share * layout.width;
 
 const innerRadiusOf = (layout: SizedLayout) => toPixels(layout, layout.placements[0].sector!.innerRadius);
@@ -56,12 +55,6 @@ describe("createArc", () => {
     const CIRCLE = { widthPx: 200, heightPx: 200, spreadDegrees: 180, itemWidthPx: 20, itemHeightPx: 20 };
     const FLAT = { ...CIRCLE, heightPx: 80 };
 
-    /**
-     * The distance between neighbours, measured straight across rather than along the curve. Even spacing
-     * along an arc does not make these exactly equal — a chord cuts the corner, and it cuts more where the
-     * curve bends harder — so what a spec can ask of them is that they stay close to one another, which is
-     * the thing that fails outright when items are placed at equal angles on an ellipse.
-     */
     const stepsOf = (layout: SizedLayout) =>
         layout.placements.slice(1).map((placement, index) => {
             const previous = layout.placements[index];
@@ -71,12 +64,6 @@ describe("createArc", () => {
 
     const spread = (values: number[]) => Math.max(...values) / Math.min(...values);
 
-    /**
-     * Placing five items at equal angles on the same flattened ellipse is the fault the even spacing exists
-     * to avoid, so it is built here and measured beside the real thing rather than described. Neither number
-     * is pinned: what is asserted is that one stays far steadier than the other once the curve is stretched,
-     * and that on a circle — where the two approaches agree exactly — it comes out perfect.
-     */
     const evenAngleSteps = (radiusX: number, radiusY: number) => {
         const points = Array.from({ length: ITEM_COUNT }, (_unused, index) => {
             const radians = (-180 + (180 * index) / (ITEM_COUNT - 1)) / (180 / Math.PI);
@@ -237,11 +224,6 @@ describe("createRing", () => {
 });
 
 describe("createHoneycomb", () => {
-    /**
-     * The first shipped layout with no angle in it, which is what makes it worth testing: everything the
-     * others produce is a radius and a bearing, and this one is a grid, so it is the check that the
-     * vocabulary a placement is written in is not secretly polar.
-     */
     const HEX_HEIGHT_RATIO = 2 / Math.sqrt(3);
 
     const rowOf = (layout: SizedLayout, index: number) => layout.placements[index].top;

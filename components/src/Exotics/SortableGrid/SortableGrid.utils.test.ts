@@ -10,7 +10,6 @@ const box = (x: number, y: number, width: number, height: number): SortableGridB
 
 const at = (x: number, y: number): SortableGridSpot => ({ x, y });
 
-/** The upright L used throughout: a column of three with a foot to the right of its bottom cell. */
 const ELL = [at(0, 0), at(0, 1), at(0, 2), at(1, 2)];
 
 const keys = (cells: SortableGridSpot[]) => cells.map((cell) => `${cell.x},${cell.y}`).sort();
@@ -116,11 +115,6 @@ describe("getReadingOrder", () => {
     });
 });
 
-/**
- * The outline is what a painter clips one continuous shape to, so it has to bridge the gap between two cells
- * of the same item while stopping short of it at the item's own edges — a shape that ran to the full pitch
- * would be one gap too wide and too tall.
- */
 describe("getOutline", () => {
     it("draws a single cell as its own square", () => {
         expect(SortableGridUtils.getOutline([at(0, 0)], CELL, GAP)).toEqual([
@@ -154,10 +148,6 @@ describe("getOutline", () => {
     });
 });
 
-/**
- * The largest solid rectangle inside a shape is what a painter centres a glyph or a label on, since a shape
- * with a notch has no usable middle of its own — the middle of an L's bounding box is the hole.
- */
 describe("getBlock", () => {
     it("takes the whole of a rectangle, so an even one centres properly", () => {
         expect(SortableGridUtils.getBlock(SortableGridUtils.getCells({ width: 2, height: 2 }))).toEqual({

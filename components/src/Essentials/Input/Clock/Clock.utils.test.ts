@@ -53,10 +53,6 @@ describe("ClockUtils.getReading and withReading", () => {
     });
 });
 
-/**
- * A stepped column rarely holds the value's own reading, so the roving position resolves to the closest row
- * it does hold rather than failing to resolve at all.
- */
 describe("ClockUtils.getNearestIndex", () => {
     it("lands on an exact reading when the column holds one", () => {
         expect(ClockUtils.getNearestIndex([0, 15, 30, 45], 30)).toBe(2);
