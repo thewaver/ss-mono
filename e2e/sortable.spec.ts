@@ -17,12 +17,12 @@ const dragBetween = async (page: Page, source: string, target: string, offsetFro
 
     if (!from || !to) throw new Error("a drag needs both boxes to exist");
 
-    await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+    await page.mouse.move(from.x + from.width * 0.5, from.y + from.height * 0.5);
     await page.mouse.down();
 
     // The first move only has to beat the slop distance, which is what separates a drag from a click.
-    await page.mouse.move(from.x + from.width / 2 + 20, from.y + from.height / 2, { steps: 5 });
-    await page.mouse.move(to.x + to.width / 2, to.y + to.height - offsetFromBottom, { steps: 10 });
+    await page.mouse.move(from.x + from.width * 0.5 + 20, from.y + from.height * 0.5, { steps: 5 });
+    await page.mouse.move(to.x + to.width * 0.5, to.y + to.height - offsetFromBottom, { steps: 10 });
     await page.mouse.up();
 };
 
@@ -175,11 +175,11 @@ test("pointer: a tap-carry re-aims as the pointer moves, with no button held", a
 
     if (!list) throw new Error("the list has to be somewhere");
 
-    await page.mouse.move(list.x + list.width / 2, list.y + list.height * 0.3, { steps: 3 });
+    await page.mouse.move(list.x + list.width * 0.5, list.y + list.height * 0.3, { steps: 3 });
 
     const near = await markerTop(page, "reorder");
 
-    await page.mouse.move(list.x + list.width / 2, list.y + list.height * 0.8, { steps: 3 });
+    await page.mouse.move(list.x + list.width * 0.5, list.y + list.height * 0.8, { steps: 3 });
 
     expect(await markerTop(page, "reorder"), "the landing place tracks the pointer").not.toBe(near);
 
@@ -231,16 +231,16 @@ test("carrying an item does not move the items being dragged past", async ({ pag
 
     if (!source || !target) throw new Error("a drag needs both boxes to exist");
 
-    await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2);
+    await page.mouse.move(source.x + source.width * 0.5, source.y + source.height * 0.5);
     await page.mouse.down();
-    await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2 + 8, { steps: 4 });
-    await page.mouse.move(target.x + target.width / 2, target.y + target.height - 2, { steps: 10 });
+    await page.mouse.move(source.x + source.width * 0.5, source.y + source.height * 0.5 + 8, { steps: 4 });
+    await page.mouse.move(target.x + target.width * 0.5, target.y + target.height - 2, { steps: 10 });
 
     expect(await carriedCount(page, "reorder"), "the destination is marked while the carry is live").toBe(1);
 
     const before = await itemTops(page, "reorder");
 
-    await page.mouse.move(target.x + target.width / 2, target.y + target.height - 4, { steps: 2 });
+    await page.mouse.move(target.x + target.width * 0.5, target.y + target.height - 4, { steps: 2 });
 
     expect(await itemTops(page, "reorder"), "and the list does not shuffle under the pointer").toEqual(before);
 
@@ -265,15 +265,15 @@ for (const [key, label, axis] of [
 
         if (!source || !list) throw new Error("a drag needs both boxes to exist");
 
-        await page.mouse.move(source.x + source.width / 2, source.y + source.height / 2);
+        await page.mouse.move(source.x + source.width * 0.5, source.y + source.height * 0.5);
         await page.mouse.down();
-        await page.mouse.move(source.x + source.width / 2 + 8, source.y + source.height / 2 + 8, { steps: 4 });
+        await page.mouse.move(source.x + source.width * 0.5 + 8, source.y + source.height * 0.5 + 8, { steps: 4 });
 
         // Every landing place the list has, the two ends included — those were the only ones that failed.
         for (const along of [0.01, 0.3, 0.55, 0.8, 0.99]) {
             await page.mouse.move(
-                axis === "row" ? list.x + list.width * along : list.x + list.width / 2,
-                axis === "row" ? list.y + list.height / 2 : list.y + list.height * along,
+                axis === "row" ? list.x + list.width * along : list.x + list.width * 0.5,
+                axis === "row" ? list.y + list.height * 0.5 : list.y + list.height * along,
                 { steps: 2 },
             );
 
@@ -346,7 +346,7 @@ test("the landing place is right when the viewport is scaled", async ({ page }) 
     if (!list) throw new Error("the list has to be somewhere");
 
     for (const along of [0.3, 0.55, 0.8]) {
-        await page.mouse.move(list.x + list.width / 2, list.y + list.height * along, { steps: 3 });
+        await page.mouse.move(list.x + list.width * 0.5, list.y + list.height * along, { steps: 3 });
 
         const placed = await page.evaluate((selector) => {
             const list = document.querySelector(`${selector} [role="list"]`) as HTMLElement;
@@ -502,10 +502,10 @@ test("a ring marks the gap it would land in, turned to lie across it", async ({ 
     const from = (await cards.nth(0).boundingBox())!;
     const to = (await cards.nth(2).boundingBox())!;
 
-    await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+    await page.mouse.move(from.x + from.width * 0.5, from.y + from.height * 0.5);
     await page.mouse.down();
-    await page.mouse.move(from.x + from.width / 2 + 20, from.y + from.height / 2, { steps: 5 });
-    await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 10 });
+    await page.mouse.move(from.x + from.width * 0.5 + 20, from.y + from.height * 0.5, { steps: 5 });
+    await page.mouse.move(to.x + to.width * 0.5, to.y + to.height * 0.5, { steps: 10 });
 
     await expect(marker, "one mark, for the one place it would land").toHaveCount(1);
 
@@ -535,12 +535,12 @@ test("the four gaps of a ring are a quarter turn apart, the last one included", 
     const box = (await page.locator(`${RING} [role="list"]`).boundingBox())!;
     const cards = page.locator(`${RING} [role="listitem"]`);
     const first = (await cards.nth(0).boundingBox())!;
-    const centre = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    const centre = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
     const reach = Math.min(box.width, box.height) * 0.34;
 
-    await page.mouse.move(first.x + first.width / 2, first.y + first.height / 2);
+    await page.mouse.move(first.x + first.width * 0.5, first.y + first.height * 0.5);
     await page.mouse.down();
-    await page.mouse.move(first.x + first.width / 2 + 20, first.y + first.height / 2, { steps: 5 });
+    await page.mouse.move(first.x + first.width * 0.5 + 20, first.y + first.height * 0.5, { steps: 5 });
 
     const placed = page.locator(`${RING} [role="presentation"]`).filter({ has: page.locator("[data-marker]") });
     const bearings: number[] = [];

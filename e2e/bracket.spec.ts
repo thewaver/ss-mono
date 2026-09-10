@@ -56,7 +56,7 @@ test("a node sits centred between the two it feeds from", async ({ page }) => {
     const second = await nodeNamed(page, "Semi 2");
 
     expect(final.top, "the final is halfway between its semis, whatever the gaps are").toBeCloseTo(
-        (first.top + second.top) / 2,
+        (first.top + second.top) * 0.5,
         1,
     );
 });
@@ -91,7 +91,7 @@ test("turning the board upright swaps the axes without changing the tree", async
     const second = await nodeNamed(page, "Semi 2");
 
     expect(final.left, "the root is now centred across the board rather than along it").toBeCloseTo(
-        (first.left + second.left) / 2,
+        (first.left + second.left) * 0.5,
         1,
     );
     expect(final.top, "and the layers run down the page").toBeGreaterThan(first.top);
@@ -103,7 +103,7 @@ test("a parent lands between the outermost of the nodes it holds, however many t
     const finance = await nodeNamed(page, "Finance", CHART);
 
     expect(founder.top, "three under one node and one under another still centres the parent").toBeCloseTo(
-        (product.top + finance.top) / 2,
+        (product.top + finance.top) * 0.5,
         1,
     );
 });
@@ -226,7 +226,7 @@ test("widening the row gap moves the leaves apart and takes their parents with t
     const second = await nodeNamed(page, "Semi 2");
 
     expect(final.top, "and the parent is still centred on the pair it feeds from").toBeCloseTo(
-        (first.top + second.top) / 2,
+        (first.top + second.top) * 0.5,
         1,
     );
 });

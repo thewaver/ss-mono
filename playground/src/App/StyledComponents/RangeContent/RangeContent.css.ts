@@ -101,10 +101,10 @@ export const rangeThumb = style({
 export const rangeThumbVariants = styleVariants({
     horizontal: {
         top: "50%",
-        marginTop: -RANGE_THUMB_SIZE / 2,
+        marginTop: -RANGE_THUMB_SIZE * 0.5,
     },
     vertical: {
         left: "50%",
-        marginLeft: -RANGE_THUMB_SIZE / 2,
+        marginLeft: -RANGE_THUMB_SIZE * 0.5,
     },
 });

@@ -9,6 +9,12 @@ export default defineConfig({
             "@thewaver/ss-utils": fromRepo("../utils/src/index.ts"),
         },
     },
+    ssr: {
+        resolve: {
+            conditions: ["browser", "development"],
+            externalConditions: ["browser", "development"],
+        },
+    },
     test: {
         include: ["src/**/*.test.ts"],
         environment: "node",

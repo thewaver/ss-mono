@@ -81,7 +81,7 @@ test("a list with nowhere to fit keeps its size and is cut by the edge", async (
     const list = (await page.locator(LISTBOX).boundingBox())!;
 
     expect(list.height, "the list kept the size its painter asked for rather than shrinking to fit").toBeGreaterThan(
-        stage.height / 2,
+        stage.height * 0.5,
     );
     expect(
         list.y < stage.y - DRIFT_TOLERANCE || list.y + list.height > stage.y + stage.height + DRIFT_TOLERANCE,
@@ -91,7 +91,7 @@ test("a list with nowhere to fit keeps its size and is cut by the edge", async (
 
     for (const y of [stage.y - OUTSIDE_PROBE, stage.y + stage.height + OUTSIDE_PROBE]) {
         expect(
-            await isPaintedAt(page, { x: stage.x + stage.width / 2, y }),
+            await isPaintedAt(page, { x: stage.x + stage.width * 0.5, y }),
             "and none of it is painted outside, because the viewport clips",
         ).toBe(false);
     }
@@ -142,7 +142,7 @@ test("a nested viewport's scale is the product of both, not either one", async (
 
     const window = page.viewportSize()!;
 
-    await page.setViewportSize({ width: window.width, height: Math.round(window.height / 2) });
+    await page.setViewportSize({ width: window.width, height: Math.round(window.height * 0.5) });
     await page.waitForTimeout(SETTLE_MS);
 
     await expect(
@@ -178,7 +178,7 @@ test("a toast raised inside a nested viewport stays inside it", async ({ page })
     expect(
         await page.evaluate(
             (at) => document.elementFromPoint(at.x, at.y)?.closest('[aria-label="Viewport notifications"]') !== null,
-            { x: box.x + box.width / 2, y: box.y + box.height / 2 },
+            { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 },
         ),
         "and it is the thing painted there, above the viewport's own content",
     ).toBe(true);
@@ -229,7 +229,7 @@ test("a list with too little room keeps the anchor's edge and is cut at the far 
         expectNoOverlap(anchor, list);
 
         expect(
-            await isPaintedAt(page, { x: anchor.x + anchor.width / 2, y: anchor.y + anchor.height / 2 }),
+            await isPaintedAt(page, { x: anchor.x + anchor.width * 0.5, y: anchor.y + anchor.height * 0.5 }),
             "and no part of it is painted over the anchor",
         ).toBe(false);
 

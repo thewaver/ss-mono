@@ -20,7 +20,7 @@ export const example = style({
     height: exampleSize,
 });
 
-export const trackedCellSize = exampleSize / 2;
+export const trackedCellSize = exampleSize * 0.5;
 
 export const trackedGrid = style({
     display: "grid",

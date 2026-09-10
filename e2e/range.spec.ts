@@ -22,7 +22,7 @@ const valueOf = async (locator: Locator) => Number(await inputValue(locator));
  */
 const dragFrom = async (page: Page, locator: Locator, from: number, to: number) => {
     const box = (await locator.boundingBox())!;
-    const y = box.y + box.height / 2;
+    const y = box.y + box.height * 0.5;
 
     await page.mouse.move(box.x + box.width * from, y);
     await page.mouse.down();
@@ -130,7 +130,7 @@ test("a disabled range refuses both the write and the focus", async ({ page }) =
     const input = page.locator(thumbs(DISABLED));
     const box = (await input.boundingBox())!;
 
-    await page.mouse.click(box.x + box.width * 0.9, box.y + box.height / 2);
+    await page.mouse.click(box.x + box.width * 0.9, box.y + box.height * 0.5);
 
     expect(
         await valueOf(input),
@@ -156,7 +156,7 @@ test("a disabled pair takes both of its thumbs out of the tab order, not just th
 
     const box = (await high.boundingBox())!;
 
-    await page.mouse.click(box.x + box.width * 0.9, box.y + box.height / 2);
+    await page.mouse.click(box.x + box.width * 0.9, box.y + box.height * 0.5);
 
     expect(await activeMatches(page, thumbs(DISABLED_PAIR)), "neither thumb takes focus from a click").toBe(false);
     expect(await readout(page, "disabledPair"), "and the value is where it started").toContain("start: 35 | end: 65");

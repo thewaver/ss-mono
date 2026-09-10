@@ -4,7 +4,6 @@ import type { PlacementLayout, PlacementRect } from "./Placement.types";
 import { PlacementUtils } from "./Placement.utils";
 
 const RING: PlacementLayout = {
-    width: 300,
     heightRatio: 1,
     pickRule: "angle",
     placements: [
@@ -16,7 +15,6 @@ const RING: PlacementLayout = {
 };
 
 const SCATTER: PlacementLayout = {
-    width: 300,
     heightRatio: 0.5,
     placements: [
         { left: 0.1, top: 0.1, width: 0.1, height: 0.1 },
@@ -125,7 +123,7 @@ describe("pickIndex, with nothing to pick", () => {
     it("has no answer for a layout with no placements in it", () => {
         expect(
             PlacementUtils.pickIndex({
-                layout: { placements: [], width: 300, heightRatio: 1 },
+                layout: { placements: [], heightRatio: 1 },
                 point: { x: 0.5, y: 0.5 },
             }),
         ).toBeUndefined();

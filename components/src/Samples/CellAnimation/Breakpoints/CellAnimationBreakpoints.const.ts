@@ -53,7 +53,7 @@ const computeEasedRatio = (easing: CellAnimationBreakpoints.Easing, ratio: numbe
         if (error > 0) high = t;
         else low = t;
 
-        t = (low + high) / 2;
+        t = (low + high) * 0.5;
     }
 
     return computeCurve(y, t);

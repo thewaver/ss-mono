@@ -38,7 +38,7 @@ const boxOf = (locator: Locator) =>
     locator.evaluate((node: HTMLElement) => {
         const [x, y] = (node.style.transform.match(/-?[\d.]+/g) ?? ["0", "0"]).map(Number);
 
-        return { centreX: x + node.offsetWidth / 2, centreY: y + node.offsetHeight / 2, width: node.offsetWidth };
+        return { centreX: x + node.offsetWidth * 0.5, centreY: y + node.offsetHeight * 0.5, width: node.offsetWidth };
     });
 
 test.beforeEach(async ({ page }) => {

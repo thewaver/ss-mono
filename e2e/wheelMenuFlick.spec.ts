@@ -38,7 +38,7 @@ const centreOf = async (page: Page, selector: string) => {
 
     if (!box) throw new Error(`nothing to measure at ${selector}`);
 
-    return { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    return { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
 };
 
 const wedge = (page: Page, name: string) =>
@@ -67,9 +67,9 @@ const flickToward = async (page: Page, name: string, share: number) => {
 
     if (!box) throw new Error(`no wedge named ${name}`);
 
-    const to = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    const to = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
 
-    for (const step of [share / 2, share]) {
+    for (const step of [share * 0.5, share]) {
         await page.mouse.move(from.x + (to.x - from.x) * step, from.y + (to.y - from.y) * step);
     }
 

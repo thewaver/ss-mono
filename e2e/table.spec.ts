@@ -321,9 +321,9 @@ test("a header dragged past its neighbour's middle swaps the two columns", async
 
     if (!from || !to) throw new Error("the reorderable demo drew no header boxes");
 
-    await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+    await page.mouse.move(from.x + from.width * 0.5, from.y + from.height * 0.5);
     await page.mouse.down();
-    await page.mouse.move(to.x + to.width * 0.75, to.y + to.height / 2, { steps: 12 });
+    await page.mouse.move(to.x + to.width * 0.75, to.y + to.height * 0.5, { steps: 12 });
     await page.mouse.up();
 
     await expect(page.locator(header(REORDERABLE)).nth(0)).toContainText("Name");
@@ -340,9 +340,9 @@ test("a drag that reorders does not also sort the column it started on", async (
 
     if (!from || !to) throw new Error("the reorderable demo drew no header boxes");
 
-    await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+    await page.mouse.move(from.x + from.width * 0.5, from.y + from.height * 0.5);
     await page.mouse.down();
-    await page.mouse.move(to.x + to.width * 0.75, to.y + to.height / 2, { steps: 12 });
+    await page.mouse.move(to.x + to.width * 0.75, to.y + to.height * 0.5, { steps: 12 });
     await page.mouse.up();
 
     await expect(page.locator(header(REORDERABLE)).nth(1)).toHaveAttribute("aria-sort", "none");

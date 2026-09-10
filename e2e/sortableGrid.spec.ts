@@ -68,7 +68,7 @@ const cellPoint = (page: Page, key: string, gridLabel: string, index: number) =>
 
             if (!box) throw new Error("the board has no such cell");
 
-            return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+            return { x: box.left + box.width * 0.5, y: box.top + box.height * 0.5 };
         },
         { gridSelector: grid(key, gridLabel), index },
     );
@@ -182,11 +182,11 @@ test("a turn lands while the button is still held down", async ({ page }) => {
 
     if (!from) throw new Error("a drag needs a box to start from");
 
-    await page.mouse.move(from.x + from.width / 4, from.y + from.height / 2);
+    await page.mouse.move(from.x + from.width * 0.25, from.y + from.height * 0.5);
     await page.mouse.down();
 
     // The first move only has to beat the slop distance, which is what separates a drag from a click.
-    await page.mouse.move(from.x + from.width / 4 + 20, from.y + from.height / 2, { steps: 5 });
+    await page.mouse.move(from.x + from.width * 0.25 + 20, from.y + from.height * 0.5, { steps: 5 });
     await page.keyboard.press("r");
     await page.mouse.move(to.x, to.y, { steps: 10 });
     await page.mouse.up();

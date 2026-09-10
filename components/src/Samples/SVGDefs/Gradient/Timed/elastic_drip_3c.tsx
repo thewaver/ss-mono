@@ -1,9 +1,11 @@
+import { MathUtils, ObjectUtils } from "@thewaver/ss-utils";
+
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const hue_1: TimedGradientConfig = {
+export const elastic_drip_3c: TimedGradientConfig = {
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -25,7 +27,27 @@ export const hue_1: TimedGradientConfig = {
                         ),
                     ),
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
+            clipPath: {
+                id: `clip1-${id}`,
+                renderDefsElement: () => (
+                    <clipPath id={`clip1-${id}`} clipPathUnits="objectBoundingBox">
+                        {SVGAnimations.Path.rotatingArc(
+                            ObjectUtils.zipArray(
+                                "stretch",
+                                [
+                                    ...MathUtils.getIntermediateValues(450, 270, 12),
+                                    ...MathUtils.getIntermediateValues(90, 270, 12),
+                                ],
+                                [
+                                    ...MathUtils.getIntermediateValues(0, 360, 12),
+                                    ...MathUtils.getIntermediateValues(360, 0, 12),
+                                ],
+                            ),
+                            defs,
+                        )}
+                    </clipPath>
+                ),
+            },
         },
     ],
 };

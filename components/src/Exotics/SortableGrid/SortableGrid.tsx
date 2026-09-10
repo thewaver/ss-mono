@@ -424,7 +424,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
 
             grabOffset = point
                 ? { x: point.x - origin.x, y: point.y - origin.y }
-                : { x: getSpan(shape.size.width) / 2, y: getSpan(shape.size.height) / 2 };
+                : { x: getSpan(shape.size.width) * 0.5, y: getSpan(shape.size.height) * 0.5 };
 
             setCarriedPoint(from ? ViewportUtils.getAdjustedClientPoint(from, viewportContext) : undefined);
         } else {

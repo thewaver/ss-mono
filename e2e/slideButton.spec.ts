@@ -22,7 +22,7 @@ const thumb = (scope: string) => `${scope} button > div > div:last-of-type`;
  */
 const slide = async (page: Page, locator: Locator, from: number, to: number) => {
     const box = (await locator.boundingBox())!;
-    const y = box.y + box.height / 2;
+    const y = box.y + box.height * 0.5;
 
     await page.mouse.move(box.x + box.width * from, y);
     await page.mouse.down();
@@ -43,7 +43,7 @@ const thumbSpan = async (page: Page, scope: string) => {
 
     return {
         start: (thumbBox.x - trackBox.x) / trackBox.width,
-        centre: (thumbBox.x + thumbBox.width / 2 - trackBox.x) / trackBox.width,
+        centre: (thumbBox.x + thumbBox.width * 0.5 - trackBox.x) / trackBox.width,
     };
 };
 
@@ -87,7 +87,7 @@ test("a slide that stops short of the end activates nothing", async ({ page }) =
  */
 test("a press on the track away from the thumb is not a grab", async ({ page }) => {
     const box = (await page.locator(track(DEFAULT)).boundingBox())!;
-    const y = box.y + box.height / 2;
+    const y = box.y + box.height * 0.5;
 
     await page.mouse.move(box.x + box.width * 0.6, y);
     await page.mouse.down();
@@ -191,7 +191,7 @@ test("the field's hint is the button's description, so the gesture is stated up 
 test("a press held on the track confirms without any dragging at all", async ({ page }) => {
     const box = (await page.locator(track(DEFAULT)).boundingBox())!;
 
-    await page.mouse.move(box.x + box.width * 0.6, box.y + box.height / 2);
+    await page.mouse.move(box.x + box.width * 0.6, box.y + box.height * 0.5);
     await page.mouse.down();
     await page.waitForTimeout(HOLD_DURATION_MS + HOLD_SLACK_MS);
     await page.mouse.up();
@@ -210,9 +210,9 @@ test("the owner is told how far along the gesture is while it is still running",
 
     expect(await readout(page, "default"), "at rest there is nothing to report").toContain("progress 0%");
 
-    await page.mouse.move(box.x + box.width * 0.6, box.y + box.height / 2);
+    await page.mouse.move(box.x + box.width * 0.6, box.y + box.height * 0.5);
     await page.mouse.down();
-    await page.waitForTimeout(HOLD_DURATION_MS / 2);
+    await page.waitForTimeout(HOLD_DURATION_MS * 0.5);
 
     const midway = await readout(page, "default");
 
@@ -233,9 +233,9 @@ test("the owner is told how far along the gesture is while it is still running",
 test("a press let go before the hold completes confirms nothing", async ({ page }) => {
     const box = (await page.locator(track(DEFAULT)).boundingBox())!;
 
-    await page.mouse.move(box.x + box.width * 0.6, box.y + box.height / 2);
+    await page.mouse.move(box.x + box.width * 0.6, box.y + box.height * 0.5);
     await page.mouse.down();
-    await page.waitForTimeout(HOLD_DURATION_MS / 2);
+    await page.waitForTimeout(HOLD_DURATION_MS * 0.5);
     await page.mouse.up();
 
     expect(await readout(page, "default"), "letting go early is how a hold is abandoned").toContain("activations: 0");
@@ -273,7 +273,7 @@ test("focus leaving the control abandons a hold it was in the middle of", async 
 
     await element.focus();
     await page.keyboard.down("Enter");
-    await page.waitForTimeout(HOLD_DURATION_MS / 2);
+    await page.waitForTimeout(HOLD_DURATION_MS * 0.5);
     await element.evaluate((node) => (node as HTMLElement).blur());
     await page.keyboard.up("Enter");
     await page.waitForTimeout(HOLD_DURATION_MS);

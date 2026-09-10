@@ -14,7 +14,7 @@ const getGlitchBreakpointGroups = (count: number, start: number, end: number) =>
 
     for (let i = 0; i < count; i++) {
         const segmentStart = start + i * segmentWidth;
-        const segmentMid = segmentStart + segmentWidth / 2;
+        const segmentMid = segmentStart + segmentWidth * 0.5;
         const segmentEnd = segmentStart + segmentWidth;
 
         result.push([Number(segmentStart.toFixed(3)), Number(segmentMid.toFixed(3)), Number(segmentEnd.toFixed(3))]);

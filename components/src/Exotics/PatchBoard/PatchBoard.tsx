@@ -437,7 +437,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
         grabOffset = board
             ? { x: board.x - node.spot.x, y: board.y - node.spot.y }
-            : { x: node.size.width / 2, y: node.size.height / 2 };
+            : { x: node.size.width * 0.5, y: node.size.height * 0.5 };
 
         CarrierUtils.start(
             zone,

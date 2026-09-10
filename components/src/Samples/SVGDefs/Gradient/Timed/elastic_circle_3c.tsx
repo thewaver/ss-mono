@@ -5,7 +5,7 @@ import { SVGAnimations } from "../../SVGAnimations.const";
 import type { TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const elastic_circle_1c: TimedGradientConfig = {
+export const elastic_circle_3c: TimedGradientConfig = {
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),

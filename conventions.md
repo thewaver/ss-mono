@@ -24,6 +24,61 @@ unwound rather than extended, and names drop the redundant directory prefix (`Ex
 
 Read a neighbouring component before writing a new one.
 
+### Dividing by a constant is written as multiplying by its reciprocal
+
+`width * 0.5`, never `width / 2`. The user's rule, and it applies wherever the reciprocal can be written
+out exactly: `* 0.25` for four, `* 0.125` for eight, and so on up the powers of two. A divisor whose
+reciprocal does not terminate is left as a division — `/ 3`, `/ 60`, `/ 180`, `Math.PI / 180` — because
+`* 0.333…` would be a different number, written to whatever length the author's patience ran out at.
+
+The two forms are the same value, bit for bit, whenever the divisor is a power of two: IEEE-754 scaling by
+an exact power of two is exact in both directions, so a sweep converting them cannot move a pixel or flip
+an assertion. **That is what makes it safe to apply everywhere, specs and `e2e/` included.** It does not
+extend to the divisors that merely terminate in decimal — `/ 100` against `* 0.01`, `/ 5` against `* 0.2` —
+where the reciprocal is not exactly representable in binary and the two forms differ in the last bit.
+Those stay as divisions unless somebody rules otherwise, and this is the interesting half of the rule: a
+convention worth applying to a hundred and seventy sites is worth knowing the boundary of.
+
+**Nothing here is about speed, and that was measured rather than recalled.** The claim goes around that
+engines do not strength-reduce a division by two, so `* 0.5` is the faster spelling. On a dependent chain
+of fifty million operations under node on an M3 Pro — a chain, because an independent loop pipelines the
+divisions and measures nothing but the loop — `x / 2 + 1` and `x * 0.5 + 1` both run at 1.73 ns per
+iteration, to three figures, and `/ 4` against `* 0.25` likewise. V8 does the reduction, because for a
+power of two it is exact and therefore legal.
+
+The same run shows what is **not** reduced, and this is the part worth keeping: `x / 3 + 1` costs 3.21 ns
+against 1.73 for the multiplication, and `x / 100 + 1` costs the same 3.21. A division whose reciprocal is
+not representable has to be a real division — the engine cannot fold it without changing the result — so it
+costs roughly twice a multiply. Which means the paragraph above is not free: leaving `/ 100` and `/ 1000`
+as divisions buys the correctly-rounded answer at about 1.5 ns an operation. Fine everywhere it currently
+appears; worth knowing before putting one inside a per-frame per-cell loop.
+
+So the rule buys consistency and one less thing to think about when reading arithmetic, and costs nothing
+where it applies.
+
+**A ratio is not a disguised division, and the rule does not reach it.** Ten multiplications in the repo
+are by a reciprocal of a non-power-of-two — seven `* 0.2`, two `* 0.1`, one `* 0.05` — and not one of them
+should become a division. Six are a fractional position across an element in `e2e/`
+(`box.x + box.width * 0.2`), sitting in the same expression as `* 0.95` and `* 0.9`, which no integer
+divides into; rewriting the ones that happen to be `1/N` would break the symmetry it was meant to restore.
+`shape.ts`'s `(yB_max - yB_min) * 0.2` is a proportion of a range and a tuned value besides, and
+`Glitch.tsx`'s `count * 0.05` is a per-step growth coefficient clamped at `0.25`. **The test is whether the
+number means "divide this by a count" — halve a width, quarter a size — not whether it happens to equal
+`1/N`.** A point on a 0-to-1 scale stays a multiplication whatever its value.
+
+**The case that does convert is a rounded decimal standing in for a fraction.** `SVG.utils.ts` swept its
+wedge control points out with `* 0.33` and `* 0.66`, which did mean thirds — so they became `/ 3` and
+`(x * 2) / 3`. The tell was not the 0.3% shortfall, invisible on a unit circle at any render size, but that
+`0.33` and `0.66` leave gaps of 0.33, 0.33 and **0.34**: the two control points were not evenly spaced, so
+the sweep was slightly biased toward the centre. **A decimal that is trying to be `1/N` and missing is a
+division written badly; a decimal that was chosen as a ratio is not.** `(x * 2) / 3` is the form to reach
+for over `x * (2 / 3)` — doubling is exact, so there is one rounding rather than two.
+
+**A named constant is preferred to a bare `0.5` where the file already names its numbers** — `HALF`,
+`NOTHING`, `SINGLE` and their neighbours are the house pattern in `Barrel`, `Bracket`, `TileBoard` and
+`SortableGrid`, and a constant's name has to agree with its value. `const HALF = 2`, used as
+`forward * HALF > count`, was correct arithmetic under a name that said the opposite.
+
 ### `aria-hidden` is always written with a value
 
 `aria-hidden` in JSX with no value renders `aria-hidden=""`, and an empty string is **not** a true value:
@@ -1366,6 +1421,23 @@ here — jsdom has no layout engine, so every geometry question comes back wrong
 already answered by `e2e/`. The line: **if it renders, it is a spec; if it returns a value, it is a unit
 test.**
 
+**No DOM is not the same as no reactivity, and the config has to say so.** Under node's own export condition
+`solid-js` resolves to its **server** build, where `createEffect` never runs and `createMemo` never
+recomputes. Nothing errors and nothing warns: a test that drives a signal and asks what an effect did simply
+reads the value the signal started with, so it can pass while asserting the opposite of the truth. The whole
+suite ran that way until `SignalMirror` was written against it. `vitest.config.ts` therefore sets
+`ssr.resolve.conditions` and `ssr.resolve.externalConditions` to `["browser", "development"]`, which loads the
+client build. A plain `resolve.conditions` does nothing — vitest resolves through its SSR pipeline, not the
+browser one. `environment` stays `"node"`: the client build of `solid-js` is DOM-free, and only `solid-js/web`
+would need a document.
+
+**With effects live, their timing decides how a reactive test is shaped.** An effect created inside
+`createRoot` has not run yet when the next line of the callback executes; it runs as `createRoot` returns.
+After that, every write flushes the effects it invalidated synchronously. So a reactive test builds its
+subject inside `createRoot`, hands the pieces back out, and does its driving and asserting outside — the
+existing `DateTimeValue` and `propUtils` tests assert inside the callback only because neither subject has an
+effect to wait for.
+
 **Tests sit next to the function**, as `<Name>.test.ts`, matching the rule about types. They are inside
 `components/src` and therefore type-checked by `npm run typecheck -w components` — a test that no longer compiles against its
 subject has stopped describing it. They do not ship: both builds start from `index.ts`.
@@ -1378,16 +1450,27 @@ the flip earlier — and the numbers are worked out from that situation.
 **Covered: every `*.utils` module that neither touches the DOM nor builds JSX** — `Anchor`, `Navigation`,
 `InteractionTracker`'s reachability predicate, `Audio`, `Select`'s flattening, `ElementHighlight`'s segment
 geometry, `RichText`'s parser and the whole of `CellAnimation` (geometry, origins, all thirty-seven weight
-functions, zones, breakpoints). The weights are covered by property rather than value: every type stays
+functions, zones, breakpoints). Reactive but element-free modules are covered on the same terms now that
+effects run: `SignalMirror`'s two-way conversion, `MaskedField`'s type-commit-blur cycle, and the aria
+resolution in `FormField` and `Label`. The weights are covered by property rather than value: every type stays
 inside 0..1, is deterministic, and — for the origin-free ones — is unaffected by moving the origin. Pinning
 thirty-seven grids of numbers would encode the arithmetic rather than describe it, and would have to be
 re-blessed wholesale by any change.
 
 **Deliberately not covered:**
 
-- **Anything taking an element or a Solid owner.** `FocusManager`, `ElementObserver`, `ElementFader`, `TextSync`,
-  `Anchor`'s own factory, `InteractionTrackerUtils.wrapElement` and `Viewport`'s rect adjustment all need a real
-  layout to say anything true. They are `e2e/`'s half.
+- **Anything that needs a real element.** `ElementObserver`, `ElementFader`, `TextSync`, `Anchor`'s own
+  factory, `InteractionTrackerUtils.wrapElement`, `Viewport`'s rect adjustment, `Dismisser`'s ownership walk,
+  `PointerTracker`, `Virtualizer`'s scroll-parent search, `MediaQueryMonitor`, `FrameRateMonitor`,
+  `LiveAnnouncer`, `Rotator` and the querying half of `FocusManager` all reach for a layout, an observer,
+  `matchMedia` or an animation frame. They are `e2e/`'s half. A Solid owner is no longer a reason to be on
+  this list — an element is.
+- **The line inside a module runs where the DOM starts, not at the file.** `FocusManager`'s restore flag is a
+  counter and a `setTimeout`, so it is covered while its focusable-children search is not; `Elevation` is
+  covered because containment is a question about ancestry rather than about layout, and a stand-in with a
+  `contains` of its own answers it as truthfully as a browser would. A stand-in is only honest where the API
+  it replaces has no geometry in it — `getBoundingClientRect` or `getComputedStyle` faked the same way would
+  be asserting the fake.
 - **The SVG defs builders.** `SVGPatternDefsUtils`, `SVGGradientDefsUtils` and `SVGAnimationDefsUtils` return
   JSX, and their arithmetic — tiling offsets, `resolveStops`' interpolation — is written inline inside the
   element or kept private. Real geometry, unreachable without rendering or a refactor separating arithmetic

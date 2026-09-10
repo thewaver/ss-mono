@@ -154,7 +154,7 @@ export namespace Color {
          */
         export const toHsl = (rgb: Color.RGB): Color.HSL => {
             const hsv = toHsv(rgb);
-            const l = hsv.v * (1 - hsv.s / 2);
+            const l = hsv.v * (1 - hsv.s * 0.5);
 
             return { h: hsv.h, s: l === 0 || l === 1 ? 0 : (hsv.v - l) / Math.min(l, 1 - l), l };
         };

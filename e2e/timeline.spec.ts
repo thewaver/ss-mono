@@ -79,7 +79,7 @@ const dragFrom = async (page: Page, at: { x: number; y: number }, byX: number) =
 const dragSurface = async (page: Page, scope: string, byX: number) => {
     const box = (await page.locator(surface(scope)).first().boundingBox())!;
 
-    await dragFrom(page, { x: box.x + box.width / 2, y: box.y + box.height - 4 }, byX);
+    await dragFrom(page, { x: box.x + box.width * 0.5, y: box.y + box.height - 4 }, byX);
 };
 
 test.beforeEach(async ({ page }) => {
@@ -171,7 +171,7 @@ test("a block the page marked as off limits is stepped over rather than landed o
 test("walking to a block that is off screen brings the window to it", async ({ page }) => {
     const box = (await page.locator(surface(MEETINGS)).first().boundingBox())!;
 
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height - 4);
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height - 4);
 
     for (let notch = 0; notch < 6; notch++) await page.mouse.wheel(0, -100);
 
@@ -203,7 +203,7 @@ test("the wheel zooms about the pointer and a drag moves the window without resi
     const before = await readWindow(page, "meetings");
     const box = (await page.locator(surface(MEETINGS)).first().boundingBox())!;
 
-    await page.mouse.move(box.x + box.width / 4, box.y + box.height - 4);
+    await page.mouse.move(box.x + box.width * 0.25, box.y + box.height - 4);
     await page.mouse.wheel(0, -300);
     await page.waitForTimeout(SETTLE_MS);
 
@@ -242,7 +242,7 @@ test("a button that resets the window puts it back exactly", async ({ page }) =>
 test("a press on a block picks it and a drag from the same block moves the window instead", async ({ page }) => {
     const surfaceBox = (await page.locator(surface(MEETINGS)).first().boundingBox())!;
 
-    await page.mouse.move(surfaceBox.x + surfaceBox.width / 2, surfaceBox.y + surfaceBox.height - 4);
+    await page.mouse.move(surfaceBox.x + surfaceBox.width * 0.5, surfaceBox.y + surfaceBox.height - 4);
 
     for (let notch = 0; notch < 4; notch++) await page.mouse.wheel(0, -100);
 
@@ -250,7 +250,7 @@ test("a press on a block picks it and a drag from the same block moves the windo
 
     const block = page.locator(`${MEETINGS} [aria-label*="Pairing"]`);
     const box = (await block.boundingBox())!;
-    const middle = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    const middle = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
     const before = await readWindow(page, "meetings");
 
     await dragFrom(page, middle, -60);
@@ -292,7 +292,7 @@ test("the gestures can be switched off, and the buttons still work when they are
     const before = await readWindow(page, "tracks");
     const box = (await page.locator(surface(TRACKS)).first().boundingBox())!;
 
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height - 4);
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height - 4);
     await page.mouse.wheel(0, -300);
     await dragSurface(page, TRACKS, -80);
 

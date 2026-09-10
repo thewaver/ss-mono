@@ -293,7 +293,7 @@ test("a honeycomb is a box per tab, and the rows interlock rather than stacking"
     expect(
         secondRow[0].left - firstRow[0].left,
         "which starts half a column in, so each cell sits in the notch between the two above it",
-    ).toBeCloseTo((firstRow[1].left - firstRow[0].left) / 2, 3);
+    ).toBeCloseTo((firstRow[1].left - firstRow[0].left) * 0.5, 3);
 });
 
 test("a placed tab list is still a tab list: the pairing, the walk and the skip all hold", async ({ page }) => {

@@ -15,7 +15,7 @@ export const slideButtonContent = style({
     display: "flex",
     alignItems: "center",
     height: SLIDE_BUTTON_THUMB_SIZE,
-    borderRadius: SLIDE_BUTTON_THUMB_SIZE / 2,
+    borderRadius: SLIDE_BUTTON_THUMB_SIZE * 0.5,
     backgroundColor: `rgb(from currentColor r g b / 10%)`,
     boxShadow: themeVars.shadow.small,
     overflow: "hidden",

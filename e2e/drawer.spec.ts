@@ -111,9 +111,9 @@ test("a swipe that starts on a control inside the drawer does not press it", asy
     const box = (await page.locator(DIALOG).boundingBox())!;
     const close = (await page.locator(DIALOG).getByText("Close").boundingBox())!;
 
-    await page.mouse.move(close.x + close.width / 2, close.y + close.height / 2);
+    await page.mouse.move(close.x + close.width * 0.5, close.y + close.height * 0.5);
     await page.mouse.down();
-    await page.mouse.move(box.x + box.width * 0.9, close.y + close.height / 2, { steps: DRAG_STEPS });
+    await page.mouse.move(box.x + box.width * 0.9, close.y + close.height * 0.5, { steps: DRAG_STEPS });
     await page.mouse.up();
 
     await expect(

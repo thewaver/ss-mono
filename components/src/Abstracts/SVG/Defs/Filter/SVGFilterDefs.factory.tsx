@@ -197,7 +197,7 @@ export class SVGFilterDefsFactory {
             edgeFade = 0,
         } = defs;
 
-        this.maxOffset = Math.max(this.maxOffset, Math.abs(scale) / 2);
+        this.maxOffset = Math.max(this.maxOffset, Math.abs(scale) * 0.5);
         this.filterPrimitives[key] = (srcIn: string) => ({
             element: (
                 <>

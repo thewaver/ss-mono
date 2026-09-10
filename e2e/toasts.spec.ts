@@ -198,7 +198,7 @@ test.describe("the pause arithmetic", () => {
         await page.locator("#raiseInfo").click();
         await expect(page.locator(TOASTS)).toHaveCount(1);
 
-        await page.clock.runFor(DURATION_MS / 2);
+        await page.clock.runFor(DURATION_MS * 0.5);
         await expect(page.locator(TOASTS), "half the duration is not enough to dismiss it").toHaveCount(1);
 
         await page.locator(TOASTS).first().hover();
@@ -219,7 +219,7 @@ test.describe("the pause arithmetic", () => {
             .poll(() => computedStyle(page.locator(COUNTDOWN), "animation-play-state"), { message: "releasing it" })
             .toBe("running");
 
-        await page.clock.runFor(DURATION_MS / 2 - TRANSITION_MS);
+        await page.clock.runFor(DURATION_MS * 0.5 - TRANSITION_MS);
         await expect(
             page.locator(QUEUED),
             "the remaining half is all it has left, so it goes without a second full wait",
@@ -234,7 +234,7 @@ test.describe("the pause arithmetic", () => {
         await page.clock.runFor(DURATION_MS * 2);
         await page.mouse.move(0, 0);
 
-        await page.clock.runFor(DURATION_MS / 2);
+        await page.clock.runFor(DURATION_MS * 0.5);
         await expect(
             page.locator(QUEUED),
             "pausing before any time elapsed leaves the full duration, so half of it is not enough",

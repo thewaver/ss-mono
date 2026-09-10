@@ -267,8 +267,9 @@ a round trip and leaves the code broken in the meantime. Report what was fixed a
 This does not loosen _"Do not bundle a judgment call into a bug fix"_ below; the two are about different
 things. Fix the defect on sight; still raise the taste question separately.
 
-**`components/src` and `playground/src` carry no comments of any kind, and none may be added.** Not a `//` note
-inside a function body, not a `/** */` block above a declaration, not on a component and not on a utility.
+**`components/src` and `playground/src` carry no comments of any kind, and none may be added**, with the
+single exception of `*.utils.ts` documentation described below. Not a `//` note inside a function body, not a
+`/** */` block above a declaration, not on a component.
 This has been asked for repeatedly and in several wordings; the count reached 108 blocks anyway, every one
 of them written by Claude rather than by the user, and they were all deleted. There is
 therefore no precedent left to copy: a comment appearing in either tree is new and is a defect. Reasoning
@@ -282,8 +283,20 @@ two sets of rules. There, every exported function is documented so that a consum
 what it returns and what it guarantees without opening the body — read its neighbours before writing in it,
 and keep writing the documentation. Here, a component's contract is its props type and a utility's is its
 signature, and neither is annotated. **The comment ban is `components/src` and `playground/src` only.**
-**Utilities in those two may one day get a `utils/`-style pass; until the user says so, they are stripped
-like everything else.**
+
+**`components/src`'s `*.utils.ts` files are documented in `utils/`'s style, and that is now the standing
+rule.** Asked for by the user, who lifted the earlier "until the user says so" hold: every export in a
+`*.utils.ts` file — function, type, constant, namespace — carries a `/** */` block saying what it takes,
+what it returns and what it guarantees, so a consumer never has to open the body. Read `utils/src` before
+writing one: a one-line summary first, then a blank line and the part that cannot be read off the signature
+(why the helper exists, what the caller is spared, what happens at the edges), then `@param` and `@returns`
+where they add something the prose has not already said. `{@link}` neighbouring exports rather than
+restating them.
+
+Two limits on it. **`Samples/` is excluded** — those files are sample data for the Playground rather than
+library surface. And **it is `*.utils.ts` and `Utils/` only**: component files, `.css.ts`, `.types.ts` and
+`.const.ts` are still stripped, and an inline `//` note inside a utility's body is still a defect. The
+documentation sits above declarations, never inside them.
 
 **`e2e/` is the only exception in this repo** — explanatory blocks are welcome there, and the existing specs
 carry them, so a new spec should read like its neighbours.

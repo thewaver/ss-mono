@@ -15,7 +15,7 @@ const outerRadiusOf = (layout: SizedLayout) => toPixels(layout, layout.placement
 const midAngleOf = (layout: SizedLayout, index: number) => {
     const { fromAngle, toAngle } = layout.placements[index].sector!;
 
-    return (fromAngle + toAngle) / 2;
+    return (fromAngle + toAngle) * 0.5;
 };
 
 const spanOf = (layout: SizedLayout, index: number) => {
@@ -80,7 +80,7 @@ describe("createArc", () => {
             "a circle comes out exactly even",
         ).toBeCloseTo(1);
         expect(
-            spread(evenAngleSteps(CIRCLE.width / 2, CIRCLE.height / 2)),
+            spread(evenAngleSteps(CIRCLE.width * 0.5, CIRCLE.height * 0.5)),
             "and equal angles agree with it there, which is why the fault hides until something is stretched",
         ).toBeCloseTo(1);
 
@@ -89,7 +89,7 @@ describe("createArc", () => {
         expect(
             unevenness(stepsOf(PlacementLayoutUtils.createArc(FLAT)(ROOT))),
             "flattened, what unevenness is left is a small fraction of what equal angles would leave",
-        ).toBeLessThan(unevenness(evenAngleSteps(FLAT.width / 2, FLAT.height / 2)) / 5);
+        ).toBeLessThan(unevenness(evenAngleSteps(FLAT.width * 0.5, FLAT.height * 0.5)) / 5);
     });
 
     it("stretches only the curve, never the items on it", () => {
@@ -197,7 +197,7 @@ describe("createRing", () => {
         });
 
         expect(innerRadiusOf(child), "a band starts a gap outside the box the level above filled").toBeCloseTo(
-            parent.extent / 2 + 12,
+            parent.extent * 0.5 + 12,
         );
     });
 
@@ -210,8 +210,8 @@ describe("createRing", () => {
             parentExtent: parent.extent,
             parentPlacement: opener,
         });
-        const openerAngle = (opener.sector!.fromAngle + opener.sector!.toAngle) / 2;
-        const blockAngle = (child.placements[0].sector!.fromAngle + child.placements[1].sector!.toAngle) / 2;
+        const openerAngle = (opener.sector!.fromAngle + opener.sector!.toAngle) * 0.5;
+        const blockAngle = (child.placements[0].sector!.fromAngle + child.placements[1].sector!.toAngle) * 0.5;
 
         expect(blockAngle, "the block's middle lands on the middle of its opener").toBeCloseTo(openerAngle, 0);
     });
@@ -239,7 +239,7 @@ describe("createHoneycomb", () => {
         expect(
             rowOf(layout, 3) - rowOf(layout, 0),
             "by three quarters of a cell, which is what makes the rows interlock rather than stack",
-        ).toBeCloseTo((layout.placements[0].height * 3) / 4);
+        ).toBeCloseTo(layout.placements[0].height * 3 * 0.25);
     });
 
     it("staggers every other row by half a cell, so a cell sits in the notch between two", () => {
@@ -249,7 +249,7 @@ describe("createHoneycomb", () => {
         expect(
             layout.placements[2].left - layout.placements[0].left,
             "the second row starts half a step in",
-        ).toBeCloseTo(step / 2);
+        ).toBeCloseTo(step * 0.5);
     });
 
     it("keeps its cells regular hexagons, whatever width they are asked for", () => {

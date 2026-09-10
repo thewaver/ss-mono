@@ -2045,7 +2045,7 @@ explicit restore). Two identical siblings and one that does not fit is not the s
 
 ### Arbitrary item placement: `Abstracts/Placement`, and `Menu` as the first consumer
 
-The first half of `backlog.md` item 26. A control's items can be placed anywhere rather than along a line, and
+The first half of `backlog.md` item 25. A control's items can be placed anywhere rather than along a line, and
 the vocabulary for saying where lives in an abstract so the next control can use the same one.
 
 **A placement is a centre, a size, an optional turn and an optional depth, all in fractions of the container's
@@ -2119,7 +2119,7 @@ its own chrome, or gets neither.
 
 ### Concentric submenus: `computeLayout` learns where it is, and a submenu borrows its parent's anchor
 
-The second piece of `backlog.md` item 26. A submenu of a laid-out menu is drawn as a wider ring round the
+The second piece of `backlog.md` item 25. A submenu of a laid-out menu is drawn as a wider ring round the
 same centre rather than hanging off the item that opened it, so a wheel stays one wheel however deep it goes.
 
 **`computeLayout` takes one object rather than a run of arguments, and the reason is the third one.**
@@ -2538,7 +2538,7 @@ all eleven, which is what lets a consumer offer the whole set by key.
 
 ### `Paginator` takes a layout, and the placed box moves into the abstract
 
-The proving pass of `backlog.md` item 26, against the control the item named as the strongest candidate. A
+The proving pass of `backlog.md` item 25, against the control the item named as the strongest candidate. A
 paginator is arithmetic over a flat list, so a layout is the only thing that changes: the steps, the pages and
 the ellipses go round a dial in the order they already had, and nothing about the counting, the addresses or
 the labels is touched.
@@ -2590,7 +2590,7 @@ the box. So the sector is vocabulary a layout offers and a painter may decline, 
 control has to understand.
 
 **What the pass did not strain, which is worth knowing before the next consumer.** `PlacementUtils.pickIndex`
-still has no caller — a paginator has no gesture that picks by direction, so the loose end item 26 records is
+still has no caller — a paginator has no gesture that picks by direction, so the loose end item 25 records is
 untouched. Nor did anything about levels move: a paginator is one level and always will be, so the concentric
 machinery went unexercised.
 
@@ -2671,7 +2671,7 @@ arrangement is drawn from it — and both suites assert the walk rather than any
 
 ### Every layout sample lives in one place, and none of them is a menu's
 
-The user's call, taken while `backlog.md` item 26's proving pass was still open. `Samples/Menu/Layouts` was
+The user's call, taken while `backlog.md` item 25's proving pass was still open. `Samples/Menu/Layouts` was
 named when a menu was the only thing that had ever asked for a layout; by the end of the pass it held a
 honeycomb and a radial tree, and eleven consumers imported it of which three were menus. It is now
 `Samples/Placement/Layouts`, and the arrangements that came in with `Formation` are in it too.
@@ -2826,7 +2826,7 @@ answer.
 
 ### Five more controls take a layout, and each one broke something different
 
-The rest of `backlog.md` item 26's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
+The rest of `backlog.md` item 25's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
 `Paginator`, `RadioGroup` and `Tabs`. The reason to keep going past the first was that each control was
 expected to strain a different part of the abstract, and each did.
 
@@ -6765,7 +6765,7 @@ the document so they paint behind it.
 layout's formula and the example now spells it a second time, along with a walk of its own data to work out
 which depths are showing — because a ring must disappear when its generation collapses, and only the layout
 knows that today. So the escape hatch is real and the duplication is real with it, which is the argument for
-the slot recorded against item 26 rather than a reason to think nothing is missing.
+the slot recorded against item 25 rather than a reason to think nothing is missing.
 
 **The user's stated position on where this should land**, taken as their framing rather than as a rule
 anything has been changed to follow: a thing that belongs in a particular place should have a render slot of
@@ -7367,12 +7367,15 @@ costs a hue rather than a chain, which is what let `spot_flare_2` be a flare at 
 blob.
 
 **A number followed by `s` means those colours are laid down solid rather than blended.** `flow_2s`,
-`flow_3s` and `flow_diag_2s` are the banded counterparts of their smooth siblings, which is `spreadKind:
-"banded"` on the gradient — each stop emitted twice so the colours meet at a hard edge.
+`flow_3s`, `flow_diag_2s` and `flow_diag_3s` are the banded counterparts of their smooth siblings, which is
+`spreadKind: "banded"` on the gradient — each stop emitted twice so the colours meet at a hard edge. **`flow`
+is the only family that bands**, since the ripples' banded twins were deleted; see _"Every ripple had a banded
+twin, and they were deleted"_ below.
 
-**Suffix letters stack, and the order is `c` then `s`.** `spot_ripple_3cs` is three colours, cycled from a
-clock, laid down solid — the user's spelling, and the general rule it fixes is that each letter qualifies
-the number and they read in that order rather than in any other.
+**Suffix letters stack, and the order is `c` then `s`.** `flow_3cs` is three colours, cycled from a clock,
+laid down solid — the user's spelling, and the general rule it fixes is that each letter qualifies the number
+and they read in that order rather than in any other. The spelling was settled on `spot_ripple_3cs`, which no
+longer exists; `flow_3cs` is the example now, and it is the only shape that carries both letters.
 
 **A number followed by `c` means the colours are cycled from a clock rather than each painting its own
 element.** `spot_trail_2c`, `spot_trail_3c`, `spot_ripple_2c` and `spot_ripple_3c` blend continuously through their colour list
@@ -7390,7 +7393,9 @@ the strict form would run to `1v1v1v1`, the short number is used instead.
 
 **The leading word is the family, and the picker groups by it.** `splitEntriesIntoGroups` takes the first run
 of lowercase letters, so everything named `sheen_…` arrives together in the dropdown. The words in between —
-`diag`, `inter`, `async`, `pulse`, `rot` — qualify the motion, and are descriptive rather than governed.
+`diag`, `inter`, `async` — qualify the motion, and are descriptive rather than governed. `pulse` and `rot`
+were two more of them and now have no consumer: `hue_pulse_2` became `fill_2c` because the number carried
+the difference, and `hue_rot_3` was deleted outright.
 
 ### A tracked sample key is a mark, then a treatment, then a colour count
 
@@ -7399,7 +7404,7 @@ sample makes a **mark** — a radial pool, a linear band, an angular wedge — a
 leave a fading history, expand it into rings, hang a chain of ghosts off it. `flare_…`, `ripple_…` and
 `trail_…` were three prefixes for three treatments of the same mark, so the picker filed one family as
 three; and `hand_trail_1` was the first key that needed both axes at once, which is what surfaced it. The
-key is now **mark, treatment, colour count** — `spot_ripple_3cs`, `spot_trail_3c`, `hand_trail_3c` — and it
+key is now **mark, treatment, colour count** — `spot_ripple_3c`, `spot_trail_3c`, `hand_trail_3c` — and it
 needed no new rule, since the leading word was always the family and the words between it and the number
 always qualified.
 
@@ -7459,15 +7464,16 @@ they started on and each takes the colour after its own.
 **`background` never enters a cycle.** Stated by the user. The palette is four colours and the fourth is the
 surface behind the sample, so the walk is primary → secondary → tertiary → primary.
 
-**The `elastic_…` samples changed in place rather than gaining a variant, and were renamed `…_1c`.** They
-painted a static three-stop ramp of the whole palette; they now paint one flat colour that cycles, which is
-`hue_1`'s treatment. The rainbow is gone rather than optional, and `elastic_circle_3` became
-`elastic_circle_1c` — the user's call on both.
+**The `elastic_…` samples changed in place rather than gaining a variant.** They painted a static
+three-stop ramp of the whole palette; they now paint one flat colour that cycles, which is `fill_3c`'s
+treatment. The rainbow is gone rather than optional — the user's call. They kept their `3` and gained the
+`c`, so `elastic_circle_3` is `elastic_circle_3c`; the first pass took them to `…_1c` and that was undone,
+for the reason the numbering rule below sets out.
 
 **The cycle rides the same clock as the motion, because every `animate` shares one duration.**
 `SVGAnimationDefsUtils.createAnimateDefs` reads `animationDurationMs` for every element it stamps, so one sweep
 across the surface is one full colour pass. Composition is a fragment in the `custom` slot of
-`computeLinearGradient`, which is what `hue_rot_3` already did.
+`computeLinearGradient`, which is what the deleted `hue_rot_3` already did.
 
 **A transparent stop must cycle too, and this is the part that decided the implementation.** The samples
 spell a faded stop as `rgb(from ${color} r g b / 0)`, and a gradient ramp between a transparent stop and an
@@ -7490,21 +7496,91 @@ tracked `c` variants already use around `Color.Hex.isHex`.
 **Only the `c` variants use it.** The samples that do not animate their colours keep the relative spelling,
 which reads better and works for any colour string.
 
-**The number counts the colours on screen at once, and `c` says they move — which is what the
-`elastic_…` rename settles.** The keys were first read as a problem: under _"A sample key is a sentence, and
-its number is a colour count"_ a `scan_1c` walking three colours looked like it wanted to be `scan_3c`. The
-user's answer was to take `elastic_circle_3` to `elastic_circle_1c`, and that fixes the reading — **the
-number is what a viewer sees at any one instant, not how many colours the sample passes through over its
-cycle.** A cycled sample shows one colour where it used to show a ramp of three, so `elastic_…` had to drop
-from three to one; and every other key is right as it stands, because cycling does not change how many
-colours are visible simultaneously. `scan_1c` shows one, `scan_1v1c` shows one per group, `snake_4c` keeps
-its four arms.
+**What the number counts depends on whether the sample has a non-cycling sibling, and that is the whole
+rule.** Under _"A sample key is a sentence, and its number is a colour count"_ the number is what a viewer
+sees at any one instant, which read as a problem the moment `scan_1c` started walking three colours and
+looked like it wanted to be `scan_3c`. The user's answer splits the two cases:
 
-**`hue_…` is the family still out of step, and it is the user's call.** Those samples cycle as their
-identity and carry no `c` — `hue_1` shows one colour at a time and should read `hue_1c`, `hue_rot_3` shows
-three at once and should read `hue_3c`, and `hue_pulse_2` shows one at a time, so a strict pass would collide
-it with `hue_1`. The user has said the family may want a rename and has not taken it yet. Do not rename them
-without them saying so.
+- **A `c` sample that has a non-cycling twin keeps the twin's number.** `scan_1` and `scan_1c`, `snake_4`
+  and `snake_4c`, `sweep_1v1` and `sweep_1v1c`: cycling does not change how many colours are on screen at
+  once, and holding the number still is what makes the pair read as a pair.
+- **A sample whose identity _is_ the cycling counts the colours it walks through.** There is no twin to
+  pair with and the instant-count says nothing, because every such sample shows one colour per stop
+  whatever it is doing. `fill_3c` and `fill_2c` would both be `fill_1c` under an instant-count, which is
+  the demonstration that the instant-count carries no information here.
+
+**The `elastic_…` four are the second case, which is why they went back to `3c`.** They are `fill_3c`'s
+treatment applied to a shaped mark — a flat colour walking the whole palette, with no static sibling — so
+`elastic_circle_3c`, `elastic_drip_3c`, `elastic_semicircle_3c` and `elastic_inter_semicircle_3c`. The
+first pass had taken them to `…_1c` on the instant-count reading, and the user overturned it. **Nothing
+else moves**: every other `c` key in the registry has a twin, so the first bullet covers it.
+
+**`hue_…` became `fill_…`, and its number counts the walk rather than the instant.** The family named what
+changed where every other timed family names a motion, which is the same fault that took `sheen_…` to
+`band_…`; and `hue` plus `c` said the colours move twice over. The user's call, with the keys they chose:
+
+- **`hue_1` → `fill_3c`.** A flat surface walking primary → secondary → tertiary.
+- **`hue_pulse_2` → `fill_2c`.** A flat surface ping-ponging between two colours. `pulse` is gone because
+  the number now carries the difference — a two-colour walk is the ping-pong.
+- **`hue_diag_inter_2` → `fill_diag_2v2c`.** A diagonal two-stop ramp whose stops take turns, each
+  walking two colours of its own. `diag` stays so the direction is on the key and a straight `fill_2v2c`
+  remains available — the user's call. `inter` goes, because `v` already says the two stops are independent.
+- **`hue_rot_3` was deleted.** Rotation is a treatment any family can take — the user noted `flow` could
+  grow a `flow_rot_…` set — so it was not worth a key of its own here. **They said explicitly not to build
+  that set**; the note records where it would go, not work to do.
+
+**`fill` was chosen over `flood` because one member is a ramp.** `flood` promises a single flat colour,
+which `fill_diag_2v2c` is not; `fill` says only that the paint itself is what changes and nothing travels across
+the surface, which covers all three. The family word states the mark, and `c` is the only place cycling is
+stated.
+
+**The `fill_…` numbers count the colours the cycle walks through**, which is the second case of the
+numbering rule above — the case these keys are what settled.
+
+**`v` now covers stops inside one gradient.** `fill_diag_2v2c` is a single linear gradient with two stops, where
+_"`N v M` means element groups that are not contiguous"_ had said two stops of one ramp read as one thing.
+The user's spelling extends it: two stops on independent cycle schedules are two things, because what makes
+them separate is the timing rather than the geometry.
+
+### `flow` has parity across both suffixes, and banding needed its own cycling helper
+
+**The family now spells every combination.** `flow` and `flow_diag`, each at two and three colours, each
+plain, `s`, `c` and `cs` — sixteen keys where there were six. The gaps were an oversight rather than a
+choice, and the user's call was to close them: `flow_2` and `flow_diag_2` had only ever existed banded, and
+nothing in the family cycled at all.
+
+**`SVGAnimations.Gradient.cycleSmoothColors` cannot drive a banded gradient, and that is why
+`cycleBandedColors` exists.** It hangs one `animate` per entry on `#{gradientId}-stop-{index}`, which is
+what `renderSmoothGradientStops` emits. `renderBandedGradientStops` emits two stops per boundary instead —
+`stop-0-start`, then a `stop-{i-1}-end` and a `stop-{i}-start` for every following colour — so every
+`animate` the smooth helper produced would reference an id that does not exist. **It fails silently**: SMIL
+ignores an `href` it cannot resolve, so the gradient renders correctly and simply never moves. Nothing had
+caught it because nothing had asked: the only keys that banded _and_ cycled were the tracked ripples, and
+those blend on their own per-frame clock rather than through SMIL, so they never touched the helper. The
+new one walks the same `string[][]` — one list per **declared** colour — and stamps both ids each declared
+colour owns, which is `stop-{i}-start` always and `stop-{i}-end` for every colour but the last.
+
+**Verified in the browser rather than argued.** With `flow_3cs` picked, all twenty-six rendered stops carry
+banded ids and all twenty-six change colour inside 400ms, while `flow_3s` — the same gradient without the
+`c` — holds every stop still. The control is the half that matters: it says the probe measured the cycle
+rather than something incidental.
+
+**`SVGDefsUtils.getCycleWalk` exists because the banded keys have up to seventeen stops.** Every `c` sample
+before these hand-wrote its per-stop colour lists, which is fine at three stops and absurd at seventeen —
+four files at roughly seventy lines of near-identical colour references. The helper turns a stop's own
+palette key into its walk, `primary` giving primary → secondary → tertiary → primary, which is the rule
+_"each gradient element cycles from the colour it already painted"_ expressed once instead of per file. So a
+cycling flow file names its stops as a list of palette keys and derives both the gradient's colours and the
+cycle from that one array; the eight cycling keys are the only samples in the tree that read this way, and
+the eighteen older `c` samples were left alone rather than migrated under this work.
+
+**The smooth two-colour keys match their three-colour siblings' structure, not their traversal count.**
+`flow_2` and `flow_diag_2` carry seven stops alternating two colours, where `flow_3` carries seven cycling
+three — the same number of colour transitions across the surface, which is what the existing banded pair
+already did by holding band count roughly level rather than palette traversals. The banded and diagonal
+tuning was copied per variant rather than normalised: horizontal banded and smooth share an offset of 0.5
+and a full sweep, while diagonal banded uses 0.25 and half a sweep where diagonal smooth uses 0.5 and a
+full one. Those are tuned numbers and were left exactly as the existing keys had them.
 
 ### The bands leave the surface by travelling off it
 
@@ -7804,7 +7880,7 @@ would rather this one match its siblings, the two constants at the top of the fi
 
 **`SVGAnimations.Gradient.cycleSmoothColors` does the same job for the timed samples and cannot do it
 here.** It emits a SMIL `animate` on each stop's `stop-color` with the colours as its `values` list, and the
-browser blends between them — which is exactly what the `hue_…` samples use and exactly what the head of a
+browser blends between them — which is exactly what the `fill_…` samples use and exactly what the head of a
 `c` sample wants. **It was not consulted when these were built, which was a miss**; the answer would still
 have come out the same, but by argument rather than by luck. Three things rule it out.
 
@@ -7975,18 +8051,24 @@ source had when it was born, so the wake grades along the path rather than repea
 or not the pointer moves — the same trade the trails' `c` variants make, and the reason the plain
 `ripple_…` three keep the loop that stops.
 
-**Every ripple has a banded twin, and it needed a suffix rather than a new word.** One prop —
-`spreadKind: "banded"` — emits each stop twice so the colours meet at a hard edge, which turns the soft
-crests into hard-edged solid rings and the wake into something closer to sonar or a contour map. The naming
-convention already had the form: a trailing `s` means the colours are laid down solid rather than blended,
-which is exactly what this is, so an invented `ripple_band_3` would have been a second spelling for a rule
-already written down. `spot_ripple_1s`, `spot_ripple_2s` and `spot_ripple_3s` are the twins of the plain three, and
-`spot_ripple_2cs` and `spot_ripple_3cs` of the cycling two — hard rings each frozen at the colour the source was
-blending through when it left, which is the most striking thing the family does.
+### Every ripple had a banded twin, and they were deleted
 
-**The trails have no banded twins, and that is deliberate.** A trail's stamps are the head's own four-stop
-pool, whose whole job is to fall off softly; banding it would produce hard-edged discs, which is a different
-effect wearing the ripples' suffix rather than the same effect laid down solid.
+**Five keys went: `spot_ripple_1s`, `_2s`, `_3s`, `_2cs` and `_3cs`.** The user's call — they never liked
+them much. What they were: one prop, `spreadKind: "banded"`, emits each stop twice so the colours meet at a
+hard edge, which turned the soft crests into hard-edged solid rings and the wake into something closer to
+sonar or a contour map. The reasoning for the suffix rather than an invented `ripple_band_3` was sound and
+still is — a trailing `s` already meant exactly that — and it is why `flow` keeps its banded set. The look
+was the thing that did not earn its keep.
+
+**What went with them.** The tracked registry now has no `s` at all, so the `TrackedGradients` description
+in `App.tsx` lost the clause promising one, and the worked example for _"suffix letters stack"_ moved to
+`flow_3cs`. Nothing else pointed at the five.
+
+**The trails never had banded twins, and that is unchanged.**
+
+A trail's stamps are the head's own four-stop pool, whose whole job is to fall off softly; banding it would
+produce hard-edged discs, which is a different effect wearing the same suffix rather than the same effect
+laid down solid.
 
 **A ring can be recycled before it has finished, and the numbers are chosen to make that rare rather than
 impossible.** Twelve slots at 0.15 of the box apart means a full recycle takes 1.8 box-widths of travel; at
@@ -10454,10 +10536,10 @@ consumer, which is worth knowing before anything is built on it.
 
 ### `ScrambleText`: the text is replaced rather than animated, and that decides the whole shape
 
-The sibling of `Typewriter` that item 24 argued for. `Typewriter` stages a CSS animation over text that never
+The sibling of `Typewriter` that `backlog.md` argued for before the item closed. `Typewriter` stages a CSS animation over text that never
 changes; this replaces the character a position is showing, on a timer, until the position's own moment
 arrives. Nothing about that is expressible as a keyframe, which is why it is a component rather than an entry
-in the Typewriter page's effect list — see the item for the two things that block the CSS route.
+in the Typewriter page's effect list — the two things that block the CSS route are recorded below.
 
 **It takes a string rather than children, and `Typewriter` taking children is not a precedent it should
 follow.** `Typewriter` parses whatever is nested inside it, links and images included, because it only ever

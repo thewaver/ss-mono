@@ -464,7 +464,7 @@ test("a hover nothing caused leaves the highlight where it is", async ({ page })
 
     const box = (await hovered.boundingBox())!;
 
-    await enterWithoutMoving(page, other, { x: box.x + box.width / 2, y: box.y + box.height / 2 });
+    await enterWithoutMoving(page, other, { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 });
 
     expect(
         await highlightAt(page, 0),

@@ -54,7 +54,7 @@ const centreOf = (page: Page, selector: string) =>
 
         if (!box) throw new Error("no such socket");
 
-        return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+        return { x: box.left + box.width * 0.5, y: box.top + box.height * 0.5 };
     }, selector);
 
 const cableCount = async (page: Page, key: string) => {
@@ -219,9 +219,9 @@ test("a cable is drawn by dragging from one socket to another", async ({ page })
 
     if (!from || !to) throw new Error("the board has no such socket");
 
-    await page.mouse.move(from.x + from.width / 2, from.y + from.height / 2);
+    await page.mouse.move(from.x + from.width * 0.5, from.y + from.height * 0.5);
     await page.mouse.down();
-    await page.mouse.move(to.x + to.width / 2, to.y + to.height / 2, { steps: 12 });
+    await page.mouse.move(to.x + to.width * 0.5, to.y + to.height * 0.5, { steps: 12 });
     await page.mouse.up();
 
     expect(await cableCount(page, CHAIN), "the drag left a cable behind it").toBe(2);
@@ -237,9 +237,9 @@ test("a box is moved by dragging it, and its cable comes along", async ({ page }
 
     if (!box) throw new Error("the board has no such node");
 
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await page.mouse.down();
-    await page.mouse.move(box.x + box.width / 2 + 60, box.y + box.height / 2 - 40, { steps: 12 });
+    await page.mouse.move(box.x + box.width * 0.5 + 60, box.y + box.height * 0.5 - 40, { steps: 12 });
     await page.mouse.up();
 
     const moved = await page.locator(node(CHAIN, "Gate", CHAIN_LABEL)).boundingBox();

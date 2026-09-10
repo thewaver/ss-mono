@@ -266,7 +266,7 @@ test("a piece is not covered by the tile it stands on, even while that tile is h
     const covered = await page.evaluate((scope) => {
         const meeple = document.querySelector(`${scope} [data-meeple]`) as HTMLElement;
         const box = meeple.getBoundingClientRect();
-        const atCentre = document.elementFromPoint(box.x + box.width / 2, box.y + box.height / 2);
+        const atCentre = document.elementFromPoint(box.x + box.width * 0.5, box.y + box.height * 0.5);
 
         return meeple.contains(atCentre) || meeple === atCentre;
     }, MARKED);
@@ -338,8 +338,8 @@ test("a piece rendered above the board lands on the middle of the tile it is giv
                 const tile = cell.getBoundingClientRect();
 
                 return {
-                    x: Math.round(piece.x + piece.width / 2 - (tile.x + tile.width / 2)),
-                    y: Math.round(piece.bottom - (tile.y + tile.height / 2)),
+                    x: Math.round(piece.x + piece.width * 0.5 - (tile.x + tile.width * 0.5)),
+                    y: Math.round(piece.bottom - (tile.y + tile.height * 0.5)),
                 };
             },
             { scope: MEEPLE, selector: tile(MEEPLE), index },

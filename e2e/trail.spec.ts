@@ -24,7 +24,7 @@ const centreOf = (page: Page, selector: string) =>
 
         if (!box) throw new Error("nothing is travelling");
 
-        return { x: box.left + box.width / 2, y: box.top + box.height / 2 };
+        return { x: box.left + box.width * 0.5, y: box.top + box.height * 0.5 };
     }, selector);
 
 /**
@@ -42,7 +42,7 @@ const distanceFromPath = (page: Page, travellerSelector: string) =>
         if (!traveller || !path) throw new Error("nothing is travelling");
 
         const box = traveller.getBoundingClientRect();
-        const centre = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+        const centre = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
         const matrix = (path as SVGPathElement).getScreenCTM();
         const length = (path as SVGPathElement).getTotalLength();
 

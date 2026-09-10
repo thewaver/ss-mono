@@ -7,9 +7,20 @@ import type { SVGDefsColors } from "./SVGDefs.types";
 const TRANSPARENT_ALPHA = 0;
 const POINTER_FADE_START_RATIO = 1;
 const POINTER_FADE_END_RATIO = 2;
+const CYCLE_COLOR_KEYS = ["primary", "secondary", "tertiary"] as const;
 
 export namespace SVGDefsUtils {
     export const DEBUG_SEAMS = false;
+
+    export type CycleColorKey = (typeof CYCLE_COLOR_KEYS)[number];
+
+    export const getCycleWalk = (colors: SVGDefsColors, key: CycleColorKey) => {
+        const start = CYCLE_COLOR_KEYS.indexOf(key);
+
+        return [...CYCLE_COLOR_KEYS.slice(start), ...CYCLE_COLOR_KEYS.slice(0, start), key].map(
+            (walkKey) => colors[walkKey],
+        );
+    };
 
     export const getBaseBlur = (
         id: string,

@@ -1,17 +1,26 @@
-import { elastic_circle_1c } from "./Gradient/Timed/elastic_circle_1c";
-import { elastic_drip_1c } from "./Gradient/Timed/elastic_drip_1c";
-import { elastic_inter_semicircle_1c } from "./Gradient/Timed/elastic_inter_semicircle_1c";
-import { elastic_semicircle_1c } from "./Gradient/Timed/elastic_semicircle_1c";
+import { elastic_circle_3c } from "./Gradient/Timed/elastic_circle_3c";
+import { elastic_drip_3c } from "./Gradient/Timed/elastic_drip_3c";
+import { elastic_inter_semicircle_3c } from "./Gradient/Timed/elastic_inter_semicircle_3c";
+import { elastic_semicircle_3c } from "./Gradient/Timed/elastic_semicircle_3c";
+import { fill_2c } from "./Gradient/Timed/fill_2c";
+import { fill_3c } from "./Gradient/Timed/fill_3c";
+import { fill_diag_2v2c } from "./Gradient/Timed/fill_diag_2v2c";
+import { flow_2 } from "./Gradient/Timed/flow_2";
+import { flow_2c } from "./Gradient/Timed/flow_2c";
+import { flow_2cs } from "./Gradient/Timed/flow_2cs";
 import { flow_2s } from "./Gradient/Timed/flow_2s";
 import { flow_3 } from "./Gradient/Timed/flow_3";
+import { flow_3c } from "./Gradient/Timed/flow_3c";
+import { flow_3cs } from "./Gradient/Timed/flow_3cs";
 import { flow_3s } from "./Gradient/Timed/flow_3s";
+import { flow_diag_2 } from "./Gradient/Timed/flow_diag_2";
+import { flow_diag_2c } from "./Gradient/Timed/flow_diag_2c";
+import { flow_diag_2cs } from "./Gradient/Timed/flow_diag_2cs";
 import { flow_diag_2s } from "./Gradient/Timed/flow_diag_2s";
 import { flow_diag_3 } from "./Gradient/Timed/flow_diag_3";
+import { flow_diag_3c } from "./Gradient/Timed/flow_diag_3c";
+import { flow_diag_3cs } from "./Gradient/Timed/flow_diag_3cs";
 import { flow_diag_3s } from "./Gradient/Timed/flow_diag_3s";
-import { hue_1 } from "./Gradient/Timed/hue_1";
-import { hue_diag_inter_2 } from "./Gradient/Timed/hue_diag_inter_2";
-import { hue_pulse_2 } from "./Gradient/Timed/hue_pulse_2";
-import { hue_rot_3 } from "./Gradient/Timed/hue_rot_3";
 import { merge_1v1 } from "./Gradient/Timed/merge_1v1";
 import { merge_1v1c } from "./Gradient/Timed/merge_1v1c";
 import { merge_diag_1v1 } from "./Gradient/Timed/merge_diag_1v1";
@@ -65,15 +74,10 @@ import { spot_1 } from "./Gradient/Tracked/spot_1";
 import { spot_flare_2 } from "./Gradient/Tracked/spot_flare_2";
 import { spot_flare_3 } from "./Gradient/Tracked/spot_flare_3";
 import { spot_ripple_1 } from "./Gradient/Tracked/spot_ripple_1";
-import { spot_ripple_1s } from "./Gradient/Tracked/spot_ripple_1s";
 import { spot_ripple_2 } from "./Gradient/Tracked/spot_ripple_2";
 import { spot_ripple_2c } from "./Gradient/Tracked/spot_ripple_2c";
-import { spot_ripple_2cs } from "./Gradient/Tracked/spot_ripple_2cs";
-import { spot_ripple_2s } from "./Gradient/Tracked/spot_ripple_2s";
 import { spot_ripple_3 } from "./Gradient/Tracked/spot_ripple_3";
 import { spot_ripple_3c } from "./Gradient/Tracked/spot_ripple_3c";
-import { spot_ripple_3cs } from "./Gradient/Tracked/spot_ripple_3cs";
-import { spot_ripple_3s } from "./Gradient/Tracked/spot_ripple_3s";
 import { spot_smear_2 } from "./Gradient/Tracked/spot_smear_2";
 import { spot_smear_2c } from "./Gradient/Tracked/spot_smear_2c";
 import { spot_smear_3 } from "./Gradient/Tracked/spot_smear_3";
@@ -151,20 +155,29 @@ export namespace SVGDefsSamples {
     export namespace Gradient {
         export namespace Timed {
             export const SAMPLE_CONFIGS = {
-                elastic_circle_1c,
-                elastic_drip_1c,
-                elastic_inter_semicircle_1c,
-                elastic_semicircle_1c,
+                elastic_circle_3c,
+                elastic_drip_3c,
+                elastic_inter_semicircle_3c,
+                elastic_semicircle_3c,
+                fill_2c,
+                fill_3c,
+                fill_diag_2v2c,
+                flow_2,
+                flow_2c,
+                flow_2cs,
                 flow_2s,
                 flow_3,
+                flow_3c,
+                flow_3cs,
                 flow_3s,
+                flow_diag_2,
+                flow_diag_2c,
+                flow_diag_2cs,
                 flow_diag_2s,
                 flow_diag_3,
+                flow_diag_3c,
+                flow_diag_3cs,
                 flow_diag_3s,
-                hue_1,
-                hue_diag_inter_2,
-                hue_pulse_2,
-                hue_rot_3,
                 merge_1v1,
                 merge_1v1c,
                 merge_diag_1v1,
@@ -225,15 +238,10 @@ export namespace SVGDefsSamples {
                 spot_flare_2,
                 spot_flare_3,
                 spot_ripple_1,
-                spot_ripple_1s,
                 spot_ripple_2,
                 spot_ripple_2c,
-                spot_ripple_2cs,
-                spot_ripple_2s,
                 spot_ripple_3,
                 spot_ripple_3c,
-                spot_ripple_3cs,
-                spot_ripple_3s,
                 spot_smear_2,
                 spot_smear_2c,
                 spot_smear_3,

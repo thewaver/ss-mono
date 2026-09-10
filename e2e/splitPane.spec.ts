@@ -149,9 +149,9 @@ test("a drag stops where the pixel bounds do, rather than writing past them", as
         const handle = page.locator(gutter(scope)).nth(index);
         const box = (await handle.boundingBox())!;
 
-        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
         await page.mouse.down();
-        await page.mouse.move(box.x + box.width / 2 + dx, box.y + box.height / 2, { steps: 10 });
+        await page.mouse.move(box.x + box.width * 0.5 + dx, box.y + box.height * 0.5, { steps: 10 });
         await page.mouse.up();
     };
 

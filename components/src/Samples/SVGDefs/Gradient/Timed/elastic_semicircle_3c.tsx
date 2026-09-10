@@ -5,7 +5,7 @@ import { SVGAnimations } from "../../SVGAnimations.const";
 import type { TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const elastic_inter_semicircle_1c: TimedGradientConfig = {
+export const elastic_semicircle_3c: TimedGradientConfig = {
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -35,14 +35,24 @@ export const elastic_inter_semicircle_1c: TimedGradientConfig = {
                             ObjectUtils.zipArray(
                                 "stretch",
                                 [
-                                    ...MathUtils.getIntermediateValues(0, 0, 12),
-                                    ...MathUtils.getIntermediateValues(0, 180, 12),
-                                    ...MathUtils.getIntermediateValues(180, 180, 12),
-                                    ...MathUtils.getIntermediateValues(180, 360, 12),
+                                    ...MathUtils.getIntermediateValues(180, 90, 12),
+                                    ...MathUtils.getIntermediateValues(90, 180, 12),
                                 ],
                                 [
                                     ...MathUtils.getIntermediateValues(0, 180, 12),
                                     ...MathUtils.getIntermediateValues(180, 0, 12),
+                                ],
+                            ),
+                            defs,
+                        )}
+                        {SVGAnimations.Path.rotatingArc(
+                            ObjectUtils.zipArray(
+                                "stretch",
+                                [
+                                    ...MathUtils.getIntermediateValues(360, 270, 12),
+                                    ...MathUtils.getIntermediateValues(270, 360, 12),
+                                ],
+                                [
                                     ...MathUtils.getIntermediateValues(0, 180, 12),
                                     ...MathUtils.getIntermediateValues(180, 0, 12),
                                 ],

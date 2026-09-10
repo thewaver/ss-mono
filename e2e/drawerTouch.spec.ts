@@ -89,7 +89,7 @@ test("a finger pushing a sheet down from the top of its content dismisses it", a
 
     const box = (await page.locator(DIALOG).boundingBox())!;
 
-    await dragFinger(page, box.x + box.width / 2, box.y + box.height * 0.2, box.y + box.height * 0.95);
+    await dragFinger(page, box.x + box.width * 0.5, box.y + box.height * 0.2, box.y + box.height * 0.95);
 
     await expect(page.locator(DIALOG), "the sheet had nothing above to scroll to, so it took the gesture").toHaveCount(
         0,
@@ -100,7 +100,7 @@ test("a finger pushing the same sheet down after reading scrolls it back instead
     await openSheet(page);
 
     const box = (await page.locator(DIALOG).boundingBox())!;
-    const x = box.x + box.width / 2;
+    const x = box.x + box.width * 0.5;
 
     await dragFinger(page, x, box.y + box.height * 0.8, box.y + box.height * 0.2);
 

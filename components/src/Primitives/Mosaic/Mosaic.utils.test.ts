@@ -240,7 +240,7 @@ describe("packScaled", () => {
         const packed = scale(SQUARE);
         const extent = MosaicUtils.getFreeExtent(packed);
 
-        expect(Math.abs(extent - ANCHORED_EXTENT)).toBeLessThan(ANCHORED_EXTENT / 2);
+        expect(Math.abs(extent - ANCHORED_EXTENT)).toBeLessThan(ANCHORED_EXTENT * 0.5);
     });
 
     it("leaves out an image whose size is not known yet", () => {

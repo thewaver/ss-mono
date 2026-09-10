@@ -184,14 +184,14 @@ export namespace SVGUtils {
             const y0 = CIRCLE_CENTER.y + Math.sin(start + curvature) * CIRCLE_RADIUS;
             const x1 = CIRCLE_CENTER.x + Math.cos(end + curvature) * CIRCLE_RADIUS;
             const y1 = CIRCLE_CENTER.y + Math.sin(end + curvature) * CIRCLE_RADIUS;
-            const cp0_1x = CIRCLE_CENTER.x + Math.cos(start + curvature * 0.33) * (CIRCLE_RADIUS * 0.33);
-            const cp0_1y = CIRCLE_CENTER.y + Math.sin(start + curvature * 0.33) * (CIRCLE_RADIUS * 0.33);
-            const cp0_2x = CIRCLE_CENTER.x + Math.cos(start + curvature * 0.66) * (CIRCLE_RADIUS * 0.66);
-            const cp0_2y = CIRCLE_CENTER.y + Math.sin(start + curvature * 0.66) * (CIRCLE_RADIUS * 0.66);
-            const cp1_1x = CIRCLE_CENTER.x + Math.cos(end + curvature * 0.66) * (CIRCLE_RADIUS * 0.66);
-            const cp1_1y = CIRCLE_CENTER.y + Math.sin(end + curvature * 0.66) * (CIRCLE_RADIUS * 0.66);
-            const cp1_2x = CIRCLE_CENTER.x + Math.cos(end + curvature * 0.33) * (CIRCLE_RADIUS * 0.33);
-            const cp1_2y = CIRCLE_CENTER.y + Math.sin(end + curvature * 0.33) * (CIRCLE_RADIUS * 0.33);
+            const cp0_1x = CIRCLE_CENTER.x + Math.cos(start + curvature / 3) * (CIRCLE_RADIUS / 3);
+            const cp0_1y = CIRCLE_CENTER.y + Math.sin(start + curvature / 3) * (CIRCLE_RADIUS / 3);
+            const cp0_2x = CIRCLE_CENTER.x + Math.cos(start + (curvature * 2) / 3) * ((CIRCLE_RADIUS * 2) / 3);
+            const cp0_2y = CIRCLE_CENTER.y + Math.sin(start + (curvature * 2) / 3) * ((CIRCLE_RADIUS * 2) / 3);
+            const cp1_1x = CIRCLE_CENTER.x + Math.cos(end + (curvature * 2) / 3) * ((CIRCLE_RADIUS * 2) / 3);
+            const cp1_1y = CIRCLE_CENTER.y + Math.sin(end + (curvature * 2) / 3) * ((CIRCLE_RADIUS * 2) / 3);
+            const cp1_2x = CIRCLE_CENTER.x + Math.cos(end + curvature / 3) * (CIRCLE_RADIUS / 3);
+            const cp1_2y = CIRCLE_CENTER.y + Math.sin(end + curvature / 3) * (CIRCLE_RADIUS / 3);
             const largeArc = wedgeAngle > Math.PI ? 1 : 0;
 
             return [

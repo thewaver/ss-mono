@@ -40,8 +40,8 @@ export const colorAreaThumb = style({
 
     width: THUMB_SIZE,
     height: THUMB_SIZE,
-    marginTop: -THUMB_SIZE / 2,
-    marginLeft: -THUMB_SIZE / 2,
+    marginTop: -THUMB_SIZE * 0.5,
+    marginLeft: -THUMB_SIZE * 0.5,
     borderRadius: "50%",
     border: "2px solid white",
     boxShadow: "0 0 0 1px rgba(0, 0, 0, 0.5)",
@@ -72,7 +72,7 @@ export const hueSlider = style({
 export const hueTrack = style({
     width: "100%",
     height: HUE_TRACK_HEIGHT,
-    borderRadius: HUE_TRACK_HEIGHT / 2,
+    borderRadius: HUE_TRACK_HEIGHT * 0.5,
     backgroundImage: `linear-gradient(to right, ${[0, 60, 120, 180, 240, 300, 360]
         .map((hue) => `hsl(${hue} 100% 50%)`)
         .join(",")})`,

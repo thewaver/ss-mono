@@ -170,7 +170,7 @@ test("holding a stepper repeats, and a tap does not", async ({ page }) => {
 
     const box = (await page.locator(QUANTITY_UP).boundingBox())!;
 
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
 
     await page.mouse.down();
     await page.mouse.up();

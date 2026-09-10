@@ -37,7 +37,7 @@ const coverChildCount = (page: Page, selector: string) => page.locator(`${select
 
 const rubAcross = async (page: Page, selector: string, fromRatio = 0.2, toRatio = 0.7) => {
     const box = (await page.locator(selector).boundingBox())!;
-    const y = box.y + box.height / 2;
+    const y = box.y + box.height * 0.5;
 
     await page.mouse.move(box.x + box.width * fromRatio, y);
     await page.mouse.down();
@@ -151,7 +151,7 @@ test("a fresh ticket waits to be pressed, rather than carrying the last one's dr
     await setField(page, "clearThreshold", LOW_THRESHOLD);
 
     const box = (await page.locator(COVER).boundingBox())!;
-    const y = box.y + box.height / 2;
+    const y = box.y + box.height * 0.5;
 
     // the button stays down while the cover clears, so its release lands on an element that has already gone
     await page.mouse.move(box.x + box.width * 0.2, y);
@@ -166,8 +166,8 @@ test("a fresh ticket waits to be pressed, rather than carrying the last one's dr
 
     const fresh = (await page.locator(COVER).boundingBox())!;
 
-    await page.mouse.move(fresh.x + fresh.width * 0.1, fresh.y + fresh.height / 2);
-    await page.mouse.move(fresh.x + fresh.width * 0.9, fresh.y + fresh.height / 2, { steps: 20 });
+    await page.mouse.move(fresh.x + fresh.width * 0.1, fresh.y + fresh.height * 0.5);
+    await page.mouse.move(fresh.x + fresh.width * 0.9, fresh.y + fresh.height * 0.5, { steps: 20 });
     await page.waitForTimeout(SETTLE_MS);
 
     expect(
@@ -179,7 +179,7 @@ test("a fresh ticket waits to be pressed, rather than carrying the last one's dr
 test("the brush preview follows the pointer, and only where a consumer asked for one", async ({ page }) => {
     const box = (await page.locator(COVER).boundingBox())!;
 
-    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await page.waitForTimeout(SETTLE_MS);
 
     expect(
@@ -195,7 +195,7 @@ test("the brush preview follows the pointer, and only where a consumer asked for
     const frostedCover = `${FROSTED} [role="button"]`;
     const frosted = (await page.locator(frostedCover).boundingBox())!;
 
-    await page.mouse.move(frosted.x + frosted.width / 2, frosted.y + frosted.height / 2);
+    await page.mouse.move(frosted.x + frosted.width * 0.5, frosted.y + frosted.height * 0.5);
     await page.waitForTimeout(SETTLE_MS);
 
     expect(

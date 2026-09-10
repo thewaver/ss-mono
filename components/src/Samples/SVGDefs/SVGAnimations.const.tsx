@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 
 import { SVGUtils } from "@thewaver/ss-utils";
 
@@ -175,6 +175,35 @@ export namespace SVGAnimations {
                             values={stop.join(";")}
                             {...animateDefs()}
                         />
+                    )}
+                </For>
+            );
+        };
+
+        export const cycleBandedColors = (gradientId: string, sArray: string[][], defs: SVGAnimationDefs) => {
+            const animateDefs = SVGAnimationDefsUtils.createAnimateDefs(defs);
+            const lastIndex = sArray.length - 1;
+
+            return (
+                <For each={sArray}>
+                    {(stop, getIndex) => (
+                        <>
+                            <animate
+                                {...{ href: `#${gradientId}-stop-${getIndex()}-start` }}
+                                attributeName="stop-color"
+                                values={stop.join(";")}
+                                {...animateDefs()}
+                            />
+
+                            <Show when={getIndex() < lastIndex}>
+                                <animate
+                                    {...{ href: `#${gradientId}-stop-${getIndex()}-end` }}
+                                    attributeName="stop-color"
+                                    values={stop.join(";")}
+                                    {...animateDefs()}
+                                />
+                            </Show>
+                        </>
                     )}
                 </For>
             );

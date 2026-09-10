@@ -19,7 +19,7 @@ export const toggleContent = style({
     height: TOGGLE_HEIGHT,
     boxShadow: themeVars.shadow.small,
     border: `2px solid rgb(from currentColor r g b / 25%)`,
-    borderRadius: TOGGLE_HEIGHT / 2,
+    borderRadius: TOGGLE_HEIGHT * 0.5,
     backgroundColor: "black",
     transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
 

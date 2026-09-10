@@ -260,7 +260,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         return CarrierUtils.computeMarkerIndex(asIndex(place), getSourceIndex() ?? 0, getIsSource());
     });
 
-    const getEndRoom = createMemo(() => (access(props.gap) ?? DEFAULT_SORTABLE_GAP) / 2);
+    const getEndRoom = createMemo(() => (access(props.gap) ?? DEFAULT_SORTABLE_GAP) * 0.5);
 
     const getMarkerPlacement = createMemo(() => {
         const layout = getLayout();
@@ -283,7 +283,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         const scrolled = isRow ? root.scrollLeft : root.scrollTop;
         const span = isRow ? root.scrollWidth : root.scrollHeight;
 
-        if (rects.length < 1) return span / 2;
+        if (rects.length < 1) return span * 0.5;
 
         const scale = viewportContext.getScale();
 
@@ -295,7 +295,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         const before = markerIndex > 0 ? endOf(rects[markerIndex - 1]) : 0;
         const after = markerIndex < rects.length ? startOf(rects[markerIndex]) : span;
 
-        return (before + after) / 2;
+        return (before + after) * 0.5;
     });
 
     const getNavigableIndexes = createMemo(() =>
@@ -345,7 +345,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
             grabOffset = grabbed
                 ? { x: grabbed.x - origin.x, y: grabbed.y - origin.y }
-                : { x: rect.width / scale / 2, y: rect.height / scale / 2 };
+                : { x: (rect.width / scale) * 0.5, y: (rect.height / scale) * 0.5 };
 
             setCarriedPoint(from ? ViewportUtils.getAdjustedClientPoint(from, viewportContext) : undefined);
         }
@@ -390,7 +390,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         if (CarrierUtils.getCarryMode() === "key") {
             const rect = getItemRefs()[index]?.getBoundingClientRect();
 
-            if (rect) CarrierUtils.aimAtPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+            if (rect) CarrierUtils.aimAtPoint(rect.left + rect.width * 0.5, rect.top + rect.height * 0.5);
         }
 
         CarrierUtils.end("drop");

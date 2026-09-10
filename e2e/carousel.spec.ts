@@ -179,7 +179,7 @@ test("the disabled knob stops the rotation as well as the controls", async ({ pa
  */
 const swipeAcross = async (page: import("@playwright/test").Page, scope: string, from: number, to: number) => {
     const box = (await page.locator(viewport(scope)).boundingBox())!;
-    const y = box.y + box.height / 2;
+    const y = box.y + box.height * 0.5;
 
     await page.mouse.move(box.x + box.width * from, y);
     await page.mouse.down();
@@ -221,7 +221,7 @@ test("a carousel with no controls refuses the swipe, because nothing else could 
  */
 const swipeDown = async (page: import("@playwright/test").Page, scope: string, from: number, to: number) => {
     const box = (await page.locator(viewport(scope)).boundingBox())!;
-    const x = box.x + box.width / 2;
+    const x = box.x + box.width * 0.5;
 
     await page.mouse.move(x, box.y + box.height * from);
     await page.mouse.down();

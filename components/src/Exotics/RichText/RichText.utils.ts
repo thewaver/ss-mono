@@ -1,9 +1,31 @@
 import type { RichTextNode } from "./RichText.types";
 
+/** Writes a node back out as the markup it came from, for a tag that turned out never to be closed. */
 const stringifyNode = (node: RichTextNode): string =>
     node.type === "text" ? node.content : `[${node.tag}]${node.children.map(stringifyNode).join("")}[/${node.tag}]`;
 
+/**
+ * Parses a small bracketed markup into a tree.
+ *
+ * The markup is the forum-style `[b]bold[/b]`: named tags in square brackets, nested freely. There
+ * is no escaping and no attributes, which is deliberate — the input is a translated string or a
+ * piece of user-facing copy, not a document format.
+ */
 export namespace RichTextUtils {
+    /**
+     * Reads bracketed markup into nodes.
+     *
+     * Nothing is ever rejected: malformed markup comes back as the literal text it was written as, so a
+     * stray bracket in a translated string shows up on screen rather than swallowing the rest of the
+     * sentence. A closing tag with no opening one is text. A tag left unclosed at the end is text, and
+     * so is everything inside it. A closing tag that skips over an unclosed tag closes the one it names
+     * and turns the skipped one back into text, warning as it goes, since that case is almost always a
+     * typo rather than an intention.
+     *
+     * @param input The markup.
+     * @returns The nodes, each either a run of text or a tag with children of its own. Which tags mean
+     * anything is the caller's business; this only reads the structure.
+     */
     export const parseContent = (input: string): RichTextNode[] => {
         const stack: { tag: string; children: RichTextNode[] }[] = [{ tag: "root", children: [] }];
         const tagRE = /\[\/?[a-z_][a-z0-9_]*\]/gi;
