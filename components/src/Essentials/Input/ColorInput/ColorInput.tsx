@@ -4,10 +4,10 @@ import { createEffect, createMemo, createSignal, createUniqueId, untrack } from 
 import { Color } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
-import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
+import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
+import { Popover } from "../../../Primitives/Popover/Popover";
 import { access } from "../../../Utils/propUtils";
-import { Popover } from "../../Popover/Popover";
 import { ColorArea } from "../ColorArea/ColorArea";
 import { FormFieldUtils } from "../FormField/FormField.utils";
 import { LabelUtils } from "../Label/Label.utils";
@@ -75,7 +75,7 @@ export const ColorInput = (props: ColorInputProps) => {
     const popupId = createUniqueId();
 
     const [getFieldRef, setFieldRef] = createSignal<HTMLElement>();
-    const [getIsOpen, setIsOpen] = SignalMirror.createOptional(() => props.visibilitySignal, false);
+    const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
     const startingValue = props.valueSignal[0]();
 
     const [getHsv, setHsv] = createSignal<Color.HSVA>(

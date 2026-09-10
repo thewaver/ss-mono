@@ -1,4 +1,4 @@
-import { createRing } from "@thewaver/ss-components";
+import { PlacementLayoutUtils } from "@thewaver/ss-components";
 
 import type { WheelSpinStyleFn, WheelSpinStyleKey } from "./Wheels.types";
 
@@ -27,9 +27,9 @@ export const STARTING_SPIN_STYLE_KEY: WheelSpinStyleKey = "bouncy";
 
 export const PRIZE_FETCH_DELAY_MS = 300;
 
-export const PRIZE_WHEEL_RING = createRing({
-    holeRadiusPx: 0,
-    bandWidthPx: 50,
+export const PRIZE_WHEEL_RING = PlacementLayoutUtils.createRing({
+    holeRadius: 0,
+    bandWidth: 50,
     wedgeGapDegrees: 0,
     labelRadiusRatio: 0.8,
     labelHeightRatio: 0.45,

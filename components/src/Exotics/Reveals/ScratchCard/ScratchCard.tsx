@@ -2,9 +2,9 @@ import { Show, createEffect, createMemo, createSignal, createUniqueId, on, onCle
 
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-import { ElementObserver } from "../../../Abstracts/ElementObserver/ElementObserver";
-import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
-import { PointerTracker } from "../../../Abstracts/PointerTracker/PointerTracker";
+import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
+import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/InteractionTracker.utils";
+import { PointerTrackerUtils } from "../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { access } from "../../../Utils/propUtils";
 import type { ScratchCardBrushGeometry, ScratchCardProps } from "./ScratchCard.types";
 import { ScratchCardUtils } from "./ScratchCard.utils";
@@ -34,7 +34,7 @@ export const ScratchCard = (props: ScratchCardProps) => {
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) === true);
 
-    const getSize = ElementObserver.createBorderBoxSizeObserver(getCoverRef, () => !getIsDisabled());
+    const getSize = ElementObserverUtils.createBorderBoxSizeObserver(getCoverRef, () => !getIsDisabled());
 
     const getBrushRadius = createMemo(() => access(props.brushRadius) ?? DEFAULT_BRUSH_RADIUS);
 
@@ -163,9 +163,9 @@ export const ScratchCard = (props: ScratchCardProps) => {
         scheduleMeasure();
     };
 
-    const { getIsDragging } = InteractionTracker.trackDrag(getCoverRef, getIsDisabled, { onDrag: rubAt });
+    const { getIsDragging } = InteractionTrackerUtils.trackDrag(getCoverRef, getIsDisabled, { onDrag: rubAt });
 
-    const { getReading, getIsPointerPresent } = PointerTracker.create(getCoverRef, getIsDisabled);
+    const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getCoverRef, getIsDisabled);
 
     const getBrushGeometry = createMemo<ScratchCardBrushGeometry | undefined>(() => {
         const isPointerOver = getIsPointerPresent() && getReading().edgeRatio <= INSIDE_EDGE_RATIO;

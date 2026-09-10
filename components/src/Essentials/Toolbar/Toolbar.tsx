@@ -1,11 +1,12 @@
 import { type Accessor, Index, type JSX, Show, createEffect, createMemo, createSignal } from "solid-js";
 
-import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
+import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
 import type { NavigatorOrientation } from "../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
-import { PlacementBox, PlacementItem } from "../../Abstracts/Placement/Placement";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import type { InteractionSizing } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
+import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
+import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
 import { Menu } from "../Menus/Menu/Menu";
 import type { MenuItem } from "../Menus/Menu/Menu.types";
@@ -36,11 +37,11 @@ export const Toolbar = <T,>(props: ToolbarProps<T>) => {
 
     const getPlacementAt = (index: number) => getLayout()?.placements[index];
 
-    const getRootSize = ElementObserver.createBorderBoxSizeObserver(getRootRef);
+    const getRootSize = ElementObserverUtils.createBorderBoxSizeObserver(getRootRef);
 
-    const getItemSizes = ElementObserver.createBorderBoxSizeListObserver(getItemRefs);
+    const getItemSizes = ElementObserverUtils.createBorderBoxSizeListObserver(getItemRefs);
 
-    const getOverflowSize = ElementObserver.createBorderBoxSizeObserver(getOverflowRef);
+    const getOverflowSize = ElementObserverUtils.createBorderBoxSizeObserver(getOverflowRef);
 
     const setItemRef = (index: number, element: HTMLElement) => {
         setItemRefs((previous) => {

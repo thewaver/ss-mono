@@ -47,10 +47,10 @@ const EXPECTED_EXPORTS = [
     "CSSUtils",
     "CSS_FILTER_KEYS",
     "CSS_TRANSFORM_KEYS",
-    "KeyframesUtils",
+    "KeyframeUtils",
     "DOMUtils",
-    "JSXTextMetrics",
-    "JSXTextParser",
+    "JSXTextMetricsUtils",
+    "JSXTextParserUtils",
     "SVGUtils",
     "IOUtils",
 ] as const;

@@ -3,12 +3,12 @@ import { Index, createEffect, createMemo, createSignal, createUniqueId, onCleanu
 import type { Point2d } from "@thewaver/ss-utils";
 
 import type { CarrierZone, Carry, CarryMode, CarryNudge, CarryPlace } from "../../Abstracts/Carrier/Carrier.types";
-import { CarrierStack } from "../../Abstracts/Carrier/CarrierStack";
-import { LiveAnnouncer } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer";
+import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
+import { LiveAnnouncerUtils } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer.utils";
+import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { LabelUtils } from "../../Essentials/Input/Label/Label.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../Utils/propUtils";
-import { useViewportContext } from "../Viewport/Viewport.context";
 import type {
     PatchBoardCableDefs,
     PatchBoardCarry,
@@ -128,7 +128,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         getRootRef,
         getIsDisabled,
         getKeyHint: () => {
-            const carry = CarrierStack.getCarry();
+            const carry = CarrierUtils.getCarry();
 
             return carry && asCarry(carry).kind === "plug"
                 ? "Arrow keys choose a socket, Enter connects, Escape cancels."
@@ -305,9 +305,9 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         },
     };
 
-    CarrierStack.registerZone(zone);
+    CarrierUtils.registerZone(zone);
 
-    const getCarry = () => (CarrierStack.getSourceZone() === zone ? CarrierStack.getCarry() : undefined);
+    const getCarry = () => (CarrierUtils.getSourceZone() === zone ? CarrierUtils.getCarry() : undefined);
 
     const getCarriedNodeKey = createMemo(() => {
         const carry = getCarry();
@@ -323,7 +323,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     });
 
     const getAimedPlace = createMemo(() => {
-        const place = CarrierStack.getTargetPlace();
+        const place = CarrierUtils.getTargetPlace();
 
         if (!getCarry() || place === undefined) return undefined;
 
@@ -410,7 +410,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                 fromKind: from.kind,
                 orientation: getOrientation(),
                 isPending: true,
-                isAllowed: CarrierStack.getIsTargetAllowed(),
+                isAllowed: CarrierUtils.getIsTargetAllowed(),
             },
         ];
     });
@@ -439,7 +439,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
             ? { x: board.x - node.spot.x, y: board.y - node.spot.y }
             : { x: node.size.width / 2, y: node.size.height / 2 };
 
-        CarrierStack.start(
+        CarrierUtils.start(
             zone,
             { kind: "spot", ...node.spot },
             {
@@ -455,7 +455,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     const pickUpPlug = (socket: PatchBoardPlacedSocket, mode: CarryMode) => {
         if (getIsDisabled() || getIsLocked() || socket.isDisabled) return;
 
-        CarrierStack.start(
+        CarrierUtils.start(
             zone,
             { kind: "socket", ...socket.end },
             {
@@ -481,7 +481,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
         cut.forEach((link) => props.onUnlink?.(link));
 
-        LiveAnnouncer.announce(
+        LiveAnnouncerUtils.announce(
             `${cut.length > SINGLE ? `${cut.length} cables` : "Cable"} unplugged from ${getEndLabel(end)}.`,
         );
 
@@ -491,13 +491,13 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     const handleNodePointerDown = (node: PatchBoardNode<T>, e: PointerEvent) => {
         if (e.button !== NOTHING || getIsDisabled()) return;
         if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
-        if (CarrierStack.getCarry()) return;
+        if (CarrierUtils.getCarry()) return;
 
         const root = getRootRef();
 
         if (!root) return;
 
-        CarrierStack.dragFromPointer(
+        CarrierUtils.dragFromPointer(
             root,
             e,
             (from) => pickUpNode(node, "drag", from),
@@ -509,13 +509,13 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
     const handleSocketPointerDown = (socket: PatchBoardPlacedSocket | undefined, e: PointerEvent) => {
         if (e.button !== NOTHING || getIsDisabled() || getIsLocked() || !socket) return;
-        if (CarrierStack.getCarry()) return;
+        if (CarrierUtils.getCarry()) return;
 
         const root = getRootRef();
 
         if (!root) return;
 
-        CarrierStack.dragFromPointer(
+        CarrierUtils.dragFromPointer(
             root,
             e,
             () => pickUpPlug(socket, "drag"),
@@ -526,17 +526,17 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     };
 
     const dropAtPointer = (e: MouseEvent) => {
-        if (CarrierStack.getCarryMode() === "drag") return;
-        if (CarrierStack.getCarryMode() === "key") CarrierStack.aimAtPoint(e.clientX, e.clientY);
+        if (CarrierUtils.getCarryMode() === "drag") return;
+        if (CarrierUtils.getCarryMode() === "key") CarrierUtils.aimAtPoint(e.clientX, e.clientY);
 
-        CarrierStack.end("drop");
+        CarrierUtils.end("drop");
     };
 
     const handleNodeClick = (node: PatchBoardNode<T>, e: MouseEvent) => {
         if (getIsDisabled()) return;
         if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
 
-        if (!CarrierStack.getCarry()) {
+        if (!CarrierUtils.getCarry()) {
             pickUpNode(node, "tap", { x: e.clientX, y: e.clientY });
             focusStop(getNodeKey(node));
 
@@ -549,7 +549,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     const handleSocketClick = (socket: PatchBoardPlacedSocket | undefined, e: MouseEvent) => {
         if (getIsDisabled() || !socket) return;
 
-        if (CarrierStack.getCarry()) {
+        if (CarrierUtils.getCarry()) {
             dropAtPointer(e);
 
             return;
@@ -576,13 +576,13 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     ) => {
         if (getIsDisabled()) return;
 
-        const isCarrying = CarrierStack.getCarry() !== undefined && CarrierStack.getCarryMode() !== "drag";
+        const isCarrying = CarrierUtils.getCarry() !== undefined && CarrierUtils.getCarryMode() !== "drag";
 
         if (e.key === "Escape") {
             if (!isCarrying) return;
 
             e.preventDefault();
-            CarrierStack.end("cancel");
+            CarrierUtils.end("cancel");
 
             return;
         }
@@ -591,7 +591,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
             e.preventDefault();
 
             if (isCarrying) {
-                CarrierStack.end("drop");
+                CarrierUtils.end("drop");
 
                 return;
             }
@@ -619,7 +619,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
             if (!nudge) return;
 
             e.preventDefault();
-            CarrierStack.aimAtNudge(
+            CarrierUtils.aimAtNudge(
                 e.shiftKey
                     ? {
                           x: (nudge.x ?? NOTHING) * COARSE_STEP_FACTOR,
@@ -665,7 +665,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     };
 
     const handleRootClick = (e: MouseEvent) => {
-        const carry = CarrierStack.getCarry();
+        const carry = CarrierUtils.getCarry();
 
         if (getIsDisabled() || !carry) return;
         if (e.target !== getRootRef()) return;
@@ -677,9 +677,9 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         if (!getCarry()) return;
 
         const trackPoint = (e: PointerEvent) => {
-            if (CarrierStack.getCarryMode() !== "tap") return;
+            if (CarrierUtils.getCarryMode() !== "tap") return;
 
-            CarrierStack.aimAtPoint(e.clientX, e.clientY);
+            CarrierUtils.aimAtPoint(e.clientX, e.clientY);
         };
 
         document.addEventListener("pointermove", trackPoint, true);
@@ -713,11 +713,11 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     createEffect(() => {
         if (!getIsDisabled() || !getCarry()) return;
 
-        CarrierStack.end("cancel");
+        CarrierUtils.end("cancel");
     });
 
     onCleanup(() => {
-        if (CarrierStack.getSourceZone() === zone) CarrierStack.end("cancel");
+        if (CarrierUtils.getSourceZone() === zone) CarrierUtils.end("cancel");
     });
 
     return (

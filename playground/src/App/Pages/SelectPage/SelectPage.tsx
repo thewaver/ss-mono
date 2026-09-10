@@ -1,7 +1,7 @@
 import type { JSX } from "solid-js";
 import { createEffect, createMemo, createSignal, on } from "solid-js";
 
-import { FrameRateMonitor } from "@thewaver/ss-components";
+import { FrameRateMonitorUtils } from "@thewaver/ss-components";
 import type { SelectOption } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -131,7 +131,7 @@ export const SelectPage = () => {
         setIsFetching(false);
     };
 
-    const { getFrameRate } = FrameRateMonitor.create(() => !stressVisibility[0]());
+    const { getFrameRate } = FrameRateMonitorUtils.create(() => !stressVisibility[0]());
 
     const getStressDeliveries = createMemo(() => createStressDeliveries(getStressCount()));
 

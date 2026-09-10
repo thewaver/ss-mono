@@ -7,39 +7,38 @@ import {
     type Point2d,
 } from "@thewaver/ss-utils";
 
+const TRANSFORM_ORDER: readonly CSSTransformKey[] = [
+    "perspective",
+    "matrix",
+    "matrix3d",
+    "translate",
+    "translate3d",
+    "translateX",
+    "translateY",
+    "translateZ",
+    "rotate",
+    "rotate3d",
+    "rotateX",
+    "rotateY",
+    "rotateZ",
+    "skew",
+    "skewX",
+    "skewY",
+    "scale",
+    "scale3d",
+    "scaleX",
+    "scaleY",
+    "scaleZ",
+];
+const formatFunction = (key: CSSAnimationKey, value: number | number[]) => {
+    const units = CSSConst.ANIMATION_UNITS[key];
+    const values = Array.isArray(value) ? value : [value];
+    const args = units.map((unit, idx) => `${values[idx] ?? 0}${unit}`);
+
+    return `${key}(${args.join(", ")})`;
+};
+
 export namespace CellAnimationUtils {
-    const TRANSFORM_ORDER: readonly CSSTransformKey[] = [
-        "perspective",
-        "matrix",
-        "matrix3d",
-        "translate",
-        "translate3d",
-        "translateX",
-        "translateY",
-        "translateZ",
-        "rotate",
-        "rotate3d",
-        "rotateX",
-        "rotateY",
-        "rotateZ",
-        "skew",
-        "skewX",
-        "skewY",
-        "scale",
-        "scale3d",
-        "scaleX",
-        "scaleY",
-        "scaleZ",
-    ];
-
-    const formatFunction = (key: CSSAnimationKey, value: number | number[]) => {
-        const units = CSSConst.ANIMATION_UNITS[key];
-        const values = Array.isArray(value) ? value : [value];
-        const args = units.map((unit, idx) => `${values[idx] ?? 0}${unit}`);
-
-        return `${key}(${args.join(", ")})`;
-    };
-
     export const assignAnimationProps = (
         el: HTMLElement,
         evalResult: Partial<Record<CSSAnimationKey, number | number[]>>,

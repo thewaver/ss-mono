@@ -6,11 +6,10 @@ import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import type { CarrierZone, CarryPlace } from "../../Abstracts/Carrier/Carrier.types";
 import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
-import { CarrierStack } from "../../Abstracts/Carrier/CarrierStack";
-import { LiveAnnouncer } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer";
+import { LiveAnnouncerUtils } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer.utils";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
-import { Virtualizer } from "../../Abstracts/Virtualizer/Virtualizer";
 import type { VirtualizerRow } from "../../Abstracts/Virtualizer/Virtualizer.types";
+import { VirtualizerUtils } from "../../Abstracts/Virtualizer/Virtualizer.utils";
 import { access } from "../../Utils/propUtils";
 import type {
     TableCellRenderProps,
@@ -102,7 +101,7 @@ export const Table = <T,>(props: TableProps<T>) => {
         };
     });
 
-    const rowWindow = Virtualizer.createRowWindow(getBodyRef, () => getRows().length, {
+    const rowWindow = VirtualizerUtils.createRowWindow(getBodyRef, () => getRows().length, {
         getIsEnabled: getIsVirtualized,
         computeEstimatedSize: (index) => props.computeEstimatedRowHeight?.(index) ?? 0,
         getPinnedRows: () => {
@@ -262,9 +261,9 @@ export const Table = <T,>(props: TableProps<T>) => {
         }, []);
 
     const getSourceColumnIndex = () => {
-        const place = CarrierStack.getSourcePlace();
+        const place = CarrierUtils.getSourcePlace();
 
-        return CarrierStack.getSourceZone() === zone && place !== undefined ? asColumnIndex(place) : undefined;
+        return CarrierUtils.getSourceZone() === zone && place !== undefined ? asColumnIndex(place) : undefined;
     };
 
     const zone: CarrierZone = {
@@ -296,16 +295,16 @@ export const Table = <T,>(props: TableProps<T>) => {
         moveAt: (fromPlace, toPlace) => moveColumn(asColumnIndex(fromPlace), asColumnIndex(toPlace)),
     };
 
-    CarrierStack.registerZone(zone);
+    CarrierUtils.registerZone(zone);
 
     const getCarriedColumnId = createMemo(() =>
-        CarrierStack.getSourceZone() === zone ? CarrierStack.getCarry()?.key : undefined,
+        CarrierUtils.getSourceZone() === zone ? CarrierUtils.getCarry()?.key : undefined,
     );
 
     const getLandingCol = createMemo(() => {
-        const place = CarrierStack.getTargetPlace();
+        const place = CarrierUtils.getTargetPlace();
 
-        if (CarrierStack.getTargetZone() !== zone || place === undefined) return;
+        if (CarrierUtils.getTargetZone() !== zone || place === undefined) return;
 
         return CarrierUtils.computeMarkerIndex(asColumnIndex(place), getSourceColumnIndex() ?? 0, true);
     });
@@ -317,13 +316,13 @@ export const Table = <T,>(props: TableProps<T>) => {
 
         if (e.button !== 0 || getIsDisabled() || !getIsReorderable(column)) return;
         if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
-        if (CarrierStack.getCarry()) return;
+        if (CarrierUtils.getCarry()) return;
 
-        CarrierStack.dragFromPointer(
+        CarrierUtils.dragFromPointer(
             e.currentTarget as HTMLElement,
             e,
             () =>
-                CarrierStack.start(
+                CarrierUtils.start(
                     zone,
                     columnIndex,
                     { groupId: tableId, key: column.id, label: column.header, value: column.id },
@@ -392,7 +391,9 @@ export const Table = <T,>(props: TableProps<T>) => {
                 moveColumn(from.col, to);
                 focusCell({ row: HEADER_ROW_INDEX, col: to });
 
-                LiveAnnouncer.announce(`${column.header} moved to column ${to + FIRST_ARIA_INDEX} of ${grid.width}.`);
+                LiveAnnouncerUtils.announce(
+                    `${column.header} moved to column ${to + FIRST_ARIA_INDEX} of ${grid.width}.`,
+                );
 
                 return;
             }

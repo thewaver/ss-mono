@@ -2,7 +2,7 @@ import { createEffect, createMemo, createSignal, untrack } from "solid-js";
 
 import type { DateValue, DateValueCalendarId } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
-import { MaskedField } from "../../../Abstracts/MaskedField/MaskedField";
+import { MaskedFieldUtils } from "../../../Abstracts/MaskedField/MaskedField.utils";
 import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import { access, accessSignal } from "../../../Utils/propUtils";
@@ -136,7 +136,7 @@ export const DateInput = (props: DateInputProps) => {
             : undefined;
     };
 
-    const field = MaskedField.createField<DateValue>({
+    const field = MaskedFieldUtils.createField<DateValue>({
         getValue: getFieldValue,
         setValue: (next) => valueSignal[1](() => next),
         formatDigits: (digits) => TextSyncUtils.formatWithMask(getMask(), digits),

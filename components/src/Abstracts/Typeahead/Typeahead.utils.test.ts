@@ -8,7 +8,7 @@ const computeText = (index: number) => CITIES[index];
 
 const key = (value: string, modifiers?: Partial<KeyboardEvent>) => ({ key: value, ...modifiers }) as KeyboardEvent;
 
-describe("TypeaheadUtils.getIsQueryKey", () => {
+describe("Typeahead.getIsQueryKey", () => {
     it("takes a single printable character", () => {
         expect(TypeaheadUtils.getIsQueryKey(key("a"), false)).toBe(true);
         expect(TypeaheadUtils.getIsQueryKey(key("7"), false)).toBe(true);
@@ -32,7 +32,7 @@ describe("TypeaheadUtils.getIsQueryKey", () => {
     });
 });
 
-describe("TypeaheadUtils.computeNextIndex", () => {
+describe("Typeahead.computeNextIndex", () => {
     it("finds the next item starting with the query, wrapping past the end", () => {
         expect(TypeaheadUtils.computeNextIndex("m", 0, CITIES.length, computeText)).toBe(3);
         expect(TypeaheadUtils.computeNextIndex("l", 3, CITIES.length, computeText)).toBe(0);

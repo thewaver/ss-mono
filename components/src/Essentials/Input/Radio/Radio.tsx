@@ -1,9 +1,9 @@
 import { Show, createSignal } from "solid-js";
 
-import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
-import { PlacementItem } from "../../../Abstracts/Placement/Placement";
+import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import { BinarySwitch } from "../../../Primitives/BinarySwitch/BinarySwitch";
 import type { InteractionSizing } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
+import { PlacementItem } from "../../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../../Utils/propUtils";
 import { useRadioGroupContext } from "../RadioGroup/RadioGroup.context";
 import type { RadioProps } from "./Radio.types";
@@ -21,7 +21,7 @@ export const Radio = <T,>(props: RadioProps<T>) => {
     const getIsDisabled = () => access(props.isDisabled) ?? false;
 
     const getIsReachable = () =>
-        InteractionTracker.computeIsReachable(
+        InteractionTrackerUtils.computeIsReachable(
             getIsDisabled(),
             access(props.isReachableWhenDisabled) ?? false,
             props.tooltipDefs !== undefined,

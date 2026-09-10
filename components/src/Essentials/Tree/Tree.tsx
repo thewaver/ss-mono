@@ -3,13 +3,13 @@ import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueI
 import { Dynamic } from "solid-js/web";
 
 import { FlattenerUtils } from "../../Abstracts/Flattener/Flattener.utils";
-import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
+import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
-import { PlacementBox, PlacementItem } from "../../Abstracts/Placement/Placement";
-import { Typeahead } from "../../Abstracts/Typeahead/Typeahead";
 import { TypeaheadUtils } from "../../Abstracts/Typeahead/Typeahead.utils";
-import { Virtualizer } from "../../Abstracts/Virtualizer/Virtualizer";
+import { VirtualizerUtils } from "../../Abstracts/Virtualizer/Virtualizer.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
+import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
+import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access, accessSignal } from "../../Utils/propUtils";
 import type { TreeNodeItemProps, TreeProps, TreeRow } from "./Tree.types";
 import { TreeUtils } from "./Tree.utils";
@@ -91,7 +91,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     const [getFocusedValue, setFocusedValue] = createSignal<T | undefined>();
 
-    const typeahead = Typeahead.createBuffer();
+    const typeahead = TypeaheadUtils.createBuffer();
 
     const getRows = createMemo(() =>
         TreeUtils.getVisibleRows(access(props.nodes), (value) => expandedSignal[0]().includes(value)),
@@ -100,7 +100,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     const getFlatRows = createMemo(() => FlattenerUtils.getFlatRows(getRows()));
 
     const computeIsNavigable = (row: TreeRow<T>) => {
-        const isReachable = InteractionTracker.computeIsReachable(
+        const isReachable = InteractionTrackerUtils.computeIsReachable(
             row.node.isDisabled ?? false,
             row.node.isReachableWhenDisabled ?? false,
             row.node.tooltipDefs !== undefined,
@@ -134,7 +134,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     const [getSizerRef, setSizerRef] = createSignal<HTMLElement>();
 
-    const rowWindow = Virtualizer.createRowWindow(getSizerRef, () => getFlatRows().length, {
+    const rowWindow = VirtualizerUtils.createRowWindow(getSizerRef, () => getFlatRows().length, {
         getIsEnabled: getIsVirtualized,
         computeEstimatedSize: (index) => props.computeEstimatedNodeHeight?.(index) ?? 0,
         getPinnedRows: () => {

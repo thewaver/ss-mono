@@ -1,7 +1,7 @@
 import type { AccessorProps, SVGDefsColors, SVGDefsSamples } from "@thewaver/ss-components";
 import type { Size2d } from "@thewaver/ss-utils";
 
-import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.const";
+import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.types";
 
 export type SVGPatternsExampleProps = AccessorProps<{
     configKey: WithNoSample<SVGDefsSamples.Pattern.SampleKey>;

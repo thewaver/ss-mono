@@ -6,7 +6,7 @@ import type {
     DateValueWeekdayWidth,
 } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
-import { LiveAnnouncer } from "../../../Abstracts/LiveAnnouncer/LiveAnnouncer";
+import { LiveAnnouncerUtils } from "../../../Abstracts/LiveAnnouncer/LiveAnnouncer.utils";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
@@ -160,7 +160,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
             previous &&
             !DateValueUtils.isSame(DateValueUtils.getStartOfMonth(previous), DateValueUtils.getStartOfMonth(month))
         ) {
-            LiveAnnouncer.announce(
+            LiveAnnouncerUtils.announce(
                 DateValueUtils.format(
                     month,
                     month.era === getCurrentEraId() ? MONTH_ANNOUNCE_OPTIONS : PAST_ERA_MONTH_ANNOUNCE_OPTIONS,

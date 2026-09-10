@@ -1,6 +1,6 @@
 import { For, createEffect, createSignal } from "solid-js";
 
-import { Virtualizer } from "@thewaver/ss-components";
+import { VirtualizerUtils } from "@thewaver/ss-components";
 
 import type { VirtualizerUnevenExampleProps } from "../VirtualizerPage.types";
 
@@ -18,7 +18,7 @@ type Props = VirtualizerUnevenExampleProps;
 export const UnevenExample = (props: Props) => {
     const [getSizerRef, setSizerRef] = createSignal<HTMLElement>();
 
-    const rowWindow = Virtualizer.createRowWindow(getSizerRef, props.rowCount, {
+    const rowWindow = VirtualizerUtils.createRowWindow(getSizerRef, props.rowCount, {
         getIsEnabled: () => true,
         computeEstimatedSize: () => ESTIMATED_HEIGHT_PX,
     });

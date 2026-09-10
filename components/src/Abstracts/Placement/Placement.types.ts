@@ -1,8 +1,4 @@
-import type { ParentProps } from "solid-js";
-
 import type { Point2d } from "@thewaver/ss-utils";
-
-import type { AccessorProps } from "../../Utils/typeUtils";
 
 export type PlacementSector = {
     innerRadius: number;
@@ -27,7 +23,7 @@ export type PlacementPickRule = "nearest" | "angle";
 
 export type PlacementLayout = {
     placements: PlacementRect[];
-    width?: number;
+    extent?: number;
     heightRatio: number;
     pickRule?: PlacementPickRule;
     origin?: Point2d;
@@ -37,7 +33,7 @@ export type PlacementLayout = {
 export type PlacementLayoutDefs = {
     itemCount: number;
     path?: number[];
-    parentWidth?: number;
+    parentExtent?: number;
     parentPlacement?: PlacementRect;
     itemParents?: (number | undefined)[];
 };
@@ -49,18 +45,3 @@ export type PlacementPickDefs = {
     point: Point2d;
     isPickable?: (index: number) => boolean;
 };
-
-export type PlacementBoxProps = ParentProps<
-    AccessorProps<{
-        layout: PlacementLayout;
-    }> & {
-        ref?: (element: HTMLElement) => void;
-    }
->;
-
-export type PlacementItemProps = ParentProps<
-    AccessorProps<{
-        placement: PlacementRect;
-        stackAt?: number;
-    }>
->;

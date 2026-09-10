@@ -2,9 +2,10 @@ import type { Accessor, JSX } from "solid-js";
 import { Index, Show, createMemo } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { PlacementBox, PlacementItem } from "../../Abstracts/Placement/Placement";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import type { InteractionSizing } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
+import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
+import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
 import type {
     PaginatorGapEntry,

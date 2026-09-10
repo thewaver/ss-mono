@@ -14,9 +14,9 @@ import type {
     CompiledCellStops,
 } from "./CellAnimationKeyframes.types";
 
-export namespace CellAnimationKeyframeUtils {
-    const RESULT_DECIMAL_PLACES = 3;
+const RESULT_DECIMAL_PLACES = 3;
 
+export namespace CellAnimationKeyframeUtils {
     export const compileStops = (stops: CellStop[]): CompiledCellStops => {
         const compiled: CompiledCellStops = {};
 

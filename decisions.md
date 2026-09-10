@@ -159,6 +159,60 @@ barrel. **Its blocks run in order of what is built on what** — `Abstracts`, `P
 user's call, taking structural precedence over the alphabetical block order it used to have. It is also the
 order the stylesheet is emitted in, so a foundational sheet now lands before the things that override it.
 
+**Which layer a unit belongs to is settled by imagining its Playground page.** The user's test: suppose a
+page had to be built for component X — does X render and have a use by itself, or would the page need
+another of the library's components, or something local, that renders X **inside** it? The direction is the
+load-bearing half. A `FormField` page needs a control in it, but the control does not use the field, so
+`FormField` is an `Essential`; a `Barrel` page needs something to move the angle, and that something renders
+the barrel, so `Barrel` is a `Primitive`. The test also reads off evidence rather than opinion, since every
+page that exists is a verdict somebody already reached. **The test it replaced was _is anything built out of
+it_, and that one over-catches**: `Calendar`, `Clock`, `Collapsible`, `ColorArea`, `DateInput`, `DatePicker`,
+`Menu`, `Modal`, `Range`, `RangeCalendar`, `Select`, `TimeInput`, `TimePicker` and `Tooltip` are all rendered
+inside another component and none of them is a body.
+
+**Where the page test leaves a unit borderline, the tiebreaker is whether the component knows what it is.**
+`Popover` is told whether it is a listbox, a menu or a dialog; `BinarySwitch` whether it is a checkbox or a
+radio; `TextField` whether it is an input or a textarea; `Barrel` is told what to call a face, and then face
+by face what its label is and whether a screen reader should be shown it. In every case the consumer supplies
+the component's own accessible identity, which is the mark of a body rather than a finished control.
+`Modal`'s `dialog`/`alertdialog` is not the same hole — it knows it is a dialog and is asking how urgent, and
+`ButtonType` is form behaviour rather than identity. This is what keeps `Barrel` out of `Essentials`, since a
+barrel with a slider beside it would scrape through the page test on its own.
+
+**`Popover` is a `Primitive` on both tests, and it was the only `Essential` with no Playground entry at all.**
+Six controls render one inside — `ColorInput`, `DatePicker`, `DateRangePicker`, `Menu`, `Select` and
+`TimePicker` — and its props are an assembly kit: the consumer owns the open state and the anchor element,
+declares which of three widgets it is impersonating, and supplies a render function handed the transition's
+visibility target and duration to wire the animation. It reads the viewport context, which used to be an
+upward reach into `Exotics` and no longer is — see _"The viewport split in two"_.
+
+**`PlacementBox` and `PlacementItem` are a folder each under `Primitives/`, and `Abstracts/Placement` keeps
+the arithmetic.** Both carry `role="presentation"`, which is a component saying in its own markup that it is
+nothing; the shape of the arrangement arrives as a layout function from outside and the items arrive from
+outside. A folder each was chosen over one `Primitives/Placement/` folder because `Abstracts/Placement` still
+exists and two folders of one name in different layers is the confusion a tab read out of context cannot
+resolve, and over a `Placement/` family folder because two components never used apart do not need the extra
+level. The cost is that the one stylesheet became two, the rule reaching into an item's children going with
+the item.
+
+**With those gone, `Abstracts/` renders no structural DOM again.** What it still produces is the contents of
+an SVG `<defs>` block from the `SVG` factories and `Glass`, which paint nothing and take no space until
+something references them by id, and `LiveAnnouncer`'s live region, which is built in JavaScript and attached
+to the body rather than placed by a consumer. Neither is a component anybody renders.
+
+**`Primitive` is a role, not a rank.** The user's framing, and it corrects how the layer had been described
+here: an engine is a primitive of a car and is still far more complex than a bicycle, which is a primitive of
+nothing. So nothing in `Primitives/` is claimed to be simpler, smaller or more foundational than what sits
+above it — `Popover` is more machinery than most of `Essentials` and belongs where it is only because nothing
+ever ships one alone. **This is what the page test measures**, which is why it asks whether something is a
+part and never asks how big it is.
+
+**Being a part constrains what a unit is, not what it may reach for.** A primitive may render a finished
+component, the way an engine uses a bought-in sensor that is also sold on its own, so `InteractionWrapper`
+rendering `Tooltip` is not a fault and is not an inversion. What the layers still forbid is a cycle: an
+`Essential` built out of a `Primitive` built out of that same `Essential`. **No unit may take part in an
+import cycle**, and the graph is walkable from `components/src` to check it.
+
 **`Primitives/` was split out of `Essentials/`, and `Fundamentals/` was renamed to make room for it.**
 Three components render DOM but mean nothing on their own: `BinarySwitch` is the shared body of `Checkbox`,
 `Radio` and `Toggle`; `TextField` is the shared body of `TextInput`, `TextArea`, `NumberInput`,
@@ -179,6 +233,14 @@ Playground pages that draw it are painters of the Playground's own — so the sh
 other three to `Primitives` does not catch it. It renders DOM and it is public, which rules out `Abstracts`
 too. What it is, is a decoration with a look of its own, which is what `Exotics` holds. The user's call, and
 it took a page with it.
+
+**`AudioSwitcher` renders nothing and is still an `Essential`.** It returns null — not a wrapper, not an
+empty box, no elements at all — so it fails the page test twice over: there is nothing to look at, and the
+track buttons and play control on its page are the page's own, which is the "something local that renders it
+inside" case. It is not an `Abstract` either, since those are namespaces and factories. The user's ruling is
+that it is a component by any other name — no DOM, but a lifecycle, state, props and everything else a
+component has — and that the taxonomy does not need a fourth word for it. **Recorded so the question is not
+reopened by the next pass over the layers**, which will find it the same way this one did.
 
 **`AudioSwitcher` plays every source it is handed except the first, which waits to be asked.** Handing it a
 source has always meant "play this", and that is wanted — a switch of track should sound without a second
@@ -259,9 +321,9 @@ which was the only thing the shared version was buying.
 **An `Abstract` is named for the thing that does the work, not for the activity.** The user's call, and a
 breaking change taken deliberately while the library has one consumer. `Dismiss`, `Navigation` and `Rotation`
 are `Dismisser`, `Navigator` and `Rotator` — folder, files, namespaces and the types hanging off them, so
-`DismissStack` is `DismisserStack`, `NavigationGrid` is `NavigatorGrid` and `Rotation.createRotation` is
-`Rotator.createRotator`. Renaming the type family too is what keeps a folder readable: a `DismissReason`
-sitting beside a `DismisserStack` reads as two things rather than one, and the rule is worth more than the
+`DismissStack` is `Dismisser`, `NavigationGrid` is `NavigatorGrid` and `Rotation.createRotation` is
+`RotatorUtils.createRotator`. Renaming the type family too is what keeps a folder readable: a `DismissReason`
+sitting beside a `Dismisser` reads as two things rather than one, and the rule is worth more than the
 sentence that one type name loses.
 
 **The last two outliers took a suffix, and one of them turned out to deserve it.** `FocusUtils` is
@@ -269,6 +331,11 @@ sentence that one type name loses.
 in a subtree and moves it on mount — state plus policy, which is an agent rather than a bag of functions, and
 "focus manager" is the term the rest of the field already uses. The earlier verdict that it was a collection
 was made without opening the file.
+
+**What that argument no longer decides is the suffix.** Both namespaces are `FocusManagerUtils` and
+`InteractionTrackerUtils` now, in `.utils.ts` files, because `Utils` marks a namespace with no type of its own
+name rather than a claim that the thing inside is stateless — see _"One namespace per folder"_ in
+`conventions.md`. The subjects keep the names argued for here; only the suffix came back.
 
 **`InteractionUtils` is `InteractionTracker`, and the arithmetic that made the name a lie went to
 `ss-utils`.** Most of it tracks — `trackHold`, `trackDrag`, `trackSwipe`, `trackPageHidden`, and
@@ -293,10 +360,12 @@ acronym left the signature with it: `getFPS` is `getFrameRate`, since keeping it
 the rename was removing sitting in the return value. The Playground's on-screen label still reads `FPS`,
 which is a display string and not an API.
 
-**It also stopped being a `.utils.ts`.** `FPSUtils.createMonitor` returned reactive state, which is what
-`Rotator.createRotator` and `DismisserStack.createLayer` do, and both of those live in a plain `.ts` exporting
-the subject. A `.utils.ts` exports `<Subject>Utils` and holds functions; a factory for a live thing is not
-that, so the file is `FrameRateMonitor/FrameRateMonitor.ts`.
+**It briefly stopped being a `.utils.ts`, and that half was later reversed.** The argument at the time was
+that `FPSUtils.createMonitor` returns reactive state, which a bag of functions does not, so the file became
+`FrameRateMonitor/FrameRateMonitor.ts`. That reading of the suffix no longer holds — see _"One namespace per
+folder"_ in `conventions.md`, where `Utils` marks a namespace with no type of its own name rather than a
+promise of purity — so the file is `FrameRateMonitor/FrameRateMonitor.utils.ts` and the namespace is
+`FrameRateMonitorUtils`. **The renaming of the subject stands**; only the file suffix moved back.
 
 **The rule reaches the abstract, not the components that use it.** A `Carousel` still has `getIsRotating`,
 `renderRotationControl` and `CarouselRotationFlags`, because those are the carousel's own vocabulary for what
@@ -361,11 +430,11 @@ below.
 **Kept, with the shape each would need first.** The user's verdict: the remainder still feels
 component-driven. Not outstanding work — the argument, so it is not re-derived.
 
-- **`TextSyncUtils`** is ready as it stands: string and caret arithmetic, no DOM, and a mask engine is
+- **`TextSync`** is ready as it stands: string and caret arithmetic, no DOM, and a mask engine is
   normally its own package. Needs a name that is not "syncing a text field".
 - **`DismisserUtils.getIsWithinOwnedLayer`** is ARIA-aware DOM containment with nothing about dismissal
   in it; `DOMUtils` is where that belongs.
-- **`AnchorUtils`** is "align one rect to another along an axis, in/out/center, then fall back to the
+- **`Anchor`** is "align one rect to another along an axis, in/out/center, then fall back to the
   variant that fits". `Rect`, `Bounds` and `Dir` already say that; the `AnchorHPlacement` vocabulary is
   the component-driven half, and dropping the word anchor **is** the abstraction. `getStackingBase`
   stays behind either way.
@@ -381,7 +450,7 @@ component-driven. Not outstanding work — the argument, so it is not re-derived
   `cloMul` — real algorithms behind a signature only their one caller can read.
 
 **Never staged, by category**: anything shaped around a component's own record (`SelectUtils`,
-`TreeUtils`, `ToastsUtils`); anything bound to a framework (`InteractionTracker`, `FocusManager`, `FrameRateMonitor`,
+`TreeUtils`, `ToastUtils`); anything bound to a framework (`InteractionTracker`, `FocusManager`, `FrameRateMonitor`,
 `ElementFader`, the SVG defs modules that return JSX — the arithmetic that used to be tangled into them has
 since moved to the Playground samples instead, so what is left here is markup and nothing else); anything adapting a
 third-party package (`DateValue`, `Virtualizer` over `@tanstack/solid-virtual`); and three near misses
@@ -404,7 +473,7 @@ Aimed at the things that read as small enough to just write: clamping, rounding 
 rects, spreading a padding, kebab-casing, picking a random element, deduplicating, formatting a number.
 Several are already there — `MathUtils`, `RectUtils`, `CSSUtils`, `StringUtils`, `RandomUtils`,
 `PolygonUtils`, `ShapeUtils`, `BitwiseUtils`, `FunctionUtils`, `DOMUtils`, `SVGUtils`, `IOUtils`,
-`KeyframesUtils`, plus `Point2d`, `Vec2d`, `Vec4d`, `Rect`, `Bounds`, `Size2d`, `Dir` and `Count`.
+`KeyframeUtils`, plus `Point2d`, `Vec2d`, `Vec4d`, `Rect`, `Bounds`, `Size2d`, `Dir` and `Count`.
 
 **How to check, in order**: pick the namespace it would belong to; read that namespace's file under
 `utils/src`, small enough to read whole; grep the export list for the noun
@@ -892,7 +961,7 @@ frame is narrower than the field it frames. Guaranteeing they move together need
 account. Until then the rule is that a painter must not be narrower than its own adornments require.
 
 **It is a local helper in `TextInput.tsx`, not an `Abstracts` utility.** It briefly was
-`ElementObserver.createLayoutSizeObserver`, which put a second unrelated thing in a namespace whose name
+`ElementObserverUtils.createLayoutSizeObserver`, which put a second unrelated thing in a namespace whose name
 then had to work harder, and shipped public API for one internal caller. Both instances live in one file.
 Same rule as `TextArea` below: extraction is cheap, the wrong base is not, and the trigger is a second
 component wanting it.
@@ -1387,7 +1456,7 @@ fade, shrink or slide it.
 
 **`renderFloater` now takes the same pair every appearing element's painter takes** — a visibility target
 of `0` or `1` and the transition duration — which is `Tooltip`, `Popover`, `Modal`, `Toasts` and
-`Spotlight`'s signature, transition pair first. `ElementFader.createFader` is driven by "is there a
+`Spotlight`'s signature, transition pair first. `ElementFaderUtils.createFader` is driven by "is there a
 selected tab whose position we have measured", and the element is mounted while the fader says visible
 **or** still transitioning.
 
@@ -1444,7 +1513,7 @@ change that moved nothing.
 
 The `componentDependencies` plugin finds a component's entry file by looking for the one whose basename
 matches its directory — `Anchor/Anchor.ts`, `Barrel/Barrel.tsx` — and walks the imports out from there.
-Ten abstracts have no such file: `Carrier` is `CarrierStack.ts` plus two more, `CheckedState` is a types file
+Ten abstracts have no such file: `Carrier` is `CarrierUtils.ts` plus two more, `CheckedState` is a types file
 and a utils file, `Dismisser`, `Flattener`, `Navigator`, `Cutout`, `ColorExtractor`, `DateValue`,
 `DateTimeValue` and `SVG` are all the same shape. They were absent from the map altogether, which nothing
 noticed while no page bore their names.
@@ -1454,7 +1523,7 @@ starts from all of them at once. The same-named file still wins where there is o
 had a map entry changed.
 
 **Test files are excluded from the walk entirely.** They were harmless while entries were single named files,
-because nothing imports a test — but a folder-wide entry set would have made `Carrier.utils.test.ts` an entry
+because nothing imports a test — but a folder-wide entry set would have made `CarrierUtils.utils.test.ts` an entry
 and counted whatever it imports as a dependency of `Carrier`.
 
 **The `SVG` folder is the one place where a folder name is not the unit name**, and it is a table of four
@@ -1572,8 +1641,8 @@ knows about placing a box against an element and nothing it knows about when to 
 
 **The split is behaviour from markup**, and the existing rule decides where it falls: _"it renders DOM, so
 it is not an `Abstract`"_ means the extraction is the effect, not the popup. `Abstracts/Anchor/` holds
-`AnchorUtils` (the placement math, formerly `TooltipUtils`, moved unchanged) and
-`Anchor.createPortalPosition(getAnchorRef, getIsVisible, opts)`, which observes the anchor, measures the
+`Anchor` (the placement math, formerly `TooltipUtils`, moved unchanged) and
+`AnchorUtils.createPortalPosition(getAnchorRef, getIsVisible, opts)`, which observes the anchor, measures the
 content, resolves the collision-safe placement and returns `{ getPlacement, getPosition, setContentRef }`.
 `Tooltip` lost sixty lines and kept its triggers, `aria-describedby`, `role` and markup.
 
@@ -1641,7 +1710,7 @@ representable twice. Multi differs in behaviour, so the `BinarySwitch` shape is 
 erecting it before a second consumer would be guessing at the seam.
 
 **The keyboard walk stops on reachable-disabled options and refuses to select them**, matching `RadioGroup`.
-`getNavigableIndexes` calls `InteractionTracker.computeIsReachable` with the option's own three fields rather
+`getNavigableIndexes` calls `InteractionTrackerUtils.computeIsReachable` with the option's own three fields rather
 than re-deriving the rule.
 
 **`scrollIntoView({ block: "nearest" })` on the highlighted option** is the only way the library reaches a
@@ -1892,7 +1961,7 @@ still draws no header of its own.
 every option sets `pointer-events: all` explicitly (it has to, to beat `interactionRoot`'s `none`), and an
 explicit value on a descendant beats an inherited one. So a click aimed at whatever sat under a closing
 popup was swallowed by an option of a list already visually gone. `inert` disables an entire subtree for
-pointer events, focus and the accessibility tree regardless of descendants; `FocusManager.isReachable` already
+pointer events, focus and the accessibility tree regardless of descendants; `FocusManagerUtils.isReachable` already
 tests `[inert]`, so support was assumed all along. **General rule: `pointer-events` on an ancestor cannot
 switch off a subtree, only `inert` can.**
 
@@ -1942,7 +2011,7 @@ The rule is repeated under `&:focus, &:focus-visible`, which outranks a plain ps
 it. What it gives up: a `Select` whose filter emptied the list has nothing painted as focused and is
 announced empty; a consumer wanting a ring there paints it on their own surface.
 
-**The initial focus is `Popover`'s, and a real bug is why.** `Menu` first called `FocusManager.autoFocus`
+**The initial focus is `Popover`'s, and a real bug is why.** `Menu` first called `FocusManagerUtils.autoFocus`
 itself and focus stayed on the trigger: the root carries `visibility: hidden` until `Anchor` has produced a
 position, and a `visibility: hidden` element silently refuses `focus()`. Being positioned is `Popover`'s own
 state, so `getHasAutoFocus` moved the call inside, gated on `getPosition() !== undefined`. **The gate is a
@@ -1953,7 +2022,7 @@ depending on it directly would re-focus the surface on every scroll.
 live.** ARIA supports the attribute on composite roles — `menu` is one, `button` is not — so the APG variant
 with a single focus target puts both on the `role="menu"` element. The items are then `Select`'s options
 exactly: non-focusable `role="menuitem"` divs at `getIsTabbable={() => false}`, `isFocused` never true, and
-a highlight held as a value resolved to an index. `FocusManager.autoFocus` restores focus to the trigger on
+a highlight held as a value resolved to an index. `FocusManagerUtils.autoFocus` restores focus to the trigger on
 close through the same `onCleanup` `Modal` relies on.
 
 **Two keydown handlers rather than `Select`'s one**, because the two states have different focus owners: the
@@ -1972,7 +2041,7 @@ click that follows does the closing. Every other blur still closes with no docum
 dismissal turned out to be `Select`'s exactly — `Escape` in a keydown, close on the focused element's blur,
 no document listener — while `Modal`'s is a different mechanism (document keydown, overlay click, focus trap,
 explicit restore). Two identical siblings and one that does not fit is not the shape that wants an
-`Abstract`; the thing genuinely shared with `Modal` was `FocusManager.autoFocus`, which existed.
+`Abstract`; the thing genuinely shared with `Modal` was `FocusManagerUtils.autoFocus`, which existed.
 
 ### Arbitrary item placement: `Abstracts/Placement`, and `Menu` as the first consumer
 
@@ -2054,7 +2123,7 @@ The second piece of `backlog.md` item 26. A submenu of a laid-out menu is drawn 
 same centre rather than hanging off the item that opened it, so a wheel stays one wheel however deep it goes.
 
 **`computeLayout` takes one object rather than a run of arguments, and the reason is the third one.**
-`PlacementLayoutFn` was `(itemCount) => layout` and is now `({ itemCount, level, parentWidth }) => layout`.
+`PlacementLayoutFn` was `(itemCount) => layout` and is now `({ itemCount, level, parentExtent }) => layout`.
 A layout that wants only the width of the level above it would otherwise have to declare and ignore the two
 before it to reach it — the same fault the one-aggregated-object rule in `conventions.md` exists to prevent,
 arriving on a compute function rather than on a painter. Existing layouts destructure what they use and
@@ -2065,12 +2134,12 @@ is its paint order — the z-index a layout can name for an item that has to sit
 called `depth` in one abstract, one meaning "how far down the menu tree" and the other "how far forward",
 is the kind of collision that costs a future session an hour. The root level is `0`.
 
-**A level cannot work out its own radius from `level` alone, which is why `parentWidth` is there too.** A
+**A level cannot work out its own radius from `level` alone, which is why `parentExtent` is there too.** A
 ring's radius grows with its item count, so the level above could be any size: a root of twenty items is a
 far bigger circle than a root of four, and a submenu placed at a fixed step per level would land inside it.
 The parent's box width is the one number that settles it, the parent already knows it, and half of it is
 exactly the outer edge the child has to clear — so each layout takes `max(what my own items need,
-parent's half-width + gap + half an item)`. At the root `parentWidth` is `0` and that second term falls below
+parent's half-width + gap + half an item)`. At the root `parentExtent` is `0` and that second term falls below
 every layout's own minimum, so the arithmetic needs no special case for having no parent.
 
 **A laid-out submenu takes its parent's anchor, placement and offset; an ordinary one still takes its own
@@ -2178,10 +2247,10 @@ data, but a layout with its measurements welded shut is data a consumer can only
 thickness of a band, the gap between levels and the gap between wedges were module constants, so anybody
 wanting a fatter band had to fork the file. `createRing(defs)` takes all of them, every field optional, and
 `ring` is `createRing()` — one implementation, not a default beside a general case that could drift from it,
-which is what the first assertion in `PlacementLayouts.const.test.ts` pins.
+which is what the first assertion in `PlacementLayouts.utils.test.ts` pins.
 
 **The close control's size follows the hole rather than a constant of its own.** `closerRadiusPx` defaults to
-`holeRadiusPx`, so a consumer who widens the hole gets a disc that still fills it and still covers the opener
+`holeRadius`, so a consumer who widens the hole gets a disc that still fills it and still covers the opener
 underneath — the thing the size is actually for. A flat default would have quietly left a ring of bare hole
 round the X the moment anybody touched the geometry.
 
@@ -2191,24 +2260,24 @@ travel and per-level overrides are all plausible and none has been asked for. `f
 for the same reason.
 
 **A hemisphere is the same band over half a turn, so one builder makes both.** Asked for by the user once the
-ring was wedges. `createArc` takes the spread in degrees and everything else the ring already had; `createRing`
-is that at 360 degrees and `createHemisphere` at 180, with `ring` and `hemisphere` the ready-made pair. The
-defs type is `ArcDefs` rather than `RingDefs` now that two shapes take it.
+ring was wedges. The builder took the spread in degrees and everything else the ring already had, and shipped
+it as two presets. **The presets are gone** — see _"One factory per arrangement"_ — and `spreadDegrees` is a
+def on `createRing` like every other knob; the paragraphs below describe the arithmetic, which is unchanged.
 
 **What the spread changes is where the first wedge sits, and that is the only branch in the builder.** A
 closed ring centres its first item straight up and the rest follow round; an open arc has two ends, so the
 items are spread symmetrically about straight up instead — first and last are mirror images, which is what
-`PlacementLayouts.const.test.ts` asserts rather than any angle. The old hemisphere placed boxes on a 150-degree
+`PlacementLayouts.utils.test.ts` asserts rather than any angle. The old hemisphere placed boxes on a 150-degree
 arc and sized its radius from how much room the items needed; none of that survived, so `toRadius` and the
 crowding factor it used went with it.
 
-**A half turn leaves each wedge half the angle, so the hemisphere ships from a wider hole.** Reported by the
-user as wedges too small for what was in them, and the arithmetic says why: a label's width is the chord
-across its wedge, which is the radius times the sine of half the wedge's angle. Halving the turn halves the
-angle, and the only thing left to win it back with is radius — so `createHemisphere` starts at a hole of 110
-and a band of 110 where the ring starts at 64 and 84. The two defaults being different is the point rather
-than an oversight, and the spec asserts the relationship — a hemisphere's hole is wider than a ring's —
-rather than either number.
+**A half turn leaves each wedge half the angle, and the builder used to compensate with a wider hole.**
+The arithmetic is worth keeping even though the compensation is gone: a label's width is the chord across its
+wedge, which is the radius times the sine of half the wedge's angle, so halving the turn halves the angle and
+the only thing left to win it back with is radius. The builder therefore carried a second set of base numbers
+that a half turn switched to. **That branch is gone** — the user's call, on the grounds that a default tuned
+for what one example needed is not a default — and a caller asking for a half turn passes the hole and band it
+wants alongside the spread.
 
 **Its close control does not fill that hole, which is the one place the two shapes disagree.** The rule for
 the ring is that the disc fills the hole so it always covers the opener; on a hemisphere the hole is wide
@@ -2262,9 +2331,10 @@ geometry was never in it. Hovering still moves the choice under either setting; 
 under `press` a hover no longer closes an open level either, since opening and closing should answer to the
 same gesture.
 
-**`createFan` came with it, on the same terms as `createRing`.** The fan's measurements — card size, spacing,
-gap and tilt — were module constants; they are `FanDefs` now and `fan` is `createFan()`. The factory ignores
-level and parent width, because in replace mode there is never a level to enclose.
+**A fan factory came with it, on the same terms as `createRing`.** The fan's measurements — card size,
+spacing, gap and tilt — were module constants and became a defs type of their own. **There is no fan factory
+any more** — see _"A fan is an arc that tilts"_ — but the paragraph below still holds, since it is about how
+a fan should be tuned rather than about which function draws it.
 
 **A fan is given the angle between two cards, not the angle the whole arc covers.** The user's call, after a
 menu of five opened a submenu of three and the three were stretched across the same spread. A total arc makes
@@ -2351,6 +2421,121 @@ both is the claim the page exists to make, and `e2e/placement.spec.ts` asserts e
 measurement: widening the band widens the menu's own popup and redraws the wheel's wedge, and emptying the
 hole turns a two-arc band into a one-arc pie.
 
+### A fan is an arc that tilts, so there is no fan
+
+**Once the fan had to fit a box, nothing was left that the arc did not already do.** It derived its spread
+from the item count and its radius from `itemHeight + gap`, both of which a given box replaces; it spaced
+items evenly in angle where the arc walks the curve by arc length, which is the same thing on a circle and
+better than it on an ellipse. What genuinely differed was that it turned its items and that it opened
+rightward rather than upward. Those are two knobs, so `ArcDefs` has `tiltRatio` and `facingDegrees`, and
+`createFan`, `ArcDefs`, `toArc` and `toPlacements` are gone. The registry keeps a `fan` entry; it is an arc
+facing zero with a tilt.
+
+**Tilt is one formula and the ring earns it too.** An item is turned by its own polar angle times
+`tiltRatio` — not by its offset from the facing, which would leave the top of a ring upright when the whole
+point is to radiate. Zero is upright, which is what every layout did before, so the default changes nothing;
+one turns an item fully with the radius, which is the fan's old behaviour and gives a band labels that point
+outward. It reaches the three radial arrangements and stops there, since a honeycomb, a whorl and a zigzag
+give an item no angle to turn by — the same boundary as `pickRule: "angle"` and `sector`.
+
+**A turned box is wider than it is, and the extent has to know.** `toArcExtent` took its bounds from
+unrotated boxes, which was safe while nothing rotated. It now takes the turned footprint —
+`width·|cos| + height·|sin|` across, the other way down — or the outermost items of a tilted fan are clipped
+at exactly the point where the arrangement is widest.
+
+**The offset the fan used to smuggle in is now something the menu says.** A fan opens rightward, so its
+items only ever used the right half of the box it reserved; the empty left half was what made a
+centre-on-the-trigger popover appear to open sideways. With the box snapped to its content that padding is
+gone, so `Menu` shifts its layout box until the layout's `origin` — the pivot every radial layout already
+publishes — lands where the box's centre used to. A band's origin is dead centre, so nothing about a wheel
+menu moves; a fan's is near its left edge, and it opens rightward because the rule says so rather than
+because of a gap in the geometry.
+
+### One factory per arrangement, and defaults that are nobody's example
+
+**A preset is not an arrangement, and the sample registry is a list of arrangements.** The user's rule, made
+against `hemisphere`, which was `createRing` with one number changed and put a second entry in every dropdown
+that reads the registry for something with nothing new to look at. `spreadDegrees` is a `BandDefs` field now,
+`createBand` and `createHemisphere` are gone, and `createRing(defs)` is the only band factory. A caller
+wanting a half turn asks for one where it renders.
+
+**The three whorls stay, and the reason is the distinction worth keeping.** They are also one factory at three
+spacings, but a whorl is read against the shape put into it — a circle, a hexagon and a square each want
+different spacing — so picking between them on the Formation page shows something a hemisphere does not. The
+test is whether a reader learns anything from the second entry, not whether the arguments differ.
+
+**A radial tree left the library entirely and lives in the page that draws one.** It is the only layout that
+needs more than an item count: every node has to know its parent before it can be given a slice of the turn.
+`Formation` passes no `itemParents`, so in the registry it silently degraded into a worse ring — every node a
+root, all of them on the inner circle. It is `Radial.tsx` now, following what `ScanlineAnimation`'s page does
+with `glitch`, and it earns its place there twice over: the recursive span divider is exactly what somebody
+writing their own layout needs to read, and a layout turns out to be nothing more than a function from defs to
+a list of boxes.
+
+**Defaults are neutral, not tuned to what an example needed.** The user's words were that 84 feels oddly
+specific and a bit off-grid for a default. Every layout is authored in the same nominal hundred-unit space
+now, so an untouched ring is exactly 100 across with a 25 hole and a 25 band, an arc's box is 100 with 25
+items, and a honeycomb cell is 25. The numbers the examples used to lean on moved into the example files —
+the wheel menu asks for its 64 hole and 84 band, the fan menu for its 168 by 40 items — which is the same
+split the pixel work drew: the arrangement is the library's, the size is the consumer's.
+
+### Layouts carry no pixels, and the box a layout is given is the consumer's
+
+**Every length a layout takes is unit-less now.** `holeRadius` is `holeRadius`, and so on through
+`bandWidth`, `levelGap`, `wedgeArc`, `centreRadius`, `width`, `height`, `itemWidth`, `itemHeight`, `gap`,
+`cellWidth`, `innerRadius` and `ringGap`. The arithmetic never had to change, because it was already
+homogeneous — every layout computed in its inputs' units and divided by the total before returning, so the
+fractions are identical whatever the numbers mean. **The user's framing was that this is what an SVG does**:
+author the geometry in one coordinate space and let whoever renders it decide how many pixels that space is
+worth.
+
+**`PlacementLayout.width` is `extent`, and the box no longer honours it.** `PlacementBox` used to set
+`width: <layout width>px`, which is what made an arrangement rigid; it now always fills its parent, so the
+same fractions scale into whatever room they are given and the aspect ratio comes from `heightRatio` as
+before. `extent` survives for one job only — telling a level how large the level inside it was — and
+`PlacementLayoutDefs.parentWidth` is `parentExtent` to say so.
+
+**What the library gives up is the legibility guarantee, deliberately.** A band was 84px so a label would
+fit, and `wedgeArc` was a chord length so a wedge would be wide enough to read. Neither can promise anything
+once the box is the consumer's, which also means WCAG 2.5.8's 24px target size becomes the consumer's to
+meet. The user's call, on the grounds that the library was guessing at a size only the consumer knows.
+
+**A menu sizes its own levels, because nothing outside can.** Each `MenuLevel` is its own portalled popover,
+so once the layout stopped reporting pixels there was nothing to give a level a width. `MenuProps.layoutSize`
+takes a CSS length from the consumer — the library never parses it — and each level renders at
+`calc(<layoutSize> * extent / rootExtent)`, so the bands still grow outward in the ratios the layout chose.
+
+**Two controls sized themselves from the box and had to be told not to.** `RadioGroup`'s root is
+`width: fit-content` and `Sortable` wraps its list in an `InteractionWrapper` whose default sizing is the
+same, both of which used to be filled out by the box's own pixel width and collapsed to nothing without it.
+Each now switches to filling when a layout is present. `PlacementBox` also carries `width: 100%` and
+`flex-shrink: 0`, since a flex item with only absolutely positioned children otherwise shrinks to zero — which
+is what emptied the paginator's dial and the honeycomb tabs.
+
+### Sized and fitted layouts are one family, and the registry lists both
+
+**A `SizedLayout` is a `PlacementLayout` with the width filled in, so `FittedLayoutFn` is nothing but the
+general signature.** That is the whole of the difference and it lands in one place: `PlacementBox` reads
+`layout.extent`, and where it is present the box is that many pixels wide while every fraction is of that,
+where it is absent the box fills its parent and the fractions are of whatever it was given. So an arrangement
+either dictates its own size or fits the room it is put in, and both are the same contract.
+
+**Which is why nothing ever stopped `Formation` taking a ring.** Its `computeLayout` is typed
+`PlacementLayoutFn` and a `SizedLayoutFn` returns a subtype of what that asks for. The restriction was in the
+Playground's dropdown, which read a key list that existed for five of the eleven layouts.
+
+**The five had no factories only because nobody had needed one.** `podium`, the three whorls and `zigzag` were
+module-private functions reachable through a registry, while the ring, arc, fan, honeycomb and radial tree
+were exported factories with a defs type each. They are now the same shape: `createPodium`, `createWhorl` and
+`createZigzag` beside `createRing` and the rest, with `WhorlDefs` and `ZigzagDefs` lifting numbers that were
+already positional arguments rather than inventing knobs, and the three whorls becoming presets of
+`createWhorl` the way the ring presets were of the band builder at the time.
+
+**The registry is a `.const.ts` and lists every layout.** `FittedLayouts` was a namespace nested inside a
+utils namespace, holding a key list for one page's dropdown — the only registry in the library shaped that
+way. It is `PlacementLayouts.const.ts` now, beside `StaircaseIndents` and `CellAnimationZones`, and it names
+all eleven, which is what lets a consumer offer the whole set by key.
+
 ### `Paginator` takes a layout, and the placed box moves into the abstract
 
 The proving pass of `backlog.md` item 26, against the control the item named as the strongest candidate. A
@@ -2358,7 +2543,7 @@ paginator is arithmetic over a flat list, so a layout is the only thing that cha
 the ellipses go round a dial in the order they already had, and nothing about the counting, the addresses or
 the labels is touched.
 
-**`path` and `parentWidth` describe a level, so a control with no levels states neither.** Both are optional on
+**`path` and `parentExtent` describe a level, so a control with no levels states neither.** Both are optional on
 `PlacementLayoutDefs` now, and `createArc` defaults them to the root. They were required because `Menu` is the
 only thing that had ever asked for a layout and a menu always knows which band it is drawing; a paginator has
 no notion of either, and making it pass an empty path and a zero width would have been the caller's version of
@@ -2368,10 +2553,10 @@ what "root" means, so no layout had to learn a new spelling.
 **The placed box is the abstract's, because the translation from fractions to CSS is.** `Menu` held four class
 names and two functions that turned a `PlacementRect` into `left`/`top`/`width`/`height` in container-query
 units; a second consumer would have had to import a sibling's internals or write the same thing again.
-`PlacementBox` and `PlacementItem` are now in `Abstracts/Placement`, and `Barrel` is the precedent — an
-abstract that renders, because lifting only the arithmetic leaves every consumer holding the same markup. The
-split is the same one `Barrel` drew: the abstract owns the sizing box, the spacer that gives it its shape and
-each item's offset and turn; the consumer owns what goes inside an item and everything said about it.
+`PlacementBox` and `PlacementItem` came out of `Menu` for that reason, and `Barrel` is the precedent, because
+lifting only the arithmetic leaves every consumer holding the same markup. The split is the same one `Barrel`
+drew: the primitive owns the sizing box, the spacer that gives it its shape and each item's offset and turn;
+the consumer owns what goes inside an item and everything said about it.
 
 **Both wrappers carry `role="presentation"`**, which is the rule _"the wrapper between a container role and its
 items is presentational"_ reaching the second wrapper of that kind. It matters more here than it did for
@@ -2522,7 +2707,7 @@ component into a fixed one — the opposite of what _"one side comes from the pa
 of what `Formation`'s own entry argues.
 
 **The floaters stopped multiplying by a width because of it.** `Tabs` and `RadioGroup` had been converting a
-placement into a pixel box by multiplying through `layout.width`, which only works for a layout that has one.
+placement into a pixel box by multiplying through `layout.extent`, which only works for a layout that has one.
 Both now write the floater in the same container-query units the items use, which means the floater has to
 live inside the box rather than beside it — and that is simpler than what it replaces, since there is no
 conversion left to get wrong.
@@ -2537,7 +2722,7 @@ it goes and no further.
 The user's call, arrived at from the rating arc. One factory had grown a `fit` of `"turn"` or `"content"`,
 and it was not a knob: it flipped the same function between two different contracts. A **band** states the
 size it needs in pixels and hands that size down, which is what lets a `WheelMenu`'s levels sit concentric
-inside one another — a nested band works out its inner radius from `parentWidth`, and that only means
+inside one another — a nested band works out its inner radius from `parentExtent`, and that only means
 anything while the parent's width _is_ the band's diameter. A snapped box's width means something else, so
 snapping and nesting could never both be true. The repo already had names for the two natures, `SizedLayout`
 and `FittedLayoutFn`; `fit` was a runtime flag flipping between them.
@@ -2548,8 +2733,8 @@ sortable's cards — and every caller that nests paints wedges of a band. Two of
 and still belong on the arc's side, which is why the arc takes a spread up to a full turn rather than being
 the partial one by definition.
 
-**So `createBand` keeps the wedges and `createArc` is new.** `createRing` and `createHemisphere` are the
-band's two presets and are unchanged apart from the name they call. `fit` is gone, and with it the recorded
+**So the band keeps the wedges and `createArc` is new.** The band was `createBand` with two presets over it
+at the time; it is one `createRing` now, and the split between it and the arc is unchanged. `fit` is gone, and with it the recorded
 fault that a snapped arc could not nest — there is nothing left to snap.
 
 **A sector still carries the point it turns about.** That came out of snapping and outlived it: a painter is
@@ -2622,7 +2807,7 @@ single band and closes the wheel only from the root. Both are scoped to a laid-o
 changed: there `ArrowRight` and `ArrowLeft` still open and close, because there they mean something.
 
 **`Escape` had to be stopped from reaching the dismisser, and `stopPropagation` was not enough.** Solid
-delegates `keydown` at the document root, so the menu's handler and `DismisserStack`'s listener are both on
+delegates `keydown` at the document root, so the menu's handler and `Dismisser`'s listener are both on
 `document` — a call that stops the event travelling further does nothing to a listener already attached to the
 same node. `stopImmediatePropagation` is what a level needs to keep a dismissal to itself.
 
@@ -2940,7 +3125,7 @@ the window. And an item whose paint is **not text** — a swatch, an avatar — 
 **The buffer is a factory and the matching is a pure function, which splits the opposite way to the walk.**
 `NavigatorUtils.computeNextPosition` was deliberately not a factory because each control owns its cursor
 differently. The typeahead buffer is the reverse: a string and a timer, owned identically by all three, with
-nothing per-control about it. So `Typeahead.createBuffer` owns that state and
+nothing per-control about it. So `TypeaheadUtils.createBuffer` owns that state and
 `TypeaheadUtils.computeNextIndex` stays pure, taking positions and a text lookup and returning a position.
 The rule from the walk still holds — the abstract answers _which item is next_, the control answers _what to
 do about it_: `Select` moves its highlight, `Menu` moves its highlight, `Tree` moves real focus.
@@ -3060,7 +3245,7 @@ demanding an answer must not be answerable by clicking next to it. `Escape` stil
 dialog must be escapable regardless of role. `ModalPage` carries it as a second variant, which is the honest
 demonstration — it shows the three props rather than hiding them.
 
-**`FocusManager.autoFocus` reads the initial ref untracked, and "initial" is why.** The effect already depends
+**`FocusManagerUtils.autoFocus` reads the initial ref untracked, and "initial" is why.** The effect already depends
 on the container ref and visibility; a third dependency that can change while the dialog is open would
 re-run it, re-capture `previouslyFocused` as whatever is focused _now_, and restore focus to the wrong
 element on close. A ref assigned during render is set before effects run, so the common path is unaffected.
@@ -3203,7 +3388,7 @@ summing to one without a normalisation pass and dragging at one end never reflow
 boundary as a percentage over 0–100, `aria-orientation` states the axis, and the arrow keys for that axis
 move it by `keyStep`. A drag-only splitter is unreachable without a pointer.
 
-**The drag is local rather than `InteractionTracker.trackDrag`.** That helper measures the pointer against the
+**The drag is local rather than `InteractionTrackerUtils.trackDrag`.** That helper measures the pointer against the
 element it is attached to, right when the drag surface _is_ the measured surface (`Range`, `ColorArea`). Here
 the drag surface is the gutter and the measured surface is the container. If a third consumer of that shape
 appears, widening `trackDrag` to take a separate measuring ref is the change to argue then.
@@ -3273,7 +3458,7 @@ that was typed, with no identity apart from its characters. A consumer needing r
 nothing declines a word, leaving the text in the field to be edited rather than retyped.
 
 **The draft text is private unless asked for**: `textSignal` is optional through
-`SignalMirror.createOptional`, the arrangement the popups use for their open state.
+`SignalMirrorUtils.createOptional`, the arrangement the popups use for their open state.
 
 **Owning the box means owning the pointer back, which the first build did not.** Fixed afterwards.
 `interactionRoot` sets `pointer-events: none` and each part turns it back on for itself (`buttonElement` does,
@@ -4178,7 +4363,7 @@ see. So the mode is chosen by whether the consumer has said what to announce.
 
 **Both announcer regions are reserved when the stack mounts.** A live region only announces what is inserted
 after it is already in the document, so a region created by the first message may be silent for exactly that
-message — the failure that is hardest to notice, because everything after it works. `LiveAnnouncer.reserve`
+message — the failure that is hardest to notice, because everything after it works. `LiveAnnouncerUtils.reserve`
 exists for this: it creates a region without saying anything into it.
 
 **The keyboard route in is `F8`, and `Escape` is the way back.** A toast is portalled to the end of the
@@ -4236,7 +4421,7 @@ entries enter from, and whether the stack runs down an edge or along one), `getG
 entry sits in a minimal library box that re-enables pointer events and is the flex item; it carries no role,
 since politeness is set once on the region and a role per entry would announce twice.
 
-**Alignment is independent of direction, and `ToastsUtils.computeStackAlignment` keeps it that way.** A
+**Alignment is independent of direction, and `ToastUtils.computeStackAlignment` keeps it that way.** A
 reversed flex direction inverts "start" on the main axis, so a naive mapping would make `bottom-right` name
 different corners depending on `getDir`. The function flips the main axis alone — exact arithmetic over two
 enums, and the one part of this component reachable from `npm test`.
@@ -4288,7 +4473,7 @@ role is the consumer's, so the ARIA that role requires is too, and one bag beats
 
 **A section has no boolean, so `SignalMirror` is the bridge.** `Accordion` owns `Signal<T[]>` and each
 section reads its own membership out of it, while `Collapsible` wants the whole signal.
-`SignalMirror.createValueMirror` was extracted for this and writes outward only when the value actually
+`SignalMirrorUtils.createValueMirror` was extracted for this and writes outward only when the value actually
 differs, so "the difference is the toggle" holds and the set stays the single source of truth. Its fifth
 consumer, and the first inside the library.
 
@@ -4312,7 +4497,7 @@ shape, so a fade or slide inside the panel is the consumer's, layered on a heigh
 Measuring the constrained box would need the height released and restored on every pass — `TextField`'s trick
 on an absolutely positioned overlay — and would fight the transition it is feeding.
 
-**`ElementObserver.createBorderBoxHeightObserver` is the extracted half, and `TextField` was deliberately not
+**`ElementObserverUtils.createBorderBoxHeightObserver` is the extracted half, and `TextField` was deliberately not
 migrated onto it.** `backlog.md` asked for the shared piece so the measurement would not be written twice; on
 reading both, they share less than that implied — `TextField` clamps to a row count derived from
 `line-height`, releases `bottom` to measure a `scrollHeight`, and republishes the result as the wrapper's
@@ -4409,7 +4594,7 @@ all hundred are built.
 **The recorded reason against building this at all was wrong, and the correction is the interesting part.**
 `backlog.md` held that withholding the panel would cost the animation on that first expansion, "since there
 would be nothing to measure yet" — which assumes the measuring and the opening happen at the same instant.
-They do not. `ElementFader.setTarget` already defers the flip of `transitionTarget` to a `requestAnimationFrame`,
+They do not. `ElementFaderUtils.setTarget` already defers the flip of `transitionTarget` to a `requestAnimationFrame`,
 with the 100ms fallback recorded above, precisely so the browser paints a start value before a transition
 begins. **That deferral is a gap, and the measurement lands inside it.**
 
@@ -4979,7 +5164,7 @@ being the stricter of the two.
 ### Pointer drag: a ratio, opt-in, and captured
 
 Settled, closing the primitive `backlog.md` #2 asked for.
-`InteractionTracker.trackDrag(ref, disabled, opts)` reports where a pointer is inside an element for as long as
+`InteractionTrackerUtils.trackDrag(ref, disabled, opts)` reports where a pointer is inside an element for as long as
 a drag lasts.
 
 **It is a separate call rather than part of `wrapElement`**, as `backlog.md` asked: most controls want no
@@ -5020,7 +5205,7 @@ Settled on the user's instruction, closing the item `backlog.md` had left as "no
 something asks". `trackDrag` reports a **ratio while a drag lasts**, which is not an event with an origin: a
 ripple has to know where one press landed and then run once from there.
 
-**`InteractionTracker.trackActivation(ref, disabled)` is that**, and it returns `{ ratio, count }` or
+**`InteractionTrackerUtils.trackActivation(ref, disabled)` is that**, and it returns `{ ratio, count }` or
 nothing. The ratio is of the element's own box, for `trackDrag`'s reason — pointer coordinates and the rect
 are the same space, so `Viewport`'s scale divides out of the fraction and the `transform: scale()` bug that
 has been open against MUI's ripple for years cannot be written here.
@@ -5049,7 +5234,7 @@ over the control, so a ratio is a percentage and no measuring happens on the pai
 
 ### The swipe: one gesture over the drag machinery, an axis it claims, and a verdict at the end
 
-Settled, closing the gesture `Abstract` `backlog.md` #26 asked for. `InteractionTracker.trackSwipe(ref,
+Settled, closing the gesture `Abstract` `backlog.md` #26 asked for. `InteractionTrackerUtils.trackSwipe(ref,
 disabled, opts)` reports how far a pointer has pushed an element along one axis, and at the release says
 whether that push counts. `Drawer` and `Carousel` are its two consumers.
 
@@ -5322,7 +5507,7 @@ is why exporting it was worth doing.
 
 **`TextSyncUtils.applyMask(pattern, previous, next, caret)` is a pure function, so the caret arithmetic is
 reachable from `npm test`.** A pattern is `#` for a digit slot and any other character as a literal, so
-`dd/mm/yyyy` is `##/##/####`. It returns the text and where the caret belongs; `TextSync.utils.test.ts` covers
+`dd/mm/yyyy` is `##/##/####`. It returns the text and where the caret belongs; `TextSyncUtils.utils.test.ts` covers
 the cases that are easy to get wrong.
 
 **Only the digits carry meaning.** Everything that is not a digit is discarded on the way in and re-emitted
@@ -5370,7 +5555,7 @@ second validator exists to disagree with the first.
 paths would be two behaviours to keep in step. Nothing observable changed: a typed `-` is discarded and the
 mask supplies its own.
 
-**`TextSyncUtils` is not exported from `index.ts` yet.** `DateInput` is its only consumer and the standing
+**`TextSync` is not exported from `index.ts` yet.** `DateInput` is its only consumer and the standing
 rule is private until a second arrives — which will be `TimeInput`'s 12-hour clock or the formatted number,
 either of which is also the moment to decide whether a consumer building their own masked field should reach
 it. _`TimeInput` became that second consumer; the export decision is still open._
@@ -5465,7 +5650,7 @@ the point has to be converted out of client coordinates into the space the posit
 consumer cannot be expected to know that a `Viewport` may be scaling everything around them.
 
 **The point is a rect of no size, which is what let this be built with nothing new underneath.**
-`Anchor.createPortalPosition` already took an optional `getAnchorRect` for `Spotlight`, so a zero-size rect at
+`AnchorUtils.createPortalPosition` already took an optional `getAnchorRect` for `Spotlight`, so a zero-size rect at
 the pointer is an anchor like any other: the default placement puts the popup's near corner on it, and the
 same edge-safety logic flips it near a screen edge. `Popover` gained the one prop that threads it through.
 
@@ -5485,7 +5670,7 @@ Settled, replacing five stories: `Select` closed on its field's blur, `Menu` on 
 blur, `DatePicker` and `ColorInput` each ran their own document-wide press listener, and `Modal` its own
 document `keydown`.
 
-**`DismisserStack` is a module-level array of open layers with one set of document listeners**, in the
+**`Dismisser` is a module-level array of open layers with one set of document listeners**, in the
 `LiveAnnouncer` position — it belongs to no component and there is one of it. Not owned by `Viewport`: a
 consumer with no `Viewport` still needs dismissal, the events are the document's rather than any element's,
 and nesting a `Viewport` inside a `Viewport` would need cross-authority ordering a single array does not have.
@@ -5853,7 +6038,7 @@ Settled, closing two unblocked items in one pass.
 **Every control here owns its value as a `*Signal`, and a consumer holding a getter plus a callback had to
 build the same mirror by hand.** `PageTextField`, `PageSelectField`, `PageCheckField`, `PageNumberField` and
 `PageColorField` were five copies, and the colour picker's hue slider made a sixth.
-`SignalMirror.createMirror(getOuter, setOuter, opts)` is that mirror once, with `createValueMirror` for the
+`SignalMirrorUtils.createMirror(getOuter, setOuter, opts)` is that mirror once, with `createValueMirror` for the
 common case where nothing converts.
 
 **It takes a getter and a setter rather than a `Signal`**, the escape hatch `backlog.md` named as the
@@ -5884,6 +6069,40 @@ arguments. Its four consumers are driven in `e2e/`, where its behaviour is obser
 **The form wiring is complete.** `Select`, `ColorInput`, `FileInput` and `Range` now read the description
 context alongside `TextField` and `BinarySwitch`, so every control that can sit in a `FormField` points at its
 message without the consumer wiring anything.
+
+### The viewport split in two, and only the wrapper is a component
+
+**The context and the arithmetic are `Abstracts/Viewport`; the element that establishes one is
+`Essentials/ViewportWrapper`.** The split was forced by the dependency graph: five units below `Essentials`
+were reaching up into an `Exotic` for the context — `Anchor`, `ElementObserver` and `PointerTracker` in
+`Abstracts`, `Popover` and `Spotlight` in `Primitives` — and `ElementObserver` and `PointerTracker` were
+reaching for `ViewportUtils` as well. The context imports nothing but solid-js, its own type and `Size2d`, and
+the component imports the context rather than the other way about, so the whole lower half lifted cleanly and
+every one of those edges now runs downward.
+
+**The abstract keeps the plain name because it is the viewport.** `useViewportContext` answers with no
+wrapper anywhere on the page, falling back to the window's size with no portal root and a scale of one —
+which is why anchoring and measuring behave the same whether or not anything has scaled the page. The
+component does not define a viewport so much as establish one, so it is the half that takes a suffix.
+
+**Names weighed and rejected, because this took several passes.** `Screen` and `ScreenBox` died on nesting:
+viewports stack, `getScale` is the parent's times its own and `composeScaledRect` exists only to carry a rect
+up through a stack of them, and screens do not do that. `View` and `ViewBox` read best of all and `viewBox` is
+even the right SVG term for scaling contents into a coordinate box — but the library writes `viewBox` as an
+attribute fifteen times, in `Shape`, `Bracket`, `Corners` and `PatchBoard` among others, so a file could carry
+both spellings a few lines apart. `ViewportBox` says the container twice, since a `-port` is already an
+aperture. **`Wrapper` won on being ordinary**: it is standard component vocabulary, and `InteractionWrapper`
+is already the library's suffix for a component whose whole job is to go round something and give it a
+property.
+
+**The wrapper is an `Essential` rather than an `Exotic`.** It renders, it has a page, and what it needs
+inside it is content rather than a host, which is the page test. The page moved with it and its route is
+`/viewport-wrapper`; the abstract took a menu entry of its own under `Abstracts`, with no page, since
+everything it does is already visible through the wrapper.
+
+**The stylesheet's class names still say `viewport`.** `viewportRootHost`, `viewportNestedHost`,
+`viewportRoot`, `viewportContent` and `viewportPortal` name the parts of the viewport being built rather than
+the component building it, and renaming them would have bought nothing a reader can use.
 
 ### A `Viewport` is a region, and it is terminal for everything inside it
 
@@ -6056,12 +6275,12 @@ back. Duplicated state plus two effects is a loop.
 Changed, when the grouped number became the third consumer.
 `computeMaskedText(previous, next, caret)` replaces `getMask`: a pattern mask and a grouped number are the same
 function with a different body, and a grouped number has no pattern to state because it has as many separators
-as its value needs. The transform stays where `getMask` was — inside `TextSync.createValueSync` — because _"a
+as its value needs. The transform stays where `getMask` was — inside `TextSyncUtils.createValueSync` — because _"a
 mask owns the caret"_ is unchanged.
 
-### `TextSyncUtils` is public, so the mask is a contract rather than an implementation
+### `TextSync` is public, so the mask is a contract rather than an implementation
 
-Settled by the user, choosing to export it over leaving it internal. `TextSync.utils` now leaves through
+Settled by the user, choosing to export it over leaving it internal. `TextSyncUtils.utils` now leaves through
 `index.ts` beside `TextSync` itself: `applyMask`, `applyGroupedMask`, `getGroupSizes`, the two `formatWith*`
 helpers, the digit readers and both types.
 
@@ -6151,7 +6370,7 @@ An in-memory array sliced by the consumer and a paged HTTP endpoint become the s
 alternative — a `scroll` listener comparing `scrollTop + clientHeight` against `scrollHeight` — loses on three
 counts: it needs the scrolling element, which is the consumer's; it needs a "how close counts" threshold,
 which is wrong for some row height; and it is silent when the first batch does not fill the box, because
-nothing has scrolled. `ElementObserver.createViewportIntersectionObserver` observes against the viewport, and
+nothing has scrolled. `ElementObserverUtils.createViewportIntersectionObserver` observes against the viewport, and
 an observer computes intersection through every ancestor's overflow clip, so it reports the marker hidden
 without being told what is hiding it. "The list is too short to scroll" and "you have scrolled to the bottom"
 become the same condition, which is what makes it converge with no startup path.
@@ -6613,7 +6832,7 @@ _less_ gesture, not a described one, and a consumer who agrees already has the s
 itself, because detecting a screen reader is neither possible nor something to attempt.
 
 **The progress is a flag and a signal, and the signal is optional.** `progressSignal` is the ratio the fill
-is drawn from, taken through `SignalMirror.createOptional` exactly as a popup's `visibilitySignal` is: with no
+is drawn from, taken through `SignalMirrorUtils.createOptional` exactly as a popup's `visibilitySignal` is: with no
 prop the control keeps the number to itself, and with one the consumer holds the same variable the painter
 reads. It exists because a flag only reaches `renderContent` — a readout beside the control, a second control
 that reacts half-way, or a warning that appears at eighty per cent is outside that slot and had no route to
@@ -6997,7 +7216,7 @@ that is the whole change in both directions.
 **The Playground's pane is dragged with `left` and `top`, never with `transform`.** A transform on an
 ancestor creates a stacking context and changes the containing block, and given how readily this arrangement
 breaks — `clip-path` killed the backdrop outright and `isolation: isolate` would have — it is not a coin worth
-flipping when plain offsets cost nothing. `InteractionTracker.trackDrag` on the stage supplies a clamped 0–1
+flipping when plain offsets cost nothing. `InteractionTrackerUtils.trackDrag` on the stage supplies a clamped 0–1
 ratio, an offset captured on the gesture's first move turns it into a grab rather than a jump, and the
 position is a `clamp()` in CSS so the pane stays wholly inside the stage without anything measuring it. The
 drag exists for two reasons, both of them measurements: seeing the glass travel over a detailed background,
@@ -7202,7 +7421,7 @@ place.
 buys nothing and costs a long key.
 
 **What they share is the driver.** They are the samples that read the pointer rather than running on a
-clock: each calls `PointerTracker.create` inside `renderDefsElement`, hands over the `getRef` the registry
+clock: each calls `PointerTrackerUtils.create` inside `renderDefsElement`, hands over the `getRef` the registry
 already passes, and turns `boxRatio` — the pointer's position as a 0–1 pair inside the element — into a
 gradient's origin or offset. Their payload carries no animation fields at all, which is what the split
 bought: a page showing them has no clock knobs to offer.
@@ -7246,7 +7465,7 @@ painted a static three-stop ramp of the whole palette; they now paint one flat c
 `elastic_circle_1c` — the user's call on both.
 
 **The cycle rides the same clock as the motion, because every `animate` shares one duration.**
-`SVGAnimationUtils.createAnimateDefs` reads `animationDurationMs` for every element it stamps, so one sweep
+`SVGAnimationDefsUtils.createAnimateDefs` reads `animationDurationMs` for every element it stamps, so one sweep
 across the surface is one full colour pass. Composition is a fragment in the `custom` slot of
 `computeLinearGradient`, which is what `hue_rot_3` already did.
 
@@ -7426,7 +7645,7 @@ leave on its own.
 
 **It is still the cheapest sample in the registry, because a bearing needs no clock.** Nothing about `hand_1`
 fades in place or advances while still, so `PointerTracker`'s own invalidate-on-move is the whole of its
-animation and `SVGDefsFrames` is not involved.
+animation and `SVGDefsFrameUtils` is not involved.
 
 ### `hand_trail_1` is the trail machinery with a bearing frozen instead of a position
 
@@ -7436,7 +7655,7 @@ and the hand drags a fading sweep behind it; hold still and the fan decays away 
 **It is a separate sample, not an edit of `hand_1`** — the user's instruction, and `hand_1` is untouched.
 
 **Everything is borrowed from the trails except what is frozen.** Same round-robin over `STAMP_COUNT` slots
-by clock tick, same `SVGDefsFrames` clock with the same lifetime, same alpha decay, same
+by clock tick, same `SVGDefsFrameUtils` clock with the same lifetime, same alpha decay, same
 `SVGDefsUtils.getPointerFade` captured at birth so the fan retracts when the pointer leaves. The one
 substitution is that a stamp stores the `angle` from the reading rather than the `boxRatio`, and hands it to
 both the clip's rotation and the gradient's angle. The whole family difference is one field.
@@ -7522,7 +7741,7 @@ which is the fault the band samples were corrected for under _"nothing about the
 **It needs a frame clock, and it was the first sample in this family that did.** The other six are pure
 functions of the pointer's position, so `PointerTracker`'s own invalidate-on-move is all the clock they
 need; something fading _in place_ has to advance while nothing is moving. The loop is
-`SVGDefsFrames.createClock`, described below.
+`SVGDefsFrameUtils.createClock`, described below.
 
 **A stamp is only written while the pointer is actually moving, and the first build got this wrong.** It
 re-stamped on the clock alone, so a pointer holding still had twelve blobs piled on one spot re-firing in
@@ -7775,7 +7994,7 @@ a brisk drag that is a little longer than the 700ms lifetime, so a slot is norma
 comes round again. Push the pointer faster than that and a half-grown ring will snap back to the centre. The
 fix if it ever matters is more slots, not a longer spacing — spacing is what makes the wake read.
 
-### `SVGDefsFrames.createClock` is the shared animation frame for samples that fade rather than follow
+### `SVGDefsFrameUtils.createClock` is the shared animation frame for samples that fade rather than follow
 
 **Why it exists.** Two tracked samples now advance while nothing is moving, and the loop they need is
 identical: one `requestAnimationFrame` shared by every layer of the sample, a signal each layer reads for
@@ -7951,7 +8170,7 @@ to avoid.
 
 **`onActivation`, not `onActivate`, because `Menu` already owns the shorter name** for the different event of
 an item being chosen. **`isActivationTracked` is gone**: tracking is on when a handler is given, the same
-presence-turns-it-on rule `Table` uses for `selectionSignal`. `InteractionTracker.trackActivation` no longer
+presence-turns-it-on rule `Table` uses for `selectionSignal`. `InteractionTrackerUtils.trackActivation` no longer
 holds a signal at all — it calls the handler and returns nothing.
 
 **Fourteen types then split off as `*RenderProps`** — `CarouselStep`, `CarouselPick`, `Calendar`, `Clock`,
@@ -7998,7 +8217,7 @@ axis forces the other, so `overflow-x` on the root would make the root the scrol
 sticky header and the `Virtualizer`'s scroll element away from the consumer's own scrolling box.
 
 **The header is a sticky rowgroup, which is why the consumer's box has to be the thing that scrolls.** Sticky
-resolves against the nearest scrolling ancestor, and `Virtualizer.createScrollParent` walks up looking for the
+resolves against the nearest scrolling ancestor, and `VirtualizerUtils.createScrollParent` walks up looking for the
 same element, so both land on the consumer's container and stay in step. A consumer wanting horizontal scroll
 puts it on that same box; scrolling both ways in one element is the arrangement everything here is built for.
 
@@ -8081,13 +8300,13 @@ stop. It is recorded in `backlog.md` under _"Accepted limits"_ so it is not redi
 **The engine was already separate from `Sortable`'s paint, so the work was a move rather than an
 extraction.** `SortableStack` and the three drop-index functions knew nothing about JSX,
 `InteractionWrapper` or items; `SortableZone` was a plain interface of getters and three mutators. They now
-live in `Abstracts/Carrier` as `CarrierStack`, `CarrierUtils` and `CarrierZone`, beside `DismisserStack`,
+live in `Abstracts/Carrier` as `Carrier`, `Carrier` and `CarrierZone`, beside `Dismisser`,
 which is the same shape of thing — a module-level registry many components sign up to. The names changed
 with the move because `Sortable*` inside an abstract that `Table` also uses reads as the component's
 private property, and there is no precedent here for an abstract sharing a name with a control.
 `Sortable` keeps its own public types; `SortableDir` is an alias of `CarryDir`.
 
-**One thing genuinely was extracted: `CarrierStack.dragFromPointer`.** The press-move-release loop that
+**One thing genuinely was extracted: `CarrierUtils.dragFromPointer`.** The press-move-release loop that
 waits four pixels before deciding a press is a drag, captures the pointer and feeds `aimAtPoint` was inline
 in `Sortable` and `Table`'s header needed exactly it. `GestureUtils` in `ss-utils` was checked first and
 covers swipes only — progress, direction, offset — so this is not a re-implementation of something that
@@ -8164,7 +8383,7 @@ the library owns only what nobody else can know: how far a step goes and whether
 `getButtonPlacement` is `split`, `start` or `end`, since "together" cannot be placed without saying which side.
 
 **The position is reported as a ratio, and a written ratio scrolls the strip.** `progressSignal` is optional
-and goes through `SignalMirror.createOptional` like every other `*Signal`, and it carries `scrollLeft` divided
+and goes through `SignalMirrorUtils.createOptional` like every other `*Signal`, and it carries `scrollLeft` divided
 by the distance there is to travel — zero when nothing overflows. Reporting it is what the stepper cannot do:
 page dots, a progress bar or a "3 of 12" readout all sit outside `renderButton`, and none of them could reach
 the number. Accepting a write is the other half of the same variable, and it is what makes those dots
@@ -8255,7 +8474,7 @@ which a single list of values is not.
 
 **The index is a two-way signal, and this is the clearest case in the library for it.** A rotating carousel
 writes its own index on a timer with nobody having asked, which no consumer callback can be expected to mirror
-back. `SignalMirror.createOptional` keeps it private until a consumer wants it.
+back. `SignalMirrorUtils.createOptional` keeps it private until a consumer wants it.
 
 **The announcement goes through `LiveAnnouncer` rather than a live region on the track.** The published pattern
 makes the slide container a live region, which works when the slides that are away are removed from the page.
@@ -8878,8 +9097,8 @@ are siblings of the tooltip rather than ancestors of the button, and nothing in 
 page has been covered.
 
 **So the height is published rather than discovered.** A module-level registry holds element-and-z-index
-pairs, the `DismisserStack` shape again: `Elevation.createElevation` registers on an effect and drops the
-entry on cleanup, and `Elevation.getBase(element)` returns the largest registered height whose element
+pairs, the `Dismisser` shape again: `ElevationUtils.createElevation` registers on an effect and drops the
+entry on cleanup, and `ElevationUtils.getBase(element)` returns the largest registered height whose element
 contains the one asked about. `Anchor`'s z-index is now the larger of the DOM walk and the registry, plus one.
 `Spotlight` registers its highlighted element at `SPOTLIGHT_Z_INDEX` while it is open, which is the same
 constant its four layers are styled with — it was a literal `10` written four times and is now one export, so
@@ -9248,7 +9467,7 @@ while the wheel turns by itself, `getIsUserSpinning` while it is fetching a targ
 on it. Both are views of `getPhase`, which remains for anyone wanting the four states apart.
 
 **`createRotator` no longer takes an element.** The hold was its only use for one, so the abstract is now what
-its own heading claimed: a state machine with no DOM whatsoever. `InteractionTracker.trackPageHidden` was split
+its own heading claimed: a state machine with no DOM whatsoever. `InteractionTrackerUtils.trackPageHidden` was split
 out of `trackHold` so the page-visibility half could be used without the pointer and focus halves; `trackHold`
 composes it and is unchanged for `Carousel` and `Toasts`.
 
@@ -9497,15 +9716,14 @@ the edge without the check reading the overhang as a drum painting outside its r
 
 A drum and a carousel are the same picture driven by different arithmetic — a barrel of faces seen through a
 perspective, turned to bring one of them to the front. What differs is where the angle comes from: `Rotator`'s
-spin, overshoot and settle for a wheel, an index and a step for a carousel. So the barrel is now an abstract
-and the angle is its caller's.
+spin, overshoot and settle for a wheel, an index and a step for a carousel. So the barrel is a `Primitive` and
+the angle is its caller's.
 
-**The abstract renders, which most of `Abstracts` does not.** `Rotator`, `Anchor` and `Virtualizer` are state
-with no DOM at all. `Barrel` is four nested elements — a girth box, a perspective box, the barrel itself, and
-one absolutely positioned element per face — and lifting only the arithmetic would have left both consumers
-holding the same markup and the same four class names. The split is drawn where it costs nothing: the abstract
-owns the box, the depth and every face's `transform`; the consumer owns the element around it, what goes inside
-each face, and every word said about them.
+**It renders, which is why it is a `Primitive` and not an `Abstract`.** `Barrel` is four nested elements — a
+girth box, a perspective box, the barrel itself, and one absolutely positioned element per face — and lifting
+only the arithmetic would have left both consumers holding the same markup and the same four class names. The
+split is drawn where it costs nothing: the primitive owns the box, the depth and every face's `transform`; the
+consumer owns the element around it, what goes inside each face, and every word said about them.
 
 **Each face's name and hidden-ness come back through `computeFaceDefs`, because the vocabulary is the
 consumer's.** A wheel's faces are wedges and a carousel's are slides, and the two disagree about what is
@@ -9551,7 +9769,7 @@ front of it. `index` and `count` are enough for a fixed peek distance, and every
 measure is itself — a card cannot reach its neighbour's height, and the flow layout has already positioned
 it using exactly those heights.
 
-**`ElementObserver.createBorderBoxSizeListObserver(refs, enabled)` is the observer for a set rather than one
+**`ElementObserverUtils.createBorderBoxSizeListObserver(refs, enabled)` is the observer for a set rather than one
 element.** It takes an accessor of the element list, publishes a `Size2d` per position in the same order, and
 re-observes when the list changes. Border box, layout pixels, so the name carries the coordinate space like
 its siblings and `Viewport`'s scale never enters. **The caller owns the keying**: `Toasts` holds a ref per
@@ -9576,11 +9794,11 @@ of it and replaces it with a peek and a scale, which lands every card of differi
 **Three components pause while somebody is looking at them, and each had written the test out.** `Toasts`
 stops its countdowns, `Carousel` stops advancing, and a wheel stops turning by itself; all three meant
 `hovered || focus within || page hidden`, and all three carried their own four handlers, their own
-`visibilitychange` effect and their own copy of a `getHasLeft` guard. `InteractionTracker.trackHold(ref)` is now
+`visibilitychange` effect and their own copy of a `getHasLeft` guard. `InteractionTrackerUtils.trackHold(ref)` is now
 the only copy, and the user's call was to convert the two existing components rather than leave them pointing
 at it.
 
-**It sits in `InteractionTracker` rather than in a folder of its own.** `InteractionTracker.wrapElement` already turns an
+**It sits in `InteractionTracker` rather than in a folder of its own.** `InteractionTrackerUtils.wrapElement` already turns an
 element's pointer and keyboard events into state; this is the same job one level out — the region rather than
 the control — and `trackDrag` had already established the `track*` verb for "attach listeners, hand back a
 signal". A folder for one function would have been discoverable only by someone who already knew it existed.
@@ -9735,7 +9953,7 @@ would depend on the container's width — which, when the height is the anchored
 from the measurements. `max-content` breaks the circle by making an item's width its own business, and it
 is the same rule that lets an oversized item overhang.
 
-**Sizes are read with `ElementObserver.createBorderBoxSizeObserver` rather than from a client rect.** A
+**Sizes are read with `ElementObserverUtils.createBorderBoxSizeObserver` rather than from a client rect.** A
 bounding client rect is the transformed size, so inside a `Viewport` it is the layout value times the scale
 factor and the whole mosaic packs against numbers that are wrong by a constant. `ResizeObserver`'s
 `borderBoxSize` is the layout box and no transform touches it.
@@ -10349,7 +10567,7 @@ reach that grows as the pointer approaches without ever overshooting it.
 it was visibly wrong in the way the user reported next: the button stopped short of the edges with no
 explanation, because thirty-four pixels is less than the travel a two-hundred-and-eighty-pixel stage allows a
 button half its width. The cap is now `(stage − button) ÷ 2` per axis, from two
-`ElementObserver.createBorderBoxSizeObserver` calls, and it is clamped per axis rather than along the
+`ElementObserverUtils.createBorderBoxSizeObserver` calls, and it is clamped per axis rather than along the
 direction — so a pointer off one corner slides the button along the edge it has already reached instead of
 stopping in mid-air. Measured flush on all four sides.
 
@@ -10383,7 +10601,7 @@ reporting `0` for the origin.
 never touches it.** The listener has to be on the document, and the lamp grid alone calls `create` twelve
 times, so a listener per consumer would be twelve listeners and twelve `getBoundingClientRect` calls per
 pointer event. Instead the module holds the client point and a subscriber set, `pointermove` marks the frame
-dirty, and one `requestAnimationFrame` recomputes every subscriber — the `DismisserStack` shape, which
+dirty, and one `requestAnimationFrame` recomputes every subscriber — the `Dismisser` shape, which
 attaches on the first consumer and detaches on the last. Scroll and resize mark the same frame dirty, since a
 page moving under a still pointer changes every reading.
 
@@ -10465,7 +10683,7 @@ briefly held: the reduced-motion preference should be reachable from plain JavaS
 it, rather than riding on an abstract that measures something else.
 
 **It is a media query rather than a preference, because the mechanism is the general one.**
-`MediaQueryMonitor.create(query)` returns an accessor of whether the query matches, and
+`MediaQueryMonitorUtils.create(query)` returns an accessor of whether the query matches, and
 `createReducedMotion()` is the one named shortcut over it, so the query string is written once in the library
 and nowhere else. Naming the general thing was the choice over a `ReducedMotionMonitor`: the next preference
 worth reading — forced colours, reduced transparency, a colour scheme — is the same code with a different
@@ -10473,7 +10691,7 @@ string, and a monitor per preference would be a file each.
 
 **One `MediaQueryList` and one listener per distinct query, however many consumers ask.** A module-level map
 keyed by the query string holds the signal and a subscriber count; the first consumer opens the listener and
-the last closes it, the `DismisserStack` shape again. The lamp grid is the case that makes it matter —
+the last closes it, the `Dismisser` shape again. The lamp grid is the case that makes it matter —
 twelve consumers on one page, which as a listener each is what `Rotator` used to do with one wheel and would
 have done badly with twelve. The signal stays in the map after the last consumer leaves, so a page mounting
 the same query again reuses it rather than flickering from a stale `false`.
@@ -10728,7 +10946,7 @@ disagree, which is the shape this avoided rather than discovered.
 **Lists find each other through a module-level registry keyed by a group id, not through a wrapper.** Two
 lists that exchange items routinely have no useful common ancestor — a hand at the foot of the screen and a
 board in the middle, or one of the two inside a `Popover` that is portalled elsewhere — so requiring a shared
-parent element would put a layout constraint on the page for a bookkeeping reason. `DismisserStack` is the
+parent element would put a layout constraint on the page for a bookkeeping reason. `Dismisser` is the
 precedent and the shape is the same: a module array, `onCleanup` removing the entry. **The registry stays in
 the component's own folder rather than under `Abstracts/`**, per the standing rule that a thing is private
 until a second consumer asks for it.
@@ -11208,7 +11426,7 @@ list — the place being aimed at can be one that cannot be taken.
 as an ordinary zone and count its cells row by row, which costs nothing up front and cannot say "does not
 fit" at any price: an index has no room for a footprint, a turn changes which cells the same index covers, and
 every piece of the settled-index arithmetic would need a bypass, leaving an engine shared in name only. Or a
-grid could have its own stack beside `CarrierStack`, which keeps its rules to itself and produces the second
+grid could have its own stack beside `Carrier`, which keeps its rules to itself and produces the second
 state machine the whole of _"why a drag is the least important of its three routes"_ was written to avoid —
 and forecloses a list and a grid ever exchanging an item, since neither registry can see the other. So the
 engine was generalised instead. **The user chose this, with the three set out as they are here.**
@@ -11272,7 +11490,7 @@ its own and therefore defaulted to `flex: 0 1 auto`. Under `fill` the root and t
 full column width and the list stayed at its content width — eight pixels when it holds nothing. The
 consumer sees a wide dashed rectangle and can only drop inside a sliver at its left edge.
 
-**`CarrierStack.findZoneAt` is what made it directional.** It reads `document.elementsFromPoint` and takes
+**`CarrierUtils.findZoneAt` is what made it directional.** It reads `document.elementsFromPoint` and takes
 the first element that is, or sits inside, a registered zone root — and the zone root is the list, not the
 wrapper. So the painted area outside the list belongs to no zone at all: crossing the sliver registers, and
 approaching the same rectangle anywhere else never does.
@@ -11502,10 +11720,10 @@ looping trail is most often seen.
 otherwise be truncated to the end and the trail would lose ground every time the tab was busy; looping takes
 the remainder, and not looping stops at the end and writes `isPlaying` false so the consumer's own button
 reads the truth. The controller is `getPlace`, `getIsPlaying`, `play`, `pause` and `seek`, and both of the
-signals behind it are `SignalMirror.createOptional`, exactly as `Rotator` takes its index and its auto-spin —
+signals behind it are `SignalMirrorUtils.createOptional`, exactly as `Rotator` takes its index and its auto-spin —
 pass nothing and the trail simply runs.
 
-**The loop stops while the page is hidden**, through `InteractionTracker.trackPageHidden`, for the same reason
+**The loop stops while the page is hidden**, through `InteractionTrackerUtils.trackPageHidden`, for the same reason
 `Rotator` does it: frames in a background tab are throttled to something that reads as a stutter when the tab
 comes back.
 
@@ -11532,7 +11750,7 @@ parents. What the two genuinely share is drawing a curve between two points, and
 hands that to the consumer — a seam that is already the consumer's is the sign these are two components.
 
 **Both interactions are carries, and they share one zone.** Moving a box and drawing a cable are the same
-shape of thing — take something, aim it somewhere, drop it or put it back — so both go through `CarrierStack`,
+shape of thing — take something, aim it somewhere, drop it or put it back — so both go through `Carrier`,
 with the carry's value saying which it is and the place being a union of a spot on the board, a socket, and a
 free point for a cable in flight over nothing. Writing a private drag instead would have meant writing the
 keyboard route, the tap route, the cancel and the announcements again: **checked 2.5.7 Dragging Movements** —
@@ -11576,7 +11794,7 @@ element"_, because it is a Solid rule rather than a fact about this component. H
 route being dead: picking a cable up worked, and every arrow press afterwards did nothing, because the socket
 element had been replaced the moment the carry started and focus had fallen to the body.
 
-**`CarrierStack.dragFromPointer` cannot be given a small element.** It listens for the move on the element it
+**`CarrierUtils.dragFromPointer` cannot be given a small element.** It listens for the move on the element it
 is handed and only takes pointer capture once the pointer has travelled the four-pixel slop that means a drag
 — so an element smaller than that journey never sees the move that would start it. A fourteen-pixel socket is
 exactly that element, and dragging from one did nothing at all while dragging a whole box worked. `PatchBoard`
@@ -11635,7 +11853,7 @@ across, the mixing desk stands up with its three sources in a row above the desk
 **The window is the consumer's state and the component only computes against it.** `range` is the whole
 extent, `viewSignal` is the part on screen, and everything the component paints is derived from the pair: a
 span's left and width are its share of the window written as percentages, so a resize needs no code here at
-all and the browser recomputes. The signal is optional through `SignalMirror.createOptional`, so a page that
+all and the browser recomputes. The signal is optional through `SignalMirrorUtils.createOptional`, so a page that
 does not care gets an internal one and a page that wants a readout passes its own — the same arrangement
 `Carousel` and `Trail` already use.
 
@@ -11720,7 +11938,7 @@ a block that stays on screen keeps its element and only the items entering or le
 #### Three things the build found
 
 **A walked-to element is not focusable yet in the update that creates it.** `InteractionWrapper` writes the
-tab stop from `InteractionTracker.wrapElement`'s own effect, and for a block that has just entered the
+tab stop from `InteractionTrackerUtils.wrapElement`'s own effect, and for a block that has just entered the
 window that effect has not run when the walk's effect fires: `focus()` on a `div` with no `tabindex` does
 nothing at all, so pressing `End` blurred the old block and landed on the body. The walk sets `tabIndex` on
 the element itself before focusing it, which is the same value the wrapper writes a moment later. Worth
@@ -11731,7 +11949,7 @@ meet this.
 inside.** Taking pointer capture on `pointerdown` — the obvious way to keep receiving moves once the pointer
 leaves the box — redirects the whole rest of the gesture, `click` included, to the capturing element: the
 first Playground version panned correctly and no block could ever be pressed. The settlement is that capture
-is taken **only once the pointer has travelled four pixels**, the same slop `CarrierStack` uses. A press that
+is taken **only once the pointer has travelled four pixels**, the same slop `Carrier` uses. A press that
 stays put never captures, so its click reaches the block; a drag captures, and its click is then delivered to
 the root instead, which is exactly the behaviour wanted and costs no flag to suppress. This is one rule, it
 is subtle, and it is the strongest argument for the component owning the gesture rather than each consumer
@@ -11771,10 +11989,10 @@ A block cannot be dragged along time, stretched at either end or moved between l
 what it is given and never writes back. There is no snapping, no marker for a current position, no second
 row of ticks at a coarser step, and no vertical arrangement — every measurement in it reads one axis, the
 same limit `Scroller` and `SlideButton` record. None of these is an accepted limit; they are simply not
-built, and the shape that would carry the first three is one carry through `CarrierStack`, the way
+built, and the shape that would carry the first three is one carry through `Carrier`, the way
 `PatchBoard` moves a node.
 
-### `JSXTextParser`: an inherited style is weighed against where the text lands, not against its own parent
+### `JSXTextParserUtils`: an inherited style is weighed against where the text lands, not against its own parent
 
 `getSegmentTokens` reads the computed style off each piece of text and copies it onto the run it emits, and it
 leaves out the properties CSS inherits on the grounds that the copy will pick them up for free. That reasoning

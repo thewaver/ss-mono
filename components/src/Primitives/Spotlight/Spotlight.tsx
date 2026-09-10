@@ -4,15 +4,15 @@ import { Portal } from "solid-js/web";
 
 import { Rect } from "@thewaver/ss-utils";
 
-import { Anchor } from "../../Abstracts/Anchor/Anchor";
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
+import { AnchorUtils } from "../../Abstracts/Anchor/Anchor.utils";
 import { CutoutUtils } from "../../Abstracts/Cutout/Cutout.utils";
-import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
-import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
-import { Elevation } from "../../Abstracts/Elevation/Elevation";
-import { FocusManager } from "../../Abstracts/FocusManager/FocusManager";
-import { LiveAnnouncer } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer";
-import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
+import { ElementFaderUtils } from "../../Abstracts/ElementFader/ElementFader.utils";
+import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
+import { ElevationUtils } from "../../Abstracts/Elevation/Elevation.utils";
+import { FocusManagerUtils } from "../../Abstracts/FocusManager/FocusManager.utils";
+import { LiveAnnouncerUtils } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer.utils";
+import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
 import type { SpotlightProps } from "./Spotlight.types";
 import { SpotlightUtils } from "./Spotlight.utils";
@@ -41,7 +41,7 @@ export const Spotlight = (props: SpotlightProps) => {
 
     const getPadding = createMemo(() => access(props.padding) ?? DEFAULT_SPOTLIGHT_PADDING);
 
-    const { getIsVisible, getTransitionTarget } = ElementFader.createFader(() => props.visibilitySignal[0](), {
+    const { getIsVisible, getTransitionTarget } = ElementFaderUtils.createFader(() => props.visibilitySignal[0](), {
         getTransitionDurationMs,
         onShow: props.onShow,
         onHide: props.onHide,
@@ -49,12 +49,12 @@ export const Spotlight = (props: SpotlightProps) => {
 
     const getHasPopup = createMemo(() => access(props.mode) === "guide" && props.renderPopup !== undefined);
 
-    ElementObserver.createViewportRectObserver(() => access(props.elementRef), getIsVisible, {
+    ElementObserverUtils.createViewportRectObserver(() => access(props.elementRef), getIsVisible, {
         setElementRect,
         getPadding,
     });
 
-    Elevation.createElevation(
+    ElevationUtils.createElevation(
         () => access(props.elementRef),
         getIsVisible,
         () => styles.SPOTLIGHT_Z_INDEX,
@@ -68,7 +68,7 @@ export const Spotlight = (props: SpotlightProps) => {
         element.scrollIntoView({ block: "nearest", inline: "nearest" });
     });
 
-    const { getPlacement, getPosition, setContentRef } = Anchor.createPortalPosition(
+    const { getPlacement, getPosition, setContentRef } = AnchorUtils.createPortalPosition(
         () => access(props.elementRef),
         () => getIsVisible() && getHasPopup(),
         {
@@ -172,7 +172,7 @@ export const Spotlight = (props: SpotlightProps) => {
     onMount(() => {
         if (props.announcement === undefined) return;
 
-        LiveAnnouncer.reserve("polite");
+        LiveAnnouncerUtils.reserve("polite");
     });
 
     createEffect<string | undefined>((previous) => {
@@ -180,7 +180,7 @@ export const Spotlight = (props: SpotlightProps) => {
 
         if (!getIsVisible()) return previous;
         if (previous !== undefined && announcement !== undefined && announcement !== previous) {
-            LiveAnnouncer.announce(announcement);
+            LiveAnnouncerUtils.announce(announcement);
         }
 
         return announcement;
@@ -198,7 +198,7 @@ export const Spotlight = (props: SpotlightProps) => {
         if (getPosition()) setHasPlaced(true);
     });
 
-    FocusManager.autoFocus(getPopupRef, getHasPlaced);
+    FocusManagerUtils.autoFocus(getPopupRef, getHasPlaced);
 
     return (
         <Show when={getIsVisible() && getElementRect()}>
@@ -244,7 +244,7 @@ export const Spotlight = (props: SpotlightProps) => {
                         role="dialog"
                         aria-modal="true"
                         aria-label={access(props.ariaLabel)}
-                        onKeyDown={(e) => FocusManager.focusTrapKeyDown(e, getPopupRef())}
+                        onKeyDown={(e) => FocusManagerUtils.focusTrapKeyDown(e, getPopupRef())}
                     >
                         {props.renderPopup?.(getTransitionTarget, getTransitionDurationMs, getPlacement)}
                     </div>

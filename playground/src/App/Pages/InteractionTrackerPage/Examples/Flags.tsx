@@ -1,6 +1,6 @@
 import { For, createEffect, createSignal } from "solid-js";
 
-import { InteractionTracker } from "@thewaver/ss-components";
+import { InteractionTrackerUtils } from "@thewaver/ss-components";
 
 import type { InteractionFlagsExampleProps } from "../InteractionTrackerPage.types";
 
@@ -13,7 +13,7 @@ type Props = InteractionFlagsExampleProps;
 export const FlagsExample = (props: Props) => {
     const [getRef, setRef] = createSignal<HTMLElement>();
 
-    const { getFlags } = InteractionTracker.wrapElement(getRef, props.isDisabled, {
+    const { getFlags } = InteractionTrackerUtils.wrapElement(getRef, props.isDisabled, {
         applyButtonSemantics: true,
         getIsReachable: props.isReachable,
     });

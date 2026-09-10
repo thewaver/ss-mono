@@ -2,12 +2,29 @@ import { Point2d } from "../../Abstracts/point2d.js";
 import { PolygonUtils } from "../../Abstracts/polygon.js";
 import { Size2d } from "../../Abstracts/size.js";
 
+const CIRCLE_CENTER = { x: 0.5, y: 0.5 };
+const CIRCLE_RADIUS = 1;
+
+/**
+ * Builds a pie-slice path covering part of a circle.
+ *
+ * The slice is drawn around a fixed unit circle, so scale it with a `viewBox` or a
+ * transform rather than by passing a size.
+ *
+ * @param arcSize How much of the circle to cover, in degrees. Values beyond a full
+ * turn wrap round; any positive whole number of turns draws a complete circle
+ * rather than collapsing to nothing.
+ * @param rotation Where the slice starts, in degrees.
+ * @returns Path text for an SVG `d` attribute.
+ */
+
 export namespace SVGUtils {
     /**
      * Formats points for an SVG `points` attribute, as in `"0,0 10,0 10,10"`.
      *
      * @param points The corners, in order.
      */
+
     export const pointArrayToString = (points: Point2d[]) => PolygonUtils.pointsToSVGString(points);
 
     /**
@@ -24,6 +41,7 @@ export namespace SVGUtils {
      * @param offset Shifts the gradient's centre away from the middle.
      * @returns The `x1`, `y1`, `x2` and `y2` for the gradient element.
      */
+
     export const getLinearCoords = ({
         angle = 0,
         scale = { width: 1, height: 1 },
@@ -68,6 +86,7 @@ export namespace SVGUtils {
      * @returns Transform text for a `gradientTransform` attribute, or `undefined` when the
      * arguments describe an untransformed circle and the attribute should be left off.
      */
+
     export const getRadialTransform = ({
         origin = { x: 0.5, y: 0.5 },
         aspect = { width: 1, height: 1 },
@@ -85,21 +104,6 @@ export namespace SVGUtils {
         );
     };
 
-    const CIRCLE_CENTER = { x: 0.5, y: 0.5 };
-    const CIRCLE_RADIUS = 1;
-
-    /**
-     * Builds a pie-slice path covering part of a circle.
-     *
-     * The slice is drawn around a fixed unit circle, so scale it with a `viewBox` or a
-     * transform rather than by passing a size.
-     *
-     * @param arcSize How much of the circle to cover, in degrees. Values beyond a full
-     * turn wrap round; any positive whole number of turns draws a complete circle
-     * rather than collapsing to nothing.
-     * @param rotation Where the slice starts, in degrees.
-     * @returns Path text for an SVG `d` attribute.
-     */
     export const getArcPath = (arcSize: number, rotation: number = 0) => {
         const normalizedArcSize = ((arcSize % 360) + 360) % 360;
         const leadingAngle = rotation + normalizedArcSize;
@@ -149,6 +153,7 @@ export namespace SVGUtils {
      * straight.
      * @returns Path text for an SVG `d` attribute holding every blade.
      */
+
     export const getWedgesPath = (
         count: number,
         thickness: number = 0.5, // 0 - 1

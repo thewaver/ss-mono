@@ -4,7 +4,7 @@ import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
 
 import { A, Route, type RouteSectionProps, Router } from "@solidjs/router";
-import { Checkbox, Collapsible, Label, Tree, Viewport } from "@thewaver/ss-components";
+import { Checkbox, Collapsible, Label, Tree, ViewportWrapper } from "@thewaver/ss-components";
 import type { SignalPair, TreeNode } from "@thewaver/ss-components";
 import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
 
@@ -98,7 +98,7 @@ import { TooltipPage } from "./Pages/TooltipPage/TooltipPage";
 import { TrailPage } from "./Pages/TrailPage/TrailPage";
 import { TreePage } from "./Pages/TreePage/TreePage";
 import { TypewriterPage } from "./Pages/TypewriterPage/TypewriterPage";
-import { ViewportPage } from "./Pages/ViewportPage/ViewportPage";
+import { ViewportWrapperPage } from "./Pages/ViewportWrapperPage/ViewportWrapperPage";
 import { VirtualizerPage } from "./Pages/VirtualizerPage/VirtualizerPage";
 import { DrumWheelPage } from "./Pages/Wheels/DrumWheelPage/DrumWheelPage";
 import { OverheadWheelPage } from "./Pages/Wheels/OverheadWheelPage/OverheadWheelPage";
@@ -141,11 +141,6 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 name: "Anchor",
                 description:
                     "Where a floating layer goes, as two independent choices — one across, one down — and a fallback that may only pick another candidate from its own family, so a list asked to sit to the right of a field can end up on its left but never above it. It also asks Elevation what the anchor is inside, which is what keeps a popup opened from within a raised layer in front of that layer rather than behind it.",
-            },
-            {
-                name: "Barrel",
-                description:
-                    "A ring of faces turned to whatever angle it is handed: two of them are a card with a front and a back, twenty are the side of a drum. It owns the geometry and nothing else — every face is the same size, each one is told whether it is turned away so a screen reader is never read the back of a card nobody can see, and what moves the angle belongs to whatever is using it.",
             },
             {
                 name: "Carrier",
@@ -313,6 +308,11 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 name: "Typeahead",
                 description:
                     "Type a few letters and land on the row that starts with them. The buffer is what makes it more than one keystroke: characters typed close together accumulate, the same character pressed again and again steps through the matches rather than hunting for a doubled letter, and the buffer empties itself after a pause. What it matches against is read off the rendered row, so a consumer painting their own row gets it without saying anything.",
+            },
+            {
+                name: "Viewport",
+                description:
+                    "What box a thing is painted into: how big it is, how it is scaled, where a floating layer should portal to, and where it sits on the page. With no wrapper anywhere it answers for the window, which is why anchoring and measuring work the same whether or not anything has scaled the page. Viewports nest, and the scales multiply.",
             },
             {
                 name: "Virtualizer",
@@ -710,6 +710,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                     "A disclosure tree with one keyboard walk over the rows that are actually visible. A node's children sit in a group box beside the node rather than inside it, which is what the role requires.",
                 component: () => <TreePage />,
             },
+            {
+                name: "ViewportWrapper",
+                description:
+                    "Scales everything inside it to one design size. It is terminal: anything measured, anchored or portalled within it works in the viewport's coordinates rather than the window's, and wrappers nest — an inner one composes its scale with the outer one's.",
+                component: () => <ViewportWrapperPage />,
+            },
         ],
     },
     {
@@ -868,12 +874,6 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 description:
                     "Reveals text one character at a time without flattening it first, so a bold run or a nested element still animates in place.",
                 component: () => <TypewriterPage />,
-            },
-            {
-                name: "Viewport",
-                description:
-                    "Scales everything inside it to one design size. It is terminal: anything measured, anchored or portalled within it works in the viewport's coordinates rather than the window's.",
-                component: () => <ViewportPage />,
             },
             {
                 name: "Wheels",
@@ -1258,9 +1258,9 @@ export function App() {
                 <Route
                     path="/"
                     component={(props: RouteSectionProps) => (
-                        <Viewport size={getViewportSize}>
+                        <ViewportWrapper size={getViewportSize}>
                             <AppContent {...props} />
-                        </Viewport>
+                        </ViewportWrapper>
                     )}
                 >
                     <Route path="/" component={EmptyPage} />

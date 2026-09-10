@@ -2,7 +2,35 @@ import { Size2d } from "../../../../Abstracts/size.js";
 import { StringUtils } from "../../../../Abstracts/string.js";
 import type { TextMetricValue, TextMetricsStyle } from "./JSXTextMetrics.types.js";
 
-export namespace JSXTextMetrics {
+let measureContext: CanvasRenderingContext2D | null | undefined;
+const getMeasureContext = () => {
+    if (measureContext === undefined) {
+        measureContext =
+            typeof document === "undefined"
+                ? null
+                : document.createElement("canvas").getContext("2d", { willReadFrequently: false });
+    }
+
+    return measureContext;
+};
+
+/**
+ * Measures how wide each string would be when drawn with the given styles.
+ *
+ * Measures off-screen on a canvas, so nothing is added to the page and no layout is
+ * triggered. Letter spacing is added on top of the raw measurement, since canvas
+ * ignores it; word spacing is added for whitespace runs only.
+ *
+ * Any `text-transform` in the styles is applied before measuring, so pass the
+ * untransformed text — transforming it yourself first is harmless but pointless.
+ *
+ * @param texts The strings to measure.
+ * @param metrics The font styles to measure against.
+ * @returns One width in pixels per string, in the same order. Returns all zeroes
+ * when there is no document to measure in, such as during server-side rendering.
+ */
+
+export namespace JSXTextMetricsUtils {
     /**
      * Reads a CSS length such as `"16px"` as a plain number.
      *
@@ -11,6 +39,7 @@ export namespace JSXTextMetrics {
      * @returns The number, or `fallback`. The unit is ignored, so `"16px"` and `"16em"`
      * both read as `16` — only pass values already resolved to pixels.
      */
+
     export const parseTextMetric = (value: TextMetricValue | undefined, fallback: number = 0) => {
         if (!value) return fallback;
 
@@ -28,34 +57,7 @@ export namespace JSXTextMetrics {
      * make the whole package throw on import under Node, during server-side rendering,
      * and in any test runner without a DOM.
      */
-    let measureContext: CanvasRenderingContext2D | null | undefined;
 
-    const getMeasureContext = () => {
-        if (measureContext === undefined) {
-            measureContext =
-                typeof document === "undefined"
-                    ? null
-                    : document.createElement("canvas").getContext("2d", { willReadFrequently: false });
-        }
-
-        return measureContext;
-    };
-
-    /**
-     * Measures how wide each string would be when drawn with the given styles.
-     *
-     * Measures off-screen on a canvas, so nothing is added to the page and no layout is
-     * triggered. Letter spacing is added on top of the raw measurement, since canvas
-     * ignores it; word spacing is added for whitespace runs only.
-     *
-     * Any `text-transform` in the styles is applied before measuring, so pass the
-     * untransformed text — transforming it yourself first is harmless but pointless.
-     *
-     * @param texts The strings to measure.
-     * @param metrics The font styles to measure against.
-     * @returns One width in pixels per string, in the same order. Returns all zeroes
-     * when there is no document to measure in, such as during server-side rendering.
-     */
     export const measureTextWidths = (texts: string[], metrics: TextMetricsStyle): number[] => {
         const ctx = getMeasureContext();
 
@@ -104,6 +106,7 @@ export namespace JSXTextMetrics {
      * `font-size` cannot be read. Empty lines contribute `0` rather than poisoning the
      * result.
      */
+
     export const getNormalizedFontSizes = (
         texts: string[],
         metrics: TextMetricsStyle,

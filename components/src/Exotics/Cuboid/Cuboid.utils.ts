@@ -1,7 +1,7 @@
 import type { Size2d } from "@thewaver/ss-utils";
 import { MathUtils } from "@thewaver/ss-utils";
 
-import { BarrelUtils } from "../../Abstracts/Barrel/Barrel.utils";
+import { BarrelUtils } from "../../Primitives/Barrel/Barrel.utils";
 import type { CuboidFace, CuboidSize } from "./Cuboid.types";
 
 const QUARTER_TURN_DEG = 90;

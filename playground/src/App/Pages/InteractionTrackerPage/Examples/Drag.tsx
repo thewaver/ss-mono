@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 
-import { InteractionTracker } from "@thewaver/ss-components";
+import { InteractionTrackerUtils } from "@thewaver/ss-components";
 
 import type { InteractionDragExampleProps } from "../InteractionTrackerPage.types";
 
@@ -15,7 +15,7 @@ export const DragExample = (props: Props) => {
     const [getRef, setRef] = createSignal<HTMLElement>();
     const [getRatio, setRatio] = createSignal({ x: CENTRE_RATIO, y: CENTRE_RATIO });
 
-    InteractionTracker.trackDrag(getRef, props.isDisabled, {
+    InteractionTrackerUtils.trackDrag(getRef, props.isDisabled, {
         onDrag: (ratio) => {
             setRatio(ratio);
             props.onDrag(ratio);

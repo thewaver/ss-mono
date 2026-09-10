@@ -1,6 +1,6 @@
 import { For, createMemo, createSignal, onCleanup } from "solid-js";
 
-import { InteractionTracker } from "@thewaver/ss-components";
+import { InteractionTrackerUtils } from "@thewaver/ss-components";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import type { InteractionSwipeExampleProps } from "../InteractionTrackerPage.types";
@@ -40,7 +40,7 @@ export const CardStackExample = (props: Props) => {
 
     const getRemaining = createMemo(() => CARDS.slice(getGoneCount()));
 
-    InteractionTracker.trackSwipe(getRef, props.isDisabled, {
+    InteractionTrackerUtils.trackSwipe(getRef, props.isDisabled, {
         getAxis: () => "horizontal",
         getCommitRatio: props.commitRatio,
         onSwipe: (progressRatio) => {

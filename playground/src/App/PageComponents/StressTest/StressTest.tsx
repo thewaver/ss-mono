@@ -1,6 +1,6 @@
 import { For, createMemo, createSignal } from "solid-js";
 
-import { Button, FrameRateMonitor, Modal, access } from "@thewaver/ss-components";
+import { Button, FrameRateMonitorUtils, Modal, access } from "@thewaver/ss-components";
 import { CSSUtils } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
@@ -28,7 +28,7 @@ export const StressTest = (props: StressTestProps) => {
         return !(isOpen && isStable);
     });
 
-    const { getFrameRate } = FrameRateMonitor.create(getIsMonitoringDisabled);
+    const { getFrameRate } = FrameRateMonitorUtils.create(getIsMonitoringDisabled);
 
     return (
         <>

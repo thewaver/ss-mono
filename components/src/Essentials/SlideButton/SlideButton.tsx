@@ -1,7 +1,7 @@
 import { createMemo, createRenderEffect, createSignal, onCleanup } from "solid-js";
 
-import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
-import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
+import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
+import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
 import { FormFieldUtils } from "../Input/FormField/FormField.utils";
@@ -80,7 +80,7 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
         step();
     };
 
-    const { getIsDragging } = InteractionTracker.trackDrag(getTrackRef, getIsDisabled, {
+    const { getIsDragging } = InteractionTrackerUtils.trackDrag(getTrackRef, getIsDisabled, {
         onDrag: (ratio) => {
             const thumbRatio = getThumbRatio();
             const press = getPress();
@@ -192,7 +192,10 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
 };
 
 export const SlideButton = (props: SlideButtonProps) => {
-    const [getProgressRatio, setProgressRatio] = SignalMirror.createOptional(() => props.progressSignal, RATIO_MIN);
+    const [getProgressRatio, setProgressRatio] = SignalMirrorUtils.createOptional(
+        () => props.progressSignal,
+        RATIO_MIN,
+    );
     const [getIsDragging, setIsDragging] = createSignal(false);
     const [getIsHolding, setIsHolding] = createSignal(false);
 

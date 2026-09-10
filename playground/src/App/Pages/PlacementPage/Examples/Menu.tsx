@@ -37,6 +37,7 @@ export const MenuExample = (props: PlacementExampleProps) => {
             </svg>
 
             <WheelMenu
+                layoutSize={"368px"}
                 items={() => ACTIONS}
                 ariaLabel={"File actions"}
                 layoutDefs={props.getLayoutDefs()}

@@ -4,8 +4,8 @@ import type { JSX } from "solid-js";
 import { MathUtils, type Point2d, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
 
 import { CutoutUtils } from "../../../Abstracts/Cutout/Cutout.utils";
-import { ElementObserver } from "../../../Abstracts/ElementObserver/ElementObserver";
-import { PointerTracker } from "../../../Abstracts/PointerTracker/PointerTracker";
+import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
+import { PointerTrackerUtils } from "../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { access } from "../../../Utils/propUtils";
 import type { RevealProps } from "./Reveal.types";
 
@@ -46,9 +46,9 @@ export const Reveal = (props: RevealProps) => {
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) === true);
 
-    const { getReading, getIsPointerPresent } = PointerTracker.create(getRootRef, getIsDisabled);
+    const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRootRef, getIsDisabled);
 
-    const getSize = ElementObserver.createBorderBoxSizeObserver(getRootRef, () => !getIsDisabled());
+    const getSize = ElementObserverUtils.createBorderBoxSizeObserver(getRootRef, () => !getIsDisabled());
 
     const getRadius = createMemo(() => access(props.radius) ?? DEFAULT_REVEAL_RADIUS);
 

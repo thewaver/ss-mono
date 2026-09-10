@@ -33,7 +33,7 @@ const parkRoamer = async (page: Page, x: string, y: string) => {
 };
 
 test.beforeEach(async ({ page }) => {
-    await page.goto("/viewport");
+    await page.goto("/viewport-wrapper");
     await expect(page.locator("[data-variant]").first()).toBeVisible();
 });
 

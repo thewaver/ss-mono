@@ -3,8 +3,8 @@ import { Dynamic } from "solid-js/web";
 
 import { MathUtils } from "@thewaver/ss-utils";
 
-import { ElementFader } from "../../../Abstracts/ElementFader/ElementFader";
-import { ElementObserver } from "../../../Abstracts/ElementObserver/ElementObserver";
+import { ElementFaderUtils } from "../../../Abstracts/ElementFader/ElementFader.utils";
+import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import type {
@@ -68,9 +68,9 @@ export const Collapsible = (props: CollapsibleProps) => {
         false,
     );
 
-    const getContentHeight = ElementObserver.createBorderBoxHeightObserver(getContentRef, getHasPanelContent);
+    const getContentHeight = ElementObserverUtils.createBorderBoxHeightObserver(getContentRef, getHasPanelContent);
 
-    const { getTransitionTarget, getHasTransitionFinished } = ElementFader.createFader(getIsExpanded, {
+    const { getTransitionTarget, getHasTransitionFinished } = ElementFaderUtils.createFader(getIsExpanded, {
         getTransitionDurationMs,
     });
 

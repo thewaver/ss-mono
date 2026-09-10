@@ -7,28 +7,51 @@ import type {
 import type { CellAnimationBreakpoints } from "../../CellAnimation/Breakpoints/CellAnimationBreakpoints.const";
 import { CellAnimationWeightUtils } from "../../CellAnimation/Weights/CellAnimationWeights.utils";
 
+const peak = (a: number, b: number, x: number) => {
+    const mid = (a + b) * 0.5;
+
+    if (x < a || x > b) return 0;
+    if (x <= mid) return (x - a) / (mid - a);
+    return (b - x) / (b - mid);
+};
+const ramp = (a: number, b: number, x: number) => {
+    if (x <= a) return 0;
+    if (x >= b) return 1;
+
+    return (x - a) / (b - a);
+};
+const DEFAULT_HORIZONTAL_SNAKE_OPTS: Required<ScanlineAnimationKeyframes.HorizontalSnakeOpts> = {
+    shiftPercent: 5,
+};
+const DEFAULT_HORIZONTAL_SPLIT_OPTS: Required<ScanlineAnimationKeyframes.HorizontalSplitOpts> = {
+    shiftPercent: 10,
+};
+const DEFAULT_HORIZONTAL_STRETCH_OPTS: Required<ScanlineAnimationKeyframes.HorizontalStretchOpts> = {
+    peakScalePercent: 150,
+};
+const DEFAULT_HORIZONTAL_WAVE_OPTS: Required<ScanlineAnimationKeyframes._HorizontalWaveOpts> = {
+    shiftPercent: 8,
+    waveCount: 3,
+};
+const DEFAULT_HORIZONTAL_ROLL_OPTS: Required<ScanlineAnimationKeyframes._HorizontalRollOpts> = {
+    shiftPercent: 100,
+    seamBrightnessPercent: 40,
+};
+const DEFAULT_HORIZONTAL_DROPOUT_OPTS: Required<ScanlineAnimationKeyframes._HorizontalDropoutOpts> = {
+    dropChance: 0.3,
+    shiftPercent: 15,
+};
+const DEFAULT_HORIZONTAL_INTERLACE_OPTS: Required<ScanlineAnimationKeyframes._HorizontalInterlaceOpts> = {
+    dipPercent: 40,
+    fieldCount: 8,
+};
+const DEFAULT_HORIZONTAL_SKEW_OPTS: Required<ScanlineAnimationKeyframes._HorizontalSkewOpts> = {
+    skewDegrees: 20,
+};
+
 export namespace ScanlineAnimationKeyframes {
-    const peak = (a: number, b: number, x: number) => {
-        const mid = (a + b) * 0.5;
-
-        if (x < a || x > b) return 0;
-        if (x <= mid) return (x - a) / (mid - a);
-        return (b - x) / (b - mid);
-    };
-
-    const ramp = (a: number, b: number, x: number) => {
-        if (x <= a) return 0;
-        if (x >= b) return 1;
-
-        return (x - a) / (b - a);
-    };
-
     export type HorizontalSnakeOpts = {
         shiftPercent?: number;
-    };
-
-    const DEFAULT_HORIZONTAL_SNAKE_OPTS: Required<HorizontalSnakeOpts> = {
-        shiftPercent: 5,
     };
 
     export const computeHorizontalSnake = (
@@ -47,10 +70,6 @@ export namespace ScanlineAnimationKeyframes {
         shiftPercent?: number;
     };
 
-    const DEFAULT_HORIZONTAL_SPLIT_OPTS: Required<HorizontalSplitOpts> = {
-        shiftPercent: 10,
-    };
-
     export const computeHorizontalSplit = (
         [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
         defs: ScanlineAnimationEvaluationDefs,
@@ -66,10 +85,6 @@ export namespace ScanlineAnimationKeyframes {
 
     export type HorizontalStretchOpts = {
         peakScalePercent?: number;
-    };
-
-    const DEFAULT_HORIZONTAL_STRETCH_OPTS: Required<HorizontalStretchOpts> = {
-        peakScalePercent: 150,
     };
 
     export const computeHorizontalStretch = (
@@ -128,11 +143,6 @@ export namespace ScanlineAnimationKeyframes {
         waveCount?: number;
     };
 
-    const DEFAULT_HORIZONTAL_WAVE_OPTS: Required<_HorizontalWaveOpts> = {
-        shiftPercent: 8,
-        waveCount: 3,
-    };
-
     export const _computeHorizontalWave = (
         [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
         defs: ScanlineAnimationEvaluationDefs,
@@ -149,11 +159,6 @@ export namespace ScanlineAnimationKeyframes {
     export type _HorizontalRollOpts = {
         shiftPercent?: number;
         seamBrightnessPercent?: number;
-    };
-
-    const DEFAULT_HORIZONTAL_ROLL_OPTS: Required<_HorizontalRollOpts> = {
-        shiftPercent: 100,
-        seamBrightnessPercent: 40,
     };
 
     export const _computeHorizontalRoll = (
@@ -173,11 +178,6 @@ export namespace ScanlineAnimationKeyframes {
     export type _HorizontalDropoutOpts = {
         dropChance?: number;
         shiftPercent?: number;
-    };
-
-    const DEFAULT_HORIZONTAL_DROPOUT_OPTS: Required<_HorizontalDropoutOpts> = {
-        dropChance: 0.3,
-        shiftPercent: 15,
     };
 
     export const _computeHorizontalDropout = (
@@ -204,11 +204,6 @@ export namespace ScanlineAnimationKeyframes {
         fieldCount?: number;
     };
 
-    const DEFAULT_HORIZONTAL_INTERLACE_OPTS: Required<_HorizontalInterlaceOpts> = {
-        dipPercent: 40,
-        fieldCount: 8,
-    };
-
     export const _computeHorizontalInterlace = (
         [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
         defs: ScanlineAnimationEvaluationDefs,
@@ -225,10 +220,6 @@ export namespace ScanlineAnimationKeyframes {
 
     export type _HorizontalSkewOpts = {
         skewDegrees?: number;
-    };
-
-    const DEFAULT_HORIZONTAL_SKEW_OPTS: Required<_HorizontalSkewOpts> = {
-        skewDegrees: 20,
     };
 
     export const _computeHorizontalSkew = (

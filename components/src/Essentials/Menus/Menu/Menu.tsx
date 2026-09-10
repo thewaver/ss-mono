@@ -4,20 +4,20 @@ import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueI
 import { Point2d, Rect } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
-import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
+import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import type { NavigatorOrientation } from "../../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
-import { PlacementBox, PlacementItem } from "../../../Abstracts/Placement/Placement";
 import { PlacementUtils } from "../../../Abstracts/Placement/Placement.utils";
-import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
-import { Typeahead } from "../../../Abstracts/Typeahead/Typeahead";
+import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
 import { TypeaheadUtils } from "../../../Abstracts/Typeahead/Typeahead.utils";
-import { useViewportContext } from "../../../Exotics/Viewport/Viewport.context";
-import { ViewportUtils } from "../../../Exotics/Viewport/Viewport.utils";
+import { useViewportContext } from "../../../Abstracts/Viewport/Viewport.context";
+import { ViewportUtils } from "../../../Abstracts/Viewport/Viewport.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
+import { PlacementBox } from "../../../Primitives/PlacementBox/PlacementBox";
+import { PlacementItem } from "../../../Primitives/PlacementItem/PlacementItem";
+import { Popover } from "../../../Primitives/Popover/Popover";
 import { access } from "../../../Utils/propUtils";
 import { LabelUtils } from "../../Input/Label/Label.utils";
-import { Popover } from "../../Popover/Popover";
 import type {
     ContextMenuProps,
     MenuHighlightPosition,
@@ -39,7 +39,9 @@ const EMPTY_CHECKED: never[] = [];
 const DEFAULT_SUBMENU_PLACEMENT: AnchorPlacement = { x: "right-out", y: "top-in" };
 const ROOT_LEVEL = 0;
 const ROOT_PATH: number[] = [];
-const NO_PARENT_WIDTH = 0;
+const NO_PARENT_EXTENT = 0;
+const BOX_CENTRE = 0.5;
+const FULL_PERCENT = 100;
 const SAME_POINT_PX = 1;
 const DEFAULT_SUBMENU_MODE: MenuSubmenuMode = "cascade";
 const DEFAULT_SUBMENU_TRIGGER: MenuSubmenuTrigger = "hover";
@@ -156,7 +158,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     const [getOpenValue, setOpenValue] = createSignal<T | undefined>();
     const [getLayoutRootRef, setLayoutRootRef] = createSignal<HTMLElement>();
 
-    const typeahead = Typeahead.createBuffer();
+    const typeahead = TypeaheadUtils.createBuffer();
 
     const getHasBackEntry = () => access(props.submenuMode) === "replace" && access(props.openerItem) !== undefined;
 
@@ -170,7 +172,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 
     const getNavigableIndexes = createMemo(() =>
         getEntries().reduce<number[]>((acc, item, index) => {
-            const isReachable = InteractionTracker.computeIsReachable(
+            const isReachable = InteractionTrackerUtils.computeIsReachable(
                 item.isDisabled ?? false,
                 item.isReachableWhenDisabled ?? false,
                 item.tooltipDefs !== undefined,
@@ -220,12 +222,36 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         props.computeLayout?.({
             itemCount: getEntries().length,
             path: access(props.path),
-            parentWidth: access(props.parentWidth),
+            parentExtent: access(props.parentExtent),
             parentPlacement: access(props.parentPlacement),
         }),
     );
 
     const getIsLaidOut = () => getLayout() !== undefined;
+
+    const getRootExtent = () => access(props.rootExtent) || (getLayout()?.extent ?? NO_PARENT_EXTENT);
+
+    const getLayoutShift = () => {
+        const layout = getLayout();
+
+        if (layout === undefined) return undefined;
+
+        const origin = layout.origin ?? { x: BOX_CENTRE, y: BOX_CENTRE * layout.heightRatio };
+        const across = (BOX_CENTRE - origin.x) * FULL_PERCENT;
+        const down = ((BOX_CENTRE * layout.heightRatio - origin.y) / layout.heightRatio) * FULL_PERCENT;
+
+        return `translate(${across}%, ${down}%)`;
+    };
+
+    const getLayoutWidth = () => {
+        const size = access(props.layoutSize);
+        const extent = getLayout()?.extent;
+        const rootExtent = getRootExtent();
+
+        if (size === undefined || extent === undefined || !rootExtent) return undefined;
+
+        return `calc(${size} * ${extent / rootExtent})`;
+    };
 
     const getIsCovered = () => access(props.submenuMode) === "replace" && getOpenValue() !== undefined;
 
@@ -482,7 +508,9 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                                 items={() => getItem().items!}
                                 isOpen={getIsSubmenuOpen}
                                 path={() => [...access(props.path), index]}
-                                parentWidth={() => getLayout()?.width ?? NO_PARENT_WIDTH}
+                                parentExtent={() => getLayout()?.extent ?? NO_PARENT_EXTENT}
+                                rootExtent={() => getRootExtent()}
+                                layoutSize={props.layoutSize}
                                 parentPlacement={getRect}
                                 anchorRef={getIsLaidOut() ? props.anchorRef : getItemRef}
                                 anchorRect={getIsLaidOut() ? props.anchorRect : undefined}
@@ -556,9 +584,11 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     const renderItems = () => (
         <Show when={getLayout()} fallback={renderRuns()}>
             {(getResolved) => (
-                <PlacementBox layout={getResolved} ref={setLayoutRootRef}>
-                    {renderRuns()}
-                </PlacementBox>
+                <div style={{ width: getLayoutWidth(), transform: getLayoutShift() }}>
+                    <PlacementBox layout={getResolved} ref={setLayoutRootRef}>
+                        {renderRuns()}
+                    </PlacementBox>
+                </div>
             )}
         </Show>
     );
@@ -600,7 +630,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
     const getPointerPoint = createPointerPointReader();
 
     const [getTriggerRef, setTriggerRef] = createSignal<HTMLElement>();
-    const [getIsOpen, setIsOpen] = SignalMirror.createOptional(() => props.visibilitySignal, false);
+    const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
     const [getInitialHighlightPosition, setInitialHighlightPosition] = createSignal<MenuHighlightPosition>("first");
     const [getFlickOrigin, setFlickOrigin] = createSignal<Point2d | undefined>();
 
@@ -717,7 +747,9 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         items={props.items}
                         isOpen={getIsOpen}
                         path={ROOT_PATH}
-                        parentWidth={NO_PARENT_WIDTH}
+                        parentExtent={NO_PARENT_EXTENT}
+                        rootExtent={NO_PARENT_EXTENT}
+                        layoutSize={props.layoutSize}
                         initialHighlightPosition={getInitialHighlightPosition}
                         anchorRef={() => access(props.anchorRef) ?? getTriggerRef()}
                         triggerRef={getTriggerRef}
@@ -754,7 +786,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
     const getPointerPoint = createPointerPointReader();
 
     const [getAnchorRect, setAnchorRect] = createSignal<Rect | undefined>(undefined, { equals: Rect.isSame });
-    const [getIsOpen, setIsOpen] = SignalMirror.createOptional(() => props.visibilitySignal, false);
+    const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
@@ -820,7 +852,9 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
             items={props.items}
             isOpen={getIsOpen}
             path={ROOT_PATH}
-            parentWidth={NO_PARENT_WIDTH}
+            parentExtent={NO_PARENT_EXTENT}
+            rootExtent={NO_PARENT_EXTENT}
+            layoutSize={undefined}
             anchorRef={props.regionRef}
             anchorRect={getAnchorRect}
             triggerRef={props.regionRef}

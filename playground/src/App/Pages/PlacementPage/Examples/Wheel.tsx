@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 
-import { Button, OverheadWheel, createRing } from "@thewaver/ss-components";
+import { Button, OverheadWheel, PlacementLayoutUtils } from "@thewaver/ss-components";
 import type { WheelController } from "@thewaver/ss-components";
 
 import {
@@ -22,7 +22,7 @@ export const WheelExample = (props: PlacementExampleProps) => {
             <OverheadWheel
                 wedges={() => PRIZES}
                 ariaLabel={"Prize wheel"}
-                computeLayout={(defs) => createRing(props.getLayoutDefs())(defs)}
+                computeLayout={(defs) => PlacementLayoutUtils.createRing(props.getLayoutDefs())(defs)}
                 computeSpinTarget={() => Math.floor(Math.random() * PRIZES.length)}
                 computeWedgeLabel={(index) => `${PRIZES[index]}, ${index + 1} of ${PRIZES.length}`}
                 renderWedge={(getWedge, getState) => <PageWheelWedge state={getState}>{getWedge()}</PageWheelWedge>}

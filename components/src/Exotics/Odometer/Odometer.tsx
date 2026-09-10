@@ -1,6 +1,6 @@
 import { Index, createEffect, createMemo, createSignal, on, untrack } from "solid-js";
 
-import { Barrel } from "../../Abstracts/Barrel/Barrel";
+import { Barrel } from "../../Primitives/Barrel/Barrel";
 import { access } from "../../Utils/propUtils";
 import type { OdometerProps } from "./Odometer.types";
 import { ODOMETER_DIGITS, OdometerUtils } from "./Odometer.utils";

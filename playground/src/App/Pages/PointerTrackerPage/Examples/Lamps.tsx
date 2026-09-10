@@ -1,6 +1,6 @@
 import { For, createMemo, createSignal } from "solid-js";
 
-import { MediaQueryMonitor, PointerTracker } from "@thewaver/ss-components";
+import { MediaQueryMonitorUtils, PointerTrackerUtils } from "@thewaver/ss-components";
 import { MathUtils } from "@thewaver/ss-utils";
 
 import * as styles from "../PointerTrackerPage.css";
@@ -16,9 +16,9 @@ const GLOW_OPACITY = 0.55;
 const Lamp = () => {
     const [getRef, setRef] = createSignal<HTMLElement>();
 
-    const { getReading, getIsPointerPresent } = PointerTracker.create(getRef);
+    const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef);
 
-    const getPrefersReducedMotion = MediaQueryMonitor.createReducedMotion();
+    const getPrefersReducedMotion = MediaQueryMonitorUtils.createReducedMotion();
 
     const getIntensity = createMemo(() =>
         getIsPointerPresent() ? MathUtils.clamp01(1 - (getReading().edgeRatio - 1) / FALLOFF_RADII) : 0,

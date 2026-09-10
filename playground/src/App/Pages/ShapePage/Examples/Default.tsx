@@ -1,6 +1,6 @@
 import { createMemo, createSignal, createUniqueId } from "solid-js";
 
-import { InteractionTracker, SVGDefsSamples, Shape, access } from "@thewaver/ss-components";
+import { InteractionTrackerUtils, SVGDefsSamples, Shape, access } from "@thewaver/ss-components";
 import { ShapeConst, ShapeUtils } from "@thewaver/ss-utils";
 
 import { NO_SAMPLE_KEY, computeNoSampleDefs } from "../../../PageComponents/SampleGroups/SampleGroups.const";
@@ -26,7 +26,7 @@ export const DefaultExample = ({
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
 
-    const { getFlags } = InteractionTracker.wrapElement(getRootRef, () => false, { applyButtonSemantics: true });
+    const { getFlags } = InteractionTrackerUtils.wrapElement(getRootRef, () => false, { applyButtonSemantics: true });
 
     const getStrokeKey = () => access(strokeConfigKey);
     const getFillKey = () => access(fillConfigKey);

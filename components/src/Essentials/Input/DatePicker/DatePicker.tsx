@@ -4,9 +4,9 @@ import { createEffect, createSignal, createUniqueId, untrack } from "solid-js";
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { DateValue } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
-import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
+import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
+import { Popover } from "../../../Primitives/Popover/Popover";
 import { access } from "../../../Utils/propUtils";
-import { Popover } from "../../Popover/Popover";
 import { Calendar } from "../Calendar/Calendar";
 import { DateInput } from "../DateInput/DateInput";
 import type { DatePickerProps } from "./DatePicker.types";
@@ -20,7 +20,7 @@ export const DatePicker = (props: DatePickerProps) => {
     const popupId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
-    const [getIsOpen, setIsOpen] = SignalMirror.createOptional(() => props.visibilitySignal, false);
+    const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
 
     const monthSignal: Signal<DateValue> = createSignal(
         toMonth(untrack(() => props.valueSignal[0]()) ?? DateValueUtils.fromDate(new Date())),

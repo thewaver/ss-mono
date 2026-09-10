@@ -7,10 +7,10 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import {
-    type WithNoSample,
     splitEntriesIntoGroups,
     toGroupEntriesWithNoSample,
 } from "../../PageComponents/SampleGroups/SampleGroups.const";
+import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.types";
 import {
     PageColorField,
     PageGroupedSelectField,

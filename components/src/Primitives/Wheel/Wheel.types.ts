@@ -2,10 +2,10 @@ import type { Accessor, JSX } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
-import type { BarrelAxis, BarrelFace } from "../../Abstracts/Barrel/Barrel.types";
 import type { PlacementLayoutFn, PlacementRect } from "../../Abstracts/Placement/Placement.types";
 import type { RotatorPhase, RotatorSpinDefs } from "../../Abstracts/Rotator/Rotator.types";
 import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
+import type { BarrelAxis, BarrelFace } from "../Barrel/Barrel.types";
 
 export type WheelVariant = "overhead" | "drum";
 

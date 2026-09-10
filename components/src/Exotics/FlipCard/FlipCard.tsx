@@ -1,6 +1,6 @@
 import { createMemo } from "solid-js";
 
-import { Barrel } from "../../Abstracts/Barrel/Barrel";
+import { Barrel } from "../../Primitives/Barrel/Barrel";
 import { access } from "../../Utils/propUtils";
 import type { FlipCardAxis, FlipCardFace, FlipCardProps, FlipCardState } from "./FlipCard.types";
 

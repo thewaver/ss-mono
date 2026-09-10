@@ -1,10 +1,10 @@
 import { Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 import { Portal } from "solid-js/web";
 
-import { Anchor } from "../../Abstracts/Anchor/Anchor";
-import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
-import { FocusManager } from "../../Abstracts/FocusManager/FocusManager";
-import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
+import { AnchorUtils } from "../../Abstracts/Anchor/Anchor.utils";
+import { ElementFaderUtils } from "../../Abstracts/ElementFader/ElementFader.utils";
+import { FocusManagerUtils } from "../../Abstracts/FocusManager/FocusManager.utils";
+import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
 import type { TooltipProps } from "./Tooltip.types";
 
@@ -35,11 +35,11 @@ export const Tooltip = (props: TooltipProps) => {
         () => access(props.focusShowDelayMs) ?? DEFAULT_TOOLTIP_SHOW_ON_FOCUS_DELAY_MS,
     );
 
-    const { getIsVisible, getTransitionTarget } = ElementFader.createFader(getShouldShow, {
+    const { getIsVisible, getTransitionTarget } = ElementFaderUtils.createFader(getShouldShow, {
         getTransitionDurationMs,
     });
 
-    const { getPlacement, getPosition, getZIndex, setContentRef } = Anchor.createPortalPosition(
+    const { getPlacement, getPosition, getZIndex, setContentRef } = AnchorUtils.createPortalPosition(
         () => access(props.anchorRef),
         getIsVisible,
         {
@@ -74,7 +74,7 @@ export const Tooltip = (props: TooltipProps) => {
 
         const anchorRef = access(props.anchorRef);
 
-        if (FocusManager.getIsRestoringFocus()) return;
+        if (FocusManagerUtils.getIsRestoringFocus()) return;
         if (anchorRef && !anchorRef.matches(":focus-visible")) return;
 
         focusTimeout = setTimeout(() => {

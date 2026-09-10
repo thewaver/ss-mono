@@ -4,19 +4,21 @@ import type {
     PlacementLayoutFn,
 } from "../../../Abstracts/Placement/Placement.types";
 
-export type SizedLayout = PlacementLayout & { width: number };
+export type SizedLayout = PlacementLayout & { extent: number };
 
 export type SizedLayoutFn = (defs: PlacementLayoutDefs) => SizedLayout;
 
 export type FittedLayoutFn = PlacementLayoutFn;
 
 export type BandDefs = {
-    holeRadiusPx?: number;
-    bandWidthPx?: number;
-    levelGapPx?: number;
+    spreadDegrees?: number;
+    holeRadius?: number;
+    bandWidth?: number;
+    levelGap?: number;
     wedgeGapDegrees?: number;
-    wedgeArcPx?: number;
-    centreRadiusPx?: number;
+    wedgeArc?: number;
+    tiltRatio?: number;
+    centreRadius?: number;
     hasCentreItem?: boolean;
     labelRadiusRatio?: number;
     labelHeightRatio?: number;
@@ -25,32 +27,26 @@ export type BandDefs = {
 };
 
 export type ArcDefs = {
-    widthPx?: number;
-    heightPx?: number;
+    width?: number;
+    height?: number;
     spreadDegrees?: number;
-    itemWidthPx?: number;
-    itemHeightPx?: number;
-};
-
-export type FanDefs = {
-    itemWidthPx?: number;
-    itemHeightPx?: number;
-    stepDegrees?: number;
-    maxSpreadDegrees?: number;
-    gapPx?: number;
+    facingDegrees?: number;
     tiltRatio?: number;
+    itemWidth?: number;
+    itemHeight?: number;
 };
 
 export type HoneycombDefs = {
-    cellWidthPx?: number;
+    cellWidth?: number;
     perRow?: number;
-    gapPx?: number;
+    gap?: number;
 };
 
-export type RadialTreeDefs = {
-    innerRadiusPx?: number;
-    ringGapPx?: number;
-    itemWidthPx?: number;
-    itemHeightPx?: number;
-    spreadDegrees?: number;
+export type WhorlDefs = {
+    itemSpacing?: number;
+    whorlSpacing?: number;
+};
+
+export type ZigzagDefs = {
+    segmentLength?: number;
 };

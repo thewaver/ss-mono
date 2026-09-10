@@ -4,8 +4,8 @@ import { Dynamic } from "solid-js/web";
 
 import { CSSUtils, MathUtils, StringUtils } from "@thewaver/ss-utils";
 
-import type { TextSyncElement } from "../../Abstracts/TextSync/TextSync";
-import { TextSync } from "../../Abstracts/TextSync/TextSync";
+import type { TextSyncElement } from "../../Abstracts/TextSync/TextSync.types";
+import { TextSyncUtils } from "../../Abstracts/TextSync/TextSync.utils";
 import { FormFieldUtils } from "../../Essentials/Input/FormField/FormField.utils";
 import { LabelUtils } from "../../Essentials/Input/Label/Label.utils";
 import { access } from "../../Utils/propUtils";
@@ -151,7 +151,7 @@ const TextFieldElement = (props: TextFieldElementProps) => {
         return getIsAutoSizing() && access(props.maxRows) === undefined ? "hidden" : "auto";
     };
 
-    const { handleInput, handleCompositionStart, handleCompositionEnd } = TextSync.createValueSync(
+    const { handleInput, handleCompositionStart, handleCompositionEnd } = TextSyncUtils.createValueSync(
         getElementRef,
         () => access(props.value),
         {

@@ -3,11 +3,11 @@ import { Portal } from "solid-js/web";
 
 import { CSSUtils, StringUtils } from "@thewaver/ss-utils";
 
-import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
-import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
-import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
-import { LiveAnnouncer } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer";
-import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
+import { ElementFaderUtils } from "../../Abstracts/ElementFader/ElementFader.utils";
+import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
+import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
+import { LiveAnnouncerUtils } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer.utils";
+import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { access, accessSignal } from "../../Utils/propUtils";
 import type {
     Toast,
@@ -19,7 +19,7 @@ import type {
     ToastsOverflow,
     ToastsProps,
 } from "./Toasts.types";
-import { ToastsUtils } from "./Toasts.utils";
+import { ToastUtils } from "./Toasts.utils";
 
 import * as styles from "./Toasts.css";
 
@@ -33,11 +33,14 @@ const DEFAULT_TOASTS_HOTKEY = "F8";
 const TOASTS_Z_INDEX = 200;
 
 const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
-    const { getTransitionTarget, getHasTransitionFinished } = ElementFader.createFader(() => !access(props.isExiting), {
-        getTransitionDurationMs: () => access(props.transitionDurationMs),
-        onShow: () => access(props.toast).onShow?.(),
-        onHide: () => access(props.toast).onHide?.(),
-    });
+    const { getTransitionTarget, getHasTransitionFinished } = ElementFaderUtils.createFader(
+        () => !access(props.isExiting),
+        {
+            getTransitionDurationMs: () => access(props.transitionDurationMs),
+            onShow: () => access(props.toast).onShow?.(),
+            onHide: () => access(props.toast).onHide?.(),
+        },
+    );
 
     const getDurationMs = createMemo(() => access(props.toast).durationMs);
 
@@ -112,11 +115,11 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
 
     const getMargins = createMemo(() => access(props.margins) ?? CSSUtils.spreadMargin(0));
 
-    const getStackAlignment = createMemo(() => ToastsUtils.computeStackAlignment(getAlignment(), getDir()));
+    const getStackAlignment = createMemo(() => ToastUtils.computeStackAlignment(getAlignment(), getDir()));
 
-    const getIsPaused = InteractionTracker.trackHold(getRootRef);
+    const getIsPaused = InteractionTrackerUtils.trackHold(getRootRef);
 
-    const getEntrySizes = ElementObserver.createBorderBoxSizeListObserver(() =>
+    const getEntrySizes = ElementObserverUtils.createBorderBoxSizeListObserver(() =>
         getEntryIds().map((id) => getEntryRefs()[id]),
     );
 
@@ -131,8 +134,8 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
     onMount(() => {
         if (props.computeAnnouncement === undefined) return;
 
-        LiveAnnouncer.reserve("polite");
-        LiveAnnouncer.reserve("assertive");
+        LiveAnnouncerUtils.reserve("polite");
+        LiveAnnouncerUtils.reserve("assertive");
     });
 
     const getAdmitted = createMemo(() => {
@@ -190,7 +193,7 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
 
             if (!toast) continue;
 
-            LiveAnnouncer.announce(computeAnnouncement(toast), toast.ariaLive ?? getAnnouncementPoliteness());
+            LiveAnnouncerUtils.announce(computeAnnouncement(toast), toast.ariaLive ?? getAnnouncementPoliteness());
         }
 
         return entryIds;

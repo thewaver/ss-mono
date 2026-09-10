@@ -1,6 +1,6 @@
 import { createSignal, createUniqueId } from "solid-js";
 
-import { GlassSurface, InteractionTracker, SVGDefsSamples, access } from "@thewaver/ss-components";
+import { GlassSurface, InteractionTrackerUtils, SVGDefsSamples, access } from "@thewaver/ss-components";
 import { CSSUtils, type Point2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -40,7 +40,7 @@ export const DefaultExample = ({
 
     let grabOffset: Point2d | undefined;
 
-    const { getIsDragging } = InteractionTracker.trackDrag(getStageRef, () => false, {
+    const { getIsDragging } = InteractionTrackerUtils.trackDrag(getStageRef, () => false, {
         onDrag: (ratio) => {
             grabOffset ??= { x: ratio.x - getRatio().x, y: ratio.y - getRatio().y };
 

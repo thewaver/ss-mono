@@ -1,7 +1,8 @@
 import { Index, createMemo } from "solid-js";
 
-import { PlacementBox, PlacementItem } from "../../Abstracts/Placement/Placement";
 import type { PlacementRect } from "../../Abstracts/Placement/Placement.types";
+import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
+import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
 import type { FormationProps } from "./Formation.types";
 

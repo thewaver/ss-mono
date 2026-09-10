@@ -1,6 +1,6 @@
 import { For, createEffect, createSignal } from "solid-js";
 
-import { Button, Virtualizer } from "@thewaver/ss-components";
+import { Button, VirtualizerUtils } from "@thewaver/ss-components";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import type { VirtualizerPinnedExampleProps } from "../VirtualizerPage.types";
@@ -15,7 +15,7 @@ type Props = VirtualizerPinnedExampleProps;
 export const PinnedExample = (props: Props) => {
     const [getSizerRef, setSizerRef] = createSignal<HTMLElement>();
 
-    const rowWindow = Virtualizer.createRowWindow(getSizerRef, props.rowCount, {
+    const rowWindow = VirtualizerUtils.createRowWindow(getSizerRef, props.rowCount, {
         getIsEnabled: () => true,
         computeEstimatedSize: () => ROW_HEIGHT_PX,
         getPinnedRows: () => [props.pinnedRow()],

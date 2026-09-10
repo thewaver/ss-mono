@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 
-import { InteractionTracker } from "@thewaver/ss-components";
+import { InteractionTrackerUtils } from "@thewaver/ss-components";
 
 import type { InteractionSwipeExampleProps } from "../InteractionTrackerPage.types";
 
@@ -16,7 +16,7 @@ export const SwipeExample = (props: Props) => {
     const [getProgress, setProgress] = createSignal(NO_PROGRESS);
     const [getPresses, setPresses] = createSignal(0);
 
-    InteractionTracker.trackSwipe(getRef, props.isDisabled, {
+    InteractionTrackerUtils.trackSwipe(getRef, props.isDisabled, {
         getAxis: () => "horizontal",
         getCommitRatio: props.commitRatio,
         onSwipe: (progressRatio) => {

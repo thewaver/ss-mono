@@ -8,7 +8,7 @@ import {
     FileInput,
     NumberInput,
     Select,
-    SignalMirror,
+    SignalMirrorUtils,
     TextInput,
     access,
 } from "@thewaver/ss-components";
@@ -56,7 +56,7 @@ const renderFieldPopup = (
 );
 
 export const PageNumberField = (props: PageNumberFieldProps) => {
-    const valueSignal = SignalMirror.createValueMirror<number | undefined>(
+    const valueSignal = SignalMirrorUtils.createValueMirror<number | undefined>(
         () => access(props.value),
         (value) => {
             if (value === undefined) return;

@@ -1,7 +1,7 @@
 import { createEffect, createMemo, createSignal } from "solid-js";
 import type { ParentProps } from "solid-js";
 
-import { ElementObserver } from "@thewaver/ss-components";
+import { ElementObserverUtils } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -36,7 +36,7 @@ type ResizableBarProps = ParentProps<{
 const ResizableBar = (props: ResizableBarProps) => {
     const [getRef, setRef] = createSignal<HTMLElement>();
 
-    const getSize = ElementObserver.createBorderBoxSizeObserver(getRef);
+    const getSize = ElementObserverUtils.createBorderBoxSizeObserver(getRef);
 
     createEffect(() => {
         const width = Math.round(getSize().width);

@@ -2,7 +2,7 @@ import { createEffect, createMemo, createSignal } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
-import { ElementObserver } from "../../../Abstracts/ElementObserver/ElementObserver";
+import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
 import { Mosaic } from "../../../Primitives/Mosaic/Mosaic";
 import type { ElementMosaicProps } from "../../../Primitives/Mosaic/Mosaic.types";
 import { MosaicUtils } from "../../../Primitives/Mosaic/Mosaic.utils";
@@ -36,7 +36,7 @@ export const ElementMosaic = <T,>(props: ElementMosaicProps<T>) => {
             renderItem={(index, getState) => {
                 const [getItemRef, setItemRef] = createSignal<HTMLElement>();
 
-                const getItemSize = ElementObserver.createBorderBoxSizeObserver(getItemRef);
+                const getItemSize = ElementObserverUtils.createBorderBoxSizeObserver(getItemRef);
 
                 createEffect(() => {
                     setSizeAt(index, getItemSize());

@@ -32,23 +32,23 @@ const MAX_LABEL_RADIUS_PERCENT = 100;
 const LABEL_RADIUS_STEP_PERCENT = 5;
 const PERCENT = 100;
 
-const STARTING_HOLE_RADIUS_PX = 64;
-const STARTING_BAND_WIDTH_PX = 84;
-const STARTING_LEVEL_GAP_PX = 8;
+const STARTING_HOLE_RADIUS = 64;
+const STARTING_BAND_WIDTH = 84;
+const STARTING_LEVEL_GAP = 8;
 const STARTING_WEDGE_GAP_DEGREES = 3;
 const STARTING_LABEL_RADIUS_PERCENT = 50;
 
 export const PlacementPage = () => {
-    const [getHoleRadiusPx, setHoleRadiusPx] = createSignal(STARTING_HOLE_RADIUS_PX);
-    const [getBandWidthPx, setBandWidthPx] = createSignal(STARTING_BAND_WIDTH_PX);
-    const [getLevelGapPx, setLevelGapPx] = createSignal(STARTING_LEVEL_GAP_PX);
+    const [getHoleRadius, setHoleRadius] = createSignal(STARTING_HOLE_RADIUS);
+    const [getBandWidth, setBandWidth] = createSignal(STARTING_BAND_WIDTH);
+    const [getLevelGap, setLevelGap] = createSignal(STARTING_LEVEL_GAP);
     const [getWedgeGapDegrees, setWedgeGapDegrees] = createSignal(STARTING_WEDGE_GAP_DEGREES);
     const [getLabelRadiusPercent, setLabelRadiusPercent] = createSignal(STARTING_LABEL_RADIUS_PERCENT);
 
     const getLayoutDefs = createMemo<BandDefs>(() => ({
-        holeRadiusPx: getHoleRadiusPx(),
-        bandWidthPx: getBandWidthPx(),
-        levelGapPx: getLevelGapPx(),
+        holeRadius: getHoleRadius(),
+        bandWidth: getBandWidth(),
+        levelGap: getLevelGap(),
         wedgeGapDegrees: getWedgeGapDegrees(),
         labelRadiusRatio: getLabelRadiusPercent() / PERCENT,
     }));
@@ -83,39 +83,39 @@ export const PlacementPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"holeRadiusPx"} label={"Hole radius (px)"}>
+                <PageProp key={"holeRadius"} label={"Hole radius"}>
                     <PageNumberField
-                        value={getHoleRadiusPx}
+                        value={getHoleRadius}
                         min={() => MIN_HOLE_RADIUS_PX}
                         max={() => MAX_HOLE_RADIUS_PX}
                         step={() => HOLE_RADIUS_STEP_PX}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Hole radius"}
-                        onInput={setHoleRadiusPx}
+                        onInput={setHoleRadius}
                     />
                 </PageProp>
 
-                <PageProp key={"bandWidthPx"} label={"Band width (px)"}>
+                <PageProp key={"bandWidth"} label={"Band width"}>
                     <PageNumberField
-                        value={getBandWidthPx}
+                        value={getBandWidth}
                         min={() => MIN_BAND_WIDTH_PX}
                         max={() => MAX_BAND_WIDTH_PX}
                         step={() => BAND_WIDTH_STEP_PX}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Band width"}
-                        onInput={setBandWidthPx}
+                        onInput={setBandWidth}
                     />
                 </PageProp>
 
-                <PageProp key={"levelGapPx"} label={"Gap between levels (px)"}>
+                <PageProp key={"levelGap"} label={"Gap between levels"}>
                     <PageNumberField
-                        value={getLevelGapPx}
+                        value={getLevelGap}
                         min={() => MIN_LEVEL_GAP_PX}
                         max={() => MAX_LEVEL_GAP_PX}
                         step={() => LEVEL_GAP_STEP_PX}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Gap between levels"}
-                        onInput={setLevelGapPx}
+                        onInput={setLevelGap}
                     />
                 </PageProp>
 

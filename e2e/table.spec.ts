@@ -301,7 +301,7 @@ test("a disabled grid reads out but does not act", async ({ page }) => {
 
 /**
  * Reordering has two ways in and they must agree. The pointer half drags a header past the middle of its
- * neighbour, which is where `CarrierUtils.computeDropIndex` flips the landing place. The keyboard half is
+ * neighbour, which is where `Carrier.computeDropIndex` flips the landing place. The keyboard half is
  * Shift with an arrow on the focused header cell, chosen because the header already spends Enter and Space
  * on sorting and Ctrl with the arrows on resizing.
  *

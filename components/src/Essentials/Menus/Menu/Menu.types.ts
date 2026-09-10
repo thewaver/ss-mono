@@ -89,7 +89,9 @@ export type MenuLevelProps<T> = AccessorProps<{
     ariaLabel?: string;
     isOpen: boolean;
     path: number[];
-    parentWidth: number;
+    parentExtent: number;
+    rootExtent: number;
+    layoutSize?: string;
     initialHighlightPosition?: MenuHighlightPosition;
     anchorRef: HTMLElement | undefined;
     triggerRef: HTMLElement | undefined;
@@ -122,6 +124,7 @@ export type MenuLevelProps<T> = AccessorProps<{
 
 export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderControl" | "extraFlags"> &
     AccessorProps<{
+        layoutSize?: string;
         id?: string;
         ariaLabel?: string;
         placement?: AnchorPlacement;

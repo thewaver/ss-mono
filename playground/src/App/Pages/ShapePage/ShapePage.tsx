@@ -10,11 +10,11 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import {
     NO_SAMPLE_KEY,
-    type WithNoSample,
     computeNoSampleDefs,
     splitEntriesIntoGroups,
     toGroupEntriesWithNoSample,
 } from "../../PageComponents/SampleGroups/SampleGroups.const";
+import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.types";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import {

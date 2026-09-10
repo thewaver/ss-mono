@@ -1,7 +1,7 @@
 import { For, Index, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
 import type { ParentProps } from "solid-js";
 
-import { type ElementSegment, JSXTextParser } from "@thewaver/ss-utils";
+import { type ElementSegment, JSXTextParserUtils } from "@thewaver/ss-utils";
 
 import { access } from "../../Utils/propUtils";
 import type { TypewriterProps, TypewriterUpdateCause } from "./Typewriter.types";
@@ -90,8 +90,8 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
         let itemCount = 0;
 
         const width = containerRef.clientWidth;
-        const segments = JSXTextParser.getSegmentTokens(containerRef);
-        const inlinedSegments = JSXTextParser.getInlinedSegments(segments, width);
+        const segments = JSXTextParserUtils.getSegmentTokens(containerRef);
+        const inlinedSegments = JSXTextParserUtils.getInlinedSegments(segments, width);
         const indexedSegments = inlinedSegments.map((segment) => {
             const result = { ...segment, startIndex: itemCount };
 

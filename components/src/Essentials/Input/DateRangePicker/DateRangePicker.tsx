@@ -4,9 +4,9 @@ import { createEffect, createSignal, createUniqueId, untrack } from "solid-js";
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { DateValue } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
-import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
+import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
+import { Popover } from "../../../Primitives/Popover/Popover";
 import { access, accessSignal } from "../../../Utils/propUtils";
-import { Popover } from "../../Popover/Popover";
 import { DateInput } from "../DateInput/DateInput";
 import { RangeCalendar } from "../RangeCalendar/RangeCalendar";
 import type { DateRangePickerProps } from "./DateRangePicker.types";
@@ -26,7 +26,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     const popupId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
-    const [getIsOpen, setIsOpen] = SignalMirror.createOptional(() => props.visibilitySignal, false);
+    const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
 
     const startSignal = createSignal<DateValue | undefined>(untrack(() => valueSignal[0]()?.start));
     const endSignal = createSignal<DateValue | undefined>(untrack(() => valueSignal[0]()?.end));

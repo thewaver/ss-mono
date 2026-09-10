@@ -1,6 +1,6 @@
 import { Index, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 
-import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
+import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access } from "../../Utils/propUtils";
 import type { ScrollerButtonPlacement, ScrollerProps, ScrollerStep, ScrollerStepper } from "./Scroller.types";
 
@@ -90,7 +90,10 @@ export const Scroller = (props: ScrollerProps) => {
 
     const getIsScrollable = createMemo(() => getMetrics().total > getMetrics().visible + SCROLL_EPSILON);
 
-    const [getProgressRatio, setProgressRatio] = SignalMirror.createOptional(() => props.progressSignal, RATIO_MIN);
+    const [getProgressRatio, setProgressRatio] = SignalMirrorUtils.createOptional(
+        () => props.progressSignal,
+        RATIO_MIN,
+    );
 
     let reportedRatio = RATIO_MIN;
 

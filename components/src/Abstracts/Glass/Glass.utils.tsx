@@ -1,6 +1,6 @@
 import { ShapeConst, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
 
-import { PointerTracker } from "../PointerTracker/PointerTracker";
+import { PointerTrackerUtils } from "../PointerTracker/PointerTracker.utils";
 import { SVGFilterDefsFactory } from "../SVG/Defs/Filter/SVGFilterDefs.factory";
 import type { SVGDefs } from "../SVG/Defs/SVGDefs.types";
 import { DEFAULT_GLASS_DEFS } from "./Glass.const";
@@ -56,7 +56,7 @@ export namespace GlassUtils {
                 filter: {
                     id: filterId,
                     renderDefsElement: () => {
-                        const { getReading } = PointerTracker.create(getRef ?? NO_REF);
+                        const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
                         const getSpot = () => {
                             const size = getSize();

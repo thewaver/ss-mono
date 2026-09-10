@@ -2,11 +2,11 @@ import { createEffect, createSignal } from "solid-js";
 
 import { MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
-import { PointerTracker } from "../../../../Abstracts/PointerTracker/PointerTracker";
+import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import type { TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
-import { SVGDefsFrames } from "../../SVGDefsFrames.utils";
+import { SVGDefsFrameUtils } from "../../SVGDefsFrames.utils";
 
 type TrailStamp = {
     origin: Point2d;
@@ -42,10 +42,10 @@ const computePoolColors = (color: string, alpha: number) => [
     { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
 ];
 
-const clock = SVGDefsFrames.createClock(TRAIL_LIFETIME_MS);
+const clock = SVGDefsFrameUtils.createClock(TRAIL_LIFETIME_MS);
 
 const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined) => {
-    const { getReading, getIsPointerPresent } = PointerTracker.create(getRef);
+    const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef);
     const [getStamp, setStamp] = createSignal<TrailStamp>();
 
     let bornTick: number | undefined;
@@ -102,7 +102,7 @@ export const spot_trail_1: TrackedGradientConfig = {
             gradientOrPattern: {
                 id: `gradient1-${id}`,
                 renderDefsElement: () => {
-                    const { getReading } = PointerTracker.create(getRef ?? NO_REF);
+                    const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient1-${id}`,

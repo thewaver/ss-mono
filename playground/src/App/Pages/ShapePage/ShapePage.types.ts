@@ -1,7 +1,7 @@
 import type { AccessorProps, SVGDefsColors, SVGDefsSamples, ShapeProps } from "@thewaver/ss-components";
 import type { ShapeConst, Size2d } from "@thewaver/ss-utils";
 
-import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.const";
+import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.types";
 
 export type ShapeExampleProps = Pick<ShapeProps, "lameExponents" | "joinRadii"> &
     AccessorProps<{

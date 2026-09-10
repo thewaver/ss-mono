@@ -14,6 +14,8 @@ export const FanExample = (props: FanMenuExampleProps) => {
     return (
         <div class={styles.stage}>
             <FanMenu
+                layoutSize={"192px"}
+                layoutDefs={{ width: 336, height: 336, itemWidth: 168, itemHeight: 40 }}
                 items={() => props.items}
                 ariaLabel={"Edit actions"}
                 placement={() => ({ x: "center", y: "center" })}

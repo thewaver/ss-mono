@@ -1,9 +1,9 @@
 import { createSignal, createUniqueId } from "solid-js";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
-import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
+import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
+import { Popover } from "../../../Primitives/Popover/Popover";
 import { access } from "../../../Utils/propUtils";
-import { Popover } from "../../Popover/Popover";
 import { Clock } from "../Clock/Clock";
 import { TimeInput } from "../TimeInput/TimeInput";
 import type { TimePickerProps, TimePickerTrigger } from "./TimePicker.types";
@@ -15,7 +15,7 @@ export const TimePicker = (props: TimePickerProps) => {
     const popupId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
-    const [getIsOpen, setIsOpen] = SignalMirror.createOptional(() => props.visibilitySignal, false);
+    const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
 
     const getClockLabel = () => access(props.clockLabel) ?? DEFAULT_TIME_PICKER_CLOCK_LABEL;
 

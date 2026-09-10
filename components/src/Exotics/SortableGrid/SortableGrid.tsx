@@ -5,14 +5,14 @@ import type { Point2d } from "@thewaver/ss-utils";
 
 import { AnchorUtils } from "../../Abstracts/Anchor/Anchor.utils";
 import type { CarrierZone, Carry, CarryMode, CarryNudge, CarryPlace } from "../../Abstracts/Carrier/Carrier.types";
-import { CarrierStack } from "../../Abstracts/Carrier/CarrierStack";
-import { Elevation } from "../../Abstracts/Elevation/Elevation";
-import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
+import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
+import { ElevationUtils } from "../../Abstracts/Elevation/Elevation.utils";
+import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
+import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
+import { ViewportUtils } from "../../Abstracts/Viewport/Viewport.utils";
 import { LabelUtils } from "../../Essentials/Input/Label/Label.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../Utils/propUtils";
-import { useViewportContext } from "../Viewport/Viewport.context";
-import { ViewportUtils } from "../Viewport/Viewport.utils";
 import type {
     SortableGridController,
     SortableGridGeometry,
@@ -172,13 +172,13 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         SortableGridUtils.getShape(asItem(carry).footprint ?? DEFAULT_SORTABLE_GRID_FOOTPRINT, turns);
 
     const getAimedTurns = (carry: Carry) => {
-        const place = CarrierStack.getTargetPlace();
+        const place = CarrierUtils.getTargetPlace();
 
         return SortableGridUtils.getIsPlace(place) ? place.turns : (asItem(carry).turns ?? 0);
     };
 
     const getGrabSpot = (shape: SortableGridShape) => {
-        if (!grabbed || grabbed.zone !== CarrierStack.getSourceZone()) return FIRST_SPOT;
+        if (!grabbed || grabbed.zone !== CarrierUtils.getSourceZone()) return FIRST_SPOT;
 
         return {
             x: Math.min(grabbed.spot.x, shape.size.width - 1),
@@ -204,7 +204,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             if (getIsDisabled() || getIsLocked()) return false;
 
             return (
-                props.computeCanAccept?.(asItem(carry).value, CarrierStack.getSourceZone()?.getLabel() ?? "") ?? true
+                props.computeCanAccept?.(asItem(carry).value, CarrierUtils.getSourceZone()?.getLabel() ?? "") ?? true
             );
         },
         computePlaceAtPoint: (point, carry) => {
@@ -241,7 +241,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             const item = asItem(carry);
             const turns = item.turns ?? 0;
 
-            if (CarrierStack.getSourceZone() === zone) return { ...item.spot, turns };
+            if (CarrierUtils.getSourceZone() === zone) return { ...item.spot, turns };
 
             const shape = getCarriedShape(carry, turns);
             const spot = SortableGridUtils.getFreeSpot(shape, getColumns(), getRows(), getTakenCells(carry));
@@ -322,18 +322,18 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         },
     };
 
-    CarrierStack.registerZone(zone);
+    CarrierUtils.registerZone(zone);
 
-    const getIsSource = createMemo(() => CarrierStack.getSourceZone() === zone);
+    const getIsSource = createMemo(() => CarrierUtils.getSourceZone() === zone);
 
-    const getIsReceiving = createMemo(() => CarrierStack.getTargetZone() === zone);
+    const getIsReceiving = createMemo(() => CarrierUtils.getTargetZone() === zone);
 
-    const getCarriedKey = createMemo(() => (getIsSource() ? CarrierStack.getCarry()?.key : undefined));
+    const getCarriedKey = createMemo(() => (getIsSource() ? CarrierUtils.getCarry()?.key : undefined));
 
     const turn = (step: number) => {
         if (!getIsTurnable() || !getIsSource()) return;
 
-        CarrierStack.aimAtNudge({ turn: step });
+        CarrierUtils.aimAtNudge({ turn: step });
     };
 
     const controller: SortableGridController = {
@@ -343,7 +343,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     };
 
     const getLandingPlace = createMemo(() => {
-        const place = CarrierStack.getTargetPlace();
+        const place = CarrierUtils.getTargetPlace();
 
         if (!getIsReceiving() || place === undefined) return;
 
@@ -351,7 +351,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     });
 
     const getLandingGeometry = createMemo(() => {
-        const carry = CarrierStack.getCarry();
+        const carry = CarrierUtils.getCarry();
         const place = getLandingPlace();
 
         if (!carry || !place) return;
@@ -359,10 +359,10 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         return getGeometry(getCarriedShape(carry, place.turns));
     });
 
-    const getCarriedItem = () => CarrierStack.getCarry()?.value as SortableGridItem<T> | undefined;
+    const getCarriedItem = () => CarrierUtils.getCarry()?.value as SortableGridItem<T> | undefined;
 
     const getCarriedGeometry = createMemo(() => {
-        const carry = CarrierStack.getCarry();
+        const carry = CarrierUtils.getCarry();
 
         if (!carry || !getIsSource()) return;
 
@@ -373,7 +373,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
 
     const getNavigableIndexes = createMemo(() =>
         getItems().reduce<number[]>((acc, item, index) => {
-            const isReachable = InteractionTracker.computeIsReachable(
+            const isReachable = InteractionTrackerUtils.computeIsReachable(
                 item.isDisabled ?? false,
                 item.isReachableWhenDisabled ?? false,
                 item.tooltipDefs !== undefined,
@@ -439,19 +439,19 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             },
         };
 
-        CarrierStack.start(zone, { ...item.spot, turns: item.turns ?? 0 }, computeCarry(item), mode);
+        CarrierUtils.start(zone, { ...item.spot, turns: item.turns ?? 0 }, computeCarry(item), mode);
     };
 
     const handlePointerDown = (index: number) => (e: PointerEvent) => {
         if (e.button !== 0 || getIsDisabled()) return;
         if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
-        if (CarrierStack.getCarry()) return;
+        if (CarrierUtils.getCarry()) return;
 
         const element = getItemRefs()[index];
 
         if (!element) return;
 
-        CarrierStack.dragFromPointer(
+        CarrierUtils.dragFromPointer(
             element,
             e,
             (from) => pickUp(index, "drag", from),
@@ -465,7 +465,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         if (getIsDisabled()) return;
         if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
 
-        const carry = CarrierStack.getCarry();
+        const carry = CarrierUtils.getCarry();
 
         if (!carry) {
             pickUp(index, "tap", { x: e.clientX, y: e.clientY });
@@ -474,23 +474,23 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             return;
         }
 
-        if (CarrierStack.getCarryMode() === "drag") return;
+        if (CarrierUtils.getCarryMode() === "drag") return;
 
-        if (CarrierStack.getCarryMode() === "key") CarrierStack.aimAtPoint(e.clientX, e.clientY);
+        if (CarrierUtils.getCarryMode() === "key") CarrierUtils.aimAtPoint(e.clientX, e.clientY);
 
-        CarrierStack.end("drop");
+        CarrierUtils.end("drop");
     };
 
     const handleKeyDown = (index: number) => (e: KeyboardEvent) => {
         if (getIsDisabled()) return;
 
-        const isCarrying = CarrierStack.getCarry() !== undefined && CarrierStack.getCarryMode() !== "drag";
+        const isCarrying = CarrierUtils.getCarry() !== undefined && CarrierUtils.getCarryMode() !== "drag";
 
         if (e.key === "Escape") {
             if (!isCarrying) return;
 
             e.preventDefault();
-            CarrierStack.end("cancel");
+            CarrierUtils.end("cancel");
 
             return;
         }
@@ -499,7 +499,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             e.preventDefault();
 
             if (isCarrying) {
-                CarrierStack.end("drop");
+                CarrierUtils.end("drop");
 
                 return;
             }
@@ -511,7 +511,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
 
         if (isCarrying && e.key === "Tab") {
             e.preventDefault();
-            CarrierStack.aimAtNextZone(e.shiftKey ? -1 : 1);
+            CarrierUtils.aimAtNextZone(e.shiftKey ? -1 : 1);
 
             return;
         }
@@ -522,7 +522,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             if (!nudge) return;
 
             e.preventDefault();
-            CarrierStack.aimAtNudge(nudge);
+            CarrierUtils.aimAtNudge(nudge);
 
             return;
         }
@@ -558,16 +558,16 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     };
 
     const handleRootClick = (e: MouseEvent) => {
-        const carry = CarrierStack.getCarry();
+        const carry = CarrierUtils.getCarry();
 
         if (getIsDisabled() || !carry) return;
-        if (CarrierStack.getCarryMode() === "drag") return;
+        if (CarrierUtils.getCarryMode() === "drag") return;
         if (e.target !== getRootRef()) return;
         if (!zone.computeCanAccept(carry) && !getIsSource()) return;
 
-        if (CarrierStack.getCarryMode() === "key") CarrierStack.aimAtPoint(e.clientX, e.clientY);
+        if (CarrierUtils.getCarryMode() === "key") CarrierUtils.aimAtPoint(e.clientX, e.clientY);
 
-        CarrierStack.end("drop");
+        CarrierUtils.end("drop");
     };
 
     createEffect(() => {
@@ -580,9 +580,9 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         const trackPoint = (e: PointerEvent) => {
             setCarriedPoint(ViewportUtils.getAdjustedClientPoint({ x: e.clientX, y: e.clientY }, viewportContext));
 
-            if (CarrierStack.getCarryMode() !== "tap") return;
+            if (CarrierUtils.getCarryMode() !== "tap") return;
 
-            CarrierStack.aimAtPoint(e.clientX, e.clientY);
+            CarrierUtils.aimAtPoint(e.clientX, e.clientY);
         };
 
         document.addEventListener("pointermove", trackPoint, true);
@@ -622,14 +622,14 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     });
 
     createEffect(() => {
-        if (!getIsDisabled() || !CarrierStack.getCarry()) return;
-        if (CarrierStack.getSourceZone() !== zone) return;
+        if (!getIsDisabled() || !CarrierUtils.getCarry()) return;
+        if (CarrierUtils.getSourceZone() !== zone) return;
 
-        CarrierStack.end("cancel");
+        CarrierUtils.end("cancel");
     });
 
     onCleanup(() => {
-        if (CarrierStack.getSourceZone() === zone) CarrierStack.end("cancel");
+        if (CarrierUtils.getSourceZone() === zone) CarrierUtils.end("cancel");
     });
 
     onMount(() => {
@@ -647,7 +647,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         <InteractionWrapper
             {...props}
             extraFlags={() => ({
-                isCarrying: CarrierStack.getCarry() !== undefined,
+                isCarrying: CarrierUtils.getCarry() !== undefined,
                 isReceiving: getIsReceiving(),
                 isSource: getIsSource(),
                 isEmpty: getItems().length < 1,
@@ -753,7 +753,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                                 aria-hidden="true"
                             >
                                 <Show when={getLandingGeometry()}>
-                                    {props.renderLanding?.(CarrierStack.getIsTargetAllowed, () =>
+                                    {props.renderLanding?.(CarrierUtils.getIsTargetAllowed, () =>
                                         getLandingGeometry()!,
                                     )}
                                 </Show>
@@ -768,7 +768,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     const getCarriedZIndex = () => {
         const root = getRootRef();
 
-        return Math.max(AnchorUtils.getStackingBase(root), Elevation.getBase(root)) + 1;
+        return Math.max(AnchorUtils.getStackingBase(root), ElevationUtils.getBase(root)) + 1;
     };
 
     return (

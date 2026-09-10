@@ -1,7 +1,7 @@
 import type { Accessor } from "solid-js";
 import { createMemo } from "solid-js";
 
-import { createBand } from "../../../Samples/Placement/Layouts/PlacementLayouts.const";
+import { PlacementLayoutUtils } from "../../../Samples/Placement/Layouts/PlacementLayouts.utils";
 import { access } from "../../../Utils/propUtils";
 import type { SignalSource } from "../../../Utils/typeUtils";
 import { Menu } from "../Menu/Menu";
@@ -20,10 +20,11 @@ export const WheelMenu = <T,>(props: WheelMenuProps<T>) => {
         path.reduce<WheelMenuItem<T>[]>((list, index) => list[index]?.items ?? [], access(props.items));
 
     const getComputeLayout = createMemo(() =>
-        createBand(getSpreadDegrees(), {
+        PlacementLayoutUtils.createRing({
+            spreadDegrees: getSpreadDegrees(),
             ...props.layoutDefs,
             hasCentreItem: props.closerDefs !== undefined,
-            computeItemArcs: (path) => getItemsAt(path).map((item) => item.arcDegrees),
+            computeItemArcs: (path: number[]) => getItemsAt(path).map((item) => item.arcDegrees),
         }),
     );
 

@@ -61,6 +61,85 @@ const TILING_RATIOS: Record<ShapeConst.DefaultShape, TileBoardTiling> = {
     },
 };
 
+const computeNeighbours = (tile: Index2d, layout: TileBoardLayout): Index2d[] => {
+    const near = TileBoardUtils.getIsShortRow(tile.row, layout) ? 0 : -SHORT_ROW_TILES;
+    const far = near + SHORT_ROW_TILES;
+
+    if (layout.neighbourhood === "diagonal") {
+        return [
+            { row: tile.row - 1, col: tile.col + near },
+            { row: tile.row - 1, col: tile.col + far },
+            { row: tile.row + 1, col: tile.col + far },
+            { row: tile.row + 1, col: tile.col + near },
+        ];
+    }
+
+    if (layout.neighbourhood === "diagonalAndAcross") {
+        return [
+            { row: tile.row - 1, col: tile.col + near },
+            { row: tile.row - 1, col: tile.col + far },
+            { row: tile.row, col: tile.col + 1 },
+            { row: tile.row + 1, col: tile.col + far },
+            { row: tile.row + 1, col: tile.col + near },
+            { row: tile.row, col: tile.col - 1 },
+        ];
+    }
+
+    if (layout.neighbourhood === "diagonalAndDown") {
+        return [
+            { row: tile.row - 2, col: tile.col },
+            { row: tile.row - 1, col: tile.col + far },
+            { row: tile.row + 1, col: tile.col + far },
+            { row: tile.row + 2, col: tile.col },
+            { row: tile.row + 1, col: tile.col + near },
+            { row: tile.row - 1, col: tile.col + near },
+        ];
+    }
+
+    if (layout.neighbourhood === "sidewaysTriangle") {
+        const pointsRight = (layout.shape === POINTS_RIGHT) !== TileBoardUtils.getIsFlippedTile(tile, layout);
+
+        if (pointsRight) {
+            return [
+                { row: tile.row - 1, col: tile.col },
+                { row: tile.row + 1, col: tile.col },
+                { row: tile.row, col: tile.col - 1 },
+            ];
+        }
+
+        return [
+            { row: tile.row - 1, col: tile.col },
+            { row: tile.row, col: tile.col + 1 },
+            { row: tile.row + 1, col: tile.col },
+        ];
+    }
+
+    if (layout.neighbourhood === "uprightTriangle") {
+        const pointsUp = (layout.shape === POINTS_UP) !== TileBoardUtils.getIsFlippedTile(tile, layout);
+
+        if (pointsUp) {
+            return [
+                { row: tile.row, col: tile.col + 1 },
+                { row: tile.row + 1, col: tile.col },
+                { row: tile.row, col: tile.col - 1 },
+            ];
+        }
+
+        return [
+            { row: tile.row - 1, col: tile.col },
+            { row: tile.row, col: tile.col + 1 },
+            { row: tile.row, col: tile.col - 1 },
+        ];
+    }
+
+    return [
+        { row: tile.row - 1, col: tile.col },
+        { row: tile.row, col: tile.col + 1 },
+        { row: tile.row + 1, col: tile.col },
+        { row: tile.row, col: tile.col - 1 },
+    ];
+};
+
 export namespace TileBoardUtils {
     export const getTiling = (shape: ShapeConst.DefaultShape, tileSize: Size2d): TileBoardTiling => {
         const ratios = TILING_RATIOS[shape];
@@ -132,85 +211,6 @@ export namespace TileBoardUtils {
         tile.row < layout.count.row &&
         tile.col >= FIRST_INDEX &&
         tile.col < getRowLength(tile.row, layout);
-
-    const computeNeighbours = (tile: Index2d, layout: TileBoardLayout): Index2d[] => {
-        const near = getIsShortRow(tile.row, layout) ? 0 : -SHORT_ROW_TILES;
-        const far = near + SHORT_ROW_TILES;
-
-        if (layout.neighbourhood === "diagonal") {
-            return [
-                { row: tile.row - 1, col: tile.col + near },
-                { row: tile.row - 1, col: tile.col + far },
-                { row: tile.row + 1, col: tile.col + far },
-                { row: tile.row + 1, col: tile.col + near },
-            ];
-        }
-
-        if (layout.neighbourhood === "diagonalAndAcross") {
-            return [
-                { row: tile.row - 1, col: tile.col + near },
-                { row: tile.row - 1, col: tile.col + far },
-                { row: tile.row, col: tile.col + 1 },
-                { row: tile.row + 1, col: tile.col + far },
-                { row: tile.row + 1, col: tile.col + near },
-                { row: tile.row, col: tile.col - 1 },
-            ];
-        }
-
-        if (layout.neighbourhood === "diagonalAndDown") {
-            return [
-                { row: tile.row - 2, col: tile.col },
-                { row: tile.row - 1, col: tile.col + far },
-                { row: tile.row + 1, col: tile.col + far },
-                { row: tile.row + 2, col: tile.col },
-                { row: tile.row + 1, col: tile.col + near },
-                { row: tile.row - 1, col: tile.col + near },
-            ];
-        }
-
-        if (layout.neighbourhood === "sidewaysTriangle") {
-            const pointsRight = (layout.shape === POINTS_RIGHT) !== getIsFlippedTile(tile, layout);
-
-            if (pointsRight) {
-                return [
-                    { row: tile.row - 1, col: tile.col },
-                    { row: tile.row + 1, col: tile.col },
-                    { row: tile.row, col: tile.col - 1 },
-                ];
-            }
-
-            return [
-                { row: tile.row - 1, col: tile.col },
-                { row: tile.row, col: tile.col + 1 },
-                { row: tile.row + 1, col: tile.col },
-            ];
-        }
-
-        if (layout.neighbourhood === "uprightTriangle") {
-            const pointsUp = (layout.shape === POINTS_UP) !== getIsFlippedTile(tile, layout);
-
-            if (pointsUp) {
-                return [
-                    { row: tile.row, col: tile.col + 1 },
-                    { row: tile.row + 1, col: tile.col },
-                    { row: tile.row, col: tile.col - 1 },
-                ];
-            }
-
-            return [
-                { row: tile.row - 1, col: tile.col },
-                { row: tile.row, col: tile.col + 1 },
-                { row: tile.row, col: tile.col - 1 },
-            ];
-        }
-
-        return [
-            { row: tile.row - 1, col: tile.col },
-            { row: tile.row, col: tile.col + 1 },
-            { row: tile.row + 1, col: tile.col },
-            { row: tile.row, col: tile.col - 1 },
-        ];
-    };
 
     export const getNeighbourTiles = (tile: Index2d, layout: TileBoardLayout): Index2d[] =>
         computeNeighbours(tile, layout).filter((neighbour) => getIsOnBoard(neighbour, layout));

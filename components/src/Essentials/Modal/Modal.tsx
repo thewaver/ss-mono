@@ -4,11 +4,11 @@ import { Portal } from "solid-js/web";
 import { CSSUtils, GestureUtils, StringUtils } from "@thewaver/ss-utils";
 import type { SwipeAxis, SwipeDirection } from "@thewaver/ss-utils";
 
-import { DismisserStack } from "../../Abstracts/Dismisser/DismisserStack";
-import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
-import { FocusManager } from "../../Abstracts/FocusManager/FocusManager";
-import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
-import { useViewportContext } from "../../Exotics/Viewport/Viewport.context";
+import { DismisserUtils } from "../../Abstracts/Dismisser/Dismisser.utils";
+import { ElementFaderUtils } from "../../Abstracts/ElementFader/ElementFader.utils";
+import { FocusManagerUtils } from "../../Abstracts/FocusManager/FocusManager.utils";
+import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
+import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
 import type { ModalAlignment, ModalProps, ModalRole } from "./Modal.types";
 
@@ -51,12 +51,12 @@ export const Modal = (props: ModalProps) => {
         return access(props.margins) ?? CSSUtils.spreadMargin(0);
     });
 
-    const { getIsVisible, getTransitionTarget, getHasTransitionFinished } = ElementFader.createFader(
+    const { getIsVisible, getTransitionTarget, getHasTransitionFinished } = ElementFaderUtils.createFader(
         () => props.visibilitySignal[0](),
         { getTransitionDurationMs, onShow: props.onShow, onHide: props.onHide },
     );
 
-    FocusManager.autoFocus(getContainerRef, getIsVisible, { getInitialRef: () => access(props.initialFocusRef) });
+    FocusManagerUtils.autoFocus(getContainerRef, getIsVisible, { getInitialRef: () => access(props.initialFocusRef) });
 
     const handleDismiss = () => {
         props.visibilitySignal[1](false);
@@ -70,7 +70,7 @@ export const Modal = (props: ModalProps) => {
 
     const [getSwipeOffsetRatio, setSwipeOffsetRatio] = createSignal(0);
 
-    const { getIsSwiping } = InteractionTracker.trackSwipe(
+    const { getIsSwiping } = InteractionTrackerUtils.trackSwipe(
         getContainerRef,
         () => getSwipeDirection() === undefined || access(props.isDismissableOnOverlayClick) === false,
         {
@@ -112,7 +112,7 @@ export const Modal = (props: ModalProps) => {
         setSwipeOffsetRatio(0);
     });
 
-    DismisserStack.createLayer(getIsVisible, {
+    DismisserUtils.createLayer(getIsVisible, {
         getRoots: () => [getContainerRef()],
         onDismiss: (reason) => {
             if (reason !== "escape") return;
@@ -137,7 +137,7 @@ export const Modal = (props: ModalProps) => {
             >
                 <div
                     class={[styles.modalRoot, styles.modalAlignmentVariants[getAlignment()]].join(" ")}
-                    onKeyDown={(e) => FocusManager.focusTrapKeyDown(e, getContainerRef())}
+                    onKeyDown={(e) => FocusManagerUtils.focusTrapKeyDown(e, getContainerRef())}
                 >
                     <div class={styles.modalOverlay} onClick={handleOverlayClick}>
                         {props.renderOverlay(getTransitionTarget, getTransitionDurationMs)}

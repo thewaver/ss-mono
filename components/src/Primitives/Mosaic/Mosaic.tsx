@@ -2,7 +2,7 @@ import { For, createMemo, createSignal } from "solid-js";
 
 import type { Rect } from "@thewaver/ss-utils";
 
-import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
+import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
 import { access } from "../../Utils/propUtils";
 import type { MosaicPlacement, MosaicProps, MosaicSizeAnchor } from "./Mosaic.types";
 import { MosaicUtils } from "./Mosaic.utils";
@@ -25,7 +25,7 @@ export const Mosaic = (props: MosaicProps) => {
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
 
-    const getRootSize = ElementObserver.createBorderBoxSizeObserver(getRootRef);
+    const getRootSize = ElementObserverUtils.createBorderBoxSizeObserver(getRootRef);
 
     const getAnchoredExtent = createMemo(() =>
         getSizeAnchor() === "width" ? getRootSize().width : getRootSize().height,

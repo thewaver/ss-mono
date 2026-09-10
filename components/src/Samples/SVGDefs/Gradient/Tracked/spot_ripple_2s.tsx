@@ -2,11 +2,11 @@ import { createEffect, createSignal } from "solid-js";
 
 import { EasingUtils, MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
-import { PointerTracker } from "../../../../Abstracts/PointerTracker/PointerTracker";
+import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import type { SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
-import { SVGDefsFrames } from "../../SVGDefsFrames.utils";
+import { SVGDefsFrameUtils } from "../../SVGDefsFrames.utils";
 
 type Ripple = {
     origin: Point2d;
@@ -40,10 +40,10 @@ const FIRST_MILESTONE = 0;
 
 const NO_REF = () => undefined;
 
-const clock = SVGDefsFrames.createClock(RIPPLE_LIFETIME_MS);
+const clock = SVGDefsFrameUtils.createClock(RIPPLE_LIFETIME_MS);
 
 const createRipple = (index: number, getRef: () => HTMLElement | undefined) => {
-    const { getReading, getIsPointerPresent } = PointerTracker.create(getRef);
+    const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef);
     const [getRipple, setRipple] = createSignal<Ripple>();
 
     let bornMilestone = FIRST_MILESTONE;
@@ -114,7 +114,7 @@ export const spot_ripple_2s: TrackedGradientConfig = {
             gradientOrPattern: {
                 id: `gradient1-${id}`,
                 renderDefsElement: () => {
-                    const { getReading } = PointerTracker.create(getRef ?? NO_REF);
+                    const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient1-${id}`,

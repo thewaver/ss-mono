@@ -69,7 +69,7 @@ test("a transition still commits when no frame ever arrives", async ({ page }) =
  * until any event arrives. Both halves are asserted, because it is the pair that answers the question.
  */
 test("an anchored layer opens a frame behind, then tracks its anchor on the event alone", async ({ page }) => {
-    await page.goto("/viewport");
+    await page.goto("/viewport-wrapper");
     await expect(page.locator("[data-variant]").first()).toBeVisible();
 
     await page.locator("#scrolledCountry").click();

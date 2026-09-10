@@ -1,12 +1,13 @@
 import { type Accessor, Index, type JSX, Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 import { Dynamic } from "solid-js/web";
 
-import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
+import { ElementFaderUtils } from "../../Abstracts/ElementFader/ElementFader.utils";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
-import { PlacementBox, PlacementItem } from "../../Abstracts/Placement/Placement";
 import type { PlacementRect } from "../../Abstracts/Placement/Placement.types";
 import { PlacementUtils } from "../../Abstracts/Placement/Placement.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
+import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
+import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
 import type { Tab, TabPanelProps, TabsDir, TabsItemProps, TabsProps } from "./Tabs.types";
 
@@ -141,7 +142,7 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
 
     const getIsFloaterShown = createMemo(() => getSelectedIndex() >= 0 && getFloaterBounds() !== undefined);
 
-    const floaterFader = ElementFader.createFader(getIsFloaterShown, { getTransitionDurationMs });
+    const floaterFader = ElementFaderUtils.createFader(getIsFloaterShown, { getTransitionDurationMs });
 
     createEffect(() => {
         if (floaterFader.getIsVisible()) return;

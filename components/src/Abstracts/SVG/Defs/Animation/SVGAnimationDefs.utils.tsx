@@ -3,7 +3,7 @@ import { createMemo, createSignal, onCleanup } from "solid-js";
 
 import type { SVGAnimationDefs, SVGAnimationIterationPattern } from "./SVGAnimationDefs.types";
 
-export namespace SVGAnimationUtils {
+export namespace SVGAnimationDefsUtils {
     export const unrollSelfReferencingPatterns = (
         patterns: SVGAnimationIterationPattern[],
     ): SVGAnimationIterationPattern[] => {

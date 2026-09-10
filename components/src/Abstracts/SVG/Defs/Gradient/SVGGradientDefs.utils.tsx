@@ -8,59 +8,52 @@ import type { SVGLinearGradientDefs, SVGRadialGradientDefs } from "./SVGGradient
 
 type GradientColors = { value: string; stop?: number }[];
 
-export namespace SVGGradientDefsUtils {
-    const resolveStops = (colors: GradientColors) =>
-        colors.map((c, i) => {
-            const prevIdx = colors.findLastIndex((x, j) => j <= i && x.stop != null);
-            const nextIdx = colors.findIndex((x, j) => j >= i && x.stop != null);
+const resolveStops = (colors: GradientColors) =>
+    colors.map((c, i) => {
+        const prevIdx = colors.findLastIndex((x, j) => j <= i && x.stop != null);
+        const nextIdx = colors.findIndex((x, j) => j >= i && x.stop != null);
 
-            const prevStop = prevIdx >= 0 ? colors[prevIdx].stop! : 0;
-            const nextStop = nextIdx >= 0 ? colors[nextIdx].stop! : 100;
+        const prevStop = prevIdx >= 0 ? colors[prevIdx].stop! : 0;
+        const nextStop = nextIdx >= 0 ? colors[nextIdx].stop! : 100;
 
-            const prev = prevIdx >= 0 ? prevIdx : 0;
-            const next = nextIdx >= 0 ? nextIdx : colors.length - 1;
+        const prev = prevIdx >= 0 ? prevIdx : 0;
+        const next = nextIdx >= 0 ? nextIdx : colors.length - 1;
 
-            return (
-                c.stop ?? (prev === next ? prevStop : prevStop + ((nextStop - prevStop) * (i - prev)) / (next - prev))
-            );
-        });
+        return c.stop ?? (prev === next ? prevStop : prevStop + ((nextStop - prevStop) * (i - prev)) / (next - prev));
+    });
+const renderSmoothGradientStops = (getColors: () => GradientColors, id: string) =>
+    untrack(getColors).map((_unused, i) => (
+        <stop id={`${id}-stop-${i}`} offset={`${resolveStops(getColors())[i]}%`} stop-color={getColors()[i].value} />
+    ));
+const renderBandedGradientStops = (getColors: () => GradientColors, id: string) => {
+    const count = untrack(getColors).length;
 
-    const renderSmoothGradientStops = (getColors: () => GradientColors, id: string) =>
-        untrack(getColors).map((_unused, i) => (
+    if (!count) return [];
+
+    const stops: JSX.Element[] = [<stop id={`${id}-stop-0-start`} offset="0%" stop-color={getColors()[0].value} />];
+
+    for (let i = 1; i < count; i++) {
+        stops.push(
             <stop
-                id={`${id}-stop-${i}`}
+                id={`${id}-stop-${i - 1}-end`}
+                offset={`${resolveStops(getColors())[i]}%`}
+                stop-color={getColors()[i - 1].value}
+            />,
+        );
+        stops.push(
+            <stop
+                id={`${id}-stop-${i}-start`}
                 offset={`${resolveStops(getColors())[i]}%`}
                 stop-color={getColors()[i].value}
-            />
-        ));
+            />,
+        );
+    }
 
-    const renderBandedGradientStops = (getColors: () => GradientColors, id: string) => {
-        const count = untrack(getColors).length;
+    return stops;
+};
+const DEFAULT_RADIAL_ORIGIN = { x: 0.5, y: 0.5 };
 
-        if (!count) return [];
-
-        const stops: JSX.Element[] = [<stop id={`${id}-stop-0-start`} offset="0%" stop-color={getColors()[0].value} />];
-
-        for (let i = 1; i < count; i++) {
-            stops.push(
-                <stop
-                    id={`${id}-stop-${i - 1}-end`}
-                    offset={`${resolveStops(getColors())[i]}%`}
-                    stop-color={getColors()[i - 1].value}
-                />,
-            );
-            stops.push(
-                <stop
-                    id={`${id}-stop-${i}-start`}
-                    offset={`${resolveStops(getColors())[i]}%`}
-                    stop-color={getColors()[i].value}
-                />,
-            );
-        }
-
-        return stops;
-    };
-
+export namespace SVGGradientDefsUtils {
     export const computeLinearGradient = (
         defs: SVGLinearGradientDefs,
         custom?: JSX.Element | ((x1: number, y1: number, x2: number, y2: number) => JSX.Element),
@@ -87,8 +80,6 @@ export namespace SVGGradientDefsUtils {
             </linearGradient>
         );
     };
-
-    const DEFAULT_RADIAL_ORIGIN = { x: 0.5, y: 0.5 };
 
     export const computeRadialGradient = (
         defs: SVGRadialGradientDefs,

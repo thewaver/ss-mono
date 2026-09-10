@@ -2,8 +2,8 @@ import { createMemo } from "solid-js";
 
 import { DecimalUtils } from "@thewaver/ss-utils";
 
-import { MaskedField } from "../../../Abstracts/MaskedField/MaskedField";
-import type { TextSyncGroupDefs } from "../../../Abstracts/TextSync/TextSync.utils";
+import { MaskedFieldUtils } from "../../../Abstracts/MaskedField/MaskedField.utils";
+import type { TextSyncGroupDefs } from "../../../Abstracts/TextSync/TextSync.types";
 import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import { access } from "../../../Utils/propUtils";
@@ -40,7 +40,7 @@ export const CurrencyInput = (props: CurrencyInputProps) => {
         return (min !== undefined && parsed < min) || (max !== undefined && parsed > max) ? undefined : parsed;
     };
 
-    const field = MaskedField.createField<number>({
+    const field = MaskedFieldUtils.createField<number>({
         getValue: () => props.valueSignal[0](),
         setValue: (next) => props.valueSignal[1](next),
         formatDigits: (digits) => TextSyncUtils.formatWithGroups(getGroupDefs(), digits),

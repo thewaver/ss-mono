@@ -1,6 +1,6 @@
 import type { Size2d } from "@thewaver/ss-utils";
 
-import { PointerTracker } from "../../../../Abstracts/PointerTracker/PointerTracker";
+import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import type { TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
@@ -31,7 +31,7 @@ export const band_1v1: TrackedGradientConfig = {
             gradientOrPattern: {
                 id: `gradient1-${id}`,
                 renderDefsElement: () => {
-                    const { getReading } = PointerTracker.create(getRef ?? NO_REF);
+                    const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
                     return SVGGradientDefsUtils.computeLinearGradient({
                         id: `gradient1-${id}`,
@@ -49,7 +49,7 @@ export const band_1v1: TrackedGradientConfig = {
             gradientOrPattern: {
                 id: `gradient2-${id}`,
                 renderDefsElement: () => {
-                    const { getReading } = PointerTracker.create(getRef ?? NO_REF);
+                    const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
                     return SVGGradientDefsUtils.computeLinearGradient({
                         id: `gradient2-${id}`,

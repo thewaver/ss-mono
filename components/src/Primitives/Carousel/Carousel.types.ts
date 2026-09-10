@@ -2,9 +2,9 @@ import type { Accessor, JSX } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
-import type { BarrelAxis, BarrelFace } from "../../Abstracts/Barrel/Barrel.types";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
+import type { BarrelAxis, BarrelFace } from "../Barrel/Barrel.types";
 import type { InteractionControlProps } from "../InteractionWrapper/InteractionWrapper.types";
 
 export type CarouselVariant = "track" | "drum";

@@ -2,7 +2,7 @@ import type { Signal } from "solid-js";
 
 import type { AccessorProps, SVGDefsColors, SVGDefsSamples } from "@thewaver/ss-components";
 
-import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.const";
+import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.types";
 
 export type SVGGradientsPaintKind = "fill" | "stroke";
 

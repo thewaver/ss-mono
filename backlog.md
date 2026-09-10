@@ -80,7 +80,7 @@ privately inside them.
   control reads the description context; see `decisions.md`. This entry used to say the opposite — that it
   was the one item whose cost _grew_ with delay, because every control built without it grew its own half of
   the error plumbing — and nothing of it is outstanding now.
-- **Dismissal, open state and openers are all settled.** All five layers dismiss through `DismisserStack`, all
+- **Dismissal, open state and openers are all settled.** All five layers dismiss through `Dismisser`, all
   five take a `visibilitySignal`, and `Menu` takes an anchor while `ContextMenu` opens at a point; see
   `decisions.md`. Nothing in this family is outstanding.
 - **`Table` / data grid stays out of scope**, and specifically must not arrive as a by-product of
@@ -257,7 +257,7 @@ control.
   shortcut rather than by a button, and holds every action in the application rather than the few that relate
   to one element. Two pieces are missing: results gathered from several sources and shown in labelled groups,
   which is the grouped-and-windowed case item 2 leaves open, and a document-level hotkey, which wants the
-  register-and-stack shape `DismisserStack` has rather than a listener per consumer.
+  register-and-stack shape `Dismisser` has rather than a listener per consumer.
 
 **_Elsewhere._** Ark UI's set is the widest of the headless libraries and is the most useful scope check
 available: it has a tree view, a pagination component, a **segment group** — a segmented control as its
@@ -340,7 +340,7 @@ fakes frames as a 16ms timer and advancing time to reach a fallback fires the fr
   reaches its visible target, which is the whole reason the fallback was written.
 - **Starving the frames showed the positioner opening a layer a frame behind, and that is item 20.** What
   the test proves is narrower than the sentence it first produced: with no frames, a layer opens 30px out on
-  `ViewportPage`'s scrolled anchor and the first scroll still lands it exactly, so the capture-phase
+  `ViewportWrapperPage`'s scrolled anchor and the first scroll still lands it exactly, so the capture-phase
   listener carries a scroll on its own. It does **not** prove the poll has no other job — the test only ever
   opens a layer and then scrolls, and the poll is the only thing watching for an anchor that moves with no
   event to announce it. The fear this item used to record, of a popup drifting further and further from its
@@ -523,7 +523,7 @@ These are the gaps.
     and rejected: a prop that does nothing in three browsers out of four is the thing this item exists to
     avoid.
 
-**Nothing about dismissal or open state is outstanding.** `ColorInput` dismisses through `DismisserStack` like
+**Nothing about dismissal or open state is outstanding.** `ColorInput` dismisses through `Dismisser` like
 every other layer and takes a `visibilitySignal` like every other popup; both are in `decisions.md`.
 
 **_Elsewhere._**
@@ -606,7 +606,7 @@ _"`TabPanel`: the pairing is written on the record"_.
 ## 12. `Viewport` as a region: what is settled and what is not
 
 A viewport now fits its design size into the box the page gives it, clips everything inside it, and keeps
-its own layers within its own bounds; see `decisions.md`. `ViewportPage` is two 400px squares — a control
+its own layers within its own bounds; see `decisions.md`. `ViewportWrapperPage` is two 400px squares — a control
 that roams one of them at a scale you can change, and an anchor inside a scrolling area in the other — and
 `viewport.spec.ts` drives both, including that the two scales multiply and that a stack of toasts raised
 inside a nested viewport stays inside it. What is left:
@@ -869,14 +869,14 @@ that opens a frame behind, and a fast scroll that shows a frame of drift — and
 anchored layer paints at is the position its anchor was in one frame ago.** At rest the last frame catches up,
 so it looks settled and only moves when something else does.
 
-**Where it shows.** Opening a layer against `ViewportPage`'s scrolled anchor, measured with frames starved:
+**Where it shows.** Opening a layer against `ViewportWrapperPage`'s scrolled anchor, measured with frames starved:
 30px out, and it stays there until any event arrives. Scrolling a box with a layer open: the layer trails the
 anchor while the scroll is moving and lands exactly when it stops. `viewport.spec.ts` and
 `noAnimationFrames.spec.ts` both assert the settled position, which is what a spec can see; the intermediate
 frames are checked by eye.
 
-**What the layer is built on.** `Anchor.createPortalPosition` derives the position from two measured signals —
-the anchor's rect from `ElementObserver.createViewportRectObserver`, the content's size from a
+**What the layer is built on.** `AnchorUtils.createPortalPosition` derives the position from two measured signals —
+the anchor's rect from `ElementObserverUtils.createViewportRectObserver`, the content's size from a
 `ResizeObserver` — and the rect observer updates from three places: once on mount, from a capture-phase
 `scroll` and a window `resize`, and from a `requestAnimationFrame` loop that runs for as long as the layer is
 open. The poll is the only one of the three that catches an anchor moving with no event behind it: an ancestor
@@ -916,7 +916,7 @@ the coverage did.
 neither was tried.
 
 - **Replacing the positioner outright** is the version that pays: the browser owns placement and flipping and
-  most of `AnchorUtils` goes. What blocks it is that the library's placement vocabulary is richer than
+  most of `Anchor` goes. What blocks it is that the library's placement vocabulary is richer than
   `position-try` can state — band clamping and `reservedScreenSize` are arithmetic on numbers, and there is no
   CSS spelling for _"clamp into this band but keep the anchor's edge"_. Those semantics would have to be
   re-expressed or dropped.
@@ -1094,11 +1094,12 @@ sits in its own abstract from the start, and the second consumer corrects the ab
 
 ### What is built
 
-`Abstracts/Placement` holds the vocabulary, the picking, the sector, link and gap builders and the placed box
-itself, and has a Playground page of its own where five knobs build one set of measurements
+`Abstracts/Placement` holds the vocabulary, the picking and the sector, link and gap builders, with the placed
+box itself in `Primitives/PlacementBox` and `Primitives/PlacementItem`, and has a Playground page of its own where five knobs build one set of measurements
 that a `WheelMenu` and an `OverheadWheel` are both handed. Every layout sample is in
 `Samples/Placement/Layouts`, none of them named for a consumer, and every one is a `PlacementLayoutFn` — so
-any of them can be handed to any placed control.
+any of them can be handed to any placed control. The exception is the radial tree, which needs each item's
+parent rather than only a count, and therefore lives in the one page that can supply it.
 
 Eight controls take an optional `computeLayout` and are unchanged without one: `Menu` (with `WheelMenu` and
 `FanMenu` built over it), the overhead `Wheel`, `Paginator`, `RadioGroup`, `Tabs`, `Stepper`, `Toolbar`,
@@ -1122,15 +1123,17 @@ is what turned up the origin-placed item it scored as pointing due east.
 ### Faults the proving pass found and left open
 
 - **A placed item's box is guessed rather than measured.** A layout picks each item's size from numbers it is
-  given — `labelMaxWidthRatio`, `itemWidthPx` — while the painter's content has an intrinsic width the layout
+  given — `labelMaxWidthRatio`, `itemWidth` — while the painter's content has an intrinsic width the layout
   never sees. Where the content is wider it simply overflows, and on a ring that means overlapping a
   neighbour. Every one of the four arrangements built for `Stepper`, `Toolbar`, `Sortable` and `Tree` had to be
   widened by hand until its labels fitted, which is what makes this the abstract's problem rather than each
   demo's tuning.
 - **A laid-out control can overflow its container, and it is no longer only popups.** A ring is centred on its
-  invoker and grows with its item count, so nothing stops it reaching past the edge of the screen — pinning
-  deliberately turned off the clamping that would have moved it, and concentric submenus make it louder, each
-  level enclosing the one above it. In a page's flow the same thing bites differently: a placed `Toolbar` has
+  invoker and is as large as the box its consumer gave it, so nothing stops it reaching past the edge of the
+  screen — pinning deliberately turned off the clamping that would have moved it, and concentric submenus make
+  it louder, each level enclosing the one above it. **The mechanism changed** — a layout no longer sizes
+  itself from its item count — but the question did not: nothing decides what happens when the box is too big
+  for the room. In a page's flow the same thing bites differently: a placed `Toolbar` has
   nothing to collapse into, so a layout that outgrows its column spills rather than adapting. What should
   happen in either case has not been decided.
 - **`Stepper` ignores `renderBody` when it is laid out.** A step's body is a panel beside a vertical
@@ -1154,7 +1157,7 @@ is what turned up the origin-placed item it scored as pointing due east.
   hover a stationary pointer used to cause, which is fixed.
 - **`fan` places boxes rather than wedges, and that has never been argued either way.** The wedge vocabulary
   is on `PlacementRect` and any layout may use it; the fan is the one layout whose items are tilted along the
-  arc rather than sitting in a band, so cards may well be right for it. It takes `FanDefs` like the others now.
+  arc rather than sitting in a band, so cards may well be right for it. It takes `ArcDefs` like the others now.
 - **`PlacementLayout.origin` and `PlacementSector.origin` hold the same number.** One is what the picking
   measures directions from and the other is what a wedge painter turns its arc about, and a layout sets both
   from the same value. The duplication is deliberate — a painter is handed a `PlacementRect` and never sees
@@ -1301,7 +1304,7 @@ than the component was**, and is the part to reach for if a hand of overlapping 
   picks the neighbour — the same bug from the other side.
 - **Picking from a `PointerTracker` reading fails a tap.** That reading is flushed on an animation frame after
   a `pointermove`, and a tap with no movement before it has nothing to read.
-  `InteractionTracker.trackDrag` reports a ratio on the press itself, which is what a pick should use.
+  `InteractionTrackerUtils.trackDrag` reports a ratio on the press itself, which is what a pick should use.
 
 ### `DrumCarousel` in `Exotics`, and the cost of splitting the carousels
 

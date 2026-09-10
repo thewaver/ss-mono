@@ -1,6 +1,6 @@
 import { Index, createMemo } from "solid-js";
 
-import { BARREL_PERSPECTIVE_PX } from "../../Abstracts/Barrel/Barrel.utils";
+import { BARREL_PERSPECTIVE_PX } from "../../Primitives/Barrel/Barrel.utils";
 import { access } from "../../Utils/propUtils";
 import type { CuboidFace, CuboidFaceState, CuboidProps } from "./Cuboid.types";
 import { CuboidUtils } from "./Cuboid.utils";

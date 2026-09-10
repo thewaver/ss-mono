@@ -2,8 +2,8 @@ import { createEffect, createMemo, createSignal, onCleanup, onMount, untrack } f
 
 import { MathUtils, type Point2d } from "@thewaver/ss-utils";
 
-import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
-import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
+import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
+import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access } from "../../Utils/propUtils";
 import type { TrailController, TrailPlace, TrailProps } from "./Trail.types";
 import { TrailUtils } from "./Trail.utils";
@@ -18,13 +18,13 @@ const ORIGIN: Point2d = { x: 0, y: 0 };
 const SAMPLE_STEP_PX = 1;
 
 export const Trail = (props: TrailProps) => {
-    const [getProgress, setProgress] = SignalMirror.createOptional(() => props.progressSignal, NO_PROGRESS);
-    const [getIsPlaying, setIsPlaying] = SignalMirror.createOptional(() => props.isPlayingSignal, true);
+    const [getProgress, setProgress] = SignalMirrorUtils.createOptional(() => props.progressSignal, NO_PROGRESS);
+    const [getIsPlaying, setIsPlaying] = SignalMirrorUtils.createOptional(() => props.isPlayingSignal, true);
 
     const [getPathRef, setPathRef] = createSignal<SVGPathElement>();
     const [getPathLength, setPathLength] = createSignal(NO_LENGTH);
 
-    const getIsPageHidden = InteractionTracker.trackPageHidden();
+    const getIsPageHidden = InteractionTrackerUtils.trackPageHidden();
 
     const getPath = createMemo(() => access(props.path));
 

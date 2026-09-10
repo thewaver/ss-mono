@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { MediaQueryMonitor } from "@thewaver/ss-components";
+import { MediaQueryMonitorUtils } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
@@ -27,7 +27,7 @@ export const TrailPage = () => {
     const [getIsLooping, setIsLooping] = createSignal(true);
     const [getIsTurning, setIsTurning] = createSignal(true);
 
-    const getPrefersReducedMotion = MediaQueryMonitor.createReducedMotion();
+    const getPrefersReducedMotion = MediaQueryMonitorUtils.createReducedMotion();
 
     const circuitProgressSignal = createSignal(0);
     const circuitPlayingSignal = createSignal(!getPrefersReducedMotion());

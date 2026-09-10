@@ -1,6 +1,6 @@
 import type { AccessorProps, SVGDefsColors, SVGDefsSamples } from "@thewaver/ss-components";
 
-import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.const";
+import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.types";
 
 export type GlassSurfaceExampleProps = AccessorProps<{
     borderRadius: number;

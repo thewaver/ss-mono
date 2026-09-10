@@ -1,6 +1,6 @@
 import { Index, Show, createMemo } from "solid-js";
 
-import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
+import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import type { TagInputProps } from "./TagInput.types";
@@ -16,7 +16,7 @@ export const TagInput = (props: TagInputProps) => {
     let fieldRef: HTMLInputElement | undefined;
     let tagRefs: (HTMLElement | undefined)[] = [];
 
-    const textSignal = SignalMirror.createOptional(() => props.textSignal, "");
+    const textSignal = SignalMirrorUtils.createOptional(() => props.textSignal, "");
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 

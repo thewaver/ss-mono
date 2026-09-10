@@ -11,8 +11,8 @@ import {
     untrack,
 } from "solid-js";
 
-import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
-import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
+import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
+import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
 import type {
@@ -94,7 +94,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     let pinchGap: number | undefined;
     let pinchCentre: number | undefined;
 
-    const getSize = ElementObserver.createBorderBoxSizeObserver(getRootRef);
+    const getSize = ElementObserverUtils.createBorderBoxSizeObserver(getRootRef);
 
     const getRange = createMemo(() => access(props.range));
 
@@ -102,7 +102,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         () => access(props.minViewExtent) ?? TimelineUtils.getExtent(getRange()) * MIN_VIEW_SHARE,
     );
 
-    const viewSignal = SignalMirror.createOptional(() => props.viewSignal, untrack(getRange));
+    const viewSignal = SignalMirrorUtils.createOptional(() => props.viewSignal, untrack(getRange));
 
     const getView = createMemo(() => TimelineUtils.clampView(viewSignal[0](), getRange(), getMinViewExtent()));
 

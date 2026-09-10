@@ -1,9 +1,9 @@
 import type { RichTextNode } from "./RichText.types";
 
-export namespace RichTextUtils {
-    const stringifyNode = (node: RichTextNode): string =>
-        node.type === "text" ? node.content : `[${node.tag}]${node.children.map(stringifyNode).join("")}[/${node.tag}]`;
+const stringifyNode = (node: RichTextNode): string =>
+    node.type === "text" ? node.content : `[${node.tag}]${node.children.map(stringifyNode).join("")}[/${node.tag}]`;
 
+export namespace RichTextUtils {
     export const parseContent = (input: string): RichTextNode[] => {
         const stack: { tag: string; children: RichTextNode[] }[] = [{ tag: "root", children: [] }];
         const tagRE = /\[\/?[a-z_][a-z0-9_]*\]/gi;

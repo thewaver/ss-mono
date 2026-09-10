@@ -1,7 +1,7 @@
 import { Show, createEffect, createMemo, createSignal, createUniqueId, on, onCleanup } from "solid-js";
 
-import { ElementFader } from "../../Abstracts/ElementFader/ElementFader";
-import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
+import { ElementFaderUtils } from "../../Abstracts/ElementFader/ElementFader.utils";
+import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../Utils/propUtils";
 import type { PreviewFlags, PreviewProps, PreviewSizing, PreviewTriggerProps } from "./Preview.types";
@@ -52,13 +52,13 @@ export const Preview = (props: PreviewProps) => {
 
     const getSizing = createMemo(() => access(props.sizing) ?? DEFAULT_PREVIEW_SIZING);
 
-    const getContentHeight = ElementObserver.createBorderBoxHeightObserver(getContentRef);
+    const getContentHeight = ElementObserverUtils.createBorderBoxHeightObserver(getContentRef);
 
     const getHasMeasured = createMemo(() => getContentHeight() > 0);
 
     const getIsOverflowing = createMemo(() => getHasMeasured() && getContentHeight() > access(props.collapsedHeight));
 
-    const { getTransitionTarget, getHasTransitionFinished } = ElementFader.createFader(getIsExpanded, {
+    const { getTransitionTarget, getHasTransitionFinished } = ElementFaderUtils.createFader(getIsExpanded, {
         getTransitionDurationMs,
     });
 

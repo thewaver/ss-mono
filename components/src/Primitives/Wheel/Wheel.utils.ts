@@ -1,4 +1,4 @@
-import { BARREL_PERSPECTIVE_PX, BarrelUtils } from "../../Abstracts/Barrel/Barrel.utils";
+import { BARREL_PERSPECTIVE_PX, BarrelUtils } from "../Barrel/Barrel.utils";
 
 export const DRUM_PERSPECTIVE_PX = BARREL_PERSPECTIVE_PX;
 

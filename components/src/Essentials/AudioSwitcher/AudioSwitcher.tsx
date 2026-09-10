@@ -3,7 +3,7 @@ import { createEffect, createMemo, createSignal, on, onCleanup, onMount } from "
 import { AudioUtils } from "@thewaver/ss-utils";
 import { MathUtils } from "@thewaver/ss-utils";
 
-import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
+import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access } from "../../Utils/propUtils";
 import type { AudioSwitcherProps } from "./AudioSwitcher.types";
 
@@ -105,7 +105,7 @@ export const AudioSwitcher = (props: AudioSwitcherProps) => {
         startFade(element, "out", fadeOutTick);
     };
 
-    const [getIsPlaying, setIsPlaying] = SignalMirror.createOptional(() => props.playbackSignal, false);
+    const [getIsPlaying, setIsPlaying] = SignalMirrorUtils.createOptional(() => props.playbackSignal, false);
 
     createEffect(() => {
         const active = getActiveElement();

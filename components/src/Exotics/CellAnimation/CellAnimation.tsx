@@ -3,7 +3,7 @@ import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMou
 import { MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
+import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access } from "../../Utils/propUtils";
 import type { CellAnimationEvaluationDefs, CellAnimationFinalFrame, CellAnimationProps } from "./CellAnimation.types";
 import { CellAnimationUtils } from "./CellAnimation.utils";
@@ -40,7 +40,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
     const [getImgRef, setImgRef] = createSignal<HTMLElement>();
     const [getContainerRef, setContainerRef] = createSignal<HTMLElement>();
     const [getIsWindowVisible, setIsWindowVisible] = createSignal(true);
-    const [getIsPlaying] = SignalMirror.createOptional(() => props.playbackSignal, true);
+    const [getIsPlaying] = SignalMirrorUtils.createOptional(() => props.playbackSignal, true);
     const [getCurrentIteration, setCurrentIteration] = createSignal(0);
     const [getRootSize, setRootSize] = createSignal<Size2d>({ width: 0, height: 0 });
 

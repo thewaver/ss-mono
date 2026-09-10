@@ -2,7 +2,7 @@ import { createSignal, onCleanup } from "solid-js";
 
 const NO_CONSUMERS = 0;
 
-export namespace SVGDefsFrames {
+export namespace SVGDefsFrameUtils {
     export const createClock = (graceMs: number) => {
         const [getFrameMs, setFrameMs] = createSignal(performance.now());
 

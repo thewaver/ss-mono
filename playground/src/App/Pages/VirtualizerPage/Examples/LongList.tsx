@@ -1,6 +1,6 @@
 import { For, createEffect, createSignal } from "solid-js";
 
-import { Virtualizer } from "@thewaver/ss-components";
+import { VirtualizerUtils } from "@thewaver/ss-components";
 
 import type { VirtualizerCountExampleProps } from "../VirtualizerPage.types";
 
@@ -13,7 +13,7 @@ type Props = VirtualizerCountExampleProps;
 export const LongListExample = (props: Props) => {
     const [getSizerRef, setSizerRef] = createSignal<HTMLElement>();
 
-    const rowWindow = Virtualizer.createRowWindow(getSizerRef, props.rowCount, {
+    const rowWindow = VirtualizerUtils.createRowWindow(getSizerRef, props.rowCount, {
         getIsEnabled: () => true,
         computeEstimatedSize: () => ROW_HEIGHT_PX,
     });

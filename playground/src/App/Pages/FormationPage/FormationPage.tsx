@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { FittedLayouts } from "@thewaver/ss-components";
+import { PlacementLayouts } from "@thewaver/ss-components";
 import { ShapeConst } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -19,7 +19,7 @@ const FORMATION_WIDTH = 380;
 const EXAMPLES_ROOT = "/src/App/Pages/FormationPage/Examples";
 
 const STARTING_ITEM_COUNT = 6;
-const STARTING_LAYOUT_KEY: FittedLayouts.SampleKey = "podium";
+const STARTING_LAYOUT_KEY: PlacementLayouts.SampleKey = "podiumLozenge";
 const STARTING_SHAPE_KIND: ShapeConst.DefaultShape = "hexagon-pointy-top";
 
 const NAMES = [
@@ -47,7 +47,7 @@ const DefaultExampleWrapper = (props: FormationExampleProps) => {
 
 export const FormationPage = () => {
     const [getItemCount, setItemCount] = createSignal(STARTING_ITEM_COUNT);
-    const [getLayoutKey, setLayoutKey] = createSignal<FittedLayouts.SampleKey>(STARTING_LAYOUT_KEY);
+    const [getLayoutKey, setLayoutKey] = createSignal<PlacementLayouts.SampleKey>(STARTING_LAYOUT_KEY);
     const [getShapeKind, setShapeKind] = createSignal<ShapeConst.DefaultShape>(STARTING_SHAPE_KIND);
     const [getIsStackedInReverse, setIsStackedInReverse] = createSignal(false);
 
@@ -89,7 +89,7 @@ export const FormationPage = () => {
                 <PageProp key={"layoutKey"} label={"Arrangement"}>
                     <PageSelectField
                         value={getLayoutKey}
-                        values={() => FittedLayouts.SAMPLE_KEYS}
+                        values={() => PlacementLayouts.SAMPLE_KEYS}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Arrangement"}
                         onChange={(key) => setLayoutKey(() => key)}

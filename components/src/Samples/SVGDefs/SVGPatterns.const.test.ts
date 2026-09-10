@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { SVGPatternLayouts } from "./SVGPatternLayouts.const";
-import type { SVGPatternKind } from "./SVGPatternLayouts.const";
+import type { SVGPatternKind } from "./SVGPatternLayouts.types";
 
 const CELL = { width: 30, height: 30 };
 

@@ -1,3 +1,10 @@
+import { createSignal, onCleanup } from "solid-js";
+
+import type { TypeaheadDefs, TypeaheadHandle } from "./Typeahead.types";
+
+const DEFAULT_TYPEAHEAD_TIMEOUT_MS = 1000;
+const EMPTY_QUERY = "";
+
 const SPACE_KEY = " ";
 const SINGLE_CHARACTER = 1;
 const NOT_HIDDEN = "false";
@@ -42,5 +49,35 @@ export namespace TypeaheadUtils {
 
             if (computeText(index).trimStart().toLowerCase().startsWith(search)) return index;
         }
+    };
+
+    export const createBuffer = (defs?: TypeaheadDefs): TypeaheadHandle => {
+        const [getQuery, setQuery] = createSignal(EMPTY_QUERY);
+
+        let timer: ReturnType<typeof setTimeout> | undefined;
+
+        const clear = () => {
+            clearTimeout(timer);
+            timer = undefined;
+            setQuery(EMPTY_QUERY);
+        };
+
+        onCleanup(clear);
+
+        return {
+            getQuery,
+            clear,
+            push: (e) => {
+                if (!getIsQueryKey(e, getQuery() !== EMPTY_QUERY)) return;
+
+                const next = getQuery() + e.key;
+
+                clearTimeout(timer);
+                timer = setTimeout(clear, defs?.getTimeoutMs?.() ?? DEFAULT_TYPEAHEAD_TIMEOUT_MS);
+                setQuery(next);
+
+                return next;
+            },
+        };
     };
 }

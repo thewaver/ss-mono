@@ -3,9 +3,9 @@ import { Index, Show, createMemo, onMount } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
-import { Barrel } from "../../Abstracts/Barrel/Barrel";
-import { Rotator } from "../../Abstracts/Rotator/Rotator";
+import { RotatorUtils } from "../../Abstracts/Rotator/Rotator.utils";
 import { access } from "../../Utils/propUtils";
+import { Barrel } from "../Barrel/Barrel";
 import type { WheelAxis, WheelController, WheelFace, WheelProps, WheelWedgeState } from "./Wheel.types";
 
 import * as styles from "./Wheel.css";
@@ -16,7 +16,7 @@ const DEFAULT_WHEEL_WEDGE_SIZE: Size2d = { width: 0, height: 0 };
 const WHEEL_ROLE_DESCRIPTION = "wheel";
 const WEDGE_ROLE_DESCRIPTION = "wedge";
 const ROOT_PATH: number[] = [];
-const NO_PARENT_WIDTH = 0;
+const NO_PARENT_EXTENT = 0;
 const FIRST_WEDGE = 0;
 
 export const Wheel = <T,>(props: WheelProps<T>) => {
@@ -28,7 +28,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
 
     const getWedgeSize = createMemo(() => access(props.wedgeSize) ?? DEFAULT_WHEEL_WEDGE_SIZE);
 
-    const rotation = Rotator.createRotator(getIsDisabled, {
+    const rotation = RotatorUtils.createRotator(getIsDisabled, {
         stepCount: getWedgeCount,
         spinDurationMs: props.spinDurationMs,
         settleDurationMs: props.settleDurationMs,
@@ -51,7 +51,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
     );
 
     const getLayout = createMemo(() =>
-        props.computeLayout?.({ itemCount: getWedgeCount(), path: ROOT_PATH, parentWidth: NO_PARENT_WIDTH }),
+        props.computeLayout?.({ itemCount: getWedgeCount(), path: ROOT_PATH, parentExtent: NO_PARENT_EXTENT }),
     );
 
     const getWedgeState = (index: number, face: WheelFace): WheelWedgeState => ({

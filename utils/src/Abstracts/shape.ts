@@ -4,8 +4,45 @@ import { ObjectUtils } from "./object.js";
 import { Point2d } from "./point2d.js";
 import { Size2d } from "./size.js";
 
+const INNER_RECT_ITERATIONS = 5;
+const INNER_RECT_SAMPLES = 50;
+const CIRCLE_KAPPA = 1;
+const HALF_PI = Math.PI * 0.5;
+
+/** The outer and inner outlines of a shape, as both SVG path text and raw points. */
+type ShapePaths = {
+    innerPath: string;
+    innerPoints: Point2d[];
+    outerPath: string;
+    outerPoints: Point2d[];
+};
+
+/**
+ * Every result {@link ShapeConst.getPaths} has ever worked out.
+ *
+ * Deliberately unbounded and never evicted. Generating a shape is expensive and
+ * real workloads run to tens of thousands of distinct variations, so any cap large
+ * enough to be safe would not be a cap worth having — and one too small turns the
+ * cache into a treadmill that recomputes the same corners every frame. Call
+ * {@link ShapeConst.clearPathCache} at a natural boundary if the memory ever needs reclaiming.
+ */
+const pathCache = new Map<string, ShapePaths>();
+const writePathCache = (key: string, value: ShapePaths) => {
+    pathCache.set(key, value);
+
+    return value;
+};
+
+/**
+ * Throws away everything {@link ShapeConst.getPaths} has worked out so far.
+ *
+ * The cache never evicts on its own, so this is the only way to release it — worth
+ * calling when tearing down a screen that generated a great many one-off shapes.
+ */
+
 export namespace ShapeConst {
     /** The built-in shapes {@link getDefaultShapePoints} knows how to build. */
+
     export const DEFAULT_SHAPES = [
         "triangle-up",
         "triangle-down",
@@ -18,6 +55,7 @@ export namespace ShapeConst {
     ] as const;
 
     /** One of the built-in shape names. */
+
     export type DefaultShape = (typeof DEFAULT_SHAPES)[number];
 
     /**
@@ -27,6 +65,7 @@ export namespace ShapeConst {
      * a plain circular round, `0` gives a straight bevel, and negatives scoop the
      * corner inwards. These match the CSS `corner-shape` keywords of the same names.
      */
+
     export const CORNER_SHAPE_LAME_EXPONENTS = {
         square: Infinity,
         squircle: 2,
@@ -45,6 +84,7 @@ export namespace ShapeConst {
      * @param shape Which shape to build.
      * @param size The box to fill.
      */
+
     export const getDefaultShapePoints = (shape: DefaultShape, { width, height }: Size2d): Point2d[] => {
         switch (shape) {
             case "triangle-up":
@@ -115,42 +155,6 @@ export namespace ShapeConst {
 }
 
 export namespace ShapeUtils {
-    const INNER_RECT_ITERATIONS = 5;
-    const INNER_RECT_SAMPLES = 50;
-    const CIRCLE_KAPPA = 1;
-    const HALF_PI = Math.PI * 0.5;
-
-    /** The outer and inner outlines of a shape, as both SVG path text and raw points. */
-    type ShapePaths = {
-        innerPath: string;
-        innerPoints: Point2d[];
-        outerPath: string;
-        outerPoints: Point2d[];
-    };
-
-    /**
-     * Every result {@link getPaths} has ever worked out.
-     *
-     * Deliberately unbounded and never evicted. Generating a shape is expensive and
-     * real workloads run to tens of thousands of distinct variations, so any cap large
-     * enough to be safe would not be a cap worth having — and one too small turns the
-     * cache into a treadmill that recomputes the same corners every frame. Call
-     * {@link clearPathCache} at a natural boundary if the memory ever needs reclaiming.
-     */
-    const pathCache = new Map<string, ShapePaths>();
-
-    const writePathCache = (key: string, value: ShapePaths) => {
-        pathCache.set(key, value);
-
-        return value;
-    };
-
-    /**
-     * Throws away everything {@link getPaths} has worked out so far.
-     *
-     * The cache never evicts on its own, so this is the only way to release it — worth
-     * calling when tearing down a screen that generated a great many one-off shapes.
-     */
     export const clearPathCache = () => pathCache.clear();
 
     /**
@@ -160,6 +164,7 @@ export namespace ShapeUtils {
      * @returns Path text for an SVG `d` attribute, or `""` if there are fewer than
      * three points, since that cannot enclose an area.
      */
+
     export const pointsToPath = (pts: Point2d[]) => {
         if (pts.length < 3) return "";
 
@@ -185,6 +190,7 @@ export namespace ShapeUtils {
      * @param pts The shape's corners, in order.
      * @returns The rectangle, or an all-zero one if there are fewer than three points.
      */
+
     export const getInnerRect = (pts: Point2d[]) => {
         if (pts.length < 3) return { x: 0, y: 0, width: 0, height: 0 };
 
@@ -307,6 +313,7 @@ export namespace ShapeUtils {
      * @returns The outer and inner walls, the padded inputs, and the per-edge
      * directions. Fewer than three corners gives a filled-in but empty result.
      */
+
     export const setupPaths = (
         vertices: Point2d[],
         edgeThicknesses: number[],
@@ -485,6 +492,7 @@ export namespace ShapeUtils {
      * @returns Path text for the outer and inner outlines plus the points behind them.
      * Fewer than three corners gives empty strings and empty lists.
      */
+
     export const getPaths = (
         vertices: Point2d[],
         edgeThicknesses: number[],
@@ -749,6 +757,7 @@ export namespace ShapeUtils {
      * {@link ShapeConst.CORNER_SHAPE_LAME_EXPONENTS}.
      * @returns CSS padding, ready to spread onto a style object.
      */
+
     export const getRectPadding = (
         edgeThicknesses: number[],
         joinRadii?: number[],
@@ -794,6 +803,7 @@ export namespace ShapeUtils {
      * @param innerPoints The shape's inner outline, as returned by {@link getPaths}.
      * @returns CSS padding, ready to spread onto a style object.
      */
+
     export const getPolygonPadding = (size: Size2d, innerPoints: Point2d[]): CSS.PropertiesHyphen => {
         const innerRect = getInnerRect(innerPoints);
 

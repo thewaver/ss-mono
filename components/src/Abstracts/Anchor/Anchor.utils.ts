@@ -1,6 +1,29 @@
-import { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
+import type { Accessor } from "solid-js";
+import { createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 
-import type { AnchorBand, AnchorBandKind, AnchorHPlacement, AnchorVPlacement } from "./Anchor.types";
+import { type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
+
+import { ElementObserverUtils } from "../ElementObserver/ElementObserver.utils";
+import { ElevationUtils } from "../Elevation/Elevation.utils";
+import { useViewportContext } from "../Viewport/Viewport.context";
+import type { AnchorBand, AnchorBandKind, AnchorHPlacement, AnchorPlacement, AnchorVPlacement } from "./Anchor.types";
+
+const H_FAMILIES: Record<AnchorHPlacement, readonly AnchorHPlacement[]> = {
+    "left-in": ["left-in", "right-in"],
+    "right-in": ["right-in", "left-in"],
+    "left-out": ["left-out", "right-out"],
+    "right-out": ["right-out", "left-out"],
+    "center": ["center", "left-in", "right-in"],
+};
+const V_FAMILIES: Record<AnchorVPlacement, readonly AnchorVPlacement[]> = {
+    "top-in": ["top-in", "bottom-in"],
+    "bottom-in": ["bottom-in", "top-in"],
+    "top-out": ["top-out", "bottom-out"],
+    "bottom-out": ["bottom-out", "top-out"],
+    "center": ["center", "top-in", "bottom-in"],
+};
+const getOverflow = (start: number, size: number, limit: number, reserved: number) =>
+    Math.max(0, reserved - start) + Math.max(0, start + size - (limit - reserved));
 
 export namespace AnchorUtils {
     export const getHPlacementShift = (hPlacement: AnchorHPlacement, anchorRect: Rect, contentSize: Size2d) => {
@@ -69,22 +92,6 @@ export namespace AnchorUtils {
         }
     };
 
-    const H_FAMILIES: Record<AnchorHPlacement, readonly AnchorHPlacement[]> = {
-        "left-in": ["left-in", "right-in"],
-        "right-in": ["right-in", "left-in"],
-        "left-out": ["left-out", "right-out"],
-        "right-out": ["right-out", "left-out"],
-        "center": ["center", "left-in", "right-in"],
-    };
-
-    const V_FAMILIES: Record<AnchorVPlacement, readonly AnchorVPlacement[]> = {
-        "top-in": ["top-in", "bottom-in"],
-        "bottom-in": ["bottom-in", "top-in"],
-        "top-out": ["top-out", "bottom-out"],
-        "bottom-out": ["bottom-out", "top-out"],
-        "center": ["center", "top-in", "bottom-in"],
-    };
-
     export const getBand = (
         kind: AnchorBandKind,
         anchorStart: number,
@@ -116,9 +123,6 @@ export namespace AnchorUtils {
     };
 
     export const getBandSize = (band: AnchorBand) => Math.max(0, band.end - band.start);
-
-    const getOverflow = (start: number, size: number, limit: number, reserved: number) =>
-        Math.max(0, reserved - start) + Math.max(0, start + size - (limit - reserved));
 
     export const getSafeHPlacement = (
         hPlacement: AnchorHPlacement,
@@ -181,5 +185,152 @@ export namespace AnchorUtils {
         }
 
         return base;
+    };
+
+    export const createPortalPosition = (
+        getAnchorRef: Accessor<HTMLElement | undefined>,
+        getIsVisible: Accessor<boolean>,
+        opts: {
+            getPlacement: Accessor<AnchorPlacement>;
+            getOffset?: () => Point2d;
+            getReservedScreenSize?: () => Size2d;
+            getAnchorRect?: () => Rect | undefined;
+            getIsPinned?: () => boolean;
+        },
+    ) => {
+        const viewportContext = useViewportContext();
+
+        const [getContentRef, setContentRef] = createSignal<HTMLElement>();
+        const [getContentSize, setContentSize] = createSignal<Size2d | undefined>(undefined, {
+            equals: Size2d.isSame,
+        });
+        const [getObservedRect, setAnchorRect] = createSignal<Rect | undefined>(undefined, {
+            equals: Rect.isSame,
+        });
+
+        const getAnchorRect = createMemo(() => opts.getAnchorRect?.() ?? getObservedRect());
+
+        const getPlacement = createMemo((): AnchorPlacement => {
+            const contentSize = getContentSize();
+            const anchorRect = getAnchorRect();
+            const screenSize: Size2d = {
+                width: viewportContext.getSize().width,
+                height: viewportContext.getSize().height,
+            };
+            const offset = opts.getOffset?.();
+            const placement = opts.getPlacement();
+            const reservedScreenSize = opts.getReservedScreenSize?.();
+
+            if (!contentSize || !anchorRect || opts.getIsPinned?.()) return placement;
+
+            return {
+                x: getSafeHPlacement(placement.x, anchorRect, contentSize, screenSize, offset, reservedScreenSize),
+                y: getSafeVPlacement(placement.y, anchorRect, contentSize, screenSize, offset, reservedScreenSize),
+            };
+        });
+
+        const getBands = createMemo(() => {
+            const anchorRect = getAnchorRect();
+            const placement = getPlacement();
+            const screenSize = viewportContext.getSize();
+            const reservedScreenSize = opts.getReservedScreenSize?.();
+            const offset = opts.getOffset?.();
+
+            const kinds = {
+                x: anchorRect ? getHBandKind(placement.x) : ("over" as const),
+                y: anchorRect ? getVBandKind(placement.y) : ("over" as const),
+            };
+
+            return {
+                kinds,
+                x: getBand(
+                    kinds.x,
+                    anchorRect?.x ?? 0,
+                    anchorRect?.width ?? 0,
+                    offset?.x ?? 0,
+                    screenSize.width,
+                    reservedScreenSize?.width ?? 0,
+                ),
+                y: getBand(
+                    kinds.y,
+                    anchorRect?.y ?? 0,
+                    anchorRect?.height ?? 0,
+                    offset?.y ?? 0,
+                    screenSize.height,
+                    reservedScreenSize?.height ?? 0,
+                ),
+            };
+        });
+
+        const getPosition = createMemo(() => {
+            const anchorRect = getAnchorRect();
+            const contentSize = getContentSize();
+            const placement = getPlacement();
+            const bands = getBands();
+
+            if (!anchorRect || !contentSize) return;
+
+            const x =
+                getHPlacementShift(placement.x, anchorRect, contentSize) +
+                getHPlacementOffset(placement.x, opts.getOffset?.().x ?? 0);
+            const y =
+                getVPlacementShift(placement.y, anchorRect, contentSize) +
+                getVPlacementOffset(placement.y, opts.getOffset?.().y ?? 0);
+
+            if (opts.getIsPinned?.()) return { x, y };
+
+            return {
+                x: clampToBand(x, contentSize.width, bands.x, bands.kinds.x),
+                y: clampToBand(y, contentSize.height, bands.y, bands.kinds.y),
+            };
+        });
+
+        const getIsAnchorOnScreen = createMemo(() => {
+            const anchorRect = getAnchorRect();
+
+            if (!anchorRect) return true;
+
+            const screenSize = viewportContext.getSize();
+
+            return (
+                anchorRect.x + anchorRect.width > 0 &&
+                anchorRect.y + anchorRect.height > 0 &&
+                anchorRect.x < screenSize.width &&
+                anchorRect.y < screenSize.height
+            );
+        });
+
+        const getZIndex = createMemo(() => {
+            if (!getIsVisible()) return 1;
+
+            const anchorRef = getAnchorRef();
+
+            return Math.max(getStackingBase(anchorRef), ElevationUtils.getBase(anchorRef)) + 1;
+        });
+
+        ElementObserverUtils.createViewportRectObserver(getAnchorRef, () => getIsVisible() && !opts.getAnchorRect, {
+            setElementRect: setAnchorRect,
+        });
+
+        createEffect(() => {
+            let contentResizeObserver: ResizeObserver | undefined;
+
+            onCleanup(() => {
+                contentResizeObserver?.disconnect();
+                setContentSize(undefined);
+            });
+
+            const contentRef = getContentRef();
+            const isVisible = getIsVisible();
+
+            if (!contentRef || !isVisible) return;
+
+            contentResizeObserver = new ResizeObserver(() => {
+                setContentSize({ width: contentRef.offsetWidth, height: contentRef.offsetHeight });
+            });
+            contentResizeObserver.observe(contentRef);
+        });
+
+        return { getAnchorRect, getIsAnchorOnScreen, getPlacement, getPosition, getZIndex, setContentRef };
     };
 }

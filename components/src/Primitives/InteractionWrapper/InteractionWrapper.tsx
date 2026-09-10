@@ -1,7 +1,7 @@
 import { Show, createMemo, createSignal } from "solid-js";
 
-import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
+import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import { Tooltip } from "../../Essentials/Tooltip/Tooltip";
 import { access } from "../../Utils/propUtils";
 import type { InteractionSizing, InteractionWrapperProps } from "./InteractionWrapper.types";
@@ -21,7 +21,7 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
     const getTooltipDefs = createMemo(() => access(props.tooltipDefs));
 
     const getIsReachable = createMemo(() =>
-        InteractionTracker.computeIsReachable(
+        InteractionTrackerUtils.computeIsReachable(
             getIsDisabled(),
             access(props.isReachableWhenDisabled) ?? false,
             getTooltipDefs() !== undefined,
@@ -29,14 +29,14 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
         ),
     );
 
-    const { getFlags: getInternalFlags } = InteractionTracker.wrapElement(getElementRef, getIsDisabled, {
+    const { getFlags: getInternalFlags } = InteractionTrackerUtils.wrapElement(getElementRef, getIsDisabled, {
         getIsReachable,
         getIsTabbable: props.isTabbable === undefined ? undefined : () => access(props.isTabbable)!,
     });
 
     const getIsActivationUntracked = createMemo(() => getIsDisabled() || props.onActivation === undefined);
 
-    InteractionTracker.trackActivation(getElementRef, getIsActivationUntracked, (activation) =>
+    InteractionTrackerUtils.trackActivation(getElementRef, getIsActivationUntracked, (activation) =>
         props.onActivation?.(activation),
     );
 

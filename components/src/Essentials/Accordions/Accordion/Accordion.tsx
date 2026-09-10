@@ -1,7 +1,7 @@
 import { Index, createMemo, createSignal, createUniqueId } from "solid-js";
 
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
-import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
+import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { Collapsible } from "../Collapsible/Collapsible";
 import type { AccordionProps, AccordionSectionProps, AccordionSizing } from "./Accordion.types";
@@ -15,7 +15,7 @@ const DEFAULT_ACCORDION_SIZING: AccordionSizing = "fill";
 const AccordionSection = <T,>(props: AccordionSectionProps<T>) => {
     const headerId = createUniqueId();
 
-    const expandedSignal = SignalMirror.createPassThrough(
+    const expandedSignal = SignalMirrorUtils.createPassThrough(
         () => access(props.isExpanded),
         () => props.onToggle(),
     );

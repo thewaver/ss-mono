@@ -4,7 +4,7 @@ import { Show, createMemo, createSignal } from "solid-js";
 import { CSSUtils, type Point2d, StringUtils } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
-import { ElementObserver } from "../../Abstracts/ElementObserver/ElementObserver";
+import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
 import { access } from "../../Utils/propUtils";
 import type { SatelliteProps } from "./Satellite.types";
 import { SatelliteUtils } from "./Satellite.utils";
@@ -20,9 +20,9 @@ export const Satellite = (props: ParentProps<SatelliteProps>) => {
     const [getSubjectRef, setSubjectRef] = createSignal<HTMLElement>();
     const [getSatelliteRef, setSatelliteRef] = createSignal<HTMLElement>();
 
-    const getSubjectSize = ElementObserver.createBorderBoxSizeObserver(getSubjectRef);
+    const getSubjectSize = ElementObserverUtils.createBorderBoxSizeObserver(getSubjectRef);
 
-    const getSatelliteSize = ElementObserver.createBorderBoxSizeObserver(getSatelliteRef);
+    const getSatelliteSize = ElementObserverUtils.createBorderBoxSizeObserver(getSatelliteRef);
 
     const getPlacement = createMemo(() => access(props.placement) ?? DEFAULT_SATELLITE_PLACEMENT);
 

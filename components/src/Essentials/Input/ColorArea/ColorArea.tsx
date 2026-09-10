@@ -2,7 +2,7 @@ import { For, createRenderEffect, createSignal } from "solid-js";
 
 import { Color, MathUtils } from "@thewaver/ss-utils";
 
-import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
+import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { LabelUtils } from "../Label/Label.utils";
@@ -11,7 +11,7 @@ import type { ColorAreaAxis, ColorAreaElementProps, ColorAreaProps, ColorAreaRen
 import * as styles from "./ColorArea.css";
 
 const readFocusVisibleAxis = (element: HTMLElement, axis: ColorAreaAxis) =>
-    InteractionTracker.computeIsFocusVisible(element) ? axis : undefined;
+    InteractionTrackerUtils.computeIsFocusVisible(element) ? axis : undefined;
 
 const DEFAULT_COLOR_AREA_STEP = 0.01;
 const DEFAULT_COLOR_AREA_AXIS_LABELS: Record<ColorAreaAxis, string> = {
@@ -36,7 +36,7 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
 
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
-    const { getIsDragging } = InteractionTracker.trackDrag(getSurfaceRef, getIsDisabled, {
+    const { getIsDragging } = InteractionTrackerUtils.trackDrag(getSurfaceRef, getIsDisabled, {
         onDrag: (ratio) => {
             props.setAxis("saturation", ratio.x);
             props.setAxis("brightness", RATIO_MAX - ratio.y);
@@ -64,7 +64,7 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
         }
     });
 
-    InteractionTracker.wrapExtraControls(() => AXES.map((axis) => getAxisRefs()[axis]), getIsDisabled, {
+    InteractionTrackerUtils.wrapExtraControls(() => AXES.map((axis) => getAxisRefs()[axis]), getIsDisabled, {
         getIsTabbable: props.isTabbable === undefined ? undefined : () => access(props.isTabbable)!,
     });
 

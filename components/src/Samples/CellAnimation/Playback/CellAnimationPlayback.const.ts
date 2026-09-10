@@ -1,25 +1,24 @@
 import { MathUtils } from "@thewaver/ss-utils";
 
+const DEFAULT_DIRECTION: CellAnimationPlayback.Direction = "normal";
+const DEFAULT_HOLD_MS = 0;
+const isAlternating = (dir: CellAnimationPlayback.Direction) => dir === "alternate" || dir === "alternate-reverse";
+const computeAlternated = (progress: number, outward: number) => {
+    if (outward <= 0) return 1;
+    if (progress < outward) return progress / outward;
+    if (progress < 1 - outward) return 1;
+
+    return (1 - progress) / outward;
+};
+
 export namespace CellAnimationPlayback {
     export const DIRECTIONS = ["normal", "reverse", "alternate", "alternate-reverse"] as const;
+
     export type Direction = (typeof DIRECTIONS)[number];
 
     export type PlaybackOpts = {
         dir?: Direction;
         holdMs?: number;
-    };
-
-    const DEFAULT_DIRECTION: Direction = "normal";
-    const DEFAULT_HOLD_MS = 0;
-
-    const isAlternating = (dir: Direction) => dir === "alternate" || dir === "alternate-reverse";
-
-    const computeAlternated = (progress: number, outward: number) => {
-        if (outward <= 0) return 1;
-        if (progress < outward) return progress / outward;
-        if (progress < 1 - outward) return 1;
-
-        return (1 - progress) / outward;
     };
 
     export const computeCycleDurationMs = (durationMs: number, opts?: PlaybackOpts) => {

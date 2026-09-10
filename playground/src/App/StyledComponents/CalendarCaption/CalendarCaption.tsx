@@ -1,7 +1,7 @@
 import { Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 
 import type { DateValue } from "@thewaver/ss-components";
-import { Button, DateValueUtils, FocusManager, access } from "@thewaver/ss-components";
+import { Button, DateValueUtils, FocusManagerUtils, access } from "@thewaver/ss-components";
 import { FunctionUtils } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../ButtonContent/ButtonContent";
@@ -95,7 +95,7 @@ export const PageCalendarCaption = (props: PageCalendarCaptionProps) => {
 
     createEffect(() => {
         if (getIsEditing()) {
-            FocusManager.getFirstFocusableChild(getFieldsRef())?.focus();
+            FocusManagerUtils.getFirstFocusableChild(getFieldsRef())?.focus();
 
             return;
         }

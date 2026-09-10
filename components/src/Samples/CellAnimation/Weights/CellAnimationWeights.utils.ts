@@ -2,6 +2,87 @@ import { MathUtils, type Point2d, Point2dUtils, type Size2d } from "@thewaver/ss
 
 import type { WeightFn, WeightOpts } from "./CellAnimationWeights.types";
 
+const getBandMax = (from: number, to: number, distanceAt: (index: number) => number) =>
+    to < from ? 0 : Math.max(distanceAt(from), distanceAt(to));
+const HASH_OFFSET = 1;
+const HASH_MULTIPLIER_X = 374761393;
+const HASH_MULTIPLIER_Y = 668265263;
+const HASH_MULTIPLIER_MIX = 1274126177;
+const HASH_LOW_SHIFT = 13;
+const HASH_HIGH_SHIFT = 16;
+const HASH_RANGE = 4294967296;
+const FIXED_SEED = 0;
+let randomSeed = FIXED_SEED;
+const GOLDEN_RATIO = 0.6180339887498949;
+const getIndexedWeights = (weights: number[][]) => {
+    const indexed = new Map<number, Point2d[]>();
+
+    for (let y = 0; y < weights.length; y++) {
+        for (let x = 0; x < weights[y].length; x++) {
+            const weight = weights[y][x];
+            const bucket = indexed.get(weight);
+
+            if (bucket) {
+                bucket.push({ x, y });
+            } else {
+                indexed.set(weight, [{ x, y }]);
+            }
+        }
+    }
+
+    return indexed;
+};
+const getOrderedKeys = (indexed: Map<number, Point2d[]>) => [...indexed.keys()].sort((a, b) => a - b);
+const normalizeWeights = (weights: number[][]) => {
+    const indexed = getIndexedWeights(weights);
+    const orderedKeys = getOrderedKeys(indexed);
+
+    if (orderedKeys.length <= 1) return weights;
+
+    const result = weights.map((row) => [...row]);
+
+    orderedKeys.forEach((key, keyIdx) => {
+        for (const pos of indexed.get(key)!) {
+            result[pos.y][pos.x] = MathUtils.roundToDecimalPlaces(
+                keyIdx / (orderedKeys.length - 1),
+                CellAnimationWeightUtils.WEIGHT_DECIMAL_PLACES,
+            );
+        }
+    });
+
+    return result;
+};
+const makeWeightsUnique = (weights: number[][]) => {
+    const indexed = getIndexedWeights(weights);
+    const orderedKeys = getOrderedKeys(indexed);
+
+    if (orderedKeys.length <= 1) return weights;
+
+    const result = weights.map((row) => [...row]);
+    const lastBucket = indexed.get(orderedKeys[orderedKeys.length - 1])!;
+    const lastGap = orderedKeys[orderedKeys.length - 1] - orderedKeys[orderedKeys.length - 2];
+    const maxWeight = 1 + lastGap * ((lastBucket.length - 1) / lastBucket.length);
+
+    let gap = lastGap;
+
+    orderedKeys.forEach((key, keyIdx) => {
+        if (keyIdx < orderedKeys.length - 1) {
+            gap = orderedKeys[keyIdx + 1] - key;
+        }
+
+        const bucket = indexed.get(key)!;
+
+        bucket.forEach((pos, posIdx) => {
+            result[pos.y][pos.x] = MathUtils.roundToDecimalPlaces(
+                (weights[pos.y][pos.x] + (posIdx / bucket.length) * gap) / maxWeight,
+                CellAnimationWeightUtils.WEIGHT_DECIMAL_PLACES,
+            );
+        });
+    });
+
+    return result;
+};
+
 export namespace CellAnimationWeightUtils {
     export const WEIGHT_DECIMAL_PLACES = 3;
 
@@ -33,9 +114,6 @@ export namespace CellAnimationWeightUtils {
             up: Math.max(origin.x + origin.y, far.x + far.y, MIN_MAX_DISTANCE),
         };
     };
-
-    const getBandMax = (from: number, to: number, distanceAt: (index: number) => number) =>
-        to < from ? 0 : Math.max(distanceAt(from), distanceAt(to));
 
     export const getMaxDiagonalDistanceInBand = (
         origin: Point2d,
@@ -83,23 +161,7 @@ export namespace CellAnimationWeightUtils {
 
     export const fromOrderedIndex = (ordered: number, total: number) => (total <= 1 ? 1 : 1 - ordered / (total - 1));
 
-    const HASH_OFFSET = 1;
-
-    const HASH_MULTIPLIER_X = 374761393;
-
-    const HASH_MULTIPLIER_Y = 668265263;
-
-    const HASH_MULTIPLIER_MIX = 1274126177;
-
-    const HASH_LOW_SHIFT = 13;
-
-    const HASH_HIGH_SHIFT = 16;
-
-    const HASH_RANGE = 4294967296;
-
-    export const FIXED_HASH_SEED = 0;
-
-    let randomSeed = FIXED_HASH_SEED;
+    export const FIXED_HASH_SEED = FIXED_SEED;
 
     export const advanceRandomSeed = () => {
         randomSeed = Math.floor(Math.random() * HASH_RANGE);
@@ -141,8 +203,6 @@ export namespace CellAnimationWeightUtils {
 
         return high;
     };
-
-    const GOLDEN_RATIO = 0.6180339887498949;
 
     export const stride = (index: number, originIndex: number, total: number) => {
         if (total <= 1) return 1;
@@ -252,78 +312,6 @@ export namespace CellAnimationWeightUtils {
         }
 
         return 1 - (result - 1) / maxWeight;
-    };
-
-    const getIndexedWeights = (weights: number[][]) => {
-        const indexed = new Map<number, Point2d[]>();
-
-        for (let y = 0; y < weights.length; y++) {
-            for (let x = 0; x < weights[y].length; x++) {
-                const weight = weights[y][x];
-                const bucket = indexed.get(weight);
-
-                if (bucket) {
-                    bucket.push({ x, y });
-                } else {
-                    indexed.set(weight, [{ x, y }]);
-                }
-            }
-        }
-
-        return indexed;
-    };
-
-    const getOrderedKeys = (indexed: Map<number, Point2d[]>) => [...indexed.keys()].sort((a, b) => a - b);
-
-    const normalizeWeights = (weights: number[][]) => {
-        const indexed = getIndexedWeights(weights);
-        const orderedKeys = getOrderedKeys(indexed);
-
-        if (orderedKeys.length <= 1) return weights;
-
-        const result = weights.map((row) => [...row]);
-
-        orderedKeys.forEach((key, keyIdx) => {
-            for (const pos of indexed.get(key)!) {
-                result[pos.y][pos.x] = MathUtils.roundToDecimalPlaces(
-                    keyIdx / (orderedKeys.length - 1),
-                    WEIGHT_DECIMAL_PLACES,
-                );
-            }
-        });
-
-        return result;
-    };
-
-    const makeWeightsUnique = (weights: number[][]) => {
-        const indexed = getIndexedWeights(weights);
-        const orderedKeys = getOrderedKeys(indexed);
-
-        if (orderedKeys.length <= 1) return weights;
-
-        const result = weights.map((row) => [...row]);
-        const lastBucket = indexed.get(orderedKeys[orderedKeys.length - 1])!;
-        const lastGap = orderedKeys[orderedKeys.length - 1] - orderedKeys[orderedKeys.length - 2];
-        const maxWeight = 1 + lastGap * ((lastBucket.length - 1) / lastBucket.length);
-
-        let gap = lastGap;
-
-        orderedKeys.forEach((key, keyIdx) => {
-            if (keyIdx < orderedKeys.length - 1) {
-                gap = orderedKeys[keyIdx + 1] - key;
-            }
-
-            const bucket = indexed.get(key)!;
-
-            bucket.forEach((pos, posIdx) => {
-                result[pos.y][pos.x] = MathUtils.roundToDecimalPlaces(
-                    (weights[pos.y][pos.x] + (posIdx / bucket.length) * gap) / maxWeight,
-                    WEIGHT_DECIMAL_PLACES,
-                );
-            });
-        });
-
-        return result;
     };
 
     export const computeCellWeights = (compute: WeightFn, count: Point2d, origin: Point2d, opts?: WeightOpts) => {

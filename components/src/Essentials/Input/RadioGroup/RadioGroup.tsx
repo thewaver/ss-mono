@@ -1,10 +1,10 @@
 import { Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
-import { ElementFader } from "../../../Abstracts/ElementFader/ElementFader";
+import { ElementFaderUtils } from "../../../Abstracts/ElementFader/ElementFader.utils";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
-import { PlacementBox } from "../../../Abstracts/Placement/Placement";
 import type { PlacementRect } from "../../../Abstracts/Placement/Placement.types";
 import { PlacementUtils } from "../../../Abstracts/Placement/Placement.utils";
+import { PlacementBox } from "../../../Primitives/PlacementBox/PlacementBox";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { RadioGroupContextProvider } from "./RadioGroup.context";
 import type { RadioGroupContextType, RadioGroupEntry } from "./RadioGroup.context.types";
@@ -91,7 +91,7 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
 
     const getIsFloaterShown = createMemo(() => getSelectedEntry() !== undefined && getFloaterBounds() !== undefined);
 
-    const floaterFader = ElementFader.createFader(getIsFloaterShown, { getTransitionDurationMs });
+    const floaterFader = ElementFaderUtils.createFader(getIsFloaterShown, { getTransitionDurationMs });
 
     createEffect(() => {
         if (floaterFader.getIsVisible()) return;
@@ -183,7 +183,7 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
     return (
         <div
             ref={setRootRef}
-            class={styles.radioGroupRoot}
+            class={getLayout() === undefined ? styles.radioGroupRoot : styles.radioGroupPlacedRoot}
             style={{
                 "flex-direction": getDir(),
                 "gap": `${access(props.gap) ?? DEFAULT_RADIO_GROUP_GAP}px`,

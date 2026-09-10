@@ -3,7 +3,7 @@ import { Index, createMemo, createRenderEffect, createSignal } from "solid-js";
 import { MathUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
+import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../../Utils/propUtils";
 import { FormFieldUtils } from "../FormField/FormField.utils";
@@ -13,7 +13,7 @@ import type { RangeElementProps, RangeOrientation, RangeProps, RangeRenderProps,
 import * as styles from "./Range.css";
 
 const readFocusVisibleThumb = (element: HTMLElement, index: number) =>
-    InteractionTracker.computeIsFocusVisible(element) ? index : undefined;
+    InteractionTrackerUtils.computeIsFocusVisible(element) ? index : undefined;
 
 const DEFAULT_RANGE_ORIENTATION: RangeOrientation = "horizontal";
 const DEFAULT_RANGE_MIN = 0;
@@ -74,7 +74,7 @@ const RangeElement = (props: RangeElementProps) => {
         getElementRefs().forEach(syncElement);
     });
 
-    InteractionTracker.wrapExtraControls(() => getElementRefs().slice(1), getIsDisabled, {
+    InteractionTrackerUtils.wrapExtraControls(() => getElementRefs().slice(1), getIsDisabled, {
         getIsTabbable: props.isTabbable === undefined ? undefined : () => access(props.isTabbable)!,
     });
 

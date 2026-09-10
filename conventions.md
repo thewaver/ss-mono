@@ -185,8 +185,8 @@ snapshot, which is why no such helper exists here.
 
 **Handing an accessor onward needs `() => access(props.x)`; reading does not.** Inside an effect, a memo or JSX
 the surrounding tracking scope is the deferral, so `access(props.x)` is enough. The arrow is only for the few
-sites that pass a function to something which calls it later — `SignalMirror.createValueMirror`,
-`TextSync.createValueSync`, `LabelUtils.resolveAriaLabel`. Where the target's parameter is itself optional, the
+sites that pass a function to something which calls it later — `SignalMirrorUtils.createValueMirror`,
+`TextSyncUtils.createValueSync`, `LabelUtils.resolveAriaLabel`. Where the target's parameter is itself optional, the
 handoff is gated on presence, `props.x === undefined ? undefined : () => access(props.x)!`, because the target
 distinguishes "no accessor" from "an accessor returning undefined".
 
@@ -277,6 +277,92 @@ about the JSX call rather than about the configuration. So the declaration stays
 `(props: ParentProps<PageWheelCardProps>)`. It also keeps the type composable: a `ParentProps<X>` cannot be
 intersected or `Omit`-ed without dragging `children` along, and every type that spreads into another would
 inherit a `children` it never renders.
+
+### One namespace per folder, and the file it lives in names it
+
+**A folder exports one namespace, not two.** The user's rule, taken while reading `Abstracts/Anchor`, which
+held `Anchor` in `AnchorUtils.ts` and `Anchor` in `AnchorUtils.utils.ts`. Splitting a subject's pure arithmetic
+from the part that owns reactive state puts a seam through one idea: a consumer has to know which half a
+function landed in before they can import it, and the two files are read together anyway. Where a folder
+already had a stateful namespace and a utils one, the utils members join the stateful namespace and the
+`.utils.ts` goes.
+
+**Every namespace of functions is `<Subject>Utils`, and it lives in `<Subject>.utils.ts`.** No exceptions by
+layer: `AnchorUtils`, `CarrierUtils`, `FocusManagerUtils`, `InteractionTrackerUtils`, `MenuUtils`,
+`BarrelUtils`, `SVGDefsUtils`. **The reason is that the bare name belongs to a type, and giving it to a
+namespace spends a seat the type may want later.** A namespace cannot merge with a type across modules, and
+this library keeps types in `<Subject>.types.ts`, so a type and a namespace of one name can only ever meet in
+the flat barrel — where TypeScript reports `TS2308: Module has already exported a member named …`, drops the
+name, and leaves every consumer calling through it with "only refers to a type, but is being used as a
+value". The suffix has somewhere to stand whatever arrives later.
+
+**`Utils` does not promise the functions are pure.** `CarrierUtils` holds a live carry and a list of zones;
+`DismisserUtils` attaches document listeners; `AnchorUtils.createPortalPosition` opens signals and must run
+inside a component. The suffix marks a namespace with **no type of its own name to be a companion to** —
+which is what `ss-utils` already encodes, where `Point2d` and `Rect` are namespaces sharing their type's name
+and holding only the algebra the field layout gives, while `Point2dUtils` and `RectUtils` hold everything
+hand-written that knows what the fields mean. Structure in the companion, meaning in the `Utils`.
+
+**Nothing is pluralised twice.** The user's rule, in their words `CubeShapeUtils`, not `CubeShapesUtils`. The
+subject goes singular in front of `Utils`, whatever the file is called, so `Toasts.utils.ts` exports
+`ToastUtils`, `CellAnimationWeights.utils.ts` exports `CellAnimationWeightUtils` and `Keyframes.utils.ts`
+exports `KeyframeUtils`. This outranks _"named after the file"_ where the two disagree, which is only ever
+when the stem is plural.
+
+**Everything inside the braces is exported; a private helper sits above them.** The house was already two
+to one this way and `InteractionTrackerUtils` set the shape, with a dozen helpers at module level before the
+namespace opens. The reason is that the namespace is the published surface, so reading it should be reading
+the contract rather than checking each line for an `export` keyword — and module scope is already private, so
+nesting a helper buys no extra hiding, only a narrower reach that means nothing in a file holding one
+namespace.
+
+**Two hazards come with it, both silent.** A namespace member can shadow a module-level helper of the same
+name, and TypeScript says nothing: an exported member written to expose a private of the same name calls
+itself instead. So a private never shares a name with a published member. And a module-level `const` is
+evaluated before the namespace object exists, so an initialiser that reads a published member throws
+`Cannot access … before initialization` at import time — `CellAnimationWeightUtils`' random seed hit this.
+Where a private needs a published constant, the value goes at module level and the namespace publishes it
+from there, never the other way round. A type annotation is erased, so annotating with a namespace type is
+always safe.
+
+**A type lives in `<Subject>.types.ts`, never in the module that uses it.** `TextSync` declared three types in
+its utils file and `LiveAnnouncer` one, so a consumer wanting only the type pulled the whole implementation
+in. The one file exempt is `Utils/typeUtils.ts`, which is a home for type transformers by design and has no
+implementation to separate from. Where the type is a companion to a value in a `.const.ts` — `NO_SAMPLE_KEY`
+and `WithNoSample` — the type file owns the literal and the const file annotates against it, so the
+dependency runs one way.
+
+**Four kinds of file are outside the rule.** A `.const.ts` holds a registry and keeps the subject's plain
+name — every `Samples` registry is one, and so are `SVGDefsSamples`, `StaircaseIndents` and
+`CellAnimationZones`. A `.factory.tsx` exports its factory rather than a namespace, which is `SVGFilterDefs`.
+A `.context.ts` exports a provider and its hooks bare, with no namespace at all. And a namespace sharing a
+type's name is that type's companion, which is the `ss-utils` shape and cannot occur here while types live in
+their own file.
+
+**One file may hold more than one namespace in `ss-utils`, and does.** The user's ruling, particularly where
+one of them carries the type's name: `point2d.ts` holds `Point2d`, `Point2dString` and `Point2dUtils`, and
+`rect.ts` the same three for rects. That is the companion pattern working as intended — the type and its
+algebra have to share a file to merge into one identifier — so it is not a split to undo. `components/src`
+and `playground/src` have none, and one namespace per file remains the rule there.
+
+**`ss-utils` names its files differently and is left alone.** `math.ts` exports `MathUtils`, `io.ts` exports
+`IOUtils`: the namespaces already satisfy the rule, only the file names do not, and that package's
+one-lowercase-file-per-subject layout is its own convention. Two namespaces there are outside the rule and
+stay: `Color`, which is a container of per-space companions so `Color.HSL` is both a type and its operations,
+and `ShapeConst`, which holds constants and is the `.const.ts` case under another spelling.
+
+**`Defs` is the one exception, and it is a proper noun rather than a plural.** `SVGDefsUtils`,
+`SVGGradientDefsUtils`, `SVGPatternDefsUtils` and `SVGAnimationDefsUtils` keep their `s`. `<defs>` is the name
+of the SVG element, `SVGDefs` is an exported type, and singularising only the namespaces would leave
+`SVGDefUtils` beside a type called `SVGDefs` — one idea reading as two, which is what the `Dismisser` rename
+was done to avoid. The user's call, taken against their own rule and not happily, so do not read it as licence
+for a second exception: anything else plural in front of `Utils` goes singular.
+
+**Module-private helpers live outside the namespace**, above it, which is what `InteractionTracker` already
+did and what a merge should leave behind. The namespace holds the published surface and nothing else.
+
+**A file holding more than one namespace is a separate question and is not covered here.** Nothing in
+`Abstracts` does; where one turns up elsewhere, ask before merging.
 
 ### Prop prefixes
 
@@ -377,9 +463,9 @@ Shortcut: **if calling `fn(x())` would lose a subscription the callee needs, pas
 ### Hook-like util arg order
 
 `ref` (if any) → enabled / visible / disabled → opts / defs. Prefer `getIsDisabled` over
-`getIsEnabled`. Examples: `ElementObserver.createViewportRectObserver(ref, visible, opts)`,
-`InteractionTracker.wrapElement(ref, disabled, opts)`, `FocusManager.autoFocus(ref, visible)`,
-`ElementFader(visible, opts)`, `FrameRateMonitor.create(disabled, opts)`.
+`getIsEnabled`. Examples: `ElementObserverUtils.createViewportRectObserver(ref, visible, opts)`,
+`InteractionTrackerUtils.wrapElement(ref, disabled, opts)`, `FocusManagerUtils.autoFocus(ref, visible)`,
+`ElementFader(visible, opts)`, `FrameRateMonitorUtils.create(disabled, opts)`.
 
 **An observer's name carries its coordinate space**, because the wrong one fails silently — it returns
 a plausible number wrong by the `Viewport` scale factor. `createViewportRectObserver` polls on
@@ -812,7 +898,7 @@ chain orders itself without anyone counting.
 
 **Why not the stack.** Open order and paint order are different questions: a `Modal` opened _from_ a menu
 should cover the menu that opened it, and the anchor chain says so while a counter does not. It also keeps
-`DismisserStack` a listener rather than something that paints, and leaves a consumer's own stacking free of a
+`Dismisser` a listener rather than something that paints, and leaves a consumer's own stacking free of a
 number the library invented.
 
 **`Tooltip` takes the same number and no longer takes a prop.** `computeZIndex` went with this change: it
@@ -851,7 +937,7 @@ Settled, closing a defect found while writing `e2e/range.spec.ts`: on a **disabl
 and `ColorAreaElement` forwards the `role="group"` rather than either slider, so every other focusable element
 was outside all of it at a native `tabIndex` of 0.
 
-**`InteractionTracker.wrapExtraControls(getRefs, getIsDisabled, opts)` is the fix, and it is deliberately only
+**`InteractionTrackerUtils.wrapExtraControls(getRefs, getIsDisabled, opts)` is the fix, and it is deliberately only
 the disabled half.** It sets `tabIndex` and attaches the same focus refusal, and it is in `InteractionTracker`
 rather than either leaf because two components needed it the day it was written.
 
@@ -916,7 +1002,7 @@ Written down after exactly that: the old signed-year `DateValue` accepted any ye
 0..9999 in expanded form, and `DateInput`'s four digit slots laid the longer run into the mask regardless —
 pushing every later part along, so 15 August 44 BC read as `0440-81-5`.
 
-**Where the check belongs, when one is needed.** Not in the mask: `TextSyncUtils` is told a pattern and a
+**Where the check belongs, when one is needed.** Not in the mask: `TextSync` is told a pattern and a
 digit run and has no idea which digits were the year, so only the control that built the pattern can know the
 run is too long. And the text-to-value effect has to stand down while an unspellable value is held, or the
 blank text it just produced parses as "no value" and clears the consumer's — turning a display bug into data
@@ -942,7 +1028,7 @@ proved it on this kind of state: it reads `visibilitySignal` and writes `false` 
 popup opens and closes for its own reasons, so a one-way "here is a boolean, obey it" prop would fight the
 component. A consumer with no signal uses `SignalMirror`.
 
-**`SignalMirror.createPassThrough` is the third shape, and it holds nothing at all.** It takes a getter and
+**`SignalMirrorUtils.createPassThrough` is the third shape, and it holds nothing at all.** It takes a getter and
 a setter and returns a `Signal` whose reads go straight to the source and whose writes go straight out, with
 no inner value between them. That matters wherever a write can be **refused**: a mirror keeps its own copy,
 and a copy that has already flipped never hears about a refusal, because the outer value it would compare
@@ -951,7 +1037,7 @@ must stay open when its own header is pressed, and with a mirror underneath it t
 the list said open. Same caveat as every setter of this shape: a `T` that is itself a function cannot be
 written as a value, only through an updater.
 
-**`SignalMirror.createOptional` is how a control stays private by default.** It returns the signal the
+**`SignalMirrorUtils.createOptional` is how a control stays private by default.** It returns the signal the
 component was handed or one of its own, reading the prop through on every access, so there is one code path
 rather than a branch at every use. Without it each of the five would carry "the shared one if I was given one,
 otherwise mine".
@@ -980,7 +1066,7 @@ Settled by the user, applying the argument that had already retired the controll
 **Whether a thing is playing is state, so it arrives as `playbackSignal`.** `CellAnimation` and
 `ScanlineAnimation` had `start()` / `stop()` on a handle given out at mount, both literally
 `setIsPlaying(true/false)` over a private signal; `AudioSwitcher` had `play()` / `pause()`, the same state
-behind a pair of fades. All three now take an optional `playbackSignal` through `SignalMirror.createOptional`.
+behind a pair of fades. All three now take an optional `playbackSignal` through `SignalMirrorUtils.createOptional`.
 
 **What that buys is visible in the Playground rather than in the API.** Both animation pages used to collect a
 controller per mounted instance into an array and call `start()` on every one when the stress-test modal
@@ -1017,7 +1103,7 @@ positions its popup against that element instead of its own trigger.
 **The positioning is the smaller half; the dismissal is the point.** `Popover` builds its dismiss roots as
 `[the popup, the anchor]`, so whatever element is the anchor is inside the layer and a press on it is not an
 outside press. Before this a consumer's own toggle button was outside, so pressing it while open dismissed the
-menu and the handler re-opened it. Making that button the anchor fixes it without `DismisserStack` learning
+menu and the handler re-opened it. Making that button the anchor fixes it without `Dismisser` learning
 anything new.
 
 **A split button is now a composition rather than a missing feature**: the arrow half is the anchor, the main
@@ -1271,7 +1357,7 @@ the same finger.
 
 `e2e/` can only reach what a click can reach. A function taking rectangles and returning a placement has no
 page to be clicked on, so provoking its edge cases through a browser means a Playground variant per case —
-which is why `AnchorUtils`'s flip-and-clamp logic went unchecked long enough to ship the overflow in
+which is why `Anchor`'s flip-and-clamp logic went unchecked long enough to ship the overflow in
 `backlog.md` #5. `npm test` calls library functions directly.
 
 **One dependency, and no DOM.** `vitest` reads the repo's own Vite setup, and `vitest.config.ts` sets
@@ -1300,9 +1386,9 @@ re-blessed wholesale by any change.
 **Deliberately not covered:**
 
 - **Anything taking an element or a Solid owner.** `FocusManager`, `ElementObserver`, `ElementFader`, `TextSync`,
-  `Anchor`'s own factory, `InteractionTracker.wrapElement` and `Viewport`'s rect adjustment all need a real
+  `Anchor`'s own factory, `InteractionTrackerUtils.wrapElement` and `Viewport`'s rect adjustment all need a real
   layout to say anything true. They are `e2e/`'s half.
-- **The SVG defs builders.** `SVGPatternDefsUtils`, `SVGGradientDefsUtils` and `SVGAnimationUtils` return
+- **The SVG defs builders.** `SVGPatternDefsUtils`, `SVGGradientDefsUtils` and `SVGAnimationDefsUtils` return
   JSX, and their arithmetic — tiling offsets, `resolveStops`' interpolation — is written inline inside the
   element or kept private. Real geometry, unreachable without rendering or a refactor separating arithmetic
   from markup. `backlog.md` #12.

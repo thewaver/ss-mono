@@ -2,7 +2,7 @@ import type { Accessor, JSX } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
-import type { BarrelAxis, BarrelFace } from "../../Abstracts/Barrel/Barrel.types";
+import type { BarrelAxis, BarrelFace } from "../../Primitives/Barrel/Barrel.types";
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
 export type FlipCardAxis = BarrelAxis;

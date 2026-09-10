@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { MediaQueryMonitor } from "@thewaver/ss-components";
+import { MediaQueryMonitorUtils } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
@@ -66,7 +66,7 @@ export const ScrambleTextPage = () => {
     const [getGlyphSet, setGlyphSet] = createSignal<(typeof GLYPH_SETS)[number]>(GLYPH_SETS[0]);
     const [getSettleOrder, setSettleOrder] = createSignal<(typeof SETTLE_ORDERS)[number]>(SETTLE_ORDERS[0]);
 
-    const getPrefersReducedMotion = MediaQueryMonitor.createReducedMotion();
+    const getPrefersReducedMotion = MediaQueryMonitorUtils.createReducedMotion();
 
     const getExamples = createMemo(() => {
         const commonProps: ScrambleTextExampleProps = {

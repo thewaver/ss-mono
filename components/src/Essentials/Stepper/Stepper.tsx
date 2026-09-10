@@ -1,8 +1,9 @@
 import { type Accessor, Index, type JSX, Show, createMemo } from "solid-js";
 
-import { PlacementBox, PlacementItem } from "../../Abstracts/Placement/Placement";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import type { InteractionSizing } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
+import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
+import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
 import type { Step, StepperDir, StepperItemProps, StepperProps } from "./Stepper.types";
 

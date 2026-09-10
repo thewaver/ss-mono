@@ -4,19 +4,18 @@ import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueI
 import { CSSUtils, StringUtils } from "@thewaver/ss-utils";
 
 import { CheckedStateUtils } from "../../../Abstracts/CheckedState/CheckedState.utils";
-import { ElementObserver } from "../../../Abstracts/ElementObserver/ElementObserver";
+import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
 import { FlattenerUtils } from "../../../Abstracts/Flattener/Flattener.utils";
-import { InteractionTracker } from "../../../Abstracts/InteractionTracker/InteractionTracker";
+import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
-import { SignalMirror } from "../../../Abstracts/SignalMirror/SignalMirror";
-import { TextSync } from "../../../Abstracts/TextSync/TextSync";
-import { Typeahead } from "../../../Abstracts/Typeahead/Typeahead";
+import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
+import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
 import { TypeaheadUtils } from "../../../Abstracts/Typeahead/Typeahead.utils";
-import { Virtualizer } from "../../../Abstracts/Virtualizer/Virtualizer";
 import type { VirtualizerRow } from "../../../Abstracts/Virtualizer/Virtualizer.types";
+import { VirtualizerUtils } from "../../../Abstracts/Virtualizer/Virtualizer.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
+import { Popover } from "../../../Primitives/Popover/Popover";
 import { access, accessSignal } from "../../../Utils/propUtils";
-import { Popover } from "../../Popover/Popover";
 import { FormFieldUtils } from "../FormField/FormField.utils";
 import { LabelUtils } from "../Label/Label.utils";
 import type {
@@ -47,7 +46,7 @@ const SelectField = (props: SelectFieldProps) => {
 
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
-    const { handleInput, handleCompositionStart, handleCompositionEnd } = TextSync.createValueSync(
+    const { handleInput, handleCompositionStart, handleCompositionEnd } = TextSyncUtils.createValueSync(
         getElementRef,
         () => access(props.query),
         { onInput: props.onQueryInput },
@@ -167,11 +166,11 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     const [getFieldRef, setFieldRef] = createSignal<HTMLElement>();
     const [getEndMarkerRef, setEndMarkerRef] = createSignal<HTMLElement>();
     const [getSizerRef, setSizerRef] = createSignal<HTMLElement>();
-    const [getIsOpen, setIsOpen] = SignalMirror.createOptional(() => props.visibilitySignal, false);
+    const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
     const [getHasPopoverSettled, setHasPopoverSettled] = createSignal(true);
     const [getHighlightedValue, setHighlightedValue] = createSignal<T | undefined>();
 
-    const typeahead = Typeahead.createBuffer();
+    const typeahead = TypeaheadUtils.createBuffer();
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
@@ -201,7 +200,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 
     const getIsVirtualized = createMemo(() => props.computeEstimatedOptionHeight !== undefined);
 
-    const getIsAtEnd = ElementObserver.createViewportIntersectionObserver(getEndMarkerRef, getIsOpen);
+    const getIsAtEnd = ElementObserverUtils.createViewportIntersectionObserver(getEndMarkerRef, getIsOpen);
 
     let askedForOptions: SelectItem<T>[] | undefined;
 
@@ -225,7 +224,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 
     const getNavigableIndexes = createMemo(() =>
         getFlatOptions().reduce<number[]>((acc, option, index) => {
-            const isReachable = InteractionTracker.computeIsReachable(
+            const isReachable = InteractionTrackerUtils.computeIsReachable(
                 option.isDisabled ?? false,
                 option.isReachableWhenDisabled ?? false,
                 option.tooltipDefs !== undefined,
@@ -254,7 +253,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
         return navigable[0];
     });
 
-    const rowWindow = Virtualizer.createRowWindow(getSizerRef, () => getRows().length, {
+    const rowWindow = VirtualizerUtils.createRowWindow(getSizerRef, () => getRows().length, {
         getIsEnabled: () => getIsVirtualized() && getIsOpen(),
         computeEstimatedSize: (index) => {
             const row = getRows()[index];

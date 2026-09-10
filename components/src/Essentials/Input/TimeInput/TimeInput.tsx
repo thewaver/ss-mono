@@ -3,7 +3,7 @@ import { createEffect, createMemo, createSignal, untrack } from "solid-js";
 import { TimeUtils } from "@thewaver/ss-utils";
 import type { TimeValue, TimeValueMeridiem, TimeValueUnit } from "@thewaver/ss-utils";
 
-import { MaskedField } from "../../../Abstracts/MaskedField/MaskedField";
+import { MaskedFieldUtils } from "../../../Abstracts/MaskedField/MaskedField.utils";
 import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import { access, accessSignal } from "../../../Utils/propUtils";
@@ -86,7 +86,7 @@ export const TimeInput = (props: TimeInputProps) => {
             : undefined;
     };
 
-    const field = MaskedField.createField<TimeValue>({
+    const field = MaskedFieldUtils.createField<TimeValue>({
         getValue: () => valueSignal[0](),
         setValue: (next) => valueSignal[1](() => next),
         formatDigits: (digits) => TextSyncUtils.formatWithMask(getMask(), digits),

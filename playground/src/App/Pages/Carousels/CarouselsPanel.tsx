@@ -40,14 +40,14 @@ export const PageCarouselsPanel = (props: Props) => {
             </PageProp>
 
             <Show when={props.hasDelay}>
-                <PageProp key={"delayMs"} label={"Rotator delay (ms)"}>
+                <PageProp key={"delayMs"} label={"RotatorUtils delay (ms)"}>
                     <PageNumberField
                         value={controls.delaySignal[0]}
                         min={() => MIN_DELAY_MS}
                         max={() => MAX_DELAY_MS}
                         step={() => DELAY_STEP_MS}
                         width={() => FIELD_WIDTH}
-                        ariaLabel={"Rotator delay in milliseconds"}
+                        ariaLabel={"RotatorUtils delay in milliseconds"}
                         onInput={controls.delaySignal[1]}
                     />
                 </PageProp>

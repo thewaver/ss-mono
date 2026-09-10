@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { MediaQueryMonitor } from "@thewaver/ss-components";
+import { MediaQueryMonitorUtils } from "@thewaver/ss-components";
 
 import {
     INDEFINITE_REST_DURATION_MS,
@@ -28,7 +28,7 @@ export const createWheelsControls = (): WheelsControls => {
     const spinStyleSignal = createSignal<WheelSpinStyleKey>(STARTING_SPIN_STYLE_KEY);
     const isDisabledSignal = createSignal(false);
 
-    const getPrefersReducedMotion = MediaQueryMonitor.createReducedMotion();
+    const getPrefersReducedMotion = MediaQueryMonitorUtils.createReducedMotion();
 
     const getWedges = createMemo(() => PRIZES.slice(0, wedgeCountSignal[0]()));
 

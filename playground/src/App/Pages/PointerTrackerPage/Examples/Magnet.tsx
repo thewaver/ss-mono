@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { ElementObserver, MediaQueryMonitor, PointerTracker } from "@thewaver/ss-components";
+import { ElementObserverUtils, MediaQueryMonitorUtils, PointerTrackerUtils } from "@thewaver/ss-components";
 import { EasingUtils, MathUtils, Point2dUtils } from "@thewaver/ss-utils";
 
 import * as styles from "../PointerTrackerPage.css";
@@ -15,12 +15,12 @@ export const MagnetExample = () => {
     const [getStageRef, setStageRef] = createSignal<HTMLElement>();
     const [getButtonRef, setButtonRef] = createSignal<HTMLElement>();
 
-    const { getReading, getIsPointerPresent } = PointerTracker.create(getStageRef);
+    const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getStageRef);
 
-    const getPrefersReducedMotion = MediaQueryMonitor.createReducedMotion();
+    const getPrefersReducedMotion = MediaQueryMonitorUtils.createReducedMotion();
 
-    const getStageSize = ElementObserver.createBorderBoxSizeObserver(getStageRef);
-    const getButtonSize = ElementObserver.createBorderBoxSizeObserver(getButtonRef);
+    const getStageSize = ElementObserverUtils.createBorderBoxSizeObserver(getStageRef);
+    const getButtonSize = ElementObserverUtils.createBorderBoxSizeObserver(getButtonRef);
 
     const getRoom = createMemo(() => ({
         x: Math.max((getStageSize().width - getButtonSize().width) * HALF, NO_ROOM),

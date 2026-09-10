@@ -4,7 +4,7 @@ import { EMPTY_ARRAY } from "../../../../Abstracts/object.js";
 import { StringUtils } from "../../../../Abstracts/string.js";
 import { CSSUtils } from "../../../CSS/CSS.utils.js";
 import type { TextMetricsStyle, TextNonMetricStyle } from "../Metrics/JSXTextMetrics.types.js";
-import { JSXTextMetrics } from "../Metrics/JSXTextMetrics.utils.js";
+import { JSXTextMetricsUtils } from "../Metrics/JSXTextMetrics.utils.js";
 
 type SegmentType = "text" | "linebreak" | "atomic";
 
@@ -104,7 +104,7 @@ const splitComputedStyle = (style: CSSStyleDeclaration, baselineStyle?: CSSStyle
     return { metrics, nonMetrics };
 };
 
-export namespace JSXTextParser {
+export namespace JSXTextParserUtils {
     /** Tests whether two runs of text would be measured identically — same font, spacing and case. */
     export const isSameMetricsStyle = (a: StyledTextSegment, b: StyledTextSegment) => deepEqual(a.metrics, b.metrics);
 
@@ -365,7 +365,7 @@ export namespace JSXTextParser {
                     const texts = StringUtils.mergePunctuation(StringUtils.intlSegmentsArrayToStrings(intlSegments));
                     // measureTextWidths applies any text-transform itself, so the raw
                     // text is passed through here and the transform is applied once.
-                    const widths = JSXTextMetrics.measureTextWidths(texts, metrics);
+                    const widths = JSXTextMetricsUtils.measureTextWidths(texts, metrics);
 
                     for (let idx = 0; idx < texts.length; idx++) {
                         addToken({ ...segment[0], text: texts[idx] }, widths[idx]);

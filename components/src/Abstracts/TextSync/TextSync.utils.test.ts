@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { TextSyncGroupDefs } from "./TextSync.utils";
+import type { TextSyncGroupDefs } from "./TextSync.types";
 import { TextSyncUtils } from "./TextSync.utils";
 
 const DATE = "##/##/####";

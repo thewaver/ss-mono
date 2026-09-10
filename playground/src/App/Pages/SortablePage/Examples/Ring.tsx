@@ -1,6 +1,6 @@
 import type { Accessor, Signal } from "solid-js";
 
-import { Sortable, createArc } from "@thewaver/ss-components";
+import { PlacementLayoutUtils, Sortable } from "@thewaver/ss-components";
 import type { ArcDefs, InteractionFlags, SortableItem, SortableItemFlags } from "@thewaver/ss-components";
 
 import {
@@ -11,9 +11,11 @@ import {
 import { LIST_GAP, computeCardKey, computeCardLabel } from "../SortablePage.const";
 import type { Card } from "../SortablePage.types";
 
-const RING_DEFS: ArcDefs = { widthPx: 324, heightPx: 324, spreadDegrees: 360, itemWidthPx: 211, itemHeightPx: 62 };
+const RING_DEFS: ArcDefs = { width: 324, height: 324, spreadDegrees: 360, itemWidth: 211, itemHeight: 62 };
 
-const RING_LAYOUT = createArc(RING_DEFS);
+const RING_LAYOUT = PlacementLayoutUtils.createArc(RING_DEFS);
+
+const RING_WIDTH = `${RING_DEFS.width}px`;
 
 const RESTING_FLAGS: InteractionFlags<SortableItemFlags> = { isCarried: false, isLandingBefore: false };
 
@@ -28,17 +30,19 @@ type Props = {
 };
 
 export const RingExample = (props: Props) => (
-    <Sortable
-        groupId={"ring"}
-        ariaLabel={"Ring"}
-        gap={LIST_GAP}
-        itemsSignal={props.itemsSignal}
-        computeLayout={RING_LAYOUT}
-        computeItemKey={computeCardKey}
-        computeItemLabel={computeCardLabel}
-        renderItem={renderCard}
-        renderCarried={(getItem) => renderCard(getItem, () => RESTING_FLAGS)}
-        renderMarker={() => <PageSortableRingMarker />}
-        renderDecoration={(getFlags) => <PageSortableSurface flags={getFlags} emptyText={"No cards"} />}
-    />
+    <div style={{ width: RING_WIDTH }}>
+        <Sortable
+            groupId={"ring"}
+            ariaLabel={"Ring"}
+            gap={LIST_GAP}
+            itemsSignal={props.itemsSignal}
+            computeLayout={RING_LAYOUT}
+            computeItemKey={computeCardKey}
+            computeItemLabel={computeCardLabel}
+            renderItem={renderCard}
+            renderCarried={(getItem) => renderCard(getItem, () => RESTING_FLAGS)}
+            renderMarker={() => <PageSortableRingMarker />}
+            renderDecoration={(getFlags) => <PageSortableSurface flags={getFlags} emptyText={"No cards"} />}
+        />
+    </div>
 );

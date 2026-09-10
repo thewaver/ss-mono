@@ -1,5 +1,6 @@
 import { Show, createUniqueId } from "solid-js";
 
+import type { BandDefs } from "@thewaver/ss-components";
 import { PlacementUtils, WheelMenu, access } from "@thewaver/ss-components";
 import type { PlacementRect } from "@thewaver/ss-components";
 
@@ -30,6 +31,8 @@ const WedgeDefs = (props: WedgeDefsProps) => (
     </svg>
 );
 
+const WHEEL_DEFS: BandDefs = { holeRadius: 64, bandWidth: 84, levelGap: 8 };
+
 export const WheelExample = (props: WheelMenuExampleProps) => {
     const gradientId = createUniqueId();
 
@@ -38,11 +41,12 @@ export const WheelExample = (props: WheelMenuExampleProps) => {
             <WedgeDefs gradientId={gradientId} />
 
             <WheelMenu
+                layoutSize={"368px"}
                 items={() => props.items}
                 ariaLabel={"Edit actions"}
                 spreadDegrees={props.spreadDegrees}
                 opensOnHold={props.opensOnHold}
-                layoutDefs={props.layoutDefs}
+                layoutDefs={props.layoutDefs ?? WHEEL_DEFS}
                 placement={() => ({ x: "center", y: "center" })}
                 closerDefs={{
                     ariaLabel: "Close the wheel",

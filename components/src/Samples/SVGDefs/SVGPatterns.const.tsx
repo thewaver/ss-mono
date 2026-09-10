@@ -1,17 +1,9 @@
-import type { JSX } from "solid-js";
-
 import type { Size2d } from "@thewaver/ss-utils";
 
 import { SVGPatternDefsUtils } from "../../Abstracts/SVG/Defs/Pattern/SVGPatternDefs.utils";
 import { SVGPatternLayouts } from "./SVGPatternLayouts.const";
-import type { SVGPatternCellCount, SVGPatternCellIndex, SVGPatternKind } from "./SVGPatternLayouts.const";
-
-export type SVGPatternCellRenderer = (
-    id: string,
-    index: SVGPatternCellIndex,
-    cellCount: SVGPatternCellCount,
-    isSplit: boolean,
-) => JSX.Element;
+import type { SVGPatternCellCount, SVGPatternKind } from "./SVGPatternLayouts.types";
+import type { SVGPatternCellRenderer } from "./SVGPatterns.types";
 
 export namespace SVGPatterns {
     export const computeLayoutPattern = (

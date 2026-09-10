@@ -21,7 +21,7 @@ const OPPOSITE_EDGE = {
     "flex-end": "flex-start",
 } as const;
 
-export namespace ToastsUtils {
+export namespace ToastUtils {
     export const computeStackAlignment = (alignment: ToastsAlignment, dir: ToastsDir): ToastsStackAlignment => {
         const [vertical, horizontal] = alignment.split("-") as [ToastsVerticalAlignment, ToastsHorizontalAlignment];
         const isColumn = dir === "column" || dir === "column-reverse";

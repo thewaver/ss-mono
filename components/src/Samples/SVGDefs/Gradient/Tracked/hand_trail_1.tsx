@@ -2,11 +2,11 @@ import { createEffect, createSignal } from "solid-js";
 
 import { MathUtils, SVGUtils, type Size2d } from "@thewaver/ss-utils";
 
-import { PointerTracker } from "../../../../Abstracts/PointerTracker/PointerTracker";
+import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import type { TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
-import { SVGDefsFrames } from "../../SVGDefsFrames.utils";
+import { SVGDefsFrameUtils } from "../../SVGDefsFrames.utils";
 
 type HandStamp = {
     angle: number;
@@ -49,10 +49,10 @@ const computeSweepColors = (color: string, alpha: number) => [
     { value: `rgb(from ${color} r g b / 0)` },
 ];
 
-const clock = SVGDefsFrames.createClock(TRAIL_LIFETIME_MS);
+const clock = SVGDefsFrameUtils.createClock(TRAIL_LIFETIME_MS);
 
 const createHandStamp = (index: number, getRef: () => HTMLElement | undefined) => {
-    const { getReading, getIsPointerPresent } = PointerTracker.create(getRef);
+    const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef);
     const [getStamp, setStamp] = createSignal<HandStamp>();
 
     let bornTick: number | undefined;
@@ -109,7 +109,7 @@ export const hand_trail_1: TrackedGradientConfig = {
             gradientOrPattern: {
                 id: `gradient1-${id}`,
                 renderDefsElement: () => {
-                    const { getReading, getIsPointerPresent } = PointerTracker.create(getRef ?? NO_REF);
+                    const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
                     return SVGGradientDefsUtils.computeLinearGradient({
                         id: `gradient1-${id}`,
@@ -126,7 +126,7 @@ export const hand_trail_1: TrackedGradientConfig = {
             clipPath: {
                 id: `clip1-${id}`,
                 renderDefsElement: () => {
-                    const { getReading } = PointerTracker.create(getRef ?? NO_REF);
+                    const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
                     return (
                         <clipPath id={`clip1-${id}`} clipPathUnits="objectBoundingBox">

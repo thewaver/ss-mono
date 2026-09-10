@@ -3,8 +3,8 @@ import { Portal } from "solid-js/web";
 
 import { MathUtils } from "@thewaver/ss-utils";
 
+import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
-import { useViewportContext } from "../Viewport/Viewport.context";
 import type { ScreenWiperDirection, ScreenWiperProps, ScreenWiperShape } from "./ScreenWiper.types";
 
 import * as styles from "./ScreenWiper.css";

@@ -148,7 +148,7 @@ export const WheelMenuPage = () => {
                 <WheelExample
                     caption={"Wheel"}
                     items={ACTIONS}
-                    layoutDefs={{ bandWidthPx: 120, wedgeGapDegrees: 10 }}
+                    layoutDefs={{ holeRadius: 64, bandWidth: 120, wedgeGapDegrees: 10 }}
                     onActivate={(action) => setLastTunedAction(action.name)}
                 />
             ),

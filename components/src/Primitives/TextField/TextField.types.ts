@@ -3,7 +3,7 @@ import type { JSX } from "solid-js";
 import type { CSSPadding } from "@thewaver/ss-utils";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { TextSyncMaskResult } from "../../Abstracts/TextSync/TextSync.utils";
+import type { TextSyncMaskResult } from "../../Abstracts/TextSync/TextSync.types";
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 import type { InteractionControlProps, InteractionWrapperProps } from "../InteractionWrapper/InteractionWrapper.types";
 

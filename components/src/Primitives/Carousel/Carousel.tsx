@@ -4,11 +4,11 @@ import { Index, Show, createEffect, createMemo, createSignal, onCleanup } from "
 import type { Size2d } from "@thewaver/ss-utils";
 import { MathUtils, RotationUtils } from "@thewaver/ss-utils";
 
-import { Barrel } from "../../Abstracts/Barrel/Barrel";
-import { InteractionTracker } from "../../Abstracts/InteractionTracker/InteractionTracker";
-import { LiveAnnouncer } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer";
-import { SignalMirror } from "../../Abstracts/SignalMirror/SignalMirror";
+import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
+import { LiveAnnouncerUtils } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer.utils";
+import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access } from "../../Utils/propUtils";
+import { Barrel } from "../Barrel/Barrel";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
 import type {
     CarouselAxis,
@@ -79,8 +79,8 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     const [getSwipeRatio, setSwipeRatio] = createSignal(0);
     const [getTurnAngle, setTurnAngle] = createSignal(0);
 
-    const [getIndex, setIndex] = SignalMirror.createOptional(() => props.indexSignal, 0);
-    const [getIsPlaying, setIsPlaying] = SignalMirror.createOptional(() => props.playingSignal, true);
+    const [getIndex, setIndex] = SignalMirrorUtils.createOptional(() => props.indexSignal, 0);
+    const [getIsPlaying, setIsPlaying] = SignalMirrorUtils.createOptional(() => props.playingSignal, true);
 
     const getCount = createMemo(() => access(props.slides).length);
 
@@ -104,7 +104,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
 
     const getAutoplayDelayMs = createMemo(() => access(props.autoplayDelayMs));
 
-    const getIsHeld = InteractionTracker.trackHold(getRootRef);
+    const getIsHeld = InteractionTrackerUtils.trackHold(getRootRef);
 
     const goTo = (index: number) => {
         const next = CarouselUtils.wrapIndex(index, getCount());
@@ -116,7 +116,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         void props.onIndexChange?.(next);
     };
 
-    const { getIsSwiping } = InteractionTracker.trackSwipe(
+    const { getIsSwiping } = InteractionTrackerUtils.trackSwipe(
         getViewportRef,
         () => props.renderControls === undefined || getIsDisabled() || getCount() < MIN_ROTATABLE_COUNT,
         {
@@ -188,7 +188,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         const index = getCurrentIndex();
 
         if (previous !== undefined && previous !== index && !getIsRotating()) {
-            LiveAnnouncer.announce(getSlideLabel(index));
+            LiveAnnouncerUtils.announce(getSlideLabel(index));
         }
 
         return index;
