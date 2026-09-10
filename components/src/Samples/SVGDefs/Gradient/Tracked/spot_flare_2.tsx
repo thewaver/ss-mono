@@ -60,7 +60,7 @@ const computeGhostColors = (ghost: FlareGhost, color: string, fade: number) => {
     ];
 };
 
-export const spot_flare_2: TrackedGradientConfig = {
+export const spot_flare_2 = (): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -119,4 +119,4 @@ export const spot_flare_2: TrackedGradientConfig = {
             blend: true,
         })),
     ],
-};
+});

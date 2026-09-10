@@ -22,7 +22,7 @@ const getBandColors = (color: string) => [
     { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
 ];
 
-export const band_1v1: TrackedGradientConfig = {
+export const band_1v1 = (): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -64,4 +64,4 @@ export const band_1v1: TrackedGradientConfig = {
             blend: true,
         },
     ],
-};
+});

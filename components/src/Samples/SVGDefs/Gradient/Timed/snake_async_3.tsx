@@ -5,7 +5,7 @@ import { SVGAnimations } from "../../SVGAnimations.const";
 import type { TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const snake_async_3: TimedGradientConfig = {
+export const snake_async_3 = (): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -123,4 +123,4 @@ export const snake_async_3: TimedGradientConfig = {
             },
         },
     ],
-};
+});

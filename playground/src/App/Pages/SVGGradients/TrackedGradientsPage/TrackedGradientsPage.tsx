@@ -1,12 +1,14 @@
 import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { SVGDefsSamples } from "@thewaver/ss-components";
+import type { SampleKnob } from "@thewaver/ss-components";
+import { SVGDefsSamples, TrackedGradientKnobs } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
+import { PageKnobs } from "../../../PageComponents/Knobs/Knobs";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
-import { toGroupEntriesWithNoSample } from "../../../PageComponents/SampleGroups/SampleGroups.const";
+import { NO_SAMPLE_KEY, toGroupEntriesWithNoSample } from "../../../PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "../../../PageComponents/SampleGroups/SampleGroups.types";
 import { PageGroupedSelectField } from "../../../StyledComponents/Field/Field";
 import { GROUPPED_TRACKED_GRADIENTS } from "../SVGGradients.const";
@@ -20,12 +22,21 @@ const EXAMPLES_ROOT = "/src/App/Pages/SVGGradients/TrackedGradientsPage/Examples
 export const TrackedGradientsPage = () => {
     const [getConfigKey, setConfigKey] =
         createSignal<WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>>("spot_1");
+    const [configDefs, setConfigDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
+
+    const getKnobs = () => {
+        const key = getConfigKey();
+
+        return key === NO_SAMPLE_KEY ? {} : (TrackedGradientKnobs.KNOBS_BY_FAMILY[key] as Record<string, SampleKnob>);
+    };
+    const getConfigDefs = () => configDefs[getConfigKey()] ?? {};
     const paintKindSignal = createSignal<SVGGradientsPaintKind>("fill");
     const blurWidthSignal = createSignal(0);
     const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS });
 
     const getExamples = createMemo(() => {
         const commonProps: TrackedGradientExampleProps = {
+            configDefs: getConfigDefs,
             configKey: getConfigKey,
             paintKind: paintKindSignal[0],
             colors: () => colors,
@@ -61,6 +72,15 @@ export const TrackedGradientsPage = () => {
                         onChange={(config) => setConfigKey(() => config)}
                     />
                 </PageProp>
+
+                <PageKnobs
+                    knobs={getKnobs}
+                    defaults={() => ({})}
+                    values={getConfigDefs}
+                    onInput={(key, value) =>
+                        setConfigDefs(getConfigKey(), (previous) => ({ ...previous, [key]: value }))
+                    }
+                />
 
                 <PageSVGGradientsProps
                     controls={{

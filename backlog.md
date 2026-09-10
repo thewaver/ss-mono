@@ -55,8 +55,8 @@ reading.
 21. `Table` — six things deliberately not built — _open_
 22. `Timeline` — the pointer routes the library cannot promise — _open_
 23. `GlassSurface` — what is built and what is not — _open_
-24. Per-sample defs as a discriminated union, and knobs that follow the key — _open_
-25. Arbitrary placement across controls, and the picking that has to come with it — _open_
+24. Arbitrary placement across controls, and the picking that has to come with it — _open_
+25. The scanline page is twelve examples of one example — _open_
 
 ### Build order
 
@@ -1026,123 +1026,7 @@ things that decide its shape"_. Three things are outstanding.
 
 ---
 
-## 24. Per-sample defs, and knobs that follow the key
-
-The user's proposal, and their framing of its worth: it unlocks a great deal from the Playground's side, so
-it is to be done properly rather than quickly.
-
-**The problem it answers:** a sample's tuned numbers are module-level `const`s that neither a consumer nor
-the Playground can reach, so the only way to try a different value is to edit the file. **It is not only the
-gradients.** The same want turns up in three registries, and each has solved a different fraction of it by
-hand:
-
-- **`Placement/Layouts`** has a `create<Family>(defs?)` factory per family, an all-optional defs type per
-  family — `BandDefs`, `ArcDefs`, `HoneycombDefs`, `WhorlDefs`, `ZigzagDefs` — and its defaults in a
-  `BAND_BASE`-style object. `SAMPLE_LAYOUTS` holds already-built instances, so a page handed the key `ring`
-  cannot reach the options at all.
-- **`ScanlineAnimation/Keyframes`** has an options type per effect and a module-private `DEFAULT_…_OPTS`
-  beside each. The page writes a wrapper component per effect, each with its own store and knob panel.
-- **`SVGDefs/Gradient`** has none of it. `spot_ripple_3c` alone carries twenty-six bare module constants.
-
-**Two live faults come with it, both of them the `GlassSurface` fault item 23 records.** Because a page
-cannot read a sample's default it retypes it. `PlacementPage` opens with a hole radius of 64, a band width of
-84 and a level gap of 8, where `BAND_BASE` says 25, 25 and 2 — so what the Playground shows on load is not
-what a consumer gets from `ring`, and nothing on the page says which is real. The starting values look tuned
-to the demo box, so they are not a defect to be "corrected" to the layout's numbers; they are a defect
-because the page owns them at all. `ScanLineAnimationPage` retypes its defaults too and currently agrees
-with the samples, which is luck rather than structure. Both go away by construction under what is settled
-below.
-
-**The constraint to respect, from a decision already taken.** A sample stays in the registry because it is
-interchangeable with every other one and needs nothing beyond the uniform `defs` bag — that is the test the
-glass sheen failed, recorded in `decisions.md` under _"The sheen left `Samples/SVGDefs/Gradient`"_.
-`Shape`'s stroke picker and `GlassSurface`'s border picker both choose a sample by a runtime string and pass
-only that bag, so a sample whose props were **required** would break them the moment the string changed.
-**Every per-sample prop therefore has to be optional with a sample-owned default**, making the shape a
-widening rather than a narrowing: the base bag keeps working everywhere, and anything that wants to reach
-further can.
-
-### What is settled
-
-All the user's calls, taken before any of it was built.
-
-- **An entry is a family plus its own options bag.** The proposal was a defs type discriminated on the
-  sample's own key; the rival, which `Placement/Layouts` already runs, is a factory per family whose
-  registry holds pre-applied instances. Neither was taken. An entry names its family and writes out the
-  options that make it that entry — `fan` becomes arc with its spread and tilt spelled out — so **every key
-  survives and both runtime pickers are unchanged**, while the panel is built from the family and seeded
-  from the entry's own bag. A number then lives in exactly one place, which is what makes the drift above
-  impossible rather than merely fixed.
-- **Knobs are derived, not hand-written.** Each family describes its own knobs — kind, range, step, label —
-  and one generic panel renders them. The deciding argument is ownership: a range is a fact about the effect,
-  and it currently sits in the Playground as twenty module constants of minimum, maximum and step for
-  `PlacementPage`'s five knobs. The practical argument is scale: eleven gradient families, six layout
-  families and ten-odd scanline effects will not all get a hand-written panel, and the ones that miss out
-  stay exactly as unreachable as they are today. The Playground's field components already cover the
-  vocabulary a descriptor needs — number, select, grouped select, check, colour, text — so the generic panel
-  is a switch over what exists rather than new UI. **A descriptor covers only some of a family's options**:
-  `BandDefs.computeItemArcs` takes a path and returns arc widths, and there is no control for that.
-- **A family may opt out into a hand-written panel, and that door is cut when something needs it.** Not up
-  front — taken up front it becomes the front entrance.
-- **The descriptor is its own module beside the family, split along runtime versus presentation.** Defaults
-  stay with the family because the code needs them whether or not anything draws a knob; ranges, steps and
-  labels leave, because a consumer who names one sample should not pull labels to call a function that never
-  reads them. This is the same split that made the light path possible — _"a sample registry and the
-  machinery that runs it are separate modules"_ — and the path it protects is measured, at 5.7K minified and
-  2.4K gzipped for one sample and its machinery against 19.2K / 5.9K for the registry of all sixty. The
-  option names and their types can still be checked against the family's own options type, so a renamed
-  option breaks the build; only the numbers can go stale next door.
-- **A registry converts in one pass, rather than growing a parallel table of descriptions.** Converting
-  changes the registry's value type, and both runtime pickers plus every call site read it by string, so the
-  smallest unit of work is a whole registry — eighty-four entries and all their call sites for the gradients.
-  The rival was a second table keyed by the same keys, which would let a family land at a time; it was
-  refused because two tables keyed alike can disagree, which is the drift surface this item exists to remove,
-  wearing a different hat.
-- **The shared descriptor type sits in a new file at the `Samples/` root.** It cannot live with a family,
-  since all three registries reference it, and it cannot live in the Playground, since samples in
-  `components/src` import it. `Samples/` currently holds nothing but folders, and every shared type in the
-  tree sits at the root of the scope that shares it — `SVGDefs/SVGDefs.types.ts`,
-  `Placement/Layouts/PlacementLayouts.types.ts` — so a type shared by every registry belongs at the root of
-  all of them, named the same way. Derived from the neighbours rather than argued; the user agreed to it as
-  a suggestion.
-- **Every registry converts, so the order is inconsequential, and `Placement/Layouts` goes first as the
-  proof of concept.** The user's call. It is the cheapest place to prove the shape: nine entries over six
-  families, options types that already exist, and drift that shows on the page, so the first pass can be
-  checked by looking rather than by argument. Nothing about the order is load-bearing — it is not a
-  dependency, and no registry is waiting on another.
-
-- **A preset stops existing once a knob reaches it.** `fan` is `createArc` with a wider spread and a tilt, so
-  once arc has those knobs the key is a knob position rather than a sample; the same argument takes
-  `whorlHex` and `whorlSquare`, which are `createWhorl` with two spacing numbers changed. That leaves the
-  nine layout keys as six, one per family, each with an empty bag. **The objection recorded here before was
-  wrong**: it said `Shape`'s stroke picker and `GlassSurface`'s border picker choose a sample by a runtime
-  string and would lose their menus, as though they were library components. They are Playground pages —
-  nothing in `components/src` outside the `Samples` tree reads a sample key at all — and the whole set of
-  places that read a registry by key is six, all Playground, all already threading the key through a signal.
-  What does survive as a cost is the published surface: every sample is exported individually from
-  `index.ts`, so a collapsed variant can no longer be named in one word.
-- **The gradients keep their keys in the first pass, and only the suffixes collapse.** The true axis of
-  variation between sibling keys is the suffix — plain, `s`, `c` — and those become flags. Everything else,
-  an arm count of two against four for instance, is argued per family after the first pass rather than
-  guessed at now. Both suffixes go in that first pass rather than cycling alone: the user closed the two
-  ragged edges that made banding look like the awkward one, giving `flow` all sixteen combinations and
-  deleting the ripples' five banded keys, so each flag now has a clean off position everywhere it appears.
-- **`fill` and `elastic` are exempt from the cycling flag.** Of thirty-three cycling keys, twenty-six have a
-  static sibling to merge back into. The seven that do not are exactly those two families, whose identity
-  _is_ the cycling — the same pair the numbering rule singles out, for the same reason. Turning the flag off
-  there gives a flat static colour that was never a sample, so they keep the `c` in the key and do not take
-  the flag.
-
-**One thing has to be sequenced.** The shared descriptor type lands before the second family, or the second
-family invents its own vocabulary and the single generic panel — the reason for deriving them at all — is
-gone.
-
-### What is still open
-
-- **What a turned knob means for the key.** Pick `fan`, move the spread, and the page still says `fan` while
-  no longer showing it. Whether the picker reflects that, and how, is unargued.
-
-## 25. Arbitrary placement across controls, and the picking that has to come with it
+## 24. Arbitrary placement across controls, and the picking that has to come with it
 
 **The user's proposal, and the direction the library is going next.** A control's items should be placeable
 anywhere rather than only along a line: a `Menu` as a closed ring or a wide fan; a `Paginator` drawn
@@ -1156,10 +1040,11 @@ sits in its own abstract from the start, and the second consumer corrects the ab
 ### What is built
 
 `Abstracts/Placement` holds the vocabulary, the picking and the sector, link and gap builders, with the placed
-box itself in `Primitives/PlacementBox` and `Primitives/PlacementItem`, and has a Playground page of its own where five knobs build one set of measurements
+box itself in `Primitives/PlacementBox` and `Primitives/PlacementItem`, and has a Playground page of its own where the band family's knobs build one set of measurements
 that a `WheelMenu` and an `OverheadWheel` are both handed. Every layout sample is in
-`Samples/Placement/Layouts`, none of them named for a consumer, and every one is a `PlacementLayoutFn` — so
-any of them can be handed to any placed control. The exception is the radial tree, which needs each item's
+`Samples/Placement/Layouts`, none of them named for a consumer, and every one is an entry naming its family
+that `PlacementLayoutUtils.toLayoutFn` turns into a `PlacementLayoutFn` — so any of them can be handed to any
+placed control. The exception is the radial tree, which needs each item's
 parent rather than only a count, and therefore lives in the one page that can supply it.
 
 Eight controls take an optional `computeLayout` and are unchanged without one: `Menu` (with `WheelMenu` and
@@ -1223,6 +1108,34 @@ is what turned up the origin-placed item it scored as pointing due east.
   measures directions from and the other is what a wedge painter turns its arc about, and a layout sets both
   from the same value. The duplication is deliberate — a painter is handed a `PlacementRect` and never sees
   the layout — but it is a fact stated twice and nothing keeps the two in step.
+
+---
+
+---
+
+## 25. The scanline page is twelve examples of one example
+
+**The user's aside when the per-sample defs work was proposed, promoted to an item by them once that work
+closed.** The page should stop being a gallery of entries and become a single example with knobs that follow
+the effect picked — one image, a picker, and the panel changing under it.
+
+**The knob half is already built.** Each effect describes its own knobs in
+`ScanlineAnimationKeyframes.knobs.ts`, the page renders them through the generic panel, and the ranges and
+defaults live with the effect rather than in the page. What is left is the twelve example boxes.
+
+**Eleven of the twelve differ only by which compute function and which knobs**, so eleven boxes are showing
+the same example over and over with a different function passed in. `Glitch` is the exception and would stay
+its own example either way, being a page-local composite built in the page rather than a registry sample.
+
+**What the collapse costs, and it is not nothing.** A gallery is what makes two effects comparable at a
+glance, and each box carries its own readout describing the effect under it — twelve sentences that would
+have to become one that changes with the picker, or be dropped. The page is 777 lines and would lose most of
+the wrapper components; the picker, the readout and where the breakpoint controls sit are the parts that
+actually need designing.
+
+**Nothing is blocked on it** and the shape of the picker has not been argued.
+
+---
 
 ## Accepted limits
 

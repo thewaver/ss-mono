@@ -15,7 +15,7 @@ const FALLOFF_ALPHA = 0.25;
 
 const NO_REF = () => undefined;
 
-export const band_diag_1: TrackedGradientConfig = {
+export const band_diag_1 = (): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -56,4 +56,4 @@ export const band_diag_1: TrackedGradientConfig = {
             filter: SVGDefsUtils.getBaseBlur(id, defs),
         },
     ],
-};
+});

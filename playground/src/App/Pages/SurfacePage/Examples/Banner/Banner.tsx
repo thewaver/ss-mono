@@ -9,16 +9,21 @@ import knight from "../../../../knight.webp";
 import * as styles from "./Banner.css";
 
 const computeDefs = (getSize: () => Size2d, getRef: () => HTMLElement | undefined, id: string) =>
-    SVGDefsSamples.Gradient.Timed.SAMPLE_CONFIGS["flow_diag_2s"].computeSVGDefs(id, undefined, getRef, {
-        getSize,
-        animationDurationMs: 4000,
-        colors: {
-            background: "#282420",
-            primary: "#FFFF00",
-            secondary: "#C0C000",
-            tertiary: "#808000",
+    SVGDefsSamples.Gradient.Timed.toConfig({ family: "flow_diag_2", defs: { banded: true } }).computeSVGDefs(
+        id,
+        undefined,
+        getRef,
+        {
+            getSize,
+            animationDurationMs: 4000,
+            colors: {
+                background: "#282420",
+                primary: "#FFFF00",
+                secondary: "#C0C000",
+                tertiary: "#808000",
+            },
         },
-    });
+    );
 
 const getConfig = (id: string): SurfaceProps => ({
     borderRadii: () => CSSUtils.spreadRadius(styles.borderRadius),

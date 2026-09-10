@@ -1,12 +1,13 @@
-import { createMemo, createSignal } from "solid-js";
+import { createMemo } from "solid-js";
+import { createStore } from "solid-js/store";
 
-import type { BandDefs } from "@thewaver/ss-components";
+import type { BandDefs, SampleKnob } from "@thewaver/ss-components";
+import { PlacementLayoutKnobs, PlacementLayoutUtils } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
-import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField } from "../../StyledComponents/Field/Field";
 import { MenuExample } from "./Examples/Menu";
 import { WheelExample } from "./Examples/Wheel";
 import type { PlacementExampleProps } from "./PlacementPage.types";
@@ -15,43 +16,12 @@ const FIELD_WIDTH = 130;
 const EXAMPLES_ROOT = "/src/App/Pages/PlacementPage/Examples";
 const WHEEL_SIZE = 340;
 
-const MIN_HOLE_RADIUS_PX = 0;
-const MAX_HOLE_RADIUS_PX = 140;
-const HOLE_RADIUS_STEP_PX = 4;
-const MIN_BAND_WIDTH_PX = 32;
-const MAX_BAND_WIDTH_PX = 160;
-const BAND_WIDTH_STEP_PX = 4;
-const MIN_LEVEL_GAP_PX = 0;
-const MAX_LEVEL_GAP_PX = 40;
-const LEVEL_GAP_STEP_PX = 2;
-const MIN_WEDGE_GAP_DEGREES = 0;
-const MAX_WEDGE_GAP_DEGREES = 20;
-const WEDGE_GAP_STEP_DEGREES = 1;
-const MIN_LABEL_RADIUS_PERCENT = 0;
-const MAX_LABEL_RADIUS_PERCENT = 100;
-const LABEL_RADIUS_STEP_PERCENT = 5;
-const PERCENT = 100;
-
-const STARTING_HOLE_RADIUS = 64;
-const STARTING_BAND_WIDTH = 84;
-const STARTING_LEVEL_GAP = 8;
-const STARTING_WEDGE_GAP_DEGREES = 3;
-const STARTING_LABEL_RADIUS_PERCENT = 50;
-
 export const PlacementPage = () => {
-    const [getHoleRadius, setHoleRadius] = createSignal(STARTING_HOLE_RADIUS);
-    const [getBandWidth, setBandWidth] = createSignal(STARTING_BAND_WIDTH);
-    const [getLevelGap, setLevelGap] = createSignal(STARTING_LEVEL_GAP);
-    const [getWedgeGapDegrees, setWedgeGapDegrees] = createSignal(STARTING_WEDGE_GAP_DEGREES);
-    const [getLabelRadiusPercent, setLabelRadiusPercent] = createSignal(STARTING_LABEL_RADIUS_PERCENT);
+    const [bandDefs, setBandDefs] = createStore<Record<string, number | boolean>>({});
 
-    const getLayoutDefs = createMemo<BandDefs>(() => ({
-        holeRadius: getHoleRadius(),
-        bandWidth: getBandWidth(),
-        levelGap: getLevelGap(),
-        wedgeGapDegrees: getWedgeGapDegrees(),
-        labelRadiusRatio: getLabelRadiusPercent() / PERCENT,
-    }));
+    const getKnobs = () => PlacementLayoutKnobs.BAND_KNOBS as Record<string, SampleKnob>;
+    const getDefaults = () => PlacementLayoutUtils.BAND_DEFAULTS as Record<string, unknown>;
+    const getLayoutDefs = createMemo(() => bandDefs as BandDefs);
 
     const getExamples = createMemo(() => {
         const commonProps: PlacementExampleProps = { getLayoutDefs };
@@ -83,65 +53,13 @@ export const PlacementPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"holeRadius"} label={"Hole radius"}>
-                    <PageNumberField
-                        value={getHoleRadius}
-                        min={() => MIN_HOLE_RADIUS_PX}
-                        max={() => MAX_HOLE_RADIUS_PX}
-                        step={() => HOLE_RADIUS_STEP_PX}
-                        width={() => FIELD_WIDTH}
-                        ariaLabel={"Hole radius"}
-                        onInput={setHoleRadius}
-                    />
-                </PageProp>
-
-                <PageProp key={"bandWidth"} label={"Band width"}>
-                    <PageNumberField
-                        value={getBandWidth}
-                        min={() => MIN_BAND_WIDTH_PX}
-                        max={() => MAX_BAND_WIDTH_PX}
-                        step={() => BAND_WIDTH_STEP_PX}
-                        width={() => FIELD_WIDTH}
-                        ariaLabel={"Band width"}
-                        onInput={setBandWidth}
-                    />
-                </PageProp>
-
-                <PageProp key={"levelGap"} label={"Gap between levels"}>
-                    <PageNumberField
-                        value={getLevelGap}
-                        min={() => MIN_LEVEL_GAP_PX}
-                        max={() => MAX_LEVEL_GAP_PX}
-                        step={() => LEVEL_GAP_STEP_PX}
-                        width={() => FIELD_WIDTH}
-                        ariaLabel={"Gap between levels"}
-                        onInput={setLevelGap}
-                    />
-                </PageProp>
-
-                <PageProp key={"wedgeGapDegrees"} label={"Gap between wedges (°)"}>
-                    <PageNumberField
-                        value={getWedgeGapDegrees}
-                        min={() => MIN_WEDGE_GAP_DEGREES}
-                        max={() => MAX_WEDGE_GAP_DEGREES}
-                        step={() => WEDGE_GAP_STEP_DEGREES}
-                        width={() => FIELD_WIDTH}
-                        ariaLabel={"Gap between wedges"}
-                        onInput={setWedgeGapDegrees}
-                    />
-                </PageProp>
-
-                <PageProp key={"labelRadiusPercent"} label={"Label across the band (%)"}>
-                    <PageNumberField
-                        value={getLabelRadiusPercent}
-                        min={() => MIN_LABEL_RADIUS_PERCENT}
-                        max={() => MAX_LABEL_RADIUS_PERCENT}
-                        step={() => LABEL_RADIUS_STEP_PERCENT}
-                        width={() => FIELD_WIDTH}
-                        ariaLabel={"Label across the band"}
-                        onInput={setLabelRadiusPercent}
-                    />
-                </PageProp>
+                <PageKnobs
+                    knobs={getKnobs}
+                    defaults={getDefaults}
+                    values={() => bandDefs}
+                    width={() => FIELD_WIDTH}
+                    onInput={(key, value) => setBandDefs(key, value)}
+                />
             </PagePropsPanel>
 
             <PageExamples items={getExamples} />

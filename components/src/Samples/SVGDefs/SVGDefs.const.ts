@@ -1,92 +1,54 @@
-import { elastic_circle_3c } from "./Gradient/Timed/elastic_circle_3c";
-import { elastic_drip_3c } from "./Gradient/Timed/elastic_drip_3c";
-import { elastic_inter_semicircle_3c } from "./Gradient/Timed/elastic_inter_semicircle_3c";
-import { elastic_semicircle_3c } from "./Gradient/Timed/elastic_semicircle_3c";
+import { elastic_circle_1 } from "./Gradient/Timed/elastic_circle_1";
+import { elastic_drip_1 } from "./Gradient/Timed/elastic_drip_1";
+import { elastic_inter_semicircle_1 } from "./Gradient/Timed/elastic_inter_semicircle_1";
+import { elastic_semicircle_1 } from "./Gradient/Timed/elastic_semicircle_1";
 import { fill_2c } from "./Gradient/Timed/fill_2c";
 import { fill_3c } from "./Gradient/Timed/fill_3c";
 import { fill_diag_2v2c } from "./Gradient/Timed/fill_diag_2v2c";
 import { flow_2 } from "./Gradient/Timed/flow_2";
-import { flow_2c } from "./Gradient/Timed/flow_2c";
-import { flow_2cs } from "./Gradient/Timed/flow_2cs";
-import { flow_2s } from "./Gradient/Timed/flow_2s";
 import { flow_3 } from "./Gradient/Timed/flow_3";
-import { flow_3c } from "./Gradient/Timed/flow_3c";
-import { flow_3cs } from "./Gradient/Timed/flow_3cs";
-import { flow_3s } from "./Gradient/Timed/flow_3s";
 import { flow_diag_2 } from "./Gradient/Timed/flow_diag_2";
-import { flow_diag_2c } from "./Gradient/Timed/flow_diag_2c";
-import { flow_diag_2cs } from "./Gradient/Timed/flow_diag_2cs";
-import { flow_diag_2s } from "./Gradient/Timed/flow_diag_2s";
 import { flow_diag_3 } from "./Gradient/Timed/flow_diag_3";
-import { flow_diag_3c } from "./Gradient/Timed/flow_diag_3c";
-import { flow_diag_3cs } from "./Gradient/Timed/flow_diag_3cs";
-import { flow_diag_3s } from "./Gradient/Timed/flow_diag_3s";
 import { merge_1v1 } from "./Gradient/Timed/merge_1v1";
-import { merge_1v1c } from "./Gradient/Timed/merge_1v1c";
 import { merge_diag_1v1 } from "./Gradient/Timed/merge_diag_1v1";
-import { merge_diag_1v1c } from "./Gradient/Timed/merge_diag_1v1c";
 import { merge_diag_async_4 } from "./Gradient/Timed/merge_diag_async_4";
 import { orbit_1 } from "./Gradient/Timed/orbit_1";
-import { orbit_1c } from "./Gradient/Timed/orbit_1c";
 import { orbit_1v1 } from "./Gradient/Timed/orbit_1v1";
-import { orbit_1v1c } from "./Gradient/Timed/orbit_1v1c";
 import { orbit_async_2v1 } from "./Gradient/Timed/orbit_async_2v1";
 import { orbit_async_3 } from "./Gradient/Timed/orbit_async_3";
 import { scan_1 } from "./Gradient/Timed/scan_1";
-import { scan_1c } from "./Gradient/Timed/scan_1c";
 import { scan_1v1 } from "./Gradient/Timed/scan_1v1";
-import { scan_1v1c } from "./Gradient/Timed/scan_1v1c";
 import { scan_diag_1 } from "./Gradient/Timed/scan_diag_1";
-import { scan_diag_1c } from "./Gradient/Timed/scan_diag_1c";
 import { scan_diag_1v1 } from "./Gradient/Timed/scan_diag_1v1";
-import { scan_diag_1v1c } from "./Gradient/Timed/scan_diag_1v1c";
 import { snake_1 } from "./Gradient/Timed/snake_1";
-import { snake_1c } from "./Gradient/Timed/snake_1c";
 import { snake_1v1 } from "./Gradient/Timed/snake_1v1";
-import { snake_1v1c } from "./Gradient/Timed/snake_1v1c";
 import { snake_2 } from "./Gradient/Timed/snake_2";
-import { snake_2c } from "./Gradient/Timed/snake_2c";
 import { snake_4 } from "./Gradient/Timed/snake_4";
-import { snake_4c } from "./Gradient/Timed/snake_4c";
 import { snake_async_3 } from "./Gradient/Timed/snake_async_3";
 import { snake_inter_2 } from "./Gradient/Timed/snake_inter_2";
-import { snake_inter_2c } from "./Gradient/Timed/snake_inter_2c";
 import { sweep_1 } from "./Gradient/Timed/sweep_1";
-import { sweep_1c } from "./Gradient/Timed/sweep_1c";
 import { sweep_1v1 } from "./Gradient/Timed/sweep_1v1";
-import { sweep_1v1c } from "./Gradient/Timed/sweep_1v1c";
 import { sweep_diag_1 } from "./Gradient/Timed/sweep_diag_1";
-import { sweep_diag_1c } from "./Gradient/Timed/sweep_diag_1c";
 import { sweep_diag_1v1 } from "./Gradient/Timed/sweep_diag_1v1";
-import { sweep_diag_1v1c } from "./Gradient/Timed/sweep_diag_1v1c";
 import { sweep_diag_async_4 } from "./Gradient/Timed/sweep_diag_async_4";
-import { sweep_diag_async_4c } from "./Gradient/Timed/sweep_diag_async_4c";
 import { band_1 } from "./Gradient/Tracked/band_1";
 import { band_1v1 } from "./Gradient/Tracked/band_1v1";
 import { band_diag_1 } from "./Gradient/Tracked/band_diag_1";
 import { hand_1 } from "./Gradient/Tracked/hand_1";
 import { hand_trail_1 } from "./Gradient/Tracked/hand_trail_1";
 import { hand_trail_2 } from "./Gradient/Tracked/hand_trail_2";
-import { hand_trail_2c } from "./Gradient/Tracked/hand_trail_2c";
 import { hand_trail_3 } from "./Gradient/Tracked/hand_trail_3";
-import { hand_trail_3c } from "./Gradient/Tracked/hand_trail_3c";
 import { spot_1 } from "./Gradient/Tracked/spot_1";
 import { spot_flare_2 } from "./Gradient/Tracked/spot_flare_2";
 import { spot_flare_3 } from "./Gradient/Tracked/spot_flare_3";
 import { spot_ripple_1 } from "./Gradient/Tracked/spot_ripple_1";
 import { spot_ripple_2 } from "./Gradient/Tracked/spot_ripple_2";
-import { spot_ripple_2c } from "./Gradient/Tracked/spot_ripple_2c";
 import { spot_ripple_3 } from "./Gradient/Tracked/spot_ripple_3";
-import { spot_ripple_3c } from "./Gradient/Tracked/spot_ripple_3c";
 import { spot_smear_2 } from "./Gradient/Tracked/spot_smear_2";
-import { spot_smear_2c } from "./Gradient/Tracked/spot_smear_2c";
 import { spot_smear_3 } from "./Gradient/Tracked/spot_smear_3";
-import { spot_smear_3c } from "./Gradient/Tracked/spot_smear_3c";
 import { spot_trail_1 } from "./Gradient/Tracked/spot_trail_1";
 import { spot_trail_2 } from "./Gradient/Tracked/spot_trail_2";
-import { spot_trail_2c } from "./Gradient/Tracked/spot_trail_2c";
 import { spot_trail_3 } from "./Gradient/Tracked/spot_trail_3";
-import { spot_trail_3c } from "./Gradient/Tracked/spot_trail_3c";
 import { constant } from "./Iteration/constant";
 import { repeat1_1 } from "./Iteration/repeat1_1";
 import { repeat2_1 } from "./Iteration/repeat2_1";
@@ -106,7 +68,9 @@ import type {
     PatternConfig,
     SVGDefsColors,
     TimedGradientConfig,
+    TimedGradientEntry,
     TrackedGradientConfig,
+    TrackedGradientEntry,
 } from "./SVGDefs.types";
 
 export namespace SVGDefsSamples {
@@ -154,106 +118,143 @@ export namespace SVGDefsSamples {
 
     export namespace Gradient {
         export namespace Timed {
-            export const SAMPLE_CONFIGS = {
-                elastic_circle_3c,
-                elastic_drip_3c,
-                elastic_inter_semicircle_3c,
-                elastic_semicircle_3c,
+            export const SAMPLE_FACTORIES = {
+                elastic_circle_1,
+                elastic_drip_1,
+                elastic_inter_semicircle_1,
+                elastic_semicircle_1,
                 fill_2c,
                 fill_3c,
                 fill_diag_2v2c,
                 flow_2,
-                flow_2c,
-                flow_2cs,
-                flow_2s,
                 flow_3,
-                flow_3c,
-                flow_3cs,
-                flow_3s,
                 flow_diag_2,
-                flow_diag_2c,
-                flow_diag_2cs,
-                flow_diag_2s,
                 flow_diag_3,
-                flow_diag_3c,
-                flow_diag_3cs,
-                flow_diag_3s,
                 merge_1v1,
-                merge_1v1c,
                 merge_diag_1v1,
-                merge_diag_1v1c,
                 merge_diag_async_4,
                 orbit_1,
-                orbit_1c,
                 orbit_1v1,
-                orbit_1v1c,
                 orbit_async_2v1,
                 orbit_async_3,
                 scan_1,
-                scan_1c,
                 scan_1v1,
-                scan_1v1c,
                 scan_diag_1,
-                scan_diag_1c,
                 scan_diag_1v1,
-                scan_diag_1v1c,
                 snake_1,
-                snake_1c,
                 snake_1v1,
-                snake_1v1c,
                 snake_2,
-                snake_2c,
                 snake_4,
-                snake_4c,
                 snake_async_3,
                 snake_inter_2,
-                snake_inter_2c,
                 sweep_1,
-                sweep_1c,
                 sweep_1v1,
-                sweep_1v1c,
                 sweep_diag_1,
-                sweep_diag_1c,
                 sweep_diag_1v1,
-                sweep_diag_1v1c,
                 sweep_diag_async_4,
-                sweep_diag_async_4c,
-            } as const satisfies Record<string, TimedGradientConfig>;
+            } as const;
 
-            export type SampleKey = keyof typeof SAMPLE_CONFIGS;
+            export const SAMPLE_ENTRIES = {
+                elastic_circle_1: { family: "elastic_circle_1" },
+                elastic_drip_1: { family: "elastic_drip_1" },
+                elastic_inter_semicircle_1: { family: "elastic_inter_semicircle_1" },
+                elastic_semicircle_1: { family: "elastic_semicircle_1" },
+                fill_2c: { family: "fill_2c" },
+                fill_3c: { family: "fill_3c" },
+                fill_diag_2v2c: { family: "fill_diag_2v2c" },
+                flow_2: { family: "flow_2" },
+                flow_3: { family: "flow_3" },
+                flow_diag_2: { family: "flow_diag_2" },
+                flow_diag_3: { family: "flow_diag_3" },
+                merge_1v1: { family: "merge_1v1" },
+                merge_diag_1v1: { family: "merge_diag_1v1" },
+                merge_diag_async_4: { family: "merge_diag_async_4" },
+                orbit_1: { family: "orbit_1" },
+                orbit_1v1: { family: "orbit_1v1" },
+                orbit_async_2v1: { family: "orbit_async_2v1" },
+                orbit_async_3: { family: "orbit_async_3" },
+                scan_1: { family: "scan_1" },
+                scan_1v1: { family: "scan_1v1" },
+                scan_diag_1: { family: "scan_diag_1" },
+                scan_diag_1v1: { family: "scan_diag_1v1" },
+                snake_1: { family: "snake_1" },
+                snake_1v1: { family: "snake_1v1" },
+                snake_2: { family: "snake_2" },
+                snake_4: { family: "snake_4" },
+                snake_async_3: { family: "snake_async_3" },
+                snake_inter_2: { family: "snake_inter_2" },
+                sweep_1: { family: "sweep_1" },
+                sweep_1v1: { family: "sweep_1v1" },
+                sweep_diag_1: { family: "sweep_diag_1" },
+                sweep_diag_1v1: { family: "sweep_diag_1v1" },
+                sweep_diag_async_4: { family: "sweep_diag_async_4" },
+            } as const satisfies Record<string, TimedGradientEntry>;
+
+            export type Entry = TimedGradientEntry;
+
+            export type SampleKey = keyof typeof SAMPLE_ENTRIES;
+
+            export const SAMPLE_KEYS = Object.keys(SAMPLE_ENTRIES) as SampleKey[];
+
+            export const toConfig = (entry: TimedGradientEntry): TimedGradientConfig =>
+                (SAMPLE_FACTORIES[entry.family] as (opts?: unknown) => TimedGradientConfig)(
+                    "defs" in entry ? entry.defs : undefined,
+                );
         }
 
         export namespace Tracked {
-            export const SAMPLE_CONFIGS = {
+            export const SAMPLE_FACTORIES = {
                 band_1,
                 band_1v1,
                 band_diag_1,
                 hand_1,
                 hand_trail_1,
                 hand_trail_2,
-                hand_trail_2c,
                 hand_trail_3,
-                hand_trail_3c,
                 spot_1,
                 spot_flare_2,
                 spot_flare_3,
                 spot_ripple_1,
                 spot_ripple_2,
-                spot_ripple_2c,
                 spot_ripple_3,
-                spot_ripple_3c,
                 spot_smear_2,
-                spot_smear_2c,
                 spot_smear_3,
-                spot_smear_3c,
                 spot_trail_1,
                 spot_trail_2,
-                spot_trail_2c,
                 spot_trail_3,
-                spot_trail_3c,
-            } as const satisfies Record<string, TrackedGradientConfig>;
+            } as const;
 
-            export type SampleKey = keyof typeof SAMPLE_CONFIGS;
+            export const SAMPLE_ENTRIES = {
+                band_1: { family: "band_1" },
+                band_1v1: { family: "band_1v1" },
+                band_diag_1: { family: "band_diag_1" },
+                hand_1: { family: "hand_1" },
+                hand_trail_1: { family: "hand_trail_1" },
+                hand_trail_2: { family: "hand_trail_2" },
+                hand_trail_3: { family: "hand_trail_3" },
+                spot_1: { family: "spot_1" },
+                spot_flare_2: { family: "spot_flare_2" },
+                spot_flare_3: { family: "spot_flare_3" },
+                spot_ripple_1: { family: "spot_ripple_1" },
+                spot_ripple_2: { family: "spot_ripple_2" },
+                spot_ripple_3: { family: "spot_ripple_3" },
+                spot_smear_2: { family: "spot_smear_2" },
+                spot_smear_3: { family: "spot_smear_3" },
+                spot_trail_1: { family: "spot_trail_1" },
+                spot_trail_2: { family: "spot_trail_2" },
+                spot_trail_3: { family: "spot_trail_3" },
+            } as const satisfies Record<string, TrackedGradientEntry>;
+
+            export type Entry = TrackedGradientEntry;
+
+            export type SampleKey = keyof typeof SAMPLE_ENTRIES;
+
+            export const SAMPLE_KEYS = Object.keys(SAMPLE_ENTRIES) as SampleKey[];
+
+            export const toConfig = (entry: TrackedGradientEntry): TrackedGradientConfig =>
+                (SAMPLE_FACTORIES[entry.family] as (opts?: unknown) => TrackedGradientConfig)(
+                    "defs" in entry ? entry.defs : undefined,
+                );
         }
     }
 }

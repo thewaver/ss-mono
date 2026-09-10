@@ -1,11 +1,13 @@
+import { Show } from "solid-js";
+
 import { MathUtils, ObjectUtils } from "@thewaver/ss-utils";
 
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
-import type { TimedGradientConfig } from "../../SVGDefs.types";
+import type { GradientCycleOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const snake_4: TimedGradientConfig = {
+export const snake_4 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -18,12 +20,33 @@ export const snake_4: TimedGradientConfig = {
                         {
                             id: `gradient1-${id}`,
                             colors: [
-                                { value: `rgb(from ${defs.colors.secondary} r g b / 0)` },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary) },
                                 { value: defs.colors.secondary, stop: 50 },
-                                { value: `rgb(from ${defs.colors.secondary} r g b / 0)`, stop: 50 },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary), stop: 50 },
                             ],
                         },
-                        SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(0, 360, 12), defs),
+                        <>
+                            {SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(0, 360, 12), defs)}
+                            <Show when={opts?.cycles}>
+                                {SVGAnimations.Gradient.cycleSmoothColors(
+                                    `gradient1-${id}`,
+                                    [
+                                        [
+                                            SVGDefsUtils.getTransparentColor(defs.colors.secondary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.tertiary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.secondary),
+                                        ],
+                                        [defs.colors.secondary, defs.colors.tertiary, defs.colors.secondary],
+                                        [
+                                            SVGDefsUtils.getTransparentColor(defs.colors.secondary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.tertiary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.secondary),
+                                        ],
+                                    ],
+                                    defs,
+                                )}
+                            </Show>
+                        </>,
                     ),
             },
             clipPath: {
@@ -46,13 +69,34 @@ export const snake_4: TimedGradientConfig = {
                         {
                             id: `gradient2-${id}`,
                             colors: [
-                                { value: `rgb(from ${defs.colors.primary} r g b / 0)` },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
                                 { value: defs.colors.primary, stop: 50 },
-                                { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 50 },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.primary), stop: 50 },
                             ],
                             angle: 90,
                         },
-                        SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(90, 450, 12), defs),
+                        <>
+                            {SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(90, 450, 12), defs)}
+                            <Show when={opts?.cycles}>
+                                {SVGAnimations.Gradient.cycleSmoothColors(
+                                    `gradient2-${id}`,
+                                    [
+                                        [
+                                            SVGDefsUtils.getTransparentColor(defs.colors.primary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.secondary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.primary),
+                                        ],
+                                        [defs.colors.primary, defs.colors.secondary, defs.colors.primary],
+                                        [
+                                            SVGDefsUtils.getTransparentColor(defs.colors.primary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.secondary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.primary),
+                                        ],
+                                    ],
+                                    defs,
+                                )}
+                            </Show>
+                        </>,
                     ),
             },
             clipPath: {
@@ -75,13 +119,34 @@ export const snake_4: TimedGradientConfig = {
                         {
                             id: `gradient3-${id}`,
                             colors: [
-                                { value: `rgb(from ${defs.colors.secondary} r g b / 0)` },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary) },
                                 { value: defs.colors.secondary, stop: 50 },
-                                { value: `rgb(from ${defs.colors.secondary} r g b / 0)`, stop: 50 },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary), stop: 50 },
                             ],
                             angle: 180,
                         },
-                        SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(180, 540, 12), defs),
+                        <>
+                            {SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(180, 540, 12), defs)}
+                            <Show when={opts?.cycles}>
+                                {SVGAnimations.Gradient.cycleSmoothColors(
+                                    `gradient3-${id}`,
+                                    [
+                                        [
+                                            SVGDefsUtils.getTransparentColor(defs.colors.secondary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.tertiary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.secondary),
+                                        ],
+                                        [defs.colors.secondary, defs.colors.tertiary, defs.colors.secondary],
+                                        [
+                                            SVGDefsUtils.getTransparentColor(defs.colors.secondary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.tertiary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.secondary),
+                                        ],
+                                    ],
+                                    defs,
+                                )}
+                            </Show>
+                        </>,
                     ),
             },
             clipPath: {
@@ -104,13 +169,34 @@ export const snake_4: TimedGradientConfig = {
                         {
                             id: `gradient4-${id}`,
                             colors: [
-                                { value: `rgb(from ${defs.colors.primary} r g b / 0)` },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
                                 { value: defs.colors.primary, stop: 50 },
-                                { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 50 },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.primary), stop: 50 },
                             ],
                             angle: 270,
                         },
-                        SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(270, 630, 12), defs),
+                        <>
+                            {SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(270, 630, 12), defs)}
+                            <Show when={opts?.cycles}>
+                                {SVGAnimations.Gradient.cycleSmoothColors(
+                                    `gradient4-${id}`,
+                                    [
+                                        [
+                                            SVGDefsUtils.getTransparentColor(defs.colors.primary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.secondary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.primary),
+                                        ],
+                                        [defs.colors.primary, defs.colors.secondary, defs.colors.primary],
+                                        [
+                                            SVGDefsUtils.getTransparentColor(defs.colors.primary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.secondary),
+                                            SVGDefsUtils.getTransparentColor(defs.colors.primary),
+                                        ],
+                                    ],
+                                    defs,
+                                )}
+                            </Show>
+                        </>,
                     ),
             },
             clipPath: {
@@ -126,4 +212,4 @@ export const snake_4: TimedGradientConfig = {
             },
         },
     ],
-};
+});

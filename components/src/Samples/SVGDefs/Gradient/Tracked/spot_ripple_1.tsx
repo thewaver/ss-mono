@@ -104,7 +104,7 @@ const createRipple = (index: number, getRef: () => HTMLElement | undefined) => {
     };
 };
 
-export const spot_ripple_1: TrackedGradientConfig = {
+export const spot_ripple_1 = (): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -147,4 +147,4 @@ export const spot_ripple_1: TrackedGradientConfig = {
             blend: true,
         })),
     ],
-};
+});

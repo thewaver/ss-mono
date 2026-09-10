@@ -3,7 +3,7 @@ import { SVGAnimations } from "../../SVGAnimations.const";
 import type { TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const merge_diag_async_4: TimedGradientConfig = {
+export const merge_diag_async_4 = (): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -125,4 +125,4 @@ export const merge_diag_async_4: TimedGradientConfig = {
             blend: true,
         },
     ],
-};
+});

@@ -1,9 +1,10 @@
-import type { PlacementRect } from "../../../Abstracts/Placement/Placement.types";
+import type { PlacementLayoutFn, PlacementRect } from "../../../Abstracts/Placement/Placement.types";
 import type {
     ArcDefs,
     BandDefs,
     FittedLayoutFn,
     HoneycombDefs,
+    PlacementLayoutEntry,
     SizedLayout,
     SizedLayoutFn,
     WhorlDefs,
@@ -22,35 +23,11 @@ const UPWARD_DEGREES = -90;
 const FULL_SHARE = 1;
 const AXIS_DEGREES = [-360, -270, -180, -90, 0, 90, 180, 270, 360];
 type BandBase = Required<Omit<BandDefs, "centreRadius" | "computeItemArcs">> & Pick<BandDefs, "centreRadius">;
-const BAND_BASE: BandBase = {
-    spreadDegrees: 360,
-    holeRadius: 25,
-    bandWidth: 25,
-    levelGap: 2,
-    wedgeGapDegrees: 3,
-    wedgeArc: 25,
-    hasCentreItem: false,
-    labelRadiusRatio: 0.5,
-    labelHeightRatio: 1,
-    labelMaxWidthRatio: 1,
-    tiltRatio: 0,
-};
-const FAN_FACING_DEGREES = 0;
-const FAN_SPREAD_DEGREES = 160;
-const FAN_TILT = 0.75;
 const NO_TILT = 0;
-const HONEYCOMB_CELL_WIDTH = 25;
-const HONEYCOMB_PER_ROW = 3;
-const HONEYCOMB_GAP = 0;
 const HEX_HEIGHT_RATIO = 2 / Math.sqrt(3);
 const HEX_ROW_STEP_RATIO = 0.75;
 const EVEN_ROW = 0;
 const ROW_PARITY = 2;
-const ARC_WIDTH = 100;
-const ARC_HEIGHT = 100;
-const ARC_SPREAD_DEGREES = 180;
-const ARC_ITEM_WIDTH = 25;
-const ARC_ITEM_HEIGHT = 25;
 const ARC_SAMPLES = 512;
 const HEX_CLIP_PATH = "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)";
 const toChordAngle = (radius: number, chord: number) =>
@@ -159,13 +136,6 @@ const toFittedLayout = (placements: PlacementRect[]) => ({
     placements,
     heightRatio: placements.reduce((lowest, placement) => Math.max(lowest, placement.top + placement.height * 0.5), 0),
 });
-const WHORL_CIRCLE_ITEM_SPACING = 1.75;
-const WHORL_CIRCLE_SPACING = 3.5;
-const WHORL_HEX_ITEM_SPACING = 1.5;
-const WHORL_HEX_SPACING = 3;
-const WHORL_SQUARE_ITEM_SPACING = 2;
-const WHORL_SQUARE_SPACING = 4;
-const ZIGZAG_SEGMENT_LENGTH = 2;
 const PODIUM_LEFT_RATIO = 1.75;
 const PODIUM_SECOND_DROP = 1;
 const PODIUM_THIRD_DROP = 1.5;
@@ -184,8 +154,47 @@ const computeWhorl = (itemCount: number, itemSpacing: number, whorlSpacing: numb
         };
     });
 export namespace PlacementLayoutUtils {
+    export const BAND_DEFAULTS: BandBase = {
+        spreadDegrees: 360,
+        holeRadius: 25,
+        bandWidth: 25,
+        levelGap: 2,
+        wedgeGapDegrees: 3,
+        wedgeArc: 25,
+        hasCentreItem: false,
+        labelRadiusRatio: 0.5,
+        labelHeightRatio: 1,
+        labelMaxWidthRatio: 1,
+        tiltRatio: 0,
+    };
+
+    export const ARC_DEFAULTS: Required<ArcDefs> = {
+        width: 100,
+        height: 100,
+        spreadDegrees: 180,
+        facingDegrees: -90,
+        tiltRatio: 0,
+        itemWidth: 25,
+        itemHeight: 25,
+    };
+
+    export const HONEYCOMB_DEFAULTS: Required<HoneycombDefs> = {
+        cellWidth: 25,
+        perRow: 3,
+        gap: 0,
+    };
+
+    export const WHORL_DEFAULTS: Required<WhorlDefs> = {
+        itemSpacing: 1.75,
+        whorlSpacing: 3.5,
+    };
+
+    export const ZIGZAG_DEFAULTS: Required<ZigzagDefs> = {
+        segmentLength: 2,
+    };
+
     export const createRing = (defs?: BandDefs): SizedLayoutFn => {
-        const base = BAND_BASE;
+        const base = BAND_DEFAULTS;
         const spreadDegrees = defs?.spreadDegrees ?? base.spreadDegrees;
         const holeRadius = defs?.holeRadius ?? base.holeRadius;
         const bandWidth = defs?.bandWidth ?? base.bandWidth;
@@ -292,13 +301,13 @@ export namespace PlacementLayoutUtils {
     export const ring = createRing();
 
     export const createArc = (defs?: ArcDefs): SizedLayoutFn => {
-        const boxWidth = defs?.width ?? ARC_WIDTH;
-        const boxHeight = defs?.height ?? ARC_HEIGHT;
-        const spreadDegrees = defs?.spreadDegrees ?? ARC_SPREAD_DEGREES;
-        const facingDegrees = defs?.facingDegrees ?? UPWARD_DEGREES;
-        const tiltRatio = defs?.tiltRatio ?? NO_TILT;
-        const itemWidth = defs?.itemWidth ?? ARC_ITEM_WIDTH;
-        const itemHeight = defs?.itemHeight ?? ARC_ITEM_HEIGHT;
+        const boxWidth = defs?.width ?? ARC_DEFAULTS.width;
+        const boxHeight = defs?.height ?? ARC_DEFAULTS.height;
+        const spreadDegrees = defs?.spreadDegrees ?? ARC_DEFAULTS.spreadDegrees;
+        const facingDegrees = defs?.facingDegrees ?? ARC_DEFAULTS.facingDegrees;
+        const tiltRatio = defs?.tiltRatio ?? ARC_DEFAULTS.tiltRatio;
+        const itemWidth = defs?.itemWidth ?? ARC_DEFAULTS.itemWidth;
+        const itemHeight = defs?.itemHeight ?? ARC_DEFAULTS.itemHeight;
 
         return ({ itemCount }): SizedLayout => {
             const radiusX = boxWidth * HALF;
@@ -338,16 +347,10 @@ export namespace PlacementLayoutUtils {
 
     export const arc = createArc();
 
-    export const fan = createArc({
-        facingDegrees: FAN_FACING_DEGREES,
-        spreadDegrees: FAN_SPREAD_DEGREES,
-        tiltRatio: FAN_TILT,
-    });
-
     export const createHoneycomb = (defs?: HoneycombDefs): SizedLayoutFn => {
-        const cellWidth = defs?.cellWidth ?? HONEYCOMB_CELL_WIDTH;
-        const perRow = Math.max(defs?.perRow ?? HONEYCOMB_PER_ROW, SINGLE_ITEM);
-        const gap = defs?.gap ?? HONEYCOMB_GAP;
+        const cellWidth = defs?.cellWidth ?? HONEYCOMB_DEFAULTS.cellWidth;
+        const perRow = Math.max(defs?.perRow ?? HONEYCOMB_DEFAULTS.perRow, SINGLE_ITEM);
+        const gap = defs?.gap ?? HONEYCOMB_DEFAULTS.gap;
 
         return ({ itemCount }): SizedLayout => {
             const cellHeight = cellWidth * HEX_HEIGHT_RATIO;
@@ -414,23 +417,16 @@ export namespace PlacementLayoutUtils {
     export const podiumLozenge = createPodiumLozenge();
 
     export const createWhorl = (defs?: WhorlDefs): FittedLayoutFn => {
-        const itemSpacing = defs?.itemSpacing ?? WHORL_CIRCLE_ITEM_SPACING;
-        const whorlSpacing = defs?.whorlSpacing ?? WHORL_CIRCLE_SPACING;
+        const itemSpacing = defs?.itemSpacing ?? WHORL_DEFAULTS.itemSpacing;
+        const whorlSpacing = defs?.whorlSpacing ?? WHORL_DEFAULTS.whorlSpacing;
 
         return ({ itemCount }) => toFittedLayout(computeWhorl(itemCount, itemSpacing, whorlSpacing));
     };
 
-    export const whorlCircle = createWhorl();
-
-    export const whorlHex = createWhorl({ itemSpacing: WHORL_HEX_ITEM_SPACING, whorlSpacing: WHORL_HEX_SPACING });
-
-    export const whorlSquare = createWhorl({
-        itemSpacing: WHORL_SQUARE_ITEM_SPACING,
-        whorlSpacing: WHORL_SQUARE_SPACING,
-    });
+    export const whorl = createWhorl();
 
     export const createZigzag = (defs?: ZigzagDefs): FittedLayoutFn => {
-        const segmentLength = defs?.segmentLength ?? ZIGZAG_SEGMENT_LENGTH;
+        const segmentLength = defs?.segmentLength ?? ZIGZAG_DEFAULTS.segmentLength;
         const step = 1 / (1 + segmentLength);
         const peak = segmentLength - 1;
 
@@ -446,4 +442,30 @@ export namespace PlacementLayoutUtils {
     };
 
     export const zigzag = createZigzag();
+
+    export const DEFAULTS_BY_FAMILY = {
+        arc: ARC_DEFAULTS,
+        honeycomb: HONEYCOMB_DEFAULTS,
+        podiumLozenge: {},
+        ring: BAND_DEFAULTS,
+        whorl: WHORL_DEFAULTS,
+        zigzag: ZIGZAG_DEFAULTS,
+    };
+
+    export const toLayoutFn = (entry: PlacementLayoutEntry): PlacementLayoutFn => {
+        switch (entry.family) {
+            case "ring":
+                return createRing(entry.defs);
+            case "arc":
+                return createArc(entry.defs);
+            case "honeycomb":
+                return createHoneycomb(entry.defs);
+            case "podiumLozenge":
+                return createPodiumLozenge();
+            case "whorl":
+                return createWhorl(entry.defs);
+            case "zigzag":
+                return createZigzag(entry.defs);
+        }
+    };
 }

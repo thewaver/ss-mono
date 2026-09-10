@@ -93,7 +93,7 @@ const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined) 
     };
 };
 
-export const spot_trail_1: TrackedGradientConfig = {
+export const spot_trail_1 = (): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -131,4 +131,4 @@ export const spot_trail_1: TrackedGradientConfig = {
             filter: SVGDefsUtils.getBaseBlur(id, defs),
         })),
     ],
-};
+});

@@ -1,12 +1,15 @@
 import { For, createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { DEFAULT_GLASS_DEFS, SVGDefsSamples } from "@thewaver/ss-components";
+import type { SampleKnob } from "@thewaver/ss-components";
+import { DEFAULT_GLASS_DEFS, SVGDefsSamples, TrackedGradientKnobs } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import {
+    NO_SAMPLE_KEY,
     splitEntriesIntoGroups,
     toGroupEntriesWithNoSample,
 } from "../../PageComponents/SampleGroups/SampleGroups.const";
@@ -18,7 +21,7 @@ import type { GlassSurfaceExampleProps } from "./GlassSurfacePage.types";
 import { BORDER_RADIUS_FULL } from "../../Theme.css";
 import * as styles from "./GlassSurfacePage.css";
 
-const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Tracked.SAMPLE_CONFIGS);
+const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Tracked.SAMPLE_ENTRIES);
 
 const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/GlassSurfacePage/Examples/Default.tsx";
 
@@ -64,6 +67,14 @@ export const GlassSurfacePage = () => {
     const [getBorderWidth, setBorderWidth] = createSignal(2);
     const [getStrokeConfigKey, setStrokeConfigKey] =
         createSignal<WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>>("spot_1");
+    const [strokeConfigDefs, setStrokeConfigDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
+
+    const getStrokeKnobs = () => {
+        const key = getStrokeConfigKey();
+
+        return key === NO_SAMPLE_KEY ? {} : (TrackedGradientKnobs.KNOBS_BY_FAMILY[key] as Record<string, SampleKnob>);
+    };
+    const getStrokeConfigDefs = () => strokeConfigDefs[getStrokeConfigKey()] ?? {};
     const [getBlurWidth, setBlurWidth] = createSignal(0);
     const [getBlurRadius, setBlurRadius] = createSignal(6);
     const [getRippleScale, setRippleScale] = createSignal(24);
@@ -82,6 +93,7 @@ export const GlassSurfacePage = () => {
             borderRadius: getBorderRadius,
             borderWidth: getBorderWidth,
             strokeConfigKey: getStrokeConfigKey,
+            strokeConfigDefs: getStrokeConfigDefs,
             colors: () => colors,
             blurWidth: getBlurWidth,
             blurRadius: getBlurRadius,
@@ -139,6 +151,15 @@ export const GlassSurfacePage = () => {
                         onChange={(config) => setStrokeConfigKey(() => config)}
                     />
                 </PageProp>
+
+                <PageKnobs
+                    knobs={getStrokeKnobs}
+                    defaults={() => ({})}
+                    values={getStrokeConfigDefs}
+                    onInput={(key, value) =>
+                        setStrokeConfigDefs(getStrokeConfigKey(), (previous) => ({ ...previous, [key]: value }))
+                    }
+                />
 
                 <PageProp key={"colors"} label={"Border Colors"}>
                     <div class={styles.colorList}>

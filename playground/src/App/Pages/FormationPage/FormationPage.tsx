@@ -1,9 +1,12 @@
 import { createMemo, createSignal } from "solid-js";
+import { createStore } from "solid-js/store";
 
-import { PlacementLayouts } from "@thewaver/ss-components";
+import type { PlacementLayoutEntry, SampleKnob } from "@thewaver/ss-components";
+import { PlacementLayoutKnobs, PlacementLayoutUtils, PlacementLayouts } from "@thewaver/ss-components";
 import { ShapeConst } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -50,6 +53,16 @@ export const FormationPage = () => {
     const [getLayoutKey, setLayoutKey] = createSignal<PlacementLayouts.SampleKey>(STARTING_LAYOUT_KEY);
     const [getShapeKind, setShapeKind] = createSignal<ShapeConst.DefaultShape>(STARTING_SHAPE_KIND);
     const [getIsStackedInReverse, setIsStackedInReverse] = createSignal(false);
+    const [layoutDefs, setLayoutDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
+
+    const getFamily = () => PlacementLayouts.SAMPLE_LAYOUTS[getLayoutKey()].family;
+    const getKnobs = () => PlacementLayoutKnobs.KNOBS_BY_FAMILY[getFamily()] as Record<string, SampleKnob>;
+    const getDefaults = () => PlacementLayoutUtils.DEFAULTS_BY_FAMILY[getFamily()] as Record<string, unknown>;
+    const getDefs = () => layoutDefs[getLayoutKey()] ?? {};
+
+    const getLayoutEntry = createMemo(
+        () => ({ family: getFamily(), defs: getDefs() }) as unknown as PlacementLayoutEntry,
+    );
 
     const getItems = createMemo(() => NAMES.slice(0, getItemCount()));
 
@@ -57,7 +70,7 @@ export const FormationPage = () => {
         const commonProps: FormationExampleProps = {
             items: getItems,
             isStackedInReverse: getIsStackedInReverse,
-            layoutKey: getLayoutKey,
+            layoutEntry: getLayoutEntry,
             shapeKind: getShapeKind,
         };
 
@@ -95,6 +108,16 @@ export const FormationPage = () => {
                         onChange={(key) => setLayoutKey(() => key)}
                     />
                 </PageProp>
+
+                <PageKnobs
+                    knobs={getKnobs}
+                    defaults={getDefaults}
+                    values={getDefs}
+                    width={() => FIELD_WIDTH}
+                    onInput={(key, value) =>
+                        setLayoutDefs(getLayoutKey(), (previous) => ({ ...previous, [key]: value }))
+                    }
+                />
 
                 <PageProp key={"isStackedInReverse"} label={"Earlier items in front"}>
                     <PageCheckField

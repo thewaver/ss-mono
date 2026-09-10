@@ -100,7 +100,7 @@ const createHandStamp = (index: number, getRef: () => HTMLElement | undefined) =
     };
 };
 
-export const hand_trail_1: TrackedGradientConfig = {
+export const hand_trail_1 = (): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -174,4 +174,4 @@ export const hand_trail_1: TrackedGradientConfig = {
             };
         }),
     ],
-};
+});

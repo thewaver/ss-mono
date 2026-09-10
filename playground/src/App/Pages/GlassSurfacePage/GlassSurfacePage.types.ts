@@ -6,6 +6,7 @@ export type GlassSurfaceExampleProps = AccessorProps<{
     borderRadius: number;
     borderWidth: number;
     strokeConfigKey: WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>;
+    strokeConfigDefs: Record<string, number | boolean>;
     colors: SVGDefsColors;
     blurWidth?: number;
     blurRadius: number;

@@ -1,15 +1,18 @@
 import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import type { SampleKnob } from "@thewaver/ss-components";
 import {
     CellAnimationBreakpoints,
     CellAnimationWeights,
     ScanlineAnimation,
     ScanlineAnimationKeyframes,
+    ScanlineAnimationKnobs,
     access,
 } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -51,9 +54,6 @@ const SHIFT_PERCENT_STEP = 5;
 const MIN_CHUNKYNESS = 0.1;
 const MAX_CHUNKYNESS = 1;
 const CHUNKYNESS_STEP = 0.1;
-const MIN_PEAK_SCALE_PERCENT = 120;
-const MAX_PEAK_SCALE_PERCENT = 200;
-const PEAK_SCALE_PERCENT_STEP = 10;
 const MIN_LINE_COUNT = 8;
 const MAX_LINE_COUNT = 240;
 const LINE_COUNT_STEP = 4;
@@ -61,27 +61,6 @@ const MIN_DURATION_MS = 100;
 const MAX_DURATION_MS = 5000;
 const DURATION_STEP_MS = 100;
 const MIN_ITERATION_DELAY_MS = 0;
-const MIN_WAVE_COUNT = 1;
-const MAX_WAVE_COUNT = 8;
-const WAVE_COUNT_STEP = 1;
-const MIN_ROLL_SHIFT_PERCENT = 20;
-const MAX_ROLL_SHIFT_PERCENT = 200;
-const ROLL_SHIFT_PERCENT_STEP = 20;
-const MIN_SEAM_BRIGHTNESS_PERCENT = 0;
-const MAX_SEAM_BRIGHTNESS_PERCENT = 100;
-const SEAM_BRIGHTNESS_PERCENT_STEP = 10;
-const MIN_DROP_CHANCE = 0.1;
-const MAX_DROP_CHANCE = 1;
-const DROP_CHANCE_STEP = 0.1;
-const MIN_DIP_PERCENT = 10;
-const MAX_DIP_PERCENT = 90;
-const DIP_PERCENT_STEP = 10;
-const MIN_FIELD_COUNT = 2;
-const MAX_FIELD_COUNT = 16;
-const FIELD_COUNT_STEP = 2;
-const MIN_SKEW_DEGREES = 5;
-const MAX_SKEW_DEGREES = 45;
-const SKEW_DEGREES_STEP = 5;
 const STRESS_LINE_COUNT = 120;
 const STRESS_ITEMS: (StressTestDefs & { size: number; kind: "transform" | "filter" })[] = (
     ["transform", "filter"] as const
@@ -287,9 +266,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const [keyframeOpts, setKeyframeOpts] = createStore<ScanlineAnimationKeyframes.HorizontalStretchOpts>({
-        peakScalePercent: 150,
-    });
+    const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
         dir: "asc",
         smoothness: 0.2,
@@ -298,20 +275,20 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     return (
         <>
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
-                <SurgeExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
+                <SurgeExample
+                    {...props}
+                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes.HorizontalStretchOpts}
+                    breakpointOpts={() => breakpointOpts}
+                />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"peakScale"} label={"Peak Scale (%)"}>
-                    <PageNumberField
-                        value={() => keyframeOpts.peakScalePercent!}
-                        min={() => MIN_PEAK_SCALE_PERCENT}
-                        max={() => MAX_PEAK_SCALE_PERCENT}
-                        step={() => PEAK_SCALE_PERCENT_STEP}
-                        ariaLabel={"Peak scale percent"}
-                        onInput={(value) => setKeyframeOpts("peakScalePercent", value)}
-                    />
-                </PageProp>
+                <PageKnobs
+                    knobs={() => ScanlineAnimationKnobs.STRETCH_KNOBS as Record<string, SampleKnob>}
+                    defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_STRETCH_OPTS}
+                    values={() => keyframeOpts}
+                    onInput={(key, value) => setKeyframeOpts(key, value)}
+                />
 
                 <SmoothnessInput
                     getter={() => breakpointOpts.smoothness!}
@@ -324,9 +301,7 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const [keyframeOpts, setKeyframeOpts] = createStore<ScanlineAnimationKeyframes.HorizontalSnakeOpts>({
-        shiftPercent: 5,
-    });
+    const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
         dir: "asc",
         smoothness: 0.2,
@@ -335,20 +310,20 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     return (
         <>
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
-                <SnakeExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
+                <SnakeExample
+                    {...props}
+                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes.HorizontalSnakeOpts}
+                    breakpointOpts={() => breakpointOpts}
+                />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"shift"} label={"Shift (%)"}>
-                    <PageNumberField
-                        value={() => keyframeOpts.shiftPercent!}
-                        min={() => MIN_SHIFT_PERCENT}
-                        max={() => MAX_SHIFT_PERCENT}
-                        step={() => SHIFT_PERCENT_STEP}
-                        ariaLabel={"Shift percent"}
-                        onInput={(value) => setKeyframeOpts("shiftPercent", value)}
-                    />
-                </PageProp>
+                <PageKnobs
+                    knobs={() => ScanlineAnimationKnobs.SNAKE_KNOBS as Record<string, SampleKnob>}
+                    defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_SNAKE_OPTS}
+                    values={() => keyframeOpts}
+                    onInput={(key, value) => setKeyframeOpts(key, value)}
+                />
 
                 <SmoothnessInput
                     getter={() => breakpointOpts.smoothness!}
@@ -361,9 +336,7 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const [keyframeOpts, setKeyframeOpts] = createStore<ScanlineAnimationKeyframes.HorizontalSplitOpts>({
-        shiftPercent: 10,
-    });
+    const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
         dir: "asc",
         smoothness: 1,
@@ -372,20 +345,20 @@ const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     return (
         <>
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
-                <SplitExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
+                <SplitExample
+                    {...props}
+                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes.HorizontalSplitOpts}
+                    breakpointOpts={() => breakpointOpts}
+                />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"shift"} label={"Shift (%)"}>
-                    <PageNumberField
-                        value={() => keyframeOpts.shiftPercent!}
-                        min={() => MIN_SHIFT_PERCENT}
-                        max={() => MAX_SHIFT_PERCENT}
-                        step={() => SHIFT_PERCENT_STEP}
-                        ariaLabel={"Shift percent"}
-                        onInput={(value) => setKeyframeOpts("shiftPercent", value)}
-                    />
-                </PageProp>
+                <PageKnobs
+                    knobs={() => ScanlineAnimationKnobs.SPLIT_KNOBS as Record<string, SampleKnob>}
+                    defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_SPLIT_OPTS}
+                    values={() => keyframeOpts}
+                    onInput={(key, value) => setKeyframeOpts(key, value)}
+                />
 
                 <SmoothnessInput
                     getter={() => breakpointOpts.smoothness!}
@@ -470,10 +443,7 @@ const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const [keyframeOpts, setKeyframeOpts] = createStore<ScanlineAnimationKeyframes._HorizontalWaveOpts>({
-        shiftPercent: 8,
-        waveCount: 3,
-    });
+    const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
         dir: "asc",
         smoothness: 0.6,
@@ -482,31 +452,20 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     return (
         <>
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
-                <WaveExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
+                <WaveExample
+                    {...props}
+                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes._HorizontalWaveOpts}
+                    breakpointOpts={() => breakpointOpts}
+                />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"shift"} label={"Shift (%)"}>
-                    <PageNumberField
-                        value={() => keyframeOpts.shiftPercent!}
-                        min={() => MIN_SHIFT_PERCENT}
-                        max={() => MAX_SHIFT_PERCENT}
-                        step={() => SHIFT_PERCENT_STEP}
-                        ariaLabel={"Shift percent"}
-                        onInput={(value) => setKeyframeOpts("shiftPercent", value)}
-                    />
-                </PageProp>
-
-                <PageProp key={"waveCount"} label={"Wave count"}>
-                    <PageNumberField
-                        value={() => keyframeOpts.waveCount!}
-                        min={() => MIN_WAVE_COUNT}
-                        max={() => MAX_WAVE_COUNT}
-                        step={() => WAVE_COUNT_STEP}
-                        ariaLabel={"Wave count"}
-                        onInput={(value) => setKeyframeOpts("waveCount", value)}
-                    />
-                </PageProp>
+                <PageKnobs
+                    knobs={() => ScanlineAnimationKnobs.WAVE_KNOBS as Record<string, SampleKnob>}
+                    defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_WAVE_OPTS}
+                    values={() => keyframeOpts}
+                    onInput={(key, value) => setKeyframeOpts(key, value)}
+                />
 
                 <SmoothnessInput
                     getter={() => breakpointOpts.smoothness!}
@@ -519,10 +478,7 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const [keyframeOpts, setKeyframeOpts] = createStore<ScanlineAnimationKeyframes._HorizontalRollOpts>({
-        shiftPercent: 100,
-        seamBrightnessPercent: 40,
-    });
+    const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
         dir: "asc",
         smoothness: 0.1,
@@ -531,31 +487,20 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     return (
         <>
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
-                <RollExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
+                <RollExample
+                    {...props}
+                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes._HorizontalRollOpts}
+                    breakpointOpts={() => breakpointOpts}
+                />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"shift"} label={"Shift (%)"}>
-                    <PageNumberField
-                        value={() => keyframeOpts.shiftPercent!}
-                        min={() => MIN_ROLL_SHIFT_PERCENT}
-                        max={() => MAX_ROLL_SHIFT_PERCENT}
-                        step={() => ROLL_SHIFT_PERCENT_STEP}
-                        ariaLabel={"Shift percent"}
-                        onInput={(value) => setKeyframeOpts("shiftPercent", value)}
-                    />
-                </PageProp>
-
-                <PageProp key={"seamBrightness"} label={"Seam brightness (%)"}>
-                    <PageNumberField
-                        value={() => keyframeOpts.seamBrightnessPercent!}
-                        min={() => MIN_SEAM_BRIGHTNESS_PERCENT}
-                        max={() => MAX_SEAM_BRIGHTNESS_PERCENT}
-                        step={() => SEAM_BRIGHTNESS_PERCENT_STEP}
-                        ariaLabel={"Seam brightness percent"}
-                        onInput={(value) => setKeyframeOpts("seamBrightnessPercent", value)}
-                    />
-                </PageProp>
+                <PageKnobs
+                    knobs={() => ScanlineAnimationKnobs.ROLL_KNOBS as Record<string, SampleKnob>}
+                    defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_ROLL_OPTS}
+                    values={() => keyframeOpts}
+                    onInput={(key, value) => setKeyframeOpts(key, value)}
+                />
 
                 <SmoothnessInput
                     getter={() => breakpointOpts.smoothness!}
@@ -568,10 +513,7 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const [keyframeOpts, setKeyframeOpts] = createStore<ScanlineAnimationKeyframes._HorizontalDropoutOpts>({
-        dropChance: 0.3,
-        shiftPercent: 15,
-    });
+    const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
         dir: "asc",
         smoothness: 0.2,
@@ -580,31 +522,20 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     return (
         <>
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
-                <DropoutExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
+                <DropoutExample
+                    {...props}
+                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes._HorizontalDropoutOpts}
+                    breakpointOpts={() => breakpointOpts}
+                />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"dropChance01"} label={"Drop chance (0-1)"}>
-                    <PageNumberField
-                        value={() => keyframeOpts.dropChance!}
-                        min={() => MIN_DROP_CHANCE}
-                        max={() => MAX_DROP_CHANCE}
-                        step={() => DROP_CHANCE_STEP}
-                        ariaLabel={"Drop chance"}
-                        onInput={(value) => setKeyframeOpts("dropChance", value)}
-                    />
-                </PageProp>
-
-                <PageProp key={"shift"} label={"Shift (%)"}>
-                    <PageNumberField
-                        value={() => keyframeOpts.shiftPercent!}
-                        min={() => MIN_SHIFT_PERCENT}
-                        max={() => MAX_SHIFT_PERCENT}
-                        step={() => SHIFT_PERCENT_STEP}
-                        ariaLabel={"Shift percent"}
-                        onInput={(value) => setKeyframeOpts("shiftPercent", value)}
-                    />
-                </PageProp>
+                <PageKnobs
+                    knobs={() => ScanlineAnimationKnobs.DROPOUT_KNOBS as Record<string, SampleKnob>}
+                    defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_DROPOUT_OPTS}
+                    values={() => keyframeOpts}
+                    onInput={(key, value) => setKeyframeOpts(key, value)}
+                />
 
                 <SmoothnessInput
                     getter={() => breakpointOpts.smoothness!}
@@ -617,10 +548,7 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const [keyframeOpts, setKeyframeOpts] = createStore<ScanlineAnimationKeyframes._HorizontalInterlaceOpts>({
-        dipPercent: 40,
-        fieldCount: 8,
-    });
+    const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
         dir: "asc",
         smoothness: 0.8,
@@ -629,31 +557,20 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     return (
         <>
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
-                <InterlaceExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
+                <InterlaceExample
+                    {...props}
+                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes._HorizontalInterlaceOpts}
+                    breakpointOpts={() => breakpointOpts}
+                />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"dip"} label={"Dip (%)"}>
-                    <PageNumberField
-                        value={() => keyframeOpts.dipPercent!}
-                        min={() => MIN_DIP_PERCENT}
-                        max={() => MAX_DIP_PERCENT}
-                        step={() => DIP_PERCENT_STEP}
-                        ariaLabel={"Dip percent"}
-                        onInput={(value) => setKeyframeOpts("dipPercent", value)}
-                    />
-                </PageProp>
-
-                <PageProp key={"fieldCount"} label={"Field count"}>
-                    <PageNumberField
-                        value={() => keyframeOpts.fieldCount!}
-                        min={() => MIN_FIELD_COUNT}
-                        max={() => MAX_FIELD_COUNT}
-                        step={() => FIELD_COUNT_STEP}
-                        ariaLabel={"Field count"}
-                        onInput={(value) => setKeyframeOpts("fieldCount", value)}
-                    />
-                </PageProp>
+                <PageKnobs
+                    knobs={() => ScanlineAnimationKnobs.INTERLACE_KNOBS as Record<string, SampleKnob>}
+                    defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_INTERLACE_OPTS}
+                    values={() => keyframeOpts}
+                    onInput={(key, value) => setKeyframeOpts(key, value)}
+                />
 
                 <SmoothnessInput
                     getter={() => breakpointOpts.smoothness!}
@@ -666,9 +583,7 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const [keyframeOpts, setKeyframeOpts] = createStore<ScanlineAnimationKeyframes._HorizontalSkewOpts>({
-        skewDegrees: 20,
-    });
+    const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
         dir: "asc",
         smoothness: 0.3,
@@ -677,20 +592,20 @@ const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     return (
         <>
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
-                <SkewExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
+                <SkewExample
+                    {...props}
+                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes._HorizontalSkewOpts}
+                    breakpointOpts={() => breakpointOpts}
+                />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"skew"} label={"Skew (deg)"}>
-                    <PageNumberField
-                        value={() => keyframeOpts.skewDegrees!}
-                        min={() => MIN_SKEW_DEGREES}
-                        max={() => MAX_SKEW_DEGREES}
-                        step={() => SKEW_DEGREES_STEP}
-                        ariaLabel={"Skew degrees"}
-                        onInput={(value) => setKeyframeOpts("skewDegrees", value)}
-                    />
-                </PageProp>
+                <PageKnobs
+                    knobs={() => ScanlineAnimationKnobs.SKEW_KNOBS as Record<string, SampleKnob>}
+                    defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_SKEW_OPTS}
+                    values={() => keyframeOpts}
+                    onInput={(key, value) => setKeyframeOpts(key, value)}
+                />
 
                 <SmoothnessInput
                     getter={() => breakpointOpts.smoothness!}

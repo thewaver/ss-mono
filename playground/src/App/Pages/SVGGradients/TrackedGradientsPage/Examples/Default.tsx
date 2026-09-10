@@ -13,7 +13,7 @@ type Props = TrackedGradientExampleProps & {
     boxClass?: string;
 };
 
-export const TrackedShape = ({ configKey, paintKind, colors, blurWidth, boxClass }: Props) => {
+export const TrackedShape = ({ configKey, configDefs, paintKind, colors, blurWidth, boxClass }: Props) => {
     const id = createUniqueId();
 
     const computeDefs = (getSize: () => Size2d, getRef: () => HTMLElement | undefined) => {
@@ -21,16 +21,14 @@ export const TrackedShape = ({ configKey, paintKind, colors, blurWidth, boxClass
 
         if (key === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), access(paintKind));
 
-        return SVGDefsSamples.Gradient.Tracked.SAMPLE_CONFIGS[key].computeSVGDefs(
-            `${access(paintKind)}-${id}`,
-            undefined,
-            getRef,
-            {
-                getSize,
-                colors: access(colors),
-                blurWidth: access(blurWidth),
-            },
-        );
+        return SVGDefsSamples.Gradient.Tracked.toConfig({
+            family: key,
+            defs: access(configDefs),
+        } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(`${access(paintKind)}-${id}`, undefined, getRef, {
+            getSize,
+            colors: access(colors),
+            blurWidth: access(blurWidth),
+        });
     };
 
     return (

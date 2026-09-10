@@ -2045,7 +2045,7 @@ explicit restore). Two identical siblings and one that does not fit is not the s
 
 ### Arbitrary item placement: `Abstracts/Placement`, and `Menu` as the first consumer
 
-The first half of `backlog.md` item 25. A control's items can be placed anywhere rather than along a line, and
+The first half of `backlog.md` item 24. A control's items can be placed anywhere rather than along a line, and
 the vocabulary for saying where lives in an abstract so the next control can use the same one.
 
 **A placement is a centre, a size, an optional turn and an optional depth, all in fractions of the container's
@@ -2119,7 +2119,7 @@ its own chrome, or gets neither.
 
 ### Concentric submenus: `computeLayout` learns where it is, and a submenu borrows its parent's anchor
 
-The second piece of `backlog.md` item 25. A submenu of a laid-out menu is drawn as a wider ring round the
+The second piece of `backlog.md` item 24. A submenu of a laid-out menu is drawn as a wider ring round the
 same centre rather than hanging off the item that opened it, so a wheel stays one wheel however deep it goes.
 
 **`computeLayout` takes one object rather than a run of arguments, and the reason is the third one.**
@@ -2538,7 +2538,7 @@ all eleven, which is what lets a consumer offer the whole set by key.
 
 ### `Paginator` takes a layout, and the placed box moves into the abstract
 
-The proving pass of `backlog.md` item 25, against the control the item named as the strongest candidate. A
+The proving pass of `backlog.md` item 24, against the control the item named as the strongest candidate. A
 paginator is arithmetic over a flat list, so a layout is the only thing that changes: the steps, the pages and
 the ellipses go round a dial in the order they already had, and nothing about the counting, the addresses or
 the labels is touched.
@@ -2590,7 +2590,7 @@ the box. So the sector is vocabulary a layout offers and a painter may decline, 
 control has to understand.
 
 **What the pass did not strain, which is worth knowing before the next consumer.** `PlacementUtils.pickIndex`
-still has no caller — a paginator has no gesture that picks by direction, so the loose end item 25 records is
+still has no caller — a paginator has no gesture that picks by direction, so the loose end item 24 records is
 untouched. Nor did anything about levels move: a paginator is one level and always will be, so the concentric
 machinery went unexercised.
 
@@ -2671,7 +2671,7 @@ arrangement is drawn from it — and both suites assert the walk rather than any
 
 ### Every layout sample lives in one place, and none of them is a menu's
 
-The user's call, taken while `backlog.md` item 25's proving pass was still open. `Samples/Menu/Layouts` was
+The user's call, taken while `backlog.md` item 24's proving pass was still open. `Samples/Menu/Layouts` was
 named when a menu was the only thing that had ever asked for a layout; by the end of the pass it held a
 honeycomb and a radial tree, and eleven consumers imported it of which three were menus. It is now
 `Samples/Placement/Layouts`, and the arrangements that came in with `Formation` are in it too.
@@ -2826,7 +2826,7 @@ answer.
 
 ### Five more controls take a layout, and each one broke something different
 
-The rest of `backlog.md` item 25's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
+The rest of `backlog.md` item 24's proving pass, run against `Stepper`, `Toolbar`, `Sortable` and `Tree` after
 `Paginator`, `RadioGroup` and `Tabs`. The reason to keep going past the first was that each control was
 expected to strain a different part of the abstract, and each did.
 
@@ -6765,7 +6765,7 @@ the document so they paint behind it.
 layout's formula and the example now spells it a second time, along with a walk of its own data to work out
 which depths are showing — because a ring must disappear when its generation collapses, and only the layout
 knows that today. So the escape hatch is real and the duplication is real with it, which is the argument for
-the slot recorded against item 25 rather than a reason to think nothing is missing.
+the slot recorded against item 24 rather than a reason to think nothing is missing.
 
 **The user's stated position on where this should land**, taken as their framing rather than as a rule
 anything has been changed to follow: a thing that belongs in a particular place should have a render slot of
@@ -7464,11 +7464,12 @@ they started on and each takes the colour after its own.
 **`background` never enters a cycle.** Stated by the user. The palette is four colours and the fourth is the
 surface behind the sample, so the walk is primary → secondary → tertiary → primary.
 
-**The `elastic_…` samples changed in place rather than gaining a variant.** They painted a static
-three-stop ramp of the whole palette; they now paint one flat colour that cycles, which is `fill_3c`'s
-treatment. The rainbow is gone rather than optional — the user's call. They kept their `3` and gained the
-`c`, so `elastic_circle_3` is `elastic_circle_3c`; the first pass took them to `…_1c` and that was undone,
-for the reason the numbering rule below sets out.
+**The `elastic_…` samples lost their rainbow, which is the part that stuck.** They painted a static
+three-stop ramp of the whole palette; they paint one flat colour instead, which is `fill_3c`'s treatment.
+The rainbow is gone rather than optional — the user's call. **Their number and suffix moved several times
+afterwards and the family is now `elastic_…_1` with a `cycles` flag**; see _"`elastic` took its static
+position and went back to `_1`"_ below for where it landed and why each move followed the rule rather than
+a change of mind.
 
 **The cycle rides the same clock as the motion, because every `animate` shares one duration.**
 `SVGAnimationDefsUtils.createAnimateDefs` reads `animationDurationMs` for every element it stamps, so one sweep
@@ -7509,11 +7510,12 @@ looked like it wanted to be `scan_3c`. The user's answer splits the two cases:
   whatever it is doing. `fill_3c` and `fill_2c` would both be `fill_1c` under an instant-count, which is
   the demonstration that the instant-count carries no information here.
 
-**The `elastic_…` four are the second case, which is why they went back to `3c`.** They are `fill_3c`'s
-treatment applied to a shaped mark — a flat colour walking the whole palette, with no static sibling — so
-`elastic_circle_3c`, `elastic_drip_3c`, `elastic_semicircle_3c` and `elastic_inter_semicircle_3c`. The
-first pass had taken them to `…_1c` on the instant-count reading, and the user overturned it. **Nothing
-else moves**: every other `c` key in the registry has a twin, so the first bullet covers it.
+**The `elastic_…` four were the second case while they had no static sibling.** They are `fill_3c`'s
+treatment applied to a shaped mark — a flat colour walking the whole palette — so they went to
+`elastic_circle_3c` and its three neighbours, the first pass having taken them to `…_1c` on the
+instant-count reading. **They have a static sibling now**, which moves them to the first case and takes the
+number back to one; the family is `elastic_…_1` with a `cycles` flag, recorded below. The rule did not
+change — the situation did, which is the point of stating it as two cases.
 
 **`hue_…` became `fill_…`, and its number counts the walk rather than the instant.** The family named what
 changed where every other timed family names a motion, which is the same fault that took `sheen_…` to
@@ -7581,6 +7583,129 @@ already did by holding band count roughly level rather than palette traversals. 
 tuning was copied per variant rather than normalised: horizontal banded and smooth share an offset of 0.5
 and a full sweep, while diagonal banded uses 0.25 and half a sweep where diagonal smooth uses 0.5 and a
 full one. Those are tuned numbers and were left exactly as the existing keys had them.
+
+### Per-sample defs: a sample is a factory, an entry is a family plus a bag, and knobs are derived
+
+The build of the per-sample defs item, across all three registries; the item is closed. What it answers: a sample's
+tuned numbers were module-level `const`s that neither a consumer nor the Playground could reach, so the only
+way to try a different value was to edit the file.
+
+**A sample is a factory named after its key.** Every gradient sample was `export const scan_1:
+TimedGradientConfig = {…}`; it is now `export const scan_1 = (opts?: GradientCycleOpts):
+TimedGradientConfig => ({…})`. The export keeps the file's name, so _"one file per key, and the key is the
+file's name"_ is intact — only the type moved from a config to a function returning one. Samples with no
+options are zero-argument factories rather than a second shape, which is what lets one resolver call them
+all. `Placement/Layouts` already had this shape as `create<Family>(defs?)` and did not move.
+
+**An entry is a family plus its own options bag, and a resolver turns one into a config.** Each registry now
+holds entries — `SAMPLE_ENTRIES` for the gradients, `SAMPLE_LAYOUTS` for the layouts — and exposes
+`toConfig(entry)` / `toLayoutFn(entry)` beside the factories. The entry type is a union discriminated on
+`family`, so a family that takes no options cannot be handed a bag and one that takes `banded` cannot be
+handed a knob it does not read. Nothing in `components/src` outside `Samples` reads a sample key at all; the
+six places that read a registry by key are all Playground pages, and each now threads a bag alongside the
+key it already threaded.
+
+**Knob descriptions are derived, and they live beside the family rather than with it.** `Samples.types.ts`
+at the root of the tree holds the vocabulary — a number knob with a range and a step, a check knob, and a
+`SampleKnobs<T>` mapped type that checks each entry's name and kind against the family's own options type,
+so a renamed option breaks the build and a boolean cannot be given a slider. Each registry has a
+`*.knobs.ts` module next to it; the registry does not import it, so a consumer who names one sample never
+pulls labels and step sizes to call a function that never reads them. **The vocabulary is deliberately two
+kinds**, because two are what the three registries need; it grows when a family needs a select or a colour,
+and an unused kind would be dead API.
+
+**Defaults stayed with the family, which is what kills the drift.** `BAND_DEFAULTS`, `ARC_DEFAULTS` and
+their neighbours are exported from the layout factories, and the scanline registry's eight
+`DEFAULT_…_OPTS` moved inside its namespace. The Playground's generic panel seeds from those, so a number
+lives in exactly one place. **The ranges came out of the pages**: `PlacementPage` held twenty module
+constants of minimum, maximum and step for five knobs and the scanline page held thirty-odd, and all of
+them are now facts the sample states about itself.
+
+**One generic panel renders them all.** `PageKnobs` is a switch over the field components the Playground
+already had, so it is not new UI. It replaced five hand-written knobs on `PlacementPage`, which went from
+150 lines to 68, and eleven hand-written panels on the scanline page, which lost 85 lines and every
+non-null assertion it carried. `Glitch` keeps its hand-written panel, being a page-local composite rather
+than a registry sample.
+
+**Two visible changes came out of it, both deliberate.** `PlacementPage` now opens on the ring's own
+defaults rather than the page's — a hole radius of 25 against the band's 25, where the page used to open at
+64 and 84 — so what the Playground shows on load is what a consumer gets from `ring`. If those proportions
+read worse in the demo box, the fix is `BAND_DEFAULTS`, not the page. And `labelRadiusRatio` is shown as
+the ratio it is, 0 to 1 in steps of 0.05, rather than as a percentage the page converted.
+
+### What collapsed, and what a turned knob means for the key
+
+**A preset stops existing once a knob reaches it.** The user's call. `fan` was `createArc` with a wider
+spread and a tilt, so once arc had those knobs the key was a knob position rather than a sample; `whorlHex`
+and `whorlSquare` went the same way, being `createWhorl` with two spacings changed, and `whorlCircle` took
+the plain name `whorl` — the same principle that gave `spot_1` the plainest key. Nine layout keys became
+six, one per family.
+
+**The gradients collapsed their suffixes and nothing else.** The axis of variation between sibling keys was
+the suffix, so `c` became a `cycles` flag and `s` a `banded` one. Eighty-nine keys became fifty-one: sixty
+-three timed became thirty-three, twenty-six tracked became eighteen. Every other difference — an arm count
+of two against four, `diag`, a `v` grouping — stays a key of its own and is argued per family later, which
+is the user's ordering.
+
+**The collapse merged the variants that existed and designed nothing**, so eleven families came out of it
+without a flag: the four `async` keys had no cycling twin, and `fill` and `elastic` had no static one. The
+first write-up called that a rule, as though `fill` and `elastic` were exempt because cycling is their
+identity; **the user corrected it** — neither family is exempt in principle, and `elastic` has since taken
+its static position.
+
+**`snake_async_3`, `orbit_async_3`, `orbit_async_2v1` and `merge_diag_async_4` carry no `cycles` flag by
+design.** The user's call, and it is settled rather than pending: the four samples answer one group of
+elements against another out of phase, and nobody has decided what cycling should do to that. Adding the
+flag would be designing a look rather than collapsing two that exist. **Do not close this gap on the
+strength of `elastic` having closed its own** — it was raised and declined. The words were "by design for
+now", so the position may change; it changes when the user says so.
+
+**`elastic` took its static position and went back to `_1`.** The off position of a cycle is the colour it
+starts on, so a static `elastic_circle` is the same clip painted flat in `primary` — the motion is the
+sample's identity and is untouched by the flag, which is what makes the static form a real look rather than
+an absence. Adding that sibling moves the family into the first case of the numbering rule, where the number
+is what a viewer sees at any one instant, and for a flat fill that is one in both positions. So
+`elastic_circle_3c` is `elastic_circle_1` with a `cycles` flag, and the same for `drip`, `semicircle` and
+`inter_semicircle`. **The number has now moved three times** — `_3`, then `_1c`, then `_3c`, now `_1` — and
+each move was the rule applying to a changed situation rather than a change of mind: the `_3c` reading holds
+for a family with no static sibling, and this one has one.
+
+**`fill` stays cycling-only, and that is the user's call rather than a consequence.** Its number counts the
+walk, so a static `fill_2` and a static `fill_3` would both be a flat `primary` — the same sample under two
+names — and only `fill_diag_2v2c` has a static form that distinguishes itself. The alternatives were to make
+the static form paint the ramp its number names, which turns the flag into a change of geometry, or to drop
+the family to one key with the walk length as a knob. Neither was taken; `fill` keeps the `c` and offers no
+flag.
+
+**`flow` is the only family that carries both flags**, which is why its parity was closed first: all sixteen
+combinations exist, so neither flag has a ragged edge anywhere it appears.
+
+**The tracked merges swap a mechanism rather than adding one, and that is the difference from the timed
+ones.** A timed `c` sample is its plain sibling plus a `cycleSmoothColors` call, so the merge is that call
+inside a `<Show when={opts?.cycles}>` and nothing else moves. A tracked one is not: the plain sample colours
+each stamp by its **age**, banding the palette across the wake, while the cycling one colours each stamp by
+**when it was born** against a clock. Both mechanisms now live in the file and the flag chooses, which is
+about twenty lines apiece. Two smaller consequences: the two colour-key lists were the same list under two
+names and are now one `COLOR_KEYS`, and the clock's `keepAwake` — which the cycling samples call whether or
+not the pointer moves, and the plain ones only when it does — is now one guard reading
+`fade > NO_FADE && (opts?.cycles || moved)`. **`spot_ripple` needed a hand merge** where the other seven
+were mechanical: its plain `getColors` takes the ring's own colour, chosen by slot at the call site, where
+the cycling one takes the whole palette, so the merged form takes the palette and the slot index and picks
+inside.
+
+**What a turned knob means for the key answered itself.** The question was what it means to pick `fan` and
+then move the spread — the page still says `fan` while no longer showing it. With presets collapsed there is
+no such key: the key names the family and the panel names the bag, and the two together are the entry. A
+reader can see both at once, so nothing is misrepresented and no rule was needed.
+
+**The conversion was checked against what the Playground actually painted, not by argument.** Every timed
+key's gradient elements, stops, offsets, colours and `animate` values were recorded from the browser before
+the change and after it: all thirty-four surviving keys came back identical, once the transparent-stop
+spelling is normalised — the merged samples use `getTransparentColor` throughout where a plain sample used
+to spell the same colour relatively. Then every one of the thirty retired keys was reproduced by picking its
+family and checking its flags, and all thirty matched their old recording exactly. The tracked eight were
+checked the other way, since they are pointer-driven and have no static rendering to diff: each paints in
+both flag positions and paints differently between them, and a sample with no flag offers no knob.
 
 ### The bands leave the surface by travelling off it
 

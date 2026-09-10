@@ -1,10 +1,10 @@
 import { createEffect, createSignal } from "solid-js";
 
-import { EasingUtils, MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
+import { Color, EasingUtils, MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
-import type { SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
+import type { GradientCycleOpts, SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 import { SVGDefsFrameUtils } from "../../SVGDefsFrames.utils";
 
@@ -30,7 +30,8 @@ const CREST_SPREAD_START = 20;
 const CREST_SPREAD_END = 4;
 const CREST_OUTER_LIMIT = 99;
 const MOTION_STEP_RATIO = 0.002;
-const CREST_COLOR_KEYS: (keyof SVGDefsColors)[] = ["primary", "secondary"];
+const CYCLE_MS = 1000;
+const COLOR_KEYS: (keyof SVGDefsColors)[] = ["primary", "secondary"];
 
 const RESTING_ORIGIN: Point2d = { x: 0.5, y: 0.5 };
 const FULL_AGE_RATIO = 1;
@@ -40,9 +41,20 @@ const FIRST_MILESTONE = 0;
 
 const NO_REF = () => undefined;
 
+const getCycleColor = (colors: SVGDefsColors, atMs: number) => {
+    const phase = ((atMs % CYCLE_MS) / CYCLE_MS) * COLOR_KEYS.length;
+    const index = Math.floor(phase);
+    const from = colors[COLOR_KEYS[index % COLOR_KEYS.length]];
+    const to = colors[COLOR_KEYS[(index + 1) % COLOR_KEYS.length]];
+
+    if (!Color.Hex.isHex(from) || !Color.Hex.isHex(to)) return from;
+
+    return Color.Hex.interpolate(from, to, phase - index);
+};
+
 const clock = SVGDefsFrameUtils.createClock(RIPPLE_LIFETIME_MS);
 
-const createRipple = (index: number, getRef: () => HTMLElement | undefined) => {
+const createRipple = (index: number, getRef: () => HTMLElement | undefined, isCycling: boolean) => {
     const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef);
     const [getRipple, setRipple] = createSignal<Ripple>();
 
@@ -60,6 +72,8 @@ const createRipple = (index: number, getRef: () => HTMLElement | undefined) => {
         const step = lastOrigin && Point2dUtils.getLength({ x: origin.x - lastOrigin.x, y: origin.y - lastOrigin.y });
 
         lastOrigin = origin;
+
+        if (isCycling && fade > NO_FADE) clock.keepAwake();
 
         if (step === undefined || step <= MOTION_STEP_RATIO) return;
 
@@ -90,7 +104,10 @@ const createRipple = (index: number, getRef: () => HTMLElement | undefined) => {
     return {
         getOrigin: () => getRipple()?.origin ?? RESTING_ORIGIN,
         getScale: () => MathUtils.lerp(RIPPLE_START_SCALE, RIPPLE_END_SCALE, EasingUtils.easeOutCubic(getAgeRatio())),
-        getColors: (color: string) => {
+        getColors: (colors: SVGDefsColors, index: number) => {
+            const color = isCycling
+                ? getCycleColor(colors, getRipple()?.bornMs ?? 0)
+                : colors[COLOR_KEYS[index % COLOR_KEYS.length]];
             const alpha = getAlpha();
             const spread = getSpread();
 
@@ -105,7 +122,7 @@ const createRipple = (index: number, getRef: () => HTMLElement | undefined) => {
     };
 };
 
-export const spot_ripple_2: TrackedGradientConfig = {
+export const spot_ripple_2 = (opts?: GradientCycleOpts): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -120,11 +137,17 @@ export const spot_ripple_2: TrackedGradientConfig = {
                         id: `gradient1-${id}`,
                         origin: () => getReading().boxRatio,
                         scale: SOURCE_SCALE,
-                        colors: [
-                            { value: `rgb(from ${defs.colors.primary} r g b / 1)` },
-                            { value: `rgb(from ${defs.colors.primary} r g b / ${SOURCE_ALPHA})`, stop: SOURCE_STOP },
-                            { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
-                        ],
+                        colors: () => {
+                            const color = opts?.cycles
+                                ? getCycleColor(defs.colors, clock.getFrameMs())
+                                : defs.colors.primary;
+
+                            return [
+                                { value: `rgb(from ${color} r g b / 1)` },
+                                { value: `rgb(from ${color} r g b / ${SOURCE_ALPHA})`, stop: SOURCE_STOP },
+                                { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
+                            ];
+                        },
                     });
                 },
             },
@@ -134,13 +157,13 @@ export const spot_ripple_2: TrackedGradientConfig = {
             gradientOrPattern: {
                 id: `gradient${index + 2}-${id}`,
                 renderDefsElement: () => {
-                    const ripple = createRipple(index, getRef ?? NO_REF);
+                    const ripple = createRipple(index, getRef ?? NO_REF, Boolean(opts?.cycles));
 
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient${index + 2}-${id}`,
                         origin: ripple.getOrigin,
                         scale: ripple.getScale,
-                        colors: () => ripple.getColors(defs.colors[CREST_COLOR_KEYS[index % CREST_COLOR_KEYS.length]]),
+                        colors: () => ripple.getColors(defs.colors, index),
                     });
                 },
             },
@@ -148,4 +171,4 @@ export const spot_ripple_2: TrackedGradientConfig = {
             blend: true,
         })),
     ],
-};
+});

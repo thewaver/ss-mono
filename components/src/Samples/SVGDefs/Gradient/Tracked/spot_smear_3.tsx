@@ -1,10 +1,10 @@
 import { createEffect, createSignal } from "solid-js";
 
-import { MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
+import { Color, MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
-import type { SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
+import type { GradientCycleOpts, SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 import { SVGDefsFrameUtils } from "../../SVGDefsFrames.utils";
 
@@ -31,8 +31,9 @@ const MOTION_STEP_RATIO = 0.002;
 const SMEAR_FULL_STEP_RATIO = 0.03;
 const SMEAR_SMOOTHING = 0.2;
 const SMEAR_MAX = 4;
+const CYCLE_MS = 1000;
 const AGE_COLOR_SPAN = 0.55;
-const AGE_COLOR_KEYS: (keyof SVGDefsColors)[] = ["primary", "secondary", "tertiary"];
+const COLOR_KEYS: (keyof SVGDefsColors)[] = ["primary", "secondary", "tertiary"];
 const MOTION_GRACE_MS = STAMP_INTERVAL_MS * 2;
 
 const RESTING_ORIGIN: Point2d = { x: 0.5, y: 0.5 };
@@ -45,6 +46,17 @@ const NO_FADE = 0;
 
 const NO_REF = () => undefined;
 
+const getCycleColor = (colors: SVGDefsColors, atMs: number) => {
+    const phase = ((atMs % CYCLE_MS) / CYCLE_MS) * COLOR_KEYS.length;
+    const index = Math.floor(phase);
+    const from = colors[COLOR_KEYS[index % COLOR_KEYS.length]];
+    const to = colors[COLOR_KEYS[(index + 1) % COLOR_KEYS.length]];
+
+    if (!Color.Hex.isHex(from) || !Color.Hex.isHex(to)) return from;
+
+    return Color.Hex.interpolate(from, to, phase - index);
+};
+
 const computePoolColors = (color: string, alpha: number) => [
     { value: `rgb(from ${color} r g b / ${alpha})` },
     { value: `rgb(from ${color} r g b / ${alpha * CORE_ALPHA})`, stop: CORE_STOP },
@@ -54,7 +66,7 @@ const computePoolColors = (color: string, alpha: number) => [
 
 const clock = SVGDefsFrameUtils.createClock(TRAIL_LIFETIME_MS);
 
-const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined) => {
+const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined, isCycling: boolean) => {
     const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef);
     const [getStamp, setStamp] = createSignal<TrailStamp>();
 
@@ -77,11 +89,11 @@ const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined) 
         lastOrigin = origin;
         speed += ((step ?? NO_SPEED) - speed) * SMEAR_SMOOTHING;
 
+        if (fade > NO_FADE && (isCycling || (step !== undefined && step > MOTION_STEP_RATIO))) clock.keepAwake();
+
         if (step !== undefined && step > MOTION_STEP_RATIO) {
             lastMovedMs = performance.now();
             lastTravel = travel;
-
-            if (fade > NO_FADE) clock.keepAwake();
         }
 
         const tick = Math.floor(nowMs / STAMP_INTERVAL_MS);
@@ -109,9 +121,9 @@ const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined) 
     const getAlpha = () => (getStamp()?.fade ?? 0) * STAMP_ALPHA * (1 - getAgeRatio()) ** STAMP_DECAY_EXPONENT;
 
     const getColorKey = () => {
-        const band = Math.floor((getAgeRatio() / AGE_COLOR_SPAN) * AGE_COLOR_KEYS.length);
+        const band = Math.floor((getAgeRatio() / AGE_COLOR_SPAN) * COLOR_KEYS.length);
 
-        return AGE_COLOR_KEYS[Math.min(band, AGE_COLOR_KEYS.length - 1)];
+        return COLOR_KEYS[Math.min(band, COLOR_KEYS.length - 1)];
     };
 
     return {
@@ -122,11 +134,14 @@ const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined) 
 
             return { width: stretch, height: NO_STRETCH / stretch };
         },
-        getColors: (colors: SVGDefsColors) => computePoolColors(colors[getColorKey()], getAlpha()),
+        getColors: (colors: SVGDefsColors) =>
+            isCycling
+                ? computePoolColors(getCycleColor(colors, getStamp()?.bornMs ?? 0), getAlpha())
+                : computePoolColors(colors[getColorKey()], getAlpha()),
     };
 };
 
-export const spot_smear_3: TrackedGradientConfig = {
+export const spot_smear_3 = (opts?: GradientCycleOpts): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -141,7 +156,9 @@ export const spot_smear_3: TrackedGradientConfig = {
                         id: `gradient1-${id}`,
                         origin: () => getReading().boxRatio,
                         scale: POOL_SCALE,
-                        colors: computePoolColors(defs.colors.primary, FULL_ALPHA),
+                        colors: opts?.cycles
+                            ? () => computePoolColors(getCycleColor(defs.colors, clock.getFrameMs()), FULL_ALPHA)
+                            : computePoolColors(defs.colors.primary, FULL_ALPHA),
                     });
                 },
             },
@@ -151,7 +168,7 @@ export const spot_smear_3: TrackedGradientConfig = {
             gradientOrPattern: {
                 id: `gradient${index + 2}-${id}`,
                 renderDefsElement: () => {
-                    const stamp = createTrailStamp(index, getRef ?? NO_REF);
+                    const stamp = createTrailStamp(index, getRef ?? NO_REF, Boolean(opts?.cycles));
 
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient${index + 2}-${id}`,
@@ -166,4 +183,4 @@ export const spot_smear_3: TrackedGradientConfig = {
             filter: SVGDefsUtils.getBaseBlur(id, defs),
         })),
     ],
-};
+});

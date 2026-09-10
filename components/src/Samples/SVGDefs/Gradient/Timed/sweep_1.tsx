@@ -1,9 +1,11 @@
+import { Show } from "solid-js";
+
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
-import type { TimedGradientConfig } from "../../SVGDefs.types";
+import type { GradientCycleOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const sweep_1: TimedGradientConfig = {
+export const sweep_1 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -16,16 +18,46 @@ export const sweep_1: TimedGradientConfig = {
                         {
                             id: `gradient1-${id}`,
                             colors: [
-                                { value: `rgb(from ${defs.colors.primary} r g b / 0)` },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
                                 { value: defs.colors.primary, stop: 50 },
-                                { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 50 },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.primary), stop: 50 },
                             ],
                             offset: { x: -1.25, y: 0 },
                         },
-                        (x1, y1, x2, y2) => SVGAnimations.Linear.sweepOrthogonal("x", x1, x2, [0, 2.5], defs),
+                        (x1, y1, x2, y2) => (
+                            <>
+                                {SVGAnimations.Linear.sweepOrthogonal("x", x1, x2, [0, 2.5], defs)}
+                                <Show when={opts?.cycles}>
+                                    {SVGAnimations.Gradient.cycleSmoothColors(
+                                        `gradient1-${id}`,
+                                        [
+                                            [
+                                                SVGDefsUtils.getTransparentColor(defs.colors.primary),
+                                                SVGDefsUtils.getTransparentColor(defs.colors.secondary),
+                                                SVGDefsUtils.getTransparentColor(defs.colors.tertiary),
+                                                SVGDefsUtils.getTransparentColor(defs.colors.primary),
+                                            ],
+                                            [
+                                                defs.colors.primary,
+                                                defs.colors.secondary,
+                                                defs.colors.tertiary,
+                                                defs.colors.primary,
+                                            ],
+                                            [
+                                                SVGDefsUtils.getTransparentColor(defs.colors.primary),
+                                                SVGDefsUtils.getTransparentColor(defs.colors.secondary),
+                                                SVGDefsUtils.getTransparentColor(defs.colors.tertiary),
+                                                SVGDefsUtils.getTransparentColor(defs.colors.primary),
+                                            ],
+                                        ],
+                                        defs,
+                                    )}
+                                </Show>
+                            </>
+                        ),
                     ),
             },
             filter: SVGDefsUtils.getBaseBlur(id, defs),
         },
     ],
-};
+});

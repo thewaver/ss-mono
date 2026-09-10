@@ -5,7 +5,7 @@ import { SVGAnimations } from "../../SVGAnimations.const";
 import type { TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const orbit_async_3: TimedGradientConfig = {
+export const orbit_async_3 = (): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -81,4 +81,4 @@ export const orbit_async_3: TimedGradientConfig = {
             blend: true,
         },
     ],
-};
+});

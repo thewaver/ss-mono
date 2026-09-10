@@ -50,3 +50,15 @@ export type WhorlDefs = {
 export type ZigzagDefs = {
     segmentLength?: number;
 };
+
+export type PodiumDefs = Record<string, never>;
+
+export type PlacementLayoutEntry =
+    | { family: "ring"; defs?: BandDefs }
+    | { family: "arc"; defs?: ArcDefs }
+    | { family: "honeycomb"; defs?: HoneycombDefs }
+    | { family: "podiumLozenge"; defs?: PodiumDefs }
+    | { family: "whorl"; defs?: WhorlDefs }
+    | { family: "zigzag"; defs?: ZigzagDefs };
+
+export type PlacementLayoutFamily = PlacementLayoutEntry["family"];

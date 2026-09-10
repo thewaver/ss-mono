@@ -18,7 +18,7 @@ const computeSweepColors = (color: string, alpha: number) => [
     { value: `rgb(from ${color} r g b / 0)` },
 ];
 
-export const hand_1: TrackedGradientConfig = {
+export const hand_1 = (): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -57,4 +57,4 @@ export const hand_1: TrackedGradientConfig = {
             filter: SVGDefsUtils.getBaseBlur(id, defs),
         },
     ],
-};
+});

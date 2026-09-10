@@ -11,6 +11,7 @@ import * as styles from "../../SVGGradients.css";
 
 export const DefaultExample = ({
     configKey,
+    configDefs,
     paintKind,
     iterationConfigKey,
     animationDurationMs,
@@ -26,18 +27,16 @@ export const DefaultExample = ({
 
         if (key === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), access(paintKind));
 
-        return SVGDefsSamples.Gradient.Timed.SAMPLE_CONFIGS[key].computeSVGDefs(
-            `${access(paintKind)}-${id}`,
-            undefined,
-            getRef,
-            {
-                getSize,
-                animationDurationMs: access(animationDurationMs),
-                colors: access(colors),
-                blurWidth: access(blurWidth),
-                ...getIterationConfig().computeDefs(access(animationDurationMs)),
-            },
-        );
+        return SVGDefsSamples.Gradient.Timed.toConfig({
+            family: key,
+            defs: access(configDefs),
+        } as SVGDefsSamples.Gradient.Timed.Entry).computeSVGDefs(`${access(paintKind)}-${id}`, undefined, getRef, {
+            getSize,
+            animationDurationMs: access(animationDurationMs),
+            colors: access(colors),
+            blurWidth: access(blurWidth),
+            ...getIterationConfig().computeDefs(access(animationDurationMs)),
+        });
     };
 
     return (

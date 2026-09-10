@@ -3,9 +3,9 @@ import { SVGDefsSamples } from "@thewaver/ss-components";
 import { splitEntriesIntoGroups } from "../../PageComponents/SampleGroups/SampleGroups.const";
 import type { SVGGradientsPaintKind } from "./SVGGradients.types";
 
-export const GROUPPED_TIMED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Timed.SAMPLE_CONFIGS);
+export const GROUPPED_TIMED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Timed.SAMPLE_ENTRIES);
 
-export const GROUPPED_TRACKED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Tracked.SAMPLE_CONFIGS);
+export const GROUPPED_TRACKED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Tracked.SAMPLE_ENTRIES);
 
 export const PAINT_KINDS: SVGGradientsPaintKind[] = ["fill", "stroke"];
 

@@ -1,11 +1,13 @@
 import { For, createMemo, createSignal, createUniqueId } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { SVGDefsSamples, Shape, access } from "@thewaver/ss-components";
+import type { SampleKnob } from "@thewaver/ss-components";
+import { SVGDefsSamples, Shape, TimedGradientKnobs, access } from "@thewaver/ss-components";
 import { ShapeConst } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import {
@@ -29,7 +31,7 @@ import type { ShapeExampleProps } from "./ShapePage.types";
 
 import * as styles from "./ShapePage.css";
 
-const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Timed.SAMPLE_CONFIGS);
+const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Timed.SAMPLE_ENTRIES);
 const GROUPPED_PATTERNS = splitEntriesIntoGroups(SVGDefsSamples.Pattern.SAMPLE_CONFIGS);
 
 const CORNER_FIELD_WIDTH = 80;
@@ -97,6 +99,7 @@ const StressTestWrapper = ({
     colors,
     blurWidth,
     edgeThicknesses,
+    strokeConfigDefs,
     ...otherProps
 }: ShapeExampleProps) => {
     const id = createUniqueId();
@@ -123,18 +126,16 @@ const StressTestWrapper = ({
 
                         if (strokeKey === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), "stroke");
 
-                        return SVGDefsSamples.Gradient.Timed.SAMPLE_CONFIGS[strokeKey].computeSVGDefs(
-                            `stroke-${id}`,
-                            undefined,
-                            getRef,
-                            {
-                                getSize,
-                                animationDurationMs: access(animationDurationMs),
-                                colors: access(colors),
-                                blurWidth: access(blurWidth),
-                                ...getIterationConfig().computeDefs(access(animationDurationMs)),
-                            },
-                        );
+                        return SVGDefsSamples.Gradient.Timed.toConfig({
+                            family: strokeKey,
+                            defs: access(strokeConfigDefs),
+                        } as SVGDefsSamples.Gradient.Timed.Entry).computeSVGDefs(`stroke-${id}`, undefined, getRef, {
+                            getSize,
+                            animationDurationMs: access(animationDurationMs),
+                            colors: access(colors),
+                            blurWidth: access(blurWidth),
+                            ...getIterationConfig().computeDefs(access(animationDurationMs)),
+                        });
                     }}
                     strokeGeom={() => [
                         {
@@ -205,6 +206,15 @@ export const ShapePage = () => {
     const [getLameExponents, setLameExponents] = createSignal<number[]>([1, 1, 1, 1, 1, 1]);
     const [getStrokeConfigKey, setStrokeConfigKey] =
         createSignal<WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>>("sweep_diag_1v1");
+    const [strokeConfigDefs, setStrokeConfigDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
+
+    const getStrokeKnobs = () => {
+        const key = getStrokeConfigKey();
+
+        return key === NO_SAMPLE_KEY ? {} : (TimedGradientKnobs.KNOBS_BY_FAMILY[key] as Record<string, SampleKnob>);
+    };
+    const getStrokeConfigDefs = () => strokeConfigDefs[getStrokeConfigKey()] ?? {};
+
     const [getFillConfigKey, setFillConfigKey] =
         createSignal<WithNoSample<SVGDefsSamples.Pattern.SampleKey>>(NO_SAMPLE_KEY);
     const [getIterationConfigKey, setIterationConfigKey] = createSignal<SVGDefsSamples.Iteration.SampleKey>("constant");
@@ -236,6 +246,7 @@ export const ShapePage = () => {
             colors: () => colors,
             shapeKind: getShapeKind,
             strokeConfigKey: getStrokeConfigKey,
+            strokeConfigDefs: getStrokeConfigDefs,
             fillConfigKey: getFillConfigKey,
             iterationConfigKey: getIterationConfigKey,
             cellSize: () => ({ width: getCellSize(), height: getCellSize() }),
@@ -370,6 +381,15 @@ export const ShapePage = () => {
                         onChange={(config) => setStrokeConfigKey(() => config)}
                     />
                 </PageProp>
+
+                <PageKnobs
+                    knobs={getStrokeKnobs}
+                    defaults={() => ({})}
+                    values={getStrokeConfigDefs}
+                    onInput={(key, value) =>
+                        setStrokeConfigDefs(getStrokeConfigKey(), (previous) => ({ ...previous, [key]: value }))
+                    }
+                />
 
                 <PageProp key={"fillConfigKey"} label={"Fill Pattern"}>
                     <PageGroupedSelectField

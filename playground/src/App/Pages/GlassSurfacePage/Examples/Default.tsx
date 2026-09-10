@@ -20,6 +20,7 @@ export const DefaultExample = ({
     borderRadius,
     borderWidth,
     strokeConfigKey,
+    strokeConfigDefs,
     colors,
     blurWidth,
     blurRadius,
@@ -71,16 +72,14 @@ export const DefaultExample = ({
 
                         if (strokeKey === NO_SAMPLE_KEY) return computeNoSampleDefs(access(colors), "stroke");
 
-                        return SVGDefsSamples.Gradient.Tracked.SAMPLE_CONFIGS[strokeKey].computeSVGDefs(
-                            `stroke-${id}`,
-                            undefined,
-                            getRef,
-                            {
-                                getSize,
-                                colors: access(colors),
-                                blurWidth: access(blurWidth),
-                            },
-                        );
+                        return SVGDefsSamples.Gradient.Tracked.toConfig({
+                            family: strokeKey,
+                            defs: access(strokeConfigDefs),
+                        } as SVGDefsSamples.Gradient.Tracked.Entry).computeSVGDefs(`stroke-${id}`, undefined, getRef, {
+                            getSize,
+                            colors: access(colors),
+                            blurWidth: access(blurWidth),
+                        });
                     }}
                     glassDefs={() => ({
                         noise: {

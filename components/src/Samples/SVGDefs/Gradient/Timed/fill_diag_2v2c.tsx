@@ -3,7 +3,7 @@ import { SVGAnimations } from "../../SVGAnimations.const";
 import type { TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const fill_diag_2v2c: TimedGradientConfig = {
+export const fill_diag_2v2c = (): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -43,4 +43,4 @@ export const fill_diag_2v2c: TimedGradientConfig = {
             filter: SVGDefsUtils.getBaseBlur(id, defs),
         },
     ],
-};
+});

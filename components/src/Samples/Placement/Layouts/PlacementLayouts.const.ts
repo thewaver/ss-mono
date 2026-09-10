@@ -1,18 +1,14 @@
-import type { PlacementLayoutFn } from "../../../Abstracts/Placement/Placement.types";
-import { PlacementLayoutUtils } from "./PlacementLayouts.utils";
+import type { PlacementLayoutEntry } from "./PlacementLayouts.types";
 
 export namespace PlacementLayouts {
     export const SAMPLE_LAYOUTS = {
-        ring: PlacementLayoutUtils.ring,
-        arc: PlacementLayoutUtils.arc,
-        fan: PlacementLayoutUtils.fan,
-        honeycomb: PlacementLayoutUtils.honeycomb,
-        podiumLozenge: PlacementLayoutUtils.podiumLozenge,
-        whorlCircle: PlacementLayoutUtils.whorlCircle,
-        whorlHex: PlacementLayoutUtils.whorlHex,
-        whorlSquare: PlacementLayoutUtils.whorlSquare,
-        zigzag: PlacementLayoutUtils.zigzag,
-    } satisfies Record<string, PlacementLayoutFn>;
+        arc: { family: "arc" },
+        honeycomb: { family: "honeycomb" },
+        podiumLozenge: { family: "podiumLozenge" },
+        ring: { family: "ring" },
+        whorl: { family: "whorl" },
+        zigzag: { family: "zigzag" },
+    } satisfies Record<string, PlacementLayoutEntry>;
 
     export type SampleKey = keyof typeof SAMPLE_LAYOUTS;
 

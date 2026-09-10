@@ -1,12 +1,14 @@
 import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import { SVGDefsSamples } from "@thewaver/ss-components";
+import type { SampleKnob } from "@thewaver/ss-components";
+import { SVGDefsSamples, TimedGradientKnobs } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
+import { PageKnobs } from "../../../PageComponents/Knobs/Knobs";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
-import { toGroupEntriesWithNoSample } from "../../../PageComponents/SampleGroups/SampleGroups.const";
+import { NO_SAMPLE_KEY, toGroupEntriesWithNoSample } from "../../../PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "../../../PageComponents/SampleGroups/SampleGroups.types";
 import { PageGroupedSelectField, PageNumberField, PageSelectField } from "../../../StyledComponents/Field/Field";
 import { DURATION_STEP_MS, GROUPPED_TIMED_GRADIENTS, MAX_DURATION_MS, MIN_DURATION_MS } from "../SVGGradients.const";
@@ -19,6 +21,14 @@ const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/SVGGradients/TimedGradientsPage/Exa
 export const TimedGradientsPage = () => {
     const [getConfigKey, setConfigKey] =
         createSignal<WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>>("sweep_diag_1v1");
+    const [configDefs, setConfigDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
+
+    const getKnobs = () => {
+        const key = getConfigKey();
+
+        return key === NO_SAMPLE_KEY ? {} : (TimedGradientKnobs.KNOBS_BY_FAMILY[key] as Record<string, SampleKnob>);
+    };
+    const getConfigDefs = () => configDefs[getConfigKey()] ?? {};
     const [getIterationConfigKey, setIterationConfigKey] = createSignal<SVGDefsSamples.Iteration.SampleKey>("constant");
     const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(2000);
     const paintKindSignal = createSignal<SVGGradientsPaintKind>("fill");
@@ -27,6 +37,7 @@ export const TimedGradientsPage = () => {
 
     const getExamples = createMemo(() => {
         const commonProps: TimedGradientExampleProps = {
+            configDefs: getConfigDefs,
             configKey: getConfigKey,
             paintKind: paintKindSignal[0],
             iterationConfigKey: getIterationConfigKey,
@@ -56,6 +67,15 @@ export const TimedGradientsPage = () => {
                         onChange={(config) => setConfigKey(() => config)}
                     />
                 </PageProp>
+
+                <PageKnobs
+                    knobs={getKnobs}
+                    defaults={() => ({})}
+                    values={getConfigDefs}
+                    onInput={(key, value) =>
+                        setConfigDefs(getConfigKey(), (previous) => ({ ...previous, [key]: value }))
+                    }
+                />
 
                 <PageSVGGradientsProps
                     controls={{

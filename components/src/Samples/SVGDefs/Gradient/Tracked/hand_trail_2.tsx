@@ -1,10 +1,10 @@
 import { createEffect, createSignal } from "solid-js";
 
-import { MathUtils, SVGUtils, type Size2d } from "@thewaver/ss-utils";
+import { Color, MathUtils, SVGUtils, type Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
-import type { SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
+import type { GradientCycleOpts, SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 import { SVGDefsFrameUtils } from "../../SVGDefsFrames.utils";
 
@@ -26,8 +26,9 @@ const TRAIL_LIFETIME_MS = STAMP_COUNT * STAMP_INTERVAL_MS;
 const STAMP_ALPHA = 0.25;
 const STAMP_DECAY_EXPONENT = 2.2;
 const MOTION_TURN_DEGREES = 0.25;
+const CYCLE_MS = 1000;
 const AGE_COLOR_SPAN = 0.55;
-const AGE_COLOR_KEYS: (keyof SVGDefsColors)[] = ["primary", "secondary"];
+const COLOR_KEYS: (keyof SVGDefsColors)[] = ["primary", "secondary"];
 const MOTION_GRACE_MS = STAMP_INTERVAL_MS * 2;
 
 const RESTING_ANGLE = 0;
@@ -45,6 +46,17 @@ const getShortestTurn = (from: number, to: number) => {
 
 const getSweepRotation = (angle: number) => angle - HALF_TURN - SWEEP_ARC * 0.5;
 
+const getCycleColor = (colors: SVGDefsColors, atMs: number) => {
+    const phase = ((atMs % CYCLE_MS) / CYCLE_MS) * COLOR_KEYS.length;
+    const index = Math.floor(phase);
+    const from = colors[COLOR_KEYS[index % COLOR_KEYS.length]];
+    const to = colors[COLOR_KEYS[(index + 1) % COLOR_KEYS.length]];
+
+    if (!Color.Hex.isHex(from) || !Color.Hex.isHex(to)) return from;
+
+    return Color.Hex.interpolate(from, to, phase - index);
+};
+
 const computeSweepColors = (color: string, alpha: number) => [
     { value: `rgb(from ${color} r g b / 0)` },
     { value: `rgb(from ${color} r g b / ${alpha})` },
@@ -53,7 +65,7 @@ const computeSweepColors = (color: string, alpha: number) => [
 
 const clock = SVGDefsFrameUtils.createClock(TRAIL_LIFETIME_MS);
 
-const createHandStamp = (index: number, getRef: () => HTMLElement | undefined) => {
+const createHandStamp = (index: number, getRef: () => HTMLElement | undefined, isCycling: boolean) => {
     const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef);
     const [getStamp, setStamp] = createSignal<HandStamp>();
 
@@ -72,11 +84,9 @@ const createHandStamp = (index: number, getRef: () => HTMLElement | undefined) =
 
         lastAngle = angle;
 
-        if (turn !== undefined && turn > MOTION_TURN_DEGREES) {
-            lastTurnedMs = performance.now();
+        if (fade > NO_FADE && (isCycling || (turn !== undefined && turn > MOTION_TURN_DEGREES))) clock.keepAwake();
 
-            if (fade > NO_FADE) clock.keepAwake();
-        }
+        if (turn !== undefined && turn > MOTION_TURN_DEGREES) lastTurnedMs = performance.now();
 
         const tick = Math.floor(nowMs / STAMP_INTERVAL_MS);
 
@@ -97,18 +107,21 @@ const createHandStamp = (index: number, getRef: () => HTMLElement | undefined) =
     const getAlpha = () => (getStamp()?.fade ?? 0) * STAMP_ALPHA * (1 - getAgeRatio()) ** STAMP_DECAY_EXPONENT;
 
     const getColorKey = () => {
-        const band = Math.floor((getAgeRatio() / AGE_COLOR_SPAN) * AGE_COLOR_KEYS.length);
+        const band = Math.floor((getAgeRatio() / AGE_COLOR_SPAN) * COLOR_KEYS.length);
 
-        return AGE_COLOR_KEYS[Math.min(band, AGE_COLOR_KEYS.length - 1)];
+        return COLOR_KEYS[Math.min(band, COLOR_KEYS.length - 1)];
     };
 
     return {
         getAngle: () => getStamp()?.angle ?? RESTING_ANGLE,
-        getColors: (colors: SVGDefsColors) => computeSweepColors(colors[getColorKey()], getAlpha()),
+        getColors: (colors: SVGDefsColors) =>
+            isCycling
+                ? computeSweepColors(getCycleColor(colors, getStamp()?.bornMs ?? 0), getAlpha())
+                : computeSweepColors(colors[getColorKey()], getAlpha()),
     };
 };
 
-export const hand_trail_2: TrackedGradientConfig = {
+export const hand_trail_2 = (opts?: GradientCycleOpts): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -125,7 +138,7 @@ export const hand_trail_2: TrackedGradientConfig = {
                         scale: SWEEP_SPAN,
                         colors: () =>
                             computeSweepColors(
-                                defs.colors.primary,
+                                getCycleColor(defs.colors, clock.getFrameMs()),
                                 FULL_ALPHA * SVGDefsUtils.getPointerFade(getReading(), getIsPointerPresent()),
                             ),
                     });
@@ -150,7 +163,7 @@ export const hand_trail_2: TrackedGradientConfig = {
 
             let shared: ReturnType<typeof createHandStamp> | undefined;
 
-            const useStamp = () => (shared ??= createHandStamp(index, getRef ?? NO_REF));
+            const useStamp = () => (shared ??= createHandStamp(index, getRef ?? NO_REF, Boolean(opts?.cycles)));
 
             return {
                 gradientOrPattern: {
@@ -162,7 +175,9 @@ export const hand_trail_2: TrackedGradientConfig = {
                             id: `gradient${stampId}`,
                             angle: () => stamp.getAngle() + SWEEP_LEAD,
                             scale: SWEEP_SPAN,
-                            colors: () => stamp.getColors(defs.colors),
+                            colors: opts?.cycles
+                                ? () => stamp.getColors(defs.colors)
+                                : () => stamp.getColors(defs.colors),
                         });
                     },
                 },
@@ -182,4 +197,4 @@ export const hand_trail_2: TrackedGradientConfig = {
             };
         }),
     ],
-};
+});

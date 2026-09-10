@@ -12,17 +12,22 @@ const getConfig = (strokeId: string): SurfaceProps => ({
     borderRadii: () => CSSUtils.spreadRadius(styles.width * 0.5),
     borderWidths: () => CSSUtils.spreadWidth(4),
     computeStrokeDefs: (getSize, getRef) =>
-        SVGDefsSamples.Gradient.Timed.SAMPLE_CONFIGS["sweep_diag_async_4"].computeSVGDefs(strokeId, undefined, getRef, {
-            getSize,
-            animationDurationMs: 4000,
-            colors: {
-                background: "#282420",
-                primary: "#FFFF00",
-                secondary: "#00FFFF",
-                tertiary: "#FF00FF",
+        SVGDefsSamples.Gradient.Timed.toConfig({ family: "sweep_diag_async_4" }).computeSVGDefs(
+            strokeId,
+            undefined,
+            getRef,
+            {
+                getSize,
+                animationDurationMs: 4000,
+                colors: {
+                    background: "#282420",
+                    primary: "#FFFF00",
+                    secondary: "#00FFFF",
+                    tertiary: "#FF00FF",
+                },
+                blurWidth: 4,
             },
-            blurWidth: 4,
-        }),
+        ),
 });
 
 export const AvatarExample = () => {

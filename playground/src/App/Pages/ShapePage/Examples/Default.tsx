@@ -13,6 +13,7 @@ export const DefaultExample = ({
     shouldPadChildren,
     shapeKind,
     strokeConfigKey,
+    strokeConfigDefs,
     fillConfigKey,
     iterationConfigKey,
     cellSize,
@@ -42,7 +43,10 @@ export const DefaultExample = ({
                     const strokes =
                         strokeKey === NO_SAMPLE_KEY
                             ? computeNoSampleDefs(access(colors), "stroke")
-                            : SVGDefsSamples.Gradient.Timed.SAMPLE_CONFIGS[strokeKey].computeSVGDefs(
+                            : SVGDefsSamples.Gradient.Timed.toConfig({
+                                  family: strokeKey,
+                                  defs: access(strokeConfigDefs),
+                              } as SVGDefsSamples.Gradient.Timed.Entry).computeSVGDefs(
                                   `stroke-${id}`,
                                   getFlags,
                                   getRef,

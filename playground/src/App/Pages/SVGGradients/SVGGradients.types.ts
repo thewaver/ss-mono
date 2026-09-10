@@ -22,6 +22,7 @@ export type SVGGradientsControls = {
 export type TimedGradientExampleProps = SVGGradientsSharedProps &
     AccessorProps<{
         configKey: WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>;
+        configDefs: Record<string, number | boolean>;
         iterationConfigKey: SVGDefsSamples.Iteration.SampleKey;
         animationDurationMs: number;
     }>;
@@ -29,4 +30,5 @@ export type TimedGradientExampleProps = SVGGradientsSharedProps &
 export type TrackedGradientExampleProps = SVGGradientsSharedProps &
     AccessorProps<{
         configKey: WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>;
+        configDefs: Record<string, number | boolean>;
     }>;

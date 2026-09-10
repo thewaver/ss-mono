@@ -20,36 +20,44 @@ const ramp = (a: number, b: number, x: number) => {
 
     return (x - a) / (b - a);
 };
-const DEFAULT_HORIZONTAL_SNAKE_OPTS: Required<ScanlineAnimationKeyframes.HorizontalSnakeOpts> = {
-    shiftPercent: 5,
-};
-const DEFAULT_HORIZONTAL_SPLIT_OPTS: Required<ScanlineAnimationKeyframes.HorizontalSplitOpts> = {
-    shiftPercent: 10,
-};
-const DEFAULT_HORIZONTAL_STRETCH_OPTS: Required<ScanlineAnimationKeyframes.HorizontalStretchOpts> = {
-    peakScalePercent: 150,
-};
-const DEFAULT_HORIZONTAL_WAVE_OPTS: Required<ScanlineAnimationKeyframes._HorizontalWaveOpts> = {
-    shiftPercent: 8,
-    waveCount: 3,
-};
-const DEFAULT_HORIZONTAL_ROLL_OPTS: Required<ScanlineAnimationKeyframes._HorizontalRollOpts> = {
-    shiftPercent: 100,
-    seamBrightnessPercent: 40,
-};
-const DEFAULT_HORIZONTAL_DROPOUT_OPTS: Required<ScanlineAnimationKeyframes._HorizontalDropoutOpts> = {
-    dropChance: 0.3,
-    shiftPercent: 15,
-};
-const DEFAULT_HORIZONTAL_INTERLACE_OPTS: Required<ScanlineAnimationKeyframes._HorizontalInterlaceOpts> = {
-    dipPercent: 40,
-    fieldCount: 8,
-};
-const DEFAULT_HORIZONTAL_SKEW_OPTS: Required<ScanlineAnimationKeyframes._HorizontalSkewOpts> = {
-    skewDegrees: 20,
-};
 
 export namespace ScanlineAnimationKeyframes {
+    export const DEFAULT_HORIZONTAL_SNAKE_OPTS: Required<ScanlineAnimationKeyframes.HorizontalSnakeOpts> = {
+        shiftPercent: 5,
+    };
+
+    export const DEFAULT_HORIZONTAL_SPLIT_OPTS: Required<ScanlineAnimationKeyframes.HorizontalSplitOpts> = {
+        shiftPercent: 10,
+    };
+
+    export const DEFAULT_HORIZONTAL_STRETCH_OPTS: Required<ScanlineAnimationKeyframes.HorizontalStretchOpts> = {
+        peakScalePercent: 150,
+    };
+
+    export const DEFAULT_HORIZONTAL_WAVE_OPTS: Required<ScanlineAnimationKeyframes._HorizontalWaveOpts> = {
+        shiftPercent: 8,
+        waveCount: 3,
+    };
+
+    export const DEFAULT_HORIZONTAL_ROLL_OPTS: Required<ScanlineAnimationKeyframes._HorizontalRollOpts> = {
+        shiftPercent: 100,
+        seamBrightnessPercent: 40,
+    };
+
+    export const DEFAULT_HORIZONTAL_DROPOUT_OPTS: Required<ScanlineAnimationKeyframes._HorizontalDropoutOpts> = {
+        dropChance: 0.3,
+        shiftPercent: 15,
+    };
+
+    export const DEFAULT_HORIZONTAL_INTERLACE_OPTS: Required<ScanlineAnimationKeyframes._HorizontalInterlaceOpts> = {
+        dipPercent: 40,
+        fieldCount: 8,
+    };
+
+    export const DEFAULT_HORIZONTAL_SKEW_OPTS: Required<ScanlineAnimationKeyframes._HorizontalSkewOpts> = {
+        skewDegrees: 20,
+    };
+
     export type HorizontalSnakeOpts = {
         shiftPercent?: number;
     };
