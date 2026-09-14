@@ -8,6 +8,8 @@ export type WheelAction = {
 export type WheelMenuExampleProps = AccessorProps<{
     caption: string;
     spreadDegrees?: number;
+    holeRadius?: number;
+    bandWidth?: number;
     opensOnHold?: boolean;
 }> & {
     items: WheelMenuItem<WheelAction>[];

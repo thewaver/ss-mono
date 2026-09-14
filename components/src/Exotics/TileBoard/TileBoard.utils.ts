@@ -17,6 +17,8 @@ const POINTS_UP = "triangle-up";
 /** The triangle shape whose unflipped tiles point rightwards. */
 const POINTS_RIGHT = "triangle-right";
 
+const DODECAGON_ROW_PITCH = Math.sqrt(3) / 2;
+
 /**
  * How each tile shape tiles, as fractions of one tile's size.
  *
@@ -75,6 +77,12 @@ const TILING_RATIOS: Record<ShapeConst.DefaultShape, TileBoardTiling> = {
         hasOffsetRows: false,
         tileFlip: "leftToRight",
         neighbourhood: "sidewaysTriangle",
+    },
+    "dodecagon": {
+        pitch: { width: 1, height: DODECAGON_ROW_PITCH },
+        hasOffsetRows: true,
+        tileFlip: "none",
+        neighbourhood: "diagonalAndAcross",
     },
 };
 

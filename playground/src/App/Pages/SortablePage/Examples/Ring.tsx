@@ -11,11 +11,17 @@ import {
 import { LIST_GAP, computeCardKey, computeCardLabel } from "../SortablePage.const";
 import type { Card } from "../SortablePage.types";
 
-const RING_DEFS: ArcDefs = { width: 324, height: 324, spreadDegrees: 360, itemWidth: 211, itemHeight: 62 };
+const RING_DEFS: ArcDefs = {
+    curveHeightRatio: 1,
+    spreadDegrees: 360,
+    facingDegrees: 45,
+    itemWidthRatio: 0.6512,
+    itemHeightRatio: 0.2938,
+};
 
 const RING_LAYOUT = PlacementLayoutUtils.createArc(RING_DEFS);
 
-const RING_WIDTH = `${RING_DEFS.width}px`;
+const RING_WIDTH = "324px";
 
 const RESTING_FLAGS: InteractionFlags<SortableItemFlags> = { isCarried: false, isLandingBefore: false };
 

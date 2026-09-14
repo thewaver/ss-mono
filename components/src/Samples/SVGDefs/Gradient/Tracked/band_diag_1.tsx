@@ -2,7 +2,7 @@ import type { Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
-import type { TrackedGradientConfig } from "../../SVGDefs.types";
+import type { GradientBandOpts, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
 const BAND_ANGLE = 45;
@@ -15,7 +15,7 @@ const FALLOFF_ALPHA = 0.25;
 
 const NO_REF = () => undefined;
 
-export const band_diag_1 = (): TrackedGradientConfig => ({
+export const band_diag_1 = (opts?: GradientBandOpts): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -37,17 +37,20 @@ export const band_diag_1 = (): TrackedGradientConfig => ({
                         colors: [
                             { value: `rgb(from ${defs.colors.primary} r g b / 0)` },
                             {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${FALLOFF_ALPHA})`,
-                                stop: CORE_STOP - FALLOFF_SPREAD,
+                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? FALLOFF_ALPHA})`,
+                                stop: (opts?.coreStop ?? CORE_STOP) - (opts?.falloffSpread ?? FALLOFF_SPREAD),
                             },
-                            { value: `rgb(from ${defs.colors.primary} r g b / ${CORE_ALPHA})`, stop: CORE_STOP },
                             {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${FALLOFF_ALPHA})`,
-                                stop: CORE_STOP + FALLOFF_SPREAD,
+                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.coreAlpha ?? CORE_ALPHA})`,
+                                stop: opts?.coreStop ?? CORE_STOP,
+                            },
+                            {
+                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? FALLOFF_ALPHA})`,
+                                stop: (opts?.coreStop ?? CORE_STOP) + (opts?.falloffSpread ?? FALLOFF_SPREAD),
                             },
                             { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
                         ],
-                        angle: BAND_ANGLE,
+                        angle: opts?.bandAngle ?? BAND_ANGLE,
                         scale: BAND_SPAN,
                         offset: () => SVGDefsUtils.offsetDiagonally(getTravel(), BAND_ANGLE),
                     });

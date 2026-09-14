@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import type { PlacementRect } from "../../../Abstracts/Placement/Placement.types";
 import type { SizedLayout } from "./PlacementLayouts.types";
 import { PlacementLayoutUtils } from "./PlacementLayouts.utils";
 
@@ -44,16 +45,20 @@ describe("createRing over half a turn", () => {
     });
 
     it("takes the same defs as a full turn, since it is the same band", () => {
-        const layout = PlacementLayoutUtils.createRing({ spreadDegrees: 180, holeRadius: 20, bandWidth: 30 })(ROOT);
+        const half = PlacementLayoutUtils.createRing({ spreadDegrees: 180, holeRatio: 0.4 })(ROOT);
+        const whole = PlacementLayoutUtils.createRing({ holeRatio: 0.4 })(ROOT);
 
-        expect(innerRadiusOf(layout)).toBeCloseTo(20);
-        expect(outerRadiusOf(layout)).toBeCloseTo(50);
+        expect(innerRadiusOf(half), "the hole is where the same ratio put it on a whole turn").toBeCloseTo(
+            innerRadiusOf(whole),
+        );
+        expect(outerRadiusOf(half), "and so is the outer edge").toBeCloseTo(outerRadiusOf(whole));
     });
 });
 
 describe("createArc", () => {
-    const CIRCLE = { width: 200, height: 200, spreadDegrees: 180, itemWidth: 20, itemHeight: 20 };
-    const FLAT = { ...CIRCLE, height: 80 };
+    const CIRCLE = { curveHeightRatio: 1, spreadDegrees: 180, itemWidthRatio: 0.1, itemHeightRatio: 1 };
+    const FLAT = { ...CIRCLE, curveHeightRatio: 0.4 };
+    const CURVE_WIDTH = 1;
 
     const stepsOf = (layout: SizedLayout) =>
         layout.placements.slice(1).map((placement, index) => {
@@ -80,7 +85,7 @@ describe("createArc", () => {
             "a circle comes out exactly even",
         ).toBeCloseTo(1);
         expect(
-            spread(evenAngleSteps(CIRCLE.width * 0.5, CIRCLE.height * 0.5)),
+            spread(evenAngleSteps(CURVE_WIDTH * 0.5, CIRCLE.curveHeightRatio * 0.5)),
             "and equal angles agree with it there, which is why the fault hides until something is stretched",
         ).toBeCloseTo(1);
 
@@ -89,7 +94,7 @@ describe("createArc", () => {
         expect(
             unevenness(stepsOf(PlacementLayoutUtils.createArc(FLAT)(ROOT))),
             "flattened, what unevenness is left is a small fraction of what equal angles would leave",
-        ).toBeLessThan(unevenness(evenAngleSteps(FLAT.width * 0.5, FLAT.height * 0.5)) / 5);
+        ).toBeLessThan(unevenness(evenAngleSteps(CURVE_WIDTH * 0.5, FLAT.curveHeightRatio * 0.5)) / 5);
     });
 
     it("stretches only the curve, never the items on it", () => {
@@ -107,19 +112,35 @@ describe("createArc", () => {
         const flat = PlacementLayoutUtils.createArc(FLAT)(ROOT);
 
         expect(flat.radii!.x / flat.radii!.y, "the two axes are as far apart as the arc was asked to be").toBeCloseTo(
-            FLAT.width / FLAT.height,
+            CURVE_WIDTH / FLAT.curveHeightRatio,
         );
     });
 
-    it("puts the first item straight up when it closes, and centres the run on straight up when it does not", () => {
-        const closed = PlacementLayoutUtils.createArc({ ...CIRCLE, spreadDegrees: 360 })(ROOT);
+    it("centres every run on the facing direction, and stops short of closing the one it is asked to close", () => {
         const open = PlacementLayoutUtils.createArc(CIRCLE)(ROOT);
+        const whole = PlacementLayoutUtils.createArc({ ...CIRCLE, spreadDegrees: 360 })(ROOT);
+        const beyond = PlacementLayoutUtils.createArc({ ...CIRCLE, spreadDegrees: 450 })(ROOT);
 
-        expect(closed.placements[0].left, "twelve o'clock is straight above the centre").toBeCloseTo(closed.origin!.x);
-        expect(closed.placements[0].top).toBeLessThan(closed.origin!.y);
-        expect(open.placements[0].left - open.origin!.x, "and an open run is symmetrical about it").toBeCloseTo(
+        const seamOf = (layout: SizedLayout) => {
+            const first = layout.placements[0];
+            const last = layout.placements[ITEM_COUNT - 1];
+
+            return Math.hypot(first.left - last.left, first.top - last.top);
+        };
+
+        expect(open.placements[0].left - open.origin!.x, "a run is symmetrical about the facing").toBeCloseTo(
             -(open.placements[ITEM_COUNT - 1].left - open.origin!.x),
         );
+        expect(spread(stepsOf(whole)), "asked for a whole turn, the steps it does take are even").toBeCloseTo(1);
+        expect(
+            seamOf(whole),
+            "and the room left between last and first is one more step, so the ring closes without the run having to",
+        ).toBeCloseTo(Math.max(...stepsOf(whole)));
+        expect(
+            whole.placements[0].left,
+            "asking for more than a whole turn cannot carry the run any further round",
+        ).toBeCloseTo(beyond.placements[0].left);
+        expect(whole.placements[0].top).toBeCloseTo(beyond.placements[0].top);
     });
 });
 
@@ -128,31 +149,38 @@ describe("createRing", () => {
         expect(PlacementLayoutUtils.createRing()(ROOT)).toEqual(PlacementLayoutUtils.ring(ROOT));
     });
 
-    it("centres its first wedge straight up and closes the turn", () => {
+    it("centres the whole turn on straight up and closes it", () => {
         const layout = PlacementLayoutUtils.createRing()(ROOT);
+        const first = layout.placements[0].sector!;
+        const last = layout.placements[ITEM_COUNT - 1].sector!;
 
-        expect(midAngleOf(layout, 0), "the first wedge sits at twelve o'clock").toBeCloseTo(-90);
+        expect(
+            (first.fromAngle + last.toAngle) * 0.5,
+            "the run is laid symmetrically about twelve o'clock, whatever the spread",
+        ).toBeCloseTo(-90);
         expect(
             midAngleOf(layout, 1) - midAngleOf(layout, 0),
             "and every item takes an equal share of the whole turn",
         ).toBeCloseTo(360 / ITEM_COUNT);
     });
 
-    it("puts the inner edge of every wedge where the hole was asked to end", () => {
-        const layout = PlacementLayoutUtils.createRing({ holeRadius: 120 })(ROOT);
+    it("puts the inner edge of every wedge at the share of the radius the hole was given", () => {
+        const layout = PlacementLayoutUtils.createRing({ holeRatio: 0.6 })(ROOT);
 
-        expect(innerRadiusOf(layout)).toBeCloseTo(120);
+        expect(innerRadiusOf(layout) / outerRadiusOf(layout), "the hole ends six tenths of the way out").toBeCloseTo(
+            0.6,
+        );
     });
 
-    it("adds the band outside the hole, so a fatter band grows the wheel and never eats the middle", () => {
-        const thin = PlacementLayoutUtils.createRing({ holeRadius: 100, bandWidth: 40 })(ROOT);
-        const fat = PlacementLayoutUtils.createRing({ holeRadius: 100, bandWidth: 90 })(ROOT);
+    it("spends the rest of the radius on the band, so the box is the outer edge whatever the hole", () => {
+        const thin = PlacementLayoutUtils.createRing({ holeRatio: 0.7 })(ROOT);
+        const fat = PlacementLayoutUtils.createRing({ holeRatio: 0.3 })(ROOT);
 
-        expect(innerRadiusOf(fat), "the hole is untouched").toBeCloseTo(innerRadiusOf(thin));
-        expect(outerRadiusOf(fat) - outerRadiusOf(thin), "and the whole of the difference lands outside").toBeCloseTo(
-            50,
+        expect(outerRadiusOf(fat), "the outer edge is the box either way").toBeCloseTo(outerRadiusOf(thin));
+        expect(fat.extent, "so the box itself never moves").toBeCloseTo(thin.extent);
+        expect(outerRadiusOf(fat) - innerRadiusOf(fat), "and a smaller hole is exactly the wider band").toBeGreaterThan(
+            outerRadiusOf(thin) - innerRadiusOf(thin),
         );
-        expect(fat.extent - thin.extent, "which the box has to grow by twice, being a diameter").toBeCloseTo(100);
     });
 
     it("spends the gap it is given between one wedge and the next", () => {
@@ -172,48 +200,16 @@ describe("createRing", () => {
         ).toBeCloseTo(10);
     });
 
-    it("puts the last item in the hole when one is asked for, and shares the arc among the rest", () => {
-        const layout = PlacementLayoutUtils.createRing({ holeRadius: 90, centreRadius: 30, hasCentreItem: true })({
-            ...ROOT,
-            itemCount: ITEM_COUNT + 1,
-        });
-        const centre = layout.placements[layout.placements.length - 1];
+    it("centres its run on the facing it is given, whatever the spread", () => {
+        const aimed = PlacementLayoutUtils.createRing({ spreadDegrees: 120, facingDegrees: 40 })(ROOT);
+        const first = aimed.placements[0].sector!;
+        const last = aimed.placements[ITEM_COUNT - 1].sector!;
 
-        expect(centre.sector, "the centre item is not on the arc at all").toBeUndefined();
-        expect(toPixels(layout, centre.width), "it is the size the defs asked for").toBeCloseTo(60);
+        expect((first.fromAngle + last.toAngle) * 0.5, "the block's middle lands on the facing").toBeCloseTo(40);
         expect(
-            layout.placements.filter((placement) => placement.sector !== undefined),
-            "and the wedges are what is left over",
-        ).toHaveLength(ITEM_COUNT);
-    });
-
-    it("ignores the hole below the root, where the level above is what has to be cleared", () => {
-        const parent = PlacementLayoutUtils.createRing({ holeRadius: 40, levelGap: 12 })(ROOT);
-        const child = PlacementLayoutUtils.createRing({ holeRadius: 40, levelGap: 12 })({
-            itemCount: 3,
-            path: [0],
-            parentExtent: parent.extent,
-            parentPlacement: parent.placements[0],
-        });
-
-        expect(innerRadiusOf(child), "a band starts a gap outside the box the level above filled").toBeCloseTo(
-            parent.extent * 0.5 + 12,
-        );
-    });
-
-    it("aims a deeper band at the wedge that opened it rather than at the whole spread", () => {
-        const parent = PlacementLayoutUtils.createRing()(ROOT);
-        const opener = parent.placements[2];
-        const child = PlacementLayoutUtils.createRing()({
-            itemCount: 2,
-            path: [2],
-            parentExtent: parent.extent,
-            parentPlacement: opener,
-        });
-        const openerAngle = (opener.sector!.fromAngle + opener.sector!.toAngle) * 0.5;
-        const blockAngle = (child.placements[0].sector!.fromAngle + child.placements[1].sector!.toAngle) * 0.5;
-
-        expect(blockAngle, "the block's middle lands on the middle of its opener").toBeCloseTo(openerAngle, 0);
+            last.toAngle - first.fromAngle,
+            "and the run is as wide as the spread, less the gap at each end",
+        ).toBeCloseTo(120 - 3);
     });
 
     it("gives a wedge the arc it asks for and shares what is left among the rest", () => {
@@ -232,7 +228,7 @@ describe("createHoneycomb", () => {
     const rowOf = (layout: SizedLayout, index: number) => layout.placements[index].top;
 
     it("fills a row before starting the next, and steps down by less than a whole cell", () => {
-        const layout = PlacementLayoutUtils.createHoneycomb({ perRow: 3, gap: 0 })({ itemCount: 6 });
+        const layout = PlacementLayoutUtils.createHoneycomb({ perRow: 3, gapRatio: 0 })({ itemCount: 6 });
 
         expect(rowOf(layout, 0), "the first three share a row").toBeCloseTo(rowOf(layout, 2));
         expect(rowOf(layout, 3), "and the next three sit below them").toBeGreaterThan(rowOf(layout, 0));
@@ -252,21 +248,70 @@ describe("createHoneycomb", () => {
         ).toBeCloseTo(step * 0.5);
     });
 
-    it("keeps its cells regular hexagons, whatever width they are asked for", () => {
-        const narrow = PlacementLayoutUtils.createHoneycomb({ cellWidth: 40 })({ itemCount: 3 });
-        const wide = PlacementLayoutUtils.createHoneycomb({ cellWidth: 90 })({ itemCount: 3 });
+    it("keeps its cells regular hexagons, whatever it is asked for", () => {
+        const tight = PlacementLayoutUtils.createHoneycomb({ perRow: 2 })({ itemCount: 6 });
+        const loose = PlacementLayoutUtils.createHoneycomb({ perRow: 5, gapRatio: 0.5 })({ itemCount: 6 });
 
-        for (const layout of [narrow, wide]) {
+        for (const layout of [tight, loose]) {
             expect(
                 layout.placements[0].height / layout.placements[0].width,
                 "a hexagon across the points is taller than it is across the flats, by a fixed amount",
             ).toBeCloseTo(HEX_HEIGHT_RATIO);
         }
 
-        expect(wide.extent, "and a wider cell makes a wider box").toBeGreaterThan(narrow.extent);
+        expect(
+            loose.placements[0].width,
+            "and a cell is a smaller share of a box that holds more of them",
+        ).toBeLessThan(tight.placements[0].width);
     });
 
     it("picks by nearest rather than by bearing, there being no centre to take a bearing from", () => {
         expect(PlacementLayoutUtils.createHoneycomb()({ itemCount: 4 }).pickRule).toBe("nearest");
+    });
+});
+
+describe("createWhorl", () => {
+    const HALF = 0.5;
+
+    const lowestEdge = (placements: PlacementRect[], from: number, count: number) =>
+        placements.slice(from, from + count).reduce((low, box) => Math.max(low, box.top + box.height * HALF), 0);
+
+    const highestEdge = (placements: PlacementRect[], from: number, count: number) =>
+        placements
+            .slice(from, from + count)
+            .reduce((high, box) => Math.min(high, box.top - box.height * HALF), Infinity);
+
+    const withinWhorl = (placements: PlacementRect[]) => highestEdge(placements, 1, 2) - lowestEdge(placements, 0, 1);
+
+    const betweenWhorls = (placements: PlacementRect[]) => highestEdge(placements, 3, 1) - lowestEdge(placements, 1, 2);
+
+    it("means the same thing by a step of one wherever the step is taken", () => {
+        const { placements } = PlacementLayoutUtils.createWhorl({ itemStepRatio: 1, whorlStepRatio: 1 })({
+            itemCount: 6,
+        });
+
+        expect(withinWhorl(placements), "a whorl's own items meet edge to edge").toBeCloseTo(0);
+        expect(betweenWhorls(placements), "and so do two neighbouring whorls").toBeCloseTo(0);
+    });
+
+    it("overlaps below one and parts above it, on both steps alike", () => {
+        const tight = PlacementLayoutUtils.createWhorl({ itemStepRatio: 0.5, whorlStepRatio: 0.5 })({ itemCount: 6 });
+        const loose = PlacementLayoutUtils.createWhorl({ itemStepRatio: 1.5, whorlStepRatio: 1.5 })({ itemCount: 6 });
+
+        expect(withinWhorl(tight.placements), "half a step overlaps within a whorl").toBeLessThan(0);
+        expect(betweenWhorls(tight.placements), "and between two of them").toBeLessThan(0);
+        expect(withinWhorl(loose.placements), "half a step again parts them within a whorl").toBeGreaterThan(0);
+        expect(betweenWhorls(loose.placements), "and between two of them").toBeGreaterThan(0);
+    });
+
+    it("carries a taller whorl down rather than into the one below", () => {
+        const { placements } = PlacementLayoutUtils.createWhorl({ itemStepRatio: 2, whorlStepRatio: 1 })({
+            itemCount: 6,
+        });
+
+        expect(
+            betweenWhorls(placements),
+            "spreading a whorl's own items leaves the step between them alone",
+        ).toBeCloseTo(0);
     });
 });

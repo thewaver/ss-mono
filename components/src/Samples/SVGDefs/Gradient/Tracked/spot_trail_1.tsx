@@ -4,7 +4,7 @@ import { MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
-import type { TrackedGradientConfig } from "../../SVGDefs.types";
+import type { GradientFalloffOpts, GradientSpotTrailOpts, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 import { SVGDefsFrameUtils } from "../../SVGDefsFrames.utils";
 
@@ -35,16 +35,22 @@ const NO_FADE = 0;
 
 const NO_REF = () => undefined;
 
-const computePoolColors = (color: string, alpha: number) => [
+const computePoolColors = (color: string, alpha: number, opts?: GradientFalloffOpts) => [
     { value: `rgb(from ${color} r g b / ${alpha})` },
-    { value: `rgb(from ${color} r g b / ${alpha * CORE_ALPHA})`, stop: CORE_STOP },
-    { value: `rgb(from ${color} r g b / ${alpha * FALLOFF_ALPHA})`, stop: FALLOFF_STOP },
+    {
+        value: `rgb(from ${color} r g b / ${alpha * (opts?.coreAlpha ?? CORE_ALPHA)})`,
+        stop: opts?.coreStop ?? CORE_STOP,
+    },
+    {
+        value: `rgb(from ${color} r g b / ${alpha * (opts?.falloffAlpha ?? FALLOFF_ALPHA)})`,
+        stop: opts?.falloffStop ?? FALLOFF_STOP,
+    },
     { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
 ];
 
 const clock = SVGDefsFrameUtils.createClock(TRAIL_LIFETIME_MS);
 
-const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined) => {
+const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined, opts?: GradientSpotTrailOpts) => {
     const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef);
     const [getStamp, setStamp] = createSignal<TrailStamp>();
 
@@ -85,15 +91,18 @@ const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined) 
         return stamp ? MathUtils.clamp01((clock.getFrameMs() - stamp.bornMs) / TRAIL_LIFETIME_MS) : FULL_AGE_RATIO;
     };
 
-    const getAlpha = () => (getStamp()?.fade ?? 0) * STAMP_ALPHA * (1 - getAgeRatio()) ** STAMP_DECAY_EXPONENT;
+    const getAlpha = () =>
+        (getStamp()?.fade ?? 0) *
+        (opts?.trailAlpha ?? STAMP_ALPHA) *
+        (1 - getAgeRatio()) ** (opts?.trailDecay ?? STAMP_DECAY_EXPONENT);
 
     return {
         getOrigin: () => getStamp()?.origin ?? RESTING_ORIGIN,
-        getColors: (color: string) => computePoolColors(color, getAlpha()),
+        getColors: (color: string) => computePoolColors(color, getAlpha(), opts),
     };
 };
 
-export const spot_trail_1 = (): TrackedGradientConfig => ({
+export const spot_trail_1 = (opts?: GradientSpotTrailOpts): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -107,8 +116,8 @@ export const spot_trail_1 = (): TrackedGradientConfig => ({
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient1-${id}`,
                         origin: () => getReading().boxRatio,
-                        scale: POOL_SCALE,
-                        colors: computePoolColors(defs.colors.primary, FULL_ALPHA),
+                        scale: opts?.glowScale ?? POOL_SCALE,
+                        colors: computePoolColors(defs.colors.primary, FULL_ALPHA, opts),
                     });
                 },
             },
@@ -118,12 +127,12 @@ export const spot_trail_1 = (): TrackedGradientConfig => ({
             gradientOrPattern: {
                 id: `gradient${index + 2}-${id}`,
                 renderDefsElement: () => {
-                    const stamp = createTrailStamp(index, getRef ?? NO_REF);
+                    const stamp = createTrailStamp(index, getRef ?? NO_REF, opts);
 
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient${index + 2}-${id}`,
                         origin: stamp.getOrigin,
-                        scale: POOL_SCALE,
+                        scale: opts?.glowScale ?? POOL_SCALE,
                         colors: () => stamp.getColors(defs.colors.primary),
                     });
                 },

@@ -2,10 +2,10 @@ import { MathUtils, ObjectUtils } from "@thewaver/ss-utils";
 
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
-import type { TimedGradientConfig } from "../../SVGDefs.types";
+import type { GradientStepsOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const snake_async_3 = (): TimedGradientConfig => ({
+export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -23,7 +23,14 @@ export const snake_async_3 = (): TimedGradientConfig => ({
                             ],
                             angle: 90,
                         },
-                        SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(90, 450, 12), defs),
+                        SVGAnimations.Linear.rotate(
+                            MathUtils.getIntermediateValues(
+                                90,
+                                450,
+                                opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                            ),
+                            defs,
+                        ),
                     ),
             },
             clipPath: {
@@ -31,7 +38,15 @@ export const snake_async_3 = (): TimedGradientConfig => ({
                 renderDefsElement: () => (
                     <clipPath id={`clip1-${id}`} clipPathUnits="objectBoundingBox">
                         {SVGAnimations.Path.rotatingArc(
-                            ObjectUtils.zipArray("stretch", MathUtils.getIntermediateValues(90, 450, 12), [180]),
+                            ObjectUtils.zipArray(
+                                "stretch",
+                                MathUtils.getIntermediateValues(
+                                    90,
+                                    450,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                [180],
+                            ),
                             defs,
                         )}
                     </clipPath>
@@ -53,8 +68,16 @@ export const snake_async_3 = (): TimedGradientConfig => ({
                         },
                         SVGAnimations.Linear.rotate(
                             [
-                                ...MathUtils.getIntermediateValues(90, 450, 12),
-                                ...MathUtils.getIntermediateValues(90, 450, 12),
+                                ...MathUtils.getIntermediateValues(
+                                    90,
+                                    450,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                ...MathUtils.getIntermediateValues(
+                                    90,
+                                    450,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
                             ],
                             defs,
                         ),
@@ -68,8 +91,16 @@ export const snake_async_3 = (): TimedGradientConfig => ({
                             ObjectUtils.zipArray(
                                 "stretch",
                                 [
-                                    ...MathUtils.getIntermediateValues(90, 450, 12),
-                                    ...MathUtils.getIntermediateValues(90, 450, 12),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        450,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        450,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
                                 ],
                                 [180],
                             ),
@@ -94,9 +125,21 @@ export const snake_async_3 = (): TimedGradientConfig => ({
                         },
                         SVGAnimations.Linear.rotate(
                             [
-                                ...MathUtils.getIntermediateValues(90, 450, 12),
-                                ...MathUtils.getIntermediateValues(90, 450, 12),
-                                ...MathUtils.getIntermediateValues(90, 450, 12),
+                                ...MathUtils.getIntermediateValues(
+                                    90,
+                                    450,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                ...MathUtils.getIntermediateValues(
+                                    90,
+                                    450,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                ...MathUtils.getIntermediateValues(
+                                    90,
+                                    450,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
                             ],
                             defs,
                         ),
@@ -110,9 +153,21 @@ export const snake_async_3 = (): TimedGradientConfig => ({
                             ObjectUtils.zipArray(
                                 "stretch",
                                 [
-                                    ...MathUtils.getIntermediateValues(90, 450, 12),
-                                    ...MathUtils.getIntermediateValues(90, 450, 12),
-                                    ...MathUtils.getIntermediateValues(90, 450, 12),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        450,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        450,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        450,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
                                 ],
                                 [180],
                             ),

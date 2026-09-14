@@ -24,6 +24,7 @@ import { PageSelectGroupContent } from "../SelectGroupContent/SelectGroupContent
 import { PageSelectOptionContent } from "../SelectOptionContent/SelectOptionContent";
 import { PageTextFieldContent, computePageTextFieldTextStyle } from "../TextFieldContent/TextFieldContent";
 import { PageTextFieldPlaceholder } from "../TextFieldPlaceholder/TextFieldPlaceholder";
+import { useFieldReset } from "./Field.context";
 import type {
     PageCheckFieldProps,
     PageColorFieldProps,
@@ -56,6 +57,11 @@ const renderFieldPopup = (
 );
 
 export const PageNumberField = (props: PageNumberFieldProps) => {
+    useFieldReset(
+        () => access(props.value),
+        (value) => props.onInput(value),
+    );
+
     const valueSignal = SignalMirrorUtils.createValueMirror<number | undefined>(
         () => access(props.value),
         (value) => {
@@ -89,6 +95,11 @@ export const PageNumberField = (props: PageNumberFieldProps) => {
 };
 
 export const PageTextField = (props: PageTextFieldProps) => {
+    useFieldReset(
+        () => access(props.value),
+        (value) => props.onInput(value),
+    );
+
     return (
         <TextInput
             valueSignal={[() => access(props.value), props.onInput]}
@@ -113,6 +124,8 @@ export const PageTextField = (props: PageTextFieldProps) => {
 
 export const PageSelectField = <T,>(props: PageSelectFieldProps<T>) => {
     const getValue = () => access(props.value);
+
+    useFieldReset(getValue, (value) => props.onChange(value));
 
     const setValue = (value: T | undefined) => {
         if (value === undefined) return;
@@ -145,6 +158,8 @@ export const PageSelectField = <T,>(props: PageSelectFieldProps<T>) => {
 
 export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>) => {
     const getValue = () => access(props.value);
+
+    useFieldReset(getValue, (value) => props.onChange(value));
 
     const setValue = (value: T | undefined) => {
         if (value === undefined) return;
@@ -179,6 +194,11 @@ export const PageGroupedSelectField = <T,>(props: PageGroupedSelectFieldProps<T>
 };
 
 export const PageCheckField = (props: PageCheckFieldProps) => {
+    useFieldReset(
+        () => access(props.value),
+        (value) => props.onChange(value),
+    );
+
     return (
         <Checkbox
             checkedSignal={[() => access(props.value), props.onChange]}
@@ -190,6 +210,11 @@ export const PageCheckField = (props: PageCheckFieldProps) => {
 };
 
 export const PageColorField = (props: PageColorFieldProps) => {
+    useFieldReset(
+        () => access(props.value),
+        (value) => props.onInput(value),
+    );
+
     return (
         <ColorInput
             valueSignal={[() => access(props.value), props.onInput]}

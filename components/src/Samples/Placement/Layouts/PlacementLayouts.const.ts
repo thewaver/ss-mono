@@ -3,8 +3,8 @@ import type { PlacementLayoutEntry } from "./PlacementLayouts.types";
 export namespace PlacementLayouts {
     export const SAMPLE_LAYOUTS = {
         arc: { family: "arc" },
+        cliff: { family: "cliff" },
         honeycomb: { family: "honeycomb" },
-        podiumLozenge: { family: "podiumLozenge" },
         ring: { family: "ring" },
         whorl: { family: "whorl" },
         zigzag: { family: "zigzag" },

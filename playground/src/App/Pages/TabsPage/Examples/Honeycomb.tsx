@@ -7,11 +7,11 @@ import type { TabsExampleProps } from "../TabsPage.types";
 
 import * as styles from "../TabsPage.css";
 
-const HONEYCOMB_DEFS: HoneycombDefs = { cellWidth: 84, perRow: 3, gap: 0 };
+const HONEYCOMB_DEFS: HoneycombDefs = { perRow: 3, gapRatio: 0 };
 
 const HONEYCOMB_LAYOUT = PlacementLayoutUtils.createHoneycomb(HONEYCOMB_DEFS);
 
-const HONEYCOMB_WIDTH = `${(HONEYCOMB_DEFS.cellWidth! + HONEYCOMB_DEFS.gap!) * (HONEYCOMB_DEFS.perRow! + 0.5)}px`;
+const HONEYCOMB_WIDTH = "294px";
 
 const ID_PREFIX = "honeycomb";
 

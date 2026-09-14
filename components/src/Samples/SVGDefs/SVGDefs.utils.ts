@@ -12,6 +12,23 @@ const CYCLE_COLOR_KEYS = ["primary", "secondary", "tertiary"] as const;
 export namespace SVGDefsUtils {
     export const DEBUG_SEAMS = false;
 
+    export const DEFAULT_GRADIENT_STEPS = 12;
+
+    /**
+     * The colour stops of a gradient that repeats a run of colours a given number of times.
+     *
+     * A flowing gradient reads as a band per colour per repeat, and it needs one stop more than that so the
+     * last band closes on the colour the first one opened with — which is what lets the whole strip slide
+     * without a seam. Callers state the repeats rather than the stops for that reason: the off-by-one is the
+     * helper's to remember.
+     *
+     * @param keys The run of colours to repeat, in order.
+     * @param repeats How many times the run appears across the gradient.
+     * @returns `keys.length * repeats + 1` colour keys, opening and closing on the first.
+     */
+    export const getCycleStopKeys = (keys: CycleColorKey[], repeats: number) =>
+        Array.from({ length: keys.length * repeats + 1 }, (_unused, index) => keys[index % keys.length]);
+
     export type CycleColorKey = (typeof CYCLE_COLOR_KEYS)[number];
 
     export const getCycleWalk = (colors: SVGDefsColors, key: CycleColorKey) => {

@@ -58,6 +58,7 @@ export const pageColumn = style({
     height: "100%",
     padding: themeVars.spacing.quad,
     overflowY: "auto",
+    scrollbarGutter: "stable",
 });
 
 export const pageBody = style({

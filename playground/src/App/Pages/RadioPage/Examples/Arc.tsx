@@ -8,13 +8,18 @@ import type { RadioRatingExampleProps } from "../RadioPage.types";
 
 const RATING_OPTIONS = [1, 2, 3, 4, 5];
 
-const ARC_DEFS: ArcDefs = { width: 300, height: 116, spreadDegrees: 160, itemWidth: 33, itemHeight: 36 };
+const ARC_DEFS: ArcDefs = {
+    curveHeightRatio: 0.3867,
+    spreadDegrees: 160,
+    itemWidthRatio: 0.11,
+    itemHeightRatio: 1.0909,
+};
 
 const ARC_LAYOUT = PlacementLayoutUtils.createArc(ARC_DEFS);
 
 type Props = RadioRatingExampleProps;
 
-const ARC_WIDTH = `${ARC_DEFS.width}px`;
+const ARC_WIDTH = "300px";
 
 export const ArcExample = (props: Props) => (
     <div style={{ width: ARC_WIDTH }}>

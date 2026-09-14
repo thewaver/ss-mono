@@ -4,10 +4,10 @@ import { MathUtils, ObjectUtils } from "@thewaver/ss-utils";
 
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
-import type { GradientCycleOpts, TimedGradientConfig } from "../../SVGDefs.types";
+import type { GradientCycleStepsOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const snake_inter_2 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
+export const snake_inter_2 = (opts?: GradientCycleStepsOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -28,14 +28,46 @@ export const snake_inter_2 = (opts?: GradientCycleOpts): TimedGradientConfig => 
                         <>
                             {SVGAnimations.Linear.rotate(
                                 [
-                                    ...MathUtils.getIntermediateValues(90, 90, 12),
-                                    ...MathUtils.getIntermediateValues(90, 90, 12),
-                                    ...MathUtils.getIntermediateValues(90, 180, 12),
-                                    ...MathUtils.getIntermediateValues(180, 270, 12),
-                                    ...MathUtils.getIntermediateValues(270, 360, 12),
-                                    ...MathUtils.getIntermediateValues(360, 450, 12),
-                                    ...MathUtils.getIntermediateValues(450, 450, 12),
-                                    ...MathUtils.getIntermediateValues(450, 450, 12),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        90,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        90,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        180,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        180,
+                                        270,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        270,
+                                        360,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        360,
+                                        450,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        450,
+                                        450,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        450,
+                                        450,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
                                 ],
                                 defs,
                             )}
@@ -64,14 +96,46 @@ export const snake_inter_2 = (opts?: GradientCycleOpts): TimedGradientConfig => 
                             ObjectUtils.zipArray(
                                 "stretch",
                                 [
-                                    ...MathUtils.getIntermediateValues(90, 90, 12),
-                                    ...MathUtils.getIntermediateValues(90, 90, 12),
-                                    ...MathUtils.getIntermediateValues(90, 180, 12),
-                                    ...MathUtils.getIntermediateValues(180, 270, 12),
-                                    ...MathUtils.getIntermediateValues(270, 360, 12),
-                                    ...MathUtils.getIntermediateValues(360, 450, 12),
-                                    ...MathUtils.getIntermediateValues(450, 450, 12),
-                                    ...MathUtils.getIntermediateValues(450, 450, 12),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        90,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        90,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        180,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        180,
+                                        270,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        270,
+                                        360,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        360,
+                                        450,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        450,
+                                        450,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        450,
+                                        450,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
                                 ],
                                 [180],
                             ),
@@ -97,14 +161,46 @@ export const snake_inter_2 = (opts?: GradientCycleOpts): TimedGradientConfig => 
                         <>
                             {SVGAnimations.Linear.rotate(
                                 [
-                                    ...MathUtils.getIntermediateValues(90, 180, 12),
-                                    ...MathUtils.getIntermediateValues(180, 270, 12),
-                                    ...MathUtils.getIntermediateValues(270, 270, 12),
-                                    ...MathUtils.getIntermediateValues(270, 270, 12),
-                                    ...MathUtils.getIntermediateValues(270, 270, 12),
-                                    ...MathUtils.getIntermediateValues(270, 270, 12),
-                                    ...MathUtils.getIntermediateValues(270, 360, 12),
-                                    ...MathUtils.getIntermediateValues(360, 450, 12),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        180,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        180,
+                                        270,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        270,
+                                        270,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        270,
+                                        270,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        270,
+                                        270,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        270,
+                                        270,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        270,
+                                        360,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        360,
+                                        450,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
                                 ],
                                 defs,
                             )}
@@ -133,14 +229,46 @@ export const snake_inter_2 = (opts?: GradientCycleOpts): TimedGradientConfig => 
                             ObjectUtils.zipArray(
                                 "stretch",
                                 [
-                                    ...MathUtils.getIntermediateValues(90, 180, 12),
-                                    ...MathUtils.getIntermediateValues(180, 270, 12),
-                                    ...MathUtils.getIntermediateValues(270, 270, 12),
-                                    ...MathUtils.getIntermediateValues(270, 270, 12),
-                                    ...MathUtils.getIntermediateValues(270, 270, 12),
-                                    ...MathUtils.getIntermediateValues(270, 270, 12),
-                                    ...MathUtils.getIntermediateValues(270, 360, 12),
-                                    ...MathUtils.getIntermediateValues(360, 450, 12),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        180,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        180,
+                                        270,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        270,
+                                        270,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        270,
+                                        270,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        270,
+                                        270,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        270,
+                                        270,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        270,
+                                        360,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        360,
+                                        450,
+                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    ),
                                 ],
                                 [180],
                             ),

@@ -61,6 +61,11 @@ const MIN_DURATION_MS = 100;
 const MAX_DURATION_MS = 5000;
 const DURATION_STEP_MS = 100;
 const MIN_ITERATION_DELAY_MS = 0;
+
+const STARTING_LINE_COUNT = 120;
+const STARTING_DURATION_MS = 2000;
+const STARTING_ITERATION_DELAY_MS = 1000;
+
 const STRESS_LINE_COUNT = 120;
 const STRESS_ITEMS: (StressTestDefs & { size: number; kind: "transform" | "filter" })[] = (
     ["transform", "filter"] as const
@@ -621,9 +626,9 @@ export const ScanlineAnimationPage = () => {
     const playback = createSignal(true);
 
     const [getSrc, setSrc] = createSignal(knight);
-    const [getLineCount, setLineCount] = createSignal(120);
-    const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(2000);
-    const [getAnimationIterationDelayMs, setAnimationIterationDelayMs] = createSignal(1000);
+    const [getLineCount, setLineCount] = createSignal(STARTING_LINE_COUNT);
+    const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(STARTING_DURATION_MS);
+    const [getAnimationIterationDelayMs, setAnimationIterationDelayMs] = createSignal(STARTING_ITERATION_DELAY_MS);
     const [getWeightType, setWeightType] = createSignal<CellAnimationWeights.OriginFreeWeightType>("sequenceLinear");
 
     const handleFile = (file: File) => {

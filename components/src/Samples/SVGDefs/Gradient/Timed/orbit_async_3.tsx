@@ -2,10 +2,10 @@ import { MathUtils } from "@thewaver/ss-utils";
 
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
-import type { TimedGradientConfig } from "../../SVGDefs.types";
+import type { GradientStepsOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const orbit_async_3 = (): TimedGradientConfig => ({
+export const orbit_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -23,7 +23,10 @@ export const orbit_async_3 = (): TimedGradientConfig => ({
                                 { value: `rgb(from ${defs.colors.primary} r g b / 0)` },
                             ],
                         },
-                        SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(0, 360, 12), defs),
+                        SVGAnimations.Linear.rotate(
+                            MathUtils.getIntermediateValues(0, 360, opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                            defs,
+                        ),
                     ),
             },
             filter: SVGDefsUtils.getBaseBlur(id, defs),
@@ -44,8 +47,16 @@ export const orbit_async_3 = (): TimedGradientConfig => ({
                         },
                         SVGAnimations.Linear.rotate(
                             [
-                                ...MathUtils.getIntermediateValues(0, 360, 12),
-                                ...MathUtils.getIntermediateValues(0, 360, 12),
+                                ...MathUtils.getIntermediateValues(
+                                    0,
+                                    360,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                ...MathUtils.getIntermediateValues(
+                                    0,
+                                    360,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
                             ],
                             defs,
                         ),
@@ -69,9 +80,21 @@ export const orbit_async_3 = (): TimedGradientConfig => ({
                         },
                         SVGAnimations.Linear.rotate(
                             [
-                                ...MathUtils.getIntermediateValues(0, 360, 12),
-                                ...MathUtils.getIntermediateValues(0, 360, 12),
-                                ...MathUtils.getIntermediateValues(0, 360, 12),
+                                ...MathUtils.getIntermediateValues(
+                                    0,
+                                    360,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                ...MathUtils.getIntermediateValues(
+                                    0,
+                                    360,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                ...MathUtils.getIntermediateValues(
+                                    0,
+                                    360,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
                             ],
                             defs,
                         ),

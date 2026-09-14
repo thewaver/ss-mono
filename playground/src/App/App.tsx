@@ -754,7 +754,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Formation",
                 description:
-                    "Places a set of items into an arrangement — a podium, a whorl of three, a zigzag — from a function that answers with a position per item. Every position is a fraction of the formation's own width, so the whole thing scales with the container and nothing is measured in JavaScript.",
+                    "Places a set of items into an arrangement — a cliff, a whorl of three, a zigzag — from a function that answers with a position per item. Every position is a fraction of the formation's own width, so the whole thing scales with the container and nothing is measured in JavaScript.",
                 component: () => <FormationPage />,
             },
             {

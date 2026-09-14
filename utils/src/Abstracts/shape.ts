@@ -8,6 +8,7 @@ const INNER_RECT_ITERATIONS = 5;
 const INNER_RECT_SAMPLES = 50;
 const CIRCLE_KAPPA = 1;
 const HALF_PI = Math.PI * 0.5;
+const DODECAGON_SIDES = 12;
 
 /** The outer and inner outlines of a shape, as both SVG path text and raw points. */
 type ShapePaths = {
@@ -41,7 +42,17 @@ const writePathCache = (key: string, value: ShapePaths) => {
  */
 
 export namespace ShapeConst {
-    /** The built-in shapes {@link getDefaultShapePoints} knows how to build. */
+    /**
+     * The built-in shapes {@link getDefaultShapePoints} knows how to build.
+     *
+     * `dodecagon` is a twelve-sided polygon, and it is named for what it is rather than for the circle it
+     * stands in for: a shape here is a list of corners and a circle has none. It sits up to 3.41% of the
+     * radius inside the circle it approximates, so its flats stay visible at the sizes these are drawn at —
+     * which is the point, a rounded shape that never claims to be round. An exact circle is still reachable
+     * without a name — a `square` whose join radii are half its side rounds into one, every corner's arc
+     * sharing the square's own centre — but that takes a second descriptor the caller has to pass, which is
+     * the whole reason this entry exists.
+     */
 
     export const DEFAULT_SHAPES = [
         "triangle-up",
@@ -52,6 +63,7 @@ export namespace ShapeConst {
         "lozenge",
         "hexagon-pointy-top",
         "hexagon-flat-top",
+        "dodecagon",
     ] as const;
 
     /** One of the built-in shape names. */
@@ -87,6 +99,13 @@ export namespace ShapeConst {
 
     export const getDefaultShapePoints = (shape: DefaultShape, { width, height }: Size2d): Point2d[] => {
         switch (shape) {
+            case "dodecagon":
+                return Array.from({ length: DODECAGON_SIDES }, (_unused, index) => {
+                    const angle = (index / DODECAGON_SIDES) * Math.PI * 2 - HALF_PI;
+
+                    return { x: width * 0.5 * (1 + Math.cos(angle)), y: height * 0.5 * (1 + Math.sin(angle)) };
+                });
+
             case "triangle-up":
                 return [
                     { x: width * 0.5, y: 0 },

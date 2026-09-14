@@ -62,10 +62,18 @@ test("a position written as a fraction of the width lands at that fraction of th
 
     const ratio = parseFloat(written) / box.hostWidth;
 
-    expect(ratio, "the podium's first place sits where the arrangement puts it, at 0.4375 of the width").toBeCloseTo(
-        0.4375,
-        2,
-    );
+    const second = await boxOf(page, item(FORMATION), 1);
+    const third = await boxOf(page, item(FORMATION), 2);
+    const places = [box, second, third];
+    const leftEdge = Math.min(...places.map((place) => place.left - place.width / 2));
+    const rightEdge = Math.max(...places.map((place) => place.left + place.width / 2));
+
+    expect(ratio, "and it lands inside the formation rather than somewhere the viewport put it").toBeGreaterThan(0);
+    expect(ratio, "and it lands inside the formation rather than somewhere the viewport put it").toBeLessThan(1);
+    expect(
+        (leftEdge + rightEdge) / 2 / box.hostWidth,
+        "a cliff is centred in the formation however far its places lean",
+    ).toBeCloseTo(0.5, 2);
 });
 
 test("the height comes from the width, so the arrangement keeps its shape", async ({ page }) => {
@@ -81,7 +89,7 @@ test("the height comes from the width, so the arrangement keeps its shape", asyn
 test("an item's own size is a fraction of the width too", async ({ page }) => {
     const box = await boxOf(page, item(FORMATION), 0);
 
-    expect(box.width / box.hostWidth, "half the width for a podium place").toBeCloseTo(0.5, 2);
+    expect(box.width / box.hostWidth, "half the width for a cliff place").toBeCloseTo(0.5, 2);
 });
 
 test("the arrangement changes with the item count, on the first paint", async ({ page }) => {

@@ -30,6 +30,8 @@ const STARTING_V_PLACEMENT: AnchorVPlacement = "top-out";
 const STARTING_SUBJECT_WIDTH = 140;
 const STARTING_SUBJECT_HEIGHT = 80;
 const STARTING_BADGE_SIZE = 28;
+const STARTING_OFFSET_X = 0;
+const STARTING_OFFSET_Y = 0;
 
 const DefaultExampleWrapper = (props: SatelliteExampleProps) => {
     return (
@@ -42,8 +44,8 @@ const DefaultExampleWrapper = (props: SatelliteExampleProps) => {
 export const SatellitePage = () => {
     const [getHPlacement, setHPlacement] = createSignal<AnchorHPlacement>(STARTING_H_PLACEMENT);
     const [getVPlacement, setVPlacement] = createSignal<AnchorVPlacement>(STARTING_V_PLACEMENT);
-    const [getOffsetX, setOffsetX] = createSignal(0);
-    const [getOffsetY, setOffsetY] = createSignal(0);
+    const [getOffsetX, setOffsetX] = createSignal(STARTING_OFFSET_X);
+    const [getOffsetY, setOffsetY] = createSignal(STARTING_OFFSET_Y);
     const [getSubjectWidth, setSubjectWidth] = createSignal(STARTING_SUBJECT_WIDTH);
     const [getSubjectHeight, setSubjectHeight] = createSignal(STARTING_SUBJECT_HEIGHT);
     const [getBadgeSize, setBadgeSize] = createSignal(STARTING_BADGE_SIZE);

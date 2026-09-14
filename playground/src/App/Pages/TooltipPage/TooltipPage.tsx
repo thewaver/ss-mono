@@ -27,13 +27,14 @@ const FIELD_WIDTH = 110;
 const STARTING_H_PLACEMENT: AnchorHPlacement = "center";
 const STARTING_V_PLACEMENT: AnchorVPlacement = "top-out";
 const STARTING_OFFSET_Y = 5;
+const STARTING_OFFSET_X = 0;
 const STARTING_TRANSITION_DURATION_MS = 200;
 const STARTING_FOCUS_SHOW_DELAY_MS = 500;
 
 export const TooltipPage = () => {
     const [getHPlacement, setHPlacement] = createSignal<AnchorHPlacement>(STARTING_H_PLACEMENT);
     const [getVPlacement, setVPlacement] = createSignal<AnchorVPlacement>(STARTING_V_PLACEMENT);
-    const [getOffsetX, setOffsetX] = createSignal(0);
+    const [getOffsetX, setOffsetX] = createSignal(STARTING_OFFSET_X);
     const [getOffsetY, setOffsetY] = createSignal(STARTING_OFFSET_Y);
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(STARTING_TRANSITION_DURATION_MS);
     const [getFocusShowDelayMs, setFocusShowDelayMs] = createSignal(STARTING_FOCUS_SHOW_DELAY_MS);

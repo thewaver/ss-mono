@@ -9,7 +9,7 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
-import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import type { FormationExampleProps } from "./FormationPage.types";
@@ -22,7 +22,7 @@ const FORMATION_WIDTH = 380;
 const EXAMPLES_ROOT = "/src/App/Pages/FormationPage/Examples";
 
 const STARTING_ITEM_COUNT = 6;
-const STARTING_LAYOUT_KEY: PlacementLayouts.SampleKey = "podiumLozenge";
+const STARTING_LAYOUT_KEY: PlacementLayouts.SampleKey = "cliff";
 const STARTING_SHAPE_KIND: ShapeConst.DefaultShape = "hexagon-pointy-top";
 
 const NAMES = [
@@ -86,57 +86,63 @@ export const FormationPage = () => {
 
     return (
         <>
-            <PagePropsPanel scope={"global"}>
-                <PageProp key={"itemCount"} label={"Items"}>
-                    <PageNumberField
-                        value={getItemCount}
-                        min={() => MIN_ITEM_COUNT}
-                        max={() => MAX_ITEM_COUNT}
-                        step={() => ITEM_COUNT_STEP}
+            <PagePropsGroups>
+                <PagePropsPanel scope={"sample"}>
+                    <PageProp key={"layoutKey"} label={"Arrangement"}>
+                        <PageSelectField
+                            value={getLayoutKey}
+                            values={() => PlacementLayouts.SAMPLE_KEYS}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Arrangement"}
+                            onChange={(key) => setLayoutKey(() => key)}
+                        />
+                    </PageProp>
+
+                    <PageKnobs
+                        knobs={getKnobs}
+                        defaults={getDefaults}
+                        values={getDefs}
                         width={() => FIELD_WIDTH}
-                        ariaLabel={"Items"}
-                        onInput={setItemCount}
+                        onInput={(key, value) =>
+                            setLayoutDefs(getLayoutKey(), (previous) => ({ ...previous, [key]: value }))
+                        }
                     />
-                </PageProp>
+                </PagePropsPanel>
 
-                <PageProp key={"layoutKey"} label={"Arrangement"}>
-                    <PageSelectField
-                        value={getLayoutKey}
-                        values={() => PlacementLayouts.SAMPLE_KEYS}
-                        width={() => FIELD_WIDTH}
-                        ariaLabel={"Arrangement"}
-                        onChange={(key) => setLayoutKey(() => key)}
-                    />
-                </PageProp>
+                <PagePropsDivider />
 
-                <PageKnobs
-                    knobs={getKnobs}
-                    defaults={getDefaults}
-                    values={getDefs}
-                    width={() => FIELD_WIDTH}
-                    onInput={(key, value) =>
-                        setLayoutDefs(getLayoutKey(), (previous) => ({ ...previous, [key]: value }))
-                    }
-                />
+                <PagePropsPanel scope={"global"}>
+                    <PageProp key={"itemCount"} label={"Items"}>
+                        <PageNumberField
+                            value={getItemCount}
+                            min={() => MIN_ITEM_COUNT}
+                            max={() => MAX_ITEM_COUNT}
+                            step={() => ITEM_COUNT_STEP}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Items"}
+                            onInput={setItemCount}
+                        />
+                    </PageProp>
 
-                <PageProp key={"isStackedInReverse"} label={"Earlier items in front"}>
-                    <PageCheckField
-                        value={getIsStackedInReverse}
-                        ariaLabel={"Earlier items in front"}
-                        onChange={setIsStackedInReverse}
-                    />
-                </PageProp>
+                    <PageProp key={"isStackedInReverse"} label={"Earlier items in front"}>
+                        <PageCheckField
+                            value={getIsStackedInReverse}
+                            ariaLabel={"Earlier items in front"}
+                            onChange={setIsStackedInReverse}
+                        />
+                    </PageProp>
 
-                <PageProp key={"shapeKind"} label={"Item shape"}>
-                    <PageSelectField
-                        value={getShapeKind}
-                        values={() => ShapeConst.DEFAULT_SHAPES}
-                        width={() => FIELD_WIDTH}
-                        ariaLabel={"Item shape"}
-                        onChange={(shape) => setShapeKind(() => shape)}
-                    />
-                </PageProp>
-            </PagePropsPanel>
+                    <PageProp key={"shapeKind"} label={"Item shape"}>
+                        <PageSelectField
+                            value={getShapeKind}
+                            values={() => ShapeConst.DEFAULT_SHAPES}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Item shape"}
+                            onChange={(shape) => setShapeKind(() => shape)}
+                        />
+                    </PageProp>
+                </PagePropsPanel>
+            </PagePropsGroups>
 
             <PageExamples items={getExamples} layout={"flow"} />
         </>

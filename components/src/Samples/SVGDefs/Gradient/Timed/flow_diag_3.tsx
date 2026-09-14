@@ -7,34 +7,16 @@ import { SVGAnimations } from "../../SVGAnimations.const";
 import type { GradientBandedCycleOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-const SMOOTH_STOP_KEYS: SVGDefsUtils.CycleColorKey[] = [
-    "primary",
-    "secondary",
-    "tertiary",
-    "primary",
-    "secondary",
-    "tertiary",
-    "primary",
-];
-const BANDED_STOP_KEYS: SVGDefsUtils.CycleColorKey[] = [
-    "primary",
-    "secondary",
-    "tertiary",
-    "primary",
-    "secondary",
-    "tertiary",
-    "primary",
-    "secondary",
-    "tertiary",
-    "primary",
-    "secondary",
-    "tertiary",
-    "primary",
-];
+const CYCLE_KEYS: SVGDefsUtils.CycleColorKey[] = ["primary", "secondary", "tertiary"];
+const SMOOTH_REPEATS = 2;
+const BANDED_REPEATS = 4;
 
 export const flow_diag_3 = (opts?: GradientBandedCycleOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => {
-        const stopKeys = opts?.banded ? BANDED_STOP_KEYS : SMOOTH_STOP_KEYS;
+        const stopKeys = SVGDefsUtils.getCycleStopKeys(
+            CYCLE_KEYS,
+            opts?.bands ?? (opts?.banded ? BANDED_REPEATS : SMOOTH_REPEATS),
+        );
 
         return [
             {

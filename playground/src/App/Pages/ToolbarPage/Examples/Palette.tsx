@@ -17,11 +17,17 @@ const ACTIONS: ToolbarAction<string>[] = [
     { value: "Zoom" },
 ];
 
-const PALETTE_DEFS: ArcDefs = { width: 288, height: 288, spreadDegrees: 360, itemWidth: 102, itemHeight: 48 };
+const PALETTE_DEFS: ArcDefs = {
+    curveHeightRatio: 1,
+    spreadDegrees: 360,
+    facingDegrees: 70,
+    itemWidthRatio: 0.3542,
+    itemHeightRatio: 0.4706,
+};
 
 const PALETTE_LAYOUT = PlacementLayoutUtils.createArc(PALETTE_DEFS);
 
-const PALETTE_WIDTH = `${PALETTE_DEFS.width! + PALETTE_DEFS.itemWidth!}px`;
+const PALETTE_WIDTH = "390px";
 
 type Props = ToolbarExampleProps;
 

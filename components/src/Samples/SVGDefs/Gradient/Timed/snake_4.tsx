@@ -4,10 +4,10 @@ import { MathUtils, ObjectUtils } from "@thewaver/ss-utils";
 
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
-import type { GradientCycleOpts, TimedGradientConfig } from "../../SVGDefs.types";
+import type { GradientCycleStepsOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const snake_4 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
+export const snake_4 = (opts?: GradientCycleStepsOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -26,7 +26,14 @@ export const snake_4 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
                             ],
                         },
                         <>
-                            {SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(0, 360, 12), defs)}
+                            {SVGAnimations.Linear.rotate(
+                                MathUtils.getIntermediateValues(
+                                    0,
+                                    360,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                defs,
+                            )}
                             <Show when={opts?.cycles}>
                                 {SVGAnimations.Gradient.cycleSmoothColors(
                                     `gradient1-${id}`,
@@ -54,7 +61,15 @@ export const snake_4 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
                 renderDefsElement: () => (
                     <clipPath id={`clip1-${id}`} clipPathUnits="objectBoundingBox">
                         {SVGAnimations.Path.rotatingArc(
-                            ObjectUtils.zipArray("stretch", MathUtils.getIntermediateValues(0, 360, 12), [180]),
+                            ObjectUtils.zipArray(
+                                "stretch",
+                                MathUtils.getIntermediateValues(
+                                    0,
+                                    360,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                [180],
+                            ),
                             defs,
                         )}
                     </clipPath>
@@ -76,7 +91,14 @@ export const snake_4 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
                             angle: 90,
                         },
                         <>
-                            {SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(90, 450, 12), defs)}
+                            {SVGAnimations.Linear.rotate(
+                                MathUtils.getIntermediateValues(
+                                    90,
+                                    450,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                defs,
+                            )}
                             <Show when={opts?.cycles}>
                                 {SVGAnimations.Gradient.cycleSmoothColors(
                                     `gradient2-${id}`,
@@ -104,7 +126,15 @@ export const snake_4 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
                 renderDefsElement: () => (
                     <clipPath id={`clip2-${id}`} clipPathUnits="objectBoundingBox">
                         {SVGAnimations.Path.rotatingArc(
-                            ObjectUtils.zipArray("stretch", MathUtils.getIntermediateValues(90, 450, 12), [180]),
+                            ObjectUtils.zipArray(
+                                "stretch",
+                                MathUtils.getIntermediateValues(
+                                    90,
+                                    450,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                [180],
+                            ),
                             defs,
                         )}
                     </clipPath>
@@ -126,7 +156,14 @@ export const snake_4 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
                             angle: 180,
                         },
                         <>
-                            {SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(180, 540, 12), defs)}
+                            {SVGAnimations.Linear.rotate(
+                                MathUtils.getIntermediateValues(
+                                    180,
+                                    540,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                defs,
+                            )}
                             <Show when={opts?.cycles}>
                                 {SVGAnimations.Gradient.cycleSmoothColors(
                                     `gradient3-${id}`,
@@ -154,7 +191,15 @@ export const snake_4 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
                 renderDefsElement: () => (
                     <clipPath id={`clip3-${id}`} clipPathUnits="objectBoundingBox">
                         {SVGAnimations.Path.rotatingArc(
-                            ObjectUtils.zipArray("stretch", MathUtils.getIntermediateValues(180, 540, 12), [180]),
+                            ObjectUtils.zipArray(
+                                "stretch",
+                                MathUtils.getIntermediateValues(
+                                    180,
+                                    540,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                [180],
+                            ),
                             defs,
                         )}
                     </clipPath>
@@ -176,7 +221,14 @@ export const snake_4 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
                             angle: 270,
                         },
                         <>
-                            {SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(270, 630, 12), defs)}
+                            {SVGAnimations.Linear.rotate(
+                                MathUtils.getIntermediateValues(
+                                    270,
+                                    630,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                defs,
+                            )}
                             <Show when={opts?.cycles}>
                                 {SVGAnimations.Gradient.cycleSmoothColors(
                                     `gradient4-${id}`,
@@ -204,7 +256,15 @@ export const snake_4 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
                 renderDefsElement: () => (
                     <clipPath id={`clip4-${id}`} clipPathUnits="objectBoundingBox">
                         {SVGAnimations.Path.rotatingArc(
-                            ObjectUtils.zipArray("stretch", MathUtils.getIntermediateValues(270, 630, 12), [180]),
+                            ObjectUtils.zipArray(
+                                "stretch",
+                                MathUtils.getIntermediateValues(
+                                    270,
+                                    630,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                [180],
+                            ),
                             defs,
                         )}
                     </clipPath>

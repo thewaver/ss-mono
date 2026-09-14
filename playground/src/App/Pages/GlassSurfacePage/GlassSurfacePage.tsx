@@ -7,7 +7,7 @@ import { DEFAULT_GLASS_DEFS, SVGDefsSamples, TrackedGradientKnobs } from "@thewa
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import { PageProp } from "../../PageComponents/Prop/Prop";
-import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import {
     NO_SAMPLE_KEY,
     splitEntriesIntoGroups,
@@ -62,11 +62,19 @@ const MIN_BLUR_WIDTH = 0;
 const MAX_BLUR_WIDTH = 40;
 const BLUR_WIDTH_STEP = 1;
 
+const STARTING_BORDER_WIDTH = 2;
+const STARTING_STROKE_CONFIG_KEY = "spot_1";
+const STARTING_BLUR_WIDTH = 0;
+const STARTING_BLUR_RADIUS = 6;
+const STARTING_RIPPLE_SCALE = 24;
+const STARTING_TINT_COLOR = "#FFFFFF";
+const STARTING_TINT_OPACITY = 0.2;
+
 export const GlassSurfacePage = () => {
     const [getBorderRadius, setBorderRadius] = createSignal(BORDER_RADIUS_FULL);
-    const [getBorderWidth, setBorderWidth] = createSignal(2);
+    const [getBorderWidth, setBorderWidth] = createSignal(STARTING_BORDER_WIDTH);
     const [getStrokeConfigKey, setStrokeConfigKey] =
-        createSignal<WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>>("spot_1");
+        createSignal<WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>>(STARTING_STROKE_CONFIG_KEY);
     const [strokeConfigDefs, setStrokeConfigDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
 
     const getStrokeKnobs = () => {
@@ -75,17 +83,17 @@ export const GlassSurfacePage = () => {
         return key === NO_SAMPLE_KEY ? {} : (TrackedGradientKnobs.KNOBS_BY_FAMILY[key] as Record<string, SampleKnob>);
     };
     const getStrokeConfigDefs = () => strokeConfigDefs[getStrokeConfigKey()] ?? {};
-    const [getBlurWidth, setBlurWidth] = createSignal(0);
-    const [getBlurRadius, setBlurRadius] = createSignal(6);
-    const [getRippleScale, setRippleScale] = createSignal(24);
+    const [getBlurWidth, setBlurWidth] = createSignal(STARTING_BLUR_WIDTH);
+    const [getBlurRadius, setBlurRadius] = createSignal(STARTING_BLUR_RADIUS);
+    const [getRippleScale, setRippleScale] = createSignal(STARTING_RIPPLE_SCALE);
     const [getNoiseFrequency, setNoiseFrequency] = createSignal(DEFAULT_GLASS_DEFS.noise.frequency);
     const [getNoiseOctaves, setNoiseOctaves] = createSignal(DEFAULT_GLASS_DEFS.noise.octaves);
     const [getLightHeight, setLightHeight] = createSignal(DEFAULT_GLASS_DEFS.sheen.lightHeight);
     const [getSurfaceScale, setSurfaceScale] = createSignal(DEFAULT_GLASS_DEFS.sheen.surfaceScale);
     const [getSpecularConstant, setSpecularConstant] = createSignal(DEFAULT_GLASS_DEFS.sheen.specularConstant);
     const [getSpecularExponent, setSpecularExponent] = createSignal(DEFAULT_GLASS_DEFS.sheen.specularExponent);
-    const [getTintColor, setTintColor] = createSignal("#FFFFFF");
-    const [getTintOpacity, setTintOpacity] = createSignal(0.2);
+    const [getTintColor, setTintColor] = createSignal(STARTING_TINT_COLOR);
+    const [getTintOpacity, setTintOpacity] = createSignal(STARTING_TINT_OPACITY);
     const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS_MONO });
 
     const getExamples = createMemo(() => {
@@ -120,175 +128,181 @@ export const GlassSurfacePage = () => {
 
     return (
         <>
-            <PagePropsPanel scope={"global"}>
-                <PageProp key={"borderRadius"} label={"Corner radius (px)"}>
-                    <PageNumberField
-                        value={getBorderRadius}
-                        min={() => MIN_BORDER_RADIUS}
-                        max={() => MAX_BORDER_RADIUS}
-                        step={() => BORDER_RADIUS_STEP}
-                        ariaLabel={"Corner radius"}
-                        onInput={setBorderRadius}
+            <PagePropsGroups>
+                <PagePropsPanel scope={"sample"}>
+                    <PageProp key={"strokeConfigKey"} label={"Border pattern"}>
+                        <PageGroupedSelectField
+                            value={getStrokeConfigKey}
+                            groups={() => toGroupEntriesWithNoSample(GROUPPED_GRADIENTS)}
+                            ariaLabel={"Border pattern"}
+                            onChange={(config) => setStrokeConfigKey(() => config)}
+                        />
+                    </PageProp>
+
+                    <PageKnobs
+                        knobs={getStrokeKnobs}
+                        defaults={() => TrackedGradientKnobs.DEFAULTS_BY_FAMILY[getStrokeConfigKey()] ?? {}}
+                        values={getStrokeConfigDefs}
+                        onInput={(key, value) =>
+                            setStrokeConfigDefs(getStrokeConfigKey(), (previous) => ({ ...previous, [key]: value }))
+                        }
                     />
-                </PageProp>
+                </PagePropsPanel>
 
-                <PageProp key={"borderWidth"} label={"Border width (px)"}>
-                    <PageNumberField
-                        value={getBorderWidth}
-                        min={() => MIN_BORDER_WIDTH}
-                        max={() => MAX_BORDER_WIDTH}
-                        step={() => BORDER_WIDTH_STEP}
-                        ariaLabel={"Border width"}
-                        onInput={setBorderWidth}
-                    />
-                </PageProp>
+                <PagePropsDivider />
 
-                <PageProp key={"strokeConfigKey"} label={"Border pattern"}>
-                    <PageGroupedSelectField
-                        value={getStrokeConfigKey}
-                        groups={() => toGroupEntriesWithNoSample(GROUPPED_GRADIENTS)}
-                        ariaLabel={"Border pattern"}
-                        onChange={(config) => setStrokeConfigKey(() => config)}
-                    />
-                </PageProp>
+                <PagePropsPanel scope={"global"}>
+                    <PageProp key={"borderRadius"} label={"Corner radius (px)"}>
+                        <PageNumberField
+                            value={getBorderRadius}
+                            min={() => MIN_BORDER_RADIUS}
+                            max={() => MAX_BORDER_RADIUS}
+                            step={() => BORDER_RADIUS_STEP}
+                            ariaLabel={"Corner radius"}
+                            onInput={setBorderRadius}
+                        />
+                    </PageProp>
 
-                <PageKnobs
-                    knobs={getStrokeKnobs}
-                    defaults={() => ({})}
-                    values={getStrokeConfigDefs}
-                    onInput={(key, value) =>
-                        setStrokeConfigDefs(getStrokeConfigKey(), (previous) => ({ ...previous, [key]: value }))
-                    }
-                />
+                    <PageProp key={"borderWidth"} label={"Border width (px)"}>
+                        <PageNumberField
+                            value={getBorderWidth}
+                            min={() => MIN_BORDER_WIDTH}
+                            max={() => MAX_BORDER_WIDTH}
+                            step={() => BORDER_WIDTH_STEP}
+                            ariaLabel={"Border width"}
+                            onInput={setBorderWidth}
+                        />
+                    </PageProp>
 
-                <PageProp key={"colors"} label={"Border Colors"}>
-                    <div class={styles.colorList}>
-                        <For each={Object.keys(colors)}>
-                            {(key) => (
-                                <PageColorField
-                                    value={() => colors[key as keyof typeof colors]}
-                                    ariaLabel={() => key}
-                                    onInput={(value) => setColors(key as keyof typeof colors, value)}
-                                />
-                            )}
-                        </For>
-                    </div>
-                </PageProp>
+                    <PageProp key={"colors"} label={"Border Colors"}>
+                        <div class={styles.colorList}>
+                            <For each={Object.keys(colors)}>
+                                {(key) => (
+                                    <PageColorField
+                                        value={() => colors[key as keyof typeof colors]}
+                                        ariaLabel={() => key}
+                                        onInput={(value) => setColors(key as keyof typeof colors, value)}
+                                    />
+                                )}
+                            </For>
+                        </div>
+                    </PageProp>
 
-                <PageProp key={"blurWidth"} label={"Border blur (px)"}>
-                    <PageNumberField
-                        value={getBlurWidth}
-                        min={() => MIN_BLUR_WIDTH}
-                        max={() => MAX_BLUR_WIDTH}
-                        step={() => BLUR_WIDTH_STEP}
-                        ariaLabel={"Border blur"}
-                        onInput={setBlurWidth}
-                    />
-                </PageProp>
+                    <PageProp key={"blurWidth"} label={"Border blur (px)"}>
+                        <PageNumberField
+                            value={getBlurWidth}
+                            min={() => MIN_BLUR_WIDTH}
+                            max={() => MAX_BLUR_WIDTH}
+                            step={() => BLUR_WIDTH_STEP}
+                            ariaLabel={"Border blur"}
+                            onInput={setBlurWidth}
+                        />
+                    </PageProp>
 
-                <PageProp key={"blurRadius"} label={"Backdrop blur (px)"}>
-                    <PageNumberField
-                        value={getBlurRadius}
-                        min={() => MIN_BLUR_RADIUS}
-                        max={() => MAX_BLUR_RADIUS}
-                        step={() => BLUR_RADIUS_STEP}
-                        ariaLabel={"Backdrop blur"}
-                        onInput={setBlurRadius}
-                    />
-                </PageProp>
+                    <PageProp key={"blurRadius"} label={"Backdrop blur (px)"}>
+                        <PageNumberField
+                            value={getBlurRadius}
+                            min={() => MIN_BLUR_RADIUS}
+                            max={() => MAX_BLUR_RADIUS}
+                            step={() => BLUR_RADIUS_STEP}
+                            ariaLabel={"Backdrop blur"}
+                            onInput={setBlurRadius}
+                        />
+                    </PageProp>
 
-                <PageProp key={"noiseFrequency"} label={"Noise scale"}>
-                    <PageNumberField
-                        value={getNoiseFrequency}
-                        min={() => MIN_GRAIN_FREQUENCY}
-                        max={() => MAX_GRAIN_FREQUENCY}
-                        step={() => GRAIN_FREQUENCY_STEP}
-                        ariaLabel={"Noise scale"}
-                        onInput={setNoiseFrequency}
-                    />
-                </PageProp>
+                    <PageProp key={"noiseFrequency"} label={"Noise scale"}>
+                        <PageNumberField
+                            value={getNoiseFrequency}
+                            min={() => MIN_GRAIN_FREQUENCY}
+                            max={() => MAX_GRAIN_FREQUENCY}
+                            step={() => GRAIN_FREQUENCY_STEP}
+                            ariaLabel={"Noise scale"}
+                            onInput={setNoiseFrequency}
+                        />
+                    </PageProp>
 
-                <PageProp key={"noiseOctaves"} label={"Noise octaves"}>
-                    <PageNumberField
-                        value={getNoiseOctaves}
-                        min={() => MIN_GRAIN_OCTAVES}
-                        max={() => MAX_GRAIN_OCTAVES}
-                        step={() => GRAIN_OCTAVES_STEP}
-                        ariaLabel={"Noise octaves"}
-                        onInput={setNoiseOctaves}
-                    />
-                </PageProp>
+                    <PageProp key={"noiseOctaves"} label={"Noise octaves"}>
+                        <PageNumberField
+                            value={getNoiseOctaves}
+                            min={() => MIN_GRAIN_OCTAVES}
+                            max={() => MAX_GRAIN_OCTAVES}
+                            step={() => GRAIN_OCTAVES_STEP}
+                            ariaLabel={"Noise octaves"}
+                            onInput={setNoiseOctaves}
+                        />
+                    </PageProp>
 
-                <PageProp key={"rippleScale"} label={"Ripple bend (px)"}>
-                    <PageNumberField
-                        value={getRippleScale}
-                        min={() => MIN_RIPPLE_SCALE}
-                        max={() => MAX_RIPPLE_SCALE}
-                        step={() => RIPPLE_SCALE_STEP}
-                        ariaLabel={"Ripple bend"}
-                        onInput={setRippleScale}
-                    />
-                </PageProp>
+                    <PageProp key={"rippleScale"} label={"Ripple bend (px)"}>
+                        <PageNumberField
+                            value={getRippleScale}
+                            min={() => MIN_RIPPLE_SCALE}
+                            max={() => MAX_RIPPLE_SCALE}
+                            step={() => RIPPLE_SCALE_STEP}
+                            ariaLabel={"Ripple bend"}
+                            onInput={setRippleScale}
+                        />
+                    </PageProp>
 
-                <PageProp key={"lightHeight"} label={"Light height"}>
-                    <PageNumberField
-                        value={getLightHeight}
-                        min={() => MIN_LIGHT_HEIGHT}
-                        max={() => MAX_LIGHT_HEIGHT}
-                        step={() => LIGHT_HEIGHT_STEP}
-                        ariaLabel={"Light height"}
-                        onInput={setLightHeight}
-                    />
-                </PageProp>
+                    <PageProp key={"lightHeight"} label={"Light height"}>
+                        <PageNumberField
+                            value={getLightHeight}
+                            min={() => MIN_LIGHT_HEIGHT}
+                            max={() => MAX_LIGHT_HEIGHT}
+                            step={() => LIGHT_HEIGHT_STEP}
+                            ariaLabel={"Light height"}
+                            onInput={setLightHeight}
+                        />
+                    </PageProp>
 
-                <PageProp key={"surfaceScale"} label={"Sheen relief"}>
-                    <PageNumberField
-                        value={getSurfaceScale}
-                        min={() => MIN_SURFACE_SCALE}
-                        max={() => MAX_SURFACE_SCALE}
-                        step={() => SURFACE_SCALE_STEP}
-                        ariaLabel={"Sheen relief"}
-                        onInput={setSurfaceScale}
-                    />
-                </PageProp>
+                    <PageProp key={"surfaceScale"} label={"Sheen relief"}>
+                        <PageNumberField
+                            value={getSurfaceScale}
+                            min={() => MIN_SURFACE_SCALE}
+                            max={() => MAX_SURFACE_SCALE}
+                            step={() => SURFACE_SCALE_STEP}
+                            ariaLabel={"Sheen relief"}
+                            onInput={setSurfaceScale}
+                        />
+                    </PageProp>
 
-                <PageProp key={"specularConstant"} label={"Sheen brightness"}>
-                    <PageNumberField
-                        value={getSpecularConstant}
-                        min={() => MIN_SPECULAR_CONSTANT}
-                        max={() => MAX_SPECULAR_CONSTANT}
-                        step={() => SPECULAR_CONSTANT_STEP}
-                        ariaLabel={"Sheen brightness"}
-                        onInput={setSpecularConstant}
-                    />
-                </PageProp>
+                    <PageProp key={"specularConstant"} label={"Sheen brightness"}>
+                        <PageNumberField
+                            value={getSpecularConstant}
+                            min={() => MIN_SPECULAR_CONSTANT}
+                            max={() => MAX_SPECULAR_CONSTANT}
+                            step={() => SPECULAR_CONSTANT_STEP}
+                            ariaLabel={"Sheen brightness"}
+                            onInput={setSpecularConstant}
+                        />
+                    </PageProp>
 
-                <PageProp key={"specularExponent"} label={"Shininess"}>
-                    <PageNumberField
-                        value={getSpecularExponent}
-                        min={() => MIN_SPECULAR_EXPONENT}
-                        max={() => MAX_SPECULAR_EXPONENT}
-                        step={() => SPECULAR_EXPONENT_STEP}
-                        ariaLabel={"Shininess"}
-                        onInput={setSpecularExponent}
-                    />
-                </PageProp>
+                    <PageProp key={"specularExponent"} label={"Shininess"}>
+                        <PageNumberField
+                            value={getSpecularExponent}
+                            min={() => MIN_SPECULAR_EXPONENT}
+                            max={() => MAX_SPECULAR_EXPONENT}
+                            step={() => SPECULAR_EXPONENT_STEP}
+                            ariaLabel={"Shininess"}
+                            onInput={setSpecularExponent}
+                        />
+                    </PageProp>
 
-                <PageProp key={"tintOpacity"} label={"Tint opacity"}>
-                    <PageNumberField
-                        value={getTintOpacity}
-                        min={() => MIN_TINT_OPACITY}
-                        max={() => MAX_TINT_OPACITY}
-                        step={() => TINT_OPACITY_STEP}
-                        ariaLabel={"Tint opacity"}
-                        onInput={setTintOpacity}
-                    />
-                </PageProp>
+                    <PageProp key={"tintOpacity"} label={"Tint opacity"}>
+                        <PageNumberField
+                            value={getTintOpacity}
+                            min={() => MIN_TINT_OPACITY}
+                            max={() => MAX_TINT_OPACITY}
+                            step={() => TINT_OPACITY_STEP}
+                            ariaLabel={"Tint opacity"}
+                            onInput={setTintOpacity}
+                        />
+                    </PageProp>
 
-                <PageProp key={"tintColor"} label={"Tint colour"}>
-                    <PageColorField value={getTintColor} ariaLabel={"Tint colour"} onInput={setTintColor} />
-                </PageProp>
-            </PagePropsPanel>
+                    <PageProp key={"tintColor"} label={"Tint colour"}>
+                        <PageColorField value={getTintColor} ariaLabel={"Tint colour"} onInput={setTintColor} />
+                    </PageProp>
+                </PagePropsPanel>
+            </PagePropsGroups>
 
             <PageExamples items={getExamples} layout={"flow"} />
         </>

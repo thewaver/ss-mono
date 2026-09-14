@@ -85,6 +85,9 @@ const FINAL_FRAMES: CellAnimationFinalFrame[] = ["source", "cells", "nothing"];
 const MIN_HOLD_MS = 0;
 const MAX_HOLD_MS = 5000;
 
+const STARTING_DURATION_MS = 2000;
+const STARTING_ITERATION_DELAY_MS = 1000;
+
 const computeContainerWidth = (size: Size2d) => (IMAGE_CONTAINER_SIZE * size.width) / Math.max(size.width, size.height);
 
 const extractOptionGroupWord = (key: string) => key.replace(/^_/, "").match(/^[a-z]+/)?.[0] ?? key;
@@ -263,8 +266,8 @@ export const CellAnimationPage = () => {
     const [getOriginType, setOriginType] = createSignal<CellAnimationOrigins.OriginType>("center");
     const [getWeightType, setWeightType] = createSignal<CellAnimationWeights.WeightType>("diamondDefault");
     const [getAnimationType, setAnimationType] = createSignal<CellAnimationKeyframes.AnimationType>("zoomIn");
-    const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(2000);
-    const [getAnimationIterationDelayMs, setAnimationIterationDelayMs] = createSignal(1000);
+    const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(STARTING_DURATION_MS);
+    const [getAnimationIterationDelayMs, setAnimationIterationDelayMs] = createSignal(STARTING_ITERATION_DELAY_MS);
     const [getAnimationIterationCount, setAnimationIterationCount] = createSignal(ENDLESS_ITERATION_COUNT);
     const [getFinalFrame, setFinalFrame] = createSignal<CellAnimationFinalFrame>("cells");
     const [cellCount, setCellCount] = createStore<Point2d>({ ...STRESS_CELL_COUNT });

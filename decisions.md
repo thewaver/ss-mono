@@ -2742,11 +2742,12 @@ handed a `PlacementRect` rather than the layout, so a wedge drawn about the midd
 about the wrong point whenever the box is not centred on the circle. `getSectorPath` prefers an explicit
 argument, then the sector's own, then the middle.
 
-### The arc is given a width and a height, and spaces its items along the curve
+### The arc can be flattened or stretched, and spaces its items along the curve
 
 The user's proposal: an arc that can be flattened or stretched sideways, rather than one that is always a
-piece of a circle. It takes `widthPx` and `heightPx`, so the same call draws a circle, a wide shallow sweep,
-or anything between.
+piece of a circle. It takes `curveHeightRatio`, the oval's height against its width, so the same call draws a
+circle, a wide shallow sweep, or anything between. It was two lengths at first, `width` and `height`, until
+the pair turned out to say nothing a single ratio does not.
 
 **Equal angles are equal distances on a circle and nowhere else.** On an ellipse a step of angle covers less
 ground near the narrow ends, so five stars bent across a wide flat arc would crowd at both tips and spread
@@ -2793,6 +2794,313 @@ dispatches a `mouseenter` carrying the coordinates the pointer actually last had
 is written to recognise, and checks that the same item entered properly still takes the highlight. The demo
 keeps its gradient definition in the page rather than in the popup all the same, which is where a definition
 shared by every wedge belongs.
+
+### A nested band's wedge is never narrower than the label it will hold
+
+A submenu band sizes each of its wedges from `wedgeArc`, a chord measured at the label radius, because a
+nested level is meant to be only as wide as its own items need rather than sharing out a whole turn. The
+label box drawn inside that wedge is sized separately, capped at `bandWidth * labelMaxWidthRatio`. Nothing
+tied the two together, so the two numbers could disagree — and at the defaults they happen to agree exactly
+(`wedgeArc` and `bandWidth` are both `25`, the cap ratio is `1`), which is what kept it hidden.
+
+`WheelMenu`'s demo widens `bandWidth` to `84` and leaves `wedgeArc` at its default. The label cap follows
+`bandWidth` up to 84 while the wedge stays at a chord of 25, so every nested wedge was about a fifth of the
+width of the label it was drawing — a sliver a dozen pixels across with "From template" laid over it and over
+its neighbours. The root ring was untouched because its wedge angle comes from dividing the spread among its
+items, not from `wedgeArc`.
+
+**So a nested wedge's chord is the larger of `wedgeArc` and the label's own cap.** The layout can no longer
+promise a label box wider than the wedge it sits in. `wedgeArc` keeps its meaning as the width a nested wedge
+asks for, and now reads as a floor rather than an absolute; at the defaults the two are equal and nothing
+moves, so the change only reaches the consumers where the pair had drifted apart.
+
+This is narrower than the recorded fault about a placed item's box being guessed rather than measured. That
+one is about content the layout never sees; this was the layout disagreeing with itself about a number it had
+already worked out.
+
+### The wedge gap holds its width rather than its angle as the bands go out
+
+`wedgeGapDegrees` is an angle, so the arc it eats grows with the radius it is taken at. On the root ring a
+gap of three degrees is a hairline; on the third band out, at nearly three times the radius, the same three
+degrees is nearly three times the gap, and a stack of concentric levels reads as if the outer ones were
+spaced by a different number.
+
+**The gap is now scaled by the ring's own label radius against the root's**, so every level's gap is the
+same width across the band whatever radius it sits at. The root's label radius comes from the defs the
+factory already has — `holeRadius + bandWidth * labelRadiusRatio` — so the root's own gap works out to
+exactly `wedgeGapDegrees` and needs no special case; the scaling collapses to one at the level it is
+measured from.
+
+The knob keeps its name and its units. It states the gap in degrees at the ring the wheel starts from, which
+is the one a consumer is looking at when they tune it, and every band beyond it matches what they saw.
+
+### The arc never closes, so the seam and the anchoring both stop jumping
+
+An open run puts an item on each end, so `N` items make `N - 1` gaps; a closed loop makes `N`. The arc used
+to hold both and swap between them the moment the spread reached a whole turn, which moved two things at
+once — the spacing, because the gap count changed, and the whole arrangement's rotation, because an open run
+is centred on the facing direction while a closed one puts its first item there. Six items over 350° left
+five gaps of 70° and a 10° seam; a nudge to 360 made every gap 60° and turned the ring by half a step. The
+user described the second half as going from an upright hexagon to a sideways one.
+
+**The arc has no closed case now.** Its spread is clamped to `360 * (N - 1) / N`, the widest run whose own
+gaps already measure a full turn divided by `N`, and the run is centred on the facing direction at every
+spread. Past the cap nothing changes at all: with six items, 300°, 350°, 360° and 450° all place the same
+six points. A full ring is still reachable — at the cap the seam equals every other gap, which is what a
+ring is — it simply cannot be asked for as `360` and land somewhere different.
+
+The user's call, and they asked for the clamp to sit in the layout rather than in the knob: the range on
+`spreadDegrees` is unchanged, because a def can reach `createArc` from a consumer who never sees a knob. A
+spread of 450 used to walk 450° of curve and lay the last items back across the first. The cap depends on the
+item count, known only when the layout is called rather than when it is built, so it lives inside the
+returned function.
+
+**The two demos that asked for a whole turn carry a facing offset to hold their old rotation.** `Sortable`'s
+ring of four faces `45` and `Toolbar`'s palette of nine faces `70`, each being the old `-90` turned by half a
+step, so both land on exactly the points they did when the closed branch placed them. Dropping those two
+values gives the rotated version rather than a broken one; they are there to keep tuned demos where they were
+put.
+
+### The ring starts from the same place at every spread, a whole turn included
+
+The band had a second rule for a whole turn: below one, the run was laid symmetrically about straight up;
+at exactly one, the first wedge was centred there instead. Nothing else jumped — the wedge width and the
+hole both close smoothly, 55.33° and 13° at 350, 56.98° and 3.1° at 359.9 — but the arrangement turned by
+half a wedge at the last degree of the knob.
+
+**There is one rule now: the run is centred on the reference at every spread.** The user's, put as "why
+don't we simply always start positioning from X regardless of the full angle being 60, 360 or
+366000000000". The whole-turn branch is gone, and the spread is clamped to a whole turn so a number past one
+means one. Six items at 359.9 and at 360 place the same wedges.
+
+**What it gives up is a wedge centred at twelve o'clock on a whole wheel.** Centring the run there puts a
+wedge boundary at the top when the item count is even and a wedge middle when it is odd. That was the whole
+reason for the branch, and a consumer wanting the old look asks for it by turning the ring rather than by
+falling into a different formula — the same answer the arc reached.
+
+The arc's version of this is one entry along; both placers now anchor the same way.
+
+### The grouped panel is every page with a sample picker, not just `Formation`
+
+The sample group, the divider and the global group below it went to the four other pages that drive a sample
+from a picker: both gradient pages, `GlassSurface`'s border pattern, and `ShapePage` — which has two sample
+groups rather than one, its stroke pattern and its fill pattern being independent samples with their own
+knobs. `ScanlineAnimation` was left alone at the user's word.
+
+### The gradient samples' tuning is props, composed rather than declared per sample
+
+The per-sample defs pass gave the gradients a `cycles` flag and, on four of them, `banded`. Everything else
+each sample was tuned with stayed unreachable — inline in the JSX for the timed ones, module constants for the
+tracked ones. The user's correction of the shape: the mechanism for props that differ per family was already
+there, it was the tuning that had not been separated.
+
+**The opts are a small vocabulary that samples intersect**, rather than a bespoke type each:
+`GradientStepsOpts`, `GradientGlowOpts`, `GradientTrailOpts`, and the pre-existing cycle and banded flags. A
+sample says `GradientCycleGlowOpts & GradientTrailOpts` and gets exactly the props it honours; the entry
+union says the same, so a knob a sample never reads cannot be handed to it.
+
+**`steps` is the one number every animated timed sample shared.** All fifty-odd calls to
+`getIntermediateValues` walked their sweep in twelve, whatever the sweep was — the endpoints are the sample's
+identity, the count is its smoothness. Fourteen samples take it now and the default lives once, as
+`SVGDefsUtils.DEFAULT_GRADIENT_STEPS`.
+
+**`bands` replaced four literal stop-key arrays.** The flows held a seven-entry array for the blended case and
+a thirteen- or seventeen-entry one for the banded case, alternating two or three colours by hand.
+`getCycleStopKeys` builds either from a repeat count, remembering the closing stop that lets the strip slide
+without a seam, and each sample keeps its own two repeat counts as the defaults it had.
+
+**The tracked samples keep their constants, which are now the defaults rather than the only value.** Every
+one of the eighteen was gone through, at the user's word — _"expose what we can and then I'll ask to hide back
+what we shouldn't"_ — and the numbers that shape an effect are all reachable: the radial falloff on the spots
+and flares, the band's core and spread and how far it tracks, the hand's sweep arc and lead, the whole ripple
+set from source size through ring count, spacing, start and end scale, decay and crest, the smear's speed
+response, and the colour walk's span and period. Nothing was retuned — every constant still holds the number
+the user arrived at, and an untouched knob resolves to it.
+
+**The opts reach them by bag rather than by parameter.** The values live inside module-level helpers —
+`computePoolColors`, `computeSweepColors`, `computeGhostColors`, `getCycleColor`, and each family's stamp or
+ripple creator — none of which can see the factory's `opts`. Rather than grow their parameter lists one value
+at a time, each takes the sample's own opts type, which also folded away the `alpha, decay` pair an earlier
+pass had added.
+
+**A knob with no default reads as `NaN`, and on a number field that loops.** The gradient pages passed an
+empty defaults map to the generic panel, which was harmless while every gradient knob was a checkbox —
+`Boolean(undefined)` is `false`. The first number knob turned it into `Number(undefined)`, the field wrote
+that back, and the page overflowed the stack before it painted. Both registries export a
+`DEFAULTS_BY_FAMILY` now, the way the layouts always did, and the four pages that render gradient knobs read
+from it. The lesson is the registry's, not the pages': a family that states a knob has to state the number
+that knob starts at.
+
+**What was deliberately left alone** is the mechanism: the frame interval derived from sixty a second, the
+lifetimes computed from it, the grace period before a still pointer stops stamping, and the epsilon that
+decides whether the pointer moved at all. A knob on any of those turns the effect's clock rather than its
+look.
+
+### Every props panel resets itself, and no page was edited to get one
+
+The user asked for the reset `Formation` had on every page. Hand-adding a row to each of the fifty-six pages
+that carry a panel would have been fifty-six chances to wire one wrong, and every new page would have to
+remember.
+
+**A field registers its own starting value with the panel it is in.** `Field.context.ts` holds a registry a
+field looks up; on mount each field snapshots the value it was handed and registers a callback that writes
+that value back through the setter it already has. `PagePropsPanel` provides the registry, collects the
+callbacks, and renders one `Reset` row once anything has registered. A page that has no panel gets nothing,
+which is correct — there is nothing to reset.
+
+**The direction of the import is why the registry lives with the fields.** `PageComponents` already import
+`StyledComponents` — `Knobs` renders `PageNumberField` — so the panel importing a field module keeps that
+direction. A registry under `PageComponents` would have had the fields importing upward instead.
+
+**A sample panel leaves its selector alone, and hides the reset when the selector is all there is.** The
+user's, in two passes: resetting the picked sample defeats the point, and a `Reset` beside a lone picker
+resets nothing. Both fall out of one fact the panel can rely on — in a sample group the control that chooses
+the sample comes first, which is the ordering the user set when they asked for these groups. So the panel
+skips the first registration when its scope is `sample`, and shows the row only once something has registered
+past it. A `global` panel has no selector and resets all of itself, its own selects included.
+
+`Formation`'s bespoke reset row is gone, along with the store `reconcile` it needed; the generic one does what
+it did.
+
+Fields with no value take no part: `PageFileField` has only an `onPick`, so it registers nothing.
+
+### The starting value of a page prop is a named constant
+
+Pages already stated every knob's minimum, maximum and step as constants at the top and then opened with an
+inline literal in the `createSignal` call, so half of each knob's definition was in one place and half
+somewhere else. The user's, raised as laborious work needing no input.
+
+The starting values are `STARTING_…` constants now, beside their own `MIN_…` and `MAX_…`. What was left
+inline is the state that is not a prop — click counters, index signals, progress readouts — where a
+`createSignal(0)` says all there is to say and a constant would only add a name to nothing.
+
+### `dodecagon` is named for what it is, and the exact circle needs no name at all
+
+The built-in shapes are lists of corners, and a circle has none, which is why the set never had one. The
+user's proposal: add a many-sided polygon and let it stand in for one.
+
+**It is named for the polygon rather than the circle**, at the user's word, to avoid claiming to be something
+it is not. It also avoids a collision: `RevealPage` and `ScratchCardPage` both build their pickers as
+`[CIRCLE, ...DEFAULT_SHAPES]`, where their own `circle` means "no points at all, let the component draw a
+real one" — a built-in also called `circle` put the same word in those lists twice, meaning two different
+things.
+
+**Twelve sides rather than twenty-four, chosen so the flats stay visible.** The sag between a vertex and an
+edge midpoint is `1 - cos(15°)`, 3.41% of the radius, against 0.86% at twenty-four. The user picked the
+coarser one deliberately: a shape that almost passes for a circle invites being used as one, and this one
+never does.
+
+**An exact circle was already reachable and is still not a name.** `setupPaths` takes a join radius per
+corner, and at the `round` exponent the corner is a plain circular arc; give a square radii of half its side
+and all four arcs share the square's own centre, closing into a true circle with no straight edge left. The
+clamping tops out at exactly that value. What that cannot do is come from a shape _name_, because
+`getDefaultShapePoints` answers with points and nothing else — a picker threading a name has no second
+descriptor to carry the radii in. Closing that gap would touch every caller that builds points from a name;
+the polygon touches none, which is why it won.
+
+**It tiles at a pitch of `√3/2` with offset rows**, the hexagonal close packing, sharing the pointy-top
+hexagon's neighbourhood — six touching neighbours either way. `TileBoard` needs a tiling for every shape in
+the set, so this was not optional.
+
+**The Shape page caps its per-corner grid at six columns.** It laid one column per two corners, which is
+three for a hexagon and twelve when this was a twenty-four-gon, and twelve overran the row and painted over
+its own label. At twelve sides it lands exactly on the cap, and the cap changes nothing for any other shape.
+
+### The cliff exposes one knob, because the other four broke it
+
+Renamed from `cliffs` to `cliff` at the user's word, one arrangement being one cliff.
+
+**A cliff is asymmetric and that asymmetry is the whole of it.** First place leads; second steps across and
+half a step down; third steps back the other way and lower still. A first pass at making it tunable gave the
+two lower places a mirrored, uniform step, which tiles hexagons beautifully and is not a cliff. The user's
+correction, and the reason the shape is fixed again.
+
+**A second pass exposed all five offsets as ratios and most of them broke the layout**, which is the point:
+the item is a fixed half the box, so the shifts can only span one item width before a cliff runs out of the
+room it is drawn in, and nothing stopped a knob asking for more. The four that place the three items are
+module constants once more — `CLIFF_SHIFT_RATIOS` and `CLIFF_DROP_RATIOS`, stated in item sizes rather than
+in the quarters they used to be — and `cliffStepRatio`, the step from one leader to the next, is the only
+def. It is the one that cannot break anything: a cliff grows downward and `toFittedLayout` measures the
+height afterwards.
+
+The old `1.75`-quarter base constant is gone, though. It was the centring, worked out once by hand; the
+leader is now placed from the shift ratios so a cliff sits centred in its box, which comes out at exactly the
+same `0.4375`.
+
+**Hexagons still overlap and that is where it rests.** Tiling them wants second across by half and third back
+by a whole one — a span of one and a half item widths, past what the fixed item size allows. Making it fit
+means the item taking its size from the ratios the way the zigzag does, which changes how large every cliff
+draws. Not built, and not asked for.
+
+### The honeycomb's unit is a cell, and a whorl clears the whorl above it
+
+Two more of the same, on the arrangements the arc and the band had left behind.
+
+**The honeycomb's cell was a length and did nothing on its own.** The layout normalises to its own box, so
+`cellWidth` only ever mattered against `gap` — the painted cell is the box divided by the columns, whatever
+number was written. The cell is the unit now, `cellWidth` is gone, and `gap` is `gapRatio`, a share of a
+cell. The user's: _"cellWidth simply becomes total / col count"_.
+
+**A whorl's step ignored the whorl's own height.** `whorlSpacing` was the distance from one whorl's top item
+to the next whorl's top item, so it had to be larger than the drop of the two below it plus an item, and
+nothing said so: below `itemSpacing + 2` the lower pair of one whorl sat on top of the next whorl's leader.
+The defaults were already inside that — a drop of 1.75 and a step of 3.5, where 3.75 was the first value that
+cleared. **`whorlSpacing` is now the gap between whorls**, measured from the bottom of one to the top of the
+next, so zero means they touch exactly and nothing can overlap. The step is worked out from the whorl's own
+height instead of being asserted. Its default is `0.5` rather than `3.5`, being a different quantity.
+
+### The band's hole is a share of its radius, so nothing about it is a length
+
+With the stacking gone the band is scale-free: its placements are fractions of its own box, so `holeRadius`
+and `bandWidth` only ever mattered as a ratio to one another. Doubling both changed nothing on screen, which
+is what made the pair read as pixels while behaving as a single number.
+
+**They are one number now — `holeRatio`, the share of the radius the hole takes.** The band is whatever is
+left, the outer edge is always the box, and every other size on the ring is already stated against one of
+those two. The user's, from the same pass that moved the stacking out.
+
+`WheelMenu` keeps the lengths, because a thing that stacks rings needs a scale for the stack: `holeRadius`,
+`bandWidth` and `levelGap` are its props, it works out each level's `holeRatio` from them, and it reports
+each level's true diameter as the layout's `extent` so `Menu` still sizes the levels against the root. That
+override is why its `layoutDefs` no longer accepts `holeRatio`, `spreadDegrees` or `computeItemArcs` — it
+sets all three per level, and a value passed in would have been discarded in silence.
+
+**A wheel's first wedge is aimed at twelve o'clock only when it fills the turn.** A partial wheel centres its
+run there instead, which is what a half wheel always did, and the aim uses the first wedge's real arc rather
+than an even share — otherwise a wedge that asks for extra room drags the whole ring off north.
+
+### The band places one ring and nothing else; the wheel owns its own stacking
+
+The band had grown three jobs that were not placement. It worked out its own inner radius from the level
+above (`parentExtent`, `levelGap`), it decided that a nested level should be only as wide as its items need
+rather than sharing a spread, and it put one item in the hole (`hasCentreItem`, `centreRadius`). Every one of
+them existed for `WheelMenu` and nothing else reached them.
+
+**The user's call, and their argument is the whole of it: concentric rings are trivial arithmetic the
+consumer already has.** Ring A's radius is 200, ring B's hole is 200 plus whatever gap the consumer wants.
+An item in the middle is `index === 0 ? a circle : a wedge`. Neither needs the placer's help.
+
+**So `createRing` takes an item count and answers with one ring.** It has no notion of depth, of a parent, or
+of a root, and `path`, `parentExtent` and `parentPlacement` no longer reach it. What it gained instead is
+`facingDegrees`, the same knob the arc has: where the run is centred. That one number replaced the aiming
+branch, because aiming a submenu at its opener is just facing the opener's mid-angle.
+
+`wedgeArc` went with the nesting. It only ever sized wedges on a level that was not the root, and there is no
+such level now — a ring shares its spread among its items, and a consumer that wants a narrower band asks for
+a narrower spread.
+
+**`WheelMenu` picked all of it up**, which is a dozen lines: each level's hole is the root's plus depth times
+band-plus-gap, each level's spread is what its items need at that radius via {@link toChordAngle}, each
+level's gap is scaled so the painted gap holds its width as the bands go out, and the closer is a box at the
+origin appended after the wedges. It also aims its own root so the first wedge sits at twelve o'clock, which
+the band used to do in a branch and is a wheel's business rather than a placer's.
+
+**`levelGap` is a `WheelMenu` prop now**, not a band def, because only a thing that stacks rings needs one.
+
+The label props went too, renamed rather than removed: `labelRadiusRatio`, `labelHeightRatio` and
+`labelMaxWidthRatio` are `itemRadiusRatio`, `itemHeightRatio` and `itemMaxWidthRatio`. They were never about
+labels — they place and size the box the consumer paints into — and the user said plainly that they could not
+tell what they were for.
 
 ### A placed menu walks on all four arrows, so `Escape` steps out one band
 

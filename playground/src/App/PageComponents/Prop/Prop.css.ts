@@ -24,6 +24,16 @@ export const propScopeVariants = styleVariants({
             ],
         },
     ],
+    sample: [
+        propScopeBase,
+        {
+            color: themeVars.color.background.contrast,
+            backgroundColor: [
+                themeVars.color.background.light,
+                `rgb(from ${themeVars.color.background.light} r g b / 75%)`,
+            ],
+        },
+    ],
     local: [
         propScopeBase,
         {

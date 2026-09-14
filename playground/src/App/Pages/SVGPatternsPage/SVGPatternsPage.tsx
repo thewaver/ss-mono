@@ -34,14 +34,18 @@ const MAX_BLUR_WIDTH = 40;
 const BLUR_WIDTH_STEP = 1;
 const MIN_DURATION_MS = 1000;
 const MAX_DURATION_MS = 5000;
+
+const STARTING_DURATION_MS = 2000;
+const STARTING_CELL_SIZE = 60;
+const STARTING_BLUR_WIDTH = 0;
 const DURATION_STEP_MS = 100;
 
 export const SVGPatternsPage = () => {
     const [getConfigKey, setConfigKey] = createSignal<WithNoSample<SVGDefsSamples.Pattern.SampleKey>>("hexagon_pt_2");
     const [getIterationConfigKey, setIterationConfigKey] = createSignal<SVGDefsSamples.Iteration.SampleKey>("constant");
-    const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(2000);
-    const [getCellSize, setCellSize] = createSignal(60);
-    const [getBlurWidth, setBlurWidth] = createSignal(0);
+    const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(STARTING_DURATION_MS);
+    const [getCellSize, setCellSize] = createSignal(STARTING_CELL_SIZE);
+    const [getBlurWidth, setBlurWidth] = createSignal(STARTING_BLUR_WIDTH);
     const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS });
 
     const getExamples = createMemo(() => {

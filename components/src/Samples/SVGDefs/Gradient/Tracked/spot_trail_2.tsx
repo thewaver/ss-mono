@@ -4,7 +4,12 @@ import { Color, MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils
 
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
-import type { GradientCycleOpts, SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
+import type {
+    GradientFalloffOpts,
+    GradientSpotTrailOpts,
+    SVGDefsColors,
+    TrackedGradientConfig,
+} from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 import { SVGDefsFrameUtils } from "../../SVGDefsFrames.utils";
 
@@ -38,8 +43,9 @@ const NO_FADE = 0;
 
 const NO_REF = () => undefined;
 
-const getCycleColor = (colors: SVGDefsColors, atMs: number) => {
-    const phase = ((atMs % CYCLE_MS) / CYCLE_MS) * COLOR_KEYS.length;
+const getCycleColor = (colors: SVGDefsColors, atMs: number, opts?: GradientSpotTrailOpts) => {
+    const cycleMs = opts?.cycleMs ?? CYCLE_MS;
+    const phase = ((atMs % cycleMs) / cycleMs) * COLOR_KEYS.length;
     const index = Math.floor(phase);
     const from = colors[COLOR_KEYS[index % COLOR_KEYS.length]];
     const to = colors[COLOR_KEYS[(index + 1) % COLOR_KEYS.length]];
@@ -49,16 +55,27 @@ const getCycleColor = (colors: SVGDefsColors, atMs: number) => {
     return Color.Hex.interpolate(from, to, phase - index);
 };
 
-const computePoolColors = (color: string, alpha: number) => [
+const computePoolColors = (color: string, alpha: number, opts?: GradientFalloffOpts) => [
     { value: `rgb(from ${color} r g b / ${alpha})` },
-    { value: `rgb(from ${color} r g b / ${alpha * CORE_ALPHA})`, stop: CORE_STOP },
-    { value: `rgb(from ${color} r g b / ${alpha * FALLOFF_ALPHA})`, stop: FALLOFF_STOP },
+    {
+        value: `rgb(from ${color} r g b / ${alpha * (opts?.coreAlpha ?? CORE_ALPHA)})`,
+        stop: opts?.coreStop ?? CORE_STOP,
+    },
+    {
+        value: `rgb(from ${color} r g b / ${alpha * (opts?.falloffAlpha ?? FALLOFF_ALPHA)})`,
+        stop: opts?.falloffStop ?? FALLOFF_STOP,
+    },
     { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
 ];
 
 const clock = SVGDefsFrameUtils.createClock(TRAIL_LIFETIME_MS);
 
-const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined, isCycling: boolean) => {
+const createTrailStamp = (
+    index: number,
+    getRef: () => HTMLElement | undefined,
+    isCycling: boolean,
+    opts?: GradientSpotTrailOpts,
+) => {
     const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef);
     const [getStamp, setStamp] = createSignal<TrailStamp>();
 
@@ -97,10 +114,13 @@ const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined, 
         return stamp ? MathUtils.clamp01((clock.getFrameMs() - stamp.bornMs) / TRAIL_LIFETIME_MS) : FULL_AGE_RATIO;
     };
 
-    const getAlpha = () => (getStamp()?.fade ?? 0) * STAMP_ALPHA * (1 - getAgeRatio()) ** STAMP_DECAY_EXPONENT;
+    const getAlpha = () =>
+        (getStamp()?.fade ?? 0) *
+        (opts?.trailAlpha ?? STAMP_ALPHA) *
+        (1 - getAgeRatio()) ** (opts?.trailDecay ?? STAMP_DECAY_EXPONENT);
 
     const getColorKey = () => {
-        const band = Math.floor((getAgeRatio() / AGE_COLOR_SPAN) * COLOR_KEYS.length);
+        const band = Math.floor((getAgeRatio() / (opts?.ageColorSpan ?? AGE_COLOR_SPAN)) * COLOR_KEYS.length);
 
         return COLOR_KEYS[Math.min(band, COLOR_KEYS.length - 1)];
     };
@@ -109,12 +129,12 @@ const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined, 
         getOrigin: () => getStamp()?.origin ?? RESTING_ORIGIN,
         getColors: (colors: SVGDefsColors) =>
             isCycling
-                ? computePoolColors(getCycleColor(colors, getStamp()?.bornMs ?? 0), getAlpha())
-                : computePoolColors(colors[getColorKey()], getAlpha()),
+                ? computePoolColors(getCycleColor(colors, getStamp()?.bornMs ?? 0, opts), getAlpha())
+                : computePoolColors(colors[getColorKey()], getAlpha(), opts),
     };
 };
 
-export const spot_trail_2 = (opts?: GradientCycleOpts): TrackedGradientConfig => ({
+export const spot_trail_2 = (opts?: GradientSpotTrailOpts): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -128,10 +148,10 @@ export const spot_trail_2 = (opts?: GradientCycleOpts): TrackedGradientConfig =>
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient1-${id}`,
                         origin: () => getReading().boxRatio,
-                        scale: POOL_SCALE,
+                        scale: opts?.glowScale ?? POOL_SCALE,
                         colors: opts?.cycles
-                            ? () => computePoolColors(getCycleColor(defs.colors, clock.getFrameMs()), FULL_ALPHA)
-                            : computePoolColors(defs.colors.primary, FULL_ALPHA),
+                            ? () => computePoolColors(getCycleColor(defs.colors, clock.getFrameMs(), opts), FULL_ALPHA)
+                            : computePoolColors(defs.colors.primary, FULL_ALPHA, opts),
                     });
                 },
             },
@@ -141,12 +161,12 @@ export const spot_trail_2 = (opts?: GradientCycleOpts): TrackedGradientConfig =>
             gradientOrPattern: {
                 id: `gradient${index + 2}-${id}`,
                 renderDefsElement: () => {
-                    const stamp = createTrailStamp(index, getRef ?? NO_REF, Boolean(opts?.cycles));
+                    const stamp = createTrailStamp(index, getRef ?? NO_REF, Boolean(opts?.cycles), opts);
 
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient${index + 2}-${id}`,
                         origin: stamp.getOrigin,
-                        scale: POOL_SCALE,
+                        scale: opts?.glowScale ?? POOL_SCALE,
                         colors: () => stamp.getColors(defs.colors),
                     });
                 },

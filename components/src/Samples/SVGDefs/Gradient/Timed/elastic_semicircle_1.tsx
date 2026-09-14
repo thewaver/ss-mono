@@ -44,12 +44,12 @@ export const elastic_semicircle_1 = (opts?: GradientCycleOpts): TimedGradientCon
                             ObjectUtils.zipArray(
                                 "stretch",
                                 [
-                                    ...MathUtils.getIntermediateValues(180, 90, 12),
-                                    ...MathUtils.getIntermediateValues(90, 180, 12),
+                                    ...MathUtils.getIntermediateValues(180, 90, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                                    ...MathUtils.getIntermediateValues(90, 180, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
                                 ],
                                 [
-                                    ...MathUtils.getIntermediateValues(0, 180, 12),
-                                    ...MathUtils.getIntermediateValues(180, 0, 12),
+                                    ...MathUtils.getIntermediateValues(0, 180, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                                    ...MathUtils.getIntermediateValues(180, 0, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
                                 ],
                             ),
                             defs,
@@ -58,12 +58,12 @@ export const elastic_semicircle_1 = (opts?: GradientCycleOpts): TimedGradientCon
                             ObjectUtils.zipArray(
                                 "stretch",
                                 [
-                                    ...MathUtils.getIntermediateValues(360, 270, 12),
-                                    ...MathUtils.getIntermediateValues(270, 360, 12),
+                                    ...MathUtils.getIntermediateValues(360, 270, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                                    ...MathUtils.getIntermediateValues(270, 360, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
                                 ],
                                 [
-                                    ...MathUtils.getIntermediateValues(0, 180, 12),
-                                    ...MathUtils.getIntermediateValues(180, 0, 12),
+                                    ...MathUtils.getIntermediateValues(0, 180, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                                    ...MathUtils.getIntermediateValues(180, 0, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
                                 ],
                             ),
                             defs,

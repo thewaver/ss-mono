@@ -44,12 +44,12 @@ export const elastic_drip_1 = (opts?: GradientCycleOpts): TimedGradientConfig =>
                             ObjectUtils.zipArray(
                                 "stretch",
                                 [
-                                    ...MathUtils.getIntermediateValues(450, 270, 12),
-                                    ...MathUtils.getIntermediateValues(90, 270, 12),
+                                    ...MathUtils.getIntermediateValues(450, 270, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                                    ...MathUtils.getIntermediateValues(90, 270, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
                                 ],
                                 [
-                                    ...MathUtils.getIntermediateValues(0, 360, 12),
-                                    ...MathUtils.getIntermediateValues(360, 0, 12),
+                                    ...MathUtils.getIntermediateValues(0, 360, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                                    ...MathUtils.getIntermediateValues(360, 0, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
                                 ],
                             ),
                             defs,

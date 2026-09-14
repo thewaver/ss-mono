@@ -57,6 +57,7 @@ reading.
 23. `GlassSurface` — what is built and what is not — _open_
 24. Arbitrary placement across controls, and the picking that has to come with it — _open_
 25. The scanline page is twelve examples of one example — _open_
+26. The gradient knobs are exposed wide, and want narrowing — _open_
 
 ### Build order
 
@@ -1047,13 +1048,13 @@ that `PlacementLayoutUtils.toLayoutFn` turns into a `PlacementLayoutFn` — so a
 placed control. The exception is the radial tree, which needs each item's
 parent rather than only a count, and therefore lives in the one page that can supply it.
 
-Eight controls take an optional `computeLayout` and are unchanged without one: `Menu` (with `WheelMenu` and
+Ten controls take an optional `computeLayout` and are unchanged without one: `Menu` (with `WheelMenu` and
 `FanMenu` built over it), the overhead `Wheel`, `Paginator`, `RadioGroup`, `Tabs`, `Stepper`, `Toolbar`,
 `Sortable`, `Tree` and `Formation`. The reasoning behind every decision taken is in `decisions.md` under
 _"Arbitrary item placement"_, _"Concentric submenus"_, _"A wheel of wedges"_, _"The wheel as the ring's second
 consumer"_, _"`WheelMenu`: the wheel becomes a component"_, _"`Paginator` takes a layout"_, _"`RadioGroup` and
 `Tabs` take a layout too"_, _"Every layout sample lives in one place"_, _"`Formation` is the abstract's"_,
-_"The band and the arc are two placers"_, _"The arc is given a width and a height"_, _"A hover the pointer
+_"The band and the arc are two placers"_, _"The arc can be flattened or stretched"_, _"A hover the pointer
 did not cause"_, _"A
 placed menu walks on all four arrows"_, _"A group's radios are ordered by the document"_, _"Five more
 controls take a layout"_ and _"Hold and flick"_.
@@ -1069,11 +1070,13 @@ is what turned up the origin-placed item it scored as pointing due east.
 ### Faults the proving pass found and left open
 
 - **A placed item's box is guessed rather than measured.** A layout picks each item's size from numbers it is
-  given — `labelMaxWidthRatio`, `itemWidth` — while the painter's content has an intrinsic width the layout
-  never sees. Where the content is wider it simply overflows, and on a ring that means overlapping a
+  given — `itemMaxWidthRatio`, `itemWidthRatio` — while the painter's content has an intrinsic width the
+  layout never sees. Where the content is wider it simply overflows, and on a ring that means overlapping a
   neighbour. Every one of the four arrangements built for `Stepper`, `Toolbar`, `Sortable` and `Tree` had to be
   widened by hand until its labels fitted, which is what makes this the abstract's problem rather than each
-  demo's tuning.
+  demo's tuning. One case of it is closed: a nested band's wedge is no longer allowed to be narrower than the
+  item box the same layout says it will draw, which is a layout disagreeing with itself rather than with its
+  content.
 - **A laid-out control can overflow its container, and it is no longer only popups.** A ring is centred on its
   invoker and is as large as the box its consumer gave it, so nothing stops it reaching past the edge of the
   screen — pinning deliberately turned off the clamping that would have moved it, and concentric submenus make
@@ -1083,8 +1086,9 @@ is what turned up the origin-placed item it scored as pointing due east.
   nothing to collapse into, so a layout that outgrows its column spills rather than adapting. What should
   happen in either case has not been decided.
 - **`Stepper` ignores `renderBody` when it is laid out.** A step's body is a panel beside a vertical
-  connector, and a curve has nowhere to put one, so the placed path drops it without saying so. A prop that
-  quietly does nothing is worse than one that is refused.
+  connector, and a curve has nowhere to put one, so the placed path drops it. It warns when handed both,
+  naming the pair and asking for one of them to go, so it is no longer silent — but a prop that is ignored is
+  still not a prop that is refused.
 - **`Tree` has no connector slot, so a radial tree's structure reads only from the angles.** A child sits
   inside the angular slice its parent was given, which is enough to see but not enough to state. `Stepper` now
   has both the slot and the geometry — `PlacementUtils.getLinkPath` — so the work is small; what it costs is
@@ -1136,6 +1140,32 @@ actually need designing.
 **Nothing is blocked on it** and the shape of the picker has not been argued.
 
 ---
+
+## 26. The gradient knobs are exposed wide, and want narrowing
+
+**The user's method, in their words: _"we will work by exposing what we can and then I'll ask to hide back what
+we shouldn't expose."_** So the current state is deliberately over-exposed and the narrowing pass has not
+happened. Nothing is wrong until they have looked.
+
+**Every tracked sample now states its own numbers.** The eighteen carry between five and fifteen knobs each,
+counting the picker and the reset — the radial falloff on the spots and flares, the band's core and spread and
+how far it tracks, the hand's sweep, the ripple set entire, the smear's speed response, and the colour walk's
+span and period. Each defaults to the constant the sample was tuned with, so an untouched knob paints exactly
+what it painted before.
+
+**One narrowing has already happened and is the pattern for the rest.** `elastic_*` lost its `steps` knob: the
+user said twelve is a sweet spot and below it the effect goes janky, so the number is pinned and the prop is
+gone rather than merely defaulted. A knob that should not be turned is removed, not left with a good default.
+
+**The timed side is only half done.** `steps` reaches the fourteen samples that walk a sweep and `bands` the
+four flows; the `scan`, `sweep`, `fill` and `merge` families still hold their tuning inline in the JSX —
+sweep offsets, hard-edge stops, the travel range handed to `sweepOrthogonal`. Whether those want exposing at
+all is part of the same question.
+
+**What was held back deliberately, and the user agreed with the line**: the frame interval and everything
+derived from it — stamp counts, lifetimes, grace periods — the epsilons that decide whether the pointer moved,
+and the named zeros and ones. Turning any of those moves the effect's clock rather than its look. The ripple
+lifetime sits on that side too, feeding a module-level clock that cannot vary per instance.
 
 ## Accepted limits
 

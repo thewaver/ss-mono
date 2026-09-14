@@ -1,6 +1,6 @@
 import { Show, createUniqueId } from "solid-js";
 
-import { PlacementUtils, WheelMenu } from "@thewaver/ss-components";
+import { PlacementLayoutUtils, PlacementUtils, WheelMenu } from "@thewaver/ss-components";
 import type { PlacementRect, WheelMenuItem } from "@thewaver/ss-components";
 
 import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
@@ -9,6 +9,8 @@ import type { PlacementExampleProps } from "../PlacementPage.types";
 import * as styles from "../PlacementPage.css";
 
 const HALF = 0.5;
+const RING_RADIUS = 148;
+const WHOLE_RADIUS = 1;
 const CLOSER_MARK = "✕";
 const SUBMENU_MARK = "›";
 
@@ -24,6 +26,7 @@ const toViewBox = (rect: PlacementRect) =>
 
 export const MenuExample = (props: PlacementExampleProps) => {
     const gradientId = createUniqueId();
+    const getHoleRatio = () => props.getLayoutDefs().holeRatio ?? PlacementLayoutUtils.BAND_DEFAULTS.holeRatio;
 
     return (
         <div class={styles.stage}>
@@ -41,6 +44,8 @@ export const MenuExample = (props: PlacementExampleProps) => {
                 items={() => ACTIONS}
                 ariaLabel={"File actions"}
                 layoutDefs={props.getLayoutDefs()}
+                holeRadius={() => RING_RADIUS * getHoleRatio()}
+                bandWidth={() => RING_RADIUS * (WHOLE_RADIUS - getHoleRatio())}
                 placement={() => ({ x: "center", y: "center" })}
                 closerDefs={{
                     ariaLabel: "Close the wheel",

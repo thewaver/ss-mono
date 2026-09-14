@@ -2,7 +2,7 @@ import { MathUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
-import type { SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
+import type { GradientFlareOpts, SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
 type FlareGhost = {
@@ -44,7 +44,7 @@ const NO_REF = () => undefined;
 const toGhostColor = (color: string, alpha: number) =>
     `hsl(from ${color} h calc(s * ${GHOST_SATURATION}) calc(l * ${GHOST_LUMINOSITY}) / ${alpha})`;
 
-const computeGhostColors = (ghost: FlareGhost, color: string, fade: number) => {
+const computeGhostColors = (ghost: FlareGhost, color: string, fade: number, opts?: GradientFlareOpts) => {
     const alpha = ghost.alpha * fade;
 
     if (ghost.isRing) {
@@ -65,7 +65,7 @@ const computeGhostColors = (ghost: FlareGhost, color: string, fade: number) => {
     ];
 };
 
-export const spot_flare_3 = (): TrackedGradientConfig => ({
+export const spot_flare_3 = (opts?: GradientFlareOpts): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -79,11 +79,17 @@ export const spot_flare_3 = (): TrackedGradientConfig => ({
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient1-${id}`,
                         origin: () => getReading().boxRatio,
-                        scale: POOL_SCALE,
+                        scale: opts?.glowScale ?? POOL_SCALE,
                         colors: [
                             { value: `rgb(from ${defs.colors.primary} r g b / 1)` },
-                            { value: `rgb(from ${defs.colors.primary} r g b / ${CORE_ALPHA})`, stop: CORE_STOP },
-                            { value: `rgb(from ${defs.colors.primary} r g b / ${FALLOFF_ALPHA})`, stop: FALLOFF_STOP },
+                            {
+                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.coreAlpha ?? CORE_ALPHA})`,
+                                stop: opts?.coreStop ?? CORE_STOP,
+                            },
+                            {
+                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? FALLOFF_ALPHA})`,
+                                stop: opts?.falloffStop ?? FALLOFF_STOP,
+                            },
                             { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
                         ],
                     });
@@ -101,7 +107,11 @@ export const spot_flare_3 = (): TrackedGradientConfig => ({
                         const ratio = getReading().boxRatio;
                         const distance = MathUtils.clamp01(Math.hypot(ratio.x - 0.5, ratio.y - 0.5) * 2);
 
-                        return MathUtils.lerp(GHOST_NEAR_GROWTH, GHOST_FAR_GROWTH, distance);
+                        return MathUtils.lerp(
+                            opts?.ghostNearGrowth ?? GHOST_NEAR_GROWTH,
+                            opts?.ghostFarGrowth ?? GHOST_FAR_GROWTH,
+                            distance,
+                        );
                     };
 
                     return SVGGradientDefsUtils.computeRadialGradient({
@@ -116,6 +126,7 @@ export const spot_flare_3 = (): TrackedGradientConfig => ({
                                 ghost,
                                 defs.colors[ghost.colorKey],
                                 SVGDefsUtils.getPointerFade(getReading(), getIsPointerPresent()),
+                                opts,
                             ),
                     });
                 },

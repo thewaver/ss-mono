@@ -18,9 +18,12 @@ export type WheelMenuCloserDefs = {
 export type WheelMenuProps<T> = Omit<MenuProps<T>, "items" | "checkedSignal" | "computeLayout"> &
     AccessorProps<{
         spreadDegrees?: number;
+        holeRadius?: number;
+        bandWidth?: number;
+        levelGap?: number;
     }> & {
         items: MaybeAccessor<WheelMenuItem<T>[]>;
         checkedSignal?: SignalSource<T[]>;
-        layoutDefs?: BandDefs;
+        layoutDefs?: Omit<BandDefs, "holeRatio" | "spreadDegrees" | "computeItemArcs">;
         closerDefs?: WheelMenuCloserDefs;
     };

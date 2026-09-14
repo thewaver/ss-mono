@@ -12,11 +12,11 @@ import type { PaginatorExampleProps } from "../PaginatorPage.types";
 
 const DIAL_STEPS: PaginatorStep[] = ["first", "previous", "next", "last"];
 
-const DIAL_DEFS: BandDefs = { holeRadius: 60, bandWidth: 60, wedgeGapDegrees: 2 };
+const DIAL_DEFS: BandDefs = { holeRatio: 0.5, wedgeGapDegrees: 2 };
 
 const DIAL_LAYOUT = PlacementLayoutUtils.createRing(DIAL_DEFS);
 
-const DIAL_WIDTH = `${(DIAL_DEFS.holeRadius! + DIAL_DEFS.bandWidth!) * 2}px`;
+const DIAL_WIDTH = "240px";
 
 type Props = PaginatorExampleProps;
 

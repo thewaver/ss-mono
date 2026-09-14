@@ -28,12 +28,11 @@ export const STARTING_SPIN_STYLE_KEY: WheelSpinStyleKey = "bouncy";
 export const PRIZE_FETCH_DELAY_MS = 300;
 
 export const PRIZE_WHEEL_RING = PlacementLayoutUtils.createRing({
-    holeRadius: 0,
-    bandWidth: 50,
+    holeRatio: 0,
     wedgeGapDegrees: 0,
-    labelRadiusRatio: 0.8,
-    labelHeightRatio: 0.45,
-    labelMaxWidthRatio: 1.4,
+    itemRadiusRatio: 0.8,
+    itemHeightRatio: 0.45,
+    itemMaxWidthRatio: 1.4,
 });
 
 const MIN_LIVELY_TURNS = 1;

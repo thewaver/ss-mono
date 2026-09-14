@@ -7,7 +7,7 @@ import { SVGDefsSamples, TrackedGradientKnobs } from "@thewaver/ss-components";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../../PageComponents/Knobs/Knobs";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
-import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
+import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { NO_SAMPLE_KEY, toGroupEntriesWithNoSample } from "../../../PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "../../../PageComponents/SampleGroups/SampleGroups.types";
 import { PageGroupedSelectField } from "../../../StyledComponents/Field/Field";
@@ -18,6 +18,8 @@ import { ContinuityExample } from "./Examples/Continuity";
 import { DefaultExample } from "./Examples/Default";
 
 const EXAMPLES_ROOT = "/src/App/Pages/SVGGradients/TrackedGradientsPage/Examples";
+
+const STARTING_BLUR_WIDTH = 0;
 
 export const TrackedGradientsPage = () => {
     const [getConfigKey, setConfigKey] =
@@ -31,7 +33,7 @@ export const TrackedGradientsPage = () => {
     };
     const getConfigDefs = () => configDefs[getConfigKey()] ?? {};
     const paintKindSignal = createSignal<SVGGradientsPaintKind>("fill");
-    const blurWidthSignal = createSignal(0);
+    const blurWidthSignal = createSignal(STARTING_BLUR_WIDTH);
     const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS });
 
     const getExamples = createMemo(() => {
@@ -63,34 +65,40 @@ export const TrackedGradientsPage = () => {
 
     return (
         <>
-            <PagePropsPanel scope={"global"}>
-                <PageProp key={"configKey"} label={"Gradient"}>
-                    <PageGroupedSelectField
-                        value={getConfigKey}
-                        groups={() => toGroupEntriesWithNoSample(GROUPPED_TRACKED_GRADIENTS)}
-                        ariaLabel={"Gradient"}
-                        onChange={(config) => setConfigKey(() => config)}
+            <PagePropsGroups>
+                <PagePropsPanel scope={"sample"}>
+                    <PageProp key={"configKey"} label={"Gradient"}>
+                        <PageGroupedSelectField
+                            value={getConfigKey}
+                            groups={() => toGroupEntriesWithNoSample(GROUPPED_TRACKED_GRADIENTS)}
+                            ariaLabel={"Gradient"}
+                            onChange={(config) => setConfigKey(() => config)}
+                        />
+                    </PageProp>
+
+                    <PageKnobs
+                        knobs={getKnobs}
+                        defaults={() => TrackedGradientKnobs.DEFAULTS_BY_FAMILY[getConfigKey()] ?? {}}
+                        values={getConfigDefs}
+                        onInput={(key, value) =>
+                            setConfigDefs(getConfigKey(), (previous) => ({ ...previous, [key]: value }))
+                        }
                     />
-                </PageProp>
+                </PagePropsPanel>
 
-                <PageKnobs
-                    knobs={getKnobs}
-                    defaults={() => ({})}
-                    values={getConfigDefs}
-                    onInput={(key, value) =>
-                        setConfigDefs(getConfigKey(), (previous) => ({ ...previous, [key]: value }))
-                    }
-                />
+                <PagePropsDivider />
 
-                <PageSVGGradientsProps
-                    controls={{
-                        paintKindSignal,
-                        blurWidthSignal,
-                        colors,
-                        setColor: (key, value) => setColors(key, value),
-                    }}
-                />
-            </PagePropsPanel>
+                <PagePropsPanel scope={"global"}>
+                    <PageSVGGradientsProps
+                        controls={{
+                            paintKindSignal,
+                            blurWidthSignal,
+                            colors,
+                            setColor: (key, value) => setColors(key, value),
+                        }}
+                    />
+                </PagePropsPanel>
+            </PagePropsGroups>
 
             <PageExamples items={getExamples} layout={"flow"} />
         </>

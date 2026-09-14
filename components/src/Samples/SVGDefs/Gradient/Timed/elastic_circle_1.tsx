@@ -44,12 +44,12 @@ export const elastic_circle_1 = (opts?: GradientCycleOpts): TimedGradientConfig 
                             ObjectUtils.zipArray(
                                 "stretch",
                                 [
-                                    ...MathUtils.getIntermediateValues(90, 90, 12),
-                                    ...MathUtils.getIntermediateValues(90, 450, 12),
+                                    ...MathUtils.getIntermediateValues(90, 90, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                                    ...MathUtils.getIntermediateValues(90, 450, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
                                 ],
                                 [
-                                    ...MathUtils.getIntermediateValues(0, 360, 12),
-                                    ...MathUtils.getIntermediateValues(360, 0, 12),
+                                    ...MathUtils.getIntermediateValues(0, 360, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                                    ...MathUtils.getIntermediateValues(360, 0, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
                                 ],
                             ),
                             defs,

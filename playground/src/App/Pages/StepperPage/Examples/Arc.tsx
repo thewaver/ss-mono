@@ -9,7 +9,12 @@ import {
 import { LABELS, ORDER } from "../StepperPage.const";
 import type { StepperExampleProps } from "../StepperPage.types";
 
-const ARC_DEFS: ArcDefs = { width: 404, height: 404, spreadDegrees: 135, itemWidth: 122, itemHeight: 51 };
+const ARC_DEFS: ArcDefs = {
+    curveHeightRatio: 1,
+    spreadDegrees: 135,
+    itemWidthRatio: 0.302,
+    itemHeightRatio: 0.418,
+};
 
 const ARC_LAYOUT = PlacementLayoutUtils.createArc(ARC_DEFS);
 

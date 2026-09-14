@@ -12,52 +12,48 @@ export type FittedLayoutFn = PlacementLayoutFn;
 
 export type BandDefs = {
     spreadDegrees?: number;
-    holeRadius?: number;
-    bandWidth?: number;
-    levelGap?: number;
+    facingDegrees?: number;
+    holeRatio?: number;
     wedgeGapDegrees?: number;
-    wedgeArc?: number;
     tiltRatio?: number;
-    centreRadius?: number;
-    hasCentreItem?: boolean;
-    labelRadiusRatio?: number;
-    labelHeightRatio?: number;
-    labelMaxWidthRatio?: number;
-    computeItemArcs?: (path: number[]) => (number | undefined)[];
+    itemRadiusRatio?: number;
+    itemHeightRatio?: number;
+    itemMaxWidthRatio?: number;
+    computeItemArcs?: () => (number | undefined)[];
 };
 
 export type ArcDefs = {
-    width?: number;
-    height?: number;
+    curveHeightRatio?: number;
     spreadDegrees?: number;
     facingDegrees?: number;
     tiltRatio?: number;
-    itemWidth?: number;
-    itemHeight?: number;
+    itemWidthRatio?: number;
+    itemHeightRatio?: number;
 };
 
 export type HoneycombDefs = {
-    cellWidth?: number;
     perRow?: number;
-    gap?: number;
+    gapRatio?: number;
 };
 
 export type WhorlDefs = {
-    itemSpacing?: number;
-    whorlSpacing?: number;
+    itemStepRatio?: number;
+    whorlStepRatio?: number;
 };
 
 export type ZigzagDefs = {
     segmentLength?: number;
 };
 
-export type PodiumDefs = Record<string, never>;
+export type CliffDefs = {
+    cliffStepRatio?: number;
+};
 
 export type PlacementLayoutEntry =
     | { family: "ring"; defs?: BandDefs }
     | { family: "arc"; defs?: ArcDefs }
     | { family: "honeycomb"; defs?: HoneycombDefs }
-    | { family: "podiumLozenge"; defs?: PodiumDefs }
+    | { family: "cliff"; defs?: CliffDefs }
     | { family: "whorl"; defs?: WhorlDefs }
     | { family: "zigzag"; defs?: ZigzagDefs };
 

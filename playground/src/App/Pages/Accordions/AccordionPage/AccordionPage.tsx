@@ -8,6 +8,8 @@ import { SectionsExample } from "./Examples/Sections";
 
 const EXAMPLES_ROOT = "/src/App/Pages/Accordions/AccordionPage/Examples";
 
+const STARTING_EXTRA_LINES = 0;
+
 export const AccordionPage = () => {
     const multiSignal = createSignal<string[]>(["Shipping"]);
     const singleSignal = createSignal<string[]>([]);
@@ -16,7 +18,7 @@ export const AccordionPage = () => {
     const scrolledSignal = createSignal<string[]>([]);
     const deferredSignal = createSignal<string[]>([]);
 
-    const [getExtraLines, setExtraLines] = createSignal(0);
+    const [getExtraLines, setExtraLines] = createSignal(STARTING_EXTRA_LINES);
     const [getBuilt, setBuilt] = createSignal<string[]>([]);
 
     const getExamples = createMemo(() => [

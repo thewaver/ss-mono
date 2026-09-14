@@ -41,6 +41,9 @@ const INNER_TOAST_GAP = 10;
 const INNER_TOAST_MARGIN = 10;
 const INNER_TOAST_MESSAGE = "Raised inside the square.";
 
+const STARTING_ROAMER_X = 50;
+const STARTING_ROAMER_Y = 50;
+
 const renderTooltip = (text: string) => ({
     placement: () => ({ x: "center", y: "top-out" }) as const,
     offset: () => ({ x: 0, y: 5 }),
@@ -77,8 +80,8 @@ const ViewportReadout = () => {
 };
 
 export const ViewportWrapperPage = () => {
-    const [getRoamerX, setRoamerX] = createSignal(50);
-    const [getRoamerY, setRoamerY] = createSignal(50);
+    const [getRoamerX, setRoamerX] = createSignal(STARTING_ROAMER_X);
+    const [getRoamerY, setRoamerY] = createSignal(STARTING_ROAMER_Y);
     const [getScalePercent, setScalePercent] = createSignal(PERCENT);
     const [getRoamingValue, setRoamingValue] = createSignal<string | undefined>();
     const innerToasts = createSignal<Toast<ToastDefs>[]>([]);

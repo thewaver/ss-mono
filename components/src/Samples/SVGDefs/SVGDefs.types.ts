@@ -34,7 +34,81 @@ export type TimedGradientElementDefs = SVGAnimationDefs & SVGDefsBaseElementDefs
 
 export type GradientCycleOpts = { cycles?: boolean };
 
-export type GradientBandedCycleOpts = GradientCycleOpts & { banded?: boolean };
+export type GradientStepsOpts = { steps?: number };
+
+export type GradientGlowOpts = { glowScale?: number };
+
+export type GradientTrailOpts = { trailAlpha?: number; trailDecay?: number };
+
+export type GradientFalloffOpts = {
+    coreStop?: number;
+    coreAlpha?: number;
+    falloffStop?: number;
+    falloffAlpha?: number;
+};
+
+export type GradientColorAgeOpts = { ageColorSpan?: number; cycleMs?: number };
+
+export type GradientSmearOpts = { smearMax?: number; smearSmoothing?: number; smearFullStepRatio?: number };
+
+export type GradientSweepOpts = { sweepArc?: number; sweepLead?: number };
+
+export type GradientSpotTrailOpts = GradientCycleGlowOpts &
+    GradientTrailOpts &
+    GradientFalloffOpts &
+    GradientColorAgeOpts;
+
+export type GradientHandTrailOpts = GradientCycleOpts & GradientTrailOpts & GradientColorAgeOpts & GradientSweepOpts;
+
+export type GradientHandOpts = GradientSweepOpts & { peakAlpha?: number };
+
+export type GradientBandOpts = {
+    coreStop?: number;
+    coreAlpha?: number;
+    falloffSpread?: number;
+    falloffAlpha?: number;
+    bandTravel?: number;
+    bandAngle?: number;
+};
+
+export type GradientSpotOpts = GradientGlowOpts & GradientFalloffOpts;
+
+export type GradientRippleOpts = {
+    sourceScale?: number;
+    sourceStop?: number;
+    sourceAlpha?: number;
+    rippleCount?: number;
+    rippleSpacingRatio?: number;
+    rippleStartScale?: number;
+    rippleEndScale?: number;
+    rippleAlpha?: number;
+    rippleDecay?: number;
+    crestStop?: number;
+    crestSpreadStart?: number;
+    crestSpreadEnd?: number;
+};
+
+export type GradientRippleSampleOpts = GradientCycleOpts & GradientRippleOpts;
+
+export type GradientFlareOpts = GradientGlowOpts &
+    GradientFalloffOpts & {
+        ghostSaturation?: number;
+        ghostLuminosity?: number;
+        ghostNearGrowth?: number;
+        ghostFarGrowth?: number;
+    };
+
+export type GradientSmearSampleOpts = GradientCycleGlowOpts &
+    GradientTrailOpts &
+    GradientFalloffOpts &
+    GradientColorAgeOpts &
+    GradientSmearOpts;
+
+export type GradientCycleGlowOpts = GradientCycleOpts & GradientGlowOpts;
+
+export type GradientCycleStepsOpts = GradientCycleOpts & GradientStepsOpts;
+
+export type GradientBandedCycleOpts = GradientCycleOpts & { banded?: boolean; bands?: number };
 
 export type TimedGradientConfig = {
     computeSVGDefs: (
@@ -79,20 +153,20 @@ export type TimedGradientEntry =
     | { family: "merge_1v1"; defs?: GradientCycleOpts }
     | { family: "merge_diag_1v1"; defs?: GradientCycleOpts }
     | { family: "merge_diag_async_4" }
-    | { family: "orbit_1"; defs?: GradientCycleOpts }
-    | { family: "orbit_1v1"; defs?: GradientCycleOpts }
-    | { family: "orbit_async_2v1" }
-    | { family: "orbit_async_3" }
+    | { family: "orbit_1"; defs?: GradientCycleStepsOpts }
+    | { family: "orbit_1v1"; defs?: GradientCycleStepsOpts }
+    | { family: "orbit_async_2v1"; defs?: GradientStepsOpts }
+    | { family: "orbit_async_3"; defs?: GradientStepsOpts }
     | { family: "scan_1"; defs?: GradientCycleOpts }
     | { family: "scan_1v1"; defs?: GradientCycleOpts }
     | { family: "scan_diag_1"; defs?: GradientCycleOpts }
     | { family: "scan_diag_1v1"; defs?: GradientCycleOpts }
-    | { family: "snake_1"; defs?: GradientCycleOpts }
-    | { family: "snake_1v1"; defs?: GradientCycleOpts }
-    | { family: "snake_2"; defs?: GradientCycleOpts }
-    | { family: "snake_4"; defs?: GradientCycleOpts }
-    | { family: "snake_async_3" }
-    | { family: "snake_inter_2"; defs?: GradientCycleOpts }
+    | { family: "snake_1"; defs?: GradientCycleStepsOpts }
+    | { family: "snake_1v1"; defs?: GradientCycleStepsOpts }
+    | { family: "snake_2"; defs?: GradientCycleStepsOpts }
+    | { family: "snake_4"; defs?: GradientCycleStepsOpts }
+    | { family: "snake_async_3"; defs?: GradientStepsOpts }
+    | { family: "snake_inter_2"; defs?: GradientCycleStepsOpts }
     | { family: "sweep_1"; defs?: GradientCycleOpts }
     | { family: "sweep_1v1"; defs?: GradientCycleOpts }
     | { family: "sweep_diag_1"; defs?: GradientCycleOpts }
@@ -102,23 +176,23 @@ export type TimedGradientEntry =
 export type TimedGradientFamily = TimedGradientEntry["family"];
 
 export type TrackedGradientEntry =
-    | { family: "band_1" }
-    | { family: "band_1v1" }
-    | { family: "band_diag_1" }
-    | { family: "hand_1" }
-    | { family: "hand_trail_1" }
-    | { family: "hand_trail_2"; defs?: GradientCycleOpts }
-    | { family: "hand_trail_3"; defs?: GradientCycleOpts }
-    | { family: "spot_1" }
-    | { family: "spot_flare_2" }
-    | { family: "spot_flare_3" }
-    | { family: "spot_ripple_1" }
-    | { family: "spot_ripple_2"; defs?: GradientCycleOpts }
-    | { family: "spot_ripple_3"; defs?: GradientCycleOpts }
-    | { family: "spot_smear_2"; defs?: GradientCycleOpts }
-    | { family: "spot_smear_3"; defs?: GradientCycleOpts }
-    | { family: "spot_trail_1" }
-    | { family: "spot_trail_2"; defs?: GradientCycleOpts }
-    | { family: "spot_trail_3"; defs?: GradientCycleOpts };
+    | { family: "band_1"; defs?: GradientBandOpts }
+    | { family: "band_1v1"; defs?: GradientBandOpts }
+    | { family: "band_diag_1"; defs?: GradientBandOpts }
+    | { family: "hand_1"; defs?: GradientHandOpts }
+    | { family: "hand_trail_1"; defs?: GradientHandTrailOpts }
+    | { family: "hand_trail_2"; defs?: GradientHandTrailOpts }
+    | { family: "hand_trail_3"; defs?: GradientHandTrailOpts }
+    | { family: "spot_1"; defs?: GradientSpotOpts }
+    | { family: "spot_flare_2"; defs?: GradientFlareOpts }
+    | { family: "spot_flare_3"; defs?: GradientFlareOpts }
+    | { family: "spot_ripple_1"; defs?: GradientRippleSampleOpts }
+    | { family: "spot_ripple_2"; defs?: GradientRippleSampleOpts }
+    | { family: "spot_ripple_3"; defs?: GradientRippleSampleOpts }
+    | { family: "spot_smear_2"; defs?: GradientSmearSampleOpts }
+    | { family: "spot_smear_3"; defs?: GradientSmearSampleOpts }
+    | { family: "spot_trail_1"; defs?: GradientSpotTrailOpts }
+    | { family: "spot_trail_2"; defs?: GradientSpotTrailOpts }
+    | { family: "spot_trail_3"; defs?: GradientSpotTrailOpts };
 
 export type TrackedGradientFamily = TrackedGradientEntry["family"];

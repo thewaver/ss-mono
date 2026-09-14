@@ -4,10 +4,10 @@ import { MathUtils } from "@thewaver/ss-utils";
 
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
-import type { GradientCycleOpts, TimedGradientConfig } from "../../SVGDefs.types";
+import type { GradientCycleStepsOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-export const orbit_1v1 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
+export const orbit_1v1 = (opts?: GradientCycleStepsOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBorderColor(defs),
@@ -26,7 +26,14 @@ export const orbit_1v1 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
                             ],
                         },
                         <>
-                            {SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(0, 360, 12), defs)}
+                            {SVGAnimations.Linear.rotate(
+                                MathUtils.getIntermediateValues(
+                                    0,
+                                    360,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                defs,
+                            )}
                             <Show when={opts?.cycles}>
                                 {SVGAnimations.Gradient.cycleSmoothColors(
                                     `gradient1-${id}`,
@@ -66,7 +73,14 @@ export const orbit_1v1 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
                             angle: 360,
                         },
                         <>
-                            {SVGAnimations.Linear.rotate(MathUtils.getIntermediateValues(360, 0, 12), defs)}
+                            {SVGAnimations.Linear.rotate(
+                                MathUtils.getIntermediateValues(
+                                    360,
+                                    0,
+                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                ),
+                                defs,
+                            )}
                             <Show when={opts?.cycles}>
                                 {SVGAnimations.Gradient.cycleSmoothColors(
                                     `gradient2-${id}`,
