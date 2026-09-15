@@ -2,7 +2,7 @@ export namespace IOUtils {
     /**
      * Saves a value to the user's machine as a JSON file.
      *
-     * Serialises the value, hands the browser a temporary link and clicks it. Anything
+     * Serializes the value, hands the browser a temporary link and clicks it. Anything
      * `JSON.stringify` cannot represent — functions, `undefined`, circular references —
      * is dropped or throws, exactly as it would anywhere else.
      *

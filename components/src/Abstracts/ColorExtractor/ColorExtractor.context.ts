@@ -57,7 +57,7 @@ export const useColorExtractor = (props?: ColorExtractorContextType) => {
                 .catch((err) => {
                     if (!isMounted) return;
 
-                    console.warn("ColorExtractor: colour extraction failed:", err);
+                    console.warn("ColorExtractor: color extraction failed:", err);
                     setColorData([]);
                     setError(err);
                 });

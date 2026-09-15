@@ -4,11 +4,12 @@ import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/Pointe
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import type { GradientHandOpts, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
+import { TrackedGradientKnobs } from "../TrackedGradient.knobs";
 
-const SWEEP_ARC = 90;
-const SWEEP_LEAD = 90;
+const QUARTER_TURN = 90;
 const HALF_TURN = 180;
-const PEAK_ALPHA = 1;
+
+const DEFAULTS = TrackedGradientKnobs.HAND_DEFAULTS;
 
 const NO_REF = () => undefined;
 
@@ -31,11 +32,11 @@ export const hand_1 = (opts?: GradientHandOpts): TrackedGradientConfig => ({
 
                     return SVGGradientDefsUtils.computeLinearGradient({
                         id: `gradient1-${id}`,
-                        angle: () => getReading().angle + (opts?.sweepLead ?? SWEEP_LEAD),
+                        angle: () => getReading().angle + QUARTER_TURN,
                         colors: () =>
                             computeSweepColors(
                                 defs.colors.primary,
-                                (opts?.peakAlpha ?? PEAK_ALPHA) *
+                                (opts?.peakAlpha ?? DEFAULTS.peakAlpha) *
                                     SVGDefsUtils.getPointerFade(getReading(), getIsPointerPresent()),
                             ),
                     });
@@ -50,8 +51,8 @@ export const hand_1 = (opts?: GradientHandOpts): TrackedGradientConfig => ({
                         <clipPath id={`clip1-${id}`} clipPathUnits="objectBoundingBox">
                             <path
                                 d={SVGUtils.getArcPath(
-                                    opts?.sweepArc ?? SWEEP_ARC,
-                                    getReading().angle - HALF_TURN - (opts?.sweepArc ?? SWEEP_ARC) * 0.5,
+                                    opts?.sweepArc ?? DEFAULTS.sweepArc,
+                                    getReading().angle - HALF_TURN - (opts?.sweepArc ?? DEFAULTS.sweepArc) * 0.5,
                                 )}
                             />
                         </clipPath>

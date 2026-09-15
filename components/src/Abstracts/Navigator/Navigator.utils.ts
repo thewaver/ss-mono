@@ -34,7 +34,7 @@ export namespace NavigatorUtils {
      * Where a key moves the cursor in a one-dimensional list.
      *
      * The ends wrap round, so pressing down on the last item returns to the first. That is the right
-     * behaviour for a menu or a tab strip, which is what this serves.
+     * behavior for a menu or a tab strip, which is what this serves.
      *
      * @param key The key that was pressed.
      * @param from Where the cursor is now.

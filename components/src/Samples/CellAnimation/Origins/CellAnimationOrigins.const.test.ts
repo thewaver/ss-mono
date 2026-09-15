@@ -18,7 +18,7 @@ describe("CellAnimationOriginsConst", () => {
         expect(CellAnimationOrigins.computeOrigin("right", ODD_GRID)).toEqual({ x: 6, y: 3 });
     });
 
-    it("lands a centred origin between cells on an even count, which is where the parity weights break", () => {
+    it("lands a centerd origin between cells on an even count, which is where the parity weights break", () => {
         expect(CellAnimationOrigins.computeOrigin("center", { x: 4, y: 4 })).toEqual({ x: 1.5, y: 1.5 });
         expect(CellAnimationOrigins.computeOrigin("center", EVEN_COLUMN)).toEqual({ x: 0, y: 3.5 });
     });

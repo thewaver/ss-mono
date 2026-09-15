@@ -85,8 +85,8 @@ export const DropShadowExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"floodColor"} label={"Flood colour"}>
-                    <PageColorField value={getFloodColor} ariaLabel={"Flood colour"} onInput={setFloodColor} />
+                <PageProp key={"floodColor"} label={"Flood color"}>
+                    <PageColorField value={getFloodColor} ariaLabel={"Flood color"} onInput={setFloodColor} />
                 </PageProp>
 
                 <PageProp key={"floodOpacity"} label={"Flood opacity"}>

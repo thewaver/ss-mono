@@ -72,7 +72,7 @@ test("a position written as a fraction of the width lands at that fraction of th
     expect(ratio, "and it lands inside the formation rather than somewhere the viewport put it").toBeLessThan(1);
     expect(
         (leftEdge + rightEdge) / 2 / box.hostWidth,
-        "a cliff is centred in the formation however far its places lean",
+        "a cliff is centerd in the formation however far its places lean",
     ).toBeCloseTo(0.5, 2);
 });
 

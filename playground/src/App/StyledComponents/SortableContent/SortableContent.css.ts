@@ -97,7 +97,7 @@ export const sortableMarkerRow = style([sortableMarker, { width: 3 }]);
 
 export const sortableMarkerColumn = style([sortableMarker, { height: 3 }]);
 
-export const sortableItemCentred = style({
+export const sortableItemCenterd = style({
     marginInline: "auto",
 });
 

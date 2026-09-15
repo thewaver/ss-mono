@@ -4,7 +4,7 @@ import type { Point2d } from "./point2d.js";
 /** The axis a swipe travels along. */
 export type SwipeAxis = "horizontal" | "vertical";
 
-/** The way a swipe travelled, once it has gone far enough to count as one. */
+/** The way a swipe traveled, once it has gone far enough to count as one. */
 export type SwipeDirection = "left" | "right" | "up" | "down";
 
 export namespace GestureUtils {
@@ -21,7 +21,7 @@ export namespace GestureUtils {
         direction === "left" || direction === "right" ? "horizontal" : "vertical";
 
     /**
-     * Finds how far a swipe has travelled along its axis, as a signed ratio.
+     * Finds how far a swipe has traveled along its axis, as a signed ratio.
      *
      * Both points are ratios of the element the gesture is happening in, so `0` is one edge and `1` is the
      * other, and the answer is in the same terms: `0.5` is half the element's width or height. Expressing it

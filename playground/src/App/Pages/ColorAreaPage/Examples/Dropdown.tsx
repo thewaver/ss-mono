@@ -83,7 +83,7 @@ export const DropdownExample = (props: Props) => {
             <Popover
                 id={props.popupId}
                 role={"dialog"}
-                ariaAttributes={() => ({ "aria-label": "Choose a colour" })}
+                ariaAttributes={() => ({ "aria-label": "Choose a color" })}
                 isOpen={getIsOpen}
                 anchorRef={getTriggerRef}
                 hasAutoFocus={true}

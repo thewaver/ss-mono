@@ -39,7 +39,7 @@ test("a group is one tab stop that travels with the selection", async ({ page })
     ]);
 });
 
-test("the walk wraps and honours the edge keys", async ({ page }) => {
+test("the walk wraps and honors the edge keys", async ({ page }) => {
     await page.locator(option(DEFAULT, "Small")).focus();
 
     await page.keyboard.press("ArrowRight");
@@ -127,7 +127,7 @@ test("each group generates its own name", async ({ page }) => {
  * The arc rating is the same radios as the row rating, with a layout function added and nothing else
  * changed. A group takes children rather than a list of records, so the placement cannot be handed down
  * as a prop — each `Radio` asks the group's context for its own, keyed on the entry it registered — and
- * these check that the answer arrives and that the group's own behaviour is untouched by it.
+ * these check that the answer arrives and that the group's own behavior is untouched by it.
  */
 const ARC = demo("arc");
 const RATING = demo("rating");

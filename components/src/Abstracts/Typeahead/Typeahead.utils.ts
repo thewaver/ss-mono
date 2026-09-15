@@ -34,7 +34,7 @@ const readText = (node: Node): string => {
 /**
  * Finds the item a user is looking for as they type its first letters.
  *
- * The behaviour every native list control has: typing jumps to the matching item, typing more
+ * The behavior every native list control has: typing jumps to the matching item, typing more
  * narrows it, and pressing one letter repeatedly cycles through everything starting with it.
  */
 export namespace TypeaheadUtils {

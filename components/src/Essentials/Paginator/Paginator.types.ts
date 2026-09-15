@@ -2,6 +2,7 @@ import type { Accessor, Component, JSX } from "solid-js";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { PlacementLayoutFn, PlacementRect } from "../../Abstracts/Placement/Placement.types";
+import type { ProximityEffectFn } from "../../Abstracts/Proximity/Proximity.types";
 import type { InteractionControlProps } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps } from "../../Utils/typeUtils";
 
@@ -62,6 +63,7 @@ export type PaginatorProps = AccessorProps<{
     computePageLabel?: (page: number, pageCount: number) => string;
     computeStepLabel?: (step: PaginatorStep, targetPage: number) => string;
     computeLayout?: PlacementLayoutFn;
+    computeEffect?: ProximityEffectFn;
     page: number;
     renderPage: (
         getEntry: Accessor<PaginatorPageEntry>,

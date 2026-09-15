@@ -8,7 +8,7 @@ import type { SatelliteLayout } from "./Satellite.types";
  * Reserves room in the layout for something hanging off the corner of an element.
  *
  * A badge or a status dot placed over an element's corner sticks out of it, and would be clipped or
- * overlap its neighbours. So instead of positioning it absolutely and hoping, the wrapper is padded
+ * overlap its neighbors. So instead of positioning it absolutely and hoping, the wrapper is padded
  * by however much the badge overhangs, and the whole assembly takes up the room it really needs.
  */
 export namespace SatelliteUtils {

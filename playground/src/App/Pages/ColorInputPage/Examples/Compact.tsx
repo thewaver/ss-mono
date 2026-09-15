@@ -10,7 +10,7 @@ export const CompactExample = (props: Props) => (
     <ColorInput
         {...pageColorPickerSlots}
         valueSignal={props.valueSignal}
-        ariaLabel={"Compact colour"}
+        ariaLabel={"Compact color"}
         renderContent={(getRenderProps) => <PageColorInputContent renderProps={getRenderProps} isCompact={true} />}
     />
 );

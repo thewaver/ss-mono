@@ -5,7 +5,7 @@ import { BothAdornmentsExample } from "./Examples/BothAdornments";
 import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
 import { ErroredExample } from "./Examples/Errored";
-import { LabelledExample } from "./Examples/Labelled";
+import { LabelledExample } from "./Examples/Labeled";
 import { NumberFieldExample } from "./Examples/NumberField";
 import { PasswordExample } from "./Examples/Password";
 import { ReachableExample } from "./Examples/Reachable";
@@ -106,7 +106,7 @@ export const TextInputPage = () => {
             name: "In a Label",
             readout: () => `value: "${labelledSignal[0]()}"`,
             component: () => <LabelledExample valueSignal={labelledSignal} />,
-            path: `${EXAMPLES_ROOT}/Labelled.tsx`,
+            path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
     ]);
 

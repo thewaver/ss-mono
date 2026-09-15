@@ -7,13 +7,13 @@ const BOUNDED = demo("bounded");
 
 /**
  * Days are located by their accessible name rather than by their text, for the reason `calendar.spec.ts`
- * gives: the painter draws a bare number and the neighbouring months repeat it.
+ * gives: the painter draws a bare number and the neighboring months repeat it.
  */
 const cell = (scope: string) => `${scope} [role="gridcell"]`;
 const day = (scope: string, label: string) => `${cell(scope)}[aria-label="${label}"]`;
 
 /**
- * The band is read off a data attribute the painter writes rather than off a class name or a colour: a
+ * The band is read off a data attribute the painter writes rather than off a class name or a color: a
  * production build hashes the class away, and a computed background also catches the hover and the selected
  * gradient, which are different states that happen to paint. The attribute asserts the thing that actually
  * crosses the boundary — that the three range flags reached the day renderer.

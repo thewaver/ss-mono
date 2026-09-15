@@ -1,10 +1,10 @@
-import type { CSSAnimationKey, Point2d, Size2d } from "@thewaver/ss-utils";
+import type { CSSAnimationValues, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
 export type CellAnimationFinalFrame = "source" | "cells" | "nothing";
 
-export type CellAnimationEvaluationResult = Partial<Record<CSSAnimationKey, number | number[]>>;
+export type CellAnimationEvaluationResult = CSSAnimationValues;
 
 export type CellAnimationEvaluationDefs = {
     pos: Point2d;

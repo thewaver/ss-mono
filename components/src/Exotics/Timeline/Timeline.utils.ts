@@ -26,10 +26,10 @@ const EPSILON = 1e-9;
 const isMultipleOf = (value: number, step: number) => Math.abs(value / step - Math.round(value / step)) < EPSILON;
 
 /**
- * Picks which step gets the labelled ticks.
+ * Picks which step gets the labeled ticks.
  *
  * It must be a whole multiple of the minor step, or the major ticks would not line up with the minor
- * ones, and it must fit in the view or nothing would be labelled at all. Comfortably coarser than
+ * ones, and it must fit in the view or nothing would be labeled at all. Comfortably coarser than
  * the minor step is preferred, falling back to the next one up.
  */
 const chooseMajorStep = (step: number, entries: number[], viewExtent: number) => {
@@ -80,7 +80,7 @@ export namespace TimelineUtils {
      * @param view The view to correct.
      * @param range Everything the timeline covers.
      * @param minExtent The narrowest the view may get. Itself capped by the range, since a range narrower
-     * than the minimum cannot be honoured.
+     * than the minimum cannot be honored.
      */
     export const clampView = (view: TimelineSpan, range: TimelineSpan, minExtent: number): TimelineSpan => {
         const available = Math.max(getExtent(range), NOTHING);
@@ -98,7 +98,7 @@ export namespace TimelineUtils {
      *
      * @param view The view before zooming.
      * @param factor Below `1` to zoom in, above to zoom out.
-     * @param focusRatio Where the zoom is centred, as a fraction across the view.
+     * @param focusRatio Where the zoom is centerd, as a fraction across the view.
      * @param range Everything the timeline covers.
      * @param minExtent The narrowest the view may get.
      */
@@ -134,7 +134,7 @@ export namespace TimelineUtils {
     /**
      * Slides the view just far enough to bring a span into it.
      *
-     * The view is not zoomed and not centred; it moves the minimum needed, which is what keeps a keyboard
+     * The view is not zoomed and not centerd; it moves the minimum needed, which is what keeps a keyboard
      * walk through the items from lurching. A span too wide to fit is aligned to its start.
      *
      * @param span The span to reveal.
@@ -303,7 +303,7 @@ export namespace TimelineUtils {
      * @param ladder Steps to choose from instead of the ones-twos-fives ladder, for a scale with its own
      * natural intervals — seconds, minutes, hours, days.
      * @returns The minor step and the coarser major step, which is always a whole multiple of it so the
-     * labelled ticks line up with the unlabelled ones.
+     * labeled ticks line up with the unlabeled ones.
      */
     export const chooseSteps = (
         viewExtent: number,

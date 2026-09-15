@@ -49,12 +49,12 @@ const computeTilesWithin = (from: Index2d, reach: number, layout: TileBoardLayou
         const next: Index2d[] = [];
 
         for (const tile of edge) {
-            for (const neighbour of TileBoardUtils.getNeighbourTiles(tile, layout)) {
-                if (seen.has(Index2d.toString(neighbour))) continue;
+            for (const neighbor of TileBoardUtils.getNeighborTiles(tile, layout)) {
+                if (seen.has(Index2d.toString(neighbor))) continue;
 
-                seen.add(Index2d.toString(neighbour));
-                next.push(neighbour);
-                within.push(neighbour);
+                seen.add(Index2d.toString(neighbor));
+                next.push(neighbor);
+                within.push(neighbor);
             }
         }
 

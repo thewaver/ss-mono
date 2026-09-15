@@ -2,18 +2,6 @@ import { describe, expect, it } from "vitest";
 
 import { MathUtils } from "../../src/Abstracts/math.js";
 
-describe("MathUtils.RADIANS_PER_DEGREE / DEGREES_PER_RADIAN", () => {
-    it("converts the landmark angles", () => {
-        expect(180 * MathUtils.RADIANS_PER_DEGREE).toBeCloseTo(Math.PI, 10);
-        expect(90 * MathUtils.RADIANS_PER_DEGREE).toBeCloseTo(Math.PI / 2, 10);
-        expect(Math.PI * MathUtils.DEGREES_PER_RADIAN).toBeCloseTo(180, 10);
-    });
-
-    it("undoes itself when applied both ways", () => {
-        expect(37 * MathUtils.RADIANS_PER_DEGREE * MathUtils.DEGREES_PER_RADIAN).toBeCloseTo(37, 10);
-    });
-});
-
 describe("MathUtils.isEven / isOdd", () => {
     it("classifies whole numbers", () => {
         expect(MathUtils.isEven(0)).toBe(true);
@@ -110,32 +98,6 @@ describe("MathUtils.getIntermediateValues", () => {
 
     it("counts downwards when the range is reversed", () => {
         expect(MathUtils.getIntermediateValues(10, 0, 5)).toEqual([10, 8, 5, 3, 0]);
-    });
-});
-
-describe("MathUtils.unwarpAngle", () => {
-    it("leaves an angle alone in a square box", () => {
-        expect(MathUtils.unwarpAngle(45, { width: 100, height: 100 })).toBeCloseTo(45, 10);
-    });
-
-    it("returns the angle untouched when the box has no area", () => {
-        expect(MathUtils.unwarpAngle(45, { width: 0, height: 10 })).toBe(45);
-        expect(MathUtils.unwarpAngle(45, { width: 10, height: 0 })).toBe(45);
-    });
-
-    it("corrects for a stretched box", () => {
-        // Twice as wide as it is tall, so a line that should look like 45 degrees has to
-        // be drawn shallower than that in the box's own coordinates.
-        expect(MathUtils.unwarpAngle(45, { width: 200, height: 100 })).toBeCloseTo(26.5651, 3);
-    });
-
-    it("keeps results within -180 to 180", () => {
-        for (const angle of [-170, -45, 0, 45, 170]) {
-            const result = MathUtils.unwarpAngle(angle, { width: 300, height: 50 });
-
-            expect(result).toBeGreaterThanOrEqual(-180);
-            expect(result).toBeLessThanOrEqual(180);
-        }
     });
 });
 

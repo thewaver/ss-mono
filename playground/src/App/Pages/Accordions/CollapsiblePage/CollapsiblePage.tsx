@@ -15,7 +15,7 @@ export const CollapsiblePage = () => {
             key: "panel",
             name: "A single panel, no heading",
             readout: () =>
-                `expanded: ${panelSignal[0]()} — one trigger and one panel, with none of the group behaviour an accordion adds`,
+                `expanded: ${panelSignal[0]()} — one trigger and one panel, with none of the group behavior an accordion adds`,
             component: () => <PanelExample expandedSignal={panelSignal} />,
             path: `${EXAMPLES_ROOT}/Panel.tsx`,
         },

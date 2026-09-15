@@ -93,7 +93,7 @@ privately inside them.
 **The half this item used to be mostly about is closed.** A fill that is not a photograph — a gradient, a
 solid, a pattern — is a source like any other: an SVG string as a `data:image/svg+xml,` URI, which the
 component slices exactly as it slices a photograph. It needed one library fix, quoting the cell's background
-URL, and no new machinery; see `decisions.md`. `PageComponents/SVGDefsSources` goes further and serialises
+URL, and no new machinery; see `decisions.md`. `PageComponents/SVGDefsSources` goes further and serializes
 `Shape`'s own gradients and patterns into sources, so the two drawn examples pick from the same registry the
 Shape page uses.
 
@@ -187,7 +187,7 @@ gaps, each with the reason it is still a gap.
   `Label` and `Separator`, plus `CheckboxItem` and `RadioGroup` / `RadioItem` — which is where the stateful
   rows landed here too, on the user's call. The separators and labels are the first bullet above and are
   still missing.
-- **Nothing does the `Tab` behaviour APG asks for.** Radix's menu does nothing at all on `Tab`, and
+- **Nothing does the `Tab` behavior APG asks for.** Radix's menu does nothing at all on `Tab`, and
   that is filed against it as a spec-compliance bug (radix#1934) which is still open. Closing and
   returning focus to the trigger is therefore ahead of the field rather than behind it.
 - **Right-click is a separate opener, never a separate menu.** Radix ships a whole `ContextMenu`
@@ -255,7 +255,7 @@ control.
 - **A command palette.** Mostly assembled already — `Select`'s autocomplete inside a `Modal`, since typing to
   narrow a list is what the autocomplete does. What separates it from `Menu` is that it is opened by a
   shortcut rather than by a button, and holds every action in the application rather than the few that relate
-  to one element. Two pieces are missing: results gathered from several sources and shown in labelled groups,
+  to one element. Two pieces are missing: results gathered from several sources and shown in labeled groups,
   which is the grouped-and-windowed case item 2 leaves open, and a document-level hotkey, which wants the
   register-and-stack shape `Dismisser` has rather than a listener per consumer.
 
@@ -321,7 +321,7 @@ the browser has refused to start.
 driven from is driven. `RichTextPage` mounts three examples — a legend naming the five tags the component
 paints, an inline diff over two tags the page named itself, and a `TextArea` holding a source string with
 the parsed result underneath it — with `removeOtherTags` as the page's one global prop, so both answers to
-an unrecognised tag can be seen. `richText.spec.ts` reads computed styles rather than class names, since a
+an unrecognized tag can be seen. `richText.spec.ts` reads computed styles rather than class names, since a
 vanilla-extract class name is hashed and reading one back would only prove a string had been copied around.
 See `decisions.md` for what the diff example settled.
 
@@ -374,7 +374,7 @@ entire cost, and in a repo with one author it is small.
 
 Recorded **2026-08-07** as advance notice in three parts. Two of them are built and are no longer
 outstanding: there is no `style.css` anywhere in `src/`, and `App/Theme.css.ts` is the theme — a
-vanilla-extract contract over colour, spacing, font size, radius, shadow, the hover / active / disabled
+vanilla-extract contract over color, spacing, font size, radius, shadow, the hover / active / disabled
 filters and one animation duration, with a small global block for the reset, the focus ring, the
 scrollbars, links and `body`. The `--clr-*` custom properties this item used to call the de facto theme
 are gone, and the theme's token shape deliberately carries no reasoning — see `decisions.md`.
@@ -382,7 +382,7 @@ are gone, and the theme's token shape deliberately carries no reasoning — see 
 What is left is the third part.
 
 **A more final-consumer-like layer of controls — `MyButton` and friends — that trade API surface for
-decided behaviour.** The stated example: no `renderContent` tooltip renderer, just tooltip content as
+decided behavior.** The stated example: no `renderContent` tooltip renderer, just tooltip content as
 a string. This is the opposite direction from every argument recorded in `conventions.md` about slots
 and flags, and deliberately so: those arguments are about what a **library** owes a consumer who has
 not been met yet, and this layer is what a consumer who has been met actually writes. Worth knowing
@@ -402,7 +402,7 @@ contract, which decides everything else about it.
 **_Elsewhere._** The two-layer arrangement is the norm, and in every case checked the layers are two
 **published packages** rather than one package with two entry points: Radix Primitives under Radix
 Themes, Base UI (by MUI's own team) under MUI's styled components, Ark UI under Park UI — which is now
-inside the same organisation. shadcn/ui is the third answer and the interesting one, because nothing is
+inside the same organization. shadcn/ui is the third answer and the interesting one, because nothing is
 published at all: the styled source is copied into the consumer's repo, so the support-contract question
 is settled by there not being one.
 
@@ -420,7 +420,7 @@ The decisions behind what exists are in `decisions.md` under the two `Toasts` he
 gap, with the reason it is still a gap.
 
 - **An id re-added while it is leaving fades back in** rather than restarting as a new entry, because the
-  id never left the rendered list. It is the reasonable behaviour and it is not obvious, so it is written
+  id never left the rendered list. It is the reasonable behavior and it is not obvious, so it is written
   down rather than left to be rediscovered.
 
 A hidden tab now holds every countdown, so that gap is closed — see `decisions.md`, and note the signal is
@@ -501,10 +501,10 @@ value the library owns"_.
 `ColorInput` is the custom picker now; the decisions are in `decisions.md` under the `ColorArea` heading.
 These are the gaps.
 
-- **No native colour input anywhere, so no form value and no OS picker.** Deliberate, and the cost of
+- **No native color input anywhere, so no form value and no OS picker.** Deliberate, and the cost of
   owning the surface. A consumer who wants the OS dialog has nothing to fall back on.
 - **No eyedropper — _postponed until the platform catches up_, decided by the user on 2026-08-15.** Swatch
-  presets and recent colours were dropped the same day and are not coming back. The eyedropper is not
+  presets and recent colors were dropped the same day and are not coming back. The eyedropper is not
   declined, it is waiting: the work is trivial and the support is not there. **Do not propose building it,
   and do not re-argue the design** — that part is settled and recorded below.
 
@@ -528,22 +528,22 @@ every other layer and takes a `visibilitySignal` like every other popup; both ar
 
 **_Elsewhere._**
 
-- **Owning the surface is the mainstream trade.** React Aria's colour suite — `ColorArea`,
-  `ColorSlider`, `ColorWheel`, `ColorField`, `ColorSwatch` and `ColorSwatchPicker`, synchronised by a
-  `ColorPicker` around one colour value object — has no native `<input type="color">` path either, and
+- **Owning the surface is the mainstream trade.** React Aria's color suite — `ColorArea`,
+  `ColorSlider`, `ColorWheel`, `ColorField`, `ColorSwatch` and `ColorSwatchPicker`, synchronized by a
+  `ColorPicker` around one color value object — has no native `<input type="color">` path either, and
   Ark UI's is custom too. Nobody keeps the OS dialog as a fallback, so the cost recorded in the first
   bullet is the cost everyone pays.
 - **The eyedropper is absent because the platform is, and re-checked on 2026-08-15 rather than assumed.**
   `EyeDropper` is Chromium-only: Chrome and Edge from 95, Opera from 81, no Firefox, no Safari, **26.83%
   global support**. MDN marks it experimental and explicitly not Baseline, needing a secure context and a
   user gesture. `open()` resolves to `{ sRGBHex }`, accepts an `AbortSignal`, and Escape cancels it. React
-  Aria's colour documentation shows no eyedropper at all, so there is nothing to copy — and a library-owned
+  Aria's color documentation shows no eyedropper at all, so there is nothing to copy — and a library-owned
   prop for it would do nothing in three browsers out of four.
 - **Dismissal is one mechanism for every layer, and it is a document listener plus a stack.** Radix's
   `DismissableLayer` keeps every open layer in an ordered set; on a pointer press each layer marks
   itself during the capture phase if the press began inside it, and on the bubble phase only the topmost
   layer that was pressed outside dismisses. `onPointerDownOutside` and `onFocusOutside` are both
-  cancellable by the consumer. One implementation serves select, menu, popover, dialog and colour picker
+  cancelable by the consumer. One implementation serves select, menu, popover, dialog and color picker
   together, which is the "settle it once" this bullet asks for — and it is worth noting that it answers
   the question as a **mechanism** before it answers it as an `openSignal`: the ordered stack is what
   stops an inner popup's press from closing the dialog around it, and that is the part four separate
@@ -568,7 +568,7 @@ auto-height measurement lives"_ and _"A panel built on first expansion"_.
   to be findable.
 - **A horizontal accordion is an `orientation` prop plus a second CSS variable.** Radix's
   `orientation="horizontal"` swaps the arrow-key axis and exposes the content _width_ beside the height,
-  which is the direction prop this bullet describes, with the measurement doubled rather than generalised.
+  which is the direction prop this bullet describes, with the measurement doubled rather than generalized.
 - **"Always exactly one open" is the default elsewhere, and the second state is a second boolean.**
   Radix's `type="single"` _requires_ one item to stay expanded; `collapsible`, default `false`, is what
   permits zero. Built here as `isExpandRequired` beside `isSingleExpand` — two booleans, as there, rather
@@ -629,7 +629,7 @@ could not be a child"_. These are the gaps, each with the reason it is still one
 
 - **The marker cannot own the toggle.** One press both selects a node and opens it, because the branch
   marker is drawn inside `renderNode` and the component cannot tell a press on it from a press on the label.
-  A consumer who wants the published desktop behaviour — the chevron opens, the label selects — has no route
+  A consumer who wants the published desktop behavior — the chevron opens, the label selects — has no route
   to it. Giving them one means either a second render slot the library positions, or a flag saying where the
   press landed, and neither has been argued.
 - **One selected value, and no checkboxes.** `valueSignal` is `Signal<T | undefined>`, so there is no
@@ -703,7 +703,7 @@ gaps, each with the reason it is still one.
   omission is the field's, not this library's.
 - **The packages that do ship one have no keyboard route at all**, which is worse than the decision taken here
   rather than different from it. `react-swipeable-button`'s whole documented surface is `onSuccess`,
-  `onFailure` and colours — no role, no `tabindex`, no key handling; `react-slide-button` is built on
+  `onFailure` and colors — no role, no `tabindex`, no key handling; `react-slide-button` is built on
   `react-swipeable`, which is pointer-only by construction.
 - **Apple, whose lock screen is where the pattern comes from, answers exactly the decision taken here.** Asked
   on the developer forum whether a swipe-to-confirm harms VoiceOver users, the guidance is to override
@@ -783,7 +783,7 @@ is the component"_. These are the gaps, each with the reason it is still one.
 ## 18. The carousels — four things deliberately not built
 
 The decisions behind what exists are in `decisions.md` under _"Controls: `Carousel`, and the first component
-that acts without being asked"_ and _"`TrackCarousel` and `DrumCarousel`: one behaviour, two ways of showing
+that acts without being asked"_ and _"`TrackCarousel` and `DrumCarousel`: one behavior, two ways of showing
 it"_. These are the gaps, each with the reason it is still one. They are the shared shell's, so both presets
 have them unless the entry says otherwise.
 
@@ -994,7 +994,7 @@ are in `decisions.md` under _"`Timeline`: a window over a range"_. What is outst
   `OverheadWheel` are in, both already recorded. The Playground's tracks example is what discharging it looks
   like, and its meetings example deliberately has none, so the two sit side by side.
 - **There is a route that would close it without painting anything, and nobody has argued it yet.** A plain
-  click on the axis strip could centre the window on the point clicked, which is a single pointer and no
+  click on the axis strip could center the window on the point clicked, which is a single pointer and no
   dragging; a double-click could zoom in a step. Both are gestures the component already has the arithmetic
   for, neither adds a control, and neither has been put to the user — the objection to expect is that a
   click on the axis is a seek in every video editor that has one, which is a different meaning from the one
@@ -1060,7 +1060,7 @@ placed menu walks on all four arrows"_, _"A group's radios are ordered by the do
 controls take a layout"_ and _"Hold and flick"_.
 
 The hold-and-flick gesture is built, as `Menu`'s `opensOnHold`: the press opens the menu, a short move in an
-item's direction highlights it, and release runs it, with the pointer never travelling as far as the thing it
+item's direction highlights it, and release runs it, with the pointer never traveling as far as the thing it
 picks. It ships with the click-open mode underneath it and the keyboard walk beside it, which is what 2.5.1
 Pointer Gestures and 2.5.7 Dragging Movements require of a path-based, dragging gesture; and the pick lands on
 release with a return toward the middle aborting it, which is the clause of 2.5.2 Pointer Cancellation that a
@@ -1072,12 +1072,12 @@ is what turned up the origin-placed item it scored as pointing due east.
 - **A placed item's box is guessed rather than measured.** A layout picks each item's size from numbers it is
   given — `itemMaxWidthRatio`, `itemWidthRatio` — while the painter's content has an intrinsic width the
   layout never sees. Where the content is wider it simply overflows, and on a ring that means overlapping a
-  neighbour. Every one of the four arrangements built for `Stepper`, `Toolbar`, `Sortable` and `Tree` had to be
+  neighbor. Every one of the four arrangements built for `Stepper`, `Toolbar`, `Sortable` and `Tree` had to be
   widened by hand until its labels fitted, which is what makes this the abstract's problem rather than each
   demo's tuning. One case of it is closed: a nested band's wedge is no longer allowed to be narrower than the
   item box the same layout says it will draw, which is a layout disagreeing with itself rather than with its
   content.
-- **A laid-out control can overflow its container, and it is no longer only popups.** A ring is centred on its
+- **A laid-out control can overflow its container, and it is no longer only popups.** A ring is centerd on its
   invoker and is as large as the box its consumer gave it, so nothing stops it reaching past the edge of the
   screen — pinning deliberately turned off the clamping that would have moved it, and concentric submenus make
   it louder, each level enclosing the one above it. **The mechanism changed** — a layout no longer sizes
@@ -1101,7 +1101,7 @@ is what turned up the origin-placed item it scored as pointing due east.
   build on, but every other tuned constant in the repo is the user's, backed by something they measured, and
   this one is not.
 - **The first item is highlighted the moment a menu opens**, before the pointer touches anything. Standard menu
-  behaviour and `aria-activedescendant` has to point somewhere, but on a wheel it means something looks chosen
+  behavior and `aria-activedescendant` has to point somewhere, but on a wheel it means something looks chosen
   while the pointer is still on the opener. The user raised it; suppressing the visual highlight until the
   pointer or keyboard engages would change `Menu` for every consumer, so it is theirs to call. Unrelated to the
   hover a stationary pointer used to cause, which is fixed.
@@ -1149,13 +1149,15 @@ happened. Nothing is wrong until they have looked.
 
 **Every tracked sample now states its own numbers.** The eighteen carry between five and fifteen knobs each,
 counting the picker and the reset — the radial falloff on the spots and flares, the band's core and spread and
-how far it tracks, the hand's sweep, the ripple set entire, the smear's speed response, and the colour walk's
+how far it tracks, the hand's sweep, the ripple set entire, the smear's speed response, and the color walk's
 span and period. Each defaults to the constant the sample was tuned with, so an untouched knob paints exactly
 what it painted before.
 
-**One narrowing has already happened and is the pattern for the rest.** `elastic_*` lost its `steps` knob: the
-user said twelve is a sweet spot and below it the effect goes janky, so the number is pinned and the prop is
-gone rather than merely defaulted. A knob that should not be turned is removed, not left with a good default.
+**Two narrowings have happened and they are the pattern for the rest.** `elastic_*` lost its `steps` knob:
+the user said twelve is a sweet spot and below it the effect goes janky, so the number is pinned and the prop
+is gone rather than merely defaulted. The four hand samples then lost `sweepLead`, which turned the gradient
+without turning the wedge it is clipped to, so any value but ninety slid the band off the hand. A knob that
+should not be turned is removed, not left with a good default; the reasoning for each sits in `decisions.md`.
 
 **The timed side is only half done.** `steps` reaches the fourteen samples that walk a sweep and `bands` the
 four flows; the `scan`, `sweep`, `fill` and `merge` families still hold their tuning inline in the JSX —
@@ -1194,7 +1196,7 @@ exception, rather than pretending to be absolute. The fix itself is cheap, a rou
 not worth taking is that it forces `withCalendar` to return `undefined`, and then each of `Calendar`,
 `DateInput` and the Playground's knob has to decide separately what to show instead. Three judgment calls and a
 non-null assertion in `toIso`, to close a case only a deliberate calendar switch on an out-of-era date reaches.
-The clamp is also `Intl`'s own behaviour, so what ships is at least consistent with the platform.
+The clamp is also `Intl`'s own behavior, so what ships is at least consistent with the platform.
 
 **Playground samples are not considered for export.** Accepted by the user when the SVG defs vocabulary moved
 out of the library: seven tilings and four families of animation builder now live in `Samples/SVGDefs`, so a
@@ -1241,10 +1243,10 @@ arrangement survives the two grounds above.
 
 **`CellAnimation` draws a brighter line around every cell when the source is see-through.** Accepted by the
 user. Each cell is drawn one pixel wider and taller than its slot so it laps over its right-hand and bottom
-neighbour — the reasoning is in `decisions.md`, and the pixel went back after being removed once. Where the
+neighbor — the reasoning is in `decisions.md`, and the pixel went back after being removed once. Where the
 source is partly transparent, that lapped strip is composited twice: 50% over 50% reads as 75%, and the result
 is a grid of denser lines boxing in each cell. Reachable on the Playground's `CellAnimation` page, in the
-gradient example with `sweep_diag_1` and in the pattern example with `hexagon_pt_2`. The two neighbouring
+gradient example with `sweep_diag_1` and in the pattern example with `hexagon_pt_2`. The two neighboring
 samples show why it is about the artwork rather than the grid: `circle_hd_2` is solid circles on fully empty
 gaps, so doubling either is invisible, and `orbit_async_2v1` lays an opaque gradient over its half-transparent
 base, leaving nothing see-through to double.
@@ -1269,6 +1271,19 @@ answer to "what is next for development"** — see the note at the top of this f
 commitment, and an entry that already carries the user's verdict is recorded here so that the same sketch is
 not put to them twice. An entry leaves this section in one of two directions: upward into a numbered item, which is the user's
 decision to take, or into `conventions.md` / `decisions.md` if building it settles something.
+
+### `Samples` holds two kinds of file, and only one of them is a sample
+
+Raised by the user while correcting a documentation sweep. A registry, a knob set and a table of keyframes
+are descriptions: a reader looks at them and that is the whole of it. The layout families and the pointer
+effects are not descriptions — they are factories that compute something, called by consumers who never read
+the body, which is to say they are utility that happens to live under `Samples`.
+
+The immediate consequence was a rule that reads as an exception: sample files carry no comments, except the
+ones that are secretly utility, which do. The deeper question the user put is whether the implementation
+should leave `Samples` entirely, so that what is left is purely structural and descriptive and the rule needs
+no clause. Nothing has been argued about where it would go, or whether the split would leave a sample's
+factory further from the sample it is for than is useful.
 
 ### A tracked sample that rewards holding still
 
@@ -1305,7 +1320,7 @@ than the component was**, and is the part to reach for if a hand of overlapping 
   strip, so the topmost rectangle at a point is the wrong answer; the index has to come from where the pointer
   falls along the row. That answer also survives a card being lifted, which changes the overlap.
 - **A click handler per card is delivered to whichever box is on top**, so clicking the sliver you can see
-  picks the neighbour — the same bug from the other side.
+  picks the neighbor — the same bug from the other side.
 - **Picking from a `PointerTracker` reading fails a tap.** That reading is flushed on an animation frame after
   a `pointermove`, and a tap with no movement before it has nothing to read.
   `InteractionTrackerUtils.trackDrag` reports a ratio on the press itself, which is what a pick should use.
@@ -1345,7 +1360,7 @@ it, and each was put to the user as a sketch. Their gradings, in their own terms
 **Deferred as knobs rather than entries.** Quantising a weight into bands so a smooth wipe arrives as thick
 blocks; jittering a weight so a machined edge becomes ragged; smoothing a weight so cells arrive in loose
 clumps. Each applies to all of the weights at once, which is what makes them attractive, and each widens
-`WeightOpts` — the user read that as adding behaviour to the API rather than extending a collection, which is a
+`WeightOpts` — the user read that as adding behavior to the API rather than extending a collection, which is a
 different kind of change from a new dropdown entry and wants deciding on its own terms.
 
 **Deferred as disproportionate.** All judged interesting, none judged worth the code for one effect:

@@ -19,6 +19,6 @@ describe("SVGDefsUri", () => {
     it("leaves parentheses alone, which is why an unquoted css url would drop the declaration", () => {
         const uri = SVGDefsUri.toDataUri(svg);
 
-        expect(uri.includes("(") && uri.includes(")"), "colour functions bring parentheses through").toBe(true);
+        expect(uri.includes("(") && uri.includes(")"), "color functions bring parentheses through").toBe(true);
     });
 });

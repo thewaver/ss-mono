@@ -5,7 +5,7 @@ import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
 import { ErroredExample } from "./Examples/Errored";
 import { ImagesExample } from "./Examples/Images";
-import { LabelledExample } from "./Examples/Labelled";
+import { LabelledExample } from "./Examples/Labeled";
 import { MultipleExample } from "./Examples/Multiple";
 import { ReachableExample } from "./Examples/Reachable";
 import { RejectingSetterExample } from "./Examples/RejectingSetter";
@@ -89,7 +89,7 @@ export const FileInputPage = () => {
             name: "In a Label",
             readout: () => `files: ${describe(labelledSignal[0]())} — the caption opens the dialog`,
             component: () => <LabelledExample filesSignal={labelledSignal} />,
-            path: `${EXAMPLES_ROOT}/Labelled.tsx`,
+            path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
     ]);
 

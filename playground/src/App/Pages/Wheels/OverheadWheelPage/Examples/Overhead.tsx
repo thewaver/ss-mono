@@ -1,10 +1,10 @@
 import { createSignal } from "solid-js";
 
-import { Button, OverheadWheel, access } from "@thewaver/ss-components";
+import { Button, OverheadWheel, ProximityEffectUtils, access } from "@thewaver/ss-components";
 import type { WheelController } from "@thewaver/ss-components";
 
 import {
-    PageWheelCentre,
+    PageWheelCenter,
     PageWheelPip,
     PageWheelSpin,
     PageWheelStack,
@@ -27,6 +27,7 @@ export const OverheadExample = ({ wedges, ...otherProps }: Props) => {
                 wedges={getWedges}
                 ariaLabel={"Prize wheel"}
                 computeLayout={PRIZE_WHEEL_RING}
+                computeEffect={ProximityEffectUtils.glow}
                 computeSpinTarget={() => pickPrizeIndex(getWedges().length)}
                 computeWedgeLabel={(index) => `${getWedges()[index]}, ${index + 1} of ${getWedges().length}`}
                 renderWedge={(getWedge, getState) => <PageWheelWedge state={getState}>{getWedge()}</PageWheelWedge>}
@@ -35,7 +36,7 @@ export const OverheadExample = ({ wedges, ...otherProps }: Props) => {
 
             <PageWheelPip side={"top"} />
 
-            <PageWheelCentre>
+            <PageWheelCenter>
                 <Button
                     id={"overheadSpin"}
                     ariaLabel={"Spin the wheel"}
@@ -45,7 +46,7 @@ export const OverheadExample = ({ wedges, ...otherProps }: Props) => {
                     )}
                     onClick={() => getController()?.spin()}
                 />
-            </PageWheelCentre>
+            </PageWheelCenter>
         </PageWheelStack>
     );
 };

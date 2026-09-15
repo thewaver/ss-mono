@@ -4,14 +4,11 @@ import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/Pointe
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import type { GradientBandOpts, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
+import { TrackedGradientKnobs } from "../TrackedGradient.knobs";
 
-const BAND_ANGLE = 45;
 const BAND_SPAN: Size2d = { width: 0.8, height: 0.8 };
-const BAND_TRAVEL = 1.25;
-const CORE_STOP = 50;
-const FALLOFF_SPREAD = 25;
-const CORE_ALPHA = 0.75;
-const FALLOFF_ALPHA = 0.25;
+
+const DEFAULTS = TrackedGradientKnobs.BAND_DIAGONAL_DEFAULTS;
 
 const NO_REF = () => undefined;
 
@@ -26,33 +23,37 @@ export const band_diag_1 = (opts?: GradientBandOpts): TrackedGradientConfig => (
                 renderDefsElement: () => {
                     const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
-                    const getTravel = () => {
-                        const ratio = getReading().boxRatio;
+                    const angle = opts?.bandAngle ?? DEFAULTS.bandAngle;
 
-                        return (ratio.x + ratio.y - 1) * BAND_TRAVEL * 0.5;
-                    };
+                    const getTravel = () =>
+                        SVGDefsUtils.projectBoxRatioOntoAngle(getReading().boxRatio, angle) *
+                        (opts?.bandTravel ?? DEFAULTS.bandTravel);
 
                     return SVGGradientDefsUtils.computeLinearGradient({
                         id: `gradient1-${id}`,
                         colors: [
                             { value: `rgb(from ${defs.colors.primary} r g b / 0)` },
                             {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? FALLOFF_ALPHA})`,
-                                stop: (opts?.coreStop ?? CORE_STOP) - (opts?.falloffSpread ?? FALLOFF_SPREAD),
+                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? DEFAULTS.falloffAlpha})`,
+                                stop:
+                                    (opts?.coreStop ?? DEFAULTS.coreStop) -
+                                    (opts?.falloffSpread ?? DEFAULTS.falloffSpread),
                             },
                             {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.coreAlpha ?? CORE_ALPHA})`,
-                                stop: opts?.coreStop ?? CORE_STOP,
+                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.coreAlpha ?? DEFAULTS.coreAlpha})`,
+                                stop: opts?.coreStop ?? DEFAULTS.coreStop,
                             },
                             {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? FALLOFF_ALPHA})`,
-                                stop: (opts?.coreStop ?? CORE_STOP) + (opts?.falloffSpread ?? FALLOFF_SPREAD),
+                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? DEFAULTS.falloffAlpha})`,
+                                stop:
+                                    (opts?.coreStop ?? DEFAULTS.coreStop) +
+                                    (opts?.falloffSpread ?? DEFAULTS.falloffSpread),
                             },
                             { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
                         ],
-                        angle: opts?.bandAngle ?? BAND_ANGLE,
+                        angle,
                         scale: BAND_SPAN,
-                        offset: () => SVGDefsUtils.offsetDiagonally(getTravel(), BAND_ANGLE),
+                        offset: () => SVGDefsUtils.offsetDiagonally(getTravel(), angle),
                     });
                 },
             },

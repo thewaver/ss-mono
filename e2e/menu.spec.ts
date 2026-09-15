@@ -437,13 +437,13 @@ test.describe("a menu opened by a right-click", () => {
 /**
  * A hover the pointer did not cause must not move the highlight. The browser re-runs hit-testing whenever
  * anything changes under a stationary cursor and reports the result as a fresh `mouseenter`, so a menu that
- * covers its own opener — a wheel is centred on its trigger — would otherwise open and immediately hand the
+ * covers its own opener — a wheel is centerd on its trigger — would otherwise open and immediately hand the
  * highlight to whatever happens to sit beneath the pointer. `Menu` tells the two apart by the point on
  * record: a real enter arrives with coordinates that differ from the last movement, an invented one matches.
  *
  * There is no real interaction that produces the invented kind on demand — it depends on what the browser
  * decides to re-test and when — so this dispatches one, with the coordinates the pointer actually last had,
- * which is exactly the shape the guard is written to recognise. The second half is the control: the same
+ * which is exactly the shape the guard is written to recognize. The second half is the control: the same
  * item, entered properly, does move the highlight.
  */
 const enterWithoutMoving = (page: Page, item: Locator, at: { x: number; y: number }) =>

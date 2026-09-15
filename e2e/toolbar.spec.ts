@@ -6,7 +6,7 @@ import { activeText, attributesOf, demo, example, prop } from "./helpers";
  * The toolbar decides what fits by measuring, so nothing here writes down a width or a number of buttons:
  * every check is a relationship between what the row is showing and what the menu is holding. A spec that
  * pinned "four buttons at 620px" would go red the day somebody changed the padding on a button, which is
- * not a behaviour change at all.
+ * not a behavior change at all.
  *
  * Every action is rendered whether or not it fits — the ones that do not are taken out of the flow so they
  * can still be measured — so "in the row" is read off `aria-hidden` rather than off what is in the DOM.
@@ -208,9 +208,9 @@ test("the same action runs whether it is pressed in the row or picked in the men
 });
 
 /**
- * A row's whole behaviour is the cut: it measures what fits and moves the tail into a menu. A layout sizes
+ * A row's whole behavior is the cut: it measures what fits and moves the tail into a menu. A layout sizes
  * the bar itself, so there is no width to run out of and nothing to collapse — which is the one case in
- * this pass where a layout removes a behaviour rather than relocating one. What has to survive is
+ * this pass where a layout removes a behavior rather than relocating one. What has to survive is
  * everything else the toolbar is: the role, the single tab stop and the roving walk.
  */
 const PALETTE = demo("palette");

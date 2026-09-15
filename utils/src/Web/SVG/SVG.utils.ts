@@ -1,3 +1,4 @@
+import { AngleUtils } from "../../Abstracts/angle.js";
 import { Point2d } from "../../Abstracts/point2d.js";
 import { PolygonUtils } from "../../Abstracts/polygon.js";
 import { Size2d } from "../../Abstracts/size.js";
@@ -37,8 +38,8 @@ export namespace SVGUtils {
      *
      * @param angle Which way the gradient runs, in degrees. Defaults to `0`.
      * @param scale Stretches the gradient beyond the element. Values above `1` push the
-     * colour stops outside the visible box, softening the ends.
-     * @param offset Shifts the gradient's centre away from the middle.
+     * color stops outside the visible box, softening the ends.
+     * @param offset Shifts the gradient's center away from the middle.
      * @returns The `x1`, `y1`, `x2` and `y2` for the gradient element.
      */
 
@@ -69,20 +70,26 @@ export namespace SVGUtils {
 
     /**
      * Works out the `gradientTransform` that squashes and turns an SVG `radialGradient`
-     * about its own centre.
+     * about its own center.
      *
      * A radial gradient is always a circle, so an ellipse — a streak, a smear along a
      * direction of travel — has to come from a transform rather than from the gradient's
      * own attributes. Because the transform is applied about the gradient's origin, the
-     * centre stays where it was put and only the shape around it changes.
+     * center stays where it was put and only the shape around it changes.
      *
-     * @param origin Where the gradient's centre sits, in the 0–1 range that
+     * @param origin Where the gradient's center sits, in the 0–1 range that
      * `objectBoundingBox` gradients use. Defaults to the middle.
      * @param aspect Multipliers for the two axes before turning. `{ width: 4, height: 1 }`
      * stretches it four times along its own x axis; `{ width: 1, height: 1 }` leaves it
-     * circular.
+     * unstretched.
      * @param angle Which way the stretched axis points, in degrees, increasing clockwise
      * to match {@link getLinearCoords}. Defaults to `0`.
+     * @param elementSize The element's own width and height. A bounding-box gradient is
+     * measured in fractions of the box, so on an oblong element a round gradient paints as
+     * an oval; giving the size counteracts that and holds it round, at the radius the
+     * shorter side gives. Omit to let the gradient follow the box, which is the default
+     * SVG behavior. A square element needs no correction and produces the same output
+     * either way.
      * @returns Transform text for a `gradientTransform` attribute, or `undefined` when the
      * arguments describe an untransformed circle and the attribute should be left off.
      */
@@ -91,21 +98,32 @@ export namespace SVGUtils {
         origin = { x: 0.5, y: 0.5 },
         aspect = { width: 1, height: 1 },
         angle = 0,
+        elementSize,
     }: {
         origin?: Point2d;
         aspect?: Size2d;
         angle?: number;
+        elementSize?: Size2d;
     }) => {
-        if (aspect.width === 1 && aspect.height === 1) return undefined;
+        const shorterSide = elementSize && Math.min(elementSize.width, elementSize.height);
+        const counter =
+            shorterSide && shorterSide > 0
+                ? { width: shorterSide / elementSize!.width, height: shorterSide / elementSize!.height }
+                : { width: 1, height: 1 };
+        const isCountered = counter.width !== 1 || counter.height !== 1;
+
+        if (aspect.width === 1 && aspect.height === 1 && !isCountered) return undefined;
 
         return (
-            `translate(${origin.x} ${origin.y}) rotate(${angle}) ` +
+            `translate(${origin.x} ${origin.y}) ` +
+            (isCountered ? `scale(${counter.width} ${counter.height}) ` : "") +
+            `rotate(${angle}) ` +
             `scale(${aspect.width} ${aspect.height}) translate(${-origin.x} ${-origin.y})`
         );
     };
 
     export const getArcPath = (arcSize: number, rotation: number = 0) => {
-        const normalizedArcSize = ((arcSize % 360) + 360) % 360;
+        const normalizedArcSize = AngleUtils.wrapPositive(arcSize);
         const leadingAngle = rotation + normalizedArcSize;
 
         if (arcSize > 0 && normalizedArcSize === 0) {
@@ -138,7 +156,7 @@ export namespace SVGUtils {
     };
 
     /**
-     * Builds a ring of pie slices radiating from the centre of a circle, like the
+     * Builds a ring of pie slices radiating from the center of a circle, like the
      * blades of a fan or the spokes of a loading spinner.
      *
      * The slices are drawn around a fixed unit circle, so scale them with a `viewBox`

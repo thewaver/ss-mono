@@ -122,7 +122,7 @@ test("keyboard: a pick, two moves and a drop land two places along", async ({ pa
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("Enter");
 
-    expect(await readout(page, "reorder"), "the first item has passed two of its neighbours").toContain(
+    expect(await readout(page, "reorder"), "the first item has passed two of its neighbors").toContain(
         "Second — locked, Third, First, Fourth",
     );
 });
@@ -134,7 +134,7 @@ test("keyboard: Escape puts the item back where it was", async ({ page }) => {
     await page.keyboard.press("ArrowRight");
     await page.keyboard.press("Escape");
 
-    expect(await readout(page, "row"), "a cancelled carry changes nothing").toContain(
+    expect(await readout(page, "row"), "a canceled carry changes nothing").toContain(
         "Ember Sprite, Gale Warden, Tide Caller",
     );
 });
@@ -160,7 +160,7 @@ test("pointer: a drag carries an item into the other list", async ({ page }) => 
 /**
  * The single-pointer route 2.5.7 asks for. A press that never moves far enough to be a drag is a click,
  * and a click picks up; the next click places. The two are one state machine with the keyboard route,
- * which is why cancelling works the same way for both.
+ * which is why canceling works the same way for both.
  */
 /**
  * A tap-carry is not a drag with the button up: nothing is holding the pointer, so the moves arrive at the
@@ -489,8 +489,8 @@ test("a placed list keeps the keyboard route, which never had an axis to lose", 
 
 /**
  * A row can put a landing mark at an offset along itself. A ring has no offset to put one at, so the mark is
- * placed like an item: the abstract works out the gap between the two neighbours the card would land
- * between — measured from the borders that face each other rather than from the two centres — and turns it to
+ * placed like an item: the abstract works out the gap between the two neighbors the card would land
+ * between — measured from the borders that face each other rather than from the two centers — and turns it to
  * lie across the line joining them. What a spec can read off that is the turn, which a row's mark never has.
  */
 test("a ring marks the gap it would land in, turned to lie across it", async ({ page }) => {
@@ -527,7 +527,7 @@ test("a ring marks the gap it would land in, turned to lie across it", async ({ 
 /**
  * Four items round a ring leave four gaps a quarter turn apart, so the marks for them should be a quarter
  * turn apart too. Checking them as a set rather than one at a time is what catches a single wrong one: the
- * gap at the end of the list is the only one with an imagined neighbour, and aiming it by reversing the last
+ * gap at the end of the list is the only one with an imagined neighbor, and aiming it by reversing the last
  * join instead of by carrying the ring round put it a quarter turn out — correct-looking on its own, and
  * obvious the moment the four are compared.
  */
@@ -535,7 +535,7 @@ test("the four gaps of a ring are a quarter turn apart, the last one included", 
     const box = (await page.locator(`${RING} [role="list"]`).boundingBox())!;
     const cards = page.locator(`${RING} [role="listitem"]`);
     const first = (await cards.nth(0).boundingBox())!;
-    const centre = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
+    const center = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
     const reach = Math.min(box.width, box.height) * 0.34;
 
     await page.mouse.move(first.x + first.width * 0.5, first.y + first.height * 0.5);
@@ -551,7 +551,7 @@ test("the four gaps of a ring are a quarter turn apart, the last one included", 
         { x: -reach, y: 0 },
         { x: 0, y: -reach },
     ]) {
-        await page.mouse.move(centre.x + spot.x, centre.y + spot.y, { steps: 6 });
+        await page.mouse.move(center.x + spot.x, center.y + spot.y, { steps: 6 });
         await expect(placed.last()).toBeAttached();
 
         const turn = await inlineStyle(placed.last(), "transform");

@@ -6,7 +6,7 @@ import { useViewportContext } from "../Viewport/Viewport.context";
 import { ViewportUtils } from "../Viewport/Viewport.utils";
 import type { PointerReading } from "./PointerTracker.types";
 
-/** What is reported before the pointer has been seen: centred, and infinitely far away, so a distance test reads as "not near". */
+/** What is reported before the pointer has been seen: centerd, and infinitely far away, so a distance test reads as "not near". */
 const RESTING_READING: PointerReading = {
     offset: { x: 0, y: 0 },
     angle: 0,
@@ -135,7 +135,7 @@ export namespace PointerTrackerUtils {
      * @param getIsDisabled Pass `true` to stop tracking; the element stops contributing to the shared
      * listeners entirely.
      * @returns `getReading` and `getIsPointerPresent`. The reading gives `offset` and `distance` from
-     * the element's centre in pixels, `angle` as a bearing, `edgeOffset` and `edgeDistance` describing
+     * the element's center in pixels, `angle` as a bearing, `edgeOffset` and `edgeDistance` describing
      * how far the element's border reaches in that same direction, `edgeRatio` — below `1` inside the
      * element, `1` on its border, `2` a further element-radius away — and `boxRatio`, the pointer's
      * position across the element from `0` to `1`, which reads outside that range when the pointer is

@@ -2,6 +2,7 @@ import { For, createMemo } from "solid-js";
 
 import { Tree, access } from "@thewaver/ss-components";
 import type { PlacementLayoutDefs, PlacementLayoutFn, PlacementRect, TreeNode } from "@thewaver/ss-components";
+import { AngleUtils } from "@thewaver/ss-utils";
 
 import { PageTreeRadialNode } from "../../../StyledComponents/TreeNodeContent/TreeNodeContent";
 import { RANKS } from "../TreePage.const";
@@ -17,10 +18,9 @@ import * as styles from "../TreePage.css";
  */
 const RADIAL_DEFS = { innerRadius: 88, ringGap: 96, itemWidth: 88, itemHeight: 88, spreadDegrees: 360 };
 
-const CENTRE = 0.5;
-const DEGREES_PER_RADIAN = 180 / Math.PI;
+const CENTER = 0.5;
 const UPWARD_DEGREES = -90;
-const CENTRED_ROOT_COUNT = 1;
+const CENTERD_ROOT_COUNT = 1;
 
 type RadialSpan = { from: number; to: number; depth: number };
 
@@ -58,23 +58,23 @@ const toRadialSpans = (itemCount: number, itemParents: (number | undefined)[], s
 const RADIAL_LAYOUT: PlacementLayoutFn = ({ itemCount, itemParents = [] }: PlacementLayoutDefs) => {
     const { spans, rootCount } = toRadialSpans(itemCount, itemParents, RADIAL_DEFS.spreadDegrees);
     const radiusAt = (depth: number) =>
-        depth === 0 && rootCount === CENTRED_ROOT_COUNT ? 0 : RADIAL_DEFS.innerRadius + RADIAL_DEFS.ringGap * depth;
+        depth === 0 && rootCount === CENTERD_ROOT_COUNT ? 0 : RADIAL_DEFS.innerRadius + RADIAL_DEFS.ringGap * depth;
     const deepest = spans.reduce((lowest, span) => Math.max(lowest, span.depth), 0);
-    const width = (radiusAt(deepest) + RADIAL_DEFS.itemWidth * CENTRE) * 2;
+    const width = (radiusAt(deepest) + RADIAL_DEFS.itemWidth * CENTER) * 2;
 
     const placements = spans.map<PlacementRect>((span) => {
-        const radians = ((span.from + span.to) * CENTRE) / DEGREES_PER_RADIAN;
+        const radians = AngleUtils.toRadians((span.from + span.to) * CENTER);
         const radius = radiusAt(span.depth);
 
         return {
-            left: CENTRE + (Math.cos(radians) * radius) / width,
-            top: CENTRE + (Math.sin(radians) * radius) / width,
+            left: CENTER + (Math.cos(radians) * radius) / width,
+            top: CENTER + (Math.sin(radians) * radius) / width,
             width: RADIAL_DEFS.itemWidth / width,
             height: RADIAL_DEFS.itemHeight / width,
         };
     });
 
-    return { placements, heightRatio: 1, pickRule: "nearest", origin: { x: CENTRE, y: CENTRE } };
+    return { placements, heightRatio: 1, pickRule: "nearest", origin: { x: CENTER, y: CENTER } };
 };
 
 const ROOT_DEPTH = 0;

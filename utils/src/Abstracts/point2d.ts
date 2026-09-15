@@ -1,4 +1,4 @@
-import { MathUtils } from "./math.js";
+import { AngleUtils } from "./angle.js";
 import { Size2d } from "./size.js";
 import { Vec2d, type Vec2dString } from "./vec2d.js";
 
@@ -37,12 +37,6 @@ export namespace Point2dString {
 }
 
 export namespace Point2dUtils {
-    /** Converts radians to degrees. */
-    export const radiansToDegrees = (radians: number): number => radians * MathUtils.DEGREES_PER_RADIAN;
-
-    /** Converts degrees to radians. */
-    export const degreesToRadians = (degrees: number): number => degrees * MathUtils.RADIANS_PER_DEGREE;
-
     /**
      * Shrinks a direction down to length 1, keeping the way it points.
      *
@@ -122,7 +116,7 @@ export namespace Point2dUtils {
      * points left. Results run from -180 to 180. The origin itself has no direction, so
      * it reports `0`.
      */
-    export const getAngle = (p: Point2d): number => radiansToDegrees(Math.atan2(p.y, p.x));
+    export const getAngle = (p: Point2d): number => AngleUtils.fromRadians(Math.atan2(p.y, p.x));
 
     /** Measures how far a point sits from the origin, in a straight line. */
     export const getLength = (p: Point2d): number => Math.hypot(p.x, p.y);
@@ -134,8 +128,8 @@ export namespace Point2dUtils {
      * @param angle Which way to face, in degrees. See {@link getAngle} for the convention.
      */
     export const polarToCartesian = (radius: number, angle: number): Point2d => ({
-        x: radius * Math.cos(angle * MathUtils.RADIANS_PER_DEGREE),
-        y: radius * Math.sin(angle * MathUtils.RADIANS_PER_DEGREE),
+        x: radius * Math.cos(AngleUtils.toRadians(angle)),
+        y: radius * Math.sin(AngleUtils.toRadians(angle)),
     });
 
     /**
@@ -185,7 +179,7 @@ export namespace Point2dUtils {
      * Shifts a line segment sideways, at right angles to the way it runs.
      *
      * Used to build the walls of a thick outline: offset each edge, then intersect the
-     * neighbours to find the corners.
+     * neighbors to find the corners.
      *
      * @param a Start of the segment.
      * @param b End of the segment.

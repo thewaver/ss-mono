@@ -173,7 +173,11 @@ export const Toolbar = <T,>(props: ToolbarProps<T>) => {
 
     const renderItems = (children: JSX.Element) => (
         <Show when={getLayout()} fallback={children}>
-            {(getResolved) => <PlacementBox layout={getResolved}>{children}</PlacementBox>}
+            {(getResolved) => (
+                <PlacementBox layout={getResolved} computeEffect={props.computeEffect}>
+                    {children}
+                </PlacementBox>
+            )}
         </Show>
     );
 

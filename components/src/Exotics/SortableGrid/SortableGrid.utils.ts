@@ -15,7 +15,7 @@ type SortableGridEdge = {
     to: SortableGridSpot;
 };
 
-/** How much sideways drift counts against a candidate when stepping in a direction. Higher keeps arrow keys travelling in a straighter line. */
+/** How much sideways drift counts against a candidate when stepping in a direction. Higher keeps arrow keys traveling in a straighter line. */
 const ACROSS_PENALTY = 2;
 /** Quarter turns in a full turn. */
 const TURN_COUNT = 4;
@@ -32,7 +32,7 @@ const getTurnedOnce = (cells: SortableGridSpot[], height: number) =>
 /**
  * The outward-facing edges of a set of cells, each pointing clockwise.
  *
- * A cell contributes an edge only where it has no neighbour, so the edges collected are exactly the
+ * A cell contributes an edge only where it has no neighbor, so the edges collected are exactly the
  * outline. Directing them consistently is what lets them be threaded into a loop afterwards.
  */
 const getEdges = (cells: SortableGridSpot[]) => {
@@ -106,7 +106,7 @@ const getWithoutCollinear = (loop: SortableGridSpot[]) =>
  * size is worked out from its cells, turning it means turning the cells, and whether it fits means
  * asking about each cell.
  *
- * Footprints are normalised to start at the origin, so a caller may describe a shape anywhere in a
+ * Footprints are normalized to start at the origin, so a caller may describe a shape anywhere in a
  * grid of its own and the description still means the same thing.
  */
 export namespace SortableGridUtils {
@@ -293,17 +293,17 @@ export namespace SortableGridUtils {
      * @param step The direction, as a unit step — `{ x: 1, y: 0 }` for right.
      * @returns The item's index, or `undefined` when there is nothing that way.
      */
-    export const getNeighbourIndex = (boxes: SortableGridBox[], fromIndex: number, step: Point2d) => {
+    export const getNeighborIndex = (boxes: SortableGridBox[], fromIndex: number, step: Point2d) => {
         const from = boxes[fromIndex];
 
         if (!from) return;
 
-        const getBoxCentre = (box: SortableGridBox) => ({
+        const getBoxCenter = (box: SortableGridBox) => ({
             x: box.spot.x + box.size.width * 0.5,
             y: box.spot.y + box.size.height * 0.5,
         });
 
-        const origin = getBoxCentre(from);
+        const origin = getBoxCenter(from);
 
         let best: number | undefined;
         let bestScore = Number.POSITIVE_INFINITY;
@@ -311,8 +311,8 @@ export namespace SortableGridUtils {
         boxes.forEach((box, index) => {
             if (index === fromIndex) return;
 
-            const centre = getBoxCentre(box);
-            const offset = { x: centre.x - origin.x, y: centre.y - origin.y };
+            const center = getBoxCenter(box);
+            const offset = { x: center.x - origin.x, y: center.y - origin.y };
             const along = offset.x * step.x + offset.y * step.y;
 
             if (along <= 0) return;
@@ -329,8 +329,8 @@ export namespace SortableGridUtils {
         return best;
     };
 
-    /** The average of a shape's cells, in cell coordinates. A shape with holes centres on its cells rather than on its bounding box. */
-    export const getCentre = (cells: SortableGridSpot[]): Point2d => ({
+    /** The average of a shape's cells, in cell coordinates. A shape with holes centers on its cells rather than on its bounding box. */
+    export const getCenter = (cells: SortableGridSpot[]): Point2d => ({
         x: cells.reduce((total, cell) => total + cell.x + HALF_CELL, 0) / cells.length,
         y: cells.reduce((total, cell) => total + cell.y + HALF_CELL, 0) / cells.length,
     });
@@ -340,7 +340,7 @@ export namespace SortableGridUtils {
      *
      * A label, an icon or a handle needs somewhere rectangular to sit, and an L-shaped item has no
      * obvious middle. This finds the biggest full rectangle of cells, preferring the one nearest the
-     * shape's centre where several are the same size.
+     * shape's center where several are the same size.
      *
      * @param cells The shape's cells.
      * @returns The rectangle's position and size, in cell coordinates.
@@ -348,7 +348,7 @@ export namespace SortableGridUtils {
     export const getBlock = (cells: SortableGridSpot[]): SortableGridBox => {
         const filled = new Set(cells.map(toKey));
         const size = getSize(cells);
-        const centre = getCentre(cells);
+        const center = getCenter(cells);
 
         const getIsSolid = (spot: SortableGridSpot, block: SortableGridSize) => {
             for (let y = spot.y; y < spot.y + block.height; y++) {
@@ -371,7 +371,7 @@ export namespace SortableGridUtils {
                         if (!getIsSolid({ x, y }, { width, height })) continue;
 
                         const area = width * height;
-                        const offset = Math.hypot(x + width * 0.5 - centre.x, y + height * 0.5 - centre.y);
+                        const offset = Math.hypot(x + width * 0.5 - center.x, y + height * 0.5 - center.y);
 
                         if (area < bestArea || (area === bestArea && offset >= bestOffset)) continue;
 

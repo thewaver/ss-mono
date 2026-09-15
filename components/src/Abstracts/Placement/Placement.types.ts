@@ -21,12 +21,19 @@ export type PlacementRect = {
 
 export type PlacementPickRule = "nearest" | "angle";
 
-export type PlacementLayout = {
+export type PlacementReachRule = "horizontal" | "vertical" | "arc" | "plane";
+
+export type PlacementReach = {
+    reachRule?: PlacementReachRule;
+    origin?: Point2d;
+    facing?: number;
+};
+
+export type PlacementLayout = PlacementReach & {
     placements: PlacementRect[];
     extent?: number;
     heightRatio: number;
     pickRule?: PlacementPickRule;
-    origin?: Point2d;
     radii?: Point2d;
 };
 

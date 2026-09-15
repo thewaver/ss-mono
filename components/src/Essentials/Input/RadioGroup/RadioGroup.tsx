@@ -203,7 +203,7 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
                 }
             >
                 {(getResolved) => (
-                    <PlacementBox layout={getResolved}>
+                    <PlacementBox layout={getResolved} computeEffect={props.computeEffect}>
                         {renderFloater()}
                         {renderItems()}
                     </PlacementBox>

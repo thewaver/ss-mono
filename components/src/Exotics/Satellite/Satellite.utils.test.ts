@@ -28,7 +28,7 @@ describe("computeLayout", () => {
         expect(spell({ x: "left-in", y: "top-in" })).toBe("0 0 0 0 0 0");
     });
 
-    it("centres the satellite over the subject without growing either way", () => {
+    it("centers the satellite over the subject without growing either way", () => {
         expect(spell({ x: "center", y: "center" })).toBe("0 0 0 0 40 40");
     });
 

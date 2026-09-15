@@ -90,7 +90,7 @@ Both functions now return `DOMRect.fromRect(...)`. The arithmetic is unchanged: 
 subtracted the same offset from `x` and `left` (and `y`/`top`), so deriving the edges from the corner
 gives identical numbers.
 
-One behaviour note: `DOMRect` normalises negative widths, where the old hand-rolled arithmetic did
+One behavior note: `DOMRect` normalizes negative widths, where the old hand-rolled arithmetic did
 not. Rectangles from `getBoundingClientRect` are never negative-width, so this should not surface.
 
 ### 5. FIXED — `roundDownToNearestInt` rounded the wrong way for negatives
@@ -115,7 +115,7 @@ comparing raw angles glitched there.
 
 Now a single `Math.atan2`, range −180…180. **This changes returned values** for the third quadrant
 (`x < 0, y < 0`) and for straight down: those used to come back 360 higher. Anything comparing raw
-numbers from `getAngle` or `cartesianToPolar` needs a look. See [Behaviour changes](#behaviour-changes).
+numbers from `getAngle` or `cartesianToPolar` needs a look. See [Behavior changes](#behavior-changes).
 
 ### 8. FIXED — `intersectEdges` took directions but was named for endpoints
 
@@ -129,7 +129,7 @@ There is now one implementation, `Point2dUtils.intersectLines(point1, dir1, poin
 
 The two originals disagreed on how near to parallel counts as never meeting — `1e-8` and `1e-6`.
 Rather than picking one, the threshold is now a fifth parameter defaulting to `1e-8`, and
-`getLineIntersection` passes `1e-6` explicitly. Both call sites keep exactly the behaviour they had.
+`getLineIntersection` passes `1e-6` explicitly. Both call sites keep exactly the behavior they had.
 
 ### 9. PARTIALLY FIXED — degenerate geometry produced `NaN`
 
@@ -201,7 +201,7 @@ all 27 modules. The 66 KB bundle is close to all-or-nothing.
 subpath entries would give real tree-shaking; `import * as MathUtils from "…/math"` keeps the
 `MathUtils.` prefix at call sites without the namespace object.
 
-**Decided against, 2026-08-05.** The organisation `namespace` gives is worth more than the bundle
+**Decided against, 2026-08-05.** The organization `namespace` gives is worth more than the bundle
 size it costs — a few KB is not a real constraint here. Not an open question; do not raise it again.
 
 ### 16. WITHDRAWN — `PATH_CACHE` growth is intentional, not a leak
@@ -231,7 +231,7 @@ What survives from this item, all uncontested:
   returned without storing.
 
 **Lesson for this file: cache sizing here is a benchmarked decision, not a code-review judgment
-call.** Do not change eviction behaviour without measurements.
+call.** Do not change eviction behavior without measurements.
 
 ### 17. FIXED — four overlapping geometry APIs
 
@@ -309,7 +309,7 @@ environment for `Web/*`.
 
 ---
 
-## Behaviour changes
+## Behavior changes
 
 Everything else is either a pure bug fix or additive.
 
@@ -329,9 +329,9 @@ Everything else is either a pure bug fix or additive.
    directions and straight-down used to come back 360 higher. This one is unavoidable — the old
    representation was internally inconsistent.
 
-No other numeric behaviour changed. `getLineIntersection` keeps its original `1e-6` parallel
+No other numeric behavior changed. `getLineIntersection` keeps its original `1e-6` parallel
 threshold, now passed explicitly rather than inherited from whichever implementation survived the
-merge. Path caching keeps its original unbounded, never-evicting behaviour — see #16.
+merge. Path caching keeps its original unbounded, never-evicting behavior — see #16.
 
 ---
 

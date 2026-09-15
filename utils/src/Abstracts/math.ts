@@ -1,12 +1,4 @@
-import { Size2d } from "./size.js";
-
 export namespace MathUtils {
-    /** How many radians make up one degree. Multiply a value in degrees by this to get radians. */
-    export const RADIANS_PER_DEGREE = Math.PI / 180;
-
-    /** How many degrees make up one radian. Multiply a value in radians by this to get degrees. */
-    export const DEGREES_PER_RADIAN = 180 / Math.PI;
-
     /**
      * Tests whether a whole number is even.
      *
@@ -84,7 +76,7 @@ export namespace MathUtils {
      * Behaves exactly like `Math.min(Math.max(value, min), max)`, including when the bounds are given the
      * wrong way round — `clamp(1, 5, 3)` is `3`, because the upper bound is applied last. That equivalence is
      * deliberate rather than incidental: it is what makes replacing a hand-written clamp a change of spelling
-     * rather than a change of behaviour.
+     * rather than a change of behavior.
      *
      * @param value The value to restrict.
      * @param min The lower bound.
@@ -202,31 +194,5 @@ export namespace MathUtils {
         values.push(to);
 
         return values;
-    };
-
-    /**
-     * Converts an on-screen angle back into the angle you would need in an unscaled
-     * box to point the same way.
-     *
-     * When a square is stretched into a rectangle, a line drawn at 45° no longer
-     * *looks* like it sits at 45°. This undoes that distortion so the visual angle is
-     * preserved.
-     *
-     * @param angle The angle as it should appear on screen, in degrees.
-     * @param size The box the angle lives in. A zero width or height returns `angle`
-     * untouched.
-     * @returns The corrected angle in degrees, in the range -180 to 180.
-     */
-    export const unwarpAngle = (angle: number, size: Size2d): number => {
-        if (size.width === 0 || size.height === 0) return angle;
-
-        const radians = angle * RADIANS_PER_DEGREE;
-        const visualX = Math.cos(radians);
-        const visualY = Math.sin(radians);
-        const boxX = visualX / size.height;
-        const boxY = visualY / size.width;
-        const unwarpedRadians = Math.atan2(boxY, boxX);
-
-        return unwarpedRadians * DEGREES_PER_RADIAN;
     };
 }

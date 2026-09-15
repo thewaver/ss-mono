@@ -50,10 +50,10 @@ import { randomDefault } from "./Samples/randomDefault";
 import { rippleDefault } from "./Samples/rippleDefault";
 import { rippleDiamondDefault } from "./Samples/rippleDiamondDefault";
 import { rippleDiamondTight } from "./Samples/rippleDiamondTight";
-import { rippleDiamondTravelling } from "./Samples/rippleDiamondTravelling";
+import { rippleDiamondTraveling } from "./Samples/rippleDiamondTraveling";
 import { rippleDiamondWide } from "./Samples/rippleDiamondWide";
 import { rippleTight } from "./Samples/rippleTight";
-import { rippleTravelling } from "./Samples/rippleTravelling";
+import { rippleTraveling } from "./Samples/rippleTraveling";
 import { rippleWide } from "./Samples/rippleWide";
 import { rollColumn } from "./Samples/rollColumn";
 import { rollColumnConvergent } from "./Samples/rollColumnConvergent";
@@ -127,10 +127,10 @@ export namespace CellAnimationWeights {
         "rippleDefault",
         "rippleDiamondDefault",
         "rippleDiamondTight",
-        "rippleDiamondTravelling",
+        "rippleDiamondTraveling",
         "rippleDiamondWide",
         "rippleTight",
-        "rippleTravelling",
+        "rippleTraveling",
         "rippleWide",
         "rollColumn",
         "rollColumnConvergent",
@@ -219,10 +219,10 @@ export namespace CellAnimationWeights {
         rippleDefault,
         rippleDiamondDefault,
         rippleDiamondTight,
-        rippleDiamondTravelling,
+        rippleDiamondTraveling,
         rippleDiamondWide,
         rippleTight,
-        rippleTravelling,
+        rippleTraveling,
         rippleWide,
         rollColumn,
         rollColumnConvergent,

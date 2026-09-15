@@ -329,7 +329,7 @@ export namespace DateValueUtils {
      * @param grid A grid from {@link DateValueUtils.getMonthGrid}.
      * @param value The date to look for.
      * @returns Its column and row, or `undefined` when the grid does not reach it. A date can appear in
-     * the leading or trailing days of a neighbouring month's grid, so the answer depends on which grid
+     * the leading or trailing days of a neighboring month's grid, so the answer depends on which grid
      * is asked.
      */
     export const getCellOf = (grid: DateValueMonthGrid, value: DateValue) => {

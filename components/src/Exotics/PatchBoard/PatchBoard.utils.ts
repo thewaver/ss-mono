@@ -18,7 +18,7 @@ const THIRDS = 3;
 /** What each vertical band is called. */
 const VERTICAL_LABELS = ["top", "middle", "bottom"];
 /** What each horizontal band is called. */
-const HORIZONTAL_LABELS = ["left", "centre", "right"];
+const HORIZONTAL_LABELS = ["left", "center", "right"];
 
 /**
  * Places the sockets of a node graph, and decides which of them may be wired together.
@@ -284,13 +284,13 @@ export namespace PatchBoardUtils {
      * Where a node sits on the board, in words.
      *
      * A dragged node's new position is invisible to a screen reader, and coordinates would mean nothing
-     * read aloud — "middle centre" does. The node's centre is what places it, so a node overlapping two
+     * read aloud — "middle center" does. The node's center is what places it, so a node overlapping two
      * bands is described by the one it mostly occupies.
      *
      * @param spot The node's position.
      * @param size The node's size.
      * @param bounds The board's size.
-     * @returns A vertical and a horizontal band, as in `"top left"` or `"middle centre"`.
+     * @returns A vertical and a horizontal band, as in `"top left"` or `"middle center"`.
      */
     export const getRegionLabel = (spot: Point2d, size: Size2d, bounds: Size2d) => {
         const band = (value: number, extent: number) =>

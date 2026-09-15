@@ -16,7 +16,7 @@ const TAG_NAMES = ["bold", "italic", "strikethrough", "underlined", "an item"];
  * side, exactly like one that worked.
  *
  * **What the component promises is the mapping, not the paint, and only the mapping is asserted here.**
- * Nothing reads a computed style. A spec that pins a weight, a decoration or a colour cannot tell a
+ * Nothing reads a computed style. A spec that pins a weight, a decoration or a color cannot tell a
  * restyle from a break — both arrive as the same red — so it reports one every time somebody changes their
  * mind about how a thing looks. The mapping has no such ambiguity: a run either came back carrying the
  * class it was mapped to or it did not, and that stays answerable however the class is drawn.
@@ -49,7 +49,7 @@ test("each of the five default tags comes back carrying a class of its own", asy
     expect(painted.filter(Boolean), "every tag in the legend reached a class").toHaveLength(TAG_NAMES.length);
     expect(
         new Set(painted.map((run) => run!.className)).size,
-        "and no two share one, so the map is a lookup per tag rather than one class for anything recognised",
+        "and no two share one, so the map is a lookup per tag rather than one class for anything recognized",
     ).toBe(TAG_NAMES.length);
 });
 
@@ -115,7 +115,7 @@ test("a class map reaches the example that supplied it and nothing else", async 
     ).toHaveText("An [add]inserted[/add] word.");
 });
 
-test("an unrecognised tag is printed as typed, or dropped, on the consumer's word", async ({ page }) => {
+test("an unrecognized tag is printed as typed, or dropped, on the consumer's word", async ({ page }) => {
     await expect(page.locator(PREVIEW), "with the switch off the brackets are part of the text").toContainText(
         "[warning]unknown tag[/warning]",
     );
@@ -140,7 +140,7 @@ test("an unclosed tag is text under either setting", async ({ page }) => {
 
     await expect(
         page.locator(PREVIEW),
-        "dropping unrecognised tags cannot reach it, because it is not a tag",
+        "dropping unrecognized tags cannot reach it, because it is not a tag",
     ).toContainText("[b]unclosed one is printed the way it was typed.");
 });
 

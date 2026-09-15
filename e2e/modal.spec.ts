@@ -6,7 +6,7 @@ const DIALOG = '[role="dialog"]';
 const ALERT = '[role="alertdialog"]';
 const OVERLAY_INSET = 4;
 
-/** The overlay's centre is under the dialog for a centred one, so a corner is the only reliable point. */
+/** The overlay's center is under the dialog for a centerd one, so a corner is the only reliable point. */
 const clickOverlayCorner = async (page: Page) => {
     const box = (await page.locator('[aria-modal="true"]').evaluate((element) => {
         const overlay = element.parentElement!.firstElementChild!;
@@ -93,7 +93,7 @@ test.describe("Drawer", () => {
 
         const box = (await page.locator(DIALOG).boundingBox())!;
 
-        expect(Math.round(box.x), "a left drawer sits against the left edge rather than being centred").toBe(0);
+        expect(Math.round(box.x), "a left drawer sits against the left edge rather than being centerd").toBe(0);
         expect(box.height > 600, "and stretches down the cross axis, which is the placement the library owns").toBe(
             true,
         );
@@ -142,9 +142,7 @@ test.describe("Drawer", () => {
         ).toBe(box.rootWidth);
     });
 
-    test("the far edges are honoured too, so all four are the same grid stating different corners", async ({
-        page,
-    }) => {
+    test("the far edges are honored too, so all four are the same grid stating different corners", async ({ page }) => {
         await page.locator(`${demo("right")} button`).click();
 
         const right = await layoutBox(page);
@@ -222,7 +220,7 @@ test.describe("Modal in its alert mode", () => {
         await page.keyboard.press("Enter");
         await expect(page.locator(ALERT), "the initial focus target can be activated straight away").toHaveCount(0);
         expect(await readout(page, "destructiveConfirmation"), "and reports what was answered").toContain(
-            "outcome: cancelled",
+            "outcome: canceled",
         );
     });
 });

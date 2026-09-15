@@ -50,6 +50,6 @@ test("a caption click on a disabled control is stopped", async ({ page }) => {
     );
     expect(
         await isChecked(page.locator(`${DISABLED} input`)),
-        "and the input is not left holding the flip the browser made before the click was cancelled",
+        "and the input is not left holding the flip the browser made before the click was canceled",
     ).toBe(true);
 });

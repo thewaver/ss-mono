@@ -50,7 +50,7 @@ export namespace ShapeConst {
      * radius inside the circle it approximates, so its flats stay visible at the sizes these are drawn at —
      * which is the point, a rounded shape that never claims to be round. An exact circle is still reachable
      * without a name — a `square` whose join radii are half its side rounds into one, every corner's arc
-     * sharing the square's own centre — but that takes a second descriptor the caller has to pass, which is
+     * sharing the square's own center — but that takes a second descriptor the caller has to pass, which is
      * the whole reason this entry exists.
      */
 
@@ -325,7 +325,7 @@ export namespace ShapeUtils {
      * @param edgeThicknesses Outline thickness per edge. Short lists are padded by
      * repeating the last entry, CSS-shorthand style.
      * @param joinRadii Corner radius per corner, padded the same way. Radii too large
-     * for their edge are scaled down together so neighbours never overlap.
+     * for their edge are scaled down together so neighbors never overlap.
      * @param lameExponents Corner style per corner. See
      * {@link ShapeConst.CORNER_SHAPE_LAME_EXPONENTS}.
      * @param offset Pushes the whole outline outwards. Negative pulls it in.

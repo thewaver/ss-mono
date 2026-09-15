@@ -68,7 +68,7 @@ test("what the pointer passes over stays rubbed off, rather than coming back beh
 
     expect(
         await clearedPercent(page),
-        "and taking the pointer away leaves it off, which is what separates this from a travelling hole",
+        "and taking the pointer away leaves it off, which is what separates this from a traveling hole",
     ).toBe(halfway);
 });
 

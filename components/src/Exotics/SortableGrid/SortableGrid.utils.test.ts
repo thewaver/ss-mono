@@ -94,16 +94,16 @@ describe("getFreeSpot", () => {
     });
 });
 
-describe("getNeighbourIndex", () => {
+describe("getNeighborIndex", () => {
     const BOXES = [box(0, 0, 1, 1), box(2, 0, 1, 1), box(0, 2, 1, 1), box(3, 3, 1, 1)];
 
     it("moves to the nearest box in the direction asked for", () => {
-        expect(SortableGridUtils.getNeighbourIndex(BOXES, 0, { x: 1, y: 0 })).toBe(1);
-        expect(SortableGridUtils.getNeighbourIndex(BOXES, 0, { x: 0, y: 1 })).toBe(2);
+        expect(SortableGridUtils.getNeighborIndex(BOXES, 0, { x: 1, y: 0 })).toBe(1);
+        expect(SortableGridUtils.getNeighborIndex(BOXES, 0, { x: 0, y: 1 })).toBe(2);
     });
 
     it("answers with nothing when there is nothing that way", () => {
-        expect(SortableGridUtils.getNeighbourIndex(BOXES, 0, { x: -1, y: 0 })).toBeUndefined();
+        expect(SortableGridUtils.getNeighborIndex(BOXES, 0, { x: -1, y: 0 })).toBeUndefined();
     });
 });
 
@@ -149,7 +149,7 @@ describe("getOutline", () => {
 });
 
 describe("getBlock", () => {
-    it("takes the whole of a rectangle, so an even one centres properly", () => {
+    it("takes the whole of a rectangle, so an even one centers properly", () => {
         expect(SortableGridUtils.getBlock(SortableGridUtils.getCells({ width: 2, height: 2 }))).toEqual({
             spot: at(0, 0),
             size: { width: 2, height: 2 },
@@ -160,7 +160,7 @@ describe("getBlock", () => {
         expect(SortableGridUtils.getBlock(ELL)).toEqual({ spot: at(0, 0), size: { width: 1, height: 3 } });
     });
 
-    it("prefers the block nearest the shape's own centre when several are the same size", () => {
+    it("prefers the block nearest the shape's own center when several are the same size", () => {
         expect(SortableGridUtils.getBlock([at(0, 0), at(1, 0), at(1, 1), at(2, 1)])).toEqual({
             spot: at(1, 0),
             size: { width: 1, height: 2 },

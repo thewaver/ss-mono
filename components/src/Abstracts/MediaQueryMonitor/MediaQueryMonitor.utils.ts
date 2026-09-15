@@ -69,13 +69,18 @@ export namespace MediaQueryMonitorUtils {
      * Watches a media query.
      *
      * @param query The query text, as it would be written in CSS.
+     * @param getIsDisabled Pass `true` to not listen at all. For a component that only consults the query
+     * when a prop it is optional on has been given — it still has to ask for the accessor while setting
+     * up, and this is how it asks without joining the count.
      * @returns Whether it currently matches. `false` until the query is first evaluated, which happens
-     * as soon as the effect runs.
+     * as soon as the effect runs, and `false` for as long as it is disabled.
      */
-    export const create = (query: string) => {
+    export const create = (query: string, getIsDisabled?: Accessor<boolean>) => {
         const entry = getEntry(query);
 
         createEffect(() => {
+            if (getIsDisabled?.()) return;
+
             subscribe(query, entry);
 
             onCleanup(() => {
@@ -83,7 +88,7 @@ export namespace MediaQueryMonitorUtils {
             });
         });
 
-        return entry.getMatches;
+        return () => (getIsDisabled?.() ? false : entry.getMatches());
     };
 
     /**
@@ -92,7 +97,9 @@ export namespace MediaQueryMonitorUtils {
      * Anything that animates should consult this and offer a still or much shorter alternative — motion
      * can cause real discomfort, and the request is explicit.
      *
+     * @param getIsDisabled Pass `true` to not listen at all. See {@link create}.
      * @returns Whether motion should be reduced.
      */
-    export const createReducedMotion = () => create(REDUCED_MOTION_QUERY);
+    export const createReducedMotion = (getIsDisabled?: Accessor<boolean>) =>
+        create(REDUCED_MOTION_QUERY, getIsDisabled);
 }

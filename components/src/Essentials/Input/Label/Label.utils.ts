@@ -5,7 +5,7 @@ export namespace LabelUtils {
     /**
      * Drops the caller's `aria-label` when the control already has a visible caption.
      *
-     * An `aria-label` replaces the accessible name entirely, so a control inside a labelled field would
+     * An `aria-label` replaces the accessible name entirely, so a control inside a labeled field would
      * be announced by the label rather than by the caption the user can see — and the two then disagree,
      * which is a failure of WCAG 2.5.3 Label in Name. The caption wins, and the ignored value is warned
      * about so the caller can drop one of the two.

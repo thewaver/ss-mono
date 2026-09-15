@@ -1,6 +1,6 @@
 import { Show } from "solid-js";
 
-import { MathUtils } from "@thewaver/ss-utils";
+import { AngleUtils } from "@thewaver/ss-utils";
 
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
@@ -28,11 +28,11 @@ export const flow_diag_2 = (opts?: GradientBandedCycleOpts): TimedGradientConfig
                                 id: `gradient1-${id}`,
                                 colors: stopKeys.map((key) => ({ value: defs.colors[key] })),
                                 spreadKind: opts?.banded ? "banded" : undefined,
-                                angle: MathUtils.unwarpAngle(45, defs.getSize()),
+                                angle: AngleUtils.unwarp(45, defs.getSize()),
                                 scale: { width: 2, height: 2 },
                                 offset: SVGDefsUtils.offsetDiagonally(
                                     opts?.banded ? 0.25 : 0.5,
-                                    MathUtils.unwarpAngle(45, defs.getSize()),
+                                    AngleUtils.unwarp(45, defs.getSize()),
                                 ),
                             },
                             (x1, y1, x2, y2) => (
@@ -42,7 +42,7 @@ export const flow_diag_2 = (opts?: GradientBandedCycleOpts): TimedGradientConfig
                                         y1,
                                         x2,
                                         y2,
-                                        MathUtils.unwarpAngle(45, defs.getSize()),
+                                        AngleUtils.unwarp(45, defs.getSize()),
                                         [0, opts?.banded ? -0.5 : -1],
                                         defs,
                                     )}

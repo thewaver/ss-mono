@@ -5,7 +5,7 @@ import { example, prop, readout } from "./helpers";
 /**
  * The layout is arithmetic over a tree, so the checks are relationships between placed nodes — a parent
  * against the two it feeds from, a layer against the next one — rather than pixel positions, which are the
- * page's node size and gaps rather than the component's behaviour.
+ * page's node size and gaps rather than the component's behavior.
  *
  * Every node is one item of a list, and the connectors are one drawing laid over the lot with nothing in it
  * for a screen reader, which is why the counts below read the list and not the picture.
@@ -50,7 +50,7 @@ test.beforeEach(async ({ page }) => {
     await expect(page.locator(NODE).first()).toBeVisible();
 });
 
-test("a node sits centred between the two it feeds from", async ({ page }) => {
+test("a node sits centerd between the two it feeds from", async ({ page }) => {
     const final = await nodeNamed(page, "Final");
     const first = await nodeNamed(page, "Semi 1");
     const second = await nodeNamed(page, "Semi 2");
@@ -90,7 +90,7 @@ test("turning the board upright swaps the axes without changing the tree", async
     const first = await nodeNamed(page, "Semi 1");
     const second = await nodeNamed(page, "Semi 2");
 
-    expect(final.left, "the root is now centred across the board rather than along it").toBeCloseTo(
+    expect(final.left, "the root is now centerd across the board rather than along it").toBeCloseTo(
         (first.left + second.left) * 0.5,
         1,
     );
@@ -102,7 +102,7 @@ test("a parent lands between the outermost of the nodes it holds, however many t
     const product = await nodeNamed(page, "Product", CHART);
     const finance = await nodeNamed(page, "Finance", CHART);
 
-    expect(founder.top, "three under one node and one under another still centres the parent").toBeCloseTo(
+    expect(founder.top, "three under one node and one under another still centers the parent").toBeCloseTo(
         (product.top + finance.top) * 0.5,
         1,
     );
@@ -127,7 +127,7 @@ test("there is one connector for every node that feeds another", async ({ page }
 });
 
 /**
- * The reason the connectors stop at the edges rather than running from centre to centre: a node's box hides
+ * The reason the connectors stop at the edges rather than running from center to center: a node's box hides
  * whatever is under it only while it is fully opaque, so a line crossing a half-faded node shows through it.
  * This walks every point of every path against every node's rectangle.
  */
@@ -225,7 +225,7 @@ test("widening the row gap moves the leaves apart and takes their parents with t
     const first = await nodeNamed(page, "Semi 1");
     const second = await nodeNamed(page, "Semi 2");
 
-    expect(final.top, "and the parent is still centred on the pair it feeds from").toBeCloseTo(
+    expect(final.top, "and the parent is still centerd on the pair it feeds from").toBeCloseTo(
         (first.top + second.top) * 0.5,
         1,
     );

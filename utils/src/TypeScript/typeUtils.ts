@@ -57,7 +57,7 @@ export type KeysOfType<T extends object, KT> = {
 /**
  * Keeps only the keys whose names contain a given piece of text.
  *
- * `PickContaining<CSSProperties, "Color">` narrows a style type down to its colour
+ * `PickContaining<CSSProperties, "Color">` narrows a style type down to its color
  * properties.
  */
 export type PickContaining<T extends object, S extends string> = {

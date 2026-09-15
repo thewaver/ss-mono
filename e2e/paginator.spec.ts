@@ -77,7 +77,7 @@ test("stepping stops at each end rather than wrapping, and says so before it is 
     expect(await readout(page, "steps")).toContain("page 2 of 20");
 });
 
-test("the end jumps are a separate pair, and go quiet alongside their neighbours", async ({ page }) => {
+test("the end jumps are a separate pair, and go quiet alongside their neighbors", async ({ page }) => {
     await expect(page.locator(step(ENDS, "First"))).toHaveAttribute("aria-disabled", "true");
     await expect(page.locator(step(ENDS, "Last"))).not.toHaveAttribute("aria-disabled");
 
@@ -164,9 +164,9 @@ const placedAngles = async (page: Page, scope: string) => {
 
     return styles.map((style) => {
         const at = (property: string) => Number((new RegExp(`${property}:\\s*([-\\d.]+)cqw`).exec(style) ?? [])[1]);
-        const centre = 50;
+        const center = 50;
 
-        return (Math.atan2(at("top") - centre, at("left") - centre) * 180) / Math.PI;
+        return (Math.atan2(at("top") - center, at("left") - center) * 180) / Math.PI;
     });
 };
 

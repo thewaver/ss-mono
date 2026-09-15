@@ -47,13 +47,18 @@ export type GradientFalloffOpts = {
     falloffAlpha?: number;
 };
 
-export type GradientColorAgeOpts = { ageColorSpan?: number; cycleMs?: number };
+export type GradientCircularOpts = { circular?: boolean };
+
+export type GradientCyclePeriodOpts = { cycleMs?: number };
+
+export type GradientColorAgeOpts = GradientCyclePeriodOpts & { ageColorSpan?: number };
 
 export type GradientSmearOpts = { smearMax?: number; smearSmoothing?: number; smearFullStepRatio?: number };
 
-export type GradientSweepOpts = { sweepArc?: number; sweepLead?: number };
+export type GradientSweepOpts = { sweepArc?: number };
 
-export type GradientSpotTrailOpts = GradientCycleGlowOpts &
+export type GradientSpotTrailOpts = GradientCircularOpts &
+    GradientCycleGlowOpts &
     GradientTrailOpts &
     GradientFalloffOpts &
     GradientColorAgeOpts;
@@ -71,7 +76,7 @@ export type GradientBandOpts = {
     bandAngle?: number;
 };
 
-export type GradientSpotOpts = GradientGlowOpts & GradientFalloffOpts;
+export type GradientSpotOpts = GradientCircularOpts & GradientGlowOpts & GradientFalloffOpts;
 
 export type GradientRippleOpts = {
     sourceScale?: number;
@@ -88,9 +93,13 @@ export type GradientRippleOpts = {
     crestSpreadEnd?: number;
 };
 
-export type GradientRippleSampleOpts = GradientCycleOpts & GradientRippleOpts;
+export type GradientRippleSampleOpts = GradientCircularOpts &
+    GradientCycleOpts &
+    GradientCyclePeriodOpts &
+    GradientRippleOpts;
 
-export type GradientFlareOpts = GradientGlowOpts &
+export type GradientFlareOpts = GradientCircularOpts &
+    GradientGlowOpts &
     GradientFalloffOpts & {
         ghostSaturation?: number;
         ghostLuminosity?: number;
@@ -98,7 +107,8 @@ export type GradientFlareOpts = GradientGlowOpts &
         ghostFarGrowth?: number;
     };
 
-export type GradientSmearSampleOpts = GradientCycleGlowOpts &
+export type GradientSmearSampleOpts = GradientCircularOpts &
+    GradientCycleGlowOpts &
     GradientTrailOpts &
     GradientFalloffOpts &
     GradientColorAgeOpts &
@@ -189,6 +199,7 @@ export type TrackedGradientEntry =
     | { family: "spot_ripple_1"; defs?: GradientRippleSampleOpts }
     | { family: "spot_ripple_2"; defs?: GradientRippleSampleOpts }
     | { family: "spot_ripple_3"; defs?: GradientRippleSampleOpts }
+    | { family: "spot_smear_1"; defs?: GradientSmearSampleOpts }
     | { family: "spot_smear_2"; defs?: GradientSmearSampleOpts }
     | { family: "spot_smear_3"; defs?: GradientSmearSampleOpts }
     | { family: "spot_trail_1"; defs?: GradientSpotTrailOpts }

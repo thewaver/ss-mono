@@ -43,7 +43,7 @@ const thumbSpan = async (page: Page, scope: string) => {
 
     return {
         start: (thumbBox.x - trackBox.x) / trackBox.width,
-        centre: (thumbBox.x + thumbBox.width * 0.5 - trackBox.x) / trackBox.width,
+        center: (thumbBox.x + thumbBox.width * 0.5 - trackBox.x) / trackBox.width,
     };
 };
 
@@ -57,7 +57,7 @@ test("a slide that reaches the end activates once, and the thumb returns to rest
 
     expect(await readout(page, "default"), "nothing has happened yet").toContain("activations: 0");
 
-    await slide(page, element, (await thumbSpan(page, DEFAULT)).centre, 1);
+    await slide(page, element, (await thumbSpan(page, DEFAULT)).center, 1);
 
     expect(await readout(page, "default"), "one gesture is one activation").toContain("activations: 1");
 
@@ -71,9 +71,9 @@ test("a slide that reaches the end activates once, and the thumb returns to rest
 test("a slide that stops short of the end activates nothing", async ({ page }) => {
     const element = page.locator(track(DEFAULT));
 
-    await slide(page, element, (await thumbSpan(page, DEFAULT)).centre, 0.6);
+    await slide(page, element, (await thumbSpan(page, DEFAULT)).center, 0.6);
 
-    expect(await readout(page, "default"), "letting go before the end is how the gesture is cancelled").toContain(
+    expect(await readout(page, "default"), "letting go before the end is how the gesture is canceled").toContain(
         "activations: 0",
     );
 });
@@ -108,7 +108,7 @@ test("a press on the track away from the thumb is not a grab", async ({ page }) 
 test("an owner can hold the thumb at the end after a successful slide", async ({ page }) => {
     const element = page.locator(track(HELD)).first();
 
-    await slide(page, element, (await thumbSpan(page, HELD)).centre, 1);
+    await slide(page, element, (await thumbSpan(page, HELD)).center, 1);
 
     expect(await readout(page, "held"), "the owner's own state is what stays").toContain("armed: true");
 
@@ -136,7 +136,7 @@ test("a disabled slide button refuses the drag, and the focus with it", async ({
     );
     await expect(page.locator(`${DISABLED} button[disabled]`)).toHaveCount(0);
 
-    await slide(page, element, (await thumbSpan(page, DISABLED)).centre, 1);
+    await slide(page, element, (await thumbSpan(page, DISABLED)).center, 1);
 
     expect(await readout(page, "disabled"), "the drag is not attached at all, so nothing moves").toContain(
         "activations: 0",

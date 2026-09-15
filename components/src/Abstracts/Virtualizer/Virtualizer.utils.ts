@@ -73,7 +73,7 @@ export namespace VirtualizerUtils {
      * scroll.
      * @returns `getIsLive` for whether virtualising is in effect, `getRows` and `getTotalSize` for what
      * to draw and how tall to make the spacer, `getRowStart` for a row's position, `measureRow` to
-     * attach to each row's element so its real height is learnt, and `scrollToRow`.
+     * attach to each row's element so its real height is learned, and `scrollToRow`.
      */
     export const createRowWindow = (
         getRef: Accessor<HTMLElement | undefined>,

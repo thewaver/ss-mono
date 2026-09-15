@@ -450,7 +450,11 @@ export const Tree = <T,>(props: TreeProps<T>) => {
             }}
         >
             <Show when={getLayout()} fallback={renderTiers()}>
-                {(getResolved) => <PlacementBox layout={getResolved}>{renderTiers()}</PlacementBox>}
+                {(getResolved) => (
+                    <PlacementBox layout={getResolved} computeEffect={props.computeEffect}>
+                        {renderTiers()}
+                    </PlacementBox>
+                )}
             </Show>
         </div>
     );

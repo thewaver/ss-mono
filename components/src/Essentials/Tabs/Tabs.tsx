@@ -295,7 +295,7 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
                 }
             >
                 {(getResolved) => (
-                    <PlacementBox layout={getResolved}>
+                    <PlacementBox layout={getResolved} computeEffect={props.computeEffect}>
                         {renderFloater()}
                         {renderTabs()}
                     </PlacementBox>

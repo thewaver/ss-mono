@@ -48,7 +48,6 @@ export const wheelWedgeLabel = style({
     justifyContent: "center",
     alignItems: "center",
     gap: "0.5em",
-    transform: "translate(-50%, -50%)",
     color: themeVars.color.control.background.contrast,
     lineHeight: 1.2,
     textAlign: "center",
@@ -107,7 +106,7 @@ export const wheelPipShape = style({
     strokeLinejoin: "round",
 });
 
-export const wheelCentre = style({
+export const wheelCenter = style({
     position: "absolute",
     top: "50%",
     left: "50%",

@@ -1,55 +1,4 @@
-import {
-    type CSSAnimationKey,
-    CSSConst,
-    type CSSTransformKey,
-    CSS_FILTER_KEYS,
-    MathUtils,
-    type Point2d,
-} from "@thewaver/ss-utils";
-
-/**
- * The order transform functions are written in.
- *
- * CSS applies transforms in the order given, so a rotate before a translate and one after it give
- * different results. Fixing the order means an animation's output does not depend on which order its
- * keys happened to be evaluated in.
- */
-const TRANSFORM_ORDER: readonly CSSTransformKey[] = [
-    "perspective",
-    "matrix",
-    "matrix3d",
-    "translate",
-    "translate3d",
-    "translateX",
-    "translateY",
-    "translateZ",
-    "rotate",
-    "rotate3d",
-    "rotateX",
-    "rotateY",
-    "rotateZ",
-    "skew",
-    "skewX",
-    "skewY",
-    "scale",
-    "scale3d",
-    "scaleX",
-    "scaleY",
-    "scaleZ",
-];
-/**
- * Writes one CSS function call, with the right unit on each argument.
- *
- * Arguments a value does not supply are written as zero, so a partial value is still a valid
- * function call.
- */
-const formatFunction = (key: CSSAnimationKey, value: number | number[]) => {
-    const units = CSSConst.ANIMATION_UNITS[key];
-    const values = Array.isArray(value) ? value : [value];
-    const args = units.map((unit, idx) => `${values[idx] ?? 0}${unit}`);
-
-    return `${key}(${args.join(", ")})`;
-};
+import { type CSSAnimationValues, CSSUtils, MathUtils, type Point2d } from "@thewaver/ss-utils";
 
 /**
  * Applies an animation's numbers to a cell, and answers which cells alternate with which.
@@ -70,31 +19,11 @@ export namespace CellAnimationUtils {
      * not mentioned are left out, and both properties are rewritten in full each time, so a value that
      * stops being produced stops applying.
      */
-    export const assignAnimationProps = (
-        el: HTMLElement,
-        evalResult: Partial<Record<CSSAnimationKey, number | number[]>>,
-    ) => {
-        const transforms: string[] = [];
-        const filters: string[] = [];
+    export const assignAnimationProps = (el: HTMLElement, evalResult: CSSAnimationValues) => {
+        const style = CSSUtils.toAnimationStyle(evalResult);
 
-        for (const key of TRANSFORM_ORDER) {
-            const value = evalResult[key];
-
-            if (value !== undefined) {
-                transforms.push(formatFunction(key, value));
-            }
-        }
-
-        for (const key of CSS_FILTER_KEYS) {
-            const value = evalResult[key];
-
-            if (value !== undefined) {
-                filters.push(formatFunction(key, value));
-            }
-        }
-
-        el.style.transform = transforms.join(" ");
-        el.style.filter = filters.join(" ");
+        el.style.transform = style.transform;
+        el.style.filter = style.filter;
     };
 
     /**

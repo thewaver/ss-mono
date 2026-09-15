@@ -7,6 +7,7 @@ import * as ssUtils from "../src/index.js";
 // the check for that.
 
 const EXPECTED_EXPORTS = [
+    "AngleUtils",
     "BitwiseUtils",
     "Bounds",
     "BoundsString",

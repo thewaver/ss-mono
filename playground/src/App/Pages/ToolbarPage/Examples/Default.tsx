@@ -11,7 +11,7 @@ const ACTIONS: ToolbarAction<string>[] = [
     { value: "Italic" },
     { value: "Underline" },
     { value: "Align left" },
-    { value: "Align centre" },
+    { value: "Align center" },
     { value: "Bullets" },
     { value: "Numbering" },
 ];

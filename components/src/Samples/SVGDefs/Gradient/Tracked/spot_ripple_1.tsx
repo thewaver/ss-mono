@@ -7,6 +7,7 @@ import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SV
 import type { GradientRippleSampleOpts, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 import { SVGDefsFrameUtils } from "../../SVGDefsFrames.utils";
+import { TrackedGradientKnobs } from "../TrackedGradient.knobs";
 
 type Ripple = {
     origin: Point2d;
@@ -14,20 +15,7 @@ type Ripple = {
     bornMs: number;
 };
 
-const SOURCE_SCALE = 0.22;
-const SOURCE_STOP = 25;
-const SOURCE_ALPHA = 0.5;
-
-const RIPPLE_COUNT = 8;
-const RIPPLE_SPACING_RATIO = 0.15;
 const RIPPLE_LIFETIME_MS = 700;
-const RIPPLE_START_SCALE = SOURCE_SCALE;
-const RIPPLE_END_SCALE = 0.85;
-const RIPPLE_ALPHA = 0.5;
-const RIPPLE_DECAY_EXPONENT = 1.8;
-const CREST_STOP = 80;
-const CREST_SPREAD_START = 20;
-const CREST_SPREAD_END = 4;
 const CREST_OUTER_LIMIT = 99;
 const MOTION_STEP_RATIO = 0.002;
 
@@ -36,6 +24,8 @@ const FULL_AGE_RATIO = 1;
 const NO_FADE = 0;
 const NO_TRAVEL = 0;
 const FIRST_MILESTONE = 0;
+
+const DEFAULTS = TrackedGradientKnobs.SPOT_RIPPLE_DEFAULTS;
 
 const NO_REF = () => undefined;
 
@@ -66,9 +56,9 @@ const createRipple = (index: number, getRef: () => HTMLElement | undefined, opts
 
         if (fade > NO_FADE) clock.keepAwake();
 
-        const milestone = Math.floor(travel / (opts?.rippleSpacingRatio ?? RIPPLE_SPACING_RATIO));
+        const milestone = Math.floor(travel / (opts?.rippleSpacingRatio ?? DEFAULTS.rippleSpacingRatio));
 
-        if (milestone % (opts?.rippleCount ?? RIPPLE_COUNT) !== index || milestone === bornMilestone) return;
+        if (milestone % (opts?.rippleCount ?? DEFAULTS.rippleCount) !== index || milestone === bornMilestone) return;
 
         bornMilestone = milestone;
 
@@ -83,22 +73,22 @@ const createRipple = (index: number, getRef: () => HTMLElement | undefined, opts
 
     const getSpread = () =>
         MathUtils.lerp(
-            opts?.crestSpreadStart ?? CREST_SPREAD_START,
-            opts?.crestSpreadEnd ?? CREST_SPREAD_END,
+            opts?.crestSpreadStart ?? DEFAULTS.crestSpreadStart,
+            opts?.crestSpreadEnd ?? DEFAULTS.crestSpreadEnd,
             EasingUtils.easeOutCubic(getAgeRatio()),
         );
 
     const getAlpha = () =>
         (getRipple()?.fade ?? 0) *
-        (opts?.rippleAlpha ?? RIPPLE_ALPHA) *
-        (1 - getAgeRatio()) ** (opts?.rippleDecay ?? RIPPLE_DECAY_EXPONENT);
+        (opts?.rippleAlpha ?? DEFAULTS.rippleAlpha) *
+        (1 - getAgeRatio()) ** (opts?.rippleDecay ?? DEFAULTS.rippleDecay);
 
     return {
         getOrigin: () => getRipple()?.origin ?? RESTING_ORIGIN,
         getScale: () =>
             MathUtils.lerp(
-                opts?.rippleStartScale ?? RIPPLE_START_SCALE,
-                opts?.rippleEndScale ?? RIPPLE_END_SCALE,
+                opts?.rippleStartScale ?? DEFAULTS.rippleStartScale,
+                opts?.rippleEndScale ?? DEFAULTS.rippleEndScale,
                 EasingUtils.easeOutCubic(getAgeRatio()),
             ),
         getColors: (color: string) => {
@@ -107,11 +97,11 @@ const createRipple = (index: number, getRef: () => HTMLElement | undefined, opts
 
             return [
                 { value: `rgb(from ${color} r g b / 0)` },
-                { value: `rgb(from ${color} r g b / 0)`, stop: (opts?.crestStop ?? CREST_STOP) - spread },
-                { value: `rgb(from ${color} r g b / ${alpha})`, stop: opts?.crestStop ?? CREST_STOP },
+                { value: `rgb(from ${color} r g b / 0)`, stop: (opts?.crestStop ?? DEFAULTS.crestStop) - spread },
+                { value: `rgb(from ${color} r g b / ${alpha})`, stop: opts?.crestStop ?? DEFAULTS.crestStop },
                 {
                     value: `rgb(from ${color} r g b / 0)`,
-                    stop: Math.min((opts?.crestStop ?? CREST_STOP) + spread, CREST_OUTER_LIMIT),
+                    stop: Math.min((opts?.crestStop ?? DEFAULTS.crestStop) + spread, CREST_OUTER_LIMIT),
                 },
                 { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
             ];
@@ -132,13 +122,14 @@ export const spot_ripple_1 = (opts?: GradientRippleSampleOpts): TrackedGradientC
 
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient1-${id}`,
+                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
                         origin: () => getReading().boxRatio,
-                        scale: opts?.sourceScale ?? SOURCE_SCALE,
+                        scale: opts?.sourceScale ?? DEFAULTS.sourceScale,
                         colors: [
                             { value: `rgb(from ${defs.colors.primary} r g b / 1)` },
                             {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.sourceAlpha ?? SOURCE_ALPHA})`,
-                                stop: opts?.sourceStop ?? SOURCE_STOP,
+                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.sourceAlpha ?? DEFAULTS.sourceAlpha})`,
+                                stop: opts?.sourceStop ?? DEFAULTS.sourceStop,
                             },
                             { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
                         ],
@@ -147,7 +138,7 @@ export const spot_ripple_1 = (opts?: GradientRippleSampleOpts): TrackedGradientC
             },
             filter: SVGDefsUtils.getBaseBlur(id, defs),
         },
-        ...Array.from({ length: opts?.rippleCount ?? RIPPLE_COUNT }, (_unused, index) => ({
+        ...Array.from({ length: opts?.rippleCount ?? DEFAULTS.rippleCount }, (_unused, index) => ({
             gradientOrPattern: {
                 id: `gradient${index + 2}-${id}`,
                 renderDefsElement: () => {
@@ -155,6 +146,7 @@ export const spot_ripple_1 = (opts?: GradientRippleSampleOpts): TrackedGradientC
 
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient${index + 2}-${id}`,
+                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
                         origin: ripple.getOrigin,
                         scale: ripple.getScale,
                         colors: () => ripple.getColors(defs.colors.primary),

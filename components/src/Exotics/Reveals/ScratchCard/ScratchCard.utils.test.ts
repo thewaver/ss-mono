@@ -37,7 +37,7 @@ describe("computeStampPath", () => {
 });
 
 describe("computeProbePoints", () => {
-    it("asks about the centre and the four points a radius out", () => {
+    it("asks about the center and the four points a radius out", () => {
         const probes = ScratchCardUtils.computeProbePoints({ x: 100, y: 50 }, 20);
 
         expect(probes).toEqual([
@@ -68,7 +68,7 @@ describe("computeSamplePoints", () => {
         ).toBe(16);
     });
 
-    it("puts each sample at the centre of the share of the card it stands for", () => {
+    it("puts each sample at the center of the share of the card it stands for", () => {
         const [first] = ScratchCardUtils.computeSamplePoints(SIZE, 2);
 
         expect(first).toEqual({ x: 150, y: 75 });
@@ -125,7 +125,7 @@ describe("computeBrushClipPath", () => {
 });
 
 describe("computeBrushBox", () => {
-    it("centres the brush on the pointer and sizes it from the radius alone", () => {
+    it("centers the brush on the pointer and sizes it from the radius alone", () => {
         expect(ScratchCardUtils.computeBrushBox({ x: 100, y: 60 }, 20)).toEqual({
             x: 80,
             y: 40,

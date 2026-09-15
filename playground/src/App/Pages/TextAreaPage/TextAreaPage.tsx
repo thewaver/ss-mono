@@ -6,7 +6,7 @@ import { AutoSizingCappedExample } from "./Examples/AutoSizingCapped";
 import { DisabledExample } from "./Examples/Disabled";
 import { ErroredExample } from "./Examples/Errored";
 import { FixedHeightExample } from "./Examples/FixedHeight";
-import { LabelledExample } from "./Examples/Labelled";
+import { LabelledExample } from "./Examples/Labeled";
 import { ReachableExample } from "./Examples/Reachable";
 import { ReadOnlyExample } from "./Examples/ReadOnly";
 import { LONG_TEXT, MAX_ROWS, MIN_ROWS, REVIEW_LIMIT } from "./TextAreaPage.const";
@@ -79,7 +79,7 @@ export const TextAreaPage = () => {
             name: "In a Label",
             readout: () => `length: ${labelledSignal[0]().length}`,
             component: () => <LabelledExample valueSignal={labelledSignal} />,
-            path: `${EXAMPLES_ROOT}/Labelled.tsx`,
+            path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
     ]);
 

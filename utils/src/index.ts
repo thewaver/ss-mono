@@ -1,3 +1,4 @@
+export * from "./Abstracts/angle.js";
 export * from "./Abstracts/bitwise.js";
 export * from "./Abstracts/bounds.js";
 export * from "./Abstracts/color.js";

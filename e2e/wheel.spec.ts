@@ -6,7 +6,7 @@ import { example, prop } from "./helpers";
  * Both drums on this page take their rotation from the same abstract, so most of what is checked here is checked
  * once against the sideways one; the tests about what a drum alone does — hiding the faces that have turned away,
  * and turning about the axis each was given — name the drum they are about. The overhead wheel used to stand in
- * for the shared behaviour and now sits on a page of its own, so nothing here reaches for it.
+ * for the shared behavior and now sits on a page of its own, so nothing here reaches for it.
  *
  * Everything timed is turned down to the panel's floor first. The spin is a fixed sequence — the page
  * pretends to fetch a prize for 400ms, then the wheel turns for the spin duration, then settles back over
@@ -20,7 +20,7 @@ import { example, prop } from "./helpers";
  * turning under the pointer, it rests after a spin, and it comes back once the rest has run out.
  *
  * No wheel renders a button any more: the page builds its own and drives it through the handle the wheel hands
- * over at mount. The overhead one is centred over the wheel by a box the page owns, and each drum's
+ * over at mount. The overhead one is centerd over the wheel by a box the page owns, and each drum's
  * sits in a bar the page puts under the barrel — outside the wheel altogether. That is why the spin locator is
  * scoped to the example rather than to the wheel, and why the button's disabled state is checked here at all:
  * it is now the page reading `getIsSpinnable` off the handle rather than the library disabling its own control.
@@ -46,7 +46,7 @@ const TURN_SAMPLE_GAP_MS = 150;
 const FETCH_MS = 400;
 const LONG_REST_MS = 6000;
 const SHORT_REST_MS = 500;
-const OFF_CENTRE_POINT = { x: 20, y: 170 };
+const OFF_CENTER_POINT = { x: 20, y: 170 };
 const MEDIUM_REST_MS = 1500;
 const PICK_SAMPLE_COUNT = 14;
 const PICK_SAMPLE_GAP_MS = 120;
@@ -71,7 +71,7 @@ const transformOf = (page: import("@playwright/test").Page, scope: string) =>
 /**
  * Which wedges the wheel has picked out, by index. The Playground paints a picked wedge by changing the fill
  * on its shape and nothing else, so there is no attribute to read — but the comparison is still exact rather
- * than a colour match, because whatever fill the majority of the wedges share is the unpicked one by
+ * than a color match, because whatever fill the majority of the wedges share is the unpicked one by
  * definition, and anything else is a pick. That holds in either theme and survives a palette change.
  */
 const pickedWedges = (page: import("@playwright/test").Page, scope: string) =>
@@ -91,7 +91,7 @@ const pickedWedges = (page: import("@playwright/test").Page, scope: string) =>
  * the first number in the wedge's transform — an overhead wedge is `rotate(a)` and a drum face is `rotateY(-a)`
  * before its own offset — and the first wedge has no offset, so the sign is the only difference and the
  * magnitude is the angle. The angle only ever increases, so the difference across a spin is the distance
- * travelled rather than a position modulo a turn.
+ * traveled rather than a position modulo a turn.
  */
 const turnedAngle = async (page: import("@playwright/test").Page, scope: string) =>
     Math.abs(Number(/-?[\d.]+/.exec(await transformOf(page, scope))![0]));
@@ -222,12 +222,12 @@ test("and the rest is only a rest, so the wheel picks up again once it has run o
 });
 
 /**
- * Hovering lands away from the middle on purpose: the page's spin button now sits over the wheel's centre, and it
- * is a neighbour of the wheel rather than something nested inside it, so a press at the centre would not reach the
- * wheel at all. Away from the centre the pointer is unambiguously on the wheel — and it still does not stop it.
+ * Hovering lands away from the middle on purpose: the page's spin button now sits over the wheel's center, and it
+ * is a neighbor of the wheel rather than something nested inside it, so a press at the center would not reach the
+ * wheel at all. Away from the center the pointer is unambiguously on the wheel — and it still does not stop it.
  */
 test("it keeps turning under the pointer, because stopping for one is the consumer's to build", async ({ page }) => {
-    await page.locator(SIDEWAYS).hover({ position: OFF_CENTRE_POINT });
+    await page.locator(SIDEWAYS).hover({ position: OFF_CENTER_POINT });
 
     const hovered = await transformOf(page, SIDEWAYS);
 
@@ -320,9 +320,9 @@ test("and the pick moves with the wheel while it spins, rather than appearing at
  * under one turn, so a spin of `n` turns covers at least `n` turns and always less than `n + 2` — which is
  * tight enough that one turn and six cannot be confused, without the spec having to know which wedge won.
  *
- * The style is switched to the one that does not randomise first, because the lively one picks a count
+ * The style is switched to the one that does not randomize first, because the lively one picks a count
  * between one and the knob and the point here is the knob rather than the range under it. All three wheels
- * are driven, since a panel control that reaches one example and not its neighbours is the failure this page
+ * are driven, since a panel control that reaches one example and not its neighbors is the failure this page
  * is most prone to.
  */
 test("the turn count decides how far a spin goes, and it reaches both drums", async ({ page }) => {
@@ -345,12 +345,12 @@ test("the turn count decides how far a spin goes, and it reaches both drums", as
         await page.waitForTimeout(SPIN_TOTAL_MS);
 
         for (const [index, wheelUnderTest] of ALL_WHEELS.entries()) {
-            const travelled = (await turnedAngle(page, wheelUnderTest.scope)) - before[index];
+            const traveled = (await turnedAngle(page, wheelUnderTest.scope)) - before[index];
 
-            expect(travelled, `${wheelUnderTest.key} went round at least ${turns} times`).toBeGreaterThanOrEqual(
+            expect(traveled, `${wheelUnderTest.key} went round at least ${turns} times`).toBeGreaterThanOrEqual(
                 turns * WHOLE_TURN_DEG,
             );
-            expect(travelled, `${wheelUnderTest.key} did not go round ${turns + ROUNDING_TURNS} times`).toBeLessThan(
+            expect(traveled, `${wheelUnderTest.key} did not go round ${turns + ROUNDING_TURNS} times`).toBeLessThan(
                 (turns + ROUNDING_TURNS) * WHOLE_TURN_DEG,
             );
         }
@@ -432,8 +432,8 @@ test("the two drums turn about different axes, which is the whole of what separa
         .first()
         .evaluate((element) => element.style.transform);
 
-    expect(sideways, "faces travelling left and right turn about the upright axis").toContain("rotateY");
-    expect(reel, "faces travelling up and over turn about the level one").toContain("rotateX");
+    expect(sideways, "faces traveling left and right turn about the upright axis").toContain("rotateY");
+    expect(reel, "faces traveling up and over turn about the level one").toContain("rotateX");
 });
 
 /**

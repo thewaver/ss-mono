@@ -74,7 +74,7 @@ export const CornersPage = () => {
                 key: "control",
                 name: "As a control's decoration",
                 readout: () =>
-                    "press it — the colour transitions rather than switching, which is the whole reason the component owns a duration",
+                    "press it — the color transitions rather than switching, which is the whole reason the component owns a duration",
                 component: () => <ControlExample {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Control.tsx`,
             },
@@ -92,8 +92,8 @@ export const CornersPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"color"} label={"Colour"}>
-                    <PageColorField value={getColor} ariaLabel={"Colour"} onInput={setColor} />
+                <PageProp key={"color"} label={"Color"}>
+                    <PageColorField value={getColor} ariaLabel={"Color"} onInput={setColor} />
                 </PageProp>
 
                 <PageProp key={"cornerLengthWidth"} label={"Arm across (px)"}>

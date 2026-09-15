@@ -24,7 +24,7 @@ describe("computeStackAlignment", () => {
         });
     });
 
-    it("leaves a centred main axis alone when reversed, since centre has no opposite", () => {
+    it("leaves a centerd main axis alone when reversed, since center has no opposite", () => {
         expect(ToastUtils.computeStackAlignment("top-center", "row-reverse")).toEqual({
             justifyContent: "center",
             alignItems: "flex-start",
@@ -38,7 +38,7 @@ describe("computeStackAlignment", () => {
         });
     });
 
-    it("reads middle and centre as the same edge on whichever axis they land", () => {
+    it("reads middle and center as the same edge on whichever axis they land", () => {
         expect(ToastUtils.computeStackAlignment("middle-left", "column")).toEqual({
             justifyContent: "center",
             alignItems: "flex-start",

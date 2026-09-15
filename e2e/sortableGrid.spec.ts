@@ -304,7 +304,7 @@ test("a press in the notch of an L belongs to the board rather than to the item"
 /**
  * The painted shape and the item's own box have to be the same size, which is a thing that can quietly stop
  * being true: an SVG whose viewBox is a different shape from the element scales its contents to fit and
- * centres what is left, so the drawing comes out short of the cells it is supposed to cover. A tall thin
+ * centers what is left, so the drawing comes out short of the cells it is supposed to cover. A tall thin
  * item is where the two ratios are furthest apart, so the sword and the bow are the ones asked here — the
  * shield went on looking right through the whole of that fault.
  */

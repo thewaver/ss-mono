@@ -11,7 +11,7 @@ export const DisabledExample = (props: Props) => (
         {...pageColorPickerSlots}
         valueSignal={props.valueSignal}
         isDisabled={true}
-        ariaLabel={"Disabled colour"}
+        ariaLabel={"Disabled color"}
         renderContent={(getRenderProps) => <PageColorInputContent renderProps={getRenderProps} />}
     />
 );

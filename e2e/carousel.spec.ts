@@ -197,7 +197,7 @@ test("a swipe across the slides steps the way the finger went", async ({ page })
     expect(await currentSlide(page, MANUAL), "and pushing them back the other way returns to the first").toBe("1 of 4");
 });
 
-test("a swipe let go before it has travelled far enough puts the slide back", async ({ page }) => {
+test("a swipe let go before it has traveled far enough puts the slide back", async ({ page }) => {
     await swipeAcross(page, MANUAL, 0.8, 0.7);
 
     expect(await currentSlide(page, MANUAL), "a tenth of the width is a nudge, not a step").toBe("1 of 4");

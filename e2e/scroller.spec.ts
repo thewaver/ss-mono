@@ -70,7 +70,7 @@ test("a step moves the track forward and brings the back button to life", async 
 /**
  * A step is measured from where the track is at the moment the button is pressed, and the scroll that follows
  * is smooth — so a second press landing mid-animation moves less than a full page. That is the component's
- * real behaviour rather than a harness artefact, which is why this waits for each scroll to come to rest
+ * real behavior rather than a harness artifact, which is why this waits for each scroll to come to rest
  * instead of pressing a fixed number of times and hoping.
  */
 const waitForRest = async (page: Page, scope: string) => {

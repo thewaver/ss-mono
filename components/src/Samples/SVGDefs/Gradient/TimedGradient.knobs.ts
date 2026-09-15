@@ -1,19 +1,19 @@
 import type { SampleCheckKnob, SampleNumberKnob } from "../../Samples.types";
 
-const CYCLES_KNOB: SampleCheckKnob = { kind: "check", label: "Cycle the colours" };
-const BANDED_KNOB: SampleCheckKnob = { kind: "check", label: "Solid bands rather than a blend" };
-const STEPS_KNOB: SampleNumberKnob = { kind: "number", label: "Keyframes per turn", min: 4, max: 36, step: 2 };
+const CYCLES_KNOB: SampleCheckKnob = { kind: "check", label: "Cycle color" };
+const BANDED_KNOB: SampleCheckKnob = { kind: "check", label: "Banded" };
+const STEPS_KNOB: SampleNumberKnob = { kind: "number", label: "Steps", min: 4, max: 36, step: 2 };
 const BANDS_KNOB: SampleNumberKnob = {
     kind: "number",
-    label: "Colour repeats across the strip",
+    label: "Bands",
     min: 1,
     max: 16,
     step: 1,
 };
 
 const STEPS_DEFAULT = { steps: 12 };
-const TWO_COLOUR_FLOW_DEFAULTS = { ...STEPS_DEFAULT, bands: 3 };
-const THREE_COLOUR_FLOW_DEFAULTS = { ...STEPS_DEFAULT, bands: 2 };
+const TWO_COLOR_FLOW_DEFAULTS = { ...STEPS_DEFAULT, bands: 3 };
+const THREE_COLOR_FLOW_DEFAULTS = { ...STEPS_DEFAULT, bands: 2 };
 
 export namespace TimedGradientKnobs {
     export const KNOBS_BY_FAMILY = {
@@ -60,10 +60,10 @@ export namespace TimedGradientKnobs {
         fill_2c: {},
         fill_3c: {},
         fill_diag_2v2c: {},
-        flow_2: TWO_COLOUR_FLOW_DEFAULTS,
-        flow_3: THREE_COLOUR_FLOW_DEFAULTS,
-        flow_diag_2: TWO_COLOUR_FLOW_DEFAULTS,
-        flow_diag_3: THREE_COLOUR_FLOW_DEFAULTS,
+        flow_2: TWO_COLOR_FLOW_DEFAULTS,
+        flow_3: THREE_COLOR_FLOW_DEFAULTS,
+        flow_diag_2: TWO_COLOR_FLOW_DEFAULTS,
+        flow_diag_3: THREE_COLOR_FLOW_DEFAULTS,
         merge_1v1: {},
         merge_diag_1v1: {},
         merge_diag_async_4: {},

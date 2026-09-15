@@ -30,7 +30,7 @@ export const CircuitExample = (props: Props) => {
                 progressSignal={props.progressSignal}
                 isPlayingSignal={props.isPlayingSignal}
                 renderTrack={(getPath) => <PageTrailTrack path={getPath} />}
-                renderTraveller={(getPlace) => (
+                renderTraveler={(getPlace) => (
                     <PageTrailVehicle id={VEHICLE_ID} place={getPlace} label={VEHICLE_LABEL} />
                 )}
                 onMount={setController}

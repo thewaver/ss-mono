@@ -1,7 +1,7 @@
 import { Button, Modal } from "@thewaver/ss-components";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import { PageModalScrim } from "../../../StyledComponents/ModalOverlay/ModalOverlay";
+import { PageModalOverlay } from "../../../StyledComponents/ModalOverlay/ModalOverlay";
 import { PageModalPanel } from "../../../StyledComponents/ModalPanel/ModalPanel";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
 import type { ModalExampleProps } from "../ModalPage.types";
@@ -39,7 +39,10 @@ export const DefaultExample = (props: Props) => (
             visibilitySignal={props.visibilitySignal}
             ariaLabelledBy={() => MODAL_TITLE_ID}
             renderOverlay={(getVisibilityTarget, getTransitionDurationMs) => (
-                <PageModalScrim visibilityTarget={getVisibilityTarget} transitionDurationMs={getTransitionDurationMs} />
+                <PageModalOverlay
+                    visibilityTarget={getVisibilityTarget}
+                    transitionDurationMs={getTransitionDurationMs}
+                />
             )}
             renderContent={(getVisibilityTarget, getTransitionDurationMs) => (
                 <PageModalPanel visibilityTarget={getVisibilityTarget} transitionDurationMs={getTransitionDurationMs}>

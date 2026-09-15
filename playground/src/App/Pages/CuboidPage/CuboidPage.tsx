@@ -91,7 +91,7 @@ export const CuboidPage = () => {
         },
         {
             key: "wandering",
-            name: "Turning to a neighbour on its own",
+            name: "Turning to a neighbor on its own",
             readout: () =>
                 `${CuboidUtils.getFacing(wanderingYawSignal[0](), wanderingPitchSignal[0]())} — every tick takes one quarter turn at random, discarding the ones that would leave the same face in view or turn back to the face it just left, so the box only ever moves on to a new face sharing an edge with this one`,
             component: () => (

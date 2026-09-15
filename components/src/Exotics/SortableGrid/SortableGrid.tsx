@@ -546,7 +546,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
 
         e.preventDefault();
 
-        const next = SortableGridUtils.getNeighbourIndex(
+        const next = SortableGridUtils.getNeighborIndex(
             navigable.map((entry) => getBoxes()[entry]),
             navigable.indexOf(index),
             step,

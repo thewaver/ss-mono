@@ -10,7 +10,7 @@ const EVEN_COLUMN: Point2d = { x: 1, y: 8 };
 const EVEN_GRID: Point2d = { x: 8, y: 8 };
 const AWKWARD_GRIDS: Point2d[] = [EVEN_GRID, EVEN_COLUMN, { x: 10, y: 4 }, { x: 2, y: 2 }];
 
-const centreOf = (count: Point2d) => CellAnimationOrigins.computeOrigin("center", count);
+const centerOf = (count: Point2d) => CellAnimationOrigins.computeOrigin("center", count);
 
 const DETERMINISTIC_WEIGHTS = CellAnimationWeights.WEIGHT_TYPES.filter((type) => !type.startsWith("random"));
 
@@ -42,7 +42,7 @@ describe("CellAnimationWeightsConst", () => {
     });
 
     it.each(DETERMINISTIC_WEIGHTS)("keeps %s inside 0..1 on an odd grid", (type) => {
-        const weights = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centreOf(ODD_GRID)).flat();
+        const weights = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centerOf(ODD_GRID)).flat();
 
         expect(weights.every((weight) => Number.isFinite(weight))).toBe(true);
         expect(Math.min(...weights)).toBeGreaterThanOrEqual(0);
@@ -50,8 +50,8 @@ describe("CellAnimationWeightsConst", () => {
     });
 
     it.each(DETERMINISTIC_WEIGHTS)("computes %s from its inputs alone", (type) => {
-        const first = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centreOf(ODD_GRID));
-        const second = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centreOf(ODD_GRID));
+        const first = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centerOf(ODD_GRID));
+        const second = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centerOf(ODD_GRID));
 
         expect(first).toEqual(second);
     });
@@ -60,17 +60,17 @@ describe("CellAnimationWeightsConst", () => {
         "leaves %s unchanged when the origin moves",
         (type) => {
             const fromCorner = CellAnimationWeights.computeCellWeights(type, ODD_GRID, { x: 0, y: 0 });
-            const fromCentre = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centreOf(ODD_GRID));
+            const fromCenter = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centerOf(ODD_GRID));
 
-            expect(fromCorner).toEqual(fromCentre);
+            expect(fromCorner).toEqual(fromCenter);
         },
     );
 
     it("moves an origin-aware weight when the origin moves", () => {
         const fromCorner = CellAnimationWeights.computeCellWeights("diamondDefault", ODD_GRID, { x: 0, y: 0 });
-        const fromCentre = CellAnimationWeights.computeCellWeights("diamondDefault", ODD_GRID, centreOf(ODD_GRID));
+        const fromCenter = CellAnimationWeights.computeCellWeights("diamondDefault", ODD_GRID, centerOf(ODD_GRID));
 
-        expect(fromCorner).not.toEqual(fromCentre);
+        expect(fromCorner).not.toEqual(fromCenter);
     });
 
     it("normalizes to span the full range, evenly spaced by rank rather than by value", () => {
@@ -103,11 +103,11 @@ describe("CellAnimationWeightsConst", () => {
         ).toBe(weights.length);
     });
 
-    it("still alternates on an even count with a centred origin, where a raw modulo would not", () => {
+    it("still alternates on an even count with a centerd origin, where a raw modulo would not", () => {
         const alternating = CellAnimationWeights.computeCellWeights(
             "lineRowAlternate",
             EVEN_COLUMN,
-            centreOf(EVEN_COLUMN),
+            centerOf(EVEN_COLUMN),
         ).flat();
 
         expect(alternating).toEqual([0, 0.643, 0.286, 0.929, 0.929, 0.286, 0.643, 0]);
@@ -115,7 +115,7 @@ describe("CellAnimationWeightsConst", () => {
         const convergent = CellAnimationWeights.computeCellWeights(
             "lineRowConvergent",
             EVEN_COLUMN,
-            centreOf(EVEN_COLUMN),
+            centerOf(EVEN_COLUMN),
         ).flat();
 
         expect(Math.min(...convergent)).toBe(0.071);
@@ -124,7 +124,7 @@ describe("CellAnimationWeightsConst", () => {
 
     it.each(DETERMINISTIC_WEIGHTS)("keeps %s inside 0..1 on the grids a formula overshoots", (type) => {
         for (const count of AWKWARD_GRIDS) {
-            const weights = CellAnimationWeights.computeCellWeights(type, count, centreOf(count)).flat();
+            const weights = CellAnimationWeights.computeCellWeights(type, count, centerOf(count)).flat();
 
             expect(Math.min(...weights), `${count.x}x${count.y}`).toBeGreaterThanOrEqual(0);
             expect(Math.max(...weights), `${count.x}x${count.y}`).toBeLessThanOrEqual(1);
@@ -132,8 +132,8 @@ describe("CellAnimationWeightsConst", () => {
     });
 
     it.each(RANDOM_WEIGHTS)("draws %s again on every call, rather than repeating one pattern", (type) => {
-        const first = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centreOf(ODD_GRID));
-        const second = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centreOf(ODD_GRID));
+        const first = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centerOf(ODD_GRID));
+        const second = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centerOf(ODD_GRID));
 
         expect(first).not.toEqual(second);
     });
@@ -142,18 +142,18 @@ describe("CellAnimationWeightsConst", () => {
         "starts %s from the origin, rather than from the first cell",
         (type) => {
             const fromCorner = CellAnimationWeights.computeCellWeights(type, ODD_GRID, { x: 0, y: 0 });
-            const fromCentre = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centreOf(ODD_GRID));
+            const fromCenter = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centerOf(ODD_GRID));
 
-            expect(fromCorner).not.toEqual(fromCentre);
+            expect(fromCorner).not.toEqual(fromCenter);
             expect(fromCorner[0][0], "the origin's own cell is the first to arrive").toBe(1);
         },
     );
 
     it("turns the mirrored radar the other way round", () => {
-        const centre = centreOf(ODD_GRID);
-        const ccw = CellAnimationWeights.computeCellWeights("radarSingle", ODD_GRID, centre);
-        const cw = CellAnimationWeights.computeCellWeights("radarSingleCw", ODD_GRID, centre);
-        const axes = (weights: number[][]) => [weights[centre.y][ODD_GRID.x - 1], weights[centre.y][0]];
+        const center = centerOf(ODD_GRID);
+        const ccw = CellAnimationWeights.computeCellWeights("radarSingle", ODD_GRID, center);
+        const cw = CellAnimationWeights.computeCellWeights("radarSingleCw", ODD_GRID, center);
+        const axes = (weights: number[][]) => [weights[center.y][ODD_GRID.x - 1], weights[center.y][0]];
 
         expect(axes(ccw), "counter-clockwise reaches the right of the origin before the left").toEqual(
             axes(cw).reverse(),

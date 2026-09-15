@@ -13,7 +13,7 @@ const computeThumbStart = (progressRatio: number, thumbRatio: number) => progres
  *
  * Everything is a fraction of the track rather than a pixel measurement, so the same numbers work
  * at any width. The one thing to keep in mind is that the thumb occupies part of the track, so full
- * progress is the thumb reaching the far end rather than travelling the track's whole length.
+ * progress is the thumb reaching the far end rather than traveling the track's whole length.
  */
 export namespace SlideButtonUtils {
     /**
@@ -31,10 +31,10 @@ export namespace SlideButtonUtils {
      * Where along the thumb the user took hold of it.
      *
      * Kept for the rest of the drag so the thumb follows the pointer from the point it was grabbed,
-     * rather than jumping to centre itself under it.
+     * rather than jumping to center itself under it.
      *
      * @param pointerRatio The pointer's position along the track.
-     * @param progressRatio How far the thumb has travelled.
+     * @param progressRatio How far the thumb has traveled.
      * @param thumbRatio The thumb's width as a fraction of the track.
      * @returns The offset from the thumb's leading edge. Negative or past the thumb's width means the
      * pointer is not on the thumb.
@@ -46,7 +46,7 @@ export namespace SlideButtonUtils {
      * Whether a press landed on the thumb rather than on the track beside it.
      *
      * @param pointerRatio The pointer's position along the track.
-     * @param progressRatio How far the thumb has travelled.
+     * @param progressRatio How far the thumb has traveled.
      * @param thumbRatio The thumb's width as a fraction of the track.
      */
     export const computeIsOnThumb = (pointerRatio: number, progressRatio: number, thumbRatio: number) => {
@@ -56,7 +56,7 @@ export namespace SlideButtonUtils {
     };
 
     /**
-     * How far the thumb has travelled, from the pointer's position.
+     * How far the thumb has traveled, from the pointer's position.
      *
      * @param pointerRatio The pointer's position along the track.
      * @param grabRatio Where along the thumb it was grabbed, from

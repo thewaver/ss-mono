@@ -4,6 +4,7 @@ import type { Point2d } from "@thewaver/ss-utils";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { PlacementLayoutFn, PlacementRect } from "../../Abstracts/Placement/Placement.types";
+import type { ProximityEffectFn } from "../../Abstracts/Proximity/Proximity.types";
 import type {
     InteractionControlProps,
     InteractionTooltipDefs,
@@ -45,6 +46,7 @@ export type StepperProps<TValue, TState> = AccessorProps<{
     steps: MaybeAccessor<Step<TValue, TState>[]>;
     currentValue: MaybeAccessor<TValue | undefined>;
     computeLayout?: PlacementLayoutFn;
+    computeEffect?: ProximityEffectFn;
     computeStepAriaLabel: (step: Step<TValue, TState>, index: number) => string;
     computeTooltipDefs?: (
         step: Step<TValue, TState>,

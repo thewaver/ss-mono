@@ -21,7 +21,7 @@ describe("getHPlacementShift", () => {
         expect(AnchorUtils.getHPlacementShift("right-in", ANCHOR, CONTENT)).toBe(120);
     });
 
-    it("centres by the difference in widths, so a content wider than the anchor overhangs both sides", () => {
+    it("centers by the difference in widths, so a content wider than the anchor overhangs both sides", () => {
         expect(AnchorUtils.getHPlacementShift("center", ANCHOR, CONTENT)).toBe(110);
         expect(AnchorUtils.getHPlacementShift("center", ANCHOR, WIDE_CONTENT)).toBe(25);
     });
@@ -38,7 +38,7 @@ describe("getVPlacementShift", () => {
         expect(AnchorUtils.getVPlacementShift("bottom-in", ANCHOR, CONTENT)).toBe(210);
     });
 
-    it("centres by the difference in heights", () => {
+    it("centers by the difference in heights", () => {
         expect(AnchorUtils.getVPlacementShift("center", ANCHOR, CONTENT)).toBe(205);
     });
 });
@@ -58,7 +58,7 @@ describe("placement offsets", () => {
         expect(AnchorUtils.getVPlacementOffset("bottom-in", 8)).toBe(-8);
     });
 
-    it("leaves a centred placement alone", () => {
+    it("leaves a centerd placement alone", () => {
         expect(AnchorUtils.getHPlacementOffset("center", 8)).toBe(0);
         expect(AnchorUtils.getVPlacementOffset("center", 8)).toBe(0);
     });
@@ -83,11 +83,11 @@ describe("getSafeHPlacement", () => {
         expect(safeH("left-out", { ...ANCHOR, x: 900 }, { width: 700, height: 0 })).toBe("left-out");
     });
 
-    it("keeps centre when there is room either side of it", () => {
+    it("keeps center when there is room either side of it", () => {
         expect(safeH("center", { ...ANCHOR, x: 400 })).toBe("center");
     });
 
-    it("drops centre to the in placement that grows away from the nearer edge", () => {
+    it("drops center to the in placement that grows away from the nearer edge", () => {
         expect(safeH("center", { ...ANCHOR, x: 10 })).toBe("left-in");
         expect(safeH("center", { ...ANCHOR, x: 940 })).toBe("right-in");
     });
@@ -157,11 +157,11 @@ describe("getSafeVPlacement", () => {
         expect(safeV("top-out", { ...ANCHOR, y: 50 })).toBe("bottom-out");
     });
 
-    it("keeps centre when there is room above and below", () => {
+    it("keeps center when there is room above and below", () => {
         expect(safeV("center", { ...ANCHOR, y: 400 })).toBe("center");
     });
 
-    it("drops centre to the in placement that grows away from the nearer edge", () => {
+    it("drops center to the in placement that grows away from the nearer edge", () => {
         expect(safeV("center", { ...ANCHOR, y: 10 })).toBe("top-in");
         expect(safeV("center", { ...ANCHOR, y: 760 })).toBe("bottom-in");
     });

@@ -176,7 +176,11 @@ export const Stepper = <TValue, TState>(props: StepperProps<TValue, TState>) => 
 
     return (
         <Show when={getLayout()} fallback={renderList(renderSteps())}>
-            {(getResolved) => <PlacementBox layout={getResolved}>{renderList(renderSteps())}</PlacementBox>}
+            {(getResolved) => (
+                <PlacementBox layout={getResolved} computeEffect={props.computeEffect}>
+                    {renderList(renderSteps())}
+                </PlacementBox>
+            )}
         </Show>
     );
 };

@@ -27,7 +27,7 @@ test("no native control survives in a props panel", async ({ page }) => {
     );
     expect(
         await page.locator('button[aria-haspopup="dialog"]').count(),
-        "with a ColorInput for the colour swatches, which is now its own popup rather than the OS dialog",
+        "with a ColorInput for the color swatches, which is now its own popup rather than the OS dialog",
     ).toBeGreaterThanOrEqual(1);
 });
 

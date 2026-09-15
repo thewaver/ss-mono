@@ -19,14 +19,6 @@ describe("Point2d", () => {
     });
 });
 
-describe("Point2dUtils angle conversions", () => {
-    it("converts both ways", () => {
-        expect(Point2dUtils.radiansToDegrees(Math.PI)).toBeCloseTo(180, 10);
-        expect(Point2dUtils.degreesToRadians(180)).toBeCloseTo(Math.PI, 10);
-        expect(Point2dUtils.radiansToDegrees(Point2dUtils.degreesToRadians(37))).toBeCloseTo(37, 10);
-    });
-});
-
 describe("Point2dUtils.getNormal", () => {
     it("shrinks to length 1 while keeping the direction", () => {
         expect(Point2dUtils.getNormal({ x: 3, y: 4 })).toEqual({ x: 0.6, y: 0.8 });

@@ -33,7 +33,7 @@ export type TrailProps = AccessorProps<{
     progressSignal?: SignalSource<number>;
     isPlayingSignal?: SignalSource<boolean>;
     renderTrack?: (getPath: Accessor<string>) => JSX.Element;
-    renderTraveller: (getPlace: Accessor<TrailPlace>) => JSX.Element;
+    renderTraveler: (getPlace: Accessor<TrailPlace>) => JSX.Element;
     onLap?: () => void;
     onMount?: (controller: TrailController) => void;
 }>;

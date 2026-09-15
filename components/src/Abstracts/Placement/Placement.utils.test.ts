@@ -33,6 +33,34 @@ describe("toLayoutPoint", () => {
     });
 });
 
+describe("getSpacing", () => {
+    it("is the distance between items that follow one another", () => {
+        expect(PlacementUtils.getSpacing(RING), "a quarter turn around a ring of radius 0.4").toBeCloseTo(0.5657);
+    });
+
+    it("takes the middle distance rather than the average, so one long jump does not drag it", () => {
+        const run = {
+            heightRatio: 1,
+            placements: [
+                { left: 0, top: 0, width: 0.1, height: 0.1 },
+                { left: 0.1, top: 0, width: 0.1, height: 0.1 },
+                { left: 0.2, top: 0, width: 0.1, height: 0.1 },
+                { left: 0.9, top: 0, width: 0.1, height: 0.1 },
+            ],
+        };
+
+        expect(PlacementUtils.getSpacing(run), "two steps of 0.1 and one of 0.7").toBeCloseTo(0.1);
+    });
+
+    it("has no spacing to report for one item, so it answers with that item's own width", () => {
+        expect(PlacementUtils.getSpacing({ heightRatio: 1, placements: [SCATTER.placements[0]] })).toBe(0.1);
+    });
+
+    it("answers nothing for an empty layout rather than reaching into it", () => {
+        expect(PlacementUtils.getSpacing({ heightRatio: 1, placements: [] })).toBe(0);
+    });
+});
+
 describe("getOrigin", () => {
     it("is the middle of the box when the layout names none", () => {
         expect(PlacementUtils.getOrigin(RING)).toEqual({ x: 0.5, y: 0.5 });
@@ -77,15 +105,15 @@ describe("pickIndex, by angle", () => {
     });
 
     it("passes over an item sitting on the origin, because it is the one place with no direction to aim at", () => {
-        const withCentre: PlacementLayout = {
+        const withCenter: PlacementLayout = {
             ...RING,
             placements: [...RING.placements, { left: 0.5, top: 0.5, width: 0.4, height: 0.4 }],
         };
-        const pickWithCentre = (x: number, y: number) =>
-            PlacementUtils.pickIndex({ layout: withCentre, point: { x, y } });
+        const pickWithCenter = (x: number, y: number) =>
+            PlacementUtils.pickIndex({ layout: withCenter, point: { x, y } });
 
-        expect(pickWithCentre(0.9, 0.5), "aimed straight at the three o'clock item").toBe(1);
-        expect(pickWithCentre(0.7, 0.48), "and just off it, where a centre item scoring zero would have won").toBe(1);
+        expect(pickWithCenter(0.9, 0.5), "aimed straight at the three o'clock item").toBe(1);
+        expect(pickWithCenter(0.7, 0.48), "and just off it, where a center item scoring zero would have won").toBe(1);
     });
 
     it("skips what it was told is not pickable, rather than picking it and being refused later", () => {
@@ -103,7 +131,7 @@ describe("pickIndex, by angle", () => {
 describe("pickIndex, by nearest", () => {
     const pick = (x: number, y: number) => PlacementUtils.pickIndex({ layout: SCATTER, point: { x, y } });
 
-    it("picks whichever item's centre is closest", () => {
+    it("picks whichever item's center is closest", () => {
         expect(pick(0.12, 0.12)).toBe(0);
         expect(pick(0.85, 0.38)).toBe(1);
         expect(pick(0.48, 0.24)).toBe(2);
@@ -145,15 +173,15 @@ describe("getGapPlacement", () => {
         angle,
     });
 
-    it("sits midway between the two borders rather than midway between the two centres", () => {
+    it("sits midway between the two borders rather than midway between the two centers", () => {
         const gap = PlacementUtils.getGapPlacement([box(0.2, 0.5), box(0.8, 0.5)], 1)!;
 
-        expect(gap.left, "the centres are level, so the gap is level with them").toBeCloseTo(0.5);
+        expect(gap.left, "the centers are level, so the gap is level with them").toBeCloseTo(0.5);
         expect(gap.top).toBeCloseTo(0.5);
         expect(gap.width, "and it is as wide as what is left between the two facing edges").toBeCloseTo(0.4);
     });
 
-    it("measures a smaller gap when the neighbours are wider, the centres being unmoved", () => {
+    it("measures a smaller gap when the neighbors are wider, the centers being unmoved", () => {
         const narrow = PlacementUtils.getGapPlacement([box(0.2, 0.5), box(0.8, 0.5)], 1)!;
         const wide = PlacementUtils.getGapPlacement(
             [
@@ -163,7 +191,7 @@ describe("getGapPlacement", () => {
             1,
         )!;
 
-        expect(wide.left, "the gap is still between the same two centres").toBeCloseTo(narrow.left);
+        expect(wide.left, "the gap is still between the same two centers").toBeCloseTo(narrow.left);
         expect(wide.width, "but there is less room left between them").toBeLessThan(narrow.width);
     });
 
@@ -175,7 +203,7 @@ describe("getGapPlacement", () => {
         expect(stacked.angle, "and two stacked along the vertical, a quarter turn from it").toBeCloseTo(90);
     });
 
-    it("reads a turned neighbour's own edge rather than the upright box it would have had", () => {
+    it("reads a turned neighbor's own edge rather than the upright box it would have had", () => {
         const upright = PlacementUtils.getGapPlacement([box(0.2, 0.5), box(0.8, 0.5)], 1)!;
         const turned = PlacementUtils.getGapPlacement([box(0.2, 0.5, 90), box(0.8, 0.5)], 1)!;
 
@@ -231,5 +259,203 @@ describe("getGapPlacement", () => {
             PlacementUtils.getGapPlacement([box(0.5, 0.5), box(0.5, 0.5)], 1),
             "and two in the same place leave no line to lie across",
         ).toBeUndefined();
+    });
+});
+
+describe("getSectorPath", () => {
+    const SECTOR = { innerRadius: 20, outerRadius: 50, fromAngle: -90, toAngle: -45 };
+
+    const arcCount = (path: string) => path.split(" A ").length - 1;
+
+    it("draws a band out along one edge and back along the other", () => {
+        expect(arcCount(PlacementUtils.getSectorPath(SECTOR)), "an annulus needs both of its arcs").toBe(2);
+    });
+
+    it("closes a holeless wedge on the center instead of drawing an inner arc", () => {
+        expect(
+            arcCount(PlacementUtils.getSectorPath({ ...SECTOR, innerRadius: 0 })),
+            "with no hole there is no near edge to come back along",
+        ).toBe(1);
+    });
+
+    it("asks for the long way round only once the wedge is past a half turn", () => {
+        const LARGE_ARC_FLAG = / A [\d.]+ [\d.]+ 0 1 /;
+
+        expect(LARGE_ARC_FLAG.test(PlacementUtils.getSectorPath({ ...SECTOR, toAngle: 90 }))).toBe(false);
+        expect(LARGE_ARC_FLAG.test(PlacementUtils.getSectorPath({ ...SECTOR, toAngle: 180 }))).toBe(true);
+    });
+});
+
+describe("getReachDistance", () => {
+    const ROW = { reachRule: "horizontal" } as const;
+    const COLUMN = { reachRule: "vertical" } as const;
+    const RING = { reachRule: "arc", origin: { x: 0.5, y: 0.5 } } as const;
+
+    it("counts only the horizontal gap in a row, so drifting off it does not make the row go quiet", () => {
+        expect(PlacementUtils.getReachDistance(ROW, { x: 0.2, y: 0.5 }, { x: 0.3, y: 0.9 })).toBeCloseTo(0.1);
+    });
+
+    it("counts only the vertical gap in a column", () => {
+        expect(PlacementUtils.getReachDistance(COLUMN, { x: 0.2, y: 0.5 }, { x: 0.9, y: 0.6 })).toBeCloseTo(0.1);
+    });
+
+    it("counts the arc swept in a ring, so the far side of it reads as far rather than as one width across", () => {
+        const quarterTurn = PlacementUtils.getReachDistance(RING, { x: 0.5, y: 0.1 }, { x: 0.9, y: 0.5 });
+        const halfTurn = PlacementUtils.getReachDistance(RING, { x: 0.5, y: 0.1 }, { x: 0.5, y: 0.9 });
+
+        expect(quarterTurn, "a quarter of the way round a circle of radius 0.4").toBeCloseTo(0.4 * (Math.PI * 0.5));
+        expect(halfTurn, "and the far side is twice that, not the 0.8 the straight line would say").toBeCloseTo(
+            0.4 * Math.PI,
+        );
+    });
+
+    it("ignores the radius entirely, which is what lets a wheel answer a pointer outside its ring", () => {
+        expect(PlacementUtils.getReachDistance(RING, { x: 0.5, y: 0.1 }, { x: 2.5, y: 0.5 })).toBeCloseTo(
+            0.4 * (Math.PI * 0.5),
+        );
+    });
+
+    it("falls back to the straight line where a turn has no meaning", () => {
+        expect(PlacementUtils.getReachDistance(RING, { x: 0.5, y: 0.5 }, { x: 0.5, y: 0.9 })).toBeCloseTo(0.4);
+        expect(PlacementUtils.getReachDistance({}, { x: 0, y: 0 }, { x: 0.3, y: 0.4 })).toBeCloseTo(0.5);
+    });
+});
+
+describe("getReachBearing", () => {
+    const ROW = { reachRule: "horizontal" } as const;
+    const RING = { reachRule: "arc", origin: { x: 0.5, y: 0.5 } } as const;
+
+    it("points along the run and nowhere else, however far off it the other point is", () => {
+        expect(PlacementUtils.getReachBearing(ROW, { x: 0.2, y: 0.5 }, { x: 0.4, y: 0.9 })).toEqual({ x: 1, y: 0 });
+    });
+
+    it("turns about the pivot rather than heading across it, which is what keeps a ring a ring", () => {
+        const bearing = PlacementUtils.getReachBearing(RING, { x: 0.5, y: 0.1 }, { x: 0.9, y: 0.5 });
+
+        expect(bearing.x, "the item is at the top and the other point is round to the right").toBeCloseTo(1);
+        expect(bearing.y, "so it travels sideways, not down toward the middle").toBeCloseTo(0);
+    });
+
+    it("is the straight line where the arrangement names no rule", () => {
+        expect(PlacementUtils.getReachBearing({}, { x: 0, y: 0 }, { x: 0.3, y: 0.4 })).toEqual({ x: 0.6, y: 0.8 });
+    });
+});
+
+describe("getIsWithinReach", () => {
+    const box = (reachRule: "horizontal" | "vertical" | "arc" | "plane") => ({
+        heightRatio: 0.25,
+        placements: [],
+        reachRule,
+    });
+
+    it("reads the axis a row throws away as a yes or a no, so the row stops at its own edge", () => {
+        expect(PlacementUtils.getIsWithinReach(box("horizontal"), { x: 5, y: 0.1 }), "far off to the side").toBe(true);
+        expect(PlacementUtils.getIsWithinReach(box("horizontal"), { x: 0.5, y: 0.4 }), "and below the row").toBe(false);
+    });
+
+    it("does the same the other way round for a column", () => {
+        expect(PlacementUtils.getIsWithinReach(box("vertical"), { x: 0.5, y: 5 })).toBe(true);
+        expect(PlacementUtils.getIsWithinReach(box("vertical"), { x: 1.4, y: 0.1 })).toBe(false);
+    });
+
+    it("gates a rule that reads both axes on both of them, so nothing answers a pointer that has left", () => {
+        expect(PlacementUtils.getIsWithinReach(box("plane"), { x: 0.5, y: 0.1 })).toBe(true);
+        expect(PlacementUtils.getIsWithinReach(box("plane"), { x: 9, y: 0.1 })).toBe(false);
+        expect(PlacementUtils.getIsWithinReach(box("plane"), { x: 0.5, y: 9 })).toBe(false);
+    });
+});
+
+describe("getIsWithinReach, around a pivot", () => {
+    const ring = (radius: number) => ({
+        heightRatio: 1,
+        reachRule: "arc" as const,
+        origin: { x: 0.5, y: 0.5 },
+        placements: [
+            { left: 0.5, top: 0.5 - radius, width: 0.1, height: 0.1 },
+            { left: 0.5 + radius, top: 0.5, width: 0.1, height: 0.1 },
+            { left: 0.5, top: 0.5 + radius, width: 0.1, height: 0.1 },
+        ],
+    });
+
+    it("lets the pointer out as far past the items as the pivot is inside them, so the two sides match", () => {
+        expect(PlacementUtils.getIsWithinReach(ring(0.3), { x: 0.5, y: 0.5 }), "on the pivot, 0.3 in").toBe(true);
+        expect(
+            PlacementUtils.getIsWithinReach(ring(0.3), { x: 0.5, y: 1.1 }),
+            "0.3 beyond the items, and outside the box besides",
+        ).toBe(true);
+        expect(PlacementUtils.getIsWithinReach(ring(0.3), { x: 0.5, y: 1.2 }), "further than that").toBe(false);
+    });
+});
+
+describe("getRunFacing", () => {
+    it("is the direction an open run faces", () => {
+        const arch = {
+            heightRatio: 1,
+            origin: { x: 0.5, y: 0.5 },
+            placements: [
+                { left: 0.1, top: 0.5, width: 0.1, height: 0.1 },
+                { left: 0.5, top: 0.1, width: 0.1, height: 0.1 },
+                { left: 0.9, top: 0.5, width: 0.1, height: 0.1 },
+            ],
+        };
+
+        expect(PlacementUtils.getRunFacing(arch), "straight up, which is where an arch opens to").toBeCloseTo(-90);
+    });
+
+    it("is nothing in particular for a run that closes, its items cancelling out", () => {
+        const ring = {
+            heightRatio: 1,
+            origin: { x: 0.5, y: 0.5 },
+            placements: [
+                { left: 0.5, top: 0.1, width: 0.1, height: 0.1 },
+                { left: 0.9, top: 0.5, width: 0.1, height: 0.1 },
+                { left: 0.5, top: 0.9, width: 0.1, height: 0.1 },
+                { left: 0.1, top: 0.5, width: 0.1, height: 0.1 },
+            ],
+        };
+
+        expect(PlacementUtils.getRunFacing(ring)).toBeCloseTo(0);
+    });
+});
+
+describe("getRunSlack", () => {
+    const turning = (spread: number, itemCount: number) => {
+        const radius = 0.4;
+        const step = itemCount > 1 ? spread / itemCount : 0;
+
+        return {
+            heightRatio: 1,
+            reachRule: "arc" as const,
+            origin: { x: 0.5, y: 0.5 },
+            placements: Array.from({ length: itemCount }, (_unused, index) => {
+                const radians = ((index * step) / 180) * Math.PI;
+
+                return {
+                    left: 0.5 + Math.cos(radians) * radius,
+                    top: 0.5 + Math.sin(radians) * radius,
+                    width: 0.1,
+                    height: 0.1,
+                };
+            }),
+        };
+    };
+
+    it("is nothing for a run that comes back round to itself, whatever is asked of it", () => {
+        expect(PlacementUtils.getRunSlack(turning(360, 10)), "ten items evenly round a circle").toBeCloseTo(0);
+    });
+
+    it("is the rest of the circle for a run that does not close", () => {
+        expect(
+            PlacementUtils.getRunSlack(turning(180, 10)),
+            "half a circle of radius 0.4 taken up, so half its circumference is what is left",
+        ).toBeCloseTo(Math.PI * 0.4);
+    });
+
+    it("shrinks as the run widens, which is what makes the answer a clamp rather than a switch", () => {
+        expect(PlacementUtils.getRunSlack(turning(300, 10))).toBeLessThan(PlacementUtils.getRunSlack(turning(180, 10)));
+    });
+
+    it("is unbounded where the run does not turn, a row having the page to grow into", () => {
+        expect(PlacementUtils.getRunSlack({ heightRatio: 1, reachRule: "horizontal", placements: [] })).toBe(Infinity);
     });
 });

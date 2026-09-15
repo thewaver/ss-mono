@@ -62,7 +62,7 @@ test("Backspace steps into the tags before it deletes one", async ({ page }) => 
 
     await page.keyboard.press("Backspace");
     expect(await readout(page, "default"), "a second press removes the tag focus is on").toContain("tags: solid");
-    expect(await activeMatches(page, tagNamed(DEFAULT, "solid")), "and focus lands on the neighbour").toBe(true);
+    expect(await activeMatches(page, tagNamed(DEFAULT, "solid")), "and focus lands on the neighbor").toBe(true);
 });
 
 test("arrows walk the tags and return to the field", async ({ page }) => {
@@ -120,7 +120,7 @@ test("a placeholder shows only while there is nothing at all", async ({ page }) 
 
 /**
  * The height follows the value: tags wrap and the box grows rather than clipping or scrolling. That is the
- * behaviour the alternatives were weighed against, so it is worth pinning — a later change to capping or
+ * behavior the alternatives were weighed against, so it is worth pinning — a later change to capping or
  * scrolling should have to break this test deliberately rather than quietly.
  */
 test("tags wrap in a narrow box, and the box grows to hold them", async ({ page }) => {
@@ -216,13 +216,13 @@ test("the field is a row of its own beneath the tags", async ({ page }) => {
 /**
  * The caret is paint, so it belongs to whoever painted the box — the same argument `computeTextStyle`
  * settles for `TextField`, whose slot and type this reuses rather than declaring a second one. Without it
- * the caret fell back to the text colour while every other field on the site had the theme's own, which is
+ * the caret fell back to the text color while every other field on the site had the theme's own, which is
  * the sort of difference that is invisible in markup and obvious on screen.
  */
 test("the painter sets the caret, as it does on every other field", async ({ page }) => {
     const caret = await page.locator(field(DEFAULT)).evaluate((element) => getComputedStyle(element).caretColor);
 
-    expect(caret, "the caret is the theme's, not the inherited text colour").not.toBe(
+    expect(caret, "the caret is the theme's, not the inherited text color").not.toBe(
         await page.locator(field(DEFAULT)).evaluate((element) => getComputedStyle(element).color),
     );
 });

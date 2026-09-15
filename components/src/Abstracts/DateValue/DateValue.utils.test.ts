@@ -140,7 +140,7 @@ describe("toIso and fromIso", () => {
         expect(DateValueUtils.getYearsInEra(gregorian(2026, 1, 1))).toBe(9999);
     });
 
-    it("serialises to the same ISO day whatever calendar the value is in", () => {
+    it("serializes to the same ISO day whatever calendar the value is in", () => {
         for (const id of DateValueUtils.getCalendarIds()) {
             expect(DateValueUtils.toIso(inCalendar(id, 2026, 8, 11)), id).toBe("2026-08-11");
         }
@@ -359,7 +359,7 @@ describe("getEraStart, through withEra", () => {
 });
 
 describe("every era of every calendar gets a real name", () => {
-    it("never names an era after its neighbour, and never after itself twice", () => {
+    it("never names an era after its neighbor, and never after itself twice", () => {
         for (const id of DateValueUtils.getCalendarIds()) {
             const eras = DateValueUtils.getEras(inCalendar(id, 2026, 8, 11), "en-GB");
             const names = eras.map((era) => era.name);
@@ -367,7 +367,7 @@ describe("every era of every calendar gets a real name", () => {
             expect(new Set(names).size, `${id} names: ${names.join(", ")}`).toBe(eras.length);
 
             for (const name of names) {
-                expect(name, `${id}: a name with a date range in it is ICU naming a neighbouring era`).not.toMatch(
+                expect(name, `${id}: a name with a date range in it is ICU naming a neighboring era`).not.toMatch(
                     /\(\d/,
                 );
             }

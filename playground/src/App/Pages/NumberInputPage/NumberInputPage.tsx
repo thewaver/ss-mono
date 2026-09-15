@@ -5,7 +5,7 @@ import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
 import { ErroredExample } from "./Examples/Errored";
 import { FractionalStepExample } from "./Examples/FractionalStep";
-import { LabelledExample } from "./Examples/Labelled";
+import { LabelledExample } from "./Examples/Labeled";
 import { ReachableExample } from "./Examples/Reachable";
 import { ReadOnlyExample } from "./Examples/ReadOnly";
 import { SteppedClampedExample } from "./Examples/SteppedClamped";
@@ -88,7 +88,7 @@ export const NumberInputPage = () => {
             name: "In a Label",
             readout: () => `value: ${labelledSignal[0]()}`,
             component: () => <LabelledExample valueSignal={labelledSignal} />,
-            path: `${EXAMPLES_ROOT}/Labelled.tsx`,
+            path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
     ]);
 

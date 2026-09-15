@@ -3,7 +3,7 @@ import { createSignal } from "solid-js";
 import { Button, Modal } from "@thewaver/ss-components";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import { PageModalScrim } from "../../../StyledComponents/ModalOverlay/ModalOverlay";
+import { PageModalOverlay } from "../../../StyledComponents/ModalOverlay/ModalOverlay";
 import { PageModalHint, PageModalPanel } from "../../../StyledComponents/ModalPanel/ModalPanel";
 import type { ModalDestructiveExampleProps } from "../ModalPage.types";
 
@@ -40,7 +40,7 @@ export const DestructiveConfirmationExample = (props: Props) => {
                 ariaLabelledBy={() => ALERT_TITLE_ID}
                 ariaDescribedBy={() => ALERT_BODY_ID}
                 renderOverlay={(getVisibilityTarget, getTransitionDurationMs) => (
-                    <PageModalScrim
+                    <PageModalOverlay
                         visibilityTarget={getVisibilityTarget}
                         transitionDurationMs={getTransitionDurationMs}
                     />
@@ -69,7 +69,7 @@ export const DestructiveConfirmationExample = (props: Props) => {
                                 renderContent={(getFlags) => (
                                     <PageButtonContent flags={getFlags}>Cancel</PageButtonContent>
                                 )}
-                                onClick={() => decide("cancelled")}
+                                onClick={() => decide("canceled")}
                             />
                         </div>
                     </PageModalPanel>

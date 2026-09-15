@@ -301,7 +301,7 @@ test("a disabled grid reads out but does not act", async ({ page }) => {
 
 /**
  * Reordering has two ways in and they must agree. The pointer half drags a header past the middle of its
- * neighbour, which is where `Carrier.computeDropIndex` flips the landing place. The keyboard half is
+ * neighbor, which is where `Carrier.computeDropIndex` flips the landing place. The keyboard half is
  * Shift with an arrow on the focused header cell, chosen because the header already spends Enter and Space
  * on sorting and Ctrl with the arrows on resizing.
  *
@@ -309,7 +309,7 @@ test("a disabled grid reads out but does not act", async ({ page }) => {
  * thing being changed and reading it back off the page's own summary would only prove the summary agrees
  * with itself.
  */
-test("a header dragged past its neighbour's middle swaps the two columns", async ({ page }) => {
+test("a header dragged past its neighbor's middle swaps the two columns", async ({ page }) => {
     const first = page.locator(header(REORDERABLE)).nth(0);
     const second = page.locator(header(REORDERABLE)).nth(1);
 

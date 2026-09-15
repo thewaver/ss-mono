@@ -5,6 +5,7 @@ import { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { PlacementLayoutFn, PlacementRect } from "../../../Abstracts/Placement/Placement.types";
+import type { ProximityEffectFn } from "../../../Abstracts/Proximity/Proximity.types";
 import type {
     InteractionControlProps,
     InteractionTooltipDefs,
@@ -115,6 +116,7 @@ export type MenuLevelProps<T> = AccessorProps<{
     items: MaybeAccessor<MenuItem<T>[]>;
     checkedValues: MaybeAccessor<T[]>;
     computeLayout?: PlacementLayoutFn;
+    computeEffect?: ProximityEffectFn;
     computeCustomText?: (item: MenuItem<T>) => string;
     flickOrigin?: MaybeAccessor<Point2d | undefined>;
     renderItem: MenuRenderItem<T>;
@@ -144,6 +146,7 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         items: MaybeAccessor<MenuItem<T>[]>;
         checkedSignal?: SignalSource<T[]>;
         computeLayout?: PlacementLayoutFn;
+        computeEffect?: ProximityEffectFn;
         computeCustomText?: (item: MenuItem<T>) => string;
         renderItem: MenuRenderItem<T>;
         onActivate: (value: T) => void;
@@ -167,6 +170,7 @@ export type ContextMenuProps<T> = AccessorProps<{
     items: MaybeAccessor<MenuItem<T>[]>;
     checkedSignal?: SignalSource<T[]>;
     computeLayout?: PlacementLayoutFn;
+    computeEffect?: ProximityEffectFn;
     computeCustomText?: (item: MenuItem<T>) => string;
     renderItem: MenuRenderItem<T>;
     onActivate: (value: T) => void;

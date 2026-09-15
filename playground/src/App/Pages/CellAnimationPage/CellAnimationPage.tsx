@@ -313,7 +313,7 @@ export const CellAnimationPage = () => {
                 key: "gradient",
                 name: "A gradient, drawn in place",
                 readout: () =>
-                    "the Shape page's own gradients, serialised into a source — the start and the pause a script would have timed are written into the markup instead, so they run at the same length and rhythm as the cells",
+                    "the Shape page's own gradients, serialized into a source — the start and the pause a script would have timed are written into the markup instead, so they run at the same length and rhythm as the cells",
                 component: () => <GradientExampleWrapper {...commonProps} />,
                 path: DRAWN_SOURCE_PATH,
             },

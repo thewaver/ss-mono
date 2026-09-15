@@ -298,8 +298,8 @@ export const GlassSurfacePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"tintColor"} label={"Tint colour"}>
-                        <PageColorField value={getTintColor} ariaLabel={"Tint colour"} onInput={setTintColor} />
+                    <PageProp key={"tintColor"} label={"Tint color"}>
+                        <PageColorField value={getTintColor} ariaLabel={"Tint color"} onInput={setTintColor} />
                     </PageProp>
                 </PagePropsPanel>
             </PagePropsGroups>

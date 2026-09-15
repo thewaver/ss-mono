@@ -92,7 +92,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     let isGrabbing = false;
     let panFrom: number | undefined;
     let pinchGap: number | undefined;
-    let pinchCentre: number | undefined;
+    let pinchCenter: number | undefined;
 
     const getSize = ElementObserverUtils.createBorderBoxSizeObserver(getRootRef);
 
@@ -283,19 +283,19 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const handlePinch = () => {
         const [first, second] = [...pointerXs.values()];
         const gap = Math.abs(second - first);
-        const centre = (first + second) / PINCH_POINTERS;
+        const center = (first + second) / PINCH_POINTERS;
 
-        if (pinchGap !== undefined && gap > NOTHING && pinchCentre !== undefined) {
-            const ratio = getPointerRatio(centre);
+        if (pinchGap !== undefined && gap > NOTHING && pinchCenter !== undefined) {
+            const ratio = getPointerRatio(center);
 
             if (getIsZoomable()) controller.zoomBy(pinchGap / gap, ratio);
             if (getIsPannable() && getWidth() > NOTHING) {
-                controller.panBy((pinchCentre - centre) / getWidth());
+                controller.panBy((pinchCenter - center) / getWidth());
             }
         }
 
         pinchGap = gap;
-        pinchCentre = centre;
+        pinchCenter = center;
     };
 
     const handlePointerMove = (e: PointerEvent) => {
@@ -311,16 +311,16 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
         if (panFrom === undefined || !getIsPannable()) return;
 
-        const travelled = e.clientX - panFrom;
+        const traveled = e.clientX - panFrom;
 
-        if (!isGrabbing && Math.abs(travelled) < DRAG_SLOP) return;
+        if (!isGrabbing && Math.abs(traveled) < DRAG_SLOP) return;
 
         if (!isGrabbing) {
             isGrabbing = true;
             (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
         }
 
-        if (getWidth() > NOTHING) controller.panBy(-travelled / getWidth());
+        if (getWidth() > NOTHING) controller.panBy(-traveled / getWidth());
 
         panFrom = e.clientX;
     };

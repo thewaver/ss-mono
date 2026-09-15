@@ -52,7 +52,7 @@ describe("CellAnimationBreakpointsConst", () => {
         }
     });
 
-    it("puts the middle of an eased window off centre, in the direction the easing names", () => {
+    it("puts the middle of an eased window off center, in the direction the easing names", () => {
         const window: CellAnimationBreakpoints.BreakpointTupleTriple = [0, 0.5, 1];
         const halfway = (easing: CellAnimationBreakpoints.Easing) =>
             CellAnimationBreakpoints.computeLocalTimeline(window, 0.5, easing);

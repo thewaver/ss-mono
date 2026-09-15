@@ -36,7 +36,7 @@ describe("getTiling", () => {
     it("turns a flat-top hexagon's spacing through the other axis", () => {
         expect(FLAT_HEXAGON.pitch).toEqual({ width: 120, height: 30 });
         expect(FLAT_HEXAGON.hasOffsetRows).toBe(true);
-        expect(FLAT_HEXAGON.neighbourhood, "and its two upright neighbours with it").toBe("diagonalAndDown");
+        expect(FLAT_HEXAGON.neighborhood, "and its two upright neighbors with it").toBe("diagonalAndDown");
     });
 
     it("packs lozenges twice as tightly down as squares, which do not interlock at all", () => {
@@ -226,9 +226,9 @@ describe("getIsOnBoard", () => {
     });
 });
 
-describe("getNeighbourTiles", () => {
+describe("getNeighborTiles", () => {
     it("gives an interlocking tile its six touching tiles, clockwise from the top left", () => {
-        expect(TileBoardUtils.getNeighbourTiles({ row: 2, col: 2 }, HEXAGON)).toEqual([
+        expect(TileBoardUtils.getNeighborTiles({ row: 2, col: 2 }, HEXAGON)).toEqual([
             { row: 1, col: 1 },
             { row: 1, col: 2 },
             { row: 2, col: 3 },
@@ -239,7 +239,7 @@ describe("getNeighbourTiles", () => {
     });
 
     it("shifts the diagonals the other way for a tile in a short row, because the rows are offset", () => {
-        expect(TileBoardUtils.getNeighbourTiles({ row: 1, col: 1 }, HEXAGON)).toEqual([
+        expect(TileBoardUtils.getNeighborTiles({ row: 1, col: 1 }, HEXAGON)).toEqual([
             { row: 0, col: 1 },
             { row: 0, col: 2 },
             { row: 1, col: 2 },
@@ -250,7 +250,7 @@ describe("getNeighbourTiles", () => {
     });
 
     it("gives a lozenge its four, because the tiles beside it meet it at a corner only", () => {
-        expect(TileBoardUtils.getNeighbourTiles({ row: 2, col: 2 }, LOZENGE)).toEqual([
+        expect(TileBoardUtils.getNeighborTiles({ row: 2, col: 2 }, LOZENGE)).toEqual([
             { row: 1, col: 1 },
             { row: 1, col: 2 },
             { row: 3, col: 2 },
@@ -259,7 +259,7 @@ describe("getNeighbourTiles", () => {
     });
 
     it("gives a flat-top hexagon the two tiles two rows away, which is where its flat edges point", () => {
-        expect(TileBoardUtils.getNeighbourTiles({ row: 2, col: 2 }, FLAT_HEXAGON)).toEqual([
+        expect(TileBoardUtils.getNeighborTiles({ row: 2, col: 2 }, FLAT_HEXAGON)).toEqual([
             { row: 0, col: 2 },
             { row: 1, col: 2 },
             { row: 3, col: 2 },
@@ -270,7 +270,7 @@ describe("getNeighbourTiles", () => {
     });
 
     it("gives a square its four, because a square shares an edge with nothing diagonal", () => {
-        expect(TileBoardUtils.getNeighbourTiles({ row: 2, col: 2 }, SQUARE)).toEqual([
+        expect(TileBoardUtils.getNeighborTiles({ row: 2, col: 2 }, SQUARE)).toEqual([
             { row: 1, col: 2 },
             { row: 2, col: 3 },
             { row: 3, col: 2 },
@@ -279,13 +279,13 @@ describe("getNeighbourTiles", () => {
     });
 
     it("gives a triangle its three, and the vertical one depends on which way it points", () => {
-        expect(TileBoardUtils.getNeighbourTiles({ row: 2, col: 2 }, TRIANGLE)).toEqual([
+        expect(TileBoardUtils.getNeighborTiles({ row: 2, col: 2 }, TRIANGLE)).toEqual([
             { row: 2, col: 3 },
             { row: 3, col: 2 },
             { row: 2, col: 1 },
         ]);
 
-        expect(TileBoardUtils.getNeighbourTiles({ row: 2, col: 1 }, TRIANGLE)).toEqual([
+        expect(TileBoardUtils.getNeighborTiles({ row: 2, col: 1 }, TRIANGLE)).toEqual([
             { row: 1, col: 1 },
             { row: 2, col: 2 },
             { row: 2, col: 0 },
@@ -293,13 +293,13 @@ describe("getNeighbourTiles", () => {
     });
 
     it("gives a sideways triangle its three, and the horizontal one depends on which way it points", () => {
-        expect(TileBoardUtils.getNeighbourTiles({ row: 2, col: 2 }, SIDEWAYS_TRIANGLE)).toEqual([
+        expect(TileBoardUtils.getNeighborTiles({ row: 2, col: 2 }, SIDEWAYS_TRIANGLE)).toEqual([
             { row: 1, col: 2 },
             { row: 3, col: 2 },
             { row: 2, col: 1 },
         ]);
 
-        expect(TileBoardUtils.getNeighbourTiles({ row: 2, col: 1 }, SIDEWAYS_TRIANGLE)).toEqual([
+        expect(TileBoardUtils.getNeighborTiles({ row: 2, col: 1 }, SIDEWAYS_TRIANGLE)).toEqual([
             { row: 1, col: 1 },
             { row: 2, col: 2 },
             { row: 3, col: 1 },
@@ -307,7 +307,7 @@ describe("getNeighbourTiles", () => {
     });
 
     it("drops the ones that fall off the board", () => {
-        expect(TileBoardUtils.getNeighbourTiles({ row: 0, col: 0 }, HEXAGON)).toEqual([
+        expect(TileBoardUtils.getNeighborTiles({ row: 0, col: 0 }, HEXAGON)).toEqual([
             { row: 0, col: 1 },
             { row: 1, col: 0 },
         ]);

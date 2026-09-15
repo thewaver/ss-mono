@@ -6,7 +6,7 @@ import { CellAnimationWeightUtils } from "../CellAnimationWeights.utils";
 const RIPPLE_PERIOD_CELLS = 4;
 const TRAVELLING_RIPPLE = 0.5;
 
-export const rippleDiamondTravelling: WeightFn = (pos, count, origin) => {
+export const rippleDiamondTraveling: WeightFn = (pos, count, origin) => {
     const maxDist = CellAnimationWeightUtils.getMaxDistance(origin, count);
     const dist = Point2dUtils.getDelta(origin, pos);
 

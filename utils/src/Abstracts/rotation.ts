@@ -1,3 +1,4 @@
+import { AngleUtils } from "./angle.js";
 import { MathUtils } from "./math.js";
 
 const MAX_JITTER_RATIO = 0.5;
@@ -35,7 +36,7 @@ export namespace RotationUtils {
     export const getIndexAngle = (index: number, stepCount: number) => {
         if (stepCount < 1) return 0;
 
-        return (360 - getStepAngle(stepCount) * MathUtils.wrapIndex(index, stepCount)) % 360;
+        return AngleUtils.wrapPositive(360 - getStepAngle(stepCount) * MathUtils.wrapIndex(index, stepCount));
     };
 
     /**

@@ -8,7 +8,7 @@ import type { AccordionSinglePanelExampleProps } from "../../Accordions.types";
 
 type Props = AccordionSinglePanelExampleProps;
 
-const NOTES = ["Signed for on arrival", "Left with a neighbour", "Returned to the depot"];
+const NOTES = ["Signed for on arrival", "Left with a neighbor", "Returned to the depot"];
 
 export const FilledExample = (props: Props) => (
     <Collapsible

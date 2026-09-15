@@ -6,7 +6,7 @@ import { CompactExample } from "./Examples/Compact";
 import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
 import { ErroredExample } from "./Examples/Errored";
-import { LabelledExample } from "./Examples/Labelled";
+import { LabelledExample } from "./Examples/Labeled";
 import { ReachableExample } from "./Examples/Reachable";
 import { SnappingExample } from "./Examples/Snapping";
 
@@ -60,7 +60,7 @@ export const ColorInputPage = () => {
         {
             key: "errored",
             name: "Error",
-            readout: () => `value: ${erroredSignal[0]()} — black is not a brand colour`,
+            readout: () => `value: ${erroredSignal[0]()} — black is not a brand color`,
             component: () => <ErroredExample valueSignal={erroredSignal} />,
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
         },
@@ -69,7 +69,7 @@ export const ColorInputPage = () => {
             name: "In a Label",
             readout: () => `value: ${labelledSignal[0]()} — the caption opens the picker`,
             component: () => <LabelledExample valueSignal={labelledSignal} />,
-            path: `${EXAMPLES_ROOT}/Labelled.tsx`,
+            path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
     ]);
 

@@ -1,4 +1,4 @@
-import { Color, MathUtils, RandomUtils, type Size2d } from "@thewaver/ss-utils";
+import { Color, MathUtils, type Point2d, RandomUtils, type Size2d } from "@thewaver/ss-utils";
 
 import type { PointerReading } from "../../Abstracts/PointerTracker/PointerTracker.types";
 import { SVGFilterDefsFactory } from "../../Abstracts/SVG/Defs/Filter/SVGFilterDefs.factory";
@@ -15,16 +15,16 @@ export namespace SVGDefsUtils {
     export const DEFAULT_GRADIENT_STEPS = 12;
 
     /**
-     * The colour stops of a gradient that repeats a run of colours a given number of times.
+     * The color stops of a gradient that repeats a run of colors a given number of times.
      *
-     * A flowing gradient reads as a band per colour per repeat, and it needs one stop more than that so the
-     * last band closes on the colour the first one opened with — which is what lets the whole strip slide
+     * A flowing gradient reads as a band per color per repeat, and it needs one stop more than that so the
+     * last band closes on the color the first one opened with — which is what lets the whole strip slide
      * without a seam. Callers state the repeats rather than the stops for that reason: the off-by-one is the
      * helper's to remember.
      *
-     * @param keys The run of colours to repeat, in order.
+     * @param keys The run of colors to repeat, in order.
      * @param repeats How many times the run appears across the gradient.
-     * @returns `keys.length * repeats + 1` colour keys, opening and closing on the first.
+     * @returns `keys.length * repeats + 1` color keys, opening and closing on the first.
      */
     export const getCycleStopKeys = (keys: CycleColorKey[], repeats: number) =>
         Array.from({ length: keys.length * repeats + 1 }, (_unused, index) => keys[index % keys.length]);
@@ -78,6 +78,14 @@ export namespace SVGDefsUtils {
         const rad = (angle * Math.PI) / 180;
 
         return { x: v * Math.cos(rad), y: v * Math.sin(rad) };
+    };
+
+    export const projectBoxRatioOntoAngle = (ratio: Point2d, angle: number) => {
+        const rad = (angle * Math.PI) / 180;
+        const x = Math.cos(rad);
+        const y = Math.sin(rad);
+
+        return ((ratio.x - 0.5) * x + (ratio.y - 0.5) * y) / (Math.abs(x) + Math.abs(y));
     };
 
     export const getRandomValuesWithSplitControl = (

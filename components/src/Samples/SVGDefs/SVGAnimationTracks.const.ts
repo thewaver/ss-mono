@@ -1,6 +1,4 @@
-import { SVGUtils } from "@thewaver/ss-utils";
-
-const DEGREES_TO_RADIANS = Math.PI / 180;
+import { AngleUtils, SVGUtils } from "@thewaver/ss-utils";
 
 export namespace SVGAnimationTracks {
     export const V_KEYS = ["x1", "y1", "x2", "y2"] as const;
@@ -17,7 +15,7 @@ export namespace SVGAnimationTracks {
     };
 
     export const computeDiagonalTracks = (x: number, y: number, angle: number, offsets: number[]) => {
-        const diagonalRad = angle * DEGREES_TO_RADIANS;
+        const diagonalRad = angle * AngleUtils.RADIANS_PER_DEGREE;
 
         return {
             x: offsets.map((offset) => x + offset * Math.cos(diagonalRad)),

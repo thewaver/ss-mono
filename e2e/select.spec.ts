@@ -176,7 +176,7 @@ test("a multi list stays open, accumulates and toggles back out", async ({ page 
  * report `true` from the list alone; picking both of the others still leaves one option unselected, which
  * is exactly what mixed means. Benelux is the group that can go all the way.
  */
-test("a group header summarises its own options as unchecked, mixed or checked", async ({ page }) => {
+test("a group header summarizes its own options as unchecked, mixed or checked", async ({ page }) => {
     await openMultiSelect(page);
     await openedWithHighlight(page, "multiSelectGrouped");
 

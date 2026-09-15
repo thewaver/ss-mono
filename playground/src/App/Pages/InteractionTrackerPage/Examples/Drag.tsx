@@ -6,14 +6,14 @@ import type { InteractionDragExampleProps } from "../InteractionTrackerPage.type
 
 import * as styles from "../InteractionTrackerPage.css";
 
-const CENTRE_RATIO = 0.5;
+const CENTER_RATIO = 0.5;
 const PERCENT = 100;
 
 type Props = InteractionDragExampleProps;
 
 export const DragExample = (props: Props) => {
     const [getRef, setRef] = createSignal<HTMLElement>();
-    const [getRatio, setRatio] = createSignal({ x: CENTRE_RATIO, y: CENTRE_RATIO });
+    const [getRatio, setRatio] = createSignal({ x: CENTER_RATIO, y: CENTER_RATIO });
 
     InteractionTrackerUtils.trackDrag(getRef, props.isDisabled, {
         onDrag: (ratio) => {

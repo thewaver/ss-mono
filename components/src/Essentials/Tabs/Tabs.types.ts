@@ -2,6 +2,7 @@ import type { Accessor, Component, JSX, ParentProps } from "solid-js";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { PlacementLayoutFn, PlacementRect } from "../../Abstracts/Placement/Placement.types";
+import type { ProximityEffectFn } from "../../Abstracts/Proximity/Proximity.types";
 import type { InteractionControlProps } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 
@@ -47,6 +48,7 @@ export type TabsProps<T> = AccessorProps<{
     tabs: MaybeAccessor<Tab<T>[]>;
     selectedValue: MaybeAccessor<T | undefined>;
     computeLayout?: PlacementLayoutFn;
+    computeEffect?: ProximityEffectFn;
     renderTab: (
         getTab: Accessor<Tab<T>>,
         getFlags: () => InteractionFlags,

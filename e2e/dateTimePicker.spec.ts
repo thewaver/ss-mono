@@ -15,7 +15,7 @@ const PICKED = demo("picked");
 
 /**
  * The two fields are the existing `DateInput` and `TimeInput`, side by side and in that order, so they are
- * found by position: the claim under test is that both are driven by one value, not that either is labelled
+ * found by position: the claim under test is that both are driven by one value, not that either is labeled
  * a particular way.
  */
 const field = (scope: string, index: number) => `${scope} input >> nth=${index}`;

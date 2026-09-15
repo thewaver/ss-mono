@@ -19,7 +19,7 @@ const pad = (value: number) => `${value}`.padStart(PAD, "0");
  *
  * `second` is optional, and its presence is the value's **shape**: a field showing `09:30`
  * holds a value without it, one showing `09:30:00` holds a value with it set to zero. The
- * operations here carry that shape through rather than normalising it away, so a value does
+ * operations here carry that shape through rather than normalizing it away, so a value does
  * not silently grow a seconds field it was never given.
  */
 export type TimeValue = {

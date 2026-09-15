@@ -337,7 +337,7 @@ test("the floater lands on the cell the layout chose, in both axes", async ({ pa
  * regions", so this presses a corner inside the rectangle and outside the hexagon and asks who answers.
  *
  * The corner is named as shares of the box rather than in pixels because the box is measured through the
- * `Viewport` scale. At `CORNER_DOWN` the cell's lower-left edge has travelled two thirds of the way across,
+ * `Viewport` scale. At `CORNER_DOWN` the cell's lower-left edge has traveled two thirds of the way across,
  * so `CORNER_ACROSS` is well outside the drawn shape while staying inside the element.
  */
 const CORNER_ACROSS = 0.08;

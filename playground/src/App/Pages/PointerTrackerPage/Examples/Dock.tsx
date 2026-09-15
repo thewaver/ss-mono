@@ -30,8 +30,8 @@ export const DockExample = () => {
         const pointerX = getReading().boxRatio.x * ROW_WIDTH;
 
         return LABELS.map((_unused, index) => {
-            const restingCentre = index * (ITEM_SIZE + ITEM_GAP) + ITEM_SIZE * HALF;
-            const nearness = MathUtils.clamp01(Math.abs(pointerX - restingCentre) / REACH_PX);
+            const restingCenter = index * (ITEM_SIZE + ITEM_GAP) + ITEM_SIZE * HALF;
+            const nearness = MathUtils.clamp01(Math.abs(pointerX - restingCenter) / REACH_PX);
 
             return RESTING_SCALE + MAX_GROWTH * (1 - nearness * nearness);
         });

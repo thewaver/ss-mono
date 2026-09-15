@@ -18,7 +18,7 @@ export const Formation = <T,>(props: FormationProps<T>) => {
     const getStackAt = (index: number) => (access(props.isStackedInReverse) ? getItemCount() - index : index + 1);
 
     return (
-        <PlacementBox layout={getLayout}>
+        <PlacementBox layout={getLayout} computeEffect={props.computeEffect}>
             <Index each={access(props.items)}>
                 {(getItem, index) => (
                     <PlacementItem placement={() => getPlacement(index)} stackAt={() => getStackAt(index)}>

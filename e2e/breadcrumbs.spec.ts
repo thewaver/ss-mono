@@ -15,7 +15,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 /**
- * The markup is the feature here, so it is what gets asserted rather than a behaviour. A trail is a
+ * The markup is the feature here, so it is what gets asserted rather than a behavior. A trail is a
  * navigation landmark holding an ordered list: the landmark is what lets someone jump straight to it,
  * and the list is what makes "four of these, in this order" true for a screen reader rather than only
  * visually. A `<div>` of links reads as neither, which is the whole reason this is a component instead

@@ -31,6 +31,17 @@ export type ArcDefs = {
     itemHeightRatio?: number;
 };
 
+export type RowDefs = {
+    gapRatio?: number;
+    itemHeightRatio?: number;
+};
+
+export type ColumnDefs = {
+    gapRatio?: number;
+    itemWidthRatio?: number;
+    itemHeightRatio?: number;
+};
+
 export type HoneycombDefs = {
     perRow?: number;
     gapRatio?: number;
@@ -52,6 +63,8 @@ export type CliffDefs = {
 export type PlacementLayoutEntry =
     | { family: "ring"; defs?: BandDefs }
     | { family: "arc"; defs?: ArcDefs }
+    | { family: "row"; defs?: RowDefs }
+    | { family: "column"; defs?: ColumnDefs }
     | { family: "honeycomb"; defs?: HoneycombDefs }
     | { family: "cliff"; defs?: CliffDefs }
     | { family: "whorl"; defs?: WhorlDefs }

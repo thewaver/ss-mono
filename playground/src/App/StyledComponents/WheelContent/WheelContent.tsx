@@ -1,6 +1,7 @@
 import { type ParentProps, Show, createUniqueId } from "solid-js";
 
 import { PlacementUtils, access } from "@thewaver/ss-components";
+import type { PlacementSector } from "@thewaver/ss-components";
 
 import type {
     PageWheelCardProps,
@@ -13,11 +14,28 @@ import type {
 import * as styles from "./WheelContent.css";
 
 const LABEL_TYPE_RATIO = 0.14;
+const NO_TILT = 0;
+const HALF = 0.5;
+const QUARTER_TURN = 90;
+const UPSIDE_DOWN_FROM = 90;
+const UPSIDE_DOWN_TO = 270;
+const HALF_TURN = 180;
+const FULL_TURN = 360;
 const PIP_PATH = "M 2 2 H 18 L 10 18 Z";
 
 const PIP_SIDE_STYLES: Record<PageWheelPipSide, string> = {
     top: styles.wheelPipTop,
     left: styles.wheelPipLeft,
+};
+
+const toLabelTilt = (wedgeAngle: number, sector: PlacementSector | undefined) => {
+    if (!sector) return NO_TILT;
+
+    const tilt = (sector.fromAngle + sector.toAngle) * HALF + QUARTER_TURN;
+    const painted = (((wedgeAngle + tilt) % FULL_TURN) + FULL_TURN) % FULL_TURN;
+    const isUpsideDown = painted > UPSIDE_DOWN_FROM && painted < UPSIDE_DOWN_TO;
+
+    return tilt + (isUpsideDown ? HALF_TURN : NO_TILT);
 };
 
 export const PageWheelWedge = (props: ParentProps<PageWheelWedgeProps>) => {
@@ -50,6 +68,7 @@ export const PageWheelWedge = (props: ParentProps<PageWheelWedgeProps>) => {
                             "width": PlacementUtils.toContainerWidth(getRect().width),
                             "height": PlacementUtils.toContainerWidth(getRect().height),
                             "font-size": PlacementUtils.toContainerWidth(getRect().width * LABEL_TYPE_RATIO),
+                            "transform": `translate(-50%, -50%) rotate(${toLabelTilt(access(props.state).angle, getRect().sector)}deg)`,
                         }}
                     >
                         {props.children}
@@ -94,7 +113,7 @@ export const PageWheelPip = (props: PageWheelPipProps) => {
     );
 };
 
-export const PageWheelCentre = (props: ParentProps) => <div class={styles.wheelCentre}>{props.children}</div>;
+export const PageWheelCenter = (props: ParentProps) => <div class={styles.wheelCenter}>{props.children}</div>;
 
 export const PageWheelBar = (props: ParentProps) => <div class={styles.wheelBar}>{props.children}</div>;
 

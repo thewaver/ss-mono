@@ -78,3 +78,18 @@ export type CSSFilterKey = (typeof CSS_FILTER_KEYS)[number];
 
 /** Anything animatable here — a transform function or a filter function. */
 export type CSSAnimationKey = CSSFilterKey | CSSTransformKey;
+
+/**
+ * A set of transform and filter functions with their arguments as plain numbers.
+ *
+ * One entry per function, keyed by its CSS name; a function with several arguments takes an array in
+ * the order the function declares them. What unit each number carries is
+ * {@link CSSConst.ANIMATION_UNITS}'s business rather than the caller's.
+ */
+export type CSSAnimationValues = Partial<Record<CSSAnimationKey, number | number[]>>;
+
+/** The two CSS properties {@link CSSAnimationValues} is written into. */
+export type CSSAnimationStyle = {
+    transform: string;
+    filter: string;
+};

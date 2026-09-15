@@ -40,7 +40,7 @@ const DEFAULT_SUBMENU_PLACEMENT: AnchorPlacement = { x: "right-out", y: "top-in"
 const ROOT_LEVEL = 0;
 const ROOT_PATH: number[] = [];
 const NO_PARENT_EXTENT = 0;
-const BOX_CENTRE = 0.5;
+const BOX_CENTER = 0.5;
 const FULL_PERCENT = 100;
 const SAME_POINT_PX = 1;
 const DEFAULT_SUBMENU_MODE: MenuSubmenuMode = "cascade";
@@ -236,9 +236,9 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
 
         if (layout === undefined) return undefined;
 
-        const origin = layout.origin ?? { x: BOX_CENTRE, y: BOX_CENTRE * layout.heightRatio };
-        const across = (BOX_CENTRE - origin.x) * FULL_PERCENT;
-        const down = ((BOX_CENTRE * layout.heightRatio - origin.y) / layout.heightRatio) * FULL_PERCENT;
+        const origin = layout.origin ?? { x: BOX_CENTER, y: BOX_CENTER * layout.heightRatio };
+        const across = (BOX_CENTER - origin.x) * FULL_PERCENT;
+        const down = ((BOX_CENTER * layout.heightRatio - origin.y) / layout.heightRatio) * FULL_PERCENT;
 
         return `translate(${across}%, ${down}%)`;
     };
@@ -527,6 +527,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                                 openerFlags={getFlags}
                                 checkedValues={props.checkedValues}
                                 computeLayout={props.computeLayout}
+                                computeEffect={props.computeEffect}
                                 computeCustomText={props.computeCustomText}
                                 getPointerPoint={props.getPointerPoint}
                                 renderItem={props.renderItem}
@@ -585,7 +586,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         <Show when={getLayout()} fallback={renderRuns()}>
             {(getResolved) => (
                 <div style={{ width: getLayoutWidth(), transform: getLayoutShift() }}>
-                    <PlacementBox layout={getResolved} ref={setLayoutRootRef}>
+                    <PlacementBox layout={getResolved} ref={setLayoutRootRef} computeEffect={props.computeEffect}>
                         {renderRuns()}
                     </PlacementBox>
                 </div>
@@ -764,6 +765,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         openerFlags={getFlags}
                         checkedValues={getCheckedValues}
                         computeLayout={props.computeLayout}
+                        computeEffect={props.computeEffect}
                         computeCustomText={props.computeCustomText}
                         getPointerPoint={getPointerPoint}
                         flickOrigin={getFlickOrigin}
@@ -869,6 +871,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
             openerFlags={() => ({ isOpen: getIsOpen() })}
             checkedValues={getCheckedValues}
             computeLayout={props.computeLayout}
+            computeEffect={props.computeEffect}
             computeCustomText={props.computeCustomText}
             getPointerPoint={getPointerPoint}
             renderItem={props.renderItem}

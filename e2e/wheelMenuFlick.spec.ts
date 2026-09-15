@@ -18,7 +18,7 @@ import { demo, readout } from "./helpers";
  * up-event, and a mechanism is available to abort the function before completion". Coming back to the middle
  * is that abort, and it is a test rather than a note for exactly that reason.
  *
- * Nothing here pins a coordinate. Each flick is aimed at a wedge whose centre the page itself reports, and
+ * Nothing here pins a coordinate. Each flick is aimed at a wedge whose center the page itself reports, and
  * travels a fraction of the way there, so re-tuning the hole, the band or the threshold cannot turn into a
  * red run — what is asserted is that aiming at a wedge picks that wedge and aiming at nothing picks nothing.
  */
@@ -33,7 +33,7 @@ const ABORT_SHARE = 0.05;
 
 const trigger = `${demo(FLICK)} [aria-haspopup="menu"]`;
 
-const centreOf = async (page: Page, selector: string) => {
+const centerOf = async (page: Page, selector: string) => {
     const box = await page.locator(selector).boundingBox();
 
     if (!box) throw new Error(`nothing to measure at ${selector}`);
@@ -57,7 +57,7 @@ const openedLevel = async (page: Page) => {
  * the level has laid itself out; a person's flick is a stream of moves and this is the cheapest way to be one.
  */
 const flickToward = async (page: Page, name: string, share: number) => {
-    const from = await centreOf(page, trigger);
+    const from = await centerOf(page, trigger);
 
     await page.mouse.move(from.x, from.y);
     await page.mouse.down();
@@ -82,7 +82,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("holding the opener brings the wheel up under the pointer, before anything is chosen", async ({ page }) => {
-    const from = await centreOf(page, trigger);
+    const from = await centerOf(page, trigger);
 
     await page.mouse.move(from.x, from.y);
     await page.mouse.down();

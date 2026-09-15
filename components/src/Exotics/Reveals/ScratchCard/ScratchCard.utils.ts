@@ -51,7 +51,7 @@ export namespace ScratchCardUtils {
     /**
      * The square a brush stamp occupies.
      *
-     * @param point The brush's centre.
+     * @param point The brush's center.
      * @param radius The brush's radius.
      */
     export const computeBrushBox = (point: Point2d, radius: number): Rect => ({
@@ -103,10 +103,10 @@ export namespace ScratchCardUtils {
     /**
      * Five points to test a stamp against, for deciding whether it cleared anything new.
      *
-     * The centre and the four extremes rather than the whole area: enough to tell a stamp landing on
+     * The center and the four extremes rather than the whole area: enough to tell a stamp landing on
      * fresh covering from one retracing ground already cleared, at a fraction of the cost.
      *
-     * @param point The brush's centre.
+     * @param point The brush's center.
      * @param radius The brush's radius.
      */
     export const computeProbePoints = (point: Point2d, radius: number): Point2d[] => [
@@ -120,7 +120,7 @@ export namespace ScratchCardUtils {
     /**
      * An evenly spaced grid of points to measure how much has been cleared.
      *
-     * Points sit at the centre of their cells rather than on the boundaries, so the edges of the card
+     * Points sit at the center of their cells rather than on the boundaries, so the edges of the card
      * are weighted like everywhere else.
      *
      * @param size The card's size.

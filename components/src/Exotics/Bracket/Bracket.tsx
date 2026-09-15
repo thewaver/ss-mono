@@ -83,7 +83,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
             ? { left: getLayerStart(placement), top: getCrossStart(placement) }
             : { left: getCrossStart(placement), top: getLayerStart(placement) };
 
-    const getCrossCentre = (placement: BracketPlacement) => getCrossStart(placement) + getCrossExtent() * HALF;
+    const getCrossCenter = (placement: BracketPlacement) => getCrossStart(placement) + getCrossExtent() * HALF;
 
     const getFacingEdge = (placement: BracketPlacement, isTowardRoot: boolean) =>
         BracketUtils.getFacingEdge(getLayerStart(placement), getLayerExtent(), getRootSide(), isTowardRoot);
@@ -95,7 +95,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
         getLayout()
             .placements.filter((placement) => placement.childIds.length > NOTHING)
             .flatMap((placement) => {
-                const from = getPoint(getFacingEdge(placement, false), getCrossCentre(placement));
+                const from = getPoint(getFacingEdge(placement, false), getCrossCenter(placement));
 
                 return placement.childIds.flatMap((childId) => {
                     const child = BracketUtils.findPlacement(getLayout().placements, childId);
@@ -109,7 +109,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                             childId,
                             orientation: getOrientation(),
                             from,
-                            to: getPoint(getFacingEdge(child, true), getCrossCentre(child)),
+                            to: getPoint(getFacingEdge(child, true), getCrossCenter(child)),
                         },
                     ];
                 });

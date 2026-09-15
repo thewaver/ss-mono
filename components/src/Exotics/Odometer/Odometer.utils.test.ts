@@ -92,7 +92,7 @@ describe("computeCascadeDelays", () => {
         expect(OdometerUtils.computeCascadeDelays([1, 9, 9], [2, 0, 0], 100)).toEqual([200, 100, 0]);
     });
 
-    it("does not hold a column back for a neighbour that is standing still", () => {
+    it("does not hold a column back for a neighbor that is standing still", () => {
         expect(OdometerUtils.computeCascadeDelays([1, 2, 3], [2, 2, 3], 100)).toEqual([0, 0, 0]);
     });
 

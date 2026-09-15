@@ -7,6 +7,7 @@ import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SV
 import type { GradientFalloffOpts, GradientSpotTrailOpts, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 import { SVGDefsFrameUtils } from "../../SVGDefsFrames.utils";
+import { TrackedGradientKnobs } from "../TrackedGradient.knobs";
 
 type TrailStamp = {
     origin: Point2d;
@@ -14,17 +15,9 @@ type TrailStamp = {
     bornMs: number;
 };
 
-const POOL_SCALE = 0.8;
-const CORE_STOP = 5;
-const FALLOFF_STOP = 30;
-const CORE_ALPHA = 0.75;
-const FALLOFF_ALPHA = 0.25;
-
 const STAMP_COUNT = Math.ceil(1000 / 60) * 2;
 const STAMP_INTERVAL_MS = Math.ceil(1000 / 60);
 const TRAIL_LIFETIME_MS = STAMP_COUNT * STAMP_INTERVAL_MS;
-const STAMP_ALPHA = 0.25;
-const STAMP_DECAY_EXPONENT = 2.2;
 const MOTION_STEP_RATIO = 0.002;
 const MOTION_GRACE_MS = STAMP_INTERVAL_MS * 2;
 
@@ -33,17 +26,19 @@ const FULL_AGE_RATIO = 1;
 const FULL_ALPHA = 1;
 const NO_FADE = 0;
 
+const DEFAULTS = TrackedGradientKnobs.SPOT_TRAIL_DEFAULTS;
+
 const NO_REF = () => undefined;
 
 const computePoolColors = (color: string, alpha: number, opts?: GradientFalloffOpts) => [
     { value: `rgb(from ${color} r g b / ${alpha})` },
     {
-        value: `rgb(from ${color} r g b / ${alpha * (opts?.coreAlpha ?? CORE_ALPHA)})`,
-        stop: opts?.coreStop ?? CORE_STOP,
+        value: `rgb(from ${color} r g b / ${alpha * (opts?.coreAlpha ?? DEFAULTS.coreAlpha)})`,
+        stop: opts?.coreStop ?? DEFAULTS.coreStop,
     },
     {
-        value: `rgb(from ${color} r g b / ${alpha * (opts?.falloffAlpha ?? FALLOFF_ALPHA)})`,
-        stop: opts?.falloffStop ?? FALLOFF_STOP,
+        value: `rgb(from ${color} r g b / ${alpha * (opts?.falloffAlpha ?? DEFAULTS.falloffAlpha)})`,
+        stop: opts?.falloffStop ?? DEFAULTS.falloffStop,
     },
     { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
 ];
@@ -93,8 +88,8 @@ const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined, 
 
     const getAlpha = () =>
         (getStamp()?.fade ?? 0) *
-        (opts?.trailAlpha ?? STAMP_ALPHA) *
-        (1 - getAgeRatio()) ** (opts?.trailDecay ?? STAMP_DECAY_EXPONENT);
+        (opts?.trailAlpha ?? DEFAULTS.trailAlpha) *
+        (1 - getAgeRatio()) ** (opts?.trailDecay ?? DEFAULTS.trailDecay);
 
     return {
         getOrigin: () => getStamp()?.origin ?? RESTING_ORIGIN,
@@ -115,8 +110,9 @@ export const spot_trail_1 = (opts?: GradientSpotTrailOpts): TrackedGradientConfi
 
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient1-${id}`,
+                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
                         origin: () => getReading().boxRatio,
-                        scale: opts?.glowScale ?? POOL_SCALE,
+                        scale: opts?.glowScale ?? DEFAULTS.glowScale,
                         colors: computePoolColors(defs.colors.primary, FULL_ALPHA, opts),
                     });
                 },
@@ -131,8 +127,9 @@ export const spot_trail_1 = (opts?: GradientSpotTrailOpts): TrackedGradientConfi
 
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient${index + 2}-${id}`,
+                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
                         origin: stamp.getOrigin,
-                        scale: opts?.glowScale ?? POOL_SCALE,
+                        scale: opts?.glowScale ?? DEFAULTS.glowScale,
                         colors: () => stamp.getColors(defs.colors.primary),
                     });
                 },

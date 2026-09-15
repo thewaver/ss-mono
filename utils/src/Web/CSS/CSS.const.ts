@@ -50,7 +50,7 @@ export namespace CSSConst {
     ] as const;
 
     /**
-     * CSS properties that change how text looks without changing its size — colour,
+     * CSS properties that change how text looks without changing its size — color,
      * background, decoration, shadow and the rest.
      */
     export const CSS_KEYS_USED_TO_RENDER_TEXT = [
@@ -204,7 +204,7 @@ export namespace CSSConst {
      * CSS properties that stop having any effect once an element is displayed inline.
      *
      * Inline elements ignore explicit sizes and vertical spacing, so carrying these
-     * across would promise something the browser will not honour.
+     * across would promise something the browser will not honor.
      */
     export const CSS_KEYS_EXCLUDED_FOR_DISPLAY_INLINE = [
         "align-content",
@@ -307,7 +307,7 @@ export namespace CSSConst {
      *
      * One entry per argument, in the order the function takes them, so the array length
      * doubles as the argument count. An empty string means the argument carries no unit
-     * of its own — a bare number, or a colour.
+     * of its own — a bare number, or a color.
      */
     export const ANIMATION_UNITS: Record<CSSAnimationKey, string[]> = {
         // TRANSFORM

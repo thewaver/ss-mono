@@ -30,7 +30,7 @@ const closerOf = (page: Page, depth: number) => page.locator(MENU).nth(depth).lo
 
 /**
  * A level is sized by its own layout and moved by a transform the `Popover` writes, both in layout space, so
- * the centre comes off the element itself rather than out of a client rect — which is what keeps this
+ * the center comes off the element itself rather than out of a client rect — which is what keeps this
  * independent of the scale `Viewport` applies to the whole page. Nothing here pins a number: what is asserted
  * is the relationship between two levels, so re-tuning a radius cannot turn into a red run.
  */
@@ -38,7 +38,7 @@ const boxOf = (locator: Locator) =>
     locator.evaluate((node: HTMLElement) => {
         const [x, y] = (node.style.transform.match(/-?[\d.]+/g) ?? ["0", "0"]).map(Number);
 
-        return { centreX: x + node.offsetWidth * 0.5, centreY: y + node.offsetHeight * 0.5, width: node.offsetWidth };
+        return { centerX: x + node.offsetWidth * 0.5, centerY: y + node.offsetHeight * 0.5, width: node.offsetWidth };
     });
 
 test.beforeEach(async ({ page }) => {
@@ -46,7 +46,7 @@ test.beforeEach(async ({ page }) => {
     await expect(page.locator("[data-example]").first()).toBeVisible();
 });
 
-test("a submenu is a wider band round the centre its parent already had", async ({ page }) => {
+test("a submenu is a wider band round the center its parent already had", async ({ page }) => {
     await page.locator(trigger("concentric")).click();
     await openedLevel(page, 0);
 
@@ -61,11 +61,11 @@ test("a submenu is a wider band round the centre its parent already had", async 
     levels.forEach((level, depth) => {
         if (depth === 0) return;
 
-        expect(level.centreX, "every level is centred on the same point the root was").toBeCloseTo(
-            levels[0].centreX,
+        expect(level.centerX, "every level is centerd on the same point the root was").toBeCloseTo(
+            levels[0].centerX,
             0,
         );
-        expect(level.centreY).toBeCloseTo(levels[0].centreY, 0);
+        expect(level.centerY).toBeCloseTo(levels[0].centerY, 0);
         expect(level.width, "and each one encloses the level above it").toBeGreaterThan(levels[depth - 1].width);
     });
 });
@@ -79,8 +79,8 @@ test("a half wheel nests the same way, one wider arc round the last", async ({ p
 
     const [root, band] = await Promise.all([0, 1].map((depth) => boxOf(page.locator(MENU).nth(depth))));
 
-    expect(band.centreX, "the arc is drawn about the point the level above was").toBeCloseTo(root.centreX, 0);
-    expect(band.centreY).toBeCloseTo(root.centreY, 0);
+    expect(band.centerX, "the arc is drawn about the point the level above was").toBeCloseTo(root.centerX, 0);
+    expect(band.centerY).toBeCloseTo(root.centerY, 0);
     expect(band.width, "and encloses it").toBeGreaterThan(root.width);
 });
 

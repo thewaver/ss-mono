@@ -19,7 +19,7 @@ export const trailPath = style({
     stroke: "none",
 });
 
-export const trailTraveller = style({
+export const trailTraveler = style({
     position: "absolute",
     top: 0,
     left: 0,

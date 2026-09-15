@@ -39,22 +39,22 @@ const mixHue = (from: number, to: number, ratio: number) => {
 };
 
 /**
- * Colour values and the conversions between them.
+ * Color values and the conversions between them.
  *
- * Every colour space gets a type describing its shape and a namespace of the same name holding
+ * Every color space gets a type describing its shape and a namespace of the same name holding
  * its operations, so `Color.HSL` is both the value and the place its functions live. Conversions
  * are named after their destination: `Color.RGB.toHsl` takes an `RGB` and returns an `HSL`.
  *
  * Spaces come in pairs. The plain form carries no transparency; the `A` form adds a required
  * `a` field, and only the `A` forms convert to each other. Inputs are clamped to their valid
- * range rather than rejected, so a nonsensical value produces the nearest sensible colour
+ * range rather than rejected, so a nonsensical value produces the nearest sensible color
  * instead of an error.
  *
  * Every space also carries an `interpolate`, which blends two of its own values. Blending is
  * done in the space it is called on and the result is a value of that space, so the path taken
- * between two colours is the caller's choice: `RGB.interpolate` walks a straight line through
+ * between two colors is the caller's choice: `RGB.interpolate` walks a straight line through
  * the channels, while `HSL.interpolate` and `HSV.interpolate` travel around the hue circle by
- * the shorter arc and so keep saturated colours saturated on the way.
+ * the shorter arc and so keep saturated colors saturated on the way.
  */
 export namespace Color {
     /** Red, green and blue, each `0`–`255`. Values may be fractional; they are rounded on output. */
@@ -110,18 +110,18 @@ export namespace Color {
      */
     export type Hexa = `#${string}`;
 
-    /** Names of the colour spaces that carry transparency, for callers that switch on one. */
+    /** Names of the color spaces that carry transparency, for callers that switch on one. */
     export type ValueSpace = "rgba" | "hsla" | "hsva" | "hexa";
 
     /** Operations on {@link Color.RGB} values. */
     export namespace RGB {
         /**
-         * Blends towards another colour, channel by channel.
+         * Blends towards another color, channel by channel.
          *
-         * @param from The colour at a ratio of `0`.
-         * @param to The colour at a ratio of `1`.
+         * @param from The color at a ratio of `0`.
+         * @param to The color at a ratio of `1`.
          * @param ratio How far to travel, clamped to `0`–`1`.
-         * @returns The blended colour. Channels may be fractional; they are rounded on output.
+         * @returns The blended color. Channels may be fractional; they are rounded on output.
          */
         export const interpolate = (from: Color.RGB, to: Color.RGB, ratio: number): Color.RGB => ({
             r: mix(from.r, to.r, ratio),
@@ -130,9 +130,9 @@ export namespace Color {
         });
 
         /**
-         * Formats the colour as a CSS `rgb()` string.
+         * Formats the color as a CSS `rgb()` string.
          *
-         * @param rgb The colour to format.
+         * @param rgb The color to format.
          * @returns A string such as `rgb(255 128 0)`, with channels rounded to whole numbers.
          */
         export const toCss = (rgb: Color.RGB) => `rgb(${toChannel(rgb.r)} ${toChannel(rgb.g)} ${toChannel(rgb.b)})`;
@@ -140,7 +140,7 @@ export namespace Color {
         /**
          * Converts to a 6 digit hex string.
          *
-         * @param rgb The colour to convert.
+         * @param rgb The color to convert.
          * @returns A lowercase value such as `#ff8000`. Channels are rounded and clamped to `0`–`255`.
          */
         export const toHex = (rgb: Color.RGB): Color.Hex =>
@@ -149,8 +149,8 @@ export namespace Color {
         /**
          * Converts to hue, saturation and lightness.
          *
-         * @param rgb The colour to convert.
-         * @returns The same colour expressed as {@link Color.HSL}.
+         * @param rgb The color to convert.
+         * @returns The same color expressed as {@link Color.HSL}.
          */
         export const toHsl = (rgb: Color.RGB): Color.HSL => {
             const hsv = toHsv(rgb);
@@ -162,8 +162,8 @@ export namespace Color {
         /**
          * Converts to hue, saturation and value.
          *
-         * @param rgb The colour to convert.
-         * @returns The same colour expressed as {@link Color.HSV}. Greys come back with a hue of `0`.
+         * @param rgb The color to convert.
+         * @returns The same color expressed as {@link Color.HSV}. Grays come back with a hue of `0`.
          */
         export const toHsv = (rgb: Color.RGB): Color.HSV => {
             const r = clamp(rgb.r, 0, CHANNEL_MAX) / CHANNEL_MAX;
@@ -194,13 +194,13 @@ export namespace Color {
     /** Operations on {@link Color.RGBA} values. */
     export namespace RGBA {
         /**
-         * Blends towards another colour, channel by channel, including the opacity.
+         * Blends towards another color, channel by channel, including the opacity.
          *
-         * @param from The colour at a ratio of `0`.
-         * @param to The colour at a ratio of `1`.
+         * @param from The color at a ratio of `0`.
+         * @param to The color at a ratio of `1`.
          * @param ratio How far to travel, clamped to `0`–`1`.
-         * @returns The blended colour. The opacity travels with the channels rather than being
-         * applied to the result, so fading between two half transparent colours stays half
+         * @returns The blended color. The opacity travels with the channels rather than being
+         * applied to the result, so fading between two half transparent colors stays half
          * transparent throughout.
          */
         export const interpolate = (from: Color.RGBA, to: Color.RGBA, ratio: number): Color.RGBA => ({
@@ -209,9 +209,9 @@ export namespace Color {
         });
 
         /**
-         * Formats the colour as a CSS `rgb()` string with an alpha component.
+         * Formats the color as a CSS `rgb()` string with an alpha component.
          *
-         * @param rgba The colour to format.
+         * @param rgba The color to format.
          * @returns A string such as `rgb(255 128 0 / 0.5)`.
          */
         export const toCss = (rgba: Color.RGBA) =>
@@ -220,7 +220,7 @@ export namespace Color {
         /**
          * Converts to an 8 digit hex string.
          *
-         * @param rgba The colour to convert.
+         * @param rgba The color to convert.
          * @returns A value such as `#ff800080`. The alpha pair is always written, even when opaque.
          */
         export const toHexa = (rgba: Color.RGBA): Color.Hexa =>
@@ -229,8 +229,8 @@ export namespace Color {
         /**
          * Converts to hue, saturation and lightness, keeping the opacity.
          *
-         * @param rgba The colour to convert.
-         * @returns The same colour as {@link Color.HSLA}, with alpha clamped to `0`–`1`.
+         * @param rgba The color to convert.
+         * @returns The same color as {@link Color.HSLA}, with alpha clamped to `0`–`1`.
          */
         export const toHsla = (rgba: Color.RGBA): Color.HSLA => ({
             ...RGB.toHsl(rgba),
@@ -240,8 +240,8 @@ export namespace Color {
         /**
          * Converts to hue, saturation and value, keeping the opacity.
          *
-         * @param rgba The colour to convert.
-         * @returns The same colour as {@link Color.HSVA}, with alpha clamped to `0`–`1`.
+         * @param rgba The color to convert.
+         * @returns The same color as {@link Color.HSVA}, with alpha clamped to `0`–`1`.
          */
         export const toHsva = (rgba: Color.RGBA): Color.HSVA => ({
             ...RGB.toHsv(rgba),
@@ -252,12 +252,12 @@ export namespace Color {
     /** Operations on {@link Color.HSV} values. */
     export namespace HSV {
         /**
-         * Blends towards another colour, taking the shorter way around the hue circle.
+         * Blends towards another color, taking the shorter way around the hue circle.
          *
-         * @param from The colour at a ratio of `0`.
-         * @param to The colour at a ratio of `1`.
+         * @param from The color at a ratio of `0`.
+         * @param to The color at a ratio of `1`.
          * @param ratio How far to travel, clamped to `0`–`1`.
-         * @returns The blended colour. Hue crosses `0` when that is the shorter arc, so blending
+         * @returns The blended color. Hue crosses `0` when that is the shorter arc, so blending
          * from `350` to `10` passes through `0` rather than running back down through `180`. Where
          * the two hues are exactly opposite, the increasing direction is taken, which is what CSS's own
          * `shorter hue` interpolation does.
@@ -269,13 +269,13 @@ export namespace Color {
         });
 
         /**
-         * Formats the colour as a CSS `hwb()` string.
+         * Formats the color as a CSS `hwb()` string.
          *
          * CSS has no `hsv()` notation, so this uses `hwb()` — the same hue with whiteness and
          * blackness, which is HSV under another name and converts exactly. Nothing is lost, and
          * the result stays in a hue-based space rather than falling back to `rgb()`.
          *
-         * @param hsv The colour to format.
+         * @param hsv The color to format.
          * @returns A string such as `hwb(210 7.06% 66.27%)`.
          */
         export const toCss = (hsv: Color.HSV) => {
@@ -288,8 +288,8 @@ export namespace Color {
         /**
          * Converts to red, green and blue.
          *
-         * @param hsv The colour to convert. Hue wraps, so `-30` and `330` mean the same thing.
-         * @returns The same colour as {@link Color.RGB}, with fractional channels.
+         * @param hsv The color to convert. Hue wraps, so `-30` and `330` mean the same thing.
+         * @returns The same color as {@link Color.RGB}, with fractional channels.
          */
         export const toRgb = (hsv: Color.HSV): Color.RGB => {
             const h = ((hsv.h % HUE_MAX) + HUE_MAX) % HUE_MAX;
@@ -319,7 +319,7 @@ export namespace Color {
         /**
          * Converts to a 6 digit hex string.
          *
-         * @param hsv The colour to convert.
+         * @param hsv The color to convert.
          * @returns A lowercase value such as `#ff8000`.
          */
         export const toHex = (hsv: Color.HSV): Color.Hex => RGB.toHex(toRgb(hsv));
@@ -327,8 +327,8 @@ export namespace Color {
         /**
          * Converts to hue, saturation and lightness.
          *
-         * @param hsv The colour to convert.
-         * @returns The same colour as {@link Color.HSL}. The hue is carried across unchanged.
+         * @param hsv The color to convert.
+         * @returns The same color as {@link Color.HSL}. The hue is carried across unchanged.
          */
         export const toHsl = (hsv: Color.HSV): Color.HSL => RGB.toHsl(toRgb(hsv));
     }
@@ -338,18 +338,18 @@ export namespace Color {
         /**
          * Reads the opacity, clamped to `0`–`1`.
          *
-         * @param hsva The colour to read.
+         * @param hsva The color to read.
          * @returns The alpha, or `1` if the field is missing at runtime.
          */
         export const getClampedAlpha = (hsva: Color.HSVA) => clamp(hsva.a ?? ALPHA_OPAQUE, 0, ALPHA_OPAQUE);
 
         /**
-         * Blends towards another colour around the hue circle, including the opacity.
+         * Blends towards another color around the hue circle, including the opacity.
          *
-         * @param from The colour at a ratio of `0`.
-         * @param to The colour at a ratio of `1`.
+         * @param from The color at a ratio of `0`.
+         * @param to The color at a ratio of `1`.
          * @param ratio How far to travel, clamped to `0`–`1`.
-         * @returns The blended colour, with hue handled as {@link HSV.interpolate} describes.
+         * @returns The blended color, with hue handled as {@link HSV.interpolate} describes.
          */
         export const interpolate = (from: Color.HSVA, to: Color.HSVA, ratio: number): Color.HSVA => ({
             ...HSV.interpolate(from, to, ratio),
@@ -357,11 +357,11 @@ export namespace Color {
         });
 
         /**
-         * Formats the colour as a CSS `hwb()` string with an alpha component.
+         * Formats the color as a CSS `hwb()` string with an alpha component.
          *
          * See {@link HSV.toCss} for why this is `hwb()` rather than an HSV notation.
          *
-         * @param hsva The colour to format.
+         * @param hsva The color to format.
          * @returns A string such as `hwb(210 7.06% 66.27% / 0.5)`.
          */
         export const toCss = (hsva: Color.HSVA) => {
@@ -374,8 +374,8 @@ export namespace Color {
         /**
          * Converts to red, green and blue, keeping the opacity.
          *
-         * @param hsva The colour to convert.
-         * @returns The same colour as {@link Color.RGBA}.
+         * @param hsva The color to convert.
+         * @returns The same color as {@link Color.RGBA}.
          */
         export const toRgba = (hsva: Color.HSVA): Color.RGBA => ({
             ...HSV.toRgb(hsva),
@@ -385,7 +385,7 @@ export namespace Color {
         /**
          * Converts to an 8 digit hex string.
          *
-         * @param hsva The colour to convert.
+         * @param hsva The color to convert.
          * @returns A value such as `#ff800080`.
          */
         export const toHexa = (hsva: Color.HSVA): Color.Hexa => RGBA.toHexa(toRgba(hsva));
@@ -393,8 +393,8 @@ export namespace Color {
         /**
          * Converts to hue, saturation and lightness, keeping the opacity.
          *
-         * @param hsva The colour to convert.
-         * @returns The same colour as {@link Color.HSLA}.
+         * @param hsva The color to convert.
+         * @returns The same color as {@link Color.HSLA}.
          */
         export const toHsla = (hsva: Color.HSVA): Color.HSLA => ({
             ...HSV.toHsl(hsva),
@@ -405,12 +405,12 @@ export namespace Color {
     /** Operations on {@link Color.HSL} values. */
     export namespace HSL {
         /**
-         * Blends towards another colour, taking the shorter way around the hue circle.
+         * Blends towards another color, taking the shorter way around the hue circle.
          *
-         * @param from The colour at a ratio of `0`.
-         * @param to The colour at a ratio of `1`.
+         * @param from The color at a ratio of `0`.
+         * @param to The color at a ratio of `1`.
          * @param ratio How far to travel, clamped to `0`–`1`.
-         * @returns The blended colour. Hue crosses `0` when that is the shorter arc, so blending
+         * @returns The blended color. Hue crosses `0` when that is the shorter arc, so blending
          * from `350` to `10` passes through `0` rather than running back down through `180`. Where
          * the two hues are exactly opposite, the increasing direction is taken, which is what CSS's own
          * `shorter hue` interpolation does.
@@ -422,9 +422,9 @@ export namespace Color {
         });
 
         /**
-         * Formats the colour as a CSS `hsl()` string.
+         * Formats the color as a CSS `hsl()` string.
          *
-         * @param hsl The colour to format.
+         * @param hsl The color to format.
          * @returns A string such as `hsl(210 65.38% 20.39%)`.
          */
         export const toCss = (hsl: Color.HSL) => `hsl(${toHue(hsl.h)} ${toPercent(hsl.s)} ${toPercent(hsl.l)})`;
@@ -432,8 +432,8 @@ export namespace Color {
         /**
          * Converts to red, green and blue.
          *
-         * @param hsl The colour to convert. Hue wraps, so `-30` and `330` mean the same thing.
-         * @returns The same colour as {@link Color.RGB}, with fractional channels.
+         * @param hsl The color to convert. Hue wraps, so `-30` and `330` mean the same thing.
+         * @returns The same color as {@link Color.RGB}, with fractional channels.
          */
         export const toRgb = (hsl: Color.HSL): Color.RGB => {
             const l = clamp(hsl.l, 0, 1);
@@ -446,7 +446,7 @@ export namespace Color {
         /**
          * Converts to a 6 digit hex string.
          *
-         * @param hsl The colour to convert.
+         * @param hsl The color to convert.
          * @returns A lowercase value such as `#ff8000`.
          */
         export const toHex = (hsl: Color.HSL): Color.Hex => RGB.toHex(toRgb(hsl));
@@ -454,8 +454,8 @@ export namespace Color {
         /**
          * Converts to hue, saturation and value.
          *
-         * @param hsl The colour to convert.
-         * @returns The same colour as {@link Color.HSV}. The hue is carried across unchanged.
+         * @param hsl The color to convert.
+         * @returns The same color as {@link Color.HSV}. The hue is carried across unchanged.
          */
         export const toHsv = (hsl: Color.HSL): Color.HSV => RGB.toHsv(toRgb(hsl));
     }
@@ -463,12 +463,12 @@ export namespace Color {
     /** Operations on {@link Color.HSLA} values. */
     export namespace HSLA {
         /**
-         * Blends towards another colour around the hue circle, including the opacity.
+         * Blends towards another color around the hue circle, including the opacity.
          *
-         * @param from The colour at a ratio of `0`.
-         * @param to The colour at a ratio of `1`.
+         * @param from The color at a ratio of `0`.
+         * @param to The color at a ratio of `1`.
          * @param ratio How far to travel, clamped to `0`–`1`.
-         * @returns The blended colour, with hue handled as {@link HSL.interpolate} describes.
+         * @returns The blended color, with hue handled as {@link HSL.interpolate} describes.
          */
         export const interpolate = (from: Color.HSLA, to: Color.HSLA, ratio: number): Color.HSLA => ({
             ...HSL.interpolate(from, to, ratio),
@@ -476,9 +476,9 @@ export namespace Color {
         });
 
         /**
-         * Formats the colour as a CSS `hsl()` string with an alpha component.
+         * Formats the color as a CSS `hsl()` string with an alpha component.
          *
-         * @param hsla The colour to format.
+         * @param hsla The color to format.
          * @returns A string such as `hsl(210 65.38% 20.39% / 0.5)`.
          */
         export const toCss = (hsla: Color.HSLA) =>
@@ -487,8 +487,8 @@ export namespace Color {
         /**
          * Converts to red, green and blue, keeping the opacity.
          *
-         * @param hsla The colour to convert.
-         * @returns The same colour as {@link Color.RGBA}, with alpha clamped to `0`–`1`.
+         * @param hsla The color to convert.
+         * @returns The same color as {@link Color.RGBA}, with alpha clamped to `0`–`1`.
          */
         export const toRgba = (hsla: Color.HSLA): Color.RGBA => ({
             ...HSL.toRgb(hsla),
@@ -498,7 +498,7 @@ export namespace Color {
         /**
          * Converts to an 8 digit hex string.
          *
-         * @param hsla The colour to convert.
+         * @param hsla The color to convert.
          * @returns A value such as `#ff800080`.
          */
         export const toHexa = (hsla: Color.HSLA): Color.Hexa => RGBA.toHexa(toRgba(hsla));
@@ -506,8 +506,8 @@ export namespace Color {
         /**
          * Converts to hue, saturation and value, keeping the opacity.
          *
-         * @param hsla The colour to convert.
-         * @returns The same colour as {@link Color.HSVA}.
+         * @param hsla The color to convert.
+         * @returns The same color as {@link Color.HSVA}.
          */
         export const toHsva = (hsla: Color.HSLA): Color.HSVA => RGBA.toHsva(toRgba(hsla));
     }
@@ -515,20 +515,20 @@ export namespace Color {
     /** Operations on {@link Color.Hex} values. */
     export namespace Hex {
         /**
-         * Blends towards another colour through {@link Color.RGB}.
+         * Blends towards another color through {@link Color.RGB}.
          *
-         * @param from A colour that has passed {@link isHex}, at a ratio of `0`.
-         * @param to A colour that has passed {@link isHex}, at a ratio of `1`.
+         * @param from A color that has passed {@link isHex}, at a ratio of `0`.
+         * @param to A color that has passed {@link isHex}, at a ratio of `1`.
          * @param ratio How far to travel, clamped to `0`–`1`.
-         * @returns The blended colour as a six digit hex value. The blend runs through the channels
-         * rather than around the hue circle, so two saturated colours pass through a duller mixture
+         * @returns The blended color as a six digit hex value. The blend runs through the channels
+         * rather than around the hue circle, so two saturated colors pass through a duller mixture
          * between them; use {@link Color.HSL.interpolate} to keep the saturation up.
          */
         export const interpolate = (from: Color.Hex, to: Color.Hex, ratio: number): Color.Hex =>
             RGB.toHex(RGB.interpolate(toRgb(from), toRgb(to), ratio));
 
         /**
-         * Checks whether a string is a well formed hex colour without an alpha pair.
+         * Checks whether a string is a well formed hex color without an alpha pair.
          *
          * This is the real check — the {@link Color.Hex} type only guarantees the leading `#`, so
          * anything arriving from storage, a URL or user input should pass through here first.
@@ -540,11 +540,11 @@ export namespace Color {
             (value.length === HEX_LENGTH || value.length === HEX_SHORT_LENGTH) && HEX_PATTERN.test(value);
 
         /**
-         * Compares two hex colours by the colour they describe rather than by their text.
+         * Compares two hex colors by the color they describe rather than by their text.
          *
-         * @param a The first colour.
-         * @param b The second colour.
-         * @returns `true` if both name the same colour, so `#abc` and `#aabbcc` match.
+         * @param a The first color.
+         * @param b The second color.
+         * @returns `true` if both name the same color, so `#abc` and `#aabbcc` match.
          */
         export const getIsSameHex = (a: Color.Hex, b: Color.Hex) => {
             const left = toRgb(a);
@@ -554,9 +554,9 @@ export namespace Color {
         };
 
         /**
-         * Returns the value as a CSS colour.
+         * Returns the value as a CSS color.
          *
-         * @param hex The colour to format.
+         * @param hex The color to format.
          * @returns The string unchanged — hex is already valid CSS.
          */
         export const toCss = (hex: Color.Hex): string => hex;
@@ -564,9 +564,9 @@ export namespace Color {
         /**
          * Converts to red, green and blue.
          *
-         * @param hex A colour that has passed {@link isHex}. Short form digits are doubled, so `#f0a`
+         * @param hex A color that has passed {@link isHex}. Short form digits are doubled, so `#f0a`
          * reads as `#ff00aa`.
-         * @returns The same colour as {@link Color.RGB}.
+         * @returns The same color as {@link Color.RGB}.
          */
         export const toRgb = (hex: Color.Hex): Color.RGB => {
             const digits = hex.slice(1);
@@ -582,16 +582,16 @@ export namespace Color {
         /**
          * Converts to hue, saturation and lightness.
          *
-         * @param hex A colour that has passed {@link isHex}.
-         * @returns The same colour as {@link Color.HSL}.
+         * @param hex A color that has passed {@link isHex}.
+         * @returns The same color as {@link Color.HSL}.
          */
         export const toHsl = (hex: Color.Hex): Color.HSL => RGB.toHsl(toRgb(hex));
 
         /**
          * Converts to hue, saturation and value.
          *
-         * @param hex A colour that has passed {@link isHex}.
-         * @returns The same colour as {@link Color.HSV}.
+         * @param hex A color that has passed {@link isHex}.
+         * @returns The same color as {@link Color.HSV}.
          */
         export const toHsv = (hex: Color.Hex): Color.HSV => RGB.toHsv(toRgb(hex));
     }
@@ -599,19 +599,19 @@ export namespace Color {
     /** Operations on {@link Color.Hexa} values. */
     export namespace Hexa {
         /**
-         * Blends towards another colour through {@link Color.RGBA}, including the opacity.
+         * Blends towards another color through {@link Color.RGBA}, including the opacity.
          *
-         * @param from A colour that has passed {@link isHexa}, at a ratio of `0`.
-         * @param to A colour that has passed {@link isHexa}, at a ratio of `1`.
+         * @param from A color that has passed {@link isHexa}, at a ratio of `0`.
+         * @param to A color that has passed {@link isHexa}, at a ratio of `1`.
          * @param ratio How far to travel, clamped to `0`–`1`.
-         * @returns The blended colour as an eight digit hex value, with the channels handled as
+         * @returns The blended color as an eight digit hex value, with the channels handled as
          * {@link Color.Hex.interpolate} describes.
          */
         export const interpolate = (from: Color.Hexa, to: Color.Hexa, ratio: number): Color.Hexa =>
             RGBA.toHexa(RGBA.interpolate(toRgba(from), toRgba(to), ratio));
 
         /**
-         * Checks whether a string is a well formed hex colour, with or without an alpha pair.
+         * Checks whether a string is a well formed hex color, with or without an alpha pair.
          *
          * This is the real check — the {@link Color.Hexa} type only guarantees the leading `#`, so
          * anything arriving from storage, a URL or user input should pass through here first.
@@ -623,12 +623,12 @@ export namespace Color {
             HEXA_LENGTHS.includes(value.length) && HEXA_PATTERN.test(value);
 
         /**
-         * Compares two hex colours by the colour they describe rather than by their text.
+         * Compares two hex colors by the color they describe rather than by their text.
          *
-         * @param a The first colour.
-         * @param b The second colour.
-         * @returns `true` if both name the same colour and opacity, so `#abcf` and `#aabbccff` match,
-         * and a value with no alpha pair matches the same colour written as fully opaque.
+         * @param a The first color.
+         * @param b The second color.
+         * @returns `true` if both name the same color and opacity, so `#abcf` and `#aabbccff` match,
+         * and a value with no alpha pair matches the same color written as fully opaque.
          */
         export const getIsSameHexa = (a: Color.Hexa, b: Color.Hexa) => {
             const left = toRgba(a);
@@ -638,9 +638,9 @@ export namespace Color {
         };
 
         /**
-         * Returns the value as a CSS colour.
+         * Returns the value as a CSS color.
          *
-         * @param hexa The colour to format.
+         * @param hexa The color to format.
          * @returns The string unchanged — hex is already valid CSS.
          */
         export const toCss = (hexa: Color.Hexa): string => hexa;
@@ -648,9 +648,9 @@ export namespace Color {
         /**
          * Converts to red, green and blue, keeping the opacity.
          *
-         * @param hexa A colour that has passed {@link isHexa}. Short form digits are doubled, and a
+         * @param hexa A color that has passed {@link isHexa}. Short form digits are doubled, and a
          * value with no alpha pair is read as fully opaque.
-         * @returns The same colour as {@link Color.RGBA}.
+         * @returns The same color as {@link Color.RGBA}.
          */
         export const toRgba = (hexa: Color.Hexa): Color.RGBA => {
             const digits = hexa.slice(1);
@@ -674,16 +674,16 @@ export namespace Color {
         /**
          * Converts to hue, saturation and lightness, keeping the opacity.
          *
-         * @param hexa A colour that has passed {@link isHexa}.
-         * @returns The same colour as {@link Color.HSLA}.
+         * @param hexa A color that has passed {@link isHexa}.
+         * @returns The same color as {@link Color.HSLA}.
          */
         export const toHsla = (hexa: Color.Hexa): Color.HSLA => RGBA.toHsla(toRgba(hexa));
 
         /**
          * Converts to hue, saturation and value, keeping the opacity.
          *
-         * @param hexa A colour that has passed {@link isHexa}.
-         * @returns The same colour as {@link Color.HSVA}.
+         * @param hexa A color that has passed {@link isHexa}.
+         * @returns The same color as {@link Color.HSVA}.
          */
         export const toHsva = (hexa: Color.Hexa): Color.HSVA => RGBA.toHsva(toRgba(hexa));
     }

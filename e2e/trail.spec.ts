@@ -12,37 +12,37 @@ const REWIND = "#circuitRewind";
 const A_FEW_FRAMES_MS = 400;
 
 /**
- * The travelling element carries no role and no name of its own — it is whatever the consumer draws — so
- * the Playground gives the two demo travellers an id, which is the same handle every other driven control
+ * The traveling element carries no role and no name of its own — it is whatever the consumer draws — so
+ * the Playground gives the two demo travelers an id, which is the same handle every other driven control
  * on a page carries. What is read back is where it ended up, measured in the same pass as something else
  * on the page, never a pixel count: the Playground runs inside a `Viewport`, so a client rect is the layout
  * value times a scale that depends on the size of this window.
  */
-const centreOf = (page: Page, selector: string) =>
+const centerOf = (page: Page, selector: string) =>
     page.evaluate((value) => {
         const box = document.querySelector(value)?.getBoundingClientRect();
 
-        if (!box) throw new Error("nothing is travelling");
+        if (!box) throw new Error("nothing is traveling");
 
         return { x: box.left + box.width * 0.5, y: box.top + box.height * 0.5 };
     }, selector);
 
 /**
- * How far the traveller is from the path it is supposed to be on, in the same client space as the path
+ * How far the traveler is from the path it is supposed to be on, in the same client space as the path
  * itself: every point along the curve is put through the element's own screen matrix and the nearest one to
- * the traveller's centre wins. Asking for the nearest point rather than the point at the reported progress
+ * the traveler's center wins. Asking for the nearest point rather than the point at the reported progress
  * keeps the reading independent of the percentage the page rounds for its readout.
  */
-const distanceFromPath = (page: Page, travellerSelector: string) =>
+const distanceFromPath = (page: Page, travelerSelector: string) =>
     page.evaluate((selector) => {
-        const traveller = document.querySelector(selector);
-        const root = traveller?.parentElement?.parentElement;
+        const traveler = document.querySelector(selector);
+        const root = traveler?.parentElement?.parentElement;
         const path = root?.querySelector("svg path");
 
-        if (!traveller || !path) throw new Error("nothing is travelling");
+        if (!traveler || !path) throw new Error("nothing is traveling");
 
-        const box = traveller.getBoundingClientRect();
-        const centre = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
+        const box = traveler.getBoundingClientRect();
+        const center = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
         const matrix = (path as SVGPathElement).getScreenCTM();
         const length = (path as SVGPathElement).getTotalLength();
 
@@ -57,11 +57,11 @@ const distanceFromPath = (page: Page, travellerSelector: string) =>
                 y: point.x * matrix.b + point.y * matrix.d + matrix.f,
             };
 
-            nearest = Math.min(nearest, Math.hypot(client.x - centre.x, client.y - centre.y));
+            nearest = Math.min(nearest, Math.hypot(client.x - center.x, client.y - center.y));
         }
 
         return nearest;
-    }, travellerSelector);
+    }, travelerSelector);
 
 const progressOf = async (page: Page, key: string) => {
     const found = /(\d+)%/.exec(await readout(page, key));
@@ -83,13 +83,13 @@ test("the slider is what puts the marker on the path", async ({ page }) => {
     await page.locator(SCRUBBER).focus();
     await page.keyboard.press("Home");
 
-    const start = await centreOf(page, MARKER);
+    const start = await centerOf(page, MARKER);
 
     expect(await progressOf(page, "timeline"), "Home is the beginning of the path").toBe(0);
 
     await page.keyboard.press("End");
 
-    const end = await centreOf(page, MARKER);
+    const end = await centerOf(page, MARKER);
 
     expect(await progressOf(page, "timeline"), "End is the far end of it").toBe(100);
     expect(end.x, "and the far end of this path is further across the box than the near end").toBeGreaterThan(start.x);
@@ -103,11 +103,11 @@ test("one step of the slider moves the marker", async ({ page }) => {
     await page.locator(SCRUBBER).focus();
     await page.keyboard.press("Home");
 
-    const before = await centreOf(page, MARKER);
+    const before = await centerOf(page, MARKER);
 
     await page.keyboard.press("ArrowRight");
 
-    const after = await centreOf(page, MARKER);
+    const after = await centerOf(page, MARKER);
 
     expect(await progressOf(page, "timeline"), "the slider says one percent along").toBe(1);
     expect(
@@ -123,7 +123,7 @@ test("one step of the slider moves the marker", async ({ page }) => {
  * mechanism for the user to pause, stop, or hide it" — and the circuit is moving information that starts
  * on its own, so the page has to offer the control and it has to work.
  */
-test("pause stops the travelling, and play starts it again", async ({ page }) => {
+test("pause stops the traveling, and play starts it again", async ({ page }) => {
     await page.locator(PAUSE).click();
 
     const stopped = await progressOf(page, "circuit");
@@ -140,7 +140,7 @@ test("pause stops the travelling, and play starts it again", async ({ page }) =>
 
 /**
  * Seeking is the third thing the controller offers, and the one a rewind button is: the position is set
- * outright rather than travelled to. It is pressed while the trail is paused so that what is read back is
+ * outright rather than traveled to. It is pressed while the trail is paused so that what is read back is
  * the seek rather than the next frame.
  */
 test("the controller can send it back to the start", async ({ page }) => {
@@ -153,34 +153,34 @@ test("the controller can send it back to the start", async ({ page }) => {
 });
 
 /**
- * The readout is the page's arithmetic; this is the element itself. The traveller is parked at the start,
+ * The readout is the page's arithmetic; this is the element itself. The traveler is parked at the start,
  * let go, and stopped again, and the two positions are compared with each other rather than with a
  * coordinate — which is what makes the assertion true at any scale.
  */
-test("the traveller leaves the point it set off from", async ({ page }) => {
+test("the traveler leaves the point it set off from", async ({ page }) => {
     await page.locator(PAUSE).click();
     await page.locator(REWIND).click();
 
-    const start = await centreOf(page, VEHICLE);
+    const start = await centerOf(page, VEHICLE);
 
     await page.locator(PLAY).click();
     await expect.poll(() => progressOf(page, "circuit")).toBeGreaterThan(0);
     await page.locator(PAUSE).click();
 
-    const moved = await centreOf(page, VEHICLE);
+    const moved = await centerOf(page, VEHICLE);
 
     expect(Math.hypot(moved.x - start.x, moved.y - start.y), "it has left the starting point").toBeGreaterThan(0);
 });
 
 /**
- * The thing the whole component promises, and the one that broke: the traveller has to be **on** the path at
- * every point of it, including the corners. It is worth its own test because turning the traveller to face
- * along the path and placing its centre on the path are two transforms fighting over the same element — with
+ * The thing the whole component promises, and the one that broke: the traveler has to be **on** the path at
+ * every point of it, including the corners. It is worth its own test because turning the traveler to face
+ * along the path and placing its center on the path are two transforms fighting over the same element — with
  * them in the wrong order the box swings off the curve wherever the direction is not straight, which is
  * invisible on a straight run and worst on a bend. The vehicle is oblong on purpose: a round one would sit
  * still under the same fault.
  */
-test("the traveller stays on the path all the way round, at every angle", async ({ page }) => {
+test("the traveler stays on the path all the way round, at every angle", async ({ page }) => {
     const SAMPLES = 5;
     const A_SIXTH_OF_A_LAP_MS = 900;
 
@@ -189,7 +189,7 @@ test("the traveller stays on the path all the way round, at every angle", async 
 
         expect(
             await distanceFromPath(page, VEHICLE),
-            `the traveller is on the curve at ${await progressOf(page, "circuit")}% round`,
+            `the traveler is on the curve at ${await progressOf(page, "circuit")}% round`,
         ).toBeLessThan(2);
 
         await page.locator(PLAY).click();

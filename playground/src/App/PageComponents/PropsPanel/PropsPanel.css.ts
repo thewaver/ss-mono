@@ -16,7 +16,7 @@ export const propsPanelScopeBase = style({
 
 const propsPanelGrid = style({
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
+    gridTemplateColumns: "repeat(auto-fill, minmax(360px, 1fr))",
 });
 
 export const propsPanelScopeVariants = styleVariants({

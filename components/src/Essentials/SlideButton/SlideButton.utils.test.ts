@@ -26,7 +26,7 @@ describe("computeIsOnThumb", () => {
         expect(SlideButtonUtils.computeIsOnThumb(0.5, 0, 0.2)).toBe(false);
     });
 
-    it("follows the thumb once it has travelled", () => {
+    it("follows the thumb once it has traveled", () => {
         expect(SlideButtonUtils.computeIsOnThumb(0.5, 0.5, 0.2)).toBe(true);
         expect(SlideButtonUtils.computeIsOnThumb(0, 0.5, 0.2)).toBe(false);
     });

@@ -28,7 +28,7 @@ const cellSources = (page: import("@playwright/test").Page, scope: string) =>
 
 test("each example slices its own kind of source, and all of them reach the cells", async ({ page }) => {
     await expect(page.locator(`${demo("image")} img`), "the first example is a file").toHaveAttribute("src", /\.webp/);
-    await expect(page.locator(`${demo("gradient")} img`), "the second is a Shape gradient, serialised").toHaveAttribute(
+    await expect(page.locator(`${demo("gradient")} img`), "the second is a Shape gradient, serialized").toHaveAttribute(
         "src",
         /^data:image\/svg\+xml,.*linearGradient/,
     );
@@ -51,11 +51,11 @@ test("each example slices its own kind of source, and all of them reach the cell
 });
 
 /**
- * Markup that parses is not markup that paints — a def serialised without the element it refers to would
+ * Markup that parses is not markup that paints — a def serialized without the element it refers to would
  * still load as a blank image, and the cells would slice nothing while looking entirely healthy. So this
  * draws each source and counts what came out.
  */
-test("a serialised def paints, rather than merely loading", async ({ page }) => {
+test("a serialized def paints, rather than merely loading", async ({ page }) => {
     const drawn = await page.evaluate(async () => {
         const inspect = async (selector: string) => {
             const img = new Image();
@@ -89,7 +89,7 @@ test("a serialised def paints, rather than merely loading", async ({ page }) => 
     });
 
     expect(drawn.gradient.loaded, "the gradient source has an intrinsic size, so it can anchor the box").toBe(1200);
-    expect(drawn.gradient.distinct, "and it is a spread of colours rather than one flat fill").toBeGreaterThan(10);
+    expect(drawn.gradient.distinct, "and it is a spread of colors rather than one flat fill").toBeGreaterThan(10);
     expect(drawn.pattern.loaded).toBe(1200);
     expect(drawn.pattern.distinct, "the pattern paints its cells rather than an empty box").toBeGreaterThan(10);
 });
@@ -97,10 +97,10 @@ test("a serialised def paints, rather than merely loading", async ({ page }) => 
 /**
  * An image source runs no script, and the library's animate defs deliberately begin on one — a ref works out
  * the document's current time and sets `begin` from it, so that the iteration patterns can be sequenced. Left
- * alone that is a still. Writing the begin into the markup at serialisation is what starts them, and it is
+ * alone that is a still. Writing the begin into the markup at serialization is what starts them, and it is
  * only correct because the source is a document nothing will ever drive.
  */
-test("a serialised gradient keeps animating, having had its begin written in", async ({ page }) => {
+test("a serialized gradient keeps animating, having had its begin written in", async ({ page }) => {
     const moved = await page.evaluate(async () => {
         const sample = async (uri: string) => {
             const img = new Image();

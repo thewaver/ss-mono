@@ -29,4 +29,5 @@ export type SVGRadialGradientDefs = SVGGradientDefs &
         scale?: number;
         aspect?: Size2d;
         angle?: number;
+        elementSize?: Size2d;
     }>;

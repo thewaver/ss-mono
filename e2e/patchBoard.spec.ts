@@ -48,7 +48,7 @@ const cableEnds = (page: Page, key: string, boardLabel: string) =>
         board(key, boardLabel),
     );
 
-const centreOf = (page: Page, selector: string) =>
+const centerOf = (page: Page, selector: string) =>
     page.evaluate((value) => {
         const box = document.querySelector(value)?.getBoundingClientRect();
 
@@ -76,7 +76,7 @@ test.beforeEach(async ({ page }) => {
 test("a cable stays on its socket while the node it hangs off is moved", async ({ page }) => {
     const target = socket(CHAIN, "Gate in", CHAIN_LABEL);
 
-    const before = await centreOf(page, target);
+    const before = await centerOf(page, target);
     const [endBefore] = await cableEnds(page, CHAIN, CHAIN_LABEL);
 
     expect(
@@ -90,7 +90,7 @@ test("a cable stays on its socket while the node it hangs off is moved", async (
     await page.keyboard.press("ArrowDown");
     await page.keyboard.press("Enter");
 
-    const after = await centreOf(page, target);
+    const after = await centerOf(page, target);
     const [endAfter] = await cableEnds(page, CHAIN, CHAIN_LABEL);
 
     expect(after.y, "the gate has actually moved down the board").toBeGreaterThan(before.y);
@@ -210,7 +210,7 @@ test("the consumer's refusal is enforced beside the component's own", async ({ p
 /**
  * The drag itself, which is the gesture the whole thing looks like it is for. It is worth a test of its own
  * beside the tap route because the two take different paths through the component: a drag starts only once
- * the pointer has travelled far enough to mean it, and a socket is far too small to hold the pointer for
+ * the pointer has traveled far enough to mean it, and a socket is far too small to hold the pointer for
  * that distance — so the board rather than the socket is what follows the pointer once a drag begins.
  */
 test("a cable is drawn by dragging from one socket to another", async ({ page }) => {
@@ -243,7 +243,7 @@ test("a box is moved by dragging it, and its cable comes along", async ({ page }
     await page.mouse.up();
 
     const moved = await page.locator(node(CHAIN, "Gate", CHAIN_LABEL)).boundingBox();
-    const after = await centreOf(page, target);
+    const after = await centerOf(page, target);
     const [end] = await cableEnds(page, CHAIN, CHAIN_LABEL);
 
     expect(moved?.x ?? 0, "the box went where the pointer took it").toBeGreaterThan(box.x);

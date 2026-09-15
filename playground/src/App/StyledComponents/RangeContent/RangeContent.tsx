@@ -10,7 +10,7 @@ const DEFAULT_RANGE_CONTENT_LENGTH = styles.RANGE_LENGTH;
 
 const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px))`;
 
-const centre = (ratio: number) =>
+const center = (ratio: number) =>
     `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE / 2}px)`;
 
 export const PageRangeContent = (props: RangeContentProps) => {
@@ -37,8 +37,8 @@ export const PageRangeContent = (props: RangeContentProps) => {
                 classList={{ [styles.hasError]: access(props.renderProps).hasError }}
                 style={
                     getOrientation() === "vertical"
-                        ? { bottom: centre(access(props.renderProps).fill.start), height: getFillSpan() }
-                        : { left: centre(access(props.renderProps).fill.start), width: getFillSpan() }
+                        ? { bottom: center(access(props.renderProps).fill.start), height: getFillSpan() }
+                        : { left: center(access(props.renderProps).fill.start), width: getFillSpan() }
                 }
             />
 

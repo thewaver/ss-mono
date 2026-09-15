@@ -82,7 +82,7 @@ test("a disabled box refuses activation and focus", async ({ page }) => {
 
     await page.locator(DISABLED).click({ force: true });
     expect(await readout(page, "disabled"), "clicking a disabled box changes nothing").toContain("checked: true");
-    expect(await isChecked(page.locator(DISABLED)), "and the cancelled click leaves the input alone").toBe(true);
+    expect(await isChecked(page.locator(DISABLED)), "and the canceled click leaves the input alone").toBe(true);
     expect(await activeMatches(page, DISABLED), "clicking a disabled box does not even focus it").toBe(false);
 });
 

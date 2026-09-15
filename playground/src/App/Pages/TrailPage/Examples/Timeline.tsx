@@ -33,7 +33,7 @@ export const TimelineExample = (props: Props) => {
                 progressSignal={props.progressSignal}
                 isPlayingSignal={props.isPlayingSignal}
                 renderTrack={(getPath) => <PageTrailTrack path={getPath} />}
-                renderTraveller={() => <PageTrailMarker id={MARKER_ID} />}
+                renderTraveler={() => <PageTrailMarker id={MARKER_ID} />}
                 onMount={setController}
             />
 

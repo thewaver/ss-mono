@@ -20,7 +20,7 @@ const confirmField = (page: Page) => page.locator(`${FORM} input`).nth(2);
  * A section sits between a form and its fields and collects the same thing a form collects. The whole of
  * what it adds is that the collecting stops at the nearest one: a field reports to its section, a section
  * reports its verdict upward, and the form ends up hearing one answer per section rather than one per field.
- * Everything here is written against that, because it is the only behaviour a consumer can be surprised by.
+ * Everything here is written against that, because it is the only behavior a consumer can be surprised by.
  */
 test.beforeEach(async ({ page }) => {
     await page.goto("/form-section");
@@ -59,7 +59,7 @@ test("a field's error reaches the form through the section that holds it", async
 
     await expect(
         page.locator(SUBMIT),
-        "one field going bad again is enough, which is the report travelling field to section to form",
+        "one field going bad again is enough, which is the report traveling field to section to form",
     ).toHaveAttribute("aria-disabled", "true");
 });
 

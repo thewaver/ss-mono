@@ -10,7 +10,7 @@ import { example, prop } from "./helpers";
  *
  * The step wrappers are found by their inline padding. It has to be `padding-left` rather than `padding`,
  * because the measure box around the demo pads itself inline too — but it sets all four sides at once, which
- * the browser serialises as the shorthand, while a step sets only two and keeps the longhands.
+ * the browser serializes as the shorthand, while a step sets only two and keeps the longhands.
  */
 const STAIRCASE = example("default");
 

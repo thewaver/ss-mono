@@ -241,7 +241,11 @@ export const Paginator = (props: PaginatorProps) => {
             aria-label={access(props.ariaLabel) ?? DEFAULT_PAGINATOR_LABEL}
         >
             <Show when={getLayout()} fallback={renderRow()}>
-                {(getResolved) => <PlacementBox layout={getResolved}>{renderRow()}</PlacementBox>}
+                {(getResolved) => (
+                    <PlacementBox layout={getResolved} computeEffect={props.computeEffect}>
+                        {renderRow()}
+                    </PlacementBox>
+                )}
             </Show>
         </nav>
     );

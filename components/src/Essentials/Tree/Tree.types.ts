@@ -3,6 +3,7 @@ import type { Accessor, Component, JSX } from "solid-js";
 import type { FlatRow } from "../../Abstracts/Flattener/Flattener.types";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { PlacementLayoutFn } from "../../Abstracts/Placement/Placement.types";
+import type { ProximityEffectFn } from "../../Abstracts/Proximity/Proximity.types";
 import type {
     InteractionControlProps,
     InteractionTooltipDefs,
@@ -49,6 +50,7 @@ export type TreeProps<T> = AccessorProps<{
 }> & {
     nodes: MaybeAccessor<TreeNode<T>[]>;
     computeLayout?: PlacementLayoutFn;
+    computeEffect?: ProximityEffectFn;
     valueSignal: SignalSource<T | undefined>;
     expandedSignal: SignalSource<T[]>;
     computeCustomText?: (node: TreeNode<T>) => string;

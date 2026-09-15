@@ -51,7 +51,6 @@ import { NumberInputPage } from "./Pages/NumberInputPage/NumberInputPage";
 import { OdometerPage } from "./Pages/OdometerPage/OdometerPage";
 import { PaginatorPage } from "./Pages/PaginatorPage/PaginatorPage";
 import { PatchBoardPage } from "./Pages/PatchBoardPage/PatchBoardPage";
-import { PlacementPage } from "./Pages/PlacementPage/PlacementPage";
 import { PointerTrackerPage } from "./Pages/PointerTrackerPage/PointerTrackerPage";
 import { PreviewPage } from "./Pages/PreviewPage/PreviewPage";
 import { ProgressPage } from "./Pages/ProgressPage/ProgressPage";
@@ -155,7 +154,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "ColorExtractor",
                 description:
-                    "Reads colours back out of an image — the one dominant colour, or a palette of as many as are asked for — by loading it out of sight and sampling it. It samples a fraction of the pixels rather than all of them, and the fraction is the consumer's to set, so the cost is a knob rather than a fixed price. An image that fails to load is reported as a value rather than thrown.",
+                    "Reads colors back out of an image — the one dominant color, or a palette of as many as are asked for — by loading it out of sight and sampling it. It samples a fraction of the pixels rather than all of them, and the fraction is the consumer's to set, so the cost is a knob rather than a fixed price. An image that fails to load is reported as a value rather than thrown.",
             },
             {
                 name: "Cutout",
@@ -236,14 +235,18 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Placement",
                 description:
-                    "Where a control's items go when they are not in a row. A layout is a function from an item count, the path down to the level being drawn, the size of the level above it and the placement of the item that opened it, to a list of boxes in fractions of the arrangement's own width — so it resolves in CSS with nothing measured in JavaScript. A box may also name the wedge of a ring it occupies, which is what lets a control hand its painter a shape rather than a rectangle. The layouts themselves are sample code; what stays here is the vocabulary, the picking that answers which item a direction means, and the path builder both wheels on this page draw with.",
-                component: () => <PlacementPage />,
+                    "Where a control's items go when they are not in a row. A layout is a function from an item count, the path down to the level being drawn, the size of the level above it and the placement of the item that opened it, to a list of boxes in fractions of the arrangement's own width — so it resolves in CSS with nothing measured in JavaScript. A box may also name the wedge of a ring it occupies, which is what lets a control hand its painter a shape rather than a rectangle. The layouts themselves are sample code; what stays here is the vocabulary, the picking that answers which item a direction means, and the sector and link path builders. Every control that takes a layout shows it on its own page.",
             },
             {
                 name: "PointerTracker",
                 description:
-                    "Reports where the pointer is relative to one element: the offset from its centre, the angle, the distance, and the point where that same line leaves the element. Dividing the two distances gives one shape-aware number — below 1 inside, 1 on the edge, 2 a further element-radius away. It renders nothing at all; every example on this page is a consumer built on top of it.",
+                    "Reports where the pointer is relative to one element: the offset from its center, the angle, the distance, and the point where that same line leaves the element. Dividing the two distances gives one shape-aware number — below 1 inside, 1 on the edge, 2 a further element-radius away. It renders nothing at all; every example on this page is a consumer built on top of it.",
                 component: () => <PointerTrackerPage />,
+            },
+            {
+                name: "Proximity",
+                description:
+                    "The other half of a layout: where `Placement` says where an arrangement's items go, this says what being near the pointer does to one of them. An effect is a function from one item's measurements to a set of CSS transform and filter values, so a dock's swell, a glow and a blur that lifts as the pointer nears are the same mechanism with a different answer. What makes it work across arrangements is that nearness is not a straight line: a row counts the horizontal gap and nothing else, a ring counts the turn between two wedges and, separately, how far off the band the pointer is — a turn never making up for the second — and each arrangement names the rule it is read by. The axis a rule throws away is read once more as a yes or a no — inside the arrangement's box or not — so ignoring an axis does not mean answering a pointer that has walked away. It never strips a response it thinks is motion — the reduced-motion preference arrives in the measurements instead, because only the consumer knows what to put in movement's place. The effects themselves are sample code; every control that takes a layout takes one of these too.",
             },
             {
                 name: "Rotator",
@@ -273,13 +276,13 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                                     {
                                         name: "TimedGradients",
                                         description:
-                                            "Linear and radial gradients written as a list of colours rather than as markup. A colour may name the stop it sits at or leave it to be spread evenly between the ones that do, and asking for bands rather than a blend emits each stop twice so the colours meet at a hard edge. Angle, origin, scale and offset belong to the gradient rather than to the colours, so the same list can be turned or squashed without being rewritten. Every sample here is driven by a clock, so a duration and an iteration pattern are what they answer to.",
+                                            "Linear and radial gradients written as a list of colors rather than as markup. A color may name the stop it sits at or leave it to be spread evenly between the ones that do, and asking for bands rather than a blend emits each stop twice so the colors meet at a hard edge. Angle, origin, scale and offset belong to the gradient rather than to the colors, so the same list can be turned or squashed without being rewritten. Every sample here is driven by a clock, so a duration and an iteration pattern are what they answer to.",
                                         component: () => <TimedGradientsPage />,
                                     },
                                     {
                                         name: "TrackedGradients",
                                         description:
-                                            "The same gradients, driven by the pointer rather than by a clock. Each one reads the element it is painting and turns the pointer's position inside that box into an origin or an offset, so there is no duration to set and no iteration to choose — the highlight simply is wherever the pointer is, and travels off the surface when the pointer leaves. A key names the mark it draws, then the treatment applied to it, then how many of the shared colours it uses. Three marks: a band slides under the pointer, a spot is a pool centred on it, and a hand throws a wedge out towards it. The treatments are what happens next — a trail leaves the mark behind at every position it passed through and fades it where it lies, a smear stretches each of those along the way the pointer was going, a ripple expands them into rings, and a flare hangs a chain of ghosts off the mark on the axis through the centre. A trailing c blends the colours continuously on a clock and freezes each mark at the colour the source had when it was laid. The second example is four boxes rather than one, because each reads the pointer against its own box and only neighbours can show whether they agree.",
+                                            "The same gradients, driven by the pointer rather than by a clock. Each one reads the element it is painting and turns the pointer's position inside that box into an origin or an offset, so there is no duration to set and no iteration to choose — the highlight simply is wherever the pointer is, and travels off the surface when the pointer leaves. A key names the mark it draws, then the treatment applied to it, then how many of the shared colors it uses. Three marks: a band slides under the pointer, a spot is a pool centerd on it, and a hand throws a wedge out towards it. The treatments are what happens next — a trail leaves the mark behind at every position it passed through and fades it where it lies, a smear stretches each of those along the way the pointer was going, a ripple expands them into rings, and a flare hangs a chain of ghosts off the mark on the axis through the center. A trailing c blends the colors continuously on a clock and freezes each mark at the color the source had when it was laid. The second example is four boxes rather than one, because each reads the pointer against its own box and only neighbors can show whether they agree.",
                                         component: () => <TrackedGradientsPage />,
                                     },
                                 ],
@@ -329,7 +332,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "GlassSurface",
                 description:
-                    "A pane of frosted glass over whatever is behind it. The blur reaches every browser; the ripple that bends the backdrop is an SVG filter reference, which only Chromium honours, so the two sit on separate layers and the ripple layer is simply inert where it is not supported. The sheen on the surface is a specular highlight that follows the pointer.",
+                    "A pane of frosted glass over whatever is behind it. The blur reaches every browser; the ripple that bends the backdrop is an SVG filter reference, which only Chromium honors, so the two sit on separate layers and the ripple layer is simply inert where it is not supported. The sheen on the surface is a specular highlight that follows the pointer.",
                 component: () => <GlassSurfacePage />,
             },
             {
@@ -355,7 +358,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "Collapsible",
                         description:
-                            "One trigger and one panel, with none of the group behaviour an accordion adds. It measures what is inside and animates to that height rather than to a number somebody guessed, stays inert while closed so nothing in it takes focus, and can leave its contents unbuilt until the first time it is opened.",
+                            "One trigger and one panel, with none of the group behavior an accordion adds. It measures what is inside and animates to that height rather than to a number somebody guessed, stays inert while closed so nothing in it takes focus, and can leave its contents unbuilt until the first time it is opened.",
                         component: () => <CollapsiblePage />,
                     },
                 ],
@@ -398,7 +401,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Drawer",
                 description:
-                    "A modal that arrives from an edge. It is a preset rather than a mode, because a panel cannot become a centred dialog while it is open.",
+                    "A modal that arrives from an edge. It is a preset rather than a mode, because a panel cannot become a centerd dialog while it is open.",
                 component: () => <DrawerPage />,
             },
             {
@@ -437,13 +440,13 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "ColorArea",
                         description:
-                            "The saturation and brightness surface that replaces the operating system's colour dialog. It holds hue, saturation and value rather than hex, because eight bits per channel cannot carry hue at black — re-reading hex every frame would drift and then stick.",
+                            "The saturation and brightness surface that replaces the operating system's color dialog. It holds hue, saturation and value rather than hex, because eight bits per channel cannot carry hue at black — re-reading hex every frame would drift and then stick.",
                         component: () => <ColorAreaPage />,
                     },
                     {
                         name: "ColorInput",
                         description:
-                            "A colour field where the browser owns the picker itself. The component owns the trigger and the value, and nothing about what the dialog looks like.",
+                            "A color field where the browser owns the picker itself. The component owns the trigger and the value, and nothing about what the dialog looks like.",
                         component: () => <ColorInputPage />,
                     },
                     {
@@ -592,7 +595,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "WheelMenu",
                         description:
-                            "The same menu with its items cut as wedges of a hollow wheel, over a whole turn or half of one. Everything a menu does it still does — the walk, the levels, the typeahead — and what this adds is angular: each item may ask for a share of the arc, a submenu is a wider band aimed at the wedge that opened it and only as wide as its own items need, and the close control in the hole is an ordinary item that happens to sit at the centre, which is why the menu underneath knows nothing about it.",
+                            "The same menu with its items cut as wedges of a hollow wheel, over a whole turn or half of one. Everything a menu does it still does — the walk, the levels, the typeahead — and what this adds is angular: each item may ask for a share of the arc, a submenu is a wider band aimed at the wedge that opened it and only as wide as its own items need, and the close control in the hole is an ordinary item that happens to sit at the center, which is why the menu underneath knows nothing about it.",
                         component: () => <WheelMenuPage />,
                     },
                 ],
@@ -724,7 +727,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Bracket",
                 description:
-                    "A tree drawn in layers with elbow connectors between a node and the nodes that feed it — a knockout draw being the arrangement it was asked for, and an org chart or a skill tree the same component with a different tree. A node sits centred between the ones it feeds from, which propagates upward and is the whole of the layout; a node with one child sits level with it, which is what a bye looks like. The arrows walk a layer and step between layers, on one tab stop.",
+                    "A tree drawn in layers with elbow connectors between a node and the nodes that feed it — a knockout draw being the arrangement it was asked for, and an org chart or a skill tree the same component with a different tree. A node sits centerd between the ones it feeds from, which propagates upward and is the whole of the layout; a node with one child sits level with it, which is what a bye looks like. The arrows walk a layer and step between layers, on one tab stop.",
                 component: () => <BracketPage />,
             },
             {
@@ -736,7 +739,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Corners",
                 description:
-                    "Four L-shaped brackets drawn just inside an element's box, on a layer that takes no pointer and says nothing to a screen reader. Each bracket is a single polygon rather than two rules meeting, so the two arm lengths and the thickness are numbers instead of a border pretending to be one, and any of the four can be left out. The colour transitions rather than switching, which is what lets a control light its corners as it is pressed and let them fade as it is released.",
+                    "Four L-shaped brackets drawn just inside an element's box, on a layer that takes no pointer and says nothing to a screen reader. Each bracket is a single polygon rather than two rules meeting, so the two arm lengths and the thickness are numbers instead of a border pretending to be one, and any of the four can be left out. The color transitions rather than switching, which is what lets a control light its corners as it is pressed and let them fade as it is released.",
                 component: () => <CornersPage />,
             },
             {
@@ -792,7 +795,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                     {
                         name: "Reveal",
                         description:
-                            "A cover with a hole cut where the pointer is, travelling with it, so the cover is whole again the moment the pointer leaves. The cover is the consumer's — opaque, frosted, or something that reads what it is told — and the component hands it the mask that cuts the hole and whether a reveal is happening.",
+                            "A cover with a hole cut where the pointer is, traveling with it, so the cover is whole again the moment the pointer leaves. The cover is the consumer's — opaque, frosted, or something that reads what it is told — and the component hands it the mask that cuts the hole and whether a reveal is happening.",
                         component: () => <RevealPage />,
                     },
                     {
@@ -806,7 +809,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "RichText",
                 description:
-                    "Paints a plain string that carries bracketed tags — [b], [i], [s], [u], [li] — so text arriving from a server or a file can say which of its words are emphasised without bringing markup along. Nothing is handed to the browser as HTML: the string is parsed into a tree of runs and painted with classes the consumer supplies, and a tag it does not recognise is either left on screen exactly as typed or dropped, whichever the consumer asks for.",
+                    "Paints a plain string that carries bracketed tags — [b], [i], [s], [u], [li] — so text arriving from a server or a file can say which of its words are emphasized without bringing markup along. Nothing is handed to the browser as HTML: the string is parsed into a tree of runs and painted with classes the consumer supplies, and a tag it does not recognize is either left on screen exactly as typed or dropped, whichever the consumer asks for.",
                 component: () => <RichTextPage />,
             },
             {
@@ -854,19 +857,19 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "TileBoard",
                 description:
-                    "A board of tiles that interlock, and every built-in shape tessellates: the offset rows and short alternate row a hexagon or a lozenge needs, the half-tile overlap and turned-over neighbours a triangle needs, or neither for a square. The board owns the geometry and the keyboard — a transparent layer wearing the tile's own shape takes the pointer, so a press lands on the tile you can see rather than on its rectangle while a piece standing taller than its tile still hangs over the row above, and the arrows walk every tile whether it will take a press or not. What a tile looks like, and what it means, are the consumer's.",
+                    "A board of tiles that interlock, and every built-in shape tessellates: the offset rows and short alternate row a hexagon or a lozenge needs, the half-tile overlap and turned-over neighbors a triangle needs, or neither for a square. The board owns the geometry and the keyboard — a transparent layer wearing the tile's own shape takes the pointer, so a press lands on the tile you can see rather than on its rectangle while a piece standing taller than its tile still hangs over the row above, and the arrows walk every tile whether it will take a press or not. What a tile looks like, and what it means, are the consumer's.",
                 component: () => <TileBoardPage />,
             },
             {
                 name: "Timeline",
                 description:
-                    "Items with a start and an end, laid on a window over a range that can be zoomed and moved. The component owns the arithmetic — where a span lands as a share of the window, which lane it goes in when it overlaps its neighbours, and which round numbers the ticks fall on at the width it currently has — and the keyboard, where the arrows walk the items in time order and bring the window with them. It moves the window only when it is asked to: the wheel, the drag and the buttons that do the asking are the consumer's.",
+                    "Items with a start and an end, laid on a window over a range that can be zoomed and moved. The component owns the arithmetic — where a span lands as a share of the window, which lane it goes in when it overlaps its neighbors, and which round numbers the ticks fall on at the width it currently has — and the keyboard, where the arrows walk the items in time order and bring the window with them. It moves the window only when it is asked to: the wheel, the drag and the buttons that do the asking are the consumer's.",
                 component: () => <TimelinePage />,
             },
             {
                 name: "Trail",
                 description:
-                    "One element travelling a path the consumer draws, on a frame loop rather than a CSS animation, so where it is right now is a value anything can read. It reports the point and the direction of travel at every frame and can turn the traveller to face along it; the controller plays, pauses and seeks, which is what lets a slider put it anywhere on the path.",
+                    "One element traveling a path the consumer draws, on a frame loop rather than a CSS animation, so where it is right now is a value anything can read. It reports the point and the direction of travel at every frame and can turn the traveler to face along it; the controller plays, pauses and seeks, which is what lets a slider put it anywhere on the path.",
                 component: () => <TrailPage />,
             },
             {

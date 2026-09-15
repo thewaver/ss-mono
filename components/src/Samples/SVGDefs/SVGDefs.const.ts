@@ -44,6 +44,7 @@ import { spot_flare_3 } from "./Gradient/Tracked/spot_flare_3";
 import { spot_ripple_1 } from "./Gradient/Tracked/spot_ripple_1";
 import { spot_ripple_2 } from "./Gradient/Tracked/spot_ripple_2";
 import { spot_ripple_3 } from "./Gradient/Tracked/spot_ripple_3";
+import { spot_smear_1 } from "./Gradient/Tracked/spot_smear_1";
 import { spot_smear_2 } from "./Gradient/Tracked/spot_smear_2";
 import { spot_smear_3 } from "./Gradient/Tracked/spot_smear_3";
 import { spot_trail_1 } from "./Gradient/Tracked/spot_trail_1";
@@ -217,6 +218,7 @@ export namespace SVGDefsSamples {
                 spot_ripple_1,
                 spot_ripple_2,
                 spot_ripple_3,
+                spot_smear_1,
                 spot_smear_2,
                 spot_smear_3,
                 spot_trail_1,
@@ -238,6 +240,7 @@ export namespace SVGDefsSamples {
                 spot_ripple_1: { family: "spot_ripple_1" },
                 spot_ripple_2: { family: "spot_ripple_2" },
                 spot_ripple_3: { family: "spot_ripple_3" },
+                spot_smear_1: { family: "spot_smear_1" },
                 spot_smear_2: { family: "spot_smear_2" },
                 spot_smear_3: { family: "spot_smear_3" },
                 spot_trail_1: { family: "spot_trail_1" },

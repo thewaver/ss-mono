@@ -83,10 +83,10 @@ test("a stacked split takes the other pair of arrows", async ({ page }) => {
 
 /**
  * With three panes there are two separators, and moving one must leave the far pane alone — otherwise a
- * drag at one end quietly reflows the whole row. The two neighbours trade their share and the total is
- * conserved, which is what keeps the ratios summing to one without a normalisation pass.
+ * drag at one end quietly reflows the whole row. The two neighbors trade their share and the total is
+ * conserved, which is what keeps the ratios summing to one without a normalization pass.
  */
-test("a gutter moves its two neighbours and leaves the rest alone", async ({ page }) => {
+test("a gutter moves its two neighbors and leaves the rest alone", async ({ page }) => {
     await expect(page.locator(gutter(TRIPLE)), "two separators for three panes").toHaveCount(2);
 
     await page.locator(gutter(TRIPLE)).first().focus();
@@ -117,8 +117,8 @@ test("a disabled split is out of the tab order and refuses the keyboard", async 
 });
 
 /**
- * The accepted behaviour, pinned so that a later change has to break it deliberately. Two minimums of
- * 250px and 400px cannot both fit inside 600px, and this control does not arbitrate: grid honours both
+ * The accepted behavior, pinned so that a later change has to break it deliberately. Two minimums of
+ * 250px and 400px cannot both fit inside 600px, and this control does not arbitrate: grid honors both
  * floors and the row overflows its container. That is inherited rather than designed, and the decision
  * was to inherit it whole.
  */
@@ -139,7 +139,7 @@ test("minimums that cannot fit overflow rather than shrink", async ({ page }) =>
  * They used to be reconciled only in CSS, which meant the drag kept writing ratios the `clamp()` then
  * refused: past a pane's floor the pane stopped moving, the gutter carried on under the pointer, and the
  * tracks added up to more than the container. Converting each bound into a ratio against the measured
- * container and clamping the drag there keeps the stored value inside what CSS will honour, so the panes
+ * container and clamping the drag there keeps the stored value inside what CSS will honor, so the panes
  * always add up to the box.
  */
 const OVERSHOOT_PX = 2000;
@@ -175,6 +175,6 @@ test("a drag stops where the pixel bounds do, rather than writing past them", as
 
     const bounded = await tracks(BOUNDED);
 
-    expect(bounded.panes[1], "a drag the other way stops on the neighbour's floor instead").toBe(160);
+    expect(bounded.panes[1], "a drag the other way stops on the neighbor's floor instead").toBe(160);
     expect(bounded.sum).toBe(bounded.box);
 });

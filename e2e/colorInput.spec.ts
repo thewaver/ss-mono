@@ -13,7 +13,7 @@ const OUTSIDE_POINT = 5;
 const SETTLE_MS = 200;
 
 /**
- * The OS colour dialog is gone, so everything here is drivable for the first time: the surface is a real
+ * The OS color dialog is gone, so everything here is drivable for the first time: the surface is a real
  * element with a real drag, and the hue slider is a native range. What is worth asserting is that the value
  * still leaves as a hex string, since that is the whole of the control's public contract.
  */
@@ -31,8 +31,8 @@ test.beforeEach(async ({ page }) => {
     await expect(page.locator(field(DEFAULT))).toBeVisible();
 });
 
-test("the control is a popup button rather than a native colour input", async ({ page }) => {
-    await expect(page.locator("input[type='color']"), "no native colour input survives").toHaveCount(0);
+test("the control is a popup button rather than a native color input", async ({ page }) => {
+    await expect(page.locator("input[type='color']"), "no native color input survives").toHaveCount(0);
     await expect(page.locator(field(DEFAULT)), "the field announces the popup it owns").toHaveAttribute(
         "aria-haspopup",
         "dialog",

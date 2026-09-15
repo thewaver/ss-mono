@@ -2,7 +2,7 @@ import { Button, Modal, Select } from "@thewaver/ss-components";
 import type { SelectOption } from "@thewaver/ss-components";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import { PageModalScrim } from "../../../StyledComponents/ModalOverlay/ModalOverlay";
+import { PageModalOverlay } from "../../../StyledComponents/ModalOverlay/ModalOverlay";
 import { PageModalPanel } from "../../../StyledComponents/ModalPanel/ModalPanel";
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
@@ -29,7 +29,10 @@ export const LayeredExample = (props: Props) => (
             visibilitySignal={props.visibilitySignal}
             ariaLabelledBy={() => LAYERED_TITLE_ID}
             renderOverlay={(getVisibilityTarget, getTransitionDurationMs) => (
-                <PageModalScrim visibilityTarget={getVisibilityTarget} transitionDurationMs={getTransitionDurationMs} />
+                <PageModalOverlay
+                    visibilityTarget={getVisibilityTarget}
+                    transitionDurationMs={getTransitionDurationMs}
+                />
             )}
             renderContent={(getVisibilityTarget, getTransitionDurationMs) => (
                 <PageModalPanel visibilityTarget={getVisibilityTarget} transitionDurationMs={getTransitionDurationMs}>

@@ -180,7 +180,7 @@ test("hold-newest keeps the overflow queued rather than dropping it", async ({ p
 });
 
 /**
- * The one behaviour here with nowhere to show itself: a toast held half way through its duration must get
+ * The one behavior here with nowhere to show itself: a toast held half way through its duration must get
  * the remaining half back on release, not a fresh full one. Real time cannot ask that question — waiting
  * four seconds proves nothing about which four seconds elapsed — so time is faked and stepped instead,
  * which is also why this is the only test in the file that installs a clock. `install` freezes time until

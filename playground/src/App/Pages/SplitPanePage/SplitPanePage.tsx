@@ -78,7 +78,7 @@ export const SplitPanePage = () => {
                 key: "triple",
                 name: "Three panes",
                 readout: () =>
-                    `ratios: ${percent(tripleSignal[0]())} — a gutter moves its two neighbours and nothing else`,
+                    `ratios: ${percent(tripleSignal[0]())} — a gutter moves its two neighbors and nothing else`,
                 component: () => <TripleExample {...commonProps} ratiosSignal={tripleSignal} />,
                 path: `${EXAMPLES_ROOT}/Triple.tsx`,
             },
@@ -101,7 +101,7 @@ export const SplitPanePage = () => {
                 key: "cramped",
                 name: "Minimums that do not fit",
                 readout: () =>
-                    `minimums of 250px and 400px in a box too narrow for both — grid honours the floors and lets the row overflow, which is the behaviour this control inherits rather than fights`,
+                    `minimums of 250px and 400px in a box too narrow for both — grid honors the floors and lets the row overflow, which is the behavior this control inherits rather than fights`,
                 component: () => <CrampedExample {...commonProps} ratiosSignal={crampedSignal} />,
                 path: `${EXAMPLES_ROOT}/Cramped.tsx`,
             },

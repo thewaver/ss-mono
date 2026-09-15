@@ -169,7 +169,7 @@ describe("getStopKeys", () => {
 describe("getSteppedKey", () => {
     const KEYS = ["one", "two", "three"];
 
-    it("steps to the neighbour", () => {
+    it("steps to the neighbor", () => {
         expect(PatchBoardUtils.getSteppedKey(KEYS, "two", 1)).toBe("three");
     });
 
@@ -202,7 +202,7 @@ describe("getRegionLabel", () => {
 
     it("names the third of the board the node's middle sits in", () => {
         expect(PatchBoardUtils.getRegionLabel({ x: 0, y: 0 }, SIZE, BOUNDS)).toBe("top left");
-        expect(PatchBoardUtils.getRegionLabel({ x: 140, y: 140 }, SIZE, BOUNDS)).toBe("middle centre");
+        expect(PatchBoardUtils.getRegionLabel({ x: 140, y: 140 }, SIZE, BOUNDS)).toBe("middle center");
         expect(PatchBoardUtils.getRegionLabel({ x: 280, y: 280 }, SIZE, BOUNDS)).toBe("bottom right");
     });
 

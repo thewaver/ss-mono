@@ -60,7 +60,7 @@ export const PRIZES = [
     "Jackpot",
     "A sticker",
     "Half a coin",
-    "A rumour",
+    "A rumor",
     "Another go",
 ];
 

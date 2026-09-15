@@ -8,14 +8,14 @@ import type { AccessorProps } from "../../Utils/typeUtils";
 
 export type TileBoardTileFlip = "none" | "topToBottom" | "leftToRight";
 
-export type TileBoardNeighbourhood =
+export type TileBoardNeighborhood =
     "orthogonal" | "diagonal" | "diagonalAndAcross" | "diagonalAndDown" | "uprightTriangle" | "sidewaysTriangle";
 
 export type TileBoardTiling = {
     pitch: Size2d;
     hasOffsetRows: boolean;
     tileFlip: TileBoardTileFlip;
-    neighbourhood: TileBoardNeighbourhood;
+    neighborhood: TileBoardNeighborhood;
 };
 
 export type TileBoardLayout = TileBoardTiling & {

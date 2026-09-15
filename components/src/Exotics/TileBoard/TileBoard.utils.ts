@@ -22,11 +22,11 @@ const DODECAGON_ROW_PITCH = Math.sqrt(3) / 2;
 /**
  * How each tile shape tiles, as fractions of one tile's size.
  *
- * The pitch is how far apart tile centres sit, which for anything but a square is less than the
+ * The pitch is how far apart tile centers sit, which for anything but a square is less than the
  * tile's own size because the tiles interlock — pointy-top hexagons overlap vertically by a quarter,
  * so their rows are three-quarters of a tile apart. `hasOffsetRows` marks the shapes whose
  * alternating rows are shifted half a tile across, and `tileFlip` the shapes where alternate tiles
- * are mirrored, as triangles are. `neighbourhood` names which tiles touch which, since that differs
+ * are mirrored, as triangles are. `neighborhood` names which tiles touch which, since that differs
  * for every shape.
  */
 const TILING_RATIOS: Record<ShapeConst.DefaultShape, TileBoardTiling> = {
@@ -34,72 +34,72 @@ const TILING_RATIOS: Record<ShapeConst.DefaultShape, TileBoardTiling> = {
         pitch: { width: 1, height: 1 },
         hasOffsetRows: false,
         tileFlip: "none",
-        neighbourhood: "orthogonal",
+        neighborhood: "orthogonal",
     },
     "lozenge": {
         pitch: { width: 1, height: 0.5 },
         hasOffsetRows: true,
         tileFlip: "none",
-        neighbourhood: "diagonal",
+        neighborhood: "diagonal",
     },
     "hexagon-pointy-top": {
         pitch: { width: 1, height: 0.75 },
         hasOffsetRows: true,
         tileFlip: "none",
-        neighbourhood: "diagonalAndAcross",
+        neighborhood: "diagonalAndAcross",
     },
     "hexagon-flat-top": {
         pitch: { width: 1.5, height: 0.5 },
         hasOffsetRows: true,
         tileFlip: "none",
-        neighbourhood: "diagonalAndDown",
+        neighborhood: "diagonalAndDown",
     },
     "triangle-up": {
         pitch: { width: 0.5, height: 1 },
         hasOffsetRows: false,
         tileFlip: "topToBottom",
-        neighbourhood: "uprightTriangle",
+        neighborhood: "uprightTriangle",
     },
     "triangle-down": {
         pitch: { width: 0.5, height: 1 },
         hasOffsetRows: false,
         tileFlip: "topToBottom",
-        neighbourhood: "uprightTriangle",
+        neighborhood: "uprightTriangle",
     },
     "triangle-left": {
         pitch: { width: 1, height: 0.5 },
         hasOffsetRows: false,
         tileFlip: "leftToRight",
-        neighbourhood: "sidewaysTriangle",
+        neighborhood: "sidewaysTriangle",
     },
     "triangle-right": {
         pitch: { width: 1, height: 0.5 },
         hasOffsetRows: false,
         tileFlip: "leftToRight",
-        neighbourhood: "sidewaysTriangle",
+        neighborhood: "sidewaysTriangle",
     },
     "dodecagon": {
         pitch: { width: 1, height: DODECAGON_ROW_PITCH },
         hasOffsetRows: true,
         tileFlip: "none",
-        neighbourhood: "diagonalAndAcross",
+        neighborhood: "diagonalAndAcross",
     },
 };
 
 /**
  * Which tiles touch a given one, before checking whether they are on the board.
  *
- * Every shape needs its own answer. Offset rows mean a tile's diagonal neighbours are at different
- * columns depending on whether its own row is a short one. Triangles have three neighbours rather
+ * Every shape needs its own answer. Offset rows mean a tile's diagonal neighbors are at different
+ * columns depending on whether its own row is a short one. Triangles have three neighbors rather
  * than four or six, and which three depends on whether that particular triangle is pointing up or
  * down. Flat-top hexagons are the odd case: their columns interleave, so the tiles directly above
  * and below are two rows away rather than one.
  */
-const computeNeighbours = (tile: Index2d, layout: TileBoardLayout): Index2d[] => {
+const computeNeighbors = (tile: Index2d, layout: TileBoardLayout): Index2d[] => {
     const near = TileBoardUtils.getIsShortRow(tile.row, layout) ? 0 : -SHORT_ROW_TILES;
     const far = near + SHORT_ROW_TILES;
 
-    if (layout.neighbourhood === "diagonal") {
+    if (layout.neighborhood === "diagonal") {
         return [
             { row: tile.row - 1, col: tile.col + near },
             { row: tile.row - 1, col: tile.col + far },
@@ -108,7 +108,7 @@ const computeNeighbours = (tile: Index2d, layout: TileBoardLayout): Index2d[] =>
         ];
     }
 
-    if (layout.neighbourhood === "diagonalAndAcross") {
+    if (layout.neighborhood === "diagonalAndAcross") {
         return [
             { row: tile.row - 1, col: tile.col + near },
             { row: tile.row - 1, col: tile.col + far },
@@ -119,7 +119,7 @@ const computeNeighbours = (tile: Index2d, layout: TileBoardLayout): Index2d[] =>
         ];
     }
 
-    if (layout.neighbourhood === "diagonalAndDown") {
+    if (layout.neighborhood === "diagonalAndDown") {
         return [
             { row: tile.row - 2, col: tile.col },
             { row: tile.row - 1, col: tile.col + far },
@@ -130,7 +130,7 @@ const computeNeighbours = (tile: Index2d, layout: TileBoardLayout): Index2d[] =>
         ];
     }
 
-    if (layout.neighbourhood === "sidewaysTriangle") {
+    if (layout.neighborhood === "sidewaysTriangle") {
         const pointsRight = (layout.shape === POINTS_RIGHT) !== TileBoardUtils.getIsFlippedTile(tile, layout);
 
         if (pointsRight) {
@@ -148,7 +148,7 @@ const computeNeighbours = (tile: Index2d, layout: TileBoardLayout): Index2d[] =>
         ];
     }
 
-    if (layout.neighbourhood === "uprightTriangle") {
+    if (layout.neighborhood === "uprightTriangle") {
         const pointsUp = (layout.shape === POINTS_UP) !== TileBoardUtils.getIsFlippedTile(tile, layout);
 
         if (pointsUp) {
@@ -179,7 +179,7 @@ const computeNeighbours = (tile: Index2d, layout: TileBoardLayout): Index2d[] =>
  * tiles touch which.
  *
  * The board is addressed by row and column, and everything else is derived: where a tile is drawn,
- * whether its row is a short one, whether it is mirrored, and who its neighbours are. That keeps the
+ * whether its row is a short one, whether it is mirrored, and who its neighbors are. That keeps the
  * component's own code the same whatever it is tiled with.
  *
  * Rows are not all the same length. Shapes with offset rows shift alternate rows half a tile across,
@@ -192,7 +192,7 @@ export namespace TileBoardUtils {
      *
      * @param shape Which tile shape.
      * @param tileSize One tile's size.
-     * @returns The tiling with its pitch in pixels — how far apart tile centres sit, which is less than
+     * @returns The tiling with its pitch in pixels — how far apart tile centers sit, which is less than
      * the tile's own size wherever the tiles interlock.
      */
     export const getTiling = (shape: ShapeConst.DefaultShape, tileSize: Size2d): TileBoardTiling => {
@@ -269,7 +269,7 @@ export namespace TileBoardUtils {
     export const getRowTop = (row: number, layout: TileBoardLayout) => row * layout.pitch.height;
 
     /**
-     * A tile's centre, in board pixels.
+     * A tile's center, in board pixels.
      *
      * @param tile Which tile.
      * @param layout The board's layout.
@@ -282,8 +282,8 @@ export namespace TileBoardUtils {
     /**
      * The whole board's size.
      *
-     * The pitch covers the gaps between tile centres and one full tile is added for the last one, since
-     * a tile extends past its own centre.
+     * The pitch covers the gaps between tile centers and one full tile is added for the last one, since
+     * a tile extends past its own center.
      *
      * @param layout The board's layout.
      * @returns The size, or nothing for a board with no rows or columns.
@@ -351,11 +351,11 @@ export namespace TileBoardUtils {
      *
      * @param tile Which tile.
      * @param layout The board's layout.
-     * @returns The neighbours that exist, so a tile at an edge or a corner gets a shorter list. The
+     * @returns The neighbors that exist, so a tile at an edge or a corner gets a shorter list. The
      * order is consistent for a given shape, going clockwise from the top.
      */
-    export const getNeighbourTiles = (tile: Index2d, layout: TileBoardLayout): Index2d[] =>
-        computeNeighbours(tile, layout).filter((neighbour) => getIsOnBoard(neighbour, layout));
+    export const getNeighborTiles = (tile: Index2d, layout: TileBoardLayout): Index2d[] =>
+        computeNeighbors(tile, layout).filter((neighbor) => getIsOnBoard(neighbor, layout));
 
     /** The top-left tile. */
     export const getFirstTile = (): Index2d => ({ row: FIRST_INDEX, col: FIRST_INDEX });

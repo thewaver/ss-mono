@@ -92,7 +92,7 @@ test("ticking is a toggle, and the owner's list is what says so", async ({ page 
 });
 
 /**
- * The one behaviour a radio row has that a checkbox does not: picking it clears whichever of its own run was
+ * The one behavior a radio row has that a checkbox does not: picking it clears whichever of its own run was
  * picked before, and leaves every tick outside that run alone.
  */
 test("picking a radio clears its own run and nothing else", async ({ page }) => {

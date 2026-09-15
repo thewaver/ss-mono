@@ -85,7 +85,7 @@ export const WheelMenuPage = () => {
             key: "concentric",
             name: "Concentric bands",
             readout: () =>
-                `${getLastNestedAction()} — a submenu is a band round the same centre, aimed at the wedge that opened it and only as wide as its own items need`,
+                `${getLastNestedAction()} — a submenu is a band round the same center, aimed at the wedge that opened it and only as wide as its own items need`,
             component: () => (
                 <WheelExample
                     caption={"Wheel"}

@@ -151,9 +151,9 @@ test("the arrows walk the blocks in time order, whatever order the page listed t
 });
 
 test("a block the page marked as off limits is stepped over rather than landed on", async ({ page }) => {
-    const cancelled = page.locator(`${MEETINGS} [aria-label*="Budget"]`);
+    const canceled = page.locator(`${MEETINGS} [aria-label*="Budget"]`);
 
-    await expect(cancelled, "it says so rather than going missing").toHaveAttribute("aria-disabled", "true");
+    await expect(canceled, "it says so rather than going missing").toHaveAttribute("aria-disabled", "true");
 
     await page.locator(`${MEETINGS} [aria-label*="Retro"]`).focus();
     await page.keyboard.press("ArrowRight");
@@ -237,7 +237,7 @@ test("a button that resets the window puts it back exactly", async ({ page }) =>
 /**
  * The gestures belong to the component now, and this is the case that decides whether that was worth doing:
  * a press and a drag start identically, so the only thing separating "pick this block" from "move the
- * window" is how far the pointer travelled before it came up.
+ * window" is how far the pointer traveled before it came up.
  */
 test("a press on a block picks it and a drag from the same block moves the window instead", async ({ page }) => {
     const surfaceBox = (await page.locator(surface(MEETINGS)).first().boundingBox())!;

@@ -8,7 +8,7 @@ const WEEKDAYS = demo("weekdays");
 
 /**
  * Days are located by their accessible name rather than by their text, because the painter draws a bare
- * number and the neighbouring months' days repeat it — selecting "31" by text finds July's before August's.
+ * number and the neighboring months' days repeat it — selecting "31" by text finds July's before August's.
  * The name is also the only thing a screen reader gets, so asserting against it checks the contract twice.
  */
 const cell = (scope: string) => `${scope} [role="gridcell"]`;

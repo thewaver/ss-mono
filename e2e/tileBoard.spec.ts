@@ -61,7 +61,7 @@ const tabStops = (page: Page, scope: string) =>
         .locator(tile(scope))
         .evaluateAll((elements) => elements.filter((element) => (element as HTMLElement).tabIndex === 0).length);
 
-const strokeColour = (page: Page, selector: string, index: number) =>
+const strokeColor = (page: Page, selector: string, index: number) =>
     page.evaluate(
         (args) => {
             const cell = document.querySelectorAll(args.selector)[args.index] as HTMLElement;
@@ -195,11 +195,11 @@ test("a disabled board takes neither a press nor a key", async ({ page }) => {
 });
 
 test("a tile that refuses a press is still drawn as focused, because nothing else would draw it", async ({ page }) => {
-    const resting = await strokeColour(page, tile(MEEPLE), 0);
+    const resting = await strokeColor(page, tile(MEEPLE), 0);
 
     await page.locator(tile(MEEPLE)).first().focus();
 
-    const focused = await strokeColour(page, tile(MEEPLE), 0);
+    const focused = await strokeColor(page, tile(MEEPLE), 0);
 
     expect(resting, "the painter has an edge to change").not.toBe("");
     expect(focused, "and it changes it when the refused tile takes focus").not.toBe(resting);
@@ -212,7 +212,7 @@ test("triangles turn every other tile over, which is what makes them meet edge t
     const second = await clipPathOf(page, hitLayer(MARKED), 1);
     const third = await clipPathOf(page, hitLayer(MARKED), 2);
 
-    expect(first, "neighbours in a row point opposite ways").not.toBe(second);
+    expect(first, "neighbors in a row point opposite ways").not.toBe(second);
     expect(third, "and the one after that points back the first way").toBe(first);
 });
 
@@ -266,9 +266,9 @@ test("a piece is not covered by the tile it stands on, even while that tile is h
     const covered = await page.evaluate((scope) => {
         const meeple = document.querySelector(`${scope} [data-meeple]`) as HTMLElement;
         const box = meeple.getBoundingClientRect();
-        const atCentre = document.elementFromPoint(box.x + box.width * 0.5, box.y + box.height * 0.5);
+        const atCenter = document.elementFromPoint(box.x + box.width * 0.5, box.y + box.height * 0.5);
 
-        return meeple.contains(atCentre) || meeple === atCentre;
+        return meeple.contains(atCenter) || meeple === atCenter;
     }, MARKED);
 
     expect(covered, "the board's own hover lift must not reach past the board").toBe(false);
@@ -314,15 +314,15 @@ test("a keyboard walk draws one focus ring, on the shape rather than around its 
 });
 
 test("a press leaves the ring off, and the next arrow key brings it back", async ({ page }) => {
-    const resting = await strokeColour(page, tile(MARKED), 2);
+    const resting = await strokeColor(page, tile(MARKED), 2);
 
     await page.locator(tile(MARKED)).nth(2).click();
 
-    const pressed = await strokeColour(page, tile(MARKED), 2);
+    const pressed = await strokeColor(page, tile(MARKED), 2);
 
     await page.keyboard.press("ArrowRight");
 
-    const walked = await strokeColour(page, tile(MARKED), 3);
+    const walked = await strokeColor(page, tile(MARKED), 3);
 
     expect(pressed, "a tile pressed with the pointer holds focus without advertising it").toBe(resting);
     expect(walked, "and the key that moved focus is what asks for the ring").not.toBe(resting);

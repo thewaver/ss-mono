@@ -4,6 +4,7 @@ import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/Pointe
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import type { GradientFlareOpts, SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
+import { TrackedGradientKnobs } from "../TrackedGradient.knobs";
 
 type FlareGhost = {
     reach: number;
@@ -12,12 +13,6 @@ type FlareGhost = {
     colorKey: keyof SVGDefsColors;
     isRing?: boolean;
 };
-
-const POOL_SCALE = 1.5;
-const CORE_STOP = 5;
-const FALLOFF_STOP = 40;
-const CORE_ALPHA = 0.75;
-const FALLOFF_ALPHA = 0.25;
 
 const GHOSTS: FlareGhost[] = [
     { reach: 0.36, scale: 0.34, alpha: 0.1, colorKey: "primary" },
@@ -29,39 +24,38 @@ const GHOSTS: FlareGhost[] = [
     { reach: 2, scale: 0.26, alpha: 0.13, colorKey: "tertiary" },
 ];
 
-const GHOST_SATURATION = 0.55;
-const GHOST_LUMINOSITY = 1.25;
-const GHOST_NEAR_GROWTH = 1;
-const GHOST_FAR_GROWTH = 0.55;
-
 const DISC_STOPS = [45, 78];
 const DISC_ALPHA_RATIOS = [1, 0.3];
 const RING_STOPS = [55, 82, 92];
 const RING_ALPHA_RATIOS = [0.12, 1, 0.2];
 
+const DEFAULTS = TrackedGradientKnobs.SPOT_FLARE_DEFAULTS;
+
 const NO_REF = () => undefined;
 
-const toGhostColor = (color: string, alpha: number) =>
-    `hsl(from ${color} h calc(s * ${GHOST_SATURATION}) calc(l * ${GHOST_LUMINOSITY}) / ${alpha})`;
+const toGhostColor = (color: string, alpha: number, opts?: GradientFlareOpts) =>
+    `hsl(from ${color} h calc(s * ${opts?.ghostSaturation ?? DEFAULTS.ghostSaturation}) calc(l * ${
+        opts?.ghostLuminosity ?? DEFAULTS.ghostLuminosity
+    }) / ${alpha})`;
 
 const computeGhostColors = (ghost: FlareGhost, color: string, fade: number, opts?: GradientFlareOpts) => {
     const alpha = ghost.alpha * fade;
 
     if (ghost.isRing) {
         return [
-            { value: toGhostColor(color, 0) },
-            { value: toGhostColor(color, alpha * RING_ALPHA_RATIOS[0]), stop: RING_STOPS[0] },
-            { value: toGhostColor(color, alpha * RING_ALPHA_RATIOS[1]), stop: RING_STOPS[1] },
-            { value: toGhostColor(color, alpha * RING_ALPHA_RATIOS[2]), stop: RING_STOPS[2] },
-            { value: toGhostColor(color, 0), stop: 100 },
+            { value: toGhostColor(color, 0, opts) },
+            { value: toGhostColor(color, alpha * RING_ALPHA_RATIOS[0], opts), stop: RING_STOPS[0] },
+            { value: toGhostColor(color, alpha * RING_ALPHA_RATIOS[1], opts), stop: RING_STOPS[1] },
+            { value: toGhostColor(color, alpha * RING_ALPHA_RATIOS[2], opts), stop: RING_STOPS[2] },
+            { value: toGhostColor(color, 0, opts), stop: 100 },
         ];
     }
 
     return [
-        { value: toGhostColor(color, alpha * DISC_ALPHA_RATIOS[0]) },
-        { value: toGhostColor(color, alpha * DISC_ALPHA_RATIOS[0]), stop: DISC_STOPS[0] },
-        { value: toGhostColor(color, alpha * DISC_ALPHA_RATIOS[1]), stop: DISC_STOPS[1] },
-        { value: toGhostColor(color, 0), stop: 100 },
+        { value: toGhostColor(color, alpha * DISC_ALPHA_RATIOS[0], opts) },
+        { value: toGhostColor(color, alpha * DISC_ALPHA_RATIOS[0], opts), stop: DISC_STOPS[0] },
+        { value: toGhostColor(color, alpha * DISC_ALPHA_RATIOS[1], opts), stop: DISC_STOPS[1] },
+        { value: toGhostColor(color, 0, opts), stop: 100 },
     ];
 };
 
@@ -78,17 +72,18 @@ export const spot_flare_3 = (opts?: GradientFlareOpts): TrackedGradientConfig =>
 
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient1-${id}`,
+                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
                         origin: () => getReading().boxRatio,
-                        scale: opts?.glowScale ?? POOL_SCALE,
+                        scale: opts?.glowScale ?? DEFAULTS.glowScale,
                         colors: [
                             { value: `rgb(from ${defs.colors.primary} r g b / 1)` },
                             {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.coreAlpha ?? CORE_ALPHA})`,
-                                stop: opts?.coreStop ?? CORE_STOP,
+                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.coreAlpha ?? DEFAULTS.coreAlpha})`,
+                                stop: opts?.coreStop ?? DEFAULTS.coreStop,
                             },
                             {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? FALLOFF_ALPHA})`,
-                                stop: opts?.falloffStop ?? FALLOFF_STOP,
+                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? DEFAULTS.falloffAlpha})`,
+                                stop: opts?.falloffStop ?? DEFAULTS.falloffStop,
                             },
                             { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
                         ],
@@ -108,14 +103,15 @@ export const spot_flare_3 = (opts?: GradientFlareOpts): TrackedGradientConfig =>
                         const distance = MathUtils.clamp01(Math.hypot(ratio.x - 0.5, ratio.y - 0.5) * 2);
 
                         return MathUtils.lerp(
-                            opts?.ghostNearGrowth ?? GHOST_NEAR_GROWTH,
-                            opts?.ghostFarGrowth ?? GHOST_FAR_GROWTH,
+                            opts?.ghostNearGrowth ?? DEFAULTS.ghostNearGrowth,
+                            opts?.ghostFarGrowth ?? DEFAULTS.ghostFarGrowth,
                             distance,
                         );
                     };
 
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient${index + 2}-${id}`,
+                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
                         origin: () => ({
                             x: getReading().boxRatio.x + (0.5 - getReading().boxRatio.x) * ghost.reach,
                             y: getReading().boxRatio.y + (0.5 - getReading().boxRatio.y) * ghost.reach,

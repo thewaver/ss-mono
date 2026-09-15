@@ -4,8 +4,10 @@ export namespace PlacementLayouts {
     export const SAMPLE_LAYOUTS = {
         arc: { family: "arc" },
         cliff: { family: "cliff" },
+        column: { family: "column" },
         honeycomb: { family: "honeycomb" },
         ring: { family: "ring" },
+        row: { family: "row" },
         whorl: { family: "whorl" },
         zigzag: { family: "zigzag" },
     } satisfies Record<string, PlacementLayoutEntry>;

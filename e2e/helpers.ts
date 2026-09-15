@@ -2,8 +2,8 @@ import type { Locator, Page } from "@playwright/test";
 
 /**
  * A demo is found by the key its page gave it, never by the caption it displays. A caption is editorial —
- * anybody may reword one without touching a behaviour — and a suite that reads captions answers "has the
- * copy changed" in the same red as "has the behaviour changed". The key is chosen once, is never displayed,
+ * anybody may reword one without touching a behavior — and a suite that reads captions answers "has the
+ * copy changed" in the same red as "has the behavior changed". The key is chosen once, is never displayed,
  * and every Playground example, variant, props row and driven control carries its own in `data-testid`.
  */
 export const variant = (key: string) => `[data-variant][data-testid="${key}"]`;
@@ -142,7 +142,7 @@ export const pickFiles = (locator: Locator, descriptors: Array<{ name: string; s
         element.dispatchEvent(new Event("change", { bubbles: true }));
     }, descriptors);
 
-/** A colour picker is an OS dialog, so the only drivable path is writing the value and reporting it. */
+/** A color picker is an OS dialog, so the only drivable path is writing the value and reporting it. */
 export const setColor = (locator: Locator, value: string) =>
     locator.evaluate((element, next) => {
         (element as HTMLInputElement).value = next;
@@ -150,7 +150,7 @@ export const setColor = (locator: Locator, value: string) =>
     }, value);
 
 /**
- * Cancelling the click is the only thing that can stop a native file or colour dialog, so the refusal is
+ * Canceling the click is the only thing that can stop a native file or color dialog, so the refusal is
  * observable as `defaultPrevented` and nowhere else.
  */
 export const clickIsAllowed = (locator: Locator) =>

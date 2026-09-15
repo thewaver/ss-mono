@@ -53,7 +53,7 @@ const findZoneAt = (x: number, y: number, groupId: string) => {
  *
  * One carry is in flight at a time, held in module state, so the item being dragged, the zone it
  * came from and the place it is currently aimed at are readable from anywhere — the source list
- * greys out its own row, the target list draws an insertion marker, and neither has to know about
+ * grays out its own row, the target list draws an insertion marker, and neither has to know about
  * the other. Zones register themselves and answer questions about their own contents through
  * {@link CarrierZone}, which is what lets the same carry work across lists, grids and boards that
  * have nothing else in common.
@@ -292,7 +292,7 @@ export namespace CarrierUtils {
      * Finishes the carry in flight, committing it or putting the item back.
      *
      * The four outcomes are all announced, because none of them is visible to a screen reader: the
-     * carry was cancelled, the item did not move, the place refused it, or the move went through. A
+     * carry was canceled, the item did not move, the place refused it, or the move went through. A
      * move within one zone is handed to that zone's `moveAt`; a move between zones is a `takeAt` and a
      * `putAt` batched together, so consumers see one update rather than a moment with the item in
      * neither place.

@@ -105,7 +105,7 @@ export namespace GlassUtils {
      * the tracker's resting position is.
      * @param getSize The element's current size, which the pointer's position is scaled against.
      * @param defs The glass description, filled out.
-     * @returns One definition, carrying the tint colour and opacity along with the filter.
+     * @returns One definition, carrying the tint color and opacity along with the filter.
      */
     export const computeSheenDefs = (
         id: string,
@@ -159,7 +159,7 @@ export namespace GlassUtils {
     /**
      * Builds the refraction applied to whatever is behind the glass.
      *
-     * Turbulence displaces the backdrop rather than colouring it, which is what makes the content
+     * Turbulence displaces the backdrop rather than coloring it, which is what makes the content
      * behind appear to bend. The displacement is faded towards the edges, so the effect does not tear
      * where it runs out of backdrop to sample.
      *

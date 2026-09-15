@@ -56,7 +56,7 @@ test("a disabled field cancels the click that would open the OS dialog", async (
 
     expect(
         await clickIsAllowed(page.locator(DISABLED)),
-        "activation is refused by cancelling the click, which is the only thing that can stop a native file dialog",
+        "activation is refused by canceling the click, which is the only thing that can stop a native file dialog",
     ).toBe(false);
 
     await page.locator(DISABLED).click({ force: true });

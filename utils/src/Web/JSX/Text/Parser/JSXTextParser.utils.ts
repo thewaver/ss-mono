@@ -64,7 +64,7 @@ const getWordSegmenter = () => (wordSegmenter ??= new Intl.Segmenter(undefined, 
  * `baselineStyle` is the style the parsed text will be redrawn under, not the element's
  * own parent. An inherited property is only safe to leave out when the destination
  * already resolves it to the same value, and the destination sits outside the tree being
- * walked — comparing against the immediate parent instead drops a colour or a shadow set
+ * walked — comparing against the immediate parent instead drops a color or a shadow set
  * two or more levels up, which then never arrives.
  */
 const splitComputedStyle = (style: CSSStyleDeclaration, baselineStyle?: CSSStyleDeclaration) => {
@@ -108,7 +108,7 @@ export namespace JSXTextParserUtils {
     /** Tests whether two runs of text would be measured identically — same font, spacing and case. */
     export const isSameMetricsStyle = (a: StyledTextSegment, b: StyledTextSegment) => deepEqual(a.metrics, b.metrics);
 
-    /** Tests whether two runs of text would be drawn identically — same colour, decoration and so on. */
+    /** Tests whether two runs of text would be drawn identically — same color, decoration and so on. */
     export const isSameNonMetricsStyle = (a: StyledTextSegment, b: StyledTextSegment) =>
         deepEqual(a.nonMetrics, b.nonMetrics);
 
@@ -126,7 +126,7 @@ export namespace JSXTextParserUtils {
      *
      * Inherited properties are weighed against `el` itself rather than against each
      * piece's own parent, since `el` is the context the result will be redrawn in — so a
-     * colour or a shadow set anywhere between the two is carried, however deep.
+     * color or a shadow set anywhere between the two is carried, however deep.
      *
      * Browser only — it reads computed styles, so the element must already be in the
      * document.
@@ -244,7 +244,7 @@ export namespace JSXTextParserUtils {
     };
 
     /**
-     * Gathers neighbouring runs of text that match into groups, so each group can be
+     * Gathers neighboring runs of text that match into groups, so each group can be
      * measured in one go.
      *
      * Line breaks and unsplittable elements always stand alone and break up a run.

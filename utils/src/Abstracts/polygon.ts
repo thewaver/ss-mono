@@ -50,7 +50,7 @@ export namespace PolygonUtils {
     /**
      * Pushes every edge of a polygon inwards (or outwards) by the same amount.
      *
-     * Each edge is shifted sideways and neighbouring edges are extended until they
+     * Each edge is shifted sideways and neighboring edges are extended until they
      * meet, so corners stay sharp rather than getting rounded off. Shifting further
      * than a shape can take will make thin parts turn inside out.
      *

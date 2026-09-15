@@ -12,7 +12,7 @@ export const ErroredExample = (props: Props) => (
         {...pageColorPickerSlots}
         valueSignal={props.valueSignal}
         hasError={() => props.valueSignal[0]() === NO_BRAND_COLOR}
-        ariaLabel={"Validated colour"}
+        ariaLabel={"Validated color"}
         renderContent={(getRenderProps) => <PageColorInputContent renderProps={getRenderProps} />}
     />
 );

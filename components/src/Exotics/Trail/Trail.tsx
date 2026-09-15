@@ -120,7 +120,7 @@ export const Trail = (props: TrailProps) => {
         props.onMount?.(controller);
     });
 
-    const getTravellerTransform = () => {
+    const getTravelerTransform = () => {
         const place = getPlace();
         const turn = getIsTurning() ? ` rotate(${place.angle}deg)` : "";
 
@@ -135,8 +135,8 @@ export const Trail = (props: TrailProps) => {
                 {props.renderTrack?.(getPath)}
             </svg>
 
-            <div class={styles.trailTraveller} style={{ transform: getTravellerTransform() }}>
-                {props.renderTraveller(getPlace)}
+            <div class={styles.trailTraveler} style={{ transform: getTravelerTransform() }}>
+                {props.renderTraveler(getPlace)}
             </div>
         </div>
     );

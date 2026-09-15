@@ -22,7 +22,7 @@ them. `StressTestDefs` beside `StressTestProps` is the precedent; a shared `Xs.t
 unwound rather than extended, and names drop the redundant directory prefix (`ExampleDefs`, not
 `PageExampleDefs`).
 
-Read a neighbouring component before writing a new one.
+Read a neighboring component before writing a new one.
 
 ### Dividing by a constant is written as multiplying by its reciprocal
 
@@ -70,12 +70,12 @@ number means "divide this by a count" — halve a width, quarter a size — not 
 wedge control points out with `* 0.33` and `* 0.66`, which did mean thirds — so they became `/ 3` and
 `(x * 2) / 3`. The tell was not the 0.3% shortfall, invisible on a unit circle at any render size, but that
 `0.33` and `0.66` leave gaps of 0.33, 0.33 and **0.34**: the two control points were not evenly spaced, so
-the sweep was slightly biased toward the centre. **A decimal that is trying to be `1/N` and missing is a
+the sweep was slightly biased toward the center. **A decimal that is trying to be `1/N` and missing is a
 division written badly; a decimal that was chosen as a ratio is not.** `(x * 2) / 3` is the form to reach
 for over `x * (2 / 3)` — doubling is exact, so there is one rounding rather than two.
 
 **A named constant is preferred to a bare `0.5` where the file already names its numbers** — `HALF`,
-`NOTHING`, `SINGLE` and their neighbours are the house pattern in `Barrel`, `Bracket`, `TileBoard` and
+`NOTHING`, `SINGLE` and their neighbors are the house pattern in `Barrel`, `Bracket`, `TileBoard` and
 `SortableGrid`, and a constant's name has to agree with its value. `const HALF = 2`, used as
 `forward * HALF > count`, was correct arithmetic under a name that said the opposite.
 
@@ -125,14 +125,14 @@ was placed at, in whatever direction it happens to be facing. At nought degrees 
 it survives review.
 
 Order it `translate(x, y) translate(-50%, -50%) rotate(a)`. The rotation applies first, about the element's own
-centre — `transform-origin` is `50% 50%` by default and applies to the whole list, not per function — and the
-centring shift is then a fixed vector the rotation cannot reach, so the centre lands on the point at every
+center — `transform-origin` is `50% 50%` by default and applies to the whole list, not per function — and the
+centring shift is then a fixed vector the rotation cannot reach, so the center lands on the point at every
 angle.
 
 **A square element hides this and an oblong shows it**, by half the difference between its sides. Found in
-`Trail`, whose traveller wandered off the curve on the bends of a closed loop while looking exactly right along
+`Trail`, whose traveler wandered off the curve on the bends of a closed loop while looking exactly right along
 the straights: the demo marker is a circle and never showed it, and the demo vehicle is a chevron and did.
-`e2e/trail.spec.ts` now asks how far the traveller is from the nearest point of the path rather than from the
+`e2e/trail.spec.ts` now asks how far the traveler is from the nearest point of the path rather than from the
 point at the reported progress, which is the only form of the question that has an answer at every angle.
 
 ### `isFocused` is focus and `isFocusVisible` is the ring
@@ -220,7 +220,7 @@ reappear inside the body either.
 (`WheelController.getIndex`, `FormContextType.getIsValid`, `renderStep(getStep, getState)`) are hand-written
 declarations that ctrl-click already resolves, and the reason above does not reach them.
 
-**`access(props.x)` at the point of use, not a resolver at the component root.** The first build normalised the
+**`access(props.x)` at the point of use, not a resolver at the component root.** The first build normalized the
 whole props object once, through a proxy, so the body could read `p.indent()`. That is gone. The proxy had to
 guess from each runtime value what the type already knew — and guessed wrong twice, once wrapping `undefined`
 into a truthy thunk (which silently disabled typing in every text field, because `if (opts.computeMaskedText)`
@@ -380,6 +380,26 @@ Where a private needs a published constant, the value goes at module level and t
 from there, never the other way round. A type annotation is erased, so annotating with a namespace type is
 always safe.
 
+**Every export in a `.utils.ts` carries a `/** */` block, and where the file sits does not change that.** A
+namespace is the published surface, so a consumer should be able to read what a function takes, what it
+answers and what it guarantees without opening the body. A one-line summary first, then a blank line and the
+part that cannot be read off the signature — why the helper exists, what the caller is spared, what happens at
+the edges — then `@param` and `@returns` where they add something the prose has not. `{@link}` a neighbor
+rather than restating it.
+
+**Sample data is exempt and sample implementation is not, which is a line about the file rather than the
+folder.** The user's rule. A registry, a table of keyframes and a set of knobs are descriptions, carry no
+comments like every other non-utils file, and are read by looking at them. A factory that computes something —
+the layout families, the pointer effects — is utility that happens to live under `Samples`, and a consumer
+calls it without reading the body, so it is documented like any other. **That the two sit in one folder is
+the thing to fix rather than the rule to bend**; see `backlog.md`'s _Open discussion_.
+
+**A `.knobs.ts` owns a tunable whole — its range, its step, its label and its default.** A default is part of
+describing a knob, and splitting the two leaves anything driving the sample reading a range from one file and
+the value it starts at from another. So a `.utils.ts` never exports a defaults object; it holds whatever
+local constants it needs and reads the published ones from the knobs beside it. The gradient samples were
+already this way and the placement ones were not.
+
 **A type lives in `<Subject>.types.ts`, never in the module that uses it.** `TextSync` declared three types in
 its utils file and `LiveAnnouncer` one, so a consumer wanting only the type pulled the whole implementation
 in. The one file exempt is `Utils/typeUtils.ts`, which is a home for type transformers by design and has no
@@ -410,7 +430,7 @@ and `ShapeConst`, which holds constants and is the `.const.ts` case under anothe
 `SVGGradientDefsUtils`, `SVGPatternDefsUtils` and `SVGAnimationDefsUtils` keep their `s`. `<defs>` is the name
 of the SVG element, `SVGDefs` is an exported type, and singularising only the namespaces would leave
 `SVGDefUtils` beside a type called `SVGDefs` — one idea reading as two, which is what the `Dismisser` rename
-was done to avoid. The user's call, taken against their own rule and not happily, so do not read it as licence
+was done to avoid. The user's call, taken against their own rule and not happily, so do not read it as license
 for a second exception: anything else plural in front of `Utils` goes singular.
 
 **Module-private helpers live outside the namespace**, above it, which is what `InteractionTracker` already
@@ -452,8 +472,8 @@ control would take it — one indirection, written once per consumer wrapper. Th
 
 **The two forms differ in exactly one way, and the control absorbs it.** A real `Setter<T>` also accepts
 an updater function and resolves it against the current value; a plain setter takes a value. So a control
-declaring `SignalSource<T>` cannot call `[1]` with an updater until it has normalised the prop, and
-`accessSignal(() => props.xSignal)` beside `access` in `propUtils` is that normalisation: it returns a
+declaring `SignalSource<T>` cannot call `[1]` with an updater until it has normalized the prop, and
+`accessSignal(() => props.xSignal)` beside `access` in `propUtils` is that normalization: it returns a
 real `Signal<T>` that reads through the getter, resolves an updater against the untracked current value,
 skips a write that would not change anything, and calls the plain setter. **It takes an accessor of the
 prop rather than the prop**, so the returned pair stays correct if the consumer swaps the source, and it
@@ -547,7 +567,7 @@ What changes is the **name**, and the name is decided by what the object holds.
   `isPressed`, `sortDirection`, `orientation`, `checkedState`. A collection of flags is what the word means,
   and a type named that way is telling a reader there is nothing else in it. `ButtonFlags` is the shape this
   is right for.
-- **`*RenderProps`** the moment it also carries a payload — an index, a value, an array, a date, a colour, a
+- **`*RenderProps`** the moment it also carries a payload — an index, a value, an array, a date, a color, a
   position. The object is then not a set of flags, and calling it one misdescribes it.
 
 A component's own contribution keeps its own name under this test, independently of what it is combined with:
@@ -583,7 +603,7 @@ looks right.
 
 ## Control architecture
 
-### Controls: wrapper owns behaviour, leaf owns the element
+### Controls: wrapper owns behavior, leaf owns the element
 
 Settled when `InteractionWrapper` was split out of `Button`.
 
@@ -612,7 +632,7 @@ replaces an earlier split where native `disabled` was the default and `aria-disa
 reachable mode. Native `disabled` blocks activation for free but kills every event, so the tooltip
 explaining _why_ a control is disabled becomes unreachable exactly when it matters — hence the split.
 What the split could not do is look the same in both modes: the UA paints a natively disabled control
-greyed and drops `accent-color`, and no CSS reproduces that on the `aria-disabled` branch. Appearance
+grayed and drops `accent-color`, and no CSS reproduces that on the `aria-disabled` branch. Appearance
 parity is non-negotiable (next section), so the mechanism has to be uniform, and only `aria-disabled`
 supports both modes.
 
@@ -651,7 +671,7 @@ text-selectable by drag, which matches native `disabled`.
 Reachable controls are untouched: the branch runs only when disabled **and** not reachable.
 
 One hole remains, deliberately: clicking a `<label>` caption still focuses a disabled control, because
-label activation focuses the labelled control directly rather than dispatching `mousedown`. After the
+label activation focuses the labeled control directly rather than dispatching `mousedown`. After the
 caret suppression below nothing is drawn in that state, so it lands back on the previously acceptable
 condition; the only catch-all — blurring from a `focus` handler — buys it with focus flicker and a jump
 to `<body>`.
@@ -662,7 +682,7 @@ The reachable predicate has two ways in, and the second one arrived with `TileBo
 reachable = isDisabled && ((isReachableWhenDisabled && tooltipDefs !== undefined) || isFocusableWhenDisabled)
 ```
 
-Deriving the mode from `getTooltipDefs` presence _alone_ was rejected, and the distinction generalises:
+Deriving the mode from `getTooltipDefs` presence _alone_ was rejected, and the distinction generalizes:
 **presence as a trigger fails invisibly** — add hover text and disabled semantics change under you —
 while **presence as a guard fails toward the safe default**, only when a prop was explicitly set, and is
 findable with a warning. The third clause exists because a focusable `aria-disabled` control with
@@ -712,12 +732,12 @@ the accessor child removes the non-null assertion.
 **Disabled + reachable has to look disabled — identically, not approximately.** Reachability is an
 accessibility affordance, not a state: a control that looks actionable but does nothing is worse than one
 that plainly reads as unavailable. Under the old mechanism split this failed on screen — `CheckboxPage`'s
-"Disabled" box sat next to a "Disabled + reachable" box in full accent colour, looking like the one
+"Disabled" box sat next to a "Disabled + reachable" box in full accent color, looking like the one
 control you were meant to click.
 
 Two rounds were needed and the first is the lesson. It kept both mechanisms and layered one appearance
 on top: `filter: grayscale(1)` plus `opacity: 0.5` on `interactionDisabled`, set from `getIsDisabled()`
-alone so it covers both. That killed the accent colour and was a real improvement, but it could only
+alone so it covers both. That killed the accent color and was a real improvement, but it could only
 narrow the gap, because the two branches start from different UA paint under the same filter. Emulating
 the UA per control instead (`accent-color: GrayText` on `[aria-disabled='true']:not(:disabled)`, then a
 rule per control type) trades one approximation for a longer list. Approximating a rendering no spec
@@ -726,14 +746,14 @@ does.
 
 **Nothing that fades or filters may touch the element that owns the focus ring.** `filter` and `opacity`
 paint an element's outline along with everything else, so an early version — those two on the wrapper
-root — drew the reachable control's ring grey at half strength. In the Playground that ring is magenta
+root — drew the reachable control's ring gray at half strength. In the Playground that ring is magenta
 `:focus-visible { outline: 2px solid var(--clr-highlight) }`, and the ring is the entire reason the
 control is reachable. Redrawing it on the unfiltered root via `:has(:focus-visible)` was rejected: the
 root is not focusable, so the consumer's own `:focus-visible` rule cannot reach it, and the library would
 own one ring appearance for disabled controls and the consumer another for enabled ones.
 
 Two further attempts to keep the fade inside the library are recorded because they look reasonable and
-are not. Inherited colour only (`color: GrayText`, `accent-color: GrayText`) spares the ring but cannot
+are not. Inherited color only (`color: GrayText`, `accent-color: GrayText`) spares the ring but cannot
 touch anything a consumer painted explicitly, which is most of what you see. Pushing `filter` down to
 `interactionDisabled > * > *` reaches consumer paint and spares the ring, but depends on a leaf returning
 the focusable element itself and on the painted thing living exactly one level below — a structural
@@ -743,7 +763,7 @@ Both are gone. The library no longer paints disabled at all: the painter does, f
 section). Since `Button`'s painter is a child of the `<button>`, fading it can never reach the ring on
 the parent — the constraint is satisfied by structure rather than by careful selectors.
 
-### Controls: the shell owns behaviour, the painter owns paint
+### Controls: the shell owns behavior, the painter owns paint
 
 The user's words: `Button` is a shell, `buttonContent` is the painter, and
 `Tooltip` and `Modal` already work this way — functional, not visual.
@@ -778,7 +798,7 @@ three-argument signature.
 
 The honest cost of the model: `PageButtonContent` and `PageCheckboxContent` hold the gradient, border,
 check mark and disabled / error / checked rendering; fourteen call sites changed. In exchange the library
-carries no colours at all, and a consumer defines their branded control once.
+carries no colors at all, and a consumer defines their branded control once.
 
 **The wrapper's box has to equal the painted box**, because the decoration slot is `inset: 0` against the
 root and the ring is drawn on the control. Two things guarantee it: the root is `display: flex`, so its
@@ -825,7 +845,7 @@ shrink-to-fit ancestor is unaffected by construction.
 
 **Render props receive what drives them.** `renderDecoration(getFlags)` replaced `Button`'s
 zero-argument `renderHighlight()`, under which the pressed linkage was faked consumer-side — `ButtonPage`
-closed over its own signal for the colour and passed the same signal as `getIsPressed`, with the
+closed over its own signal for the color and passed the same signal as `getIsPressed`, with the
 component connecting neither. Renamed because `ElementHighlight.renderHighlight` already means
 `(getVisibilityTarget, getTransitionDurationMs)`, and two contracts under one name is a trap.
 
@@ -844,7 +864,7 @@ gates the flags instead: `isActive` and `isHovered` are forced false whenever `g
 
 `isHovered` is gated because a painter keyed on hover would light up under the cursor on a disabled
 control and read as actionable — and now painters own every pixel, the flags are the only thing between a
-disabled control and a live-looking one. Hover behaviour that must survive is untouched: `Tooltip` runs
+disabled control and a live-looking one. Hover behavior that must survive is untouched: `Tooltip` runs
 its own listeners on the anchor, so a disabled but reachable control still reveals its explanation.
 `isFocused` is the deliberate exception, because a reachable control has to show where focus landed.
 
@@ -1020,7 +1040,7 @@ A two-thumb `Range` is two stops and a `ColorArea` is two; the roving single-sto
 `Tabs` use is deliberately not applied. The distinction is what the members _are_: a radio group's members are
 N spellings of one value, so stopping on each would make the tab order describe the options rather than the
 control, while a range's two thumbs are two values with their own names and their own `aria-valuetext`, and a
-colour surface's two axes likewise. `Calendar`'s previous and next buttons are the same call one level out.
+color surface's two axes likewise. `Calendar`'s previous and next buttons are the same call one level out.
 
 ### The wrapper between a container role and its items is presentational
 
@@ -1226,15 +1246,15 @@ is a store builds the bridge themselves.
 
 ### Each palette token has one job, and the two rules that follow from it
 
-Stated by the user. A colour group is `dark` / `main` / `light` / `contrast`, or `dark` / `light` /
+Stated by the user. A color group is `dark` / `main` / `light` / `contrast`, or `dark` / `light` /
 `contrast` where there is no `main`. Which token goes where is not a matter of taste:
 
 - **`main` is never a background.** It is for highlights, borders, and text over black — the places where a
-  colour has to announce itself against something dark, not the places something else has to be read on top
+  color has to announce itself against something dark, not the places something else has to be read on top
   of it.
 - **A background is a gradient from `dark` to `light`, or the reverse — never a flat `main`.** Linear or
   radial, whichever suits the shape: linear for cells and rows, radial for round badges and markers.
-- **`color` only ever takes `main` or `contrast`.** `main` when the text is a coloured accent on a dark
+- **`color` only ever takes `main` or `contrast`.** `main` when the text is a colored accent on a dark
   surface, `contrast` when it sits on its own family's background. Never `dark` or `light`, which are
   background shades and are not built to be read against anything.
 
@@ -1259,9 +1279,9 @@ any more, so any `dark`-to-`light` gradient is safe to put its own `contrast` on
 **The overhead wheel's wedge is an SVG `path`, so it needed a real gradient def rather than a CSS one.** `fill`
 cannot take a CSS gradient. Each `PageWheelWedge` renders its own two-stop `<linearGradient>` under a
 `createUniqueId`, and the picked state points the path's `fill` at it through an inline style — inline so it
-beats the class rule that carries the unpicked colour, which stays in the stylesheet where every other colour
+beats the class rule that carries the unpicked color, which stays in the stylesheet where every other color
 lives. The stops themselves are vanilla-extract classes rather than attributes, because a presentation
-attribute will not resolve a CSS custom property and every colour here is one. Eight wedges means eight
+attribute will not resolve a CSS custom property and every color here is one. Eight wedges means eight
 identical defs with eight different ids: redundant, but valid, and a shared id would mean one component
 knowing about a def emitted somewhere else on the page.
 
@@ -1316,13 +1336,13 @@ side of the `100ms` token, but a duration is a tuned value and those are the use
 flagged rather than rounded.
 
 **The rule is `playground/src` only, because it is the only tree with a theme.** `components/src` has no
-`themeVars` and no colours of its own — a component's paint is the consumer's, which is the whole shape of
+`themeVars` and no colors of its own — a component's paint is the consumer's, which is the whole shape of
 this library — so a number there is a layout fact rather than a missed token.
 
 **One exception, and it is mechanical rather than a matter of taste.** `FIELD_STEPPER_PADDING` in
 `TextFieldContent.css.ts` is not a CSS declaration; it is a value handed to a component's `padding` prop,
 which takes numbers. A `var(--…)` string does not typecheck there and would not survive the arithmetic the
-neighbouring `FIELD_PADDING` does either. A value crossing into a prop stays a number; only declarations
+neighboring `FIELD_PADDING` does either. A value crossing into a prop stays a number; only declarations
 inside a `style({})` take tokens.
 
 ## Testing
@@ -1368,8 +1388,8 @@ was clicked where it used to be. That is what made `Select` and `Menu` pass alon
 Playwright re-checks that an element is visible, stable and hit-testable at the instant it acts, and gives
 every test a fresh page.
 
-**One test per behaviour, not one per component.** The old specs were one long scenario per control, so
-state accumulated within a file and a failure halfway hid everything after it. Each behaviour is its own
+**One test per behavior, not one per component.** The old specs were one long scenario per control, so
+state accumulated within a file and a failure halfway hid everything after it. Each behavior is its own
 `test`, `beforeEach` navigates, the run is parallel across workers, and the suite finishes in about fifteen
 seconds.
 
@@ -1442,7 +1462,7 @@ effect to wait for.
 `components/src` and therefore type-checked by `npm run typecheck -w components` — a test that no longer compiles against its
 subject has stopped describing it. They do not ship: both builds start from `index.ts`.
 
-**Assert the behaviour, not the implementation.** These functions are small enough that a test mirroring
+**Assert the behavior, not the implementation.** These functions are small enough that a test mirroring
 their arithmetic would pass forever and prove nothing. Each case names a situation — an out placement that
 would overflow flips to the side with room, a walk that wraps at both ends, a reserved docked panel pushing
 the flip earlier — and the numbers are worked out from that situation.
@@ -1495,7 +1515,7 @@ Nothing about a green run says the types hold; only the compiler does.
 
 The fault `backlog.md` used to carry about locators built from caption text, for the part of it that is now
 closed. A locator built out of
-editorial text answers two questions in one red — did the behaviour change, and has anybody edited the
+editorial text answers two questions in one red — did the behavior change, and has anybody edited the
 copy — and the second answer is worthless. Every variant, example and props row on a Playground page now
 carries a key that is chosen once and never displayed.
 
@@ -1562,7 +1582,7 @@ prose reasons, and there is no single control to key. This is the line worth bei
 converted is a control the page **names**, and what stays is a control the page **lists**.
 
 **An assertion reads the mapping, not the value.** The user's rule, and the same argument as this section one
-step further in. A locator built from a caption answers "did the behaviour change" and "has somebody edited the
+step further in. A locator built from a caption answers "did the behavior change" and "has somebody edited the
 copy" in one red; an assertion built from a hardcoded style answers "did the wiring break" and "has somebody
 restyled it" in one red. **A border going from `1px dashed` to `2px solid` is a change, not a failure**, and a
 spec pinning the value cannot tell which it is looking at. So an assertion checks the relationship — this
@@ -1575,7 +1595,7 @@ a red run.
 **What is left reading CSS reads state rather than paint, which is the line to hold when adding one.**
 `visibility` on the image switcher, `animation-play-state` on the toast countdown, the tabs floater's
 `transform`, `caret-color: transparent` on a disabled field, `resize: none` on a textarea: each is a
-component's own behaviour with nowhere else to show, not a choice about how something looks. Satellite reads
+component's own behavior with nowhere else to show, not a choice about how something looks. Satellite reads
 padding as a measurement and Formation reads `left` only to ask which side resolved the unit. None of them
 pins an appearance.
 
@@ -1590,7 +1610,7 @@ reads a string the Playground wrote as furniture.
 
 Stated by the user, after an assertion pinning the number of radio groups on the Radio page at seven went red
 because a new example had been added: a guard like that should never exist in any spec, because examples are
-fluid. Anybody may add one, split one or drop one without touching a behaviour, so a census answers "has
+fluid. Anybody may add one, split one or drop one without touching a behavior, so a census answers "has
 somebody added an example" in the same red as "has something broken" — the caption fault on another axis, and
 the same reason a demo is found by its key rather than by the words it displays.
 
@@ -1607,3 +1627,17 @@ six weeks of seven days in a calendar, goes red only when that demo's data or th
 changes, which is the red worth having. This rule is about counting across a page, where what is being counted
 is editorial. Where a spec genuinely needs to know a page has examples at all, `toBeGreaterThan(0)` is the
 form, which is what `playgroundExamples.spec.ts` already does.
+
+## US English everywhere
+
+**Every word in this repository is spelled US English** — code, string literals, file names, comments and
+documents alike. Asked for by the user. `color` not `colour`, `center` not `centre`, `neighbor` not
+`neighbour`, `behavior` not `behaviour`, `-ize` not `-ise` on `normalize`, `serialize`, `recognize` and their
+kin, and `traveled` with one `l`.
+
+**The one exception is a spelling the platform itself owns.** `aria-labelledby` is the attribute's name, so
+it keeps its two `l`s, and so do the props and signals named after it — `labelledBy`, `labelledSignal`. A
+platform name is not ours to correct.
+
+Watch the words where the British stem also lives inside a word that is already US English: `emphasis`,
+`analysis`, `optimistic`, `promise` and `cancellation` are all correct as they stand.

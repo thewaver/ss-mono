@@ -3,6 +3,7 @@ import type { Accessor, JSX } from "solid-js";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import type { PlacementLayoutFn, PlacementRect } from "../../Abstracts/Placement/Placement.types";
+import type { ProximityEffectFn } from "../../Abstracts/Proximity/Proximity.types";
 import type { RotatorPhase, RotatorSpinDefs } from "../../Abstracts/Rotator/Rotator.types";
 import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 import type { BarrelAxis, BarrelFace } from "../Barrel/Barrel.types";
@@ -18,6 +19,7 @@ export type WheelWedgeState = {
     wedgeCount: number;
     face: WheelFace;
     isSelected: boolean;
+    angle: number;
     placement?: PlacementRect;
 };
 
@@ -61,16 +63,19 @@ export type WheelProps<T> = AccessorProps<
             variant: WheelVariant;
             axis?: WheelAxis;
             wedgeSize?: Size2d;
+            markerDegrees?: number;
         }
 > &
     WheelSlots<T> & {
         computeLayout?: PlacementLayoutFn;
+        computeEffect?: ProximityEffectFn;
         renderWedgeBack?: (getWedge: Accessor<T>, getState: Accessor<WheelWedgeState>) => JSX.Element;
     };
 
-export type OverheadWheelProps<T> = AccessorProps<WheelState & WheelLabels> &
+export type OverheadWheelProps<T> = AccessorProps<WheelState & WheelLabels & { markerDegrees?: number }> &
     WheelSlots<T> & {
         computeLayout?: PlacementLayoutFn;
+        computeEffect?: ProximityEffectFn;
     };
 
 export type DrumWheelProps<T> = AccessorProps<

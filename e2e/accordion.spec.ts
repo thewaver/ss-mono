@@ -242,7 +242,7 @@ test("arrow keys do nothing to a lone panel, because it is not part of a set", a
  * The scroll is opt-in and off by default, so the box is what makes it visible: four sections in a window
  * a couple of headers tall means the lower ones grow below the fold, which is a long page reproduced inside
  * a card. Neither test asserts a scroll distance — what matters is where the section ends up, not how far
- * anything travelled to put it there.
+ * anything traveled to put it there.
  */
 const SCROLLED = demo("scrolled");
 
@@ -269,7 +269,7 @@ test("opening a section below the fold brings it into view", async ({ page }) =>
 });
 
 /**
- * The case that decides whether this behaviour is worth having: a panel with more in it than the box can
+ * The case that decides whether this behavior is worth having: a panel with more in it than the box can
  * show cannot be brought fully into view, and scrolling to its far edge would push the header someone just
  * pressed off the top. So the header wins, and the panel is cut at the bottom instead.
  */

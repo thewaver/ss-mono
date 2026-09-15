@@ -1,8 +1,13 @@
 import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import type { PlacementLayoutEntry, SampleKnob } from "@thewaver/ss-components";
-import { PlacementLayoutKnobs, PlacementLayoutUtils, PlacementLayouts } from "@thewaver/ss-components";
+import type { PlacementLayoutEntry, ProximityEffectEntry, SampleKnob } from "@thewaver/ss-components";
+import {
+    PlacementLayoutKnobs,
+    PlacementLayouts,
+    ProximityEffectKnobs,
+    ProximityEffects,
+} from "@thewaver/ss-components";
 import { ShapeConst } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -23,7 +28,13 @@ const EXAMPLES_ROOT = "/src/App/Pages/FormationPage/Examples";
 
 const STARTING_ITEM_COUNT = 6;
 const STARTING_LAYOUT_KEY: PlacementLayouts.SampleKey = "cliff";
+const NO_EFFECT_KEY = "none";
+const STARTING_EFFECT_KEY: EffectKey = "glow";
 const STARTING_SHAPE_KIND: ShapeConst.DefaultShape = "hexagon-pointy-top";
+
+type EffectKey = ProximityEffects.SampleKey | typeof NO_EFFECT_KEY;
+
+const EFFECT_KEYS: EffectKey[] = [NO_EFFECT_KEY, ...ProximityEffects.SAMPLE_KEYS];
 
 const NAMES = [
     "Aurora",
@@ -51,18 +62,48 @@ const DefaultExampleWrapper = (props: FormationExampleProps) => {
 export const FormationPage = () => {
     const [getItemCount, setItemCount] = createSignal(STARTING_ITEM_COUNT);
     const [getLayoutKey, setLayoutKey] = createSignal<PlacementLayouts.SampleKey>(STARTING_LAYOUT_KEY);
+    const [getEffectKey, setEffectKey] = createSignal<EffectKey>(STARTING_EFFECT_KEY);
     const [getShapeKind, setShapeKind] = createSignal<ShapeConst.DefaultShape>(STARTING_SHAPE_KIND);
     const [getIsStackedInReverse, setIsStackedInReverse] = createSignal(false);
     const [layoutDefs, setLayoutDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
+    const [effectDefs, setEffectDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
 
     const getFamily = () => PlacementLayouts.SAMPLE_LAYOUTS[getLayoutKey()].family;
     const getKnobs = () => PlacementLayoutKnobs.KNOBS_BY_FAMILY[getFamily()] as Record<string, SampleKnob>;
-    const getDefaults = () => PlacementLayoutUtils.DEFAULTS_BY_FAMILY[getFamily()] as Record<string, unknown>;
+    const getDefaults = () => PlacementLayoutKnobs.DEFAULTS_BY_FAMILY[getFamily()] as Record<string, unknown>;
     const getDefs = () => layoutDefs[getLayoutKey()] ?? {};
 
     const getLayoutEntry = createMemo(
         () => ({ family: getFamily(), defs: getDefs() }) as unknown as PlacementLayoutEntry,
     );
+
+    const getEffectFamily = () => {
+        const key = getEffectKey();
+
+        return key === NO_EFFECT_KEY ? undefined : ProximityEffects.SAMPLE_EFFECTS[key].family;
+    };
+
+    const getEffectKnobs = () => {
+        const family = getEffectFamily();
+
+        return (family === undefined ? {} : ProximityEffectKnobs.KNOBS_BY_FAMILY[family]) as Record<string, SampleKnob>;
+    };
+
+    const getEffectDefaults = () => {
+        const family = getEffectFamily();
+
+        return (family === undefined ? {} : ProximityEffectKnobs.DEFAULTS_BY_FAMILY[family]) as Record<string, unknown>;
+    };
+
+    const getPickedEffectDefs = () => effectDefs[getEffectKey()] ?? {};
+
+    const getEffectEntry = createMemo(() => {
+        const family = getEffectFamily();
+
+        return family === undefined
+            ? undefined
+            : ({ family, defs: getPickedEffectDefs() } as unknown as ProximityEffectEntry);
+    });
 
     const getItems = createMemo(() => NAMES.slice(0, getItemCount()));
 
@@ -71,6 +112,7 @@ export const FormationPage = () => {
             items: getItems,
             isStackedInReverse: getIsStackedInReverse,
             layoutEntry: getLayoutEntry,
+            effectEntry: getEffectEntry,
             shapeKind: getShapeKind,
         };
 
@@ -105,6 +147,30 @@ export const FormationPage = () => {
                         width={() => FIELD_WIDTH}
                         onInput={(key, value) =>
                             setLayoutDefs(getLayoutKey(), (previous) => ({ ...previous, [key]: value }))
+                        }
+                    />
+                </PagePropsPanel>
+
+                <PagePropsDivider />
+
+                <PagePropsPanel scope={"sample"}>
+                    <PageProp key={"effectKey"} label={"Pointer effect"}>
+                        <PageSelectField
+                            value={getEffectKey}
+                            values={() => EFFECT_KEYS}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Pointer effect"}
+                            onChange={(key) => setEffectKey(() => key)}
+                        />
+                    </PageProp>
+
+                    <PageKnobs
+                        knobs={getEffectKnobs}
+                        defaults={getEffectDefaults}
+                        values={getPickedEffectDefs}
+                        width={() => FIELD_WIDTH}
+                        onInput={(key, value) =>
+                            setEffectDefs(getEffectKey(), (previous) => ({ ...previous, [key]: value }))
                         }
                     />
                 </PagePropsPanel>

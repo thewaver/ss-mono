@@ -13,10 +13,10 @@ faster than anyone can read, and line-by-line review would bottleneck throughput
 Two things follow, and both are load-bearing.
 
 **The prose explanation is the review surface.** They approve or reject on the explanation plus the
-observed behaviour, so an explanation only decodable by someone who already knows the answer means the
+observed behavior, so an explanation only decodable by someone who already knows the answer means the
 change ships on trust rather than understanding.
 
-**Anything with no observable behaviour passes through unexamined.** Their gate catches whatever a user
+**Anything with no observable behavior passes through unexamined.** Their gate catches whatever a user
 could see. It cannot catch this file, `conventions.md`, `decisions.md`, `backlog.md`, `e2e/`, or build config —
 nothing there changes what the Playground does. Keep such changes small, and say plainly in the reply when
 one lands there, so they can choose to look.
@@ -61,7 +61,7 @@ came after — what the thing does, why the two other samples do not show it —
 paired walkthroughs were length without content. So describe what happens, concretely and in order if the
 order matters, and say which part is the actual defect. **This costs most when the fault is already fixed**:
 a defect found and repaired in the same turn is reported as what was wrong and what was done, not as a
-reconstruction of the broken behaviour the user will now never see.
+reconstruction of the broken behavior the user will now never see.
 
 Whatever shape it takes, it stays in terms of what a person does and sees rather than what the code does —
 the mechanism comes after, if at all.
@@ -126,8 +126,8 @@ ordering already: item 8 says in its own text not to list it, and item 5's **_Bo
 holds `Table` / data grid and the command palette, placed last by the user after each was argued. Both were
 put at the top of a "biggest remaining work" list anyway, on the grounds that the question was about extent —
 that is the mistake. A question about what is left is a question about what to do next, so anything they have
-deprioritised is either left out or named as deprioritised, never ranked above live work. Size is a property
-worth mentioning inside their ordering, not a licence to reorder it.
+deprioritized is either left out or named as deprioritized, never ranked above live work. Size is a property
+worth mentioning inside their ordering, not a license to reorder it.
 
 ## Arguing a position
 
@@ -145,11 +145,11 @@ which convention it displaces, and change the convention.
 
 **A contrast finding in the Playground's own look is a warning, not an edit.** Stated by the user after the
 wheel's picked-wedge purple was darkened to take a label from 3.41:1 to 7.11:1: the analysis was welcome, the
-change to their colours was not. So measure it, name the criterion, give the ratio and the sizes it was taken
+change to their colors was not. So measure it, name the criterion, give the ratio and the sizes it was taken
 at, and set out the ways out — then leave the styling alone until they choose. Their theme is theirs.
 
 This does **not** loosen the rule above. They said contrast and they said their styling; nothing was said
-about behaviour, structure, markup or naming, so nothing else moves, and a criterion that a component _fails
+about behavior, structure, markup or naming, so nothing else moves, and a criterion that a component _fails
 by what it does_ is still fixed on sight. Where the boundary between the two actually falls has not been
 argued — if a case turns up that is plainly neither, ask rather than deciding it from this paragraph.
 
@@ -169,7 +169,7 @@ sweep of the drive root, the repository, `C:\` and the home folder, reporting th
 had already deleted the files. If they say the sky outside their window is blue, the sky is blue; do not go
 looking for the weather. A statement about the state of their machine, their screen, their files or the world
 is taken as given and acted on directly. **The only claims worth checking are technical ones about the
-code** — a practical regression, a build that fails, a behaviour that decides what gets written next.
+code** — a practical regression, a build that fails, a behavior that decides what gets written next.
 Everything else spends their token allowance to buy nothing, and reads as calling them a liar besides.
 
 When they report a mess, the answer is to clear it or to ask where it is, never to produce evidence that it
@@ -178,7 +178,7 @@ does not exist. Being right about it is worth less than they are.
 **Authorship claims are about who holds the rationale, not about blame.** "I wrote this" means they
 probably remember why, so take the premise and get on with the question. "You wrote this" means their
 review did not stop there and something may now be surprising — so the thing being asked for is the
-reasoning, not a defence and not a check of whether it is true.
+reasoning, not a defense and not a check of whether it is true.
 
 **Look facts up; do not offer recollection as the answer.** For browser or platform support, MDN and
 caniuse are expected sources. Probing the local toolchain is a useful supplement but not a substitute —
@@ -189,7 +189,7 @@ which is easy to misread as support.
 
 **A failing test is not evidence the code is wrong — ask before changing either.** Stated by the user after a
 `wheel.spec.ts` assertion about a doubled prize list was made to pass by putting the doubling back: they had
-removed it deliberately and do not update specs when they change behaviour. So a red spec has two readings —
+removed it deliberately and do not update specs when they change behavior. So a red spec has two readings —
 the code regressed, or the spec is describing something they decided against — and the two are not
 distinguishable from the failure. Say which assertion fails and what it expects, and let them say which it is.
 This is the exception to _"fix on sight"_: a spec disagreeing with the code is not a defect on sight.
@@ -204,7 +204,7 @@ it was mapped to, that class is not the one some other thing was mapped to, and 
 business. **Where a spec has no mechanism to separate the two readings, it does not check that thing at all.**
 
 This is the same defect as the caption-derived locators that the demo keys replaced, on a different axis: there
-a red answered "did the behaviour change" and "has somebody edited the copy" at once, here it answers "did the
+a red answered "did the behavior change" and "has somebody edited the copy" at once, here it answers "did the
 wiring break" and "has somebody restyled it" at once. It bites hardest on pure aesthetics.
 
 **Temporary files go in `.scratch/` at the repo root, never in the system temp folder.** Asked for by the
@@ -221,7 +221,7 @@ formatter, a language server — anything that writes outside the repository. Na
 and what it would buy, and wait. Where the question was "which browser are you in", the answer was to ask
 them.
 
-**A probe is cheaper than a theory: make the thing an obvious colour.** The user's technique, offered after
+**A probe is cheaper than a theory: make the thing an obvious color.** The user's technique, offered after
 several rounds of reasoning about why a layout looked wrong — _"quick way to test - make the dashed box
 background red"_. A garish `background`, `outline` or border on one named element answers, in one reload,
 which element is which, whether the file is even reaching the browser, and where the space is actually going.
@@ -229,7 +229,7 @@ Two of them at once — one on the box, one on its child — bisects it. It sett
 reach for it early rather than after the fourth hypothesis, and take the probes back out afterwards.
 
 **When they say it looks wrong, measure what is painted, not the model.** Learned the hard way in the same
-exchange: the user reported items on a ring not sharing a centre, and several rounds of measurement said the
+exchange: the user reported items on a ring not sharing a center, and several rounds of measurement said the
 boxes were symmetric to the pixel — which was true, and irrelevant, because what they were looking at was the
 painter inside each box drawing itself at its own width and hugging one edge. Every number was right and the
 conclusion was wrong. So a report about appearance is answered by measuring the element that carries the
@@ -280,7 +280,7 @@ signal the code should be clearer instead.
 **`utils/` is the opposite, and confusing the two is the mistake to avoid.** That is `@thewaver/ss-utils`,
 which now shares this repo rather than sitting in a clone next door — but sharing a repo did not merge the
 two sets of rules. There, every exported function is documented so that a consumer can read what it takes,
-what it returns and what it guarantees without opening the body — read its neighbours before writing in it,
+what it returns and what it guarantees without opening the body — read its neighbors before writing in it,
 and keep writing the documentation. Here, a component's contract is its props type and a utility's is its
 signature, and neither is annotated. **The comment ban is `components/src` and `playground/src` only.**
 
@@ -290,19 +290,25 @@ rule.** Asked for by the user, who lifted the earlier "until the user says so" h
 what it returns and what it guarantees, so a consumer never has to open the body. Read `utils/src` before
 writing one: a one-line summary first, then a blank line and the part that cannot be read off the signature
 (why the helper exists, what the caller is spared, what happens at the edges), then `@param` and `@returns`
-where they add something the prose has not already said. `{@link}` neighbouring exports rather than
+where they add something the prose has not already said. `{@link}` neighboring exports rather than
 restating them.
 
-Two limits on it. **`Samples/` is excluded** — those files are sample data for the Playground rather than
-library surface. And **it is `*.utils.ts` and `Utils/` only**: component files, `.css.ts`, `.types.ts` and
-`.const.ts` are still stripped, and an inline `//` note inside a utility's body is still a defect. The
-documentation sits above declarations, never inside them.
+Two limits on it. **`Samples/` is excluded where it holds sample data** — a registry, a table, a set of
+knobs — and **is not excluded where it holds implementation**. The user's correction: the layout families and
+the pointer effects are utility that happens to sit under `Samples`, and a consumer calls a factory without
+reading its body. So a `.utils.ts` is documented wherever it lives, and a `.knobs.ts` or `.const.ts` carries
+no comments wherever it lives. And **it is `*.utils.ts` and `Utils/` only**: component files, `.css.ts`,
+`.types.ts`, `.const.ts` and `.knobs.ts` are still stripped, and an inline `//` note inside a utility's body
+is still a defect. The documentation sits above declarations, never inside them.
+
+The rule also lives in `conventions.md` now, which is where it should always have been — it was written only
+here, and that is why it went unfollowed in a tree nobody thought to check this file about.
 
 **`e2e/` is the only exception in this repo** — explanatory blocks are welcome there, and the existing specs
-carry them, so a new spec should read like its neighbours.
+carry them, so a new spec should read like its neighbors.
 
-**Read a neighbouring component before writing a new one.** House style is tight and consistent, and
-`conventions.md` and `decisions.md` record the parts of it that were argued rather than assumed. Copy the neighbour's shape
+**Read a neighboring component before writing a new one.** House style is tight and consistent, and
+`conventions.md` and `decisions.md` record the parts of it that were argued rather than assumed. Copy the neighbor's shape
 rather than writing generically idiomatic Solid: code that reads as if they wrote it costs nothing to
 review, code that does not forces a translation pass on every line. When a new API needs a convention that
 does not exist yet, derive it from the closest existing one and record it rather than
@@ -310,10 +316,10 @@ inventing freely.
 
 **Do not bundle a judgment call into a bug fix.** Ship the defect fix on its own; do not carry a subjective
 design, API-surface, or performance change along under the fix's justification, and never list a taste
-change under the same `backlog.md` item as the bug it travelled with. A change riding along on a real fix
+change under the same `backlog.md` item as the bug it traveled with. A change riding along on a real fix
 is hard to spot in review and inherits credibility it has not earned, and the user often has context or
 measurements the code does not show. Raise the judgment call separately, in one sentence, and let them
-answer. When merging two implementations that disagree on a constant, keep both behaviours — a parameter
+answer. When merging two implementations that disagree on a constant, keep both behaviors — a parameter
 with per-call-site defaults — rather than picking a winner.
 
 **Treat anything measured as the user's call.** Cache sizes, thresholds, epsilons and similar tuned values
@@ -324,7 +330,7 @@ are decisions backed by benchmarks you cannot see. Flag a concern; do not change
 The first three are written for Claude and the last two for the user; see _"The five documents split by
 audience"_ above for what that changes.
 
-- **This file** — how to work with the user. Behaviour, not code.
+- **This file** — how to work with the user. Behavior, not code.
 - **`conventions.md`** — rules that hold across the whole library, and the reasoning behind them. **The test
   for whether something belongs here: would it be written again from scratch in another project built on the
   same backbone — SolidJS, vanilla-extract, Vite?** If yes it is a convention; if it explains one component,
@@ -403,7 +409,7 @@ naming its destination, in the exact words it should carry once it lands.
 
 **Entries are lift-and-paste ready.** Write the finished text, in the voice of the file it is going to, not a
 note describing what should be written. A `decisions.md` entry names the component and reads like its
-neighbours; a `backlog.md` entry says which numbered item it belongs under, or `new` if it is a new item; a
+neighbors; a `backlog.md` entry says which numbered item it belongs under, or `new` if it is a new item; a
 `brief.md` entry is the one line, under the group it belongs to.
 
 **No numbering is invented in a staging file.** New `backlog.md` items are listed under `new` in the order

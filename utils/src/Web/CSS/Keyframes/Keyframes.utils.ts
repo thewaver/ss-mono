@@ -35,7 +35,7 @@ const getSharedSheet = (): CSSStyleSheet | null => {
  * Registers a `@keyframes` animation at runtime and gives back the name to use.
  *
  * All animations share one `<style>` element, created on first use. Identical
- * animations are recognised and reuse a single rule, so a hundred elements
+ * animations are recognized and reuse a single rule, so a hundred elements
  * animating the same way cost one rule between them, with a tally kept of how many
  * are relying on it.
  *

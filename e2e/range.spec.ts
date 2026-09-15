@@ -72,9 +72,9 @@ test("crossing is prevented by the inputs' own bounds rather than by a guard", a
     await low.focus();
     await page.keyboard.press("End");
 
-    expect(await valueOf(low), "so End stops at the neighbour rather than at the end of the scale").toBe(80);
+    expect(await valueOf(low), "so End stops at the neighbor rather than at the end of the scale").toBe(80);
     expect(await readout(page, "pair"), "and the owner sees the clamped value").toContain("start: 80 | end: 80");
-    await expect(high, "with the neighbour's floor following it up").toHaveAttribute("min", "80");
+    await expect(high, "with the neighbor's floor following it up").toHaveAttribute("min", "80");
 });
 
 test("two thumbs on the same value are not stuck, because the pointer's side breaks the tie", async ({ page }) => {
@@ -91,7 +91,7 @@ test("two thumbs on the same value are not stuck, because the pointer's side bre
     expect(await valueOf(high), "and leaves the high one where it was").toBe(80);
 });
 
-test("stepping honours the step and stops at both ends of the scale", async ({ page }) => {
+test("stepping honors the step and stops at both ends of the scale", async ({ page }) => {
     const input = page.locator(thumbs(STEPPED));
 
     await input.focus();

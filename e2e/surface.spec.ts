@@ -16,10 +16,10 @@ test.beforeEach(async ({ page }) => {
     await expect(page.locator("[data-example]").first()).toBeVisible();
 });
 
-test("plain colours take the div path", async ({ page }) => {
+test("plain colors take the div path", async ({ page }) => {
     await expect(
         page.locator(`${CARD} svg`),
-        "a surface whose fill and stroke are plain colours takes the div path and draws no SVG",
+        "a surface whose fill and stroke are plain colors takes the div path and draws no SVG",
     ).toHaveCount(0);
     expect(
         await inlineStyle(page.locator(CARD_ROOT).first(), "border-radius"),
@@ -27,7 +27,7 @@ test("plain colours take the div path", async ({ page }) => {
     ).toBe("20px");
     expect(
         (await page.locator(CARD_ROOT).first().getAttribute("style"))?.includes("--"),
-        "and so does its fill, as a custom property the consumer's colour is assigned into",
+        "and so does its fill, as a custom property the consumer's color is assigned into",
     ).toBe(true);
     await expect(page.locator(`${CARD} img`), "and it still renders the consumer's children").toHaveCount(1);
 });

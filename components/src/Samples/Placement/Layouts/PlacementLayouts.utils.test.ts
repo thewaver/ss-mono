@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 
+import { AngleUtils } from "@thewaver/ss-utils";
+
 import type { PlacementRect } from "../../../Abstracts/Placement/Placement.types";
 import type { SizedLayout } from "./PlacementLayouts.types";
 import { PlacementLayoutUtils } from "./PlacementLayouts.utils";
@@ -71,7 +73,7 @@ describe("createArc", () => {
 
     const evenAngleSteps = (radiusX: number, radiusY: number) => {
         const points = Array.from({ length: ITEM_COUNT }, (_unused, index) => {
-            const radians = (-180 + (180 * index) / (ITEM_COUNT - 1)) / (180 / Math.PI);
+            const radians = AngleUtils.toRadians(-180 + (180 * index) / (ITEM_COUNT - 1));
 
             return { x: Math.cos(radians) * radiusX, y: Math.sin(radians) * radiusY };
         });
@@ -116,7 +118,7 @@ describe("createArc", () => {
         );
     });
 
-    it("centres every run on the facing direction, and stops short of closing the one it is asked to close", () => {
+    it("centers every run on the facing direction, and stops short of closing the one it is asked to close", () => {
         const open = PlacementLayoutUtils.createArc(CIRCLE)(ROOT);
         const whole = PlacementLayoutUtils.createArc({ ...CIRCLE, spreadDegrees: 360 })(ROOT);
         const beyond = PlacementLayoutUtils.createArc({ ...CIRCLE, spreadDegrees: 450 })(ROOT);
@@ -149,7 +151,7 @@ describe("createRing", () => {
         expect(PlacementLayoutUtils.createRing()(ROOT)).toEqual(PlacementLayoutUtils.ring(ROOT));
     });
 
-    it("centres the whole turn on straight up and closes it", () => {
+    it("centers the whole turn on straight up and closes it", () => {
         const layout = PlacementLayoutUtils.createRing()(ROOT);
         const first = layout.placements[0].sector!;
         const last = layout.placements[ITEM_COUNT - 1].sector!;
@@ -196,11 +198,11 @@ describe("createRing", () => {
         ).toBeCloseTo(10);
         expect(
             loose.placements[1].sector!.fromAngle - loose.placements[0].sector!.toAngle,
-            "leaving exactly that much bare between neighbours",
+            "leaving exactly that much bare between neighbors",
         ).toBeCloseTo(10);
     });
 
-    it("centres its run on the facing it is given, whatever the spread", () => {
+    it("centers its run on the facing it is given, whatever the spread", () => {
         const aimed = PlacementLayoutUtils.createRing({ spreadDegrees: 120, facingDegrees: 40 })(ROOT);
         const first = aimed.placements[0].sector!;
         const last = aimed.placements[ITEM_COUNT - 1].sector!;
@@ -265,7 +267,7 @@ describe("createHoneycomb", () => {
         ).toBeLessThan(tight.placements[0].width);
     });
 
-    it("picks by nearest rather than by bearing, there being no centre to take a bearing from", () => {
+    it("picks by nearest rather than by bearing, there being no center to take a bearing from", () => {
         expect(PlacementLayoutUtils.createHoneycomb()({ itemCount: 4 }).pickRule).toBe("nearest");
     });
 });
@@ -291,7 +293,7 @@ describe("createWhorl", () => {
         });
 
         expect(withinWhorl(placements), "a whorl's own items meet edge to edge").toBeCloseTo(0);
-        expect(betweenWhorls(placements), "and so do two neighbouring whorls").toBeCloseTo(0);
+        expect(betweenWhorls(placements), "and so do two neighboring whorls").toBeCloseTo(0);
     });
 
     it("overlaps below one and parts above it, on both steps alike", () => {

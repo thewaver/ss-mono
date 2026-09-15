@@ -106,7 +106,7 @@ export namespace EasingUtils {
     /**
      * Turns a curve that starts slowly into one that finishes slowly.
      *
-     * The curve is rotated a half turn about its own centre: it is read backwards, and the answer is
+     * The curve is rotated a half turn about its own center: it is read backwards, and the answer is
      * subtracted from `1`. So a curve that creeps away from the start and arrives fast becomes one that
      * leaves fast and creeps into the end, which is what every `easeOut` in this namespace is.
      *

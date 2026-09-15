@@ -11,7 +11,7 @@ import { AutocompleteOnDemandExample } from "./Examples/AutocompleteOnDemand";
 import { CountriesExample } from "./Examples/Countries";
 import { DeliveriesExample } from "./Examples/Deliveries";
 import { HoursExample } from "./Examples/Hours";
-import { LabelledExample } from "./Examples/Labelled";
+import { LabelledExample } from "./Examples/Labeled";
 import { OnDemandExample } from "./Examples/OnDemand";
 import { ReachableExample } from "./Examples/Reachable";
 import { VirtualizedExample } from "./Examples/Virtualized";
@@ -351,7 +351,7 @@ export const SelectPage = () => {
             name: "In a Label",
             readout: () => `value: ${labelledSignal[0]() ?? "undefined"} — the caption opens the list`,
             component: () => <LabelledExample valueSignal={labelledSignal} />,
-            path: `${EXAMPLES_ROOT}/Labelled.tsx`,
+            path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
     ]);
 

@@ -582,7 +582,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     const renderPlaced = (children: JSX.Element) => (
         <Show when={getLayout()} fallback={children}>
             {(getResolved) => (
-                <PlacementBox ref={setBoxRef} layout={getResolved}>
+                <PlacementBox ref={setBoxRef} layout={getResolved} computeEffect={props.computeEffect}>
                     {children}
                 </PlacementBox>
             )}

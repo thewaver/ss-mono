@@ -7,6 +7,7 @@ import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SV
 import type { GradientHandTrailOpts, SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 import { SVGDefsFrameUtils } from "../../SVGDefsFrames.utils";
+import { TrackedGradientKnobs } from "../TrackedGradient.knobs";
 
 type HandStamp = {
     angle: number;
@@ -14,20 +15,15 @@ type HandStamp = {
     bornMs: number;
 };
 
-const SWEEP_ARC = 90;
-const SWEEP_LEAD = 90;
 const SWEEP_SPAN: Size2d = { width: 0.7, height: 0.7 };
+const QUARTER_TURN = 90;
 const HALF_TURN = 180;
 const FULL_TURN = 360;
 
 const STAMP_COUNT = Math.ceil(1000 / 60) * 2;
 const STAMP_INTERVAL_MS = Math.ceil(1000 / 60);
 const TRAIL_LIFETIME_MS = STAMP_COUNT * STAMP_INTERVAL_MS;
-const STAMP_ALPHA = 0.25;
-const STAMP_DECAY_EXPONENT = 2.2;
 const MOTION_TURN_DEGREES = 0.25;
-const CYCLE_MS = 1000;
-const AGE_COLOR_SPAN = 0.55;
 const COLOR_KEYS: (keyof SVGDefsColors)[] = ["primary", "secondary"];
 const MOTION_GRACE_MS = STAMP_INTERVAL_MS * 2;
 
@@ -35,6 +31,8 @@ const RESTING_ANGLE = 0;
 const FULL_AGE_RATIO = 1;
 const FULL_ALPHA = 1;
 const NO_FADE = 0;
+
+const DEFAULTS = TrackedGradientKnobs.HAND_TRAIL_CYCLING_DEFAULTS;
 
 const NO_REF = () => undefined;
 
@@ -47,7 +45,7 @@ const getShortestTurn = (from: number, to: number) => {
 const getSweepRotation = (angle: number, arc: number) => angle - HALF_TURN - arc * 0.5;
 
 const getCycleColor = (colors: SVGDefsColors, atMs: number, opts?: GradientHandTrailOpts) => {
-    const cycleMs = opts?.cycleMs ?? CYCLE_MS;
+    const cycleMs = opts?.cycleMs ?? DEFAULTS.cycleMs;
     const phase = ((atMs % cycleMs) / cycleMs) * COLOR_KEYS.length;
     const index = Math.floor(phase);
     const from = colors[COLOR_KEYS[index % COLOR_KEYS.length]];
@@ -112,11 +110,11 @@ const createHandStamp = (
 
     const getAlpha = () =>
         (getStamp()?.fade ?? 0) *
-        (opts?.trailAlpha ?? STAMP_ALPHA) *
-        (1 - getAgeRatio()) ** (opts?.trailDecay ?? STAMP_DECAY_EXPONENT);
+        (opts?.trailAlpha ?? DEFAULTS.trailAlpha) *
+        (1 - getAgeRatio()) ** (opts?.trailDecay ?? DEFAULTS.trailDecay);
 
     const getColorKey = () => {
-        const band = Math.floor((getAgeRatio() / (opts?.ageColorSpan ?? AGE_COLOR_SPAN)) * COLOR_KEYS.length);
+        const band = Math.floor((getAgeRatio() / (opts?.ageColorSpan ?? DEFAULTS.ageColorSpan)) * COLOR_KEYS.length);
 
         return COLOR_KEYS[Math.min(band, COLOR_KEYS.length - 1)];
     };
@@ -143,7 +141,7 @@ export const hand_trail_2 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
 
                     return SVGGradientDefsUtils.computeLinearGradient({
                         id: `gradient1-${id}`,
-                        angle: () => getReading().angle + (opts?.sweepLead ?? SWEEP_LEAD),
+                        angle: () => getReading().angle + QUARTER_TURN,
                         scale: SWEEP_SPAN,
                         colors: () =>
                             computeSweepColors(
@@ -162,8 +160,8 @@ export const hand_trail_2 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
                         <clipPath id={`clip1-${id}`} clipPathUnits="objectBoundingBox">
                             <path
                                 d={SVGUtils.getArcPath(
-                                    opts?.sweepArc ?? SWEEP_ARC,
-                                    getSweepRotation(getReading().angle, opts?.sweepArc ?? SWEEP_ARC),
+                                    opts?.sweepArc ?? DEFAULTS.sweepArc,
+                                    getSweepRotation(getReading().angle, opts?.sweepArc ?? DEFAULTS.sweepArc),
                                 )}
                             />
                         </clipPath>
@@ -187,7 +185,7 @@ export const hand_trail_2 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
 
                         return SVGGradientDefsUtils.computeLinearGradient({
                             id: `gradient${stampId}`,
-                            angle: () => stamp.getAngle() + (opts?.sweepLead ?? SWEEP_LEAD),
+                            angle: () => stamp.getAngle() + QUARTER_TURN,
                             scale: SWEEP_SPAN,
                             colors: opts?.cycles
                                 ? () => stamp.getColors(defs.colors)
@@ -204,8 +202,8 @@ export const hand_trail_2 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
                             <clipPath id={`clip${stampId}`} clipPathUnits="objectBoundingBox">
                                 <path
                                     d={SVGUtils.getArcPath(
-                                        opts?.sweepArc ?? SWEEP_ARC,
-                                        getSweepRotation(stamp.getAngle(), opts?.sweepArc ?? SWEEP_ARC),
+                                        opts?.sweepArc ?? DEFAULTS.sweepArc,
+                                        getSweepRotation(stamp.getAngle(), opts?.sweepArc ?? DEFAULTS.sweepArc),
                                     )}
                                 />
                             </clipPath>

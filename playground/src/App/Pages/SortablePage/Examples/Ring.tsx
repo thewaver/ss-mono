@@ -26,7 +26,7 @@ const RING_WIDTH = "324px";
 const RESTING_FLAGS: InteractionFlags<SortableItemFlags> = { isCarried: false, isLandingBefore: false };
 
 const renderCard = (getItem: Accessor<SortableItem<Card>>, getFlags: () => InteractionFlags<SortableItemFlags>) => (
-    <PageSortableItemContent flags={getFlags} detail={() => `${getItem().value.cost}`} isCentred={true}>
+    <PageSortableItemContent flags={getFlags} detail={() => `${getItem().value.cost}`} isCenterd={true}>
         {getItem().value.name}
     </PageSortableItemContent>
 );

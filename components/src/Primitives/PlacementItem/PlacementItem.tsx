@@ -1,26 +1,49 @@
 import { createMemo } from "solid-js";
 
+import { type CSSAnimationStyle, CSSUtils } from "@thewaver/ss-utils";
+
 import type { PlacementRect } from "../../Abstracts/Placement/Placement.types";
 import { PlacementUtils } from "../../Abstracts/Placement/Placement.utils";
+import { ProximityUtils } from "../../Abstracts/Proximity/Proximity.utils";
 import { access } from "../../Utils/propUtils";
+import { usePlacementBoxContext } from "../PlacementBox/PlacementBox.context";
 import type { PlacementItemProps } from "./PlacementItem.types";
 
 import * as styles from "./PlacementItem.css";
 
 const NO_ANGLE = 0;
 
-const toBoxStyle = (rect: PlacementRect, stackAt: number | undefined) => ({
+const toBoxStyle = (rect: PlacementRect, stackAt: number | undefined, effect: CSSAnimationStyle | undefined) => ({
     "left": PlacementUtils.toContainerWidth(rect.left),
     "top": PlacementUtils.toContainerWidth(rect.top),
     "width": PlacementUtils.toContainerWidth(rect.width),
     "height": PlacementUtils.toContainerWidth(rect.height),
-    "transform": `translate(-50%, -50%) rotate(${rect.angle ?? NO_ANGLE}deg)`,
+    "transform": `translate(-50%, -50%) rotate(${rect.angle ?? NO_ANGLE}deg)${effect?.transform ? ` ${effect.transform}` : ""}`,
+    "filter": effect?.filter || undefined,
     "z-index": rect.depth ?? stackAt,
     "clip-path": rect.clipPath,
 });
 
 export const PlacementItem = (props: PlacementItemProps) => {
-    const getStyle = createMemo(() => toBoxStyle(access(props.placement), access(props.stackAt)));
+    const context = usePlacementBoxContext();
+
+    const getEffect = createMemo(() => {
+        const computeEffect = context.getComputeEffect();
+        const point = context.getPointerPoint();
+
+        if (computeEffect === undefined || point === undefined) return undefined;
+
+        const defs = ProximityUtils.toEffectDefs(
+            access(props.placement),
+            point,
+            context.getArrangement(),
+            context.getPrefersReducedMotion(),
+        );
+
+        return CSSUtils.toAnimationStyle(computeEffect(defs));
+    });
+
+    const getStyle = createMemo(() => toBoxStyle(access(props.placement), access(props.stackAt), getEffect()));
 
     return (
         <div class={styles.placementItem} style={getStyle()} role="presentation">

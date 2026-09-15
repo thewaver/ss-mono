@@ -116,7 +116,7 @@ which is what the registries already called them internally. Every other sample 
 and the file-name-is-the-key rule is intact inside the registries.
 
 **`SVGDefsSources` and `SVGDefsUri` did not go with them**, and are now
-`playground/src/App/PageComponents/SVGDefsSources`. They are not samples: they render sample defs and serialise
+`playground/src/App/PageComponents/SVGDefsSources`. They are not samples: they render sample defs and serialize
 them to a data URI so two `CellAnimation` examples have something to animate. That is Playground furniture by
 the _"three trees"_ definition, it needs a DOM, and keeping it out of the library keeps page tooling off the
 published surface. Its source tab still works, because it is Playground-side.
@@ -176,7 +176,7 @@ radio; `TextField` whether it is an input or a textarea; `Barrel` is told what t
 by face what its label is and whether a screen reader should be shown it. In every case the consumer supplies
 the component's own accessible identity, which is the mark of a body rather than a finished control.
 `Modal`'s `dialog`/`alertdialog` is not the same hole — it knows it is a dialog and is asking how urgent, and
-`ButtonType` is form behaviour rather than identity. This is what keeps `Barrel` out of `Essentials`, since a
+`ButtonType` is form behavior rather than identity. This is what keeps `Barrel` out of `Essentials`, since a
 barrel with a slider beside it would scrape through the page test on its own.
 
 **`Popover` is a `Primitive` on both tests, and it was the only `Essential` with no Playground entry at all.**
@@ -400,12 +400,37 @@ An extraction round ran: candidates were staged in a temporary `src/Extract`, th
 user lifted what they wanted, the folder was removed. Recorded so the next round starts from the
 argument rather than the survey.
 
-**Left**: `Audio`, `ColorValue` (now `Color`, a namespace per colour space), `Decimal`, `Matrix3` (now
+**Left**: `Audio`, `ColorValue` (now `Color`, a namespace per color space), `Decimal`, `Matrix3` (now
 `Matrix3d`, over a `Point3d` rather than a tuple), `TimeValue` (now `TimeUtils`). `MathUtils` gained
 `clamp`, `clamp01`, `normalize`, `lerp`, retiring sixteen hand-written `Math.min(Math.max(…))` clamps
 across ten files — **nobody should write that expression again.** Four collapsed further to
 `clamp01(normalize(…))`; `Progress` keeps its own guard, because its zero-span answer is `1` where
 `normalize` reports `0`, and that choice is the caller's.
+
+**`AngleUtils` is the third round, and it went because subtracting two bearings with `-` had produced three
+bugs in one sitting.** The user's call. A bearing is a position on a circle rather than a quantity — `350` and
+`10` are twenty degrees apart, neither is larger than the other, and the same direction has infinitely many
+spellings — so `to - from` is right almost everywhere and wrong at exactly the place a run's two ends meet.
+Every fault came from that: a swell's far item taking the opposite way round an arc, then taking it again
+after the first repair, and a run's facing coming out as noise for a closed ring.
+
+**The line drawn is that `AngleUtils` owns the scalar algebra and anything touching a point does not.**
+`wrap`, `wrapPositive`, `getTurn`, `getSeparation`, `add`, `lerp`, `getMidpoint` and `unwarp` moved or were
+written; `Point2dUtils.getAngle`, `polarToCartesian` and `cartesianToPolar` stayed where they are, since each
+takes or answers with a point and the namespace that knows what `x` and `y` mean is the one that should. What
+did move out of `Point2dUtils` is `radiansToDegrees` and `degreesToRadians`, which know nothing about points
+and are `fromRadians` and `toRadians` now, beside the two conversion constants that came from `MathUtils` and
+`unwarpAngle` that came with them.
+
+**Two wrap forms rather than one, and the difference is which question is being asked.** A bearing is written
+from `-180`, because its two neighbors either side of straight back are as near as each other. An amount of
+turning is written from `0`, because it has a direction and no negative form — a sweep of `370` is a sweep of
+`10`. Both had been hand-written: the first four times across `Placement` and `Proximity`, the second in
+`SVGUtils.getArcPath` and `RotationUtils.getIndexAngle`. Nobody should write either expression again, which is
+the same sentence the clamps got.
+
+**`PlacementUtils.getAngleDelta` is gone rather than kept as a pass-through**, being `AngleUtils.getSeparation`
+under another name, and `Placement`'s private signed-turn helper went with it.
 
 **`RotationUtils` went, whole, and is `utils/src/Abstracts/rotation.ts`.** It was listed below as a kept
 candidate, and only `wrapIndex` was ever staked as qualifying — the rest reads as angular arithmetic in a
@@ -557,14 +582,14 @@ parked. The rule above stands for the next foreign file that needs somewhere to 
 When arguing a modern CSS or JS feature is safe here, **only `components/src` counts** — it is the published
 package and the only thing with a support contract, **with one carve-out: `components/src/Samples` does not
 count.** It ships from the library now, but it is sample code a consumer copies or ignores rather than
-component internals, and it was written to the Playground's old licence. `playground/src` is a harness;
+component internals, and it was written to the Playground's old license. `playground/src` is a harness;
 citing either is not an argument.
 
-**A use that carries a fallback is not evidence for a use that doesn't.** Relative colour syntax
+**A use that carries a fallback is not evidence for a use that doesn't.** Relative color syntax
 appears 71 times in Samples and twice in `components/src`, both in `Composites/Surface/Surface.css.ts` and
 both in vanilla-extract's array-value form — `backgroundColor: [fillColorVar, "rgb(from …)"]` — which
 emits the plain variable first, so an engine that does not understand the newer syntax keeps a working
-colour. That is graceful degradation, not a hard dependency. Check where the feature actually lives and
+color. That is graceful degradation, not a hard dependency. Check where the feature actually lives and
 whether existing uses degrade; if the new code has no fallback, say so.
 
 ## Components
@@ -577,7 +602,7 @@ deleted — it referenced `@ui/*` and `preact` aliases, so `vite-plugin-checker`
 sat in the tree.
 
 **The base was the same idea from the other side**: a shell of a hidden native `<input>` plus a
-`children` slot doing all the painting, parameterised by `type: 'checkbox' | 'radio'`. One difference
+`children` slot doing all the painting, parameterized by `type: 'checkbox' | 'radio'`. One difference
 decides everything else.
 
 **How the painter learns the state.** The old painters read state out of CSS through sibling selectors —
@@ -595,7 +620,7 @@ uncarryable here for three stacking reasons:
 
 **`Toggle` needs no new library code**, the audit's most useful result. In the React tree `Toggle` was
 141 lines and almost all paint: body size, handle size, radii, two translate distances computed in JS,
-the colour swap on check. A toggle **is** a `Checkbox` whose painter draws a track and a sliding handle;
+the color swap on check. A toggle **is** a `Checkbox` whose painter draws a track and a sliding handle;
 `isChecked` is the entire input it needs. The only library-side difference is one line of semantics —
 `role="switch"` so it announces on/off rather than checked. So `Toggle` is a thin preset over `Checkbox`
 in the `Surface`-over-`Shape` shape: not a new leaf, and not a base extracted from two leaves with
@@ -607,7 +632,7 @@ needed somewhere new — they became `RadioGroup`. The leaf-sharing job was exac
 for, down to the `type` parameter, and the shipped component keeps its name for that reason._
 
 Old radio support was `type="radio"` plus `name`, leaving mutual exclusion to the browser. Too little
-here, because the two things a radio group needs are behaviour, and behaviour is the shell's:
+here, because the two things a radio group needs are behavior, and behavior is the shell's:
 
 - A radio group is a **single tab stop**, arrows both moving and selecting — a roving tabindex, which
   `Tabs` already implements and is the model to follow.
@@ -617,7 +642,7 @@ here, because the two things a radio group needs are behaviour, and behaviour is
 
 **The size / config / token layer is inconsequent here, and it is the bulk of the code.** The three
 `*.config.ts` files, the `s | m | l` scale, `BINARY_SWITCH_SIZE_REMAP`, derivations off
-`uiCoreConfig.input.height`, `assignInlineVars` pushing per-instance colours, `useBackground` picking a
+`uiCoreConfig.input.height`, `assignInlineVars` pushing per-instance colors, `useBackground` picking a
 contrast pair, `hasOutline` switching filled versus outlined — all so the library can paint with values
 the consumer chose. This library paints nothing. Port none of it. The `hasOutline` _technique_ (an empty
 marker class selecting a variant) is already the idiom here.
@@ -638,7 +663,7 @@ opt-in when it is, or every control pays for a listener it ignores.
   one (nested `<label>` is invalid). The hit-area half is solved better here: the input is `inset: 0`
   over the painter, so it **is** the hit target. The context half has no current need, but the pattern is
   worth remembering if a `Label` or `FormField` arrives — a component supplying a wrapper should let
-  descendants detect it rather than making every caller pass "I am already labelled". Incidentally
+  descendants detect it rather than making every caller pass "I am already labeled". Incidentally
   `<label disabled>` was never valid HTML and did nothing.
 - _`hasOwnValue`._ A controlled-versus-uncontrolled mode flag: false force-wrote the DOM back to the prop
   and reported the inverse; true reported the DOM's checkedness. `checkedSignal` replaces the flag with
@@ -650,7 +675,7 @@ opt-in when it is, or every control pays for a listener it ignores.
 Settled, immediately after the audit, which predicted most of this.
 
 **`BinarySwitch` is a private shared composite, not a leaf and not public API**: `InteractionWrapper` plus
-the hidden-native-input leaf plus change gating plus the single-writer DOM sync, parameterised by
+the hidden-native-input leaf plus change gating plus the single-writer DOM sync, parameterized by
 `type: "checkbox" | "radio"`. `Checkbox`, `Toggle` and `Radio` are a dozen lines each on top. Checkbox and
 Radio shared about nine tenths of their leaf, including `syncElement` — the one piece that must not be
 copy-pasted, because the second copy is where the bug comes back.
@@ -692,10 +717,10 @@ the shell, so a painter inferring it from a boolean could not draw it.
 `boolean | "mixed"` declared inside `BinarySwitch.types`; it is now
 `Abstracts/CheckedState/CheckedState.types`, which `BinarySwitchFlags` imports like anyone else. The
 standing _private until a second consumer_ rule fired the moment `Select`'s group header needed the same
-three states — a header summarising a group of options is the same shape as a parent box summarising a group
+three states — a header summarizing a group of options is the same shape as a parent box summarizing a group
 of children, and two controls each declaring their own `boolean | "mixed"` would agree by luck rather than by
 construction. It is a type and one fold, not a component, so it sits beside `DateValue` — the other abstract
-that is a vocabulary rather than a behaviour — rather than under `Essentials`.
+that is a vocabulary rather than a behavior — rather than under `Essentials`.
 
 `CheckedStateUtils.fromMembers` takes the booleans and returns `true` only if every member is checked, `false`
 only if none is, and `"mixed"` the moment they disagree. **An empty set is `false`, not `"mixed"`**: mixed means
@@ -709,7 +734,7 @@ user can never _click into_ mixed: it is a summary the owner computes (a parent 
 children, a setting inherited elsewhere), and clicking always resolves it. Putting `"mixed"` in the
 two-way signal would force every plain-checkbox consumer to handle a third case that only arrives from
 their own code, and would let the component write a value the user cannot produce. `Radio` has no
-`getIsMixed` and it is `Omit`ted: ARIA gives `role="radio"` no mixed state, and a radio that summarises
+`getIsMixed` and it is `Omit`ted: ARIA gives `role="radio"` no mixed state, and a radio that summarizes
 anything is a checkbox.
 
 **A switch may not be mixed, so `Toggle` drops its role exactly while mixed.** ARIA disallows
@@ -729,7 +754,7 @@ Context rather than `Tabs`' count-plus-`renderOption` shape, because each radio 
 would grow a `compute*` prop per capability and re-expose all of them per index. The cost is
 registration: `context.register(entry)` runs during each `Radio`'s setup and cleans up through the
 caller's `onCleanup`, and the group sorts entries by `compareDocumentPosition` rather than trusting
-registration order, so a reordered `<For>` cannot desynchronise keyboard order from the screen.
+registration order, so a reordered `<For>` cannot desynchronize keyboard order from the screen.
 
 The context is typed `unknown` on the value, because a context cannot be generic; `Radio<T>` casts at the
 boundary. Benign consequence: a `RadioGroup<SizeValue | undefined>` will accept a `Radio<string>`, and
@@ -822,7 +847,7 @@ literally every pixel, and the direct price of keeping the ring correct.
 
 **`computeTextStyle` is the one place paint lives on the element the browser owns**, because there is no
 other hook: the consumer must style the text, the text is inside the input, the input is the library's. It
-takes `getFlags` per _"Render props receive what drives them"_ — disabled text is grey, and no ancestor
+takes `getFlags` per _"Render props receive what drives them"_ — disabled text is gray, and no ancestor
 knows the flags.
 
 It returns a **whitelisted** object rather than a class name:
@@ -857,8 +882,8 @@ locked the same way.
 
 **Left alone deliberately, and not because it is hard.** The lock is anti-spoofing: Chromium refuses
 author overrides so a site cannot conceal that the browser filled a field with stored data. Defeating it
-is possible — `box-shadow: inset 0 0 0 1000px <colour>` paints above the background and below the text,
-and `-webkit-text-fill-color` covers the forced text colour — but doing it by default would suppress a
+is possible — `box-shadow: inset 0 0 0 1000px <color>` paints above the background and below the text,
+and `-webkit-text-fill-color` covers the forced text color — but doing it by default would suppress a
 signal the browser is deliberately showing. `opacity` and `filter` are not alternatives at any
 specificity: both composite the whole paint, fading text with background and reaching the ring. So no
 escape hatch ships; if one is ever wanted it should be a narrowly documented pseudo-selector hook rather
@@ -877,7 +902,7 @@ above the input and is shared by every control, whereas a placeholder must sit b
 text field has one.
 
 **Focus is drawn once, by the ring, and a painter must not draw a second one.** The first
-`PageTextFieldContent` coloured its border on `isFocused`, producing two concentric indications at
+`PageTextFieldContent` colored its border on `isFocused`, producing two concentric indications at
 different radii. The outline already hugs the painted box exactly, so there is nothing left to add.
 `isFocused` stays available for focus-driven paint that is **not** a ring.
 
@@ -916,7 +941,7 @@ while nothing else in the library is RTL-aware — `getDir` on `Label` and `Radi
 direction, not writing direction. Going RTL later means changing the CSS, not the prop names.
 
 **The field's inset is measured, not declared.** `getPadding` and `getGap` are what the consumer states;
-everything else is derived. `getPadding` takes `CSSPadding | number`, normalised through
+everything else is derived. `getPadding` takes `CSSPadding | number`, normalized through
 `CSSUtils.spreadPadding`, so one number spreads to four sides and per-side control needs no second prop.
 `CSSUtils.spreadableToStyle` renames the keys and adds the `px`, so no template strings are built by
 hand. It briefly took a bare `number`, and briefly used `Bounds` — the right shape for
@@ -1043,13 +1068,13 @@ type**, and with `Signal<string>` the round-trip never happens — `syncElement`
 them equal, writes nothing. The `setSelectionRange` hazard was already handled by the `null` guard written
 for `email` and `url`.
 
-So `"number"` is a member of `TextInputType`, and it needed three behavioural attributes (`getMin` /
+So `"number"` is a member of `TextInputType`, and it needed three behavioral attributes (`getMin` /
 `getMax` / `getStep`, driving arrow-key stepping) and one CSS rule suppressing the spin buttons, which are
 UA paint. Consumers who want a number derive it from the string.
 
-This generalises: **an HTML input type is not a reason for a component.** `Toggle` was not one because its
+This generalizes: **an HTML input type is not a reason for a component.** `Toggle` was not one because its
 difference was paint; `number` is not one because its difference is an attribute. What earns a component
-is behaviour the shell has to own — which `RadioGroup` had and neither of these did.
+is behavior the shell has to own — which `RadioGroup` had and neither of these did.
 
 **One caveat `type="number"` carries and the library cannot repair.** During bad input — a lone `"e"`,
 `"-"`, `"1e"` mid-typing — the HTML value sanitisation algorithm makes `element.value` return `""` while
@@ -1059,7 +1084,7 @@ string, and `syncElement` sees two empty strings and correctly does nothing. The
 `type="text"` with `getInputMode={() => "decimal"}` avoids it and is better wherever the placeholder or an
 exact value matters.
 
-**Password is not a component.** Its only distinguishing behaviour is revealing, which is `getType`
+**Password is not a component.** Its only distinguishing behavior is revealing, which is `getType`
 flipping between `"password"` and `"text"` over a signal the consumer owns — the audit's "`Toggle` needs
 no new library code" result again. The Playground demonstrates it with a `Toggle` beside the field.
 
@@ -1074,7 +1099,7 @@ holds, one file down, and `TextInput` is a dozen lines on top of it.
 ### Controls: `TextField` extracted, with `TextInput` and `TextArea` as presets
 
 Settled, on the terms `TextInput` had already written down: a private shared leaf
-parameterised by its element, presets that `Omit` what does not apply, in the `BinarySwitch` shape — and
+parameterized by its element, presets that `Omit` what does not apply, in the `BinarySwitch` shape — and
 **not** a `"textarea"` member of the type union, which would be a type that silently changes the element.
 
 **Nothing about `TextInput` changed except where it lives.** `Primitives/TextField/` holds the
@@ -1089,7 +1114,7 @@ serves three shells.
 `value`, `selectionStart`, `selectionEnd` and `setSelectionRange`, so the caret restore is unchanged
 rather than branched.
 
-**The element is a `Dynamic`, and that is the whole parameterisation.** One attribute list, with the two
+**The element is a `Dynamic`, and that is the whole parameterization.** One attribute list, with the two
 element-specific attributes computed: `type` is `undefined` on a textarea, `rows` on an input. This also
 tightened `min` / `max` / `step`, now emitted only for `type="number"` — the browser ignores them
 elsewhere, but a `type="text"` field carrying them is a lie in the DOM, and `NumberInput` is a
@@ -1190,7 +1215,7 @@ Both are gone and the adapter now guards nothing, because the control does.
 **The general rule is that an owner may not correct a value a control reports mid-gesture.** A mirror is two
 sides that both write: the control writes what was typed, the owner writes what it decided to store, and
 anything the owner changes on the way in comes back over the text on the way out. Clamping, rounding and
-normalising are one shape here, and none of them is safe per keystroke. Where a control defines the moment a
+normalizing are one shape here, and none of them is safe per keystroke. Where a control defines the moment a
 value settles, a correction belongs at that moment or nowhere — and a control that can be handed a reading it
 refuses should refuse it itself, rather than leaving every owner to remember not to.
 
@@ -1210,7 +1235,7 @@ stay out of them.
 arrows, `Home` / `End` and the blur-clamp need them, and the base is where they belong; whether `TextInput`
 should expose them is a separate question, and answering it as a side effect would be smuggling.
 
-**`untrack` on the mirror is the fix for a real flip-flop, not a micro-optimisation.** The effect
+**`untrack` on the mirror is the fix for a real flip-flop, not a micro-optimization.** The effect
 restating the text when the owner writes a new number must read the text _untracked_. Tracked, it also
 re-runs when the text changes — and `TextField` writes the raw text into the signal before the preset's
 `onInput` sanitises it, so for one moment the text says `"1"` and the number still says `undefined`. A
@@ -1230,7 +1255,7 @@ rendered twice and the two modes cannot diverge in paint, keyboard or ARIA. Nati
 `Home`/`End`, `PageUp`/`PageDown`, drag and the track-click jump.
 
 `Range` therefore did **not** need `backlog.md` #2's pointer primitive. What did was a two-dimensional
-colour surface, which has no native equivalent; `ColorArea` is built over `trackDrag` and that item is closed.
+color surface, which has no native equivalent; `ColorArea` is built over `trackDrag` and that item is closed.
 
 **Crossing is prevented by the inputs' own `min` and `max`, not by JS.** Thumb `n`'s `min` is thumb
 `n-1`'s value and its `max` is thumb `n+1`'s, so the browser clamps drag and keypress identically and no
@@ -1249,7 +1274,7 @@ thumb with no size in Chromium, which kills dragging, so `Range.css.ts` styles
 and the painter's visible thumb must agree and nothing enforces it: exactly `TextInput`'s
 padding-versus-inset cost, paid the same way with one shared `RANGE_THUMB_SIZE` constant.
 
-It is also why the painter is handed `ratios` rather than percentages. A thumb's centre travels between
+It is also why the painter is handed `ratios` rather than percentages. A thumb's center travels between
 `thumbSize / 2` and `length - thumbSize / 2`, never the full track, so `left: ratio%` would overhang both
 ends. The painter positions with `calc(ratio * (100% - thumbSize))`, which it can only write because it
 knows the thumb size.
@@ -1353,9 +1378,9 @@ contradicts.
 published pattern allows both, and calls the second one automatic activation. Manual stays the default
 because the cost of guessing wrong is asymmetric: a panel that fetches or builds something expensive is
 built once per tab arrowed _past_ under automatic, and the person walking a list to reach the far end pays
-for every stop on the way. Automatic is the better behaviour for a panel already in the document, which is
+for every stop on the way. Automatic is the better behavior for a panel already in the document, which is
 why it is a prop rather than a rejection — and it is one flag rather than a mode string, because there are
-exactly two behaviours and no third one is coming.
+exactly two behaviors and no third one is coming.
 
 **The flag rides on the same key handler and changes nothing else.** The arrow already sets the focused
 value and moves focus; automatic activation reports that value through `onSelectionChange` afterwards, so
@@ -1440,10 +1465,10 @@ too, and a file tree has no reason to shout its top row.
 **The menu is 320px rather than 240px**, at the user's request, because three levels of indent plus a
 marker leaves less room for a name like `MediaQueryMonitor` than the flat list needed.
 
-**The theme paints every anchor in the primary colour, and the menu now overrides that.** Tree leaves are
+**The theme paints every anchor in the primary color, and the menu now overrides that.** Tree leaves are
 anchors; the tab rows they replaced were not painted that way, so every leaf arrived in the accent green and
 the selected row was distinguishable only by being bold. A `globalStyle` scoped to the menu's own class puts
-anchor colour back to `inherit`, which is a Playground fix rather than a theme change — nothing outside the
+anchor color back to `inherit`, which is a Playground fix rather than a theme change — nothing outside the
 `<nav>` is touched.
 
 ### The floater appears and disappears through `ElementFader`, like every other library element that comes and goes
@@ -1597,13 +1622,13 @@ header to the width of its words, and that is a look the user chose.
 browser's history decided which.** `dependencyName` painted every chip white and the theme paints `a` and
 `a:visited` primary — and `a:visited` carries a class and a pseudo-class against the chip's single class, so
 it won on specificity while plain `a` lost. A link chip was therefore white until it had been followed and
-primary afterwards, which is a colour nobody chose, cannot be undone once a link has been visited, and says
+primary afterwards, which is a color nobody chose, cannot be undone once a link has been visited, and says
 something about the reader's history rather than about the page.
 
 **The split is now two classes over one shared chip.** `dependencyName` keeps white for a name with no page
 of its own — which is only on screen when `LIST_PAGELESS_COMPONENTS` is on — and `dependencyLink` is primary
 in both states — it declares `:visited` explicitly rather than
-relying on the theme's rule happening to name the same colour. `hsl(165, 100%, 50%)` on the chip's ground
+relying on the theme's rule happening to name the same color. `hsl(165, 100%, 50%)` on the chip's ground
 measures 14.1:1, so nothing is given up for it.
 
 **The menu tree does not follow that rule, and the difference is the point.** Every row there is a link, so
@@ -1624,7 +1649,7 @@ judge its mirror, whose offset has the opposite sign.
 it; `out` means beside it. Choosing between them is the consumer stating a relationship, not a hint — a
 tooltip that hops from inside its anchor to outside has changed what it means. So `left-in` may become
 `right-in` and `left-out` may become `right-out`, and nothing else. `center` may fall back to either `in`,
-since a centred layer already overlaps.
+since a centerd layer already overlaps.
 
 The cost is measured: when an anchor is itself clipped by the viewport there are cases where no `in`
 placement fits and an `out` one would have. All of them require the anchor to be partly off-screen.
@@ -1639,7 +1664,7 @@ viewport is the consumer's to size.
 Settled, as the other half of the `Select` groundwork. A dropdown needs everything `Tooltip`
 knows about placing a box against an element and nothing it knows about when to show one.
 
-**The split is behaviour from markup**, and the existing rule decides where it falls: _"it renders DOM, so
+**The split is behavior from markup**, and the existing rule decides where it falls: _"it renders DOM, so
 it is not an `Abstract`"_ means the extraction is the effect, not the popup. `Abstracts/Anchor/` holds
 `Anchor` (the placement math, formerly `TooltipUtils`, moved unchanged) and
 `AnchorUtils.createPortalPosition(getAnchorRef, getIsVisible, opts)`, which observes the anchor, measures the
@@ -1653,7 +1678,7 @@ still comes from `createViewportRectObserver`, so the scale factor is divided ou
 **What stays duplicated is the dozen lines of `<Show><Portal><div>`, deliberately.** Both consumers portal
 into the same mount and position absolutely, but disagree about everything else — a tooltip is
 `role="tooltip"` and `pointer-events: none`, a listbox is clickable, focusable and `role="listbox"` — so a
-shared component would be a two-mode component. Behaviour is shared; markup is not.
+shared component would be a two-mode component. Behavior is shared; markup is not.
 
 `Tooltip` is not renamed. `AnchorPlacement` replaces `TooltipPlacement` (and its `H` / `V` halves) because
 the type is now shared vocabulary.
@@ -1697,7 +1722,7 @@ painter nests them, which ARIA allows as long as nothing between carries a confl
 
 **Geometry is the library's, including the width floor.** `createPortalPosition` also returns
 `getAnchorRect`, and the popup root sets `min-width` from it. A painter cannot compute this — it is portalled
-away from the field — and a dropdown narrower than its control is a positioning artefact, not a style choice.
+away from the field — and a dropdown narrower than its control is a positioning artifact, not a style choice.
 Everything above the floor stays the painter's, exactly as `getMinWidth` draws that line for adornment insets.
 
 **`pointer-events` is switched off for the closing fade**, since `ElementFader` keeps the popup mounted for
@@ -1706,7 +1731,7 @@ inline style overrides the `pointer-events: all` the class needs while open.
 
 **Single-select first, and no shared private composite yet.** `valueSignal: Signal<T | undefined>` is what a
 consumer already holds; `Signal<T[]>` for both cases would tax the common one and make "nothing selected"
-representable twice. Multi differs in behaviour, so the `BinarySwitch` shape is the likely end state, but
+representable twice. Multi differs in behavior, so the `BinarySwitch` shape is the likely end state, but
 erecting it before a second consumer would be guessing at the seam.
 
 **The keyboard walk stops on reachable-disabled options and refuses to select them**, matching `RadioGroup`.
@@ -1832,7 +1857,7 @@ group as a group so its header still renders. `computeIsEntry` is above.
 first row of lower depth; `Select`'s windowed path needed each option's group in order to cut the visible
 rows into runs of one group. Both are now a lookup. It is an **index rather than a reference** so the row
 structure stays acyclic — a parent's `rows` already holds the child, and a back-reference would make the
-structure impossible to compare in a spec or to serialise.
+structure impossible to compare in a spec or to serialize.
 
 **`TreeRow<T>` is `FlatRow<TreeNode<T>>` and `SelectRow<T>` is `FlatRow<SelectItem<T>>`**, both plain
 aliases, so neither component's vocabulary changed at its call sites. What `Select` gave up is the projected
@@ -1845,7 +1870,7 @@ was not buying the safety its shape implied. `SelectUtils.getGroupRowIndex` repl
 group's **written item index**, which is a group row's `position` at depth 0, not its row index. Changing
 which number a consumer's callback receives would be an API change riding along inside a refactor.
 
-**The tests moved with the behaviour rather than being dropped.** `Flattener.utils.test.ts` holds the walk's
+**The tests moved with the behavior rather than being dropped.** `Flattener.utils.test.ts` holds the walk's
 own assertions — the depth-first order, the numbering, `parentIndex`, and that an empty uncounted branch
 leaves no hole in `entryOffset` — and `Select.utils.test.ts` keeps the ones that are about `Select`'s
 numbering in particular, which is what the entry above called the agreement that used to be implicit.
@@ -1869,7 +1894,7 @@ travels on `aria-label`, which is present whether or not the header row is in th
 mid-group is ordinary. The box is a static element, so the rows inside keep resolving their `position:
 absolute` against the sizer and their transforms are untouched — wrapping them costs no layout.
 
-**The header is not sticky, and that is not a taste call.** Windowing is an optimisation, so the windowed list
+**The header is not sticky, and that is not a taste call.** Windowing is an optimization, so the windowed list
 must look like the mounted one, and in the mounted list a header scrolls away with its group. Repeating or
 pinning a header would make the two renderings differ by whether the consumer happened to pass an estimate.
 If sticky headers are ever wanted they belong to both renderings at once.
@@ -1965,7 +1990,7 @@ pointer events, focus and the accessibility tree regardless of descendants; `Foc
 tests `[inert]`, so support was assumed all along. **General rule: `pointer-events` on an ancestor cannot
 switch off a subtree, only `inert` can.**
 
-**Behaviours a `Select` guarantees, to re-check after touching it** — none visible in markup, and the last
+**Behaviors a `Select` guarantees, to re-check after touching it** — none visible in markup, and the last
 two were wrong once: `Enter` on a reachable-disabled option changes nothing and leaves the popup open;
 clicking an option leaves `document.activeElement` on the field; a disabled field neither opens nor takes
 focus while its reachable twin stays at `tabIndex 0`; the arrow walk skips a disabled option _inside_ a group
@@ -2000,7 +2025,7 @@ an icon button has no such relationship and should size to its content. `Select`
 **The fader stays inside and reports out through `onTransitionStatusChange`**, the shape `Modal` uses. A
 component cannot return values, and `Select` needs the settled flag to know when it may clear the query.
 
-**`outline: none` on the root is deliberate and is not a colour decision.** The root is focusable only to
+**`outline: none` on the root is deliberate and is not a color decision.** The root is focusable only to
 host `aria-activedescendant`; the visible focus is the highlighted item, painted by the consumer. A ring
 around the whole surface would point at the wrong thing.
 
@@ -2048,7 +2073,7 @@ explicit restore). Two identical siblings and one that does not fit is not the s
 The first half of `backlog.md` item 24. A control's items can be placed anywhere rather than along a line, and
 the vocabulary for saying where lives in an abstract so the next control can use the same one.
 
-**A placement is a centre, a size, an optional turn and an optional depth, all in fractions of the container's
+**A placement is a center, a size, an optional turn and an optional depth, all in fractions of the container's
 width.** `Formation`'s trick, taken wholesale: measurements in container-query units resolve in CSS with no
 `ResizeObserver` and no measured size anywhere, and the layout declares its own `heightRatio` so the box knows
 its shape. The picking works in the same units, which is why none of this touches the DOM to decide anything.
@@ -2066,7 +2091,7 @@ is the "a wheel of twenty is a bad idea" judgement made in the one place able to
 arbitrary 340px box before this and the fan's outer items fell off the sides of it, which is what settled it.
 
 **Picking belongs to the flick, and hovering belongs to the pointer.** The abstract answers "which item is
-meant" from a point, by angle about an origin or by nearest centre, with the rule declared by the layout
+meant" from a point, by angle about an origin or by nearest center, with the rule declared by the layout
 rather than by the component. It exists because `CardFan`'s three findings and the ring's gaps are the same
 bug — a layout has an inverse and hit-testing is not it. **But hover was wired to it and that was wrong**: the
 user opened a wheel, hovered the opener in the middle of it, and something across the ring lit up with no way
@@ -2088,7 +2113,7 @@ are drawn at, which is what makes a submenu concentric with the level above it.
   nothing. `Popover` gained `isTransparentToPointer` and the placed items re-enable themselves. The fix
   silently did nothing at first because the new style was declared _above_ `popoverRoot` and lost on source
   order; both are a single class, so the later one wins.
-- **It must not be nudged.** A ring is centred on its invoker, and `Anchor` moving it to keep it on screen
+- **It must not be nudged.** A ring is centerd on its invoker, and `Anchor` moving it to keep it on screen
   breaks exactly that. `getIsPinned` skips both adjustments it makes — choosing a safe placement from the
   family, and clamping into the viewport bands.
 - **Pinned means it has to close.** A layer that does not follow its anchor is pointing at nothing once the
@@ -2120,7 +2145,7 @@ its own chrome, or gets neither.
 ### Concentric submenus: `computeLayout` learns where it is, and a submenu borrows its parent's anchor
 
 The second piece of `backlog.md` item 24. A submenu of a laid-out menu is drawn as a wider ring round the
-same centre rather than hanging off the item that opened it, so a wheel stays one wheel however deep it goes.
+same center rather than hanging off the item that opened it, so a wheel stays one wheel however deep it goes.
 
 **`computeLayout` takes one object rather than a run of arguments, and the reason is the third one.**
 `PlacementLayoutFn` was `(itemCount) => layout` and is now `({ itemCount, level, parentExtent }) => layout`.
@@ -2130,7 +2155,7 @@ arriving on a compute function rather than on a painter. Existing layouts destru
 nothing else changes.
 
 **It is `level`, not `depth`, because `PlacementRect.depth` already means something else.** A rect's `depth`
-is its paint order — the z-index a layout can name for an item that has to sit over its neighbour. Two fields
+is its paint order — the z-index a layout can name for an item that has to sit over its neighbor. Two fields
 called `depth` in one abstract, one meaning "how far down the menu tree" and the other "how far forward",
 is the kind of collision that costs a future session an hour. The root level is `0`.
 
@@ -2143,7 +2168,7 @@ parent's half-width + gap + half an item)`. At the root `parentExtent` is `0` an
 every layout's own minimum, so the arithmetic needs no special case for having no parent.
 
 **A laid-out submenu takes its parent's anchor, placement and offset; an ordinary one still takes its own
-item's.** Sharing a centre is the whole point, and the centre in question is whatever the root anchored to —
+item's.** Sharing a center is the whole point, and the center in question is whatever the root anchored to —
 a trigger, some other element the consumer named, or the point a right-click happened at. Passing the
 parent's own anchor down rather than reaching for the trigger keeps all three cases right, and it chains:
 level two inherits level one's anchor, which is already the root's. `submenuPlacement` and `submenuOffset`
@@ -2155,8 +2180,8 @@ one branch — `ArrowLeft` closes a level only when there is a level above it �
 
 **The demo is the nested action set on the ring layout, and the spec asserts the relationship rather than the
 radii.** Three bands come out at 296px, 480px and 664px across, but nothing in `e2e/menuLaidOut.spec.ts`
-names those numbers: it reads each level's centre and width off the element and checks that every level
-shares the root's centre and encloses the one above it. Re-tuning a gap then cannot arrive as a red run.
+names those numbers: it reads each level's center and width off the element and checks that every level
+shares the root's center and encloses the one above it. Re-tuning a gap then cannot arrive as a red run.
 
 ### A wheel of wedges: sectors on the placement, and an X in the hole
 
@@ -2172,7 +2197,7 @@ apply, was rejected because it puts a CSS string in the vocabulary and still lea
 draw a border, a gradient or anything else that follows the arc.
 
 **A sector's item element does not take the pointer, and the painted path does.** Wedge boxes overlap — a
-rectangle round an arc always covers its neighbours' rectangles — so a box that claimed the pointer would
+rectangle round an arc always covers its neighbors' rectangles — so a box that claimed the pointer would
 steal presses meant for the wedge beside it. `menuItemRegion` turns pointer events off on the `menuitem`
 element and the path turns them back on for itself, which is the same split `Popover`'s
 `isTransparentToPointer` already uses one level up. Hit-testing is then the drawn shape exactly, with no
@@ -2180,9 +2205,9 @@ geometry in the component at all.
 
 **The placement box stays the label's box, and it is not the sector's bounding box — that was tried and it
 is wrong.** A bounding box looked tidier: the element would then contain the whole wedge and the label
-could simply centre in it. But the centre of an annular sector's bounding box is not on the sector. For a
-wide, thin band — the second level of a wheel is 117° of a band 84px thick — that centre lands **inside the
-hole**, so the label would float off the wedge and the element's own centre would not be a point a pointer
+could simply center in it. But the center of an annular sector's bounding box is not on the sector. For a
+wide, thin band — the second level of a wheel is 117° of a band 84px thick — that center lands **inside the
+hole**, so the label would float off the wedge and the element's own center would not be a point a pointer
 could press. So `left` and `top` stay what they mean everywhere else, the mid-radius mid-angle point where
 the content goes, and the painter's SVG carries `overflow: visible` so a small box can paint a wedge much
 larger than itself.
@@ -2265,7 +2290,7 @@ it as two presets. **The presets are gone** — see _"One factory per arrangemen
 def on `createRing` like every other knob; the paragraphs below describe the arithmetic, which is unchanged.
 
 **What the spread changes is where the first wedge sits, and that is the only branch in the builder.** A
-closed ring centres its first item straight up and the rest follow round; an open arc has two ends, so the
+closed ring centers its first item straight up and the rest follow round; an open arc has two ends, so the
 items are spread symmetrically about straight up instead — first and last are mirror images, which is what
 `PlacementLayouts.utils.test.ts` asserts rather than any angle. The old hemisphere placed boxes on a 150-degree
 arc and sized its radius from how much room the items needed; none of that survived, so `toRadius` and the
@@ -2370,14 +2395,14 @@ hints had nowhere to look them up; and a submenu that wants to point at its open
 **Arcs are sequential from one start angle, and an item asks only for its own share.** The user's
 simplification, and it removes a whole class of problem: no item names an absolute angle, so two items cannot
 collide, and there is no rule needed about who wins. An item may declare `arcDegrees`; the rest split what is
-left. Two protections finish it — the block is normalised down if it would exceed the level's spread, and its
+left. Two protections finish it — the block is normalized down if it would exceed the level's spread, and its
 start is chosen so it sits inside that spread rather than being squashed to fit.
 
 **The root fills its spread; a deeper band is only as wide as its items need.** A band four levels out has a
 radius several times the root's, so the same angle there is a far longer arc — which is how a two-item
 submenu ended up sprawled across a half-circle. Below the root each wedge asks for a target arc _length_
 instead, converted to an angle at that band's radius, so a wedge is about the same size however deep it is.
-The block is then centred on the wedge that opened it, which is the thing that makes three bands legible.
+The block is then centerd on the wedge that opened it, which is the thing that makes three bands legible.
 
 **Where the pieces live.** `components/src/Essentials/Menus` holds `Menu` and `WheelMenu`; the Playground
 mirrors it under `Pages/Menus` and the left-hand nav groups them. The arc factory itself is sample code
@@ -2434,7 +2459,7 @@ facing zero with a tilt.
 **Tilt is one formula and the ring earns it too.** An item is turned by its own polar angle times
 `tiltRatio` — not by its offset from the facing, which would leave the top of a ring upright when the whole
 point is to radiate. Zero is upright, which is what every layout did before, so the default changes nothing;
-one turns an item fully with the radius, which is the fan's old behaviour and gives a band labels that point
+one turns an item fully with the radius, which is the fan's old behavior and gives a band labels that point
 outward. It reaches the three radial arrangements and stops there, since a honeycomb, a whorl and a zigzag
 give an item no angle to turn by — the same boundary as `pickRule: "angle"` and `sector`.
 
@@ -2445,9 +2470,9 @@ at exactly the point where the arrangement is widest.
 
 **The offset the fan used to smuggle in is now something the menu says.** A fan opens rightward, so its
 items only ever used the right half of the box it reserved; the empty left half was what made a
-centre-on-the-trigger popover appear to open sideways. With the box snapped to its content that padding is
+center-on-the-trigger popover appear to open sideways. With the box snapped to its content that padding is
 gone, so `Menu` shifts its layout box until the layout's `origin` — the pivot every radial layout already
-publishes — lands where the box's centre used to. A band's origin is dead centre, so nothing about a wheel
+publishes — lands where the box's center used to. A band's origin is dead center, so nothing about a wheel
 menu moves; a fan's is near its left edge, and it opens rightward because the rule says so rather than
 because of a gap in the geometry.
 
@@ -2482,14 +2507,14 @@ split the pixel work drew: the arrangement is the library's, the size is the con
 ### Layouts carry no pixels, and the box a layout is given is the consumer's
 
 **Every length a layout takes is unit-less now.** `holeRadius` is `holeRadius`, and so on through
-`bandWidth`, `levelGap`, `wedgeArc`, `centreRadius`, `width`, `height`, `itemWidth`, `itemHeight`, `gap`,
+`bandWidth`, `levelGap`, `wedgeArc`, `centerRadius`, `width`, `height`, `itemWidth`, `itemHeight`, `gap`,
 `cellWidth`, `innerRadius` and `ringGap`. The arithmetic never had to change, because it was already
 homogeneous — every layout computed in its inputs' units and divided by the total before returning, so the
 fractions are identical whatever the numbers mean. **The user's framing was that this is what an SVG does**:
 author the geometry in one coordinate space and let whoever renders it decide how many pixels that space is
 worth.
 
-**`PlacementLayout.width` is `extent`, and the box no longer honours it.** `PlacementBox` used to set
+**`PlacementLayout.width` is `extent`, and the box no longer honors it.** `PlacementBox` used to set
 `width: <layout width>px`, which is what made an arrangement rigid; it now always fills its parent, so the
 same fractions scale into whatever room they are given and the aspect ratio comes from `heightRatio` as
 before. `extent` survives for one job only — telling a level how large the level inside it was — and
@@ -2519,6 +2544,14 @@ general signature.** That is the whole of the difference and it lands in one pla
 `layout.extent`, and where it is present the box is that many pixels wide while every fraction is of that,
 where it is absent the box fills its parent and the fractions are of whatever it was given. So an arrangement
 either dictates its own size or fits the room it is put in, and both are the same contract.
+
+**An arrangement with no effect on it pays for none of this.** The pointer was already left untracked, but
+three things still ran: the reduced-motion query was subscribed to, the arrangement's spacing and closure
+were computed on every layout change, and both happen once per placed box on a page. `MediaQueryMonitorUtils`
+grew the same `getIsDisabled` its neighbor `PointerTracker` already had — a component has to ask for the
+accessor while it is setting up, before it knows whether it will ever be read, so asking without joining the
+count is the thing it needed to be able to do — and the arrangement memo answers with a resting value while
+no effect is passed. Raised by the user as a question about whether the placement work had grown.
 
 **Which is why nothing ever stopped `Formation` taking a ring.** Its `computeLayout` is typed
 `PlacementLayoutFn` and a `SizedLayoutFn` returns a subtype of what that asks for. The restriction was in the
@@ -2561,7 +2594,7 @@ the consumer owns what goes inside an item and everything said about it.
 **Both wrappers carry `role="presentation"`**, which is the rule _"the wrapper between a container role and its
 items is presentational"_ reaching the second wrapper of that kind. It matters more here than it did for
 `InteractionWrapper`: `role="menu"` and `role="tablist"` own their items, and a laid-out control puts two
-generic divs in between. Neither is focusable and neither carries global ARIA, so the role is honoured rather
+generic divs in between. Neither is focusable and neither carries global ARIA, so the role is honored rather
 than ignored.
 
 **`toContainerWidth` is `PlacementUtils`' now**, having been written by hand three times — in `Menu`, in
@@ -2648,7 +2681,7 @@ other, because the two controls disagreed before any of this and for reasons of 
 shipped until now is a radius and a bearing, so nothing had ever tested whether a placement's vocabulary is
 general or quietly polar. It is general: a honeycomb is rows of hexagons, staggered by half a column and
 stepping down by three quarters of a cell so the rows interlock, and it needs nothing the ring did not already
-have — plus one field, below. It picks by `"nearest"`, there being no centre to take a bearing from.
+have — plus one field, below. It picks by `"nearest"`, there being no center to take a bearing from.
 
 **A placement carries the shape it occupies, because otherwise the target and the drawing disagree.** A
 hexagon drawn inside a rectangular box leaves the corners of that box live, and two interlocking rows overlap
@@ -2717,6 +2750,194 @@ placement are the same four numbers, so the name can stay pointing at the new ty
 shape, because `insets` became `placements`. That is the `WheelUtils.getApothem` precedent applied as far as
 it goes and no further.
 
+### `Abstracts/Proximity`: an arrangement reacts to the pointer, and the reaction is the consumer's
+
+The second half of what a layout function does, on the same split. `computeLayout` says where the items go;
+`computeEffect` says what being near the pointer does to one, and both are functions the consumer passes in,
+so the library never holds a list of named effects. A macOS dock, a row that brightens toward the cursor and a
+ring whose far side dims are the same mechanism answering differently.
+
+**An effect answers in CSS function names, which is what makes it general without becoming a string.** The
+type is `CSSAnimationValues` — the same `Partial<Record<CSSAnimationKey, number | number[]>>` `CellAnimation`
+evaluates per cell — so a scale, a translate, a brightness and a blur are all one vocabulary and the item does
+not need a prop per response. A structured alternative with `scale`, `offset` and `opacity` fields was
+rejected on the obvious ground: the next effect wants `hue-rotate`, and the one after that wants
+`drop-shadow`.
+
+**Which meant one writer for both, and it went to `ss-utils` rather than to a shared spot here.**
+`CellAnimation` held the ordering table and the unit formatter privately, beside the `ANIMATION_UNITS` table
+that already lived in `ss-utils`; splitting a writer from its own units across two packages is the thing to
+avoid, so `CSSUtils.toAnimationStyle` is where both go. It answers with `transform` and `filter` in full every
+time, which is what lets a caller assign the pair and have a value that stopped being produced stop applying.
+
+**`PlacementBox` tracks the pointer and `PlacementItem` measures itself against it.** The box is the layout's
+own coordinate space — a container whose height is `heightRatio` of its width — so one `PointerTracker` on it
+gives `boxRatio`, and `toLayoutPoint` turns that into the same coordinates the placements are in with no
+measuring of anything else. The two talk through a context, which is `RadioGroup` and `Radio`'s arrangement:
+every consumer already renders a `PlacementItem` inside a `PlacementBox`, so not one of the nine call sites
+had to learn an index or thread a reading down. Tracking is off entirely while no effect is passed.
+
+**Effects are per item and pure, which is what stops the feedback the dock example warns about.** Each item is
+measured against the resting layout, never against where its neighbors have moved to — grow an item from its
+live position and it shifts its neighbor, which changes that neighbor's distance from a pointer that has not
+moved, which changes its size. What a consumer gives up is a swell that genuinely re-flows the run: the
+displacement is a transform, so items pass over one another rather than pushing. `swell` gets the look back
+analytically instead, by displacing each item by the running total of what its inner neighbors grew — which is
+the falloff curve integrated and normalized, and comes out as a closed form.
+
+**Nearness is not a straight line, and an arrangement is the only thing that knows what it is.** The user's
+diagnosis, and it is the whole architecture rather than a correction to it. A straight-line distance is right
+for a scatter and wrong for everything else: in a row only the horizontal gap says anything, so a pointer a
+little above the row must not make it go quiet; in a ring what separates two wedges is the turn between them,
+so measuring across the middle makes the far side read as near and the whole thing respond at once. So
+`PlacementLayout` carries a `reachRule` beside its `pickRule` — `"horizontal"`, `"vertical"`, `"arc"` or
+`"plane"` — and `PlacementUtils.getReachDistance` is what everything measuring nearness asks, spacing
+included, so a reach and the spacing it is quoted in are in the same units whatever the shape.
+
+**The same rule read as a direction is what an item gives way along**, which is `getReachBearing`. Whatever
+the rule ignores when it measures, it also refuses to move along: a row's items part sideways however far
+above them the pointer is, and a ring's turn about their own center rather than sliding across the middle.
+That last one was a visible fault before the rule existed — two neighbors displaced along the chord between
+them both drift inward, and the circle buckles exactly where it was meant to spread.
+
+**Which way round the run the pointer lies is read about the middle of the run, not by the shorter way.**
+Two wrong answers preceded this one and both showed as the same thing — the item at the far end of an arc
+giving way into its neighbor instead of away from it. The first signed the tangent by its agreement with the
+straight line to the pointer, which is right in the middle of a run and unstable at the ends of one, the
+chord there being nearly at right angles to the item's own tangent. The second took the shorter way round,
+which is ambiguous at exactly half a turn — and a half-turn arc's two ends are exactly that far apart, so the
+ambiguous case is not an edge case but the default arrangement. `PlacementUtils.getRunFacing` reports the
+circular mean of where a run's items lie and both bearings are unwrapped about it, which puts the ambiguity
+diametrically opposite the middle of the run — off the run entirely for anything that does not close. A run
+that does close has no middle, its items cancelling out, and reports zero; nothing reads it, because a closed
+run is not pushed along at all.
+
+**And the travel takes its direction from that same answer rather than working it out again.**
+`toRunDisplacement` reads the bearing and takes the sign from its agreement with the tangent, so the way an
+item is sent and the way it was said to lie cannot disagree — which they did, once.
+
+**And travelling along a curve is a rotation, not a step along the tangent.** A tangent step is only the
+first term, and an item giving way travels far enough for the rest to matter — on a half-turn arc of six, a
+push of three quarters of an item width is a twenty-seven degree step, and the straight tangent leaves the
+curve far enough that neighbors overlap, which is what the user saw. `ProximityUtils.toRunDisplacement`
+swings the item about the pivot by the angle that distance is worth at its own radius and answers with the
+chord, so every item stays on the curve and the spacing between them is preserved exactly.
+
+**`"arc"` answers in arc length rather than in degrees**, swept at the item's own radius, so it stays
+comparable with every other length in the layout. It is a cousin of `pickRule`'s `"angle"` and the two were
+deliberately not merged: picking asks which item a direction means and reaching asks how far away something
+is, and one is not derivable from the other.
+
+**How far round the run is the caller's reach; how far off the band is the arrangement's.** A turn alone
+treats every radius as equally near, which is wrong the moment an arrangement has more than one band — a
+nested wheel menu's inner and outer items share a bearing and are not the same distance away — and on a
+single band it makes the whole ring answer at full strength from anywhere in its column. What was tried
+first and is wrong is folding the two into one length and handing it one reach: the reach is quoted in
+spacings, and a pointer sitting on the pivot is then some arbitrary fraction of a reach from every item,
+which is why the middle of a ring lit the whole ring up at about half strength.
+
+**The two are bounded differently, and that is the reason they cannot share a reach.** How far round an
+effect should carry is a matter of taste, so it is a number the caller picks. How far in or out it can carry
+is not, because the space is finite — a pointer cannot travel further in than the pivot. So the radial part
+spans exactly the run's own radius, which is the whole of the room there is, and
+`ProximityEffectDefs.radialShare` reports it as a share of that: `0` on the band, `1` at the pivot, and `1`
+again as far outside the band as the pivot is inside it. `getFalloff` takes the two in quadrature, so a
+turning arrangement gets the one profile that is right — nothing at the pivot, everything on the band,
+nothing again on the way out — and a turn can never make up for being off the band, which is what would
+otherwise let the far side of a ring answer.
+
+**That is also why the gate is radial rather than the box.** A pointer may travel inward as far as the
+pivot, so it has to be let outward the same distance past the items or the two sides of the same ring answer
+differently — the box edge sits barely past the items, and cutting there would make approaching from outside
+feel dead while approaching from inside did not. `getRunRadius` reports the middle radius of the run, the
+gate is twice it, and the radial falloff reaches nothing at exactly that point, so the two agree rather than
+one clipping the other.
+
+**`getFalloff` takes the whole defs rather than a distance, and that is the point.** An effect asks how much
+one item cares; which of the arrangement's axes that weighs, and how far each of them runs, is not something
+an effect author should have to know. It was briefly a knob — a `polar` rule beside `arc`, with the choice
+offered on the ring and the arc — and the user's call was that a profile with the wrong numbers is a defect
+rather than a preference. There is one turning rule.
+
+**The axis a rule throws away is read once more, as a yes or a no.** The user's call, and it closes the hole
+the rule opens: an ignored axis is ignored without limit, so a row measuring only the horizontal gap answered
+the same whether the pointer was on it or a whole page above, and would have sat lit for as long as the
+pointer was anywhere in that column. `PlacementUtils.getIsWithinReach` asks whether the point is inside the
+layout's own box on the axis the rule discarded — a boolean, never a distance, so nearness inside the
+arrangement is untouched and the whole thing simply stops at the edge. A rule that reads both axes is gated on both, so nothing
+answers a pointer that has left the box altogether; `"arc"` discards the radius, which has no one axis to
+test, so the whole box is the test — which is why a wheel still answers a pointer outside its ring and stops
+answering one that has left the wheel.
+
+**The gate is on the pointer rather than on the item**, so failing it is indistinguishable from the pointer
+not being there: the box reports no point at all and no item computes an effect. Gating per item instead
+would have left `fade` dimming a whole arrangement the pointer had already walked away from, since a distant
+item and an absent pointer are different things to an effect that answers on remoteness.
+
+**A swell's push is clamped to the room the arrangement actually has, and a closed run is where that room
+runs out.** Past the reach the push saturates at its full value, which is right for a row — everything beyond
+the swelling shifts outward and the row gets longer — and ruinous for a loop, where the two directions travel
+round and pile into each other at the far side. The first answer was a flag: test whether the run closes and
+refuse to push when it does. The user's correction is better and is the house pattern — `createRing` already
+clamps a spread to a turn and a hole ratio to one, and the falloff clamps nearness — so this is a clamp too.
+`PlacementUtils.getRunSlack` reports how much of a turning run's circle is still free, counting the run's own
+width as occupied along with the turn its items cover, and the push is capped at half of it, the two ends
+spreading in opposite directions and each taking a share.
+
+**What that buys is a continuum rather than a switch**, which is the part the flag could not express. A
+half-turn arc has room to spare and is untouched; at two hundred and eighty degrees the push comes down to
+about half what was asked for; at three hundred and forty there is nothing left and it grows in place. A ring
+is simply the end of that curve, so there is no closed case to detect and `isClosedRun` is gone. It also means
+`pushRatio` can be asked for freely: an arrangement that cannot honor it says so, rather than the number being
+quietly ignored on some arrangements and not others.
+
+**Reach is measured in the arrangement's own spacing, and that was not the first answer.** Measuring it in
+item widths is the obvious scale-free unit and it reads completely differently in the arrangements the library
+actually ships: a cliff's hexagons are half the box wide and overlap heavily, so two-and-a-half item widths
+reached every item on the page and the whole formation bloomed at once rather than picking one out.
+`PlacementUtils.getSpacing` reports the middle distance between items that follow one another — the middle
+rather than the average, so a zigzag's turn or a tree's tier step does not drag it — and the box computes it
+once per layout. "The two either side of this one" is a statement about spacing, and only the layout knows
+what that is.
+
+**Everything the run knows about itself arrives as one value.** The reach rule, the pivot, the spacing and
+whether the run closes are facts about the arrangement rather than about any item in it, so
+`ProximityUtils.toArrangement` reads them off the layout once and the box memoizes that. What forced it was
+the signature: each one had arrived as another positional argument, and `toEffectDefs` had reached six. The
+reduced-motion flag stayed outside the bundle, being a fact about the reader rather than about the
+arrangement. `PlacementReach` is the pair the measuring functions actually need, and a whole layout satisfies
+it, so a caller passes whichever it is holding.
+
+**An item's placement and the box its transform lands on are two different rectangles.** They are the same
+one almost everywhere, which is why `frame` defaults to `placement` — but a wheel paints every wedge across
+the whole wheel, so an effect measured against a wedge has to be written onto the wheel. Keeping one field
+for both would have made a translation on a wheel wrong by the ratio between a wedge and the disc, silently,
+in exactly the effects that move things.
+
+**The defs carry the reduced-motion preference rather than the library acting on it.** A transform is motion
+under success criterion 2.3.3 and a blur is too under its erratum, so the library could tell which half of an
+effect to strip — and stripping is the one thing the `PointerTracker` entry above argues it must not do, because
+only the consumer can _substitute_. So the flag arrives in the defs and each sample effect answers it in the
+way that suits it: `swell` sends the same curve to `brightness` instead of to size, `fade` keeps its dimming
+and drops its blur, `lift` is nothing but movement and answers with nothing at all, and `glow` is not motion
+under the criterion's own definition and is unchanged. Four samples, four different right answers, which is
+the argument for the flag rather than a rule.
+
+**A row and a column joined the layout registry, and they are there to be tested against.** The user's call.
+Every arrangement the library shipped curved, scattered or overlapped, which meant there was nothing to check
+a pointer effect against where the right answer is obvious by eye — and both faults above were invisible until
+there was. They are the two arrangements a control would have had without a layout at all, which is the second
+thing they buy: a dock is a row, and until these existed the one shape a swell most obviously wants was the one
+shape no layout could describe.
+
+**`Wheel` takes one, and it is the one place the effect is not measured against the layout it was given.** A
+wheel reads a layout for one wedge's shape and then puts every wedge where CSS says, turning the lot as it
+spins — so the placements are a design drawing rather than a description of what is on screen. Each wedge's
+defs are built from where it currently points: the resting placement turned about the layout's own origin by
+that wedge's live angle, which means the effect follows the wheel round as it spins rather than lighting the
+place a wedge used to be. `Bracket` and `Satellite` take no layout and never did — each owns a
+`computeLayout` of its own, internal and not a prop, which is why a search for the name turns them up.
+
 ### The band and the arc are two placers, and `fit` was the seam between them
 
 The user's call, arrived at from the rating arc. One factory had grown a `fit` of `"turn"` or `"content"`,
@@ -2739,7 +2960,7 @@ fault that a snapped arc could not nest — there is nothing left to snap.
 
 **A sector still carries the point it turns about.** That came out of snapping and outlived it: a painter is
 handed a `PlacementRect` rather than the layout, so a wedge drawn about the middle of the box would be drawn
-about the wrong point whenever the box is not centred on the circle. `getSectorPath` prefers an explicit
+about the wrong point whenever the box is not centerd on the circle. `getSectorPath` prefers an explicit
 argument, then the sector's own, then the middle.
 
 ### The arc can be flattened or stretched, and spaces its items along the curve
@@ -2762,10 +2983,10 @@ even, which is the case that proves the walk is not introducing error of its own
 survives is a fraction of what equal angles leave, and the spec asserts that ratio rather than either number.
 
 **The item keeps the size it was given.** Stretching the curve must not stretch what sits on it — only the
-centres move, so a star stays a star on a flat arc.
+centers move, so a star stays a star on a flat arc.
 
 **A run between two items needs the curve, not a radius, so `PlacementLayout` gained `radii`.** `getLinkPath`
-drew a circular arc between two centres about an origin, which is right only while the curve is a circle;
+drew a circular arc between two centers about an origin, which is right only while the curve is a circle;
 `Stepper`'s connectors would otherwise cut across a flattened arc rather than following it. The layout now
 says what curve its items sit on, `StepperConnectorDefs` carries it through to the painter, and `getLinkPath`
 emits an elliptical arc when it is given one and behaves exactly as before when it is not.
@@ -2779,7 +3000,7 @@ would read as uneven in a way they never do on a circle.
 
 The user's call, on a finding that came out of painting a wheel's wedges with a gradient. Putting an SVG
 gradient definition inside the wheel's popup was enough to make the browser re-run hit-testing as the popup
-appeared, and it reports that as a fresh `mouseenter` — so a wheel, which opens centred on its own trigger,
+appeared, and it reports that as a fresh `mouseenter` — so a wheel, which opens centerd on its own trigger,
 handed the highlight to the close control in its hole before anybody had touched anything.
 
 **The machinery to tell the two apart was already there and was only half-used.** `createPointerPointReader`
@@ -2791,7 +3012,7 @@ decision. `hoverIndex` now returns early for an enter nothing caused.
 **What proves it is a dispatched event rather than a browser quirk.** No real interaction produces the
 invented kind on demand — it depends on what the browser decides to re-test and when — so `menu.spec.ts`
 dispatches a `mouseenter` carrying the coordinates the pointer actually last had, which is the shape the guard
-is written to recognise, and checks that the same item entered properly still takes the highlight. The demo
+is written to recognize, and checks that the same item entered properly still takes the highlight. The demo
 keeps its gradient definition in the page rather than in the popup all the same, which is where a definition
 shared by every wedge belongs.
 
@@ -2806,7 +3027,7 @@ tied the two together, so the two numbers could disagree — and at the defaults
 `WheelMenu`'s demo widens `bandWidth` to `84` and leaves `wedgeArc` at its default. The label cap follows
 `bandWidth` up to 84 while the wedge stays at a chord of 25, so every nested wedge was about a fifth of the
 width of the label it was drawing — a sliver a dozen pixels across with "From template" laid over it and over
-its neighbours. The root ring was untouched because its wedge angle comes from dividing the spread among its
+its neighbors. The root ring was untouched because its wedge angle comes from dividing the spread among its
 items, not from `wedgeArc`.
 
 **So a nested wedge's chord is the larger of `wedgeArc` and the label's own cap.** The layout can no longer
@@ -2839,12 +3060,12 @@ is the one a consumer is looking at when they tune it, and every band beyond it 
 An open run puts an item on each end, so `N` items make `N - 1` gaps; a closed loop makes `N`. The arc used
 to hold both and swap between them the moment the spread reached a whole turn, which moved two things at
 once — the spacing, because the gap count changed, and the whole arrangement's rotation, because an open run
-is centred on the facing direction while a closed one puts its first item there. Six items over 350° left
+is centerd on the facing direction while a closed one puts its first item there. Six items over 350° left
 five gaps of 70° and a 10° seam; a nudge to 360 made every gap 60° and turned the ring by half a step. The
 user described the second half as going from an upright hexagon to a sideways one.
 
 **The arc has no closed case now.** Its spread is clamped to `360 * (N - 1) / N`, the widest run whose own
-gaps already measure a full turn divided by `N`, and the run is centred on the facing direction at every
+gaps already measure a full turn divided by `N`, and the run is centerd on the facing direction at every
 spread. Past the cap nothing changes at all: with six items, 300°, 350°, 360° and 450° all place the same
 six points. A full ring is still reachable — at the cap the seam equals every other gap, which is what a
 ring is — it simply cannot be asked for as `360` and land somewhere different.
@@ -2864,16 +3085,16 @@ put.
 ### The ring starts from the same place at every spread, a whole turn included
 
 The band had a second rule for a whole turn: below one, the run was laid symmetrically about straight up;
-at exactly one, the first wedge was centred there instead. Nothing else jumped — the wedge width and the
+at exactly one, the first wedge was centerd there instead. Nothing else jumped — the wedge width and the
 hole both close smoothly, 55.33° and 13° at 350, 56.98° and 3.1° at 359.9 — but the arrangement turned by
 half a wedge at the last degree of the knob.
 
-**There is one rule now: the run is centred on the reference at every spread.** The user's, put as "why
+**There is one rule now: the run is centerd on the reference at every spread.** The user's, put as "why
 don't we simply always start positioning from X regardless of the full angle being 60, 360 or
 366000000000". The whole-turn branch is gone, and the spread is clamped to a whole turn so a number past one
 means one. Six items at 359.9 and at 360 place the same wedges.
 
-**What it gives up is a wedge centred at twelve o'clock on a whole wheel.** Centring the run there puts a
+**What it gives up is a wedge centerd at twelve o'clock on a whole wheel.** Centring the run there puts a
 wedge boundary at the top when the item count is even and a wedge middle when it is odd. That was the whole
 reason for the branch, and a consumer wanting the old look asks for it by turning the ring rather than by
 falling into a different formula — the same answer the arc reached.
@@ -2896,7 +3117,7 @@ there, it was the tuning that had not been separated.
 
 **The opts are a small vocabulary that samples intersect**, rather than a bespoke type each:
 `GradientStepsOpts`, `GradientGlowOpts`, `GradientTrailOpts`, and the pre-existing cycle and banded flags. A
-sample says `GradientCycleGlowOpts & GradientTrailOpts` and gets exactly the props it honours; the entry
+sample says `GradientCycleGlowOpts & GradientTrailOpts` and gets exactly the props it honors; the entry
 union says the same, so a knob a sample never reads cannot be handed to it.
 
 **`steps` is the one number every animated timed sample shared.** All fifty-odd calls to
@@ -2905,7 +3126,7 @@ identity, the count is its smoothness. Fourteen samples take it now and the defa
 `SVGDefsUtils.DEFAULT_GRADIENT_STEPS`.
 
 **`bands` replaced four literal stop-key arrays.** The flows held a seven-entry array for the blended case and
-a thirteen- or seventeen-entry one for the banded case, alternating two or three colours by hand.
+a thirteen- or seventeen-entry one for the banded case, alternating two or three colors by hand.
 `getCycleStopKeys` builds either from a repeat count, remembering the closing stop that lets the strip slide
 without a seam, and each sample keeps its own two repeat counts as the defaults it had.
 
@@ -2914,7 +3135,7 @@ one of the eighteen was gone through, at the user's word — _"expose what we ca
 what we shouldn't"_ — and the numbers that shape an effect are all reachable: the radial falloff on the spots
 and flares, the band's core and spread and how far it tracks, the hand's sweep arc and lead, the whole ripple
 set from source size through ring count, spacing, start and end scale, decay and crest, the smear's speed
-response, and the colour walk's span and period. Nothing was retuned — every constant still holds the number
+response, and the color walk's span and period. Nothing was retuned — every constant still holds the number
 the user arrived at, and an untouched knob resolves to it.
 
 **The opts reach them by bag rather than by parameter.** The values live inside module-level helpers —
@@ -2935,6 +3156,268 @@ that knob starts at.
 lifetimes computed from it, the grace period before a still pointer stops stamping, and the epsilon that
 decides whether the pointer moved at all. A knob on any of those turns the effect's clock rather than its
 look.
+
+### A band's travel is the pointer projected onto the band's own axis, normalized
+
+`band_diag_1` exposed its angle but kept its motion pinned to the diagonal it was built at: the gradient was
+drawn at the angle asked for while the pointer offset was still decomposed along a hardcoded forty-five, so
+turning the knob left the band sliding across itself instead of along itself. Three knobs on the band family
+were declared, defaulted and never read at all — `band_diag_1`'s travel, and the travel on the second gradient
+of `band_1v1`.
+
+**The travel is one rule now, `projectBoxRatioOntoAngle`.** The centerd pointer ratio is projected onto the
+band's axis and divided by `|cos| + |sin|`, which is the largest that projection can reach inside the box. So
+a drag from one corner to the opposite one moves the band by the whole of its travel knob whatever angle it
+sits at, rather than by a factor that grows and shrinks with the angle.
+
+The normalization was chosen because it reproduces both hand-written formulas exactly rather than replacing
+them. At nought degrees it collapses to `x - 0.5`, which is what `band_1` wrote; at forty-five it collapses
+to `(x + y - 1) / 2`, which is what `band_diag_1` wrote. Neither sample was retuned and neither moved a pixel
+at its own default — the two were already the same rule, seen at two angles.
+
+**`band_diag_1`'s stated travel default was wrong as well**, at `1`, against the `1.25` the sample was tuned
+with. The knob was never read, so nothing showed it. Fixing the reading fixes the promise the registry makes,
+and the default now says `1.25`.
+
+**The same fault ran through the flares' ghost colors.** `spot_flare_2` and `spot_flare_3` declared ghost
+saturation and brightness, defaulted them and painted from the module constants, because `toGhostColor` was
+the one helper in those files that never took the opts bag — the pass that threaded opts through
+`computeGhostColors` stopped one call short. It takes the bag now, like its neighbors.
+
+**`band_1` and `band_1v1` keep their fixed horizontal and vertical**, at the user's word, and are not to be
+offered an angle knob again. The travel rule reaching them costs nothing either way — at nought and ninety it
+is the same arithmetic they already had.
+
+**The lesson for the rest of the exposure pass**: a knob is only exposed once the value it names is read at
+every place it is used. A helper the value reaches by module constant, a second gradient in a paired sample,
+or a decomposition taken at a literal angle each swallow a knob silently, and the panel shows a control that
+does nothing. Cross-checking the registry's keys against the sample's own reads is what found the four here.
+
+### The hand's sweep is pinned across its arc, and a fade exponent says so in its label
+
+**`sweepLead` is gone rather than defaulted**, at the user's word, and is the second narrowing after
+`elastic_*`'s step count. The knob turned the gradient that paints the hand while leaving the clip arc where
+it was, so any value but ninety slid the bright band off the wedge it is meant to fill and the sample stopped
+reading as a hand at all. Ninety is not a tuned number: the gradient runs across the arc's bisector, which is
+a quarter turn from the pointer by construction. It is written as `QUARTER_TURN` in the four hand samples
+beside the `HALF_TURN` that was already there, so it reads as the geometry it is rather than as a value
+somebody chose.
+
+`GradientSweepOpts` is `sweepArc` alone now, and `hand_1` and the three `hand_trail_*` lost the prop.
+
+**Two fade knobs are exponents and their labels now say so.** _"How fast the trail fades"_ and _"How fast a
+ring fades"_ promised a rate, and the number is neither a duration nor a speed — it is the power that
+remaining life is raised to, which the code has always called `STAMP_DECAY_EXPONENT` and
+`RIPPLE_DECAY_EXPONENT`. One leaves the fade even; higher drops it away sooner. There is no unit to add, so
+the labels name the shape instead: _"Trail fade curve (exponent)"_ and _"Ring fade curve (exponent)"_.
+
+### The cycle time sits beside the cycle switch, and the smear has a one-color member
+
+**A knob's neighbors are its panel order**, since the generic panel renders `KNOBS_BY_FAMILY` in the order
+its keys are written. `cycleMs` had drifted to the far end of six families, several rows below the switch
+that turns cycling on, so the number and the thing it governs were never on screen together. It follows
+`cycles` directly now in all six.
+
+**The two cycling ripples got the same knob, at the user's word.** `spot_ripple_2` and `spot_ripple_3` held
+`CYCLE_MS` as a module constant while their trail, smear and hand equivalents exposed it, so those panels
+showed a cycle switch with no period beside it.
+
+The period needed a home in the vocabulary before it could reach them. It had only ever existed inside
+`GradientColorAgeOpts`, bundled with `ageColorSpan`, and the ripples have no age-banded color walk to
+justify taking that whole pair — while `GradientCycleOpts` is the bare switch that a dozen timed samples take
+without any period of their own. So `cycleMs` is its own `GradientCyclePeriodOpts` now, `GradientColorAgeOpts`
+intersects it rather than declaring it, and the ripple sample opts intersect it directly. Nothing else
+changed shape.
+
+**`spot_smear_1` is the one-color member the family was missing.** A trailing digit in this vocabulary is
+how many of the theme's colors a sample paints with, and the smear had a two and a three but no one. It is
+`spot_smear_2` without the color machinery — no cycle, no age-banded walk, everything primary — which is
+exactly the relationship `spot_trail_1` has to `spot_trail_2` and `spot_ripple_1` to `spot_ripple_2`.
+
+**It takes the family's shared opts type and simply declares fewer knobs**, rather than a narrower type of
+its own. That is what `spot_trail_1` and `spot_ripple_1` already do: one opts type per family, and the
+registry is what says which of them a given member honors. A precise per-member type would read better in
+isolation and worse beside its neighbors, and the neighbors won.
+
+Nothing in the Playground needed editing for it. The picker builds its groups from `SAMPLE_ENTRIES` and
+groups by the leading word of the key, so registering the sample is the whole of it.
+
+### A spot can hold its shape against the box, and the correction sits outside the smear's turn
+
+A bounding-box gradient is measured in fractions of the element, so a radial gradient with a radius of
+`0.4` reaches four tenths of the width across and four tenths of the height down. On a square element those
+are the same number of pixels; on an oblong one they are not, and the spot paints as an oval. Nothing in the
+samples chose that — it is what SVG does when no transform says otherwise, and the Playground's example box
+is resizable, so it is reachable by dragging.
+
+**Every `spot_*` sample takes a `circular` switch, off by default.** Off is what the family did before. On,
+the gradient keeps its shape whatever the box does.
+
+**The radius is taken from the shorter side.** Correcting onto the longer one would let a spot tuned at `0.8`
+of the width balloon far outside a short box; the shorter side keeps it inscribed. It also means a square
+element computes a correction of exactly one, so the transform is byte-for-byte what it was and no sample
+moves at its default.
+
+**The correction had to go into `getRadialTransform` rather than into the samples' `aspect`.** Six of the
+twelve could have folded it into the aspect they were already passing — they pass no angle, so order does not
+bite. The three smears cannot: they use `aspect` and `angle` together to stretch a stamp along its heading,
+and the box correction has to apply to the result of that turn rather than inside it. The helper emits the
+counter-scale between the origin translate and the rotate, so one field serves both cases and all twelve
+samples ask for it the same way.
+
+**What the switch does not do is make the arrangement round**, and the user accepted that when it was put to
+them. A ghost's reach, a ripple's spacing and the pointer's own reading are all fractions of the box, so a
+stretched element gives round blobs strung along an oval. Correcting those is a different piece of work — it
+would change how the whole family measures itself, not add a knob.
+
+**The size arrives as an accessor chosen at build time, not an accessor that may return nothing.**
+`AccessorProps` strips `undefined` from what an accessor may return, on the grounds that an accessor
+returning nothing is the same as no accessor. `circular` is a plain flag the factory reads once, so the
+sample picks between an accessor and `undefined` rather than passing one that answers conditionally.
+
+### A tracked gradient's defaults have one home, and the samples read from it
+
+Every default was written twice: once in `DEFAULTS_BY_FAMILY`, which is what the Playground panel starts a
+knob at, and once as the module constant the sample falls back to when no knob is passed. Nothing tied the
+two together and nothing complained when they disagreed, so the panel could paint one number while a consumer
+importing the sample got another. Thirteen of them had already drifted apart.
+
+**The registry is the home and the samples import from it**, the user's, in those words. Each sample holds
+`const DEFAULTS = TrackedGradientKnobs.<FAMILY>_DEFAULTS` and every fallback reads a field off it, so the
+number cannot be stated in two places again. The direction is safe: the knobs file imports only
+`Samples.types`, the samples import the knobs file, and the sample registry imports the samples.
+
+**The defaults compose rather than repeat.** Fourteen objects cover the nineteen samples. A family states its
+numbers once and its cycling members add the two color knobs to it — `SPOT_TRAIL_CYCLING_DEFAULTS` is
+`SPOT_TRAIL_DEFAULTS` plus the span and the period — which is where most of the seventy-six repeated entries
+went.
+
+**Two of the compositions cross a family line, deliberately.** `SPOT_FLARE_DEFAULTS` extends
+`SPOT_DEFAULTS` and `SPOT_SMEAR_DEFAULTS` extends `SPOT_TRAIL_DEFAULTS`, because in both cases the base is
+exactly contained in the extension and the relationship is real — a flare is a spot with ghosts, and a smear
+is a trail whose stamps stretch. The consequence is that retuning a spot moves the flares with it. That is
+the point of unifying, but it is worth knowing before changing a number.
+
+**Where the two copies disagreed, the registry's value won.** The user had just retuned there, so the
+registry held what they wanted and the constants held what it used to be. The rebuilt map was checked
+value-for-value against what was on disk before the change, and nothing moved.
+
+**`rippleStartScale` keeps its link to `sourceScale`.** A ring starts at the size of the source that threw
+it, which the sample expressed by defining one constant as the other. Both now read a single
+`RIPPLE_SOURCE_SCALE`, so the relationship survives rather than becoming two numbers that happen to match.
+
+**The wide type on `DEFAULTS_BY_FAMILY` stays.** Four pages index it with a key that may be the
+no-sample sentinel, so a precise object type would push a cast into each of them. The shared objects carry
+the precise types the samples need, and the map is the loose page-facing view of the same values.
+
+### A sample knob is labeled after the prop it sets, not after what the effect does
+
+The Playground is read by people who will write against these props, so a label has to tell them which prop
+their hand is on. The labels were descriptions instead — _"How much of a mark's life the color walks"_ for
+`ageColorSpan`, _"Rings at once"_ for `rippleCount`, _"Travel between rings"_ for `rippleSpacingRatio` — and
+a reader who liked what a knob did could not tell what to type to get it.
+
+**`CellAnimation`'s page set the form, at the user's word.** A label is the prop's own name as a short
+readable phrase: `uniqueWeights` is _"Unique weights"_, `originType` is _"Origin"_, `animationDurationMs` is
+_"Animation duration (ms)"_. Units and ranges stay in brackets, and a name can shed the part its group
+already says. All four sample registries follow it now — both gradient families, the placement layouts and
+the scanline effects — sixty-two props, each with one label and no label serving two props.
+
+**It is a matter of taste and not of derivation, which the user said in as many words.** A few do not fold
+into a tidy phrase, and those took a readable label rather than a mechanical transliteration: `cycleMs` is
+_"Cycle (ms)"_ rather than _"Cycle ms"_, `perRow` stayed _"Cells per row"_ because the bare name says
+nothing, and the two exponents keep their bracketed note because the number is otherwise unreadable.
+
+**The pass turned up one knob serving two props.** `hand_1`'s `peakAlpha` was pointed at the core-alpha knob
+object, which was invisible while both labels read _"Core opacity"_ and became a lie the moment the label
+named a prop. It has its own knob now, with the same range.
+
+**What is deliberately not covered**: labels a page writes for its own props rather than for a sample's, like
+the gradient pages' _"Gradient"_ picker or the blur width. Those are the page's controls, not the library's
+surface, and no consumer types them.
+
+### An overhead wheel turns its picked wedge to the marker, and the marker is a prop
+
+The wheel reported the right wedge and highlighted the right wedge, and the wedge was nowhere near the
+pointer at the top of the demo. It had been drawing each wedge at `index * step + angle`, which puts the
+picked wedge at rotation zero — wherever the layout happens to put its first placement. Nothing said that had
+to be under the marker; it used to be, by accident.
+
+**The accident was the ring's whole-turn branch, which was removed on purpose.** A full-turn ring used to
+centre its _first_ wedge on the facing direction; it now centres the _run_ there, so on eight wedges the first
+one starts at the bottom and a wedge boundary sits at twelve o'clock. That change is right and stays — the
+entry two along argues it — and this is the consumer that was leaning on the old formula.
+
+**The wheel corrects for it rather than the layout going back.** It reads the first placement's sector, takes
+the middle of it, and turns the whole assembly by whatever lands that middle on the marker. Any layout, any
+facing, any wedge count: the wedge the wheel names is the wedge under the marker. `markerDegrees` says where
+the marker is and defaults to `-90`, straight up, which is where the layouts already face and where a pip
+conventionally sits. It is a prop because the marker is drawn by the consumer, outside the wheel, so nothing
+else can know.
+
+**A wedge now reports the angle it was turned to.** `WheelWedgeState` carries `angle`, because the painter
+cannot work out its own orientation otherwise — every wedge is handed the _same_ placement rect and told
+apart only by the rotation the wheel applies.
+
+### A wheel's label lies across its wedge, and flips rather than reading upside down
+
+The labels were painted at whatever angle the wheel had turned them to, so half the wheel read upside down.
+Two things were wrong underneath that.
+
+**The label was square to the layout rather than to its wedge.** With `tiltRatio` at zero the placement's box
+is axis-aligned, which looks deliberate only for the one wedge sitting at the layout's own zero and arbitrary
+everywhere else. The label is laid across the wedge now — a quarter turn from the sector's own bisector —
+which is also what the layout's arithmetic implies, since it sizes the box from the chord across the wedge
+rather than from anything radial.
+
+**Then it flips a half turn when it would otherwise read upside down**, which is the half of the wheel where
+the painted angle falls between ninety and two hundred and seventy degrees. Top and bottom labels come out
+horizontal, the two sides vertical and mirrored, and nothing is inverted at any wedge count.
+
+The flip happens while the wheel spins, at the two crossings. That is accepted: a label is read when the
+wheel is at rest, and the alternative — laying every label along its radius, which never inverts — is a
+different look nobody asked for.
+
+**This lives in the Playground's painter, not in the wheel.** The wheel says how far it turned each wedge;
+what to do about it is the paint, and `components/src` paints nothing.
+
+### The Placement page is prose, and its examples live on the controls that take a layout
+
+The page carried a band knob panel driving two demos, a menu and a wheel, to show one layout reaching two
+controls that share nothing else. The user asked for it back to explanation only. A menu entry with no
+`component` is already the shape for that, so the entry keeps its description and the page, its two examples
+and its own types and styles are gone.
+
+**The description lost its last sentence and gained one.** It pointed at "both wheels on this page", which
+would have been a reference to nothing. Ten controls take a layout and every one of them demonstrates it on
+its own page, which is what the new sentence says.
+
+**`placement.spec.ts` went with the page**, since both of its tests reached through those two demos. One of
+them was not really about the page at all: whether a wedge with no hole closes on the center rather than
+drawing a near edge is arithmetic in `getSectorPath`, so it is a unit test now, alongside a band's two arcs
+and the large-arc flag that only appears past a half turn. The other test — one knob reaching a menu and a
+wheel at once — had the page as its only possible harness and is not covered any more. Rebuilding it would
+mean rebuilding the demos it was written against.
+
+### The Playground's modals all darken the page the same way
+
+`PageModalOverlay` blurs and desaturates what is behind it; `PageModalScrim` is a flat dark panel that only
+fades. The source-code viewer, the drawer and the stress test used the first, and all three demos on the
+Modal page used the second, so the control whose own page is supposed to show what a modal looks like was the
+one showing something different from everywhere else.
+
+**The three Modal demos take `PageModalOverlay` now**, at the user's word. Nothing else changed: the two
+places that deliberately paint their own overlay — `Preview`'s text fade and the `Surface` card's bio fade —
+are their examples' own effect rather than a modal backdrop, and the spotlights cut a hole in theirs.
+
+**The library still has no default here and should not grow one.** `renderOverlay` is a slot and
+`components/src` paints nothing, so "by default" is a Playground decision about which overlay a modal reaches
+for, not a default the `Modal` component could hold.
+
+**`PageModalScrim` is deleted**, at the user's word, along with its two styles: once the Modal page moved off
+it nothing used it, and there is one overlay now rather than a choice of two. Its removal took two dead
+things with it — the `themeVars` import that only the scrim's background needed, and the `background-color`
+in the overlay's transition list, which had never had a background colour to move.
 
 ### Every props panel resets itself, and no page was edited to get one
 
@@ -2992,14 +3475,14 @@ never does.
 
 **An exact circle was already reachable and is still not a name.** `setupPaths` takes a join radius per
 corner, and at the `round` exponent the corner is a plain circular arc; give a square radii of half its side
-and all four arcs share the square's own centre, closing into a true circle with no straight edge left. The
+and all four arcs share the square's own center, closing into a true circle with no straight edge left. The
 clamping tops out at exactly that value. What that cannot do is come from a shape _name_, because
 `getDefaultShapePoints` answers with points and nothing else — a picker threading a name has no second
 descriptor to carry the radii in. Closing that gap would touch every caller that builds points from a name;
 the polygon touches none, which is why it won.
 
 **It tiles at a pitch of `√3/2` with offset rows**, the hexagonal close packing, sharing the pointy-top
-hexagon's neighbourhood — six touching neighbours either way. `TileBoard` needs a tiling for every shape in
+hexagon's neighborhood — six touching neighbors either way. `TileBoard` needs a tiling for every shape in
 the set, so this was not optional.
 
 **The Shape page caps its per-corner grid at six columns.** It laid one column per two corners, which is
@@ -3024,7 +3507,7 @@ def. It is the one that cannot break anything: a cliff grows downward and `toFit
 height afterwards.
 
 The old `1.75`-quarter base constant is gone, though. It was the centring, worked out once by hand; the
-leader is now placed from the shift ratios so a cliff sits centred in its box, which comes out at exactly the
+leader is now placed from the shift ratios so a cliff sits centerd in its box, which comes out at exactly the
 same `0.4375`.
 
 **Hexagons still overlap and that is where it rests.** Tiling them wants second across by half and third back
@@ -3036,7 +3519,7 @@ draws. Not built, and not asked for.
 
 Two more of the same, on the arrangements the arc and the band had left behind.
 
-**The honeycomb's cell was a length and did nothing on its own.** The layout normalises to its own box, so
+**The honeycomb's cell was a length and did nothing on its own.** The layout normalizes to its own box, so
 `cellWidth` only ever mattered against `gap` — the painted cell is the box divided by the columns, whatever
 number was written. The cell is the unit now, `cellWidth` is gone, and `gap` is `gapRatio`, a share of a
 cell. The user's: _"cellWidth simply becomes total / col count"_.
@@ -3065,7 +3548,7 @@ each level's true diameter as the layout's `extent` so `Menu` still sizes the le
 override is why its `layoutDefs` no longer accepts `holeRatio`, `spreadDegrees` or `computeItemArcs` — it
 sets all three per level, and a value passed in would have been discarded in silence.
 
-**A wheel's first wedge is aimed at twelve o'clock only when it fills the turn.** A partial wheel centres its
+**A wheel's first wedge is aimed at twelve o'clock only when it fills the turn.** A partial wheel centers its
 run there instead, which is what a half wheel always did, and the aim uses the first wedge's real arc rather
 than an even share — otherwise a wedge that asks for extra room drags the whole ring off north.
 
@@ -3073,7 +3556,7 @@ than an even share — otherwise a wedge that asks for extra room drags the whol
 
 The band had grown three jobs that were not placement. It worked out its own inner radius from the level
 above (`parentExtent`, `levelGap`), it decided that a nested level should be only as wide as its items need
-rather than sharing a spread, and it put one item in the hole (`hasCentreItem`, `centreRadius`). Every one of
+rather than sharing a spread, and it put one item in the hole (`hasCenterItem`, `centerRadius`). Every one of
 them existed for `WheelMenu` and nothing else reached them.
 
 **The user's call, and their argument is the whole of it: concentric rings are trivial arithmetic the
@@ -3082,7 +3565,7 @@ An item in the middle is `index === 0 ? a circle : a wedge`. Neither needs the p
 
 **So `createRing` takes an item count and answers with one ring.** It has no notion of depth, of a parent, or
 of a root, and `path`, `parentExtent` and `parentPlacement` no longer reach it. What it gained instead is
-`facingDegrees`, the same knob the arc has: where the run is centred. That one number replaced the aiming
+`facingDegrees`, the same knob the arc has: where the run is centerd. That one number replaced the aiming
 branch, because aiming a submenu at its opener is just facing the opener's mid-angle.
 
 `wedgeArc` went with the nesting. It only ever sized wedges on a level that was not the root, and there is no
@@ -3116,7 +3599,7 @@ changed: there `ArrowRight` and `ArrowLeft` still open and close, because there 
 
 **`Escape` had to be stopped from reaching the dismisser, and `stopPropagation` was not enough.** Solid
 delegates `keydown` at the document root, so the menu's handler and `Dismisser`'s listener are both on
-`document` — a call that stops the event travelling further does nothing to a listener already attached to the
+`document` — a call that stops the event traveling further does nothing to a listener already attached to the
 same node. `stopImmediatePropagation` is what a level needs to keep a dismissal to itself.
 
 ### A group's radios are ordered by the document, and only once every one of them has reported
@@ -3139,7 +3622,7 @@ The rest of `backlog.md` item 24's proving pass, run against `Stepper`, `Toolbar
 expected to strain a different part of the abstract, and each did.
 
 **A connector has to reach, which no amount of repositioning gives you.** `Stepper`'s run between two steps
-was a bar between two flex siblings: it has no idea where either of its neighbours is, because in a row it
+was a bar between two flex siblings: it has no idea where either of its neighbors is, because in a row it
 does not need to. A placed run is handed both placements and draws its own path, and
 `PlacementUtils.getLinkPath` is the geometry — straight between two placements, or bent along the arc they
 sit on when it is given the point they turn about. `BracketConnectorPaths` is the precedent for a connector
@@ -3152,7 +3635,7 @@ box with `pointer-events: none`, the step sits in a placement inside it, and the
 drawn across it. That is `Menu`'s radio-group run pattern, and it is what makes a reaching connector possible
 at all — the connector needs a surface as wide as the box, which a placed item is not.
 
-**`Toolbar` is the one control where a layout removes a behaviour instead of moving it.** Its whole substance
+**`Toolbar` is the one control where a layout removes a behavior instead of moving it.** Its whole substance
 is the cut: it measures every action against the room it has and moves the tail into a menu. A layout sizes
 the toolbar itself, so there is no room to run out of — a placed toolbar collapses nothing, its overflow menu
 holds nothing, and its observers do not run. The 1-D arithmetic in `ToolbarUtils.computeCut` is not extended
@@ -3163,7 +3646,7 @@ a drop by walking its items in order and comparing one coordinate against each m
 coordinate — the item at twelve o'clock is neither before nor after the one at three — so a placed list asks
 which placement is nearest instead. `toLayoutPoint` converts the pointer through the box's own rect, which is
 also why the `Viewport` scale divides out: a ratio taken within one rect does not care what scale that rect
-was measured at. Item 26 recorded the picking as a tested generalisation with nothing consuming it, waiting on
+was measured at. Item 26 recorded the picking as a tested generalization with nothing consuming it, waiting on
 the flick; the flick is still unbuilt and this got there first.
 
 **`Tree` is the only layout that needed to know more than how many items it is placing.** Where a node goes
@@ -3195,20 +3678,20 @@ paint for the reason `getSectorPath` gives.
 
 ### A landing mark is placed like an item, and the gap between two placements is geometry
 
-The user's, on seeing that a placed `Sortable` marked nothing: the two neighbours a card would land between
+The user's, on seeing that a placed `Sortable` marked nothing: the two neighbors a card would land between
 have borders, and the point midway between them is calculable however they are turned. So it is calculated,
 in the abstract, and the answer is a `PlacementRect` — which means the mark is placed exactly the way an item
 is and needs no second mechanism.
 
 **`PlacementUtils.getGapPlacement` takes the placements and an index, not two rects.** The index is the one a
 control already has — where the carried item would land — and the ends of the list are the reason the whole
-list is the argument: before the first and after the last there is only one neighbour, so the gap is aimed by
+list is the argument: before the first and after the last there is only one neighbor, so the gap is aimed by
 the pair inside it and put on the far side of the outermost one. A list of one has no direction and gets
 nothing back.
 
-**It measures between the borders that face each other, which is not the midpoint of the two centres.** Those
-are the same point only while the neighbours are the same size. A placement may also be turned, so the
-distance from a centre to its own border along a direction is a ray against a box in that box's own frame
+**It measures between the borders that face each other, which is not the midpoint of the two centers.** Those
+are the same point only while the neighbors are the same size. A placement may also be turned, so the
+distance from a center to its own border along a direction is a ray against a box in that box's own frame
 rather than against the upright rectangle it would have been — and the length of the mark is the box's
 shadow across the join, which for a diagonal join is neither of its two sides.
 
@@ -3216,8 +3699,8 @@ shadow across the join, which for a diagonal join is neither of its two sides.
 first attempt aimed the last gap by reversing the join before it, which is right for a row and a quarter turn
 out on a ring: the user found it by eye on the north-west gap of a ring of four, where the mark lay across
 the six-to-nine join instead of across nine-to-twelve. Three consecutive placements say how a run is curving
-and two say only which way it is heading, so the imagined neighbour past the end sits on the circle through
-the last three, one turn further round; where those three are in a line the circle has no centre and the
+and two say only which way it is heading, so the imagined neighbor past the end sits on the circle through
+the last three, one turn further round; where those three are in a line the circle has no center and the
 straight continuation is all there is, which is the row's answer falling out of the same arithmetic. Both
 ends of a closed ring then describe the same gap, because on a ring they are the same place.
 
@@ -3226,17 +3709,17 @@ bearing among four looks plausible in isolation and is obvious the moment the se
 the fault reached the user rather than the suite. `sortable.spec.ts` walks the carried card round all four
 and asserts the step between consecutive bearings; reverting the continuation to the straight line fails it.
 
-**A placement is a centre before it is a size, so what sits in one stays on that centre whether or not it
+**A placement is a center before it is a size, so what sits in one stays on that center whether or not it
 fits.** The user's, on noticing that the item at the top of a ring and the item at the bottom did not share
-a centre. The boxes did — both were at `50cqw` — and what had moved was the card inside one of them: a card
+a center. The boxes did — both were at `50cqw` — and what had moved was the card inside one of them: a card
 whose content needs more room than the box it was given pulls the box's only track out with it, and an
-`auto` track grows out of one side only. So the placed box pins its single track to itself and centres what
+`auto` track grows out of one side only. So the placed box pins its single track to itself and centers what
 it holds, and holds that child to at least the box's own size so a painter that draws the whole box still
 has one to draw. What does not fit is then squeezed rather than shifted, which is the honest failure: the
 item stays on its point and the too-small box shows up as clipped content rather than as a crooked ring.
 
 **The gap is the space, and how much of it to ink is the painter's.** The rect handed over is the whole gap,
-turned so its own width runs along the join and its height lies across it; the library centres whatever the
+turned so its own width runs along the join and its height lies across it; the library centers whatever the
 painter draws inside that, rather than stretching it to fill. A painter that filled it drew a diamond the
 size of the gap, which is what settled the split — the same line `getSectorPath` draws between a shape and
 the paint on it.
@@ -3245,7 +3728,7 @@ the paint on it.
 round the ring and checks that the box the library placed carries a real bearing rather than none, which
 separates a placed mark from a repositioned bar without measuring where either of them is.
 
-### The `Sortable` page's cards centre on their slot rather than filling it, and its surfaces are given room
+### The `Sortable` page's cards center on their slot rather than filling it, and its surfaces are given room
 
 Two faults the user found in the placed `Sortable` demo, both in the Playground's paint rather than in the
 library, and worth recording because the first cost several rounds to locate.
@@ -3253,15 +3736,15 @@ library, and worth recording because the first cost several rounds to locate.
 **A card drew itself at its own width and hugged one edge of its slot.** `sortableItemContent` had no width
 and the default `flex: 0 1 auto`, so a chip took the size of its text and sat at the left of whatever slot it
 was given. In a column that reads as a left-aligned list and nobody notices; on a ring the slot is the size
-the layout chose, so a long label pushed its own centre right and the items stopped sharing an axis. The
+the layout chose, so a long label pushed its own center right and the items stopped sharing an axis. The
 library was correct throughout — box, wrapper and `listitem` were all exactly the slot's width — which is
 what made it hard to see: every measurement of the library's own geometry came back symmetric while the
 screen was visibly not.
 
-**Centred, not stretched, on the user's call.** `margin-inline: auto` on the chip, which centres a flex item
+**Centerd, not stretched, on the user's call.** `margin-inline: auto` on the chip, which centers a flex item
 along the main axis, so a card keeps its own width and sits on its point. Making it `flex: 1 1 auto` instead
 also fixed the geometry and was tried first; the user preferred the cards to stay their own size. It changes
-the column demo too, where the three shorter cards now centre in the width of the longest rather than lining
+the column demo too, where the three shorter cards now center in the width of the longest rather than lining
 up on the left.
 
 **The dashed surface is drawn outside the list, so every demo has to keep room for it.** `sortableSurface`
@@ -3310,7 +3793,7 @@ own layout root — divide by the measured width, which cancels whatever scale `
 `pickRule`, so an arrangement nobody has drawn yet is picked from by the same code.
 
 **`pickIndex` had a defect that only a layout with something in the middle could reveal.** An item placed on
-the origin has no direction to be aimed at, and `Math.atan2(0, 0)` is zero, so the wheel's centre X scored as
+the origin has no direction to be aimed at, and `Math.atan2(0, 0)` is zero, so the wheel's center X scored as
 though it pointed due east and won any flick that went that way. The guard the query point already had is now
 on the placements too: under the `"angle"` rule a placement sitting within `NO_DIRECTION_RADIUS` of the origin
 is passed over entirely. `Sortable` reached the same function first and never saw it, because a sortable ring
@@ -3362,7 +3845,7 @@ ignores a keydown whose target is not its own popup root. Stopping propagation w
 rejected: it would swallow the key for anything outside the menu that listens.
 
 **A blur dismisses only when focus has left the whole tree**, identified by id prefix — every level's id
-derives from the root's. The previous `relatedTarget === trigger` guard cannot generalise, because closing a
+derives from the root's. The previous `relatedTarget === trigger` guard cannot generalize, because closing a
 level restores focus to the level above and that restore reaches the parent as a blur; with three levels
 open, hovering back up the chain closed everything. The trigger check stays beside it for its own reason.
 
@@ -3439,7 +3922,7 @@ The rule from the walk still holds — the abstract answers _which item is next_
 do about it_: `Select` moves its highlight, `Menu` moves its highlight, `Tree` moves real focus.
 
 **A repeated letter cycles, and a growing query holds.** `l` then `l` means "the next thing starting with
-l"; `l` then `i` means Lisbon. One rule covers both: when the query normalises to a single character the
+l"; `l` then `i` means Lisbon. One rule covers both: when the query normalizes to a single character the
 current item is excluded from the scan, otherwise it is not — which is why typing `li` does not walk away
 from the Lisbon it just landed on.
 
@@ -3472,7 +3955,7 @@ inside the callback. So on a page that stops producing frames — a backgrounded
 never leaves: `getIsVisible` stays true, the `<Show>` stays mounted, and the focus trap stays with it.
 
 It now schedules the same idempotent `commit` from both a frame and a 100ms timer, whichever arrives first,
-cancelling the loser. The frame wins wherever frames exist; where they do not, the state machine advances
+canceling the loser. The frame wins wherever frames exist; where they do not, the state machine advances
 without an animation, which is correct on a page that is not painting.
 
 ### Controls: `Progress`, and what a non-interactive Fundamental looks like
@@ -3484,7 +3967,7 @@ of one, so it settles the shape by being it.
 `<div role="progressbar">` and the painter receives `getState`, not `getFlags` — `ProgressState` is the
 analogue, and calling it flags would claim an interaction contract this component does not have.
 
-**The painter is handed a normalised `ratio` as well as the raw value.** Clamping `(value - min) / span`
+**The painter is handed a normalized `ratio` as well as the raw value.** Clamping `(value - min) / span`
 into 0..1 is the one computation a painter must not repeat, since getting it wrong draws past the end of the
 track. `value`, `min` and `max` come along because a painter rendering "1.2 of 2.4 MB" cannot get them
 anywhere else — the opposite of `TextInput`, which withholds the value because the input already draws it.
@@ -3538,11 +4021,11 @@ and one prop meaning a string union on one component and a record on another is 
 trap.
 
 **`Drawer` narrows to four edges and adds nothing else**: `DrawerEdge` drops `"center"`, and `getEdge` is
-required where `getAlignment` was optional. An edge-attached dialog that could be centred is not a drawer.
+required where `getAlignment` was optional. An edge-attached dialog that could be centerd is not a drawer.
 
 **`AlertDialog` was a preset that earned nothing.** It set `role="alertdialog"`, required
 `getInitialFocusRef` and turned overlay-click dismissal off — three props already public on `Modal`, and no
-behaviour of its own. The line: `Drawer` narrows a vocabulary so a wrong state is unexpressible;
+behavior of its own. The line: `Drawer` narrows a vocabulary so a wrong state is unexpressible;
 `AlertDialog` only pre-filled values. A component whose whole body is three defaults is a comment with a
 build step. This does not overturn the `Toggle`-over-`Checkbox` rule — `Toggle` both removes surface and adds
 semantics a consumer cannot reach (the `switch` role, the mixed-state role swap).
@@ -3567,7 +4050,7 @@ Both are the `TextInput` arrangement (overlay geometry, wrapper, flags, private
 leaf), and both exist because of one thing the library cannot take over.
 
 **Activation must stay native, so gating a disabled control is `preventDefault` on `click`.** Only a user
-gesture on the real element opens a file dialog or the OS colour picker, so there is no JS path to gate and
+gesture on the real element opens a file dialog or the OS color picker, so there is no JS path to gate and
 no `readonly` to lean on. `preventDefault` cancels the default action — `BinarySwitch`'s mechanism rather
 than `Button`'s early return, which would have left both dialogs opening. `wrapElement`'s `mousedown`
 refusal still keeps a disabled control from taking focus.
@@ -3577,8 +4060,8 @@ each needed a different mechanism:
 
 - **A file input** hides `::file-selector-button` and sets `color: transparent` for the filename. It stays
   transparent-but-present rather than `opacity: 0`, because opacity paints the outline too.
-- **A colour input** needs `visibility: hidden` on `::-webkit-color-swatch`; a transparent background is
-  **not** enough, since the UA paints the current colour onto the swatch through a path an author
+- **A color input** needs `visibility: hidden` on `::-webkit-color-swatch`; a transparent background is
+  **not** enough, since the UA paints the current color onto the swatch through a path an author
   `background` does not reach, covering the painter with a solid rectangle. Visible on screen and invisible
   to every DOM assertion — the shape of what markup checks cannot catch. `visibility` takes the swatch out
   of paint and leaves the input's outline alone.
@@ -3590,7 +4073,7 @@ side of one rule — withhold what the element already draws, hand over what it 
 **`syncElement` returns for a third time**, on `BinarySwitch`'s premise:
 
 - **`ColorInput`** assigns `value` when it differs, so a snapping owner ("nearest of four") sees its
-  correction reach the element instead of the picker's raw colour.
+  correction reach the element instead of the picker's raw color.
 - **`FileInput`** cannot be pushed into an arbitrary state, because a `FileList` cannot be constructed. Only
   the empty case is expressible, via `element.value = ""`, and it is the case that matters: an owner that
   rejects a file and writes `[]` back would otherwise leave the input holding it, and **re-picking the same
@@ -3610,7 +4093,7 @@ its source is deliberately unknown. This dissolved the months-old "what does the
 nothing, because it is told.
 
 **What the library does own is `aria-current="step"`**, which is not a state a consumer may invent.
-`aria-current` is enumerated and `step` means exactly this, and an unrecognised value degrades silently to
+`aria-current` is enumerated and `step` means exactly this, and an unrecognized value degrades silently to
 plain `true` — so a consumer expressing "current" as one of their own states would produce a strip whose
 position is invisible to a screen reader. Same split `Breadcrumbs` makes with `aria-current="page"`.
 
@@ -3626,11 +4109,11 @@ exists rather than taken as a prop, so that rule's warning can never fire from h
 
 **Each step is its own tab stop; there is no roving order.** Researched on request. Roving is legal — no
 criterion counts tab stops — but the APG's account of how a user _discovers_ arrow keys is that assistive
-technology recognises the role and says so, and its composite list (combobox, grid, listbox, menu, radio
+technology recognizes the role and says so, and its composite list (combobox, grid, listbox, menu, radio
 group, tabs, toolbar, treegrid, tree view) has no stepper. An ordered list of buttons announces "list", so
 roving hides most of the strip from anyone who did not guess. No ARIA attribute advertises arrow-key
 navigation either: `aria-keyshortcuts` is for shortcuts that activate or focus, `aria-roledescription`
-renames a role without adding behaviour and is explicitly discouraged, and `role="application"` disables
+renames a role without adding behavior and is explicitly discouraged, and `role="application"` disables
 browse mode wholesale. Getting the announcement would mean claiming `role="tablist"`, which asserts the
 steps swap panels — untrue when the state source is agnostic. A stepper that does swap panels is `Tabs`.
 
@@ -3683,14 +4166,14 @@ why this shape beat an `fr`-based one: `fr` cannot appear inside `clamp()` or `m
 is not expressible alongside it, while percentages and pixels compose freely. N panes come free.
 
 **When the minimums cannot all fit, it overflows — accepted by the user.** Two floors of 250px
-and 400px in a 600px box do not shrink proportionally; grid honours both and the row spills. Chosen over
+and 400px in a 600px box do not shrink proportionally; grid honors both and the row spills. Chosen over
 computing a proportional shrink, which needs a `ResizeObserver` and the library rewriting floors on every
-resize. The user's reasoning: grid's behaviour is consistent, expected and documented, a consumer declaring
+resize. The user's reasoning: grid's behavior is consistent, expected and documented, a consumer declaring
 floors that cannot fit is misusing the API, and inheriting the platform's answer beats inventing a second
 one. `splitPane.spec.ts` pins it.
 
-**A gutter moves its two neighbours and nothing else.** Their combined share is conserved, so ratios keep
-summing to one without a normalisation pass and dragging at one end never reflows the far side.
+**A gutter moves its two neighbors and nothing else.** Their combined share is conserved, so ratios keep
+summing to one without a normalization pass and dragging at one end never reflows the far side.
 
 **The gutter is a `<button>` with `role="separator"`, and it carries a value.** `aria-valuenow` is the
 boundary as a percentage over 0–100, `aria-orientation` states the axis, and the arrow keys for that axis
@@ -3799,7 +4282,7 @@ place to add to it. It is now `flex: 1 0 100%` — a 100% basis cannot share a l
 rather than incidental.
 
 **The caret is the painter's, through `computeTextStyle`.** `TagInput` had no way to reach the
-input's text, so the caret fell back to the inherited colour while every other field drew the theme's. The
+input's text, so the caret fell back to the inherited color while every other field drew the theme's. The
 slot is `TextField`'s, reused with the same name and `TextFieldTextStyle` type — the `TabLinkProps`
 precedent: a second identical type for the second caller is the thing to avoid.
 
@@ -3847,7 +4330,7 @@ is its own tab stop, as `Paginator` records for its page numbers. A roving order
 stop, which is what a `tablist` wants and a `nav` does not.
 
 **Trimming the trail is the consumer's.** Raised by the user: pressing `B` in `A > B > C > D`
-ought to leave `A > B`. The behaviour is right and so is the component — `onSelect` reports the press and
+ought to leave `A > B`. The behavior is right and so is the component — `onSelect` reports the press and
 nothing else, since the component does not own the route and a trail that trimmed itself would fight a
 router-driven consumer. The demo was wrong: it reported into a readout and left the trail at four. The page
 now derives the trail from the pressed crumb's index, and the panel's `Reset` is the way back.
@@ -3865,7 +4348,7 @@ knows its own.
 `gap` — it already decides where its children sit, so handing that measurement back out exposes something it
 owns rather than teaching it something new.
 
-**The mechanism is `Tabs`', copied deliberately rather than generalised**: a root ref, a `ResizeObserver`
+**The mechanism is `Tabs`', copied deliberately rather than generalized**: a root ref, a `ResizeObserver`
 watching the root and the selected item's `offsetParent`, the box written as inline `top` / `left` / `width` /
 `height`, and `ElementFader` for entry and exit. Two consumers is not yet an `Abstract`; a third is when to
 extract.
@@ -3878,7 +4361,7 @@ the measuring is optional, and confusing the two would break the keyboard.
 
 **Both roots carry `isolation: isolate`, and without it the floater escapes the control.** The floater sits
 at `z-index: -1` so the items paint over it. A negative index resolves against the nearest ancestor that
-starts a **stacking context**, and `position: relative` alone does not start one — so the floater travelled up
+starts a **stacking context**, and `position: relative` alone does not start one — so the floater traveled up
 the ancestor chain until it found one, and any background painted on the way covered it. Exactly what happened
 when the Playground put a background on the box wrapping the segmented strip: measured correctly, positioned
 correctly, painted underneath the wrapper. `isolation: isolate` starts a stacking context and nothing else;
@@ -3901,7 +4384,7 @@ meaning.
 
 So it needs no component. `RadioPage`'s **Segmented** variant is the demonstration: `RadioGroup` with
 `getDir` row and `getGap` zero, painted by `RadioSegmentContent` instead of `RadioContent`. **A segment paints almost nothing** — no
-dot, no border, no background, only padding and a text colour that flips when checked.
+dot, no border, no background, only padding and a text color that flips when checked.
 
 **The strip's own look belongs to a wrapper, not to the segments.** `PageRadioSegmentGroup` is a plain
 `<div>` around the whole `RadioGroup` carrying the border, background and outer radius, and the fill behind
@@ -3925,7 +4408,7 @@ move the value itself, so the keyboard case needs no preview.
 ### The Playground theme is an example, and carries no rationale on purpose
 
 Settled by the user, when asked whether `App/Theme.css.ts`'s token shape deserved an entry
-here. It does not: **every value in it is as arbitrary as any consumer's own.** Four steps per colour rather
+here. It does not: **every value in it is as arbitrary as any consumer's own.** Four steps per color rather
 than a numeric ramp, one animation duration rather than a set, `half` / `full` / `double` / `quad` spacing —
 none of it is a recommendation and none of it constrains the library, which paints nothing and reads no
 token. A consumer copying its shape is copying an example.
@@ -3953,7 +4436,7 @@ is laid under it. Only the appearance is common. The metrics travel as the exist
 `getMinHeight`, so an empty tag box is exactly as tall as a text field and grows from there.
 
 **Width is deliberately not matched.** A text field is 240px because its painter says so; a tag box is as
-wide as its tags, which is the documented behaviour of the control.
+wide as its tags, which is the documented behavior of the control.
 
 ### A Playground demo a visitor can move must be a demo they can put back
 
@@ -4005,7 +4488,7 @@ timeline the cell owns — direction is weight inversion, smoothness is the widt
 
 **The timing curve is the sample's, and it shapes a cell's own window rather than the whole timeline.**
 `computeLocalTimeline` takes one of the five CSS timing functions — `linear`, `ease`, `ease-in`, `ease-out`,
-`ease-in-out` — and applies it to the ratio a cell has travelled through its own slice, so the stagger keeps
+`ease-in-out` — and applies it to the ratio a cell has traveled through its own slice, so the stagger keeps
 the arrival order the weights decided and only the playback within each cell bends. It is solved as CSS
 solves it, a cubic bezier inverted by Newton with a bisection fallback, so `ease` here and `ease` in a
 stylesheet are the same curve rather than two approximations of it.
@@ -4037,7 +4520,7 @@ and the two drawn examples each carry a dropdown over `Shape`'s own gradient and
 the three share, the grid and the weights and the timing, stays in the page's own panel, since changing it is
 meant to change all of them.
 
-**A drawn example also picks its own shape, which the photograph cannot.** The two serialised sources are
+**A drawn example also picks its own shape, which the photograph cannot.** The two serialized sources are
 written at whatever width and height they are handed, so `1:1`, `2:1` and `1:2` are a per-example dropdown over
 `SOURCE_RATIO_SIZES` — the long side stays 1200 and the short one halves, so the default source is the same
 1200×1200 it always was. `computeGradientSource` and `computePatternSource` take that size as an argument
@@ -4048,15 +4531,15 @@ stretched ones. The demo box takes its width from the ratio so the longest side 
 portrait source renders 240 wide rather than 960 tall.
 
 **The palette and the animation length come from the same places the Shape page gets them.** The four
-colours are `SVGDefsSamples.SAMPLE_COLORS`, which `ShapePage` now seeds its own editable store from rather
+colors are `SVGDefsSamples.SAMPLE_COLORS`, which `ShapePage` now seeds its own editable store from rather
 than declaring a second copy; the duration is the cell animation's own, passed in per call. What a sample then
-does with that duration is the sample's business and is not normalised — the pointy-top hexagon runs its fill
+does with that duration is the sample's business and is not normalized — the pointy-top hexagon runs its fill
 cycle at four times what it is given, on the Shape page and here alike, so the numbers agree at the input
 rather than at the output.
 
-**A `Shape` def becomes a source by being rendered and serialised, which is `SVGDefsSources`.** The samples
+**A `Shape` def becomes a source by being rendered and serialized, which is `SVGDefsSources`.** The samples
 are Solid callbacks returning live elements, so the helper renders them into a detached `<svg>`, adds a
-full-size rect per entry filled from that entry's colour or `url(#id)`, serialises with `XMLSerializer`, and
+full-size rect per entry filled from that entry's color or `url(#id)`, serializes with `XMLSerializer`, and
 disposes the reactive root. Nothing about the samples changes; the Shape page and the animation page ask the
 same registry for the same thing.
 
@@ -4067,11 +4550,11 @@ no `begin`, which defaults to zero, so they were always going to move. The gradi
 `createAnimateDefs`, which sets `begin="indefinite"` on purpose and starts it from a ref that reads the
 document's own clock, so that the iteration patterns can be sequenced.
 
-**So the serialiser writes the timing into the markup, which is the whole of what a script would have done for
+**So the serializer writes the timing into the markup, which is the whole of what a script would have done for
 the common case.** With no iteration delay asked for, every `begin="indefinite"` becomes `begin="0s"` on the
 way out. That is exact rather than
 approximate wherever the iteration config is `constant`, because `constant` supplies no patterns at all: the
-repeat count is already `indefinite` and the only thing missing was the start. It is a serialisation-time
+repeat count is already `indefinite` and the only thing missing was the start. It is a serialization-time
 rewrite rather than a change to the builders, and it is only correct because a source is a document nothing
 will ever drive — the live `Shape` on a page still needs the script, which is what sequences its stages.
 
@@ -4150,7 +4633,7 @@ to `ORIGIN_FREE_WEIGHT_TYPES` and exposed no origin. With the vocabulary gone th
 the constraint is now the Playground's: its Scanline page offers only origin-free weights and pins the
 origin to `{ x: 0, y: 0 }`. A real loss — the type used to make the trap unreachable.
 
-**Cell geometry is integral and the requested count is honoured exactly.** Edges are
+**Cell geometry is integral and the requested count is honored exactly.** Edges are
 `round(idx * total / count)`, so every cell starts on a whole pixel and the remainder is spread across the
 row — 7 cells over 240px start at 0, 34, 69, 103, 137, 171, 206. This replaced two worse rules:
 `ScanlineAnimation` snapped `lineCount` down to a divisor of the measured size, tiling exactly but silently
@@ -4164,7 +4647,7 @@ fractional device pixels, the browser antialiases each cell independently, and h
 was removed once on the reasoning that exact tiling made it unnecessary and had to go straight back — the
 seams were visible on screen, and reasoning about sub-pixel rounding is not a substitute for looking. Only
 the drawn box grows: positions, `background-position` and the logical span stay exact, so the extra pixel
-repeats the neighbour's first column rather than shifting the slicing. `defs.size` reports the drawn box,
+repeats the neighbor's first column rather than shifting the slicing. `defs.size` reports the drawn box,
 because that is what a percentage `translateX` resolves against. The pixel has a cost the seams do not: where
 the source is partly transparent, the lapped strip is composited twice and every cell ends up boxed in a
 brighter line. That is recorded as an accepted limit in `backlog.md`, with the three fixes that were declined.
@@ -4187,9 +4670,9 @@ geometry, so it lives in `CellAnimationWeights.const.ts`. `computeCellWeights` i
 future simplification that drops it fails loudly.
 
 **An anchor is a translate, not a new value key.** Scaling or rotating about an anchor `a` equals the
-centre-anchored transform `M` plus a translate of `(I - M)·a`, and translate percentages resolve against the
+center-anchored transform `M` plus a translate of `(I - M)·a`, and translate percentages resolve against the
 element's own unscaled border box — so `transform-origin` folds into `translateX` / `translateY` inside
-`fromStops` and never reaches the result type. Exact rather than an approximation, and it generalises to 3D:
+`fromStops` and never reaches the result type. Exact rather than an approximation, and it generalizes to 3D:
 with `perspective` on the **parent**, a 3D rotation folds the same way using `translateZ`. It does **not**
 work with the `perspective()` transform function on the element itself, which puts the vanishing point at
 that element's own `transform-origin`, so moving the origin changes the projection. Perspective on the
@@ -4220,7 +4703,7 @@ cell in place, so it is always an entrance. Two batches of new entries were buil
 collection and the user's verdict on most of them was that they look repetitive, which is the expected outcome
 of adding a fifth circle rather than a failure of the individual samples. **What pays off instead is machinery
 that recombines what is already there**: an operator over any weight, or a combinator over any two animations,
-multiplies the collection without adding anything that looks like its neighbour. `shouldMakeUnique` and
+multiplies the collection without adding anything that looks like its neighbor. `shouldMakeUnique` and
 `shouldNormalize` on `computeCellWeights` are already this pattern, and `fromZones` is the first one on the
 animation side. Ideas of that kind, graded but not built, are in `backlog.md` under **_Open discussion_**.
 
@@ -4234,7 +4717,7 @@ from `diamondConvergent`'s shape with the straight-line distance. `quadratic` to
 distances, so its rings are squares — and that turned out to be one half of a pair rather than a family of its
 own, which is the entry below.
 
-**`frame` is one metric with three normalisations, and it absorbed both `quadratic` and the old
+**`frame` is one metric with three normalizations, and it absorbed both `quadratic` and the old
 border-anchored `frame`.** The metric is the larger of the two axis distances, so its rings are nested
 rectangles around the origin, and what differs is only what that distance is divided by. `frameFarthest`
 divides by the larger of the two maximum distances, so the ring stays square and grows until it reaches the
@@ -4245,15 +4728,15 @@ a name that described neither the shape nor the family.
 
 **What `frameNearest` costs is worth knowing before it is judged, because the clamp hides it.** Everything
 outside the square that fits inside the grid lands below zero and is clamped, so all of it starts at the same
-moment: measured on a twenty-one by seven grid with a centred origin, forty-nine of a hundred and forty-seven
+moment: measured on a twenty-one by seven grid with a centerd origin, forty-nine of a hundred and forty-seven
 cells carry the ramp and the other ninety-eight arrive together. On a square grid it is identical to
 `frameFarthest`. It is here because the user asked for the nearest-edge member by name, having been told first
 what it does to a wide grid.
 
 **What that cost, and why it was still the right trade.** The `frame` that existed before measured its rings
 from the grid's border inward and ignored the origin entirely, which is a different idea rather than a second
-normalisation — a shared name with the origin-anchored metric would have hidden the larger difference. The
-user chose the pair, so the border-anchored behaviour is gone, and with it `frame`'s place in
+normalization — a shared name with the origin-anchored metric would have hidden the larger difference. The
+user chose the pair, so the border-anchored behavior is gone, and with it `frame`'s place in
 `ORIGIN_FREE_WEIGHT_TYPES` and therefore on the Playground's Scanline page. Measured before removing it, all
 three of its forms gave every line of a single column the same weight, so the Scanline page lost nothing it
 could show.
@@ -4267,7 +4750,7 @@ banded a wide grid's stretched entries across rings the ramp does not follow.
 **Handedness is an axis of an existing family, not a family of its own.** `_sweepCw` and `_sweepCcw` were a
 second implementation of the thing `radar` already does — one arm turning about the origin — and measured, with
 the origin at a corner they and `radarSingle` order the hundred and twenty-one cells identically to within a
-rounding error, so nothing on the page could tell them apart. At a centred origin they do differ, but only in
+rounding error, so nothing on the page could tell them apart. At a centerd origin they do differ, but only in
 which ray the arm starts from and which way it turns: `radarSingle` starts at six o'clock and turns
 counter-clockwise, `_sweepCw` starts at twelve and turns clockwise. Sweep also spaces the arm by true angle
 where radar spaces it by how far round the square ring a cell sits, which is a few percent of one cell's start
@@ -4311,7 +4794,7 @@ down-diagonal only reaches ten, so that bound would have left half the weight ra
 finish halfway through its stagger. `getMaxDiagonalDistance` takes the larger of the two corner sums per
 direction instead.
 
-**Two of the four families degenerated on a diagonal basis, and the fix was to normalise along the band.** In
+**Two of the four families degenerated on a diagonal basis, and the fix was to normalize along the band.** In
 the rotated basis `down + up` is always even, so a cell's two diagonal distances always share a parity. `roll`
 and `entwine` use the band index for nothing but its parity, so that parity was the parity of the coordinate
 the ramp already ran on, and the weight collapsed into a function of one coordinate — a banded diagonal wipe.
@@ -4332,11 +4815,11 @@ the two sides of the origin as one, exactly as `lineRow` treats the rows above a
 along-band term is one part in `bandCount + 1` of the range whatever it is divided by, and a diagonal basis has
 about twice as many bands as a row basis on a square grid — eleven against six on eleven by eleven. So the
 diagonal snake deviated from a plain diagonal wipe by at most 0.091 where the row snake reaches 0.167, and
-per-band normalisation could not widen that, only let every band sweep its own length. The user looked and
+per-band normalization could not widen that, only let every band sweep its own length. The user looked and
 deleted both entries: a snake that reads as a straight diagonal wipe is a fifth circle. `roll` and `entwine`
-kept theirs, because for them the same normalisation was the difference between a duplicate and a pattern.
+kept theirs, because for them the same normalization was the difference between a duplicate and a pattern.
 
-**The origin moves a diagonal wipe only across its bands, which is the family's own behaviour rather than a
+**The origin moves a diagonal wipe only across its bands, which is the family's own behavior rather than a
 gap.** `lineRow` reads `dist.y` alone, so sliding the origin sideways changes nothing; a diagonal reads its own
 band index alone, so sliding the origin along the band changes nothing — measured, `_lineDiagonalDown` is
 identical at `center` and at `topLeft`, both being on the same falling line.
@@ -4352,7 +4835,7 @@ the origin's column, and every row sweeps the same way. The frontier that gives 
 the two terms compound, not because anything measures a radius. It is therefore a band family and does take a
 diagonal member — the caution about rings never applied to it.
 
-**Its diagonal member was built, measured and deleted, on `zigzag`'s ratio.** With a centred origin, `ovalRow`
+**Its diagonal member was built, measured and deleted, on `zigzag`'s ratio.** With a centerd origin, `ovalRow`
 differs from `lineRow` by up to 0.167 on eleven by eleven and 0.250 on twenty-one by seven, while the diagonal
 member differed from `lineDiagonalDown` by 0.091 and 0.071 — the second figure worse, because a wide grid has
 few rows and many diagonal bands. That is the same 0.091 that had both `zigzagDiagonal` entries deleted, so
@@ -4380,7 +4863,7 @@ blob. A flat hash of the cell's coordinates was built as well, and its only dist
 that it repeated; once the user chose a pattern that never repeats, a freshly seeded flat hash is a slower
 `Math.random()` giving a statistically identical picture, so it was dropped rather than kept as a duplicate.
 `randomClustered` takes a seed, and the seed is drawn once per `computeCellWeights` call: a cluster needs
-neighbouring cells to agree on it, and a never-repeating pattern cannot fix it at module load either. That is
+neighboring cells to agree on it, and a never-repeating pattern cannot fix it at module load either. That is
 the one piece of mutable state in the collection, it lives in `CellAnimationWeightUtils` beside the hash, and
 `FIXED_HASH_SEED` is there for the callers that want the opposite — `_computeHorizontalDropout` picks which
 scanlines drop out and is called every frame, so a seed that moved would reshuffle the dropout mid-animation.
@@ -4390,7 +4873,7 @@ spread, the spread's maximum, the period in cells and a travel ratio, and each e
 distance measure. Eight were built to be looked at and four survived the first pass: straight bands along a row
 or a column and rings on the square metric were all discarded, and the diamond metric was kept — so the family
 is now two metrics, the straight-line distance and the diamond one, each with the same variants. The period
-gives `Tight` at two cells and `Wide` at eight, and the travel ratio gives `Travelling`, which mixes the bands
+gives `Tight` at two cells and `Wide` at eight, and the travel ratio gives `Traveling`, which mixes the bands
 with a falloff so the rings arrive in order outward instead of all at once — the difference between one wave
 crossing the grid and a set of standing rings. `rippleDefault` and `rippleDiamondDefault` are the two the user
 has kept, and the plain-distance entries carry no metric word in their names for the same reason the
@@ -4404,7 +4887,7 @@ marked entry sits beside the family it belongs to rather than in a block of its 
 records are sorted the same way as the type arrays, so there is one order to maintain rather than two.
 
 **Three lists are exempt, confirmed by the user, because their order carries meaning.** `ORIGIN_TYPES` walks
-the centre and then clockwise, `EASINGS` runs in the order CSS names them, and `ZONE_TYPES` groups by kind.
+the center and then clockwise, `EASINGS` runs in the order CSS names them, and `ZONE_TYPES` groups by kind.
 Alphabetising any of the three would scatter something a reader uses to find an entry, which is the opposite of
 what the rule is for. The rule is about collections whose order is otherwise arbitrary.
 
@@ -4428,7 +4911,7 @@ Checked at the same time, those two were the only entries in the collection that
 **Where an entry can hide itself by geometry, that beats an opacity fade, and the user's reason is what it looks
 like at full size.** A cell that fades in at its final dimensions reads as the shape appearing rather than
 arriving — the eye is given a large rectangle that simply gains substance. So `skew` hides by scaling from
-nothing instead, and the shear it unwinds went from 45 degrees to 75 to keep the entry recognisably a skew now
+nothing instead, and the shear it unwinds went from 45 degrees to 75 to keep the entry recognizably a skew now
 that a growing cell carries most of the movement. Transforms are written scale-last, so the shear is applied to
 an already-scaled cell and a 75 degree lean on a nearly-zero-size cell stays local rather than smearing across
 the grid. Opacity is still right where nothing about the geometry can hide the cell, which is what `cube`,
@@ -4464,10 +4947,10 @@ four members are two directions times two handednesses rather than four position
 quadrants would be invented here rather than read off the names.
 
 **A diagonal family needs the four axis zones as well as the four quadrants.** The quadrants leave out every
-cell sharing a row or a column with the origin, which on an odd grid with a centred origin is a cross of
+cell sharing a row or a column with the origin, which on an odd grid with a centerd origin is a cross of
 twenty-one cells out of a hundred and twenty-one — enough to look broken if they all fall through to the
 fallback. `rollQuadrant` maps each axis to the quadrant member clockwise after it, and only the origin cell
-itself reaches the fallback. A family with a centre member — `pop` has `popCenter` — needs no axis entries,
+itself reaches the fallback. A family with a center member — `pop` has `popCenter` — needs no axis entries,
 because the fallback is already the right answer for the whole cross.
 
 **Entries the user has not yet groomed carry a leading underscore.** Asked for so that a batch of new samples
@@ -4519,7 +5002,7 @@ near end. A second control for it would be two knobs over one gap.
 `CellAnimationPlayback.Direction` is the CSS set and says which way the pass runs. Both are namespaced, and the
 Playground labels them _Direction_ and _Playback direction_.
 
-**The drawn gradient and pattern sources are timed to the cycle, not to the leg.** Those two examples serialise
+**The drawn gradient and pattern sources are timed to the cycle, not to the leg.** Those two examples serialize
 `Shape`'s own gradients and patterns into a source with their animation written into the markup, timed so that
 they run at the same length and rhythm as the cells — which is what their readout claims. Handing them the leg
 would leave them looping at the old period while the cells take twice as long, so they take
@@ -4534,7 +5017,7 @@ none is needed — the hold is the absence of anything undoing the last write.
 
 **The counter increments past the maximum on the last pass, even though no iteration follows it.** That looks
 redundant and is not: the animation effect re-runs whenever anything it reads changes — the window becoming
-visible again, the image resizing, the cell grid changing — and its only defence against re-running a run that
+visible again, the image resizing, the cell grid changing — and its only defense against re-running a run that
 has already finished is the `iteration >= maxIterations` guard. Incrementing only when another iteration is
 scheduled is what the first version did, which left the counter one below the maximum forever and made the
 guard unsatisfiable: tabbing away and back, or resizing the image, replayed a finished animation from the
@@ -4608,7 +5091,7 @@ being exceeded. `Modal`'s `visibilitySignal` argument with a list instead of a b
 
 It also settles an ownership question no other shape answers cleanly. If the consumer owned the list outright
 and the component only reported, "show at most three" would be enforced consumer-side, making queue policy
-the consumer's job when policy is behaviour and behaviour is the shell's. If the component owned the list
+the consumer's job when policy is behavior and behavior is the shell's. If the component owned the list
 privately, nothing could raise a toast without a handle to a mounted component. A shared signal is the only
 arrangement where the component enforces policy by writing something the consumer can see.
 
@@ -4736,7 +5219,7 @@ enums, and the one part of this component reachable from `npm test`.
 
 **Flow stacking is the geometry props; an overlapping pile is the painter's**, offsetting and scaling itself
 off `index` and `count`, which works for a fixed peek distance. Overlapping by each card's own **measured**
-height needs the neighbours' heights, which a painter cannot take; `ToastState.sizes` hands them over, and
+height needs the neighbors' heights, which a painter cannot take; `ToastState.sizes` hands them over, and
 _"Measuring the element in front"_ is where that was settled. The arithmetic is still the painter's.
 
 **Toasts sit above dialogs** — `z-index` 200 against `Modal`'s 100 — because a toast routinely reports the
@@ -4747,7 +5230,7 @@ prop whose value may be `undefined` cannot pass through the mapped type, and "no
 switches to at runtime rather than a prop they omit. `getAriaLabel` is **required**, since a `role="region"`
 with no name is not exposed as a landmark at all.
 
-**`getOverflow` keeps both queue behaviours rather than picking one.** `dismiss-oldest` writes the excess out
+**`getOverflow` keeps both queue behaviors rather than picking one.** `dismiss-oldest` writes the excess out
 of the consumer's list so the newest is on screen; `hold-newest` renders only the limit and leaves the rest
 queued, entering as slots free. Genuinely different products — latest-news versus lose-nothing — and the
 request for a prop rather than a default is why both exist. Held entries are not rendered at all, so they run
@@ -4764,7 +5247,7 @@ measured height, the fader, and `inert` while closed. `expandedSignal: Signal<bo
 panel genuinely owns its own boolean.
 
 **`Accordion` adds the three things that make a panel part of a set**, each a statement rather than a
-behaviour: the heading element around the trigger, the panel's `role="region"` named by that trigger, and the
+behavior: the heading element around the trigger, the panel's `role="region"` named by that trigger, and the
 arrow-key walk across the headers. The expanded-set policy, including single-expand, stays with it too, since
 only a set can have a policy.
 
@@ -4791,7 +5274,7 @@ old names went with it and the Playground's painter was renamed. One shape, one 
 ### Controls: `Accordion`, and where auto-height measurement lives
 
 The first component whose geometry cannot be expressed in CSS at all, which decides
-the division of labour.
+the division of labor.
 
 **The height animation is the library's, and that is not a contradiction of "a control paints nothing".**
 CSS cannot transition to `auto`, so animating a panel open requires measuring the content and animating to a
@@ -4878,7 +5361,7 @@ the same call on the **header** immediately afterwards is the clamp for a panel 
 window can hold, where reaching the panel's far edge would push the header that was just pressed off the top.
 The second call gives back the least amount that puts the header back, so the panel is cut at the bottom
 instead. Chromium's own reading of `"nearest"` happens to keep the header for that case already, but the
-behaviour is stated rather than inherited from one engine's reading.
+behavior is stated rather than inherited from one engine's reading.
 
 **And each call happens twice, once on the finish and once on the frame after it.** The fader's completion is
 a timer started a frame before the CSS transition does, so it can report "over" while the last few pixels of
@@ -4891,7 +5374,7 @@ loaded machine, and the suite failed exactly that way while the whole of it ran 
 Settled with the user, on their call between keeping a lazily built panel afterwards and unmounting it again
 on close. **`isPanelBuiltOnExpand` withholds `renderPanel`'s output until the first expansion and keeps it
 from then on**, so a section nobody opens costs nothing and a section opened once keeps whatever is inside
-it. It lives on `Collapsible`, so `Accordion` passes it through and both get one behaviour.
+it. It lives on `Collapsible`, so `Accordion` passes it through and both get one behavior.
 
 **Discarding state was the whole of the argument against unmounting on close.** The alternative — track what
 is open right now — is the smaller footprint, and it silently throws away a half-filled form, a scroll
@@ -5032,7 +5515,7 @@ neither the current one nor still connected.
 **This is the same shape as the cell timeline being keyed on its source**, and worth reading together: in both
 cases the restart is owned by an identity that changes, and in both cases the thing to avoid is a restart that
 happens by accident somewhere up the tree. The difference is which document owns the clock — a `Shape` on the
-page rebuilds its own elements, while a serialised source gets a new clock only by being a new image.
+page rebuilds its own elements, while a serialized source gets a new clock only by being a new image.
 
 ### `addTurbulenceFilter` emits two primitives, because a lone `feTurbulence` cannot chain
 
@@ -5091,9 +5574,9 @@ is which.
 
 **One subject, six examples, and every method of the factory appears exactly once.** The subject is a striped
 card carrying a word, chosen because it answers three questions at once: stripes show a displacement, the
-word's edges show a blur or a shadow, and a saturated fill shows the colour matrix family. The examples are
+word's edges show a blur or a shadow, and a saturated fill shows the color matrix family. The examples are
 the five primitive families — blur, drop shadow, turbulence, hue and tone — plus one that stacks four of them,
-which is the only one where `method` is visible. Hue carries hue rotation, saturation and the colour channels;
+which is the only one where `method` is visible. Hue carries hue rotation, saturation and the color channels;
 tone carries brightness, contrast and inversion; splitting them that way keeps either panel to a readable
 number of knobs and still leaves nothing untested.
 
@@ -5172,7 +5655,7 @@ instead, and `triangle_s_2` is the sample that draws left- and right-pointing tr
 
 **One thing the extraction found immediately.** `computeGrowTracks` assumes its two ends are given in order;
 handed them reversed it walks outside the segment instead of mirroring. No call site does that, so it is a
-precondition rather than a defect, and it is pinned by a test rather than changed — the behaviour is what
+precondition rather than a defect, and it is pinned by a test rather than changed — the behavior is what
 ships and nothing has asked for the other one.
 
 ### `LiveAnnouncer`: the region that belongs to no component
@@ -5212,7 +5695,7 @@ against and a calendar never talks about itself as it mounts.
 Settled, beside the 1D walk rather than replacing it, and deliberately different at the edges.
 
 `computeNextPosition` wraps within its length, because a tab list or menu is a closed ring.
-`computeNextCell` does neither: overflow along a row **carries** into the neighbouring row, and `y` is
+`computeNextCell` does neither: overflow along a row **carries** into the neighboring row, and `y` is
 allowed out of range. That lets a caller whose grid is a window onto something larger resolve the overflow by
 moving the window — `Calendar` reads `y === -1` as "the previous month" and needs no special case for the
 first or last day. `x` is always in range, because carrying is what puts it there.
@@ -5234,13 +5717,13 @@ end in a private signal; while it is set, the outward value is `undefined` and t
 that end to the roving day, so keyboard movement previews the range without a pointer. The second press
 commits `orderRange(first, second)`, which sorts the ends — so picking backwards gives the same span, and a
 consumer never receives a record of which end was clicked first. A third press starts again rather than
-extending, which is the behaviour that needs no rule to remember.
+extending, which is the behavior that needs no rule to remember.
 
 **Three flags carry the band: `isInRange`, `isRangeStart`, `isRangeEnd`.** `isInRange` is inclusive of both
 ends, so a painter can lay a continuous band and then round the two caps; the ends are marked separately
 rather than inferred from position, because the first and last day of a visible week are not the ends of the
 span. The Playground's day painter writes them out as `data-in-range`, `data-range-start` and `data-range-end`
-so the suite can read the flag rather than a hashed class or a computed colour.
+so the suite can read the flag rather than a hashed class or a computed color.
 
 **`DateRangePicker` derives its two fields from the one signal.** A start typed on its own leaves the outward
 value `undefined`, exactly as a single press on the calendar does, and the grid and the fields are two ways
@@ -5312,7 +5795,7 @@ no notion of, so the time half is given `undefined` rather than the date half's 
 picker roots are flex items that shrink below their content and overlap, which puts the second field's trigger
 underneath the first field's input — clickable by coordinate, unclickable by pointer. `DateRangePicker` has the
 same rule for the same reason. The Playground pages give these examples `span: 2`, because a control about
-460px wide otherwise overflows a 320px grid column and the neighbouring card paints over its trigger.
+460px wide otherwise overflows a 320px grid column and the neighboring card paints over its trigger.
 
 **A pair with a half missing reports nothing, and this was corrected mid-build.** The first version filled the
 absent half from a default, so typing a date alone produced a value at midnight. That is wrong twice over: it
@@ -5344,7 +5827,7 @@ year 4 answered 29 because it was really being asked about 1904.
 
 Both now go through one private `buildLocalDate`, which builds an anchor date in a safe year and calls
 `setFullYear(year, month, day)` — the documented way past the shorthand. **All three fields go in that one
-call**: set alone, the year lands on an anchor whose month and day have already been normalised, and year 0 is
+call**: set alone, the year lands on an anchor whose month and day have already been normalized, and year 0 is
 a leap year while the 1900 it was shorthand for is not, so 29 February in year 0 would have become 1 March on
 the way through. The shorthand is unreachable from the rest of the file — the two remaining `new Date` calls
 with a literal year build the month and weekday **name** lists, where the year is an arbitrary anchor.
@@ -5360,7 +5843,7 @@ anything longer. Six digits with a leading sign is what ISO 8601 prescribes and 
 **Expanded only when the year needs it.** Emitting a sign on every date would be more uniform and would
 rewrite every stored date string every consumer has, for a case almost nobody reaches. The cost is that the
 writer is canonical while the reader is lenient — `fromIso` accepts `+002026-08-10` and `toIso` gives back
-`2026-08-10` — so reading and writing normalises rather than reproducing the input character for character.
+`2026-08-10` — so reading and writing normalizes rather than reproducing the input character for character.
 Both halves are pinned by tests. `-000000` is refused: ISO 8601 does not allow a negative zero year, and
 `toIso` can never emit one.
 
@@ -5378,8 +5861,8 @@ February, never 2 or 3 March, because `Date.setMonth`'s rollover makes a month s
 `fromIso("2026-02-31")` is `undefined` rather than 3 March: a field that silently moves what was typed is
 worse than one reporting the value as not yet valid.
 
-**The grid is always six weeks of seven days, and carries the neighbouring months' days.** A fixed row count
-stops the calendar changing height as months are paged. The neighbouring days make the keyboard walk work
+**The grid is always six weeks of seven days, and carries the neighboring months' days.** A fixed row count
+stops the calendar changing height as months are paged. The neighboring days make the keyboard walk work
 without a special case — the grid is a continuous run of dates, so the next cell from `computeNextCell` maps
 back as `addDays(gridStart, y * 7 + x)` whatever `y` is.
 
@@ -5427,7 +5910,7 @@ work from either.
 
 **Two bugs found building it, both recurring in any component with modes.** A `focusout` fires when the
 fields unmount, _after_ the mode has been ended by `Enter` or `Escape`, so the focus-out handler ran a second
-time and cancelled the focus restore the first exit asked for; it now ignores anything arriving once the mode
+time and canceled the focus restore the first exit asked for; it now ignores anything arriving once the mode
 is closed. And the year field's `SignalMirror` pushes its inner value outward from an effect, which runs after
 the handler that closed the mode — so `Escape` restored the old month and the mirror wrote the abandoned one
 back over it; the year write ignores anything queued while the mode is closed. Both are the same shape:
@@ -5489,7 +5972,7 @@ strands the control mid-drag, and releasing outside must still land the value. C
 `pointermove` handler can be on the element rather than the document, so nothing leaks when the component goes
 away.
 
-**`pointerdown` reports immediately**, so a click positions the value without a drag — what a colour surface
+**`pointerdown` reports immediately**, so a click positions the value without a drag — what a color surface
 and any track-clicking slider need.
 
 **A drag is dropped when the tracked element is swapped, and only then.** The pointer's id and the measured
@@ -5502,7 +5985,7 @@ off without a press, because the release had landed on an element that was alrea
 
 The first fix cleared the state in the listener effect's cleanup, which is wrong and `ColorArea` caught it
 within a run: its drag handler focuses an axis input, that changes the interaction flags, the flags are what
-`getIsDisabled` reads, and so the effect re-runs on the first move of every drag — cancelling it. So the reset
+`getIsDisabled` reads, and so the effect re-runs on the first move of every drag — canceling it. So the reset
 is its own effect, on the ref alone and deferred, and it fires when the element genuinely changes rather than
 whenever anything the binding effect happens to read has moved. **A drag surviving a rebind and a drag
 surviving a swap are different questions, and the binding effect can only answer the first.**
@@ -5524,7 +6007,7 @@ activation, so a painter compares it with the one it last drew and starts a new 
 That is the same information an event carries without being one: it is state a painter can read at any time
 and compare, rather than a callback it has to have been mounted to receive.
 
-**The keyboard gets the centre.** `Enter` and `Space` produce `{ x: 0.5, y: 0.5 }`, with `e.repeat` ignored
+**The keyboard gets the center.** `Enter` and `Space` produce `{ x: 0.5, y: 0.5 }`, with `e.repeat` ignored
 so holding the key does not fire a stream of activations. A press has no point when it did not come from a
 pointer, and reporting nothing would mean a decoration that exists for mouse users only.
 
@@ -5554,7 +6037,7 @@ for as long as it lasts, a swipe reports **an event** with a verdict, and the ar
 decision that a swipe also reports progress in flight, because the verdict is still a thing a drag has no
 word for.
 
-**`trackDrag` now says why a drag ended, which closes `SlideButton`'s cancelled-pointer gap in the same
+**`trackDrag` now says why a drag ended, which closes `SlideButton`'s canceled-pointer gap in the same
 change.** `onDragEnd` receives `"release"` or `"cancel"`; `SlideButton` activates only on the first, so a
 drag the browser or the OS takes over with the thumb already at the end no longer confirms. A swipe must
 never commit on a cancel, and that consumer is what made the change to a shipped `Abstract` worth making —
@@ -5575,8 +6058,8 @@ reading, and pushing a right-edge one rightwards runs away to a commit on the fi
 at `pointerdown` removes the loop. `trackDrag` keeps measuring live, because its two consumers do not move
 under the pointer and a page scrolling during a drag would strand a frozen rect.
 
-**A swipe takes the pointer over only once it has travelled, and a drag takes it immediately.** `trackDrag`
-captures and calls `preventDefault` on `pointerdown`, which is right for a colour surface — a click there
+**A swipe takes the pointer over only once it has traveled, and a drag takes it immediately.** `trackDrag`
+captures and calls `preventDefault` on `pointerdown`, which is right for a color surface — a click there
 sets a value. A swipe cannot: the elements it watches are a dialog and a carousel viewport, both full of
 buttons and links, and capturing every press inside them would break all of them. So `trackSwipe` waits until
 the travel passes a small slop, then captures, and swallows the one `click` that follows an engaged gesture
@@ -5666,11 +6149,11 @@ never reaches it.
 
 ### Controls: `ColorArea`, and the value form a picker has to hold
 
-The saturation-and-brightness surface replacing the OS colour dialog, plus the
+The saturation-and-brightness surface replacing the OS color dialog, plus the
 arithmetic under it.
 
 **Hex is the storage form and HSV the working one, and they do not round-trip.** `Abstracts/ColorValue` holds
-both plus the conversions. Eight bits per channel cannot carry hue at black or saturation at grey, so a
+both plus the conversions. Eight bits per channel cannot carry hue at black or saturation at gray, so a
 surface re-reading the hex on every drag frame would drift and then stick — drag brightness to zero and the
 hue is gone. `ColorArea` takes `hsvSignal: Signal<ColorValueHsv>` and never touches hex; converting at the
 boundary is the consumer's, and `ColorValueUtils.getIsSameHex` exists so a caller can tell whether the hex it
@@ -5685,7 +6168,7 @@ technology get the native slider free — arrow keys, `aria-valuetext`, the lot.
 reimplementing key handling two native inputs already have.
 
 Accepted cost: the axis inputs' own focus rings are invisible, so the painter draws focus from `focusedAxis`
-in the flags — the arrangement `TextInput` uses for its caret colour rather than the rejected
+in the flags — the arrangement `TextInput` uses for its caret color rather than the rejected
 `:has(:focus-visible)` shape, because here the flag reaches the painter directly.
 
 **`syncElement` returns for a fourth time.** Both axis inputs are pushed from state in a render effect, for
@@ -5706,14 +6189,14 @@ being a general string.
   stale half over the new value. The emitted spelling is six digits while alpha is 1 and eight when it is
   not, so the old contract is unchanged until a consumer uses opacity.
 - **Dismissal is the component's, and it needs a document listener.** `Select` closes on blur because its
-  popup refuses focus; a colour popup cannot, since the axis sliders and the hue slider must be focusable. So
+  popup refuses focus; a color popup cannot, since the axis sliders and the hue slider must be focusable. So
   `ColorInput` listens for a `pointerdown` outside both popup and field while open, and `Escape` closes from
   either and returns focus to the field. The first popup here needing outside-click detection, and why
   `Popover` still has none — the need is the consumer's, not the layer's.
 - **The paint is four slots**, following `Select`'s count: `renderContent` for the field, `renderArea` and
   `renderHue` for the two controls, and `renderPopup` for everything around them. `renderPopup` receives a
-  thunk rendering the surface plus the HSV signal itself, which lets a consumer add a colour-space toggle and
-  channel inputs — paint and arithmetic over a value they now hold, not behaviour the library owes them.
+  thunk rendering the surface plus the HSV signal itself, which lets a consumer add a color-space toggle and
+  channel inputs — paint and arithmetic over a value they now hold, not behavior the library owes them.
 
 **There is no `renderAlpha`, and there will not be one — settled by the user.** Alpha is a
 channel input in `renderPopup`. It was argued the other way first, on the grounds that alpha is judged by eye
@@ -5727,7 +6210,7 @@ no twin, so a consumer scanning the props concludes transparency is unsupported.
 `HSVA` throughout and `toHexValue` emits eight digits whenever alpha is below opaque. The two slots exist
 because those controls own a **gesture** the library implements, and alpha owns none.
 
-**A native colour input is no longer reachable through this control**, which is the cost: no form value and
+**A native color input is no longer reachable through this control**, which is the cost: no form value and
 no OS picker, and `FileInput` remains the only control where the UA owns activation. The suite got better for
 it — every part of the picker is drivable, where the OS dialog could only be tested by writing the value.
 
@@ -5744,9 +6227,9 @@ a display form only.
 
 **A two-way mirror must track only its own source, and this cost two bugs to learn.** The Playground's picker
 mirrors the hue into a `Signal<number>` for the slider, and both directions originally read the other side's
-value inside the effect. That makes the pair fight: picking a colour elsewhere re-ran the hue-to-picker
+value inside the effect. That makes the pair fight: picking a color elsewhere re-ran the hue-to-picker
 direction, which found the hue signal still holding the previous hue and wrote that stale hue over the new
-colour — so typing a hex produced a different colour entirely. The guard on the far side has to be read
+color — so typing a hex produced a different color entirely. The guard on the far side has to be read
 `untrack`ed. The same shape broke the hex field twice over: an effect refreshing the field's text while
 tracking the picker overwrote what was being typed. The fourth mirror in the Playground and the first two to
 go wrong, which is the argument for extracting it.
@@ -5860,7 +6343,7 @@ into `yyyy-mm-dd` and handed to it, so 31 February is refused in every order rat
 second validator exists to disagree with the first.
 
 **ISO is masked too, on the same path.** It could have kept its unmasked branch and did not, because two
-paths would be two behaviours to keep in step. Nothing observable changed: a typed `-` is discarded and the
+paths would be two behaviors to keep in step. Nothing observable changed: a typed `-` is discarded and the
 mask supplies its own.
 
 **`TextSync` is not exported from `index.ts` yet.** `DateInput` is its only consumer and the standing
@@ -5969,7 +6452,7 @@ anchor is a whole region rather than a button, and a plain left-click inside it 
 any other press outside. The right-click that re-opens the menu elsewhere in the region is unaffected —
 `pointerdown` dismisses first and `contextmenu` opens again at the new point, so the menu appears to move.
 
-**The menu names itself, because there is no trigger to be named by.** `MenuLevel` labelled its popup with
+**The menu names itself, because there is no trigger to be named by.** `MenuLevel` labeled its popup with
 the trigger's id; it now takes an `ariaLabel` beside that, and `ContextMenu` requires one.
 
 ### Dismissal is one stack, and `Popover` is the layer
@@ -6161,7 +6644,7 @@ painter place a unit and a control together, and the physical position both want
 
 **Both pickers forward a per-item disabled predicate, and `DatePicker` gained its one here.** `Calendar`
 had always taken `computeIsDayDisabled` and `DatePicker` never passed it through, so a consumer wanting to
-grey out weekends had to drop down to `Calendar` and build the popup themselves. The bounds a picker takes
+gray out weekends had to drop down to `Calendar` and build the popup themselves. The bounds a picker takes
 are a range, and a range cannot express "not on a Sunday" — closing that was the user's call, taken
 separately from the work that surfaced it rather than carried along inside it.
 
@@ -6187,9 +6670,9 @@ every icon button carry a clip-rect idiom the consumer had to know.
 ### The 0..1 guarantee belongs to `computeCellWeights`, not to each formula
 
 Three formulas leave the range a weight is defined on, and always for the same reason: they are built for
-whole-number distances, and a centred origin on an even count makes the farthest bound a half-integer. `spiral`
+whole-number distances, and a centerd origin on an even count makes the farthest bound a half-integer. `spiral`
 subtracts its raw result from 1 and divides, so a result below 1 lifts the weight above it. `radar` divides by
-`maxWeight - 1`, and measured on an eight-by-eight grid with a centred origin `radarSingle` reached -0.019,
+`maxWeight - 1`, and measured on an eight-by-eight grid with a centerd origin `radarSingle` reached -0.019,
 `radarDouble` -0.038 and `radarQuad` -0.083. `checkeredConvergent` reached -0.071 on the same grid and -0.25 on
 every cell of a two-by-two.
 
@@ -6323,8 +6806,8 @@ cover touch and pen without a second pair.
 
 **The repeat itself is the library's, not the painter's.** `NumberInputStepper` grew `startSteppingUp`,
 `startSteppingDown` and `stopStepping`; the painter calls them from the pointer events and owns no timer. A
-painter running its own interval would be four lines of behaviour duplicated in every consumer's stepper, and
-behaviour is the shell's — the argument that put the auto-dismiss clock inside `Toasts`.
+painter running its own interval would be four lines of behavior duplicated in every consumer's stepper, and
+behavior is the shell's — the argument that put the auto-dismiss clock inside `Toasts`.
 
 **Both timings are props with defaults, because they are tuned values.** `getRepeatDelayMs` at 400 and
 `getRepeatIntervalMs` at 60 match a native spin button, and they are exposed rather than baked because a
@@ -6345,7 +6828,7 @@ Settled, closing two unblocked items in one pass.
 
 **Every control here owns its value as a `*Signal`, and a consumer holding a getter plus a callback had to
 build the same mirror by hand.** `PageTextField`, `PageSelectField`, `PageCheckField`, `PageNumberField` and
-`PageColorField` were five copies, and the colour picker's hue slider made a sixth.
+`PageColorField` were five copies, and the color picker's hue slider made a sixth.
 `SignalMirrorUtils.createMirror(getOuter, setOuter, opts)` is that mirror once, with `createValueMirror` for the
 common case where nothing converts.
 
@@ -6355,7 +6838,7 @@ route param or callback passes those. The first attempt took a `Signal` and coul
 Playground's own wrappers.
 
 **Every control now takes that pair directly, so the mirror is no longer the way in.** A `*Signal` prop is
-typed `SignalSource<T>` and `accessSignal` normalises it — see _"Signal tuples for two-way state"_ in
+typed `SignalSource<T>` and `accessSignal` normalizes it — see _"Signal tuples for two-way state"_ in
 `conventions.md`, which carries the rule and the reasoning. `createOptional` and `createPassThrough` are both
 `accessSignal` underneath. What `SignalMirror` still owns, and what the Playground's `PageNumberField` still
 uses it for, is the case a pass-through cannot serve: an **inner** value that survives the outer refusing a
@@ -6364,7 +6847,7 @@ write, which is what lets a field hold `7.` or a half-typed date while the numbe
 two halves.
 
 **Each direction reads the far side `untrack`ed**, which is the whole reason this is worth extracting: the two
-colour-picker bugs were both a mirror whose guard tracked the other side, so an unrelated change re-ran it and
+color-picker bugs were both a mirror whose guard tracked the other side, so an unrelated change re-ran it and
 wrote a stale half back.
 
 **It converts only when the value changes, so a half-written inner value survives.** Typing `7.0` into a
@@ -6372,7 +6855,7 @@ field mirroring a number leaves the text alone, because the number did not chang
 fields needed, now free for anything built on it.
 
 **It is not unit tested, deliberately.** A mirror is two effects and a scheduler, not a function of its
-arguments. Its four consumers are driven in `e2e/`, where its behaviour is observable.
+arguments. Its four consumers are driven in `e2e/`, where its behavior is observable.
 
 **The form wiring is complete.** `Select`, `ColorInput`, `FileInput` and `Range` now read the description
 context alongside `TextField` and `BinarySwitch`, so every control that can sit in a `FormField` points at its
@@ -6462,7 +6945,7 @@ Settled, from three defects seen on `ViewportPage`.
 anchor.** Three things could give: the layer's size, its distance from the anchor, or the part of it you can
 see. The library gives up the last. `AnchorUtils.getBand` gives an `out` placement only the space between the
 anchor and the edge it faces, and `clampToBand` pins the edge touching the anchor, letting the far edge run
-past the viewport where `overflow: hidden` cuts it. An `in` or centred placement is deliberately over the
+past the viewport where `overflow: hidden` cuts it. An `in` or centerd placement is deliberately over the
 anchor and gets the whole viewport.
 
 Pinning the other end — `Math.max(band.start, ...)` in both directions, the obvious clamp — is what makes a
@@ -6502,7 +6985,7 @@ names, grid row count and year ceiling are now questions asked of the value's ow
 
 **Thirteen calendars, and the list is explicit rather than the package's own.** `createCalendar` does not
 refuse an identifier it has no implementation for: asked for `chinese`, `dangi`, `islamic` or `islamic-rgsa` it
-returns a **Gregorian** calendar, so a consumer would get Gregorian dates labelled as something else with no
+returns a **Gregorian** calendar, so a consumer would get Gregorian dates labeled as something else with no
 indication. `DateValueCalendarId` names the thirteen that map to themselves, and `getCalendarIds` is what a
 consumer offers in a picker. The lunisolar calendars are excluded rather than half-supported — the same call as
 `Table` being out of scope: a thing that looks supported and is not costs more than a thing that is absent.
@@ -6600,7 +7083,7 @@ caret lands when the groups shift under it. Withholding it does not stop that fi
 stops it being built on the answer already tested here.
 
 **What that commits to, stated so the next change to it is a deliberate one.** The caret rules are now
-observable behaviour: where the caret lands after an insertion, a deletion or a paste is part of the
+observable behavior: where the caret lands after an insertion, a deletion or a paste is part of the
 contract, not an internal detail. So is the mask vocabulary — `#` as the digit slot, a minus as the only
 sign, group sizes read from the decimal point outwards. Changing any of those is a change a consumer can
 see, and belongs in the same class as changing a prop's meaning.
@@ -6640,7 +7123,7 @@ consumer who wants something other than their locale's grouping would otherwise 
 than the default it replaces, which is the argument for the shape rather than any current call site.
 
 **There is no sign and no currency symbol.** The mask is digits-only, so a negative amount cannot be typed;
-the symbol is paint in a leading slot, because a library holding no colours does not hold currencies either.
+the symbol is paint in a leading slot, because a library holding no colors does not hold currencies either.
 
 ### An era is named from year 2, not from its first day
 
@@ -6695,7 +7178,7 @@ path is unchanged.
 Why the suite missed it: at a scale of exactly 1 the marker's top edge lands on the scroll box's bottom edge to
 the pixel, and Chrome reports that zero-area contact as an intersection, so the batch arrives and the spec
 passes. The Playground is scaled by `Viewport` and is almost never at 1, and at any other scale the contact
-misses by a fraction. **A behaviour that depends on two edges being equal is not a behaviour**, so the spec now
+misses by a fraction. **A behavior that depends on two edges being equal is not a behavior**, so the spec now
 asserts the overlap itself rather than the batch that follows.
 
 **The Playground does not skip painting off-screen options, because it moves the list under the reader.** The
@@ -6726,7 +7209,7 @@ and batches are combined, which the Playground now demonstrates. The guard clear
 batches are the consumer's, and the library only reports that the end of what it holds is on screen. A
 consumer wanting the server to filter runs a new search on a query change and replaces the array; `onReachEnd`
 then pages within that query. Note that `Home` and `End` are already suppressed on a filterable field, so the
-wrap rule below is the only keyboard behaviour applying to a fetched autocomplete.
+wrap rule below is the only keyboard behavior applying to a fetched autocomplete.
 
 **An incomplete list does not wrap, and that is `Select`'s call rather than `NavigatorUtils`'s.** The 1D walk
 still answers _which position is next_ and still wraps; `Select` answers _whether to go there_, and refuses
@@ -6816,7 +7299,7 @@ records, flattening them, finding the navigable ones — and that is the floor a
 
 The toolbar was dropped once, on the reading that it is a flex row of buttons — which was right about the
 toolbar and wrong about the problem. A real one has more actions than room, and what happens to the ones that
-do not fit is behaviour rather than paint. `backlog.md` records the reopening; this records what got built.
+do not fit is behavior rather than paint. `backlog.md` records the reopening; this records what got built.
 
 **Every action is rendered whether or not it fits, and the ones that do not are taken out of the flow.** They
 keep `position: absolute` at the row's origin with `visibility: hidden`, `pointer-events: none`, `inert` and
@@ -6861,7 +7344,7 @@ button, which is where that action has just gone.
 
 **Disabled actions are skipped by the walk rather than kept in it.** The pattern allows either and notes that
 keeping them focusable helps where discoverability of a function is crucial; the library's existing answer is
-`Tabs`, which skips them, and there was no argument for the toolbar differing from its neighbour. A disabled
+`Tabs`, which skips them, and there was no argument for the toolbar differing from its neighbor. A disabled
 action that collapses is still handed to the menu as a disabled item, so it is discoverable there.
 
 **The toolbar is invisible until it has measured, which is one or two frames.** Measuring after mounting means
@@ -6961,7 +7444,7 @@ rather than the arithmetic.
 **The walk wraps, as every other list in this library does.** The published tree pattern stops at the ends.
 Wrapping is what `Select`, `Menu`, `Tabs` and `RadioGroup` all do through `computeNextPosition`, and a tree
 that stopped would be the one list here behaving differently — consistency inside the library won over the
-published behaviour, recorded here rather than being discoverable only by pressing `ArrowUp` on the first row.
+published behavior, recorded here rather than being discoverable only by pressing `ArrowUp` on the first row.
 
 ### A branch whose children have not arrived: `hasMoreChildren`, and where the waiting is painted
 
@@ -7063,8 +7546,8 @@ change the subject rather than the layout, since the layout is a **generation ri
 ever badly cast. It is now a taxonomy — Animalia, then phyla, then classes — where everything on a ring
 genuinely shares a rank no matter which parent it hangs from.
 
-**The layout puts the box's centre where the tree's root is, and the box is square.** `createRadialTree`
-reports `origin` at the middle and `heightRatio` of one, so a page that centres its own rings and the `Tree`
+**The layout puts the box's center where the tree's root is, and the box is square.** `createRadialTree`
+reports `origin` at the middle and `heightRatio` of one, so a page that centers its own rings and the `Tree`
 in the same box has them line up with no measuring and no library change. The rings are plain divs with a
 `border-radius` of 50%, sized in pixels from the radii the page itself chose, and they sit before the tree in
 the document so they paint behind it.
@@ -7158,7 +7641,7 @@ should become a prop.
 slider wants — press the track and the value jumps there — and is exactly wrong here, since pressing at 90% and
 nudging right would be the shortcut the control exists to prevent. The first report of each drag is hit-tested
 against the thumb's current span, and a drag that did not begin on the thumb is ignored for its whole length
-rather than cancelled part-way. The grab offset inside the thumb is kept and subtracted from every later report,
+rather than canceled part-way. The grab offset inside the thumb is kept and subtracted from every later report,
 so the thumb does not jump under the pointer.
 
 **The thumb's size is the library's to know and the painter's to draw, which is `Range`'s cost paid again.**
@@ -7242,7 +7725,7 @@ gets answered by looking at a real page.
 
 ### Samples: one file per key, and the key is the file's name
 
-The same decision from the other end, and why `Samples/` had to be reorganised first.
+The same decision from the other end, and why `Samples/` had to be reorganized first.
 
 **A sample is a file, and the registry is an index that imports them.** `SVGDefs.const.tsx` was 2534 lines
 holding three registries; a tab showing it would have been useless whatever it cost to load. Splitting was
@@ -7262,7 +7745,7 @@ key gives the sample tab. It also makes renaming a sample and renaming its file 
 **Nothing is folded into a factory.** `circle("grid")` produced three of the pattern samples from one helper,
 and a file whose whole content is that call teaches nobody anything — the reader still has to open a second
 tab. Each sample is written out. The line, taken from what `Gradient` already did: the sample's own **shape** is
-explicit, while small shared helpers that are not the point of any sample — a base colour, a diagonal offset —
+explicit, while small shared helpers that are not the point of any sample — a base color, a diagonal offset —
 stay shared and get a tab of their own when opened. The total line count goes up, deliberately.
 
 **A registry is only split when a tab of it would be unreadable, which is not every registry.** The tab is
@@ -7317,8 +7800,8 @@ ratio or a selection. Neither channel substitutes for the other, which is why th
 flags and did not replace `getSize` either.
 
 **`getSize` stays even though a ref could yield a size.** `computeSVGDefs` is called where no element exists:
-the Playground's gallery serialises each sample against a synthetic 1200×1200 box that never enters the
-layout, and `Surface` probes it three times against a mock 0×0 to decide whether the result is a plain colour,
+the Playground's gallery serializes each sample against a synthetic 1200×1200 box that never enters the
+layout, and `Surface` probes it three times against a mock 0×0 to decide whether the result is a plain color,
 in which case it draws a div and no SVG at all. Size is a parameter of the drawing; the ref is a handle on a
 host that may not be there. Both are therefore optional-tolerant, and `PointerTracker` already rests when its
 ref accessor returns nothing.
@@ -7332,9 +7815,9 @@ neither ref nor flags draws its resting frame and says nothing about it. The gal
 its still image is the resting frame by construction.
 
 **Structure is fixed when the element is built; values vary afterwards.** `SVGLinearGradientDefs` and
-`SVGRadialGradientDefs` now take accessors for geometry and for the colour array, and those reach the DOM as
+`SVGRadialGradientDefs` now take accessors for geometry and for the color array, and those reach the DOM as
 attribute-level updates — `cx`, `r`, `offset`, `stop-color` change in place on a live element. What stays
-plain is anything that decides how many nodes exist: `spreadKind`, and the length of the colour array, read
+plain is anything that decides how many nodes exist: `spreadKind`, and the length of the color array, read
 once through `untrack`. The reason is not taste. Reading a varying value in the body of `renderDefsElement`
 re-runs the enclosing expression, Solid rebuilds the whole `<linearGradient>`, every `<animate>` inside it
 gets its `ref` callback again and `beginElementAt` restarts the animation from zero — a visible jump on every
@@ -7364,7 +7847,7 @@ an edge into a bevel rather than a texture; it is not built, and adding it would
 choice between two shapes rather than a set of numbers.
 
 **These two set `color-interpolation-filters` to sRGB and nothing else in the factory does.** Filters run in
-linearRGB unless told otherwise, which makes a highlight noticeably hotter than the same colour anywhere else
+linearRGB unless told otherwise, which makes a highlight noticeably hotter than the same color anywhere else
 on the page. Setting it on the whole `<filter>` would change how every existing filter in the library paints,
 so it is set on the elements of these two chains alone. Nothing already built moves.
 
@@ -7377,7 +7860,7 @@ source, so both stay inside the shape, and neither touches the region arithmetic
 **A radial gradient whose origin is the pointer reading, and nothing else.** `boxRatio` is already 0–1 and a
 radial gradient's `cx`/`cy` are object-bounding-box units, so the origin is the reading passed straight
 through — where the specular version has to multiply by the element's size every frame to place a point light
-in pixels. There is no filter, so no turbulence pass and no lighting pass: the whole sample is four colour
+in pixels. There is no filter, so no turbulence pass and no lighting pass: the whole sample is four color
 stops and an accessor.
 
 **The falloff is a stop list, which is the point.** The lighting version steers one fixed curve with four
@@ -7392,10 +7875,10 @@ sheen failed. See _"The sheen left `Samples/SVGDefs/Gradient`"_.
 
 ### `glass_sheen_1`, and what a pointer-driven sample looks like
 
-**It is a gradient sample whose filter slot carries the moving part.** The colour ramp is an ordinary vertical
+**It is a gradient sample whose filter slot carries the moving part.** The color ramp is an ordinary vertical
 linear gradient; what follows the pointer is an `fePointLight` inside a specular chain, positioned from
 `PointerTracker`'s `boxRatio` times the element's own size. When no pointer is present — and in the gallery,
-where the sample is serialised against a detached SVG with no element at all — the ratio rests at the centre,
+where the sample is serialized against a detached SVG with no element at all — the ratio rests at the center,
 which is what the still image shows.
 
 **The tracker is created inside `renderDefsElement`, and the light's x and y are accessors.** Both follow from
@@ -7405,14 +7888,14 @@ rebuild the filter on every pointer frame.
 
 **The distortion and the blur are applied to the lit image, not to the source, and the order is the whole
 trick.** The three primitives run chained — specular lighting, then displacement, then blur — because the
-shape being filtered is a flat translucent white. Warping a uniform colour changes nothing that can be seen,
+shape being filtered is a flat translucent white. Warping a uniform color changes nothing that can be seen,
 so displacing the source first would be invisible; displacing the _highlight_ is what makes the light look as
 though it is coming through rippled glass. The blur last is the fog, and it softens the edge the displacement
 has just made irregular. The ripple is a coarser, slower noise than the lighting surface — frequency 0.012
 against 0.05 — so the pane warps in broad waves while the sheen keeps its fine grain.
 
 **It does not distort what is behind it, and cannot.** An SVG filter can only reach the element it is applied
-to; bending a real backdrop needs `backdrop-filter: url(#…)`, which Chromium honours and Firefox and Safari
+to; bending a real backdrop needs `backdrop-filter: url(#…)`, which Chromium honors and Firefox and Safari
 ignore outright. So this is a pane that ripples its own light rather than the page beneath it, and a sample
 that had to bend a real background would have to put that background inside the filtered element.
 
@@ -7432,7 +7915,7 @@ that can never be taken and a props shape built around defs it does not accept. 
 `renderChildren`, which is what makes the backdrop layers' corners follow a squircle exactly instead of
 approximating it with `border-radius`.
 
-**The backdrop is two layers, not one declaration with a fallback.** `backdrop-filter: url(#…)` is honoured
+**The backdrop is two layers, not one declaration with a fallback.** `backdrop-filter: url(#…)` is honored
 by Chromium and ignored by Firefox and Safari, both of which support `backdrop-filter` with the CSS functions
 and both of which parse the `url()` form as perfectly valid. That last part is what rules out
 vanilla-extract's `[fallback, desired]` array: the array works by the browser _rejecting_ the second
@@ -7467,7 +7950,7 @@ on a 300px pane the visible boundary is a circle touching the rectangle's edges,
 border rather than trying to clamp the sampling. `SourceAlpha` in a backdrop filter is an opaque rectangle the
 size of the element, so eroding it by the fade distance and blurring the result gives an inset mask; the
 turbulence is forced opaque with an `feColorMatrix`, composited `in` that mask, then laid `over` an `feFlood`
-of `#808080`. Mid-grey is zero displacement in both channels, so the map lerps from noise in the middle to no
+of `#808080`. Mid-gray is zero displacement in both channels, so the map lerps from noise in the middle to no
 movement at all at the edge, and nothing is ever sampled from outside. `GlassUtils` derives the fade from the
 ripple scale rather than exposing it, because it is a correctness constraint and not a matter of taste.
 
@@ -7538,7 +8021,7 @@ collapses the SVG layers to zero height. The box goes inside.
 is part of how glass reads, so it could have been described alongside the tint and the sheen — and the user
 settled it the other way: `GlassSurfaceProps` carries `computeStrokeDefs` and `borderWidths`, exactly the two
 `Surface` takes, and whatever paints the edge is chosen outside. `GlassDefs` stays the description of the
-optical effect; a border is a colour, a gradient or a pattern like any other stroke in the library, and
+optical effect; a border is a color, a gradient or a pattern like any other stroke in the library, and
 routing it through the glass vocabulary would have meant a second, poorer copy of the defs contract.
 
 **The two are declared together or not at all, which the type enforces rather than the runtime.**
@@ -7554,11 +8037,11 @@ only when stroke defs exist, and `Shape` renders the band between its outer and 
 content. Thickness moves the inner outline only, so the fill, the clip handed to `renderChildren` and the
 margined backdrop clips are all unaffected by a border appearing.
 
-**The page's border knobs are `Shape`'s, not a colour and an opacity.** The first build gave the pane a flat
-colour with an opacity beside it, on the reasoning that a glass edge is a hairline and a registry picker would
-drag the colour bag, the animation duration and the iteration pattern onto a panel about glass. The user's
+**The page's border knobs are `Shape`'s, not a color and an opacity.** The first build gave the pane a flat
+color with an opacity beside it, on the reasoning that a glass edge is a hairline and a registry picker would
+drag the color bag, the animation duration and the iteration pattern onto a panel about glass. The user's
 answer was to look at the `Shape` page, and it settles the general rule: **a knob for a `computeStrokeDefs`
-prop is the gradient registry, the shared colours, the blur, the animation duration and the iteration
+prop is the gradient registry, the shared colors, the blur, the animation duration and the iteration
 pattern** — the same five every other page that paints a stroke carries, so the page shows what the prop can
 take rather than what one consumer would probably pass. A flat edge is still reachable, as the `plain` sample.
 Width zero is how the edge is turned off; both props are always passed, and `Shape` draws a band of no
@@ -7646,56 +8129,56 @@ depth: the source view globs the Playground's own tree only, so the move was imp
 
 **Two pages, because the knobs differ.** The timed page carries the animation duration and the iteration
 pattern; the tracked page carries neither, since nothing there reads a clock. What they share — how the defs
-are painted, the colours, the blur — lives in `SVGGradientsProps`, a fragment of `PageProp`s each page drops
+are painted, the colors, the blur — lives in `SVGGradientsProps`, a fragment of `PageProp`s each page drops
 into its own panel, the shape `CarouselsPanel` already set. The consumer pages follow their knobs rather than
 their history: `Shape`'s stroke picker offers `Timed`, since every knob beside it is an animation knob, and
 `GlassSurface`'s border offers `Tracked`, which is why the animation duration and iteration knobs are gone
 from that page. Each page therefore offers exactly the samples its payload can drive.
 
 **`plain` stopped being a sample.** Both registries carried one, and neither was a gradient or a tiling — a
-flat colour is the absence of a def. They also disagreed: the gradient's was the base border colour and the
-pattern's the base background colour, so a single shared entry would have needed to be told which, and every
+flat color is the absence of a def. They also disagreed: the gradient's was the base border color and the
+pattern's the base background color, so a single shared entry would have needed to be told which, and every
 sample would have carried a fill-or-stroke field for the benefit of one. Instead the pickers offer a `none`
-choice and the page paints the base colour itself, choosing fill or stroke because the page already knows
+choice and the page paints the base color itself, choosing fill or stroke because the page already knows
 which it is doing. `NO_SAMPLE_KEY`, `toGroupEntriesWithNoSample` and `computeNoSampleDefs` are the whole of
 it, and they live beside the group helpers the pickers already used.
 
-### A sample key is a sentence, and its number is a colour count
+### A sample key is a sentence, and its number is a color count
 
 The convention as the user stated it, and stated loosely on purpose: it was never designed, it is a habit
 that reads well enough, and they have said not to take it too seriously. It is written down because it has
 been guessed wrong twice, not because it is a law. **Do not rename existing keys to enforce it** — some of
 the `_4` samples would be `1v1v1v1` under a strict reading, and were left short because that is unreadable.
 
-**The trailing number is how many of the shared colours the sample paints with — never how many elements it
+**The trailing number is how many of the shared colors the sample paints with — never how many elements it
 draws.** `spot_flare_3` puts ten gradients on the surface out of `primary`, `secondary` and `tertiary`, and
 that is a three. A ten-layer sample named `flare_10` was the mistake that produced the rule. The useful
-consequence: a sample can be made as elaborate as it likes without its name moving, and dropping a colour
+consequence: a sample can be made as elaborate as it likes without its name moving, and dropping a color
 costs a hue rather than a chain, which is what let `spot_flare_2` be a flare at all rather than a pool and a
 blob.
 
-**A number followed by `s` means those colours are laid down solid rather than blended.** `flow_2s`,
+**A number followed by `s` means those colors are laid down solid rather than blended.** `flow_2s`,
 `flow_3s`, `flow_diag_2s` and `flow_diag_3s` are the banded counterparts of their smooth siblings, which is
-`spreadKind: "banded"` on the gradient — each stop emitted twice so the colours meet at a hard edge. **`flow`
+`spreadKind: "banded"` on the gradient — each stop emitted twice so the colors meet at a hard edge. **`flow`
 is the only family that bands**, since the ripples' banded twins were deleted; see _"Every ripple had a banded
 twin, and they were deleted"_ below.
 
-**Suffix letters stack, and the order is `c` then `s`.** `flow_3cs` is three colours, cycled from a clock,
+**Suffix letters stack, and the order is `c` then `s`.** `flow_3cs` is three colors, cycled from a clock,
 laid down solid — the user's spelling, and the general rule it fixes is that each letter qualifies the number
 and they read in that order rather than in any other. The spelling was settled on `spot_ripple_3cs`, which no
 longer exists; `flow_3cs` is the example now, and it is the only shape that carries both letters.
 
-**A number followed by `c` means the colours are cycled from a clock rather than each painting its own
-element.** `spot_trail_2c`, `spot_trail_3c`, `spot_ripple_2c` and `spot_ripple_3c` blend continuously through their colour list
-one second at a time, so at any instant the sample is showing one colour — or a mixture of two — rather than
+**A number followed by `c` means the colors are cycled from a clock rather than each painting its own
+element.** `spot_trail_2c`, `spot_trail_3c`, `spot_ripple_2c` and `spot_ripple_3c` blend continuously through their color list
+one second at a time, so at any instant the sample is showing one color — or a mixture of two — rather than
 all of them at once. The user asked for the suffix form specifically, in place of the `_cycle_N` these were
 first named: a letter after the number is the shape the registry already had for `s`, and it keeps the
-colour count where a reader looks for it. **A suffix letter is therefore how the number is qualified, and a
+color count where a reader looks for it. **A suffix letter is therefore how the number is qualified, and a
 word between the family and the number is not the place for it.**
 
-**`N v M` means element groups that are not contiguous, with their own colour counts.** A horizontal line and
-a vertical line is `1v1`: two separate things, one colour each, not one two-coloured thing. `orbit_async_2v1`
-is a two-coloured group answering a one-coloured one. It is a statement about the composition rather than
+**`N v M` means element groups that are not contiguous, with their own color counts.** A horizontal line and
+a vertical line is `1v1`: two separate things, one color each, not one two-colored thing. `orbit_async_2v1`
+is a two-colored group answering a one-colored one. It is a statement about the composition rather than
 about the count, so a chain of ghosts strung along a single axis is not a `v` — it reads as one thing. Where
 the strict form would run to `1v1v1v1`, the short number is used instead.
 
@@ -7705,14 +8188,14 @@ of lowercase letters, so everything named `sheen_…` arrives together in the dr
 were two more of them and now have no consumer: `hue_pulse_2` became `fill_2c` because the number carried
 the difference, and `hue_rot_3` was deleted outright.
 
-### A tracked sample key is a mark, then a treatment, then a colour count
+### A tracked sample key is a mark, then a treatment, then a color count
 
 **The registry grew two axes and the keys only had room for one, which is what the rename fixed.** A
 sample makes a **mark** — a radial pool, a linear band, an angular wedge — and applies a **treatment** to it:
 leave a fading history, expand it into rings, hang a chain of ghosts off it. `flare_…`, `ripple_…` and
 `trail_…` were three prefixes for three treatments of the same mark, so the picker filed one family as
 three; and `hand_trail_1` was the first key that needed both axes at once, which is what surfaced it. The
-key is now **mark, treatment, colour count** — `spot_ripple_3c`, `spot_trail_3c`, `hand_trail_3c` — and it
+key is now **mark, treatment, color count** — `spot_ripple_3c`, `spot_trail_3c`, `hand_trail_3c` — and it
 needed no new rule, since the leading word was always the family and the words between it and the number
 always qualified.
 
@@ -7745,35 +8228,35 @@ opening the group first should meet. The radial pool that used to hold that key 
 call, and the renaming is the point of it: a numbered key with no qualifier reads as the family's base case,
 so the base case has to be the one that earns it.
 
-**What each one does with the reading.** `band_1` is a vertical band whose centre follows the pointer's
-horizontal position. `spot_1` is a radial pool centred on the pointer. `band_diag_1` is a band fixed
-at 45° whose centre slides along that diagonal by the pointer's projection onto it, so the tilt never changes
+**What each one does with the reading.** `band_1` is a vertical band whose center follows the pointer's
+horizontal position. `spot_1` is a radial pool centerd on the pointer. `band_diag_1` is a band fixed
+at 45° whose center slides along that diagonal by the pointer's projection onto it, so the tilt never changes
 and only the position does. `band_1v1` is two bands, one horizontal and one vertical,
 each following its own axis of the pointer, so they cross where the pointer is and the crossing is the
-brightest point — the `1v1` suffix, as elsewhere in the registry, is one colour answering another.
-`spot_flare_2` is the pool plus a ghost mirrored through the centre: at the bottom-right corner the ghost is
-a small disc at the top-left, and as the pointer comes in the ghost grows and closes on the centre with it,
+brightest point — the `1v1` suffix, as elsewhere in the registry, is one color answering another.
+`spot_flare_2` is the pool plus a ghost mirrored through the center: at the bottom-right corner the ghost is
+a small disc at the top-left, and as the pointer comes in the ghost grows and closes on the center with it,
 because its origin is the pointer's reflection and its radius is interpolated by the pointer's distance from
-the centre. `spot_flare_2` and `spot_flare_3` are both the photographic thing — a source, two streaks and a chain of
-ghosts along the axis through the centre — and what separates them is how many colours the chain draws on.
+the center. `spot_flare_2` and `spot_flare_3` are both the photographic thing — a source, two streaks and a chain of
+ghosts along the axis through the center — and what separates them is how many colors the chain draws on.
 
-### Cycling the timed gradients: which colour a stop takes, and why the transparent ones are concrete
+### Cycling the timed gradients: which color a stop takes, and why the transparent ones are concrete
 
 **The rule the user stated covers two arities, and one sentence covers the rest.** They specified that a
-`_1` cycles through primary, secondary and tertiary, and that in a `_1v1` the first colour travels between
+`_1` cycles through primary, secondary and tertiary, and that in a `_1v1` the first color travels between
 primary and secondary while the second travels between secondary and tertiary. Both fall out of a single
-statement: **each gradient element cycles from the colour it already painted, and where a sample draws more
-than one element the cycle is a two-colour ping-pong rather than the full palette.** A lone element has
+statement: **each gradient element cycles from the color it already painted, and where a sample draws more
+than one element the cycle is a two-color ping-pong rather than the full palette.** A lone element has
 nobody to distinguish itself from, so it takes the whole palette; two elements starting on primary and
 secondary land on exactly the pairs the user named. It needs no table of arities, and it keeps a sample's
-identity intact: `snake_4c` alternates the way `snake_4` does, because its arms still start on the colours
-they started on and each takes the colour after its own.
+identity intact: `snake_4c` alternates the way `snake_4` does, because its arms still start on the colors
+they started on and each takes the color after its own.
 
-**`background` never enters a cycle.** Stated by the user. The palette is four colours and the fourth is the
+**`background` never enters a cycle.** Stated by the user. The palette is four colors and the fourth is the
 surface behind the sample, so the walk is primary → secondary → tertiary → primary.
 
 **The `elastic_…` samples lost their rainbow, which is the part that stuck.** They painted a static
-three-stop ramp of the whole palette; they paint one flat colour instead, which is `fill_3c`'s treatment.
+three-stop ramp of the whole palette; they paint one flat color instead, which is `fill_3c`'s treatment.
 The rainbow is gone rather than optional — the user's call. **Their number and suffix moved several times
 afterwards and the family is now `elastic_…_1` with a `cycles` flag**; see _"`elastic` took its static
 position and went back to `_1`"_ below for where it landed and why each move followed the rule rather than
@@ -7781,70 +8264,70 @@ a change of mind.
 
 **The cycle rides the same clock as the motion, because every `animate` shares one duration.**
 `SVGAnimationDefsUtils.createAnimateDefs` reads `animationDurationMs` for every element it stamps, so one sweep
-across the surface is one full colour pass. Composition is a fragment in the `custom` slot of
+across the surface is one full color pass. Composition is a fragment in the `custom` slot of
 `computeLinearGradient`, which is what the deleted `hue_rot_3` already did.
 
 **A transparent stop must cycle too, and this is the part that decided the implementation.** The samples
 spell a faded stop as `rgb(from ${color} r g b / 0)`, and a gradient ramp between a transparent stop and an
-opaque one interpolates the two colours **without premultiplying** — so the hue of a fully transparent stop
+opaque one interpolates the two colors **without premultiplying** — so the hue of a fully transparent stop
 is visible in the middle of the ramp. Measured in Chromium: a ramp from transparent yellow to opaque cyan
 samples `rgb(175 255 175)` at its midpoint where transparent-cyan-to-opaque-cyan samples `rgb(0 255 255)`.
 Leaving the faded stops on the starting hue while the opaque one cycled would therefore wash every band
 through a muddy green for most of the cycle.
 
-**SMIL cannot animate a relative colour, which is why `SVGDefsUtils.getTransparentColor` exists.** An
+**SMIL cannot animate a relative color, which is why `SVGDefsUtils.getTransparentColor` exists.** An
 `animate` on `stop-color` whose `values` are `rgb(from … r g b / 0)` is ignored outright — measured in
 Chromium, the stop sits on its attribute value for the whole duration while a hex-valued control interpolates
-normally. SMIL's colour parser predates CSS relative colour syntax and does not resolve `from`. Concrete
+normally. SMIL's color parser predates CSS relative color syntax and does not resolve `from`. Concrete
 forms all work: `rgba(r,g,b,a)`, `#rrggbbaa`, and the space-separated `rgb(r g b / a)` that
-`Color.RGBA.toCss` emits. So `getTransparentColor` resolves a hex palette colour to that concrete form and
-falls back to the relative spelling for anything that is not a hex — a non-hex colour then behaves exactly as
+`Color.RGBA.toCss` emits. So `getTransparentColor` resolves a hex palette color to that concrete form and
+falls back to the relative spelling for anything that is not a hex — a non-hex color then behaves exactly as
 it does in the non-cycling sibling, which is to say the faded stops hold still. The guard mirrors the one the
 tracked `c` variants already use around `Color.Hex.isHex`.
 
-**Only the `c` variants use it.** The samples that do not animate their colours keep the relative spelling,
-which reads better and works for any colour string.
+**Only the `c` variants use it.** The samples that do not animate their colors keep the relative spelling,
+which reads better and works for any color string.
 
 **What the number counts depends on whether the sample has a non-cycling sibling, and that is the whole
-rule.** Under _"A sample key is a sentence, and its number is a colour count"_ the number is what a viewer
-sees at any one instant, which read as a problem the moment `scan_1c` started walking three colours and
+rule.** Under _"A sample key is a sentence, and its number is a color count"_ the number is what a viewer
+sees at any one instant, which read as a problem the moment `scan_1c` started walking three colors and
 looked like it wanted to be `scan_3c`. The user's answer splits the two cases:
 
 - **A `c` sample that has a non-cycling twin keeps the twin's number.** `scan_1` and `scan_1c`, `snake_4`
-  and `snake_4c`, `sweep_1v1` and `sweep_1v1c`: cycling does not change how many colours are on screen at
+  and `snake_4c`, `sweep_1v1` and `sweep_1v1c`: cycling does not change how many colors are on screen at
   once, and holding the number still is what makes the pair read as a pair.
-- **A sample whose identity _is_ the cycling counts the colours it walks through.** There is no twin to
-  pair with and the instant-count says nothing, because every such sample shows one colour per stop
+- **A sample whose identity _is_ the cycling counts the colors it walks through.** There is no twin to
+  pair with and the instant-count says nothing, because every such sample shows one color per stop
   whatever it is doing. `fill_3c` and `fill_2c` would both be `fill_1c` under an instant-count, which is
   the demonstration that the instant-count carries no information here.
 
 **The `elastic_…` four were the second case while they had no static sibling.** They are `fill_3c`'s
-treatment applied to a shaped mark — a flat colour walking the whole palette — so they went to
-`elastic_circle_3c` and its three neighbours, the first pass having taken them to `…_1c` on the
+treatment applied to a shaped mark — a flat color walking the whole palette — so they went to
+`elastic_circle_3c` and its three neighbors, the first pass having taken them to `…_1c` on the
 instant-count reading. **They have a static sibling now**, which moves them to the first case and takes the
 number back to one; the family is `elastic_…_1` with a `cycles` flag, recorded below. The rule did not
 change — the situation did, which is the point of stating it as two cases.
 
 **`hue_…` became `fill_…`, and its number counts the walk rather than the instant.** The family named what
 changed where every other timed family names a motion, which is the same fault that took `sheen_…` to
-`band_…`; and `hue` plus `c` said the colours move twice over. The user's call, with the keys they chose:
+`band_…`; and `hue` plus `c` said the colors move twice over. The user's call, with the keys they chose:
 
 - **`hue_1` → `fill_3c`.** A flat surface walking primary → secondary → tertiary.
-- **`hue_pulse_2` → `fill_2c`.** A flat surface ping-ponging between two colours. `pulse` is gone because
-  the number now carries the difference — a two-colour walk is the ping-pong.
+- **`hue_pulse_2` → `fill_2c`.** A flat surface ping-ponging between two colors. `pulse` is gone because
+  the number now carries the difference — a two-color walk is the ping-pong.
 - **`hue_diag_inter_2` → `fill_diag_2v2c`.** A diagonal two-stop ramp whose stops take turns, each
-  walking two colours of its own. `diag` stays so the direction is on the key and a straight `fill_2v2c`
+  walking two colors of its own. `diag` stays so the direction is on the key and a straight `fill_2v2c`
   remains available — the user's call. `inter` goes, because `v` already says the two stops are independent.
 - **`hue_rot_3` was deleted.** Rotation is a treatment any family can take — the user noted `flow` could
   grow a `flow_rot_…` set — so it was not worth a key of its own here. **They said explicitly not to build
   that set**; the note records where it would go, not work to do.
 
-**`fill` was chosen over `flood` because one member is a ramp.** `flood` promises a single flat colour,
+**`fill` was chosen over `flood` because one member is a ramp.** `flood` promises a single flat color,
 which `fill_diag_2v2c` is not; `fill` says only that the paint itself is what changes and nothing travels across
 the surface, which covers all three. The family word states the mark, and `c` is the only place cycling is
 stated.
 
-**The `fill_…` numbers count the colours the cycle walks through**, which is the second case of the
+**The `fill_…` numbers count the colors the cycle walks through**, which is the second case of the
 numbering rule above — the case these keys are what settled.
 
 **`v` now covers stops inside one gradient.** `fill_diag_2v2c` is a single linear gradient with two stops, where
@@ -7854,7 +8337,7 @@ them separate is the timing rather than the geometry.
 
 ### `flow` has parity across both suffixes, and banding needed its own cycling helper
 
-**The family now spells every combination.** `flow` and `flow_diag`, each at two and three colours, each
+**The family now spells every combination.** `flow` and `flow_diag`, each at two and three colors, each
 plain, `s`, `c` and `cs` — sixteen keys where there were six. The gaps were an oversight rather than a
 choice, and the user's call was to close them: `flow_2` and `flow_diag_2` had only ever existed banded, and
 nothing in the family cycled at all.
@@ -7862,33 +8345,33 @@ nothing in the family cycled at all.
 **`SVGAnimations.Gradient.cycleSmoothColors` cannot drive a banded gradient, and that is why
 `cycleBandedColors` exists.** It hangs one `animate` per entry on `#{gradientId}-stop-{index}`, which is
 what `renderSmoothGradientStops` emits. `renderBandedGradientStops` emits two stops per boundary instead —
-`stop-0-start`, then a `stop-{i-1}-end` and a `stop-{i}-start` for every following colour — so every
+`stop-0-start`, then a `stop-{i-1}-end` and a `stop-{i}-start` for every following color — so every
 `animate` the smooth helper produced would reference an id that does not exist. **It fails silently**: SMIL
 ignores an `href` it cannot resolve, so the gradient renders correctly and simply never moves. Nothing had
 caught it because nothing had asked: the only keys that banded _and_ cycled were the tracked ripples, and
 those blend on their own per-frame clock rather than through SMIL, so they never touched the helper. The
-new one walks the same `string[][]` — one list per **declared** colour — and stamps both ids each declared
-colour owns, which is `stop-{i}-start` always and `stop-{i}-end` for every colour but the last.
+new one walks the same `string[][]` — one list per **declared** color — and stamps both ids each declared
+color owns, which is `stop-{i}-start` always and `stop-{i}-end` for every color but the last.
 
 **Verified in the browser rather than argued.** With `flow_3cs` picked, all twenty-six rendered stops carry
-banded ids and all twenty-six change colour inside 400ms, while `flow_3s` — the same gradient without the
+banded ids and all twenty-six change color inside 400ms, while `flow_3s` — the same gradient without the
 `c` — holds every stop still. The control is the half that matters: it says the probe measured the cycle
 rather than something incidental.
 
 **`SVGDefsUtils.getCycleWalk` exists because the banded keys have up to seventeen stops.** Every `c` sample
-before these hand-wrote its per-stop colour lists, which is fine at three stops and absurd at seventeen —
-four files at roughly seventy lines of near-identical colour references. The helper turns a stop's own
+before these hand-wrote its per-stop color lists, which is fine at three stops and absurd at seventeen —
+four files at roughly seventy lines of near-identical color references. The helper turns a stop's own
 palette key into its walk, `primary` giving primary → secondary → tertiary → primary, which is the rule
-_"each gradient element cycles from the colour it already painted"_ expressed once instead of per file. So a
-cycling flow file names its stops as a list of palette keys and derives both the gradient's colours and the
+_"each gradient element cycles from the color it already painted"_ expressed once instead of per file. So a
+cycling flow file names its stops as a list of palette keys and derives both the gradient's colors and the
 cycle from that one array; the eight cycling keys are the only samples in the tree that read this way, and
 the eighteen older `c` samples were left alone rather than migrated under this work.
 
-**The smooth two-colour keys match their three-colour siblings' structure, not their traversal count.**
-`flow_2` and `flow_diag_2` carry seven stops alternating two colours, where `flow_3` carries seven cycling
-three — the same number of colour transitions across the surface, which is what the existing banded pair
+**The smooth two-color keys match their three-color siblings' structure, not their traversal count.**
+`flow_2` and `flow_diag_2` carry seven stops alternating two colors, where `flow_3` carries seven cycling
+three — the same number of color transitions across the surface, which is what the existing banded pair
 already did by holding band count roughly level rather than palette traversals. The banded and diagonal
-tuning was copied per variant rather than normalised: horizontal banded and smooth share an offset of 0.5
+tuning was copied per variant rather than normalized: horizontal banded and smooth share an offset of 0.5
 and a full sweep, while diagonal banded uses 0.25 and half a sweep where diagonal smooth uses 0.5 and a
 full one. Those are tuned numbers and were left exactly as the existing keys had them.
 
@@ -7919,11 +8402,11 @@ at the root of the tree holds the vocabulary — a number knob with a range and 
 so a renamed option breaks the build and a boolean cannot be given a slider. Each registry has a
 `*.knobs.ts` module next to it; the registry does not import it, so a consumer who names one sample never
 pulls labels and step sizes to call a function that never reads them. **The vocabulary is deliberately two
-kinds**, because two are what the three registries need; it grows when a family needs a select or a colour,
+kinds**, because two are what the three registries need; it grows when a family needs a select or a color,
 and an unused kind would be dead API.
 
 **Defaults stayed with the family, which is what kills the drift.** `BAND_DEFAULTS`, `ARC_DEFAULTS` and
-their neighbours are exported from the layout factories, and the scanline registry's eight
+their neighbors are exported from the layout factories, and the scanline registry's eight
 `DEFAULT_…_OPTS` moved inside its namespace. The Playground's generic panel seeds from those, so a number
 lives in exactly one place. **The ranges came out of the pages**: `PlacementPage` held twenty module
 constants of minimum, maximum and step for five knobs and the scanline page held thirty-odd, and all of
@@ -7968,7 +8451,7 @@ flag would be designing a look rather than collapsing two that exist. **Do not c
 strength of `elastic` having closed its own** — it was raised and declined. The words were "by design for
 now", so the position may change; it changes when the user says so.
 
-**`elastic` took its static position and went back to `_1`.** The off position of a cycle is the colour it
+**`elastic` took its static position and went back to `_1`.** The off position of a cycle is the color it
 starts on, so a static `elastic_circle` is the same clip painted flat in `primary` — the motion is the
 sample's identity and is untouched by the flag, which is what makes the static form a real look rather than
 an absence. Adding that sibling moves the family into the first case of the numbering rule, where the number
@@ -7990,14 +8473,14 @@ combinations exist, so neither flag has a ragged edge anywhere it appears.
 
 **The tracked merges swap a mechanism rather than adding one, and that is the difference from the timed
 ones.** A timed `c` sample is its plain sibling plus a `cycleSmoothColors` call, so the merge is that call
-inside a `<Show when={opts?.cycles}>` and nothing else moves. A tracked one is not: the plain sample colours
-each stamp by its **age**, banding the palette across the wake, while the cycling one colours each stamp by
+inside a `<Show when={opts?.cycles}>` and nothing else moves. A tracked one is not: the plain sample colors
+each stamp by its **age**, banding the palette across the wake, while the cycling one colors each stamp by
 **when it was born** against a clock. Both mechanisms now live in the file and the flag chooses, which is
-about twenty lines apiece. Two smaller consequences: the two colour-key lists were the same list under two
+about twenty lines apiece. Two smaller consequences: the two color-key lists were the same list under two
 names and are now one `COLOR_KEYS`, and the clock's `keepAwake` — which the cycling samples call whether or
 not the pointer moves, and the plain ones only when it does — is now one guard reading
 `fade > NO_FADE && (opts?.cycles || moved)`. **`spot_ripple` needed a hand merge** where the other seven
-were mechanical: its plain `getColors` takes the ring's own colour, chosen by slot at the call site, where
+were mechanical: its plain `getColors` takes the ring's own color, chosen by slot at the call site, where
 the cycling one takes the whole palette, so the merged form takes the palette and the slot index and picks
 inside.
 
@@ -8007,17 +8490,17 @@ no such key: the key names the family and the panel names the bag, and the two t
 reader can see both at once, so nothing is misrepresented and no rule was needed.
 
 **The conversion was checked against what the Playground actually painted, not by argument.** Every timed
-key's gradient elements, stops, offsets, colours and `animate` values were recorded from the browser before
+key's gradient elements, stops, offsets, colors and `animate` values were recorded from the browser before
 the change and after it: all thirty-four surviving keys came back identical, once the transparent-stop
-spelling is normalised — the merged samples use `getTransparentColor` throughout where a plain sample used
-to spell the same colour relatively. Then every one of the thirty retired keys was reproduced by picking its
+spelling is normalized — the merged samples use `getTransparentColor` throughout where a plain sample used
+to spell the same color relatively. Then every one of the thirty retired keys was reproduced by picking its
 family and checking its flags, and all thirty matched their old recording exactly. The tracked eight were
 checked the other way, since they are pointer-driven and have no static rendering to diff: each paints in
 both flag positions and paints differently between them, and a sample with no flag offers no knob.
 
-### The bands leave the surface by travelling off it
+### The bands leave the surface by traveling off it
 
-**The bands leave the surface by travelling off it, and nothing about them fades.** The first
+**The bands leave the surface by traveling off it, and nothing about them fades.** The first
 build faded their alphas out over a window of pointer distance, and it looked wrong — a band lying still and
 dimming is not what a highlight does. The user's call was to drop the opacity entirely and let the movement
 carry the band off the painted area, and it needs no extra arithmetic at all: the pointer's position inside
@@ -8029,14 +8512,14 @@ read correctly.
 **The clamp was the thing making it look stuck.** Pinning `boxRatio` to 0 – 1 holds the band against the
 edge for as long as the pointer is anywhere outside, so every version of the fade had to hide a band that
 was still there. Removing the clamp is the whole fix, and it also means an untouched page shows the band
-centred, exactly as `spot_1` shows its pool centred.
+centerd, exactly as `spot_1` shows its pool centerd.
 
-**Every tracked sample reads from the colours bag, and brightness comes from luminosity rather than from white.**
-The first build painted every core white on the reasoning that a highlight is the colour of the light; the
-user recoloured them, so each layer now takes `primary`, `secondary` or `tertiary` and the Border Colors
-knobs move all of it. What keeps a core reading as a source rather than as a flat disc is `hsl(from <colour>
-h s calc(l * 1.5))` at the innermost stop — the sample's own colour with its lightness lifted — which is the
-same relative-colour form `getBaseBorderColor` already uses. The ghosts lift theirs less, at 1.35, so the
+**Every tracked sample reads from the colors bag, and brightness comes from luminosity rather than from white.**
+The first build painted every core white on the reasoning that a highlight is the color of the light; the
+user recolored them, so each layer now takes `primary`, `secondary` or `tertiary` and the Border Colors
+knobs move all of it. What keeps a core reading as a source rather than as a flat disc is `hsl(from <color>
+h s calc(l * 1.5))` at the innermost stop — the sample's own color with its lightness lifted — which is the
+same relative-color form `getBaseBorderColor` already uses. The ghosts lift theirs less, at 1.35, so the
 pool stays the brightest thing on the surface.
 
 **A band that starts inside the box leaves a visible kink, and it is inherent.** A linear gradient pads its
@@ -8064,13 +8547,13 @@ needed it.** It is back, described under _"a radial gradient can only be a circl
 are still not built: what wanted the prop was a smear along a direction of travel, not a spike.
 
 **A flare is a table, not a dozen hand-written blocks.** Each sample's ghosts are rows of reach, scale,
-alpha, colour and a filled-or-ring flag, mapped into defs; the streaks are two more rows. That keeps the
+alpha, color and a filled-or-ring flag, mapped into defs; the streaks are two more rows. That keeps the
 sample's own shape explicit in its own file, which is what _"nothing is folded into a factory"_ is protecting
 — the reader sees the whole chain as data rather than chasing a helper in another tab.
 
 **The satellites fade out with the pointer's distance, and that is a correctness fix rather than a taste
-one.** A ghost's origin is the pointer pushed toward the centre by its `reach`, so a ghost at a reach of one
-sits **on** the centre no matter where the pointer is — with the cursor a whole screen away, a couple of
+one.** A ghost's origin is the pointer pushed toward the center by its `reach`, so a ghost at a reach of one
+sits **on** the center no matter where the pointer is — with the cursor a whole screen away, a couple of
 faint rings stayed parked in the middle of the surface. Every satellite's alpha is now multiplied by
 `SVGDefsUtils.getPointerFade`, full strength while the pointer is within the element and gone by twice that
 distance, which also takes them away when the pointer leaves the window. The source needs no such thing: it
@@ -8078,17 +8561,17 @@ follows the pointer, so it leaves on its own.
 
 **What makes the chain read: alpha, count and spacing.** Ghost alphas run between 0.07 and 0.2 against the
 source's 0.9, saturation is cut to 55% and lightness lifted 25%, so each one is a pale veil rather than a
-coloured circle. Reaches are uneven — 0.36, 0.62, 0.95, 1.18, 1.44, 1.72, 2 along the line from the pointer
-through the centre — because evenly spaced ghosts read as a pattern, and sizes alternate between specks and
+colored circle. Reaches are uneven — 0.36, 0.62, 0.95, 1.18, 1.44, 1.72, 2 along the line from the pointer
+through the center — because evenly spaced ghosts read as a pattern, and sizes alternate between specks and
 wide faint rings for the same reason. `spot_flare_2` keeps one filled satellite and one ring, which is the
-user's call: two colours should look simpler than three, not merely differ in hue. The source itself is a small bright core with a tight bloom and a long
+user's call: two colors should look simpler than three, not merely differ in hue. The source itself is a small bright core with a tight bloom and a long
 faint veil, four stops in, which is what separates a light from a haze.
 
 **The source is `spot_1`'s pool, unchanged, and every flare shares it.** The rebuilt
 flare had tightened it into a small bright core with a long faint veil, which is what separates a light from
-a haze — but the user's instruction was that the primary element stays exactly as the one-colour
+a haze — but the user's instruction was that the primary element stays exactly as the one-color
 sample paints it, spikes and all removed. So all three now share one pool: scale 1.5,
-full alpha at the centre, 0.75 at five per cent, 0.25 at forty, gone by the edge, and no screen blend on that
+full alpha at the center, 0.75 at five per cent, 0.25 at forty, gone by the edge, and no screen blend on that
 layer. **The cost is visible and is the reason it was asked for rather than assumed**: that pool is broad and
 bright, so with the pointer near the middle it floods a third of the surface and the ghosts sit inside the
 glow rather than against the dark. Reverting to the tighter source is the four constants at the top of each
@@ -8102,16 +8585,16 @@ file.
 and the clockwise-degrees convention the linear gradient already used, so the two abstracts agree.
 
 **The transform is applied about the gradient's own origin, which is the part that matters.** A bare
-`scale()` on a gradient drags its centre toward the corner, so a stamp following the pointer would slide off
+`scale()` on a gradient drags its center toward the corner, so a stamp following the pointer would slide off
 it as soon as it stretched. Translating to the origin, turning, scaling and translating back leaves the
-centre exactly where the sample put it and changes only the shape around it.
+center exactly where the sample put it and changes only the shape around it.
 
 **It returns `undefined` for an untransformed circle rather than an identity transform.** Every existing
 sample passes no `aspect`, and emitting `gradientTransform="translate(…) rotate(0) scale(1 1) translate(…)"`
 on all of them would be a new attribute on hundreds of gradient elements for no effect. The guard is
 `aspect.width === 1 && aspect.height === 1`, so the markup those samples produce is byte-for-byte what it was.
 
-### `hand_1` is `snake_1` with the clock taken out, a third colour stop, and a narrower wedge
+### `hand_1` is `snake_1` with the clock taken out, a third color stop, and a narrower wedge
 
 **What it draws.** A quarter-turn wedge running from the middle of the element outward, its bisector pointing
 at the cursor, solid along that bisector and fading to nothing at both of its straight edges. The user's
@@ -8120,16 +8603,16 @@ this one was over-engineered enough that it is worth writing down what the sampl
 
 **It is `snake_1` with three edits and nothing else.** That sample clips a linear gradient to a `180` degree
 pie slice from `SVGUtils.getArcPath` and animates the slice's rotation and the gradient's angle together off
-a clock. The edits are: the gradient's colours become transparent, `primary`, transparent — three stops with
+a clock. The edits are: the gradient's colors become transparent, `primary`, transparent — three stops with
 no positions, so they spread evenly and the solid one lands in the middle; both angles come from
 `PointerTracker`'s `angle` instead of from the animation; and `SWEEP_ARC` narrows the slice to `90`. No part
 of the geometry was rebuilt.
 
 **The gradient runs across the wedge, not along it, and that is the whole of why it reads.** With the
 gradient's axis a quarter turn off the bearing, its middle stop lands on the perpendicular through the
-centre — which is the wedge's own bisector — so the wedge is solid down its middle and falls off toward its
-two edges, the falloff growing with distance from the centre. The earlier build ran the gradient **along**
-the bearing instead, fading from hub to tip, and a pie slice has its point at the centre, so the end meant to
+center — which is the wedge's own bisector — so the wedge is solid down its middle and falls off toward its
+two edges, the falloff growing with distance from the center. The earlier build ran the gradient **along**
+the bearing instead, fading from hub to tip, and a pie slice has its point at the center, so the end meant to
 fade in at the hub was squeezed into a tip with no width and the result was a tapered shard. Narrowing the
 arc was never the mistake; turning the gradient to face along it was.
 
@@ -8143,7 +8626,7 @@ edge instead of down the middle. **Checked by pointing at three known bearings a
 widths, rather than derived and trusted.
 
 **It fades with the pointer's distance, which the first build forgot.** A hand is anchored at the element's
-centre and only turns, so unlike a band it can never travel off the surface — it kept painting at full
+center and only turns, so unlike a band it can never travel off the surface — it kept painting at full
 strength with the pointer three hundred million pixels away, which is the fault the user reported. Its peak
 alpha is now multiplied by `SVGDefsUtils.getPointerFade`: full while the pointer is inside the element, gone
 by twice that distance, and gone when the pointer leaves the window. The same multiplication went on every
@@ -8159,7 +8642,7 @@ animation and `SVGDefsFrameUtils` is not involved.
 ### `hand_trail_1` is the trail machinery with a bearing frozen instead of a position
 
 **What it draws.** `hand_1`'s wedge at the live bearing, and behind it a fan of wedges left at the bearings
-the pointer swung through, fading out over the same window the trails use. Swing the cursor round the centre
+the pointer swung through, fading out over the same window the trails use. Swing the cursor round the center
 and the hand drags a fading sweep behind it; hold still and the fan decays away to leave the hand alone.
 **It is a separate sample, not an edit of `hand_1`** — the user's instruction, and `hand_1` is untouched.
 
@@ -8169,12 +8652,12 @@ by clock tick, same `SVGDefsFrameUtils` clock with the same lifetime, same alpha
 substitution is that a stamp stores the `angle` from the reading rather than the `boxRatio`, and hands it to
 both the clip's rotation and the gradient's angle. The whole family difference is one field.
 
-**The gate is angular, so a pointer moving straight at the centre lays nothing down.** The trails wake and
-stamp on distance travelled; here the thing that changes is the bearing, so the gate is
+**The gate is angular, so a pointer moving straight at the center lays nothing down.** The trails wake and
+stamp on distance traveled; here the thing that changes is the bearing, so the gate is
 `MOTION_TURN_DEGREES` of turn. Moving radially — in or out along the same bearing — does not rotate the hand
 and correctly leaves no trail. The comparison has to take the shorter way round the circle, because a
 bearing crossing the `-180` / `180` seam otherwise reads as a `359` degree turn and stamps a whole fan from
-one frame; `getShortestTurn` is the same normalise-and-fold used for hue in `Color`.
+one frame; `getShortestTurn` is the same normalize-and-fold used for hue in `Color`.
 
 **One stamp per slot, shared by the clip and the gradient, and the first build got this wrong.** A slot has
 two `renderDefsElement` closures — one for the wedge, one for the gradient inside it — and calling
@@ -8195,23 +8678,23 @@ pixels wide, they stay hard and it does not matter. **`hand_1` has the same hard
 and has not been changed** — the user has already accepted how it looks, and softening it is a change to its
 appearance rather than a fix to a fault.
 
-**The colour variants are the trails' two treatments unchanged.** `hand_trail_2` and `hand_trail_3` band
-the colour by the stamp's age, with the same `AGE_COLOR_SPAN` compressing the bands into the part of the
-life that is still visible; `hand_trail_2c` and `hand_trail_3c` blend the live wedge through the colours on
-`CYCLE_MS` and freeze each stamp at the colour the wedge had when it was laid. Neither needed anything new —
+**The color variants are the trails' two treatments unchanged.** `hand_trail_2` and `hand_trail_3` band
+the color by the stamp's age, with the same `AGE_COLOR_SPAN` compressing the bands into the part of the
+life that is still visible; `hand_trail_2c` and `hand_trail_3c` blend the live wedge through the colors on
+`CYCLE_MS` and freeze each stamp at the color the wedge had when it was laid. Neither needed anything new —
 the treatments are written against a stamp's age and birth time, and a stamp storing a bearing has both.
 That the same two treatments dropped in unaltered is the clearest evidence that `trail` is a treatment
 rather than a family, which is the naming question recorded below.
 
 **Per-stamp alpha is far lower than the trails', because wedges stack where pools do not.** Near the hub
 every wedge in the fan overlaps every other, so at the trails' `0.25` the composite saturated to a solid
-sheet of colour — a fan, not a fading trail. `0.07` makes each one a veil and the fan reads as a sweep. The
+sheet of color — a fan, not a fading trail. `0.07` makes each one a veil and the fan reads as a sweep. The
 hub stays the brightest point no matter what, since it is the one place every wedge covers; that is inherent
 to a pie slice and is not worth fighting.
 
 ### The trails leave stamps behind and fade them where they lie
 
-**What they draw.** A pool centred on the pointer, and behind it `STAMP_COUNT` radial stamps laid down along
+**What they draw.** A pool centerd on the pointer, and behind it `STAMP_COUNT` radial stamps laid down along
 the path the pointer took. Each stamp is a frozen position: it is written once, and from then on it dims in
 place until it is overwritten. The pointer therefore leaves a smear behind it that fades away over
 `STAMP_COUNT * STAMP_INTERVAL_MS`, and a pointer holding still shows only the pool. The numbers are the
@@ -8238,7 +8721,7 @@ tables of reach, scale and alpha because each of their ghosts is a different thi
 the same part and differs only in when its turn comes. Giving the slots uneven alphas or sizes — the trick
 that keeps a flare's chain from reading as a pattern — would make the trail **shimmer**, because a given
 point on the path is drawn by a different slot on each pass. Scale and alpha are therefore derived from age
-alone. Colour is derived from age for the same reason, and the entry below on `AGE_COLOR_KEYS` is what
+alone. Color is derived from age for the same reason, and the entry below on `AGE_COLOR_KEYS` is what
 happens when it is derived from the slot instead.
 
 **The fade is captured at stamp time rather than read live.** `SVGDefsUtils.getPointerFade` is called once,
@@ -8278,14 +8761,14 @@ differ. So one local function builds the four-stop pool table at a given peak al
 width, consecutive stamps overlap almost entirely, so the trail is a soft comet glow rather than the defined
 tapering tail the first build drew.
 
-**The colour follows the stamp's age, not its slot, and the first build got that backwards.** `spot_trail_2`
-alternates two of the shared colours and `spot_trail_3` runs all three, and the obvious way to do it — colour by
-`index % keys.length`, exactly as the ripples do — produced mud: an olive haze for the two-colour one and a
-grey-brown one for the three. Two things caused it together. Stamps are the pool's width and are laid one
-per frame, so no stamp is ever visible alone for its colour to be seen in; and none of them is opaque, so at
+**The color follows the stamp's age, not its slot, and the first build got that backwards.** `spot_trail_2`
+alternates two of the shared colors and `spot_trail_3` runs all three, and the obvious way to do it — color by
+`index % keys.length`, exactly as the ripples do — produced mud: an olive haze for the two-color one and a
+gray-brown one for the three. Two things caused it together. Stamps are the pool's width and are laid one
+per frame, so no stamp is ever visible alone for its color to be seen in; and none of them is opaque, so at
 any point the composite is an alpha-weighted average of every stamp covering it rather than the topmost one.
-Cycling by slot therefore averages all the colours everywhere. Cycling by **age** does not, because alpha is
-also a function of age: the young stamps that dominate a point near the pointer all carry the first colour,
+Cycling by slot therefore averages all the colors everywhere. Cycling by **age** does not, because alpha is
+also a function of age: the young stamps that dominate a point near the pointer all carry the first color,
 and the older, fainter ones further back carry the later ones. So the trail grades from the head backwards
 instead of averaging. The user chose this over screen-blending the stamps, shrinking them, or spacing them
 out, all three of which would have cost either the size-and-stops rule or their tuned count and interval.
@@ -8298,7 +8781,7 @@ change to the decay the user tuned.
 
 **It reads on a moving pointer and averages on a slow one, and that is inherent.** Sweep quickly and
 `spot_trail_3` grades yellow, through cyan, to magenta along the tail. Drag slowly and every stamp sits on
-roughly the same spot, so the three average to a pale green-white glow. Nothing about the colour scheme
+roughly the same spot, so the three average to a pale green-white glow. Nothing about the color scheme
 causes that — at the pool's width, stamps laid a frame apart at walking pace are simply on top of each
 other, and any scheme would average there. The way out is narrower stamps or wider spacing, both of which
 the user has already ruled out for this family.
@@ -8312,7 +8795,7 @@ The instruction it bends was about the flares, so the shared pool is untouched e
 would rather this one match its siblings, the two constants at the top of the file are the whole change.
 
 **`SVGAnimations.Gradient.cycleSmoothColors` does the same job for the timed samples and cannot do it
-here.** It emits a SMIL `animate` on each stop's `stop-color` with the colours as its `values` list, and the
+here.** It emits a SMIL `animate` on each stop's `stop-color` with the colors as its `values` list, and the
 browser blends between them — which is exactly what the `fill_…` samples use and exactly what the head of a
 `c` sample wants. **It was not consulted when these were built, which was a miss**; the answer would still
 have come out the same, but by argument rather than by luck. Three things rule it out.
@@ -8323,35 +8806,35 @@ so it could build that object locally and hand it over without the payload gaini
 having no consumer-set clock does not mean it has no clock; these ones plainly do, which is how they cycle
 at all.
 
-**The reason is that the head and its stamps have to read one clock.** A stamp takes whatever colour the
+**The reason is that the head and its stamps have to read one clock.** A stamp takes whatever color the
 head was showing at the instant it was born and keeps it for its whole life. That needs the blend as a
 number in JavaScript at a known timestamp, and SMIL gives neither: it drives an attribute forward over time,
 nothing can ask it what value it held three hundred milliseconds ago, and nothing can freeze one element at
 another's current one. Driving the head with `cycleSmoothColors` and the stamps with `getCycleColor` would
 be two timelines — SMIL's starts when its element is created, `getCycleColor` reads `performance.now()` —
-so the stamps would freeze colours the head never showed.
+so the stamps would freeze colors the head never showed.
 
-**Where it would work is a tracked sample that cycles and leaves nothing behind.** A colour-cycling `band_1`
+**Where it would work is a tracked sample that cycles and leaves nothing behind.** A color-cycling `band_1`
 or `hand_1` has no stamps to agree with, so `cycleSmoothColors` would drive it with no frame clock at all
 and less code than any of this. That is the shape to reach for if one is ever wanted.
 
 **The `c` treatment applies to every trail, smear included.** `spot_smear_2c` and `spot_smear_3c` are the
-stretched stamps taking their colour from the clock instead of from their own age, which needed nothing
+stretched stamps taking their color from the clock instead of from their own age, which needed nothing
 beyond the swap the other pairs make: the cycle reads a stamp's `bornMs`, and a smeared stamp has one.
 
-**The `c` variants are the other answer to the same question, and both are kept.** `spot_trail_3` colours a
+**The `c` variants are the other answer to the same question, and both are kept.** `spot_trail_3` colors a
 stamp by how old it is, so the gradient from head to tail stands still while the trail moves through it.
-`spot_trail_2c` and `spot_trail_3c` colour the **head** from the wall clock — one second to run through the
-colours in the list — and a stamp simply keeps whatever colour the head had at the moment it was born. So a
-stamp never changes colour again, and the colour marches backwards along the trail rather than sitting at
+`spot_trail_2c` and `spot_trail_3c` color the **head** from the wall clock — one second to run through the
+colors in the list — and a stamp simply keeps whatever color the head had at the moment it was born. So a
+stamp never changes color again, and the color marches backwards along the trail rather than sitting at
 fixed distances from the pointer. The user's suggestion, and it was tried after the age-based one on their
 instruction. `spot_ripple_2c` and `spot_ripple_3c` are the same idea in the other family: the source cycles,
-and a ring keeps the source's colour from the instant it left it.
+and a ring keeps the source's color from the instant it left it.
 
-**Neither the head nor a stamp is told the colour by the other, which is what keeps them agreeing.** One
-function maps a millisecond to a colour key. The head asks it about `clock.getFrameMs()`, a stamp asks it
+**Neither the head nor a stamp is told the color by the other, which is what keeps them agreeing.** One
+function maps a millisecond to a color key. The head asks it about `clock.getFrameMs()`, a stamp asks it
 about the `bornMs` it already stores, and because both read the same clock the stamp is provably wearing the
-head's colour from its own birth instant. Nothing is passed between the layers, which is the same property
+head's color from its own birth instant. Nothing is passed between the layers, which is the same property
 the round-robin arithmetic buys everywhere else in this family.
 
 **This is the one sample where the clock has to run with the pointer standing still, and that is a real
@@ -8363,46 +8846,46 @@ requires movement, so the pulse that gating fixed cannot come back — a still p
 but lays nothing down.
 
 **The cycle is a blend rather than three steps, and that is what `Color.interpolate` was added for.** The
-first build picked whichever third of the second the clock was in and used that colour whole, so the head
+first build picked whichever third of the second the clock was in and used that color whole, so the head
 jumped between the three. The user asked whether it could actually cycle, and then that the blending live in
 `colorUtils` rather than in the sample. So `Color` grew an `interpolate` on every space it already had a
-`toCss` for, and the sample walks a position through the colour list, takes the two colours either side of
+`toCss` for, and the sample walks a position through the color list, takes the two colors either side of
 it, and asks for the blend between them.
 
 **It interpolates through the channels rather than around the hue circle, and that is the user's choice
-between two looks rather than a default.** Picture the palette on a colour wheel, the three colours evenly
+between two looks rather than a default.** Picture the palette on a color wheel, the three colors evenly
 spaced around the rim. `Color.Hex.interpolate` blends red, green and blue, which is a chord straight across
-the wheel — and the middle of the wheel is grey, so the halfway point is a milky version of the two ends
-rather than a colour of its own. `Color.HSL.interpolate` moves the hue itself, which is an arc along the rim,
+the wheel — and the middle of the wheel is gray, so the halfway point is a milky version of the two ends
+rather than a color of its own. `Color.HSL.interpolate` moves the hue itself, which is an arc along the rim,
 so it passes through everything between the two ends at full strength: vivid green between yellow and cyan,
 vivid blue between cyan and magenta, vivid red between magenta and yellow.
 
 **The arc was built first and the chord is what shipped, on the user's call.** The reasoning for the arc
-was that a chord makes two saturated colours "meet at a duller mixture", which is true and turned out to be
-the point: with the chord, only the three palette colours ever assert themselves and the transitions are
+was that a chord makes two saturated colors "meet at a duller mixture", which is true and turned out to be
+the point: with the chord, only the three palette colors ever assert themselves and the transitions are
 quiet fades through nothing in particular, which is the character the effect wanted. **Their reason for
 preferring it is about the palette, and that is the part worth keeping.** The three defaults are 120° apart
-on the wheel, so an arc between them covers the entire circle — the cycle stops being three colours pulsing
+on the wheel, so an arc between them covers the entire circle — the cycle stops being three colors pulsing
 and becomes a rainbow, which buries the palette the Border Colors knobs are there to set. A palette of three
-neighbouring hues would arc without ever looking like a rainbow, so this is not a finding about hue
+neighboring hues would arc without ever looking like a rainbow, so this is not a finding about hue
 interpolation being wrong; it is a finding about this palette. Do not swap it back as a correction. **Swapping back is one line in each of the four `c` files** —
 `Color.HSL.toCss(Color.HSL.interpolate(Color.Hex.toHsl(from), Color.Hex.toHsl(to), ratio))` in place of
 `Color.Hex.interpolate(from, to, ratio)`. Both functions exist and each says in its own documentation what
 the other is for, which is why the swap costs a line.
 
-**Blending needs the colours as hex, and that is a real limit rather than a hidden one.** `SVGDefsColors`
-holds plain strings, and every other sample treats them as opaque and hands them to relative colour syntax,
-which accepts any CSS colour. Blending in JavaScript needs the numbers, so `getCycleColor` guards with
-`Color.Hex.isHex` and falls back to the unblended colour when either end is not hex. The Playground's colour
+**Blending needs the colors as hex, and that is a real limit rather than a hidden one.** `SVGDefsColors`
+holds plain strings, and every other sample treats them as opaque and hands them to relative color syntax,
+which accepts any CSS color. Blending in JavaScript needs the numbers, so `getCycleColor` guards with
+`Color.Hex.isHex` and falls back to the unblended color when either end is not hex. The Playground's color
 picker emits hex and `SAMPLE_COLORS` are hex, so the blend runs in practice; a consumer passing `oklch(…)`
-gets the stepping behaviour rather than a broken gradient. Tightening `SVGDefsColors` to `Color.Hex` would
+gets the stepping behavior rather than a broken gradient. Tightening `SVGDefsColors` to `Color.Hex` would
 remove the guard and was not done — it would ripple through `GlassDefs` and every consumer for the benefit
 of four samples.
 
 **What it looks like, and the one knob.** The head sweeps continuously — parked in the middle it moves
 yellow, teal, dull gold and back — and the trail carries the sweep along its length. The hard band seams the
-stepped build had are gone entirely, because neighbouring stamps now differ by one frame's worth of blend
-rather than by a whole colour. `CYCLE_MS` is the lever: shorten it to fit more of the cycle inside one
+stepped build had are gone entirely, because neighboring stamps now differ by one frame's worth of blend
+rather than by a whole color. `CYCLE_MS` is the lever: shorten it to fit more of the cycle inside one
 trail, at the cost of the head cycling faster than is comfortable to watch.
 
 **The `smear` trails stretch each stamp along the way the pointer was going, and they are the answer to
@@ -8439,7 +8922,7 @@ built on frozen positions, and the reason is sharper here than in the trail: wat
 so a ripple that tracked the pointer would not be a ripple at all.
 
 **The spawn rule is accumulated distance, not elapsed time, and that is the whole difference from the
-trail.** Each layer adds up how far the pointer's `boxRatio` has travelled and owns the milestones where
+trail.** Each layer adds up how far the pointer's `boxRatio` has traveled and owns the milestones where
 `Math.floor(travel / RIPPLE_SPACING_RATIO) % RIPPLE_COUNT` equals its own index. So rings are spaced evenly
 **along the path** whatever the speed — a slow drag leaves two or three large ones, a fast sweep leaves a
 dozen — where a clock would bunch them up when the pointer slowed and string them out when it hurried. It
@@ -8463,22 +8946,22 @@ disturbance leaves the thing that caused it.
 radial gradient's stops are fractions of its own radius, so a fixed annulus gets absolutely fatter as the
 ring expands and reads as a spreading smear instead of a wave. The stops are therefore a peak at
 `CREST_STOP` with a spread either side that shrinks from `CREST_SPREAD_START` to `CREST_SPREAD_END` over the
-ripple's life, roughly cancelling the tenfold growth in radius. The outer shoulder is capped just under 100
+ripple's life, roughly canceling the tenfold growth in radius. The outer shoulder is capped just under 100
 so it cannot collide with the final stop.
 
 **Expansion is `easeOutCubic` and the fade is a power curve, deliberately not the same function.** The ring
 should leap out and then slow, which is the easing; its brightness should hold for a moment and then go,
 which the exponent does. Tying both to one curve made the ring fade before it had finished growing.
 
-**The colour cycles by slot, and this is the family where that works.** `spot_ripple_1` paints every crest in
+**The color cycles by slot, and this is the family where that works.** `spot_ripple_1` paints every crest in
 `primary`; `spot_ripple_2` alternates `primary` and `secondary`, `spot_ripple_3` runs all three, in each case by
 `index % CREST_COLOR_KEYS.length`. Because the slots take their turns in order, consecutive rings carry
-consecutive colours, and because the crests are thin and spaced a spacing-ratio apart they hardly overlap —
-so each ring reads as its own colour rather than averaging with its neighbours. The source stays `primary`
-in all three, which is why the trailing number is still a straight colour count: two colours on the surface
+consecutive colors, and because the crests are thin and spaced a spacing-ratio apart they hardly overlap —
+so each ring reads as its own color rather than averaging with its neighbors. The source stays `primary`
+in all three, which is why the trailing number is still a straight color count: two colors on the surface
 is a `_2`, three is a `_3`. The trails cannot cycle by slot — their stamps overlap far too much for it — and
-cycle by age instead, recorded under _"the colour follows the stamp's age"_ above. `spot_ripple_2c` and
-`spot_ripple_3c` are the third option: the source blends continuously and each ring keeps the colour the
+cycle by age instead, recorded under _"the color follows the stamp's age"_ above. `spot_ripple_2c` and
+`spot_ripple_3c` are the third option: the source blends continuously and each ring keeps the color the
 source had when it was born, so the wake grades along the path rather than repeating a fixed sequence.
 **The `c` variants pay for it with a clock that runs at rest**, because a cycling source animates whether
 or not the pointer moves — the same trade the trails' `c` variants make, and the reason the plain
@@ -8487,7 +8970,7 @@ or not the pointer moves — the same trade the trails' `c` variants make, and t
 ### Every ripple had a banded twin, and they were deleted
 
 **Five keys went: `spot_ripple_1s`, `_2s`, `_3s`, `_2cs` and `_3cs`.** The user's call — they never liked
-them much. What they were: one prop, `spreadKind: "banded"`, emits each stop twice so the colours meet at a
+them much. What they were: one prop, `spreadKind: "banded"`, emits each stop twice so the colors meet at a
 hard edge, which turned the soft crests into hard-edged solid rings and the wake into something closer to
 sonar or a contour map. The reasoning for the suffix rather than an invented `ripple_band_3` was sound and
 still is — a trailing `s` already meant exactly that — and it is why `flow` keeps its banded set. The look
@@ -8506,7 +8989,7 @@ laid down solid.
 **A ring can be recycled before it has finished, and the numbers are chosen to make that rare rather than
 impossible.** Twelve slots at 0.15 of the box apart means a full recycle takes 1.8 box-widths of travel; at
 a brisk drag that is a little longer than the 700ms lifetime, so a slot is normally dead before its turn
-comes round again. Push the pointer faster than that and a half-grown ring will snap back to the centre. The
+comes round again. Push the pointer faster than that and a half-grown ring will snap back to the center. The
 fix if it ever matters is more slots, not a longer spacing — spacing is what makes the wake read.
 
 ### `SVGDefsFrameUtils.createClock` is the shared animation frame for samples that fade rather than follow
@@ -8550,10 +9033,10 @@ sixteen-pixel band is a row of fragments.
 **The tracked page carries two examples, and the second is a test rather than a gallery.** `Default` is the
 single large box every other defs page shows, which is what a sample is judged on. `Continuity` is four
 boxes in a 2x2 grid, and it exists because every tracked sample computes `boxRatio` against the element it
-is painting — a single demo can never show whether two neighbouring elements agree. Four of them can: park
-the pointer on the grid's centre and `spot_1`'s pool spans all four cells as one continuous circle, each
+is painting — a single demo can never show whether two neighboring elements agree. Four of them can: park
+the pointer on the grid's center and `spot_1`'s pool spans all four cells as one continuous circle, each
 quarter drawn by a different element from its own reading. `hand_1` in the same position lights the inner
-corner of each cell, four wedges each pointing at the cursor from its own centre — correct, and looking
+corner of each cell, four wedges each pointing at the cursor from its own center — correct, and looking
 nothing like continuous. Seeing both is the point. Each cell keeps the resizable child, so the cells can be
 given different sizes and checked again.
 
@@ -8574,7 +9057,7 @@ either way, which is what a pointer-driven one needs.
 
 ### A sample registry and the machinery that runs it are separate modules
 
-The rule: **a module a consumer imports for behaviour may not import the samples.** Machinery takes the sample
+The rule: **a module a consumer imports for behavior may not import the samples.** Machinery takes the sample
 itself; the registry that maps a name to a sample is its own export in the `.const.ts`, and only code driven by
 a runtime string — the Playground's dropdowns — touches it.
 
@@ -8690,7 +9173,7 @@ holds a signal at all — it calls the handler and returns nothing.
 
 **Fourteen types then split off as `*RenderProps`** — `CarouselStep`, `CarouselPick`, `Calendar`, `Clock`,
 `ColorArea`, `ColorInput`, `FileInput`, `Range`, `PaginatorPage`, `PaginatorStep`, `SlideButton`,
-`TableColumn`, `TableCell`, `TreeNode` — each carrying an index, a value, an array, a date or a colour. The
+`TableColumn`, `TableCell`, `TreeNode` — each carrying an index, a value, an array, a date or a color. The
 other seventeen keep `*Flags`. `checkedState` is `boolean | "mixed"`, a choice from a fixed set, so
 `BinarySwitchFlags` and `SelectGroupFlags` stayed as they were.
 
@@ -8708,7 +9191,7 @@ added — see the gaps at the foot of this entry.
 
 **The five features are what a `Table` component is _for_, and the argument is worth stating once.** A
 `<table>` gives the semantics free: the row and column relationships are in the elements, so a reader
-announces "column 3 of 7, Price, row 12" without being told. It gives no behaviour, and its layout is
+announces "column 3 of 7, Price, row 12" without being told. It gives no behavior, and its layout is
 auto-computed, which resizing and pinning fight. A `display: grid` of divs is the mirror image: total layout
 control, and no semantics at all — `role="table"`, `role="row"`, `role="columnheader"`, `aria-rowcount` and
 `aria-colindex` all have to be written by hand and kept correct as rows come and go. **The component is the
@@ -8881,13 +9364,13 @@ boundary inside the page to prefer.
 **It never claims the arrow keys.** A `Tabs` inside it already walks its tabs with them, and two owners of one
 key is a bug found later rather than sooner. The component listens; it never moves focus itself.
 
-**A focused child is revealed, not centred, and the pointer counts the same as the keyboard.** Settled with the
-user after the first attempt centred on keyboard focus alone: an item already fully in view does not move the
+**A focused child is revealed, not centerd, and the pointer counts the same as the keyboard.** Settled with the
+user after the first attempt centerd on keyboard focus alone: an item already fully in view does not move the
 strip, and one cut off by an edge scrolls by the least that shows it whole. Centring is worse in both
 directions — it drags a half-clicked item out from under the cursor, and it moves the strip when nothing needed
 moving. Distinguishing pointer from keyboard was my patch for the first of those and it bought a second
-behaviour to remember; revealing removes the cause instead, so one rule covers both. What it gives up is the
-look-ahead a centred item has: a child revealed at an edge sits flush against it, with nothing of the next one
+behavior to remember; revealing removes the cause instead, so one rule covers both. What it gives up is the
+look-ahead a centerd item has: a child revealed at an edge sits flush against it, with nothing of the next one
 showing.
 
 **It renders no `<button>`, which is the `NumberInput` shape rather than the `Tabs` one.** `renderButton` is
@@ -8907,7 +9390,7 @@ pressable rather than decorative.
 **Which way a change came from is remembered rather than inferred**, because the track scrolls smoothly and
 every intermediate frame reports itself. The component keeps the last ratio it wrote and ignores exactly that
 value coming back; anything else is the consumer's and is scrolled to. Without it a consumer's write would be
-cancelled by the first frame of its own animation — the report would land back in the signal, look like a new
+canceled by the first frame of its own animation — the report would land back in the signal, look like a new
 instruction, and scroll to where the strip had got to instead of where it was sent.
 
 **`getPadding` exists because a scroll container clips a focus ring, and only the consumer knows how big the
@@ -9025,12 +9508,12 @@ and was refused for the reason `DrumWheel` can require `wedgeSize` and this cann
 direction and meaningless in the other is a shape the type cannot state, which is the same objection that
 keeps a drum carousel out of `Carousel`'s own props.
 
-### `TrackCarousel` and `DrumCarousel`: one behaviour, two ways of showing it
+### `TrackCarousel` and `DrumCarousel`: one behavior, two ways of showing it
 
 A carousel and a drum wheel are the same picture driven by different arithmetic, which is what `Barrel` was
 lifted out to make usable twice. The wheel spins to a wedge nobody chose; a carousel steps to a slide somebody
 did. So the barrel is now shown by two components — one turned by `Rotator`, one turned by an index — and the
-carousel's own behaviour, all of it, is shared between its two presentations.
+carousel's own behavior, all of it, is shared between its two presentations.
 
 **The shell is `Carousel` and it is not exported; the presets are.** Same arrangement as `Spotlight` and as
 `OverheadWheel` / `DrumWheel`, and for the same reason: `slideSize` is required on the drum and meaningless on
@@ -9068,11 +9551,11 @@ drum-only one, exactly as `WheelWedgeState.face` is shared by a wheel that never
 
 **The two Playground pages carry the same three demos, because the shell they share is the thing being shown.**
 The drum page began with one demo against the track page's three, which read as the drum having less to it —
-but every behaviour the track page demonstrates lives in the shared shell, so the drum has all of it. Both pages
+but every behavior the track page demonstrates lives in the shared shell, so the drum has all of it. Both pages
 now show the same trio under the same names: stepped by hand, rotating on its own, and no controls at all. The
 knob panel is the same on both, delay knob included, and the only thing that differs between the pages is which
 preset the examples render. **Where a family's presets are two views of one shell, a demo that exists on one
-page and not the other is a claim that the behaviour is missing**, and that claim should be true or the demo
+page and not the other is a claim that the behavior is missing**, and that claim should be true or the demo
 should be there.
 
 ### `FlipCard`: the smallest thing that can turn a barrel
@@ -9158,7 +9641,7 @@ pins the sequence. What is genuinely degenerate — turning across while on the 
 it is what a box does.
 
 **The room it reserves is the silhouette of the sphere the box sits inside.** `BarrelUtils.getProjectedExtent`
-is now the shared piece: it takes a circumradius and how far the centre sits behind the screen, and returns the
+is now the shared piece: it takes a circumradius and how far the center sits behind the screen, and returns the
 extent the projection can reach — `getGirth` is expressed through it and its numbers are unchanged, which the
 existing wheel tests prove. `Cuboid` passes the half-diagonal of the whole box, so the reservation is correct at
 every orientation including the ones that combine both turns. It over-reserves for a slab — a box 400 wide, 40
@@ -9197,14 +9680,14 @@ followed, which is the mechanism `Theme.css` was already meant to be kept out by
 
 **`Theme.css` is excluded by name as well, and it is the only file that is.** Settled with the user on
 , after the mechanism gave `Card` a `Theme` tab honestly — the example does import the theme by
-name. The user's reason generalises: **the theme holds no logic that helps build the component**, it is a
-palette, and a tab of colour tokens teaches a reader nothing. The exclusion is a single path constant rather
+name. The user's reason generalizes: **the theme holds no logic that helps build the component**, it is a
+palette, and a tab of color tokens teaches a reader nothing. The exclusion is a single path constant rather
 than a pattern, so it stays a named exception rather than the start of a filter list.
 
 **Forced: `?raw` cannot read a `.css.ts`, so the Playground's Vite config carries a nine-line plugin.** The
 vanilla-extract plugin claims every `*.css.ts` by file name and discards the query, so a stylesheet requested
 as text comes back compiled and with no default export — `codeToHtml` then receives `undefined` and the modal
-renders nothing. `?source` resolves to an id no other plugin recognises (a null-byte prefix and a `.source`
+renders nothing. `?source` resolves to an id no other plugin recognizes (a null-byte prefix and a `.source`
 extension) and is read off disk by the plugin itself. The only part of the feature living outside `src`.
 
 **An example is given the key rather than the resolved sample, and three pages changed to do it.** Still true
@@ -9270,7 +9753,7 @@ paired with a panel component, and each page calls the factory and renders the p
 written out twice. Three knobs mean the same thing to both mosaics — how many items, the gap, and which side is
 fixed — and live in that shared panel. **What only one of them has stays in that page's own local panel** — a
 target shape means nothing to an element mosaic, so it sits under the image demo rather than in the shared row.
-It generalises: share what can be shared, make the rest local.
+It generalizes: share what can be shared, make the rest local.
 
 **The image mosaic's second demo became a knob on the first**, which is the rule above rather than a new one.
 The decorated version differed from the plain one only in whether each image is wrapped in an element of the
@@ -9289,7 +9772,7 @@ been the same choice asked four times.
 **Furniture that only one direction needs is still sized for both, so a card does not resize when a knob
 changes.** The user's objection, and it is about the page rather than the component: the box round each
 carousel demo was `height: 320` for a column and nothing for a row, so switching direction made every card
-jump. It is one fixed height for both now, with the demo centred in it — a row carousel leaves slack under
+jump. It is one fixed height for both now, with the demo centerd in it — a row carousel leaves slack under
 itself and a column one fills it, and the card stays put either way. The first three corrections: `Formation`'s pair differed only in `getIsStackedInReverse`,
 `Satellite`'s first two only in `getIsBehindSubject`, and `Staircase`'s only in `getDir`, and each was first
 built as two example files with the value written into each. Every one of them is now a single example with
@@ -9302,7 +9785,7 @@ can carry the same prizes round more than once.
 
 **Dropping a demo drops its spec, and that is the trade to state rather than work around.** `Satellite`'s
 third demo — the component with no satellite at all — was excluded on the user's instruction, so
-`with nothing to attach there is no wrapper either` went with it. The behaviour is still covered by unit
+`with nothing to attach there is no wrapper either` went with it. The behavior is still covered by unit
 tests; what is gone is the browser's confirmation of it.
 
 **Where a sample registry is not split, the key is still the example's to resolve.** `Formation/Layouts` and
@@ -9318,14 +9801,14 @@ style reading it — which keeps the styles pure page constants that can be read
 
 **The two styles read the knob differently and both are right.** `rigid` uses it exactly. `bouncy` picks a
 whole number between one and it, because randomness is what that style is for and a knob that fixed the count
-would leave it randomising nothing but the jitter. So the knob is a ceiling for one and a setting for the
-other, which is why it is labelled _"Turns per spin"_ rather than named after either reading. At the starting
+would leave it randomizing nothing but the jitter. So the knob is a ceiling for one and a setting for the
+other, which is why it is labeled _"Turns per spin"_ rather than named after either reading. At the starting
 value of 3 both reproduce the constants they replaced — `PLAIN_TURNS` was 3 and the lively range was 1 to 3 —
-so nothing about the page's default behaviour moved.
+so nothing about the page's default behavior moved.
 
 **`WheelExampleProps.computeSpinDefs` is the library's two-argument shape, not `WheelSpinStyleFn`.** An
 example spreads its props straight onto a wheel, so what it receives has to be what the wheel accepts; the
-three-argument form is the page's catalogue signature and stops at the page. The two were the same type until
+three-argument form is the page's catalog signature and stops at the page. The two were the same type until
 the knob arrived and the difference was invisible, which is worth knowing before merging them back.
 
 **`Wheel` passes `computeSpinDefs` resolved rather than as a key**, which is the one place this departs from
@@ -9356,10 +9839,10 @@ settled held for the rest; two things they never exercised did not.
 **An example card now marks its demo, because the source button is a button in the card.** `PageExamples`
 wraps the demo in a `data-demo` element and `e2e/helpers.ts` gains `demo(key)` beside `example(key)`. Without
 a marker a spec asking for "the first button in this card" found the `</>` button and opened the source viewer
-instead of the control it meant — which is how a colour-dropdown test came to assert against a code listing.
+instead of the control it meant — which is how a color-dropdown test came to assert against a code listing.
 
 **That marker is `display: contents`, and the first attempt at it broke six pages.** It was given
-`PageVariants`' demo box — a centred flex row — which changed how every card lays its own contents out: the
+`PageVariants`' demo box — a centerd flex row — which changed how every card lays its own contents out: the
 pages that were already on `PageExamples` had always put a demo's children straight into the card's column, so
 `CellAnimation` and `ScanlineAnimation` suddenly showed their local props panels **beside** their demos rather
 than below. A marker exists to be found by a selector, not to lay anything out, so it generates no box at all.
@@ -9406,8 +9889,8 @@ collapsing two demos into one plus a panel knob, because that removes demos and 
 user holds that as a separate pass.
 
 **One demo needed pinning down rather than converting.** `SplitPane`'s bounded demo stretched until a pane's
-160px floor stopped being reachable — with a wide enough frame the neighbour never reaches it, so the spec
-proving the floor is honoured had nothing to bump into. `PageSplitPaneFrame` now caps at 380px, which is the
+160px floor stopped being reachable — with a wide enough frame the neighbor never reaches it, so the spec
+proving the floor is honored had nothing to bump into. `PageSplitPaneFrame` now caps at 380px, which is the
 width it used to get. The alternative was to weaken the assertion.
 
 ### `PageExamples` lays out on a grid, with the column width per page and a span per example
@@ -9440,7 +9923,7 @@ children it grew to the column while the box it traces stayed 320: the outline a
 box is what the demo is about, so the page now wraps it in a `width: fit-content` host and the `Shape` hugs it
 again. `ViewportPage` builds its own cards rather than using `PageExamples`, and had capped them at the host's
 width; it now uses the same grid, with a floor of the host plus the card's padding, and its fixed-size hosts
-centre inside a column that can be wider.
+center inside a column that can be wider.
 
 **Which is the general lesson: a card stretches its children, so a demo that must match a fixed-size child has
 to say so.** The old row let a demo of unstated width agree with a fixed-size sibling by accident, because
@@ -9455,7 +9938,7 @@ column count at ordinary widths is unchanged.
 ### `PageExamples` takes one layout switch, because the two questions turned out to be one
 
 Settled with the user after the grid had been running for a while. The grid fixed what it was brought in for —
-cards of a size, and a long readout no longer stretching one card wider than its neighbours — and broke two
+cards of a size, and a long readout no longer stretching one card wider than its neighbors — and broke two
 things on the pages whose demos come at a fixed size. `Shape`'s card and its stress-test card were handed the
 same track, which is right for two text fields and absurd for a 320px box beside three buttons; and neither
 card was flush with what it held, so the page could no longer be read as "this is the room the component asks
@@ -9473,10 +9956,10 @@ tab strip — has no size of its own, any width is as arbitrary as any other, an
 one. Argued from ownership rather than from how the pages happen to look: a demo with no width cannot be
 flush with anything, because there is nothing to be flush with.
 
-**`grid` centres its demo rather than stretching it, and a demo that must fill says so itself.** The card was
+**`grid` centers its demo rather than stretching it, and a demo that must fill says so itself.** The card was
 a column that stretched its children, which was invisible while cards hugged their content and became a demo
-pinned to the left edge once they did not. The demo slot is now a centred row. The alternative — keep
-stretching and have the fixed-size demos centre themselves — was rejected by the user: it leaves the rule in
+pinned to the left edge once they did not. The demo slot is now a centerd row. The alternative — keep
+stretching and have the fixed-size demos center themselves — was rejected by the user: it leaves the rule in
 each demo's CSS, where a new example forgets it silently. Nothing had to be swept in for the change, because
 a demo that has to fill already declares its own width and a declared width still fills a flex line:
 `Progress`'s bar, `ColorArea`'s surface and `Tabs`' panels came through untouched. What moved is what should
@@ -9575,7 +10058,7 @@ spec unwritable. The strip is what reproduces a long page inside a card, and `sp
 ### The hint example's moving buttons are bounded by a `PageMeasureBox`
 
 The user's call, after the sliding buttons walked out of the example card — the vertical one worst, because a
-column of two buttons reserves only their own height and the second then travelled a further two of its own
+column of two buttons reserves only their own height and the second then traveled a further two of its own
 heights past the bottom.
 
 **The travel was a fraction of the button, and it needed to be a fraction of a box.** Each wrapper slid
@@ -9601,7 +10084,7 @@ the used width was zero at every step and the declaration painted nothing on any
 
 ### `Abstracts/Elevation`: a height an element has without carrying a z-index
 
-Built after a tooltip added to the hint example's sliding button turned up blurred and greyed while the
+Built after a tooltip added to the hint example's sliding button turned up blurred and grayed while the
 spotlight was open on that very button — the one element the spotlight exists to keep readable.
 
 **Anchor already worked out its own height, and the method was right.** `AnchorUtils.getStackingBase` walks
@@ -9682,7 +10165,7 @@ still fills it, which is what the individual segments used to do.
 each clamps at its own edge, so the four lines running out from the highlight carried a faint seam; one layer
 blurs continuously and they are gone, and it is one filter pass per frame rather than eight while the
 highlighted element moves. Against that, the blur now samples across the hole's edge, so the highlighted
-element's colour bleeds a little way into the darkened ring around it. That is inherent to blurring the whole
+element's color bleeds a little way into the darkened ring around it. That is inherent to blurring the whole
 backdrop and then punching a hole in the result, and it is what `Reveal`'s frosted cover has always done.
 
 **The mask itself is `Abstracts/Cutout`, shared with `Reveal` and `ScratchCard`.**
@@ -9693,7 +10176,7 @@ props, `ScratchCard` passes a feathered rectangle per merged run, and `Spotlight
 `linear-gradient` layer, which is a hard-edged rectangle and is exactly the hole it had before. It took a
 single hole when only `Reveal` and `Spotlight` used it; see `ScratchCard`'s entry for why the list, and why
 `mask-composite` lost its prefixed twin. **Softness and shape were deliberately
-not added to `Spotlight`**: the generalisation makes them reachable, but a soft or rounded spotlight is a
+not added to `Spotlight`**: the generalization makes them reachable, but a soft or rounded spotlight is a
 design decision nobody has taken, and adding props under a refactor's justification is the thing that must not
 ride along. Both pages now list `Cutout` in their derived Abstracts row, which is the mechanism working.
 
@@ -9717,7 +10200,7 @@ look for the rule.
 
 **Derived rather than stated, and marked as such**: the four have in common that they render DOM, hold no
 user-editable value, and are not compositions of `Essentials` — which is what would separate the folder from
-its neighbours if a rule were written, rather than anything about how unusual a thing looks. All four lay
+its neighbors if a rule were written, rather than anything about how unusual a thing looks. All four lay
 elements out or turn them; none is a control, and none is a `Surface`-style assembly of other components. The
 user's call was where these four go; whether that is the general test is theirs to make.
 
@@ -9781,9 +10264,9 @@ offset reaches it. Confirmed by the user as working as designed.
 
 **The offset is a nudge in screen space, and that differs from `Anchor` on purpose.** For a floating layer the
 offset means a **gap**, so `AnchorUtils.getHPlacementOffset` signs it by the placement and discards it entirely
-on a centred axis. A consumer placing a badge is aligning it rather than clearing a gutter, and "nudge it two
+on a centerd axis. A consumer placing a badge is aligning it rather than clearing a gutter, and "nudge it two
 to the right" must not become "two to the left" because the placement flipped, nor be silently dropped because
-the axis is centred. So `computeLayout` adds the offset raw. Stated because the two components share the
+the axis is centerd. So `computeLayout` adds the offset raw. Stated because the two components share the
 placement type and disagree here.
 
 **With no satellite there is no wrapper.** `renderSatellite` is optional and the component renders its children
@@ -9847,7 +10330,7 @@ fallback — 94.07%, and Firefox 121, which is **ten months later than the unit 
 published package already requires a strictly newer browser than this does, in the one component every control
 passes through.
 
-### `Rotator`: the behaviour both wheels share, with no DOM of its own
+### `Rotator`: the behavior both wheels share, with no DOM of its own
 
 **A wheel that spins to an index is arithmetic plus a small state machine, and neither is markup.** The
 original had a `useRotationEffect` hook shared by its two wheels and left everything else — where to stop, how
@@ -9860,9 +10343,9 @@ asked for and then the target index's angle, so a spin is always forward however
 spun. Testable in one line, and the property a consumer would otherwise discover by watching a wheel unwind
 backwards.
 
-**A spin overshoots and then settles, which is two turns rather than one.** Landing dead centre on the
+**A spin overshoots and then settles, which is two turns rather than one.** Landing dead center on the
 wedge looks mechanical, so `computeSpinDefs` may return a `jitterRatio`: the wheel spins to the target plus
-that fraction of a wedge, then corrects to the centre over the settle duration. `getJitterAngle` clamps the
+that fraction of a wedge, then corrects to the center over the settle duration. `getJitterAngle` clamps the
 ratio to half a wedge, because past that the wheel would come to rest on a different wedge from the one the
 index names — the clamp exists to protect that correspondence, not to be tasteful.
 
@@ -9963,16 +10446,16 @@ was a second exception and is not any more** — see the entry below.
 **After a user spin settles, the wheel rests for `restDurationMs` and then picks up again; `-1` rests for
 good.** The rest is its own private state, deliberately not the same thing as the auto-spin switch, because the
 two have different owners — the rest is the component saying "let them read the prize", the switch is the
-consumer saying "not now". Folding them into one flag meant a consumer's pause being cancelled by a rest timer
+consumer saying "not now". Folding them into one flag meant a consumer's pause being canceled by a rest timer
 they never started. `DEFAULT_REST_DURATION_MS` is 3000 and is mine, not measured; change it freely.
 
 **A pause on hover is now the consumer's to build, and `autoSpinSignal` is the door.** This is the settled
 `playbackSignal` rule applied again — whether the passive turn is running is state a consumer can read and
 write, so it is a two-way signal rather than a `pause()` on the mount handle. A consumer wanting the old
-behaviour writes `false` on pointer enter and `true` on leave, over their own box, which is also the only way
+behavior writes `false` on pointer enter and `true` on leave, over their own box, which is also the only way
 to cover a control that sits **on top of** the wheel rather than inside it. The library cannot do that for
 them: the hold it used to keep listened for the pointer arriving on the wheel's own element, and a button
-overlapping the wheel is a neighbour rather than something nested inside, so it took the pointer away from the
+overlapping the wheel is a neighbor rather than something nested inside, so it took the pointer away from the
 wheel instead of holding it.
 
 **`getIsHeld` is gone from the handle, and `getIsPlaying` is now two getters.** `isHeld` existed for one
@@ -10015,7 +10498,7 @@ internal check: the analysis above already records that `prefers-reduced-motion`
 sufficient techniques and that the user's answer to that criterion is the essential-activity exemption, so
 removing it changes no conformance claim. **The Playground is now the consumer that answers it** — `WheelPage`
 reads the query and returns no `idleDelayMs` under reduce, which is what keeps `e2e/wheel.spec.ts`'s
-reduced-motion expectation true. That spec is testing the Playground's behaviour, not the library's, and its
+reduced-motion expectation true. That spec is testing the Playground's behavior, not the library's, and its
 prose still reads correctly.
 
 `Carousel` and `Toasts` keep the three-part hold; the wheel no longer has one at all, so what they share now is
@@ -10027,7 +10510,7 @@ seconds is the noise 2.2.2 exists to prevent.
 
 ### `OverheadWheel` and `DrumWheel`: two presets, because a wheel cannot become a drum
 
-**They share behaviour and no markup at all.** One rotates in the plane of the screen; the other is a barrel
+**They share behavior and no markup at all.** One rotates in the plane of the screen; the other is a barrel
 seen edge-on, with a front and a back face per wedge, a perspective ancestor and a size derived from the
 wedge's own extent. A single component with a mode prop would be `Scroller` and `Carousel` again —
 everything they appear to share, they hold for different reasons.
@@ -10067,7 +10550,7 @@ edges are parallel and the tangent is unbounded, fall to the arc bound rather th
 **The count-based shrink was inert on the page, which is why the labels collided.** `min(12 / wedgeCount, 1)`
 is exactly 1 at every count the props panel offers, since the panel stops at twelve — so the mechanism the
 original had could never be seen, and the label box was the full width of the wheel rather than the width of
-the slice, so at twelve wedges each label ran across its neighbours. Sizing the type from the slice bites at
+the slice, so at twelve wedges each label ran across its neighbors. Sizing the type from the slice bites at
 every count instead of only past a threshold, and it needs no reference count to be kept in step with the
 length of the prize list.
 
@@ -10169,7 +10652,7 @@ decides, so the drum showed a back where a front belonged. `WheelUtils.getHasWed
 is a count test rather than an apothem test on purpose — the apothem is also zero while a consumer's wedge
 size is still being measured, and backs must not flicker in and out during a measurement.
 
-**A picked wedge and a picked drum face wear the same treatment, and the colour is decided by contrast
+**A picked wedge and a picked drum face wear the same treatment, and the color is decided by contrast
 rather than by taste.** Asked for by the user, who found the drums had no visible highlight at all: the card
 changed its border from `primary.main` to `primary.light` and nothing else, which is not something anyone
 notices on a barrel that is turning. Both now take a `secondary.dark` to `secondary.light` gradient behind `secondary.contrast` text — the
@@ -10260,7 +10743,7 @@ is unit-tested against those strings, which is cheaper than reading them off a r
 **A barrel carries a transition duration it does not use by default.** The wheel animates its angle frame by
 frame and wants no transition at all, so the property is declared and the duration left unset, which is a
 transition of zero. A carousel steps its angle in one jump and asks for the duration it already publishes.
-Both behaviours live side by side rather than one winning.
+Both behaviors live side by side rather than one winning.
 
 ### `ElementObserver` reports a size, and the height observer is a view of it
 
@@ -10281,7 +10764,7 @@ this is an exception taken deliberately rather than a precedent.
 
 **The gap.** A painter drawing an overlapping pile wants each card offset by the real height of the one in
 front of it. `index` and `count` are enough for a fixed peek distance, and everything else a painter can
-measure is itself — a card cannot reach its neighbour's height, and the flow layout has already positioned
+measure is itself — a card cannot reach its neighbor's height, and the flow layout has already positioned
 it using exactly those heights.
 
 **`ElementObserverUtils.createBorderBoxSizeListObserver(refs, enabled)` is the observer for a set rather than one
@@ -10319,7 +10802,7 @@ the control — and `trackDrag` had already established the `track*` verb for "a
 signal". A folder for one function would have been discoverable only by someone who already knew it existed.
 
 **Why it carries a Level A requirement rather than being a nicety**: see 2.2.2 under `Rotator`. That is the
-argument for one copy. Three copies of a conformance behaviour can drift apart silently, and the fourth
+argument for one copy. Three copies of a conformance behavior can drift apart silently, and the fourth
 component to want it copies whichever it finds first.
 
 **`mouseenter` / `mouseleave` replaced `mouseover` / `mouseout` plus a containment check.** The pair that does
@@ -10417,7 +10900,7 @@ to the DOM or only its position.
 
 **The packer is a skyline, and the gap is baked into the cell rather than added afterwards.** Every item is
 inflated by the gap on its right and bottom edges and packed into a container one gap wider than the real
-one. Two neighbours then have exactly one gap between them and the outermost items sit flush against the
+one. Two neighbors then have exactly one gap between them and the outermost items sit flush against the
 edges, with no special case for the first column or the last row. The placement written out is the inflated
 cell minus the gap again.
 
@@ -10458,7 +10941,7 @@ the reading order has no other way to ask. Everything else on `MosaicItemState` 
 
 **An unplaced item is rendered and hidden, never left out.** Where the sizes come from mounted elements —
 which is `ElementMosaic` — an item that is not in the DOM can never be measured and would never earn a
-placement, so leaving it out is a deadlock rather than an optimisation. It renders at the origin with `visibility: hidden`, which still measures,
+placement, so leaving it out is a deadlock rather than an optimization. It renders at the origin with `visibility: hidden`, which still measures,
 and takes its place on the next pass. That is also what covers the first frame, where nothing has been
 measured yet.
 
@@ -10494,7 +10977,7 @@ whichever of that count and the one before it lands nearer. Nothing is tuned and
 constant to defend.
 
 **Within a row count, the split is a dynamic program rather than a greedy fill.** For a candidate count the
-target height divides into an ideal thickness per row, and the program picks the split minimising the summed
+target height divides into an ideal thickness per row, and the program picks the split minimizing the summed
 squared deviation from it — the standard way a justified image wall is laid out. A greedy pass closing each
 row as soon as it is full is cheaper and visibly worse: it pushes all the slack into the last row. The cost
 is the honest one for a dynamic program, quadratic in the images per row count tried, so a mosaic of several
@@ -10541,7 +11024,7 @@ anchor, a `<figure>` with a caption, a `<picture>` with a srcset. Same shape as 
 `renderCalendar`, `TimePicker`'s `renderClock` and `Select`'s `renderOptions`: the library builds, the
 consumer places.
 
-**The size is forced by the cell being a one-cell grid, not by asking the consumer to honour a number.**
+**The size is forced by the cell being a one-cell grid, not by asking the consumer to honor a number.**
 Publishing the computed size as a prop was weighed and dropped: it hands over a decision the component has
 already taken, cannot revise and cannot verify, so a consumer who quietly ignores it gets overlapping tiles
 that nothing detects. The cell carries the pixel width and height, `display: grid` puts every direct child
@@ -10557,7 +11040,7 @@ happens to paint inside or outside the box is the consumer's half, the same line
 `Shape` and around the `Toasts` painter; the box's job is only to be the right size. The consequence worth
 knowing is that a grown tile paints **under** the tiles after it, since later siblings win ties, and the
 cell wrapper is deliberately not a stacking context — so `position: relative` plus a `z-index` on the
-consumer's own element reaches past its neighbours and lifts it clear.
+consumer's own element reaches past its neighbors and lifts it clear.
 
 ### `RichText`: a tag name is what you could write after a dot in JavaScript
 
@@ -10578,7 +11061,7 @@ reference-shaped bracket in someone's text cannot become a tag. `$` is out too, 
 identifier, because `[$5]` is a plausible thing to have written on purpose.
 
 **What was already decided and is unchanged:** tags are found case-insensitively and matched
-case-sensitively, so `[B]bold[/B]` is recognised as a tag, finds no class under `"B"` and prints its own
+case-sensitively, so `[B]bold[/B]` is recognized as a tag, finds no class under `"B"` and prints its own
 brackets. Both halves are pinned by name in `RichText.utils.test.ts`, as is the exclusion of `[123]` and
 `[b-c]`.
 
@@ -10591,7 +11074,7 @@ took the defaults, so a map that failed to arrive at all would have looked ident
 
 **The example that reaches it is an inline diff**, over two tags the library has never heard of — `[add]` and
 `[sub]`. A diff is the case that makes the argument on its own: nobody would expect a component to ship an
-insertion or a deletion colour, the two tags are obviously the page's rather than the library's, and the
+insertion or a deletion color, the two tags are obviously the page's rather than the library's, and the
 sentence being diffed can carry a `[b]` inside an `[add]` to show that the default map came through the same
 call unchanged. The tags are named after what they mark rather than after what they look like, which is why
 they are not `green` and `red`.
@@ -10600,9 +11083,9 @@ they are not `green` and `red`.
 file: the first version struck the deletion through and underlined the insertion, argued it from WCAG 1.4.1
 Use of Color, and wrote both into `richText.spec.ts`. The user removed the underline, and the spec went red —
 which is the failure mode to learn from, because nothing was broken. A spec that pins the decoration or the
-colour of a Playground run has made the user's own styling a thing they cannot change without a red run, and
+color of a Playground run has made the user's own styling a thing they cannot change without a red run, and
 the paint on that page is theirs. The grounds are `success.dark` and `error.dark` with each family's own
-`contrast` for the text, under the rule that a container changing its own background owns the colour of the
+`contrast` for the text, under the rule that a container changing its own background owns the color of the
 text inside it; beyond that, nothing here states what the diff must look like.
 
 **`richText.spec.ts` reads no computed style at all, and that is the general rule rather than a quirk of this
@@ -10630,7 +11113,7 @@ whose digit fell; going down turns every column back. That is what a geared mech
 makes 199 → 200 read as travel rather than one column rewinding while two go on.
 
 **A column waits one beat for every column to its right that is also carrying.** Not a fixed stagger: a
-column whose neighbour is standing still does not wait for it, so 123 → 223 moves the hundreds immediately
+column whose neighbor is standing still does not wait for it, so 123 → 223 moves the hundreds immediately
 while 199 → 200 cascades from the units up. The delay is per column and reaches the faces through
 `Barrel`'s new `transitionDelayMs`, which is the one thing the abstract gained.
 
@@ -10647,9 +11130,9 @@ one, a change of sign alone turns nothing because no digit changed, and 2 to −
 magnitude fell. Comparing the digit sequences and ignoring the sign gives all four, which is why there is no
 sign handling in the component at all.
 
-**A column has to be windowed, and the window has to centre the drum explicitly.** `Barrel` is as tall as the
+**A column has to be windowed, and the window has to center the drum explicitly.** `Barrel` is as tall as the
 whole drum looks, because a drum wheel is meant to show several faces; an odometer shows one. The window is
-one digit tall with the barrel absolutely positioned at its centre — `place-items: center` on an item taller
+one digit tall with the barrel absolutely positioned at its center — `place-items: center` on an item taller
 than its box was tried first and lands one face out, which reads as every column showing the digit above the
 right one.
 
@@ -10692,7 +11175,7 @@ it was asked for rather than the thing that got built, which was put to them alo
 for now. Recorded so the same list is not put to them twice; a better name is still welcome, but it has to be
 one nobody has already turned down.
 
-**A node sits centred between the outermost of the nodes that feed it, and that propagates upward.** The mean
+**A node sits centerd between the outermost of the nodes that feed it, and that propagates upward.** The mean
 of the first and last child rather than of all of them, so an uneven fan-out still lands the parent between
 the ends instead of being dragged toward whichever side has more children — the org chart example is three
 children under one node, two under another and one leaf, and exists to show exactly that. A node with one
@@ -10719,10 +11202,10 @@ than three positioned divs per connector. The overlay carries `aria-hidden` and 
 picture of a relationship the list already states.
 
 **The consumer draws the connectors, and the component only says where they go.** The first build took a
-width and a colour and drew a plain stroke itself, which is the one place this component departed from the
+width and a color and drew a plain stroke itself, which is the one place this component departed from the
 rest of the library — `renderNode` sits beside it, `ScratchCard` takes a `renderCell`, `Shape` takes its fill
 and stroke defs. `renderConnector` now receives one `BracketConnectorDefs` per edge and returns whatever SVG
-it likes inside the component's overlay, and the two colour and width props are gone.
+it likes inside the component's overlay, and the two color and width props are gone.
 
 **The defs stop at the two endpoints and the axis, and deliberately do not name the bend.** Each one carries
 the parent's facing edge point, the child's facing edge point, which orientation the board is in, and the two
@@ -10731,7 +11214,7 @@ midpoint of those two points along the layer axis, because a child is always exa
 over a spine position instead would have made the elbow a contract, and an elbow is a drawing rather than a
 layout.
 
-**The elbow is therefore sample vocabulary, not behaviour**, which is the rule the SVG defs move already
+**The elbow is therefore sample vocabulary, not behavior**, which is the rule the SVG defs move already
 settled. `Samples/Bracket/Connectors` holds `BracketConnectorPaths` — `elbow`, `roundedElbow` and `curve`,
 pure functions returning a `d` string, in a file with no JSX so the unit tests can reach them — and
 `BracketConnectors`, the painters built on top: `flat`, `rounded`, `curved` and `ballAndArrow`. A consumer
@@ -10752,12 +11235,12 @@ ids, so a painter has something document-unique to key on without inventing it.
 
 **The gradient runs corner to corner, along the connector's own diagonal.** Anchoring it to the layer axis
 alone is also correct, but the axis then spans only the gap between two layers while most of a connector's
-length is the run across it — so nine tenths of every line sits at one flat mid-colour. Anchoring it from the
+length is the run across it — so nine tenths of every line sits at one flat mid-color. Anchoring it from the
 parent's edge point to the child's makes each connector ramp along its whole length, and stays consistent
 between siblings because every connector's axis is anchored to its own two ends.
 
 **The stops set `stop-color` through `style` rather than as an attribute**, because a presentation attribute
-does not resolve a CSS custom property and the Playground's colours are theme tokens. And the two colours are
+does not resolve a CSS custom property and the Playground's colors are theme tokens. And the two colors are
 one family's `dark` and `light`, which is the recorded rule for a gradient in the Playground rather than
 anything about this component.
 
@@ -10827,10 +11310,10 @@ as a `data:` URI costs 0.7ms a stamp and 5.8ms once the card is fully rubbed, be
 image for the browser to decode.
 
 **A stamp is refused when it would add nothing, which is what bounds the path by area rather than by time.**
-`SVGGeometryElement.isPointInFill` is asked about the brush's centre and four points a radius out, and the
+`SVGGeometryElement.isPointInFill` is asked about the brush's center and four points a radius out, and the
 stamp is skipped only when all five are already inside. On a long back-and-forth scribble that is 150 stamps
 where stamping everything gives 401, **with the rubbed area identical to four decimal places**. Testing the
-centre alone is the tempting cheap version and it is wrong: it drops to 53 stamps but under-fills, because it
+center alone is the tempting cheap version and it is wrong: it drops to 53 stamps but under-fills, because it
 refuses stamps whose outer half would still have widened the edge.
 
 **`cellCount` is gone, and with it rows, columns, run-merging and the layer ceiling.** The previous build cut
@@ -10843,7 +11326,7 @@ drawing-model leak. **The props that remain are `brushRadius`, `softness`, the t
 
 **Two things improved for free.** The rubbed area now carries one soft outline round the whole of it rather
 than a feather per row-run, so the rule that each hole's solid core had to be drawn a feather wider than its
-cell — to stop two neighbouring feathers meeting at three-quarter alpha and leaving a quarter of the foil
+cell — to stop two neighboring feathers meeting at three-quarter alpha and leaving a quarter of the foil
 behind — disappears entirely. And the edge is a real union rather than a staircase of axis-aligned boxes, at
 any softness.
 
@@ -10893,7 +11376,7 @@ scratched, so the set is empty for the whole gesture: the preview vanished on th
 could never be observed true, making the flag in the signature a lie. The second sized the wrapper to the
 bounding box of the cells the brush covered, which meant **the brush changed size as the pointer crossed from
 one cell into the next** — the user's report. Both mistakes are the same one: deriving the brush from the grid.
-The brush is a property of the props. Its box is `2 × brushRadius` centred exactly on the pointer, and what
+The brush is a property of the props. Its box is `2 × brushRadius` centerd exactly on the pointer, and what
 actually comes off is allowed to differ, because the difference is sampling and the user said so explicitly.
 
 **It takes `Reveal`'s shape props, and they drive the rub as well as the drawing.** `computePoints`,
@@ -10964,7 +11447,7 @@ raced the fade it was watching.
 
 **`Abstracts/Cutout` no longer has `ScratchCard` as a consumer.** It grew from one hole to a list of them for
 the grid build, and that build is gone; `Reveal` and `Spotlight` each pass a list of one. The list form is kept
-rather than reverted because it is tested and costs nothing, but it is now a generalisation with no second
+rather than reverted because it is tested and costs nothing, but it is now a generalization with no second
 consumer, which is worth knowing before anything is built on it.
 
 ### `ScrambleText`: the text is replaced rather than animated, and that decides the whole shape
@@ -11059,7 +11542,7 @@ edge ratio like the lamps, and on a wide, short button that made the vertical re
 element's own radius upwards is half its height. A magnet's field is a distance, so it reads `distance`
 against a pixel range, eased so the pull is already visible at the far end of it rather than creeping in over
 the last few pixels. The lamps keep the edge ratio because a lamp's glow really is a property of its shape.
-Both numbers are in the reading precisely so a consumer can pick the one that matches what it is modelling.
+Both numbers are in the reading precisely so a consumer can pick the one that matches what it is modeling.
 
 **The magnet tracks the box it sits in, not itself, and this is the feedback trap `trackSwipe` already
 documents.** An element that leans towards the pointer moves the very box its reading is measured from, so the
@@ -11070,12 +11553,12 @@ the thing rests, not of where it has already been dragged to.
 
 **The lean is a fraction of the offset, capped — not a fixed length along the direction.** The first two
 versions multiplied a unit direction by a constant scaled by the falloff, which is wrong in the way that is
-easiest to miss: the falloff is strongest at the centre, so the button jumped its full travel towards a pointer
-sitting almost on top of it and only snapped back to nothing at the exact centre, where the direction
-degenerates. Reported by the user as the button not being centred when the pointer is. The reading was not at
-fault — the readout on the same page shows `distance: 0px` at the element's own centre — the arithmetic on top
+easiest to miss: the falloff is strongest at the center, so the button jumped its full travel towards a pointer
+sitting almost on top of it and only snapped back to nothing at the exact center, where the direction
+degenerates. Reported by the user as the button not being centerd when the pointer is. The reading was not at
+fault — the readout on the same page shows `distance: 0px` at the element's own center — the arithmetic on top
 of it was.
-Taking `distance × follow ratio × pull` gives the behaviour the name promises: nothing at the centre, and a
+Taking `distance × follow ratio × pull` gives the behavior the name promises: nothing at the center, and a
 reach that grows as the pointer approaches without ever overshooting it.
 
 **What limits the reach is the room the box leaves, not a constant.** A fixed maximum was the first answer and
@@ -11087,7 +11570,7 @@ direction — so a pointer off one corner slides the button along the edge it ha
 stopping in mid-air. Measured flush on all four sides.
 
 **The reading carries pixels _and_ a ratio, because the two answer different questions.** A pixel offset from
-the element's centre is isotropic, so the angle derived from it is the true direction on any shape; a ratio of
+the element's center is isotropic, so the angle derived from it is the true direction on any shape; a ratio of
 the box says where inside the box the pointer sits, which is what a mask position wants and what
 `trackDrag` already reports. Reporting only the ratio would have distorted the angle on a non-square element —
 a bar 400 by 40 would call a shallow approach 45° — and reporting only pixels would have left every
@@ -11095,7 +11578,7 @@ mask-positioning consumer dividing by a size it has to measure again. Both fall 
 carrying both costs nothing.
 
 **The user's contribution, and the part that makes the reading shape-aware: `edgeOffset`.** Draw the line from
-the element's centre through the pointer and record where it leaves the box. `distance / edgeDistance` is then
+the element's center through the pointer and record where it leaves the box. `distance / edgeDistance` is then
 one number that means the same thing on any element: below `1` the pointer is inside, `1` is on the edge, `2`
 is a further element-radius away. A wide bar reports a short reach sideways and a long one along its length,
 so a falloff written against it lights the way a bar-shaped lamp actually would, with no consumer arithmetic
@@ -11108,7 +11591,7 @@ three consumers is round, and teaching the abstract about shapes means either re
 of computed style or taking a shape argument, both of which are a lot to carry for a decoration.
 
 **The arithmetic went to `ss-utils` as `RectUtils.getEdgePointTowards`.** It needs only the language, which is
-the line for that package, and the degenerate case follows a rule already recorded there: the centre has no
+the line for that package, and the degenerate case follows a rule already recorded there: the center has no
 direction to leave in, so it reports the middle of the right-hand edge, matching `Point2dUtils.getAngle`
 reporting `0` for the origin.
 
@@ -11127,8 +11610,8 @@ reads one thing and never has to know which parts of the reading are shared.
 `undefined`: before the first pointer event, and on a touch device where the pointer only exists while a
 finger is down, it reports `distance` and `edgeRatio` of `Infinity` with a zero offset. That is the honest
 statement — infinitely far away, in no particular direction — and it means the arithmetic path never branches:
-a falloff clamps to nothing lit, an offset multiplied by a normalised zero direction displaces nothing. Zeros
-would have been the wrong resting value, since a zero distance is the pointer at the centre, which is every
+a falloff clamps to nothing lit, an offset multiplied by a normalized zero direction displaces nothing. Zeros
+would have been the wrong resting value, since a zero distance is the pointer at the center, which is every
 effect at full strength. **After a pointer has been seen the last reading is kept**, and
 `getIsPointerPresent` goes false, so a consumer can fade out from where it was rather than snapping — which
 is what leaving a room looks like. A consumer ignoring the flag gets an effect frozen mid-strength; that was
@@ -11139,13 +11622,13 @@ weighed and accepted as the price of not making the reading optional.
 suppressing the reading itself. It cannot do the thing the preference actually asks
 for. The platform preference is to "remove, **reduce, or replace**" motion, and success criterion 2.3.3
 Animation from Interactions (AAA) covers only motion animation triggered by interaction — its own definition
-excludes changes of colour and opacity that do not change perceived size, shape or position, with an erratum
+excludes changes of color and opacity that do not change perceived size, shape or position, with an erratum
 amending it to no longer exclude blurring. So the lamp's brightness is outside the criterion entirely, while
-the shadow's offset and blur and the reveal's travelling hole are inside it. An abstract that stops reporting
+the shadow's offset and blur and the reveal's traveling hole are inside it. An abstract that stops reporting
 can only delete, and it would delete the brightness along with the movement; only the consumer knows which of
 its own responses is motion, and only the consumer can substitute. The three examples each answer differently:
 the lamp keeps its brightness and drops its glow, the shadow pins its offset and blur and keeps responding
-through opacity alone, and the reveal replaces the travelling hole with the whole veil fading.
+through opacity alone, and the reveal replaces the traveling hole with the whole veil fading.
 
 **The abstract briefly published the preference alongside the reading, and does not any more.** The user's
 question closed it: a consumer can read a media query in CSS with no JavaScript at all, or in about ten lines
@@ -11164,11 +11647,11 @@ Added to the `PointerTracker` and `InteractionTracker` pages. Two of the three n
 sketch did not contain, and both are the kind that would be got wrong a second time.
 
 **The dock sizes every tile from the row's layout at rest, never from where the tiles currently are.** A dock
-grows the tile under the pointer and its neighbours by less, which means the row's total width changes while
+grows the tile under the pointer and its neighbors by less, which means the row's total width changes while
 the pointer is inside it. Size the tiles from their live positions and the row feeds back into itself: a tile
-growing shifts its neighbour sideways, which changes that neighbour's distance from a pointer that has not
+growing shifts its neighbor sideways, which changes that neighbor's distance from a pointer that has not
 moved, which changes its size, which shifts the next one. The reading is taken as a ratio of the row's own
-box — which never changes, because the tiles are absolutely positioned inside it — and the resting centres
+box — which never changes, because the tiles are absolutely positioned inside it — and the resting centers
 are arithmetic rather than measurements. The row is then laid out by accumulating the grown widths and
 centring the result, so the whole row breathes symmetrically around the pointer.
 
@@ -11183,12 +11666,12 @@ visibly slides back in from the side it just left. Cards are removed from the li
 element and leaves nothing to animate, and the deck refills once the last one has gone. That also satisfies
 the house rule that a demo a visitor can move must be a demo they can put back, with no reset button.
 
-**The tilt's sheen is a band positioned by its own colour stops, and it travels against the tilt.** A
+**The tilt's sheen is a band positioned by its own color stops, and it travels against the tilt.** A
 reflection is of something that is not moving, so it slides the opposite way to the surface and further than
 it — which is what separates foil from a sticker painted on the card. Two constructions were tried and
 abandoned before the third: `background-position` over an oversized image puts the band off the element at
 the extremes, because the gradient line is measured over the image rather than the box. Interpolating the
-stops themselves — `transparent`, white, `transparent` at a centre driven by the pointer — is exact, always
+stops themselves — `transparent`, white, `transparent` at a center driven by the pointer — is exact, always
 within the element, and needs no second layer.
 
 ### `MediaQueryMonitor`: a media query as an accessor, shared per query
@@ -11201,7 +11684,7 @@ it, rather than riding on an abstract that measures something else.
 `MediaQueryMonitorUtils.create(query)` returns an accessor of whether the query matches, and
 `createReducedMotion()` is the one named shortcut over it, so the query string is written once in the library
 and nowhere else. Naming the general thing was the choice over a `ReducedMotionMonitor`: the next preference
-worth reading — forced colours, reduced transparency, a colour scheme — is the same code with a different
+worth reading — forced colors, reduced transparency, a color scheme — is the same code with a different
 string, and a monitor per preference would be a file each.
 
 **One `MediaQueryList` and one listener per distinct query, however many consumers ask.** A module-level map
@@ -11223,12 +11706,12 @@ the one Abstract with no component consumer would otherwise be the only thing in
 at.
 
 **Four Abstracts earn a page, and the test is whether anything already shows them.** `PointerTracker` has no
-component consumer at all. `InteractionTracker` is seen today only through a colour surface, a drawer and a
+component consumer at all. `InteractionTracker` is seen today only through a color surface, a drawer and a
 carousel, which show what it is used for rather than what it reports. `Virtualizer` was visible only inside a
 stress-test modal buried in the Select page. Everything else is either already on screen through the component
 that consumes it — `Rotator` through the wheels, `ElementFader` through every overlay, `Dismisser` and
 `FocusManager` through the modal, `Typeahead` through select, `MaskedField` through the inputs, `ColorExtractor`
-through the colour input — or would be a page of numbers changing, which is `ElementObserver`, `SignalMirror`,
+through the color input — or would be a page of numbers changing, which is `ElementObserver`, `SignalMirror`,
 `TextSync`, `MediaQueryMonitor`, `LiveAnnouncer` and `FrameRateMonitor`.
 
 **`Anchor` was argued for and rejected by the user: it is already everywhere.** Tooltips, menus, selects and
@@ -11283,7 +11766,7 @@ page's derived dependency row, which is the mechanism working as intended.
 
 **`radius` and `softness` rather than a gradient string.** Softness is the fraction of the radius that is fully
 clear before the mask starts fading back to opaque, so `1` is a hard-edged hole at the full radius and `0` is
-all fade — the drawn shape shrinks as the blur grows, until only the very centre comes close to fully clear.
+all fade — the drawn shape shrinks as the blur grows, until only the very center comes close to fully clear.
 The Playground labels the field _Clear fraction_ for that reason.
 Handing the consumer the gradient instead would have made the hole's geometry their arithmetic rather
 than the component's, and `radius` and `softness` name the effect where a gradient string names the mechanism.
@@ -11321,7 +11804,7 @@ component owned the mask, a frosted cover — the consumer's element, sitting in
 layer — had nothing left to blur the moment the pointer arrived and the mask appeared. So the blur existed
 only at rest and vanished on the first pointer move, which is the opposite of the effect the example claimed.
 Mask and filter on the same element and both hold together. This is what makes the whole family reachable:
-content greyed or blurred everywhere with colour and detail restored inside the hole is a `backdrop-filter`
+content grayed or blurred everywhere with color and detail restored inside the hole is a `backdrop-filter`
 on the cover and nothing else.
 
 **The cost, accepted rather than mitigated.** `Shape`'s handout is optional — ignore `getClipPath` and the
@@ -11334,7 +11817,7 @@ means was judged worse than a silent omission, and the user took the call on the
 irreversible yet.
 
 **It reads no preference of any kind, and reduced motion is the consumer's to answer.** The first build had
-the component substituting for itself — under reduce, no travelling hole and the whole cover fading instead —
+the component substituting for itself — under reduce, no traveling hole and the whole cover fading instead —
 on the argument that the motion is not incidental here but is the entire component. The user rejected it: the
 rule set with the wheel holds for a component too, so the library reports and the consumer decides.
 
@@ -11406,10 +11889,10 @@ category with nothing left in it was already there.
 display names and the folder names disagree in a couple of places (`TypeWriter` against `Typewriter`), and a
 name with no page renders as plain text rather than a dead link.
 
-### Colour in the Playground: two rules, both the user's
+### Color in the Playground: two rules, both the user's
 
 Stated after a review of the pages built for the `Abstracts`. They are house rules for the Playground's own
-paint, not library behaviour, and they are recorded because every new page will otherwise re-invent an answer.
+paint, not library behavior, and they are recorded because every new page will otherwise re-invent an answer.
 
 **A background always runs from a family's `dark` to its `light`.** `linear-gradient(135deg, X.dark, X.light)`
 with both stops from the same family — not two families mixed, and not a `.main` used as a stop. What went in
@@ -11435,14 +11918,14 @@ after a second pass wrapped everything in `PageMeasureBox`, which was as wrong a
   looking alike is the useful signal.
 - **A surface-family card** for everything else.
 
-**Text on a background is that family's `contrast`, and a highlight colour has to be checked against the
+**Text on a background is that family's `contrast`, and a highlight color has to be checked against the
 background it actually lands on.** A highlight is allowed — `primary.main` on a dark surface is fine — but it
 travels with the element, and the failure the user caught is what happens when the background moves out from
 under it: the virtualizer's row index is `primary.main`, and a pinned row painted itself `secondary.dark`,
 leaving teal on warm brown with almost nothing between them. The fix is that the pinned row's own paint claims
 the text inside it — a `globalStyle` on the index within a pinned row sets `color: inherit`, so the highlight
 gives way to the row's `contrast` rather than surviving into a background it was never checked against.
-**The general form: when a container can change its own background, it owns the colour of the text inside
+**The general form: when a container can change its own background, it owns the color of the text inside
 it.**
 
 ### Controls: `Sortable`, and why a drag is the least important of its three routes
@@ -11480,8 +11963,8 @@ both directions, so in a column the consumer's bar had no width to inherit and d
 landing place existed, was correct, and was invisible, which reads as a control that does not respond. The
 wrapper's flex direction now follows the list's, so the child stretches across the right axis.
 
-**The marker sits midway between its two neighbours, and the list is padded by half a gap all round so the
-outermost two have a neighbour to be midway from.** The landing place before the first card and after the
+**The marker sits midway between its two neighbors, and the list is padded by half a gap all round so the
+outermost two have a neighbor to be midway from.** The landing place before the first card and after the
 last one are the only ones that ever went wrong, and they went wrong twice for the same reason: a list whose
 box stops exactly where its cards stop has nowhere to draw a bar. The first build put the end marker a half
 gap past the last card, outside the list, over whatever sat beside it; the second clamped it back inside,
@@ -11552,7 +12035,7 @@ how they read out. A tap-carry has no button held, so its moves never reach the 
 aimed only on the drag's own moves: the copy followed the cursor while the landing place stayed where the
 card had been picked up, and the drop then landed somewhere the page had never marked. The document listener
 re-aims for `drag` and `tap` and leaves `key` alone, since a stray mouse must not overrule an arrow key.
-**With the pointer aiming, the click that drops must not aim again** — it used to re-aim at the centre of
+**With the pointer aiming, the click that drops must not aim again** — it used to re-aim at the center of
 whatever card was clicked, which is a second source of truth and quietly beat the first. **It is `pointer-events:
 none`, and that is load-bearing rather than tidy**: the drop target is resolved by asking what sits under
 the pointer, and this element sits exactly there, so a hit-testable preview would answer for every drop.
@@ -11578,14 +12061,14 @@ item put "after itself" has not moved. Counting in landing places therefore spen
 key going nowhere, which reads as a broken control. So the carry holds a **settled** index — the position in
 the list once the item is out of it — and `computeSettledIndex` converts a pointer's landing place into one on
 the way in, while `computeMarkerIndex` converts back on the way out so the marker draws between the right two
-items. Two presses move two places, which is the only behaviour anybody expects.
+items. Two presses move two places, which is the only behavior anybody expects.
 
 **Pointer capture is why the target is found by hit-testing rather than by `pointerenter`.** The drag captures
 the pointer on the item so that moves keep arriving after the pointer leaves it — which is also why no other
 element ever receives an enter or a leave for the rest of the gesture. The target is therefore resolved by
 asking `document.elementsFromPoint` what is under the pointer and matching against the registered lists.
 **By containment, not by identity**: the topmost element at a point is whatever the consumer painted, and a
-list that only recognised itself when the point landed on its own box recognised itself almost never. That was
+list that only recognized itself when the point landed on its own box recognized itself almost never. That was
 the second bug, and it presented as a drag that did nothing at all.
 
 **A list refuses an item before it is offered as a destination, not at the drop.** `computeCanAccept` is
@@ -11642,7 +12125,7 @@ and the library needs no notion of a group identity to write it — the run it w
 **A tick keeps the menu open and a pick closes it, because that is the split `Select` already made.** A
 multi list stays open across a pick and a single one closes; ticking is a thing you do several times and
 picking one of a set is a thing you do once. Following the existing decision rather than inventing a third
-answer also means the two controls cannot drift apart. Radix arrives at the same behaviour by a different
+answer also means the two controls cannot drift apart. Radix arrives at the same behavior by a different
 route — its items close on select unless the consumer prevents it.
 
 **`aria-checked` goes on the two stateful roles and nowhere near a command.** The attribute is what tells a
@@ -11676,14 +12159,14 @@ Where it sits says nothing about what it owes: `Calendar` is what it was written
 
 The first build read the row spacing off the shape's own corners — the topmost corner on its left edge,
 divided by the height — and claimed no constant was needed. **That is true only for the shapes whose rows
-interlock by a half-tile shift, and it was wrong to generalise from them.** `hexagon-flat-top` tiles through
+interlock by a half-tile shift, and it was wrong to generalize from them.** `hexagon-flat-top` tiles through
 the other axis entirely, with its rows half a tile apart and its columns one and a half tiles apart, and no
 reading of the left edge produces that. Triangles do not tile by translation at all.
 
 So `TILING_RATIOS` names, per `ShapeConst.DefaultShape`, the pitch as a fraction of the tile box and two
 questions about how the rows and tiles sit:
 
-| Shape                      | Pitch across | Pitch down | Offset rows | Turned-over tiles | Neighbours          |
+| Shape                      | Pitch across | Pitch down | Offset rows | Turned-over tiles | Neighbors           |
 | -------------------------- | ------------ | ---------- | ----------- | ----------------- | ------------------- |
 | `square`                   | 1            | 1          | no          | `none`            | `orthogonal`        |
 | `lozenge`                  | 1            | 1/2        | yes         | `none`            | `diagonal`          |
@@ -11729,17 +12212,17 @@ outline, so the test rotates both lists to start at the topmost corner before co
 rows are not offset; a triangle board that should start the other way round asks for `triangle-down` instead,
 which is what the two names are for.
 
-**A tile's neighbours are a sixth column in the table, because "the rows are offset" does not decide them.**
+**A tile's neighbors are a sixth column in the table, because "the rows are offset" does not decide them.**
 The first build read them off `hasOffsetRows`, which handed the same six-tile list to every offset shape, and
 that is wrong for two of the three. A lozenge has four edges, so the tiles to its left and right — which the
 six-tile list claimed — meet it at a single corner and nowhere else. A flat-top hexagon has six edges, but
 its flat ones point up and down, and the tile they meet is **two rows away**, not one column across: rows two
 apart sit at the same offset and the same column positions, so `hexagon-flat-top` is the one shape whose
-neighbour steps are `row ± 2`. Both were reporting two tiles that touch nothing and, for the hexagon, missing
+neighbor steps are `row ± 2`. Both were reporting two tiles that touch nothing and, for the hexagon, missing
 two that do.
 
-Neither is derivable from the two questions already in the table, so `neighbourhood` names the family
-outright and `computeNeighbours` switches on it. The six families: `orthogonal` is a square's four;
+Neither is derivable from the two questions already in the table, so `neighborhood` names the family
+outright and `computeNeighbors` switches on it. The six families: `orthogonal` is a square's four;
 `diagonal` is the lozenge's four; `diagonalAndAcross` adds the two beside it, which is the pointy-top
 hexagon; `diagonalAndDown` adds the two `row ± 2` away, which is the flat-top one; `uprightTriangle` and
 `sidewaysTriangle` are three each. Every list is clockwise from the top, filtered to what is on the board.
@@ -11749,19 +12232,19 @@ together — so `triangle-right` unturned and `triangle-left` turned over answer
 triangle the two beside it are always there and the vertical one depends; for a sideways one it is the two
 above and below that are always there and the horizontal one that depends.
 
-**A wrong neighbour list is the failure that never announces itself**, which is why this was checked by
+**A wrong neighbor list is the failure that never announces itself**, which is why this was checked by
 measurement rather than by reading: for every shape, every tile of a seven-by-six board and both row
 phasings, the tiles that genuinely share an edge were found by intersecting the actual polygons and compared
-against what `getNeighbourTiles` claims. That is what turned up the two faults above, and it now comes back
-clean. The unit tests pin one central tile per family, which is the part worth keeping cheap. `getNeighbourTiles` answers them clockwise from the top,
+against what `getNeighborTiles` claims. That is what turned up the two faults above, and it now comes back
+clean. The unit tests pin one central tile per family, which is the part worth keeping cheap. `getNeighborTiles` answers them clockwise from the top,
 filtered to what is on the board. A consumer re-deriving this gets a plausible board with the wrong adjacency,
 which is the failure that never announces itself.
 
 #### The shape is worn by a hit layer, so the pointer follows the drawing and the paint is free
 
 A tile is a rectangle in the DOM. A pointy-top hexagon's box overlaps the boxes around it by a quarter of
-its height, a triangle's box overlaps its neighbour's by half its width — about a quarter of every hexagon
-box is corner that belongs to a neighbour and is drawn by one. A press there has to reach the tile that is
+its height, a triangle's box overlaps its neighbor's by half its width — about a quarter of every hexagon
+box is corner that belongs to a neighbor and is drawn by one. A press there has to reach the tile that is
 drawn there, or the board's one promise, that these things interlock, is false to the pointer.
 
 **The first build clipped the cell itself, and the user rejected it: content has to be able to hang out of
@@ -11782,7 +12265,7 @@ landing outside every hit layer falls through to the tile beneath rather than st
 reason the cell can stay the focusable element while the layer inside it takes the pointer. Checked in
 Chromium rather than recalled: with a clipped `pointer-events: all` child as the hit target, the cell
 receives `mouseover`, `mouseenter`, `mousedown`, `click` and `mouseleave` and takes focus, and a press in the
-clipped-away corner hits nothing at all. That is the defined behaviour — `pointer-events: none` stops an
+clipped-away corner hits nothing at all. That is the defined behavior — `pointer-events: none` stops an
 element being a hit _target_; it does not stop events propagating through it — but it is load-bearing enough
 here to be worth having watched happen.
 
@@ -11805,7 +12288,7 @@ gone the Playground's global `:focus-visible` rule started painting a rectangle 
 stroke the painter draws on the shape — two rings for one focus. Which to keep is not a matter of taste:
 **the cell's box is not the tile.** For a hexagon it is a tight bounding box and merely looks wrong; for a
 triangle the box is twice the pitch, so the rectangle covers the focused triangle and half of each
-neighbour, and an indicator that marks out three tiles is not identifying the focused one. The stroke
+neighbor, and an indicator that marks out three tiles is not identifying the focused one. The stroke
 follows the polygon exactly and is what stays.
 
 **And the ring it does draw only shows when it should.** The tile's stroke reads `isFocusVisible` rather
@@ -11841,12 +12324,12 @@ and it should not be rebuilt because the tile under it re-rendered. That consume
 the board and needs one thing from the library: **where is tile 2,3 on screen.**
 
 `TileBoardUtils.getTileCenter(tile, layout)` answers it, and the `layout` a consumer needs is the same
-`getLayout(shape, count, tileSize, hasShortFirstRow)` they already build for `getNeighbourTiles`. It carries
+`getLayout(shape, count, tileSize, hasShortFirstRow)` they already build for `getNeighborTiles`. It carries
 the short row's half-tile shift and steps by the **pitch** rather than the tile, which is what makes it right
 for a flat-top hexagon at one and a half tiles across and a triangle at half a tile.
 
 **The gap does not enter it, which is worth knowing rather than deriving twice.** A gap insets the row by half
-and shrinks the tile by a whole, and the two cancel: the centre of the tile's box is where it would be with no
+and shrinks the tile by a whole, and the two cancel: the center of the tile's box is where it would be with no
 gap at all. So a consumer positioning a piece never passes the gap, and a piece does not shuffle when the gap
 changes.
 
@@ -11876,7 +12359,7 @@ else — grep the built CSS for one of its class names. `z-index: 0` opens the s
 fine.
 
 **Both Playground examples put their pieces on that layer**, one piece or several, and the piece stands on
-the tile's middle rather than being centred on it: `translate(-50%, -100%)` puts its base on the point
+the tile's middle rather than being centerd on it: `translate(-50%, -100%)` puts its base on the point
 `getTileCenter` returns, which is how a piece on a board is drawn. The board is unaware of any of it.
 
 **The Playground's second example is the proof, and it is deliberately not a tile's content.** The piece is a
@@ -11907,7 +12390,7 @@ A board disabled as a whole is skipped entirely, which is what a disabled compos
 
 #### The rest of the port
 
-**Up and down keep the column rather than choosing a diagonal.** Six neighbours do not fit on four arrows.
+**Up and down keep the column rather than choosing a diagonal.** Six neighbors do not fit on four arrows.
 Left and right walk the row; up and down go to the row above or below at the same column index, clamped into
 it when that row is the shorter kind — which lands on the nearer of the two diagonals and zigzags with the
 tiles, the same walk a plain grid does. Home and End are the ends of the row and Ctrl with either is the
@@ -11944,7 +12427,7 @@ every piece of the settled-index arithmetic would need a bypass, leaving an engi
 grid could have its own stack beside `Carrier`, which keeps its rules to itself and produces the second
 state machine the whole of _"why a drag is the least important of its three routes"_ was written to avoid —
 and forecloses a list and a grid ever exchanging an item, since neither registry can see the other. So the
-engine was generalised instead. **The user chose this, with the three set out as they are here.**
+engine was generalized instead. **The user chose this, with the three set out as they are here.**
 
 **A place is opaque to the engine, and the zone answers every question about one.** `CarryState` holds
 `fromPlace` and `toPlace` as `CarryPlace`, which is `NonNullable<unknown>` rather than plain `unknown` so that
@@ -12081,7 +12564,7 @@ because a position on a board cannot be inferred from anything else that is spok
 reading order, top row first and left to right within it, which is also what `Home` and `End` go to.
 
 **The arrows walk to the nearest item in the direction pressed, not to the next one in the array.** Two items
-on the same row are next to each other whatever order they were declared in, so `getNeighbourIndex` scores
+on the same row are next to each other whatever order they were declared in, so `getNeighborIndex` scores
 candidates by how far along the direction they are plus twice how far off to the side, and takes the lowest.
 Array order is what a list uses because a list has only one axis; using it here would send the right arrow to
 an item three rows down.
@@ -12096,7 +12579,7 @@ The filter now drops the carried key unconditionally, which is right at every mo
 into from outside does not hold that item anyway, so there is nothing to exclude. Worth keeping as the
 general shape: **anything the zone is asked after `end` has begun is being asked with no carry in flight.**
 
-**A list and a grid exchange items, and that is the payment for generalising the engine.** A
+**A list and a grid exchange items, and that is the payment for generalizing the engine.** A
 `SortableGridItem` is structurally a `SortableItem`, so a grid item dropped into a list is one; an item
 arriving from a list carries no footprint and is given a single cell, which is the smallest honest thing to
 say about something that has never had a size. Where it lands is the first free spot scanned row by row,
@@ -12106,7 +12589,7 @@ since a keyboard carry arriving by `Tab` has no pointer to take a position from.
 box the size of the aimed footprint and hands over whether that place is allowed; `renderLanding` decides
 what green and red look like, `renderCell` paints the empty board, and `renderCarried` is handed the item
 exactly as `Sortable` hands it over. The Playground's own painters draw the landing as a dashed box, filled
-in the theme's primary when it fits and its error colour when it does not — colour is not the only channel,
+in the theme's primary when it fits and its error color when it does not — color is not the only channel,
 since the announcement says "no room" in the same breath.
 
 **Turning is a command on a handle, and the component binds no gesture for it at all.** The user's call,
@@ -12174,15 +12657,15 @@ well, so a glow, a badge or a shadow hanging past the shape would be cut off by 
 for a hit-testing reason.
 
 **The geometry carries the largest solid rectangle inside the shape, because a shape with a notch has no
-usable middle.** Reported by the user as an icon drawn off-centre on a two-by-two: the painter had been
-choosing the cell nearest the shape's centre, which for an even rectangle is a corner and looks like a
+usable middle.** Reported by the user as an icon drawn off-center on a two-by-two: the painter had been
+choosing the cell nearest the shape's center, which for an even rectangle is a corner and looks like a
 mistake. `block` is the largest run of filled cells that is itself a rectangle, so a rectangle's block is the
-whole of it and an L's is its long arm, and a painter centres on that. A bare centre point was the simpler
-answer and is wrong for a U, whose centre of mass is in the hole; a rectangle is also more useful than a
+whole of it and an L's is its long arm, and a painter centers on that. A bare center point was the simpler
+answer and is wrong for a U, whose center of mass is in the hole; a rectangle is also more useful than a
 point, since a label needs a width to sit in. Ties are broken by whichever candidate is nearest the shape's
-centre of mass, which is what puts a Z's block on its middle pair rather than on an end.
+center of mass, which is what puts a Z's block on its middle pair rather than on an end.
 
-**The Playground's cell-by-cell example colours each item's squares by a hue derived from its key.** Also
+**The Playground's cell-by-cell example colors each item's squares by a hue derived from its key.** Also
 the user's: drawn as bare squares, two items side by side read as one field of tiles. The outline example
 did not need it because the shape's own edge says where an item ends, so this is the one thing the per-cell
 route has to solve for itself — which is worth a demo showing it rather than a note saying it.
@@ -12191,7 +12674,7 @@ route has to solve for itself — which is worth a demo showing it rather than a
 Reported by the user, who noticed it worst on a one-by-three and a one-by-four and — the part that made it
 hard to name — not at all on the Z. The painter inset the viewBox by two units on every side so the stroke
 would have room, which changes the ratio of the box, not just its size. An SVG whose viewBox is a different
-shape from its element scales the drawing down uniformly to fit and centres what is left, so the outline
+shape from its element scales the drawing down uniformly to fit and centers what is left, so the outline
 came out short of the cells it was supposed to cover: a 44 by 140 sword was given a 48 by 144 viewBox and
 drawn at 91 per cent, while a 140 by 92 Z was given 144 by 96 and drawn at 96 — near enough to look right.
 The room for the stroke was never needed, since the element is `overflow: visible` and the half that falls
@@ -12202,11 +12685,11 @@ call and is useless here: it reports the geometry before the viewBox is applied,
 passing throughout. `getBoundingClientRect` sees what was actually drawn. Only the lower bound is pinned,
 because a stroke sits half outside the shape and how thick it is belongs to the painter.
 
-### `Trail`: a path, one traveller, and a frame loop chosen over the CSS the platform already has
+### `Trail`: a path, one traveler, and a frame loop chosen over the CSS the platform already has
 
-Asked for by the user as the travelling half of a sketch that had spaced a list evenly along a curve: the
-distribution was not the point, the travelling was. Three shapes were put to them — the component places and
-the consumer moves it, the component travels, or both — and they chose the component travelling, with a
+Asked for by the user as the traveling half of a sketch that had spaced a list evenly along a curve: the
+distribution was not the point, the traveling was. Three shapes were put to them — the component places and
+the consumer moves it, the component travels, or both — and they chose the component traveling, with a
 controller that pauses, resumes and sets the position.
 
 **The frames are the user's call, made against the platform's own answer.** `offset-path` with
@@ -12214,7 +12697,7 @@ controller that pauses, resumes and sets the position.
 ordinary elements rather than only SVG ones, and would have run the whole animation off a stylesheet with no
 per-frame JavaScript. Their reason for `requestAnimationFrame` instead — "just like with wheel and
 CellAnimation, precisely to answer questions like that" — is that a CSS animation's current position is not a
-value anything can read, so a consumer wanting to hang a label off the traveller, spawn something where it is,
+value anything can read, so a consumer wanting to hang a label off the traveler, spawn something where it is,
 or ask which way it is facing has nowhere to ask. The frame loop makes the place an ordinary signal, and every
 other question about the component follows from that.
 
@@ -12224,10 +12707,10 @@ real `SVGPathElement`, so there is one in the component's own `<svg>` with no fi
 curve is redundant and was chosen over both alternatives: a detached element created with `createElementNS` is
 a browser-support gamble on geometry the spec does not require to work unrendered, and measuring the
 consumer's own painted path would make the arithmetic depend on what they happened to draw — a track drawn as
-two strokes, or not drawn at all, would break the travelling.
+two strokes, or not drawn at all, would break the traveling.
 
 **The direction is sampled either side of the point rather than ahead of it.** One pixel back and one pixel on,
-clamped to the ends of the path, so a traveller parked at 0 or at 1 still has a direction — sampling only
+clamped to the ends of the path, so a traveler parked at 0 or at 1 still has a direction — sampling only
 forwards leaves the last point with nothing to compare against and the angle collapses to zero exactly where a
 looping trail is most often seen.
 
@@ -12275,7 +12758,7 @@ abstract rather than being built here.
 
 **A carried box is rendered at the place being aimed at, not at the place it was taken from.** The placements
 memo reads the aim, so the sockets move with the box mid-drag and every cable hanging off them is redrawn
-against the new socket positions — which is the behaviour the whole component exists for. Nothing is written
+against the new socket positions — which is the behavior the whole component exists for. Nothing is written
 back to the consumer's list until the drop commits, so an escape puts the box back with one signal read rather
 than an undo.
 
@@ -12310,7 +12793,7 @@ route being dead: picking a cable up worked, and every arrow press afterwards di
 element had been replaced the moment the carry started and focus had fallen to the body.
 
 **`CarrierUtils.dragFromPointer` cannot be given a small element.** It listens for the move on the element it
-is handed and only takes pointer capture once the pointer has travelled the four-pixel slop that means a drag
+is handed and only takes pointer capture once the pointer has traveled the four-pixel slop that means a drag
 — so an element smaller than that journey never sees the move that would start it. A fourteen-pixel socket is
 exactly that element, and dragging from one did nothing at all while dragging a whole box worked. `PatchBoard`
 hands it the **board root** for both carries instead, which sees every move over the board and captures the
@@ -12327,11 +12810,11 @@ count under `SortableGrid`, one component along.
 
 #### What the first review of `Trail` and `PatchBoard` found
 
-**The traveller was not on its path, and the transform order was why.** Reported by the user against the
+**The traveler was not on its path, and the transform order was why.** Reported by the user against the
 circuit demo. The rule is in `conventions.md` under _"A rotation and a centring offset on one element have to
-be ordered"_ — the half-its-own-size shift that centres the traveller was being turned along with it, so the
+be ordered"_ — the half-its-own-size shift that centers the traveler was being turned along with it, so the
 box swung off the curve wherever the direction was not straight. Their guess was `Viewport` scaling and it was
-not: the whole subtree scales together, and the traveller and the path stay in step at any scale. What made it
+not: the whole subtree scales together, and the traveler and the path stay in step at any scale. What made it
 survive the build is that every check had been made at a window height that happens to give a scale of one and
 on the straight top edge of the loop, where the fault is exactly zero.
 
@@ -12423,13 +12906,13 @@ decade.
 
 **The major step is the next entry that divides the minor one, and it took two corrections to get right.**
 The first rule asked for an entry at least three times the step and invented one when the ladder had none —
-so a half-minute step over a three-minute reel was labelled at 0:00 and 2:30, which are the wrong numbers to
+so a half-minute step over a three-minute reel was labeled at 0:00 and 2:30, which are the wrong numbers to
 write on an axis. Preferring an entry three times the step and falling back to the smallest that divides it
 fixed that, and then broke differently at a narrower width: the step rises to a minute, the ladder has
 nothing above a minute, and the invented major was five minutes on a reel three minutes long, so the axis
 carried exactly one label. **A major step nobody can see is not a major step**, so the choice is now made
 among the entries that divide the step _and_ fit inside the window, and when there are none the step is its
-own major and every tick is labelled.
+own major and every tick is labeled.
 
 **The axis strip is inside the component's own box, because clipping one direction clips both.** The root
 hides its overflow so a span reaching past an edge is cut at it; `overflow-x: hidden` with a visible `y` is
@@ -12464,9 +12947,9 @@ meet this.
 inside.** Taking pointer capture on `pointerdown` — the obvious way to keep receiving moves once the pointer
 leaves the box — redirects the whole rest of the gesture, `click` included, to the capturing element: the
 first Playground version panned correctly and no block could ever be pressed. The settlement is that capture
-is taken **only once the pointer has travelled four pixels**, the same slop `Carrier` uses. A press that
+is taken **only once the pointer has traveled four pixels**, the same slop `Carrier` uses. A press that
 stays put never captures, so its click reaches the block; a drag captures, and its click is then delivered to
-the root instead, which is exactly the behaviour wanted and costs no flag to suppress. This is one rule, it
+the root instead, which is exactly the behavior wanted and costs no flag to suppress. This is one rule, it
 is subtle, and it is the strongest argument for the component owning the gesture rather than each consumer
 writing it again.
 
@@ -12518,8 +13001,8 @@ Nothing the parser produces stays where it was read from. `Typewriter` keeps a h
 measure, walks that, and builds the visible characters somewhere else entirely — a sibling of the hidden copy,
 under the same root. So the question is never "does my parent already say this", it is "will the place this
 text is going to say this", and the two differ the moment a value is set more than one level up. A red set on
-a `<div>` reached a `<b>` inside it by inheritance, both computed to red, they matched, and the colour was
-dropped — and the destination, which had no red anywhere above it, drew the text in the page's colour. The
+a `<div>` reached a `<b>` inside it by inheritance, both computed to red, they matched, and the color was
+dropped — and the destination, which had no red anywhere above it, drew the text in the page's color. The
 same went for `text-shadow`, `text-align` and `direction`, every inherited property that is also one the parser
 carries. One level worked by luck, because the value's own element and its parent still disagreed.
 
@@ -12543,9 +13026,9 @@ paints over the fill or under it, so a list holding it and not the stroke itself
 
 **`-webkit-text-fill-color` stays out, and that is the decision rather than the oversight.** Its initial value
 is `currentcolor`, so a computed style always resolves it to whatever `color` resolves to — meaning it would be
-written onto every run whose colour differs from the baseline, which is every coloured run, saying nothing that
+written onto every run whose color differs from the baseline, which is every colored run, saying nothing that
 `color` had not already said. That redundancy is not the problem; the problem is that an explicitly set
 `-webkit-text-fill-color` beats `color` for the glyph fill. A consumer animating `color` in their keyframes
-would find the text frozen at the colour it was parsed with, and the property they would have to know about to
-explain it is one they never wrote. So a fill colour set inside a `Typewriter` is lost, and that is the cheaper
+would find the text frozen at the color it was parsed with, and the property they would have to know about to
+explain it is one they never wrote. So a fill color set inside a `Typewriter` is lost, and that is the cheaper
 of the two failures.

@@ -1,4 +1,4 @@
-import { MathUtils } from "./math.js";
+import { AngleUtils } from "./angle.js";
 import { Point3d } from "./point3d.js";
 
 const SIZE = 3;
@@ -51,7 +51,7 @@ export namespace Matrix3dUtils {
      * @param degrees How far to turn. Negative turns the other way.
      */
     export const rotationX = (degrees: number): Matrix3d => {
-        const radians = degrees * MathUtils.RADIANS_PER_DEGREE;
+        const radians = degrees * AngleUtils.RADIANS_PER_DEGREE;
         const cos = Math.cos(radians);
         const sin = Math.sin(radians);
 
@@ -64,7 +64,7 @@ export namespace Matrix3dUtils {
      * @param degrees How far to turn. Negative turns the other way.
      */
     export const rotationY = (degrees: number): Matrix3d => {
-        const radians = degrees * MathUtils.RADIANS_PER_DEGREE;
+        const radians = degrees * AngleUtils.RADIANS_PER_DEGREE;
         const cos = Math.cos(radians);
         const sin = Math.sin(radians);
 
@@ -77,7 +77,7 @@ export namespace Matrix3dUtils {
      * @param degrees How far to turn. Negative turns the other way.
      */
     export const rotationZ = (degrees: number): Matrix3d => {
-        const radians = degrees * MathUtils.RADIANS_PER_DEGREE;
+        const radians = degrees * AngleUtils.RADIANS_PER_DEGREE;
         const cos = Math.cos(radians);
         const sin = Math.sin(radians);
 

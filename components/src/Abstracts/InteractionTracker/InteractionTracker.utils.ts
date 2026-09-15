@@ -223,7 +223,7 @@ export namespace InteractionTrackerUtils {
      *
      * @param isDisabled Whether the control is disabled. An enabled control is reachable anyway, so
      * this reports `false` for one.
-     * @param isReachableWhenDisabled Whether the control opts into this behaviour.
+     * @param isReachableWhenDisabled Whether the control opts into this behavior.
      * @param hasTooltip Whether there is anything to read once focused.
      * @param isFocusableWhenDisabled Forces reachability, tooltip or not.
      */
@@ -239,7 +239,7 @@ export namespace InteractionTrackerUtils {
      *
      * For the extra buttons a composite control carries — a clear button in a field, a step button on a
      * number input — which follow the parent's disabled state but are not the thing being tracked.
-     * Pressing a disabled one does not steal focus, which is the one behaviour a native `disabled`
+     * Pressing a disabled one does not steal focus, which is the one behavior a native `disabled`
      * would have given for free.
      *
      * @param getRefs The controls. Missing entries are skipped, so refs that have not attached yet are
@@ -504,7 +504,7 @@ export namespace InteractionTrackerUtils {
      * @param getRef The element to track.
      * @param getIsDisabled Whether to ignore presses.
      * @param onActivate Called on each press, with the press position as a `0` to `1` ratio across the
-     * element — the centre for a keyboard press — and a count that increases each time.
+     * element — the center for a keyboard press — and a count that increases each time.
      */
     export const trackActivation = (
         getRef: () => HTMLElement | undefined,
@@ -550,7 +550,7 @@ export namespace InteractionTrackerUtils {
      * Reports the pointer's position within an element throughout a drag.
      *
      * Ownership is taken on press rather than after any movement, which is right for a control the
-     * whole of which is the target — a slider track, a colour area — where a press with no movement
+     * whole of which is the target — a slider track, a color area — where a press with no movement
      * should still move the handle.
      *
      * @param getRef The element to track.
@@ -558,7 +558,7 @@ export namespace InteractionTrackerUtils {
      * @param opts.onDrag Called on press and on every move, with the position as a `0` to `1` ratio
      * across the element, held inside it however far the pointer strays.
      * @param opts.onDragEnd Called when the drag finishes, saying whether the pointer was released or
-     * the gesture was cancelled by the system.
+     * the gesture was canceled by the system.
      * @returns `getIsDragging`.
      */
     export const trackDrag = (
@@ -591,7 +591,7 @@ export namespace InteractionTrackerUtils {
      * The hard part is not the gesture but everything it competes with. Ownership is deferred until the
      * movement passes a threshold, so a tap is still a tap. `touch-action` is set to leave the other
      * axis scrollable, so a horizontal swipe does not stop the page scrolling vertically. Touch moves
-     * are cancelled by hand once no ancestor scroller has room left, which is what stops a swipe inside
+     * are canceled by hand once no ancestor scroller has room left, which is what stops a swipe inside
      * a scroller from fighting it. And the click the browser fires after the gesture is swallowed, so a
      * swipe on a card does not also open it.
      *
@@ -603,7 +603,7 @@ export namespace InteractionTrackerUtils {
      * @param opts.onSwipe Called on every move once the gesture is owned, with progress as a signed
      * fraction of the element — negative back along the axis, positive forward.
      * @param opts.onSwipeEnd Called when the swipe finishes, with the committed direction, or
-     * `undefined` when it fell short or the system cancelled it.
+     * `undefined` when it fell short or the system canceled it.
      * @returns `getIsSwiping`.
      */
     export const trackSwipe = (

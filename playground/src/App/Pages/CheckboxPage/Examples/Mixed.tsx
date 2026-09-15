@@ -24,7 +24,7 @@ export const MixedExample = (props: Props) => {
                             visibilityTarget={getVisibilityTarget}
                             transitionDurationMs={getTransitionDurationMs}
                         >
-                            {`Summarises the two boxes on the right. It reads mixed whenever they disagree, and clicking it sets both. checkedState: ${String(getFlags().checkedState)}.`}
+                            {`Summarizes the two boxes on the right. It reads mixed whenever they disagree, and clicking it sets both. checkedState: ${String(getFlags().checkedState)}.`}
                         </PageTooltipContent>
                     ),
                 })}

@@ -75,7 +75,7 @@ export namespace CuboidUtils {
     /**
      * The transform that turns the whole cuboid to show a chosen face.
      *
-     * The cuboid is pushed back by half its depth first, so it turns about its own centre rather than
+     * The cuboid is pushed back by half its depth first, so it turns about its own center rather than
      * about its front surface — without that, turning would swing the box through the space around it.
      *
      * @param yaw How many quarter turns about the vertical axis.
@@ -108,7 +108,7 @@ export namespace CuboidUtils {
      * How much room to leave for a cuboid so it never clips as it turns.
      *
      * The worst case is a corner pointing at the viewer, so the space needed is set by the distance from
-     * the centre to a corner rather than by any one dimension. Perspective then makes the near part of
+     * the center to a corner rather than by any one dimension. Perspective then makes the near part of
      * the box larger than life, which is allowed for as well.
      *
      * @param size The cuboid's width, height and depth.

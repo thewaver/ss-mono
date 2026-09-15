@@ -282,7 +282,7 @@ export namespace TextSyncUtils {
     };
 
     /**
-     * Binds an input element to a value, preserving the caret and honouring composition.
+     * Binds an input element to a value, preserving the caret and honoring composition.
      *
      * Two problems handled. Writing to `value` collapses the selection, so the selection is read before
      * the write and restored after it — which is what lets a controlled input be typed in at all. And

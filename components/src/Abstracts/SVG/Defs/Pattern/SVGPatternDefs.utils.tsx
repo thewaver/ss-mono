@@ -16,7 +16,7 @@ export namespace SVGPatternDefsUtils {
      * @param patternSize The tile's size, in the same user units as whatever the pattern fills.
      * @param computeCellPos Where each cell sits within the tile.
      * @param renderCell Draws one cell. Receives an id of its own, so a cell may carry gradients or
-     * filters without colliding with its neighbours, along with its position in the grid and the grid's
+     * filters without colliding with its neighbors, along with its position in the grid and the grid's
      * size.
      */
     export const computePattern = (

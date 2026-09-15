@@ -85,13 +85,13 @@ test("the dropdown is a dialog holding the surface and a hue slider", async ({ p
 
     await expect(page.locator(POPUP), "the popup is a dialog rather than a listbox").toHaveAttribute(
         "aria-label",
-        "Choose a colour",
+        "Choose a color",
     );
     await expect(page.locator(`${POPUP} ${surface("")}`).first(), "with the surface inside it").toBeVisible();
     await expect(page.locator("#hueSlider"), "and a hue slider beside it").toHaveCount(1);
 });
 
-test("hue and the surface write the same colour, and the popup's own mousedown does not block the drag", async ({
+test("hue and the surface write the same color, and the popup's own mousedown does not block the drag", async ({
     page,
 }) => {
     await page.locator(`${DROPDOWN} button`).first().click();
@@ -158,13 +158,13 @@ test("the space toggle is a radio group, so the dropdown holds no second dropdow
 
     await expect(page.locator(`${POPUP} [role="radiogroup"]`), "one group naming itself").toHaveAttribute(
         "aria-label",
-        "Colour space",
+        "Color space",
     );
     await expect(page.locator(RADIO), "with one radio per space").toHaveCount(3);
     await expect(page.locator(`${POPUP} [role="combobox"]`), "and no select nested inside the popup").toHaveCount(0);
 });
 
-test("each space shows its own channels and writes the same colour", async ({ page }) => {
+test("each space shows its own channels and writes the same color", async ({ page }) => {
     await page.locator(`${DROPDOWN} button`).first().click();
 
     await page.locator(channel("r")).fill("17");
@@ -175,7 +175,7 @@ test("each space shows its own channels and writes the same colour", async ({ pa
 
     await page.locator(RADIO).nth(1).click();
 
-    expect(await inputValue(page.locator(channel("h"))), "and hsla reads the same colour back in its own units").toBe(
+    expect(await inputValue(page.locator(channel("h"))), "and hsla reads the same color back in its own units").toBe(
         "210",
     );
 
