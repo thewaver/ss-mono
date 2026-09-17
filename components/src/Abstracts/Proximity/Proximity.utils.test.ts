@@ -108,6 +108,19 @@ describe("toEffectDefs", () => {
     });
 });
 
+describe("toRestingEffectDefs", () => {
+    const RUN: ProximityArrangement = { spacing: 0.3, radius: 0, slack: Infinity };
+
+    it("reports the pointer as infinitely far on every axis an effect might read", () => {
+        const defs = ProximityUtils.toRestingEffectDefs(ITEM, RUN, false);
+
+        expect(defs.distance).toBe(Infinity);
+        expect(defs.overreach).toBe(Infinity);
+        expect(defs.ratio).toBe(Infinity);
+        expect(defs.offset).toEqual({ x: 0, y: 0 });
+    });
+});
+
 describe("toTranslation", () => {
     it("divides each axis by the item's own extent, since a CSS translate in percent is of the element", () => {
         expect(ProximityUtils.toTranslation(ITEM, { x: 0.1, y: 0.05 }), "half a width and half a height").toEqual([

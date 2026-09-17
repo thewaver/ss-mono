@@ -13,6 +13,7 @@ import type { PlacementBoxProps } from "./PlacementBox.types";
 import * as styles from "./PlacementBox.css";
 
 const RESTING_ARRANGEMENT: ProximityArrangement = { spacing: 0, radius: 0, slack: Infinity };
+const NO_OVERREACH = 0;
 
 export const PlacementBox = (props: PlacementBoxProps) => {
     const getLayout = createMemo(() => access(props.layout));
@@ -41,9 +42,16 @@ export const PlacementBox = (props: PlacementBoxProps) => {
         getComputeEffect() === undefined ? RESTING_ARRANGEMENT : ProximityUtils.toArrangement(getLayout()),
     );
 
+    const getOverreach = createMemo(() => {
+        const point = getPointerPoint();
+
+        return point === undefined ? NO_OVERREACH : PlacementUtils.getRunOverreach(getLayout(), point);
+    });
+
     const context: PlacementBoxContextType = {
         getPointerPoint,
         getArrangement,
+        getOverreach,
         getPrefersReducedMotion,
         getComputeEffect,
     };

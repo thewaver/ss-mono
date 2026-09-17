@@ -50,6 +50,7 @@ import { MultiSelectPage } from "./Pages/MultiSelectPage/MultiSelectPage";
 import { NumberInputPage } from "./Pages/NumberInputPage/NumberInputPage";
 import { OdometerPage } from "./Pages/OdometerPage/OdometerPage";
 import { PaginatorPage } from "./Pages/PaginatorPage/PaginatorPage";
+import { ParticleSpawnerPage } from "./Pages/ParticleSpawnerPage/ParticleSpawnerPage";
 import { PatchBoardPage } from "./Pages/PatchBoardPage/PatchBoardPage";
 import { PointerTrackerPage } from "./Pages/PointerTrackerPage/PointerTrackerPage";
 import { PreviewPage } from "./Pages/PreviewPage/PreviewPage";
@@ -782,6 +783,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 description:
                     "A number where each digit is a column that turns to its new value, so a change reads as travel rather than a swap. The columns turn the way the number is going, so nine to zero keeps going forward instead of rewinding, and a column waits for every column to its right that is also carrying. It takes the text rather than the number, so a separator is a slot that never turns and the component owns no locale.",
                 component: () => <OdometerPage />,
+            },
+            {
+                name: "ParticleSpawner",
+                description:
+                    "A spawner element and a set of target elements: particles leave the spawner one after another, each aimed at a target its own evaluator picked, and are removed once they arrive. Where a particle sits at any moment is answered by a caller-supplied function rather than fixed to a straight line, and several spawners can aim at the same pool of targets without knowing about each other.",
+                component: () => <ParticleSpawnerPage />,
             },
             {
                 name: "PatchBoard",

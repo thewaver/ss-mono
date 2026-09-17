@@ -1,0 +1,247 @@
+import { createMemo, createSignal } from "solid-js";
+import { createStore } from "solid-js/store";
+
+import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
+import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
+import { PageProp } from "../../PageComponents/Prop/Prop";
+import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { StressTest } from "../../PageComponents/StressTest/StressTest";
+import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
+import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
+import { GridExample } from "./Examples/Grid";
+import { MultipleTargetsExample } from "./Examples/MultipleTargets";
+import { SingleTargetExample } from "./Examples/SingleTarget";
+import {
+    ITERATION_PATTERNS,
+    ITERATION_PATTERN_KEYS,
+    MAX_PARTICLE_COUNT,
+    MAX_RETENTION_MS,
+    MAX_SPAWN_DELAY_MS,
+    MAX_TRAVEL_DURATION_MS,
+    MIN_PARTICLE_COUNT,
+    MIN_RETENTION_MS,
+    MIN_SPAWN_DELAY_MS,
+    MIN_TRAVEL_DURATION_MS,
+    PARTICLE_COUNT_STEP,
+    RETENTION_STEP_MS,
+    SPAWN_DELAY_STEP_MS,
+    STARTING_ITERATION_PATTERN_KEY,
+    STARTING_PARTICLE_COUNT,
+    STARTING_RETENTION_MS,
+    STARTING_SPAWN_DELAY_MS,
+    STARTING_TRAVEL_DURATION_MS,
+    STARTING_TRAVEL_PATTERN_KEY,
+    TRAVEL_DEFAULTS_BY_PATTERN,
+    TRAVEL_DURATION_STEP_MS,
+    TRAVEL_KNOBS_BY_PATTERN,
+    TRAVEL_PATTERN_FACTORIES,
+    TRAVEL_PATTERN_KEYS,
+} from "./ParticleSpawnerPage.const";
+import type { IterationPattern, ParticleSpawnerExampleProps, ParticleTravelPattern } from "./ParticleSpawnerPage.types";
+
+const EXAMPLES_ROOT = "/src/App/Pages/ParticleSpawnerPage/Examples";
+const FIELD_WIDTH = 130;
+const BOX_WIDTH = 420;
+const BOX_HEIGHT = 260;
+
+const STRESS_BOX_WIDTH = 120;
+const STRESS_BOX_HEIGHT = 80;
+
+const STRESS_ITEMS: (StressTestDefs & { width: number; height: number })[] = [
+    { count: 8, cols: 4, gap: 10, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
+    { count: 24, cols: 6, gap: 8, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
+    { count: 48, cols: 8, gap: 6, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
+    { count: 96, cols: 12, gap: 4, width: STRESS_BOX_WIDTH, height: STRESS_BOX_HEIGHT },
+];
+
+const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
+    const modalPlayback = createSignal(true);
+
+    return (
+        <StressTest
+            configs={() => STRESS_ITEMS}
+            onShowModal={() => props.playbackSignal[1](false)}
+            onHideModal={() => props.playbackSignal[1](true)}
+            renderLabel={(getConfigIndex) => `Render ${STRESS_ITEMS[getConfigIndex()].count} spawners`}
+            renderItem={(getConfigIndex) => (
+                <div
+                    style={{
+                        width: `${STRESS_ITEMS[getConfigIndex()].width}px`,
+                        height: `${STRESS_ITEMS[getConfigIndex()].height}px`,
+                    }}
+                >
+                    <SingleTargetExample {...props} playbackSignal={modalPlayback} />
+                </div>
+            )}
+        />
+    );
+};
+
+export const ParticleSpawnerPage = () => {
+    const [getParticleCount, setParticleCount] = createSignal(STARTING_PARTICLE_COUNT);
+    const [getTravelDurationMs, setTravelDurationMs] = createSignal(STARTING_TRAVEL_DURATION_MS);
+    const [getRetentionMs, setRetentionMs] = createSignal(STARTING_RETENTION_MS);
+    const [getSpawnDelayMs, setSpawnDelayMs] = createSignal(STARTING_SPAWN_DELAY_MS);
+
+    const [getTravelPatternKey, setTravelPatternKey] = createSignal<ParticleTravelPattern>(STARTING_TRAVEL_PATTERN_KEY);
+
+    const [getIterationPatternKey, setIterationPatternKey] =
+        createSignal<IterationPattern>(STARTING_ITERATION_PATTERN_KEY);
+
+    const [travelDefs, setTravelDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
+    const playback = createSignal(true);
+
+    const getTravelKnobs = () => TRAVEL_KNOBS_BY_PATTERN[getTravelPatternKey()];
+    const getTravelDefaults = () => TRAVEL_DEFAULTS_BY_PATTERN[getTravelPatternKey()];
+    const getPickedTravelDefs = () => travelDefs[getTravelPatternKey()] ?? {};
+
+    const getComputeParticlePos = createMemo(() =>
+        TRAVEL_PATTERN_FACTORIES[getTravelPatternKey()]({
+            ...getTravelDefaults(),
+            ...getPickedTravelDefs(),
+        } as Record<string, number>),
+    );
+
+    const getExamples = createMemo(() => {
+        const commonProps: ParticleSpawnerExampleProps = {
+            particleCount: getParticleCount,
+            travelDurationMs: getTravelDurationMs,
+            retentionMs: getRetentionMs,
+            spawnDelayMs: getSpawnDelayMs,
+            spawnIterationPatterns: () => ITERATION_PATTERNS[getIterationPatternKey()](),
+            computeParticlePos: (defs, t) => getComputeParticlePos()(defs, t),
+            playbackSignal: playback,
+        };
+
+        return [
+            {
+                key: "singleTarget",
+                name: "Single target",
+                component: () => (
+                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                        <SingleTargetExample {...commonProps} />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/SingleTarget.tsx`,
+            },
+            {
+                key: "multipleTargets",
+                name: "Multiple targets",
+                component: () => (
+                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                        <MultipleTargetsExample {...commonProps} />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/MultipleTargets.tsx`,
+            },
+            {
+                key: "grid",
+                name: "N spawners x M targets",
+                component: () => (
+                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                        <GridExample {...commonProps} />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/Grid.tsx`,
+            },
+            {
+                key: "stressTest",
+                name: "Stress Test",
+                component: () => <StressTestWrapper {...commonProps} />,
+            },
+        ];
+    });
+
+    return (
+        <>
+            <PagePropsGroups>
+                <PagePropsPanel scope={"sample"}>
+                    <PageProp key={"travelPattern"} label={"Travel pattern"}>
+                        <PageSelectField
+                            value={getTravelPatternKey}
+                            values={() => TRAVEL_PATTERN_KEYS}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Travel pattern"}
+                            onChange={(key) => setTravelPatternKey(() => key)}
+                        />
+                    </PageProp>
+
+                    <PageKnobs
+                        knobs={getTravelKnobs}
+                        defaults={getTravelDefaults}
+                        values={getPickedTravelDefs}
+                        width={() => FIELD_WIDTH}
+                        onInput={(key, value) =>
+                            setTravelDefs(getTravelPatternKey(), (previous) => ({ ...previous, [key]: value }))
+                        }
+                    />
+                </PagePropsPanel>
+
+                <PagePropsDivider />
+
+                <PagePropsPanel scope={"global"}>
+                    <PageProp key={"particleCount"} label={"Particle count"}>
+                        <PageNumberField
+                            value={getParticleCount}
+                            min={() => MIN_PARTICLE_COUNT}
+                            max={() => MAX_PARTICLE_COUNT}
+                            step={() => PARTICLE_COUNT_STEP}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Particle count"}
+                            onInput={setParticleCount}
+                        />
+                    </PageProp>
+
+                    <PageProp key={"travelDurationMs"} label={"Travel (ms)"}>
+                        <PageNumberField
+                            value={getTravelDurationMs}
+                            min={() => MIN_TRAVEL_DURATION_MS}
+                            max={() => MAX_TRAVEL_DURATION_MS}
+                            step={() => TRAVEL_DURATION_STEP_MS}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Travel duration in milliseconds"}
+                            onInput={setTravelDurationMs}
+                        />
+                    </PageProp>
+
+                    <PageProp key={"retentionMs"} label={"Retention (ms)"}>
+                        <PageNumberField
+                            value={getRetentionMs}
+                            min={() => MIN_RETENTION_MS}
+                            max={() => MAX_RETENTION_MS}
+                            step={() => RETENTION_STEP_MS}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Retention in milliseconds"}
+                            onInput={setRetentionMs}
+                        />
+                    </PageProp>
+
+                    <PageProp key={"spawnDelayMs"} label={"Spawn delay (ms)"}>
+                        <PageNumberField
+                            value={getSpawnDelayMs}
+                            min={() => MIN_SPAWN_DELAY_MS}
+                            max={() => MAX_SPAWN_DELAY_MS}
+                            step={() => SPAWN_DELAY_STEP_MS}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Spawn delay in milliseconds"}
+                            onInput={setSpawnDelayMs}
+                        />
+                    </PageProp>
+
+                    <PageProp key={"iterationPattern"} label={"Iteration pattern"}>
+                        <PageSelectField
+                            value={getIterationPatternKey}
+                            values={() => ITERATION_PATTERN_KEYS}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Iteration pattern"}
+                            onChange={(key) => setIterationPatternKey(() => key)}
+                        />
+                    </PageProp>
+                </PagePropsPanel>
+            </PagePropsGroups>
+
+            <PageExamples items={getExamples} layout={"flow"} />
+        </>
+    );
+};

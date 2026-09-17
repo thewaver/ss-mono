@@ -29,16 +29,27 @@ export const PlacementItem = (props: PlacementItemProps) => {
 
     const getEffect = createMemo(() => {
         const computeEffect = context.getComputeEffect();
+
+        if (computeEffect === undefined) return undefined;
+
+        const placement = access(props.placement);
         const point = context.getPointerPoint();
-
-        if (computeEffect === undefined || point === undefined) return undefined;
-
-        const defs = ProximityUtils.toEffectDefs(
-            access(props.placement),
-            point,
-            context.getArrangement(),
-            context.getPrefersReducedMotion(),
-        );
+        const defs =
+            point === undefined
+                ? ProximityUtils.toRestingEffectDefs(
+                      placement,
+                      context.getArrangement(),
+                      context.getPrefersReducedMotion(),
+                      placement,
+                  )
+                : ProximityUtils.toEffectDefs(
+                      placement,
+                      point,
+                      context.getArrangement(),
+                      context.getPrefersReducedMotion(),
+                      placement,
+                      context.getOverreach(),
+                  );
 
         return CSSUtils.toAnimationStyle(computeEffect(defs));
     });

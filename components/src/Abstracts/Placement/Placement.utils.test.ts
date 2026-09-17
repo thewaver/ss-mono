@@ -321,6 +321,131 @@ describe("getReachDistance", () => {
     });
 });
 
+describe("getNearestReach", () => {
+    const COLUMN: PlacementLayout = {
+        heightRatio: 1,
+        reachRule: "vertical",
+        placements: [
+            { left: 0.5, top: 0.2, width: 0.2, height: 0.1 },
+            { left: 0.5, top: 0.4, width: 0.2, height: 0.1 },
+            { left: 0.5, top: 0.6, width: 0.2, height: 0.1 },
+        ],
+    };
+
+    it("is whichever item's own reach distance is smallest, not the straight line to any of them", () => {
+        expect(
+            PlacementUtils.getNearestReach(COLUMN, { x: 5, y: 0.4 }),
+            "closest to the middle item along the axis the column reaches by, however far off to the side",
+        ).toBeCloseTo(0);
+    });
+
+    it("grows once every item has moved past the point, rather than staying pinned to the first one", () => {
+        expect(PlacementUtils.getNearestReach(COLUMN, { x: 0.5, y: 5 })).toBeCloseTo(4.4);
+    });
+
+    it("answers with no limit for a layout with nothing in it, there being no item to be near", () => {
+        expect(PlacementUtils.getNearestReach({ heightRatio: 1, placements: [] }, { x: 0.5, y: 0.5 })).toBe(Infinity);
+    });
+});
+
+describe("getRunOverreach", () => {
+    const COLUMN: PlacementLayout = {
+        heightRatio: 1,
+        reachRule: "vertical",
+        placements: [
+            { left: 0.5, top: 0.2, width: 0.2, height: 0.1 },
+            { left: 0.5, top: 0.4, width: 0.2, height: 0.1 },
+            { left: 0.5, top: 0.6, width: 0.2, height: 0.1 },
+        ],
+    };
+
+    it("is nothing anywhere between the run's own two ends, however far off to the side", () => {
+        expect(
+            PlacementUtils.getRunOverreach(COLUMN, { x: 5, y: 0.4 }),
+            "level with the middle item, however far across",
+        ).toBe(0);
+        expect(
+            PlacementUtils.getRunOverreach(COLUMN, { x: 5, y: 0.3 }),
+            "in the real gap between the first two items, not past either of them",
+        ).toBe(0);
+    });
+
+    it("grows past whichever end the point has gone beyond", () => {
+        expect(PlacementUtils.getRunOverreach(COLUMN, { x: 0.5, y: 0.05 }), "above the first item").toBeCloseTo(0.15);
+        expect(PlacementUtils.getRunOverreach(COLUMN, { x: 0.5, y: 0.7 }), "below the last item").toBeCloseTo(0.1);
+    });
+
+    it("reads the same way in a row, along the horizontal axis instead", () => {
+        const row: PlacementLayout = {
+            heightRatio: 1,
+            reachRule: "horizontal",
+            placements: [
+                { left: 0.2, top: 0.5, width: 0.1, height: 0.1 },
+                { left: 0.4, top: 0.5, width: 0.1, height: 0.1 },
+            ],
+        };
+
+        expect(PlacementUtils.getRunOverreach(row, { x: 0.3, y: 9 }), "between the two, however far up or down").toBe(0);
+        expect(PlacementUtils.getRunOverreach(row, { x: 0.9, y: 0.5 })).toBeCloseTo(0.5);
+    });
+
+    const turning = (spread: number, itemCount: number): PlacementLayout => {
+        const radius = 0.4;
+        const step = itemCount > 1 ? spread / itemCount : 0;
+
+        return {
+            heightRatio: 1,
+            reachRule: "arc",
+            origin: { x: 0.5, y: 0.5 },
+            placements: Array.from({ length: itemCount }, (_unused, index) => {
+                const radians = (step * index * Math.PI) / 180;
+
+                return {
+                    left: 0.5 + Math.cos(radians) * radius,
+                    top: 0.5 + Math.sin(radians) * radius,
+                    width: 0.1,
+                    height: 0.1,
+                };
+            }),
+        };
+    };
+
+    it("is nothing anywhere for a ring that comes back round to itself, there being no end to be past", () => {
+        const ring = turning(360, 10);
+
+        expect(PlacementUtils.getRunOverreach(ring, { x: 0.9, y: 0.5 })).toBe(0);
+        expect(PlacementUtils.getRunOverreach(ring, { x: 0.1, y: 0.9 })).toBe(0);
+    });
+
+    it("grows past whichever end of an open arc the point has turned beyond", () => {
+        const arc = turning(90, 4);
+
+        expect(
+            PlacementUtils.getRunOverreach(arc, { x: 0.5 + Math.cos(0) * 0.4, y: 0.5 + Math.sin(0) * 0.4 }),
+            "exactly on the first item",
+        ).toBeCloseTo(0);
+
+        const beyondRadians = (-45 * Math.PI) / 180;
+        const beyond = { x: 0.5 + Math.cos(beyondRadians) * 0.4, y: 0.5 + Math.sin(beyondRadians) * 0.4 };
+
+        expect(
+            PlacementUtils.getRunOverreach(arc, beyond),
+            "a quarter of the way further round than the arc reaches",
+        ).toBeCloseTo(0.4 * (Math.PI / 4));
+    });
+
+    it("falls back to the nearest item where a layout names no reach rule to have an end at all", () => {
+        const scatter: PlacementLayout = {
+            heightRatio: 1,
+            placements: [{ left: 0.5, top: 0.5, width: 0.1, height: 0.1 }],
+        };
+
+        expect(PlacementUtils.getRunOverreach(scatter, { x: 0.5, y: 0.6 })).toBeCloseTo(
+            PlacementUtils.getNearestReach(scatter, { x: 0.5, y: 0.6 }),
+        );
+    });
+});
+
 describe("getReachBearing", () => {
     const ROW = { reachRule: "horizontal" } as const;
     const RING = { reachRule: "arc", origin: { x: 0.5, y: 0.5 } } as const;
@@ -358,10 +483,14 @@ describe("getIsWithinReach", () => {
         expect(PlacementUtils.getIsWithinReach(box("vertical"), { x: 1.4, y: 0.1 })).toBe(false);
     });
 
-    it("gates a rule that reads both axes on both of them, so nothing answers a pointer that has left", () => {
+    it("gates neither axis for a rule that reads both at once, distance already limiting it in every direction", () => {
         expect(PlacementUtils.getIsWithinReach(box("plane"), { x: 0.5, y: 0.1 })).toBe(true);
-        expect(PlacementUtils.getIsWithinReach(box("plane"), { x: 9, y: 0.1 })).toBe(false);
-        expect(PlacementUtils.getIsWithinReach(box("plane"), { x: 0.5, y: 9 })).toBe(false);
+        expect(PlacementUtils.getIsWithinReach(box("plane"), { x: 9, y: 0.1 }), "far to the side").toBe(true);
+        expect(PlacementUtils.getIsWithinReach(box("plane"), { x: 0.5, y: 9 }), "far below").toBe(true);
+    });
+
+    it("gates nothing at all for a layout that names no rule either, the same as naming plane", () => {
+        expect(PlacementUtils.getIsWithinReach({ heightRatio: 0.25, placements: [] }, { x: 9, y: 9 })).toBe(true);
     });
 });
 

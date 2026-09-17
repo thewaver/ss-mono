@@ -4,8 +4,7 @@ export namespace ProximityEffects {
     export const SAMPLE_EFFECTS = {
         fade: { family: "fade" },
         glow: { family: "glow" },
-        lift: { family: "lift" },
-        swell: { family: "swell" },
+        zoomIn: { family: "zoomIn" },
     } satisfies Record<string, ProximityEffectEntry>;
 
     export type SampleKey = keyof typeof SAMPLE_EFFECTS;

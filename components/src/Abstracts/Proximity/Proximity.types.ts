@@ -15,6 +15,7 @@ export type ProximityEffectDefs = ProximityArrangement & {
     frame: PlacementRect;
     offset: Point2d;
     distance: number;
+    overreach: number;
     radialShare: number;
     ratio: number;
     prefersReducedMotion: boolean;

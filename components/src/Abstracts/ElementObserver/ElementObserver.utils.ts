@@ -1,7 +1,7 @@
 import type { Accessor, Setter } from "solid-js";
 import { createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 
-import { Bounds, type Point2d, type Rect, Size2d } from "@thewaver/ss-utils";
+import { Bounds, type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import { useViewportContext } from "../Viewport/Viewport.context";
 import { ViewportUtils } from "../Viewport/Viewport.utils";
@@ -9,9 +9,17 @@ import { ViewportUtils } from "../Viewport/Viewport.utils";
 /** Shared empty result, so a disabled observer does not hand out a new array each time. */
 const EMPTY_SIZES: Size2d[] = [];
 
+/** Shared empty result, so a disabled observer does not hand out a new array each time. */
+const EMPTY_RECTS: (Rect | undefined)[] = [];
+
 /** Whether two size lists match entry for entry. */
 const isSameSizeList = (a: Size2d[], b: Size2d[]) =>
     a.length === b.length && a.every((size, index) => Size2d.isSame(size, b[index]));
+
+/** Whether two rect lists match entry for entry, an entry missing on both sides counting as a match. */
+const isSameRectList = (a: (Rect | undefined)[], b: (Rect | undefined)[]) =>
+    a.length === b.length &&
+    a.every((rect, index) => (rect === undefined ? b[index] === undefined : Rect.isSame(rect, b[index])));
 
 /**
  * Reports an element's size and position as reactive accessors, and keeps them current.
@@ -243,5 +251,73 @@ export namespace ElementObserverUtils {
 
             frameId = requestAnimationFrame(tick);
         });
+    };
+
+    /**
+     * Keeps several elements' positions and sizes current every frame, in viewport coordinates.
+     *
+     * The list version of {@link createViewportRectObserver}: one set of listeners and one frame loop
+     * covers every element, which is what lets a consumer with an unbounded number of targets — a
+     * spawner aiming at however many are on screen — read each one's current rect without measuring
+     * on its own, on demand, in the middle of some other loop.
+     *
+     * @param getRefs The elements to measure, in the order the rects should come back. A missing entry
+     * is kept as `undefined` rather than dropped, so the result always lines up with the input.
+     * @param getIsVisible Whether to keep measuring. The frame loop and the listeners both follow this.
+     * @returns One rect per element, in the enclosing viewport's coordinates. `undefined` for an entry
+     * that has no element.
+     */
+    export const createViewportRectListObserver = (
+        getRefs: Accessor<Array<HTMLElement | undefined>>,
+        getIsVisible: Accessor<boolean>,
+    ) => {
+        const viewportContext = useViewportContext();
+        const [getRects, setRects] = createSignal<(Rect | undefined)[]>(EMPTY_RECTS, { equals: isSameRectList });
+
+        const updateRects = () => {
+            setRects(
+                getRefs().map((ref) => (ref ? ViewportUtils.getAdjustedBoundingClientRect(ref, viewportContext) : undefined)),
+            );
+        };
+
+        onMount(() => {
+            updateRects();
+        });
+
+        createEffect(() => {
+            onCleanup(() => {
+                document.removeEventListener("scroll", updateRects, true);
+                window.removeEventListener("resize", updateRects);
+            });
+
+            if (!getIsVisible()) return;
+
+            document.addEventListener("scroll", updateRects, { capture: true, passive: true });
+            window.addEventListener("resize", updateRects);
+        });
+
+        createEffect(() => {
+            let frameId: ReturnType<typeof requestAnimationFrame>;
+            let isCancelled = false;
+
+            onCleanup(() => {
+                isCancelled = true;
+                cancelAnimationFrame(frameId);
+            });
+
+            if (!getIsVisible()) return;
+
+            const tick = () => {
+                if (isCancelled) return;
+
+                updateRects();
+
+                frameId = requestAnimationFrame(tick);
+            };
+
+            frameId = requestAnimationFrame(tick);
+        });
+
+        return getRects;
     };
 }

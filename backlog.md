@@ -1159,10 +1159,12 @@ is gone rather than merely defaulted. The four hand samples then lost `sweepLead
 without turning the wedge it is clipped to, so any value but ninety slid the band off the hand. A knob that
 should not be turned is removed, not left with a good default; the reasoning for each sits in `decisions.md`.
 
-**The timed side is only half done.** `steps` reaches the fourteen samples that walk a sweep and `bands` the
-four flows; the `scan`, `sweep`, `fill` and `merge` families still hold their tuning inline in the JSX —
-sweep offsets, hard-edge stops, the travel range handed to `sweepOrthogonal`. Whether those want exposing at
-all is part of the same question.
+**The timed side is settled, and it settled the other way.** `steps` reaches the fourteen samples that walk a
+sweep and `bands` the four flows; the `scan`, `sweep`, `fill` and `merge` families stay inline, and the user
+confirmed why: the travel range, the starting offset, sweep's hard-edge stop that scan doesn't have, and
+merge's blend flag are what make each family the effect it is, not a shared shape wearing different numbers.
+A knob there would let someone turn `sweep` into a worse `scan` rather than tune `sweep`, so nothing in these
+four families is a pending exposure — it is held back the same way the frame interval below is.
 
 **What was held back deliberately, and the user agreed with the line**: the frame interval and everything
 derived from it — stamp counts, lifetimes, grace periods — the epsilons that decide whether the pointer moved,

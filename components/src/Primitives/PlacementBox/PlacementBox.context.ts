@@ -9,6 +9,7 @@ export const PlacementBoxContextProvider = PlacementBoxContext.Provider;
 const UNTRACKED_BOX_CONTEXT: PlacementBoxContextType = {
     getPointerPoint: () => undefined,
     getArrangement: () => ({ spacing: 0, radius: 0, slack: Infinity }),
+    getOverreach: () => 0,
     getPrefersReducedMotion: () => false,
     getComputeEffect: () => undefined,
 };

@@ -1,12 +1,7 @@
-export type SwellDefs = {
+export type ZoomInDefs = {
     reachRatio?: number;
     growthRatio?: number;
     pushRatio?: number;
-};
-
-export type LiftDefs = {
-    reachRatio?: number;
-    shiftRatio?: number;
 };
 
 export type GlowDefs = {
@@ -22,8 +17,7 @@ export type FadeDefs = {
 };
 
 export type ProximityEffectEntry =
-    | { family: "swell"; defs?: SwellDefs }
-    | { family: "lift"; defs?: LiftDefs }
+    | { family: "zoomIn"; defs?: ZoomInDefs }
     | { family: "glow"; defs?: GlowDefs }
     | { family: "fade"; defs?: FadeDefs };
 

@@ -211,6 +211,25 @@ export namespace PlacementUtils {
     };
 
     /**
+     * How close the nearest item in a layout actually is to a point, the way the layout counts distance.
+     *
+     * {@link getReachDistance} answers for one item; a pointer effect needs to know whether the pointer is
+     * near *any* item before it treats the space between them as something that grew. Without this, an
+     * item far down a run reads the pointer's own raw distance as "everything between here and the pointer
+     * already grew," even where the pointer sits well past the run's own end and nothing there ever did.
+     *
+     * @param layout The layout to measure against.
+     * @param point The point being measured from.
+     * @returns The smallest reach distance from `point` to any item's center, or `Infinity` where the
+     * layout has no items.
+     */
+    export const getNearestReach = (layout: PlacementLayout, point: Point2d) =>
+        layout.placements.reduce(
+            (nearest, placement) => Math.min(nearest, getReachDistance(layout, getCenter(placement), point)),
+            Infinity,
+        );
+
+    /**
      * How far an arrangement's items sit from the point it turns about.
      *
      * The middle of them rather than the largest, so a layout whose bands are at different radii reports
@@ -235,7 +254,7 @@ export namespace PlacementUtils {
     /**
      * How much room a turning run has left to spread into.
      *
-     * A ring occupies the whole circle and can only pretend to make room for a swelling item: push its
+     * A ring occupies the whole circle and can only pretend to make room for a growing item: push its
      * items along and the two directions travel round and pile into each other at the far side. An arc
      * has the rest of the circle to grow into, and a wide enough arc has almost none. Both are the same
      * measurement, which is what lets the answer be a clamp rather than a special case — a closed run is
@@ -307,6 +326,54 @@ export namespace PlacementUtils {
     };
 
     /**
+     * How far a point sits past the run's own populated span, along the axis the rule measures by.
+     *
+     * {@link getNearestReach} cannot tell a point sitting in the gap between two real items from one
+     * that has drifted past the run's own end — both read as "close to the nearest item," and a pointer
+     * effect that reads nearness as "something here is growing" needs the two told apart. This is `0`
+     * everywhere inside the run, where the gap to the nearest item is a real gap between real neighbors,
+     * and grows only past the outermost item on whichever side the point has gone.
+     *
+     * @param layout The layout to measure against.
+     * @param point The point being measured from.
+     * @returns The reach distance from the point to the run's nearer edge, or `0` where the point falls
+     * within the run's own span. A closed ring has no edge to be past and always answers `0`. A layout
+     * with no reach rule has no single span to be inside or outside of, and falls back to
+     * {@link getNearestReach}.
+     */
+    export const getRunOverreach = (layout: PlacementLayout, point: Point2d): number => {
+        const { placements, reachRule } = layout;
+
+        if (placements.length === NOTHING) return NOTHING;
+
+        if (reachRule === "arc") {
+            if (getRunSlack(layout) < NO_DIRECTION_RADIUS) return NOTHING;
+
+            const origin = getOrigin(layout);
+            const facing = getRunFacing(layout);
+            const toTurn = (target: Point2d) => AngleUtils.getTurn(facing, toAngle(origin, target));
+            const turns = placements.map((placement) => toTurn(getCenter(placement)));
+            const pointTurn = toTurn(point);
+            const minTurn = Math.min(...turns);
+            const maxTurn = Math.max(...turns);
+            const overshoot =
+                pointTurn < minTurn ? minTurn - pointTurn : pointTurn > maxTurn ? pointTurn - maxTurn : NOTHING;
+
+            return overshoot * AngleUtils.RADIANS_PER_DEGREE * getRunRadius(layout);
+        }
+
+        if (reachRule !== "horizontal" && reachRule !== "vertical") return getNearestReach(layout, point);
+
+        const axis = reachRule === "horizontal" ? "x" : "y";
+        const coords = placements.map((placement) => getCenter(placement)[axis]);
+        const min = Math.min(...coords);
+        const max = Math.max(...coords);
+        const pointCoord = point[axis];
+
+        return pointCoord < min ? min - pointCoord : pointCoord > max ? pointCoord - max : NOTHING;
+    };
+
+    /**
      * Whether a point is near enough to an arrangement to be measured against it at all.
      *
      * The companion question to {@link getReachDistance}, and the reason it is a separate one: a rule that
@@ -314,10 +381,12 @@ export namespace PlacementUtils {
      * whether the pointer is on it or a whole page above it, and would sit lit for as long as the pointer
      * was anywhere at that column. Being inside the layout's own box is therefore read once more as a yes
      * or a no, never as a distance, which costs nothing in the region that matters and stops at the edge.
-     * Only the axis a rule measures along is left ungated, distance already limiting that one. `"plane"` throws nothing away and so needs no gate: distance is already limiting it in
-     * every direction. `"arc"` throws away the radius, which has no single axis to test, so the whole box
-     * is the test — a wheel still answers a pointer outside its ring, and stops answering one that has
-     * left the wheel.
+     * Only the axis a rule measures along is left ungated, distance already limiting that one. `"plane"`
+     * throws nothing away and so needs no gate at all: its distance is a straight line on both axes at
+     * once, already falling toward nothing well before a pointer reaches the far side of the page, the same
+     * way a row's own measured axis needs none. `"arc"` throws away the radius, which has no single axis to
+     * test, so the whole box is the test — a wheel still answers a pointer outside its ring, and stops
+     * answering one that has left the wheel.
      *
      * @param layout The arrangement being pointed at.
      * @param point The point, in layout coordinates.
@@ -334,9 +403,11 @@ export namespace PlacementUtils {
                 return isAcross;
             case "arc":
                 return getDistance(getOrigin(layout), point) <= getRunRadius(layout) * PAIR;
+            case "plane":
+                return true;
         }
 
-        return isAcross && isDown;
+        return true;
     };
 
     /**

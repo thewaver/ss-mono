@@ -411,7 +411,7 @@ across ten files — **nobody should write that expression again.** Four collaps
 bugs in one sitting.** The user's call. A bearing is a position on a circle rather than a quantity — `350` and
 `10` are twenty degrees apart, neither is larger than the other, and the same direction has infinitely many
 spellings — so `to - from` is right almost everywhere and wrong at exactly the place a run's two ends meet.
-Every fault came from that: a swell's far item taking the opposite way round an arc, then taking it again
+Every fault came from that: a zoomIn's far item taking the opposite way round an arc, then taking it again
 after the first repair, and a run's facing coming out as noise for a closed ring.
 
 **The line drawn is that `AngleUtils` owns the scalar algebra and anything touching a point does not.**
@@ -2780,10 +2780,24 @@ had to learn an index or thread a reading down. Tracking is off entirely while n
 **Effects are per item and pure, which is what stops the feedback the dock example warns about.** Each item is
 measured against the resting layout, never against where its neighbors have moved to — grow an item from its
 live position and it shifts its neighbor, which changes that neighbor's distance from a pointer that has not
-moved, which changes its size. What a consumer gives up is a swell that genuinely re-flows the run: the
-displacement is a transform, so items pass over one another rather than pushing. `swell` gets the look back
-analytically instead, by displacing each item by the running total of what its inner neighbors grew — which is
-the falloff curve integrated and normalized, and comes out as a closed form.
+moved, which changes its size. What a consumer gives up is a `zoomIn` that genuinely re-flows the run: the
+displacement is a transform, so items pass over one another rather than pushing — a few pixels of overlap at
+the boundary between two growing neighbors is this trade-off's residue, not a bug to chase. `zoomIn` gets the
+look back analytically instead, by displacing each item by the running total of what its inner neighbors
+grew — which is the falloff curve integrated and normalized, and comes out as a closed form.
+
+**That integral is anchored to the run's own span, not to the pointer's raw coordinate.** The first version
+measured every item's push from its own distance to the pointer alone, which reads "past one reach" the same
+way whether the pointer is genuinely near another item or has drifted off the end of the run entirely with
+nothing there to have grown — so a pointer far past the whole run still pushed every item by the same large,
+constant amount, and two items equally near the pointer (the common case of it sitting between them) both read
+as "at the growth center" and got zero push each while both were still growing, colliding into each other.
+`PlacementUtils.getRunOverreach` is the fix: `0` anywhere between the run's first and last item, where the gap
+to a neighbor is a real gap between real neighbors, and only positive once the pointer has actually left the
+run's own span. `ProximityEffectDefs.overreach` carries it, and `zoomIn`'s push subtracts the share already
+spent by the time that overreach is reached — nothing, while the pointer is inside the run, so the original
+per-item math is untouched there; the full share, once the pointer is far enough outside it that nothing
+anywhere is growing.
 
 **Nearness is not a straight line, and an arrangement is the only thing that knows what it is.** The user's
 diagnosis, and it is the whole architecture rather than a correction to it. A straight-line distance is right
@@ -2864,19 +2878,29 @@ the rule opens: an ignored axis is ignored without limit, so a row measuring onl
 the same whether the pointer was on it or a whole page above, and would have sat lit for as long as the
 pointer was anywhere in that column. `PlacementUtils.getIsWithinReach` asks whether the point is inside the
 layout's own box on the axis the rule discarded — a boolean, never a distance, so nearness inside the
-arrangement is untouched and the whole thing simply stops at the edge. A rule that reads both axes is gated on both, so nothing
-answers a pointer that has left the box altogether; `"arc"` discards the radius, which has no one axis to
-test, so the whole box is the test — which is why a wheel still answers a pointer outside its ring and stops
-answering one that has left the wheel.
+arrangement is untouched and the whole thing simply stops at the edge. `"plane"` throws nothing away, so it
+gates neither axis: its distance is a straight line across both of them at once, already falling toward
+nothing well before a pointer reaches the far side of the page, the same way a row's own measured axis
+carries no gate. `"arc"` throws away the radius, which has no one axis to test, so the whole box is the
+test — which is why a wheel still answers a pointer outside its ring and stops answering one that has left
+the wheel.
+
+**That `"plane"` case was wired to the row/column box gate for a while, and it was a defect rather than a
+second reading of the same reasoning.** The distinction above says plane needs no gate at all, but the
+`switch` had no case for it, so it fell through to the two-axis box check anyway — a scattered layout stopped
+answering the instant the pointer left its own bounding rectangle, on either axis, which is exactly the "sat
+lit forever" problem this section exists to prevent, just inverted into "went dark too soon." Caught because
+`Honeycomb`, `Cliff`, `Whorl` and `Zigzag` visibly snapped at their own edges where a row or a column never
+does at its measured one. Fixed by giving `"plane"` its own case.
 
 **The gate is on the pointer rather than on the item**, so failing it is indistinguishable from the pointer
 not being there: the box reports no point at all and no item computes an effect. Gating per item instead
 would have left `fade` dimming a whole arrangement the pointer had already walked away from, since a distant
 item and an absent pointer are different things to an effect that answers on remoteness.
 
-**A swell's push is clamped to the room the arrangement actually has, and a closed run is where that room
+**A `zoomIn`'s push is clamped to the room the arrangement actually has, and a closed run is where that room
 runs out.** Past the reach the push saturates at its full value, which is right for a row — everything beyond
-the swelling shifts outward and the row gets longer — and ruinous for a loop, where the two directions travel
+the growing item shifts outward and the row gets longer — and ruinous for a loop, where the two directions travel
 round and pile into each other at the far side. The first answer was a flag: test whether the run closes and
 refuse to push when it does. The user's correction is better and is the house pattern — `createRing` already
 clamps a spread to a turn and a hole ratio to one, and the falloff clamps nearness — so this is a clamp too.
@@ -2918,16 +2942,15 @@ in exactly the effects that move things.
 under success criterion 2.3.3 and a blur is too under its erratum, so the library could tell which half of an
 effect to strip — and stripping is the one thing the `PointerTracker` entry above argues it must not do, because
 only the consumer can _substitute_. So the flag arrives in the defs and each sample effect answers it in the
-way that suits it: `swell` sends the same curve to `brightness` instead of to size, `fade` keeps its dimming
-and drops its blur, `lift` is nothing but movement and answers with nothing at all, and `glow` is not motion
-under the criterion's own definition and is unchanged. Four samples, four different right answers, which is
-the argument for the flag rather than a rule.
+way that suits it: `zoomIn` sends the same curve to `brightness` instead of to size, `fade` keeps its dimming
+and drops its blur, and `glow` is not motion under the criterion's own definition and is unchanged. Three
+samples, three different right answers, which is the argument for the flag rather than a rule.
 
 **A row and a column joined the layout registry, and they are there to be tested against.** The user's call.
 Every arrangement the library shipped curved, scattered or overlapped, which meant there was nothing to check
 a pointer effect against where the right answer is obvious by eye — and both faults above were invisible until
 there was. They are the two arrangements a control would have had without a layout at all, which is the second
-thing they buy: a dock is a row, and until these existed the one shape a swell most obviously wants was the one
+thing they buy: a dock is a row, and until these existed the one shape `zoomIn` most obviously wants was the one
 shape no layout could describe.
 
 **`Wheel` takes one, and it is the one place the effect is not measured against the layout it was given.** A

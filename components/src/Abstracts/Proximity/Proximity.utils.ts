@@ -32,7 +32,7 @@ const toRadialShare = (arrangement: ProximityArrangement, point: Point2d) => {
  * A component that lays its items out with {@link PlacementUtils} knows where each one sits and where
  * the pointer is, both in the same layout coordinates; what it does not know is what the consumer
  * wants that to look like. An effect function is given one item's measurements against the pointer
- * and answers with CSS function values, so a swell, a glow and a nudge are the same mechanism with a
+ * and answers with CSS function values, so a zoom, a glow and a nudge are the same mechanism with a
  * different answer.
  *
  * Every length here is in layout units — fractions of the container's width — so an effect written
@@ -91,13 +91,17 @@ export namespace ProximityUtils {
      *
      * @param placement The item's box, in layout coordinates.
      * @param point The pointer, in the same coordinates.
+     * @param arrangement What the run it sits in is like, from {@link toArrangement}.
+     * @param prefersReducedMotion Whether the user has asked for reduced motion, passed on so the
+     * effect can answer with something other than movement rather than being silently stripped.
      * @param frame The box the effect's own transform will be written onto. It is the item's own box
      * wherever an item is its own element, and something larger where it is not — a wheel paints each of
      * its wedges across the whole wheel, so a translation there is of the wheel. Defaults to the
      * placement, which is the common case.
-     * @param arrangement What the run it sits in is like, from {@link toArrangement}.
-     * @param prefersReducedMotion Whether the user has asked for reduced motion, passed on so the
-     * effect can answer with something other than movement rather than being silently stripped.
+     * @param overreach How far past the run's own span the pointer sits — see
+     * {@link PlacementUtils.getRunOverreach}. Defaults to `0`, which is what a caller with only one item
+     * to measure should leave it at, there being no "past the run" for a run of one. A caller measuring
+     * a whole run should pass the same value to every item in it.
      * @returns `offset`, the true vector from the item's center to the pointer, `radialShare` — how far
      * off the band the pointer sits, as a share of the run's own radius, which is `0` everywhere an
      * arrangement does not turn — and `distance`, which is
@@ -113,6 +117,7 @@ export namespace ProximityUtils {
         arrangement: ProximityArrangement,
         prefersReducedMotion: boolean,
         frame: PlacementRect = placement,
+        overreach = NOTHING,
     ): ProximityEffectDefs => {
         const center = PlacementUtils.getCenter(placement);
         const offset = { x: point.x - center.x, y: point.y - center.y };
@@ -127,6 +132,7 @@ export namespace ProximityUtils {
                 frame,
                 offset,
                 distance,
+                overreach,
                 radialShare,
                 ratio: NOTHING,
                 prefersReducedMotion,
@@ -142,11 +148,46 @@ export namespace ProximityUtils {
             frame,
             offset,
             distance,
+            overreach,
             radialShare,
             ratio: border < NO_DIRECTION ? Infinity : straight / border,
             prefersReducedMotion,
         };
     };
+
+    /**
+     * Measures an item as though the pointer were nowhere near the run at all.
+     *
+     * A control stops tracking the pointer the instant it leaves the layout's own box, or has never been
+     * seen yet, and until now that meant no effect ran at all — the element's `transform` and `filter`
+     * went from whatever they were mid-approach straight to nothing, a different-shaped value with
+     * nothing for a transition to ease between. Calling the same effect function with this instead keeps
+     * the shape identical to an engaged reading, at whatever values the effect settles to on its own once
+     * nothing is near — full brightness for `glow`, but dimmed for `fade`, since dimming what is far is
+     * `fade`'s whole idea and nothing being near is the far end of that.
+     *
+     * @param placement The item's box, in layout coordinates.
+     * @param arrangement What the run it sits in is like, from {@link toArrangement}.
+     * @param prefersReducedMotion Whether the user has asked for reduced motion.
+     * @param frame The box the effect's own transform will be written onto — see {@link toEffectDefs}.
+     * @returns Measurements reporting the pointer as infinitely far away on every axis that matters.
+     */
+    export const toRestingEffectDefs = (
+        placement: PlacementRect,
+        arrangement: ProximityArrangement,
+        prefersReducedMotion: boolean,
+        frame: PlacementRect = placement,
+    ): ProximityEffectDefs => ({
+        ...arrangement,
+        placement,
+        frame,
+        offset: { x: NOTHING, y: NOTHING },
+        distance: Infinity,
+        overreach: Infinity,
+        radialShare: NOTHING,
+        ratio: Infinity,
+        prefersReducedMotion,
+    });
 
     /**
      * Which way the pointer lies from an item, in a straight line.
@@ -187,7 +228,7 @@ export namespace ProximityUtils {
      * How far and which way to move an item so that it travels a given distance along its run.
      *
      * A straight step along the tangent is only the first term of travelling along a curve, and an item
-     * giving way to a swelling neighbor travels far enough for the rest of the terms to matter: on a
+     * giving way to a growing neighbor travels far enough for the rest of the terms to matter: on a
      * half-turn arc of six, a push of three quarters of an item width is a twenty-seven degree step, and
      * a straight tangent leaves the curve far enough that neighbors converge and overlap. So where the
      * run turns, this turns with it — the item is swung about the arrangement's pivot by the angle that

@@ -5,6 +5,7 @@ import type { ProximityArrangement, ProximityEffectFn } from "../../Abstracts/Pr
 export type PlacementBoxContextType = {
     getPointerPoint: () => Point2d | undefined;
     getArrangement: () => ProximityArrangement;
+    getOverreach: () => number;
     getPrefersReducedMotion: () => boolean;
     getComputeEffect: () => ProximityEffectFn | undefined;
 };

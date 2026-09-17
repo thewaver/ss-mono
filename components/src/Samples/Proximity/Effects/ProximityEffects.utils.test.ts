@@ -28,13 +28,13 @@ const defsFor = (placement: PlacementRect, prefersReducedMotion = false) =>
 
 const toNumbers = (value: number | number[] | undefined) => (Array.isArray(value) ? value : [value ?? 0]);
 
-describe("swell", () => {
-    const swell = ProximityEffectUtils.createSwell();
+describe("zoomIn", () => {
+    const zoomIn = ProximityEffectUtils.createZoomIn();
 
     it("grows the item the pointer is on, grows its neighbor less, and leaves a distant one alone", () => {
-        const [under] = toNumbers(swell(defsFor(UNDER)).scale);
-        const [beside] = toNumbers(swell(defsFor(BESIDE)).scale);
-        const [away] = toNumbers(swell(defsFor(AWAY)).scale);
+        const [under] = toNumbers(zoomIn(defsFor(UNDER)).scale);
+        const [beside] = toNumbers(zoomIn(defsFor(BESIDE)).scale);
+        const [away] = toNumbers(zoomIn(defsFor(AWAY)).scale);
 
         expect(under).toBeGreaterThan(beside);
         expect(beside).toBeGreaterThan(away);
@@ -42,17 +42,17 @@ describe("swell", () => {
     });
 
     it("pushes a neighbor away from the pointer rather than toward it", () => {
-        const [across] = toNumbers(swell(defsFor(BESIDE)).translate);
+        const [across] = toNumbers(zoomIn(defsFor(BESIDE)).translate);
 
         expect(across, "the pointer is to its right, so it gives way to the left").toBeLessThan(0);
     });
 
     it("leaves the item under the pointer where it is, since nothing between them has grown", () => {
-        expect(toNumbers(swell(defsFor(UNDER)).translate)).toEqual([0, 0]);
+        expect(toNumbers(zoomIn(defsFor(UNDER)).translate)).toEqual([0, 0]);
     });
 
     it("answers with brightness instead of size when motion is to be reduced", () => {
-        const reduced = swell(defsFor(UNDER, true));
+        const reduced = zoomIn(defsFor(UNDER, true));
 
         expect(reduced.scale, "nothing changes size").toBeUndefined();
         expect(reduced.translate, "and nothing moves").toBeUndefined();
@@ -60,7 +60,45 @@ describe("swell", () => {
     });
 });
 
-describe("swell, around a pivot", () => {
+describe("zoomIn, with the pointer nowhere near the run", () => {
+    const zoomIn = ProximityEffectUtils.createZoomIn();
+    const FAR_POINTER = { x: 100, y: ROW_TOP };
+    const OVERREACH = 90;
+
+    const farDefsFor = (placement: PlacementRect) =>
+        ProximityUtils.toEffectDefs(placement, FAR_POINTER, RUN, false, placement, OVERREACH);
+
+    it("neither grows an item nor pushes it, since nothing in the run is close enough to be growing", () => {
+        const effect = zoomIn(farDefsFor(AWAY));
+
+        expect(effect.scale, "a hundred percent is the size it was laid out at").toEqual([100, 100]);
+        expect(
+            toNumbers(effect.translate),
+            "there is nothing nearby that grew, so there is nothing to make room for",
+        ).toEqual([0, 0]);
+    });
+});
+
+describe("zoomIn, with the pointer between two real neighbors", () => {
+    const zoomIn = ProximityEffectUtils.createZoomIn();
+    const LEFT = itemAt(0.4);
+    const RIGHT = itemAt(0.6);
+    const MIDPOINT = { x: 0.5, y: ROW_TOP };
+    const NO_OVERREACH = 0;
+
+    const midDefsFor = (placement: PlacementRect) =>
+        ProximityUtils.toEffectDefs(placement, MIDPOINT, RUN, false, placement, NO_OVERREACH);
+
+    it("still pushes both neighbors apart, since the gap between two real items is not the same as the gap past the run's own end", () => {
+        const [leftAcross] = toNumbers(zoomIn(midDefsFor(LEFT)).translate);
+        const [rightAcross] = toNumbers(zoomIn(midDefsFor(RIGHT)).translate);
+
+        expect(leftAcross, "gives way to the left").toBeLessThan(0);
+        expect(rightAcross, "and its neighbor gives way to the right").toBeGreaterThan(0);
+    });
+});
+
+describe("zoomIn, around a pivot", () => {
     const ON_RING = { left: 0.5, top: 0.2, width: 0.16, height: 0.16 };
     const ORIGIN = { x: 0.5, y: 0.5 };
 
@@ -71,7 +109,7 @@ describe("swell, around a pivot", () => {
             { spacing: 0.2, radius: 0.3, reachRule: "arc", origin: ORIGIN, slack: 1 },
             false,
         );
-        const [along, across] = ProximityEffectUtils.swell(defs).translate as number[];
+        const [along, across] = ProximityEffectUtils.zoomIn(defs).translate as number[];
         const moved = {
             x: ON_RING.left + along * PERCENT_TO_SHARE * ON_RING.width,
             y: ON_RING.top + across * PERCENT_TO_SHARE * ON_RING.height,
@@ -91,10 +129,10 @@ describe("swell, around a pivot", () => {
             { spacing: 0.2, radius: 0.3, reachRule: "arc", origin: ORIGIN, slack: 0 },
             false,
         );
-        const swollen = ProximityEffectUtils.swell(defs);
+        const zoomed = ProximityEffectUtils.zoomIn(defs);
 
-        expect(swollen.translate, "nothing moves").toBeUndefined();
-        expect(swollen.scale, "and the growing is untouched").toBeDefined();
+        expect(zoomed.translate, "nothing moves").toBeUndefined();
+        expect(zoomed.scale, "and the growing is untouched").toBeDefined();
     });
 
     it("is the straight line to the pointer again where the arrangement names no pivot", () => {
@@ -104,23 +142,9 @@ describe("swell, around a pivot", () => {
             { spacing: 0.2, radius: 0, slack: Infinity },
             false,
         );
-        const [, across] = ProximityEffectUtils.swell(defs).translate as number[];
+        const [, across] = ProximityEffectUtils.zoomIn(defs).translate as number[];
 
         expect(across, "the pointer is a little below, so the push has some upward in it").not.toBeCloseTo(0);
-    });
-});
-
-describe("lift", () => {
-    it("draws an item toward the pointer, and away from it when the shift is negative", () => {
-        const [toward] = toNumbers(ProximityEffectUtils.createLift({ shiftRatio: 0.25 })(defsFor(BESIDE)).translate);
-        const [away] = toNumbers(ProximityEffectUtils.createLift({ shiftRatio: -0.25 })(defsFor(BESIDE)).translate);
-
-        expect(toward, "the pointer is to its right, so it leans right").toBeGreaterThan(0);
-        expect(away).toBe(-toward);
-    });
-
-    it("answers with nothing at all when motion is to be reduced, movement being the whole of it", () => {
-        expect(ProximityEffectUtils.lift(defsFor(BESIDE, true))).toEqual({});
     });
 });
 
@@ -151,7 +175,20 @@ describe("fade", () => {
     });
 });
 
-describe("swell, at the far end of an open arc", () => {
+describe("every sample effect, given a resting reading", () => {
+    const resting = ProximityUtils.toRestingEffectDefs(UNDER, RUN, false);
+
+    it("settles zoomIn and glow to the same shape an engaged reading would carry, just at identity values", () => {
+        expect(ProximityEffectUtils.zoomIn(resting)).toEqual({ scale: [100, 100], translate: [0, 0] });
+        expect(ProximityEffectUtils.glow(resting)).toEqual({ brightness: 100, saturate: 100 });
+    });
+
+    it("still dims for fade, since nothing being near is the far end of what fade already does", () => {
+        expect(ProximityEffectUtils.fade(resting)).toEqual(ProximityEffectUtils.fade(defsFor(AWAY)));
+    });
+});
+
+describe("zoomIn, at the far end of an open arc", () => {
     const ARCH = PlacementLayoutUtils.createArc()({ itemCount: 6 });
     const RUN = ProximityUtils.toArrangement(ARCH);
     const ORIGIN = PlacementUtils.getOrigin(ARCH);
@@ -160,8 +197,9 @@ describe("swell, at the far end of an open arc", () => {
 
     const toMovedBearing = (index: number, pointer: { x: number; y: number }) => {
         const placement = ARCH.placements[index];
-        const [along, across] = ProximityEffectUtils.swell(ProximityUtils.toEffectDefs(placement, pointer, RUN, false))
-            .translate as number[];
+        const [along, across] = ProximityEffectUtils.zoomIn(
+            ProximityUtils.toEffectDefs(placement, pointer, RUN, false),
+        ).translate as number[];
         const moved = {
             x: placement.left + along * PERCENT_TO_SHARE * placement.width,
             y: placement.top + across * PERCENT_TO_SHARE * placement.height,

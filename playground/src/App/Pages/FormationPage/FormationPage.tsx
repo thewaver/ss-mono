@@ -29,8 +29,8 @@ const EXAMPLES_ROOT = "/src/App/Pages/FormationPage/Examples";
 const STARTING_ITEM_COUNT = 6;
 const STARTING_LAYOUT_KEY: PlacementLayouts.SampleKey = "cliff";
 const NO_EFFECT_KEY = "none";
-const STARTING_EFFECT_KEY: EffectKey = "glow";
-const STARTING_SHAPE_KIND: ShapeConst.DefaultShape = "hexagon-pointy-top";
+const STARTING_EFFECT_KEY: EffectKey = "zoomIn";
+const STARTING_SHAPE_KIND: ShapeConst.DefaultShape = "lozenge";
 
 type EffectKey = ProximityEffects.SampleKey | typeof NO_EFFECT_KEY;
 

@@ -27,6 +27,7 @@ const DEFAULT_MARKER_DEGREES = -90;
 const NO_CORRECTION = 0;
 const HALF = 0.5;
 const SQUARE_HEIGHT_RATIO = 1;
+const NO_OVERREACH = 0;
 
 const toTurnedPoint = (point: Point2d, origin: Point2d, degrees: number): Point2d => {
     const radians = degrees * AngleUtils.RADIANS_PER_DEGREE;
@@ -110,14 +111,20 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
         return PlacementUtils.getIsWithinReach(layout, point) ? point : undefined;
     });
 
+    const getOverreach = createMemo(() => {
+        const layout = getLayout();
+        const point = getPointerPoint();
+
+        return layout === undefined || point === undefined ? NO_OVERREACH : PlacementUtils.getRunOverreach(layout, point);
+    });
+
     const getWedgeEffect = (index: number) => {
         const computeEffect = getComputeEffect();
         const layout = getLayout();
         const arrangement = getArrangement();
-        const point = getPointerPoint();
         const resting = layout?.placements[FIRST_WEDGE];
 
-        if (!computeEffect || !layout || !arrangement || !point || !resting) return undefined;
+        if (!computeEffect || !layout || !arrangement || !resting) return undefined;
 
         const origin = PlacementUtils.getOrigin(layout);
         const angle = getWedgeAngle(index);
@@ -131,9 +138,20 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
             angle,
         };
 
-        return CSSUtils.toAnimationStyle(
-            computeEffect(ProximityUtils.toEffectDefs(placement, point, arrangement, getPrefersReducedMotion(), frame)),
-        );
+        const point = getPointerPoint();
+        const defs =
+            point === undefined
+                ? ProximityUtils.toRestingEffectDefs(placement, arrangement, getPrefersReducedMotion(), frame)
+                : ProximityUtils.toEffectDefs(
+                      placement,
+                      point,
+                      arrangement,
+                      getPrefersReducedMotion(),
+                      frame,
+                      getOverreach(),
+                  );
+
+        return CSSUtils.toAnimationStyle(computeEffect(defs));
     };
 
     const getWedgeState = (index: number, face: WheelFace): WheelWedgeState => ({

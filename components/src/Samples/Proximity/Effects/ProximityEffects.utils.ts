@@ -1,9 +1,9 @@
-import { MathUtils, type Point2d } from "@thewaver/ss-utils";
+import { MathUtils } from "@thewaver/ss-utils";
 
 import type { ProximityEffectFn } from "../../../Abstracts/Proximity/Proximity.types";
 import { ProximityUtils } from "../../../Abstracts/Proximity/Proximity.utils";
 import { ProximityEffectKnobs } from "./ProximityEffects.knobs";
-import type { FadeDefs, GlowDefs, LiftDefs, ProximityEffectEntry, SwellDefs } from "./ProximityEffects.types";
+import type { FadeDefs, GlowDefs, ProximityEffectEntry, ZoomInDefs } from "./ProximityEffects.types";
 
 const NOTHING = 0;
 const WHOLE = 1;
@@ -16,14 +16,14 @@ const SPREAD_CUBE = 0.5;
 /**
  * How far along its full travel an item at a given distance has been pushed.
  *
- * A swelling item takes room from the run it sits in, and its neighbors have to give that room up:
+ * A growing item takes room from the run it sits in, and its neighbors have to give that room up:
  * an item's displacement is everything its inner neighbors grew by, which is the running total of
  * the falloff rather than the falloff itself. Integrating {@link ProximityUtils.getFalloff} and
  * scaling the result to end at `1` gives that shape in closed form — barely any movement right
  * beside the pointer, where there is nothing in between to have grown, rising to the whole push once
  * past the reach, where everything that was going to grow already has.
  */
-const toSpreadShare = (distance: number, reach: number) => {
+const toSpreadShareAt = (distance: number, reach: number) => {
     if (reach < NO_DIRECTION) return NOTHING;
 
     const ratio = MathUtils.clamp01(distance / reach);
@@ -31,17 +31,25 @@ const toSpreadShare = (distance: number, reach: number) => {
     return SPREAD_SLOPE * ratio - SPREAD_CUBE * ratio * ratio * ratio;
 };
 
-/** A displacement of a given length along a bearing. A negative length sends it the other way. */
-const toDisplacement = (bearing: Point2d, length: number): Point2d => ({
-    x: bearing.x * length,
-    y: bearing.y * length,
-});
+/**
+ * How much of an item's push is real, once the stretch of nothing past the run's own end is discounted.
+ *
+ * {@link toSpreadShareAt} alone assumes the run has something growing everywhere from the pointer's own
+ * position outward, which is only true while the pointer is actually near the run. Once it drifts past
+ * the run's own end, every item reads itself as "a full reach past the pointer" and inherits the whole
+ * push regardless — the run shifts as one block with nothing in it actually growing. Subtracting the
+ * share already spent by the time the run's own edge is reached leaves only the growth that happened
+ * *inside* the run, which is nothing once even that edge is out of reach — and nothing at all while the
+ * pointer is somewhere inside the run, `overreach` being `0` there.
+ */
+const toSpreadShare = (distance: number, overreach: number, reach: number) =>
+    toSpreadShareAt(distance, reach) - toSpreadShareAt(overreach, reach);
 
 /**
  * The pointer effects this library ships, as factories a consumer can tune or take as they are.
  *
  * Each is a function from one item's measurements to CSS transform and filter values, which is the whole
- * of what an effect is — see {@link ProximityUtils}. What is worth reading them for is the four different
+ * of what an effect is — see {@link ProximityUtils}. What is worth reading them for is the different
  * answers they give to the reduced-motion preference, since the library never strips a response it thinks
  * is motion and leaves the substitution to whoever wrote the effect.
  */
@@ -56,8 +64,8 @@ export namespace ProximityEffectUtils {
      * the case where the clamp comes out at nothing rather than a case of its own, and it is why
      * `pushRatio` can be asked for freely: an arrangement that cannot honor it says so.
      */
-    export const createSwell = (defs?: SwellDefs): ProximityEffectFn => {
-        const base = ProximityEffectKnobs.SWELL_DEFAULTS;
+    export const createZoomIn = (defs?: ZoomInDefs): ProximityEffectFn => {
+        const base = ProximityEffectKnobs.ZOOM_IN_DEFAULTS;
         const reachRatio = defs?.reachRatio ?? base.reachRatio;
         const growthRatio = defs?.growthRatio ?? base.growthRatio;
         const pushRatio = defs?.pushRatio ?? base.pushRatio;
@@ -73,7 +81,7 @@ export namespace ProximityEffectUtils {
 
             if (push < NO_DIRECTION) return size;
 
-            const spread = -push * toSpreadShare(effectDefs.distance, reach);
+            const spread = -push * toSpreadShare(effectDefs.distance, effectDefs.overreach, reach);
 
             return {
                 ...size,
@@ -85,38 +93,8 @@ export namespace ProximityEffectUtils {
         };
     };
 
-    /** {@link createSwell} at its defaults. */
-    export const swell = createSwell();
-
-    /**
-     * Leans the items nearest the pointer toward it, without changing their size.
-     *
-     * The one sample that is nothing but movement, which is why it answers the reduced-motion preference
-     * by doing nothing at all: there is no other channel for it to say the same thing in. A negative
-     * `shiftRatio` makes it a repulsion.
-     */
-    export const createLift = (defs?: LiftDefs): ProximityEffectFn => {
-        const base = ProximityEffectKnobs.LIFT_DEFAULTS;
-        const reachRatio = defs?.reachRatio ?? base.reachRatio;
-        const shiftRatio = defs?.shiftRatio ?? base.shiftRatio;
-
-        return (effectDefs) => {
-            if (effectDefs.prefersReducedMotion) return {};
-
-            const reach = reachRatio * effectDefs.spacing;
-            const shift = shiftRatio * effectDefs.placement.width * ProximityUtils.getFalloff(effectDefs, reach);
-
-            return {
-                translate: ProximityUtils.toTranslation(
-                    effectDefs.frame,
-                    toDisplacement(ProximityUtils.getPointerBearing(effectDefs), shift),
-                ),
-            };
-        };
-    };
-
-    /** {@link createLift} at its defaults. */
-    export const lift = createLift();
+    /** {@link createZoomIn} at its defaults. */
+    export const zoomIn = createZoomIn();
 
     /**
      * Brightens and saturates the items nearest the pointer.
@@ -182,10 +160,8 @@ export namespace ProximityEffectUtils {
      */
     export const toEffectFn = (entry: ProximityEffectEntry): ProximityEffectFn => {
         switch (entry.family) {
-            case "swell":
-                return createSwell(entry.defs);
-            case "lift":
-                return createLift(entry.defs);
+            case "zoomIn":
+                return createZoomIn(entry.defs);
             case "glow":
                 return createGlow(entry.defs);
             case "fade":
