@@ -57,8 +57,8 @@ const DEFAULT_THEME_VALUES = {
             contrast: "hsl(195, 100%, 95%)",
         },
         tooltip: {
-            dark: "rgba(16, 16, 16, 0.5)",
-            light: "rgba(32, 32, 32, 0.5)",
+            dark: "rgba(0, 0, 0, 0.5)",
+            light: "rgba(16, 16, 16, 0.5)",
             contrast: "rgb(255, 255, 255)",
         },
         control: {

@@ -47,7 +47,7 @@ export const columnTab = style([
 ]);
 
 export const rowTabGutter = style({
-    borderBlockEnd: `2px solid rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
+    borderBlockEnd: `2px solid rgb(from currentColor r g b / 10%)`,
 });
 
 export const rowTabFloater = style({

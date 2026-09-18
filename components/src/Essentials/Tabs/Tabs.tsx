@@ -230,7 +230,7 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
 
         const element = (
             <InteractionWrapper
-                sizing={"fill"}
+                sizing={() => (getDir() === "column" || getLayout() !== undefined ? "fill" : "fit-content")}
                 isDisabled={() => getTab().isDisabled ?? false}
                 isTabbable={() => index === getRovingIndex()}
                 ref={(element) => setItemRef(index, element)}

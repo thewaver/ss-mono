@@ -10,7 +10,7 @@ import type { PageViewKey, PageViewTabsProps } from "./ViewTabs.types";
 
 import * as styles from "./ViewTabs.css";
 
-const TAB_GAP = 4;
+const TAB_GAP = 20;
 const TAB_DIR = "row";
 
 const PageViewTabLink = (props: TabLinkProps) => <A {...props} data-view-tab={props.href} />;

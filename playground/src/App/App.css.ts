@@ -64,7 +64,7 @@ export const pageColumn = style({
 export const pageBody = style({
     display: "flex",
     flexDirection: "column",
-    gap: themeVars.spacing.quad,
+    gap: themeVars.spacing.double,
 });
 
 export const pageHeader = style({
