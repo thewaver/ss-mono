@@ -26,7 +26,7 @@ export const ReachableExample = (props: Props) => (
         renderTrailing={(getFlags, stepper) => <PageNumberInputStepper flags={getFlags} stepper={stepper} />}
         tooltipDefs={() => ({
             placement: () => ({ x: "center", y: "top-out" }),
-            offset: () => ({ x: 0, y: 5 }),
+            offset: () => ({ x: 0, y: 10 }),
             renderContent: (getVisibilityTarget, getTransitionDurationMs) => (
                 <PageTooltipContent
                     visibilityTarget={getVisibilityTarget}

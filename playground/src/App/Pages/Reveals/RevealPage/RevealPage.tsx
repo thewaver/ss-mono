@@ -92,7 +92,11 @@ export const RevealPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"radius"} label={"Radius (px)"}>
+                <PageProp
+                    key={"radius"}
+                    label={"Radius (px)"}
+                    hint={"How large the window that follows the pointer is."}
+                >
                     <PageNumberField
                         value={getRadius}
                         min={() => MIN_RADIUS}
@@ -104,7 +108,11 @@ export const RevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"computePoints"} label={"Shape"}>
+                <PageProp
+                    key={"computePoints"}
+                    label={"Shape"}
+                    hint={"The outline of the window that follows the pointer."}
+                >
                     <PageSelectField
                         value={getShape}
                         values={() => SHAPES}
@@ -114,7 +122,13 @@ export const RevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"joinRadii"} label={"Corner radius (px)"}>
+                <PageProp
+                    key={"joinRadii"}
+                    label={"Corner radius (px)"}
+                    hint={
+                        "How far the window's corners are rounded. A circular window has no corners, so it is off then."
+                    }
+                >
                     <PageNumberField
                         value={getJoinRadius}
                         min={() => MIN_JOIN_RADIUS}
@@ -127,7 +141,13 @@ export const RevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"lameExponents"} label={"Lamé Exponent"}>
+                <PageProp
+                    key={"lameExponents"}
+                    label={"Lamé Exponent"}
+                    hint={
+                        "How square or how pinched the window's rounded corners are: 2 is a circular round, higher is squarer."
+                    }
+                >
                     <PageNumberField
                         value={getLameExponent}
                         min={() => MIN_LAME_EXPONENT}
@@ -140,7 +160,11 @@ export const RevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"softness"} label={"Softness"}>
+                <PageProp
+                    key={"softness"}
+                    label={"Softness"}
+                    hint={"How gradually the window fades into what is still covered. 0 gives a hard edge."}
+                >
                     <PageNumberField
                         value={getSoftness}
                         min={() => MIN_SOFTNESS}
@@ -152,7 +176,11 @@ export const RevealPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"isDisabled"} label={"Disabled"}>
+                <PageProp
+                    key={"isDisabled"}
+                    label={"Disabled"}
+                    hint={"Stops the window following the pointer, leaving whatever is underneath covered."}
+                >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
             </PagePropsPanel>

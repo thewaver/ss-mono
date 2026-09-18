@@ -39,11 +39,21 @@ const WanderingExampleWrapper = (props: CuboidExampleProps) => {
             <WanderingExample {...props} turnIntervalMs={() => (getIsTurning() ? getTurnIntervalMs() : undefined)} />
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"isTurning"} label={"Turns by itself"}>
+                <PageProp
+                    key={"isTurning"}
+                    label={"Turns by itself"}
+                    hint={"Lets the box turn to a new face on its own, without anybody clicking it."}
+                >
                     <PageCheckField value={getIsTurning} ariaLabel={"Turns by itself"} onChange={setIsTurning} />
                 </PageProp>
 
-                <PageProp key={"turnIntervalMs"} label={"Turn every (ms)"}>
+                <PageProp
+                    key={"turnIntervalMs"}
+                    label={"Turn every (ms)"}
+                    hint={
+                        "How long the box rests on a face before turning to the next one. It only applies while the box turns by itself."
+                    }
+                >
                     <PageNumberField
                         value={getTurnIntervalMs}
                         min={() => MIN_TURN_INTERVAL_MS}
@@ -109,7 +119,7 @@ export const CuboidPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"width"} label={"Width (px)"}>
+                <PageProp key={"width"} label={"Width (px)"} hint={"How wide the box is."}>
                     <PageNumberField
                         value={getWidth}
                         min={() => MIN_EXTENT}
@@ -121,7 +131,7 @@ export const CuboidPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"height"} label={"Height (px)"}>
+                <PageProp key={"height"} label={"Height (px)"} hint={"How tall the box is."}>
                     <PageNumberField
                         value={getHeight}
                         min={() => MIN_EXTENT}
@@ -133,7 +143,7 @@ export const CuboidPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"depth"} label={"Depth (px)"}>
+                <PageProp key={"depth"} label={"Depth (px)"} hint={"How deep the box is, front face to back face."}>
                     <PageNumberField
                         value={getDepth}
                         min={() => MIN_EXTENT}
@@ -145,7 +155,11 @@ export const CuboidPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"transitionDurationMs"} label={"Turn duration (ms)"}>
+                <PageProp
+                    key={"transitionDurationMs"}
+                    label={"Turn duration (ms)"}
+                    hint={"How long one turn from face to face takes."}
+                >
                     <PageNumberField
                         value={getTransitionDurationMs}
                         min={() => MIN_DURATION_MS}

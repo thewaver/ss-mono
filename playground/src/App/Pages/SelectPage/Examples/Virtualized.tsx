@@ -64,7 +64,13 @@ export const VirtualizedExample = (props: Props) => {
             />
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"stressCount"} label={"Option count"}>
+                <PageProp
+                    key={"stressCount"}
+                    label={"Option count"}
+                    hint={
+                        "How many options the list holds. Only the ones on screen are rendered, so a very large number should still open instantly."
+                    }
+                >
                     <PageNumberField
                         value={props.count}
                         min={() => MIN_STRESS_COUNT}

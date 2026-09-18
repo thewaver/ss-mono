@@ -71,7 +71,7 @@ export const SVGPatternsPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"configKey"} label={"Pattern"}>
+                <PageProp key={"configKey"} label={"Pattern"} hint={"Which repeating pattern is shown."}>
                     <PageGroupedSelectField
                         value={getConfigKey}
                         groups={() => toGroupEntriesWithNoSample(GROUPPED_PATTERNS)}
@@ -80,7 +80,11 @@ export const SVGPatternsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"cellSize"} label={"Cell Size (px)"}>
+                <PageProp
+                    key={"cellSize"}
+                    label={"Cell Size (px)"}
+                    hint={"How large one tile of the pattern is before it repeats."}
+                >
                     <PageNumberField
                         value={getCellSize}
                         min={() => MIN_CELL_SIZE}
@@ -91,7 +95,11 @@ export const SVGPatternsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"colors"} label={"Colors"}>
+                <PageProp
+                    key={"colors"}
+                    label={"Colors"}
+                    hint={"The colors the pattern is drawn from. Each sample uses as many of them as it needs."}
+                >
                     <div class={styles.colorList}>
                         <For each={Object.keys(colors)}>
                             {(key) => (
@@ -105,7 +113,11 @@ export const SVGPatternsPage = () => {
                     </div>
                 </PageProp>
 
-                <PageProp key={"blurWidth"} label={"Blur (px)"}>
+                <PageProp
+                    key={"blurWidth"}
+                    label={"Blur (px)"}
+                    hint={"How far the pattern is blurred outward, which is what gives it its glow."}
+                >
                     <PageNumberField
                         value={getBlurWidth}
                         min={() => MIN_BLUR_WIDTH}
@@ -116,7 +128,11 @@ export const SVGPatternsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"animationDurationMs"} label={"Animation duration (ms)"}>
+                <PageProp
+                    key={"animationDurationMs"}
+                    label={"Animation duration (ms)"}
+                    hint={"How long one pass of the pattern's animation takes."}
+                >
                     <PageNumberField
                         value={getAnimationDurationMs}
                         min={() => MIN_DURATION_MS}
@@ -127,7 +143,11 @@ export const SVGPatternsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"iterationConfigKey"} label={"Iteration Pattern"}>
+                <PageProp
+                    key={"iterationConfigKey"}
+                    label={"Iteration Pattern"}
+                    hint={"How the animation repeats: once, endlessly, or back and forth."}
+                >
                     <PageSelectField
                         value={getIterationConfigKey}
                         values={() =>

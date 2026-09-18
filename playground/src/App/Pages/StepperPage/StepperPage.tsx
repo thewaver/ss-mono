@@ -159,7 +159,11 @@ export const StepperPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"isFreeNavigation"} label={"Free navigation"}>
+                <PageProp
+                    key={"isFreeNavigation"}
+                    label={"Free navigation"}
+                    hint={"Lets any step be jumped to directly, instead of making each one be reached in order."}
+                >
                     <PageCheckField
                         value={getIsFreeNavigation}
                         ariaLabel={"Free navigation"}
@@ -167,7 +171,11 @@ export const StepperPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"currentStep"} label={"Current step"}>
+                <PageProp
+                    key={"currentStep"}
+                    label={"Current step"}
+                    hint={"Puts the examples back to the step they started on."}
+                >
                     <Button
                         renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Reset</PageButtonContent>}
                         onClick={async () => {

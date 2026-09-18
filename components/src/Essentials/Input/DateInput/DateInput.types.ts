@@ -33,11 +33,18 @@ export type DateInputProps = Omit<
     | "onBlur"
 > &
     AccessorProps<{
+        /** The earliest date that can be entered. */
         minDate?: DateValue;
+        /** The latest date that can be entered. */
         maxDate?: DateValue;
+        /** The order and separators the date is written in. */
         format?: DateInputFormat;
+        /** Which calendar system the date is read and written in. */
         calendar?: DateValueCalendarId;
+        /** Which country's conventions decide the default format and names. */
         locale?: string;
+        /** The date. It is the only thing that changes it. */
         valueSignal: SignalSource<DateValue | undefined>;
+        /** Draws whatever sits before the field's text, inside the field. */
         renderLeading?: (getFlags: () => InteractionFlags<TextFieldFlags>, era: DateInputEra) => JSX.Element;
     }>;

@@ -117,7 +117,13 @@ export const ScrambleTextPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"settleDurationMs"} label={"Settle duration (ms)"}>
+                <PageProp
+                    key={"settleDurationMs"}
+                    label={"Settle duration (ms)"}
+                    hint={
+                        "How long the text takes to go from all scrambled to fully settled. It is off while the visitor has asked for reduced motion."
+                    }
+                >
                     <PageNumberField
                         value={getSettleDurationMs}
                         min={() => MIN_SETTLE_DURATION_MS}
@@ -129,7 +135,13 @@ export const ScrambleTextPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"scrambleIntervalMs"} label={"Scramble interval (ms)"}>
+                <PageProp
+                    key={"scrambleIntervalMs"}
+                    label={"Scramble interval (ms)"}
+                    hint={
+                        "How often an unsettled character is swapped for another. Shorter intervals make a busier churn."
+                    }
+                >
                     <PageNumberField
                         value={getScrambleIntervalMs}
                         min={() => MIN_SCRAMBLE_INTERVAL_MS}
@@ -140,7 +152,11 @@ export const ScrambleTextPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"glyphSet"} label={"Glyphs"}>
+                <PageProp
+                    key={"glyphSet"}
+                    label={"Glyphs"}
+                    hint={"Which characters the unsettled positions are drawn from."}
+                >
                     <PageSelectField
                         value={getGlyphSet}
                         values={() => GLYPH_SETS}
@@ -149,7 +165,13 @@ export const ScrambleTextPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"settleOrder"} label={"Settle order"}>
+                <PageProp
+                    key={"settleOrder"}
+                    label={"Settle order"}
+                    hint={
+                        "The order the characters settle in: left to right, from the middle out, at random, and so on."
+                    }
+                >
                     <PageSelectField
                         value={getSettleOrder}
                         values={() => SETTLE_ORDERS}

@@ -80,7 +80,13 @@ export const SatellitePage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"hPlacement"} label={"Placement across"}>
+                <PageProp
+                    key={"hPlacement"}
+                    label={"Placement across"}
+                    hint={
+                        "Where the satellite sits across its subject: inside an edge, centered, or outside it altogether."
+                    }
+                >
                     <PageSelectField
                         value={getHPlacement}
                         values={() => H_PLACEMENTS}
@@ -90,7 +96,13 @@ export const SatellitePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"vPlacement"} label={"Placement down"}>
+                <PageProp
+                    key={"vPlacement"}
+                    label={"Placement down"}
+                    hint={
+                        "Where the satellite sits above or below its subject: inside an edge, centered, or outside it altogether."
+                    }
+                >
                     <PageSelectField
                         value={getVPlacement}
                         values={() => V_PLACEMENTS}
@@ -100,7 +112,11 @@ export const SatellitePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"offsetX"} label={"Offset across (px)"}>
+                <PageProp
+                    key={"offsetX"}
+                    label={"Offset across (px)"}
+                    hint={"How far the satellite is nudged sideways from where the placement put it."}
+                >
                     <PageNumberField
                         value={getOffsetX}
                         min={() => MIN_OFFSET}
@@ -112,7 +128,11 @@ export const SatellitePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"offsetY"} label={"Offset down (px)"}>
+                <PageProp
+                    key={"offsetY"}
+                    label={"Offset down (px)"}
+                    hint={"How far the satellite is nudged up or down from where the placement put it."}
+                >
                     <PageNumberField
                         value={getOffsetY}
                         min={() => MIN_OFFSET}
@@ -124,7 +144,11 @@ export const SatellitePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"subjectWidth"} label={"Subject width (px)"}>
+                <PageProp
+                    key={"subjectWidth"}
+                    label={"Subject width (px)"}
+                    hint={"How wide the thing the satellite is pinned to is."}
+                >
                     <PageNumberField
                         value={getSubjectWidth}
                         min={() => MIN_SUBJECT_SIZE}
@@ -136,7 +160,11 @@ export const SatellitePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"subjectHeight"} label={"Subject height (px)"}>
+                <PageProp
+                    key={"subjectHeight"}
+                    label={"Subject height (px)"}
+                    hint={"How tall the thing the satellite is pinned to is."}
+                >
                     <PageNumberField
                         value={getSubjectHeight}
                         min={() => MIN_SUBJECT_SIZE}
@@ -148,7 +176,11 @@ export const SatellitePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"hasSatellite"} label={"Render a satellite"}>
+                <PageProp
+                    key={"hasSatellite"}
+                    label={"Render a satellite"}
+                    hint={"Whether a satellite is rendered at all, so the subject can be seen with and without one."}
+                >
                     <PageCheckField
                         value={getHasSatellite}
                         ariaLabel={"Render a satellite"}
@@ -156,7 +188,7 @@ export const SatellitePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"badgeSize"} label={"Satellite size (px)"}>
+                <PageProp key={"badgeSize"} label={"Satellite size (px)"} hint={"How large the satellite itself is."}>
                     <PageNumberField
                         value={getBadgeSize}
                         min={() => MIN_BADGE_SIZE}
@@ -168,7 +200,13 @@ export const SatellitePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"isBehindSubject"} label={"Behind the subject"}>
+                <PageProp
+                    key={"isBehindSubject"}
+                    label={"Behind the subject"}
+                    hint={
+                        "Puts the satellite under the subject rather than over it, so the subject hides whatever overlaps."
+                    }
+                >
                     <PageCheckField
                         value={getIsBehindSubject}
                         ariaLabel={"Behind the subject"}

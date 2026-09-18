@@ -592,6 +592,52 @@ emits the plain variable first, so an engine that does not understand the newer 
 color. That is graceful degradation, not a hard dependency. Check where the feature actually lives and
 whether existing uses degrade; if the new code has no fallback, say so.
 
+### Every props row carries its own explanation, and the default comes from the field rather than from the caller
+
+A props row now renders a circled `?` beside its label, and hovering or focusing it opens a tooltip holding
+one sentence about what the row drives, with the row's default value on a line of its own beneath. It uses
+the `Button` + `tooltipDefs` route the example cards' source button already uses, so nothing new was added
+to the library to carry it.
+
+**`hint` is required on `PageProp`, for the same reason `key` is.** An optional one would let the next row
+arrive without an explanation, and the whole point is that every row has one. Required means the compiler
+names every site, which is how all 263 of them were found rather than by grepping for `label=`.
+
+**A knob owns its explanation, beside its range, its step, its label and its default.** `SampleKnob` gained
+a required `hint`, so `PageKnobs` reads it off the knob rather than being handed one per page — the knob
+records already travel by family, and a hint written per consuming page would be written several times and
+drift apart. This is the same argument as _"A `.knobs.ts` owns a tunable whole"_ in `conventions.md`, one
+field further.
+
+**The default value is reported by the field, not written at the call site.** `useFieldReset` already
+captures each field's value at mount, because that is what its reset restores; it now also reports that
+value up to the enclosing `PageProp` through a second context declared beside the reset one. Writing 263
+defaults by hand was rejected: half of them are expressions rather than literals, and a hand-copied number
+goes stale silently the first time a starting value is tuned. Reporting it means the tooltip cannot disagree
+with what Reset does, because both read the same capture.
+
+The context lives in `StyledComponents/Field/Field.context.ts` rather than beside `PageProp`, which keeps
+the existing direction — `PageComponents` imports from `StyledComponents` and not the other way round — and
+puts the registry next to the code that already computes the value it carries.
+
+**A row holding more than one field shows no default at all.** `Colors` is four swatches, `Cell count` is
+two numbers, and the corner rows are one field per corner; with several reporters there is no single value
+the label stands for, so the line is dropped rather than showing whichever mounted last. The same row with
+individual corners switched off renders one field and does show its default, which is correct rather than a
+special case.
+
+**`PageKnobs` passes its default explicitly and overrides the capture.** A knob's value survives switching
+away from its family and back, so what the field holds at mount is the last value it was given rather than
+the knob's default — the knob record has the real one, and an explicit `defaultValue` wins over the report.
+
+**Booleans read as `on` / `off` and everything else prints as it stands.** An empty string and an absent
+value both drop the line.
+
+**One spec locator moved.** `tileBoard.spec.ts` picked its shape select with `[data-prop][…] button` and
+`.first()`, which the hint button would have answered instead; it now asks for `[role="combobox"]`, which is
+what every other spec in the suite already does. This is the same trap `e2e/helpers.ts` records for the
+example cards, where a source-code button beside the title is why `demo()` exists.
+
 ## Components
 
 ### Audit: the React-era `BinarySwitch`, and what of it survives here
@@ -1534,6 +1580,62 @@ other three ever arrived. **They are plural to match the page that was already t
 them in the singular, and the existing name is a rename the user made deliberately, so matching it was the
 change that moved nothing.
 
+### A component page is three routed views, and the API one is read off the published type
+
+Each component page is now Docs, API and Samples, and which one you are on is a URL rather than component
+state, so a view can be linked to and the back button walks them.
+
+**Samples is the index rather than a segment of its own.** `/button` is the Samples view and only `/docs`
+and `/api` are added. Giving Samples a segment would have renamed every address in the Playground and every
+locator in the suite for no gain, and the bare route is what the pages already were.
+
+**The tab bar lives in the shell, not in the pages.** `AppContent` already renders the title and the
+dependency chips above the routed outlet, so the tabs go there too and no page file was touched. What did
+have to change is the config lookup: it keyed off the exact pathname, so `/button/docs` found nothing and
+the whole header — tabs included — disappeared on any view but the first. It resolves the base route now.
+
+**The description moved out of the header into Docs**, which is what makes Docs a view rather than an empty
+frame. The consequence is that landing on a page no longer shows the description; reaching it is one click.
+
+**The props table is read off the published type at build time, not written by hand.** `virtual:component-props`
+is a vite plugin in the shape of the dependency one, except that it drives the TypeScript compiler rather
+than a regex: a regex cannot see through `AccessorProps<{…}> & {…}`, and the checker flattens exactly that
+into the property list a consumer actually has. Hand-writing the tables was rejected outright — a hundred
+and twenty components' worth of prop names and types, every one of them free to drift the moment a type
+changes and nothing to catch it.
+
+**The type column shows the type as it is written, not as the checker resolves it.** They differ because
+the props sit inside `AccessorProps`, so the written side is the value a prop carries — `boolean`, `TabsDir` —
+and the resolved side is `MaybeAccessor<boolean> | undefined`. The written one is also what keeps the column
+readable: `role` resolves to the entire ARIA role union, some two thousand characters of it, against
+`JSX.AriaAttributes["role"]` as authored.
+
+**The accessor wrapper is stated once, beside the type rather than inside it.** A prop declared outside the
+`AccessorProps` block carries its own `MaybeAccessor<…>` in the source, so taking the written text verbatim
+would have printed the wrapper on some rows and not others while all of them accept the same two things.
+The wrapper is unwrapped wherever it appears and the column beside says `value or accessor`.
+
+**Shiki highlights the type expression directly.** The first version wrapped each type in a throwaway
+`type X = …` on the assumption that a bare expression would come back uncoloured; it does not, and the
+scaffold only had to be cut back off again, which it did imperfectly.
+
+**The `Use` column is the prop's own documentation block, read through the mapped type.** The user's call,
+over a registry in the Playground: written beside the table the prose drifts the first time a prop is
+renamed, written on the property it cannot, and it reaches a consumer's editor on hover as well. The checker
+resolves a documentation comment straight through `AccessorProps`, so the property the consumer sees carries
+the block the author wrote on the literal — nothing had to be threaded through by hand. The rule this took
+is in `CLAUDE.md` and `conventions.md`; a row with nothing written yet says so rather than showing blank.
+
+**The table lists what the library declares, not what a type inherits.** `TabLinkProps` and its two siblings
+are `JSX.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }`, which resolves to four hundred and
+sixty-four properties — the whole DOM anchor surface, most of it already carrying documentation from the DOM
+typings, none of it the component's contract. A property whose declaration sits outside `components/src` is
+dropped, which leaves `href` and takes the library's own total from 3,718 to 2,320.
+
+**Documenting a wrapper fills every table built on it.** `InteractionWrapperProps` and the interaction flags
+spread into every wrapped control, so two files took the documented count from 7 to 643. That is why
+`conventions.md` says to document the layered props first rather than working component by component.
+
 ### The dependency map takes a whole abstract folder as its entry when no file carries the folder's name
 
 The `componentDependencies` plugin finds a component's entry file by looking for the one whose basename
@@ -1677,11 +1779,59 @@ still comes from `createViewportRectObserver`, so the scale factor is divided ou
 
 **What stays duplicated is the dozen lines of `<Show><Portal><div>`, deliberately.** Both consumers portal
 into the same mount and position absolutely, but disagree about everything else — a tooltip is
-`role="tooltip"` and `pointer-events: none`, a listbox is clickable, focusable and `role="listbox"` — so a
-shared component would be a two-mode component. Behavior is shared; markup is not.
+`role="tooltip"`, takes the pointer but never focus, and closes itself; a listbox is focusable, walkable and
+`role="listbox"` — so a shared component would be a two-mode component. Behavior is shared; markup is not.
+The tooltip was `pointer-events: none` throughout when this was written, which is no longer true and was
+never what separated the two; see _"A tooltip can be hovered"_ below.
 
 `Tooltip` is not renamed. `AnchorPlacement` replaces `TooltipPlacement` (and its `H` / `V` halves) because
 the type is now shared vocabulary.
+
+### A tooltip can be hovered, and the offset it is held clear by is bridged rather than left as dead space
+
+Success criterion 1.4.13 asks that content revealed on hover can itself be hovered, so that somebody reading
+at magnification or with an unsteady hand can bring the pointer onto it. `Tooltip` failed that by what it
+did: the root was `pointer-events: none`, and any `mouseleave` on the anchor hid it outright, so the pointer
+could never arrive. The Playground made this the main way it explains itself, which is what brought it up.
+
+**Three things had to change, and each is load-bearing on its own.**
+
+**The root takes pointer events while it is shown.** `pointer-events` is `none` in the class and overridden
+inline to `auto` while `getShouldShow()`, so the closing fade is click-through — the same split the popup
+already uses, and for the same reason. The cost is real and accepted: a shown tooltip now swallows clicks
+on whatever it covers, which is inherent, because nothing can be both hoverable and click-through.
+
+**The offset is bridged by a `::before` on the root.** An offset holds the tooltip clear of its anchor, and
+that gap is dead space: a pointer crossing it is over neither, so the tooltip is withdrawn before it can be
+reached. The pseudo-element extends the root's hit region back across the gap, on the one side facing the
+anchor — `AnchorUtils.getHBandKind` / `getVBandKind` already say which side that is, and an `in` or `center`
+placement overlaps its anchor and gets no bridge at all. It is absolutely positioned, so it changes neither
+the measured `offsetWidth` the placement math reads nor anything painted, and a negative offset clamps to
+zero rather than eating into the tooltip.
+
+**Leaving is judged by where the pointer is going, not by a timer.** `mouseleave` carries `relatedTarget`,
+so the anchor ignores a leave into the tooltip and the tooltip ignores a leave into the anchor. A grace
+delay would have done the same job and was rejected: it is a tuned constant standing in for something the
+event already states exactly, and it would have to be longer than any hand is slow.
+
+**The other half of the criterion is Dismissible, and `Tooltip` joined the layer stack for it.** `Escape`
+was bound to the anchor's own `keydown`, so it only ever arrived while the anchor had focus — a reader using
+a pointer alone, which is exactly who the hoverable half was fixed for, had no way to put a tooltip away
+except by moving off it, and moving off it is the mechanism the criterion excludes. `Tooltip` now registers
+with `DismisserUtils.createLayer` like `Popover` and `Modal`, so the document-level handler reaches it from
+wherever focus happens to be, and its own `keydown` wiring is gone: there is one Escape path, not two.
+
+**It registers on `getShouldShow` rather than on visibility**, so a dismissed tooltip leaves the stack at
+once and a second `Escape` reaches the layer beneath instead of being eaten by one that is still fading.
+
+**A showing tooltip now outranks an open dialog for `Escape`, and that is the intent rather than a cost.**
+The stack unwinds topmost-first one press at a time, which is what the criterion asks for; the whole suite
+was run against it precisely because sixteen spec files press `Escape`, and none of them changed.
+
+**What it did not take from `Dismisser` is blur.** `handleBlur` stays, because the shared `focusout` handler
+tests the element receiving focus and gives up when there is none — focus leaving for the document body or
+another window would otherwise leave a tooltip standing. The press-outside and focus-out paths it did take
+are near no-ops for a tooltip, since a pointer that presses elsewhere has already left the anchor.
 
 ### Controls: `Select`, and who owns a floating list
 

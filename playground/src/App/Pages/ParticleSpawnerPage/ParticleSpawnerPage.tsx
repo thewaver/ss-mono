@@ -221,7 +221,13 @@ export const ParticleSpawnerPage = () => {
         <>
             <PagePropsGroups>
                 <PagePropsPanel scope={"sample"}>
-                    <PageProp key={"travelPattern"} label={"Travel pattern"}>
+                    <PageProp
+                        key={"travelPattern"}
+                        label={"Travel pattern"}
+                        hint={
+                            "The path a particle takes from where it starts to where it ends. Choosing one brings its own knobs with it."
+                        }
+                    >
                         <PageSelectField
                             value={getTravelPatternKey}
                             values={() => TRAVEL_PATTERN_KEYS}
@@ -245,7 +251,11 @@ export const ParticleSpawnerPage = () => {
                 <PagePropsDivider />
 
                 <PagePropsPanel scope={"global"}>
-                    <PageProp key={"particleCount"} label={"Particle count"}>
+                    <PageProp
+                        key={"particleCount"}
+                        label={"Particle count"}
+                        hint={"How many particles are sent on each round."}
+                    >
                         <PageNumberField
                             value={getParticleCount}
                             min={() => MIN_PARTICLE_COUNT}
@@ -257,7 +267,11 @@ export const ParticleSpawnerPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"travelDurationMs"} label={"Travel (ms)"}>
+                    <PageProp
+                        key={"travelDurationMs"}
+                        label={"Travel (ms)"}
+                        hint={"How long one particle takes to walk its path."}
+                    >
                         <PageNumberField
                             value={getTravelDurationMs}
                             min={() => MIN_TRAVEL_DURATION_MS}
@@ -269,7 +283,11 @@ export const ParticleSpawnerPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"retentionMs"} label={"Retention (ms)"}>
+                    <PageProp
+                        key={"retentionMs"}
+                        label={"Retention (ms)"}
+                        hint={"How long a particle stays put at the end of its path before it disappears."}
+                    >
                         <PageNumberField
                             value={getRetentionMs}
                             min={() => MIN_RETENTION_MS}
@@ -281,7 +299,13 @@ export const ParticleSpawnerPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"spawnDelayMs"} label={"Spawn delay (ms)"}>
+                    <PageProp
+                        key={"spawnDelayMs"}
+                        label={"Spawn delay (ms)"}
+                        hint={
+                            "How long each particle waits after the one before it sets off, which is what staggers them."
+                        }
+                    >
                         <PageNumberField
                             value={getSpawnDelayMs}
                             min={() => MIN_SPAWN_DELAY_MS}
@@ -293,7 +317,13 @@ export const ParticleSpawnerPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"iterationPattern"} label={"Iteration pattern"}>
+                    <PageProp
+                        key={"iterationPattern"}
+                        label={"Iteration pattern"}
+                        hint={
+                            "How the rounds follow each other: in bursts of three with a pause, one at a time with a pause, or without any pause at all."
+                        }
+                    >
                         <PageSelectField
                             value={getIterationPatternKey}
                             values={() => ITERATION_PATTERN_KEYS}
@@ -303,7 +333,13 @@ export const ParticleSpawnerPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"overshootPercent"} label={"Overshoot (%)"}>
+                    <PageProp
+                        key={"overshootPercent"}
+                        label={"Overshoot (%)"}
+                        hint={
+                            "How far a particle runs past its destination before coming back to it. 0 stops it dead on target."
+                        }
+                    >
                         <PageNumberField
                             value={getOvershootPercent}
                             min={() => MIN_OVERSHOOT_PERCENT}
@@ -315,7 +351,11 @@ export const ParticleSpawnerPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"travelEasing"} label={"Travel easing"}>
+                    <PageProp
+                        key={"travelEasing"}
+                        label={"Travel easing"}
+                        hint={"The speed curve a particle follows along its path."}
+                    >
                         <PageSelectField
                             value={getTravelEasingKey}
                             values={() => TRAVEL_EASING_KEYS}

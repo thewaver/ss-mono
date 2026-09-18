@@ -106,7 +106,11 @@ export const BreadcrumbsPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"depth"} label={"Depth"}>
+                <PageProp
+                    key={"depth"}
+                    label={"Depth"}
+                    hint={"How many crumbs the trail holds. Past what fits, the middle ones collapse behind a menu."}
+                >
                     <PageNumberField
                         value={getDepth}
                         min={() => MIN_DEPTH}
@@ -118,11 +122,21 @@ export const BreadcrumbsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"isDisabled"} label={"Disabled"}>
+                <PageProp
+                    key={"isDisabled"}
+                    label={"Disabled"}
+                    hint={"Turns every crumb off. A disabled crumb stays readable and keeps its tooltip."}
+                >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
 
-                <PageProp key={"trail"} label={"Trail"}>
+                <PageProp
+                    key={"trail"}
+                    label={"Trail"}
+                    hint={
+                        "Puts the trail back to the crumb it started on, undoing wherever the examples have navigated to."
+                    }
+                >
                     <Button
                         renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Reset</PageButtonContent>}
                         onClick={async () => {

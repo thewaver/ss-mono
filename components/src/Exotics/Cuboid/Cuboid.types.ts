@@ -16,11 +16,18 @@ export type CuboidFaceState = {
 };
 
 export type CuboidProps = AccessorProps<{
+    /** How large the box is, in all three directions. */
     size: CuboidSize;
+    /** How long one turn from face to face takes. */
     transitionDurationMs?: number;
+    /** Names the box for assistive technology. */
     ariaLabel: string;
+    /** Names one face, so a reader is told which side is showing. */
     computeFaceLabel?: (face: CuboidFace) => string;
+    /** How far the box is turned left and right. It is the only thing that turns it. */
     yawSignal: SignalSource<number>;
+    /** How far the box is tipped up and down. It is the only thing that tips it. */
     pitchSignal: SignalSource<number>;
+    /** Draws one face, and is told which face it is. */
     renderFace: (getFace: Accessor<CuboidFace>, getState: Accessor<CuboidFaceState>) => JSX.Element;
 }>;

@@ -22,7 +22,13 @@ export const PageMosaicsPanel = (props: Props) => {
 
     return (
         <PagePropsPanel scope={"global"}>
-            <PageProp key={"itemCount"} label={"Items"}>
+            <PageProp
+                key={"itemCount"}
+                label={"Items"}
+                hint={
+                    "How many tiles the mosaic packs. The arrangement is recomputed from scratch each time it changes."
+                }
+            >
                 <PageNumberField
                     value={controls.itemCountSignal[0]}
                     min={() => MIN_ITEM_COUNT}
@@ -34,7 +40,7 @@ export const PageMosaicsPanel = (props: Props) => {
                 />
             </PageProp>
 
-            <PageProp key={"gap"} label={"Gap (px)"}>
+            <PageProp key={"gap"} label={"Gap (px)"} hint={"The space left between tiles."}>
                 <PageNumberField
                     value={controls.gapSignal[0]}
                     min={() => MIN_GAP}
@@ -46,7 +52,11 @@ export const PageMosaicsPanel = (props: Props) => {
                 />
             </PageProp>
 
-            <PageProp key={"sizeAnchor"} label={"Fixed side"}>
+            <PageProp
+                key={"sizeAnchor"}
+                label={"Fixed side"}
+                hint={"Which side the mosaic takes as given: it fills that one and works the other out from the tiles."}
+            >
                 <PageSelectField
                     value={controls.sizeAnchorSignal[0]}
                     values={() => SIZE_ANCHORS}

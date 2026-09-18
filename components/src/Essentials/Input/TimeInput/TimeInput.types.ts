@@ -33,10 +33,16 @@ export type TimeInputProps = Omit<
     | "onKeyDown"
 > &
     AccessorProps<{
+        /** The earliest time that can be entered. */
         minTime?: TimeValue;
+        /** The latest time that can be entered. */
         maxTime?: TimeValue;
+        /** Whether seconds are part of the value as well as hours and minutes. */
         hasSeconds?: boolean;
+        /** Whether times are written as twelve hours with a morning and afternoon marker, or as twenty-four. */
         isTwelveHour?: boolean;
+        /** The time. It is the only thing that changes it. */
         valueSignal: SignalSource<TimeValue | undefined>;
+        /** Draws whatever sits after the field's text, inside the field. */
         renderTrailing?: (getFlags: () => InteractionFlags<TextFieldFlags>, meridiem: TimeInputMeridiem) => JSX.Element;
     }>;

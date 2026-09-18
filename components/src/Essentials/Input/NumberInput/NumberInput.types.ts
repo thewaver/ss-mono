@@ -27,9 +27,17 @@ export type NumberInputProps = Omit<
     TextFieldPresetProps,
     "type" | "autoComplete" | "valueSignal" | "renderTrailing" | "onInput"
 > & {
+    /** How long a stepper button has to be held before it starts repeating. */
     repeatDelayMs?: MaybeAccessor<number>;
+    /** How often it repeats once it has started. */
     repeatIntervalMs?: MaybeAccessor<number>;
+    /** The number. It is the only thing that changes it. */
     valueSignal: SignalSource<number | undefined>;
+    /** Draws whatever sits after the field's text, inside the field — usually the stepper. */
     renderTrailing?: (getFlags: () => InteractionFlags<TextFieldFlags>, stepper: NumberInputStepper) => JSX.Element;
+    /**
+     * Runs as the number changes. It answers with nothing while the field is empty, which is what separates empty from
+     * zero.
+     */
     onInput?: (value: number | undefined) => void | Promise<void>;
 };

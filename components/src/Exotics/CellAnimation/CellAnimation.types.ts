@@ -14,18 +14,37 @@ export type CellAnimationEvaluationDefs = {
 };
 
 export type CellAnimationProps = AccessorProps<{
+    /** The picture the cells are cut from. */
     src: string;
+    /** Names the picture for assistive technology. */
     ariaLabel?: string;
+    /** Which side the animation takes as given, working the other out from the picture's proportions. */
     sizeAnchor?: "width" | "height";
+    /**
+     * How many cells the picture is cut into, across and down. More cells is a finer animation and more work per frame.
+     */
     cellCount: Point2d;
+    /** How long one pass over the whole grid takes. */
     animationDurationMs?: number;
+    /** How many passes to run. Zero means it never stops. */
     animationIterationCount?: number;
+    /** How long the grid waits between one pass and the next. */
     animationIterationDelayMs?: number;
+    /** Whether the animation is running. It is the only thing that starts or pauses it. */
     playbackSignal?: SignalSource<boolean>;
+    /** What the grid is left showing once the passes are done. */
     finalFrame?: CellAnimationFinalFrame;
+    /**
+     * Decides each cell's turn, as a weight per cell. It is what makes a sweep a sweep rather than everything moving at
+     * once.
+     */
     computeCellWeights?: (count: Point2d) => number[][];
+    /** What the picture as a whole does over the pass, for an effect that is not per cell. */
     computeRootAnimation?: (timeline: number) => CellAnimationEvaluationResult;
+    /** What one cell does on its turn, given where it is and how far through the pass it is. */
     computeCellAnimation: (defs: CellAnimationEvaluationDefs, timeline: number) => CellAnimationEvaluationResult;
+    /** Runs at the end of each pass. */
     onIterationEnd?: () => void;
+    /** Runs once every pass is done. */
     onAnimationEnd?: () => void;
 }>;

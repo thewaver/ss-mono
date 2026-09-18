@@ -112,11 +112,21 @@ export const InteractionTrackerPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"isDisabled"} label={"Disabled"}>
+                <PageProp
+                    key={"isDisabled"}
+                    label={"Disabled"}
+                    hint={"Turns the control off, so it neither activates nor drags."}
+                >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
 
-                <PageProp key={"isReachable"} label={"Reachable while disabled"}>
+                <PageProp
+                    key={"isReachable"}
+                    label={"Reachable while disabled"}
+                    hint={
+                        "Keeps a disabled control in the tab order, so its tooltip can still be read. It only matters while the control is off."
+                    }
+                >
                     <PageCheckField
                         value={getIsReachable}
                         ariaLabel={"Reachable while disabled"}
@@ -124,7 +134,13 @@ export const InteractionTrackerPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"commitRatio"} label={"Swipe commit ratio"}>
+                <PageProp
+                    key={"commitRatio"}
+                    label={"Swipe commit ratio"}
+                    hint={
+                        "How far across the card a swipe has to get before it counts. Let go short of it and the card springs back."
+                    }
+                >
                     <PageNumberField
                         value={getCommitRatio}
                         min={() => MIN_COMMIT_RATIO}

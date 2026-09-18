@@ -8,6 +8,10 @@ import { Checkbox, Collapsible, Label, Tree, ViewportWrapper } from "@thewaver/s
 import type { SignalPair, TreeNode } from "@thewaver/ss-components";
 import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
 
+import { PageApiView } from "./PageComponents/ApiView/ApiView";
+import { PageDocsView } from "./PageComponents/DocsView/DocsView";
+import { PageViewTabs } from "./PageComponents/ViewTabs/ViewTabs";
+import { toBaseRoute } from "./PageComponents/ViewTabs/ViewTabs.const";
 import { AccordionPage } from "./Pages/Accordions/AccordionPage/AccordionPage";
 import { CollapsiblePage } from "./Pages/Accordions/CollapsiblePage/CollapsiblePage";
 import { AudioSwitcherPage } from "./Pages/AudioSwitcherPage/AudioSwitcherPage";
@@ -124,6 +128,8 @@ type MenuBranchConfig = {
 type MenuNodeConfig = ComponentConfig | MenuBranchConfig;
 
 const EmptyPage = () => <>{null}</>;
+
+const PassThroughPage = (props: RouteSectionProps) => <>{props.children}</>;
 
 const getIsBranchConfig = (node: MenuNodeConfig): node is MenuBranchConfig => "children" in node;
 
@@ -1142,7 +1148,7 @@ export function AppContent(props: RouteSectionProps) {
     });
 
     createEffect(() => {
-        const pathName = props.location.pathname;
+        const pathName = toBaseRoute(props.location.pathname);
         const config = COMPONENT_CONFIGS_BY_ROUTE[pathName];
 
         setSelectedConfig(() => config);
@@ -1220,9 +1226,10 @@ export function AppContent(props: RouteSectionProps) {
                         <div class={styles.pageBody}>
                             <div class={styles.pageHeader}>
                                 <h1 class={styles.pageTitle}>{getConfig().name}</h1>
-                                <div class={styles.pageDescription}>{getConfig().description}</div>
 
                                 <PageDependencies name={getConfig().name} />
+
+                                <PageViewTabs baseRoute={componentToRouteName(getConfig().name)} />
                             </div>
 
                             {props.children}
@@ -1275,7 +1282,11 @@ export function App() {
                 >
                     <Route path="/" component={EmptyPage} />
                     {COMPONENT_CONFIGS.map((config) => (
-                        <Route path={componentToRouteName(config.name)} component={config.component ?? EmptyPage} />
+                        <Route path={componentToRouteName(config.name)} component={PassThroughPage}>
+                            <Route path="/" component={config.component ?? EmptyPage} />
+                            <Route path="/docs" component={() => <PageDocsView description={config.description} />} />
+                            <Route path="/api" component={() => <PageApiView name={config.name} />} />
+                        </Route>
                     ))}
                 </Route>
             </Router>

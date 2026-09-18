@@ -95,7 +95,11 @@ export const PatchBoardPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"socketSize"} label={"Socket size (px)"}>
+                <PageProp
+                    key={"socketSize"}
+                    label={"Socket size (px)"}
+                    hint={"How large each socket is drawn. The cables and their pull handles scale with it."}
+                >
                     <PageNumberField
                         value={getSocketSize}
                         min={() => MIN_SOCKET_SIZE}
@@ -106,11 +110,21 @@ export const PatchBoardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"isLocked"} label={"Wiring locked"}>
+                <PageProp
+                    key={"isLocked"}
+                    label={"Wiring locked"}
+                    hint={
+                        "Freezes the wiring as it stands: the cables still show, but none can be dragged, made or pulled out."
+                    }
+                >
                     <PageCheckField value={getIsLocked} ariaLabel={"Wiring locked"} onChange={setIsLocked} />
                 </PageProp>
 
-                <PageProp key={"isDisabled"} label={"Disabled"}>
+                <PageProp
+                    key={"isDisabled"}
+                    label={"Disabled"}
+                    hint={"Turns the whole board off, so nothing on it responds to the pointer or the keyboard."}
+                >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
             </PagePropsPanel>

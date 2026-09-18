@@ -91,15 +91,23 @@ export const TagInputPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"isDisabled"} label={"Disabled"}>
+                <PageProp
+                    key={"isDisabled"}
+                    label={"Disabled"}
+                    hint={"Turns the field off: no tag can be added, and none can be removed."}
+                >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
 
-                <PageProp key={"hasError"} label={"Error"}>
+                <PageProp
+                    key={"hasError"}
+                    label={"Error"}
+                    hint={"Puts the field into its error look, without changing what it accepts."}
+                >
                     <PageCheckField value={getHasError} ariaLabel={"Error"} onChange={setHasError} />
                 </PageProp>
 
-                <PageProp key={"tags"} label={"Tags"}>
+                <PageProp key={"tags"} label={"Tags"} hint={"Puts the examples back to the tags they started with."}>
                     <Button
                         renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Reset</PageButtonContent>}
                         onClick={async () => {

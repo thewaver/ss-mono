@@ -130,7 +130,13 @@ export const FormationPage = () => {
         <>
             <PagePropsGroups>
                 <PagePropsPanel scope={"sample"}>
-                    <PageProp key={"layoutKey"} label={"Arrangement"}>
+                    <PageProp
+                        key={"layoutKey"}
+                        label={"Arrangement"}
+                        hint={
+                            "How the items are arranged: a ring, an arc, a row, a honeycomb, and so on. Choosing one brings its own knobs with it."
+                        }
+                    >
                         <PageSelectField
                             value={getLayoutKey}
                             values={() => PlacementLayouts.SAMPLE_KEYS}
@@ -154,7 +160,11 @@ export const FormationPage = () => {
                 <PagePropsDivider />
 
                 <PagePropsPanel scope={"sample"}>
-                    <PageProp key={"effectKey"} label={"Pointer effect"}>
+                    <PageProp
+                        key={"effectKey"}
+                        label={"Pointer effect"}
+                        hint={"What the items do as the pointer nears them. Choosing one brings its own knobs with it."}
+                    >
                         <PageSelectField
                             value={getEffectKey}
                             values={() => EFFECT_KEYS}
@@ -178,7 +188,7 @@ export const FormationPage = () => {
                 <PagePropsDivider />
 
                 <PagePropsPanel scope={"global"}>
-                    <PageProp key={"itemCount"} label={"Items"}>
+                    <PageProp key={"itemCount"} label={"Items"} hint={"How many items the arrangement holds."}>
                         <PageNumberField
                             value={getItemCount}
                             min={() => MIN_ITEM_COUNT}
@@ -190,7 +200,13 @@ export const FormationPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"isStackedInReverse"} label={"Earlier items in front"}>
+                    <PageProp
+                        key={"isStackedInReverse"}
+                        label={"Earlier items in front"}
+                        hint={
+                            "Puts the first item on top of the pile instead of the last, which shows where two items overlap."
+                        }
+                    >
                         <PageCheckField
                             value={getIsStackedInReverse}
                             ariaLabel={"Earlier items in front"}
@@ -198,7 +214,7 @@ export const FormationPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"shapeKind"} label={"Item shape"}>
+                    <PageProp key={"shapeKind"} label={"Item shape"} hint={"The outline each item is cut to."}>
                         <PageSelectField
                             value={getShapeKind}
                             values={() => ShapeConst.DEFAULT_SHAPES}

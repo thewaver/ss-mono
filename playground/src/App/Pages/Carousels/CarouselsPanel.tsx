@@ -27,7 +27,7 @@ export const PageCarouselsPanel = (props: Props) => {
 
     return (
         <PagePropsPanel scope={"global"}>
-            <PageProp key={"slideCount"} label={"Slide count"}>
+            <PageProp key={"slideCount"} label={"Slide count"} hint={"How many slides the carousel holds."}>
                 <PageNumberField
                     value={controls.slideCountSignal[0]}
                     min={() => MIN_SLIDE_COUNT}
@@ -40,7 +40,11 @@ export const PageCarouselsPanel = (props: Props) => {
             </PageProp>
 
             <Show when={props.hasDelay}>
-                <PageProp key={"delayMs"} label={"RotatorUtils delay (ms)"}>
+                <PageProp
+                    key={"delayMs"}
+                    label={"RotatorUtils delay (ms)"}
+                    hint={"How long a slide is held before the carousel moves to the next one on its own."}
+                >
                     <PageNumberField
                         value={controls.delaySignal[0]}
                         min={() => MIN_DELAY_MS}
@@ -53,7 +57,11 @@ export const PageCarouselsPanel = (props: Props) => {
                 </PageProp>
             </Show>
 
-            <PageProp key={"dir"} label={"Direction"}>
+            <PageProp
+                key={"dir"}
+                label={"Direction"}
+                hint={"Which way the slides run, and so which way the arrows and the arrow keys move."}
+            >
                 <PageSelectField
                     value={controls.dirSignal[0]}
                     values={() => DIRS}
@@ -64,7 +72,11 @@ export const PageCarouselsPanel = (props: Props) => {
                 />
             </PageProp>
 
-            <PageProp key={"isDisabled"} label={"Disabled"}>
+            <PageProp
+                key={"isDisabled"}
+                label={"Disabled"}
+                hint={"Turns the carousel off, so neither its controls nor its swipes do anything."}
+            >
                 <PageCheckField
                     value={controls.isDisabledSignal[0]}
                     ariaLabel={"Disabled"}

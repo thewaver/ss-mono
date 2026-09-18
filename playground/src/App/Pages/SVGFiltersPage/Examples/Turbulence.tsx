@@ -66,7 +66,13 @@ export const TurbulenceExample = (props: Props) => {
             />
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"type"} label={"Type"}>
+                <PageProp
+                    key={"type"}
+                    label={"Type"}
+                    hint={
+                        "Which noise is generated: fractal noise is soft and cloudy, turbulence is sharper and more veined."
+                    }
+                >
                     <PageSelectField
                         value={getType}
                         values={() => TYPES}
@@ -75,7 +81,11 @@ export const TurbulenceExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"baseFrequencyX"} label={"Base frequency x"}>
+                <PageProp
+                    key={"baseFrequencyX"}
+                    label={"Base frequency x"}
+                    hint={"How fine the noise is across. Higher numbers make a tighter grain."}
+                >
                     <PageNumberField
                         value={getFrequencyX}
                         min={() => MIN_FREQUENCY}
@@ -86,7 +96,11 @@ export const TurbulenceExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"baseFrequencyY"} label={"Base frequency y"}>
+                <PageProp
+                    key={"baseFrequencyY"}
+                    label={"Base frequency y"}
+                    hint={"How fine the noise is down. Set it apart from the across value to stretch the grain."}
+                >
                     <PageNumberField
                         value={getFrequencyY}
                         min={() => MIN_FREQUENCY}
@@ -97,7 +111,11 @@ export const TurbulenceExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"scale"} label={"Scale"}>
+                <PageProp
+                    key={"scale"}
+                    label={"Scale"}
+                    hint={"How far the noise pushes the picture about. 0 leaves the picture where it was."}
+                >
                     <PageNumberField
                         value={getScale}
                         min={() => MIN_SCALE}
@@ -107,7 +125,11 @@ export const TurbulenceExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"numOctaves"} label={"Octaves"}>
+                <PageProp
+                    key={"numOctaves"}
+                    label={"Octaves"}
+                    hint={"How many layers of noise are piled up. More layers add fine detail and cost more to draw."}
+                >
                     <PageNumberField
                         value={getOctaves}
                         min={() => MIN_OCTAVES}
@@ -117,7 +139,13 @@ export const TurbulenceExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"seed"} label={"Seed"}>
+                <PageProp
+                    key={"seed"}
+                    label={"Seed"}
+                    hint={
+                        "The number the random noise is grown from. Change it for a different pattern at the same settings."
+                    }
+                >
                     <PageNumberField
                         value={getSeed}
                         min={() => MIN_SEED}
@@ -127,7 +155,11 @@ export const TurbulenceExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"xChannelSelector"} label={"X channel"}>
+                <PageProp
+                    key={"xChannelSelector"}
+                    label={"X channel"}
+                    hint={"Which channel of the noise decides how far each point moves sideways."}
+                >
                     <PageSelectField
                         value={getXChannel}
                         values={() => CHANNELS}
@@ -136,7 +168,11 @@ export const TurbulenceExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"yChannelSelector"} label={"Y channel"}>
+                <PageProp
+                    key={"yChannelSelector"}
+                    label={"Y channel"}
+                    hint={"Which channel of the noise decides how far each point moves up or down."}
+                >
                     <PageSelectField
                         value={getYChannel}
                         values={() => CHANNELS}

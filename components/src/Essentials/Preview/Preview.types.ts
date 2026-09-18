@@ -20,9 +20,13 @@ export type PreviewOverlayRenderer = (
 
 export type PreviewTriggerProps = AccessorProps<
     Omit<InteractionControlProps<PreviewFlags>, "renderContent"> & {
+        /** Identifies the content the trigger expands, so the trigger can point at it. */
         contentId: string;
+        /** Whether the content is expanded, so the trigger can say so. */
         isExpanded: boolean;
+        /** Draws the trigger. It is handed the interaction state, including whether the content is expanded. */
         renderTrigger: (getFlags: () => InteractionFlags<PreviewFlags>) => JSX.Element;
+        /** Runs when the trigger is activated. */
         onToggle: () => void;
     }
 >;
@@ -32,13 +36,25 @@ export type PreviewProps = Omit<
     "renderControl" | "extraFlags" | "sizing" | "minWidth" | "minHeight"
 > &
     AccessorProps<{
+        /** Identifies the preview, and is what its parts compose their own ids from. */
         id?: string;
+        /** Whether the content animates its height open and closed or simply appears. */
         sizing?: PreviewSizing;
+        /** How much of the content is shown while it is collapsed. */
         collapsedHeight: number;
+        /**
+         * Scrolls the preview back into view when it is collapsed, so the reader is not left further down the page than
+         * they started.
+         */
         isScrolledIntoViewOnCollapse?: boolean;
+        /** How long the content takes to expand and collapse. */
         transitionDurationMs?: number;
+        /** Whether the content is expanded. It is the only thing that expands or collapses it. */
         expandedSignal: SignalSource<boolean>;
+        /** Draws the content being previewed. */
         renderContent: () => JSX.Element;
+        /** Draws the trigger. */
         renderTrigger: (getFlags: () => InteractionFlags<PreviewFlags>) => JSX.Element;
+        /** Draws the fade over the cut-off edge of the collapsed content. */
         renderOverlay?: PreviewOverlayRenderer;
     }>;

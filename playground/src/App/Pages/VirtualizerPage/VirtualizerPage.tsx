@@ -59,7 +59,13 @@ export const VirtualizerPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"rowCount"} label={"Rows"}>
+                <PageProp
+                    key={"rowCount"}
+                    label={"Rows"}
+                    hint={
+                        "How many rows the list holds. Only the ones on screen are rendered, so a very large number should still scroll smoothly."
+                    }
+                >
                     <PageNumberField
                         value={getRowCount}
                         min={() => MIN_ROW_COUNT}
@@ -71,7 +77,11 @@ export const VirtualizerPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"pinnedRow"} label={"Pinned row"}>
+                <PageProp
+                    key={"pinnedRow"}
+                    label={"Pinned row"}
+                    hint={"Which row is held in place at the top, whatever the list is scrolled to."}
+                >
                     <PageNumberField
                         value={getPinnedRow}
                         min={() => FIRST_ROW}

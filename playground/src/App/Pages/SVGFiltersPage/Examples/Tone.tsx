@@ -45,7 +45,11 @@ export const ToneExample = (props: Props) => {
             />
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"brightness"} label={"Brightness"}>
+                <PageProp
+                    key={"brightness"}
+                    label={"Brightness"}
+                    hint={"How much lighter or darker the picture is. 1 leaves it alone."}
+                >
                     <PageNumberField
                         value={getBrightness}
                         min={() => MIN_AMOUNT}
@@ -56,7 +60,11 @@ export const ToneExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"contrast"} label={"Contrast"}>
+                <PageProp
+                    key={"contrast"}
+                    label={"Contrast"}
+                    hint={"How far the lights and darks are pushed apart. 1 leaves it alone."}
+                >
                     <PageNumberField
                         value={getContrast}
                         min={() => MIN_AMOUNT}
@@ -67,7 +75,11 @@ export const ToneExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"inversion"} label={"Inversion"}>
+                <PageProp
+                    key={"inversion"}
+                    label={"Inversion"}
+                    hint={"How far the colors are flipped to their opposites. 0 leaves them alone, 1 fully inverts."}
+                >
                     <PageNumberField
                         value={getInversion}
                         min={() => MIN_INVERSION}

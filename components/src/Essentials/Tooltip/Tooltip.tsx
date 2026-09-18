@@ -1,7 +1,10 @@
 import { Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 import { Portal } from "solid-js/web";
 
+import { assignInlineVars } from "@vanilla-extract/dynamic";
+
 import { AnchorUtils } from "../../Abstracts/Anchor/Anchor.utils";
+import { DismisserUtils } from "../../Abstracts/Dismisser/Dismisser.utils";
 import { ElementFaderUtils } from "../../Abstracts/ElementFader/ElementFader.utils";
 import { FocusManagerUtils } from "../../Abstracts/FocusManager/FocusManager.utils";
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
@@ -13,6 +16,9 @@ import * as styles from "./Tooltip.css";
 const DEFAULT_TOOLTIP_TRANSITION_DURATION_MS = 200;
 const DEFAULT_TOOLTIP_SHOW_ON_FOCUS_DELAY_MS = 500;
 const DEFAULT_ARIA_DESCRIBED_BY = "aria-describedby";
+const NO_GAP = 0;
+
+const toGap = (value: number | undefined) => Math.max(value ?? NO_GAP, NO_GAP);
 
 export const Tooltip = (props: TooltipProps) => {
     const viewportContext = useViewportContext();
@@ -39,6 +45,8 @@ export const Tooltip = (props: TooltipProps) => {
         getTransitionDurationMs,
     });
 
+    const [getContentRef, setLocalContentRef] = createSignal<HTMLElement>();
+
     const { getPlacement, getPosition, getZIndex, setContentRef } = AnchorUtils.createPortalPosition(
         () => access(props.anchorRef),
         getIsVisible,
@@ -50,23 +58,42 @@ export const Tooltip = (props: TooltipProps) => {
         },
     );
 
+    const getBridge = createMemo(() => {
+        const placement = getPlacement();
+        const offset = access(props.offset);
+        const gapX = toGap(offset?.x);
+        const gapY = toGap(offset?.y);
+        const hKind = AnchorUtils.getHBandKind(placement.x);
+        const vKind = AnchorUtils.getVBandKind(placement.y);
+
+        return {
+            top: vKind === "after" ? gapY : NO_GAP,
+            right: hKind === "before" ? gapX : NO_GAP,
+            bottom: vKind === "before" ? gapY : NO_GAP,
+            left: hKind === "after" ? gapX : NO_GAP,
+        };
+    });
+
+    const getIsMovingInto = (e: MouseEvent, element: HTMLElement | undefined) =>
+        e.relatedTarget instanceof Node && element !== undefined && element.contains(e.relatedTarget);
+
     const handleMouseEnter = () => {
         clearTimeout(focusTimeout);
         setShouldShow(true);
     };
 
-    const handleMouseLeave = () => {
+    const handleMouseLeave = (e: MouseEvent) => {
+        if (getIsMovingInto(e, getContentRef())) return;
+
         clearTimeout(focusTimeout);
         setShouldShow(false);
     };
 
-    const handleKeyDown = (e: KeyboardEvent) => {
-        if (!getIsVisible()) return;
+    const handleContentMouseLeave = (e: MouseEvent) => {
+        if (getIsMovingInto(e, access(props.anchorRef))) return;
 
-        if (e.key === "Escape") {
-            clearTimeout(focusTimeout);
-            setShouldShow(false);
-        }
+        clearTimeout(focusTimeout);
+        setShouldShow(false);
     };
 
     const handleFocus = () => {
@@ -87,13 +114,20 @@ export const Tooltip = (props: TooltipProps) => {
         setShouldShow(false);
     };
 
+    DismisserUtils.createLayer(getShouldShow, {
+        getRoots: () => [access(props.anchorRef), getContentRef()],
+        onDismiss: () => {
+            clearTimeout(focusTimeout);
+            setShouldShow(false);
+        },
+    });
+
     createEffect(() => {
         const anchorRef = access(props.anchorRef);
 
         onCleanup(() => {
             anchorRef?.removeEventListener("mouseenter", handleMouseEnter);
             anchorRef?.removeEventListener("mouseleave", handleMouseLeave);
-            anchorRef?.removeEventListener("keydown", handleKeyDown);
             anchorRef?.removeEventListener("focus", handleFocus);
             anchorRef?.removeEventListener("blur", handleBlur);
         });
@@ -102,7 +136,6 @@ export const Tooltip = (props: TooltipProps) => {
 
         anchorRef.addEventListener("mouseenter", handleMouseEnter);
         anchorRef.addEventListener("mouseleave", handleMouseLeave);
-        anchorRef.addEventListener("keydown", handleKeyDown);
         anchorRef.addEventListener("focus", handleFocus);
         anchorRef.addEventListener("blur", handleBlur);
     });
@@ -139,15 +172,27 @@ export const Tooltip = (props: TooltipProps) => {
         <Show when={getIsVisible()}>
             <Portal mount={viewportContext.getPortalRef()}>
                 <div
-                    ref={setContentRef}
+                    ref={(element) => {
+                        setContentRef(element);
+                        setLocalContentRef(element);
+                    }}
                     id={tooltipId}
                     class={styles.tooltipRoot}
                     style={{
                         "visibility": getPosition() ? "visible" : "hidden",
                         "transform": `translate(${getPosition()?.x ?? 0}px, ${getPosition()?.y ?? 0}px)`,
                         "z-index": getZIndex(),
+                        "pointer-events": getShouldShow() ? "auto" : "none",
+                        ...assignInlineVars({
+                            [styles.bridgeTopVar]: `${-getBridge().top}px`,
+                            [styles.bridgeRightVar]: `${-getBridge().right}px`,
+                            [styles.bridgeBottomVar]: `${-getBridge().bottom}px`,
+                            [styles.bridgeLeftVar]: `${-getBridge().left}px`,
+                        }),
                     }}
                     role="tooltip"
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleContentMouseLeave}
                 >
                     {props.renderContent(getTransitionTarget, getTransitionDurationMs, getPlacement)}
                 </div>

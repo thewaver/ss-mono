@@ -23,31 +23,59 @@ export type AccordionPanelRenderer<T> = (
 ) => JSX.Element;
 
 export type AccordionSectionProps<T> = AccessorProps<{
+    /** Which heading level this section's header sits at, so the page's outline stays correct. */
     headingLevel: number;
+    /** Whether this section is open. */
     isExpanded: boolean;
+    /** Scrolls this section into view once it has finished opening. */
     isScrolledIntoViewOnExpand?: boolean;
+    /** Builds this section's panel only once it is first opened. */
     isPanelBuiltOnExpand?: boolean;
+    /** How long this section takes to open and close. */
     transitionDurationMs?: number;
+    /** Receives the section element once it exists, for a consumer that has to measure or scroll it. */
     ref?: (element: HTMLElement) => void;
+    /** Runs when this section's header is activated. */
     onToggle: () => void;
 }> & {
+    /** The item this section stands for, carrying whatever the consumer needs to draw its header and panel. */
     item: MaybeAccessor<AccordionItem<T>>;
+    /** Draws this section's header. */
     renderHeader: AccordionHeaderRenderer<T>;
+    /** Draws this section's panel. */
     renderPanel: AccordionPanelRenderer<T>;
 };
 
 export type AccordionProps<T> = AccessorProps<{
+    /** The space between sections. */
     gap?: number;
+    /** Whether panels animate their height open and closed or simply appear. */
     sizing?: AccordionSizing;
+    /**
+     * Which heading level the section headers sit at, so the page's outline stays correct wherever the accordion is
+     * used.
+     */
     headingLevel?: number;
+    /** Closes whatever is open when another section is opened, so at most one is ever open. */
     isSingleExpand?: boolean;
+    /**
+     * Keeps at least one section open, so the last open one cannot be closed. It is what stops the accordion collapsing
+     * to nothing.
+     */
     isExpandRequired?: boolean;
+    /** Scrolls a section into view once it has finished opening. */
     isScrolledIntoViewOnExpand?: boolean;
+    /** Builds a section's panel only once it is first opened, rather than all of them up front. */
     isPanelBuiltOnExpand?: boolean;
+    /** How long a section takes to open and close. */
     transitionDurationMs?: number;
 }> & {
+    /** The sections, in the order they are shown. */
     items: MaybeAccessor<AccordionItem<T>[]>;
+    /** Which sections are open, by item. It is the only thing that opens or closes them. */
     expandedSignal: SignalSource<T[]>;
+    /** Draws a section's header. */
     renderHeader: AccordionHeaderRenderer<T>;
+    /** Draws a section's panel. */
     renderPanel: AccordionPanelRenderer<T>;
 };

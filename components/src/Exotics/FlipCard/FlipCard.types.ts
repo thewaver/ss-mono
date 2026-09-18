@@ -15,12 +15,20 @@ export type FlipCardState = {
 };
 
 export type FlipCardProps = AccessorProps<{
+    /** Which way the card turns over. */
     axis?: FlipCardAxis;
+    /** How large the card is. */
     size: Size2d;
+    /** How long one turn takes. */
     transitionDurationMs?: number;
+    /** Names the card for assistive technology. */
     ariaLabel: string;
+    /** Names one face, so a reader is told which side is showing. */
     computeFaceLabel?: (face: FlipCardFace) => string;
+    /** Which side is showing. It is the only thing that turns the card. */
     flippedSignal: SignalSource<boolean>;
+    /** Draws the front. */
     renderFront: (getState: Accessor<FlipCardState>) => JSX.Element;
+    /** Draws the back. */
     renderBack: (getState: Accessor<FlipCardState>) => JSX.Element;
 }>;

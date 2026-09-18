@@ -387,6 +387,19 @@ part that cannot be read off the signature — why the helper exists, what the c
 the edges — then `@param` and `@returns` where they add something the prose has not. `{@link}` a neighbor
 rather than restating it.
 
+**A member of an exported props type carries a `/** */` block too, for the same reason.** A component's
+contract is its props type, so a consumer reading that type should learn what each prop is for without
+opening the component — on hover in their editor, and in whatever the project renders its API reference from.
+Writing that prose anywhere else means it drifts the first time a prop is renamed, because nothing ties the
+two together; written on the property, it cannot. Say what the prop is for, what it does at the edges, and
+what the caller is spared; the type already says what it takes.
+
+**The scope is the props types and what feeds them, not the whole type file.** A type a props type is built
+out of is documented because its members show up as that component's props — but a type that is merely
+declared nearby is not, and neither is anything a props table never reaches. Where a library layers props —
+a wrapper's props spread into every control built on it — documenting the wrapper once is what fills every
+one of those tables, so do that before documenting any of them individually.
+
 **Sample data is exempt and sample implementation is not, which is a line about the file rather than the
 folder.** The user's rule. A registry, a table of keyframes and a set of knobs are descriptions, carry no
 comments like every other non-utils file, and are read by looking at them. A factory that computes something —
@@ -394,9 +407,11 @@ the layout families, the pointer effects — is utility that happens to live und
 calls it without reading the body, so it is documented like any other. **That the two sit in one folder is
 the thing to fix rather than the rule to bend**; see `backlog.md`'s _Open discussion_.
 
-**A `.knobs.ts` owns a tunable whole — its range, its step, its label and its default.** A default is part of
-describing a knob, and splitting the two leaves anything driving the sample reading a range from one file and
-the value it starts at from another. So a `.utils.ts` never exports a defaults object; it holds whatever
+**A `.knobs.ts` owns a tunable whole — its range, its step, its label, its explanation and its default.** A
+default is part of describing a knob, and splitting the two leaves anything driving the sample reading a range
+from one file and the value it starts at from another. The `hint` is there for the same reason and is required:
+a sentence saying what the knob does belongs with the knob, not with each harness that renders it, or it gets
+written once per consumer and the copies drift. So a `.utils.ts` never exports a defaults object; it holds whatever
 local constants it needs and reads the published ones from the knobs beside it. The gradient samples were
 already this way and the placement ones were not.
 

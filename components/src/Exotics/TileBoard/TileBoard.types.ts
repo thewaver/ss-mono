@@ -26,10 +26,15 @@ export type TileBoardLayout = TileBoardTiling & {
 };
 
 export type TileBoardRenderProps = {
+    /** Which tile this is, by column and row. */
     tile: Index2d;
+    /** How large the tile is. */
     size: Size2d;
+    /** The corners of the tile's outline, for a consumer drawing something other than a rectangle. */
     points: Point2d[];
+    /** Whether this tile sits on an offset row, which for a hexagon decides which way round it is drawn. */
     isFlipped: boolean;
+    /** Whether the keyboard is currently on this tile. */
     isHighlighted: boolean;
 };
 
@@ -40,24 +45,40 @@ export type TileBoardTileRenderer = (
 
 export type TileBoardTileProps = AccessorProps<
     Omit<InteractionControlProps<TileBoardRenderProps>, "renderContent"> & {
+        /** Which column this tile sits in. */
         colIndex: number;
+        /** The outline the tile is cut to. */
         clipPath: string;
+        /** How large the tile is. */
         size: Size2d;
+        /** Draws the tile body. */
         renderContent: (getRenderProps: () => InteractionFlags<TileBoardRenderProps>) => JSX.Element;
+        /** Runs when this tile is activated. */
         onActivate: () => void;
     }
 >;
 
 export type TileBoardProps = AccessorProps<{
+    /** Names the board for assistive technology. */
     ariaLabel?: string;
+    /** How many tiles the board has, across and down. */
     tileCount: Index2d;
+    /** How large one tile is. */
     tileSize: Size2d;
+    /** The outline each tile is cut to, which also decides whether rows are offset. */
     tileShape?: ShapeConst.DefaultShape;
+    /** The space between tiles. */
     gap?: number;
+    /** Starts the offset rows at the top instead of the second row, for shapes that stagger. */
     hasShortFirstRow?: boolean;
+    /** Turns the board off, so no tile responds. */
     isDisabled?: boolean;
+    /** Whether one tile is unavailable, which is what paints a move as out of reach. */
     computeIsTileDisabled?: (tile: Index2d) => boolean;
+    /** Names one tile for assistive technology, so a reader hears where it is rather than its number. */
     computeTileAriaLabel?: (tile: Index2d) => string;
+    /** Draws one tile. */
     renderTile: TileBoardTileRenderer;
+    /** Runs when a tile is activated. */
     onTileActivate: (tile: Index2d) => void;
 }>;

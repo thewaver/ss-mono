@@ -67,7 +67,11 @@ export const TrackedGradientsPage = () => {
         <>
             <PagePropsGroups>
                 <PagePropsPanel scope={"sample"}>
-                    <PageProp key={"configKey"} label={"Gradient"}>
+                    <PageProp
+                        key={"configKey"}
+                        label={"Gradient"}
+                        hint={"Which pointer-following gradient is shown. Choosing one brings its own knobs with it."}
+                    >
                         <PageGroupedSelectField
                             value={getConfigKey}
                             groups={() => toGroupEntriesWithNoSample(GROUPPED_TRACKED_GRADIENTS)}

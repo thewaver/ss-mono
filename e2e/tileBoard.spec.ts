@@ -79,7 +79,7 @@ const clipPathOf = (page: Page, selector: string, index: number) =>
     });
 
 const pickShape = async (page: Page, name: string) => {
-    await page.locator('[data-prop][data-testid="shape"] button').first().click();
+    await page.locator(`${prop("shape")} [role="combobox"]`).click();
     await page.getByRole("option", { name, exact: true }).click();
 };
 

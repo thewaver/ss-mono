@@ -35,7 +35,11 @@ export const BlurExample = (props: Props) => {
             />
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"stdDeviation"} label={"Std deviation"}>
+                <PageProp
+                    key={"stdDeviation"}
+                    label={"Std deviation"}
+                    hint={"How far the blur reaches. 0 leaves the picture sharp."}
+                >
                     <PageNumberField
                         value={getStdDeviation}
                         min={() => MIN_DEVIATION}

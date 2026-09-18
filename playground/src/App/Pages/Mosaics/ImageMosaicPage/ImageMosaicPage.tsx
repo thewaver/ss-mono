@@ -40,7 +40,7 @@ const ImagesExampleWrapper = (props: MosaicSharedProps) => {
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"shapeKey"} label={"Target shape"}>
+                <PageProp key={"shapeKey"} label={"Target shape"} hint={"The outline the tiles are packed into."}>
                     <PageSelectField
                         value={getShapeKey}
                         values={() => MosaicImages.SAMPLE_SHAPE_KEYS}
@@ -50,7 +50,13 @@ const ImagesExampleWrapper = (props: MosaicSharedProps) => {
                     />
                 </PageProp>
 
-                <PageProp key={"isDecorated"} label={"Wrapped"}>
+                <PageProp
+                    key={"isDecorated"}
+                    label={"Wrapped"}
+                    hint={
+                        "Puts each tile in a frame of its own, so the packing can be told apart from the pictures in it."
+                    }
+                >
                     <PageCheckField value={getIsDecorated} ariaLabel={"Wrapped"} onChange={setIsDecorated} />
                 </PageProp>
             </PagePropsPanel>

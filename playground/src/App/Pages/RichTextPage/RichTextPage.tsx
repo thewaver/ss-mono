@@ -76,7 +76,13 @@ export const RichTextPage = () => {
     return (
         <div class={styles.root}>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"removeOtherTags"} label={"Remove other tags"}>
+                <PageProp
+                    key={"removeOtherTags"}
+                    label={"Remove other tags"}
+                    hint={
+                        "Strips any tag the editor was not told to keep, rather than leaving it in the markup untouched."
+                    }
+                >
                     <PageCheckField
                         value={getRemoveOtherTags}
                         ariaLabel={"Remove other tags"}

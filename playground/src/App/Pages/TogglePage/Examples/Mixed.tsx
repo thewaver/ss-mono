@@ -18,7 +18,7 @@ export const MixedExample = (props: Props) => {
                 renderContent={(getFlags) => <PageToggleContent flags={getFlags} />}
                 tooltipDefs={() => ({
                     placement: () => ({ x: "center", y: "top-out" }),
-                    offset: () => ({ x: 0, y: 5 }),
+                    offset: () => ({ x: 0, y: 10 }),
                     renderContent: (getVisibilityTarget, getTransitionDurationMs, _getPlacement, getFlags) => (
                         <PageTooltipContent
                             visibilityTarget={getVisibilityTarget}

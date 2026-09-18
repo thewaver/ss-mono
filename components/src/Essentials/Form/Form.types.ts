@@ -8,11 +8,18 @@ export type FormState = {
 };
 
 export type FormProps = AccessorProps<{
+    /** Identifies the form, so a control outside it can say it belongs to it. */
     id?: string;
+    /** The form's name. */
     name?: string;
+    /** Names the form for assistive technology. */
     ariaLabel?: string;
+    /** Points at the element whose text names the form, for a form that already shows its own heading. */
     ariaLabelledBy?: string;
+    /** Runs when the form is submitted. */
     onSubmit?: () => void | Promise<void>;
+    /** Runs when the form is reset. */
     onReset?: () => void | Promise<void>;
+    /** Draws the form's contents, and is told whether it is currently submitting. */
     renderContent: (getState: () => FormState) => JSX.Element;
 }>;

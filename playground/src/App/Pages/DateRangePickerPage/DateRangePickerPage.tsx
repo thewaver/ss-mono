@@ -51,7 +51,11 @@ export const DateRangePickerPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"calendarId"} label={"Calendar"}>
+                <PageProp
+                    key={"calendarId"}
+                    label={"Calendar"}
+                    hint={"Which calendar system the dates are read and written in, such as Gregorian or Islamic."}
+                >
                     <PageSelectField
                         value={getCalendarId}
                         values={DateValueUtils.getCalendarIds}

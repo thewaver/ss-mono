@@ -87,7 +87,13 @@ export const SVGFiltersPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"method"} label={"Method"}>
+                <PageProp
+                    key={"method"}
+                    label={"Method"}
+                    hint={
+                        "Whether each step is fed the result of the one before it, or each works from the original and the results are combined."
+                    }
+                >
                     <PageSelectField
                         value={getMethod}
                         values={() => METHODS}
@@ -96,7 +102,13 @@ export const SVGFiltersPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"elementSize"} label={"Region sized from the element"}>
+                <PageProp
+                    key={"elementSize"}
+                    label={"Region sized from the element"}
+                    hint={
+                        "Sizes the area the filter is allowed to paint in from the element itself, rather than from a fixed region."
+                    }
+                >
                     <PageCheckField
                         value={getIsSizedFromElement}
                         ariaLabel={"Region sized from the element"}

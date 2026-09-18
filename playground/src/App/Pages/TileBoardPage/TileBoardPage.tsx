@@ -142,7 +142,13 @@ export const TileBoardPage = () => {
                         />
 
                         <PagePropsPanel scope={"local"}>
-                            <PageProp key={"reach"} label={"Reach"}>
+                            <PageProp
+                                key={"reach"}
+                                label={"Reach"}
+                                hint={
+                                    "How many tiles the piece may travel in one move. Tiles out of reach are shown as unavailable."
+                                }
+                            >
                                 <PageNumberField
                                     value={getReach}
                                     min={() => MIN_REACH}
@@ -179,7 +185,7 @@ export const TileBoardPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"rows"} label={"Rows"}>
+                <PageProp key={"rows"} label={"Rows"} hint={"How many rows of tiles the board has."}>
                     <PageNumberField
                         value={getRows}
                         min={() => MIN_ROWS}
@@ -191,7 +197,7 @@ export const TileBoardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"cols"} label={"Columns"}>
+                <PageProp key={"cols"} label={"Columns"} hint={"How many tiles sit in a row."}>
                     <PageNumberField
                         value={getCols}
                         min={() => MIN_COLS}
@@ -203,7 +209,7 @@ export const TileBoardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"tileWidth"} label={"Tile width"}>
+                <PageProp key={"tileWidth"} label={"Tile width"} hint={"How wide one tile is."}>
                     <PageNumberField
                         value={getTileWidth}
                         min={() => MIN_TILE_SIZE}
@@ -215,7 +221,7 @@ export const TileBoardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"tileHeight"} label={"Tile height"}>
+                <PageProp key={"tileHeight"} label={"Tile height"} hint={"How tall one tile is."}>
                     <PageNumberField
                         value={getTileHeight}
                         min={() => MIN_TILE_SIZE}
@@ -227,7 +233,7 @@ export const TileBoardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"gap"} label={"Gap"}>
+                <PageProp key={"gap"} label={"Gap"} hint={"The space left between tiles."}>
                     <PageNumberField
                         value={getGap}
                         min={() => MIN_GAP}
@@ -239,7 +245,11 @@ export const TileBoardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"shape"} label={"Tile shape"}>
+                <PageProp
+                    key={"shape"}
+                    label={"Tile shape"}
+                    hint={"The outline each tile is cut to. A hexagon offsets alternate rows; a square does not."}
+                >
                     <PageSelectField
                         value={getShape}
                         values={() => ShapeConst.DEFAULT_SHAPES}
@@ -249,7 +259,11 @@ export const TileBoardPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"hasShortFirstRow"} label={"Start on the short row"}>
+                <PageProp
+                    key={"hasShortFirstRow"}
+                    label={"Start on the short row"}
+                    hint={"Starts the offset rows at the top instead of the second row, for shapes that stagger."}
+                >
                     <PageCheckField
                         value={getHasShortFirstRow}
                         ariaLabel={"Start on the short row"}

@@ -126,7 +126,13 @@ export const GlassSurfacePage = () => {
         <>
             <PagePropsGroups>
                 <PagePropsPanel scope={"sample"}>
-                    <PageProp key={"strokeConfigKey"} label={"Border pattern"}>
+                    <PageProp
+                        key={"strokeConfigKey"}
+                        label={"Border pattern"}
+                        hint={
+                            "Which pointer-following gradient lights the panel's edge. Choosing one brings its own knobs with it."
+                        }
+                    >
                         <PageGroupedSelectField
                             value={getStrokeConfigKey}
                             groups={() => toGroupEntriesWithNoSample(GROUPPED_GRADIENTS)}
@@ -148,7 +154,11 @@ export const GlassSurfacePage = () => {
                 <PagePropsDivider />
 
                 <PagePropsPanel scope={"global"}>
-                    <PageProp key={"borderRadius"} label={"Corner radius (px)"}>
+                    <PageProp
+                        key={"borderRadius"}
+                        label={"Corner radius (px)"}
+                        hint={"How far the panel's corners are rounded."}
+                    >
                         <PageNumberField
                             value={getBorderRadius}
                             min={() => MIN_BORDER_RADIUS}
@@ -159,7 +169,11 @@ export const GlassSurfacePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"borderWidth"} label={"Border width (px)"}>
+                    <PageProp
+                        key={"borderWidth"}
+                        label={"Border width (px)"}
+                        hint={"How thick the lit edge around the panel is."}
+                    >
                         <PageNumberField
                             value={getBorderWidth}
                             min={() => MIN_BORDER_WIDTH}
@@ -170,7 +184,11 @@ export const GlassSurfacePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"colors"} label={"Border Colors"}>
+                    <PageProp
+                        key={"colors"}
+                        label={"Border Colors"}
+                        hint={"The colors the edge light is painted from."}
+                    >
                         <div class={styles.colorList}>
                             <For each={Object.keys(colors)}>
                                 {(key) => (
@@ -184,7 +202,13 @@ export const GlassSurfacePage = () => {
                         </div>
                     </PageProp>
 
-                    <PageProp key={"blurWidth"} label={"Border blur (px)"}>
+                    <PageProp
+                        key={"blurWidth"}
+                        label={"Border blur (px)"}
+                        hint={
+                            "How far the edge light bleeds outward, which is what makes it glow rather than sit flat."
+                        }
+                    >
                         <PageNumberField
                             value={getBlurWidth}
                             min={() => MIN_BLUR_WIDTH}
@@ -195,7 +219,11 @@ export const GlassSurfacePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"blurRadius"} label={"Backdrop blur (px)"}>
+                    <PageProp
+                        key={"blurRadius"}
+                        label={"Backdrop blur (px)"}
+                        hint={"How far whatever is behind the panel is blurred as it shows through."}
+                    >
                         <PageNumberField
                             value={getBlurRadius}
                             min={() => MIN_BLUR_RADIUS}
@@ -206,7 +234,11 @@ export const GlassSurfacePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"noiseFrequency"} label={"Noise scale"}>
+                    <PageProp
+                        key={"noiseFrequency"}
+                        label={"Noise scale"}
+                        hint={"How fine the grain dusted over the glass is. Higher numbers make a tighter grain."}
+                    >
                         <PageNumberField
                             value={getNoiseFrequency}
                             min={() => MIN_GRAIN_FREQUENCY}
@@ -217,7 +249,13 @@ export const GlassSurfacePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"noiseOctaves"} label={"Noise octaves"}>
+                    <PageProp
+                        key={"noiseOctaves"}
+                        label={"Noise octaves"}
+                        hint={
+                            "How many layers of grain are piled up. More layers add fine detail and cost more to draw."
+                        }
+                    >
                         <PageNumberField
                             value={getNoiseOctaves}
                             min={() => MIN_GRAIN_OCTAVES}
@@ -228,7 +266,13 @@ export const GlassSurfacePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"rippleScale"} label={"Ripple bend (px)"}>
+                    <PageProp
+                        key={"rippleScale"}
+                        label={"Ripple bend (px)"}
+                        hint={
+                            "How far the glass bends what is behind it, as though it were not quite flat. 0 leaves it looking like a window."
+                        }
+                    >
                         <PageNumberField
                             value={getRippleScale}
                             min={() => MIN_RIPPLE_SCALE}
@@ -239,7 +283,13 @@ export const GlassSurfacePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"lightHeight"} label={"Light height"}>
+                    <PageProp
+                        key={"lightHeight"}
+                        label={"Light height"}
+                        hint={
+                            "How far above the panel the light lighting the sheen is placed. Lower puts it closer and makes the highlight tighter."
+                        }
+                    >
                         <PageNumberField
                             value={getLightHeight}
                             min={() => MIN_LIGHT_HEIGHT}
@@ -250,7 +300,13 @@ export const GlassSurfacePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"surfaceScale"} label={"Sheen relief"}>
+                    <PageProp
+                        key={"surfaceScale"}
+                        label={"Sheen relief"}
+                        hint={
+                            "How deep the relief the sheen is shaded against is. 0 leaves the surface flat and kills the highlight."
+                        }
+                    >
                         <PageNumberField
                             value={getSurfaceScale}
                             min={() => MIN_SURFACE_SCALE}
@@ -261,7 +317,11 @@ export const GlassSurfacePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"specularConstant"} label={"Sheen brightness"}>
+                    <PageProp
+                        key={"specularConstant"}
+                        label={"Sheen brightness"}
+                        hint={"How strong the sheen highlight is overall."}
+                    >
                         <PageNumberField
                             value={getSpecularConstant}
                             min={() => MIN_SPECULAR_CONSTANT}
@@ -272,7 +332,13 @@ export const GlassSurfacePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"specularExponent"} label={"Shininess"}>
+                    <PageProp
+                        key={"specularExponent"}
+                        label={"Shininess"}
+                        hint={
+                            "How tightly the sheen highlight is focused: low is a broad soft gleam, high is a small hard glint."
+                        }
+                    >
                         <PageNumberField
                             value={getSpecularExponent}
                             min={() => MIN_SPECULAR_EXPONENT}
@@ -283,7 +349,11 @@ export const GlassSurfacePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"tintOpacity"} label={"Tint opacity"}>
+                    <PageProp
+                        key={"tintOpacity"}
+                        label={"Tint opacity"}
+                        hint={"How strongly the panel is colored. 0 leaves it clear."}
+                    >
                         <PageNumberField
                             value={getTintOpacity}
                             min={() => MIN_TINT_OPACITY}
@@ -294,7 +364,11 @@ export const GlassSurfacePage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"tintColor"} label={"Tint color"}>
+                    <PageProp
+                        key={"tintColor"}
+                        label={"Tint color"}
+                        hint={"The color the panel itself is tinted with."}
+                    >
                         <PageColorField value={getTintColor} ariaLabel={"Tint color"} onInput={setTintColor} />
                     </PageProp>
                 </PagePropsPanel>

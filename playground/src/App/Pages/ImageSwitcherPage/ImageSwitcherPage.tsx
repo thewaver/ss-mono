@@ -77,7 +77,11 @@ export const ImageSwitcherPage = () => {
     return (
         <div class={styles.root}>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"sourceType"} label={"Source"}>
+                <PageProp
+                    key={"sourceType"}
+                    label={"Source"}
+                    hint={"Where the pictures come from, which is what decides how long each one takes to load."}
+                >
                     <PageSelectField
                         value={getSourceType}
                         values={() => SOURCE_TYPES}
@@ -86,7 +90,11 @@ export const ImageSwitcherPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"transitionDurationMs"} label={"Transition duration (ms)"}>
+                <PageProp
+                    key={"transitionDurationMs"}
+                    label={"Transition duration (ms)"}
+                    hint={"How long the crossfade from one picture to the next takes."}
+                >
                     <PageNumberField
                         value={getTransitionDurationMs}
                         min={() => MIN_DURATION_MS}

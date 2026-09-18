@@ -111,7 +111,11 @@ export const SplitPanePage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"gutterSize"} label={"Gutter size (px)"}>
+                <PageProp
+                    key={"gutterSize"}
+                    label={"Gutter size (px)"}
+                    hint={"How wide the draggable divider between two panes is."}
+                >
                     <PageNumberField
                         value={getGutterSize}
                         min={() => MIN_GUTTER}
@@ -123,11 +127,15 @@ export const SplitPanePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"isDisabled"} label={"Disabled"}>
+                <PageProp
+                    key={"isDisabled"}
+                    label={"Disabled"}
+                    hint={"Turns the dividers off, so the panes keep the sizes they have."}
+                >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
 
-                <PageProp key={"ratios"} label={"Ratios"}>
+                <PageProp key={"ratios"} label={"Ratios"} hint={"Puts the panes back to the sizes they started at."}>
                     <Button
                         renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Reset</PageButtonContent>}
                         onClick={async () => {

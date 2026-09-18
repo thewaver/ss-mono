@@ -96,7 +96,7 @@ export const ScrollerPage = () => {
     return (
         <div class={styles.root}>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"itemCount"} label={"Item count"}>
+                <PageProp key={"itemCount"} label={"Item count"} hint={"How many items sit in the scrolling strip."}>
                     <PageNumberField
                         value={getItemCount}
                         min={() => MIN_ITEM_COUNT}
@@ -107,7 +107,11 @@ export const ScrollerPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"position"} label={"First strip (%)"}>
+                <PageProp
+                    key={"position"}
+                    label={"First strip (%)"}
+                    hint={"How far through its run the first strip is scrolled, as a percentage."}
+                >
                     <PageNumberField
                         value={() => Math.round(progressSignal[0]() * PERCENT)}
                         min={() => MIN_POSITION}

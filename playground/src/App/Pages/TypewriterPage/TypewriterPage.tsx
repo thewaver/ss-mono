@@ -112,7 +112,13 @@ export const TypewriterPage = () => {
     return (
         <div class={styles.root}>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"textContainerWidth"} label={"Container width (px)"}>
+                <PageProp
+                    key={"textContainerWidth"}
+                    label={"Container width (px)"}
+                    hint={
+                        "How wide the box holding the text is, which decides where the lines wrap as the text is typed."
+                    }
+                >
                     <PageNumberField
                         value={getTextContainerWidth}
                         min={() => MIN_CONTAINER_WIDTH}
@@ -123,7 +129,11 @@ export const TypewriterPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"textEffect"} label={"Effect"}>
+                <PageProp
+                    key={"textEffect"}
+                    label={"Effect"}
+                    hint={"How each character arrives: plainly, or with one of the entrance effects."}
+                >
                     <PageSelectField
                         value={getTextEffect}
                         values={() => TEXT_EFFECTS}

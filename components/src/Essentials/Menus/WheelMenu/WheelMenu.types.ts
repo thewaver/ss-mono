@@ -17,13 +17,21 @@ export type WheelMenuCloserDefs = {
 
 export type WheelMenuProps<T> = Omit<MenuProps<T>, "items" | "checkedSignal" | "computeLayout"> &
     AccessorProps<{
+        /** How much of the circle the items are spread over. */
         spreadDegrees?: number;
+        /** How much of the middle is left empty, which is where the close control sits. */
         holeRadius?: number;
+        /** How thick one level's band is. */
         bandWidth?: number;
+        /** The space between one level's band and the next. */
         levelGap?: number;
     }> & {
+        /** The items, in the order they sit round the wheel. */
         items: MaybeAccessor<WheelMenuItem<T>[]>;
+        /** Which values are currently checked, for the checkbox and radio items among them. */
         checkedSignal?: SignalSource<T[]>;
+        /** How the items sit on their band, for the parts of the arrangement the wheel does not decide itself. */
         layoutDefs?: Omit<BandDefs, "holeRatio" | "spreadDegrees" | "computeItemArcs">;
+        /** The control in the hole that closes the menu. */
         closerDefs?: WheelMenuCloserDefs;
     };

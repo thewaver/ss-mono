@@ -52,7 +52,11 @@ export const AudioSwitcherPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"track"} label={"Track"}>
+                <PageProp
+                    key={"track"}
+                    label={"Track"}
+                    hint={"Which piece is playing. Changing it is what the switcher crossfades between."}
+                >
                     <PageSelectField
                         value={getTrackName}
                         values={() => TRACK_NAMES}
@@ -62,7 +66,11 @@ export const AudioSwitcherPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"crossfadeMs"} label={"Crossfade (ms)"}>
+                <PageProp
+                    key={"crossfadeMs"}
+                    label={"Crossfade (ms)"}
+                    hint={"How long the old track takes to fade out while the new one fades in."}
+                >
                     <PageNumberField
                         value={getCrossfadeMs}
                         min={() => MIN_CROSSFADE_MS}
@@ -74,7 +82,7 @@ export const AudioSwitcherPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"volume"} label={"Volume (%)"}>
+                <PageProp key={"volume"} label={"Volume (%)"} hint={"How loud the playback is."}>
                     <PageNumberField
                         value={getVolumePercent}
                         min={() => MIN_VOLUME_PERCENT}

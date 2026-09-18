@@ -102,7 +102,11 @@ export const ToolbarPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"barWidth"} label={"Bar width (px)"}>
+                <PageProp
+                    key={"barWidth"}
+                    label={"Bar width (px)"}
+                    hint={"How wide the bar is. Narrow it far enough and items start moving into the overflow menu."}
+                >
                     <PageNumberField
                         value={getBarWidth}
                         min={() => MIN_BAR_WIDTH}
@@ -113,7 +117,7 @@ export const ToolbarPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"gap"} label={"Gap (px)"}>
+                <PageProp key={"gap"} label={"Gap (px)"} hint={"The space left between items on the bar."}>
                     <PageNumberField
                         value={getGap}
                         min={() => MIN_GAP}

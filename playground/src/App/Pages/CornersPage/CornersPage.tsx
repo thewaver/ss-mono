@@ -92,11 +92,15 @@ export const CornersPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"color"} label={"Color"}>
+                <PageProp key={"color"} label={"Color"} hint={"The color the corner marks are drawn in."}>
                     <PageColorField value={getColor} ariaLabel={"Color"} onInput={setColor} />
                 </PageProp>
 
-                <PageProp key={"cornerLengthWidth"} label={"Arm across (px)"}>
+                <PageProp
+                    key={"cornerLengthWidth"}
+                    label={"Arm across (px)"}
+                    hint={"How long each corner's horizontal arm is."}
+                >
                     <PageNumberField
                         value={getLengthAcross}
                         min={() => MIN_LENGTH}
@@ -108,7 +112,11 @@ export const CornersPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"cornerLengthHeight"} label={"Arm down (px)"}>
+                <PageProp
+                    key={"cornerLengthHeight"}
+                    label={"Arm down (px)"}
+                    hint={"How long each corner's vertical arm is."}
+                >
                     <PageNumberField
                         value={getLengthDown}
                         min={() => MIN_LENGTH}
@@ -120,7 +128,11 @@ export const CornersPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"strokeThickness"} label={"Thickness (px)"}>
+                <PageProp
+                    key={"strokeThickness"}
+                    label={"Thickness (px)"}
+                    hint={"How thick the corner arms are drawn."}
+                >
                     <PageNumberField
                         value={getStrokeThickness}
                         min={() => MIN_THICKNESS}
@@ -132,7 +144,11 @@ export const CornersPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"transitionDurationMs"} label={"Fade (ms)"}>
+                <PageProp
+                    key={"transitionDurationMs"}
+                    label={"Fade (ms)"}
+                    hint={"How long a corner takes to fade in or out when it is turned on or off."}
+                >
                     <PageNumberField
                         value={getTransitionDurationMs}
                         min={() => MIN_DURATION}
@@ -145,7 +161,11 @@ export const CornersPage = () => {
                 </PageProp>
 
                 {CORNER_KEYS.map((key) => (
-                    <PageProp key={key} label={CORNER_LABELS[key]}>
+                    <PageProp
+                        key={key}
+                        label={CORNER_LABELS[key]}
+                        hint={`Whether the ${CORNER_LABELS[key].toLowerCase()} mark is drawn at all.`}
+                    >
                         <PageCheckField
                             value={() => getVisibleCorners().has(key)}
                             ariaLabel={CORNER_LABELS[key]}

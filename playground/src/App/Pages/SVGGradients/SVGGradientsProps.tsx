@@ -18,7 +18,11 @@ export const PageSVGGradientsProps = (props: Props) => {
 
     return (
         <>
-            <PageProp key={"paintKind"} label={"Painted as"}>
+            <PageProp
+                key={"paintKind"}
+                label={"Painted as"}
+                hint={"Whether the gradient paints the inside of the sample shape or only its outline."}
+            >
                 <PageSelectField
                     value={controls.paintKindSignal[0]}
                     values={() => PAINT_KINDS}
@@ -27,7 +31,11 @@ export const PageSVGGradientsProps = (props: Props) => {
                 />
             </PageProp>
 
-            <PageProp key={"colors"} label={"Colors"}>
+            <PageProp
+                key={"colors"}
+                label={"Colors"}
+                hint={"The colors the gradient is built from. Each sample uses as many of them as it needs."}
+            >
                 <div class={styles.colorList}>
                     <For each={Object.keys(controls.colors)}>
                         {(key) => (
@@ -41,7 +49,11 @@ export const PageSVGGradientsProps = (props: Props) => {
                 </div>
             </PageProp>
 
-            <PageProp key={"blurWidth"} label={"Blur (px)"}>
+            <PageProp
+                key={"blurWidth"}
+                label={"Blur (px)"}
+                hint={"How far the paint is blurred outward, which is what gives it its glow."}
+            >
                 <PageNumberField
                     value={controls.blurWidthSignal[0]}
                     min={() => MIN_BLUR_WIDTH}

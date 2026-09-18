@@ -15,7 +15,7 @@ export const PageKnobs = (props: PageKnobsProps) => {
     return (
         <For each={toEntries(props.knobs())}>
             {([key, knob]) => (
-                <PageProp key={key} label={knob.label}>
+                <PageProp key={key} label={knob.label} hint={knob.hint} defaultValue={() => props.defaults()[key]}>
                     <Switch>
                         <Match when={knob.kind === "number" ? knob : undefined}>
                             {(getNumberKnob) => (

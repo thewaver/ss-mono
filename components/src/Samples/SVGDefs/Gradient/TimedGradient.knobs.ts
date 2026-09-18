@@ -1,11 +1,27 @@
 import type { SampleCheckKnob, SampleNumberKnob } from "../../Samples.types";
 
-const CYCLES_KNOB: SampleCheckKnob = { kind: "check", label: "Cycle color" };
-const BANDED_KNOB: SampleCheckKnob = { kind: "check", label: "Banded" };
-const STEPS_KNOB: SampleNumberKnob = { kind: "number", label: "Steps", min: 4, max: 36, step: 2 };
+const CYCLES_KNOB: SampleCheckKnob = {
+    kind: "check",
+    label: "Cycle color",
+    hint: "Walks the gradient through the sample's colors as it animates, instead of holding the one it starts on.",
+};
+const BANDED_KNOB: SampleCheckKnob = {
+    kind: "check",
+    label: "Banded",
+    hint: "Draws the flow as hard-edged stripes instead of one smooth blend.",
+};
+const STEPS_KNOB: SampleNumberKnob = {
+    kind: "number",
+    label: "Steps",
+    hint: "How many stops the movement is cut into. More steps make the run smoother and cost more to draw.",
+    min: 4,
+    max: 36,
+    step: 2,
+};
 const BANDS_KNOB: SampleNumberKnob = {
     kind: "number",
     label: "Bands",
+    hint: "How many times the colors repeat across the gradient. More bands make a tighter stripe.",
     min: 1,
     max: 16,
     step: 1,

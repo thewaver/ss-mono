@@ -31,7 +31,7 @@ export const ScreenWiperPage = () => {
             <Button
                 tooltipDefs={() => ({
                     placement: () => ({ x: "center", y: "top-out" }),
-                    offset: () => ({ x: 0, y: 5 }),
+                    offset: () => ({ x: 0, y: 10 }),
                     renderContent: (getVisibilityTarget, getTransitionDurationMs) => (
                         <PageTooltipContent
                             visibilityTarget={getVisibilityTarget}

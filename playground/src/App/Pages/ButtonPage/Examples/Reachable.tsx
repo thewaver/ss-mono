@@ -13,7 +13,7 @@ export const ReachableExample = (props: Props) => (
         renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Click Me</PageButtonContent>}
         tooltipDefs={() => ({
             placement: () => ({ x: "center", y: "top-out" }),
-            offset: () => ({ x: 0, y: 5 }),
+            offset: () => ({ x: 0, y: 10 }),
             renderContent: (getVisibilityTarget, getTransitionDurationMs, _getPlacement, getFlags) => (
                 <PageTooltipContent
                     visibilityTarget={getVisibilityTarget}

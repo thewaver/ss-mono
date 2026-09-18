@@ -95,7 +95,11 @@ export const ToastsPage = () => {
     return (
         <div class={styles.root}>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"alignment"} label={"Alignment"}>
+                <PageProp
+                    key={"alignment"}
+                    label={"Alignment"}
+                    hint={"Which corner or edge of the screen the toasts gather at."}
+                >
                     <PageSelectField
                         value={getAlignment}
                         values={() => ALIGNMENTS}
@@ -104,7 +108,13 @@ export const ToastsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"dir"} label={"Dir"}>
+                <PageProp
+                    key={"dir"}
+                    label={"Dir"}
+                    hint={
+                        "Which way the stack grows from there, and so whether a new toast joins at the top or the bottom."
+                    }
+                >
                     <PageSelectField
                         value={getDir}
                         values={() => DIRS}
@@ -113,7 +123,11 @@ export const ToastsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"limit"} label={"Limit"}>
+                <PageProp
+                    key={"limit"}
+                    label={"Limit"}
+                    hint={"How many toasts may be on screen at once. Choose none and they all show."}
+                >
                     <PageSelectField
                         value={getLimit}
                         values={() => LIMITS}
@@ -123,7 +137,13 @@ export const ToastsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"overflow"} label={"Overflow"}>
+                <PageProp
+                    key={"overflow"}
+                    label={"Overflow"}
+                    hint={
+                        "What happens when the limit is reached: the oldest toast is dismissed, or the newest waits its turn."
+                    }
+                >
                     <PageSelectField
                         value={getOverflow}
                         values={() => OVERFLOWS}
@@ -132,7 +152,11 @@ export const ToastsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"durationMs"} label={"Duration"}>
+                <PageProp
+                    key={"durationMs"}
+                    label={"Duration"}
+                    hint={"How long a toast stays before it dismisses itself. Sticky ones wait to be closed."}
+                >
                     <PageSelectField
                         value={getDurationMs}
                         values={() => DURATIONS_MS}
@@ -142,7 +166,7 @@ export const ToastsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"animation"} label={"Animation"}>
+                <PageProp key={"animation"} label={"Animation"} hint={"How a toast arrives and leaves."}>
                     <PageSelectField
                         value={getAnimation}
                         values={() => ANIMATIONS}
@@ -151,7 +175,13 @@ export const ToastsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"stacking"} label={"Stacking"}>
+                <PageProp
+                    key={"stacking"}
+                    label={"Stacking"}
+                    hint={
+                        "Whether the toasts sit in a row of their own, or pile up on each other with only the top one fully shown."
+                    }
+                >
                     <PageSelectField
                         value={getStacking}
                         values={() => STACKINGS}
@@ -160,7 +190,7 @@ export const ToastsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"gap"} label={"Gap (px)"}>
+                <PageProp key={"gap"} label={"Gap (px)"} hint={"The space between one toast and the next."}>
                     <PageNumberField
                         value={getGap}
                         min={() => MIN_GAP}
@@ -170,7 +200,11 @@ export const ToastsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"margin"} label={"Margin (px)"}>
+                <PageProp
+                    key={"margin"}
+                    label={"Margin (px)"}
+                    hint={"How far the stack is held off the edge of the screen."}
+                >
                     <PageNumberField
                         value={getMargin}
                         min={() => MIN_MARGIN}
@@ -180,7 +214,11 @@ export const ToastsPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"transitionDurationMs"} label={"Transition duration (ms)"}>
+                <PageProp
+                    key={"transitionDurationMs"}
+                    label={"Transition duration (ms)"}
+                    hint={"How long a toast takes to arrive, to leave, and to slide when the stack shifts."}
+                >
                     <PageNumberField
                         value={getTransitionDurationMs}
                         min={() => MIN_TRANSITION_DURATION_MS}

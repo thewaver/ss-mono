@@ -5,5 +5,6 @@ export type DrawerEdge = "left" | "right" | "top" | "bottom";
 
 export type DrawerProps = Omit<ModalProps, "role" | "alignment"> &
     AccessorProps<{
+        /** Which edge of the screen the drawer slides in from. */
         edge: DrawerEdge;
     }>;

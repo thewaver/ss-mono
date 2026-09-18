@@ -60,7 +60,11 @@ export const RangeCalendarPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"calendarId"} label={"Calendar"}>
+                <PageProp
+                    key={"calendarId"}
+                    label={"Calendar"}
+                    hint={"Which calendar system the dates are read and written in, such as Gregorian or Islamic."}
+                >
                     <PageSelectField
                         value={getCalendarId}
                         values={DateValueUtils.getCalendarIds}
@@ -70,7 +74,11 @@ export const RangeCalendarPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"weekStartsOn"} label={"Week starts on"}>
+                <PageProp
+                    key={"weekStartsOn"}
+                    label={"Week starts on"}
+                    hint={"Which day begins a week, which decides the order of the column headings."}
+                >
                     <PageSelectField
                         value={getWeekStartsOn}
                         values={() => [...WEEK_STARTS]}

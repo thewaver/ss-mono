@@ -1,6 +1,7 @@
 export type SampleNumberKnob = {
     kind: "number";
     label: string;
+    hint: string;
     min: number;
     max: number;
     step: number;
@@ -9,6 +10,7 @@ export type SampleNumberKnob = {
 export type SampleCheckKnob = {
     kind: "check";
     label: string;
+    hint: string;
 };
 
 export type SampleKnob = SampleNumberKnob | SampleCheckKnob;

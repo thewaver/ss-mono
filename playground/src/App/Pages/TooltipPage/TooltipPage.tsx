@@ -26,7 +26,7 @@ const FIELD_WIDTH = 110;
 
 const STARTING_H_PLACEMENT: AnchorHPlacement = "center";
 const STARTING_V_PLACEMENT: AnchorVPlacement = "top-out";
-const STARTING_OFFSET_Y = 5;
+const STARTING_OFFSET_Y = 10;
 const STARTING_OFFSET_X = 0;
 const STARTING_TRANSITION_DURATION_MS = 200;
 const STARTING_FOCUS_SHOW_DELAY_MS = 500;
@@ -81,7 +81,13 @@ export const TooltipPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"hPlacement"} label={"Placement across"}>
+                <PageProp
+                    key={"hPlacement"}
+                    label={"Placement across"}
+                    hint={
+                        "Where the tooltip sits across its anchor: inside an edge, centered, or outside it altogether."
+                    }
+                >
                     <PageSelectField
                         value={getHPlacement}
                         values={() => H_PLACEMENTS}
@@ -91,7 +97,13 @@ export const TooltipPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"vPlacement"} label={"Placement down"}>
+                <PageProp
+                    key={"vPlacement"}
+                    label={"Placement down"}
+                    hint={
+                        "Where the tooltip sits above or below its anchor: inside an edge, centered, or outside it altogether."
+                    }
+                >
                     <PageSelectField
                         value={getVPlacement}
                         values={() => V_PLACEMENTS}
@@ -101,7 +113,11 @@ export const TooltipPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"offsetX"} label={"Offset across (px)"}>
+                <PageProp
+                    key={"offsetX"}
+                    label={"Offset across (px)"}
+                    hint={"How far the tooltip is nudged sideways from where the placement put it."}
+                >
                     <PageNumberField
                         value={getOffsetX}
                         min={() => MIN_OFFSET}
@@ -113,7 +129,11 @@ export const TooltipPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"offsetY"} label={"Offset down (px)"}>
+                <PageProp
+                    key={"offsetY"}
+                    label={"Offset down (px)"}
+                    hint={"How far the tooltip is nudged up or down from where the placement put it."}
+                >
                     <PageNumberField
                         value={getOffsetY}
                         min={() => MIN_OFFSET}
@@ -125,7 +145,11 @@ export const TooltipPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"transitionDurationMs"} label={"Fade (ms)"}>
+                <PageProp
+                    key={"transitionDurationMs"}
+                    label={"Fade (ms)"}
+                    hint={"How long the tooltip takes to fade in and out."}
+                >
                     <PageNumberField
                         value={getTransitionDurationMs}
                         min={() => MIN_DURATION}
@@ -137,7 +161,13 @@ export const TooltipPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"focusShowDelayMs"} label={"Focus delay (ms)"}>
+                <PageProp
+                    key={"focusShowDelayMs"}
+                    label={"Focus delay (ms)"}
+                    hint={
+                        "How long a keyboard focus has to rest on the anchor before the tooltip appears. Hovering shows it at once."
+                    }
+                >
                     <PageNumberField
                         value={getFocusShowDelayMs}
                         min={() => MIN_DURATION}

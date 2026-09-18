@@ -38,7 +38,11 @@ export const PagePropsPanel = (props: ParentProps<PagePropsPanelProps>) => {
                     {props.children}
 
                     <Show when={getResets().length > getLeastToReset()}>
-                        <PageProp key={"resetPanel"} label={"These controls"}>
+                        <PageProp
+                            key={"resetPanel"}
+                            label={"These controls"}
+                            hint={"Puts every control in this panel back to the value it started at."}
+                        >
                             <Button
                                 renderContent={(getFlags) => (
                                     <PageButtonContent flags={getFlags}>Reset</PageButtonContent>

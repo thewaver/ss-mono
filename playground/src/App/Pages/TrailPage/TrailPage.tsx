@@ -82,7 +82,11 @@ export const TrailPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"durationMs"} label={"Lap duration (ms)"}>
+                <PageProp
+                    key={"durationMs"}
+                    label={"Lap duration (ms)"}
+                    hint={"How long the traveller takes to walk the path once, end to end."}
+                >
                     <PageNumberField
                         value={getDurationMs}
                         min={() => MIN_DURATION_MS}
@@ -93,11 +97,21 @@ export const TrailPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"isLooping"} label={"Loops"}>
+                <PageProp
+                    key={"isLooping"}
+                    label={"Loops"}
+                    hint={"Sends the traveller round again as soon as it reaches the end, instead of stopping there."}
+                >
                     <PageCheckField value={getIsLooping} ariaLabel={"Loops"} onChange={setIsLooping} />
                 </PageProp>
 
-                <PageProp key={"isTurning"} label={"Faces along the path"}>
+                <PageProp
+                    key={"isTurning"}
+                    label={"Faces along the path"}
+                    hint={
+                        "Turns the traveller to point the way it is going, instead of leaving it upright the whole way round."
+                    }
+                >
                     <PageCheckField value={getIsTurning} ariaLabel={"Faces along the path"} onChange={setIsTurning} />
                 </PageProp>
             </PagePropsPanel>

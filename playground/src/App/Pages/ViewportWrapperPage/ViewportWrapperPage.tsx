@@ -46,7 +46,7 @@ const STARTING_ROAMER_Y = 50;
 
 const renderTooltip = (text: string) => ({
     placement: () => ({ x: "center", y: "top-out" }) as const,
-    offset: () => ({ x: 0, y: 5 }),
+    offset: () => ({ x: 0, y: 10 }),
     renderContent: (getVisibilityTarget: () => 0 | 1, getTransitionDurationMs: () => number) => (
         <PageTooltipContent visibilityTarget={getVisibilityTarget} transitionDurationMs={getTransitionDurationMs}>
             {text}

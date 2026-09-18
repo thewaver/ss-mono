@@ -50,7 +50,11 @@ export const HueExample = (props: Props) => {
             />
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"deg"} label={"Hue rotation"}>
+                <PageProp
+                    key={"deg"}
+                    label={"Hue rotation"}
+                    hint={"How far every color is turned round the color wheel."}
+                >
                     <PageNumberField
                         value={getDeg}
                         min={() => MIN_DEG}
@@ -61,7 +65,11 @@ export const HueExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"saturation"} label={"Saturation"}>
+                <PageProp
+                    key={"saturation"}
+                    label={"Saturation"}
+                    hint={"How colorful the result is. 0 takes it to gray, above 1 pushes the colors harder."}
+                >
                     <PageNumberField
                         value={getSaturation}
                         min={() => MIN_AMOUNT}
@@ -72,7 +80,13 @@ export const HueExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"red"} label={"Red"}>
+                <PageProp
+                    key={"red"}
+                    label={"Red"}
+                    hint={
+                        "How much the red channel is scaled on its own, after the hue and saturation have been applied."
+                    }
+                >
                     <PageNumberField
                         value={getRed}
                         min={() => MIN_CHANNEL}
@@ -83,7 +97,13 @@ export const HueExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"green"} label={"Green"}>
+                <PageProp
+                    key={"green"}
+                    label={"Green"}
+                    hint={
+                        "How much the green channel is scaled on its own, after the hue and saturation have been applied."
+                    }
+                >
                     <PageNumberField
                         value={getGreen}
                         min={() => MIN_CHANNEL}
@@ -94,7 +114,13 @@ export const HueExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"blue"} label={"Blue"}>
+                <PageProp
+                    key={"blue"}
+                    label={"Blue"}
+                    hint={
+                        "How much the blue channel is scaled on its own, after the hue and saturation have been applied."
+                    }
+                >
                     <PageNumberField
                         value={getBlue}
                         min={() => MIN_CHANNEL}

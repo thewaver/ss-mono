@@ -115,7 +115,11 @@ export const OdometerPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"value"} label={"Value"}>
+                <PageProp
+                    key={"value"}
+                    label={"Value"}
+                    hint={"The number the odometer is counting to. Changing it is what starts the digits turning."}
+                >
                     <PageNumberField
                         value={getValue}
                         min={() => MIN_VALUE}
@@ -126,7 +130,11 @@ export const OdometerPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"turnDurationMs"} label={"Turn (ms)"}>
+                <PageProp
+                    key={"turnDurationMs"}
+                    label={"Turn (ms)"}
+                    hint={"How long one digit takes to turn from its old face to its new one."}
+                >
                     <PageNumberField
                         value={getTurnMs}
                         min={() => MIN_TURN_MS}
@@ -137,7 +145,13 @@ export const OdometerPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"cascadeDelayMs"} label={"Cascade (ms)"}>
+                <PageProp
+                    key={"cascadeDelayMs"}
+                    label={"Cascade (ms)"}
+                    hint={
+                        "How long each digit waits after the one beside it starts, which is what makes the turn ripple along."
+                    }
+                >
                     <PageNumberField
                         value={getCascadeMs}
                         min={() => MIN_CASCADE_MS}

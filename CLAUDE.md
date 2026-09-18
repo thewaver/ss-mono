@@ -267,9 +267,9 @@ a round trip and leaves the code broken in the meantime. Report what was fixed a
 This does not loosen _"Do not bundle a judgment call into a bug fix"_ below; the two are about different
 things. Fix the defect on sight; still raise the taste question separately.
 
-**`components/src` and `playground/src` carry no comments of any kind, and none may be added**, with the
-single exception of `*.utils.ts` documentation described below. Not a `//` note inside a function body, not a
-`/** */` block above a declaration, not on a component.
+**`components/src` and `playground/src` carry no comments of any kind, and none may be added**, with two
+exceptions: `*.utils.ts` documentation, described below, and the props-type documentation described after it.
+Not a `//` note inside a function body, not a `/** */` block above a declaration, not on a component.
 This has been asked for repeatedly and in several wordings; the count reached 108 blocks anyway, every one
 of them written by Claude rather than by the user, and they were all deleted. There is
 therefore no precedent left to copy: a comment appearing in either tree is new and is a defect. Reasoning
@@ -303,6 +303,20 @@ is still a defect. The documentation sits above declarations, never inside them.
 
 The rule also lives in `conventions.md` now, which is where it should always have been — it was written only
 here, and that is why it went unfollowed in a tree nobody thought to check this file about.
+
+**A member of an exported props type in `components/src` carries a `/** */` block, and that is the second
+exception.** The user's call, taken when the Playground grew an API view: the table it draws lists a
+component's props, and the sentence saying what each one is for has to come from somewhere. Hand-writing it
+beside the table was rejected because it drifts from the type the moment a prop is renamed; putting it on the
+property means it cannot. It also reaches a consumer's editor on hover, which the Playground never could.
+
+It is the same argument that carved out `*.utils.ts` — a consumer should not have to open the body to learn
+the contract — one file kind further, so write these in that style: what the prop is for, what it does at the
+edges, and what the caller is spared. **The scope is members of the exported `*Props` types**, and a type that
+feeds one is documented for the same reason it is shown, which is how `ExternalInteractionFlags` comes to
+carry blocks. **Nothing else in a `.types.ts` changes**, and the ban is untouched everywhere else: component
+files, `.css.ts`, `.const.ts`, `.knobs.ts` and every file in `playground/src` — its `*.utils.ts` included, which
+has never carried documentation and does not start now.
 
 **`e2e/` is the only exception in this repo** — explanatory blocks are welcome there, and the existing specs
 carry them, so a new spec should read like its neighbors.

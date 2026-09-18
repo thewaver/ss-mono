@@ -109,7 +109,13 @@ export const CurrencyInputPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"locale"} label={"Locale"}>
+                <PageProp
+                    key={"locale"}
+                    label={"Locale"}
+                    hint={
+                        "Which country's conventions the amount is written in, which decides the separators and where the symbol sits."
+                    }
+                >
                     <PageSelectField
                         value={getLocale}
                         values={() => LOCALES}
@@ -119,7 +125,11 @@ export const CurrencyInputPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"decimals"} label={"Decimals"}>
+                <PageProp
+                    key={"decimals"}
+                    label={"Decimals"}
+                    hint={"How many digits are kept after the decimal separator."}
+                >
                     <PageSelectField
                         value={getDecimals}
                         values={() => DECIMALS}
@@ -128,11 +138,21 @@ export const CurrencyInputPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"hasSign"} label={"Signed"}>
+                <PageProp
+                    key={"hasSign"}
+                    label={"Signed"}
+                    hint={"Allows negative amounts to be typed. With it off, a minus sign is rejected."}
+                >
                     <PageCheckField value={getHasSign} ariaLabel={"Signed"} onChange={setHasSign} />
                 </PageProp>
 
-                <PageProp key={"grouping"} label={"Grouping"}>
+                <PageProp
+                    key={"grouping"}
+                    label={"Grouping"}
+                    hint={
+                        "How the digits before the decimal point are grouped, such as in threes or in the Indian lakh pattern."
+                    }
+                >
                     <PageSelectField
                         value={getGrouping}
                         values={() => GROUPINGS}

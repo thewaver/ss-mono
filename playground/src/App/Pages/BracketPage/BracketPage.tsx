@@ -104,7 +104,11 @@ export const BracketPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"connector"} label={"Connectors"}>
+                <PageProp
+                    key={"connector"}
+                    label={"Connectors"}
+                    hint={"The line drawn between a match and the one it feeds: straight, elbowed, or curved."}
+                >
                     <PageSelectField
                         value={getConnector}
                         values={() => CONNECTORS}
@@ -113,7 +117,11 @@ export const BracketPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"orientation"} label={"Orientation"}>
+                <PageProp
+                    key={"orientation"}
+                    label={"Orientation"}
+                    hint={"Whether the rounds run across the page or down it."}
+                >
                     <PageSelectField
                         value={getOrientation}
                         values={() => ORIENTATIONS}
@@ -122,7 +130,11 @@ export const BracketPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"rootSide"} label={"Root side"}>
+                <PageProp
+                    key={"rootSide"}
+                    label={"Root side"}
+                    hint={"Which end the final holds, and so which way the rounds read."}
+                >
                     <PageSelectField
                         value={getRootSide}
                         values={() => ROOT_SIDES}
@@ -131,7 +143,7 @@ export const BracketPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"layerGap"} label={"Layer gap (px)"}>
+                <PageProp key={"layerGap"} label={"Layer gap (px)"} hint={"The space between one round and the next."}>
                     <PageNumberField
                         value={getLayerGap}
                         min={() => MIN_LAYER_GAP}
@@ -142,7 +154,11 @@ export const BracketPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"crossGap"} label={"Row gap (px)"}>
+                <PageProp
+                    key={"crossGap"}
+                    label={"Row gap (px)"}
+                    hint={"The space between two matches in the same round."}
+                >
                     <PageNumberField
                         value={getCrossGap}
                         min={() => MIN_CROSS_GAP}

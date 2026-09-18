@@ -98,29 +98,49 @@ export type PatchBoardSocketFlags = {
 };
 
 export type PatchBoardProps<T> = AccessorProps<{
+    /** Identifies the board, so two boards can tell their own sockets from each other's. */
     groupId: string;
+    /** Names the board for assistive technology. */
     ariaLabel: string;
+    /** How large the board is. */
     size: Size2d;
+    /** Which way the board runs, which decides where a node's inputs and outputs sit. */
     orientation?: PatchBoardOrientation;
+    /** How large one socket is drawn. */
     socketSize?: number;
+    /** How close a cable end has to get to a socket before it counts as landing on it. */
     socketReach?: number;
+    /** How far one press of an arrow key moves a node, for moving without a pointer. */
     stepSize?: number;
+    /** Turns the board off, so nothing on it responds. */
     isDisabled?: boolean;
+    /** Freezes the wiring as it stands: cables still show, but none can be made, moved or pulled out. */
     isLocked?: boolean;
+    /** The cables currently wired. It is the only thing that adds or removes one. */
     linksSignal: SignalSource<PatchBoardLink[]>;
+    /** Whether a cable between two given sockets is allowed, so a board can refuse a connection that makes no sense. */
     computeCanLink?: (link: PatchBoardLink) => boolean;
+    /** Draws one socket. */
     renderSocket?: (
         getSocket: Accessor<PatchBoardSocket>,
         getFlags: () => InteractionFlags<PatchBoardSocketFlags>,
     ) => JSX.Element;
+    /** Draws one cable, and is told where both ends are. */
     renderCable: (getDefs: Accessor<PatchBoardCableDefs>) => JSX.Element;
+    /** Runs when a cable is made. */
     onLink?: (link: PatchBoardLink) => void;
+    /** Runs when a cable is pulled out. */
     onUnlink?: (link: PatchBoardLink) => void;
+    /** Runs when a node is moved. */
     onMove?: (nodeKey: string, spot: Point2d) => void;
 }> & {
+    /** The nodes and where they sit. It is the only thing that moves them. */
     nodesSignal: SignalSource<PatchBoardNode<T>[]>;
+    /** The key one node is told apart by, which is what lets a node keep its cables as it moves. */
     computeNodeKey: (value: T) => string;
+    /** Names one node for assistive technology. */
     computeNodeLabel: (value: T) => string;
+    /** Draws one node. */
     renderNode: (
         getNode: Accessor<PatchBoardNode<T>>,
         getFlags: () => InteractionFlags<PatchBoardNodeFlags>,

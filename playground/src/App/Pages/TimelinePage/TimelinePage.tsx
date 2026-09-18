@@ -60,11 +60,19 @@ export const TimelinePage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"isPannable"} label={"Drag to move"}>
+                <PageProp
+                    key={"isPannable"}
+                    label={"Drag to move"}
+                    hint={"Lets the timeline be dragged sideways to move through it."}
+                >
                     <PageCheckField value={getIsPannable} ariaLabel={"Drag to move"} onChange={setIsPannable} />
                 </PageProp>
 
-                <PageProp key={"isZoomable"} label={"Wheel and pinch to zoom"}>
+                <PageProp
+                    key={"isZoomable"}
+                    label={"Wheel and pinch to zoom"}
+                    hint={"Lets the wheel and a pinch change how much of the timeline is in view."}
+                >
                     <PageCheckField
                         value={getIsZoomable}
                         ariaLabel={"Wheel and pinch to zoom"}
@@ -72,11 +80,21 @@ export const TimelinePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"isDisabled"} label={"Disabled"}>
+                <PageProp
+                    key={"isDisabled"}
+                    label={"Disabled"}
+                    hint={"Turns the timeline off, so it neither pans, zooms nor picks."}
+                >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>
 
-                <PageProp key={"picked"} label={`Picked: ${getPicked()}`}>
+                <PageProp
+                    key={"picked"}
+                    label={`Picked: ${getPicked()}`}
+                    hint={
+                        "Puts the examples back to the item they started on, and clears whatever has been picked since."
+                    }
+                >
                     <Button
                         renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Reset</PageButtonContent>}
                         onClick={async () => {

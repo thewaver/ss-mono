@@ -74,7 +74,11 @@ export const FormFieldPage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"dir"} label={"Direction"}>
+                <PageProp
+                    key={"dir"}
+                    label={"Direction"}
+                    hint={"Whether the label sits above the control or beside it."}
+                >
                     <PageSelectField
                         value={getDirection}
                         values={() => DIRECTIONS}
@@ -84,7 +88,11 @@ export const FormFieldPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"gap"} label={"Gap (px)"}>
+                <PageProp
+                    key={"gap"}
+                    label={"Gap (px)"}
+                    hint={"The space between the label, the control and the message."}
+                >
                     <PageNumberField
                         value={getGap}
                         min={() => MIN_GAP}
@@ -96,7 +104,11 @@ export const FormFieldPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"message"} label={"Message"}>
+                <PageProp
+                    key={"message"}
+                    label={"Message"}
+                    hint={"The line shown under the control. Leave it empty and no line is rendered at all."}
+                >
                     <PageTextField
                         value={getMessage}
                         width={() => MESSAGE_WIDTH}
@@ -106,7 +118,13 @@ export const FormFieldPage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"hasError"} label={"In error"}>
+                <PageProp
+                    key={"hasError"}
+                    label={"In error"}
+                    hint={
+                        "Puts the field into its error look and reads the message out as the error rather than as help."
+                    }
+                >
                     <PageCheckField value={getHasError} ariaLabel={"In error"} onChange={setHasError} />
                 </PageProp>
             </PagePropsPanel>

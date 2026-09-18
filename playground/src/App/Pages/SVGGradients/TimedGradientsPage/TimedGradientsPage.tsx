@@ -63,7 +63,11 @@ export const TimedGradientsPage = () => {
         <>
             <PagePropsGroups>
                 <PagePropsPanel scope={"sample"}>
-                    <PageProp key={"configKey"} label={"Gradient"}>
+                    <PageProp
+                        key={"configKey"}
+                        label={"Gradient"}
+                        hint={"Which animated gradient is shown. Choosing one brings its own knobs with it."}
+                    >
                         <PageGroupedSelectField
                             value={getConfigKey}
                             groups={() => toGroupEntriesWithNoSample(GROUPPED_TIMED_GRADIENTS)}
@@ -94,7 +98,11 @@ export const TimedGradientsPage = () => {
                         }}
                     />
 
-                    <PageProp key={"animationDurationMs"} label={"Animation duration (ms)"}>
+                    <PageProp
+                        key={"animationDurationMs"}
+                        label={"Animation duration (ms)"}
+                        hint={"How long one pass of the gradient's animation takes."}
+                    >
                         <PageNumberField
                             value={getAnimationDurationMs}
                             min={() => MIN_DURATION_MS}
@@ -105,7 +113,11 @@ export const TimedGradientsPage = () => {
                         />
                     </PageProp>
 
-                    <PageProp key={"iterationConfigKey"} label={"Iteration Pattern"}>
+                    <PageProp
+                        key={"iterationConfigKey"}
+                        label={"Iteration Pattern"}
+                        hint={"How the animation repeats: once, endlessly, or back and forth."}
+                    >
                         <PageSelectField
                             value={getIterationConfigKey}
                             values={() =>

@@ -8,6 +8,7 @@ import solid from "vite-plugin-solid";
 import { vanillaExtractPlugin } from "@vanilla-extract/vite-plugin";
 
 import { componentDependencies } from "./vite/componentDependencies.ts";
+import { componentProps } from "./vite/componentProps.ts";
 
 const SOURCE_QUERY = "?source";
 const SOURCE_PREFIX = "\0source:";
@@ -40,6 +41,7 @@ export default defineConfig({
     plugins: [
         playgroundSource(),
         componentDependencies(fromRepo("../components/src")),
+        componentProps(fromRepo("../components/src"), fromRepo("../utils/src/index.ts")),
         solid(),
         checker({
             typescript: {

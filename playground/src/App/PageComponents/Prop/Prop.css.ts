@@ -45,5 +45,15 @@ export const propScopeVariants = styleVariants({
 });
 
 export const propLabel = style({
+    display: "flex",
+    alignItems: "center",
+    gap: themeVars.spacing.half,
     alignSelf: "center",
+    minWidth: 0,
+});
+
+export const propHintDefault = style({
+    marginTop: themeVars.spacing.half,
+    fontFamily: "monospace",
+    fontSize: themeVars.fontSize.xSmall,
 });

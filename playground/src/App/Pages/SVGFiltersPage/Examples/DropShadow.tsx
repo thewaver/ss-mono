@@ -54,7 +54,11 @@ export const DropShadowExample = (props: Props) => {
             />
 
             <PagePropsPanel scope={"local"}>
-                <PageProp key={"dx"} label={"Offset x"}>
+                <PageProp
+                    key={"dx"}
+                    label={"Offset x"}
+                    hint={"How far the shadow is thrown sideways from the shape casting it."}
+                >
                     <PageNumberField
                         value={getDx}
                         min={() => MIN_OFFSET}
@@ -64,7 +68,11 @@ export const DropShadowExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"dy"} label={"Offset y"}>
+                <PageProp
+                    key={"dy"}
+                    label={"Offset y"}
+                    hint={"How far the shadow is thrown up or down from the shape casting it."}
+                >
                     <PageNumberField
                         value={getDy}
                         min={() => MIN_OFFSET}
@@ -74,7 +82,11 @@ export const DropShadowExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"shadowStdDeviation"} label={"Std deviation"}>
+                <PageProp
+                    key={"shadowStdDeviation"}
+                    label={"Std deviation"}
+                    hint={"How soft the shadow's edge is. 0 gives a hard copy of the shape."}
+                >
                     <PageNumberField
                         value={getStdDeviation}
                         min={() => MIN_DEVIATION}
@@ -85,11 +97,15 @@ export const DropShadowExample = (props: Props) => {
                     />
                 </PageProp>
 
-                <PageProp key={"floodColor"} label={"Flood color"}>
+                <PageProp key={"floodColor"} label={"Flood color"} hint={"The color the shadow is painted in."}>
                     <PageColorField value={getFloodColor} ariaLabel={"Flood color"} onInput={setFloodColor} />
                 </PageProp>
 
-                <PageProp key={"floodOpacity"} label={"Flood opacity"}>
+                <PageProp
+                    key={"floodOpacity"}
+                    label={"Flood opacity"}
+                    hint={"How solid the shadow is. 0 hides it entirely."}
+                >
                     <PageNumberField
                         value={getFloodOpacity}
                         min={() => MIN_OPACITY}

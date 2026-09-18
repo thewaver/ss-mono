@@ -84,7 +84,7 @@ export const StaircasePage = () => {
     return (
         <>
             <PagePropsPanel scope={"global"}>
-                <PageProp key={"stepCount"} label={"Steps"}>
+                <PageProp key={"stepCount"} label={"Steps"} hint={"How many steps the staircase holds."}>
                     <PageNumberField
                         value={getStepCount}
                         min={() => MIN_STEP_COUNT}
@@ -96,7 +96,11 @@ export const StaircasePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"indent"} label={"Indent (px)"}>
+                <PageProp
+                    key={"indent"}
+                    label={"Indent (px)"}
+                    hint={"How far one step is set in from the one before it."}
+                >
                     <PageNumberField
                         value={getIndent}
                         min={() => MIN_INDENT}
@@ -108,7 +112,7 @@ export const StaircasePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"gap"} label={"Gap (px)"}>
+                <PageProp key={"gap"} label={"Gap (px)"} hint={"The space between one step and the next."}>
                     <PageNumberField
                         value={getGap}
                         min={() => MIN_GAP}
@@ -120,7 +124,7 @@ export const StaircasePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"dir"} label={"Direction"}>
+                <PageProp key={"dir"} label={"Direction"} hint={"Which way the staircase runs."}>
                     <PageSelectField
                         value={getDir}
                         values={() => DIRS}
@@ -130,7 +134,11 @@ export const StaircasePage = () => {
                     />
                 </PageProp>
 
-                <PageProp key={"indentKey"} label={"Indent function"}>
+                <PageProp
+                    key={"indentKey"}
+                    label={"Indent function"}
+                    hint={"How the indent grows down the run: evenly, faster and faster, or in and out again."}
+                >
                     <PageSelectField
                         value={getIndentKey}
                         values={() => StaircaseIndents.SAMPLE_KEYS}

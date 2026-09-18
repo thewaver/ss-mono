@@ -7,3 +7,17 @@ declare module "virtual:component-dependencies" {
 
     export default dependencies;
 }
+
+declare module "virtual:component-props" {
+    export type PropEntry = {
+        name: string;
+        type: string;
+        description: string;
+        isOptional: boolean;
+        isAccessor: boolean;
+    };
+
+    const props: Record<string, PropEntry[]>;
+
+    export default props;
+}
