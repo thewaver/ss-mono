@@ -1,6 +1,6 @@
 import { For, type Setter, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
 
-import { type Point2d, Rect } from "@thewaver/ss-utils";
+import { Rect } from "@thewaver/ss-utils";
 
 import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
 import { MediaQueryMonitorUtils } from "../../Abstracts/MediaQueryMonitor/MediaQueryMonitor.utils";
@@ -24,8 +24,6 @@ type LiveParticle = {
     index: number;
     repeatIndex: number;
     targetIndex: number;
-    from: Point2d;
-    to: Point2d;
     spawnedAtMs: number;
 };
 
@@ -49,6 +47,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const [getRootRect, setRootRect] = createSignal<Rect | undefined>(undefined, {
         equals: (a, b) => (a === undefined || b === undefined ? a === b : Rect.isSame(a, b)),
     });
+    const getHasRootRect = createMemo(() => getRootRect() !== undefined);
 
     const getPrefersReducedMotion = MediaQueryMonitorUtils.createReducedMotion();
 
@@ -86,9 +85,9 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
         const isWindowVisible = getIsWindowVisible();
         const isPlaying = getIsPlaying();
         const prefersReducedMotion = getPrefersReducedMotion();
-        const rootRect = getRootRect();
+        const hasRootRect = getHasRootRect();
 
-        if (!rootRect || !isWindowVisible || !isPlaying || particleCount <= 0 || targets.length === 0 || !pattern)
+        if (!hasRootRect || !isWindowVisible || !isPlaying || particleCount <= 0 || targets.length === 0 || !pattern)
             return;
 
         let repeatIndex = 0;
@@ -103,8 +102,6 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
             repeatStartMs = performance.now();
         };
 
-        const from = { x: rootRect.width * 0.5, y: rootRect.height * 0.5 };
-
         const spawnNext = () => {
             const targetIndex =
                 props.computeTarget?.(spawnedInRepeat, targets.length) ??
@@ -114,9 +111,6 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
 
             if (targetIndex === undefined) return;
 
-            const targetRect = getTargetRects()[targetIndex];
-            const to = targetRect ? ParticleSpawnerUtils.toRelativeCenter(targetRect, rootRect) : from;
-
             setLiveParticles((particles) => [
                 ...particles,
                 {
@@ -124,8 +118,6 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
                     index: spawnedInRepeat - 1,
                     repeatIndex,
                     targetIndex,
-                    from,
-                    to,
                     spawnedAtMs: repeatStartMs + (spawnedInRepeat - 1) * spawnDelayMs,
                 },
             ]);
@@ -135,14 +127,20 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
             while (spawnedInRepeat < particleCount && now >= repeatStartMs + spawnedInRepeat * spawnDelayMs)
                 spawnNext();
 
+            const rootRect = getRootRect();
+            const from = rootRect ? { x: rootRect.width * 0.5, y: rootRect.height * 0.5 } : undefined;
+
             for (const particle of getLiveParticles()) {
                 const el = refs.get(particle.id);
 
-                if (!el) continue;
+                if (!el || !rootRect || !from) continue;
 
                 const t = Math.min(1, (now - particle.spawnedAtMs) / travelDurationMs);
 
                 tSetters.get(particle.id)?.(t);
+
+                const targetRect = getTargetRects()[particle.targetIndex];
+                const to = targetRect ? ParticleSpawnerUtils.toRelativeCenter(targetRect, rootRect) : from;
 
                 ParticleSpawnerUtils.assignParticlePos(
                     el,
@@ -151,8 +149,8 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
                             id: particle.id,
                             index: particle.index,
                             targetIndex: particle.targetIndex,
-                            from: particle.from,
-                            to: particle.to,
+                            from,
+                            to,
                             prefersReducedMotion,
                         },
                         t,

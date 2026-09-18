@@ -1,9 +1,12 @@
-import { style } from "@vanilla-extract/css";
+import { keyframes, style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
 
 const MARKER_SIZE_PX = 28;
 const PARTICLE_SIZE_PX = 10;
+const MOVING_TARGET_LOOP_MS = 4000;
+const CORNER_NEAR = "15%";
+const CORNER_FAR = "85%";
 
 export const demoArea = style({
     position: "relative",
@@ -35,6 +38,24 @@ export const targetMarker = style({
     backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
     boxShadow: themeVars.shadow.small,
 });
+
+const moveAroundCorners = keyframes({
+    "0%": { left: CORNER_NEAR, top: CORNER_NEAR },
+    "25%": { left: CORNER_FAR, top: CORNER_NEAR },
+    "50%": { left: CORNER_FAR, top: CORNER_FAR },
+    "75%": { left: CORNER_NEAR, top: CORNER_FAR },
+    "100%": { left: CORNER_NEAR, top: CORNER_NEAR },
+});
+
+export const movingTargetMarker = style([
+    targetMarker,
+    {
+        animationName: moveAroundCorners,
+        animationDuration: `${MOVING_TARGET_LOOP_MS}ms`,
+        animationTimingFunction: "linear",
+        animationIterationCount: "infinite",
+    },
+]);
 
 export const particle = style({
     width: PARTICLE_SIZE_PX,

@@ -9,36 +9,53 @@ import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageCom
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
+import { DiagonalExample } from "./Examples/Diagonal";
 import { GridExample } from "./Examples/Grid";
+import { MovingTargetExample } from "./Examples/MovingTarget";
 import { MultipleTargetsExample } from "./Examples/MultipleTargets";
+import { RadialExample } from "./Examples/Radial";
 import { SingleTargetExample } from "./Examples/SingleTarget";
+import { VerticalExample } from "./Examples/Vertical";
 import {
     ITERATION_PATTERNS,
     ITERATION_PATTERN_KEYS,
+    MAX_OVERSHOOT_PERCENT,
     MAX_PARTICLE_COUNT,
     MAX_RETENTION_MS,
     MAX_SPAWN_DELAY_MS,
     MAX_TRAVEL_DURATION_MS,
+    MIN_OVERSHOOT_PERCENT,
     MIN_PARTICLE_COUNT,
     MIN_RETENTION_MS,
     MIN_SPAWN_DELAY_MS,
     MIN_TRAVEL_DURATION_MS,
+    OVERSHOOT_PERCENT_STEP,
     PARTICLE_COUNT_STEP,
     RETENTION_STEP_MS,
     SPAWN_DELAY_STEP_MS,
     STARTING_ITERATION_PATTERN_KEY,
+    STARTING_OVERSHOOT_PERCENT,
     STARTING_PARTICLE_COUNT,
     STARTING_RETENTION_MS,
     STARTING_SPAWN_DELAY_MS,
     STARTING_TRAVEL_DURATION_MS,
+    STARTING_TRAVEL_EASING_KEY,
     STARTING_TRAVEL_PATTERN_KEY,
     TRAVEL_DEFAULTS_BY_PATTERN,
     TRAVEL_DURATION_STEP_MS,
+    TRAVEL_EASING_FNS,
+    TRAVEL_EASING_KEYS,
     TRAVEL_KNOBS_BY_PATTERN,
     TRAVEL_PATTERN_FACTORIES,
     TRAVEL_PATTERN_KEYS,
+    applyOvershoot,
 } from "./ParticleSpawnerPage.const";
-import type { IterationPattern, ParticleSpawnerExampleProps, ParticleTravelPattern } from "./ParticleSpawnerPage.types";
+import type {
+    IterationPattern,
+    ParticleSpawnerExampleProps,
+    ParticleTravelPattern,
+    TravelEasingKey,
+} from "./ParticleSpawnerPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/ParticleSpawnerPage/Examples";
 const FIELD_WIDTH = 130;
@@ -83,6 +100,8 @@ export const ParticleSpawnerPage = () => {
     const [getTravelDurationMs, setTravelDurationMs] = createSignal(STARTING_TRAVEL_DURATION_MS);
     const [getRetentionMs, setRetentionMs] = createSignal(STARTING_RETENTION_MS);
     const [getSpawnDelayMs, setSpawnDelayMs] = createSignal(STARTING_SPAWN_DELAY_MS);
+    const [getOvershootPercent, setOvershootPercent] = createSignal(STARTING_OVERSHOOT_PERCENT);
+    const [getTravelEasingKey, setTravelEasingKey] = createSignal<TravelEasingKey>(STARTING_TRAVEL_EASING_KEY);
 
     const [getTravelPatternKey, setTravelPatternKey] = createSignal<ParticleTravelPattern>(STARTING_TRAVEL_PATTERN_KEY);
 
@@ -96,12 +115,17 @@ export const ParticleSpawnerPage = () => {
     const getTravelDefaults = () => TRAVEL_DEFAULTS_BY_PATTERN[getTravelPatternKey()];
     const getPickedTravelDefs = () => travelDefs[getTravelPatternKey()] ?? {};
 
-    const getComputeParticlePos = createMemo(() =>
-        TRAVEL_PATTERN_FACTORIES[getTravelPatternKey()]({
+    const getComputeParticlePos = createMemo(() => {
+        const evaluate = TRAVEL_PATTERN_FACTORIES[getTravelPatternKey()]({
             ...getTravelDefaults(),
             ...getPickedTravelDefs(),
-        } as Record<string, number>),
-    );
+        } as Record<string, number>);
+        const easingFn = TRAVEL_EASING_FNS[getTravelEasingKey()];
+        const overshootPercent = getOvershootPercent();
+
+        return (defs: Parameters<typeof evaluate>[0], t: number) =>
+            evaluate(defs, applyOvershoot(t, easingFn(t), overshootPercent));
+    });
 
     const getExamples = createMemo(() => {
         const commonProps: ParticleSpawnerExampleProps = {
@@ -124,6 +148,46 @@ export const ParticleSpawnerPage = () => {
                     </PageMeasureBox>
                 ),
                 path: `${EXAMPLES_ROOT}/SingleTarget.tsx`,
+            },
+            {
+                key: "vertical",
+                name: "Vertical",
+                component: () => (
+                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                        <VerticalExample {...commonProps} />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/Vertical.tsx`,
+            },
+            {
+                key: "diagonal",
+                name: "Diagonal",
+                component: () => (
+                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                        <DiagonalExample {...commonProps} />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/Diagonal.tsx`,
+            },
+            {
+                key: "movingTarget",
+                name: "Moving target",
+                component: () => (
+                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                        <MovingTargetExample {...commonProps} />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/MovingTarget.tsx`,
+            },
+            {
+                key: "radial",
+                name: "Radial (1 spawner, many targets)",
+                component: () => (
+                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                        <RadialExample {...commonProps} />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/Radial.tsx`,
             },
             {
                 key: "multipleTargets",
@@ -236,6 +300,28 @@ export const ParticleSpawnerPage = () => {
                             width={() => FIELD_WIDTH}
                             ariaLabel={"Iteration pattern"}
                             onChange={(key) => setIterationPatternKey(() => key)}
+                        />
+                    </PageProp>
+
+                    <PageProp key={"overshootPercent"} label={"Overshoot (%)"}>
+                        <PageNumberField
+                            value={getOvershootPercent}
+                            min={() => MIN_OVERSHOOT_PERCENT}
+                            max={() => MAX_OVERSHOOT_PERCENT}
+                            step={() => OVERSHOOT_PERCENT_STEP}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Overshoot percent"}
+                            onInput={setOvershootPercent}
+                        />
+                    </PageProp>
+
+                    <PageProp key={"travelEasing"} label={"Travel easing"}>
+                        <PageSelectField
+                            value={getTravelEasingKey}
+                            values={() => TRAVEL_EASING_KEYS}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Travel easing"}
+                            onChange={(key) => setTravelEasingKey(() => key)}
                         />
                     </PageProp>
                 </PagePropsPanel>

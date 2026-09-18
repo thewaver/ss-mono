@@ -1,11 +1,53 @@
 import type { Signal } from "solid-js";
 
-import type { AccessorProps, ParticleSpawnIterationPattern, ParticleTravelDefs, SampleKnob } from "@thewaver/ss-components";
+import type {
+    AccessorProps,
+    ParticleSpawnIterationPattern,
+    ParticleTravelDefs,
+    SampleKnob,
+} from "@thewaver/ss-components";
 import type { Point2d } from "@thewaver/ss-utils";
 
-export type ParticleTravelPattern = "line" | "arc" | "wave";
+export type ParticleTravelPattern = "line" | "arc" | "wave" | "spiral" | "orbit" | "bezier" | "zigzag";
 
 export type IterationPattern = "burst" | "intermittent" | "continuous";
+
+export type TravelEasingKey =
+    | "linear"
+    | "ease"
+    | "easeIn"
+    | "easeOut"
+    | "easeInOut"
+    | "easeInQuad"
+    | "easeOutQuad"
+    | "easeInOutQuad"
+    | "easeInCubic"
+    | "easeOutCubic"
+    | "easeInOutCubic"
+    | "easeInQuart"
+    | "easeOutQuart"
+    | "easeInOutQuart"
+    | "easeInQuint"
+    | "easeOutQuint"
+    | "easeInOutQuint"
+    | "easeInSine"
+    | "easeOutSine"
+    | "easeInOutSine"
+    | "easeInExpo"
+    | "easeOutExpo"
+    | "easeInOutExpo"
+    | "easeInCirc"
+    | "easeOutCirc"
+    | "easeInOutCirc"
+    | "easeInBack"
+    | "easeOutBack"
+    | "easeInOutBack"
+    | "easeInElastic"
+    | "easeOutElastic"
+    | "easeInOutElastic"
+    | "easeOutBounce"
+    | "easeInBounce"
+    | "easeInOutBounce";
 
 export type ParticleTravelPatternFn = (defs: ParticleTravelDefs, t: number) => Point2d;
 
