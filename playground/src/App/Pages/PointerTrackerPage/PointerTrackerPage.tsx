@@ -5,7 +5,6 @@ import type { PointerReading } from "@thewaver/ss-components";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { CastShadowExample } from "./Examples/CastShadow";
-import { DockExample } from "./Examples/Dock";
 import { LampsExample } from "./Examples/Lamps";
 import { MagnetExample } from "./Examples/Magnet";
 import { TiltExample } from "./Examples/Tilt";
@@ -17,8 +16,6 @@ const BOX_WIDTH = 300;
 const BOX_PADDING = 10;
 const MAGNET_HEIGHT = 160;
 const TILT_HEIGHT = 200;
-const DOCK_WIDTH = 320;
-const DOCK_HEIGHT = 100;
 
 export const PointerTrackerPage = () => {
     const [getShadowReading, setShadowReading] = createSignal<PointerReading>();
@@ -70,18 +67,6 @@ export const PointerTrackerPage = () => {
                 </PageMeasureBox>
             ),
             path: `${EXAMPLES_ROOT}/Tilt.tsx`,
-        },
-        {
-            key: "dock",
-            name: "Dock",
-            readout: () =>
-                "every tile is sized from where the pointer falls on the row at rest, so growing never moves the row",
-            component: () => (
-                <PageMeasureBox width={() => DOCK_WIDTH} height={() => DOCK_HEIGHT} padding={() => BOX_PADDING}>
-                    <DockExample />
-                </PageMeasureBox>
-            ),
-            path: `${EXAMPLES_ROOT}/Dock.tsx`,
         },
     ]);
 

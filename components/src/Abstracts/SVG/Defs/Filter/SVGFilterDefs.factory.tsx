@@ -400,6 +400,8 @@ export class SVGFilterDefsFactory {
     };
 
     public addSpecularLightingFilter = (defs: SVGSpecularLightingFilterDefs, custom?: JSX.Element) => {
+        if ((access(defs.specularConstant) ?? 1) <= 0) return this;
+
         const key = `${this.filterId}_specularLighting_${this.specularLightingCount++}`;
         const surfaceKey = `${key}_surface`;
         const lightKey = `${key}_light`;

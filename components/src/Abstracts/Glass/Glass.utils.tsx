@@ -2,9 +2,10 @@ import { ShapeConst, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerUtils } from "../PointerTracker/PointerTracker.utils";
 import { SVGFilterDefsFactory } from "../SVG/Defs/Filter/SVGFilterDefs.factory";
+import { SVGGradientDefsUtils } from "../SVG/Defs/Gradient/SVGGradientDefs.utils";
 import type { SVGDefs } from "../SVG/Defs/SVGDefs.types";
 import { DEFAULT_GLASS_DEFS } from "./Glass.const";
-import type { GlassDefs, PartialGlassDefs } from "./Glass.types";
+import type { GlassDefs, GlassTintDefs, PartialGlassDefs } from "./Glass.types";
 
 /** Stands in for a missing element, so the pointer tracker always has something to call. */
 const NO_REF = () => undefined;
@@ -28,7 +29,9 @@ export namespace GlassUtils {
      * Fills a partial glass description out with the defaults.
      *
      * Merged one group at a time rather than wholesale, so a caller can override a single number — the
-     * blur radius, say — without having to restate the rest of that group.
+     * blur radius, say — without having to restate the rest of that group. `tint` is the exception: a
+     * flat color and a gradient are different shapes, not a wider set of the same fields, so a caller
+     * who supplies one replaces the default entirely rather than having it blended in field by field.
      *
      * @param partial What the caller wants to change. Missing entirely gives the defaults.
      */
@@ -36,7 +39,7 @@ export namespace GlassUtils {
         noise: { ...DEFAULT_GLASS_DEFS.noise, ...partial?.noise },
         backdrop: { ...DEFAULT_GLASS_DEFS.backdrop, ...partial?.backdrop },
         ripple: { ...DEFAULT_GLASS_DEFS.ripple, ...partial?.ripple },
-        tint: { ...DEFAULT_GLASS_DEFS.tint, ...partial?.tint },
+        tint: partial?.tint ?? DEFAULT_GLASS_DEFS.tint,
         sheen: { ...DEFAULT_GLASS_DEFS.sheen, ...partial?.sheen },
     });
 
@@ -92,6 +95,40 @@ export namespace GlassUtils {
     /** The id of an instance's backdrop filter. */
     export const getBackdropFilterId = (id: string) => `glass-backdrop-${id}`;
 
+    /** The id of an instance's tint gradient, when the tint is a gradient rather than a flat color. */
+    export const getTintGradientId = (id: string) => `glass-tint-${id}`;
+
+    /**
+     * Builds the tint's fill: a flat color, or a gradient built the same way the SVG defs factories
+     * build one anywhere else in the library.
+     *
+     * @param id The instance's id, which the gradient's own id is built from.
+     * @param getSize The element's current size, which a radial gradient's `elementSize` needs to hold
+     * its shape on a non-square element.
+     * @param tint The tint half of the glass description.
+     */
+    const computeTintFill = (id: string, getSize: () => Size2d, tint: GlassTintDefs) => {
+        const gradient = tint.gradient;
+
+        if (!gradient) return { color: tint.color };
+
+        const gradientId = getTintGradientId(id);
+
+        return {
+            gradientOrPattern: {
+                id: gradientId,
+                renderDefsElement: () =>
+                    gradient.kind === "linear"
+                        ? SVGGradientDefsUtils.computeLinearGradient({ ...gradient, id: gradientId })
+                        : SVGGradientDefsUtils.computeRadialGradient({
+                              ...gradient,
+                              id: gradientId,
+                              elementSize: getSize,
+                          }),
+            },
+        };
+    };
+
     /**
      * Builds the pointer-tracking highlight.
      *
@@ -105,7 +142,9 @@ export namespace GlassUtils {
      * the tracker's resting position is.
      * @param getSize The element's current size, which the pointer's position is scaled against.
      * @param defs The glass description, filled out.
-     * @returns One definition, carrying the tint color and opacity along with the filter.
+     * @returns One definition, carrying the tint's fill and opacity along with the filter. The filter
+     * is left off entirely at a `specularConstant` of zero, rather than pointed at one that builds
+     * nothing — the same trap `computeBackdropFilterElement`'s callers have to account for.
      */
     export const computeSheenDefs = (
         id: string,
@@ -113,12 +152,15 @@ export namespace GlassUtils {
         getSize: () => Size2d,
         defs: GlassDefs,
     ): SVGDefs[] => {
+        const tintDef = { ...computeTintFill(id, getSize, defs.tint), opacity: defs.tint.opacity };
+
+        if (defs.sheen.specularConstant <= 0) return [tintDef];
+
         const filterId = getSheenFilterId(id);
 
         return [
             {
-                color: defs.tint.color,
-                opacity: defs.tint.opacity,
+                ...tintDef,
                 filter: {
                     id: filterId,
                     renderDefsElement: () => {

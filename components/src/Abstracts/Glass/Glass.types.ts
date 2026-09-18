@@ -1,3 +1,5 @@
+import type { SVGLinearGradientDefs, SVGRadialGradientDefs } from "../SVG/Defs/Gradient/SVGGradientDefs.types";
+
 export type GlassNoiseDefs = {
     frequency: number;
     octaves: number;
@@ -12,10 +14,13 @@ export type GlassRippleDefs = {
     scale: number;
 };
 
-export type GlassTintDefs = {
-    color: string;
-    opacity: number;
-};
+export type GlassTintGradientDefs =
+    | ({ kind: "linear" } & Omit<SVGLinearGradientDefs, "id">)
+    | ({ kind: "radial" } & Omit<SVGRadialGradientDefs, "id" | "elementSize">);
+
+export type GlassTintDefs =
+    | { color: string; opacity: number; gradient?: never }
+    | { color?: never; opacity: number; gradient: GlassTintGradientDefs };
 
 export type GlassSheenDefs = {
     lightHeight: number;
@@ -33,5 +38,9 @@ export type GlassDefs = {
 };
 
 export type PartialGlassDefs = {
-    [K in keyof GlassDefs]?: Partial<GlassDefs[K]>;
+    noise?: Partial<GlassDefs["noise"]>;
+    backdrop?: Partial<GlassDefs["backdrop"]>;
+    ripple?: Partial<GlassDefs["ripple"]>;
+    tint?: GlassTintDefs;
+    sheen?: Partial<GlassDefs["sheen"]>;
 };

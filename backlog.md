@@ -54,10 +54,9 @@ reading.
 20. An anchored layer is always a frame behind — _postponed until the platform catches up_
 21. `Table` — six things deliberately not built — _open_
 22. `Timeline` — the pointer routes the library cannot promise — _open_
-23. `GlassSurface` — what is built and what is not — _open_
+23. `GlassSurface` — what is built and what is not — _open, one item postponed until the platform catches up_
 24. Arbitrary placement across controls, and the picking that has to come with it — _open_
 25. The scanline page is twelve examples of one example — _open_
-26. The gradient knobs are exposed wide, and want narrowing — _open_
 
 ### Build order
 
@@ -1007,23 +1006,32 @@ are in `decisions.md` under _"`Timeline`: a window over a range"_. What is outst
 The component is built and works: two backdrop layers, the tint, and a specular sheen that follows the
 pointer, with a draggable pane on its page. `GlassDefs` names the four groups of settings, and the ripple and
 the sheen share one noise field. The reasoning is in `decisions.md` under _"`GlassSurface`, and the two
-things that decide its shape"_. Three things are outstanding.
+things that decide its shape"_. Two things are outstanding.
 
-- **The defaults should be the user's tuned values, in one place.** Also asked for. `DEFAULT_GLASS_DEFS` and
-  the Playground page have drifted apart — the page sits at a ripple frequency of 0.025 and a tint opacity of
-  0.2 against the component's 0.012 and 0.1, because the page's numbers were tuned by hand and the component's
-  were not. The component's defaults become whatever the user settles on, and the page seeds every control
-  from them rather than repeating any number. The sheen controls already do this; the older ones do not.
-  **The user intends to fine-tune before this is done**, so the values to copy are the ones current at that
-  point, not today's.
+**The defaults are unified.** `DEFAULT_GLASS_DEFS` now carries the page's hand-tuned ripple scale and tint
+opacity, and every control on the page — noise, sheen, backdrop blur, ripple, tint — seeds from it rather
+than repeating a number. A future re-tune changes one place.
 
-- **The page cannot be reached.** `GlassSurface` sits under `Composites`, which the Playground hides behind
-  `SHOW_COMPOSITES`, currently `false`. `Surface` is in the same position. Nothing is broken; the route
-  exists and works when opened directly, but neither component is in the menu.
+`GlassSurface` sits under `Composites`, which the Playground hides behind `SHOW_COMPOSITES` — that flag is
+what decides visibility by design, so the page not being in the menu is not a gap.
+
 - **Nothing uses it yet.** The intent stated when it was commissioned was to replace the Playground's own
   example boxes and left navigation panel with it. Both currently use a plain `backdrop-filter: blur()`. The
   cost worth measuring first: a blurred _and_ displaced backdrop repaints whenever anything behind it moves,
   and a nav panel is large and permanently on screen.
+
+- **The ripple layer's edge shows a defect under real GPU rendering, and it is postponed rather than fixed —
+  _postponed until the platform catches up_.** Clipping the ripple layer with `clip-path`, an ancestor's
+  `overflow: hidden`, or a `feComposite` mask built into the filter itself all either reproduce the fault or
+  introduce a different one, a precise notch at two diagonally opposite corners, confirmed in a real Microsoft
+  Edge window and unaffected by curve resolution or device pixel ratio — see `decisions.md` for the full
+  investigation. This is not a bug particular to this codebase: the W3C SVG working group has an open issue
+  ([w3c/svgwg#1142](https://github.com/w3c/svgwg/issues/1142)) asking for an interoperable way to do exactly
+  this — backdrop displacement for "liquid glass" UI — because `backdrop-filter` combined with
+  `feDisplacementMap` is not currently reliable, and Safari does not implement the combination at all
+  ([WebKit bug 245510](https://bugs.webkit.org/show_bug.cgi?id=245510)). **Do not propose a CSS-only or
+  filter-internal workaround** — every shape one could take was tried and is recorded in `decisions.md`. Re-open
+  when the platform actually supports this, which the W3C issue above is the thing to watch.
 
 ---
 
@@ -1138,38 +1146,6 @@ the wrapper components; the picker, the readout and where the breakpoint control
 actually need designing.
 
 **Nothing is blocked on it** and the shape of the picker has not been argued.
-
----
-
-## 26. The gradient knobs are exposed wide, and want narrowing
-
-**The user's method, in their words: _"we will work by exposing what we can and then I'll ask to hide back what
-we shouldn't expose."_** So the current state is deliberately over-exposed and the narrowing pass has not
-happened. Nothing is wrong until they have looked.
-
-**Every tracked sample now states its own numbers.** The eighteen carry between five and fifteen knobs each,
-counting the picker and the reset — the radial falloff on the spots and flares, the band's core and spread and
-how far it tracks, the hand's sweep, the ripple set entire, the smear's speed response, and the color walk's
-span and period. Each defaults to the constant the sample was tuned with, so an untouched knob paints exactly
-what it painted before.
-
-**Two narrowings have happened and they are the pattern for the rest.** `elastic_*` lost its `steps` knob:
-the user said twelve is a sweet spot and below it the effect goes janky, so the number is pinned and the prop
-is gone rather than merely defaulted. The four hand samples then lost `sweepLead`, which turned the gradient
-without turning the wedge it is clipped to, so any value but ninety slid the band off the hand. A knob that
-should not be turned is removed, not left with a good default; the reasoning for each sits in `decisions.md`.
-
-**The timed side is settled, and it settled the other way.** `steps` reaches the fourteen samples that walk a
-sweep and `bands` the four flows; the `scan`, `sweep`, `fill` and `merge` families stay inline, and the user
-confirmed why: the travel range, the starting offset, sweep's hard-edge stop that scan doesn't have, and
-merge's blend flag are what make each family the effect it is, not a shared shape wearing different numbers.
-A knob there would let someone turn `sweep` into a worse `scan` rather than tune `sweep`, so nothing in these
-four families is a pending exposure — it is held back the same way the frame interval below is.
-
-**What was held back deliberately, and the user agreed with the line**: the frame interval and everything
-derived from it — stamp counts, lifetimes, grace periods — the epsilons that decide whether the pointer moved,
-and the named zeros and ones. Turning any of those moves the effect's clock rather than its look. The ripple
-lifetime sits on that side too, feeding a module-level clock that cannot vary per instance.
 
 ## Accepted limits
 

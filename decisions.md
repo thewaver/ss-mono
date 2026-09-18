@@ -8012,20 +8012,17 @@ pane-shaped clipping parent — renders no backdrop at all, because `clip-path` 
 page behind is then outside what the layer can see. It is the same trap as `isolation: isolate` above, and it
 is why each layer carries its own clip rather than sharing one.
 
-**What is left is a disagreement between the two backdrop layers, and it was measured rather than argued.**
-The ripple layer sits above the blur layer and both stop at the same shape, so where the displacement reaches
-past that shape it samples _unblurred_ page content and drags it inward, leaving a speckled fringe where sharp
-meets soft. Oversizing both by the same margin does not help, because they still end in the same place. It is
-invisible at the default ripple of 12 even at a 150px radius, shows around 20 and is obvious at 40.
-
-**Folding the blur into the ripple filter fixes it completely, was built, was looked at, and was reverted.**
-One filter doing displacement and then blur leaves no second layer to disagree, and the blur runs _after_ the
-displacement so it smooths over the sampling boundary rather than fighting it: at a ripple of 40 the chewed rim
-and chaotic interior became a clean edge and a coherent distortion. The cost is the whole reason the two
-layers exist — the blur then lives only inside the filter Firefox and Safari ignore, so a `GlassSurface` there
-would be a tint and a sheen over sharp, undistorted content. The user saw both and kept the fallback. Rebuild
-it by adding `addGaussianBlurFilter` to `computeBackdropFilterElement` and collapsing the two layers into one;
-that is the whole change in both directions.
+**The fringe this section used to blame on a disagreement between the two backdrop layers is postponed, not
+fixed — see item 23 in `backlog.md` for the current standing.** The margin explanation did not survive a
+direct test: pushing the margin far past what either layer needs changes nothing, and shrinking it to nearly
+zero changes nothing either. Folding the blur into the ripple filter was tried, looked clean, and was reverted
+anyway — not because it cost Firefox and Safari their blur, though it does, but because "clean" turned out to
+mean "clean under the software renderer every one of these tests was unknowingly run under." A later pass
+building a `feImage` / `feComposite` mask into the filter, so the pane never needs a `clip-path` or an
+ancestor `overflow: hidden` at all, also looked clean under that same software path and also failed once
+checked against a real GPU-accelerated window. Neither fix is in the tree. What each attempt actually ruled
+out is real and kept below; what it did not do is find a fix that survives real rendering, and nothing further
+should be attempted here without a way to check against GPU rendering from the start — see item 23.
 
 **The Playground's pane is dragged with `left` and `top`, never with `transform`.** A transform on an
 ancestor creates a stacking context and changes the containing block, and given how readily this arrangement
@@ -8085,6 +8082,91 @@ as belonging to the glass.
 arrangement of the same grain the ripple and the sheen share, so turning it changes the pattern without
 changing anything describable — the page settles on the component's default and the knob is gone. It stays a
 prop, so a consumer that wants two panes to differ can still set it.
+
+**The tint can be a gradient, built the same way every other gradient in the library is.** Raised when the
+Playground's own tooltip moved onto `GlassSurface` and lost the two-tone background it used to paint by hand.
+Full `FillDefs` support — handing the tint a filter, a clip-path or a blend mode — was ruled out as more than
+a tint needs; a gradient is the one piece of that worth having, and `Shape` already draws a `gradientOrPattern`
+fill exactly the way it draws a flat color, so nothing downstream of the fill changed. `GlassTintDefs` is now
+a union: a flat `color` and `opacity`, or an `opacity` with a `gradient` shaped like `SVGGradientDefsUtils`'
+own `computeLinearGradient` / `computeRadialGradient` arguments (minus `id`, which `GlassUtils` assigns
+per-instance the way it already does for the sheen and backdrop filter ids) plus a `kind` discriminant, so a
+caller writes the same shape it would write anywhere else a gradient is built rather than a `GlassSurface`-only
+vocabulary.
+
+**Merging a partial tint had to stop being field-by-field.** `GlassUtils.mergeDefs` spreads every other group
+over its defaults — `{...defaults.sheen, ...partial?.sheen}` — because each is a flat set of numbers and any
+subset can be overridden safely. A tint that is sometimes a color and sometimes a gradient is two different
+shapes, not a wider set of the same fields, so the same spread would blend half a color into half a gradient
+and produce neither. `PartialGlassDefs.tint` takes a whole `GlassTintDefs` or nothing, and a caller who
+supplies one replaces the default outright.
+
+**The sheen turns off at a `specularConstant` of zero, and the switch had to live in `Glass.utils.tsx`, not
+just in the SVG filter factory.** Found on the Playground's tooltip: `feSpecularLighting`'s highlight is
+composited onto the tint with `feComposite operator="arithmetic", k2=1, k3=1` — an unclamped add, not a blend
+— which reads as a tight, tasteful shine on a 300px demo pane and as the whole surface blown toward white on
+something tooltip-sized, because the same light height and falloff that make a small hotspot on a large pane
+cover a small element's entire area at once. `SVGFilterDefsFactory.addSpecularLightingFilter` now declines to
+register a primitive at `specularConstant <= 0`, matching every sibling `add*` method's no-op guard — but
+`computeSheenDefs` still has to omit the `filter` key from the returned def entirely in that case, rather than
+pointing one at an id the factory built nothing for. That second part is the one that actually matters:
+`Shape` decides whether to write `filter="url(#…)"` from whether the def object *carries* a `filter` key, not
+from whether anything was rendered under that id, which is the same "a factory-built filter can build
+nothing" trap the backdrop layers above are already written to avoid. Skipping the key also skips
+`PointerTrackerUtils.create` and the rest of the primitive-building work, so a caller who wants no sheen pays
+nothing for one.
+
+**The ripple layer's edge is postponed, not fixed, and the investigation is recorded here so it is not repeated
+blind — see item 23 in `backlog.md` for what this means for now.** Found on the Playground's tooltip once
+moved onto `GlassSurface`: a patch of whatever sat behind it rendered sharp and barely warped instead of
+frosted. Chased with a standalone sandbox — raw `feTurbulence` / `feDisplacementMap`, no library code — every
+test run in the browser this session had, which turned out to be headless Chromium and headless Edge, both of
+which render SVG filters on the software path unless told otherwise. Under that path, the fault tracked one
+variable cleanly: whether the layer was clipped by anything at all. `clip-path`, an ancestor's
+`overflow: hidden`, on the layer itself or a grandparent two levels up, all reproduced the identical defect in
+the identical place; `mask-image` on an ancestor failed differently and worse, since masking an ancestor forms
+its own boundary that `backdrop-filter` cannot see through, so the layer stopped seeing the page behind it at
+all. Leaving the layer fully unclipped was the only configuration that rendered correctly under software
+rendering, at every setting pushed. A plain `backdrop-filter: blur()` layer, clipped the same two ways, showed
+nothing wrong at any blur radius tried under that same path — that finding was never re-checked against a real
+GPU window and should not be trusted further than that.
+
+An unclipped oversized layer is not shippable regardless: it paints a hard rectangle past the rounded pane in
+every direction, and — measured directly by wrapping the pane in a scroll probe — it grows a scrollable
+ancestor's `scrollWidth`/`scrollHeight` by the margin, the same growth `overflow: hidden` was already added
+once to stop. So a fix needs the shape drawn some other way, and one was built: `feImage` referencing a data
+URI built from `computeMarginedClipPath`'s own path — the same string `clip-path` already used, drawn as a
+filled shape instead — composited against the displaced result with `feComposite operator="in"` as the
+filter's own last step, with the filter region switched to an explicit `userSpaceOnUse` box matching the
+layer's own size so the mask's coordinates are unambiguous. It rendered perfectly under software rendering, at
+default settings and pushed hard on both blur and ripple. **It does not render correctly under a real,
+GPU-accelerated window**, checked directly in desktop Microsoft Edge after the user reported still seeing the
+fault post-fix. The corruption under GPU rendering is a different shape from the original one — not the same
+fringe, but a precise, repeatable notch at two diagonally opposite corners of the mask, present with the curve
+built from 12 line segments and unchanged at 96, present at a device pixel ratio of 1 and unchanged at 4. Both
+of those rule out the two cheap explanations — a too-coarse curve, a DPI/rasterization-scale mismatch — without
+identifying what the real one is. The fix was reverted; nothing about this component has shipped from this
+investigation.
+
+**Tried the same masking technique on the Playground's raw SVG-filters page and it does not carry over
+either.** That page applies `filter: url(...)` (not `backdrop-filter`) directly to the element being warped,
+and there `feDisplacementMap`'s painted output ignored every clipping mechanism tried — `overflow: hidden` on
+an ancestor, `clip-path`, CSS `mask-image`, and the internal `feComposite` mask — while a plain `blur()` on the
+same element clipped exactly as expected. That page was left alone too.
+
+**This is a known, unresolved interoperability gap, not a defect in how any of this was built.** The W3C SVG
+working group has an open issue asking for an interoperable way to do backdrop displacement/refraction for
+"liquid glass" UI precisely because `backdrop-filter: url(#svg-filter)` combined with `feDisplacementMap` is
+not currently reliable across — the proposal is a real filter input (`BackdropGraphic`) to replace the current
+approach, not a workaround for it: [w3c/svgwg#1142](https://github.com/w3c/svgwg/issues/1142). Safari does not
+implement the combination at all: [WebKit bug 245510](https://bugs.webkit.org/show_bug.cgi?id=245510). A
+community library built around the same technique independently documents the margin/filter-region trap this
+file already worked out on its own, and separately lists GPU jank and stacking-context interference among its
+own known gotchas. Nobody has written up the specific two-corner symptom found here, but the broader picture
+holds everywhere it was checked: this combination is unreliable across the ecosystem right now, not just in
+this codebase. Re-open when the platform actually supports it — the W3C issue above is the thing to watch —
+and do not re-attempt a CSS-only or filter-internal workaround in the meantime; every shape that one could take
+has already been tried once.
 
 ### The glass effect is a type in `Abstracts`, and the sheen stopped being a sample
 

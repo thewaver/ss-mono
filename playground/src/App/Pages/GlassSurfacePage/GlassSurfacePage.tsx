@@ -65,10 +65,6 @@ const BLUR_WIDTH_STEP = 1;
 const STARTING_BORDER_WIDTH = 2;
 const STARTING_STROKE_CONFIG_KEY = "spot_1";
 const STARTING_BLUR_WIDTH = 0;
-const STARTING_BLUR_RADIUS = 6;
-const STARTING_RIPPLE_SCALE = 24;
-const STARTING_TINT_COLOR = "#FFFFFF";
-const STARTING_TINT_OPACITY = 0.2;
 
 export const GlassSurfacePage = () => {
     const [getBorderRadius, setBorderRadius] = createSignal(BORDER_RADIUS_FULL);
@@ -84,16 +80,16 @@ export const GlassSurfacePage = () => {
     };
     const getStrokeConfigDefs = () => strokeConfigDefs[getStrokeConfigKey()] ?? {};
     const [getBlurWidth, setBlurWidth] = createSignal(STARTING_BLUR_WIDTH);
-    const [getBlurRadius, setBlurRadius] = createSignal(STARTING_BLUR_RADIUS);
-    const [getRippleScale, setRippleScale] = createSignal(STARTING_RIPPLE_SCALE);
+    const [getBlurRadius, setBlurRadius] = createSignal(DEFAULT_GLASS_DEFS.backdrop.blurRadius);
+    const [getRippleScale, setRippleScale] = createSignal(DEFAULT_GLASS_DEFS.ripple.scale);
     const [getNoiseFrequency, setNoiseFrequency] = createSignal(DEFAULT_GLASS_DEFS.noise.frequency);
     const [getNoiseOctaves, setNoiseOctaves] = createSignal(DEFAULT_GLASS_DEFS.noise.octaves);
     const [getLightHeight, setLightHeight] = createSignal(DEFAULT_GLASS_DEFS.sheen.lightHeight);
     const [getSurfaceScale, setSurfaceScale] = createSignal(DEFAULT_GLASS_DEFS.sheen.surfaceScale);
     const [getSpecularConstant, setSpecularConstant] = createSignal(DEFAULT_GLASS_DEFS.sheen.specularConstant);
     const [getSpecularExponent, setSpecularExponent] = createSignal(DEFAULT_GLASS_DEFS.sheen.specularExponent);
-    const [getTintColor, setTintColor] = createSignal(STARTING_TINT_COLOR);
-    const [getTintOpacity, setTintOpacity] = createSignal(STARTING_TINT_OPACITY);
+    const [getTintColor, setTintColor] = createSignal(DEFAULT_GLASS_DEFS.tint.color);
+    const [getTintOpacity, setTintOpacity] = createSignal(DEFAULT_GLASS_DEFS.tint.opacity);
     const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS_MONO });
 
     const getExamples = createMemo(() => {

@@ -1,6 +1,6 @@
 import type { GlassDefs } from "./Glass.types";
 
-export const DEFAULT_GLASS_DEFS: GlassDefs = {
+export const DEFAULT_GLASS_DEFS = {
     noise: {
         frequency: 0.025,
         octaves: 2,
@@ -10,11 +10,11 @@ export const DEFAULT_GLASS_DEFS: GlassDefs = {
         blurRadius: 6,
     },
     ripple: {
-        scale: 12,
+        scale: 24,
     },
     tint: {
         color: "#FFFFFF",
-        opacity: 0.1,
+        opacity: 0.2,
     },
     sheen: {
         lightHeight: 960,
@@ -22,4 +22,4 @@ export const DEFAULT_GLASS_DEFS: GlassDefs = {
         specularConstant: 1,
         specularExponent: 120,
     },
-};
+} satisfies GlassDefs;

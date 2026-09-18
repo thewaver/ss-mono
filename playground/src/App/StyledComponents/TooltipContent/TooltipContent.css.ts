@@ -4,15 +4,8 @@ import { themeVars } from "../../Theme.css";
 
 export const isVisible = style({});
 
-export const tooltipContent = style({
-    color: themeVars.color.tooltip.contrast,
-    backgroundImage: `linear-gradient(45deg, ${themeVars.color.tooltip.dark}, ${themeVars.color.tooltip.light})`,
-    backdropFilter: "blur(10px)",
+export const tooltipVisibility = style({
     boxShadow: themeVars.shadow.medium,
-    borderRadius: themeVars.borderRadius.full,
-    padding: themeVars.spacing.full,
-
-    maxWidth: 240,
     opacity: 0,
 
     selectors: {
@@ -20,4 +13,11 @@ export const tooltipContent = style({
             opacity: 1,
         },
     },
+});
+
+export const tooltipBody = style({
+    color: themeVars.color.tooltip.contrast,
+    padding: themeVars.spacing.full,
+
+    maxWidth: 240,
 });
