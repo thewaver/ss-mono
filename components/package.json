@@ -17,7 +17,8 @@
         "**/*.css"
     ],
     "files": [
-        "dist"
+        "dist",
+        "llms.txt"
     ],
     "license": "MIT",
     "author": "Luís Santos",

@@ -1,0 +1,48 @@
+# @thewaver/ss-components
+
+> SolidJS components for building shaped UI. Headless: structure, behavior and ARIA wiring only —
+> no color, spacing or typography. The consumer supplies all visual styling.
+
+Peer dependencies: `@thewaver/ss-utils`, `solid-js`. CSS entry point: `@thewaver/ss-components/styles.css`
+(structural only, required). Full prop tables and interactive examples: https://ss-components.vercel.app
+
+Authoritative signatures, prop types and prop-level doc comments are in `dist/index.d.ts` inside the
+published package — read that for ground truth on any single component rather than this file.
+
+## Components
+
+Grouped by the source tree's own top-level folders.
+
+### Essentials — the standard control and layout set
+Accordion, Collapsible, AudioSwitcher, Breadcrumbs, Button, Calendar, RangeCalendar, Checkbox,
+Clock, ColorArea, ColorInput, CurrencyInput, DateInput, DatePicker, DateRangePicker,
+DateTimePicker, DrumCarousel, TrackCarousel, Drawer, FanMenu, FileInput, Form, FormField,
+FormSection, ImageSwitcher, Label, Menu, Modal, MultiSelect, NumberInput, Paginator, Preview,
+Progress, Radio, RadioGroup, Range, Scroller, Select, SlideButton, Sortable, SpotlightGuide,
+SpotlightHint, SpotlightPrompt, SplitPane, Stepper, Table, Tabs, TagInput, TextArea, TextInput,
+TimeInput, TimePicker, Toasts, Toggle, Toolbar, Tooltip, Tree, ViewportWrapper, WheelMenu.
+
+### Exotics — visual and motion effects
+Bracket, CellAnimation, Corners, Cuboid, ElementMosaic, ImageMosaic, FlipCard, Formation,
+Odometer, ParticleSpawner, PatchBoard, Reveal, RichText, Satellite, ScanlineAnimation,
+ScrambleText, ScratchCard, ScreenWiper, Shape, SortableGrid, Staircase, TileBoard, Timeline,
+Trail, Typewriter, DrumWheel, OverheadWheel.
+
+### Composites — assemblies of the above
+GlassSurface, Surface.
+
+### Primitives — lower-level building blocks the above are built from
+Barrel, InteractionWrapper, PlacementBox, PlacementItem, Popover.
+
+### Abstracts — framework-agnostic state/behavior hooks (no markup of their own)
+Anchor, Carrier, CheckedState, ColorExtractor, Cutout, Placement, Proximity, DateTimeValue,
+DateValue, Dismisser, ElementFader, ElementObserver, Elevation, Flattener, FrameRateMonitor,
+FocusManager, Glass, InteractionTracker, LiveAnnouncer, MaskedField, MediaQueryMonitor,
+Navigator, PointerTracker, Rotator, SVG defs (animation/filter/gradient/pattern), SignalMirror,
+TextSync, Typeahead, Viewport, Virtualizer.
+
+### Samples — sample/registry data for the Exotics above (keyframes, weights, gradients,
+patterns, layouts, connectors), meant to be copied or referenced, not a stable API surface.
+
+## License
+MIT.
