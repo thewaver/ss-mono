@@ -3,6 +3,8 @@ import { Index, Show, createMemo } from "solid-js";
 import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
+import { FormFieldUtils } from "../FormField/FormField.utils";
+import { LabelUtils } from "../Label/Label.utils";
 import type { TagInputProps } from "./TagInput.types";
 
 import * as styles from "./TagInput.css";
@@ -11,6 +13,11 @@ const DEFAULT_TAG_INPUT_GAP = 5;
 const DEFAULT_TAG_INPUT_PADDING = 0;
 
 export const TagInput = (props: TagInputProps) => {
+    const getAriaLabel = LabelUtils.resolveAriaLabel(
+        props.ariaLabel === undefined ? undefined : () => access(props.ariaLabel)!,
+    );
+    const getAriaDescribedBy = FormFieldUtils.resolveAriaDescribedBy();
+
     const valueSignal = accessSignal(() => props.valueSignal);
 
     let fieldRef: HTMLInputElement | undefined;
@@ -132,7 +139,7 @@ export const TagInput = (props: TagInputProps) => {
                         role="group"
                         aria-label={access(props.ariaLabel)}
                         onPointerDown={(e) => {
-                            if (e.target !== e.currentTarget) return;
+                            if (e.target !== e.currentTarget || getIsDisabled()) return;
 
                             e.preventDefault();
                             focusField();
@@ -142,6 +149,7 @@ export const TagInput = (props: TagInputProps) => {
                             {(getTag, index) => (
                                 <InteractionWrapper
                                     isDisabled={() => getFlags().isDisabled ?? false}
+                                    isTabbable={false}
                                     renderControl={(setTagRef, getTagFlags) => (
                                         <button
                                             type="button"
@@ -150,7 +158,6 @@ export const TagInput = (props: TagInputProps) => {
                                                 setTagRef(element);
                                             }}
                                             class={styles.tagInputTag}
-                                            tabindex={-1}
                                             aria-label={props.computeTagAriaLabel?.(getTag()) ?? getTag()}
                                             aria-disabled={getTagFlags().isDisabled || undefined}
                                             onClick={() => {
@@ -179,7 +186,8 @@ export const TagInput = (props: TagInputProps) => {
                             style={props.computeTextStyle?.(getFlags)}
                             value={textSignal[0]()}
                             readOnly={getFlags().isDisabled}
-                            aria-label={access(props.ariaLabel)}
+                            aria-label={getAriaLabel()}
+                            aria-describedby={getAriaDescribedBy()}
                             aria-disabled={getFlags().isDisabled || undefined}
                             onInput={(e) => textSignal[1](e.currentTarget.value)}
                             onKeyDown={handleFieldKeyDown}

@@ -38,6 +38,7 @@ export type ClockColumnRenderer = (renderOptions: () => JSX.Element, unit: Clock
 
 export type ClockOptionProps = AccessorProps<
     Omit<InteractionControlProps<ClockRenderProps>, "renderContent"> & {
+        /** Names the option for assistive technology, since the cell often shows only its number. Required here: a bare number is not a time. */
         ariaLabel: string;
         /** Draws the option. */
         renderContent: (getRenderProps: () => InteractionFlags<ClockRenderProps>) => JSX.Element;

@@ -1,7 +1,6 @@
 import { createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
 
-import { AudioUtils } from "@thewaver/ss-utils";
-import { MathUtils } from "@thewaver/ss-utils";
+import { AudioUtils, MathUtils } from "@thewaver/ss-utils";
 
 import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access } from "../../Utils/propUtils";
@@ -60,11 +59,10 @@ export const AudioSwitcher = (props: AudioSwitcherProps) => {
     };
 
     const fadeIn = (element: HTMLAudioElement) => {
-        const step = getStep();
-        const volume = getVolume();
-
         const fadeInTick = () => {
-            element.volume = Math.min(element.volume + step, volume);
+            const volume = getVolume();
+
+            element.volume = Math.min(element.volume + getStep(), volume);
 
             if (element.volume === volume) {
                 clearFade(element);
@@ -91,10 +89,8 @@ export const AudioSwitcher = (props: AudioSwitcherProps) => {
     };
 
     const fadeOut = (element: HTMLAudioElement) => {
-        const step = getStep();
-
         const fadeOutTick = () => {
-            element.volume = Math.max(element.volume - step, 0);
+            element.volume = Math.max(element.volume - getStep(), 0);
 
             if (element.volume === 0) {
                 element.pause();
@@ -110,8 +106,6 @@ export const AudioSwitcher = (props: AudioSwitcherProps) => {
     createEffect(() => {
         const active = getActiveElement();
 
-        if (!active) return;
-
         if (getIsPlaying()) {
             if (!AudioUtils.isPlaying(active) || getFadeDirection(active) === "out") fadeIn(active);
 
@@ -123,14 +117,7 @@ export const AudioSwitcher = (props: AudioSwitcherProps) => {
 
     const controller = createMemo(() => ({
         reset: () => {
-            const active = getActiveElement();
-
-            if (active) {
-                active.currentTime = 0;
-
-                return true;
-            }
-            return false;
+            getActiveElement().currentTime = 0;
         },
     }));
 
@@ -138,7 +125,7 @@ export const AudioSwitcher = (props: AudioSwitcherProps) => {
         on(getVolume, (volume) => {
             const active = getActiveElement();
 
-            if (active && !fades.has(active)) {
+            if (!fades.has(active)) {
                 active.volume = volume;
             }
         }),

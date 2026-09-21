@@ -50,7 +50,7 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
 
     if (props.isReachableWhenDisabled && !props.tooltipDefs) {
         console.warn(
-            "InteractionWrapper: getIsReachableWhenDisabled has no effect without getTooltipDefs — a focusable disabled control with nothing to reveal is worse than one skipped by the tab order.",
+            "InteractionWrapper: isReachableWhenDisabled has no effect without tooltipDefs — a focusable disabled control with nothing to reveal is worse than one skipped by the tab order.",
         );
     }
 
@@ -59,7 +59,7 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
             class={[styles.interactionRoot, styles.interactionSizingVariants[getSizing()]].join(" ")}
             role={access(props.role) ?? DEFAULT_INTERACTION_ROLE}
             style={{
-                "min-width": props.minWidth ? `${access(props.minWidth)}px` : undefined,
+                "min-width": access(props.minWidth) ? `${access(props.minWidth)}px` : undefined,
                 "min-height": access(props.minHeight) ? `${access(props.minHeight)}px` : undefined,
             }}
             classList={{

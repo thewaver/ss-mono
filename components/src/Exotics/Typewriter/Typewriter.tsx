@@ -12,6 +12,7 @@ const EMPTY_SEGMENTS: (ElementSegment & { startIndex: number })[] = [];
 const DEFAULT_TYPEWRITER_ANIMATION_NAME = styles.typewriterFade;
 const DEFAULT_TYPEWRITER_ANIMATION_DURATION_MS = 500;
 const DEFAULT_TYPEWRITER_ANIMATION_DELAY_MS = 10;
+const DEFAULT_TYPEWRITER_INITIAL_ANIMATION_DELAY_MS = 0;
 
 export const Typewriter = (props: ParentProps<TypewriterProps>) => {
     const [getContainerRef, setContainerRef] = createSignal<HTMLElement>();
@@ -22,6 +23,7 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
     const [getHasAnimatedOnce, setHasAnimatedOnce] = createSignal(false);
 
     let animationToggleTimeout: ReturnType<typeof setTimeout> | undefined;
+    let lastParsedWidth: number | undefined;
 
     onCleanup(() => {
         clearTimeout(animationToggleTimeout);
@@ -37,13 +39,17 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
         () => access(props.animationDelayMs) ?? DEFAULT_TYPEWRITER_ANIMATION_DELAY_MS,
     );
 
+    const getInitialAnimationDelayMs = createMemo(
+        () => access(props.initialAnimationDelayMs) ?? DEFAULT_TYPEWRITER_INITIAL_ANIMATION_DELAY_MS,
+    );
+
     const getAnimationBase = createMemo(() =>
         getIsAnimating()
             ? {
                   name: getAnimationName(),
                   durationMs: getAnimationDurationMs(),
                   delayMs: getAnimationDelayMs(),
-                  initialDelayMs: access(props.initialAnimationDelayMs) ?? 0,
+                  initialDelayMs: getInitialAnimationDelayMs(),
               }
             : undefined,
     );
@@ -57,9 +63,7 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
         clearAnimation();
 
         const timeoutDuration =
-            getAnimatedElementCount() * getAnimationDelayMs() +
-            (access(props.initialAnimationDelayMs) ?? 0) +
-            getAnimationDurationMs();
+            getAnimatedElementCount() * getAnimationDelayMs() + getInitialAnimationDelayMs() + getAnimationDurationMs();
 
         if (
             getHasAnimatedOnce() &&
@@ -83,13 +87,16 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
 
         if (!containerRef) return;
 
+        const width = containerRef.clientWidth;
+
+        if (cause === "layout" && width === lastParsedWidth) return;
+
+        lastParsedWidth = width;
+
         clearAnimation();
-        setIndexedSegments(EMPTY_SEGMENTS);
-        setAnimatedElementCount(0);
 
         let itemCount = 0;
 
-        const width = containerRef.clientWidth;
         const segments = JSXTextParserUtils.getSegmentTokens(containerRef);
         const inlinedSegments = JSXTextParserUtils.getInlinedSegments(segments, width);
         const indexedSegments = inlinedSegments.map((segment) => {

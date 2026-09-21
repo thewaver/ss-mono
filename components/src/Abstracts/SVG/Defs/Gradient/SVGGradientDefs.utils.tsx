@@ -1,5 +1,5 @@
 import type { JSX } from "solid-js";
-import { untrack } from "solid-js";
+import { Index, createMemo, untrack } from "solid-js";
 
 import { SVGUtils } from "@thewaver/ss-utils";
 
@@ -8,6 +8,12 @@ import type { SVGLinearGradientDefs, SVGRadialGradientDefs } from "./SVGGradient
 
 /** A gradient's colors, each optionally pinned to a percentage along it. */
 type GradientColors = { value: string; stop?: number }[];
+
+/** The first color in a run, which opens the gradient at nought and needs no closing stop before it. */
+const FIRST_COLOR_INDEX = 0;
+
+/** A radial gradient radiates from the center unless told otherwise. */
+const DEFAULT_RADIAL_ORIGIN = { x: 0.5, y: 0.5 };
 
 /**
  * Fills in the positions of colors that were not given one.
@@ -29,40 +35,43 @@ const resolveStops = (colors: GradientColors) =>
 
         return c.stop ?? (prev === next ? prevStop : prevStop + ((nextStop - prevStop) * (i - prev)) / (next - prev));
     });
+
 /** One stop per color, so the colors blend into each other. */
-const renderSmoothGradientStops = (getColors: () => GradientColors, id: string) =>
-    untrack(getColors).map((_unused, i) => (
-        <stop id={`${id}-stop-${i}`} offset={`${resolveStops(getColors())[i]}%`} stop-color={getColors()[i].value} />
-    ));
+const renderSmoothGradientStops = (getColors: () => GradientColors, id: string) => {
+    const getStops = createMemo(() => resolveStops(getColors()));
+
+    return (
+        <Index each={getColors()}>
+            {(getColor, i) => (
+                <stop id={`${id}-stop-${i}`} offset={`${getStops()[i]}%`} stop-color={getColor().value} />
+            )}
+        </Index>
+    );
+};
+
 /** Two stops per boundary, so each color holds to its band and changes abruptly at the edge rather than blending. */
 const renderBandedGradientStops = (getColors: () => GradientColors, id: string) => {
-    const count = untrack(getColors).length;
+    const getStops = createMemo(() => resolveStops(getColors()));
 
-    if (!count) return [];
-
-    const stops: JSX.Element[] = [<stop id={`${id}-stop-0-start`} offset="0%" stop-color={getColors()[0].value} />];
-
-    for (let i = 1; i < count; i++) {
-        stops.push(
-            <stop
-                id={`${id}-stop-${i - 1}-end`}
-                offset={`${resolveStops(getColors())[i]}%`}
-                stop-color={getColors()[i - 1].value}
-            />,
-        );
-        stops.push(
-            <stop
-                id={`${id}-stop-${i}-start`}
-                offset={`${resolveStops(getColors())[i]}%`}
-                stop-color={getColors()[i].value}
-            />,
-        );
-    }
-
-    return stops;
+    return (
+        <Index each={getColors()}>
+            {(getColor, i) =>
+                i === FIRST_COLOR_INDEX ? (
+                    <stop id={`${id}-stop-${i}-start`} offset="0%" stop-color={getColor().value} />
+                ) : (
+                    <>
+                        <stop
+                            id={`${id}-stop-${i - 1}-end`}
+                            offset={`${getStops()[i]}%`}
+                            stop-color={getColors()[i - 1].value}
+                        />
+                        <stop id={`${id}-stop-${i}-start`} offset={`${getStops()[i]}%`} stop-color={getColor().value} />
+                    </>
+                )
+            }
+        </Index>
+    );
 };
-/** A radial gradient radiates from the center unless told otherwise. */
-const DEFAULT_RADIAL_ORIGIN = { x: 0.5, y: 0.5 };
 
 /**
  * Builds `linearGradient` and `radialGradient` definitions, with the stops worked out from the

@@ -1,7 +1,7 @@
 import { createMemo } from "solid-js";
 
 import { Barrel } from "../../Primitives/Barrel/Barrel";
-import { access } from "../../Utils/propUtils";
+import { access, accessSignal } from "../../Utils/propUtils";
 import type { FlipCardAxis, FlipCardFace, FlipCardProps, FlipCardState } from "./FlipCard.types";
 
 import * as styles from "./FlipCard.css";
@@ -22,7 +22,7 @@ const FLIP_CARD_ROLE_DESCRIPTION = "flip card";
 const FACE_ROLE_DESCRIPTION = "face";
 
 export const FlipCard = (props: FlipCardProps) => {
-    const [getIsFlipped] = props.flippedSignal;
+    const [getIsFlipped] = accessSignal(() => props.flippedSignal);
 
     const getShownFace = createMemo((): FlipCardFace => (getIsFlipped() ? "back" : "front"));
 

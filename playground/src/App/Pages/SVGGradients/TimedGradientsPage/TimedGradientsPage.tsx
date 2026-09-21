@@ -31,6 +31,11 @@ export const TimedGradientsPage = () => {
 
         return key === NO_SAMPLE_KEY ? {} : (TimedGradientKnobs.KNOBS_BY_FAMILY[key] as Record<string, SampleKnob>);
     };
+    const getDefaults = () => {
+        const key = getConfigKey();
+
+        return key === NO_SAMPLE_KEY ? {} : (TimedGradientKnobs.DEFAULTS_BY_FAMILY[key] as Record<string, unknown>);
+    };
     const getConfigDefs = () => configDefs[getConfigKey()] ?? {};
     const [getIterationConfigKey, setIterationConfigKey] = createSignal<SVGDefsSamples.Iteration.SampleKey>("constant");
     const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(STARTING_DURATION_MS);
@@ -78,7 +83,7 @@ export const TimedGradientsPage = () => {
 
                     <PageKnobs
                         knobs={getKnobs}
-                        defaults={() => TimedGradientKnobs.DEFAULTS_BY_FAMILY[getConfigKey()] ?? {}}
+                        defaults={() => getDefaults()}
                         values={getConfigDefs}
                         onInput={(key, value) =>
                             setConfigDefs(getConfigKey(), (previous) => ({ ...previous, [key]: value }))
@@ -120,11 +125,7 @@ export const TimedGradientsPage = () => {
                     >
                         <PageSelectField
                             value={getIterationConfigKey}
-                            values={() =>
-                                Object.keys(
-                                    SVGDefsSamples.Iteration.SAMPLE_CONFIGS,
-                                ) as (keyof typeof SVGDefsSamples.Iteration.SAMPLE_CONFIGS)[]
-                            }
+                            values={() => SVGDefsSamples.Iteration.SAMPLE_KEYS}
                             ariaLabel={"Iteration pattern"}
                             onChange={(config) => setIterationConfigKey(() => config)}
                         />

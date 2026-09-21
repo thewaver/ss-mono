@@ -203,7 +203,7 @@ export namespace AnchorUtils {
      * back towards the screen edge but must never be pushed past the anchor, so only its far end is
      * held; content after the anchor is the mirror of that; content over the anchor is held at both
      * ends. This is what keeps a menu that is taller than the screen still touching its button rather
-     * than centring itself over it.
+     * than centering itself over it.
      *
      * @param start The position the placement asked for.
      * @param size The content's extent along this axis.
@@ -257,7 +257,7 @@ export namespace AnchorUtils {
 
         const getCandidateOverflow = (candidate: AnchorHPlacement) =>
             getOverflow(
-                getHPlacementShift(candidate, anchorRect, contentSize)! + getHPlacementOffset(candidate, offsetX),
+                getHPlacementShift(candidate, anchorRect, contentSize) + getHPlacementOffset(candidate, offsetX),
                 contentSize.width,
                 screenSize.width,
                 reservedW,
@@ -292,7 +292,7 @@ export namespace AnchorUtils {
 
         const getCandidateOverflow = (candidate: AnchorVPlacement) =>
             getOverflow(
-                getVPlacementShift(candidate, anchorRect, contentSize)! + getVPlacementOffset(candidate, offsetY),
+                getVPlacementShift(candidate, anchorRect, contentSize) + getVPlacementOffset(candidate, offsetY),
                 contentSize.height,
                 screenSize.height,
                 reservedH,

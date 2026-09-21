@@ -15,20 +15,32 @@ export type WheelAxis = BarrelAxis;
 export type WheelFace = BarrelFace;
 
 export type WheelWedgeState = {
+    /** Which wedge this is, counting from zero. */
     index: number;
+    /** How many wedges the wheel has. */
     wedgeCount: number;
+    /** Which side of the wedge is being drawn, since a wedge turned past the axis shows its back. */
     face: WheelFace;
+    /** Whether this wedge is the one at the marker. */
     isSelected: boolean;
+    /** How far round this wedge sits, in degrees. */
     angle: number;
+    /** Where the wedge sits, for an overhead wheel that lays its wedges out rather than turning a drum. */
     placement?: PlacementRect;
 };
 
 export type WheelController = {
+    /** Which wedge is at the marker. */
     getIndex: Accessor<number>;
+    /** What the wheel is doing: still, spinning, settling or idling. */
     getPhase: Accessor<RotatorPhase>;
+    /** Whether a spin can be started right now. */
     getIsSpinnable: Accessor<boolean>;
+    /** Whether the wheel is turning on its own rather than because somebody asked. */
     getIsAutoSpinning: Accessor<boolean>;
+    /** Whether the turn under way was started by a spin rather than by the idle drift. */
     getIsUserSpinning: Accessor<boolean>;
+    /** Starts a spin. Does nothing while one is already under way. */
     spin: () => void;
 };
 

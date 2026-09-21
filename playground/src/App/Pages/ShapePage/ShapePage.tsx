@@ -218,6 +218,11 @@ export const ShapePage = () => {
 
         return key === NO_SAMPLE_KEY ? {} : (TimedGradientKnobs.KNOBS_BY_FAMILY[key] as Record<string, SampleKnob>);
     };
+    const getStrokeDefaults = () => {
+        const key = getStrokeConfigKey();
+
+        return key === NO_SAMPLE_KEY ? {} : (TimedGradientKnobs.DEFAULTS_BY_FAMILY[key] as Record<string, unknown>);
+    };
     const getStrokeConfigDefs = () => strokeConfigDefs[getStrokeConfigKey()] ?? {};
 
     const [getFillConfigKey, setFillConfigKey] =
@@ -297,7 +302,7 @@ export const ShapePage = () => {
 
                     <PageKnobs
                         knobs={getStrokeKnobs}
-                        defaults={() => TimedGradientKnobs.DEFAULTS_BY_FAMILY[getStrokeConfigKey()] ?? {}}
+                        defaults={() => getStrokeDefaults()}
                         values={getStrokeConfigDefs}
                         onInput={(key, value) =>
                             setStrokeConfigDefs(getStrokeConfigKey(), (previous) => ({ ...previous, [key]: value }))
@@ -537,11 +542,7 @@ export const ShapePage = () => {
                     >
                         <PageSelectField
                             value={getIterationConfigKey}
-                            values={() =>
-                                Object.keys(
-                                    SVGDefsSamples.Iteration.SAMPLE_CONFIGS,
-                                ) as (keyof typeof SVGDefsSamples.Iteration.SAMPLE_CONFIGS)[]
-                            }
+                            values={() => SVGDefsSamples.Iteration.SAMPLE_KEYS}
                             ariaLabel={"Iteration pattern"}
                             onChange={(config) => setIterationConfigKey(() => config)}
                         />

@@ -71,8 +71,11 @@ export namespace TypeaheadUtils {
      * That is the cycling gesture rather than a search for a repeated string, and it is treated
      * differently.
      */
-    export const getIsRepeat = (query: string) =>
-        query.length > SINGLE_CHARACTER && [...query].every((character) => character === query[0]);
+    export const getIsRepeat = (query: string) => {
+        const [first, ...rest] = [...query];
+
+        return rest.length > 0 && rest.every((character) => character === first);
+    };
 
     /**
      * Which item a query matches.
@@ -99,8 +102,8 @@ export namespace TypeaheadUtils {
     ) => {
         if (length < 1 || query.length < 1) return;
 
-        const search = (getIsRepeat(query) ? query[0] : query).toLowerCase();
-        const start = search.length === SINGLE_CHARACTER ? 1 : 0;
+        const search = (getIsRepeat(query) ? [...query][0] : query).toLowerCase();
+        const start = [...search].length === SINGLE_CHARACTER ? 1 : 0;
 
         for (let offset = start; offset < length; offset++) {
             const index = (Math.max(from, 0) + offset) % length;

@@ -90,10 +90,13 @@ export namespace ScrambleTextUtils {
      * @returns A different glyph, or the excluded one when there is no alternative.
      */
     export const pickGlyph = (glyphs: string[], excluded: string, roll: number) => {
-        const options = glyphs.filter((glyph) => glyph !== excluded);
+        const excludedAt = glyphs.indexOf(excluded);
+        const count = excludedAt < 0 ? glyphs.length : glyphs.length - SINGLE_CHARACTER;
 
-        if (!options.length) return excluded;
+        if (count < SINGLE_CHARACTER) return excluded;
 
-        return options[Math.min(Math.floor(roll * options.length), options.length - SINGLE_CHARACTER)];
+        const picked = Math.min(Math.floor(roll * count), count - SINGLE_CHARACTER);
+
+        return glyphs[excludedAt < 0 || picked < excludedAt ? picked : picked + SINGLE_CHARACTER];
     };
 }

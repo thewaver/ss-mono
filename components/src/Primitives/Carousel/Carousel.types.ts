@@ -18,9 +18,13 @@ export type CarouselFace = BarrelFace;
 export type CarouselStep = "previous" | "next";
 
 export type CarouselSlideState = {
+    /** Which slide this is, counting from zero. */
     index: number;
+    /** How many slides there are. */
     count: number;
+    /** Which side of the slide is being drawn, for a carousel that turns rather than slides. */
     face: CarouselFace;
+    /** Whether this is the slide currently shown. */
     isCurrent: boolean;
 };
 

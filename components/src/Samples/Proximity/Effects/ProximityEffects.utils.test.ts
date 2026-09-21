@@ -197,9 +197,8 @@ describe("zoomIn, at the far end of an open arc", () => {
 
     const toMovedBearing = (index: number, pointer: { x: number; y: number }) => {
         const placement = ARCH.placements[index];
-        const [along, across] = ProximityEffectUtils.zoomIn(
-            ProximityUtils.toEffectDefs(placement, pointer, RUN, false),
-        ).translate as number[];
+        const [along, across] = ProximityEffectUtils.zoomIn(ProximityUtils.toEffectDefs(placement, pointer, RUN, false))
+            .translate as number[];
         const moved = {
             x: placement.left + along * PERCENT_TO_SHARE * placement.width,
             y: placement.top + across * PERCENT_TO_SHARE * placement.height,

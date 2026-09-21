@@ -113,10 +113,7 @@ export type TimelineItemProps = {
     id: string;
     /** Names this item for assistive technology. */
     ariaLabel?: string;
-    /** This item's place among the items, counting from one. */
-    posInSet: number;
-    /** How many items there are, so a reader can be told it is the third of five. */
-    setSize: number;
+
     /** This item's interaction state, handed down so the painted part can answer to it. */
     flags: InteractionFlags<TimelineItemRenderProps>;
     /** Receives the item element once it exists, so the timeline can measure and scroll it. */

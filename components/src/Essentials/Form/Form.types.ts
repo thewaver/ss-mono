@@ -20,6 +20,6 @@ export type FormProps = AccessorProps<{
     onSubmit?: () => void | Promise<void>;
     /** Runs when the form is reset. */
     onReset?: () => void | Promise<void>;
-    /** Draws the form's contents, and is told whether it is currently submitting. */
+    /** Draws the form's contents, and is told whether the form validates and whether it has been submitted. */
     renderContent: (getState: () => FormState) => JSX.Element;
 }>;

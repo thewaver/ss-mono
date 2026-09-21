@@ -116,7 +116,6 @@ export const Collapsible = (props: CollapsibleProps) => {
                     ref={(element) => {
                         setElementRef(element);
                         setTriggerRef(element);
-                        props.ref?.(element);
                     }}
                     id={() => access(props.id) ?? triggerId}
                     panelId={() => panelId}

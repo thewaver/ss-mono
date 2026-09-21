@@ -62,8 +62,8 @@ import { hexagon_pt_2 } from "./Pattern/hexagon_pt_2";
 import { lozenge_d_2 } from "./Pattern/lozenge_d_2";
 import { triangle_s_2 } from "./Pattern/triangle_s_2";
 import { triangle_t_2 } from "./Pattern/triangle_t_2";
-import { whirlCurved_2 } from "./Pattern/whirlCurved_2";
 import { whirl_2 } from "./Pattern/whirl_2";
+import { whirl_curved_2 } from "./Pattern/whirl_curved_2";
 import type {
     IterationConfig,
     PatternConfig,
@@ -98,6 +98,8 @@ export namespace SVGDefsSamples {
         } as const satisfies Record<string, IterationConfig>;
 
         export type SampleKey = keyof typeof SAMPLE_CONFIGS;
+
+        export const SAMPLE_KEYS = Object.keys(SAMPLE_CONFIGS) as SampleKey[];
     }
 
     export namespace Pattern {
@@ -110,11 +112,13 @@ export namespace SVGDefsSamples {
             lozenge_d_2,
             triangle_s_2,
             triangle_t_2,
-            whirlCurved_2,
             whirl_2,
+            whirl_curved_2,
         } as const satisfies Record<string, PatternConfig>;
 
         export type SampleKey = keyof typeof SAMPLE_CONFIGS;
+
+        export const SAMPLE_KEYS = Object.keys(SAMPLE_CONFIGS) as SampleKey[];
     }
 
     export namespace Gradient {

@@ -5,7 +5,7 @@ import type { Size2d } from "@thewaver/ss-utils";
 
 import { access } from "../../Utils/propUtils";
 import type { BarrelAxis, BarrelFace, BarrelProps } from "./Barrel.types";
-import { BARREL_PERSPECTIVE_PX, BarrelUtils } from "./Barrel.utils";
+import { BarrelUtils } from "./Barrel.utils";
 
 import * as styles from "./Barrel.css";
 
@@ -75,7 +75,7 @@ export const Barrel = <T,>(props: BarrelProps<T>) => {
                 style={{
                     width: `${getFaceSize().width}px`,
                     height: `${getFaceSize().height}px`,
-                    perspective: `${BARREL_PERSPECTIVE_PX}px`,
+                    perspective: `${BarrelUtils.PERSPECTIVE_PX}px`,
                 }}
             >
                 <div class={styles.barrelBody} style={{ transform: `translateZ(${-getApothem()}px)` }}>

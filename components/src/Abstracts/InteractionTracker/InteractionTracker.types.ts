@@ -1,6 +1,6 @@
 export type ExternalInteractionFlags = {
     /**
-     * Turns the control off. It keeps its place in the layout and stays readable rather than being greyed
+     * Turns the control off. It keeps its place in the layout and stays readable rather than being grayed
      * out by the browser, because the library marks it disabled rather than using the native attribute —
      * which is what lets a disabled control still explain itself.
      */
@@ -31,7 +31,7 @@ export type InternalInteractionFlags = {
 export type InteractionActivation = {
     /** How far the control was dragged before it was let go, as a share of its own size on each axis. */
     ratio: InteractionDragRatio;
-    /** How many activations have landed in quick succession, so a double click can be told from two clicks. */
+    /** How many presses have landed since mount, going up by one each time. A change is what lets a repeated press restart an effect that is already running. */
     count: number;
 };
 

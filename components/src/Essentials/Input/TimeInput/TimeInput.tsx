@@ -103,9 +103,13 @@ export const TimeInput = (props: TimeInputProps) => {
         if (value) setMeridiem(TimeUtils.getMeridiem(value));
     });
 
+    const getIsWritable = () => !(access(props.isDisabled) ?? false) && !(access(props.isReadOnly) ?? false);
+
     const meridiem: TimeInputMeridiem = {
         getValue: getMeridiem,
         set: (next) => {
+            if (!getIsWritable()) return;
+
             setMeridiem(next);
 
             const value = untrack(() => valueSignal[0]());
@@ -122,6 +126,8 @@ export const TimeInput = (props: TimeInputProps) => {
     };
 
     const handleKeyDown = (e: KeyboardEvent) => {
+        if (!getIsWritable()) return;
+
         const delta = STEP_KEYS[e.key];
         const element = e.currentTarget as HTMLInputElement | null;
         const value = valueSignal[0]();

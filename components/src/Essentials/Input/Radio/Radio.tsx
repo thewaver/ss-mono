@@ -24,7 +24,8 @@ export const Radio = <T,>(props: RadioProps<T>) => {
         InteractionTrackerUtils.computeIsReachable(
             getIsDisabled(),
             access(props.isReachableWhenDisabled) ?? false,
-            props.tooltipDefs !== undefined,
+            access(props.tooltipDefs) !== undefined,
+            access(props.isFocusableWhenDisabled) ?? false,
         );
 
     const entry = {

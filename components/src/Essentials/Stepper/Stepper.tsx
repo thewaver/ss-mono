@@ -24,33 +24,18 @@ const StepperItem = <TValue, TState>(props: StepperItemProps<TValue, TState>) =>
     };
 
     return (
-        <Show
-            when={getIsNavigable()}
-            fallback={
-                <span
-                    ref={(element) => props.ref?.(element)}
-                    class={styles.stepperItem}
-                    id={access(props.step).id}
-                    aria-label={access(props.ariaLabel)}
-                    aria-current={access(props.flags).isCurrent ? "step" : undefined}
-                    aria-disabled={access(props.flags).isDisabled || undefined}
-                >
-                    {props.renderContent(() => access(props.flags))}
-                </span>
-            }
+        <button
+            type="button"
+            ref={(element) => props.ref?.(element)}
+            class={styles.stepperItem}
+            id={access(props.step).id}
+            aria-label={access(props.ariaLabel)}
+            aria-current={access(props.flags).isCurrent ? "step" : undefined}
+            aria-disabled={getIsNavigable() ? undefined : true}
+            onClick={handleClick}
         >
-            <button
-                type="button"
-                ref={(element) => props.ref?.(element)}
-                class={styles.stepperItem}
-                id={access(props.step).id}
-                aria-label={access(props.ariaLabel)}
-                aria-current={access(props.flags).isCurrent ? "step" : undefined}
-                onClick={handleClick}
-            >
-                {props.renderContent(() => access(props.flags))}
-            </button>
-        </Show>
+            {props.renderContent(() => access(props.flags))}
+        </button>
     );
 };
 
@@ -168,7 +153,6 @@ export const Stepper = <TValue, TState>(props: StepperProps<TValue, TState>) => 
                 "gap": getLayout() === undefined ? `${access(props.gap) ?? DEFAULT_STEPPER_GAP}px` : undefined,
             }}
             aria-label={access(props.ariaLabel)}
-            aria-orientation={getDir() === "column" ? "vertical" : undefined}
         >
             {children}
         </ol>

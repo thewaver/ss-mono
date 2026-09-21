@@ -2,6 +2,7 @@ import { createEffect, createSignal } from "solid-js";
 
 import { EasingUtils, MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
+import type { PointerReading } from "../../../../Abstracts/PointerTracker/PointerTracker.types";
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import type { GradientRippleSampleOpts, TrackedGradientConfig } from "../../SVGDefs.types";
@@ -31,8 +32,12 @@ const NO_REF = () => undefined;
 
 const clock = SVGDefsFrameUtils.createClock(RIPPLE_LIFETIME_MS);
 
-const createRipple = (index: number, getRef: () => HTMLElement | undefined, opts?: GradientRippleSampleOpts) => {
-    const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef);
+const createRipple = (
+    index: number,
+    getReading: () => PointerReading,
+    getIsPointerPresent: () => boolean,
+    opts?: GradientRippleSampleOpts,
+) => {
     const [getRipple, setRipple] = createSignal<Ripple>();
 
     let bornMilestone = FIRST_MILESTONE;
@@ -110,51 +115,53 @@ const createRipple = (index: number, getRef: () => HTMLElement | undefined, opts
 };
 
 export const spot_ripple_1 = (opts?: GradientRippleSampleOpts): TrackedGradientConfig => ({
-    computeSVGDefs: (id, __, getRef, defs) => [
-        {
-            color: SVGDefsUtils.getBaseBorderColor(defs),
-        },
-        {
-            gradientOrPattern: {
-                id: `gradient1-${id}`,
-                renderDefsElement: () => {
-                    const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
+    computeSVGDefs: (id, __, getRef, defs) => {
+        const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
-                    return SVGGradientDefsUtils.computeRadialGradient({
-                        id: `gradient1-${id}`,
-                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
-                        origin: () => getReading().boxRatio,
-                        scale: opts?.sourceScale ?? DEFAULTS.sourceScale,
-                        colors: [
-                            { value: `rgb(from ${defs.colors.primary} r g b / 1)` },
-                            {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.sourceAlpha ?? DEFAULTS.sourceAlpha})`,
-                                stop: opts?.sourceStop ?? DEFAULTS.sourceStop,
-                            },
-                            { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
-                        ],
-                    });
-                },
+        return [
+            {
+                color: SVGDefsUtils.getBaseBorderColor(defs),
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-        },
-        ...Array.from({ length: opts?.rippleCount ?? DEFAULTS.rippleCount }, (_unused, index) => ({
-            gradientOrPattern: {
-                id: `gradient${index + 2}-${id}`,
-                renderDefsElement: () => {
-                    const ripple = createRipple(index, getRef ?? NO_REF, opts);
+            {
+                gradientOrPattern: {
+                    id: `gradient1-${id}`,
+                    renderDefsElement: () => {
+                        return SVGGradientDefsUtils.computeRadialGradient({
+                            id: `gradient1-${id}`,
+                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            origin: () => getReading().boxRatio,
+                            scale: opts?.sourceScale ?? DEFAULTS.sourceScale,
+                            colors: [
+                                { value: `rgb(from ${defs.colors.primary} r g b / 1)` },
+                                {
+                                    value: `rgb(from ${defs.colors.primary} r g b / ${opts?.sourceAlpha ?? DEFAULTS.sourceAlpha})`,
+                                    stop: opts?.sourceStop ?? DEFAULTS.sourceStop,
+                                },
+                                { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
+                            ],
+                        });
+                    },
+                },
+                filter: SVGDefsUtils.getBaseBlur(id, defs),
+            },
+            ...Array.from({ length: opts?.rippleCount ?? DEFAULTS.rippleCount }, (_unused, index) => ({
+                gradientOrPattern: {
+                    id: `gradient${index + 2}-${id}`,
+                    renderDefsElement: () => {
+                        const ripple = createRipple(index, getReading, getIsPointerPresent, opts);
 
-                    return SVGGradientDefsUtils.computeRadialGradient({
-                        id: `gradient${index + 2}-${id}`,
-                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
-                        origin: ripple.getOrigin,
-                        scale: ripple.getScale,
-                        colors: () => ripple.getColors(defs.colors.primary),
-                    });
+                        return SVGGradientDefsUtils.computeRadialGradient({
+                            id: `gradient${index + 2}-${id}`,
+                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            origin: ripple.getOrigin,
+                            scale: ripple.getScale,
+                            colors: () => ripple.getColors(defs.colors.primary),
+                        });
+                    },
                 },
-            },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-            blend: true,
-        })),
-    ],
+                filter: SVGDefsUtils.getBaseBlur(id, defs),
+                blend: true,
+            })),
+        ];
+    },
 });

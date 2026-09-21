@@ -3,7 +3,6 @@ import { createMemo, createSignal } from "solid-js";
 import { MediaQueryMonitorUtils } from "../../Abstracts/MediaQueryMonitor/MediaQueryMonitor.utils";
 import { PlacementUtils } from "../../Abstracts/Placement/Placement.utils";
 import { PointerTrackerUtils } from "../../Abstracts/PointerTracker/PointerTracker.utils";
-import type { ProximityArrangement } from "../../Abstracts/Proximity/Proximity.types";
 import { ProximityUtils } from "../../Abstracts/Proximity/Proximity.utils";
 import { access } from "../../Utils/propUtils";
 import { PlacementBoxContextProvider } from "./PlacementBox.context";
@@ -12,7 +11,6 @@ import type { PlacementBoxProps } from "./PlacementBox.types";
 
 import * as styles from "./PlacementBox.css";
 
-const RESTING_ARRANGEMENT: ProximityArrangement = { spacing: 0, radius: 0, slack: Infinity };
 const NO_OVERREACH = 0;
 
 export const PlacementBox = (props: PlacementBoxProps) => {
@@ -39,7 +37,9 @@ export const PlacementBox = (props: PlacementBoxProps) => {
     });
 
     const getArrangement = createMemo(() =>
-        getComputeEffect() === undefined ? RESTING_ARRANGEMENT : ProximityUtils.toArrangement(getLayout()),
+        getComputeEffect() === undefined
+            ? ProximityUtils.RESTING_ARRANGEMENT
+            : ProximityUtils.toArrangement(getLayout()),
     );
 
     const getOverreach = createMemo(() => {

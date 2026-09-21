@@ -46,7 +46,7 @@ export namespace ProximityEffectKnobs {
         pushRatio: {
             kind: "number",
             label: "Push ratio",
-            hint: "How far neighbours are shoved aside to make room, as a share of an item's width. An arrangement with no slack, such as a full ring, quietly ignores it.",
+            hint: "How far neighbors are shoved aside to make room, as a share of an item's width. An arrangement with no slack, such as a full ring, quietly ignores it.",
             min: 0,
             max: 2,
             step: 0.05,

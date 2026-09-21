@@ -1,16 +1,21 @@
 import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
 
+/** One registered stacking context: the element that makes it, and the z-index it was given. */
 type ElevationEntry = {
     element: HTMLElement;
     zIndex: number;
 };
 
+/** The floor a popup is raised from when nothing above it has claimed a z-index. */
 const NO_ELEVATION = 0;
 
+/** Every registered stacking context, in registration order. Shared, because nesting is a page-wide fact. */
 const entries: ElevationEntry[] = [];
 
+/** Bumped whenever the list changes, so the readers below re-run without the list itself being reactive. */
 const [getRevision, setRevision] = createSignal(0);
 
+/** Tells every reader the list has changed. */
 const bumpRevision = () => {
     setRevision((previous) => previous + 1);
 };

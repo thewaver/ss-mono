@@ -150,11 +150,7 @@ export const SVGPatternsPage = () => {
                 >
                     <PageSelectField
                         value={getIterationConfigKey}
-                        values={() =>
-                            Object.keys(
-                                SVGDefsSamples.Iteration.SAMPLE_CONFIGS,
-                            ) as (keyof typeof SVGDefsSamples.Iteration.SAMPLE_CONFIGS)[]
-                        }
+                        values={() => SVGDefsSamples.Iteration.SAMPLE_KEYS}
                         ariaLabel={"Iteration pattern"}
                         onChange={(config) => setIterationConfigKey(() => config)}
                     />

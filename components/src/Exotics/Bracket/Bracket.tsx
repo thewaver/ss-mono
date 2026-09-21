@@ -1,5 +1,6 @@
-import { For, Index, createMemo, createSignal, createUniqueId } from "solid-js";
+import { For, Index, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
+import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { access } from "../../Utils/propUtils";
 import type {
     BracketConnectorDefs,
@@ -22,7 +23,14 @@ const HALF = 0.5;
 const NOTHING = 0;
 const SINGLE = 1;
 
-const ACTIVATION_KEYS = ["Enter", " "];
+const MISSING_PLACEMENT: BracketPlacement = {
+    id: "",
+    parentId: undefined,
+    childIds: [],
+    layer: 0,
+    cross: 0,
+    isDisabled: true,
+};
 
 export const Bracket = <T,>(props: BracketProps<T>) => {
     const boardId = createUniqueId();
@@ -116,6 +124,12 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
             }),
     );
 
+    const getPlacementById = createMemo(
+        () => new Map(getLayout().placements.map((placement) => [placement.id, placement])),
+    );
+
+    const getNodeIds = createMemo(() => getLayout().placements.map((placement) => placement.id));
+
     const getStops = createMemo(() => getLayout().placements.filter((placement) => !placement.isDisabled));
 
     const getRovingId = createMemo(() => {
@@ -129,6 +143,10 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
 
     const setNodeRef = (id: string, element: HTMLElement) => {
         setNodeRefs((previous) => ({ ...previous, [id]: element }));
+
+        onCleanup(() => {
+            setNodeRefs((previous) => ({ ...previous, [id]: undefined }));
+        });
     };
 
     const getStepForKey = (key: string): BracketStep | undefined => {
@@ -151,7 +169,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
 
         if (from === undefined) return;
 
-        if (ACTIVATION_KEYS.includes(e.key)) {
+        if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();
             props.onActivate?.(getNodeAt(from).value);
 
@@ -186,37 +204,42 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
             </svg>
 
             <ul class={styles.bracketList} aria-label={access(props.ariaLabel)}>
-                <For each={getLayout().placements}>
-                    {(placement) => (
-                        <li
-                            class={styles.bracketItem}
-                            style={{
-                                left: `${getInset(placement).left}px`,
-                                top: `${getInset(placement).top}px`,
-                                width: `${getNodeSize().width}px`,
-                                height: `${getNodeSize().height}px`,
-                            }}
-                        >
-                            <div
-                                ref={(element) => setNodeRef(placement.id, element)}
-                                class={styles.bracketNode}
-                                role="button"
-                                tabindex={placement.isDisabled || placement.id !== getRovingId() ? undefined : 0}
-                                aria-disabled={placement.isDisabled || undefined}
-                                onClick={() => {
-                                    if (placement.isDisabled) return;
+                <For each={getNodeIds()}>
+                    {(id) => {
+                        const getPlacement = createMemo(() => getPlacementById().get(id) ?? MISSING_PLACEMENT);
+                        const getIsNodeDisabled = () => getPlacement().isDisabled;
 
-                                    setFocusedId(placement.id);
-                                    props.onActivate?.(getNodeAt(placement.id).value);
+                        return (
+                            <li
+                                class={styles.bracketItem}
+                                style={{
+                                    left: `${getInset(getPlacement()).left}px`,
+                                    top: `${getInset(getPlacement()).top}px`,
+                                    width: `${getNodeSize().width}px`,
+                                    height: `${getNodeSize().height}px`,
                                 }}
                             >
-                                {props.renderNode(
-                                    () => getNodeAt(placement.id),
-                                    () => ({ placement, isFocused: getFocusedId() === placement.id }),
-                                )}
-                            </div>
-                        </li>
-                    )}
+                                <div
+                                    ref={(element) => setNodeRef(id, element)}
+                                    class={styles.bracketNode}
+                                    role="button"
+                                    tabindex={getIsNodeDisabled() ? undefined : id === getRovingId() ? 0 : -1}
+                                    aria-disabled={getIsNodeDisabled() || undefined}
+                                    onClick={() => {
+                                        if (getIsNodeDisabled()) return;
+
+                                        setFocusedId(id);
+                                        props.onActivate?.(getNodeAt(id).value);
+                                    }}
+                                >
+                                    {props.renderNode(
+                                        () => getNodeAt(id),
+                                        () => ({ placement: getPlacement(), isFocused: getFocusedId() === id }),
+                                    )}
+                                </div>
+                            </li>
+                        );
+                    }}
                 </For>
             </ul>
         </div>

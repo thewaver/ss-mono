@@ -232,17 +232,17 @@ export namespace ElementObserverUtils {
 
         createEffect(() => {
             let frameId: ReturnType<typeof requestAnimationFrame>;
-            let isCancelled = false;
+            let isCanceled = false;
 
             onCleanup(() => {
-                isCancelled = true;
+                isCanceled = true;
                 cancelAnimationFrame(frameId);
             });
 
             if (!getIsVisible()) return;
 
             const tick = () => {
-                if (isCancelled) return;
+                if (isCanceled) return;
 
                 updateSize();
 
@@ -276,7 +276,9 @@ export namespace ElementObserverUtils {
 
         const updateRects = () => {
             setRects(
-                getRefs().map((ref) => (ref ? ViewportUtils.getAdjustedBoundingClientRect(ref, viewportContext) : undefined)),
+                getRefs().map((ref) =>
+                    ref ? ViewportUtils.getAdjustedBoundingClientRect(ref, viewportContext) : undefined,
+                ),
             );
         };
 
@@ -298,17 +300,17 @@ export namespace ElementObserverUtils {
 
         createEffect(() => {
             let frameId: ReturnType<typeof requestAnimationFrame>;
-            let isCancelled = false;
+            let isCanceled = false;
 
             onCleanup(() => {
-                isCancelled = true;
+                isCanceled = true;
                 cancelAnimationFrame(frameId);
             });
 
             if (!getIsVisible()) return;
 
             const tick = () => {
-                if (isCancelled) return;
+                if (isCanceled) return;
 
                 updateRects();
 

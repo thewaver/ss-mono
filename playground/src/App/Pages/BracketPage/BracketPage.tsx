@@ -19,7 +19,6 @@ import { CONNECTOR_FROM_COLOR, CONNECTOR_TO_COLOR } from "./BracketPage.css";
 
 const EXAMPLES_ROOT = "/src/App/Pages/BracketPage/Examples";
 
-const CONNECTORS = ["flat", "rounded", "curved", "ballAndArrow"] as const;
 const CONNECTOR_RADIUS = 14;
 const CONNECTOR_WIDTH = 2;
 const ORIENTATIONS: BracketOrientation[] = ["horizontal", "vertical"];
@@ -39,7 +38,7 @@ export const BracketPage = () => {
     const [getCrossGap, setCrossGap] = createSignal(STARTING_CROSS_GAP);
     const [getOrientation, setOrientation] = createSignal<BracketOrientation>(ORIENTATIONS[0]);
     const [getRootSide, setRootSide] = createSignal<BracketRootSide>(ROOT_SIDES[0]);
-    const [getConnector, setConnector] = createSignal<(typeof CONNECTORS)[number]>(CONNECTORS[0]);
+    const [getConnector, setConnector] = createSignal<BracketConnectors.SampleKey>(BracketConnectors.SAMPLE_KEYS[0]);
     const [getPicked, setPicked] = createSignal(NOTHING_PICKED);
 
     const getExamples = createMemo(() => {
@@ -50,7 +49,7 @@ export const BracketPage = () => {
             rootSide: getRootSide,
             onActivate: setPicked,
             renderConnector: (getDefs) =>
-                BracketConnectors.ALL[getConnector()]({
+                BracketConnectors.SAMPLE_CONNECTORS[getConnector()]({
                     defs: getDefs(),
                     radius: CONNECTOR_RADIUS,
                     width: CONNECTOR_WIDTH,
@@ -111,7 +110,7 @@ export const BracketPage = () => {
                 >
                     <PageSelectField
                         value={getConnector}
-                        values={() => CONNECTORS}
+                        values={() => BracketConnectors.SAMPLE_KEYS}
                         ariaLabel={"Connectors"}
                         onChange={(connector) => setConnector(() => connector)}
                     />

@@ -61,9 +61,8 @@ const computeBounds = (anchor: DateValue) => {
     } satisfies Record<DateInputPart, { min: number; max: number }>;
 };
 
-const getHasImpossiblePart = (digits: string, format: DateInputFormat, anchor: DateValue) => {
+const getHasImpossiblePart = (digits: string, format: DateInputFormat, bounds: ReturnType<typeof computeBounds>) => {
     const { parts } = FORMATS[format];
-    const bounds = computeBounds(anchor);
 
     return TextSyncUtils.readGroups(
         digits,
@@ -108,6 +107,8 @@ export const DateInput = (props: DateInputProps) => {
         { equals: (a, b) => a.era === b.era && a.year === b.year && a.calendar.identifier === b.calendar.identifier },
     );
 
+    const getBounds = createMemo(() => computeBounds(getAnchor()));
+
     const getEraOptions = createMemo(() => DateValueUtils.getEras(getAnchor(), access(props.locale)));
 
     const [getEra, setEra] = createSignal<string>(
@@ -143,7 +144,7 @@ export const DateInput = (props: DateInputProps) => {
         getDigitCount: () => DIGIT_COUNT,
         toDigits: (value) => toDigits(value, getFormat()),
         fromDigits,
-        getHasImpossibleDigits: (digits) => getHasImpossiblePart(digits, getFormat(), getAnchor()),
+        getHasImpossibleDigits: (digits) => getHasImpossiblePart(digits, getFormat(), getBounds()),
         getIsSame: DateValueUtils.isSame,
     });
 

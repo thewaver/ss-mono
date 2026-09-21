@@ -1,5 +1,7 @@
 import { Index, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 
+import { MathUtils } from "@thewaver/ss-utils";
+
 import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access } from "../../Utils/propUtils";
 import type { ScrollerButtonPlacement, ScrollerProps, ScrollerStep, ScrollerStepper } from "./Scroller.types";
@@ -25,7 +27,7 @@ const computeScrollRange = (metrics: { visible: number; total: number }) =>
 const computeProgressRatio = (metrics: { start: number; visible: number; total: number }) => {
     const range = computeScrollRange(metrics);
 
-    return range === 0 ? RATIO_MIN : Math.min(Math.max(metrics.start / range, RATIO_MIN), 1);
+    return range === 0 ? RATIO_MIN : MathUtils.clamp01(metrics.start / range);
 };
 
 const computeOffsetWithin = (element: HTMLElement, ancestor: HTMLElement) => {

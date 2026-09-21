@@ -1,6 +1,6 @@
 import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
 
-import { MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
+import { MathUtils, type Point2d, Size2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
@@ -18,6 +18,7 @@ const DEFAULT_CELL_ANIMATION_FINAL_FRAME: CellAnimationFinalFrame = "cells";
 const DEFAULT_CELL_ANIMATION_WEIGHT = 0;
 const CELL_ANIMATION_PERSPECTIVE_RATIO = 1.5;
 const CELL_ANIMATION_BLEED_PX = 1;
+const CELL_ANIMATION_DEPTH_STEPS = 100;
 
 export const CellAnimation = (props: CellAnimationProps) => {
     const getAnimationDurationMs = createMemo(
@@ -42,7 +43,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
     const [getIsWindowVisible, setIsWindowVisible] = createSignal(true);
     const [getIsPlaying] = SignalMirrorUtils.createOptional(() => props.playbackSignal, true);
     const [getCurrentIteration, setCurrentIteration] = createSignal(0);
-    const [getRootSize, setRootSize] = createSignal<Size2d>({ width: 0, height: 0 });
+    const [getRootSize, setRootSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });
 
     const getCellCount = createMemo<Point2d, undefined>(
         () => {
@@ -256,7 +257,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
                                         "width": `${getBounds().width}px`,
                                         "height": `${getBounds().height}px`,
                                         "background-position": `${-getBounds().x}px ${-getBounds().y}px`,
-                                        "z-index": `${Math.floor((1 - defs.weight) * 100)}`,
+                                        "z-index": `${Math.floor((1 - defs.weight) * CELL_ANIMATION_DEPTH_STEPS)}`,
                                     }}
                                     aria-hidden="true"
                                 />

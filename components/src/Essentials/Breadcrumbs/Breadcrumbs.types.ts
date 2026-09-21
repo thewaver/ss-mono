@@ -31,8 +31,12 @@ export type BreadcrumbsItemProps<T> = AccessorProps<
 export type BreadcrumbsProps<T> = AccessorProps<{
     /** The space between crumbs and separators. */
     gap?: number;
-    /** Names the trail for assistive technology. */
-    ariaLabel?: string;
+    /**
+     * Names the trail for assistive technology. Required, because the `<nav>` around it is a landmark and
+     * nothing else can name it — a page with two unnamed navigation landmarks gives a reader no way to tell
+     * them apart.
+     */
+    ariaLabel: string;
     /** The component to draw navigating crumbs with, for a trail of links rather than of buttons. */
     linkComponent?: Component<TabLinkProps>;
     /** Draws whatever sits between two crumbs. */

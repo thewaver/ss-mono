@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal } from "solid-js";
+import { createMemo, createSignal } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
@@ -13,15 +13,17 @@ import * as styles from "./ElementMosaic.css";
 const EMPTY_SIZE: Size2d = { width: 0, height: 0 };
 
 export const ElementMosaic = <T,>(props: ElementMosaicProps<T>) => {
-    const [getMeasuredSizes, setMeasuredSizes] = createSignal<Size2d[]>([]);
+    const [getItemRefs, setItemRefs] = createSignal<Array<HTMLElement | undefined>>([]);
+
+    const getMeasuredSizes = ElementObserverUtils.createBorderBoxSizeListObserver(getItemRefs);
 
     const getSizes = createMemo(() => access(props.items).map((_, index) => getMeasuredSizes()[index] ?? EMPTY_SIZE));
 
-    const setSizeAt = (index: number, size: Size2d) =>
-        setMeasuredSizes((sizes) => {
-            const next = [...sizes];
+    const setItemRefAt = (index: number, element: HTMLElement) =>
+        setItemRefs((refs) => {
+            const next = [...refs];
 
-            next[index] = size;
+            next[index] = element;
 
             return next;
         });
@@ -33,21 +35,11 @@ export const ElementMosaic = <T,>(props: ElementMosaicProps<T>) => {
             sizes={getSizes}
             isItemSized={false}
             computePlacements={MosaicUtils.packFixed}
-            renderItem={(index, getState) => {
-                const [getItemRef, setItemRef] = createSignal<HTMLElement>();
-
-                const getItemSize = ElementObserverUtils.createBorderBoxSizeObserver(getItemRef);
-
-                createEffect(() => {
-                    setSizeAt(index, getItemSize());
-                });
-
-                return (
-                    <div ref={setItemRef} class={styles.elementMosaicItem}>
-                        {props.renderItem(() => access(props.items)[index], getState)}
-                    </div>
-                );
-            }}
+            renderItem={(index, getState) => (
+                <div ref={(element) => setItemRefAt(index, element)} class={styles.elementMosaicItem}>
+                    {props.renderItem(() => access(props.items)[index], getState)}
+                </div>
+            )}
         />
     );
 };

@@ -4,6 +4,7 @@ import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SV
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { GradientStepsOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
+import { TimedGradientKnobs } from "../TimedGradient.knobs";
 
 export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
@@ -18,7 +19,7 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                         {
                             id: `gradient1-${id}`,
                             colors: [
-                                { value: `rgb(from ${defs.colors.primary} r g b / 0)` },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
                                 { value: defs.colors.primary },
                             ],
                             angle: 90,
@@ -27,7 +28,7 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                             MathUtils.getIntermediateValues(
                                 90,
                                 450,
-                                opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                             ),
                             defs,
                         ),
@@ -43,7 +44,7 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                                 MathUtils.getIntermediateValues(
                                     90,
                                     450,
-                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                 ),
                                 [180],
                             ),
@@ -61,7 +62,7 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                         {
                             id: `gradient2-${id}`,
                             colors: [
-                                { value: `rgb(from ${defs.colors.secondary} r g b / 0)` },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary) },
                                 { value: defs.colors.secondary },
                             ],
                             angle: 90,
@@ -71,12 +72,12 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                                 ...MathUtils.getIntermediateValues(
                                     90,
                                     450,
-                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                 ),
                                 ...MathUtils.getIntermediateValues(
                                     90,
                                     450,
-                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                 ),
                             ],
                             defs,
@@ -94,12 +95,12 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                                     ...MathUtils.getIntermediateValues(
                                         90,
                                         450,
-                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         90,
                                         450,
-                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                     ),
                                 ],
                                 [180],
@@ -118,7 +119,7 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                         {
                             id: `gradient3-${id}`,
                             colors: [
-                                { value: `rgb(from ${defs.colors.tertiary} r g b / 0)` },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.tertiary) },
                                 { value: defs.colors.tertiary },
                             ],
                             angle: 90,
@@ -128,17 +129,17 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                                 ...MathUtils.getIntermediateValues(
                                     90,
                                     450,
-                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                 ),
                                 ...MathUtils.getIntermediateValues(
                                     90,
                                     450,
-                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                 ),
                                 ...MathUtils.getIntermediateValues(
                                     90,
                                     450,
-                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                 ),
                             ],
                             defs,
@@ -156,17 +157,17 @@ export const snake_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                                     ...MathUtils.getIntermediateValues(
                                         90,
                                         450,
-                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         90,
                                         450,
-                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         90,
                                         450,
-                                        opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                     ),
                                 ],
                                 [180],

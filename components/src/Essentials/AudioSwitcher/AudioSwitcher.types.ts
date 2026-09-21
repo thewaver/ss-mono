@@ -1,7 +1,7 @@
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
 export type AudioSwitcherController = {
-    reset: () => boolean;
+    reset: () => void;
 };
 
 export type AudioSwitcherProps = AccessorProps<{

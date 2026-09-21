@@ -154,8 +154,15 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     const findRowById = (id: string | undefined) => getNavigableRows().find((row) => getRowId(row) === id);
 
-    const computeRowText = (row: TreeRow<T>) =>
-        props.computeCustomText?.(row.node) ?? TypeaheadUtils.getElementText(document.getElementById(getRowId(row)));
+    const computeRowText = (row: TreeRow<T>) => {
+        const custom = props.computeCustomText?.(row.node);
+
+        if (custom !== undefined) return custom;
+
+        const painted = TypeaheadUtils.getElementText(document.getElementById(getRowId(row)));
+
+        return painted.length > 0 ? painted : String(row.node.value);
+    };
 
     let lastFocusedValue: T | undefined;
     let lastExpanded: T[] = [];

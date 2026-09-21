@@ -1,7 +1,7 @@
 import { Index, createMemo } from "solid-js";
 
-import { BARREL_PERSPECTIVE_PX } from "../../Primitives/Barrel/Barrel.utils";
-import { access } from "../../Utils/propUtils";
+import { BarrelUtils } from "../../Primitives/Barrel/Barrel.utils";
+import { access, accessSignal } from "../../Utils/propUtils";
 import type { CuboidFace, CuboidFaceState, CuboidProps } from "./Cuboid.types";
 import { CuboidUtils } from "./Cuboid.utils";
 
@@ -26,8 +26,8 @@ const CUBOID_ROLE_DESCRIPTION = "box";
 const FACE_ROLE_DESCRIPTION = "face";
 
 export const Cuboid = (props: CuboidProps) => {
-    const [getYaw] = props.yawSignal;
-    const [getPitch] = props.pitchSignal;
+    const [getYaw] = accessSignal(() => props.yawSignal);
+    const [getPitch] = accessSignal(() => props.pitchSignal);
 
     const getSize = createMemo(() => access(props.size));
 
@@ -58,7 +58,7 @@ export const Cuboid = (props: CuboidProps) => {
                 style={{
                     width: `${getSize().width}px`,
                     height: `${getSize().height}px`,
-                    perspective: `${BARREL_PERSPECTIVE_PX}px`,
+                    perspective: `${BarrelUtils.PERSPECTIVE_PX}px`,
                 }}
             >
                 <div

@@ -3448,6 +3448,24 @@ would change how the whole family measures itself, not add a knob.
 returning nothing is the same as no accessor. `circular` is a plain flag the factory reads once, so the
 sample picks between an accessor and `undefined` rather than passing one that answers conditionally.
 
+### A trail sample opens one pointer tracker, not one per stamp
+
+A trail is 34 stamps plus the mark itself, and each stamp factory used to call `PointerTrackerUtils.create`
+on the same element — so one sample instance ran 35 trackers, each calling `getAdjustedBoundingClientRect`
+and `computeReading` every frame for a reading identical to its neighbors'. On the tracked-gradients page
+that was around 420 rect reads a frame where 19 would do.
+
+**The tracker is opened once at the top of `computeSVGDefs`, and the stamp factory takes `getReading` and
+`getIsPointerPresent` rather than the ref.** Passing the two accessors rather than the whole tracker keeps
+the factory's dependency visible in its signature and needs no type for the tracker itself. `create` opens a
+`createEffect` and an `onCleanup`, so it needs an owner; `computeSVGDefs` always runs under one, which the
+user confirmed.
+
+**What the stamps still own is their own timing.** Each keeps its birth tick, its last origin and its last
+movement time, which is what staggers them along the pointer's path — sharing the reading changed where the
+numbers come from and nothing about what each stamp does with them. Twelve samples work this way:
+`spot_trail_1..3`, `spot_smear_1..3`, `hand_trail_1..3` and `spot_ripple_1..3`.
+
 ### A tracked gradient's defaults have one home, and the samples read from it
 
 Every default was written twice: once in `DEFAULTS_BY_FAMILY`, which is what the Playground panel starts a
@@ -4086,6 +4104,13 @@ view and nothing else, so an unmounted option has no element and no text; the Pl
 example passes `computeCustomText` for exactly that reason, and typing a route's name reaches one far below
 the window. And an item whose paint is **not text** — a swatch, an avatar — has nothing to read.
 
+**A consumer who forgets it gets the node's value rather than nothing.** `Tree` falls back to
+`String(row.node.value)` when the row has no element and no custom text, because the alternative is a
+typeahead that silently finds only what happens to be on screen — a windowed tree where typing "z" for a node
+four hundred rows down does nothing at all, and looks like a key that was never wired. The fallback is worse
+than `computeCustomText` whenever the value is not what the row displays, so it is a floor rather than a
+substitute, and the prop is still the answer. `Select` has the same shape and no fallback yet.
+
 **The buffer is a factory and the matching is a pure function, which splits the opposite way to the walk.**
 `NavigatorUtils.computeNextPosition` was deliberately not a factory because each control owns its cursor
 differently. The typeahead buffer is the reverse: a string and a timer, owned identically by all three, with
@@ -4275,10 +4300,19 @@ exists for "this step failed", for any invented state, so a red ring on step two
 step three and the only route by which an invented state can be announced is **text in the accessible
 name**. The strings are the consumer's, for the reason `TagInput` does not ship the word "Remove".
 
-**Navigability is per step and decides the element, not an attribute.** A step you can move to is a
-`<button>`; one you cannot is a `<span>` — `Breadcrumbs`' call for its last crumb. A non-navigable step with
-a tooltip stays reachable, which is `getIsReachableWhenDisabled`'s pairing, derived from whether a tooltip
-exists rather than taken as a prop, so that rule's warning can never fire from here.
+**Every step is a `<button>`, and navigability is `aria-disabled`.** This reverses an earlier call — a step
+you could move to was a `<button>` and one you could not was a `<span>`, on the precedent `Breadcrumbs` sets
+for its last crumb — and ARIA is what reversed it. A step's name is the consumer's state string, handed in
+as `aria-label`, and a bare `<span>` has the `generic` role, for which ARIA 1.2 says "Authors MUST NOT use
+the aria-label or aria-labelledby attributes to name the element". So the `<span>` was throwing the state
+away. It is worse than that where the step carries a tooltip: the step then stays reachable, `wrapElement`
+gives it `tabindex="0"`, and a focusable element with no role announces as nothing at all (4.1.2 Name, Role,
+Value). The `Breadcrumbs` precedent does not actually reach this case — its current crumb carries no
+`aria-label` and, since it was taken out of the tab order, is not focusable either.
+
+A non-navigable step with a tooltip still stays reachable, which is `getIsReachableWhenDisabled`'s pairing,
+derived from whether a tooltip exists rather than taken as a prop, so that rule's warning can never fire
+from here. What changed is only the element it lands on.
 
 **Each step is its own tab stop; there is no roving order.** Researched on request. Roving is legal — no
 criterion counts tab stops — but the APG's account of how a user _discovers_ arrow keys is that assistive
@@ -4294,7 +4328,10 @@ The sharper argument is local: a locked or failed step stays reachable **so its 
 under roving someone who does not know to press an arrow tabs in, lands on the current step, tabs out, and
 never reaches it.
 
-**Both orientations ship**, as a `dir` prop with `aria-orientation` on the list.
+**Both orientations ship**, as a `dir` prop, and nothing in the markup states the axis. `aria-orientation` is
+not among the attributes the `list` role supports, so an `<ol>` carrying it is ignored by assistive technology
+and flagged by validators — the same position `Carousel` reached for `role="region"`. The `dir` prop drives the
+flex direction and the arrow keys, and stops there.
 
 **Not built:** the connector is a slot rather than something the library draws, and nothing enforces that a
 linear flow is linear — a consumer who marks every step navigable gets free navigation, which is
@@ -5809,8 +5846,9 @@ their own would build on. The gradient file stays whole.
 **The split the move was for is a file extension.** `vitest` runs `src/**/*.test.ts` in a node environment
 with no JSX transform, which is the rule _"Unit tests"_ in `conventions.md` already states — so a test cannot import a file
 containing an element. That makes the separation mandatory rather than stylistic: `SVGPatternLayouts.const.ts`
-and `SVGAnimationTracks.const.ts` hold the arithmetic and no markup, `SVGPatterns.const.tsx` and
-`SVGAnimations.const.tsx` hold the builders that consume them. This is what `backlog.md` asked for and could
+and `SVGAnimationTracks.const.ts` hold the arithmetic and no markup, `SVGPatterns.const.ts` and
+`SVGAnimations.const.tsx` hold the builders that consume them, and only a file that really does write an
+element keeps the `.tsx`. This is what `backlog.md` asked for and could
 not get while the numbers lived inside the callback that emitted the element.
 
 **A tiling is now four pure functions rather than a closure.** Each entry in `SVGPatternLayouts.ALL` answers
@@ -5884,6 +5922,20 @@ already set: the shared work moved into a `CalendarComposite` — the grid, the 
 month announcement — and the two thin components over it own only their value shape and answer three hooks,
 `computeIsSelected`, `computeAnchorDay` and `onPick`. `SelectComposite` is the same arrangement, so a reader
 who knows one knows both. `DateRangePicker` sits beside `DatePicker` the same way.
+
+**A control holding two fields suffixes the consumer's `id` and `name` rather than passing them to both.**
+`DateRangePicker` composes `-start` and `-end`, `DateTimePicker` composes `-date` and `-time`, which is what
+`ColorArea` already does for its two axes. Handing one `id` to two inputs puts the same id on both, so a
+`<label for>` reaches whichever the browser finds first, and one `name` submits two fields under one key —
+a form receives `date=2026-01-01&date=2026-01-08` and cannot tell which end is which. The suffix is not
+documented on the `id` prop itself because both types inherit it from `DateInputProps`, and redeclaring a
+prop only to document it is the drift that got the `locale` redeclarations deleted.
+
+**`DateRangePicker`'s Escape returns focus to the end field, which is where the trigger lives.** The calendar
+is opened from the trailing slot of the second field, so focus has to go back to that field rather than to
+the first — a dismissal that lands on the start field moves the person somewhere they did not come from. It
+is found by the composed `-end` id, with a generated id standing in when the consumer supplied none, rather
+than by taking the root's first `<input>`.
 
 **The half-entered state is the component's, and never reaches the consumer.** `RangeCalendar` holds the first
 end in a private signal; while it is set, the outward value is `undefined` and the grid paints the span from
@@ -6599,6 +6651,16 @@ painter is handed `undefined`.
 Settled while closing the last of `backlog.md` item 4's opener bullets. What differs between a menu on a
 button and a menu on a right-click is the opener, not the menu — so the level, the items, the submenus, the
 typeahead, the keyboard and the dismissal are all the ones `Menu` already has.
+
+**There is a keyboard opener, and the anchor is the focused element rather than a point.** The ContextMenu
+key, and Shift+F10 for keyboards without one, open the menu on the region's own `keydown`. The anchor is the
+adjusted rect of whatever inside the region has focus, falling back to the region itself, so the menu lands
+against something the person can see rather than at a coordinate they never pointed at. The `contextmenu`
+event is handled the same way when it arrives carrying the origin as its point: a menu anchored at 0,0 is
+not usable however it got there, which is a fact about the coordinate rather than a guess about the input
+device — MDN does not document a property that separates a keyboard-invoked `contextmenu` from a mouse one,
+so nothing here tries to infer it. What this does not reach is a region nobody can focus in the first place,
+which is `backlog.md` item 26.
 
 **It is a second component rather than a mode, because a right-click menu has no button to render.** `Menu`
 is a trigger plus a root level, and its trigger is a real `<button>` with a name, a tab stop and an
@@ -8251,7 +8313,7 @@ shapes, not a wider set of the same fields, so the same spread would blend half 
 and produce neither. `PartialGlassDefs.tint` takes a whole `GlassTintDefs` or nothing, and a caller who
 supplies one replaces the default outright.
 
-**The sheen turns off at a `specularConstant` of zero, and the switch had to live in `Glass.utils.tsx`, not
+**The sheen turns off at a `specularConstant` of zero, and the switch had to live in `Glass.utils.ts`, not
 just in the SVG filter factory.** Found on the Playground's tooltip: `feSpecularLighting`'s highlight is
 composited onto the tint with `feComposite operator="arithmetic", k2=1, k3=1` — an unclamped add, not a blend
 — which reads as a tight, tasteful shine on a 300px demo pane and as the whole surface blown toward white on
@@ -8260,7 +8322,7 @@ cover a small element's entire area at once. `SVGFilterDefsFactory.addSpecularLi
 register a primitive at `specularConstant <= 0`, matching every sibling `add*` method's no-op guard — but
 `computeSheenDefs` still has to omit the `filter` key from the returned def entirely in that case, rather than
 pointing one at an id the factory built nothing for. That second part is the one that actually matters:
-`Shape` decides whether to write `filter="url(#…)"` from whether the def object *carries* a `filter` key, not
+`Shape` decides whether to write `filter="url(#…)"` from whether the def object _carries_ a `filter` key, not
 from whether anything was rendered under that id, which is the same "a factory-built filter can build
 nothing" trap the backdrop layers above are already written to avoid. Skipping the key also skips
 `PointerTrackerUtils.create` and the rest of the primitive-building work, so a caller who wants no sheen pays
@@ -8340,7 +8402,8 @@ of freedom the tuning sweeps had been using. Asked about and settled by the user
 **`GlassDefs`'s remaining groups**: the backdrop blur every browser gets,
 the ripple only Chromium gets, the tint, and the sheen. Nothing beyond what the effect actually has was
 invented for it. It lives in `Abstracts`, which renders no DOM and is where shared vocabulary belongs, and
-`Glass.utils.tsx` builds JSX there the way `SVGFilterDefs.factory.tsx` already does.
+`Glass.utils.ts` assembles the defs there and hands them to `SVGFilterDefs.factory.tsx`, which is what writes
+the elements.
 
 **The sheen left `Samples/SVGDefs/Gradient` because the registry's contract could not carry it.** Every
 sample in that registry has to be callable with the same `defs` bag — that is what lets a picker take any key

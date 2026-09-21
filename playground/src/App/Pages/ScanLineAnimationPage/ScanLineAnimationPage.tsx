@@ -6,8 +6,8 @@ import {
     CellAnimationBreakpoints,
     CellAnimationWeights,
     ScanlineAnimation,
+    ScanlineAnimationKeyframeKnobs,
     ScanlineAnimationKeyframes,
-    ScanlineAnimationKnobs,
     access,
 } from "@thewaver/ss-components";
 
@@ -309,7 +309,7 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKnobs.STRETCH_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.STRETCH_KNOBS as Record<string, SampleKnob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_STRETCH_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
@@ -344,7 +344,7 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKnobs.SNAKE_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.SNAKE_KNOBS as Record<string, SampleKnob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_SNAKE_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
@@ -379,7 +379,7 @@ const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKnobs.SPLIT_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.SPLIT_KNOBS as Record<string, SampleKnob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_SPLIT_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
@@ -486,7 +486,7 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKnobs.WAVE_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.WAVE_KNOBS as Record<string, SampleKnob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_WAVE_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
@@ -521,7 +521,7 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKnobs.ROLL_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.ROLL_KNOBS as Record<string, SampleKnob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_ROLL_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
@@ -556,7 +556,7 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKnobs.DROPOUT_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.DROPOUT_KNOBS as Record<string, SampleKnob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_DROPOUT_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
@@ -591,7 +591,7 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKnobs.INTERLACE_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.INTERLACE_KNOBS as Record<string, SampleKnob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_INTERLACE_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
@@ -626,7 +626,7 @@ const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKnobs.SKEW_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.SKEW_KNOBS as Record<string, SampleKnob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_SKEW_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}

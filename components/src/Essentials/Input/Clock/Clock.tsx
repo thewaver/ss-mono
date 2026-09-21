@@ -1,5 +1,5 @@
 import type { Accessor } from "solid-js";
-import { Index, createEffect, createMemo, createSignal, createUniqueId } from "solid-js";
+import { Index, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
 import { TimeUtils } from "@thewaver/ss-utils";
 import type { TimeValue } from "@thewaver/ss-utils";
@@ -15,7 +15,6 @@ import * as styles from "./Clock.css";
 const DEFAULT_CLOCK_GAP = 0;
 const DEFAULT_CLOCK_STEP = 1;
 const NO_CLOCK_STEPS: ClockSteps = {};
-const SELECT_KEYS = ["Enter", " "];
 const LABEL_DIGITS = 2;
 
 type ClockColumn = {
@@ -60,7 +59,7 @@ export const Clock = (props: ClockProps) => {
     const groupId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
-    const [getOptionRefs, setOptionRefs] = createSignal<Record<string, HTMLElement | undefined>>({});
+    const optionRefs = new Map<string, HTMLElement>();
     const [getHighlighted, setHighlighted] = createSignal<TimeValue | undefined>();
     const [getHighlightedUnit, setHighlightedUnit] = createSignal<ClockUnit | undefined>();
 
@@ -135,15 +134,21 @@ export const Clock = (props: ClockProps) => {
         (props.computeIsTimeDisabled?.(time) ?? false);
 
     const setOptionRef = (unit: ClockUnit, index: number, element: HTMLElement) => {
-        setOptionRefs((prev) => ({ ...prev, [`${unit}:${index}`]: element }));
+        const key = `${unit}:${index}`;
+
+        optionRefs.set(key, element);
+
+        onCleanup(() => {
+            if (optionRefs.get(key) === element) optionRefs.delete(key);
+        });
     };
 
-    const pick = (option: ClockOption) => {
-        if (getIsTimeDisabled(option.time)) return;
+    const pick = (time: TimeValue, unit: ClockUnit) => {
+        if (getIsTimeDisabled(time)) return;
 
-        setHighlighted(() => option.time);
-        setHighlightedUnit(option.unit);
-        valueSignal[1](() => option.time);
+        setHighlighted(() => time);
+        setHighlightedUnit(unit);
+        valueSignal[1](() => time);
     };
 
     createEffect(() => {
@@ -155,16 +160,14 @@ export const Clock = (props: ClockProps) => {
     });
 
     createEffect(() => {
-        const refs = getOptionRefs();
-
         getColumns().forEach((column) => {
-            refs[`${column.unit}:${getRovingIndex(column)}`]?.scrollIntoView({ block: "nearest" });
+            optionRefs.get(`${column.unit}:${getRovingIndex(column)}`)?.scrollIntoView({ block: "nearest" });
         });
     });
 
     createEffect(() => {
         const column = getColumns().find((candidate) => candidate.unit === getRovingUnit());
-        const element = column && getOptionRefs()[`${column.unit}:${getRovingIndex(column)}`];
+        const element = column && optionRefs.get(`${column.unit}:${getRovingIndex(column)}`);
         const root = getRootRef();
 
         if (!element || !root?.contains(document.activeElement) || root === document.activeElement) return;
@@ -181,9 +184,12 @@ export const Clock = (props: ClockProps) => {
 
         const index = getRovingIndex(column);
 
-        if (SELECT_KEYS.includes(e.key)) {
+        if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();
-            pick(column.options[index]);
+            pick(
+                ClockUtils.withReading(column.unit, column.readings[index], getRovingTime(), getIsTwelveHour()),
+                column.unit,
+            );
 
             return;
         }
@@ -242,7 +248,7 @@ export const Clock = (props: ClockProps) => {
                                 flags={getRenderProps}
                                 ariaLabel={() => getOption().label}
                                 renderContent={(getOptionFlags) => props.renderOption(getOption, getOptionFlags)}
-                                onSelect={() => pick(getOption())}
+                                onSelect={() => pick(getOption().time, getOption().unit)}
                             />
                         )}
                     />

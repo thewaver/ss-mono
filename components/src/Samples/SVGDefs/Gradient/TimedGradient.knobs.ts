@@ -1,4 +1,21 @@
-import type { SampleCheckKnob, SampleNumberKnob } from "../../Samples.types";
+import type { SampleCheckKnob, SampleKnobs, SampleNumberKnob } from "../../Samples.types";
+import type { TimedGradientEntry, TimedGradientFamily } from "../SVGDefs.types";
+
+/**
+ * The options a Timed gradient family takes, read off the registry's own entry for it.
+ *
+ * The entry union is what already pairs a family with its `Gradient*Opts`, so deriving from it means a
+ * renamed option breaks the knob map rather than silently describing a knob nothing reads. A family that
+ * takes no options answers an empty type, which only an empty knob set satisfies.
+ */
+type TimedGradientDefsOf<F extends TimedGradientFamily> =
+    Extract<TimedGradientEntry, { family: F }> extends { defs?: infer TDefs } ? NonNullable<TDefs> : object;
+
+/** A knob set per family, each checked against that family's own options. */
+type TimedGradientKnobsByFamily = { [F in TimedGradientFamily]: SampleKnobs<TimedGradientDefsOf<F>> };
+
+/** The starting values per family, each checked against that family's own options. */
+type TimedGradientDefaultsByFamily = { [F in TimedGradientFamily]: Partial<TimedGradientDefsOf<F>> };
 
 const CYCLES_KNOB: SampleCheckKnob = {
     kind: "check",
@@ -27,12 +44,14 @@ const BANDS_KNOB: SampleNumberKnob = {
     step: 1,
 };
 
-const STEPS_DEFAULT = { steps: 12 };
-const TWO_COLOR_FLOW_DEFAULTS = { ...STEPS_DEFAULT, bands: 3 };
-const THREE_COLOR_FLOW_DEFAULTS = { ...STEPS_DEFAULT, bands: 2 };
+const DEFAULT_STEP_COUNT = 12;
+const TWO_COLOR_FLOW_DEFAULTS = { steps: DEFAULT_STEP_COUNT, bands: 3 };
+const THREE_COLOR_FLOW_DEFAULTS = { steps: DEFAULT_STEP_COUNT, bands: 2 };
 
 export namespace TimedGradientKnobs {
-    export const KNOBS_BY_FAMILY = {
+    export const STEPS_DEFAULT = { steps: DEFAULT_STEP_COUNT };
+
+    export const KNOBS_BY_FAMILY: TimedGradientKnobsByFamily = {
         elastic_circle_1: { cycles: CYCLES_KNOB },
         elastic_drip_1: { cycles: CYCLES_KNOB },
         elastic_inter_semicircle_1: { cycles: CYCLES_KNOB },
@@ -68,7 +87,7 @@ export namespace TimedGradientKnobs {
         sweep_diag_async_4: { cycles: CYCLES_KNOB },
     };
 
-    export const DEFAULTS_BY_FAMILY: Record<string, Record<string, number>> = {
+    export const DEFAULTS_BY_FAMILY: TimedGradientDefaultsByFamily = {
         elastic_circle_1: {},
         elastic_drip_1: {},
         elastic_inter_semicircle_1: {},

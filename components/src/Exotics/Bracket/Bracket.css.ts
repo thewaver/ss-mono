@@ -24,5 +24,10 @@ export const bracketItem = style({
 export const bracketNode = style({
     width: "100%",
     height: "100%",
-    outline: "0 none",
+
+    selectors: {
+        "&:focus:not(:focus-visible)": {
+            outline: "0 none",
+        },
+    },
 });

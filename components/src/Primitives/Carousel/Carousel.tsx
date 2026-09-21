@@ -1,5 +1,5 @@
 import type { Accessor, JSX } from "solid-js";
-import { Index, Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
+import { Index, Show, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 import { MathUtils, RotationUtils } from "@thewaver/ss-utils";
@@ -74,6 +74,8 @@ const CarouselControl = (props: CarouselControlProps) => {
 };
 
 export const Carousel = <T,>(props: CarouselProps<T>) => {
+    onMount(() => LiveAnnouncerUtils.reserve("polite"));
+
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getViewportRef, setViewportRef] = createSignal<HTMLElement>();
     const [getSwipeRatio, setSwipeRatio] = createSignal(0);

@@ -103,7 +103,7 @@ describe("CellAnimationWeightsConst", () => {
         ).toBe(weights.length);
     });
 
-    it("still alternates on an even count with a centerd origin, where a raw modulo would not", () => {
+    it("still alternates on an even count with a centered origin, where a raw modulo would not", () => {
         const alternating = CellAnimationWeights.computeCellWeights(
             "lineRowAlternate",
             EVEN_COLUMN,

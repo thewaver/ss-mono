@@ -21,6 +21,7 @@ const FULL_TURN_DEGREES = 360;
 const HALF = 0.5;
 const SINGLE_ITEM = 1;
 const NO_ITEMS = 0;
+const NOTHING = 0;
 const FULL_SHARE = 1;
 const AXIS_DEGREES = [-360, -270, -180, -90, 0, 90, 180, 270, 360];
 const NO_TILT = 0;
@@ -36,8 +37,14 @@ const WHOLE_RADIUS = 1;
 const CELL_WIDTH = 1;
 const ITEM_QUARTERS = 2;
 const HEX_CLIP_PATH = "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)";
+const QUARTER = 0.25;
+const WHORL_SIZE = 3;
+const CLIFF_SIZE = 3;
+const CLIFF_CENTER = 0.5;
+const CLIFF_SHIFT_RATIOS = [0, 0.5, -0.25];
+const CLIFF_DROP_RATIOS = [0, 0.5, 0.75];
 
-const toSum = (values: number[]) => values.reduce((total, value) => total + value, NO_ITEMS);
+const toSum = (values: number[]) => values.reduce((total, value) => total + value, NOTHING);
 
 type ArcBox = {
     x: number;
@@ -111,9 +118,9 @@ const toEvenArcAngles = (
     if (itemCount === SINGLE_ITEM) return [(fromAngle + toAngle) * HALF];
 
     const step = (toAngle - fromAngle) / ARC_SAMPLES;
-    const walked: number[] = [NO_ITEMS];
+    const walked: number[] = [NOTHING];
     let previous = toEllipsePoint(radiusX, radiusY, fromAngle);
-    let total = NO_ITEMS;
+    let total = NOTHING;
 
     for (let sample = SINGLE_ITEM; sample <= ARC_SAMPLES; sample++) {
         const point = toEllipsePoint(radiusX, radiusY, fromAngle + step * sample);
@@ -125,15 +132,15 @@ const toEvenArcAngles = (
 
     const gaps = itemCount - SINGLE_ITEM;
     const angles: number[] = [];
-    let sample = NO_ITEMS;
+    let sample = NOTHING;
 
-    for (let index = NO_ITEMS; index < itemCount; index++) {
+    for (let index = NOTHING; index < itemCount; index++) {
         const target = (total * index) / gaps;
 
         while (sample < ARC_SAMPLES - SINGLE_ITEM && walked[sample + SINGLE_ITEM] < target) sample++;
 
         const spanned = walked[sample + SINGLE_ITEM] - walked[sample];
-        const share = spanned <= NO_ITEMS ? NO_ITEMS : (target - walked[sample]) / spanned;
+        const share = spanned <= NOTHING ? NOTHING : (target - walked[sample]) / spanned;
 
         angles.push(fromAngle + step * (sample + share));
     }
@@ -141,16 +148,12 @@ const toEvenArcAngles = (
     return angles;
 };
 
-const WHORL_SIZE = 3;
-const CLIFF_SIZE = 3;
-const CLIFF_CENTER = 0.5;
-const CLIFF_SHIFT_RATIOS = [0, 0.5, -0.25];
-const CLIFF_DROP_RATIOS = [0, 0.5, 0.75];
-const QUARTER = 0.25;
-
 const toFittedLayout = (placements: PlacementRect[]) => ({
     placements,
-    heightRatio: placements.reduce((lowest, placement) => Math.max(lowest, placement.top + placement.height * HALF), 0),
+    heightRatio: placements.reduce(
+        (lowest, placement) => Math.max(lowest, placement.top + placement.height * HALF),
+        NOTHING,
+    ),
 });
 
 /**
@@ -178,7 +181,7 @@ const computeWhorl = (itemCount: number, itemStepRatio: number, whorlStepRatio: 
         const place = index % WHORL_SIZE;
 
         return {
-            top: QUARTER + whorlTop + (place === 0 ? NO_ITEMS : itemDrop),
+            top: QUARTER + whorlTop + (place === 0 ? NOTHING : itemDrop),
             left: QUARTER * (place === 0 ? 2 : place === 1 ? 1 : 3),
             width: itemSize,
             height: itemSize,
@@ -246,9 +249,9 @@ export namespace PlacementLayoutUtils {
         return ({ itemCount }): SizedLayout => {
             const declared = computeItemArcs?.() ?? [];
             const asked = Array.from({ length: itemCount }, (_unused, index) => declared[index]);
-            const askedTotal = toSum(asked.map((arc) => arc ?? NO_ITEMS));
+            const askedTotal = toSum(asked.map((arc) => arc ?? NOTHING));
             const freeCount = asked.filter((arc) => arc === undefined).length;
-            const evenArc = Math.max(spreadDegrees - askedTotal, NO_ITEMS) / Math.max(freeCount, SINGLE_ITEM);
+            const evenArc = Math.max(spreadDegrees - askedTotal, NOTHING) / Math.max(freeCount, SINGLE_ITEM);
             const wanted = asked.map((arc) => arc ?? evenArc);
             const total = toSum(wanted);
             const arcs = wanted.map((arc) => (arc * spreadDegrees) / Math.max(total, Number.EPSILON));
@@ -256,9 +259,9 @@ export namespace PlacementLayoutUtils {
             const start = facingDegrees - blockArc * HALF;
 
             const boxes: ArcBox[] = [];
-            let walked = NO_ITEMS;
+            let walked = NOTHING;
 
-            for (let index = NO_ITEMS; index < itemCount; index++) {
+            for (let index = NOTHING; index < itemCount; index++) {
                 const fromAngle = start + walked + wedgeGapDegrees * HALF;
                 const toAngle = start + walked + arcs[index] - wedgeGapDegrees * HALF;
                 const centerAngle = (fromAngle + toAngle) * HALF;
@@ -266,7 +269,7 @@ export namespace PlacementLayoutUtils {
                 const itemWidth = Math.min(
                     2 *
                         itemRadius *
-                        Math.sin(Math.max(toAngle - fromAngle, NO_ITEMS) * HALF * AngleUtils.RADIANS_PER_DEGREE),
+                        Math.sin(Math.max(toAngle - fromAngle, NOTHING) * HALF * AngleUtils.RADIANS_PER_DEGREE),
                     bandWidth * itemMaxWidthRatio,
                 );
 
@@ -342,7 +345,7 @@ export namespace PlacementLayoutUtils {
             const radiusX = CURVE_WIDTH * HALF;
             const radiusY = curveHeightRatio * HALF;
             const widestSpread =
-                (FULL_TURN_DEGREES * Math.max(itemCount - SINGLE_ITEM, NO_ITEMS)) / Math.max(itemCount, SINGLE_ITEM);
+                (FULL_TURN_DEGREES * Math.max(itemCount - SINGLE_ITEM, NOTHING)) / Math.max(itemCount, SINGLE_ITEM);
             const spread = Math.min(Math.max(spreadDegrees, NO_SPREAD_DEGREES), widestSpread);
             const fromAngle = facingDegrees - spread * HALF;
             const toAngle = fromAngle + spread;
@@ -454,12 +457,12 @@ export namespace PlacementLayoutUtils {
             const rowCount = Math.max(Math.ceil(itemCount / perRow), SINGLE_ITEM);
             const columnCount = Math.min(itemCount, perRow);
             const hasStaggeredRow = rowCount > SINGLE_ITEM;
-            const width = columnStep * columnCount + (hasStaggeredRow ? columnStep * HALF : NO_ITEMS);
+            const width = columnStep * columnCount + (hasStaggeredRow ? columnStep * HALF : NOTHING);
             const height = rowStep * (rowCount - SINGLE_ITEM) + cellHeight;
 
             const placements = Array.from({ length: itemCount }, (_unused, index): PlacementRect => {
                 const row = Math.floor(index / perRow);
-                const stagger = row % ROW_PARITY === EVEN_ROW ? NO_ITEMS : columnStep * HALF;
+                const stagger = row % ROW_PARITY === EVEN_ROW ? NOTHING : columnStep * HALF;
 
                 return {
                     left: (stagger + columnStep * (index % perRow) + cellWidth * HALF) / width,

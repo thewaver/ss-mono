@@ -10,8 +10,8 @@ const join = (values: number[]) => values.map((value) => `${value}`).join(";");
 
 export namespace SVGAnimations {
     export namespace Linear {
-        export const grow = (vName: "x" | "y", v1: number, v2: number, sArr: number[], defs: SVGAnimationDefs) => {
-            const tracks = SVGAnimationTracks.computeGrowTracks(v1, v2, sArr);
+        export const grow = (vName: "x" | "y", v1: number, v2: number, scales: number[], defs: SVGAnimationDefs) => {
+            const tracks = SVGAnimationTracks.computeGrowTracks(v1, v2, scales);
             const animateDefs = SVGAnimationDefsUtils.createAnimateDefs(defs);
 
             return (
@@ -26,7 +26,7 @@ export namespace SVGAnimations {
             vName: "x" | "y",
             v1: number,
             v2: number,
-            oArr: number[],
+            offsets: number[],
             defs: SVGAnimationDefs,
         ) => {
             const animateDefs = SVGAnimationDefsUtils.createAnimateDefs(defs);
@@ -35,12 +35,12 @@ export namespace SVGAnimations {
                 <>
                     <animate
                         attributeName={`${vName}1`}
-                        values={join(SVGAnimationTracks.computeOffsetTrack(v1, oArr))}
+                        values={join(SVGAnimationTracks.computeOffsetTrack(v1, offsets))}
                         {...animateDefs()}
                     />
                     <animate
                         attributeName={`${vName}2`}
-                        values={join(SVGAnimationTracks.computeOffsetTrack(v2, oArr))}
+                        values={join(SVGAnimationTracks.computeOffsetTrack(v2, offsets))}
                         {...animateDefs()}
                     />
                 </>
@@ -53,7 +53,7 @@ export namespace SVGAnimations {
             x2: number,
             y2: number,
             angle: number,
-            oArr: number[],
+            offsets: number[],
             defs: SVGAnimationDefs,
         ) => {
             const points = [
@@ -65,7 +65,7 @@ export namespace SVGAnimations {
             return (
                 <For each={points}>
                     {(point, getIndex) => {
-                        const tracks = SVGAnimationTracks.computeDiagonalTracks(point[0], point[1], angle, oArr);
+                        const tracks = SVGAnimationTracks.computeDiagonalTracks(point[0], point[1], angle, offsets);
 
                         return (
                             <>
@@ -86,8 +86,8 @@ export namespace SVGAnimations {
             );
         };
 
-        export const rotate = (aArray: number[], defs: SVGAnimationDefs) => {
-            const tracks = SVGAnimationTracks.computeRotationTracks(aArray);
+        export const rotate = (angles: number[], defs: SVGAnimationDefs) => {
+            const tracks = SVGAnimationTracks.computeRotationTracks(angles);
             const animateDefs = SVGAnimationDefsUtils.createAnimateDefs(defs);
 
             return (
@@ -99,26 +99,26 @@ export namespace SVGAnimations {
     }
 
     export namespace Radial {
-        export const grow = (rArr: number[], defs: SVGAnimationDefs) => {
+        export const grow = (radii: number[], defs: SVGAnimationDefs) => {
             const animateDefs = SVGAnimationDefsUtils.createAnimateDefs(defs);
 
-            return <animate attributeName="r" values={rArr.join(";")} {...animateDefs()} />;
+            return <animate attributeName="r" values={join(radii)} {...animateDefs()} />;
         };
 
-        export const sweepOrthogonal = (vName: "cx" | "cy", vArr: number[], defs: SVGAnimationDefs) => {
+        export const sweepOrthogonal = (vName: "cx" | "cy", values: number[], defs: SVGAnimationDefs) => {
             const animateDefs = SVGAnimationDefsUtils.createAnimateDefs(defs);
 
-            return <animate attributeName={vName} values={vArr.join(";")} {...animateDefs()} />;
+            return <animate attributeName={vName} values={join(values)} {...animateDefs()} />;
         };
 
         export const sweepDiagonal = (
             cx: number,
             cy: number,
             angle: number,
-            oArr: number[],
+            offsets: number[],
             defs: SVGAnimationDefs,
         ) => {
-            const tracks = SVGAnimationTracks.computeDiagonalTracks(cx, cy, angle, oArr);
+            const tracks = SVGAnimationTracks.computeDiagonalTracks(cx, cy, angle, offsets);
             const animateDefs = SVGAnimationDefsUtils.createAnimateDefs(defs);
 
             return (
@@ -131,8 +131,8 @@ export namespace SVGAnimations {
     }
 
     export namespace Path {
-        export const rotatingArc = (aArray: [rotation: number, arcSize: number][], defs: SVGAnimationDefs) => {
-            const paths = aArray.map(([rotation, arcSize]) => SVGUtils.getArcPath(arcSize, rotation));
+        export const rotatingArc = (angles: [rotation: number, arcSize: number][], defs: SVGAnimationDefs) => {
+            const paths = angles.map(([rotation, arcSize]) => SVGUtils.getArcPath(arcSize, rotation));
             const animateDefs = SVGAnimationDefsUtils.createAnimateDefs(defs);
 
             return (
@@ -146,10 +146,10 @@ export namespace SVGAnimations {
             wedgeCount: number,
             wedgeThickness: number,
             curvature: number,
-            aArray: number[],
+            angles: number[],
             defs: SVGAnimationDefs,
         ) => {
-            const paths = aArray.map((rotation) =>
+            const paths = angles.map((rotation) =>
                 SVGUtils.getWedgesPath(wedgeCount, wedgeThickness, rotation, curvature),
             );
             const animateDefs = SVGAnimationDefsUtils.createAnimateDefs(defs);
@@ -163,11 +163,11 @@ export namespace SVGAnimations {
     }
 
     export namespace Gradient {
-        export const cycleSmoothColors = (gradientId: string, sArray: string[][], defs: SVGAnimationDefs) => {
+        export const cycleSmoothColors = (gradientId: string, colorTracks: string[][], defs: SVGAnimationDefs) => {
             const animateDefs = SVGAnimationDefsUtils.createAnimateDefs(defs);
 
             return (
-                <For each={sArray}>
+                <For each={colorTracks}>
                     {(stop, getIndex) => (
                         <animate
                             {...{ href: `#${gradientId}-stop-${getIndex()}` }}
@@ -180,12 +180,12 @@ export namespace SVGAnimations {
             );
         };
 
-        export const cycleBandedColors = (gradientId: string, sArray: string[][], defs: SVGAnimationDefs) => {
+        export const cycleBandedColors = (gradientId: string, colorTracks: string[][], defs: SVGAnimationDefs) => {
             const animateDefs = SVGAnimationDefsUtils.createAnimateDefs(defs);
-            const lastIndex = sArray.length - 1;
+            const lastIndex = colorTracks.length - 1;
 
             return (
-                <For each={sArray}>
+                <For each={colorTracks}>
                     {(stop, getIndex) => (
                         <>
                             <animate

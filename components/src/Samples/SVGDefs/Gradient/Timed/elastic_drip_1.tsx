@@ -4,6 +4,7 @@ import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SV
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { GradientCycleOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
+import { TimedGradientKnobs } from "../TimedGradient.knobs";
 
 export const elastic_drip_1 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
@@ -44,12 +45,16 @@ export const elastic_drip_1 = (opts?: GradientCycleOpts): TimedGradientConfig =>
                             ObjectUtils.zipArray(
                                 "stretch",
                                 [
-                                    ...MathUtils.getIntermediateValues(450, 270, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
-                                    ...MathUtils.getIntermediateValues(90, 270, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                                    ...MathUtils.getIntermediateValues(
+                                        450,
+                                        270,
+                                        TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(90, 270, TimedGradientKnobs.STEPS_DEFAULT.steps),
                                 ],
                                 [
-                                    ...MathUtils.getIntermediateValues(0, 360, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
-                                    ...MathUtils.getIntermediateValues(360, 0, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                                    ...MathUtils.getIntermediateValues(0, 360, TimedGradientKnobs.STEPS_DEFAULT.steps),
+                                    ...MathUtils.getIntermediateValues(360, 0, TimedGradientKnobs.STEPS_DEFAULT.steps),
                                 ],
                             ),
                             defs,

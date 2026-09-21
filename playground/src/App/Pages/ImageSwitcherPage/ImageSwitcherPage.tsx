@@ -26,6 +26,13 @@ const SOURCE_URLS: Record<SourceType, string | undefined> = {
     none: undefined,
 };
 
+const SOURCE_ALTS: Record<SourceType, string | undefined> = {
+    profile: "A knight in profile",
+    date: "A knight on a date",
+    missingFile: "A picture that will not load",
+    none: undefined,
+};
+
 const STARTING_DURATION_MS = 1000;
 const MIN_DURATION_MS = 0;
 const MAX_DURATION_MS = 5000;
@@ -49,6 +56,8 @@ export const ImageSwitcherPage = () => {
 
     const getSrc = () => SOURCE_URLS[getSourceType()];
 
+    const getAlt = () => SOURCE_ALTS[getSourceType()];
+
     const onLoad = (e: Event) => {
         const loaded = (e.target as HTMLImageElement).src;
 
@@ -59,6 +68,7 @@ export const ImageSwitcherPage = () => {
     const getExamples = createMemo(() => {
         const commonProps: ImageSwitcherProps = {
             src: getSrc,
+            alt: getAlt,
             transitionDurationMs: getTransitionDurationMs,
             onLoad,
         };

@@ -1,6 +1,6 @@
 import type { JSX } from "solid-js";
 
-import { Point2d, Size2d } from "@thewaver/ss-utils";
+import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
 import type { AccessorProps } from "../../Utils/typeUtils";

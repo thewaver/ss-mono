@@ -42,7 +42,7 @@ export namespace ClockUtils {
      *
      * @param unit Which column.
      * @param locale The locale to name it in. The platform's default when omitted.
-     * @returns The localised name, falling back to the unit's own key where the platform has none.
+     * @returns The localized name, falling back to the unit's own key where the platform has none.
      */
     export const getUnitName = (unit: ClockUnit, locale?: string) =>
         new Intl.DisplayNames(locale ?? [], { type: "dateTimeField" }).of(NAME_FIELDS[unit]) ?? unit;

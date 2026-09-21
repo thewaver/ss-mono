@@ -4,6 +4,9 @@ import { createContext, createEffect, createSignal, onCleanup, useContext } from
 
 import type { ColorExtractorContextType } from "./ColorExtractor.context.types";
 
+const DEFAULT_COLOR_COUNT = 1;
+const DEFAULT_SAMPLE_PERCENTILE = 10;
+
 const ColorExtractorContext = createContext<ColorExtractorContextType>();
 
 export const ColorExtractorContextProvider = ColorExtractorContext.Provider;
@@ -16,8 +19,8 @@ export const useColorExtractor = (props?: ColorExtractorContextType) => {
         let isMounted = true;
 
         const src = props?.getSrc();
-        const colorCount = props?.getColorCount?.() ?? 1;
-        const quality = props?.getSamplePercentile?.() ?? 10;
+        const colorCount = props?.getColorCount?.() ?? DEFAULT_COLOR_COUNT;
+        const quality = props?.getSamplePercentile?.() ?? DEFAULT_SAMPLE_PERCENTILE;
 
         if (!src) return;
 

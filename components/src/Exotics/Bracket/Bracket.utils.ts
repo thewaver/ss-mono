@@ -8,7 +8,7 @@ const FIRST_LAYER = 0;
 const NOTHING = 0;
 /** One layer, one step or one item. */
 const SINGLE = 1;
-/** Halfway, for centring a match between its two feeders. */
+/** Halfway, for centering a match between its two feeders. */
 const HALF = 0.5;
 
 /**
@@ -109,7 +109,9 @@ export namespace BracketUtils {
      * @param step `"toRoot"`, `"toLeaves"`, `"next"`, `"previous"`, `"first"` or `"last"`. The last four
      * move within the current layer.
      * @param fromId Where the cursor is now.
-     * @param placements The bracket's placements.
+     * @param placements The matches the walk may land on. A caller that skips disabled matches passes
+     * only the enabled ones, and every step — across a layer or between layers — is resolved against
+     * that list, so a step never answers with a match the caller cannot focus.
      * @returns The match to move to, or `undefined` when there is none that way — the final has no
      * parent, a first-round match has no feeders, and the layer's ends do not wrap.
      */
@@ -118,12 +120,14 @@ export namespace BracketUtils {
 
         if (!from) return undefined;
 
-        if (step === "toRoot") return from.parentId;
+        if (step === "toRoot") return findPlacement(placements, from.parentId)?.id;
 
         if (step === "toLeaves") {
-            if (!from.childIds.length) return undefined;
+            const children = from.childIds.filter((id) => findPlacement(placements, id) !== undefined);
 
-            return from.childIds[Math.floor((from.childIds.length - SINGLE) * HALF)];
+            if (!children.length) return undefined;
+
+            return children[Math.floor((children.length - SINGLE) * HALF)];
         }
 
         const layer = getLayerPlacements(placements, from.layer);

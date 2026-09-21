@@ -25,3 +25,5 @@ export const breadcrumbsSeparator = style({
 });
 
 export const breadcrumbsItem = style([buttonElement, {}]);
+
+export const breadcrumbsCurrent = style([buttonElement, { cursor: "default" }]);

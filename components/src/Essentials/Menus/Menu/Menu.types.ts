@@ -1,6 +1,6 @@
 import type { Accessor, JSX } from "solid-js";
 
-import { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
+import type { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
@@ -47,7 +47,6 @@ export type MenuTriggerProps = AccessorProps<
     InteractionControlProps<MenuFlags> & {
         /** Identifies the menu this trigger opens, so the trigger can point at it. */
         menuId: string;
-        ariaLabel?: string;
         /** Whether holding the trigger down opens the menu, rather than needing a full click. */
         isHoldable: boolean;
         /** Runs when the trigger is activated and the menu should open or close. */
@@ -64,8 +63,8 @@ export type MenuTriggerProps = AccessorProps<
 export type MenuItemViewProps = AccessorProps<
     InteractionControlProps<MenuItemFlags> & {
         /**
-         * What kind of item this is — a plain command, a checkbox, a radio, a separator — which decides what it
-         * announces and whether it carries a mark.
+         * What kind of item this is — a plain command, a checkbox, a radio — which decides what it announces and
+         * whether it carries a mark.
          */
         kind: MenuItemKind;
         /** Identifies the submenu this item opens, where it opens one. */
@@ -180,8 +179,15 @@ export type MenuLevelProps<T> = AccessorProps<{
      * step.
      */
     onPick: (item: MenuItem<T>, radioGroupValues: T[]) => void;
-    /** Runs when a flick gesture ends, whether it picked something or was aborted. */
-    onFlickEnd?: () => void;
+    /**
+     * Runs when a flick gesture ends, whether it picked something or was aborted.
+     *
+     * Receives the node the pointer was released on, or nothing when the system canceled the gesture and
+     * there was no release at all. That is also what says whether a `click` is still to come: the browser
+     * fires one only where the press and the release share an element, so a caller holding state until the
+     * click can tell an ordinary release on the trigger from one that will never be followed up.
+     */
+    onFlickEnd?: (releasedOn: Node | undefined) => void;
 };
 
 export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderControl" | "extraFlags"> &

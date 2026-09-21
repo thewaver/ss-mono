@@ -18,7 +18,6 @@ export type DatePickerProps = Omit<DateInputProps, "renderTrailing"> &
         popupTransitionDurationMs?: number;
         /** Names the calendar for assistive technology. */
         calendarLabel?: string;
-        locale?: string;
         /** Which day begins a week, which decides the order of the column headings. */
         weekStartsOn?: DateValueWeekStart;
         /** Whether one day can be picked, for rules a plain earliest and latest cannot express. */

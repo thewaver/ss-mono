@@ -2,8 +2,6 @@ import type { LiveAnnouncerPoliteness } from "./LiveAnnouncer.types";
 
 /** How long a message stays in the document. Long enough to be read out, short enough that the region does not accumulate. */
 const MESSAGE_LIFETIME_MS = 1000;
-/** Every level, for tearing all the regions down at once. */
-const POLITENESS: LiveAnnouncerPoliteness[] = ["polite", "assertive"];
 
 /** One region per politeness level, reused across announcements. */
 const regions = new Map<LiveAnnouncerPoliteness, HTMLElement>();
@@ -93,18 +91,5 @@ export namespace LiveAnnouncerUtils {
         setTimeout(() => {
             node.remove();
         }, MESSAGE_LIFETIME_MS);
-    };
-
-    /**
-     * Removes the live regions from the document.
-     *
-     * For tests, which would otherwise leak regions between cases. Announcing afterwards works
-     * normally, since the regions are rebuilt on demand.
-     */
-    export const clear = () => {
-        for (const politeness of POLITENESS) {
-            regions.get(politeness)?.remove();
-            regions.delete(politeness);
-        }
     };
 }

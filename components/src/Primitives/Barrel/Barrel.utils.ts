@@ -13,7 +13,7 @@ const HALF_TURN_DEG = 180;
 const HALF = 0.5;
 
 /** How far the viewer sits from the barrel. Every projected measurement depends on it, so it must match the `perspective` the stylesheet applies. */
-export const BARREL_PERSPECTIVE_PX = 1000;
+const VIEWER_DISTANCE_PX = 1000;
 
 /**
  * Builds a rotating prism out of flat faces — the shape behind a picker drum or a slot-machine reel.
@@ -28,6 +28,9 @@ export const BARREL_PERSPECTIVE_PX = 1000;
  * what has to be reserved in the layout, or the barrel will clip as it turns.
  */
 export namespace BarrelUtils {
+    /** How far the viewer sits from the barrel. A consumer writing the `perspective` themselves has to match it. */
+    export const PERSPECTIVE_PX = VIEWER_DISTANCE_PX;
+
     /**
      * How wide a face is along the direction the barrel turns.
      *
@@ -65,7 +68,7 @@ export namespace BarrelUtils {
 
         if (!Number.isFinite(halfAngleTangent) || halfAngleTangent <= 0) return 0;
 
-        return Math.round((faceExtent * 0.5) / halfAngleTangent);
+        return Math.round((faceExtent * HALF) / halfAngleTangent);
     };
 
     /**
@@ -94,12 +97,12 @@ export namespace BarrelUtils {
      * would enclose the viewpoint and the projection has no meaning.
      */
     export const getProjectedExtent = (circumradius: number, apothem: number) => {
-        const eyeDistance = BARREL_PERSPECTIVE_PX + apothem;
+        const eyeDistance = VIEWER_DISTANCE_PX + apothem;
         const tangentDistanceSquared = eyeDistance * eyeDistance - circumradius * circumradius;
 
         if (tangentDistanceSquared <= 0) return circumradius * 2;
 
-        return (2 * BARREL_PERSPECTIVE_PX * circumradius) / Math.sqrt(tangentDistanceSquared);
+        return (2 * VIEWER_DISTANCE_PX * circumradius) / Math.sqrt(tangentDistanceSquared);
     };
 
     /**

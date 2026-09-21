@@ -45,7 +45,6 @@ export const ImageSwitcher = (props: ImageSwitcherProps) => {
             img.src = "";
         });
 
-        img.crossOrigin = "anonymous";
         img.onload = (e) => {
             swap();
             onLoad?.call(img, e);
@@ -67,7 +66,7 @@ export const ImageSwitcher = (props: ImageSwitcherProps) => {
                     "visibility": (isEven() ? getCurrentImage() : getPrevImage()) ? undefined : "hidden",
                 }}
                 src={isEven() ? getCurrentImage() : getPrevImage()}
-                alt=""
+                alt={access(props.alt) ?? ""}
             />
             <img
                 class={styles.imageSwitcherImage}
@@ -77,7 +76,7 @@ export const ImageSwitcher = (props: ImageSwitcherProps) => {
                     "visibility": (!isEven() ? getCurrentImage() : getPrevImage()) ? undefined : "hidden",
                 }}
                 src={!isEven() ? getCurrentImage() : getPrevImage()}
-                alt=""
+                alt={access(props.alt) ?? ""}
             />
         </div>
     );

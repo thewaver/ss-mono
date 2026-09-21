@@ -1,6 +1,6 @@
 import type { JSX } from "solid-js";
 
-import { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
+import type { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
 import type { DismisserReason } from "../../Abstracts/Dismisser/Dismisser.types";
@@ -15,7 +15,7 @@ export type PopoverProps = AccessorProps<{
     id: string;
     /**
      * What the popup is announced as — a listbox, a menu, a dialog — which is usually what decides the keyboard
-     * contract a consumer has to honour.
+     * contract a consumer has to honor.
      */
     role: PopoverRole;
     /** ARIA attributes for the popup element, for the parts of the contract the role alone does not carry. */

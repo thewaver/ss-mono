@@ -19,6 +19,27 @@ export namespace MenuUtils {
     export const getIsStateful = <T>(item: MenuItem<T>) => getKind(item) !== "command";
 
     /**
+     * The checked list a menu should hold after one of its stateful items is picked.
+     *
+     * A checkbox toggles, so it comes out of the list when it was in it and goes in when it was not. A
+     * radio replaces its whole group instead: every value belonging to the group is dropped first, so
+     * exactly one of them survives. The caller is spared having to know which of the two rules applies,
+     * and `Menu` and `ContextMenu` cannot drift apart on it.
+     *
+     * @param checked What is checked now.
+     * @param item The item being picked. A command never reaches here and is treated as a radio if it does.
+     * @param radioGroupValues Every value in the radio group the item belongs to, from
+     * {@link MenuUtils.getRadioGroupValues}. Unread for a checkbox.
+     * @returns The new list. A fresh array; the one handed in is not touched.
+     */
+    export const computeNextChecked = <T>(checked: T[], item: MenuItem<T>, radioGroupValues: T[]): T[] =>
+        getKind(item) === "checkbox"
+            ? checked.includes(item.value)
+                ? checked.filter((value) => value !== item.value)
+                : [...checked, item.value]
+            : [...checked.filter((value) => !radioGroupValues.includes(value)), item.value];
+
+    /**
      * The values of the radio group an item belongs to.
      *
      * For the item's own state: a radio choice is selected when the menu's value is its own, and it

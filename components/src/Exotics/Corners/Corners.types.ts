@@ -1,11 +1,11 @@
-import { Size2d } from "@thewaver/ss-utils";
+import type { Size2d } from "@thewaver/ss-utils";
 
 import type { AccessorProps } from "../../Utils/typeUtils";
 
 export type CornerKey = "topLeft" | "topRight" | "bottomLeft" | "bottomRight";
 
 export type CornersProps = AccessorProps<{
-    /** The colour the corner marks are drawn in. */
+    /** The color the corner marks are drawn in. */
     color?: string;
     /** How long each corner's arms are, across and down. */
     cornerLength?: Size2d;

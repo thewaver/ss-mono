@@ -116,7 +116,7 @@ applies to a `ref` callback, which also runs inside the insert's tracking scope.
 string notifies nobody — so binding on a stable key costs nothing. It is the object-valued and array-valued
 reads that bite, since a fresh object is never equal to the last one.
 
-### A rotation and a centring offset on one element have to be ordered, or the element leaves its point
+### A rotation and a centering offset on one element have to be ordered, or the element leaves its point
 
 `transform: translate(x, y) rotate(a) translate(-50%, -50%)` reads as "put it there, turn it, and pull it back
 by half itself", and does not do that. The list applies right to left, so the `-50%` shift happens **before**
@@ -126,7 +126,7 @@ it survives review.
 
 Order it `translate(x, y) translate(-50%, -50%) rotate(a)`. The rotation applies first, about the element's own
 center — `transform-origin` is `50% 50%` by default and applies to the whole list, not per function — and the
-centring shift is then a fixed vector the rotation cannot reach, so the center lands on the point at every
+centering shift is then a fixed vector the rotation cannot reach, so the center lands on the point at every
 angle.
 
 **A square element hides this and an oblong shows it**, by half the difference between its sides. Found in

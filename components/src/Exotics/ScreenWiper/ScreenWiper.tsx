@@ -43,6 +43,12 @@ export const ScreenWiper = (props: ScreenWiperProps) => {
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
 
+    let targetDeferralTimeout: ReturnType<typeof setTimeout> | undefined;
+
+    onCleanup(() => {
+        clearTimeout(targetDeferralTimeout);
+    });
+
     const getShape = createMemo(() => access(props.shape) ?? DEFAULT_SCREENWIPER_SHAPE);
 
     createEffect(() => {
@@ -54,7 +60,8 @@ export const ScreenWiper = (props: ScreenWiperProps) => {
             if (newTarget === getTarget()) return;
 
             setHasFinished(false);
-            setTimeout(() => {
+            clearTimeout(targetDeferralTimeout);
+            targetDeferralTimeout = setTimeout(() => {
                 setTarget(newTarget);
             }, 0);
         });
@@ -74,14 +81,14 @@ export const ScreenWiper = (props: ScreenWiperProps) => {
 
                 const animations = rootRef.getAnimations({ subtree: true });
 
-                let isCancelled = false;
+                let isCanceled = false;
 
                 onCleanup(() => {
-                    isCancelled = true;
+                    isCanceled = true;
                 });
 
                 void Promise.allSettled(animations.map((animation) => animation.finished)).then(() => {
-                    if (isCancelled) return;
+                    if (isCanceled) return;
 
                     setHasFinished(true);
                     props.onTransitionEnd?.(direction);

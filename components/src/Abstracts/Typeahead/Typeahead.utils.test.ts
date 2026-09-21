@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { TypeaheadUtils } from "./Typeahead.utils";
 
 const CITIES = ["London", "Lisbon", "Los Angeles", "Madrid", "Manchester"];
+const FRUIT = ["🍎 apple", "🍎 crab apple", "🍐 pear"];
 
 const computeText = (index: number) => CITIES[index];
 
@@ -60,5 +61,12 @@ describe("Typeahead.computeNextIndex", () => {
 
     it("starts from the beginning when nothing is highlighted yet", () => {
         expect(TypeaheadUtils.computeNextIndex("ma", -1, CITIES.length, computeText)).toBe(3);
+    });
+
+    it("cycles on a repeated character that is a surrogate pair, which is two code units and one letter", () => {
+        const computeFruit = (index: number) => FRUIT[index];
+
+        expect(TypeaheadUtils.computeNextIndex("🍎", 0, FRUIT.length, computeFruit)).toBe(1);
+        expect(TypeaheadUtils.computeNextIndex("🍎🍎", 1, FRUIT.length, computeFruit)).toBe(0);
     });
 });

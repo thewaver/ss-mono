@@ -41,10 +41,7 @@ export type CollapsibleProps = Omit<
     AccessorProps<{
         /** Identifies the collapsible, and is what the trigger and panel compose their own ids from. */
         id?: string;
-        /**
-         * Whether the panel animates its height open and closed or simply appears, which is the trade between a smooth
-         * open and never measuring the content.
-         */
+        /** Whether the collapsible takes only the room its content needs, or fills the width it is given. */
         sizing?: CollapsibleSizing;
         /** How long the panel takes to open and close. */
         transitionDurationMs?: number;

@@ -1,4 +1,6 @@
-import { type Accessor, createEffect, createSignal, onCleanup, onMount } from "solid-js";
+import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
+
+import { InteractionTrackerUtils } from "../InteractionTracker/InteractionTracker.utils";
 
 /** How long each sample covers. A second is long enough to be steady and short enough to react. */
 const SAMPLE_INTERVAL_MS = 1000;
@@ -28,7 +30,7 @@ export namespace FrameRateMonitorUtils {
         },
     ) => {
         const [getFrameRate, setFrameRate] = createSignal({ current: 0, average: 0 });
-        const [getIsWindowVisible, setIsWindowVisible] = createSignal(true);
+        const getIsPageHidden = InteractionTrackerUtils.trackPageHidden();
 
         createEffect(() => {
             let cycleFrameCount = 0;
@@ -44,10 +46,10 @@ export namespace FrameRateMonitorUtils {
                 setFrameRate({ current: 0, average: 0 });
             });
 
-            const isVisible = getIsWindowVisible();
+            const isPageHidden = getIsPageHidden();
             const isDisabled = getIsDisabled();
 
-            if (!isVisible || isDisabled) return;
+            if (isPageHidden || isDisabled) return;
 
             const updateFrameRate = () => {
                 const now = performance.now();
@@ -74,18 +76,6 @@ export namespace FrameRateMonitorUtils {
 
                 rafId = requestAnimationFrame(updateFrameRate);
             }, opts?.startupTimeMs ?? 0);
-        });
-
-        onMount(() => {
-            const handleVisibilityChange = () => {
-                setIsWindowVisible(document.visibilityState === "visible");
-            };
-
-            document.addEventListener("visibilitychange", handleVisibilityChange);
-
-            onCleanup(() => {
-                document.removeEventListener("visibilitychange", handleVisibilityChange);
-            });
         });
 
         return { getFrameRate };

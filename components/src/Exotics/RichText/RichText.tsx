@@ -46,19 +46,12 @@ const renderNodes = (
 };
 
 export const RichText = (props: RichTextProps) => {
-    const parsedTree = createMemo(() => {
-        try {
-            return RichTextUtils.parseContent(access(props.content));
-        } catch (err) {
-            console.error("RichText parse error:", err);
-            return [{ type: "text", content: access(props.content) }] as RichTextNode[];
-        }
-    });
+    const getParsedTree = createMemo(() => RichTextUtils.parseContent(access(props.content)));
 
     return (
         <>
             {renderNodes(
-                parsedTree(),
+                getParsedTree(),
                 props.computeClassNames?.(DEFAULT_RICH_TEXT_CLASSES) ?? DEFAULT_RICH_TEXT_CLASSES,
                 access(props.removeOtherTags),
             )}

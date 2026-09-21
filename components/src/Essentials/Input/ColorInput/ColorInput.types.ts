@@ -1,7 +1,6 @@
 import type { JSX, Signal } from "solid-js";
 
-import type { Color } from "@thewaver/ss-utils";
-import type { Point2d } from "@thewaver/ss-utils";
+import type { Color, Point2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
@@ -14,16 +13,16 @@ import type { ColorAreaRenderProps } from "../ColorArea/ColorArea.types";
 import type { RangeRenderProps } from "../Range/Range.types";
 
 export type ColorInputRenderProps = {
-    /** The colour as written, in whatever notation the consumer handed in. */
+    /** The color as written, in whatever notation the consumer handed in. */
     value: string;
-    /** The same colour split into hue, saturation, value and alpha, which is what the picker actually moves in. */
+    /** The same color split into hue, saturation, value and alpha, which is what the picker actually moves in. */
     hsv: Color.HSVA;
     /** Whether the picker is open. */
     isOpen: boolean;
 };
 
 export type ColorInputCbs = {
-    /** Runs as the colour changes. */
+    /** Runs as the color changes. */
     onInput?: (value: string) => void | Promise<void>;
     /** Runs when the pointer arrives over the field. */
     onMouseEnter?: (e: MouseEvent) => void | Promise<void>;
@@ -34,8 +33,13 @@ export type ColorInputCbs = {
 export type ColorInputState = {
     /** The field's name when it is submitted as part of a form. */
     name?: string;
-    /** Names the colour input for assistive technology. */
+    /** Names the color input for assistive technology. */
     ariaLabel?: string;
+    /**
+     * Names the popup the field opens. It is a dialog, so it needs a name of its own; the field's name cannot
+     * serve, because a field named through a `Label` has no `ariaLabel` to borrow. Defaults to "Choose a color".
+     */
+    pickerLabel?: string;
     /** Names the saturation and brightness square, which has no visible label of its own. */
     areaLabel?: string;
     /** Names the hue slider, which has no visible label of its own. */
@@ -66,7 +70,7 @@ export type ColorInputProps = Omit<InteractionWrapperProps<ColorInputRenderProps
         ColorInputCbs &
             Pick<InteractionControlProps<ColorInputRenderProps>, "id" | "renderContent"> &
             ColorInputState & {
-                /** The colour. It is the only thing that changes it. */
+                /** The color. It is the only thing that changes it. */
                 valueSignal: SignalSource<string>;
                 /** Whether the picker is open. It is the only thing that opens or closes it. */
                 visibilitySignal?: SignalSource<boolean>;

@@ -70,6 +70,8 @@ export namespace RotatorUtils {
      * target, and `spin` to start one.
      */
     export const createRotator = (getIsDisabled: Accessor<boolean>, defs: RotatorDefs) => {
+        LiveAnnouncerUtils.reserve("polite");
+
         const [getAngle, setAngle] = createSignal(0);
         const [getSpinPhase, setSpinPhase] = createSignal<Exclude<RotatorPhase, "idling">>("still");
         const [getIsAwaitingTarget, setIsAwaitingTarget] = createSignal(false);
@@ -81,6 +83,7 @@ export namespace RotatorUtils {
         let targetIndex: number | undefined;
         let spinFrameId: number | undefined;
         let starvationHandle: ReturnType<typeof setTimeout> | undefined;
+        let isDisposed = false;
 
         const getStepCount = createMemo(() => Math.max(0, Math.trunc(access(defs.stepCount))));
 
@@ -189,6 +192,8 @@ export namespace RotatorUtils {
 
             void Promise.resolve(defs.computeSpinTarget())
                 .then((index) => {
+                    if (isDisposed) return;
+
                     const stepCount = getStepCount();
                     const spinDefs = defs.computeSpinDefs?.(index, stepCount) ?? DEFAULT_SPIN_DEFS;
                     const jitterAngle = RotationUtils.getJitterAngle(spinDefs.jitterRatio, stepCount);
@@ -213,6 +218,8 @@ export namespace RotatorUtils {
                     });
                 })
                 .catch(() => {
+                    if (isDisposed) return;
+
                     setIsAwaitingTarget(false);
                 });
         };
@@ -259,7 +266,11 @@ export namespace RotatorUtils {
 
         createEffect(on(getSelectedIndex, (index) => defs.onStepChange?.(index), { defer: true }));
 
-        onCleanup(stopSpinFrames);
+        onCleanup(() => {
+            isDisposed = true;
+
+            stopSpinFrames();
+        });
 
         return {
             getAngle,

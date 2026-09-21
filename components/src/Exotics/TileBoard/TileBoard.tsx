@@ -2,6 +2,7 @@ import { Index, createEffect, createMemo, createSignal, createUniqueId, onCleanu
 
 import { Index2d, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
+import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
 import type { TileBoardProps, TileBoardRenderProps, TileBoardTileProps } from "./TileBoard.types";
@@ -15,7 +16,6 @@ const FIRST_ARIA_INDEX = 1;
 const HALF = 0.5;
 const MIN_CLIP_POINTS = 3;
 const NO_CLIP = "none";
-const SELECT_KEYS = ["Enter", " "];
 const EDGE_KEYS = ["Home", "End"];
 
 const toClipPath = (points: Point2d[]) => {
@@ -48,7 +48,7 @@ const TileBoardTile = (props: TileBoardTileProps) => {
         >
             <div class={styles.tileBoardPaint}>{props.renderContent(() => access(props.flags))}</div>
 
-            <div class={styles.tileBoardHit} style={{ "clip-path": access(props.clipPath) }} aria-hidden={"true"} />
+            <div class={styles.tileBoardHit} style={{ "clip-path": access(props.clipPath) }} aria-hidden="true" />
         </div>
     );
 };
@@ -118,7 +118,7 @@ export const TileBoard = (props: TileBoardProps) => {
     const handleKeyDown = (e: KeyboardEvent) => {
         const roving = getRovingTile();
 
-        if (SELECT_KEYS.includes(e.key)) {
+        if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();
             activateTile(roving);
 

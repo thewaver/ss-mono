@@ -21,6 +21,8 @@ const PREVIOUS_KEYS: Record<NavigatorOrientation, string[]> = {
 const FIRST_KEY = "Home";
 /** Jumps to the end. */
 const LAST_KEY = "End";
+/** Acts on whatever the cursor is on. */
+const ACTIVATION_KEYS = ["Enter", " "];
 
 /**
  * Works out where an arrow key should move focus, in a list or in a grid.
@@ -30,6 +32,18 @@ const LAST_KEY = "End";
  * produces nothing, which is the signal to leave the event alone rather than swallow it.
  */
 export namespace NavigatorUtils {
+    /**
+     * Whether a key means "act on the thing the cursor is on".
+     *
+     * Enter and Space, which is what every roving widget in the library treats as activation — a day in a
+     * calendar, a tile on a board, a node in a bracket, a block on a timeline. It is a predicate rather
+     * than an exported list so that a caller cannot hold onto the array and drift from it, and so the two
+     * keys are named in one place instead of six.
+     *
+     * @param key The `key` of the keyboard event.
+     */
+    export const getIsActivationKey = (key: string) => ACTIVATION_KEYS.includes(key);
+
     /**
      * Where a key moves the cursor in a one-dimensional list.
      *

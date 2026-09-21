@@ -126,7 +126,7 @@ export namespace FocusManagerUtils {
     ) => {
         if (e.key !== "Tab") return;
 
-        const children = FocusManagerUtils.getFocusableChildren(ref);
+        const children = getFocusableChildren(ref);
         const first = children[0];
         const last = children.at(-1);
 
@@ -169,7 +169,7 @@ export namespace FocusManagerUtils {
             const previouslyFocused = (document.activeElement as HTMLElement | null) ?? undefined;
             const initialRef = untrack(() => opts?.getInitialRef?.());
 
-            (initialRef ?? getFirstFocusableChild(ref))?.focus({ preventScroll: true });
+            (initialRef ?? getFirstFocusableChild(ref) ?? ref).focus({ preventScroll: true });
 
             onCleanup(() => {
                 if (!previouslyFocused?.isConnected) return;

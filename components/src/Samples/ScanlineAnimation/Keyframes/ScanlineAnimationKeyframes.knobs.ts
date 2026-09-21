@@ -1,7 +1,7 @@
 import type { SampleKnobs } from "../../Samples.types";
 import type { ScanlineAnimationKeyframes } from "./ScanlineAnimationKeyframes.const";
 
-export namespace ScanlineAnimationKnobs {
+export namespace ScanlineAnimationKeyframeKnobs {
     export const SNAKE_KNOBS: SampleKnobs<ScanlineAnimationKeyframes.HorizontalSnakeOpts> = {
         shiftPercent: {
             kind: "number",

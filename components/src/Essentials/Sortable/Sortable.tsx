@@ -11,13 +11,15 @@ import {
 } from "solid-js";
 import { Portal } from "solid-js/web";
 
-import { Point2d, Size2d } from "@thewaver/ss-utils";
+import { MathUtils, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import { AnchorUtils } from "../../Abstracts/Anchor/Anchor.utils";
 import type { CarrierZone, Carry, CarryMode, CarryPlace } from "../../Abstracts/Carrier/Carrier.types";
 import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
 import { ElevationUtils } from "../../Abstracts/Elevation/Elevation.utils";
 import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
+import type { NavigatorOrientation } from "../../Abstracts/Navigator/Navigator.types";
+import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import type { PlacementRect } from "../../Abstracts/Placement/Placement.types";
 import { PlacementUtils } from "../../Abstracts/Placement/Placement.utils";
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
@@ -47,10 +49,9 @@ const BACKWARD_KEYS: Record<SortableDir | "both", string[]> = {
     column: ["ArrowUp"],
     both: ["ArrowLeft", "ArrowUp"],
 };
-const PLACED_SIZING: InteractionSizing = "fill";
 
-const INTERACTIVE_SELECTOR =
-    "a[href], button, input, select, textarea, [role='button'], [role='checkbox'], [role='link'], [role='switch']";
+const PLACED_SIZING: InteractionSizing = "fill";
+const PLACED_ORIENTATION: NavigatorOrientation = "both";
 
 const SortableItemSlot = (props: SortableItemSlotProps) => {
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
@@ -193,7 +194,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
             if (step === 0) return;
 
-            return Math.min(Math.max(asIndex(place) + step, 0), getPlaceCount() - 1);
+            return MathUtils.clamp(asIndex(place) + step, 0, getPlaceCount() - 1);
         },
         computeEntryPlace: () => getSourceIndex() ?? getItems().length,
         computeIsSamePlace: (a, b) => a === b,
@@ -355,7 +356,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
     const handlePointerDown = (index: number) => (e: PointerEvent) => {
         if (e.button !== 0 || getIsDisabled()) return;
-        if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
+        if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
         if (CarrierUtils.getCarry()) return;
 
         const element = getItemRefs()[index];
@@ -374,7 +375,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
     const handleClick = (index: number) => (e: MouseEvent) => {
         if (getIsDisabled()) return;
-        if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
+        if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
 
         const carry = CarrierUtils.getCarry();
 
@@ -447,22 +448,14 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         }
 
         const navigable = getNavigableIndexes();
+        const position = NavigatorUtils.computeNextPosition(e.key, navigable.indexOf(index), navigable.length, {
+            orientation: isPlaced ? PLACED_ORIENTATION : getDir(),
+        });
 
-        if (navigable.length < 1) return;
-
-        const from = navigable.indexOf(index);
-
-        let next: number | undefined;
-
-        if (isForward) next = navigable[(from + 1) % navigable.length];
-        if (isBackward) next = navigable[(from - 1 + navigable.length) % navigable.length];
-        if (e.key === "Home") next = navigable[0];
-        if (e.key === "End") next = navigable[navigable.length - 1];
-
-        if (next === undefined) return;
+        if (position === undefined) return;
 
         e.preventDefault();
-        focusIndex(next);
+        focusIndex(navigable[position]);
     };
 
     const handleRootClick = (e: MouseEvent) => {

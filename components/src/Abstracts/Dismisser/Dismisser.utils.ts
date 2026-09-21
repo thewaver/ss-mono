@@ -5,9 +5,43 @@ import type { DismisserLayerDefs } from "./Dismisser.types";
 /** Every open layer, oldest first, so the last entry is the topmost. */
 const layers: DismisserLayerDefs[] = [];
 
+/**
+ * Tests whether a node belongs to a layer, following ownership as well as nesting.
+ *
+ * Walking up the DOM is not enough on its own, because a submenu portalled to the end of the
+ * document is not inside its parent menu. So the walk also steps sideways: an element whose id
+ * something points at with `aria-controls` continues the walk from that controller, which is what
+ * keeps a menu open while the user is in the popup it opened. A trigger button counts as inside
+ * the layer it controls for the same reason — clicking it should toggle the layer, not have it
+ * closed from underneath and reopened.
+ *
+ * Published as {@link DismisserUtils.getIsWithinOwnedLayer}; it lives here because the module's own
+ * listeners need it before the namespace object exists.
+ *
+ * @param target The node the event landed on.
+ * @param roots The layer's own elements. Missing entries are ignored, so a caller may pass refs
+ * that have not been attached yet.
+ * @returns `true` when the node is inside one of those roots or inside something they own.
+ */
+const computeIsWithinOwnedLayer = (target: Node | null, roots: (HTMLElement | null | undefined)[]) => {
+    let node = target instanceof Element ? target : (target?.parentElement ?? null);
+
+    while (node) {
+        const current = node;
+
+        if (roots.some((root) => root?.contains(current))) return true;
+
+        const owner = current.id ? document.querySelector(`[aria-controls="${CSS.escape(current.id)}"]`) : null;
+
+        node = owner ?? current.parentElement;
+    }
+
+    return false;
+};
+
 /** Whether an event landed outside a layer and everything that layer owns. */
 const getIsOutside = (layer: DismisserLayerDefs, target: Node | null) =>
-    !DismisserUtils.getIsWithinOwnedLayer(target, layer.getRoots());
+    !computeIsWithinOwnedLayer(target, layer.getRoots());
 
 /** Dismisses every layer the event landed outside of, topmost first. */
 const dismissOutside = (target: Node | null, reason: "press" | "focus") => {
@@ -79,21 +113,7 @@ export namespace DismisserUtils {
      * that have not been attached yet.
      * @returns `true` when the node is inside one of those roots or inside something they own.
      */
-    export const getIsWithinOwnedLayer = (target: Node | null, roots: (HTMLElement | null | undefined)[]) => {
-        let node = target instanceof Element ? target : (target?.parentElement ?? null);
-
-        while (node) {
-            const current = node;
-
-            if (roots.some((root) => root?.contains(current))) return true;
-
-            const owner = current.id ? document.querySelector(`[aria-controls="${CSS.escape(current.id)}"]`) : null;
-
-            node = owner ?? current.parentElement;
-        }
-
-        return false;
-    };
+    export const getIsWithinOwnedLayer = computeIsWithinOwnedLayer;
 
     /**
      * Registers a layer to be dismissed for as long as it is open.

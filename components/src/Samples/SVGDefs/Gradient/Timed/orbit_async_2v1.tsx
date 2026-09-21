@@ -4,6 +4,7 @@ import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SV
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { GradientStepsOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
+import { TimedGradientKnobs } from "../TimedGradient.knobs";
 
 export const orbit_async_2v1 = (opts?: GradientStepsOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
@@ -20,7 +21,11 @@ export const orbit_async_2v1 = (opts?: GradientStepsOpts): TimedGradientConfig =
                             colors: [{ value: defs.colors.tertiary }, { value: defs.colors.secondary }],
                         },
                         SVGAnimations.Linear.rotate(
-                            MathUtils.getIntermediateValues(0, 360, opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                            MathUtils.getIntermediateValues(
+                                0,
+                                360,
+                                opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                            ),
                             defs,
                         ),
                     ),
@@ -35,13 +40,17 @@ export const orbit_async_2v1 = (opts?: GradientStepsOpts): TimedGradientConfig =
                         {
                             id: `gradient2-${id}`,
                             colors: [
-                                { value: `rgb(from ${defs.colors.primary} r g b / 0)` },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
                                 { value: defs.colors.primary },
                             ],
                             angle: 360,
                         },
                         SVGAnimations.Linear.rotate(
-                            MathUtils.getIntermediateValues(360, 0, opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                            MathUtils.getIntermediateValues(
+                                360,
+                                0,
+                                opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                            ),
                             defs,
                         ),
                     ),

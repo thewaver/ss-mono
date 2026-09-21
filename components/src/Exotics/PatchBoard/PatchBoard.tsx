@@ -1,4 +1,4 @@
-import { Index, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
+import { Index, createEffect, createMemo, createSignal, createUniqueId, onCleanup, onMount } from "solid-js";
 
 import type { Point2d } from "@thewaver/ss-utils";
 
@@ -32,9 +32,6 @@ const COARSE_STEP_FACTOR = 4;
 const NOTHING = 0;
 const SINGLE = 1;
 
-const INTERACTIVE_SELECTOR =
-    "a[href], button, input, select, textarea, [role='button'], [role='checkbox'], [role='link'], [role='switch']";
-
 const NUDGE_KEYS: Record<string, CarryNudge | undefined> = {
     ArrowRight: { x: 1 },
     ArrowLeft: { x: -1 },
@@ -43,6 +40,8 @@ const NUDGE_KEYS: Record<string, CarryNudge | undefined> = {
 };
 
 export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
+    onMount(() => LiveAnnouncerUtils.reserve("polite"));
+
     const nodesSignal = accessSignal(() => props.nodesSignal);
     const linksSignal = accessSignal(() => props.linksSignal);
 
@@ -350,6 +349,12 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
     const getPlacedSockets = createMemo(() => PatchBoardUtils.getPlacedSockets(getPlacements(), getOrientation()));
 
+    const getPlacedSocketByEndKey = createMemo(
+        () => new Map(getPlacedSockets().map((socket) => [PatchBoardUtils.getEndKey(socket.end), socket])),
+    );
+
+    const getPlacementByKey = createMemo(() => new Map(getPlacements().map((placement) => [placement.key, placement])));
+
     const getStopKeys = createMemo(() => PatchBoardUtils.getStopKeys(getPlacements()));
 
     const getNodeKeys = createMemo(() => PatchBoardUtils.getReadingOrder(getPlacements()).map((entry) => entry.key));
@@ -370,10 +375,10 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     });
 
     const getCableDefs = createMemo((): PatchBoardCableDefs[] => {
-        const placed = getPlacedSockets();
+        const placedByEndKey = getPlacedSocketByEndKey();
         const defs = getLinks().reduce<PatchBoardCableDefs[]>((acc, link) => {
-            const from = PatchBoardUtils.findSocket(placed, link.from);
-            const to = PatchBoardUtils.findSocket(placed, link.to);
+            const from = placedByEndKey.get(PatchBoardUtils.getEndKey(link.from));
+            const to = placedByEndKey.get(PatchBoardUtils.getEndKey(link.to));
 
             if (from && to) {
                 acc.push({
@@ -392,12 +397,14 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
         const source = getPlugSource();
         const place = getAimedPlace();
-        const from = source && PatchBoardUtils.findSocket(placed, source);
+        const from = source && placedByEndKey.get(PatchBoardUtils.getEndKey(source));
 
         if (!from || !place || place.kind === "spot") return defs;
 
         const to =
-            place.kind === "socket" ? PatchBoardUtils.findSocket(placed, place)?.point : { x: place.x, y: place.y };
+            place.kind === "socket"
+                ? placedByEndKey.get(PatchBoardUtils.getEndKey(place))?.point
+                : { x: place.x, y: place.y };
 
         if (!to) return defs;
 
@@ -490,7 +497,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
     const handleNodePointerDown = (node: PatchBoardNode<T>, e: PointerEvent) => {
         if (e.button !== NOTHING || getIsDisabled()) return;
-        if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
+        if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
         if (CarrierUtils.getCarry()) return;
 
         const root = getRootRef();
@@ -534,7 +541,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
     const handleNodeClick = (node: PatchBoardNode<T>, e: MouseEvent) => {
         if (getIsDisabled()) return;
-        if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
+        if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
 
         if (!CarrierUtils.getCarry()) {
             pickUpNode(node, "tap", { x: e.clientX, y: e.clientY });
@@ -743,9 +750,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                 {(getNode) => {
                     const getKey = createMemo(() => getNodeKey(getNode()));
 
-                    const getPlacement = createMemo(() =>
-                        getPlacements().find((placement) => placement.key === getKey()),
-                    );
+                    const getPlacement = createMemo(() => getPlacementByKey().get(getKey()));
 
                     return (
                         <div
@@ -761,6 +766,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                 <InteractionWrapper
                                     sizing={() => "fill"}
                                     isDisabled={() => getNode().isDisabled ?? false}
+                                    isFocusableWhenDisabled={() => !getIsDisabled()}
                                     isTabbable={() => getRovingStop() === getKey()}
                                     extraFlags={() => ({ isCarried: getCarriedNodeKey() === getKey() })}
                                     renderControl={(setElementRef, getFlags) => (
@@ -791,11 +797,9 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                         socketId: getSocket().id,
                                     }));
 
-                                    const getPlaced = createMemo(() =>
-                                        PatchBoardUtils.findSocket(getPlacedSockets(), getEnd()),
-                                    );
-
                                     const getStopKey = createMemo(() => PatchBoardUtils.getEndKey(getEnd()));
+
+                                    const getPlaced = createMemo(() => getPlacedSocketByEndKey().get(getStopKey()));
 
                                     const getIsTaken = createMemo(
                                         () => PatchBoardUtils.getLinksAt(getLinks(), getEnd()).length > NOTHING,
@@ -835,6 +839,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                                 isDisabled={() =>
                                                     (getNode().isDisabled ?? false) || (getSocket().isDisabled ?? false)
                                                 }
+                                                isFocusableWhenDisabled={() => !getIsDisabled()}
                                                 isTabbable={() => getRovingStop() === getStopKey()}
                                                 extraFlags={() => ({
                                                     kind: getSocket().kind,
@@ -856,9 +861,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                                         role="button"
                                                         aria-label={`${getEndLabel(getEnd())}, ${getSocket().kind === "in" ? "input" : "output"}${getIsTaken() ? ", connected" : ""}`}
                                                         aria-disabled={
-                                                            (getSocket().isDisabled ?? false) ||
-                                                            getIsLocked() ||
-                                                            undefined
+                                                            getPlaced()?.isDisabled || getIsLocked() || undefined
                                                         }
                                                         onPointerDown={(e) => handleSocketPointerDown(getPlaced(), e)}
                                                         onClick={(e) => handleSocketClick(getPlaced(), e)}

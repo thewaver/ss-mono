@@ -17,7 +17,7 @@ export const merge_diag_async_4 = (): TimedGradientConfig => ({
                             id: `gradient1-${id}`,
                             colors: [
                                 { value: defs.colors.primary },
-                                { value: `rgb(from ${defs.colors.primary} r g b / 0)` },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
                             ],
                             angle: 45,
                             offset: SVGDefsUtils.offsetDiagonally(-1.25, 45),
@@ -46,7 +46,7 @@ export const merge_diag_async_4 = (): TimedGradientConfig => ({
                             id: `gradient2-${id}`,
                             colors: [
                                 { value: defs.colors.secondary },
-                                { value: `rgb(from ${defs.colors.secondary} r g b / 0)` },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary) },
                             ],
                             angle: 135,
                             offset: SVGDefsUtils.offsetDiagonally(-1.25, 135),
@@ -75,7 +75,7 @@ export const merge_diag_async_4 = (): TimedGradientConfig => ({
                             id: `gradient3-${id}`,
                             colors: [
                                 { value: defs.colors.primary },
-                                { value: `rgb(from ${defs.colors.primary} r g b / 0)` },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
                             ],
                             angle: 225,
                             offset: SVGDefsUtils.offsetDiagonally(-1.25, 225),
@@ -104,7 +104,7 @@ export const merge_diag_async_4 = (): TimedGradientConfig => ({
                             id: `gradient4-${id}`,
                             colors: [
                                 { value: defs.colors.secondary },
-                                { value: `rgb(from ${defs.colors.secondary} r g b / 0)` },
+                                { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary) },
                             ],
                             angle: 315,
                             offset: SVGDefsUtils.offsetDiagonally(-1.25, 315),

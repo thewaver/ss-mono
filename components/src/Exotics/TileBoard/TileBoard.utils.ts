@@ -10,14 +10,14 @@ const NO_TILES = 0;
 const FIRST_INDEX = 0;
 /** How many fewer tiles a short row holds, and the column shift an offset row applies. */
 const SHORT_ROW_TILES = 1;
-/** Halfway, for centring a tile or offsetting a row. */
+/** Halfway, for centering a tile or offsetting a row. */
 const HALF = 0.5;
 /** The triangle shape whose unflipped tiles point upwards. */
 const POINTS_UP = "triangle-up";
 /** The triangle shape whose unflipped tiles point rightwards. */
 const POINTS_RIGHT = "triangle-right";
 
-const DODECAGON_ROW_PITCH = Math.sqrt(3) / 2;
+const DODECAGON_ROW_PITCH = Math.sqrt(3) * HALF;
 
 /**
  * How each tile shape tiles, as fractions of one tile's size.
@@ -87,6 +87,32 @@ const TILING_RATIOS: Record<ShapeConst.DefaultShape, TileBoardTiling> = {
 };
 
 /**
+ * Whether a row is offset half a tile across, and so holds one tile fewer.
+ *
+ * At module level because the neighbor and pointing tables below need it, and a module-level const is
+ * evaluated before the namespace object exists. Published as {@link TileBoardUtils.getIsShortRow}.
+ *
+ * @param row Which row.
+ * @param layout The board's layout.
+ * @returns Always `false` for shapes whose rows are not offset.
+ */
+const computeIsShortRow = (row: number, layout: TileBoardLayout) =>
+    layout.hasOffsetRows && MathUtils.isOdd(row + (layout.hasShortFirstRow ? SHORT_ROW_TILES : 0));
+
+/**
+ * Whether a tile is mirrored relative to its shape's default orientation.
+ *
+ * Triangles alternate, which is what lets them tile at all; every other shape is drawn the same way
+ * everywhere. At module level for the same reason as {@link computeIsShortRow}, and published as
+ * {@link TileBoardUtils.getIsFlippedTile}.
+ *
+ * @param tile Which tile.
+ * @param layout The board's layout.
+ */
+const computeIsFlippedTile = (tile: Index2d, layout: TileBoardLayout) =>
+    layout.tileFlip !== "none" && MathUtils.isOdd(tile.row + tile.col);
+
+/**
  * Which tiles touch a given one, before checking whether they are on the board.
  *
  * Every shape needs its own answer. Offset rows mean a tile's diagonal neighbors are at different
@@ -96,7 +122,7 @@ const TILING_RATIOS: Record<ShapeConst.DefaultShape, TileBoardTiling> = {
  * and below are two rows away rather than one.
  */
 const computeNeighbors = (tile: Index2d, layout: TileBoardLayout): Index2d[] => {
-    const near = TileBoardUtils.getIsShortRow(tile.row, layout) ? 0 : -SHORT_ROW_TILES;
+    const near = computeIsShortRow(tile.row, layout) ? 0 : -SHORT_ROW_TILES;
     const far = near + SHORT_ROW_TILES;
 
     if (layout.neighborhood === "diagonal") {
@@ -131,7 +157,7 @@ const computeNeighbors = (tile: Index2d, layout: TileBoardLayout): Index2d[] => 
     }
 
     if (layout.neighborhood === "sidewaysTriangle") {
-        const pointsRight = (layout.shape === POINTS_RIGHT) !== TileBoardUtils.getIsFlippedTile(tile, layout);
+        const pointsRight = (layout.shape === POINTS_RIGHT) !== computeIsFlippedTile(tile, layout);
 
         if (pointsRight) {
             return [
@@ -149,7 +175,7 @@ const computeNeighbors = (tile: Index2d, layout: TileBoardLayout): Index2d[] => 
     }
 
     if (layout.neighborhood === "uprightTriangle") {
-        const pointsUp = (layout.shape === POINTS_UP) !== TileBoardUtils.getIsFlippedTile(tile, layout);
+        const pointsUp = (layout.shape === POINTS_UP) !== computeIsFlippedTile(tile, layout);
 
         if (pointsUp) {
             return [
@@ -236,8 +262,7 @@ export namespace TileBoardUtils {
      * @param layout The board's layout.
      * @returns Always `false` for shapes whose rows are not offset.
      */
-    export const getIsShortRow = (row: number, layout: TileBoardLayout) =>
-        layout.hasOffsetRows && MathUtils.isOdd(row + (layout.hasShortFirstRow ? SHORT_ROW_TILES : 0));
+    export const getIsShortRow = computeIsShortRow;
 
     /**
      * How many tiles a row holds.
@@ -306,8 +331,7 @@ export namespace TileBoardUtils {
      * @param tile Which tile.
      * @param layout The board's layout.
      */
-    export const getIsFlippedTile = (tile: Index2d, layout: TileBoardLayout) =>
-        layout.tileFlip !== "none" && MathUtils.isOdd(tile.row + tile.col);
+    export const getIsFlippedTile = computeIsFlippedTile;
 
     /**
      * A tile's outline, in its own coordinates.

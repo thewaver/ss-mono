@@ -1,6 +1,6 @@
 import type { Accessor, JSX } from "solid-js";
 
-import { type CSSPadding, Point2d, Size2d } from "@thewaver/ss-utils";
+import type { CSSPadding, Point2d, Size2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { CheckedState } from "../../../Abstracts/CheckedState/CheckedState.types";
@@ -54,7 +54,6 @@ export type SelectFieldProps = AccessorProps<
          * without focus leaving the field.
          */
         activeOptionId: string | undefined;
-        ariaLabel?: string;
         /** Whether typing in the field narrows the list rather than jumping to a match. */
         isFilterable: boolean;
         /** What the reader has typed to narrow the list by. */

@@ -22,7 +22,6 @@ export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "valu
         startLabel?: string;
         /** Names the end field for assistive technology. */
         endLabel?: string;
-        locale?: string;
         /** Which day begins a week, which decides the order of the column headings. */
         weekStartsOn?: DateValueWeekStart;
         /** Whether one day can be picked, for rules a plain earliest and latest cannot express. */

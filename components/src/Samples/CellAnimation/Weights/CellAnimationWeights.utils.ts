@@ -4,6 +4,7 @@ import type { WeightFn, WeightOpts } from "./CellAnimationWeights.types";
 
 const getBandMax = (from: number, to: number, distanceAt: (index: number) => number) =>
     to < from ? 0 : Math.max(distanceAt(from), distanceAt(to));
+const WEIGHT_ROUNDING_PLACES = 3;
 const HASH_OFFSET = 1;
 const HASH_MULTIPLIER_X = 374761393;
 const HASH_MULTIPLIER_Y = 668265263;
@@ -45,7 +46,7 @@ const normalizeWeights = (weights: number[][]) => {
         for (const pos of indexed.get(key)!) {
             result[pos.y][pos.x] = MathUtils.roundToDecimalPlaces(
                 keyIdx / (orderedKeys.length - 1),
-                CellAnimationWeightUtils.WEIGHT_DECIMAL_PLACES,
+                WEIGHT_ROUNDING_PLACES,
             );
         }
     });
@@ -75,7 +76,7 @@ const makeWeightsUnique = (weights: number[][]) => {
         bucket.forEach((pos, posIdx) => {
             result[pos.y][pos.x] = MathUtils.roundToDecimalPlaces(
                 (weights[pos.y][pos.x] + (posIdx / bucket.length) * gap) / maxWeight,
-                CellAnimationWeightUtils.WEIGHT_DECIMAL_PLACES,
+                WEIGHT_ROUNDING_PLACES,
             );
         });
     });
@@ -84,7 +85,7 @@ const makeWeightsUnique = (weights: number[][]) => {
 };
 
 export namespace CellAnimationWeightUtils {
-    export const WEIGHT_DECIMAL_PLACES = 3;
+    export const WEIGHT_DECIMAL_PLACES = WEIGHT_ROUNDING_PLACES;
 
     export const MIN_MAX_DISTANCE = 1;
 

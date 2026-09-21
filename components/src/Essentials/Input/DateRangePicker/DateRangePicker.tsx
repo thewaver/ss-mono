@@ -24,6 +24,9 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     const valueSignal = accessSignal(() => props.valueSignal);
 
     const popupId = createUniqueId();
+    const fallbackFieldId = createUniqueId();
+
+    const getEndFieldId = () => `${access(props.id) ?? fallbackFieldId}-end`;
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
@@ -65,7 +68,9 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
         if (!getIsOpen()) return;
 
         setIsOpen(false);
-        getRootRef()?.querySelector("input")?.focus();
+        getRootRef()
+            ?.querySelector<HTMLInputElement>(`#${CSS.escape(getEndFieldId())}`)
+            ?.focus();
     };
 
     createEffect(() => {
@@ -97,6 +102,8 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
             <DateInput
                 {...props}
                 valueSignal={startSignal}
+                id={access(props.id) && `${access(props.id)}-start`}
+                name={access(props.name) && `${access(props.name)}-start`}
                 ariaLabel={() => access(props.startLabel) ?? DEFAULT_DATE_RANGE_PICKER_START_LABEL}
             />
 
@@ -105,6 +112,8 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
             <DateInput
                 {...props}
                 valueSignal={endSignal}
+                id={getEndFieldId}
+                name={access(props.name) && `${access(props.name)}-end`}
                 ariaLabel={() => access(props.endLabel) ?? DEFAULT_DATE_RANGE_PICKER_END_LABEL}
                 renderTrailing={() => props.renderTrigger(getIsOpen, () => (getIsOpen() ? dismiss() : setIsOpen(true)))}
             />

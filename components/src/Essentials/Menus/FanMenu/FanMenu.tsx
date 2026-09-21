@@ -1,6 +1,7 @@
 import { createMemo } from "solid-js";
 
 import { PlacementLayoutUtils } from "../../../Samples/Placement/Layouts/PlacementLayouts.utils";
+import { access } from "../../../Utils/propUtils";
 import { Menu } from "../Menu/Menu";
 import type { FanMenuProps } from "./FanMenu.types";
 
@@ -14,7 +15,7 @@ export const FanMenu = <T,>(props: FanMenuProps<T>) => {
             facingDegrees: FAN_FACING_DEGREES,
             spreadDegrees: FAN_SPREAD_DEGREES,
             tiltRatio: FAN_TILT_RATIO,
-            ...props.layoutDefs,
+            ...access(props.layoutDefs),
         }),
     );
 

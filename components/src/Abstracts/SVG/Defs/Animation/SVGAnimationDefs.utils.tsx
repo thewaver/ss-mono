@@ -3,6 +3,8 @@ import { createMemo, createSignal, onCleanup } from "solid-js";
 
 import type { SVGAnimationDefs, SVGAnimationIterationPattern } from "./SVGAnimationDefs.types";
 
+const MS_PER_SECOND = 1000;
+
 /**
  * Drives SVG's own `animate` elements from a script of iteration patterns.
  *
@@ -82,6 +84,7 @@ export namespace SVGAnimationDefsUtils {
             },
             get repeatCount() {
                 const pattern = getPatterns()[getPatternIndex()];
+
                 return !pattern || pattern.count === Infinity ? "indefinite" : pattern.count;
             },
             fill: "freeze",
@@ -92,7 +95,7 @@ export namespace SVGAnimationDefsUtils {
                 const frameId = requestAnimationFrame(() => {
                     if (!el.isConnected) return;
 
-                    el.beginElementAt((getPatterns()[0]?.beginDelayMs ?? 0) / 1000);
+                    el.beginElementAt((getPatterns()[0]?.beginDelayMs ?? 0) / MS_PER_SECOND);
                 });
 
                 const handleEndEvent = () => {
@@ -110,7 +113,7 @@ export namespace SVGAnimationDefsUtils {
 
                     setPatternIndex(nextIndex);
 
-                    const delaySecs = (getPatterns()[nextIndex]?.beginDelayMs ?? 0) / 1000;
+                    const delaySecs = (getPatterns()[nextIndex]?.beginDelayMs ?? 0) / MS_PER_SECOND;
 
                     for (const element of elements) {
                         if (element.isConnected) {

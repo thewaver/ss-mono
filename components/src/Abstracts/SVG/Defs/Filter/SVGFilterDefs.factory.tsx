@@ -40,6 +40,7 @@ const FILTER_COLOR_SPACE = "sRGB";
 const NEUTRAL_DISPLACEMENT_COLOR = "#808080";
 const OPAQUE_ALPHA_MATRIX = "1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 0 1";
 const EDGE_FADE_BLUR_RATIO = 0.5;
+const BLUR_REACH_SIGMAS = 3;
 
 const renderLightSource = (light: SVGLightSourceDefs) =>
     light.kind === "point" ? (
@@ -137,7 +138,7 @@ export class SVGFilterDefsFactory {
 
         this.maxOffset = Math.max(
             this.maxOffset,
-            defs.stdDeviation * 3 + Math.max(Math.abs(defs.dx), Math.abs(defs.dy)),
+            defs.stdDeviation * BLUR_REACH_SIGMAS + Math.max(Math.abs(defs.dx), Math.abs(defs.dy)),
         );
         this.filterPrimitives[key] = (srcIn) => ({
             element: (
@@ -162,7 +163,7 @@ export class SVGFilterDefsFactory {
 
         const key = `${this.filterId}_gaussianBlur_${this.gaussianBlurCount++}`;
 
-        this.maxOffset = Math.max(this.maxOffset, defs.stdDeviation * 3);
+        this.maxOffset = Math.max(this.maxOffset, defs.stdDeviation * BLUR_REACH_SIGMAS);
         this.filterPrimitives[key] = (srcIn: string) => ({
             element: (
                 <feGaussianBlur in={srcIn} {...defs} result={key}>
@@ -227,12 +228,7 @@ export class SVGFilterDefsFactory {
 
                             <feFlood flood-color={NEUTRAL_DISPLACEMENT_COLOR} result={flatKey} />
 
-                            <feMorphology
-                                {...{ in: "SourceAlpha" }}
-                                operator="erode"
-                                radius={edgeFade}
-                                result={erodedKey}
-                            />
+                            <feMorphology in="SourceAlpha" operator="erode" radius={edgeFade} result={erodedKey} />
 
                             <feGaussianBlur
                                 in={erodedKey}
@@ -426,7 +422,7 @@ export class SVGFilterDefsFactory {
                     </feSpecularLighting>
 
                     <feComposite
-                        {...{ in: lightKey }}
+                        in={lightKey}
                         in2="SourceAlpha"
                         operator="in"
                         color-interpolation-filters={FILTER_COLOR_SPACE}
@@ -434,7 +430,7 @@ export class SVGFilterDefsFactory {
                     />
 
                     <feComposite
-                        {...{ in: srcIn }}
+                        in={srcIn}
                         in2={maskKey}
                         operator="arithmetic"
                         k1={0}
@@ -475,7 +471,7 @@ export class SVGFilterDefsFactory {
                     </feDiffuseLighting>
 
                     <feComposite
-                        {...{ in: lightKey }}
+                        in={lightKey}
                         in2={srcIn}
                         operator="arithmetic"
                         k1={1}

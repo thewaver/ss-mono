@@ -1,4 +1,4 @@
-import { For, type Setter, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
+import { For, type Setter, batch, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
 
 import { Rect } from "@thewaver/ss-utils";
 
@@ -60,9 +60,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
     const refs = new Map<number, HTMLElement>();
     const tSetters = new Map<number, Setter<number>>();
 
-    createEffect(
-        on([getParticleCount, getSpawnDelayMs, getSpawnIterationPatterns], () => setStageIndex(0)),
-    );
+    createEffect(on([getParticleCount, getSpawnDelayMs, getSpawnIterationPatterns], () => setStageIndex(0)));
 
     createEffect(() => {
         let rafId: ReturnType<typeof requestAnimationFrame>;
@@ -124,11 +122,15 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
         };
 
         const tick = (now: number) => {
-            while (spawnedInRepeat < particleCount && now >= repeatStartMs + spawnedInRepeat * spawnDelayMs)
-                spawnNext();
+            batch(() => {
+                while (spawnedInRepeat < particleCount && now >= repeatStartMs + spawnedInRepeat * spawnDelayMs)
+                    spawnNext();
+            });
 
             const rootRect = getRootRect();
             const from = rootRect ? { x: rootRect.width * 0.5, y: rootRect.height * 0.5 } : undefined;
+            const targetRects = getTargetRects();
+            const arrived: number[] = [];
 
             for (const particle of getLiveParticles()) {
                 const el = refs.get(particle.id);
@@ -139,7 +141,7 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
 
                 tSetters.get(particle.id)?.(t);
 
-                const targetRect = getTargetRects()[particle.targetIndex];
+                const targetRect = targetRects[particle.targetIndex];
                 const to = targetRect ? ParticleSpawnerUtils.toRelativeCenter(targetRect, rootRect) : from;
 
                 ParticleSpawnerUtils.assignParticlePos(
@@ -161,9 +163,11 @@ export const ParticleSpawner = (props: ParticleSpawnerProps) => {
                     refs.delete(particle.id);
                     if (particle.repeatIndex === repeatIndex) arrivedInRepeat++;
                     props.onParticleArrive?.(particle.index);
-                    setLiveParticles((particles) => particles.filter((p) => p.id !== particle.id));
+                    arrived.push(particle.id);
                 }
             }
+
+            if (arrived.length > 0) setLiveParticles((particles) => particles.filter((p) => !arrived.includes(p.id)));
 
             if (spawnedInRepeat >= particleCount && arrivedInRepeat >= particleCount) {
                 props.onIterationEnd?.();

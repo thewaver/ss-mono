@@ -17,6 +17,11 @@ _Status: complete. Every folder of `components/src` plus the package files has b
 
 ## How to work this list (for the session that applies the fixes)
 
+- **Read each item's status in Section 1 first.** Most of this list is already done; the statuses are kept
+  current as items land, and the legend under Section 1 says what each one means. Do not re-derive it from
+  the code.
+- **The 2.5.7 dragging items 62, 63, 65 and 66 joined the decision list** after being worked: each asks
+  whether to build a single-pointer route or record the limit, which is the user's call rather than a defect.
 - **Fix only the items the user has approved by number.** Nothing here is pre-approved.
 - **Ask before fixing any item whose detail says "user's call", "user's word first", "behavior change", or offers
   two fixes (a) and (b).** Those are decisions, not defects: 23, 39 with 164 (decide together), 58, 77, 79, 108,
@@ -35,209 +40,237 @@ _Status: complete. Every folder of `components/src` plus the package files has b
   the reply since the user reviews by running the app.
 - **Where an item says to record something in `decisions.md`**, write it in that file's voice, or into the
   staging file if two machines are running (CLAUDE.md, "Staging documents").
+- **Update this file as each item closes**, per CLAUDE.md _"An itemized source of work is updated as items
+  land"_ — the next session reads Section 1 to tell done from pending.
 - After the approved items are done, delete `.scratch/review/` and, if the user agrees, this file.
 
 ---
 
 ## 1. Brief list
 
+**Every item carries its status, kept up to date as the work lands.** `done` means the fix is in and its
+specs pass; `partly done` means the mechanical half is in and what is left is a judgment call written up in
+that item's detail; `closed with no code change` means the item was withdrawn, with the reason in its detail;
+`waiting on the user` is the review's own list of decisions plus the four 2.5.7 items; `not started` is
+untouched work anyone may pick up. Current count: 140 done, 2 partly done, 2 closed, 20 waiting, 6 not
+started.
+
+**Six `e2e/` specs were already red before any of this work began**, checked by running the suite against a
+pristine copy of the starting commit: `accordion.spec.ts:255`, `slideButton.spec.ts:88`,
+`wheel.spec.ts:295`, `wheel.spec.ts:470` and two of the three `scroller.spec.ts` position tests, which
+rotate between themselves run to run. A session seeing those red has not broken them.
+
 ### Package files
-1. **PEC** README usage example passes children to `Button`, which takes `renderContent`.
-2. **PEC** README lists `MaskedField` as a form control; no such component exists.
-3. **PEC** llms.txt calls the Abstracts "framework-agnostic"; 33 of their files import solid-js.
-4. **INC** `index.ts` omits `spot_smear_1` while exporting every sibling sample.
-5. **PEC** Six files fail `prettier --check`.
-6. **INC** `index.ts` ordering drifts from alphabetical within folders in about a dozen places.
+
+1. **PEC** README usage example passes children to `Button`, which takes `renderContent`. — **done**
+2. **PEC** README lists `MaskedField` as a form control; no such component exists. — **done**
+3. **PEC** llms.txt calls the Abstracts "framework-agnostic"; 33 of their files import solid-js. — **done**
+4. **INC** `index.ts` omits `spot_smear_1` while exporting every sibling sample. — **done**
+5. **PEC** Six files fail `prettier --check`. — **done**
+6. **INC** `index.ts` ordering drifts from alphabetical within folders in about a dozen places. — **not started**
 
 ### Spelling (repo rule: US English)
-7. **PEC** About 45 British spellings across the library, including two identifiers.
+
+7. **PEC** About 45 British spellings across the library, including two identifiers. — **done**
 
 ### Primitives and Composites
-8. **BUG** `InteractionWrapper` tests `min-width` on the raw prop instead of its value.
-9. **PEC** `InteractionWrapper`'s console warning names props by their old `get` names.
-10. **PEC** Commented-out code in `PlacementItem.css.ts` and `Wheel.css.ts`.
-11. **INC** `Barrel.utils` names `HALF` yet writes a bare `0.5` in the same file.
-12. **INC** `Carousel` gives `computeSlideLabel` a 1-based index; `Wheel` gives `computeWedgeLabel` a 0-based one.
-13. **INC** Only `Toasts` and `Spotlight` reserve their live region on mount; six other announcers do not.
-14. **INC** `Spotlight` spells `Point2d` inline as `{ x; y }`.
-15. **PEC** `WheelUtils` and `DRUM_PERSPECTIVE_PX` have no caller anywhere.
-16. **INC** `BARREL_PERSPECTIVE_PX` is exported outside its namespace.
-17. **PERF** `GlassSurface` builds the margined clip path twice per change.
-18. **PERF** `MosaicUtils.packScaled` builds prefix sums with an O(n²) spread.
-19. **PEC** `carouselControl` composes an empty style object.
-20. **PEC** The resting arrangement literal is duplicated in two `PlacementBox` files.
-21. **INC** Render-callback state types are documented in some Primitives and not others.
+
+8. **BUG** `InteractionWrapper` tests `min-width` on the raw prop instead of its value. — **done**
+9. **PEC** `InteractionWrapper`'s console warning names props by their old `get` names. — **done**
+10. **PEC** Commented-out code in `PlacementItem.css.ts` and `Wheel.css.ts`. — **done**
+11. **INC** `Barrel.utils` names `HALF` yet writes a bare `0.5` in the same file. — **done**
+12. **INC** `Carousel` gives `computeSlideLabel` a 1-based index; `Wheel` gives `computeWedgeLabel` a 0-based one. — **not started**
+13. **INC** Only `Toasts` and `Spotlight` reserve their live region on mount; six other announcers do not. — **done**
+14. **INC** `Spotlight` spells `Point2d` inline as `{ x; y }`. — **done**
+15. **PEC** `WheelUtils` and `DRUM_PERSPECTIVE_PX` have no caller anywhere. — **done**
+16. **INC** `BARREL_PERSPECTIVE_PX` is exported outside its namespace. — **done**
+17. **PERF** `GlassSurface` builds the margined clip path twice per change. — **done**
+18. **PERF** `MosaicUtils.packScaled` builds prefix sums with an O(n²) spread. — **done**
+19. ~~`carouselControl` composes an empty style object.~~ Declined: that form is the house majority, and the built CSS is identical either way. — **closed with no code change, see the detail**
+20. **PEC** The resting arrangement literal is duplicated in two `PlacementBox` files. — **done**
+21. **INC** Render-callback state types are documented in some Primitives and not others. — **done**
 
 ### Abstracts, second half
-22. **BUG** `getGapPlacement` throws on the end gaps of a two-item run (crashes a two-item laid-out `Sortable`).
-23. **BUG** Writing `indexSignal` from outside does not turn the wheel (medium confidence on intent).
-24. **BUG** A spin whose target resolves after unmount still runs and announces.
-25. **BUG** Gradient stop count is frozen at first render, and each stop recomputes all stops per frame.
-26. **BUG** A repeated non-BMP character (emoji) does not cycle in typeahead.
-27. **BUG** Virtualizer `overscan` is read once although typed as an accessor.
-28. **INC** `NavigatorCell` / `NavigatorGrid` name grid indices `x`/`y` against the row/col convention.
-29. **INC** Two `.types.ts` files import ss-utils types as values.
-30. **INC** `Virtualizer` takes `getIsEnabled` where the house prefers `getIsDisabled`.
-31. **INC** Missing blank-line grouping in the two SVG `.utils.tsx` files.
-32. **PEC** `SVGBaseFilterDefs` is an empty type intersected into eleven types.
-33. **PEC** `{...{ in: srcIn }}` spread where `in={srcIn}` is used beside it.
-34. **PEC** Bare `* 3` and `/ 1000` in files that name their other numbers.
-35. **PEC** `computePattern` spells `Index2d` inline three times.
-36. **PEC** `LiveAnnouncerUtils.clear` has no caller.
+
+22. **BUG** `getGapPlacement` throws on the end gaps of a two-item run (crashes a two-item laid-out `Sortable`). — **done**
+23. **BUG** Writing `indexSignal` from outside does not turn the wheel (medium confidence on intent). — **not started: waiting on the user**
+24. **BUG** A spin whose target resolves after unmount still runs and announces. — **done**
+25. **BUG** Gradient stop count is frozen at first render, and each stop recomputes all stops per frame. — **done**
+26. **BUG** A repeated non-BMP character (emoji) does not cycle in typeahead. — **done**
+27. **BUG** Virtualizer `overscan` is read once although typed as an accessor. — **done**
+28. **INC** `NavigatorCell` / `NavigatorGrid` name grid indices `x`/`y` against the row/col convention. — **not started**
+29. **INC** Two `.types.ts` files import ss-utils types as values. — **done**
+30. **INC** `Virtualizer` takes `getIsEnabled` where the house prefers `getIsDisabled`. — **not started**
+31. **INC** Missing blank-line grouping in the two SVG `.utils.tsx` files. — **done**
+32. **PEC** `SVGBaseFilterDefs` is an empty type intersected into eleven types. — **done**
+33. **PEC** `{...{ in: srcIn }}` spread where `in={srcIn}` is used beside it. — **done**
+34. **PEC** Bare `* 3` and `/ 1000` in files that name their other numbers. — **done**
+35. **PEC** `computePattern` spells `Index2d` inline three times. — **done**
+36. **PEC** `LiveAnnouncerUtils.clear` has no caller. — **done**
 
 ### Abstracts, first half
-37. **BUG** Swipe tracking wedges after a mouse release outside the element; every later swipe is dropped.
-38. **BUG** `Carrier` drag leaks listeners after an off-element release and then fires pick-up twice.
-39. **BUG** `DateTimeValue.createSplit` ignores a whole-value clear, so both fields keep stale values.
-40. **INC** `Glass.utils.tsx` contains no JSX and should be `.ts`.
-41. **INC** A private helper is declared inside the `GlassUtils` namespace.
-42. **INC** `DateValueUtils.getCellOf` returns an `x`/`y` pair for a row-and-column index.
-43. **INC** Two utils files call their own namespace by name from inside.
-44. **INC** `ColorExtractor.context.ts` carries two inline numeric defaults instead of `DEFAULT_X` constants.
-45. **INC** Three utils files leave their private helpers undocumented where eleven neighbors document theirs.
-46. **PEC** `getYearsInEra` doc promises `Infinity` that never arrives, contradicting its test and conventions.md.
-47. **PEC** `InteractionActivation.count` is documented as a burst count but only ever increments.
-48. **PEC** Unnamed magic date and hour in `getWeekdayNames`.
-49. **PEC** `FrameRateMonitor` re-implements `trackPageHidden`.
-50. **PEC** Two redundant non-null assertions on exhaustive switches in `Anchor.utils`.
+
+37. **BUG** Swipe tracking wedges after a mouse release outside the element; every later swipe is dropped. — **done**
+38. **BUG** `Carrier` drag leaks listeners after an off-element release and then fires pick-up twice. — **done**
+39. **BUG** `DateTimeValue.createSplit` ignores a whole-value clear, so both fields keep stale values. — **not started: waiting on the user**
+40. **INC** `Glass.utils.tsx` contains no JSX and should be `.ts`. — **done**
+41. **INC** A private helper is declared inside the `GlassUtils` namespace. — **done**
+42. **INC** `DateValueUtils.getCellOf` returns an `x`/`y` pair for a row-and-column index. — **not started**
+43. **INC** Two utils files call their own namespace by name from inside. _Done, across all four._ — **done**
+44. **INC** `ColorExtractor.context.ts` carries two inline numeric defaults instead of `DEFAULT_X` constants. — **done**
+45. **INC** Three utils files leave their private helpers undocumented where eleven neighbors document theirs. — **done**
+46. **PEC** `getYearsInEra` doc promises `Infinity` that never arrives, contradicting its test and conventions.md. — **done**
+47. **PEC** `InteractionActivation.count` is documented as a burst count but only ever increments. — **done**
+48. **PEC** Unnamed magic date and hour in `getWeekdayNames`. — **done**
+49. **PEC** `FrameRateMonitor` re-implements `trackPageHidden`. — **done**
+50. **PEC** Two redundant non-null assertions on exhaustive switches in `Anchor.utils`. — **done**
 
 ### Essentials/Input, second half (FormField … Toggle)
-51. **WCAG** `TagInput`'s field ignores the `FormField` message and the `Label` caption (3.3.1, 1.3.1, 2.5.3).
-52. **BUG** `TagInput` chips are all tab stops; the written `tabindex={-1}` is overwritten by the wrapper.
-53. **BUG** `TimeInput` steps and flips am/pm while read-only, and flips am/pm while disabled.
-54. **BUG** `NumberInput` fires `onInput` on blur and at a bound when the value did not change.
-55. **INC** `NumberInputProps` hand-writes `MaybeAccessor` with no `AccessorProps` block.
-56. **INC** `Radio` decides reachability from prop presence while its wrapper reads the value.
-57. **WCAG** A vertical `Range` states no `aria-orientation` (4.1.2).
-58. **BUG** `TimePicker` can be opened while disabled.
-59. **BUG** `TimePicker`'s trigger cannot own its popup, so a press in the clock dismisses an enclosing layer.
-60. **BUG** A click on `TagInput`'s padding focuses a disabled field.
-61. **PEC** `Select.utils` documents an `aria-describedby` that nothing writes.
+
+51. **WCAG** `TagInput`'s field ignores the `FormField` message and the `Label` caption (3.3.1, 1.3.1, 2.5.3). — **done**
+52. **BUG** `TagInput` chips are all tab stops; the written `tabindex={-1}` is overwritten by the wrapper. — **done**
+53. **BUG** `TimeInput` steps and flips am/pm while read-only, and flips am/pm while disabled. — **done**
+54. **BUG** `NumberInput` fires `onInput` on blur and at a bound when the value did not change. — **done**
+55. **INC** `NumberInputProps` hand-writes `MaybeAccessor` with no `AccessorProps` block. — **done**
+56. **INC** `Radio` decides reachability from prop presence while its wrapper reads the value. — **done**
+57. **WCAG** A vertical `Range` states no `aria-orientation` (4.1.2). — **done**
+58. **BUG** `TimePicker` can be opened while disabled. — **not started: waiting on the user**
+59. **BUG** `TimePicker`'s trigger cannot own its popup, so a press in the clock dismisses an enclosing layer. — **not started**
+60. **BUG** A click on `TagInput`'s padding focuses a disabled field. — **done**
+61. **PEC** `Select.utils` documents an `aria-describedby` that nothing writes. — **done**
 
 ### Essentials, second half (Paginator … ViewportWrapper)
-62. **WCAG** `SplitPane` gutter moves only by dragging or keyboard; no single-pointer route (2.5.7).
-63. **WCAG** `Table` column resize and reorder are drag-only for a pointer (2.5.7).
-64. **WCAG** A non-navigable `Stepper` step is a nameless, sometimes focusable `<span>` (4.1.2).
-65. **WCAG** `SplitPane` splitter lacks Home/End, `aria-controls`, and puts `separator` on a `<button>`.
-66. **WCAG** `Sortable` items are operable but announce as static list items (4.1.2).
-67. **BUG** A disabled `Table` cannot be navigated with the arrow keys.
-68. **BUG** Windowed `Tree` typeahead cannot find rows that are not rendered.
-69. **PERF** `Table` selection membership is an array scan per cell and per row.
-70. **INC** `Sortable` re-implements the 1D roving walk instead of `computeNextPosition`.
-71. **PEC** `INTERACTIVE_SELECTOR` is copied verbatim into four components.
-72. **PEC** Hand-written clamps where `MathUtils.clamp` / `clamp01` exist (Scroller, Sortable, Table).
-73. **PEC** `Preview` prop documentation describes the wrong thing for `sizing` and `id`.
-74. **PEC** `Tooltip` constant named `DEFAULT_…` holds an attribute name, not a default.
-75. **PEC** `Stepper`'s `<ol>` carries `aria-orientation`, which the list role does not support.
-76. **PEC** Missing blank line between constant groups in `Sortable`.
+
+62. **WCAG** `SplitPane` gutter moves only by dragging or keyboard; no single-pointer route (2.5.7). — **not started: waiting on the user**
+63. **WCAG** `Table` column resize and reorder are drag-only for a pointer (2.5.7). — **not started: waiting on the user**
+64. **WCAG** A non-navigable `Stepper` step is a nameless, sometimes focusable `<span>` (4.1.2). — **done**
+65. **WCAG** `SplitPane` splitter lacks Home/End, `aria-controls`, and puts `separator` on a `<button>`. — **not started: waiting on the user**
+66. **WCAG** `Sortable` items are operable but announce as static list items (4.1.2). — **not started: waiting on the user**
+67. **BUG** A disabled `Table` cannot be navigated with the arrow keys. — **done**
+68. **BUG** Windowed `Tree` typeahead cannot find rows that are not rendered. — **done**
+69. **PERF** `Table` selection membership is an array scan per cell and per row. — **done**
+70. **INC** `Sortable` re-implements the 1D roving walk instead of `computeNextPosition`. — **done**
+71. **PEC** `INTERACTIVE_SELECTOR` is copied verbatim into four components. — **done**
+72. **PEC** Hand-written clamps where `MathUtils.clamp` / `clamp01` exist (Scroller, Sortable, Table). — **done**
+73. **PEC** `Preview` prop documentation describes the wrong thing for `sizing` and `id`. — **done**
+74. **PEC** `Tooltip` constant named `DEFAULT_…` holds an attribute name, not a default. — **done**
+75. **PEC** `Stepper`'s `<ol>` carries `aria-orientation`, which the list role does not support. _Done._ — **done**
+76. **PEC** Missing blank line between constant groups in `Sortable`. — **done**
 
 ### Essentials/Input, first half (Calendar … FileInput)
-77. **BUG** `ColorInput` overwrites a non-hex starting value with black on mount.
-78. **BUG** `ColorArea` drag writes the signal twice per move and fires `onInput` with a half-updated color.
-79. **WCAG** Arrow-walking onto a day or time disabled by the consumer's predicate lands focus with no ring (2.4.7).
-80. **PERF** `Clock` copies its ref record and scrolls every column once per option at mount.
-81. **PERF** `DateInput` rebuilds the twelve-month day ceiling on every keystroke.
-82. **INC** `DatePicker` and `DateRangePicker` redeclare `locale` without a doc block.
-83. **WCAG** `ColorInput`'s popup dialog is named from the raw prop, so a `Label`-named field has an unnamed dialog.
-84. **PEC** `ColorInput.types.ts` imports the same module on two consecutive lines.
-85. **PEC** `Calendar.css.ts` names `WEEK_COLUMNS = 7` beside `Calendar.tsx`'s `DAYS_PER_WEEK = 7`.
-86. **INC** `ColorArea.tsx` declares a helper above its `DEFAULT_` constants.
+
+77. **BUG** `ColorInput` overwrites a non-hex starting value with black on mount. — **not started: waiting on the user**
+78. **BUG** `ColorArea` drag writes the signal twice per move and fires `onInput` with a half-updated color. — **done**
+79. **WCAG** Arrow-walking onto a day or time disabled by the consumer's predicate lands focus with no ring (2.4.7). — **not started: waiting on the user**
+80. **PERF** `Clock` copies its ref record and scrolls every column once per option at mount. — **done**
+81. **PERF** `DateInput` rebuilds the twelve-month day ceiling on every keystroke. — **done**
+82. **INC** `DatePicker` and `DateRangePicker` redeclare `locale` without a doc block. — **done**
+83. **WCAG** `ColorInput`'s popup dialog is named from the raw prop, so a `Label`-named field has an unnamed dialog. — **done**
+84. **PEC** `ColorInput.types.ts` imports the same module on two consecutive lines. — **done**
+85. **PEC** `Calendar.css.ts` names `WEEK_COLUMNS = 7` beside `Calendar.tsx`'s `DAYS_PER_WEEK = 7`. — **done**
+86. **INC** `ColorArea.tsx` declares a helper above its `DEFAULT_` constants. — **done**
 
 ### Essentials, first half (Accordions … Modal)
-87. **BUG** `Collapsible` calls the consumer's `ref` twice for one element.
-88. **WCAG** A `Modal` with no focusable content never takes focus, so Tab walks the page behind it (2.4.3).
-89. **WCAG** The current breadcrumb is a tab stop with a pointer cursor and no role (4.1.2, 2.4.3).
-90. **WCAG** `ImageSwitcher` hardcodes `alt=""`; a meaningful picture can never carry an alternative (1.1.1).
-91. **BUG** `ImageSwitcher`'s preloader requests with CORS while the visible `<img>` does not.
-92. **PERF** Every mounted `Menu`/`ContextMenu` holds a document `pointermove` listener, open or closed.
-93. **PEC** Four dead style exports in `Accordion.css.ts` ship unused CSS.
-94. **INC** `Menu.css.ts` copies the button reset instead of composing `buttonElement` (7 of 8 compose).
-95. **PEC** Four prop doc blocks describe something the prop does not do (Accordion, Collapsible, Form, Menu).
-96. **PEC** `ContextMenu` duplicates `Menu`'s pick logic verbatim.
-97. **BUG** `AudioSwitcher` drops a volume change made during a crossfade.
-98. **BUG** A cancelled hold leaves `Menu`'s toggle latch set; the next trigger press does nothing.
-99. **INC** `FanMenuProps.layoutDefs` sits in a bare intersection rather than an `AccessorProps` block.
-100. **PEC** `AudioSwitcher`: split imports and three guards that can never fail.
-101. **INC** `Breadcrumbs`' `<nav>` landmark can be left unnamed; `ContextMenu` requires its label.
-102. **WCAG** `ContextMenu` has no keyboard opener and anchors at a pointer coordinate (2.1.1).
-103. **PEC** `MenuTriggerProps` re-declares `ariaLabel` undocumented.
+
+87. **BUG** `Collapsible` calls the consumer's `ref` twice for one element. — **done**
+88. **WCAG** A `Modal` with no focusable content never takes focus, so Tab walks the page behind it (2.4.3). — **done**
+89. **WCAG** The current breadcrumb is a tab stop with a pointer cursor and no role (4.1.2, 2.4.3). — **done**
+90. **WCAG** `ImageSwitcher` hardcodes `alt=""`; a meaningful picture can never carry an alternative (1.1.1). — **done**
+91. **BUG** `ImageSwitcher`'s preloader requests with CORS while the visible `<img>` does not. — **done**
+92. **PERF** Every mounted `Menu`/`ContextMenu` holds a document `pointermove` listener, open or closed. — **done**
+93. **PEC** Four dead style exports in `Accordion.css.ts` ship unused CSS. — **done**
+94. **INC** `Menu.css.ts` copies the button reset instead of composing `buttonElement` (7 of 8 compose). — **done**
+95. **PEC** Four prop doc blocks describe something the prop does not do (Accordion, Collapsible, Form, Menu). — **done**
+96. **PEC** `ContextMenu` duplicates `Menu`'s pick logic verbatim. — **done**
+97. **BUG** `AudioSwitcher` drops a volume change made during a crossfade. — **done**
+98. **BUG** A cancelled hold leaves `Menu`'s toggle latch set; the next trigger press does nothing. — **done**
+99. **INC** `FanMenuProps.layoutDefs` sits in a bare intersection rather than an `AccessorProps` block. — **done**
+100.    **PEC** `AudioSwitcher`: split imports and three guards that can never fail. — **done**
+101.    **INC** `Breadcrumbs`' `<nav>` landmark can be left unnamed; `ContextMenu` requires its label. — **done**
+102.    **WCAG** `ContextMenu` has no keyboard opener and anchors at a pointer coordinate (2.1.1). — **partly done; the rest is a decision, see the detail**
+103.    **PEC** `MenuTriggerProps` re-declares `ariaLabel` undocumented. — **done**
 
 ### Exotics, first half (Bracket … Odometer)
-104. **BUG** `Bracket`'s toRoot/toLeaves steps land on disabled nodes and displace the roving stop.
-105. **BUG** A clicked `Bracket` node takes the tab stop but not the focus (no `tabindex="-1"`).
-106. **PERF** `Bracket` rebuilds every node element whenever the tree object changes.
-107. **BUG** `Bracket` node refs are never cleared on unmount.
-108. **BUG** A `Corners` corner switched off vanishes instead of fading, against its own prop docs.
-109. **BUG** `CellAnimation`: an iteration count of zero stops the animation; the doc says it runs forever.
-110. **PERF** `CellAnimation` root size has no equality check, so a sub-pixel resize restarts the pass.
-111. **PEC** Bare `100` in `CellAnimation`'s z-index where the file names its numbers.
-112. **WCAG** `Odometer`'s `ariaLabel` sits on a role-less div and produces no accessible name (1.3.1).
-113. **PEC** `OdometerSlot.digitIndex` is computed and documented but read by nothing.
-114. **PERF** `ElementMosaic` opens one `ResizeObserver` and runs one full re-pack per item.
-115. **PERF** `ImageMosaic` runs one full re-pack per image as pictures load.
-116. **BUG** Changing `ImageMosaic` sources mid-load re-downloads everything and lets dropped images write back.
-117. **INC** `Cuboid` and `FlipCard` destructure a `*Signal` prop once at setup instead of `accessSignal`.
-118. **PEC** `FormationInset` is exported and used nowhere.
-119. **PEC** "centring" in `Bracket.utils.ts` (add to item 7's list).
+
+104. **BUG** `Bracket`'s toRoot/toLeaves steps land on disabled nodes and displace the roving stop. — **done**
+105. **BUG** A clicked `Bracket` node takes the tab stop but not the focus (no `tabindex="-1"`). — **done**
+106. **PERF** `Bracket` rebuilds every node element whenever the tree object changes. — **done**
+107. **BUG** `Bracket` node refs are never cleared on unmount. — **done**
+108. **BUG** A `Corners` corner switched off vanishes instead of fading, against its own prop docs. — **not started: waiting on the user**
+109. **BUG** `CellAnimation`: an iteration count of zero stops the animation; the doc says it runs forever. — **not started: waiting on the user**
+110. **PERF** `CellAnimation` root size has no equality check, so a sub-pixel resize restarts the pass. — **done**
+111. **PEC** Bare `100` in `CellAnimation`'s z-index where the file names its numbers. — **done**
+112. **WCAG** `Odometer`'s `ariaLabel` sits on a role-less div and produces no accessible name (1.3.1). — **done**
+113. **PEC** `OdometerSlot.digitIndex` is computed and documented but read by nothing. — **done**
+114. **PERF** `ElementMosaic` opens one `ResizeObserver` and runs one full re-pack per item. — **done**
+115. **PERF** `ImageMosaic` runs one full re-pack per image as pictures load. — **done**
+116. **BUG** Changing `ImageMosaic` sources mid-load re-downloads everything and lets dropped images write back. — **done**
+117. **INC** `Cuboid` and `FlipCard` destructure a `*Signal` prop once at setup instead of `accessSignal`. — **done**
+118. **PEC** `FormationInset` is exported and used nowhere. — **done**
+119. **PEC** "centring" in `Bracket.utils.ts` (add to item 7's list). — **done**
 
 ### Exotics, second half (ParticleSpawner … Wheels)
-120. **BUG** A `PatchBoard` whose first node is disabled has no tab stop at all (2.1.1).
-121. **WCAG** A socket on a disabled `PatchBoard` node announces itself as enabled (4.1.2).
-122. **PERF** `PatchBoard` rescans every socket for every socket on every pointer move (O(S²)).
-123. **WCAG** `Timeline` puts `aria-posinset`/`aria-setsize` on a `button` role that ignores them (4.1.2).
-124. **WCAG** `Timeline` and `Bracket` erase the focus outline unconditionally on the focusable element (2.4.7).
-125. **BUG** `restartAnimation` refuses to restart a running `Typewriter`/`ScrambleText`, against conventions.md.
-126. **PERF** `Typewriter` tears down and rebuilds every character on each resize callback.
-127. **PERF** `ParticleSpawner` writes the particle list once per particle inside the frame loop.
-128. **PERF** `Shape` recomputes every path on a resize callback that changed nothing.
-129. **PERF** `Timeline` and `SortableGrid` copy their whole ref collection per item mount.
-130. **INC** The one remaining `/ 2` in the library, beside a `HALF` constant (`TileBoard.utils.ts:20`).
-131. **INC** `SortableGrid` names grid cell coordinates `x`/`y` against the row/col convention.
-132. **BUG** `SortableGrid` calls the consumer's `ref` callback twice.
-133. **WCAG** `ScratchCard` throws focus to the body when the cover clears (2.4.3).
-134. **PEC** `RichText` has an unreachable `try`/`catch` holding the tree's only `console.error`.
-135. **INC** A memo named `parsedTree` without the `get` prefix (`RichText`).
-136. **INC** `aria-hidden={"true"}` in braces at three sites where the house writes `aria-hidden="true"`.
-137. **WCAG** `PatchBoard` sockets sit loose inside `role="list"` without being list items (1.3.1).
-138. **PERF** `ScrambleText` rolls a new glyph for every character every tick, settled ones included.
+
+120. **BUG** A `PatchBoard` whose first node is disabled has no tab stop at all (2.1.1). — **done**
+121. **WCAG** A socket on a disabled `PatchBoard` node announces itself as enabled (4.1.2). — **done**
+122. **PERF** `PatchBoard` rescans every socket for every socket on every pointer move (O(S²)). — **done**
+123. **WCAG** `Timeline` puts `aria-posinset`/`aria-setsize` on a `button` role that ignores them (4.1.2). — **done**
+124. **WCAG** `Timeline` and `Bracket` erase the focus outline unconditionally on the focusable element (2.4.7). — **done**
+125. **BUG** `restartAnimation` refuses to restart a running `Typewriter`/`ScrambleText`, against conventions.md. — **not started: waiting on the user**
+126. **PERF** `Typewriter` tears down and rebuilds every character on each resize callback. — **done**
+127. **PERF** `ParticleSpawner` writes the particle list once per particle inside the frame loop. — **done**
+128. **PERF** `Shape` recomputes every path on a resize callback that changed nothing. — **done**
+129. **PERF** `Timeline` and `SortableGrid` copy their whole ref collection per item mount. — **done**
+130. **INC** The one remaining `/ 2` in the library, beside a `HALF` constant (`TileBoard.utils.ts:20`). — **done**
+131. **INC** `SortableGrid` names grid cell coordinates `x`/`y` against the row/col convention. — **not started: waiting on the user**
+132. **BUG** `SortableGrid` calls the consumer's `ref` callback twice. — **done**
+133. **WCAG** `ScratchCard` throws focus to the body when the cover clears (2.4.3). — **done**
+134. **PEC** `RichText` has an unreachable `try`/`catch` holding the tree's only `console.error`. — **done**
+135. **INC** A memo named `parsedTree` without the `get` prefix (`RichText`). — **done**
+136. **INC** `aria-hidden={"true"}` in braces at three sites where the house writes `aria-hidden="true"`. — **done**
+137. **WCAG** `PatchBoard` sockets sit loose inside `role="list"` without being list items (1.3.1). — **not started: waiting on the user**
+138. **PERF** `ScrambleText` rolls a new glyph for every character every tick, settled ones included. — **done**
 
 ### Cross-cutting sweep (new items; other hits were folded into 7, 16, 29, 30, 40, 82, 116)
-139. **INC** 44 namespace members in four `Samples` utils files carry no doc block.
-140. **INC** `Typewriter` writes one prop's default inline, twice, beside three named defaults.
-141. **INC** `ScreenWiper`'s deferred `setTimeout` is never stored or cleared.
-142. **INC** `ScanlineAnimationKeyframes.knobs.ts` exports `ScanlineAnimationKnobs`, dropping the stem.
-143. **INC** `Clock.utils.ts` is the only `.utils.ts` missing from `index.ts`.
-144. **INC** `RadioGroup` exports its context type but not its provider/hook; `PlacementBox` exports neither.
-145. **INC** `SVGDefs.utils.ts` publishes a type (`CycleColorKey`) from inside its namespace.
+
+139. ~~44 namespace members in four `Samples` utils files carry no doc block.~~ Killed: the user has postponed the question of documenting `Samples` at all. — **closed with no code change, see the detail**
+140. **INC** `Typewriter` writes one prop's default inline, twice, beside three named defaults. — **done**
+141. **INC** `ScreenWiper`'s deferred `setTimeout` is never stored or cleared. — **done**
+142. **INC** `ScanlineAnimationKeyframes.knobs.ts` exports `ScanlineAnimationKnobs`, dropping the stem. — **done**
+143. **INC** `Clock.utils.ts` is the only `.utils.ts` missing from `index.ts`. — **done**
+144. **INC** `RadioGroup` exports its context type but not its provider/hook; `PlacementBox` exports neither. — **partly done; the rest is a decision, see the detail**
+145. **INC** `SVGDefs.utils.ts` publishes a type (`CycleColorKey`) from inside its namespace. — **done**
 
 ### Samples
-146. **PERF** Every trail stamp opens its own pointer tracker on the same element (35 per sample instance).
-147. **BUG** A trail sample emits 35 `<filter>` defs sharing one DOM id once blur is above zero.
-148. **INC** The two gradient knob modules drop the `SampleKnobs<T>` type check the design relies on.
-149. **INC** The gradient step default is written in two places (`STEPS_DEFAULT` and `DEFAULT_GRADIENT_STEPS`).
-150. **INC** A private constant sits inside the exported `TrackedGradientKnobs` namespace.
-151. **INC** The `Bracket` registries are the only ones not named `SAMPLE_*` or publishing `SampleKey`/`SAMPLE_KEYS`.
-152. **INC** `Iteration` and `Pattern` publish a key type but no `SAMPLE_KEYS` list; three pages cast instead.
-153. **INC** Four Timed samples spell the transparent color by hand instead of `getTransparentColor`.
-154. **INC** `whirlCurved_2` is the only camelCase key in the snake_case SVG registries.
-155. **PEC** `encircle` writes thirds as `0.33` and `0.66`.
-156. **PEC** `NOTHING + 1` as a one-unit threshold in the bracket connector paths.
-157. **INC** `PlacementLayoutKnobs`' family maps and declaration runs are in three different orders.
-158. **INC** The band gradient's five-stop ramp is written out twice and factored out once.
-159. **INC** `radar` and `spiral` samples pass five bare numbers where the ripple samples name theirs.
-160. **PEC** `NO_ITEMS` is `PlacementLayouts.utils.ts`'s general-purpose zero, in fourteen non-count uses.
-161. **PEC** `SVGAnimations.const.tsx` mixes `Arr`/`Array` parameter names and bypasses its own `join` helper.
-162. **PEC** `swarmCw` and `swarmCcw` disagree on one stop of an otherwise mirrored pair.
+
+146. **PERF** Every trail stamp opens its own pointer tracker on the same element (35 per sample instance). — **done**
+147. **BUG** A trail sample emits 35 `<filter>` defs sharing one DOM id once blur is above zero. — **not started: waiting on the user**
+148. **INC** The two gradient knob modules drop the `SampleKnobs<T>` type check the design relies on. — **done**
+149. **INC** The gradient step default is written in two places (`STEPS_DEFAULT` and `DEFAULT_GRADIENT_STEPS`). — **done**
+150. **INC** A private constant sits inside the exported `TrackedGradientKnobs` namespace. — **done**
+151. **INC** The `Bracket` registries are the only ones not named `SAMPLE_*` or publishing `SampleKey`/`SAMPLE_KEYS`. — **done**
+152. **INC** `Iteration` and `Pattern` publish a key type but no `SAMPLE_KEYS` list; three pages cast instead. — **done**
+153. **INC** Four Timed samples spell the transparent color by hand instead of `getTransparentColor`. — **done**
+154. **INC** `whirlCurved_2` is the only camelCase key in the snake_case SVG registries. — **done**
+155. **PEC** `encircle` writes thirds as `0.33` and `0.66`. — **done**
+156. **PEC** `NOTHING + 1` as a one-unit threshold in the bracket connector paths. — **done**
+157. **INC** `PlacementLayoutKnobs`' family maps and declaration runs are in three different orders. — **done**
+158. **INC** The band gradient's five-stop ramp is written out twice and factored out once. — **not started: waiting on the user**
+159. **INC** `radar` and `spiral` samples pass five bare numbers where the ripple samples name theirs. — **not started: waiting on the user**
+160. **PEC** `NO_ITEMS` is `PlacementLayouts.utils.ts`'s general-purpose zero, in fourteen non-count uses. — **done**
+161. **PEC** `SVGAnimations.const.tsx` mixes `Arr`/`Array` parameter names and bypasses its own `join` helper. — **done**
+162. **PEC** `swarmCw` and `swarmCcw` disagree on one stop of an otherwise mirrored pair. — **not started: waiting on the user**
 
 ### Essentials/Input, first half (late report; adds to 77–86)
-163. **BUG** `Clock`: Enter commits only the current column, throwing away the walk in the others.
-164. **BUG** `DateRangePicker`: clear one field and retype it, and the range never comes back.
-165. **WCAG** `ColorInput`'s picker cannot be reached with a keyboard; Tab leaves and closes it (2.1.1).
-166. **BUG** `DateRangePicker` and `DateTimePicker` put one `id` and one `name` on two inputs.
-167. **BUG** `RangeCalendar`: finishing a range jumps focus back to its start day.
-168. **PEC** `["Enter", " "]` is declared in six files under three names.
-169. **PERF** `Calendar` builds a new `Intl.DateTimeFormat` for every cell label, 42 per month page.
-170. **PEC** `DateRangePicker`'s Escape lands on the start field, not the end field that holds the trigger.
+
+163. **BUG** `Clock`: Enter commits only the current column, throwing away the walk in the others. — **done**
+164. **BUG** `DateRangePicker`: clear one field and retype it, and the range never comes back. — **not started: waiting on the user**
+165. **WCAG** `ColorInput`'s picker cannot be reached with a keyboard; Tab leaves and closes it (2.1.1). — **not started: waiting on the user**
+166. **BUG** `DateRangePicker` and `DateTimePicker` put one `id` and one `name` on two inputs. — **done**
+167. **BUG** `RangeCalendar`: finishing a range jumps focus back to its start day. — **done**
+168. **PEC** `["Enter", " "]` is declared in six files under three names. — **done**
+169. **PERF** `Calendar` builds a new `Intl.DateTimeFormat` for every cell label, 42 per month page. — **done**
+170. **PEC** `DateRangePicker`'s Escape lands on the start field, not the end field that holds the trigger. — **done**
 
 ---
 
@@ -286,6 +319,7 @@ directly under its folder's value export as the Abstracts block already does.
 ### Spelling
 
 **7. British spellings.** The rule is in `conventions.md` "US English everywhere". Sites (file:line → fix):
+
 - `Abstracts/Carrier/Carrier.utils.ts:25` "Capitalises" → "Capitalizes"
 - `Abstracts/DateValue/DateValue.utils.ts:73` and `Essentials/Input/Clock/Clock.utils.ts:45` "localised" → "localized"
 - `Abstracts/Flattener/Flattener.utils.ts:79` "virtualisation" → "virtualization"
@@ -308,14 +342,13 @@ directly under its folder's value export as the Abstracts block already does.
 - `Abstracts/InteractionTracker/InteractionTracker.types.ts:3` "greyed" → "grayed"
 - `Abstracts/ElementObserver/ElementObserver.utils.ts:235,238,245,301,304,311` local identifier `isCancelled` → `isCanceled` (the same file's neighbors already write `canceled`)
 - Typo "centerd" → "centered" in `Abstracts/Anchor/Anchor.utils.test.ts:61`, `Exotics/Timeline/Timeline.utils.ts:101,137`, `Essentials/Toasts/Toasts.utils.test.ts:27`, `Samples/CellAnimation/Weights/CellAnimationWeights.const.test.ts:106`, `Samples/CellAnimation/Origins/CellAnimationOrigins.const.test.ts:21`
-_Fix:_ plain text edits at each site; rename the two identifiers with a find-and-replace in their files.
+  _Fix:_ plain text edits at each site; rename the two identifiers with a find-and-replace in their files.
 
 ### Primitives and Composites
 
 **8. `InteractionWrapper` min-width.** `Primitives/InteractionWrapper/InteractionWrapper.tsx:63`:
-`"min-width": props.minWidth ? \`${access(props.minWidth)}px\` : undefined` tests the MaybeAccessor itself; line
-64 does `access(props.minHeight) ? …`. An accessor is always truthy, so one returning `undefined` yields
-`min-width: undefinedpx`. _Fix:_ make line 63 mirror line 64: `access(props.minWidth) ? … : undefined`.
+`"min-width": props.minWidth ? \`${access(props.minWidth)}px\` : undefined`tests the MaybeAccessor itself; line
+64 does`access(props.minHeight) ? …`. An accessor is always truthy, so one returning `undefined`yields`min-width: undefinedpx`. _Fix:_ make line 63 mirror line 64: `access(props.minWidth) ? … : undefined`.
 
 **9. Stale warning text.** Same file, lines 53-57: the message names `getIsReachableWhenDisabled` and
 `getTooltipDefs`; the props are `isReachableWhenDisabled` and `tooltipDefs`. _Fix:_ reword the string.
@@ -364,8 +397,13 @@ once each, so every size or defs change builds the superellipse path twice. _Fix
 `cells.reduce((sums, cell) => [...sums, …], [0])` copies the array per item and runs on every root resize.
 _Fix:_ `const ratioSums = [0]; for (const cell of cells) ratioSums.push(ratioSums[ratioSums.length - 1] + cell.ratio);`
 
-**19. Empty style composition.** `Primitives/Carousel/Carousel.css.ts:34` `style([buttonElement, {}])`.
-_Fix:_ `style([buttonElement])`.
+**19. Empty style composition.** _Declined; the item has it backwards._ `style([buttonElement, {}])` is the form
+six of the seven `.css.ts` files that compose `buttonElement` use — `Breadcrumbs`, `TagInput`, `Paginator`,
+`Stepper`, `Tabs` and `Toolbar` — and `Carousel` is the seventh, already matching them. Dropping the `{}` from
+`Carousel` alone would create the inconsistency the item exists to remove. It also buys nothing: the built
+`index.css` holds no empty rules at all, so vanilla-extract has already dropped the empty object. Either all
+seven lose it or none do, which is taste with no measurable difference, so nothing moved. Item 94 quietly agrees —
+it counts the same six as the pattern `Menu` should join.
 
 **20. Duplicated literal.** `Primitives/PlacementBox/PlacementBox.context.ts:9` and `PlacementBox.tsx:15` both
 write `{ spacing: 0, radius: 0, slack: Infinity }`. _Fix:_ one exported constant (a `PlacementBox.const.ts`, or
@@ -513,6 +551,13 @@ has a module-level private reaching into `DismisserUtils.getIsWithinOwnedLayer` 
 function body, the direction conventions warns about). Across 64 utils files only 7 lines do this (also `TileBoard` ×3,
 `CellAnimationWeights` ×2). _Fix:_ drop the prefix in FocusManager; in Dismisser move the walk to a module-level
 private under a different name and publish it from the namespace.
+
+_Done, all four files._ FocusManager's call was inside the namespace, so the prefix simply went. The other three
+each had a **module-level private** reading a published member, which the prefix was load-bearing for — dropping
+it there does not compile. Each was fixed the way `conventions.md` prescribes instead: the value moves to module
+level under a name of its own and the namespace publishes it from there. `Dismisser` got
+`computeIsWithinOwnedLayer`, `TileBoard` got `computeIsShortRow` and `computeIsFlippedTile`, and
+`CellAnimationWeights` got `WEIGHT_ROUNDING_PLACES`. No published name changed.
 
 **44. Inline defaults.** `Abstracts/ColorExtractor/ColorExtractor.context.ts:19-20` `?? 1` and `?? 10`. _Fix:_
 `const DEFAULT_COLOR_COUNT = 1;` and `const DEFAULT_SAMPLE_PERCENTILE = 10;` at module scope.
@@ -685,9 +730,10 @@ from the prop.
 **74. `DEFAULT_ARIA_DESCRIBED_BY`.** `Essentials/Tooltip/Tooltip.tsx:18` names an attribute string `DEFAULT_…`,
 the prefix the house reserves for prop defaults. _Fix:_ rename to `ARIA_DESCRIBED_BY_ATTRIBUTE` or inline the literal.
 
-**75. `aria-orientation` on a list.** `Essentials/Stepper/Stepper.tsx:171` puts it on the `<ol>`; the `list` role
-does not support it, so AT ignores it and validators flag it. `decisions.md` records the placement, so amend that
-sentence. _Fix:_ remove the attribute. Medium.
+**75. `aria-orientation` on a list.** _Done._ The attribute is off the `<ol>`, the `decisions.md` sentence that
+recorded the placement now records the opposite, and `e2e/stepper.spec.ts` asks about the layout instead — a
+column strip stacks its steps and a row strip lays them side by side, compared against each other in layout
+space. The user confirmed the code is right and the spec was the thing to change.
 
 **76. Blank line.** `Sortable.tsx:49-50`: `BACKWARD_KEYS`'s `};` runs straight into `const PLACED_SIZING`. _Fix:_
 insert one blank line.
@@ -1022,12 +1068,9 @@ glyph. Medium.
 
 ### Cross-cutting sweep, new items
 
-**139. Undocumented `Samples` utils members.** (The Samples reviewer counted the same four files independently: 27, 6, 14 and 2 exports; `radar`'s `cdoMul`/`croMul`/`cuoMul`/`cloMul` parameters are the worst case. Expand the abbreviations in prose rather than renaming nine call sites.) `Samples/CellAnimation/Weights/CellAnimationWeights.utils.ts:87-317`
-(26), `Samples/CellAnimation/Keyframes/CellAnimationKeyframes.utils.ts:20-131` (5), `Samples/SVGDefs/SVGDefs.utils.ts:13-91`
-(12, one member documented and twelve around it bare), `Samples/SVGDefs/SVGDefsFrames.utils.ts:6` (1). Convention:
-sample implementation is documented like any utils; `PlacementLayouts.utils.ts` and `ProximityEffects.utils.ts`
-are fully documented. _Fix:_ a `/** */` per member in `utils/src` style, highest value first (`SVGDefs.utils.ts`,
-then the five public generators in the weights file).
+**139. Undocumented `Samples` utils members.** _Killed by the user._ Whether anything under `Samples` should
+carry documentation at all is a discussion they had already postponed, so the item was never open; the review
+picked it up from the convention without knowing that. Do not raise it again, and do not write the doc blocks.
 
 **140. `Typewriter` inline default.** `Typewriter.tsx:46,61` `access(props.initialAnimationDelayMs) ?? 0` written
 twice beside three `DEFAULT_TYPEWRITER_*` constants with memos; the only inline numeric prop defaults in the tree

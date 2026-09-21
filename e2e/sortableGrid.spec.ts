@@ -298,7 +298,10 @@ test("a press in the notch of an L belongs to the board rather than to the item"
 
     expect(await spotOf(page, "pack", "Pack", "Pickaxe"), "the pickaxe never moved").toBe("7,2");
 
-    await expect(page.locator(ANNOUNCER), "and nothing was ever picked up").toHaveCount(0);
+    await expect(
+        page.locator(`${ANNOUNCER} > *`),
+        "and nothing was ever picked up, so the reserved region is still empty",
+    ).toHaveCount(0);
 });
 
 /**

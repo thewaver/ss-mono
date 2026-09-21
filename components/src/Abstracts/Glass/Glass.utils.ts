@@ -15,6 +15,40 @@ const BLUR_REACH_RATIO = 3;
 /** Asks the shape builder for an outline only, with no stroked edges. */
 const NO_EDGE_THICKNESSES = [0];
 
+/** Builds the id of an instance's tint gradient. Published as {@link GlassUtils.getTintGradientId}. */
+const computeTintGradientId = (id: string) => `glass-tint-${id}`;
+
+/**
+ * Builds the tint's fill: a flat color, or a gradient built the same way the SVG defs factories
+ * build one anywhere else in the library.
+ *
+ * @param id The instance's id, which the gradient's own id is built from.
+ * @param getSize The element's current size, which a radial gradient's `elementSize` needs to hold
+ * its shape on a non-square element.
+ * @param tint The tint half of the glass description.
+ */
+const computeTintFill = (id: string, getSize: () => Size2d, tint: GlassTintDefs) => {
+    const gradient = tint.gradient;
+
+    if (!gradient) return { color: tint.color };
+
+    const gradientId = computeTintGradientId(id);
+
+    return {
+        gradientOrPattern: {
+            id: gradientId,
+            renderDefsElement: () =>
+                gradient.kind === "linear"
+                    ? SVGGradientDefsUtils.computeLinearGradient({ ...gradient, id: gradientId })
+                    : SVGGradientDefsUtils.computeRadialGradient({
+                          ...gradient,
+                          id: gradientId,
+                          elementSize: getSize,
+                      }),
+        },
+    };
+};
+
 /**
  * Builds the SVG filters behind the frosted-glass look: a blurred backdrop, a rippled edge and a
  * highlight that follows the pointer.
@@ -96,38 +130,7 @@ export namespace GlassUtils {
     export const getBackdropFilterId = (id: string) => `glass-backdrop-${id}`;
 
     /** The id of an instance's tint gradient, when the tint is a gradient rather than a flat color. */
-    export const getTintGradientId = (id: string) => `glass-tint-${id}`;
-
-    /**
-     * Builds the tint's fill: a flat color, or a gradient built the same way the SVG defs factories
-     * build one anywhere else in the library.
-     *
-     * @param id The instance's id, which the gradient's own id is built from.
-     * @param getSize The element's current size, which a radial gradient's `elementSize` needs to hold
-     * its shape on a non-square element.
-     * @param tint The tint half of the glass description.
-     */
-    const computeTintFill = (id: string, getSize: () => Size2d, tint: GlassTintDefs) => {
-        const gradient = tint.gradient;
-
-        if (!gradient) return { color: tint.color };
-
-        const gradientId = getTintGradientId(id);
-
-        return {
-            gradientOrPattern: {
-                id: gradientId,
-                renderDefsElement: () =>
-                    gradient.kind === "linear"
-                        ? SVGGradientDefsUtils.computeLinearGradient({ ...gradient, id: gradientId })
-                        : SVGGradientDefsUtils.computeRadialGradient({
-                              ...gradient,
-                              id: gradientId,
-                              elementSize: getSize,
-                          }),
-            },
-        };
-    };
+    export const getTintGradientId = computeTintGradientId;
 
     /**
      * Builds the pointer-tracking highlight.

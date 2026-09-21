@@ -4,7 +4,7 @@ import type { BracketConnectorDefs } from "../../../Exotics/Bracket/Bracket.type
 import type { BracketConnectorPathFn } from "./BracketConnectors.types";
 
 const HALF = 0.5;
-const NOTHING = 0;
+const MIN_BEND_DROP = 1;
 
 const getAlong = (point: Point2d, defs: BracketConnectorDefs) =>
     defs.orientation === "horizontal" ? point.x : point.y;
@@ -40,7 +40,7 @@ export namespace BracketConnectorPaths {
         const toAcross = getAcross(defs.to, defs);
         const drop = toAcross - fromAcross;
 
-        if (Math.abs(drop) < NOTHING + 1) return elbow(defs, radius);
+        if (Math.abs(drop) < MIN_BEND_DROP) return elbow(defs, radius);
 
         const bend = Math.min(radius, Math.abs(spine - fromAlong), Math.abs(toAlong - spine), Math.abs(drop) * HALF);
         const alongStep = Math.sign(spine - fromAlong) * bend;
@@ -67,5 +67,9 @@ export namespace BracketConnectorPaths {
         ].join(" ");
     };
 
-    export const ALL: Record<string, BracketConnectorPathFn> = { elbow, roundedElbow, curve };
+    export const SAMPLE_PATHS = { elbow, roundedElbow, curve } satisfies Record<string, BracketConnectorPathFn>;
+
+    export type SampleKey = keyof typeof SAMPLE_PATHS;
+
+    export const SAMPLE_KEYS = Object.keys(SAMPLE_PATHS) as SampleKey[];
 }

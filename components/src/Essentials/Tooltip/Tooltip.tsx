@@ -15,7 +15,7 @@ import * as styles from "./Tooltip.css";
 
 const DEFAULT_TOOLTIP_TRANSITION_DURATION_MS = 200;
 const DEFAULT_TOOLTIP_SHOW_ON_FOCUS_DELAY_MS = 500;
-const DEFAULT_ARIA_DESCRIBED_BY = "aria-describedby";
+const ARIA_DESCRIBED_BY_ATTRIBUTE = "aria-describedby";
 const NO_GAP = 0;
 
 const toGap = (value: number | undefined) => Math.max(value ?? NO_GAP, NO_GAP);
@@ -146,24 +146,24 @@ export const Tooltip = (props: TooltipProps) => {
 
         if (!anchorRef || !isVisible) return;
 
-        const describedBy = anchorRef.getAttribute(DEFAULT_ARIA_DESCRIBED_BY);
+        const describedBy = anchorRef.getAttribute(ARIA_DESCRIBED_BY_ATTRIBUTE);
         const ids = describedBy ? describedBy.split(/\s+/).filter(Boolean) : [];
 
         if (!ids.includes(tooltipId)) {
-            anchorRef.setAttribute(DEFAULT_ARIA_DESCRIBED_BY, [...ids, tooltipId].join(" "));
+            anchorRef.setAttribute(ARIA_DESCRIBED_BY_ATTRIBUTE, [...ids, tooltipId].join(" "));
         }
 
         onCleanup(() => {
-            const current = anchorRef.getAttribute(DEFAULT_ARIA_DESCRIBED_BY);
+            const current = anchorRef.getAttribute(ARIA_DESCRIBED_BY_ATTRIBUTE);
 
             if (!current) return;
 
             const remaining = current.split(/\s+/).filter((id) => id && id !== tooltipId);
 
             if (remaining.length) {
-                anchorRef.setAttribute(DEFAULT_ARIA_DESCRIBED_BY, remaining.join(" "));
+                anchorRef.setAttribute(ARIA_DESCRIBED_BY_ATTRIBUTE, remaining.join(" "));
             } else {
-                anchorRef.removeAttribute(DEFAULT_ARIA_DESCRIBED_BY);
+                anchorRef.removeAttribute(ARIA_DESCRIBED_BY_ATTRIBUTE);
             }
         });
     });

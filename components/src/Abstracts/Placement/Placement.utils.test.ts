@@ -250,6 +250,17 @@ describe("getGapPlacement", () => {
         expect(before.angle).toBeCloseTo(after.angle!);
     });
 
+    it("carries the ends of a run of exactly two straight on, there being no third item to curve through", () => {
+        const placements = [box(0.2, 0.5), box(0.8, 0.5)];
+        const before = PlacementUtils.getGapPlacement(placements, 0)!;
+        const after = PlacementUtils.getGapPlacement(placements, placements.length)!;
+
+        expect(before.left, "the gap before the first sits on its far side").toBeLessThan(placements[0].left);
+        expect(after.left, "and the one after the last on its far side").toBeGreaterThan(placements[1].left);
+        expect(before.angle, "both lie across the line the two describe").toBeCloseTo(0);
+        expect(after.angle).toBeCloseTo(0);
+    });
+
     it("has nothing to say about a list with no direction in it", () => {
         expect(
             PlacementUtils.getGapPlacement([box(0.5, 0.5)], 0),
@@ -385,7 +396,9 @@ describe("getRunOverreach", () => {
             ],
         };
 
-        expect(PlacementUtils.getRunOverreach(row, { x: 0.3, y: 9 }), "between the two, however far up or down").toBe(0);
+        expect(PlacementUtils.getRunOverreach(row, { x: 0.3, y: 9 }), "between the two, however far up or down").toBe(
+            0,
+        );
         expect(PlacementUtils.getRunOverreach(row, { x: 0.9, y: 0.5 })).toBeCloseTo(0.5);
     });
 
@@ -531,7 +544,7 @@ describe("getRunFacing", () => {
         expect(PlacementUtils.getRunFacing(arch), "straight up, which is where an arch opens to").toBeCloseTo(-90);
     });
 
-    it("is nothing in particular for a run that closes, its items cancelling out", () => {
+    it("is nothing in particular for a run that closes, its items canceling out", () => {
         const ring = {
             heightRatio: 1,
             origin: { x: 0.5, y: 0.5 },

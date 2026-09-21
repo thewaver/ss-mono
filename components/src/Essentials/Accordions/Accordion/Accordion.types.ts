@@ -49,7 +49,7 @@ export type AccordionSectionProps<T> = AccessorProps<{
 export type AccordionProps<T> = AccessorProps<{
     /** The space between sections. */
     gap?: number;
-    /** Whether panels animate their height open and closed or simply appear. */
+    /** Whether the accordion takes only the room its content needs, or fills the width it is given. */
     sizing?: AccordionSizing;
     /**
      * Which heading level the section headers sit at, so the page's outline stays correct wherever the accordion is

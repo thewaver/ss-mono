@@ -68,7 +68,7 @@ export const GlassSurface = (props: ParentProps<GlassSurfaceProps>) => {
                     const getRippleFilter = createMemo(() => GlassUtils.computeBackdropFilterElement(id, getDefs()));
                     const getMargin = createMemo(() => GlassUtils.computeBackdropMargin(getDefs()));
 
-                    const getBackdropStyle = () => ({
+                    const getBackdropStyle = createMemo(() => ({
                         "clip-path": `path("${GlassUtils.computeMarginedClipPath(
                             getSize(),
                             getMargin(),
@@ -79,7 +79,7 @@ export const GlassSurface = (props: ParentProps<GlassSurfaceProps>) => {
                             [styles.backdropMarginVar]: `${getMargin()}px`,
                             [styles.blurRadiusVar]: `${getDefs().backdrop.blurRadius}px`,
                         }),
-                    });
+                    }));
 
                     return (
                         <>

@@ -1,6 +1,6 @@
 import { For, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 
-import { ObjectUtils, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
+import { ObjectUtils, ShapeUtils, Size2d } from "@thewaver/ss-utils";
 
 import { access } from "../../Utils/propUtils";
 import type { ShapeProps, ShapeStrokeGeom } from "./Shape.types";
@@ -11,7 +11,7 @@ const DEFAULT_STROKE_GEOM: ShapeStrokeGeom = { thicknesses: [0] };
 
 export const Shape = (props: ShapeProps) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
-    const [getRootSize, setRootSize] = createSignal<Size2d>({ width: 0, height: 0 });
+    const [getRootSize, setRootSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });
 
     const getFillDefs = createMemo(() => {
         return props.computeFillDefs?.(getRootSize, getRootRef);

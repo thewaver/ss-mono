@@ -1,4 +1,4 @@
-import { Index, createEffect, createMemo, createSignal, createUniqueId } from "solid-js";
+import { Index, createEffect, createMemo, createSignal, createUniqueId, onMount } from "solid-js";
 
 import type {
     DateValue,
@@ -17,11 +17,9 @@ import * as styles from "./Calendar.css";
 const DEFAULT_CALENDAR_WEEK_STARTS_ON: DateValueWeekStart = 1;
 const DEFAULT_CALENDAR_WEEKDAY_WIDTH: DateValueWeekdayWidth = "short";
 const DEFAULT_CALENDAR_GAP = 0;
-const DAYS_PER_WEEK = 7;
 const GRID_WEEKS = 6;
 const MONTH_STEP = 1;
 const YEAR_STEP = 1;
-const SELECT_KEYS = ["Enter", " "];
 
 const DAY_LABEL_OPTIONS: Intl.DateTimeFormatOptions = { day: "numeric", month: "long", year: "numeric" };
 const MONTH_ANNOUNCE_OPTIONS: Intl.DateTimeFormatOptions = { month: "long", year: "numeric" };
@@ -53,6 +51,8 @@ const CalendarDay = (props: CalendarDayProps) => {
 };
 
 export const CalendarComposite = (props: CalendarCompositeProps) => {
+    onMount(() => LiveAnnouncerUtils.reserve("polite"));
+
     const monthSignal = accessSignal(() => props.monthSignal);
 
     const gridId = createUniqueId();
@@ -80,10 +80,20 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
         return eras[eras.length - 1].id;
     });
 
-    const getDayLabelOptions = (day: DateValue) =>
-        day.era === getCurrentEraId() ? DAY_LABEL_OPTIONS : PAST_ERA_DAY_LABEL_OPTIONS;
-
     const getGridStart = createMemo(() => getGrid().weeks[0][0]);
+
+    const getDayLabelFormatters = createMemo(() => {
+        const start = getGridStart();
+        const locale = access(props.locale);
+
+        return {
+            currentEra: DateValueUtils.createFormatter(start, DAY_LABEL_OPTIONS, locale),
+            pastEra: DateValueUtils.createFormatter(start, PAST_ERA_DAY_LABEL_OPTIONS, locale),
+        };
+    });
+
+    const computeDayLabel = (day: DateValue) =>
+        getDayLabelFormatters()[day.era === getCurrentEraId() ? "currentEra" : "pastEra"](day);
 
     const getWeekdayNames = createMemo(() =>
         DateValueUtils.getWeekdayNames(
@@ -178,13 +188,13 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
 
         if (!cell || !root?.contains(document.activeElement) || root === document.activeElement) return;
 
-        getDayRefs()[cell.y * DAYS_PER_WEEK + cell.x]?.focus();
+        getDayRefs()[cell.y * styles.DAYS_PER_WEEK + cell.x]?.focus();
     });
 
     const handleKeyDown = (e: KeyboardEvent) => {
         const roving = getRovingDay();
 
-        if (SELECT_KEYS.includes(e.key)) {
+        if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();
             pickDay(roving);
 
@@ -211,14 +221,14 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
         const next = NavigatorUtils.computeNextCell(
             e.key,
             cell,
-            { width: DAYS_PER_WEEK, height: GRID_WEEKS },
+            { width: styles.DAYS_PER_WEEK, height: GRID_WEEKS },
             { hasPageKeys: false },
         );
 
         if (!next) return;
 
         e.preventDefault();
-        moveTo(DateValueUtils.addDays(getGridStart(), next.y * DAYS_PER_WEEK + next.x));
+        moveTo(DateValueUtils.addDays(getGridStart(), next.y * styles.DAYS_PER_WEEK + next.x));
     };
 
     return (
@@ -261,19 +271,13 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
                                         isRangeStart: DateValueUtils.isSame(getDay(), getPaintedRange()?.start),
                                         isRangeEnd: DateValueUtils.isSame(getDay(), getPaintedRange()?.end),
                                     })}
-                                    ref={(element) => setDayRef(weekIndex * DAYS_PER_WEEK + dayIndex, element)}
+                                    ref={(element) => setDayRef(weekIndex * styles.DAYS_PER_WEEK + dayIndex, element)}
                                     renderControl={(setElementRef, getRenderProps) => (
                                         <CalendarDay
                                             ref={setElementRef}
                                             id={() => `${gridId}-day-${DateValueUtils.toIso(getDay())}`}
                                             flags={getRenderProps}
-                                            ariaLabel={() =>
-                                                DateValueUtils.format(
-                                                    getDay(),
-                                                    getDayLabelOptions(getDay()),
-                                                    access(props.locale),
-                                                )
-                                            }
+                                            ariaLabel={() => computeDayLabel(getDay())}
                                             renderContent={(getDayFlags) => props.renderDay(getDay, getDayFlags)}
                                             onSelect={() => pickDay(getDay())}
                                         />

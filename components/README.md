@@ -24,7 +24,7 @@ import { Button } from "@thewaver/ss-components";
 import "@thewaver/ss-components/styles.css";
 
 function Example() {
-    return <Button onClick={() => console.log("clicked")}>Click me</Button>;
+    return <Button onClick={() => console.log("clicked")} renderContent={() => "Click me"} />;
 }
 ```
 
@@ -33,7 +33,7 @@ handling) every component depends on.
 
 ## What's here
 
-- **Form controls** — `TextInput`, `TextArea`, `NumberInput`, `CurrencyInput`, `MaskedField`,
+- **Form controls** — `TextInput`, `TextArea`, `NumberInput`, `CurrencyInput`,
   `DateInput`, `DatePicker`, `DateRangePicker`, `TimeInput`, `TimePicker`, `Calendar`,
   `RangeCalendar`, `ColorInput`, `ColorArea`, `Select`, `MultiSelect`, `Checkbox`, `Radio`,
   `RadioGroup`, `Range`, `Toggle`, `FileInput`, `TagInput`, plus `Form`, `FormField` and

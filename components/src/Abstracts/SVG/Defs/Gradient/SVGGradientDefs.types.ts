@@ -1,4 +1,4 @@
-import { Point2d, Size2d } from "@thewaver/ss-utils";
+import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
 import type { AccessorProps } from "../../../../Utils/typeUtils";
 

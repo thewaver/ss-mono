@@ -6,6 +6,7 @@ import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SV
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { GradientCycleStepsOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
+import { TimedGradientKnobs } from "../TimedGradient.knobs";
 
 export const orbit_1 = (opts?: GradientCycleStepsOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
@@ -30,7 +31,7 @@ export const orbit_1 = (opts?: GradientCycleStepsOpts): TimedGradientConfig => (
                                 MathUtils.getIntermediateValues(
                                     0,
                                     360,
-                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                 ),
                                 defs,
                             )}

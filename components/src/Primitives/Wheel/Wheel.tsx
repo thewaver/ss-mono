@@ -115,7 +115,9 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
         const layout = getLayout();
         const point = getPointerPoint();
 
-        return layout === undefined || point === undefined ? NO_OVERREACH : PlacementUtils.getRunOverreach(layout, point);
+        return layout === undefined || point === undefined
+            ? NO_OVERREACH
+            : PlacementUtils.getRunOverreach(layout, point);
     });
 
     const getWedgeEffect = (index: number) => {

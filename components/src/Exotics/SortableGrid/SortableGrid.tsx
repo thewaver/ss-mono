@@ -45,9 +45,6 @@ const STEP_KEYS: Record<string, Point2d | undefined> = {
     ArrowUp: { x: 0, y: -1 },
 };
 
-const INTERACTIVE_SELECTOR =
-    "a[href], button, input, select, textarea, [role='button'], [role='checkbox'], [role='link'], [role='switch']";
-
 let grabbed: { zone: CarrierZone; spot: SortableGridSpot } | undefined;
 
 const SortableGridItemSlot = (props: SortableGridItemSlotProps) => {
@@ -96,7 +93,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     const viewportContext = useViewportContext();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
-    const [getItemRefs, setItemRefs] = createSignal<Array<HTMLElement | undefined>>([]);
+    const itemRefs = new Map<number, HTMLElement>();
     const [getFocusedIndex, setFocusedIndex] = createSignal(0);
     const [getCarriedPoint, setCarriedPoint] = createSignal<Point2d | undefined>();
 
@@ -147,13 +144,11 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         };
     };
 
-    const setItemRef = (index: number, element: HTMLElement | undefined) => {
-        setItemRefs((refs) => {
-            const next = [...refs];
+    const setItemRef = (index: number, element: HTMLElement) => {
+        itemRefs.set(index, element);
 
-            next[index] = element;
-
-            return next;
+        onCleanup(() => {
+            if (itemRefs.get(index) === element) itemRefs.delete(index);
         });
     };
 
@@ -403,7 +398,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
 
     const focusIndex = (index: number) => {
         setFocusedIndex(index);
-        getItemRefs()[index]?.focus();
+        itemRefs.get(index)?.focus();
     };
 
     let hasPendingClick = false;
@@ -415,7 +410,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
 
         if (!item || item.isDisabled) return;
 
-        const rect = getItemRefs()[index]?.getBoundingClientRect();
+        const rect = itemRefs.get(index)?.getBoundingClientRect();
         const shape = SortableGridUtils.getItemShape(item);
 
         if (rect) {
@@ -444,10 +439,10 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
 
     const handlePointerDown = (index: number) => (e: PointerEvent) => {
         if (e.button !== 0 || getIsDisabled()) return;
-        if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
+        if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
         if (CarrierUtils.getCarry()) return;
 
-        const element = getItemRefs()[index];
+        const element = itemRefs.get(index);
 
         if (!element) return;
 
@@ -463,7 +458,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
 
     const handleClick = (index: number) => (e: MouseEvent) => {
         if (getIsDisabled()) return;
-        if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
+        if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
 
         const carry = CarrierUtils.getCarry();
 
@@ -658,7 +653,6 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                     ref={(element) => {
                         setRootRef(element);
                         setElementRef(element);
-                        props.ref?.(element);
                     }}
                     class={styles.sortableGridRoot}
                     style={{

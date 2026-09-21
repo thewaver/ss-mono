@@ -45,8 +45,8 @@ export type ModalProps = AccessorProps<{
     renderContent: (getVisibilityTarget: () => 0 | 1, getTransitionDurationMs: () => number) => JSX.Element;
 }> & {
     /**
-     * The element to focus when the dialog opens. Without one the dialog focuses itself, which is what keeps the reader
-     * from being dropped behind it.
+     * The element to focus when the dialog opens. Without one the first focusable thing inside it is focused, and
+     * failing that the dialog itself, which is what keeps the reader from being dropped behind it.
      */
     initialFocusRef?: MaybeAccessor<HTMLElement | undefined>;
 };

@@ -13,17 +13,6 @@ import type {
 type BandBase = Required<Omit<BandDefs, "computeItemArcs">>;
 
 export namespace PlacementLayoutKnobs {
-    export const BAND_DEFAULTS: BandBase = {
-        spreadDegrees: 360,
-        facingDegrees: -90,
-        holeRatio: 0.5,
-        wedgeGapDegrees: 3,
-        tiltRatio: 0,
-        itemRadiusRatio: 0.5,
-        itemHeightRatio: 1,
-        itemMaxWidthRatio: 1,
-    };
-
     export const ARC_DEFAULTS: Required<ArcDefs> = {
         curveHeightRatio: 1,
         spreadDegrees: 180,
@@ -33,9 +22,8 @@ export namespace PlacementLayoutKnobs {
         itemHeightRatio: 1,
     };
 
-    export const ROW_DEFAULTS: Required<RowDefs> = {
-        gapRatio: 0,
-        itemHeightRatio: 1,
+    export const CLIFF_DEFAULTS: Required<CliffDefs> = {
+        cliffStepRatio: 1.5,
     };
 
     export const COLUMN_DEFAULTS: Required<ColumnDefs> = {
@@ -49,13 +37,25 @@ export namespace PlacementLayoutKnobs {
         gapRatio: 0,
     };
 
+    export const BAND_DEFAULTS: BandBase = {
+        spreadDegrees: 360,
+        facingDegrees: -90,
+        holeRatio: 0.5,
+        wedgeGapDegrees: 3,
+        tiltRatio: 0,
+        itemRadiusRatio: 0.5,
+        itemHeightRatio: 1,
+        itemMaxWidthRatio: 1,
+    };
+
+    export const ROW_DEFAULTS: Required<RowDefs> = {
+        gapRatio: 0,
+        itemHeightRatio: 1,
+    };
+
     export const WHORL_DEFAULTS: Required<WhorlDefs> = {
         itemStepRatio: 0.75,
         whorlStepRatio: 0.75,
-    };
-
-    export const CLIFF_DEFAULTS: Required<CliffDefs> = {
-        cliffStepRatio: 1.5,
     };
 
     export const ZIGZAG_DEFAULTS: Required<ZigzagDefs> = {
@@ -64,80 +64,13 @@ export namespace PlacementLayoutKnobs {
 
     export const DEFAULTS_BY_FAMILY = {
         arc: ARC_DEFAULTS,
-        column: COLUMN_DEFAULTS,
-        row: ROW_DEFAULTS,
-        honeycomb: HONEYCOMB_DEFAULTS,
         cliff: CLIFF_DEFAULTS,
+        column: COLUMN_DEFAULTS,
+        honeycomb: HONEYCOMB_DEFAULTS,
         ring: BAND_DEFAULTS,
+        row: ROW_DEFAULTS,
         whorl: WHORL_DEFAULTS,
         zigzag: ZIGZAG_DEFAULTS,
-    };
-
-    export const BAND_KNOBS: SampleKnobs<BandDefs> = {
-        spreadDegrees: {
-            kind: "number",
-            label: "Spread (°)",
-            hint: "How much of the circle the items are spread over. Anything short of a full turn opens the ring into an arc.",
-            min: 30,
-            max: 360,
-            step: 10,
-        },
-        facingDegrees: {
-            kind: "number",
-            label: "Facing (°)",
-            hint: "Which way the middle of the band points. -90 is straight up, 0 is to the right.",
-            min: -180,
-            max: 180,
-            step: 15,
-        },
-        holeRatio: {
-            kind: "number",
-            label: "Hole ratio",
-            hint: "How much of the circle is left empty in the middle, as a share of the radius. The items sit in the band that is left.",
-            min: 0,
-            max: 0.9,
-            step: 0.05,
-        },
-        wedgeGapDegrees: {
-            kind: "number",
-            label: "Wedge gap (°)",
-            hint: "How much is trimmed off each side of an item's wedge, so neighbouring wedges do not touch.",
-            min: 0,
-            max: 20,
-            step: 1,
-        },
-        tiltRatio: {
-            kind: "number",
-            label: "Tilt ratio",
-            hint: "How far an item leans with its position round the ring. 0 leaves every item upright, 1 turns each one to face outwards.",
-            min: 0,
-            max: 1,
-            step: 0.05,
-        },
-        itemRadiusRatio: {
-            kind: "number",
-            label: "Item radius ratio",
-            hint: "Where an item sits across the band: 0 hugs the hole's edge, 1 hugs the outside.",
-            min: 0,
-            max: 1,
-            step: 0.05,
-        },
-        itemHeightRatio: {
-            kind: "number",
-            label: "Item height ratio",
-            hint: "How tall an item is against its own width. 1 keeps it square.",
-            min: 0.25,
-            max: 2,
-            step: 0.05,
-        },
-        itemMaxWidthRatio: {
-            kind: "number",
-            label: "Item max width ratio",
-            hint: "The widest an item is allowed to get, as a share of the band's thickness. It stops items running into each other when there are only a few.",
-            min: 0.25,
-            max: 2,
-            step: 0.05,
-        },
     };
 
     export const ARC_KNOBS: SampleKnobs<ArcDefs> = {
@@ -191,21 +124,13 @@ export namespace PlacementLayoutKnobs {
         },
     };
 
-    export const ROW_KNOBS: SampleKnobs<RowDefs> = {
-        gapRatio: {
+    export const CLIFF_KNOBS: SampleKnobs<CliffDefs> = {
+        cliffStepRatio: {
             kind: "number",
-            label: "Gap ratio",
-            hint: "The space between items, as a share of one item's width. 0 leaves them touching.",
-            min: 0,
-            max: 2,
-            step: 0.05,
-        },
-        itemHeightRatio: {
-            kind: "number",
-            label: "Item height ratio",
-            hint: "How tall an item is against its own width. 1 keeps it square.",
-            min: 0.25,
-            max: 4,
+            label: "Cliff step ratio",
+            hint: "How far each group of three drops below the group before it.",
+            min: 0.5,
+            max: 3,
             step: 0.05,
         },
     };
@@ -256,6 +181,92 @@ export namespace PlacementLayoutKnobs {
         },
     };
 
+    export const BAND_KNOBS: SampleKnobs<BandDefs> = {
+        spreadDegrees: {
+            kind: "number",
+            label: "Spread (°)",
+            hint: "How much of the circle the items are spread over. Anything short of a full turn opens the ring into an arc.",
+            min: 30,
+            max: 360,
+            step: 10,
+        },
+        facingDegrees: {
+            kind: "number",
+            label: "Facing (°)",
+            hint: "Which way the middle of the band points. -90 is straight up, 0 is to the right.",
+            min: -180,
+            max: 180,
+            step: 15,
+        },
+        holeRatio: {
+            kind: "number",
+            label: "Hole ratio",
+            hint: "How much of the circle is left empty in the middle, as a share of the radius. The items sit in the band that is left.",
+            min: 0,
+            max: 0.9,
+            step: 0.05,
+        },
+        wedgeGapDegrees: {
+            kind: "number",
+            label: "Wedge gap (°)",
+            hint: "How much is trimmed off each side of an item's wedge, so neighboring wedges do not touch.",
+            min: 0,
+            max: 20,
+            step: 1,
+        },
+        tiltRatio: {
+            kind: "number",
+            label: "Tilt ratio",
+            hint: "How far an item leans with its position round the ring. 0 leaves every item upright, 1 turns each one to face outwards.",
+            min: 0,
+            max: 1,
+            step: 0.05,
+        },
+        itemRadiusRatio: {
+            kind: "number",
+            label: "Item radius ratio",
+            hint: "Where an item sits across the band: 0 hugs the hole's edge, 1 hugs the outside.",
+            min: 0,
+            max: 1,
+            step: 0.05,
+        },
+        itemHeightRatio: {
+            kind: "number",
+            label: "Item height ratio",
+            hint: "How tall an item is against its own width. 1 keeps it square.",
+            min: 0.25,
+            max: 2,
+            step: 0.05,
+        },
+        itemMaxWidthRatio: {
+            kind: "number",
+            label: "Item max width ratio",
+            hint: "The widest an item is allowed to get, as a share of the band's thickness. It stops items running into each other when there are only a few.",
+            min: 0.25,
+            max: 2,
+            step: 0.05,
+        },
+    };
+
+    export const ROW_KNOBS: SampleKnobs<RowDefs> = {
+        gapRatio: {
+            kind: "number",
+            label: "Gap ratio",
+            hint: "The space between items, as a share of one item's width. 0 leaves them touching.",
+            min: 0,
+            max: 2,
+            step: 0.05,
+        },
+        itemHeightRatio: {
+            kind: "number",
+            label: "Item height ratio",
+            hint: "How tall an item is against its own width. 1 keeps it square.",
+            min: 0.25,
+            max: 4,
+            step: 0.05,
+        },
+    };
+
     export const WHORL_KNOBS: SampleKnobs<WhorlDefs> = {
         itemStepRatio: {
             kind: "number",
@@ -283,17 +294,6 @@ export namespace PlacementLayoutKnobs {
             min: 2,
             max: 8,
             step: 1,
-        },
-    };
-
-    export const CLIFF_KNOBS: SampleKnobs<CliffDefs> = {
-        cliffStepRatio: {
-            kind: "number",
-            label: "Cliff step ratio",
-            hint: "How far each group of three drops below the group before it.",
-            min: 0.5,
-            max: 3,
-            step: 0.05,
         },
     };
 

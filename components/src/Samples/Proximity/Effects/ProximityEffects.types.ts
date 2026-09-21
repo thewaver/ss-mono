@@ -17,8 +17,6 @@ export type FadeDefs = {
 };
 
 export type ProximityEffectEntry =
-    | { family: "zoomIn"; defs?: ZoomInDefs }
-    | { family: "glow"; defs?: GlowDefs }
-    | { family: "fade"; defs?: FadeDefs };
+    { family: "zoomIn"; defs?: ZoomInDefs } | { family: "glow"; defs?: GlowDefs } | { family: "fade"; defs?: FadeDefs };
 
 export type ProximityEffectFamily = ProximityEffectEntry["family"];

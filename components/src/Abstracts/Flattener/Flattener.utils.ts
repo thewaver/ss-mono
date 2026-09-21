@@ -1,6 +1,8 @@
 import type { FlatRow, FlattenerDefs } from "./Flattener.types";
 
+/** Stands in for a collapsed node's rows. One shared array, so a re-flatten does not allocate per leaf. */
 const EMPTY_ROWS: never[] = [];
+/** Stands in for a node whose children accessor answered nothing, so the walk has something to iterate. */
 const EMPTY_NODES: never[] = [];
 
 /** Flattens a tree of nodes into the rows a list or a table draws, one row per visible node. */
@@ -76,7 +78,7 @@ export namespace FlattenerUtils {
     /**
      * Unnests the rows into a single run, in the order they are drawn.
      *
-     * Nesting is what a renderer wants; a flat run is what keyboard navigation, virtualisation and
+     * Nesting is what a renderer wants; a flat run is what keyboard navigation, virtualization and
      * `indexOf` want. This is the second view of the same rows, not a copy of the nodes.
      *
      * @param rows Rows from {@link FlattenerUtils.getRows}.

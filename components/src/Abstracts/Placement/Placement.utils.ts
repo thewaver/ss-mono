@@ -87,6 +87,18 @@ const toCircumcenter = (first: Point2d, second: Point2d, third: Point2d): Point2
  * arc as an arc and a straight line as a straight line, which is what a phantom neighbor past the
  * end of a ring or a row needs to be.
  */
+/**
+ * Extends a run of two points by one more, in a straight line.
+ *
+ * Reflecting the near point through the far one steps the same distance again along the line the two
+ * describe, which is the only continuation two points have to offer. It is what {@link toContinuedCenter}
+ * falls back to on a run of exactly two, where there is no third point to fit a circle to.
+ */
+const toMirroredCenter = (near: Point2d, from: Point2d): Point2d => ({
+    x: from.x + (from.x - near.x),
+    y: from.y + (from.y - near.y),
+});
+
 const toContinuedCenter = (beyond: Point2d, near: Point2d, from: Point2d): Point2d => {
     const alongTheLine = { x: from.x + (from.x - near.x), y: from.y + (from.y - near.y) };
     const center = toCircumcenter(beyond, near, from);
@@ -595,7 +607,12 @@ export namespace PlacementUtils {
         const last = placements.length - SINGLE_STEP;
         const at = (position: number) => placements[position];
         const phantomOf = (from: number, near: number, beyond: number): PlacementRect => {
-            const center = toContinuedCenter(getCenter(at(beyond)), getCenter(at(near)), getCenter(at(from)));
+            const fromCenter = getCenter(at(from));
+            const nearCenter = getCenter(at(near));
+            const beyondPlacement = at(beyond);
+            const center = beyondPlacement
+                ? toContinuedCenter(getCenter(beyondPlacement), nearCenter, fromCenter)
+                : toMirroredCenter(nearCenter, fromCenter);
 
             return { ...at(from), left: center.x, top: center.y };
         };

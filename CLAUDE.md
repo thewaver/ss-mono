@@ -236,6 +236,21 @@ conclusion was wrong. So a report about appearance is answered by measuring the 
 paint, and by ruling out the consumer's own styling before the library's geometry; "the box is correct" is not
 an answer to "it looks crooked".
 
+**An itemized source of work is updated as items land, not at the end.** The user's rule, stated while
+preparing a handoff to another machine: `review.md`, `backlog.md` and anything else that numbers work is
+read by the next session to tell done from pending, so an item whose status is stale either gets redone or
+gets skipped. So mark each item as it closes — done, partly done with what is left, or closed with the
+reason — and record alongside it anything a fresh session would otherwise misread, such as which specs were
+already red before the work started. This holds whether or not a second machine is running; it is about the
+next session, not about parallelism.
+
+**Do not run Prettier as a verification step.** The user's call. Formatting is going to be a pre-commit
+check, so a `prettier --check` after every edit spends a process to answer a question that is about to be
+answered automatically, and `--write` between edits churns lines nobody asked to move. Write code in the
+house format and leave it; if formatting is genuinely the task, run it once at the end. This says nothing
+about `tsc --noEmit` and the test runs, which answer whether the code works and are still worth running as
+the work goes.
+
 **Never kill the user's processes.** No `pkill`, no killing a dev server, no stopping anything you did not
 start. They keep `npm start` running while working, and losing it interrupts them. `npm run verify:dom`
 serves a production preview on its own port and `reuseExistingServer` handles a stale one, so it never

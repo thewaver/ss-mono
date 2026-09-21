@@ -17,6 +17,8 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
             <DatePicker
                 {...props}
                 valueSignal={dateSignal}
+                id={access(props.id) && `${access(props.id)}-date`}
+                name={access(props.name) && `${access(props.name)}-date`}
                 visibilitySignal={props.dateVisibilitySignal}
                 ariaLabel={() => access(props.dateLabel) ?? DEFAULT_DATE_TIME_PICKER_DATE_LABEL}
             />
@@ -26,6 +28,8 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
             <TimePicker
                 {...props}
                 valueSignal={timeSignal}
+                id={access(props.id) && `${access(props.id)}-time`}
+                name={access(props.name) && `${access(props.name)}-time`}
                 visibilitySignal={props.timeVisibilitySignal}
                 ariaLabel={() => access(props.timeLabel) ?? DEFAULT_DATE_TIME_PICKER_TIME_LABEL}
                 renderLeading={undefined}

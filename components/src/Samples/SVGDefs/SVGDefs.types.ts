@@ -6,6 +6,8 @@ import type { SVGDefs } from "../../Abstracts/SVG/Defs/SVGDefs.types";
 
 export type SVGDefsColors = { [K in "primary" | "secondary" | "tertiary" | "background"]: string };
 
+export type CycleColorKey = "primary" | "secondary" | "tertiary";
+
 export type SVGDefsBaseElementDefs = {
     getSize: () => Size2d;
     colors: SVGDefsColors;

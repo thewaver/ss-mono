@@ -1,5 +1,6 @@
 import { createContext, useContext } from "solid-js";
 
+import { ProximityUtils } from "../../Abstracts/Proximity/Proximity.utils";
 import type { PlacementBoxContextType } from "./PlacementBox.context.types";
 
 const PlacementBoxContext = createContext<PlacementBoxContextType>();
@@ -8,7 +9,7 @@ export const PlacementBoxContextProvider = PlacementBoxContext.Provider;
 
 const UNTRACKED_BOX_CONTEXT: PlacementBoxContextType = {
     getPointerPoint: () => undefined,
-    getArrangement: () => ({ spacing: 0, radius: 0, slack: Infinity }),
+    getArrangement: () => ProximityUtils.RESTING_ARRANGEMENT,
     getOverreach: () => 0,
     getPrefersReducedMotion: () => false,
     getComputeEffect: () => undefined,

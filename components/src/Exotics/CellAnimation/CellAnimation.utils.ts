@@ -4,7 +4,7 @@ import { type CSSAnimationValues, CSSUtils, MathUtils, type Point2d } from "@the
  * Applies an animation's numbers to a cell, and answers which cells alternate with which.
  *
  * The numbers come from evaluating the animation per cell and per frame; what is here is turning
- * them into CSS and the parity tests that let a wave, a ripple or a chequerboard alternate direction
+ * them into CSS and the parity tests that let a wave, a ripple or a checkerboard alternate direction
  * across the grid.
  */
 export namespace CellAnimationUtils {
@@ -52,7 +52,7 @@ export namespace CellAnimationUtils {
         !((!isEvenColumn(dist) && dist.y <= dist.x) || (!isEvenRow(dist) && dist.x <= dist.y));
 
     /**
-     * Whether a cell sits on a light or a dark square of a chequerboard.
+     * Whether a cell sits on a light or a dark square of a checkerboard.
      *
      * @param dist The cell's distance from the animation's origin, in cells.
      */

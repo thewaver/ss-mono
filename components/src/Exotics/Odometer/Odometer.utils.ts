@@ -12,7 +12,7 @@ const SINGLE = 1;
 const NO_DIGIT = -1;
 
 /** The digits in the order they appear around a wheel. */
-export const ODOMETER_DIGITS = Array.from({ length: DIGIT_COUNT }, (_unused, index) => String(index));
+const DIGIT_FACES = Array.from({ length: DIGIT_COUNT }, (_unused, index) => String(index));
 
 /**
  * Works out how an odometer's digit wheels should turn to reach a new number.
@@ -23,6 +23,9 @@ export const ODOMETER_DIGITS = Array.from({ length: DIGIT_COUNT }, (_unused, ind
  * start one after another rather than all at once.
  */
 export namespace OdometerUtils {
+    /** The digits in the order they appear around a wheel, which is what a slot's barrel is handed as its faces. */
+    export const DIGITS = DIGIT_FACES;
+
     /**
      * Splits text into the wheels that turn and the characters that do not.
      *

@@ -22,7 +22,7 @@ export namespace VirtualizerUtils {
      *
      * @param getRef The element to search up from.
      * @param getIsEnabled Pass `false` to stop looking.
-     * @returns The scroller, or `undefined` when there is none — which is the signal that virtualising
+     * @returns The scroller, or `undefined` when there is none — which is the signal that virtualizing
      * cannot work here and every row should be drawn.
      */
     export const createScrollParent = (getRef: Accessor<HTMLElement | undefined>, getIsEnabled: Accessor<boolean>) => {
@@ -59,19 +59,19 @@ export namespace VirtualizerUtils {
      * measurement also allows for a scroller drawn under a CSS transform, where the rectangle on screen
      * and the element's own height disagree.
      *
-     * Everything falls back safely: with no scrolling ancestor or with virtualising switched off,
+     * Everything falls back safely: with no scrolling ancestor or with virtualizing switched off,
      * `getIsLive` reports `false` and the caller should draw the whole list.
      *
      * @param getRef The list's own element.
      * @param getCount How many rows there are.
-     * @param opts.getIsEnabled Whether to virtualise at all.
+     * @param opts.getIsEnabled Whether to virtualize at all.
      * @param opts.computeEstimatedSize A row's likely height, used before it has been measured. Being
      * wrong only costs a scrollbar that settles as rows are measured.
      * @param opts.getPinnedRows Rows to keep drawn wherever the scroll is — a selected row that must
      * stay measurable, a row being dragged.
      * @param opts.getOverscan How many extra rows to draw beyond the visible ones, to cover a fast
      * scroll.
-     * @returns `getIsLive` for whether virtualising is in effect, `getRows` and `getTotalSize` for what
+     * @returns `getIsLive` for whether virtualizing is in effect, `getRows` and `getTotalSize` for what
      * to draw and how tall to make the spacer, `getRowStart` for a row's position, `measureRow` to
      * attach to each row's element so its real height is learned, and `scrollToRow`.
      */
@@ -128,7 +128,9 @@ export namespace VirtualizerUtils {
 
                 return instance.options.horizontal ? box.inlineSize : box.blockSize;
             },
-            overscan: opts.getOverscan?.(),
+            get overscan() {
+                return opts.getOverscan?.();
+            },
         });
 
         const getRows = createMemo(() => (opts.getIsEnabled() ? virtualizer.getVirtualItems() : []));

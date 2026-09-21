@@ -31,6 +31,11 @@ export const TrackedGradientsPage = () => {
 
         return key === NO_SAMPLE_KEY ? {} : (TrackedGradientKnobs.KNOBS_BY_FAMILY[key] as Record<string, SampleKnob>);
     };
+    const getDefaults = () => {
+        const key = getConfigKey();
+
+        return key === NO_SAMPLE_KEY ? {} : (TrackedGradientKnobs.DEFAULTS_BY_FAMILY[key] as Record<string, unknown>);
+    };
     const getConfigDefs = () => configDefs[getConfigKey()] ?? {};
     const paintKindSignal = createSignal<SVGGradientsPaintKind>("fill");
     const blurWidthSignal = createSignal(STARTING_BLUR_WIDTH);
@@ -82,7 +87,7 @@ export const TrackedGradientsPage = () => {
 
                     <PageKnobs
                         knobs={getKnobs}
-                        defaults={() => TrackedGradientKnobs.DEFAULTS_BY_FAMILY[getConfigKey()] ?? {}}
+                        defaults={() => getDefaults()}
                         values={getConfigDefs}
                         onInput={(key, value) =>
                             setConfigDefs(getConfigKey(), (previous) => ({ ...previous, [key]: value }))

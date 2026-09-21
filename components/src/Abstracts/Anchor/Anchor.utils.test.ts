@@ -58,7 +58,7 @@ describe("placement offsets", () => {
         expect(AnchorUtils.getVPlacementOffset("bottom-in", 8)).toBe(-8);
     });
 
-    it("leaves a centerd placement alone", () => {
+    it("leaves a centered placement alone", () => {
         expect(AnchorUtils.getHPlacementOffset("center", 8)).toBe(0);
         expect(AnchorUtils.getVPlacementOffset("center", 8)).toBe(0);
     });

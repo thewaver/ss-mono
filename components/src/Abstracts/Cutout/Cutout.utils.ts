@@ -2,8 +2,11 @@ import type { JSX } from "solid-js";
 
 import type { CutoutHole } from "./Cutout.types";
 
+/** An opaque layer covering the whole element. It is what the holes are then subtracted from. */
 const FULL_COVERAGE_LAYER = "linear-gradient(black, black)";
+/** How the holes meet the base layer: everything they cover is taken out of it. */
 const KEEP_OUTSIDE_HOLES = "subtract";
+/** How one hole meets the next: they merge, so overlapping holes cut one opening rather than canceling out. */
 const JOIN_WITH_OTHER_HOLES = "add";
 
 /** Builds the CSS mask that punches transparent holes through an otherwise solid element. */

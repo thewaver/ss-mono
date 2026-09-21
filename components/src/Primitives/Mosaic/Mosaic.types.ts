@@ -7,19 +7,27 @@ import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 export type MosaicSizeAnchor = "width" | "height";
 
 export type MosaicPlacement = Rect & {
+    /** Which item this box belongs to, counting from zero in the order the items were given. */
     index: number;
 };
 
 export type MosaicPackDefs = {
+    /** Each item's measured size, in the order the items were given. An unmeasured item is zero by zero. */
     sizes: Size2d[];
+    /** How much room there is across the anchored axis, which is the one the packing has to fit. */
     anchoredExtent: number;
+    /** The space to leave between boxes. */
     gap: number;
 };
 
 export type MosaicItemState = {
+    /** Which item this is, counting from zero in the order the items were given. */
     index: number;
+    /** Where this item falls when the mosaic is read left to right and top to bottom, which is not the order it was given in. */
     readingIndex: number;
+    /** How many items there are. */
     itemCount: number;
+    /** The box this item was packed into. */
     rect: Rect;
 };
 
@@ -33,7 +41,7 @@ export type MosaicState = {
 export type MosaicProps = AccessorProps<
     MosaicState & {
         /**
-         * Whether the tiles have sizes of their own that the packing has to honour, rather than being given whatever
+         * Whether the tiles have sizes of their own that the packing has to honor, rather than being given whatever
          * shape is left.
          */
         isItemSized: boolean;

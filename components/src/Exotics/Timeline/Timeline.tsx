@@ -12,6 +12,7 @@ import {
 } from "solid-js";
 
 import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
+import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
@@ -43,8 +44,6 @@ const PINCH_POINTERS = 2;
 const DRAG_SLOP = 4;
 const ZOOM_RATE = 0.0015;
 
-const ACTIVATION_KEYS = ["Enter", " "];
-
 const STEP_BY_KEY: Record<string, TimelineStep> = {
     ArrowRight: "next",
     ArrowLeft: "previous",
@@ -64,8 +63,6 @@ const TimelineItem = (props: TimelineItemProps) => {
             class={styles.timelineControl}
             role="button"
             aria-label={props.ariaLabel}
-            aria-posinset={props.posInSet}
-            aria-setsize={props.setSize}
             aria-disabled={getIsDisabled() || undefined}
             onFocus={() => props.onFocused()}
             onClick={() => {
@@ -83,7 +80,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const timelineId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
-    const [getItemRefs, setItemRefs] = createSignal<Record<number, HTMLElement | undefined>>({});
+    const itemRefs = new Map<number, HTMLElement>();
     const [getFocusedIndex, setFocusedIndex] = createSignal<number>();
 
     const pointerXs = new Map<number, number>();
@@ -181,10 +178,10 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const getTicks = createMemo(() => TimelineUtils.computeTicks(getView(), getSteps()));
 
     const setItemRef = (index: number, element: HTMLElement) => {
-        setItemRefs((previous) => ({ ...previous, [index]: element }));
+        itemRefs.set(index, element);
 
         onCleanup(() => {
-            setItemRefs((previous) => ({ ...previous, [index]: undefined }));
+            if (itemRefs.get(index) === element) itemRefs.delete(index);
         });
     };
 
@@ -220,7 +217,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
     createEffect(() => {
         const index = getRovingIndex();
-        const element = index === undefined ? undefined : getItemRefs()[index];
+        const element = index === undefined ? undefined : itemRefs.get(index);
 
         if (!isFocusFollowing || element === undefined) return;
 
@@ -337,7 +334,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
         if (from === undefined || getIsDisabled()) return;
 
-        if (ACTIVATION_KEYS.includes(e.key)) {
+        if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();
             activateItem(from);
 
@@ -368,6 +365,8 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                     top: `${getAxisSize() + getPlacement().lane * (getLaneSize() + getLaneGap())}px`,
                     height: `${getLaneSize()}px`,
                 }}
+                aria-posinset={getPlacement().order + FIRST_ARIA_POSITION}
+                aria-setsize={getItems().length}
             >
                 <InteractionWrapper
                     sizing={"fill"}
@@ -385,8 +384,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                             id={`${timelineId}-item-${index}`}
                             ref={setElementRef}
                             ariaLabel={props.computeItemAriaLabel?.(getItems()[index], index)}
-                            posInSet={getPlacement().order + FIRST_ARIA_POSITION}
-                            setSize={getItems().length}
+
                             flags={getFlags()}
                             renderContent={(getItemFlags) => props.renderItem(() => getItems()[index], getItemFlags)}
                             onActivate={() => activateItem(index)}
@@ -414,7 +412,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
             onPointerCancel={endGesture}
             onWheel={handleWheel}
         >
-            <div class={styles.timelineTicks} aria-hidden={"true"}>
+            <div class={styles.timelineTicks} aria-hidden="true">
                 <Index each={getTicks()}>
                     {(getTick) => (
                         <div class={styles.timelineTick} style={{ left: `${getTick().ratio * PERCENT}%` }}>
@@ -424,7 +422,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                 </Index>
             </div>
 
-            <ul class={styles.timelineList} aria-label={access(props.ariaLabel)}>
+            <ul class={styles.timelineList} role="list" aria-label={access(props.ariaLabel)}>
                 <For each={getRenderedIndices()}>{(index) => renderItem(index)}</For>
             </ul>
         </div>

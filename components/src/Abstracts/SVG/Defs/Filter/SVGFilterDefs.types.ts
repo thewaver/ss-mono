@@ -2,11 +2,9 @@ import type { Point2d } from "@thewaver/ss-utils";
 
 import type { AccessorProps } from "../../../../Utils/typeUtils";
 
-type SVGBaseFilterDefs = {};
-
 export type SVGFilterMethod = "chain" | "isolate";
 
-export type SVGDropShadowFilterDefs = SVGBaseFilterDefs & {
+export type SVGDropShadowFilterDefs = {
     dx: number;
     dy: number;
     stdDeviation: number;
@@ -14,13 +12,13 @@ export type SVGDropShadowFilterDefs = SVGBaseFilterDefs & {
     floodOpacity: number;
 };
 
-export type SVGGaussianBlurFilterDefs = SVGBaseFilterDefs & {
+export type SVGGaussianBlurFilterDefs = {
     stdDeviation: number;
 };
 
 export type SVGDisplacementChannel = "R" | "G" | "B" | "A";
 
-export type SVGTurbulenceFilterDefs = SVGBaseFilterDefs & {
+export type SVGTurbulenceFilterDefs = {
     baseFrequency: number | Point2d;
     scale: number;
     type?: "fractalNoise" | "turbulence";
@@ -32,27 +30,27 @@ export type SVGTurbulenceFilterDefs = SVGBaseFilterDefs & {
     edgeFade?: number;
 };
 
-export type SVGSaturationFilterDefs = SVGBaseFilterDefs & {
+export type SVGSaturationFilterDefs = {
     amount: number;
 };
 
-export type SVGHueRotationFilterDefs = SVGBaseFilterDefs & {
+export type SVGHueRotationFilterDefs = {
     deg: number;
 };
 
-export type SVGBrightnessFilterDefs = SVGBaseFilterDefs & {
+export type SVGBrightnessFilterDefs = {
     amount: number;
 };
 
-export type SVGContrastFilterDefs = SVGBaseFilterDefs & {
+export type SVGContrastFilterDefs = {
     amount: number;
 };
 
-export type SVGInversionFilterDefs = SVGBaseFilterDefs & {
+export type SVGInversionFilterDefs = {
     amount: number;
 };
 
-export type SVGColorFilterDefs = SVGBaseFilterDefs & {
+export type SVGColorFilterDefs = {
     r: number;
     g: number;
     b: number;
@@ -79,13 +77,13 @@ export type SVGLightSurfaceDefs = AccessorProps<{
     stitchTiles?: "stitch" | "noStitch";
 }>;
 
-type SVGBaseLightingFilterDefs = SVGBaseFilterDefs & {
+type SVGBaseLightingFilterDefs = {
     light: SVGLightSourceDefs;
     surface: SVGLightSurfaceDefs;
 } & AccessorProps<{
-        surfaceScale: number;
-        lightingColor?: string;
-    }>;
+    surfaceScale: number;
+    lightingColor?: string;
+}>;
 
 export type SVGSpecularLightingFilterDefs = SVGBaseLightingFilterDefs &
     AccessorProps<{

@@ -9,7 +9,7 @@ import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 export type ColorAreaAxis = "saturation" | "brightness";
 
 export type ColorAreaRenderProps = {
-    /** The colour the square is currently on, as hue, saturation, value and alpha. */
+    /** The color the square is currently on, as hue, saturation, value and alpha. */
     hsv: Color.HSVA;
     /** Whether the handle is being dragged right now. */
     isDragging: boolean;
@@ -18,7 +18,7 @@ export type ColorAreaRenderProps = {
 };
 
 export type ColorAreaCbs = {
-    /** Runs as the colour changes. */
+    /** Runs as the color changes. */
     onInput?: (hsv: Color.HSVA) => void | Promise<void>;
     /** Runs when the pointer arrives over the square. */
     onMouseEnter?: (e: MouseEvent) => void | Promise<void>;
@@ -42,12 +42,19 @@ export type ColorAreaElementProps = AccessorProps<
         InteractionControlProps<ColorAreaRenderProps> &
         Required<Omit<ColorAreaState, "name" | "ariaLabel">> &
         Pick<ColorAreaState, "name" | "ariaLabel"> & {
-            /** The colour the square is currently on. */
+            /** The color the square is currently on. */
             hsv: Color.HSVA;
             /** Whether the square can be reached by tabbing. */
             isTabbable?: boolean;
-            /** Moves the handle along one axis, as a share of the square. */
+            /** Moves the handle along one axis, as a share of the square. For the keyboard, which moves one axis at a time. */
             setAxis: (axis: ColorAreaAxis, ratio: number) => void;
+            /**
+             * Moves the handle along both axes at once, as shares of the square.
+             *
+             * A drag changes both, and writing them one at a time would report an intermediate color that the
+             * pointer was never over. This writes the color once.
+             */
+            setAxes: (saturation: number, brightness: number) => void;
             /** Says which axis should show a focus ring, or clears it. */
             setFocusVisibleAxis: (axis?: ColorAreaAxis) => void;
             /** Says whether the handle is being dragged. */
@@ -60,7 +67,7 @@ export type ColorAreaProps = Omit<InteractionWrapperProps<ColorAreaRenderProps>,
         ColorAreaCbs &
             Pick<InteractionControlProps<ColorAreaRenderProps>, "id" | "renderContent"> &
             ColorAreaState & {
-                /** The colour. It is the only thing that changes it. */
+                /** The color. It is the only thing that changes it. */
                 hsvSignal: SignalSource<Color.HSVA>;
             }
     >;

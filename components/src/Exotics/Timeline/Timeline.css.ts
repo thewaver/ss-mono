@@ -35,8 +35,13 @@ export const timelineItem = style({
 export const timelineControl = style({
     width: "100%",
     height: "100%",
-    outline: "0 none",
     pointerEvents: "all",
+
+    selectors: {
+        "&:focus:not(:focus-visible)": {
+            outline: "0 none",
+        },
+    },
 });
 
 globalStyle(`${timelineItem} > *`, {

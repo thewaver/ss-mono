@@ -111,6 +111,7 @@ const RangeElement = (props: RangeElementProps) => {
                         step={access(props.step)}
                         aria-label={access(props.thumbLabels)?.[index] ?? getAriaLabel()}
                         aria-describedby={getAriaDescribedBy()}
+                        aria-orientation={access(props.orientation) === "vertical" ? "vertical" : undefined}
                         aria-disabled={getIsDisabled() || undefined}
                         aria-invalid={access(props.flags).hasError || undefined}
                         onPointerDown={(e) => raiseNearestThumb(e, e.currentTarget)}

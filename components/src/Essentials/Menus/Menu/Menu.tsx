@@ -53,19 +53,36 @@ const PLACED_ORIENTATION: NavigatorOrientation = "both";
 const PRIMARY_BUTTON = 0;
 const NO_WIDTH = 0;
 const FLICK_TRAVEL_RATIO = 0.1;
+const CONTEXT_MENU_KEY = "ContextMenu";
+const CONTEXT_MENU_FALLBACK_KEY = "F10";
+const ORIGIN_COORDINATE = 0;
+const NO_READERS = 0;
+const ONE_READER = 1;
+
+let pointerPoint: Point2d | undefined;
+let pointerReaderCount = NO_READERS;
+
+const handlePointerPointMove = (e: PointerEvent) => {
+    pointerPoint = { x: e.clientX, y: e.clientY };
+};
 
 const createPointerPointReader = () => {
-    let point: Point2d | undefined;
+    pointerReaderCount += ONE_READER;
 
-    const handleMove = (e: PointerEvent) => {
-        point = { x: e.clientX, y: e.clientY };
-    };
+    if (pointerReaderCount === ONE_READER) {
+        document.addEventListener("pointermove", handlePointerPointMove, { passive: true });
+    }
 
-    document.addEventListener("pointermove", handleMove, { passive: true });
+    onCleanup(() => {
+        pointerReaderCount -= ONE_READER;
 
-    onCleanup(() => document.removeEventListener("pointermove", handleMove));
+        if (pointerReaderCount === NO_READERS) {
+            document.removeEventListener("pointermove", handlePointerPointMove);
+            pointerPoint = undefined;
+        }
+    });
 
-    return () => point;
+    return () => pointerPoint;
 };
 
 const MenuTrigger = (props: MenuTriggerProps) => {
@@ -363,14 +380,14 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         const handleUp = (e: PointerEvent) => {
             const index = flickTo(toPoint(e));
 
-            props.onFlickEnd?.();
+            props.onFlickEnd?.((e.target as Node | null) ?? undefined);
 
             if (index !== undefined) activateIndex(index);
         };
 
         const handleCancel = () => {
             setHighlightedValue(() => undefined);
-            props.onFlickEnd?.();
+            props.onFlickEnd?.(undefined);
         };
 
         document.addEventListener("pointermove", handleMove, { passive: true });
@@ -667,15 +684,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
         const checkedSignal = props.checkedSignal;
 
         if (kind !== "command" && checkedSignal) {
-            const checked = checkedSignal[0]();
-
-            checkedSignal[1](
-                kind === "checkbox"
-                    ? checked.includes(item.value)
-                        ? checked.filter((value) => value !== item.value)
-                        : [...checked, item.value]
-                    : [...checked.filter((value) => !radioGroupValues.includes(value)), item.value],
-            );
+            checkedSignal[1](MenuUtils.computeNextChecked(checkedSignal[0](), item, radioGroupValues));
         }
 
         props.onActivate(item.value);
@@ -772,7 +781,11 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         renderItem={props.renderItem}
                         renderPopup={props.renderPopup}
                         onPick={pick}
-                        onFlickEnd={() => setFlickOrigin(() => undefined)}
+                        onFlickEnd={(releasedOn) => {
+                            setFlickOrigin(() => undefined);
+
+                            if (!releasedOn || !getTriggerRef()?.contains(releasedOn)) isTogglePrevented = false;
+                        }}
                         onClose={close}
                         onDismiss={close}
                     />
@@ -803,15 +816,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
         const checkedSignal = props.checkedSignal;
 
         if (kind !== "command" && checkedSignal) {
-            const checked = checkedSignal[0]();
-
-            checkedSignal[1](
-                kind === "checkbox"
-                    ? checked.includes(item.value)
-                        ? checked.filter((value) => value !== item.value)
-                        : [...checked, item.value]
-                    : [...checked.filter((value) => !radioGroupValues.includes(value)), item.value],
-            );
+            checkedSignal[1](MenuUtils.computeNextChecked(checkedSignal[0](), item, radioGroupValues));
         }
 
         props.onActivate(item.value);
@@ -830,20 +835,44 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
 
         if (!region) return;
 
+        const openAtElement = (element: Element) => {
+            const rect = ViewportUtils.getAdjustedBoundingClientRect(element, viewportContext);
+
+            setAnchorRect({ x: rect.x, y: rect.y, width: rect.width, height: rect.height });
+            setIsOpen(true);
+        };
+
         const handleContextMenu = (e: MouseEvent) => {
             if (getIsDisabled()) return;
 
+            e.preventDefault();
+
+            if (e.clientX === ORIGIN_COORDINATE && e.clientY === ORIGIN_COORDINATE) {
+                openAtElement(region.contains(document.activeElement) ? document.activeElement! : region);
+
+                return;
+            }
+
             const point = ViewportUtils.getAdjustedClientPoint({ x: e.clientX, y: e.clientY }, viewportContext);
 
-            e.preventDefault();
             setAnchorRect({ x: point.x, y: point.y, width: 0, height: 0 });
             setIsOpen(true);
         };
 
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (getIsDisabled()) return;
+            if (e.key !== CONTEXT_MENU_KEY && !(e.key === CONTEXT_MENU_FALLBACK_KEY && e.shiftKey)) return;
+
+            e.preventDefault();
+            openAtElement(region.contains(document.activeElement) ? document.activeElement! : region);
+        };
+
         region.addEventListener("contextmenu", handleContextMenu);
+        region.addEventListener("keydown", handleKeyDown);
 
         onCleanup(() => {
             region.removeEventListener("contextmenu", handleContextMenu);
+            region.removeEventListener("keydown", handleKeyDown);
         });
     });
 

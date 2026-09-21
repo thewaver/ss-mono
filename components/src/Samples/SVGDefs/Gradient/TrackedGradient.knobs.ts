@@ -1,4 +1,21 @@
-import type { SampleCheckKnob, SampleNumberKnob } from "../../Samples.types";
+import type { SampleCheckKnob, SampleKnobs, SampleNumberKnob } from "../../Samples.types";
+import type { TrackedGradientEntry, TrackedGradientFamily } from "../SVGDefs.types";
+
+/**
+ * The options a Tracked gradient family takes, read off the registry's own entry for it.
+ *
+ * The entry union is what already pairs a family with its `Gradient*Opts`, so deriving from it means a
+ * renamed option breaks the knob map rather than silently describing a knob nothing reads. A family that
+ * takes no options answers an empty type.
+ */
+type TrackedGradientDefsOf<F extends TrackedGradientFamily> =
+    Extract<TrackedGradientEntry, { family: F }> extends { defs?: infer TDefs } ? NonNullable<TDefs> : object;
+
+/** A knob set per family, each checked against that family's own options. */
+type TrackedGradientKnobsByFamily = { [F in TrackedGradientFamily]: SampleKnobs<TrackedGradientDefsOf<F>> };
+
+/** The starting values per family, each checked against that family's own options. */
+type TrackedGradientDefaultsByFamily = { [F in TrackedGradientFamily]: Partial<TrackedGradientDefsOf<F>> };
 
 const CIRCULAR_KNOB: SampleCheckKnob = {
     kind: "check",
@@ -174,7 +191,7 @@ const SOURCE_ALPHA_KNOB: SampleNumberKnob = {
 const RIPPLE_COUNT_KNOB: SampleNumberKnob = {
     kind: "number",
     label: "Ripple count",
-    hint: "How many rings can be travelling outwards at the same time.",
+    hint: "How many rings can be traveling outwards at the same time.",
     min: 1,
     max: 16,
     step: 1,
@@ -254,7 +271,7 @@ const SWEEP_ARC_KNOB: SampleNumberKnob = {
 const SMEAR_MAX_KNOB: SampleNumberKnob = {
     kind: "number",
     label: "Smear max",
-    hint: "How far a trail mark stretches along the way it is travelling when the pointer is at full speed.",
+    hint: "How far a trail mark stretches along the way it is traveling when the pointer is at full speed.",
     min: 1,
     max: 8,
     step: 0.5,
@@ -276,8 +293,10 @@ const SMEAR_FULL_STEP_KNOB: SampleNumberKnob = {
     step: 0.005,
 };
 
+const RIPPLE_SOURCE_SCALE = 0.25;
+
 export namespace TrackedGradientKnobs {
-    export const KNOBS_BY_FAMILY = {
+    export const KNOBS_BY_FAMILY: TrackedGradientKnobsByFamily = {
         band_1: {
             coreStop: CORE_STOP_KNOB,
             coreAlpha: CORE_ALPHA_KNOB,
@@ -486,8 +505,6 @@ export namespace TrackedGradientKnobs {
         },
     };
 
-    const RIPPLE_SOURCE_SCALE = 0.25;
-
     export const BAND_DEFAULTS = {
         coreStop: 50,
         coreAlpha: 0.75,
@@ -546,7 +563,7 @@ export namespace TrackedGradientKnobs {
     };
     export const SPOT_SMEAR_CYCLING_DEFAULTS = { ...SPOT_SMEAR_DEFAULTS, ageColorSpan: 0.5, cycleMs: 1000 };
 
-    export const DEFAULTS_BY_FAMILY: Record<string, Record<string, number>> = {
+    export const DEFAULTS_BY_FAMILY: TrackedGradientDefaultsByFamily = {
         band_1: BAND_DEFAULTS,
         band_1v1: BAND_BLEND_DEFAULTS,
         band_diag_1: BAND_DIAGONAL_DEFAULTS,

@@ -51,6 +51,11 @@ test("the last crumb is the current page, and is not a control", async ({ page }
         await tagName(page.locator(`${DEFAULT} button`).first()),
         "while the crumbs before it are still pressable",
     ).toBe("BUTTON");
+
+    await expect(
+        entries,
+        "and being no control, it is out of the tab order rather than a stop that does nothing",
+    ).not.toHaveAttribute("tabindex", "0");
 });
 
 test("pressing a crumb reports its value, and the current one has nothing to report", async ({ page }) => {

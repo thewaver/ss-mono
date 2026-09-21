@@ -2,17 +2,15 @@ import { Color, MathUtils, type Point2d, RandomUtils, type Size2d } from "@thewa
 
 import type { PointerReading } from "../../Abstracts/PointerTracker/PointerTracker.types";
 import { SVGFilterDefsFactory } from "../../Abstracts/SVG/Defs/Filter/SVGFilterDefs.factory";
-import type { SVGDefsColors } from "./SVGDefs.types";
+import type { CycleColorKey, SVGDefsColors } from "./SVGDefs.types";
 
 const TRANSPARENT_ALPHA = 0;
 const POINTER_FADE_START_RATIO = 1;
 const POINTER_FADE_END_RATIO = 2;
-const CYCLE_COLOR_KEYS = ["primary", "secondary", "tertiary"] as const;
+const CYCLE_COLOR_KEYS: CycleColorKey[] = ["primary", "secondary", "tertiary"];
 
 export namespace SVGDefsUtils {
     export const DEBUG_SEAMS = false;
-
-    export const DEFAULT_GRADIENT_STEPS = 12;
 
     /**
      * The color stops of a gradient that repeats a run of colors a given number of times.
@@ -28,8 +26,6 @@ export namespace SVGDefsUtils {
      */
     export const getCycleStopKeys = (keys: CycleColorKey[], repeats: number) =>
         Array.from({ length: keys.length * repeats + 1 }, (_unused, index) => keys[index % keys.length]);
-
-    export type CycleColorKey = (typeof CYCLE_COLOR_KEYS)[number];
 
     export const getCycleWalk = (colors: SVGDefsColors, key: CycleColorKey) => {
         const start = CYCLE_COLOR_KEYS.indexOf(key);

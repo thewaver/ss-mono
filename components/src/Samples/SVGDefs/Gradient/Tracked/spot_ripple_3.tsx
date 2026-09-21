@@ -2,6 +2,7 @@ import { createEffect, createSignal } from "solid-js";
 
 import { Color, EasingUtils, MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
+import type { PointerReading } from "../../../../Abstracts/PointerTracker/PointerTracker.types";
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import type { GradientRippleSampleOpts, SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
@@ -46,11 +47,11 @@ const clock = SVGDefsFrameUtils.createClock(RIPPLE_LIFETIME_MS);
 
 const createRipple = (
     index: number,
-    getRef: () => HTMLElement | undefined,
+    getReading: () => PointerReading,
+    getIsPointerPresent: () => boolean,
     isCycling: boolean,
     opts?: GradientRippleSampleOpts,
 ) => {
-    const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef);
     const [getRipple, setRipple] = createSignal<Ripple>();
 
     let bornMilestone = FIRST_MILESTONE;
@@ -133,57 +134,65 @@ const createRipple = (
 };
 
 export const spot_ripple_3 = (opts?: GradientRippleSampleOpts): TrackedGradientConfig => ({
-    computeSVGDefs: (id, __, getRef, defs) => [
-        {
-            color: SVGDefsUtils.getBaseBorderColor(defs),
-        },
-        {
-            gradientOrPattern: {
-                id: `gradient1-${id}`,
-                renderDefsElement: () => {
-                    const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
+    computeSVGDefs: (id, __, getRef, defs) => {
+        const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
-                    return SVGGradientDefsUtils.computeRadialGradient({
-                        id: `gradient1-${id}`,
-                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
-                        origin: () => getReading().boxRatio,
-                        scale: opts?.sourceScale ?? DEFAULTS.sourceScale,
-                        colors: () => {
-                            const color = opts?.cycles
-                                ? getCycleColor(defs.colors, clock.getFrameMs(), opts)
-                                : defs.colors.primary;
-
-                            return [
-                                { value: `rgb(from ${color} r g b / 1)` },
-                                {
-                                    value: `rgb(from ${color} r g b / ${opts?.sourceAlpha ?? DEFAULTS.sourceAlpha})`,
-                                    stop: opts?.sourceStop ?? DEFAULTS.sourceStop,
-                                },
-                                { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
-                            ];
-                        },
-                    });
-                },
+        return [
+            {
+                color: SVGDefsUtils.getBaseBorderColor(defs),
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-        },
-        ...Array.from({ length: opts?.rippleCount ?? DEFAULTS.rippleCount }, (_unused, index) => ({
-            gradientOrPattern: {
-                id: `gradient${index + 2}-${id}`,
-                renderDefsElement: () => {
-                    const ripple = createRipple(index, getRef ?? NO_REF, Boolean(opts?.cycles), opts);
+            {
+                gradientOrPattern: {
+                    id: `gradient1-${id}`,
+                    renderDefsElement: () => {
+                        return SVGGradientDefsUtils.computeRadialGradient({
+                            id: `gradient1-${id}`,
+                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            origin: () => getReading().boxRatio,
+                            scale: opts?.sourceScale ?? DEFAULTS.sourceScale,
+                            colors: () => {
+                                const color = opts?.cycles
+                                    ? getCycleColor(defs.colors, clock.getFrameMs(), opts)
+                                    : defs.colors.primary;
 
-                    return SVGGradientDefsUtils.computeRadialGradient({
-                        id: `gradient${index + 2}-${id}`,
-                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
-                        origin: ripple.getOrigin,
-                        scale: ripple.getScale,
-                        colors: () => ripple.getColors(defs.colors, index),
-                    });
+                                return [
+                                    { value: `rgb(from ${color} r g b / 1)` },
+                                    {
+                                        value: `rgb(from ${color} r g b / ${opts?.sourceAlpha ?? DEFAULTS.sourceAlpha})`,
+                                        stop: opts?.sourceStop ?? DEFAULTS.sourceStop,
+                                    },
+                                    { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
+                                ];
+                            },
+                        });
+                    },
                 },
+                filter: SVGDefsUtils.getBaseBlur(id, defs),
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-            blend: true,
-        })),
-    ],
+            ...Array.from({ length: opts?.rippleCount ?? DEFAULTS.rippleCount }, (_unused, index) => ({
+                gradientOrPattern: {
+                    id: `gradient${index + 2}-${id}`,
+                    renderDefsElement: () => {
+                        const ripple = createRipple(
+                            index,
+                            getReading,
+                            getIsPointerPresent,
+                            Boolean(opts?.cycles),
+                            opts,
+                        );
+
+                        return SVGGradientDefsUtils.computeRadialGradient({
+                            id: `gradient${index + 2}-${id}`,
+                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            origin: ripple.getOrigin,
+                            scale: ripple.getScale,
+                            colors: () => ripple.getColors(defs.colors, index),
+                        });
+                    },
+                },
+                filter: SVGDefsUtils.getBaseBlur(id, defs),
+                blend: true,
+            })),
+        ];
+    },
 });

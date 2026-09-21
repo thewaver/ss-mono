@@ -2,6 +2,7 @@ import { createEffect, createSignal } from "solid-js";
 
 import { MathUtils, SVGUtils, type Size2d } from "@thewaver/ss-utils";
 
+import type { PointerReading } from "../../../../Abstracts/PointerTracker/PointerTracker.types";
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import type { GradientHandTrailOpts, TrackedGradientConfig } from "../../SVGDefs.types";
@@ -51,8 +52,12 @@ const computeSweepColors = (color: string, alpha: number) => [
 
 const clock = SVGDefsFrameUtils.createClock(TRAIL_LIFETIME_MS);
 
-const createHandStamp = (index: number, getRef: () => HTMLElement | undefined, opts?: GradientHandTrailOpts) => {
-    const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef);
+const createHandStamp = (
+    index: number,
+    getReading: () => PointerReading,
+    getIsPointerPresent: () => boolean,
+    opts?: GradientHandTrailOpts,
+) => {
     const [getStamp, setStamp] = createSignal<HandStamp>();
 
     let bornTick: number | undefined;
@@ -104,79 +109,38 @@ const createHandStamp = (index: number, getRef: () => HTMLElement | undefined, o
 };
 
 export const hand_trail_1 = (opts?: GradientHandTrailOpts): TrackedGradientConfig => ({
-    computeSVGDefs: (id, __, getRef, defs) => [
-        {
-            color: SVGDefsUtils.getBaseBorderColor(defs),
-        },
-        {
-            gradientOrPattern: {
-                id: `gradient1-${id}`,
-                renderDefsElement: () => {
-                    const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef ?? NO_REF);
+    computeSVGDefs: (id, __, getRef, defs) => {
+        const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
-                    return SVGGradientDefsUtils.computeLinearGradient({
-                        id: `gradient1-${id}`,
-                        angle: () => getReading().angle + QUARTER_TURN,
-                        scale: SWEEP_SPAN,
-                        colors: () =>
-                            computeSweepColors(
-                                defs.colors.primary,
-                                FULL_ALPHA * SVGDefsUtils.getPointerFade(getReading(), getIsPointerPresent()),
-                            ),
-                    });
-                },
+        return [
+            {
+                color: SVGDefsUtils.getBaseBorderColor(defs),
             },
-            clipPath: {
-                id: `clip1-${id}`,
-                renderDefsElement: () => {
-                    const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
-
-                    return (
-                        <clipPath id={`clip1-${id}`} clipPathUnits="objectBoundingBox">
-                            <path
-                                d={SVGUtils.getArcPath(
-                                    opts?.sweepArc ?? DEFAULTS.sweepArc,
-                                    getSweepRotation(getReading().angle, opts?.sweepArc ?? DEFAULTS.sweepArc),
-                                )}
-                            />
-                        </clipPath>
-                    );
-                },
-            },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-        },
-        ...Array.from({ length: STAMP_COUNT }, (_unused, index) => {
-            const stampId = `${index + 2}-${id}`;
-
-            let shared: ReturnType<typeof createHandStamp> | undefined;
-
-            const useStamp = () => (shared ??= createHandStamp(index, getRef ?? NO_REF, opts));
-
-            return {
+            {
                 gradientOrPattern: {
-                    id: `gradient${stampId}`,
+                    id: `gradient1-${id}`,
                     renderDefsElement: () => {
-                        const stamp = useStamp();
-
                         return SVGGradientDefsUtils.computeLinearGradient({
-                            id: `gradient${stampId}`,
-                            angle: () => stamp.getAngle() + QUARTER_TURN,
+                            id: `gradient1-${id}`,
+                            angle: () => getReading().angle + QUARTER_TURN,
                             scale: SWEEP_SPAN,
-                            colors: () => stamp.getColors(defs.colors.primary),
+                            colors: () =>
+                                computeSweepColors(
+                                    defs.colors.primary,
+                                    FULL_ALPHA * SVGDefsUtils.getPointerFade(getReading(), getIsPointerPresent()),
+                                ),
                         });
                     },
                 },
                 clipPath: {
-                    id: `clip${stampId}`,
+                    id: `clip1-${id}`,
                     renderDefsElement: () => {
-                        const stamp = useStamp();
-
                         return (
-                            <clipPath id={`clip${stampId}`} clipPathUnits="objectBoundingBox">
+                            <clipPath id={`clip1-${id}`} clipPathUnits="objectBoundingBox">
                                 <path
                                     d={SVGUtils.getArcPath(
                                         opts?.sweepArc ?? DEFAULTS.sweepArc,
-                                        getSweepRotation(stamp.getAngle(), opts?.sweepArc ?? DEFAULTS.sweepArc),
+                                        getSweepRotation(getReading().angle, opts?.sweepArc ?? DEFAULTS.sweepArc),
                                     )}
                                 />
                             </clipPath>
@@ -184,7 +148,48 @@ export const hand_trail_1 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
                     },
                 },
                 filter: SVGDefsUtils.getBaseBlur(id, defs),
-            };
-        }),
-    ],
+            },
+            ...Array.from({ length: STAMP_COUNT }, (_unused, index) => {
+                const stampId = `${index + 2}-${id}`;
+
+                let shared: ReturnType<typeof createHandStamp> | undefined;
+
+                const useStamp = () => (shared ??= createHandStamp(index, getReading, getIsPointerPresent, opts));
+
+                return {
+                    gradientOrPattern: {
+                        id: `gradient${stampId}`,
+                        renderDefsElement: () => {
+                            const stamp = useStamp();
+
+                            return SVGGradientDefsUtils.computeLinearGradient({
+                                id: `gradient${stampId}`,
+                                angle: () => stamp.getAngle() + QUARTER_TURN,
+                                scale: SWEEP_SPAN,
+                                colors: () => stamp.getColors(defs.colors.primary),
+                            });
+                        },
+                    },
+                    clipPath: {
+                        id: `clip${stampId}`,
+                        renderDefsElement: () => {
+                            const stamp = useStamp();
+
+                            return (
+                                <clipPath id={`clip${stampId}`} clipPathUnits="objectBoundingBox">
+                                    <path
+                                        d={SVGUtils.getArcPath(
+                                            opts?.sweepArc ?? DEFAULTS.sweepArc,
+                                            getSweepRotation(stamp.getAngle(), opts?.sweepArc ?? DEFAULTS.sweepArc),
+                                        )}
+                                    />
+                                </clipPath>
+                            );
+                        },
+                    },
+                    filter: SVGDefsUtils.getBaseBlur(id, defs),
+                };
+            }),
+        ];
+    },
 });

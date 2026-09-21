@@ -10,9 +10,6 @@ import type { ColorAreaAxis, ColorAreaElementProps, ColorAreaProps, ColorAreaRen
 
 import * as styles from "./ColorArea.css";
 
-const readFocusVisibleAxis = (element: HTMLElement, axis: ColorAreaAxis) =>
-    InteractionTrackerUtils.computeIsFocusVisible(element) ? axis : undefined;
-
 const DEFAULT_COLOR_AREA_STEP = 0.01;
 const DEFAULT_COLOR_AREA_AXIS_LABELS: Record<ColorAreaAxis, string> = {
     saturation: "Saturation",
@@ -23,6 +20,9 @@ const AXES: ColorAreaAxis[] = ["saturation", "brightness"];
 const RATIO_MIN = 0;
 const RATIO_MAX = 1;
 const PERCENT = 100;
+
+const readFocusVisibleAxis = (element: HTMLElement, axis: ColorAreaAxis) =>
+    InteractionTrackerUtils.computeIsFocusVisible(element) ? axis : undefined;
 
 const getAxisRatio = (hsv: Color.HSVA, axis: ColorAreaAxis) => (axis === "saturation" ? hsv.s : hsv.v);
 
@@ -38,8 +38,7 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
 
     const { getIsDragging } = InteractionTrackerUtils.trackDrag(getSurfaceRef, getIsDisabled, {
         onDrag: (ratio) => {
-            props.setAxis("saturation", ratio.x);
-            props.setAxis("brightness", RATIO_MAX - ratio.y);
+            props.setAxes(ratio.x, RATIO_MAX - ratio.y);
             getAxisRefs().saturation?.focus();
         },
     });
@@ -133,14 +132,21 @@ export const ColorArea = (props: ColorAreaProps) => {
     const [getFocusVisibleAxis, setFocusVisibleAxis] = createSignal<ColorAreaAxis>();
     const [getIsDragging, setIsDragging] = createSignal(false);
 
-    const setAxis = (axis: ColorAreaAxis, ratio: number) => {
-        const clamped = MathUtils.clamp01(ratio);
-        const hsv = hsvSignal[0]();
-        const next = axis === "saturation" ? { ...hsv, s: clamped } : { ...hsv, v: clamped };
-
+    const writeHsv = (next: Color.HSVA) => {
         hsvSignal[1](() => next);
 
         void props.onInput?.(next);
+    };
+
+    const setAxis = (axis: ColorAreaAxis, ratio: number) => {
+        const clamped = MathUtils.clamp01(ratio);
+        const hsv = hsvSignal[0]();
+
+        writeHsv(axis === "saturation" ? { ...hsv, s: clamped } : { ...hsv, v: clamped });
+    };
+
+    const setAxes = (saturation: number, brightness: number) => {
+        writeHsv({ ...hsvSignal[0](), s: MathUtils.clamp01(saturation), v: MathUtils.clamp01(brightness) });
     };
 
     return (
@@ -163,6 +169,7 @@ export const ColorArea = (props: ColorAreaProps) => {
                     hsv={() => hsvSignal[0]()}
                     isTabbable={props.isTabbable}
                     renderContent={props.renderContent}
+                    setAxes={setAxes}
                     setAxis={setAxis}
                     setFocusVisibleAxis={setFocusVisibleAxis}
                     setIsDragging={setIsDragging}

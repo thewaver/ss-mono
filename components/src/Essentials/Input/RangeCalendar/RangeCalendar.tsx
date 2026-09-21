@@ -10,11 +10,32 @@ export const RangeCalendar = (props: RangeCalendarProps) => {
     const valueSignal = accessSignal(() => props.valueSignal);
 
     const [getPendingStart, setPendingStart] = createSignal<DateValue | undefined>();
+    const [getLastPicked, setLastPicked] = createSignal<DateValue | undefined>();
 
     const getRange = () => valueSignal[0]();
 
+    const getAnchorDay = () => {
+        const pending = getPendingStart();
+
+        if (pending) return pending;
+
+        const range = getRange();
+        const lastPicked = getLastPicked();
+
+        if (
+            lastPicked &&
+            (DateValueUtils.isSame(lastPicked, range?.start) || DateValueUtils.isSame(lastPicked, range?.end))
+        ) {
+            return lastPicked;
+        }
+
+        return range?.start;
+    };
+
     const pick = (day: DateValue) => {
         const pending = getPendingStart();
+
+        setLastPicked(() => day);
 
         if (!pending) {
             setPendingStart(() => day);
@@ -39,7 +60,7 @@ export const RangeCalendar = (props: RangeCalendarProps) => {
 
                 return DateValueUtils.isSame(day, range?.start) || DateValueUtils.isSame(day, range?.end);
             }}
-            computeAnchorDay={() => getPendingStart() ?? getRange()?.start}
+            computeAnchorDay={getAnchorDay}
             computeRange={(highlighted) => {
                 const pending = getPendingStart();
 

@@ -78,6 +78,11 @@ export const GlassSurfacePage = () => {
 
         return key === NO_SAMPLE_KEY ? {} : (TrackedGradientKnobs.KNOBS_BY_FAMILY[key] as Record<string, SampleKnob>);
     };
+    const getStrokeDefaults = () => {
+        const key = getStrokeConfigKey();
+
+        return key === NO_SAMPLE_KEY ? {} : (TrackedGradientKnobs.DEFAULTS_BY_FAMILY[key] as Record<string, unknown>);
+    };
     const getStrokeConfigDefs = () => strokeConfigDefs[getStrokeConfigKey()] ?? {};
     const [getBlurWidth, setBlurWidth] = createSignal(STARTING_BLUR_WIDTH);
     const [getBlurRadius, setBlurRadius] = createSignal(DEFAULT_GLASS_DEFS.backdrop.blurRadius);
@@ -143,7 +148,7 @@ export const GlassSurfacePage = () => {
 
                     <PageKnobs
                         knobs={getStrokeKnobs}
-                        defaults={() => TrackedGradientKnobs.DEFAULTS_BY_FAMILY[getStrokeConfigKey()] ?? {}}
+                        defaults={() => getStrokeDefaults()}
                         values={getStrokeConfigDefs}
                         onInput={(key, value) =>
                             setStrokeConfigDefs(getStrokeConfigKey(), (previous) => ({ ...previous, [key]: value }))

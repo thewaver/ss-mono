@@ -332,7 +332,9 @@ export namespace MosaicUtils {
 
         if (!cells.length) return [];
 
-        const ratioSums = cells.reduce((sums, cell) => [...sums, sums[sums.length - 1] + cell.ratio], [0]);
+        const ratioSums = [0];
+
+        for (const cell of cells) ratioSums.push(ratioSums[ratioSums.length - 1] + cell.ratio);
 
         const targetExtent =
             targetAspectRatio.width > 0

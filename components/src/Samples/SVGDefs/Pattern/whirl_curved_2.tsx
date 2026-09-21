@@ -5,7 +5,7 @@ import { SVGAnimations } from "../SVGAnimations.const";
 import type { PatternConfig } from "../SVGDefs.types";
 import { SVGDefsUtils } from "../SVGDefs.utils";
 
-export const whirlCurved_2: PatternConfig = {
+export const whirl_curved_2: PatternConfig = {
     computeSVGDefs: (id, __, ___, defs) => [
         {
             color: SVGDefsUtils.getBaseBackgroundColor(defs),

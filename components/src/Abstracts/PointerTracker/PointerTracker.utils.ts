@@ -6,7 +6,7 @@ import { useViewportContext } from "../Viewport/Viewport.context";
 import { ViewportUtils } from "../Viewport/Viewport.utils";
 import type { PointerReading } from "./PointerTracker.types";
 
-/** What is reported before the pointer has been seen: centerd, and infinitely far away, so a distance test reads as "not near". */
+/** What is reported before the pointer has been seen: centered, and infinitely far away, so a distance test reads as "not near". */
 const RESTING_READING: PointerReading = {
     offset: { x: 0, y: 0 },
     angle: 0,

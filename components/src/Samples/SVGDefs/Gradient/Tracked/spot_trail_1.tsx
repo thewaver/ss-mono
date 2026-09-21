@@ -2,6 +2,7 @@ import { createEffect, createSignal } from "solid-js";
 
 import { MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
+import type { PointerReading } from "../../../../Abstracts/PointerTracker/PointerTracker.types";
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import type { GradientFalloffOpts, GradientSpotTrailOpts, TrackedGradientConfig } from "../../SVGDefs.types";
@@ -45,8 +46,12 @@ const computePoolColors = (color: string, alpha: number, opts?: GradientFalloffO
 
 const clock = SVGDefsFrameUtils.createClock(TRAIL_LIFETIME_MS);
 
-const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined, opts?: GradientSpotTrailOpts) => {
-    const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef);
+const createTrailStamp = (
+    index: number,
+    getReading: () => PointerReading,
+    getIsPointerPresent: () => boolean,
+    opts?: GradientSpotTrailOpts,
+) => {
     const [getStamp, setStamp] = createSignal<TrailStamp>();
 
     let bornTick: number | undefined;
@@ -98,43 +103,45 @@ const createTrailStamp = (index: number, getRef: () => HTMLElement | undefined, 
 };
 
 export const spot_trail_1 = (opts?: GradientSpotTrailOpts): TrackedGradientConfig => ({
-    computeSVGDefs: (id, __, getRef, defs) => [
-        {
-            color: SVGDefsUtils.getBaseBorderColor(defs),
-        },
-        {
-            gradientOrPattern: {
-                id: `gradient1-${id}`,
-                renderDefsElement: () => {
-                    const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
+    computeSVGDefs: (id, __, getRef, defs) => {
+        const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
-                    return SVGGradientDefsUtils.computeRadialGradient({
-                        id: `gradient1-${id}`,
-                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
-                        origin: () => getReading().boxRatio,
-                        scale: opts?.glowScale ?? DEFAULTS.glowScale,
-                        colors: computePoolColors(defs.colors.primary, FULL_ALPHA, opts),
-                    });
-                },
+        return [
+            {
+                color: SVGDefsUtils.getBaseBorderColor(defs),
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-        },
-        ...Array.from({ length: STAMP_COUNT }, (_unused, index) => ({
-            gradientOrPattern: {
-                id: `gradient${index + 2}-${id}`,
-                renderDefsElement: () => {
-                    const stamp = createTrailStamp(index, getRef ?? NO_REF, opts);
+            {
+                gradientOrPattern: {
+                    id: `gradient1-${id}`,
+                    renderDefsElement: () => {
+                        return SVGGradientDefsUtils.computeRadialGradient({
+                            id: `gradient1-${id}`,
+                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            origin: () => getReading().boxRatio,
+                            scale: opts?.glowScale ?? DEFAULTS.glowScale,
+                            colors: computePoolColors(defs.colors.primary, FULL_ALPHA, opts),
+                        });
+                    },
+                },
+                filter: SVGDefsUtils.getBaseBlur(id, defs),
+            },
+            ...Array.from({ length: STAMP_COUNT }, (_unused, index) => ({
+                gradientOrPattern: {
+                    id: `gradient${index + 2}-${id}`,
+                    renderDefsElement: () => {
+                        const stamp = createTrailStamp(index, getReading, getIsPointerPresent, opts);
 
-                    return SVGGradientDefsUtils.computeRadialGradient({
-                        id: `gradient${index + 2}-${id}`,
-                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
-                        origin: stamp.getOrigin,
-                        scale: opts?.glowScale ?? DEFAULTS.glowScale,
-                        colors: () => stamp.getColors(defs.colors.primary),
-                    });
+                        return SVGGradientDefsUtils.computeRadialGradient({
+                            id: `gradient${index + 2}-${id}`,
+                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            origin: stamp.getOrigin,
+                            scale: opts?.glowScale ?? DEFAULTS.glowScale,
+                            colors: () => stamp.getColors(defs.colors.primary),
+                        });
+                    },
                 },
-            },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-        })),
-    ],
+                filter: SVGDefsUtils.getBaseBlur(id, defs),
+            })),
+        ];
+    },
 });

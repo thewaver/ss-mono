@@ -6,6 +6,7 @@ import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SV
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { GradientCycleStepsOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
+import { TimedGradientKnobs } from "../TimedGradient.knobs";
 
 export const snake_1v1 = (opts?: GradientCycleStepsOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
@@ -30,7 +31,7 @@ export const snake_1v1 = (opts?: GradientCycleStepsOpts): TimedGradientConfig =>
                                 MathUtils.getIntermediateValues(
                                     90,
                                     450,
-                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                 ),
                                 defs,
                             )}
@@ -61,7 +62,7 @@ export const snake_1v1 = (opts?: GradientCycleStepsOpts): TimedGradientConfig =>
                                 MathUtils.getIntermediateValues(
                                     90,
                                     450,
-                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                 ),
                                 [180],
                             ),
@@ -89,7 +90,7 @@ export const snake_1v1 = (opts?: GradientCycleStepsOpts): TimedGradientConfig =>
                                 MathUtils.getIntermediateValues(
                                     630,
                                     270,
-                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                 ),
                                 defs,
                             )}
@@ -120,7 +121,7 @@ export const snake_1v1 = (opts?: GradientCycleStepsOpts): TimedGradientConfig =>
                                 MathUtils.getIntermediateValues(
                                     630,
                                     270,
-                                    opts?.steps ?? SVGDefsUtils.DEFAULT_GRADIENT_STEPS,
+                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
                                 ),
                                 [180],
                             ),

@@ -153,6 +153,7 @@ export const Modal = (props: ModalProps) => {
                             "transition-property": "transform",
                             "transition-duration": `${getIsSwiping() ? 0 : getTransitionDurationMs()}ms`,
                         }}
+                        tabIndex={-1}
                         role={access(props.role) ?? DEFAULT_MODAL_ROLE}
                         aria-modal="true"
                         aria-label={access(props.ariaLabel)}

@@ -22,7 +22,7 @@ const zones: CarrierZone[] = [];
 
 const [getCarryState, setCarryState] = createSignal<CarryState | undefined>();
 
-/** Capitalises a place label so it can open an announcement. */
+/** Capitalizes a place label so it can open an announcement. */
 const startSentence = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
 /** The mounted, enabled zones belonging to one group. */
@@ -64,6 +64,16 @@ const findZoneAt = (x: number, y: number, groupId: string) => {
  * second-class one.
  */
 export namespace CarrierUtils {
+    /**
+     * The elements a press should be left to rather than treated as the start of a carry.
+     *
+     * A carriable item may hold controls of its own — a remove button, a checkbox, a link — and a press
+     * on one of those belongs to it. Every board that reads a pointer against its items tests
+     * `closest(INTERACTIVE_SELECTOR)` first and bails out, so the rule is one string rather than four.
+     */
+    export const INTERACTIVE_SELECTOR =
+        "a[href], button, input, select, textarea, [role='button'], [role='checkbox'], [role='link'], [role='switch']";
+
     /**
      * Finds which gap between items a point falls into.
      *
@@ -143,6 +153,8 @@ export namespace CarrierUtils {
      * @param zone The zone's own answers about its contents, places and how to change them.
      */
     export const registerZone = (zone: CarrierZone) => {
+        LiveAnnouncerUtils.reserve("polite");
+
         zones.push(zone);
 
         onCleanup(() => {
@@ -390,8 +402,8 @@ export namespace CarrierUtils {
             if (endEvent.pointerId !== e.pointerId) return;
 
             element.removeEventListener("pointermove", handleMove);
-            element.removeEventListener("pointerup", handleEnd);
-            element.removeEventListener("pointercancel", handleEnd);
+            document.removeEventListener("pointerup", handleEnd);
+            document.removeEventListener("pointercancel", handleEnd);
 
             if (element.hasPointerCapture(e.pointerId)) element.releasePointerCapture(e.pointerId);
 
@@ -403,7 +415,7 @@ export namespace CarrierUtils {
         };
 
         element.addEventListener("pointermove", handleMove);
-        element.addEventListener("pointerup", handleEnd);
-        element.addEventListener("pointercancel", handleEnd);
+        document.addEventListener("pointerup", handleEnd);
+        document.addEventListener("pointercancel", handleEnd);
     };
 }

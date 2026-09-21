@@ -39,6 +39,8 @@ export const NumberInput = (props: NumberInputProps) => {
     const applyValue = (value: number | undefined) => {
         textSignal[1](NumberInputUtils.formatValue(value));
 
+        if (untrack(() => props.valueSignal[0]()) === value) return;
+
         reportValue(value);
     };
 

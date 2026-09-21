@@ -37,7 +37,7 @@ const BreadcrumbsItem = <T,>(props: BreadcrumbsItemProps<T>) => {
             fallback={
                 <span
                     ref={(element) => props.ref?.(element)}
-                    class={styles.breadcrumbsItem}
+                    class={styles.breadcrumbsCurrent}
                     id={access(props.crumb).id}
                     aria-current="page"
                 >
@@ -83,6 +83,7 @@ export const Breadcrumbs = <T,>(props: BreadcrumbsProps<T>) => {
                         <li class={styles.breadcrumbsEntry}>
                             <InteractionWrapper
                                 isDisabled={() => getCrumb().isDisabled ?? false}
+                                isTabbable={() => index !== getLastIndex()}
                                 extraFlags={() => ({ isCurrent: index === getLastIndex() })}
                                 renderControl={(setElementRef, getFlags) => (
                                     <BreadcrumbsItem

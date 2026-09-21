@@ -40,6 +40,15 @@ const toRadialShare = (arrangement: ProximityArrangement, point: Point2d) => {
  */
 export namespace ProximityUtils {
     /**
+     * The arrangement of a run nothing is reaching for.
+     *
+     * No spacing to open, no radius to turn about, and unlimited slack — so every effect works out to
+     * the identity and the items sit exactly where the layout put them. It is what a `PlacementItem`
+     * outside a `PlacementBox` reads, and the value a box starts at before its first measurement.
+     */
+    export const RESTING_ARRANGEMENT: ProximityArrangement = { spacing: 0, radius: 0, slack: Infinity };
+
+    /**
      * How strongly one item should be affected.
      *
      * Falls off as the square of how near the pointer is rather than linearly, so the item the pointer is
@@ -227,7 +236,7 @@ export namespace ProximityUtils {
     /**
      * How far and which way to move an item so that it travels a given distance along its run.
      *
-     * A straight step along the tangent is only the first term of travelling along a curve, and an item
+     * A straight step along the tangent is only the first term of traveling along a curve, and an item
      * giving way to a growing neighbor travels far enough for the rest of the terms to matter: on a
      * half-turn arc of six, a push of three quarters of an item width is a twenty-seven degree step, and
      * a straight tangent leaves the curve far enough that neighbors converge and overlap. So where the

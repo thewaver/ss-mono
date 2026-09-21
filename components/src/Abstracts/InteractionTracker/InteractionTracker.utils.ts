@@ -179,14 +179,14 @@ const trackPointer = (
 
         ref.addEventListener("pointerdown", onPointerDown);
         ref.addEventListener("pointermove", onPointerMove);
-        ref.addEventListener("pointerup", onPointerEnd);
-        ref.addEventListener("pointercancel", onPointerEnd);
+        document.addEventListener("pointerup", onPointerEnd);
+        document.addEventListener("pointercancel", onPointerEnd);
 
         onCleanup(() => {
             ref.removeEventListener("pointerdown", onPointerDown);
             ref.removeEventListener("pointermove", onPointerMove);
-            ref.removeEventListener("pointerup", onPointerEnd);
-            ref.removeEventListener("pointercancel", onPointerEnd);
+            document.removeEventListener("pointerup", onPointerEnd);
+            document.removeEventListener("pointercancel", onPointerEnd);
         });
     });
 

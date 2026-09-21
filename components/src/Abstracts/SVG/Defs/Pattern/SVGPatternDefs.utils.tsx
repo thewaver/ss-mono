@@ -1,6 +1,6 @@
 import type { JSX } from "solid-js";
 
-import type { Point2d, Size2d } from "@thewaver/ss-utils";
+import type { Index2d, Point2d, Size2d } from "@thewaver/ss-utils";
 
 /** Builds a repeating SVG `pattern` from a grid of cells. */
 export namespace SVGPatternDefsUtils {
@@ -23,12 +23,8 @@ export namespace SVGPatternDefsUtils {
         id: string,
         cellCount: { rows: number; cols: number },
         patternSize: Size2d,
-        computeCellPos: (index: { row: number; col: number }) => Point2d,
-        renderCell: (
-            id: string,
-            index: { row: number; col: number },
-            cellCount: { rows: number; cols: number },
-        ) => JSX.Element,
+        computeCellPos: (index: Index2d) => Point2d,
+        renderCell: (id: string, index: Index2d, cellCount: { rows: number; cols: number }) => JSX.Element,
     ) => {
         return (
             <pattern id={id} width={patternSize.width} height={patternSize.height} patternUnits="userSpaceOnUse">

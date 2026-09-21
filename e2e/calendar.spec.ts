@@ -187,11 +187,15 @@ test("the wrapper between a row and its cells is transparent", async ({ page }) 
  * the focus. The fix is a live region that belongs to no component — the month title on the page is the
  * consumer's own markup, so the announcement cannot be read off it — which means the assertion has to look
  * outside the calendar entirely, at the announcer's region on the body.
+ *
+ * The region is reserved on mount rather than created by the first message, because a region that appears
+ * already carrying text can be read as silence — the reader never saw it empty. So the calendar starts with
+ * one region holding nothing, and what is asserted is that paging puts a message into it.
  */
 const ANNOUNCER = 'body > [role="log"][aria-live="polite"]';
 
 test("paging announces the month it landed on, through a region no component owns", async ({ page }) => {
-    await expect(page.locator(ANNOUNCER), "nothing has been announced yet, so no region exists").toHaveCount(0);
+    await expect(page.locator(`${ANNOUNCER} > *`), "the region is reserved and empty, not absent").toHaveCount(0);
 
     await page.locator("#defaultNextMonth").click();
 

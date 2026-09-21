@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { attributesOf, demo, prop, readout, tabIndex, tagName } from "./helpers";
+import { attributesOf, demo, offsetLeft, offsetTop, prop, readout, tabIndex, tagName } from "./helpers";
 
 const LINEAR = demo("linear");
 const FAILED = demo("failed");
@@ -55,26 +55,26 @@ test("each step's name carries its state as words", async ({ page }) => {
 });
 
 /**
- * Navigability is per step, and it decides the element rather than an attribute on a fixed one: a step you
- * can go to is a button, a step you cannot is a plain element. That is the same call `Breadcrumbs` makes
- * for its last crumb, and it is what stops an unreachable step from looking pressable.
+ * Every step is a button and navigability is `aria-disabled`, which is the same shape disabling already
+ * takes here. Swapping the element instead was tried and could not work: the consumer's state string
+ * arrives as `aria-label`, and ARIA 1.2 prohibits naming an element whose role is `generic` — "Authors MUST
+ * NOT use the aria-label or aria-labelledby attributes to name the element" — so a `<span>` threw the state
+ * away. A step carrying a tooltip is reachable besides, and a focusable element with no role announces as
+ * nothing (4.1.2 Name, Role, Value).
  */
-test("a navigable step is a button and the rest are not", async ({ page }) => {
-    expect(
-        await tagName(page.locator(`${LINEAR} ol > li:nth-of-type(1) [aria-label]`)),
-        "a completed step can be returned to, so it is a real control",
-    ).toBe("BUTTON");
-    expect(
-        await tagName(page.locator(`${LINEAR} ol > li:nth-of-type(4) [aria-label]`)),
-        "a step ahead of you is not a control at all",
-    ).toBe("SPAN");
+test("every step is a button, and navigability is stated rather than built into the element", async ({ page }) => {
+    const first = page.locator(`${LINEAR} ol > li:nth-of-type(1) [aria-label]`);
+    const ahead = page.locator(`${LINEAR} ol > li:nth-of-type(4) [aria-label]`);
+
+    expect(await tagName(first), "a completed step can be returned to").toBe("BUTTON");
+    expect(await tagName(ahead), "and a step ahead of you is the same element, so it keeps its name").toBe("BUTTON");
+
+    await expect(first, "the one you can reach says nothing about being disabled").not.toHaveAttribute("aria-disabled");
+    await expect(ahead, "the one you cannot says so").toHaveAttribute("aria-disabled", "true");
 
     await page.locator(`${prop("isFreeNavigation")} input`).check();
 
-    expect(
-        await tagName(page.locator(`${LINEAR} ol > li:nth-of-type(4) [aria-label]`)),
-        "and opening navigation up turns it into one",
-    ).toBe("BUTTON");
+    await expect(ahead, "and opening navigation up takes the refusal off it").not.toHaveAttribute("aria-disabled");
 });
 
 test("pressing a navigable step reports it, and an unreachable one reports nothing", async ({ page }) => {
@@ -99,7 +99,9 @@ test("a locked step stays reachable so its explanation can be read", async ({ pa
     const locked = page.locator(`${FAILED} ol > li:nth-of-type(4) [aria-label]`);
 
     await expect(locked, "it is not a navigation target").toHaveAttribute("aria-disabled", "true");
-    expect(await tagName(locked), "so it is not a control either").toBe("SPAN");
+    expect(await tagName(locked), "and it is a button like every other step, so focus lands on something named").toBe(
+        "BUTTON",
+    );
     expect(await tabIndex(locked), "but it stays in the tab order, because it has something to say").toBe(0);
 
     await locked.hover();
@@ -122,11 +124,29 @@ test("a failed step is still a control, because you go back and fix it", async (
     await expect(page.locator(TOOLTIP), "and it explains itself too").toContainText("card was declined");
 });
 
-test("a stacked stepper declares its orientation, and the connector is optional", async ({ page }) => {
-    await expect(page.locator(`${STACKED} ol`), "a column strip says which way it runs").toHaveAttribute(
-        "aria-orientation",
-        "vertical",
+/**
+ * `aria-orientation` is not among the attributes the `list` role supports, so an `<ol>` carrying it is
+ * dropped by assistive technology and flagged by a validator — the same position `Carousel` reached for
+ * `role="region"`. So `dir` decides the layout and nothing else, and the layout is what is asked about
+ * here: a column strip stacks its steps where a row strip lays them side by side. The two strips are
+ * compared against each other in layout space rather than against a number, so the gap, the step size
+ * and the window all stop mattering.
+ */
+test("a stacked stepper stacks its steps, and the connector is optional", async ({ page }) => {
+    const stacked = page.locator(step(STACKED));
+    const linear = page.locator(step(LINEAR));
+
+    expect(await offsetTop(stacked.nth(1)), "a column strip puts the step after the first below it").toBeGreaterThan(
+        await offsetTop(stacked.nth(0)),
     );
+    expect(await offsetLeft(linear.nth(1)), "and a row strip puts it beside").toBeGreaterThan(
+        await offsetLeft(linear.nth(0)),
+    );
+
+    await expect(
+        page.locator(`${STACKED} ol`),
+        "while nothing in the markup names the axis, the list role having nowhere to keep it",
+    ).not.toHaveAttribute("aria-orientation");
 
     await expect(
         page.locator(`${LINEAR} ol [aria-hidden="true"]`).filter({ hasText: "" }),

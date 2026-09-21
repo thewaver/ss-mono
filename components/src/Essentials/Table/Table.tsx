@@ -1,5 +1,5 @@
 import type { Accessor } from "solid-js";
-import { For, Index, Show, createMemo, createSignal, createUniqueId } from "solid-js";
+import { For, Index, Show, createMemo, createSignal, createUniqueId, onMount } from "solid-js";
 
 import { type Index2d, MathUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
@@ -36,10 +36,9 @@ const EMPTY_WIDTHS: Record<string, number> = {};
 const EMPTY_ORDER: string[] = [];
 const EMPTY_SELECTION: never[] = [];
 
-const INTERACTIVE_SELECTOR =
-    "a[href], button, input, select, textarea, [role='button'], [role='checkbox'], [role='link'], [role='switch']";
-
 export const Table = <T,>(props: TableProps<T>) => {
+    onMount(() => LiveAnnouncerUtils.reserve("polite"));
+
     const tableId = createUniqueId();
 
     const [getBodyRef, setBodyRef] = createSignal<HTMLElement>();
@@ -66,6 +65,8 @@ export const Table = <T,>(props: TableProps<T>) => {
     const getSort = createMemo(() => props.sortSignal?.[0]());
 
     const getSelection = createMemo(() => props.selectionSignal?.[0]() ?? EMPTY_SELECTION);
+
+    const getSelectedRows = createMemo(() => new Set(getSelection()));
 
     const getSelectionMode = createMemo(
         (): TableSelectionMode => access(props.selectionMode) ?? (props.selectionSignal ? "multiple" : "none"),
@@ -284,7 +285,7 @@ export const Table = <T,>(props: TableProps<T>) => {
 
             if (step === 0) return;
 
-            return Math.min(Math.max(asColumnIndex(place) + step, 0), getColumns().length - 1);
+            return MathUtils.clamp(asColumnIndex(place) + step, 0, getColumns().length - 1);
         },
         computeEntryPlace: () => getSourceColumnIndex() ?? 0,
         computeIsSamePlace: (a, b) => a === b,
@@ -315,7 +316,7 @@ export const Table = <T,>(props: TableProps<T>) => {
         const column = getColumns()[columnIndex];
 
         if (e.button !== 0 || getIsDisabled() || !getIsReorderable(column)) return;
-        if ((e.target as HTMLElement).closest(INTERACTIVE_SELECTOR)) return;
+        if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
         if (CarrierUtils.getCarry()) return;
 
         CarrierUtils.dragFromPointer(
@@ -337,7 +338,7 @@ export const Table = <T,>(props: TableProps<T>) => {
     const handleKeyDown = (e: KeyboardEvent) => {
         const grid = getGrid();
 
-        if (grid.width < 1 || getIsDisabled()) return;
+        if (grid.width < 1) return;
 
         const from = getRovingCell();
         const column = getColumns()[from.col];
@@ -403,7 +404,7 @@ export const Table = <T,>(props: TableProps<T>) => {
             if (e.key === "Enter") {
                 e.preventDefault();
 
-                void props.onRowActivate?.(getRows()[rowIndex], rowIndex);
+                if (!getIsDisabled()) void props.onRowActivate?.(getRows()[rowIndex], rowIndex);
 
                 return;
             }
@@ -436,13 +437,13 @@ export const Table = <T,>(props: TableProps<T>) => {
     };
 
     const handleCellClick = (e: MouseEvent, cell: Index2d) => {
-        if (getIsDisabled()) return;
-
-        const interactive = (e.target as HTMLElement).closest(INTERACTIVE_SELECTOR);
+        const interactive = (e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR);
 
         if (interactive && (e.currentTarget as HTMLElement).contains(interactive)) return;
 
         focusCell(cell);
+
+        if (getIsDisabled()) return;
 
         if (cell.row === HEADER_ROW_INDEX) {
             toggleSort(getColumns()[cell.col]);
@@ -483,7 +484,7 @@ export const Table = <T,>(props: TableProps<T>) => {
             layoutCol,
             dataRow: getDataRow(layoutRow),
             layoutRow,
-            isSelected: getSelection().includes(getRows()[layoutRow]),
+            isSelected: getSelectedRows().has(getRows()[layoutRow]),
             isFocused: roving.row === layoutRow + 1 && roving.col === layoutCol,
             isHovered: getHoveredRow() === layoutRow,
             isDisabled: getIsDisabled(),
@@ -493,7 +494,7 @@ export const Table = <T,>(props: TableProps<T>) => {
     const renderResizer = (getColumn: Accessor<TableColumn<T>>, columnIndex: number) => (
         <div
             class={styles.tableResizer}
-            aria-hidden={"true"}
+            aria-hidden="true"
             onPointerDown={(e) => handleResizerPointerDown(e, getColumn(), columnIndex)}
             onPointerMove={(e) => handleResizerPointerMove(e, getColumn())}
             onPointerUp={(e) => handleResizerPointerUp(e, getColumn())}
@@ -577,7 +578,7 @@ export const Table = <T,>(props: TableProps<T>) => {
             class={virtualRow ? [styles.tableRow, styles.tableWindowedRow].join(" ") : styles.tableRow}
             role="row"
             aria-rowindex={rowIndex + 1 + FIRST_ARIA_INDEX}
-            aria-selected={getSelectionMode() === "none" ? undefined : getSelection().includes(getRow())}
+            aria-selected={getSelectionMode() === "none" ? undefined : getSelectedRows().has(getRow())}
             aria-label={props.computeRowAriaLabel?.(getRow(), rowIndex)}
             style={virtualRow ? { transform: `translateY(${rowWindow.getRowStart(virtualRow)}px)` } : undefined}
             ref={(element: HTMLElement) => {

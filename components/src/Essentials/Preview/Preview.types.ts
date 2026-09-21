@@ -36,9 +36,9 @@ export type PreviewProps = Omit<
     "renderControl" | "extraFlags" | "sizing" | "minWidth" | "minHeight"
 > &
     AccessorProps<{
-        /** Identifies the preview, and is what its parts compose their own ids from. */
+        /** Identifies the preview's trigger. The content gets an id of its own, so this one names the control a consumer labels. */
         id?: string;
-        /** Whether the content animates its height open and closed or simply appears. */
+        /** Whether the preview takes only the room its content needs, or fills the width it is given. */
         sizing?: PreviewSizing;
         /** How much of the content is shown while it is collapsed. */
         collapsedHeight: number;

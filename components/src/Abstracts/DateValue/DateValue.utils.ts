@@ -30,6 +30,10 @@ const MIDDAY_MS = 12 * 60 * 60 * 1000;
 const DEFAULT_CALENDAR_ID: DateValueCalendarId = "gregory";
 /** `YYYY-MM-DD`, with the expanded `±YYYYYY` form for years outside four digits. */
 const ISO_PATTERN = /^(\d{4}|[+-]\d{6})-(\d{2})-(\d{2})$/;
+/** A real Sunday, so a week of weekday names can be walked from a known start. 1 August 2021 was one. */
+const A_SUNDAY = { year: 2021, monthIndex: 7, day: 1 };
+/** Noon, so naming a weekday cannot be pushed onto the day before or after by a time-zone shift. */
+const MIDDAY_HOUR = 12;
 
 /** Every calendar this supports, in the order a picker should offer them. */
 const CALENDAR_IDS: DateValueCalendarId[] = [
@@ -70,7 +74,7 @@ const getEraStart = (id: DateValueCalendarId, era: string) => new CalendarDate(g
 const getEraSample = (id: DateValueCalendarId, era: string) => getEraStart(id, era).set({ year: 2 });
 
 /**
- * Calendar arithmetic, month grids and localised names for a date without a time.
+ * Calendar arithmetic, month grids and localized names for a date without a time.
  *
  * A thin layer over `@internationalized/date`, which does the calendar mathematics; what is added
  * here is the shape a date picker actually needs — a six-week grid, the cell a date sits in, era
@@ -208,8 +212,8 @@ export namespace DateValueUtils {
     /**
      * How many years the date's era runs for.
      *
-     * @returns The count, or `Infinity` for an era with no end — which is most of them, including the
-     * current one in any calendar still in use.
+     * @returns At most 9999, which is where every supported calendar bounds an open-ended era;
+     * `Infinity` only if a calendar implementation declines to answer at all.
      */
     export const getYearsInEra = (value: DateValue) => value.calendar.getYearsInEra?.(value) ?? Infinity;
 
@@ -466,7 +470,14 @@ export namespace DateValueUtils {
         const formatter = new Intl.DateTimeFormat(locale, { weekday: width });
 
         return Array.from({ length: DAYS_PER_WEEK }, (_, index) =>
-            formatter.format(new Date(2021, 7, 1 + ((index + weekStartsOn) % DAYS_PER_WEEK), 12)),
+            formatter.format(
+                new Date(
+                    A_SUNDAY.year,
+                    A_SUNDAY.monthIndex,
+                    A_SUNDAY.day + ((index + weekStartsOn) % DAYS_PER_WEEK),
+                    MIDDAY_HOUR,
+                ),
+            ),
         );
     };
 
@@ -479,9 +490,30 @@ export namespace DateValueUtils {
      * @param locale The locale to format in. The platform's default is used when omitted.
      */
     export const format = (value: DateValue, options?: Intl.DateTimeFormatOptions, locale?: string) =>
-        new Intl.DateTimeFormat(locale, {
+        createFormatter(value, options, locale)(value);
+
+    /**
+     * A formatter bound to a calendar, a locale and a set of options.
+     *
+     * Constructing an `Intl.DateTimeFormat` is the expensive half of formatting, so anything that formats
+     * many dates the same way — a month grid's forty-two day labels — builds one of these once and calls
+     * it per date, rather than calling {@link DateValueUtils.format} and paying for a fresh formatter each
+     * time. The calendar is taken from the date handed in, so every date given to the returned function
+     * has to be in that same calendar.
+     *
+     * @param value Any date in the calendar to format in; its own value is not read otherwise.
+     * @param options Anything `Intl.DateTimeFormat` accepts. The calendar and time zone are supplied and
+     * cannot be overridden.
+     * @param locale The locale to format in. The platform's default is used when omitted.
+     * @returns A function answering a date's formatted text.
+     */
+    export const createFormatter = (value: DateValue, options?: Intl.DateTimeFormatOptions, locale?: string) => {
+        const formatter = new Intl.DateTimeFormat(locale, {
             ...options,
             calendar: getCalendarId(value),
             timeZone: getLocalTimeZone(),
-        }).format(toIntlDate(value));
+        });
+
+        return (date: DateValue) => formatter.format(toIntlDate(date));
+    };
 }

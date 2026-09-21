@@ -108,5 +108,12 @@ export namespace BracketConnectors {
         );
     };
 
-    export const ALL: Record<string, BracketConnectorFn> = { flat, rounded, curved, ballAndArrow };
+    export const SAMPLE_CONNECTORS = { flat, rounded, curved, ballAndArrow } satisfies Record<
+        string,
+        BracketConnectorFn
+    >;
+
+    export type SampleKey = keyof typeof SAMPLE_CONNECTORS;
+
+    export const SAMPLE_KEYS = Object.keys(SAMPLE_CONNECTORS) as SampleKey[];
 }

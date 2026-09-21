@@ -3,7 +3,7 @@ import { Index, createEffect, createMemo, createSignal, on, untrack } from "soli
 import { Barrel } from "../../Primitives/Barrel/Barrel";
 import { access } from "../../Utils/propUtils";
 import type { OdometerProps } from "./Odometer.types";
-import { ODOMETER_DIGITS, OdometerUtils } from "./Odometer.utils";
+import { OdometerUtils } from "./Odometer.utils";
 
 import * as styles from "./Odometer.css";
 
@@ -66,12 +66,12 @@ export const Odometer = (props: OdometerProps) => {
         getSlots().flatMap((slot, order) => (slot.kind === "fixed" ? [{ character: slot.character, order }] : [])),
     );
 
-    const getDigitOrders = createMemo(() =>
-        getSlots().flatMap((slot, order) => (slot.kind === "digit" ? [order] : [])),
+    const getDigitSlots = createMemo(() =>
+        getSlots().flatMap((slot, order) => (slot.kind === "digit" ? [{ order, digitIndex: slot.digitIndex }] : [])),
     );
 
     return (
-        <div class={styles.odometerRoot} aria-label={access(props.ariaLabel)}>
+        <div class={styles.odometerRoot} role="group" aria-label={access(props.ariaLabel)}>
             <span class={styles.odometerValue}>{access(props.text)}</span>
 
             <Index each={getFixedSlots()}>
@@ -90,25 +90,25 @@ export const Odometer = (props: OdometerProps) => {
                 )}
             </Index>
 
-            <Index each={getDigitOrders()}>
-                {(getOrder, digitIndex) => (
+            <Index each={getDigitSlots()}>
+                {(getSlot) => (
                     <div
                         class={styles.odometerWindow}
                         style={{
-                            order: getOrder(),
+                            order: getSlot().order,
                             width: `${getDigitSize().width}px`,
                             height: `${getDigitSize().height}px`,
                         }}
                     >
                         <div class={styles.odometerBarrel}>
                             <Barrel
-                                faces={ODOMETER_DIGITS}
+                                faces={OdometerUtils.DIGITS}
                                 axis={"column"}
                                 hasBacks={false}
                                 faceSize={getDigitSize}
-                                angle={() => getAngle(digitIndex)}
+                                angle={() => getAngle(getSlot().digitIndex)}
                                 transitionDurationMs={() => access(props.turnDurationMs) ?? DEFAULT_TURN_DURATION_MS}
-                                transitionDelayMs={() => getDelay(digitIndex)}
+                                transitionDelayMs={() => getDelay(getSlot().digitIndex)}
                                 faceRoleDescription={""}
                                 computeFaceDefs={() => ({ ariaLabel: "", isHidden: true })}
                                 renderFace={(getFace) => (

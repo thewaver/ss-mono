@@ -34,7 +34,7 @@ GlassSurface, Surface.
 ### Primitives — lower-level building blocks the above are built from
 Barrel, InteractionWrapper, PlacementBox, PlacementItem, Popover.
 
-### Abstracts — framework-agnostic state/behavior hooks (no markup of their own)
+### Abstracts — Solid-based state/behavior hooks (no markup of their own)
 Anchor, Carrier, CheckedState, ColorExtractor, Cutout, Placement, Proximity, DateTimeValue,
 DateValue, Dismisser, ElementFader, ElementObserver, Elevation, Flattener, FrameRateMonitor,
 FocusManager, Glass, InteractionTracker, LiveAnnouncer, MaskedField, MediaQueryMonitor,

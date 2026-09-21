@@ -4,6 +4,7 @@ import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SV
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { GradientCycleOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
+import { TimedGradientKnobs } from "../TimedGradient.knobs";
 
 export const elastic_inter_semicircle_1 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
@@ -44,16 +45,24 @@ export const elastic_inter_semicircle_1 = (opts?: GradientCycleOpts): TimedGradi
                             ObjectUtils.zipArray(
                                 "stretch",
                                 [
-                                    ...MathUtils.getIntermediateValues(0, 0, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
-                                    ...MathUtils.getIntermediateValues(0, 180, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
-                                    ...MathUtils.getIntermediateValues(180, 180, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
-                                    ...MathUtils.getIntermediateValues(180, 360, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                                    ...MathUtils.getIntermediateValues(0, 0, TimedGradientKnobs.STEPS_DEFAULT.steps),
+                                    ...MathUtils.getIntermediateValues(0, 180, TimedGradientKnobs.STEPS_DEFAULT.steps),
+                                    ...MathUtils.getIntermediateValues(
+                                        180,
+                                        180,
+                                        TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        180,
+                                        360,
+                                        TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                    ),
                                 ],
                                 [
-                                    ...MathUtils.getIntermediateValues(0, 180, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
-                                    ...MathUtils.getIntermediateValues(180, 0, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
-                                    ...MathUtils.getIntermediateValues(0, 180, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
-                                    ...MathUtils.getIntermediateValues(180, 0, SVGDefsUtils.DEFAULT_GRADIENT_STEPS),
+                                    ...MathUtils.getIntermediateValues(0, 180, TimedGradientKnobs.STEPS_DEFAULT.steps),
+                                    ...MathUtils.getIntermediateValues(180, 0, TimedGradientKnobs.STEPS_DEFAULT.steps),
+                                    ...MathUtils.getIntermediateValues(0, 180, TimedGradientKnobs.STEPS_DEFAULT.steps),
+                                    ...MathUtils.getIntermediateValues(180, 0, TimedGradientKnobs.STEPS_DEFAULT.steps),
                                 ],
                             ),
                             defs,

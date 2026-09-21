@@ -17,7 +17,7 @@ export type CalendarRenderProps = {
     isSelected: boolean;
     /** Whether this day is today. */
     isToday: boolean;
-    /** Whether this day belongs to a neighbouring month, shown to fill the grid out. */
+    /** Whether this day belongs to a neighboring month, shown to fill the grid out. */
     isOutsideMonth: boolean;
     /** Whether the keyboard is currently on this day. */
     isHighlighted: boolean;
@@ -38,6 +38,7 @@ export type CalendarWeekdayRenderer = (name: string, index: number) => JSX.Eleme
 
 export type CalendarDayProps = AccessorProps<
     Omit<InteractionControlProps<CalendarRenderProps>, "renderContent"> & {
+        /** Names the day for assistive technology, since the cell often shows only its number. Required here: a bare number is not a date. */
         ariaLabel: string;
         /** Draws the day cell. */
         renderContent: (getRenderProps: () => InteractionFlags<CalendarRenderProps>) => JSX.Element;

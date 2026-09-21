@@ -57,7 +57,13 @@ export const ScrambleText = (props: ScrambleTextProps) => {
     const rollNoise = () => {
         const glyphs = getGlyphs();
 
-        setNoise(getCharacters().map((character) => ScrambleTextUtils.pickGlyph(glyphs, character, Math.random())));
+        setNoise((previous) =>
+            getCharacters().map((character, index) =>
+                getIsSettled(index) || getIsPending(index)
+                    ? (previous[index] ?? character)
+                    : ScrambleTextUtils.pickGlyph(glyphs, character, Math.random()),
+            ),
+        );
     };
 
     const stopScrambling = () => {

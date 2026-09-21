@@ -1,5 +1,7 @@
 import type { JSX } from "solid-js";
 
+import type { Point2d } from "@thewaver/ss-utils";
+
 import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
@@ -49,7 +51,7 @@ export type SpotlightPopupState = {
     /** Where the popup sits against the lit element. */
     popupPlacement?: AnchorPlacement;
     /** How far the popup is held clear of the lit element. */
-    popupOffset?: { x: number; y: number };
+    popupOffset?: Point2d;
 };
 
 export type SpotlightPopupSlot = {

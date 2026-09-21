@@ -17,6 +17,7 @@ import type { ColorInputFieldProps, ColorInputProps, ColorInputRenderProps } fro
 import * as styles from "./ColorInput.css";
 
 const DEFAULT_COLOR_INPUT_PLACEMENT: AnchorPlacement = { x: "left-in", y: "bottom-out" };
+const DEFAULT_COLOR_INPUT_PICKER_LABEL = "Choose a color";
 const DEFAULT_COLOR_INPUT_AREA_LABEL = "Saturation and brightness";
 const DEFAULT_COLOR_INPUT_HUE_LABEL = "Hue";
 const STARTING_COLOR: Color.HSVA = { h: 0, s: 0, v: 0, a: 1 };
@@ -182,7 +183,9 @@ export const ColorInput = (props: ColorInputProps) => {
             <Popover
                 id={() => popupId}
                 role={"dialog"}
-                ariaAttributes={() => ({ "aria-label": access(props.ariaLabel) })}
+                ariaAttributes={() => ({
+                    "aria-label": access(props.pickerLabel) ?? DEFAULT_COLOR_INPUT_PICKER_LABEL,
+                })}
                 isOpen={getIsOpen}
                 anchorRef={getFieldRef}
                 placement={() => access(props.placement) ?? DEFAULT_COLOR_INPUT_PLACEMENT}

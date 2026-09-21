@@ -4,10 +4,10 @@ import { AngleUtils } from "@thewaver/ss-utils";
 
 import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
-import type { GradientBandedCycleOpts, TimedGradientConfig } from "../../SVGDefs.types";
+import type { CycleColorKey, GradientBandedCycleOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
-const CYCLE_KEYS: SVGDefsUtils.CycleColorKey[] = ["primary", "secondary", "tertiary"];
+const CYCLE_KEYS: CycleColorKey[] = ["primary", "secondary", "tertiary"];
 const SMOOTH_REPEATS = 2;
 const BANDED_REPEATS = 4;
 

@@ -4,8 +4,6 @@ import type { PlacementLayoutFn, PlacementRect } from "../../Abstracts/Placement
 import type { ProximityEffectFn } from "../../Abstracts/Proximity/Proximity.types";
 import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 
-export type FormationInset = PlacementRect;
-
 export type FormationItemState = {
     index: number;
     itemCount: number;

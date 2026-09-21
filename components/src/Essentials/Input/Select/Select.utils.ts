@@ -27,8 +27,8 @@ export namespace SelectUtils {
      *
      * @param row The row to ask about.
      * @returns The group's own row number — itself, for a group heading — or `undefined` for an option
-     * outside any group. This is what an option's `aria-describedby` points at, so a screen reader
-     * announces which group it is in.
+     * outside any group. Consecutive rows sharing an answer are one run, which is how a windowed list
+     * knows where to cut a group box so only the part of it on screen is drawn.
      */
     export const getGroupRowIndex = <T>(row: SelectRow<T>) => (getIsGroup(row.node) ? row.index : row.parentIndex);
 

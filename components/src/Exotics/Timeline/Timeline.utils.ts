@@ -15,7 +15,7 @@ const SINGLE = 1;
 const DECADE = 10;
 /** The tick steps within one decade: ones, twos and fives. Anything else gives labels nobody can read off — nobody counts in sevens. */
 const MANTISSAS = [1, 2, 5];
-/** How much coarser a major tick should be than a minor one before it is worth labelling. */
+/** How much coarser a major tick should be than a minor one before it is worth labeling. */
 const MAJOR_FACTOR = 3;
 /** A cap on how many ticks are produced, in case a view and a step disagree wildly. */
 const MAX_TICKS = 512;
@@ -98,7 +98,7 @@ export namespace TimelineUtils {
      *
      * @param view The view before zooming.
      * @param factor Below `1` to zoom in, above to zoom out.
-     * @param focusRatio Where the zoom is centerd, as a fraction across the view.
+     * @param focusRatio Where the zoom is centered, as a fraction across the view.
      * @param range Everything the timeline covers.
      * @param minExtent The narrowest the view may get.
      */
@@ -134,7 +134,7 @@ export namespace TimelineUtils {
     /**
      * Slides the view just far enough to bring a span into it.
      *
-     * The view is not zoomed and not centerd; it moves the minimum needed, which is what keeps a keyboard
+     * The view is not zoomed and not centered; it moves the minimum needed, which is what keeps a keyboard
      * walk through the items from lurching. A span too wide to fit is aligned to its start.
      *
      * @param span The span to reveal.

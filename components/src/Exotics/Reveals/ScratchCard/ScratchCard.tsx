@@ -4,6 +4,7 @@ import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
 import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/InteractionTracker.utils";
+import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { PointerTrackerUtils } from "../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { access } from "../../../Utils/propUtils";
 import type { ScratchCardBrushGeometry, ScratchCardProps } from "./ScratchCard.types";
@@ -17,7 +18,6 @@ const DEFAULT_PRECISION = 32;
 const DEFAULT_CLEAR_THRESHOLD = 1;
 const DEFAULT_CLEAR_DURATION_MS = 450;
 const NOTHING_RUBBED = 0;
-const CLEAR_KEYS = ["Enter", " "];
 const INSIDE_EDGE_RATIO = 1;
 const NO_PATH = "";
 const MEASURE_INTERVAL_MS = 100;
@@ -25,6 +25,7 @@ const MEASURE_INTERVAL_MS = 100;
 export const ScratchCard = (props: ScratchCardProps) => {
     const maskId = createUniqueId();
 
+    const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getCoverRef, setCoverRef] = createSignal<HTMLElement>();
     const [getPathRef, setPathRef] = createSignal<SVGPathElement>();
     const [getPath, setPath] = createSignal(NO_PATH);
@@ -116,6 +117,10 @@ export const ScratchCard = (props: ScratchCardProps) => {
         if (!getIsClearing()) return;
 
         const timeout = setTimeout(() => {
+            const cover = getCoverRef();
+
+            if (cover && cover.contains(document.activeElement)) getRootRef()?.focus({ preventScroll: true });
+
             setIsCleared(true);
             props.onClear?.();
         }, getClearDurationMs());
@@ -184,14 +189,14 @@ export const ScratchCard = (props: ScratchCardProps) => {
     });
 
     const handleKeyDown = (e: KeyboardEvent) => {
-        if (getIsDisabled() || !CLEAR_KEYS.includes(e.key)) return;
+        if (getIsDisabled() || !NavigatorUtils.getIsActivationKey(e.key)) return;
 
         e.preventDefault();
         setIsClearing(true);
     };
 
     return (
-        <div class={styles.scratchCardRoot}>
+        <div ref={setRootRef} class={styles.scratchCardRoot} tabindex={-1}>
             {props.renderContent()}
 
             <svg class={styles.scratchCardDefs} aria-hidden="true">
