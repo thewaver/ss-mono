@@ -1,17 +1,21 @@
 import type { Signal } from "solid-js";
-import { createEffect, createSignal, createUniqueId, untrack } from "solid-js";
+import { createEffect, createMemo, createSignal, createUniqueId, untrack } from "solid-js";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { DateValue } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
 import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
+import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
+import { PopupTrigger } from "../../../Primitives/PopupTrigger/PopupTrigger";
+import type { PopupTriggerFlags } from "../../../Primitives/PopupTrigger/PopupTrigger.types";
 import { access } from "../../../Utils/propUtils";
 import { Calendar } from "../Calendar/Calendar";
 import { DateInput } from "../DateInput/DateInput";
 import type { DatePickerProps } from "./DatePicker.types";
 
 const DEFAULT_DATE_PICKER_PLACEMENT: AnchorPlacement = { x: "left-in", y: "bottom-out" };
+const DEFAULT_DATE_PICKER_TRIGGER_LABEL = "Open the calendar";
 const DEFAULT_DATE_PICKER_CALENDAR_LABEL = "Choose a date";
 
 const toMonth = (value: DateValue): DateValue => DateValueUtils.getStartOfMonth(value);
@@ -33,9 +37,19 @@ export const DatePicker = (props: DatePickerProps) => {
         getRootRef()?.querySelector("input")?.focus();
     };
 
+    const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
+
     const open = () => {
+        if (getIsDisabled()) return;
+
         setIsOpen(true);
     };
+
+    createEffect(() => {
+        if (!getIsOpen() || !getIsDisabled()) return;
+
+        setIsOpen(false);
+    });
 
     createEffect(() => {
         if (!getIsOpen()) return;
@@ -65,7 +79,24 @@ export const DatePicker = (props: DatePickerProps) => {
         <div ref={setRootRef}>
             <DateInput
                 {...props}
-                renderTrailing={() => props.renderTrigger(getIsOpen, () => (getIsOpen() ? dismiss() : open()))}
+                renderTrailing={() => (
+                    <InteractionWrapper<PopupTriggerFlags>
+                        isDisabled={getIsDisabled}
+                        extraFlags={() => ({ isOpen: getIsOpen() })}
+                        renderControl={(setElementRef, getRenderProps) => (
+                            <PopupTrigger
+                                ref={setElementRef}
+                                id={props.triggerId}
+                                popupId={() => popupId}
+                                isOpen={getIsOpen}
+                                ariaLabel={() => access(props.triggerAriaLabel) ?? DEFAULT_DATE_PICKER_TRIGGER_LABEL}
+                                flags={getRenderProps}
+                                renderContent={props.renderTrigger}
+                                onToggle={() => (getIsOpen() ? dismiss() : open())}
+                            />
+                        )}
+                    />
+                )}
             />
 
             <Popover

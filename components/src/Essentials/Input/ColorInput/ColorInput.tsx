@@ -21,14 +21,9 @@ const DEFAULT_COLOR_INPUT_PICKER_LABEL = "Choose a color";
 const DEFAULT_COLOR_INPUT_AREA_LABEL = "Saturation and brightness";
 const DEFAULT_COLOR_INPUT_HUE_LABEL = "Hue";
 const STARTING_COLOR: Color.HSVA = { h: 0, s: 0, v: 0, a: 1 };
+const DEFAULT_NOTATION: Color.Notation = "hex";
 const HUE_MAX = 360;
 const HUE_STEP = 1;
-const OPAQUE = 1;
-
-const toHexValue = (hsva: Color.HSVA) => (hsva.a < OPAQUE ? Color.HSVA.toHexa(hsva) : Color.HSV.toHex(hsva));
-
-const getIsSameValue = (a: string, b: string) =>
-    Color.Hexa.isHexa(a) && Color.Hexa.isHexa(b) ? Color.Hexa.getIsSameHexa(a, b) : a === b;
 
 const ColorInputField = (props: ColorInputFieldProps) => {
     const getAriaLabel = LabelUtils.resolveAriaLabel(
@@ -79,9 +74,13 @@ export const ColorInput = (props: ColorInputProps) => {
     const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
     const startingValue = props.valueSignal[0]();
 
-    const [getHsv, setHsv] = createSignal<Color.HSVA>(
-        Color.Hexa.isHexa(startingValue) ? Color.Hexa.toHsva(startingValue) : STARTING_COLOR,
+    const [getHsv, setHsv] = createSignal<Color.HSVA>(Color.parse(startingValue) ?? STARTING_COLOR);
+    const [getNotation, setNotation] = createSignal<Color.Notation>(
+        Color.getNotationOf(startingValue) ?? DEFAULT_NOTATION,
     );
+    const [getIsUnreadable, setIsUnreadable] = createSignal(Color.parse(startingValue) === undefined);
+
+    const toValue = (hsva: Color.HSVA) => Color.toNotation(hsva, untrack(getNotation));
 
     const hsvSignal: Signal<Color.HSVA> = [getHsv, setHsv];
     const hueSignal: Signal<number> = [() => getHsv().h, (hue) => setHueValue(hue)];
@@ -96,6 +95,18 @@ export const ColorInput = (props: ColorInputProps) => {
         return next;
     };
 
+    const open = () => {
+        if (getIsDisabled()) return;
+
+        setIsOpen(true);
+    };
+
+    createEffect(() => {
+        if (!getIsOpen() || !getIsDisabled()) return;
+
+        setIsOpen(false);
+    });
+
     const dismiss = () => {
         if (!getIsOpen()) return;
 
@@ -105,24 +116,31 @@ export const ColorInput = (props: ColorInputProps) => {
 
     createEffect(() => {
         const value = props.valueSignal[0]();
+        const parsed = Color.parse(value);
+
+        setIsUnreadable(parsed === undefined);
+
+        if (parsed === undefined) return;
+
+        setNotation(Color.getNotationOf(value) ?? DEFAULT_NOTATION);
 
         if (
-            getIsSameValue(
+            Color.isSame(
                 value,
-                untrack(() => toHexValue(getHsv())),
+                untrack(() => toValue(getHsv())),
             )
         )
             return;
 
-        if (!Color.Hexa.isHexa(value)) return;
-
-        setHsv(() => Color.Hexa.toHsva(value));
+        setHsv(() => parsed);
     });
 
     createEffect(() => {
-        const value = toHexValue(getHsv());
+        const value = toValue(getHsv());
 
-        if (getIsSameValue(untrack(props.valueSignal[0]), value)) return;
+        if (untrack(getIsUnreadable)) return;
+
+        if (Color.isSame(untrack(props.valueSignal[0]), value)) return;
 
         props.valueSignal[1](value);
 
@@ -155,10 +173,12 @@ export const ColorInput = (props: ColorInputProps) => {
         <>
             <InteractionWrapper
                 {...props}
+                hasError={() => (access(props.hasError) ?? false) || getIsUnreadable()}
                 extraFlags={(): ColorInputRenderProps => ({
                     value: props.valueSignal[0](),
                     hsv: getHsv(),
                     isOpen: getIsOpen(),
+                    isUnreadable: getIsUnreadable(),
                 })}
                 ref={(element) => {
                     setFieldRef(element);
@@ -173,7 +193,7 @@ export const ColorInput = (props: ColorInputProps) => {
                         isOpen={getIsOpen}
                         flags={getRenderProps}
                         renderContent={props.renderContent}
-                        onToggle={() => setIsOpen((prev) => !prev)}
+                        onToggle={() => (getIsOpen() ? setIsOpen(false) : open())}
                         onMouseEnter={props.onMouseEnter}
                         onMouseLeave={props.onMouseLeave}
                     />
@@ -191,6 +211,7 @@ export const ColorInput = (props: ColorInputProps) => {
                 placement={() => access(props.placement) ?? DEFAULT_COLOR_INPUT_PLACEMENT}
                 offset={props.offset}
                 transitionDurationMs={props.transitionDurationMs}
+                hasAutoFocus={true}
                 onDismiss={(reason) => (reason === "escape" ? dismiss() : setIsOpen(false))}
                 renderContent={(getVisibilityTarget, getTransitionDurationMs) =>
                     props.renderPopup(renderSurface, hsvSignal, getVisibilityTarget, getTransitionDurationMs)

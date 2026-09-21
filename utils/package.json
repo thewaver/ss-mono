@@ -47,6 +47,7 @@
         "test:watch": "vitest"
     },
     "dependencies": {
+        "colord": "^2.10.0",
         "csstype": "^3.2.3",
         "fast-equals": "^6.0.3"
     },

@@ -13,12 +13,12 @@ export type WheelExampleProps = AccessorProps<{
     settleDurationMs: number;
     restDurationMs: number;
     idleDelayMs: number | undefined;
-    indexSignal: Signal<number>;
+    targetIndexSignal: Signal<number>;
     computeSpinDefs: (index: number, wedgeCount: number) => RotatorSpinDefs;
     onSelectedWedgeChange: (index: number) => void;
 }>;
 
-export type WheelSharedProps = Omit<WheelExampleProps, "indexSignal" | "onSelectedWedgeChange">;
+export type WheelSharedProps = Omit<WheelExampleProps, "targetIndexSignal" | "onSelectedWedgeChange">;
 
 export type WheelsControls = {
     wedgeCountSignal: Signal<number>;

@@ -21,17 +21,17 @@ export namespace VirtualizerUtils {
      * Finds the nearest ancestor that actually scrolls vertically.
      *
      * @param getRef The element to search up from.
-     * @param getIsEnabled Pass `false` to stop looking.
+     * @param getIsDisabled Pass `true` to stop looking.
      * @returns The scroller, or `undefined` when there is none — which is the signal that virtualizing
      * cannot work here and every row should be drawn.
      */
-    export const createScrollParent = (getRef: Accessor<HTMLElement | undefined>, getIsEnabled: Accessor<boolean>) => {
+    export const createScrollParent = (getRef: Accessor<HTMLElement | undefined>, getIsDisabled: Accessor<boolean>) => {
         const [getScrollParent, setScrollParent] = createSignal<HTMLElement>();
 
         createEffect(() => {
             const ref = getRef();
 
-            if (!ref || !getIsEnabled()) {
+            if (!ref || getIsDisabled()) {
                 setScrollParent(undefined);
 
                 return;
@@ -64,7 +64,7 @@ export namespace VirtualizerUtils {
      *
      * @param getRef The list's own element.
      * @param getCount How many rows there are.
-     * @param opts.getIsEnabled Whether to virtualize at all.
+     * @param opts.getIsDisabled Whether to skip virtualizing altogether.
      * @param opts.computeEstimatedSize A row's likely height, used before it has been measured. Being
      * wrong only costs a scrollbar that settles as rows are measured.
      * @param opts.getPinnedRows Rows to keep drawn wherever the scroll is — a selected row that must
@@ -80,7 +80,7 @@ export namespace VirtualizerUtils {
         getCount: Accessor<number>,
         opts: VirtualizerRowWindowOpts,
     ): VirtualizerRowWindow => {
-        const getScrollParent = createScrollParent(getRef, opts.getIsEnabled);
+        const getScrollParent = createScrollParent(getRef, opts.getIsDisabled);
 
         const [getScrollMargin, setScrollMargin] = createSignal(0);
 
@@ -106,7 +106,7 @@ export namespace VirtualizerUtils {
                 return getCount();
             },
             get enabled() {
-                return opts.getIsEnabled() && getScrollParent() !== undefined;
+                return !opts.getIsDisabled() && getScrollParent() !== undefined;
             },
             get estimateSize() {
                 return opts.computeEstimatedSize;
@@ -133,12 +133,12 @@ export namespace VirtualizerUtils {
             },
         });
 
-        const getRows = createMemo(() => (opts.getIsEnabled() ? virtualizer.getVirtualItems() : []));
+        const getRows = createMemo(() => (opts.getIsDisabled() ? [] : virtualizer.getVirtualItems()));
 
-        const getTotalSize = createMemo(() => (opts.getIsEnabled() ? virtualizer.getTotalSize() : 0));
+        const getTotalSize = createMemo(() => (opts.getIsDisabled() ? 0 : virtualizer.getTotalSize()));
 
         return {
-            getIsLive: () => opts.getIsEnabled() && getScrollParent() !== undefined,
+            getIsLive: () => !opts.getIsDisabled() && getScrollParent() !== undefined,
             getRows,
             getTotalSize,
             getRowStart: (row) => row.start - getScrollMargin(),

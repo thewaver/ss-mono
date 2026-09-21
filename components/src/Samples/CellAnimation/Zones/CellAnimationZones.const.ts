@@ -1,33 +1,38 @@
-import { type Point2d, Point2dUtils } from "@thewaver/ss-utils";
+import { type Index2d } from "@thewaver/ss-utils";
 
 import type { CellAnimationEvaluationDefs } from "../../../Exotics/CellAnimation/CellAnimation.types";
 import { CellAnimationUtils } from "../../../Exotics/CellAnimation/CellAnimation.utils";
+import { CellAnimationWeightUtils } from "../Weights/CellAnimationWeights.utils";
 
 const zoneRegistry: Record<CellAnimationZones.ZoneType, CellAnimationZones.ZoneFn> = {
     all: () => true,
-    top: ({ pos, origin }) => pos.y < origin.y,
-    left: ({ pos, origin }) => pos.x < origin.x,
-    bottom: ({ pos, origin }) => pos.y > origin.y,
-    right: ({ pos, origin }) => pos.x > origin.x,
-    quadrant1: ({ pos, origin }) => pos.x > origin.x && pos.y < origin.y,
-    quadrant2: ({ pos, origin }) => pos.x < origin.x && pos.y < origin.y,
-    quadrant3: ({ pos, origin }) => pos.x < origin.x && pos.y > origin.y,
-    quadrant4: ({ pos, origin }) => pos.x > origin.x && pos.y > origin.y,
-    axisX: ({ pos, origin }) => pos.y === origin.y,
-    axisY: ({ pos, origin }) => pos.x === origin.x,
-    axis1: ({ pos, origin }) => pos.x === origin.x && pos.y < origin.y,
-    axis2: ({ pos, origin }) => pos.x < origin.x && pos.y === origin.y,
-    axis3: ({ pos, origin }) => pos.x > origin.x && pos.y === origin.y,
-    axis4: ({ pos, origin }) => pos.x === origin.x && pos.y > origin.y,
-    origin: ({ pos, origin }) => pos.x === origin.x && pos.y === origin.y,
-    evenRows: ({ pos, origin }) => CellAnimationUtils.isEvenRow(Point2dUtils.getDelta(origin, pos)),
-    oddRows: ({ pos, origin }) => !CellAnimationUtils.isEvenRow(Point2dUtils.getDelta(origin, pos)),
-    evenColumns: ({ pos, origin }) => CellAnimationUtils.isEvenColumn(Point2dUtils.getDelta(origin, pos)),
-    oddColumns: ({ pos, origin }) => !CellAnimationUtils.isEvenColumn(Point2dUtils.getDelta(origin, pos)),
-    evenRings: ({ pos, origin }) => CellAnimationUtils.isEvenRing(Point2dUtils.getDelta(origin, pos)),
-    oddRings: ({ pos, origin }) => !CellAnimationUtils.isEvenRing(Point2dUtils.getDelta(origin, pos)),
-    evenCheckeredCells: ({ pos, origin }) => CellAnimationUtils.isEvenCheckered(Point2dUtils.getDelta(origin, pos)),
-    oddCheckeredCells: ({ pos, origin }) => !CellAnimationUtils.isEvenCheckered(Point2dUtils.getDelta(origin, pos)),
+    top: ({ pos, origin }) => pos.row < origin.row,
+    left: ({ pos, origin }) => pos.col < origin.col,
+    bottom: ({ pos, origin }) => pos.row > origin.row,
+    right: ({ pos, origin }) => pos.col > origin.col,
+    quadrant1: ({ pos, origin }) => pos.col > origin.col && pos.row < origin.row,
+    quadrant2: ({ pos, origin }) => pos.col < origin.col && pos.row < origin.row,
+    quadrant3: ({ pos, origin }) => pos.col < origin.col && pos.row > origin.row,
+    quadrant4: ({ pos, origin }) => pos.col > origin.col && pos.row > origin.row,
+    axisX: ({ pos, origin }) => pos.row === origin.row,
+    axisY: ({ pos, origin }) => pos.col === origin.col,
+    axis1: ({ pos, origin }) => pos.col === origin.col && pos.row < origin.row,
+    axis2: ({ pos, origin }) => pos.col < origin.col && pos.row === origin.row,
+    axis3: ({ pos, origin }) => pos.col > origin.col && pos.row === origin.row,
+    axis4: ({ pos, origin }) => pos.col === origin.col && pos.row > origin.row,
+    origin: ({ pos, origin }) => pos.col === origin.col && pos.row === origin.row,
+    evenRows: ({ pos, origin }) => CellAnimationUtils.isEvenRow(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+    oddRows: ({ pos, origin }) => !CellAnimationUtils.isEvenRow(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+    evenColumns: ({ pos, origin }) =>
+        CellAnimationUtils.isEvenColumn(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+    oddColumns: ({ pos, origin }) =>
+        !CellAnimationUtils.isEvenColumn(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+    evenRings: ({ pos, origin }) => CellAnimationUtils.isEvenRing(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+    oddRings: ({ pos, origin }) => !CellAnimationUtils.isEvenRing(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+    evenCheckeredCells: ({ pos, origin }) =>
+        CellAnimationUtils.isEvenCheckered(CellAnimationWeightUtils.getCellDelta(origin, pos)),
+    oddCheckeredCells: ({ pos, origin }) =>
+        !CellAnimationUtils.isEvenCheckered(CellAnimationWeightUtils.getCellDelta(origin, pos)),
     lighterHalf: ({ weight }) => weight < 0.5,
     heavierHalf: ({ weight }) => weight >= 0.5,
 };
@@ -64,8 +69,8 @@ export namespace CellAnimationZones {
 
     export type ZoneType = (typeof ZONE_TYPES)[number];
 
-    export type ZoneFn = (defs: CellAnimationEvaluationDefs & { origin: Point2d }) => boolean;
+    export type ZoneFn = (defs: CellAnimationEvaluationDefs & { origin: Index2d }) => boolean;
 
-    export const isInZone = (type: ZoneType, defs: CellAnimationEvaluationDefs & { origin: Point2d }) =>
+    export const isInZone = (type: ZoneType, defs: CellAnimationEvaluationDefs & { origin: Index2d }) =>
         zoneRegistry[type](defs);
 }

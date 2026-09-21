@@ -3,16 +3,16 @@ import { describe, expect, it } from "vitest";
 import type { SortableGridBox, SortableGridSpot } from "./SortableGrid.types";
 import { SortableGridUtils } from "./SortableGrid.utils";
 
-const box = (x: number, y: number, width: number, height: number): SortableGridBox => ({
-    spot: { x, y },
-    size: { width, height },
+const box = (col: number, row: number, colCount: number, rowCount: number): SortableGridBox => ({
+    spot: { col, row },
+    size: { colCount, rowCount },
 });
 
-const at = (x: number, y: number): SortableGridSpot => ({ x, y });
+const at = (col: number, row: number): SortableGridSpot => ({ col, row });
 
 const ELL = [at(0, 0), at(0, 1), at(0, 2), at(1, 2)];
 
-const keys = (cells: SortableGridSpot[]) => cells.map((cell) => `${cell.x},${cell.y}`).sort();
+const keys = (cells: SortableGridSpot[]) => cells.map((cell) => `${cell.col},${cell.row}`).sort();
 
 const COLUMNS = 6;
 const ROWS = 4;
@@ -22,7 +22,7 @@ const GAP = 2;
 
 describe("getCells", () => {
     it("expands a rectangle into every cell it covers", () => {
-        expect(keys(SortableGridUtils.getCells({ width: 2, height: 2 }))).toEqual(
+        expect(keys(SortableGridUtils.getCells({ colCount: 2, rowCount: 2 }))).toEqual(
             keys([at(0, 0), at(1, 0), at(0, 1), at(1, 1)]),
         );
     });
@@ -34,11 +34,11 @@ describe("getCells", () => {
 
 describe("getTurnedCells", () => {
     it("turns a rectangle onto its side, which is the same either way round", () => {
-        const cw = SortableGridUtils.getTurnedCells(SortableGridUtils.getCells({ width: 2, height: 1 }), 1);
-        const ccw = SortableGridUtils.getTurnedCells(SortableGridUtils.getCells({ width: 2, height: 1 }), -1);
+        const cw = SortableGridUtils.getTurnedCells(SortableGridUtils.getCells({ colCount: 2, rowCount: 1 }), 1);
+        const ccw = SortableGridUtils.getTurnedCells(SortableGridUtils.getCells({ colCount: 2, rowCount: 1 }), -1);
 
         expect(keys(cw)).toEqual(keys(ccw));
-        expect(SortableGridUtils.getSize(cw)).toEqual({ width: 1, height: 2 });
+        expect(SortableGridUtils.getSize(cw)).toEqual({ colCount: 1, rowCount: 2 });
     });
 
     it("turns an L two different ways, which is the whole reason turns are counted rather than flagged", () => {
@@ -61,12 +61,12 @@ describe("getTurnedCells", () => {
 
 describe("getIsInside", () => {
     it("takes a box that ends exactly on the last cell", () => {
-        expect(SortableGridUtils.getIsInside(at(4, 2), { width: 2, height: 2 }, COLUMNS, ROWS)).toBe(true);
+        expect(SortableGridUtils.getIsInside(at(4, 2), { colCount: 2, rowCount: 2 }, COLUMNS, ROWS)).toBe(true);
     });
 
     it("refuses one that hangs off the right or the bottom", () => {
-        expect(SortableGridUtils.getIsInside(at(5, 0), { width: 2, height: 1 }, COLUMNS, ROWS)).toBe(false);
-        expect(SortableGridUtils.getIsInside(at(0, 3), { width: 1, height: 2 }, COLUMNS, ROWS)).toBe(false);
+        expect(SortableGridUtils.getIsInside(at(5, 0), { colCount: 2, rowCount: 1 }, COLUMNS, ROWS)).toBe(false);
+        expect(SortableGridUtils.getIsInside(at(0, 3), { colCount: 1, rowCount: 2 }, COLUMNS, ROWS)).toBe(false);
     });
 });
 
@@ -82,13 +82,13 @@ describe("getIsFree", () => {
 
 describe("getFreeSpot", () => {
     it("scans row by row, so the first answer is the topmost then the leftmost", () => {
-        const shape = SortableGridUtils.getShape({ width: 1, height: 1 }, 0);
+        const shape = SortableGridUtils.getShape({ colCount: 1, rowCount: 1 }, 0);
 
         expect(SortableGridUtils.getFreeSpot(shape, COLUMNS, ROWS, [at(0, 0), at(1, 0)])).toEqual(at(2, 0));
     });
 
     it("answers with nothing when there is nowhere it fits", () => {
-        const shape = SortableGridUtils.getShape({ width: 2, height: 1 }, 0);
+        const shape = SortableGridUtils.getShape({ colCount: 2, rowCount: 1 }, 0);
 
         expect(SortableGridUtils.getFreeSpot(shape, 1, 1, [])).toBeUndefined();
     });
@@ -98,12 +98,12 @@ describe("getNeighborIndex", () => {
     const BOXES = [box(0, 0, 1, 1), box(2, 0, 1, 1), box(0, 2, 1, 1), box(3, 3, 1, 1)];
 
     it("moves to the nearest box in the direction asked for", () => {
-        expect(SortableGridUtils.getNeighborIndex(BOXES, 0, { x: 1, y: 0 })).toBe(1);
-        expect(SortableGridUtils.getNeighborIndex(BOXES, 0, { x: 0, y: 1 })).toBe(2);
+        expect(SortableGridUtils.getNeighborIndex(BOXES, 0, { col: 1, row: 0 })).toBe(1);
+        expect(SortableGridUtils.getNeighborIndex(BOXES, 0, { col: 0, row: 1 })).toBe(2);
     });
 
     it("answers with nothing when there is nothing that way", () => {
-        expect(SortableGridUtils.getNeighborIndex(BOXES, 0, { x: -1, y: 0 })).toBeUndefined();
+        expect(SortableGridUtils.getNeighborIndex(BOXES, 0, { col: -1, row: 0 })).toBeUndefined();
     });
 });
 
@@ -150,20 +150,20 @@ describe("getOutline", () => {
 
 describe("getBlock", () => {
     it("takes the whole of a rectangle, so an even one centers properly", () => {
-        expect(SortableGridUtils.getBlock(SortableGridUtils.getCells({ width: 2, height: 2 }))).toEqual({
+        expect(SortableGridUtils.getBlock(SortableGridUtils.getCells({ colCount: 2, rowCount: 2 }))).toEqual({
             spot: at(0, 0),
-            size: { width: 2, height: 2 },
+            size: { colCount: 2, rowCount: 2 },
         });
     });
 
     it("takes the long arm of an L rather than a corner cell", () => {
-        expect(SortableGridUtils.getBlock(ELL)).toEqual({ spot: at(0, 0), size: { width: 1, height: 3 } });
+        expect(SortableGridUtils.getBlock(ELL)).toEqual({ spot: at(0, 0), size: { colCount: 1, rowCount: 3 } });
     });
 
     it("prefers the block nearest the shape's own center when several are the same size", () => {
         expect(SortableGridUtils.getBlock([at(0, 0), at(1, 0), at(1, 1), at(2, 1)])).toEqual({
             spot: at(1, 0),
-            size: { width: 1, height: 2 },
+            size: { colCount: 1, rowCount: 2 },
         });
     });
 });

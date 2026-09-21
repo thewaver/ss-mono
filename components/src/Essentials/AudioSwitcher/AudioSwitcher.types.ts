@@ -1,7 +1,12 @@
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
 export type AudioSwitcherController = {
-    reset: () => void;
+    /**
+     * Rewinds the playing track to its start, leaving it playing or paused as it was.
+     *
+     * @returns `true`, since it always acts.
+     */
+    reset: () => boolean;
 };
 
 export type AudioSwitcherProps = AccessorProps<{

@@ -48,9 +48,9 @@ describe("Color.Hex.toRgb", () => {
 
 describe("Color.RGB.toHsv", () => {
     it("places the primaries on their hue", () => {
-        expect(Color.Hex.toHsv(RED)).toEqual({ h: 0, s: 1, v: 1 });
-        expect(Color.Hex.toHsv(GREEN)).toEqual({ h: 120, s: 1, v: 1 });
-        expect(Color.Hex.toHsv(BLUE)).toEqual({ h: 240, s: 1, v: 1 });
+        expect(Color.Hex.toHsv(RED)).toEqual({ h: 0, s: 100, v: 100 });
+        expect(Color.Hex.toHsv(GREEN)).toEqual({ h: 120, s: 100, v: 100 });
+        expect(Color.Hex.toHsv(BLUE)).toEqual({ h: 240, s: 100, v: 100 });
     });
 
     it("reports greys as unsaturated with a hue of zero", () => {
@@ -58,7 +58,7 @@ describe("Color.RGB.toHsv", () => {
 
         expect(grey.s).toBe(0);
         expect(grey.h).toBe(0);
-        expect(grey.v).toBeCloseTo(0.502, 3);
+        expect(grey.v).toBeCloseTo(50.2, 1);
     });
 
     it("reports black as fully dark", () => {
@@ -68,33 +68,33 @@ describe("Color.RGB.toHsv", () => {
 
 describe("Color.RGB.toHsl", () => {
     it("places the primaries at half lightness", () => {
-        expect(Color.Hex.toHsl(RED)).toEqual({ h: 0, s: 1, l: 0.5 });
-        expect(Color.Hex.toHsl(GREEN)).toEqual({ h: 120, s: 1, l: 0.5 });
+        expect(Color.Hex.toHsl(RED)).toEqual({ h: 0, s: 100, l: 50 });
+        expect(Color.Hex.toHsl(GREEN)).toEqual({ h: 120, s: 100, l: 50 });
     });
 
     it("reports white and black as unsaturated", () => {
-        expect(Color.Hex.toHsl("#ffffff")).toEqual({ h: 0, s: 0, l: 1 });
+        expect(Color.Hex.toHsl("#ffffff")).toEqual({ h: 0, s: 0, l: 100 });
         expect(Color.Hex.toHsl("#000000")).toEqual({ h: 0, s: 0, l: 0 });
     });
 });
 
 describe("Color hue wrapping", () => {
     it("treats hues outside 0-360 as their wrapped equivalent", () => {
-        const base = Color.HSV.toRgb({ h: 30, s: 1, v: 1 });
+        const base = Color.HSV.toRgb({ h: 30, s: 100, v: 100 });
 
-        expect(Color.HSV.toRgb({ h: 390, s: 1, v: 1 })).toEqual(base);
-        expect(Color.HSV.toRgb({ h: -330, s: 1, v: 1 })).toEqual(base);
+        expect(Color.HSV.toRgb({ h: 390, s: 100, v: 100 })).toEqual(base);
+        expect(Color.HSV.toRgb({ h: -330, s: 100, v: 100 })).toEqual(base);
     });
 
     it("wraps the hue in HSL as well", () => {
-        expect(Color.HSL.toRgb({ h: 390, s: 1, l: 0.5 })).toEqual(Color.HSL.toRgb({ h: 30, s: 1, l: 0.5 }));
+        expect(Color.HSL.toRgb({ h: 390, s: 100, l: 50 })).toEqual(Color.HSL.toRgb({ h: 30, s: 100, l: 50 }));
     });
 });
 
 describe("Color clamping", () => {
-    it("clamps saturation and value that fall outside 0-1", () => {
-        expect(round(Color.HSV.toRgb({ h: 0, s: 5, v: 5 }))).toEqual({ r: 255, g: 0, b: 0 });
-        expect(round(Color.HSV.toRgb({ h: 0, s: -1, v: -1 }))).toEqual({ r: 0, g: 0, b: 0 });
+    it("clamps saturation and value that fall outside 0-100", () => {
+        expect(round(Color.HSV.toRgb({ h: 0, s: 500, v: 500 }))).toEqual({ r: 255, g: 0, b: 0 });
+        expect(round(Color.HSV.toRgb({ h: 0, s: -100, v: -100 }))).toEqual({ r: 0, g: 0, b: 0 });
     });
 
     it("clamps alpha on the way in and out", () => {
@@ -190,28 +190,66 @@ describe("Color.Hexa.isHexa", () => {
     });
 });
 
-describe("Color.Hex.getIsSameHex", () => {
+describe("Color.isSame", () => {
     it("matches the short and long forms of one colour", () => {
-        expect(Color.Hex.getIsSameHex("#abc", "#aabbcc")).toBe(true);
-        expect(Color.Hex.getIsSameHex("#ABC", "#aabbcc")).toBe(true);
+        expect(Color.isSame("#abc", "#aabbcc")).toBe(true);
+        expect(Color.isSame("#ABC", "#aabbcc")).toBe(true);
+        expect(Color.isSame("#abcf", "#aabbccff")).toBe(true);
     });
 
     it("separates different colours", () => {
-        expect(Color.Hex.getIsSameHex("#abc", "#abd")).toBe(false);
-    });
-});
-
-describe("Color.Hexa.getIsSameHexa", () => {
-    it("matches the short and long forms of one colour", () => {
-        expect(Color.Hexa.getIsSameHexa("#abcf", "#aabbccff")).toBe(true);
+        expect(Color.isSame("#abc", "#abd")).toBe(false);
     });
 
     it("treats a missing alpha pair as fully opaque", () => {
-        expect(Color.Hexa.getIsSameHexa("#aabbcc", "#aabbccff")).toBe(true);
+        expect(Color.isSame("#aabbcc", "#aabbccff")).toBe(true);
     });
 
     it("separates colours that differ only in opacity", () => {
-        expect(Color.Hexa.getIsSameHexa("#aabbcc", "#aabbcc80")).toBe(false);
+        expect(Color.isSame("#aabbcc", "#aabbcc80")).toBe(false);
+    });
+
+    it("reaches across notations, which is what a single hex comparison could not", () => {
+        expect(Color.isSame("red", "#ff0000")).toBe(true);
+        expect(Color.isSame("rgb(255 0 0)", "hsl(0 100% 50%)")).toBe(true);
+    });
+
+    it("refuses a string that is not a colour rather than guessing", () => {
+        expect(Color.isSame("not-a-colour", "#ff0000")).toBe(false);
+    });
+});
+
+describe("Color.parse and Color.getNotationOf", () => {
+    it("reads every notation into one shape", () => {
+        expect(Color.parse("red")).toEqual({ h: 0, s: 100, v: 100, a: 1 });
+        expect(Color.parse("#ff0000")).toEqual({ h: 0, s: 100, v: 100, a: 1 });
+        expect(Color.parse("rgb(255 0 0)")).toEqual({ h: 0, s: 100, v: 100, a: 1 });
+        expect(Color.parse("hsl(0 100% 50%)")).toEqual({ h: 0, s: 100, v: 100, a: 1 });
+    });
+
+    it("answers nothing for a string it cannot read, rather than a colour", () => {
+        expect(Color.parse("not-a-colour")).toBe(undefined);
+        expect(Color.getNotationOf("not-a-colour")).toBe(undefined);
+    });
+
+    it("reports which notation a string was written in", () => {
+        expect(Color.getNotationOf("red")).toBe("name");
+        expect(Color.getNotationOf("#ff0000")).toBe("hex");
+        expect(Color.getNotationOf("rgb(255 0 0)")).toBe("rgb");
+        expect(Color.getNotationOf("hsl(0 100% 50%)")).toBe("hsl");
+    });
+
+    it("round trips a value back into the notation it arrived in", () => {
+        for (const value of ["#ff0000", "rgb(255, 0, 0)", "hsl(0, 100%, 50%)"]) {
+            const notation = Color.getNotationOf(value)!;
+
+            expect(Color.isSame(Color.toNotation(Color.parse(value)!, notation), value)).toBe(true);
+            expect(Color.getNotationOf(Color.toNotation(Color.parse(value)!, notation))).toBe(notation);
+        }
+    });
+
+    it("writes a named colour as hex, since not every colour has a name", () => {
+        expect(Color.toNotation(Color.parse("red")!, "name")).toBe("#ff0000");
     });
 });
 
@@ -251,9 +289,9 @@ describe("Color toCss", () => {
     });
 
     it("describes white and black in every space", () => {
-        expect(Color.HSV.toCss({ h: 0, s: 0, v: 1 })).toBe("hwb(0 100% 0%)");
+        expect(Color.HSV.toCss({ h: 0, s: 0, v: 100 })).toBe("hwb(0 100% 0%)");
         expect(Color.HSV.toCss({ h: 0, s: 0, v: 0 })).toBe("hwb(0 0% 100%)");
-        expect(Color.HSL.toCss({ h: 0, s: 0, l: 1 })).toBe("hsl(0 0% 100%)");
+        expect(Color.HSL.toCss({ h: 0, s: 0, l: 100 })).toBe("hsl(0 0% 100%)");
     });
 });
 
@@ -298,15 +336,15 @@ describe("Color.RGBA.interpolate", () => {
 
 describe("Color.HSL.interpolate", () => {
     it("takes the shorter arc across zero rather than the long way round", () => {
-        expect(Color.HSL.interpolate({ h: 350, s: 1, l: 0.5 }, { h: 10, s: 1, l: 0.5 }, 0.5).h).toBe(0);
+        expect(Color.HSL.interpolate({ h: 350, s: 100, l: 50 }, { h: 10, s: 100, l: 50 }, 0.5).h).toBe(0);
     });
 
     it("does not cross zero when the direct route is shorter", () => {
-        expect(Color.HSL.interpolate({ h: 10, s: 1, l: 0.5 }, { h: 110, s: 1, l: 0.5 }, 0.5).h).toBe(60);
+        expect(Color.HSL.interpolate({ h: 10, s: 100, l: 50 }, { h: 110, s: 100, l: 50 }, 0.5).h).toBe(60);
     });
 
     it("goes the increasing way when the hues are exactly opposite", () => {
-        expect(Color.HSL.interpolate({ h: 0, s: 1, l: 0.5 }, { h: 180, s: 1, l: 0.5 }, 0.5).h).toBe(90);
+        expect(Color.HSL.interpolate({ h: 0, s: 100, l: 50 }, { h: 180, s: 100, l: 50 }, 0.5).h).toBe(90);
     });
 
     it("holds saturation up across the blend, where a channel blend would not", () => {
@@ -319,7 +357,7 @@ describe("Color.HSL.interpolate", () => {
 
 describe("Color.HSV.interpolate", () => {
     it("takes the shorter arc across zero", () => {
-        expect(Color.HSV.interpolate({ h: 340, s: 1, v: 1 }, { h: 20, s: 1, v: 1 }, 0.5).h).toBe(0);
+        expect(Color.HSV.interpolate({ h: 340, s: 100, v: 100 }, { h: 20, s: 100, v: 100 }, 0.5).h).toBe(0);
     });
 });
 

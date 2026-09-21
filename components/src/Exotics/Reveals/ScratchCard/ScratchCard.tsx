@@ -1,4 +1,14 @@
-import { Show, createEffect, createMemo, createSignal, createUniqueId, on, onCleanup, onMount } from "solid-js";
+import {
+    Show,
+    createEffect,
+    createMemo,
+    createSignal,
+    createUniqueId,
+    on,
+    onCleanup,
+    onMount,
+    untrack,
+} from "solid-js";
 
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
@@ -35,7 +45,7 @@ export const ScratchCard = (props: ScratchCardProps) => {
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) === true);
 
-    const getSize = ElementObserverUtils.createBorderBoxSizeObserver(getCoverRef, () => !getIsDisabled());
+    const getSize = ElementObserverUtils.createBorderBoxSizeObserver(getCoverRef, getIsDisabled);
 
     const getBrushRadius = createMemo(() => access(props.brushRadius) ?? DEFAULT_BRUSH_RADIUS);
 
@@ -93,7 +103,20 @@ export const ScratchCard = (props: ScratchCardProps) => {
         setClearedRatio(NOTHING_RUBBED);
     };
 
-    const controller = createMemo(() => ({ reset, clear: () => setIsClearing(true) }));
+    const controller = createMemo(() => ({
+        reset: () => {
+            reset();
+
+            return true;
+        },
+        clear: () => {
+            if (untrack(getIsClearing)) return false;
+
+            setIsClearing(true);
+
+            return true;
+        },
+    }));
 
     onMount(() => {
         props.onMount?.(controller());

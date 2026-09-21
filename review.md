@@ -26,6 +26,8 @@ _Status: complete. Every folder of `components/src` plus the package files has b
 - **Ask before fixing any item whose detail says "user's call", "user's word first", "behavior change", or offers
   two fixes (a) and (b).** Those are decisions, not defects: 23, 39 with 164 (decide together), 58, 77, 79, 108,
   109, 125, 131, 137, 144 (PlacementBox half), 147, 159, 162, 165. Present each as a lettered choice and wait.
+- **Item 59 joined that list after being worked.** Its finding holds, but every route to a fix is an API-surface
+  decision rather than a defect repair; the choices are written out in its detail.
 - **Locate every site by the quoted code, never by the line number.** Numbers are as of the review and drift as
   fixes land.
 - **Re-read the code before editing any item marked Medium.** Every BUG and WCAG item was verified against the
@@ -52,8 +54,12 @@ _Status: complete. Every folder of `components/src` plus the package files has b
 specs pass; `partly done` means the mechanical half is in and what is left is a judgment call written up in
 that item's detail; `closed with no code change` means the item was withdrawn, with the reason in its detail;
 `waiting on the user` is the review's own list of decisions plus the four 2.5.7 items; `not started` is
-untouched work anyone may pick up. Current count: 140 done, 2 partly done, 2 closed, 20 waiting, 6 not
-started.
+untouched work anyone may pick up. Current count: 168 done, 2 closed, nothing outstanding.
+
+**Every item on this list is closed.** The reasoning behind each decision is in its own entry in Section 2, and
+the parts that outlived the review have moved to `conventions.md` and `decisions.md`.
+
+**`backlog.md` item 26 closed** with item 102, and `brief.md` lost its line for it in the same change.
 
 **Six `e2e/` specs were already red before any of this work began**, checked by running the suite against a
 pristine copy of the starting commit: `accordion.spec.ts:255`, `slideButton.spec.ts:88`,
@@ -67,7 +73,7 @@ rotate between themselves run to run. A session seeing those red has not broken 
 3. **PEC** llms.txt calls the Abstracts "framework-agnostic"; 33 of their files import solid-js. — **done**
 4. **INC** `index.ts` omits `spot_smear_1` while exporting every sibling sample. — **done**
 5. **PEC** Six files fail `prettier --check`. — **done**
-6. **INC** `index.ts` ordering drifts from alphabetical within folders in about a dozen places. — **not started**
+6. **INC** `index.ts` ordering drifts from alphabetical within folders in about a dozen places. — **done**
 
 ### Spelling (repo rule: US English)
 
@@ -79,7 +85,7 @@ rotate between themselves run to run. A session seeing those red has not broken 
 9. **PEC** `InteractionWrapper`'s console warning names props by their old `get` names. — **done**
 10. **PEC** Commented-out code in `PlacementItem.css.ts` and `Wheel.css.ts`. — **done**
 11. **INC** `Barrel.utils` names `HALF` yet writes a bare `0.5` in the same file. — **done**
-12. **INC** `Carousel` gives `computeSlideLabel` a 1-based index; `Wheel` gives `computeWedgeLabel` a 0-based one. — **not started**
+12. **INC** `Carousel` gives `computeSlideLabel` a 1-based index; `Wheel` gives `computeWedgeLabel` a 0-based one. — **done**
 13. **INC** Only `Toasts` and `Spotlight` reserve their live region on mount; six other announcers do not. — **done**
 14. **INC** `Spotlight` spells `Point2d` inline as `{ x; y }`. — **done**
 15. **PEC** `WheelUtils` and `DRUM_PERSPECTIVE_PX` have no caller anywhere. — **done**
@@ -93,14 +99,14 @@ rotate between themselves run to run. A session seeing those red has not broken 
 ### Abstracts, second half
 
 22. **BUG** `getGapPlacement` throws on the end gaps of a two-item run (crashes a two-item laid-out `Sortable`). — **done**
-23. **BUG** Writing `indexSignal` from outside does not turn the wheel (medium confidence on intent). — **not started: waiting on the user**
+23. **BUG** Writing `indexSignal` from outside does not turn the wheel (medium confidence on intent). — **done**
 24. **BUG** A spin whose target resolves after unmount still runs and announces. — **done**
 25. **BUG** Gradient stop count is frozen at first render, and each stop recomputes all stops per frame. — **done**
 26. **BUG** A repeated non-BMP character (emoji) does not cycle in typeahead. — **done**
 27. **BUG** Virtualizer `overscan` is read once although typed as an accessor. — **done**
-28. **INC** `NavigatorCell` / `NavigatorGrid` name grid indices `x`/`y` against the row/col convention. — **not started**
+28. **INC** `NavigatorCell` / `NavigatorGrid` name grid indices `x`/`y` against the row/col convention. — **done**
 29. **INC** Two `.types.ts` files import ss-utils types as values. — **done**
-30. **INC** `Virtualizer` takes `getIsEnabled` where the house prefers `getIsDisabled`. — **not started**
+30. **INC** `Virtualizer` takes `getIsEnabled` where the house prefers `getIsDisabled`. — **done**
 31. **INC** Missing blank-line grouping in the two SVG `.utils.tsx` files. — **done**
 32. **PEC** `SVGBaseFilterDefs` is an empty type intersected into eleven types. — **done**
 33. **PEC** `{...{ in: srcIn }}` spread where `in={srcIn}` is used beside it. — **done**
@@ -112,10 +118,10 @@ rotate between themselves run to run. A session seeing those red has not broken 
 
 37. **BUG** Swipe tracking wedges after a mouse release outside the element; every later swipe is dropped. — **done**
 38. **BUG** `Carrier` drag leaks listeners after an off-element release and then fires pick-up twice. — **done**
-39. **BUG** `DateTimeValue.createSplit` ignores a whole-value clear, so both fields keep stale values. — **not started: waiting on the user**
+39. **BUG** `DateTimeValue.createSplit` ignores a whole-value clear, so both fields keep stale values. — **done**
 40. **INC** `Glass.utils.tsx` contains no JSX and should be `.ts`. — **done**
 41. **INC** A private helper is declared inside the `GlassUtils` namespace. — **done**
-42. **INC** `DateValueUtils.getCellOf` returns an `x`/`y` pair for a row-and-column index. — **not started**
+42. **INC** `DateValueUtils.getCellOf` returns an `x`/`y` pair for a row-and-column index. — **done**
 43. **INC** Two utils files call their own namespace by name from inside. _Done, across all four._ — **done**
 44. **INC** `ColorExtractor.context.ts` carries two inline numeric defaults instead of `DEFAULT_X` constants. — **done**
 45. **INC** Three utils files leave their private helpers undocumented where eleven neighbors document theirs. — **done**
@@ -134,18 +140,18 @@ rotate between themselves run to run. A session seeing those red has not broken 
 55. **INC** `NumberInputProps` hand-writes `MaybeAccessor` with no `AccessorProps` block. — **done**
 56. **INC** `Radio` decides reachability from prop presence while its wrapper reads the value. — **done**
 57. **WCAG** A vertical `Range` states no `aria-orientation` (4.1.2). — **done**
-58. **BUG** `TimePicker` can be opened while disabled. — **not started: waiting on the user**
-59. **BUG** `TimePicker`'s trigger cannot own its popup, so a press in the clock dismisses an enclosing layer. — **not started**
+58. **BUG** `TimePicker` can be opened while disabled. — **done**
+59. **BUG** `TimePicker`'s trigger cannot own its popup, so a press in the clock dismisses an enclosing layer. — **done**
 60. **BUG** A click on `TagInput`'s padding focuses a disabled field. — **done**
 61. **PEC** `Select.utils` documents an `aria-describedby` that nothing writes. — **done**
 
 ### Essentials, second half (Paginator … ViewportWrapper)
 
-62. **WCAG** `SplitPane` gutter moves only by dragging or keyboard; no single-pointer route (2.5.7). — **not started: waiting on the user**
-63. **WCAG** `Table` column resize and reorder are drag-only for a pointer (2.5.7). — **not started: waiting on the user**
+62. **WCAG** `SplitPane` gutter moves only by dragging or keyboard; no single-pointer route (2.5.7). — **done**
+63. **WCAG** `Table` column resize and reorder are drag-only for a pointer (2.5.7). — **done**
 64. **WCAG** A non-navigable `Stepper` step is a nameless, sometimes focusable `<span>` (4.1.2). — **done**
-65. **WCAG** `SplitPane` splitter lacks Home/End, `aria-controls`, and puts `separator` on a `<button>`. — **not started: waiting on the user**
-66. **WCAG** `Sortable` items are operable but announce as static list items (4.1.2). — **not started: waiting on the user**
+65. **WCAG** `SplitPane` splitter lacks Home/End, `aria-controls`, and puts `separator` on a `<button>`. — **done**
+66. **WCAG** `Sortable` items are operable but announce as static list items (4.1.2). — **done**
 67. **BUG** A disabled `Table` cannot be navigated with the arrow keys. — **done**
 68. **BUG** Windowed `Tree` typeahead cannot find rows that are not rendered. — **done**
 69. **PERF** `Table` selection membership is an array scan per cell and per row. — **done**
@@ -159,9 +165,9 @@ rotate between themselves run to run. A session seeing those red has not broken 
 
 ### Essentials/Input, first half (Calendar … FileInput)
 
-77. **BUG** `ColorInput` overwrites a non-hex starting value with black on mount. — **not started: waiting on the user**
+77. **BUG** `ColorInput` overwrites a non-hex starting value with black on mount. — **done**
 78. **BUG** `ColorArea` drag writes the signal twice per move and fires `onInput` with a half-updated color. — **done**
-79. **WCAG** Arrow-walking onto a day or time disabled by the consumer's predicate lands focus with no ring (2.4.7). — **not started: waiting on the user**
+79. **WCAG** Arrow-walking onto a day or time disabled by the consumer's predicate lands focus with no ring (2.4.7). — **done**
 80. **PERF** `Clock` copies its ref record and scrolls every column once per option at mount. — **done**
 81. **PERF** `DateInput` rebuilds the twelve-month day ceiling on every keystroke. — **done**
 82. **INC** `DatePicker` and `DateRangePicker` redeclare `locale` without a doc block. — **done**
@@ -187,7 +193,7 @@ rotate between themselves run to run. A session seeing those red has not broken 
 99. **INC** `FanMenuProps.layoutDefs` sits in a bare intersection rather than an `AccessorProps` block. — **done**
 100.    **PEC** `AudioSwitcher`: split imports and three guards that can never fail. — **done**
 101.    **INC** `Breadcrumbs`' `<nav>` landmark can be left unnamed; `ContextMenu` requires its label. — **done**
-102.    **WCAG** `ContextMenu` has no keyboard opener and anchors at a pointer coordinate (2.1.1). — **partly done; the rest is a decision, see the detail**
+102.    **WCAG** `ContextMenu` has no keyboard opener and anchors at a pointer coordinate (2.1.1). — **done**
 103.    **PEC** `MenuTriggerProps` re-declares `ariaLabel` undocumented. — **done**
 
 ### Exotics, first half (Bracket … Odometer)
@@ -196,8 +202,8 @@ rotate between themselves run to run. A session seeing those red has not broken 
 105. **BUG** A clicked `Bracket` node takes the tab stop but not the focus (no `tabindex="-1"`). — **done**
 106. **PERF** `Bracket` rebuilds every node element whenever the tree object changes. — **done**
 107. **BUG** `Bracket` node refs are never cleared on unmount. — **done**
-108. **BUG** A `Corners` corner switched off vanishes instead of fading, against its own prop docs. — **not started: waiting on the user**
-109. **BUG** `CellAnimation`: an iteration count of zero stops the animation; the doc says it runs forever. — **not started: waiting on the user**
+108. **PEC** The `Corners` prop docs describe a per-corner fade; the fade is the container's, by design. — **done**
+109. **PEC** `CellAnimation`'s iteration-count doc claims zero is endless; the endless value is `Infinity`. — **done**
 110. **PERF** `CellAnimation` root size has no equality check, so a sub-pixel resize restarts the pass. — **done**
 111. **PEC** Bare `100` in `CellAnimation`'s z-index where the file names its numbers. — **done**
 112. **WCAG** `Odometer`'s `ariaLabel` sits on a role-less div and produces no accessible name (1.3.1). — **done**
@@ -216,19 +222,19 @@ rotate between themselves run to run. A session seeing those red has not broken 
 122. **PERF** `PatchBoard` rescans every socket for every socket on every pointer move (O(S²)). — **done**
 123. **WCAG** `Timeline` puts `aria-posinset`/`aria-setsize` on a `button` role that ignores them (4.1.2). — **done**
 124. **WCAG** `Timeline` and `Bracket` erase the focus outline unconditionally on the focusable element (2.4.7). — **done**
-125. **BUG** `restartAnimation` refuses to restart a running `Typewriter`/`ScrambleText`, against conventions.md. — **not started: waiting on the user**
+125. **BUG** `restartAnimation` refuses to restart a running `Typewriter`/`ScrambleText`, against conventions.md. — **done**
 126. **PERF** `Typewriter` tears down and rebuilds every character on each resize callback. — **done**
 127. **PERF** `ParticleSpawner` writes the particle list once per particle inside the frame loop. — **done**
 128. **PERF** `Shape` recomputes every path on a resize callback that changed nothing. — **done**
 129. **PERF** `Timeline` and `SortableGrid` copy their whole ref collection per item mount. — **done**
 130. **INC** The one remaining `/ 2` in the library, beside a `HALF` constant (`TileBoard.utils.ts:20`). — **done**
-131. **INC** `SortableGrid` names grid cell coordinates `x`/`y` against the row/col convention. — **not started: waiting on the user**
+131. **INC** `SortableGrid` and `CellAnimation` name grid coordinates and tallies `x`/`y`. — **done**
 132. **BUG** `SortableGrid` calls the consumer's `ref` callback twice. — **done**
 133. **WCAG** `ScratchCard` throws focus to the body when the cover clears (2.4.3). — **done**
 134. **PEC** `RichText` has an unreachable `try`/`catch` holding the tree's only `console.error`. — **done**
 135. **INC** A memo named `parsedTree` without the `get` prefix (`RichText`). — **done**
 136. **INC** `aria-hidden={"true"}` in braces at three sites where the house writes `aria-hidden="true"`. — **done**
-137. **WCAG** `PatchBoard` sockets sit loose inside `role="list"` without being list items (1.3.1). — **not started: waiting on the user**
+137. **WCAG** `PatchBoard` sockets sit loose inside `role="list"` without being list items (1.3.1). — **done**
 138. **PERF** `ScrambleText` rolls a new glyph for every character every tick, settled ones included. — **done**
 
 ### Cross-cutting sweep (new items; other hits were folded into 7, 16, 29, 30, 40, 82, 116)
@@ -238,13 +244,13 @@ rotate between themselves run to run. A session seeing those red has not broken 
 141. **INC** `ScreenWiper`'s deferred `setTimeout` is never stored or cleared. — **done**
 142. **INC** `ScanlineAnimationKeyframes.knobs.ts` exports `ScanlineAnimationKnobs`, dropping the stem. — **done**
 143. **INC** `Clock.utils.ts` is the only `.utils.ts` missing from `index.ts`. — **done**
-144. **INC** `RadioGroup` exports its context type but not its provider/hook; `PlacementBox` exports neither. — **partly done; the rest is a decision, see the detail**
+144. **INC** `RadioGroup` exports its context type but not its provider/hook; `PlacementBox` exports neither. — **done**
 145. **INC** `SVGDefs.utils.ts` publishes a type (`CycleColorKey`) from inside its namespace. — **done**
 
 ### Samples
 
 146. **PERF** Every trail stamp opens its own pointer tracker on the same element (35 per sample instance). — **done**
-147. **BUG** A trail sample emits 35 `<filter>` defs sharing one DOM id once blur is above zero. — **not started: waiting on the user**
+147. **BUG** A trail sample emits 35 `<filter>` defs sharing one DOM id once blur is above zero. — **done**
 148. **INC** The two gradient knob modules drop the `SampleKnobs<T>` type check the design relies on. — **done**
 149. **INC** The gradient step default is written in two places (`STEPS_DEFAULT` and `DEFAULT_GRADIENT_STEPS`). — **done**
 150. **INC** A private constant sits inside the exported `TrackedGradientKnobs` namespace. — **done**
@@ -255,17 +261,17 @@ rotate between themselves run to run. A session seeing those red has not broken 
 155. **PEC** `encircle` writes thirds as `0.33` and `0.66`. — **done**
 156. **PEC** `NOTHING + 1` as a one-unit threshold in the bracket connector paths. — **done**
 157. **INC** `PlacementLayoutKnobs`' family maps and declaration runs are in three different orders. — **done**
-158. **INC** The band gradient's five-stop ramp is written out twice and factored out once. — **not started: waiting on the user**
-159. **INC** `radar` and `spiral` samples pass five bare numbers where the ripple samples name theirs. — **not started: waiting on the user**
+158. **INC** The band gradient's five-stop ramp is written out twice and factored out once. — **done**
+159. **INC** `radar` and `spiral` samples pass five bare numbers where the ripple samples name theirs. — **done**
 160. **PEC** `NO_ITEMS` is `PlacementLayouts.utils.ts`'s general-purpose zero, in fourteen non-count uses. — **done**
 161. **PEC** `SVGAnimations.const.tsx` mixes `Arr`/`Array` parameter names and bypasses its own `join` helper. — **done**
-162. **PEC** `swarmCw` and `swarmCcw` disagree on one stop of an otherwise mirrored pair. — **not started: waiting on the user**
+162. **PEC** `swarmCw` and `swarmCcw` disagree on one stop of an otherwise mirrored pair. — **done**
 
 ### Essentials/Input, first half (late report; adds to 77–86)
 
 163. **BUG** `Clock`: Enter commits only the current column, throwing away the walk in the others. — **done**
-164. **BUG** `DateRangePicker`: clear one field and retype it, and the range never comes back. — **not started: waiting on the user**
-165. **WCAG** `ColorInput`'s picker cannot be reached with a keyboard; Tab leaves and closes it (2.1.1). — **not started: waiting on the user**
+164. **BUG** `DateRangePicker`: clear one field and retype it, and the range never comes back. — **done**
+165. **WCAG** `ColorInput`'s picker cannot be reached with a keyboard; Tab leaves and closes it (2.1.1). — **done**
 166. **BUG** `DateRangePicker` and `DateTimePicker` put one `id` and one `name` on two inputs. — **done**
 167. **BUG** `RangeCalendar`: finishing a range jumps focus back to its start day. — **done**
 168. **PEC** `["Enter", " "]` is declared in six files under three names. — **done**
@@ -435,6 +441,35 @@ signal is meant to drive):_ add `createEffect(on(getIndex, (index) => { if (untr
 _Fix (if it is observe-only):_ correct the doc block and have `Wheel.tsx:203` read `rotation.getSelectedIndex()`.
 Medium confidence on which is intended; the doc/behavior mismatch is certain.
 
+**Settled by the user: the signal drives, and it is renamed to say so.** Their distinction is between a
+_current_ index — the transient wedge at the marker, derived from the angle — and a _target_ index, the wedge
+the wheel is heading for. `indexSignal` is the target, and the ambiguity only existed because the prop said
+"index" and so left a consumer unable to tell which of the two they were holding. Their words: if the name
+explicitly announces "target", immediate reflection is the correct way.
+
+What that settles, in order:
+
+- **The prop is renamed.** `RotatorDefs.indexSignal` and `WheelSlots.indexSignal` become `targetIndexSignal`.
+- **A consumer write turns the wheel**, which is what a target means, so the existing doc sentence becomes true
+  rather than being corrected away.
+- **The component publishes the target as soon as it knows it** — when `computeSpinTarget` resolves, not when
+  the spin lands. This is the behavior change: the outcome becomes readable while the wheel is still turning.
+  The user's call, over protecting the surprise by default; a consumer who does not want to see it early reads
+  `onSpinEnd`.
+- **`Rotator` publishes `getCurrentIndex` (was `getSelectedIndex`) and `getTargetIndex` (was `getIndex`)**, so
+  the two are named apart everywhere they surface.
+- **`WheelController.getIndex` becomes `getCurrentIndex` and is wired to the current.** It is documented "which
+  wedge is at the marker" and holds the target today, which is the outright wrong one of the three docs. No
+  consumer reads it.
+- **The drum's `isHidden` needs no change**, contrary to what this item and the first reply both assumed. Under
+  a driving target, a consumer write moves the wheel, so the face it un-hides really is the one at the marker;
+  and while the wheel idles the library's own position is that nothing is selected, so exposing the last landing
+  is the stable answer rather than churning the accessibility tree once per idle step. `wheel.spec.ts:401`
+  pins that resting face and would have gone red.
+
+`Carousel.indexSignal` is the same concept under the vague name and is **not** covered by this — raised
+separately.
+
 **24. Spin resolves after unmount.** `Rotator.utils.ts:184-218,262`: `spin()` awaits `computeSpinTarget()`; the
 `.then` re-arms a `requestAnimationFrame` loop and a `setTimeout`, and `settle` later writes `setIndex`, calls
 `onSpinEnd` and announces. `onCleanup(stopSpinFrames)` runs at disposal but cannot stop a promise that resolves
@@ -530,6 +565,29 @@ that deliberate behavior. Have `emit` remember what it last wrote (`let lastEmit
 halves only when `value === undefined` and `!isSame(value, lastEmitted)` — an outside clear, not the echo of an inside
 one. Add a test writing `undefined` to the outer signal and expecting both halves `undefined`, and one clearing a half
 from inside and expecting the other half kept. Medium.
+
+**Settled by the user, together with item 164: option C — the remembered-emit rule, in one shared helper.**
+Both splits get the same rule, and it lives in one place rather than being written twice:
+
+- **The rule is "ignore my own echo".** A split remembers the value it last wrote outward; an incoming
+  `undefined` clears both halves only when it is _not_ that remembered value. An outside clear — a consumer's
+  Clear button, a form reset — therefore reaches both halves, where today it is swallowed; and clearing one half
+  from inside still keeps the other, which is what `decisions.md`'s _"A pair with a half missing reports
+  nothing"_ records and what the existing guard was protecting.
+- **One helper, not two.** The generic split is `SignalMirrorUtils.createSplit`, beside `createOptional`,
+  `createPassThrough` and `createValueMirror` — the same family, one signal in and signals out, and nothing in
+  it is date-specific. It takes compose, decompose and an equality test, because the range's two halves are the
+  same type and get ordered where the date-time pair's are not.
+- **`DateTimeValueUtils.createSplit` stays as the named entry point** and becomes a thin wrapper supplying
+  `of`, the decomposition and `isSame`, so its consumers are untouched.
+- **`DateRangePicker` drops its three hand-written effects** and builds its halves through the helper, which is
+  what fixes item 164.
+- **The reason for one helper rather than two guards** is that the divergence is how 164 happened, and
+  `conventions.md` names a date-time **range** as the composition coming next — it would have been the third
+  hand-written split.
+
+Tests to add: an outside clear leaving both halves `undefined`; an inside clear of one half leaving the other
+held; and for the range, clear-then-retype bringing the range back.
 
 **40. `.tsx` with no JSX.** `Abstracts/Glass/Glass.utils.tsx` builds objects and calls the filter factory; no element
 anywhere. The other three `.utils.tsx` each contain JSX. `Samples/SVGDefs/SVGPatterns.const.tsx` is the same case
@@ -637,12 +695,72 @@ is vertical, it has `aria-orientation` set to vertical" (4.1.2). `Tabs` and `Rad
 owns is enforced against the state too" (`Select.tsx:292-301` does both). `DatePicker.tsx:36` (`open`) and `DateRangePicker.tsx:97` (inline `setIsOpen(true)`) share the shape.
 _Fix:_ at all three sites refuse when disabled; add an effect closing an open popup when `isDisabled` turns true. Medium.
 
+**Not a decision: `conventions.md` already settles it**, under _"An invariant the component owns is enforced
+against the state too"_ — "A disabled control cannot be open: `open()` already refused, but a consumer writing
+`true` bypassed it, so `Select` and `Menu` write `false` back." Five controls fail a rule that is already
+written down, which is a defect rather than an open question, so it is taken with the sweep.
+
+**It is wider than this item says.** Audited across every popup-owning control: `Select` and `Menu` guard both
+ways and are correct. `DatePicker`, `TimePicker` and `DateRangePicker` guard neither way, as recorded here.
+`ColorInput` is the fourth and was missed — its leaf gates the click on disabled, but `onToggle` is a bare
+`setIsOpen((prev) => !prev)` and there is no effect writing `false` back, so a consumer's `visibilitySignal`
+opens a disabled picker exactly as it does on the other three. `DateTimePicker` inherits whatever the two it
+composes do.
+
+The effect closes the popup without moving focus, which is what `Select` does — returning focus to a field that
+has just been disabled would be the wrong place to put it.
+
 **59. `TimePicker` trigger cannot claim `aria-controls`.** `TimePicker.tsx:33-36`, `TimePicker.types.ts:12-15`:
 the popover has `id={popupId}` but `TimePickerTrigger` exposes only `getIsOpen` and `toggle`, so no consumer
 trigger can write `aria-controls`. The dismissal ownership walk (`Dismisser.utils.ts:82-96`) relies on that
 attribute, so a `TimePicker` inside any popover-driven layer opens its clock as a portal sibling and a press on an
 hour dismisses the outer layer. _Fix:_ add `getPopupId: () => string` to the trigger handle (documented), set it,
 and have the Playground painter write `aria-controls`/`aria-expanded`; same for `DatePicker.renderTrigger`. Medium.
+
+_Re-read and confirmed, and it is a decision rather than a defect repair._ The finding holds: the walk in
+`computeIsWithinOwnedLayer` looks for an element carrying `aria-controls="<popup id>"`, nothing in the repo
+writes one for a picker, and the picker's trigger is painted entirely by the consumer. But the prescribed fix
+cannot land as written, because `Button` — which is what both `PageDatePickerTrigger` and `PageTimePickerTrigger`
+are built on — has no way to write an arbitrary ARIA attribute. `ButtonProps` picks `id`, `ariaLabel` and
+`renderContent` off `InteractionControlProps` and nothing else, and `InteractionWrapperProps` carries only
+`role`. So exposing `getPopupId` alone closes the library's half and leaves the only trigger in the repo unable
+to use it. Three routes:
+
+- **A.** `InteractionWrapper` grows an `ariaAttributes?: JSX.AriaAttributes` prop, the way `Popover` already
+  has one, and the picker publishes `getPopupId` on its trigger handle. The consumer wires the two together.
+- **B.** The pickers follow `ColorInput`'s precedent and own the trigger element themselves — a private leaf
+  writing `aria-haspopup`, `aria-expanded` and `aria-controls` — with `renderTrigger` narrowed to painting the
+  content inside it rather than the whole control. Matches the house's other popup owners; the largest change,
+  and it moves what `renderTrigger` means.
+- **C.** `Popover` registers its popup against its anchor directly rather than relying on the markup, so the
+  dismisser no longer needs the attribute for this case. Contradicts _"A popup opened from inside a popup is not
+  outside it"_ in `conventions.md`, which chose the markup route precisely so nothing has to be registered on
+  open.
+
+`DatePicker` and `DateRangePicker` have the same gap and whichever route is chosen covers all three.
+
+**Settled by the user: route B — the picker owns the trigger element.** Their words: the library already uses
+and abuses wrappers, and the thing that matters is that the aesthetics do not become limited. Checked against
+`ColorInput`, which is the precedent, and the caveat holds by construction:
+
+- **`ColorInput` wraps.** It renders an `InteractionWrapper` around a private `ColorInputField` leaf, and that
+  leaf is the `<button>` carrying `aria-haspopup`, `aria-expanded` and `aria-controls`. So the consumer keeps
+  the flags, the decoration slot, the tooltip, the sizing and the whole disabled-and-reachable machinery.
+- **Its class is a pure reset, not paint** — `border: none`, `padding: 0`, `background: none`, and `font`,
+  `color` and `text-align` inherited. Every pixel still comes from the consumer's `renderContent`, which is
+  _"A control paints nothing"_ working as written. Nothing about the look is constrained.
+- **The pickers differ in where the button sits.** `ColorInput`'s button _is_ the field; a picker's trigger is a
+  trailing adornment inside a `DateInput` or `TimeInput`, which already has its own wrapper. So each picker
+  renders a **second, nested** `InteractionWrapper` plus a private trigger leaf into the field's trailing slot —
+  which is the shape `conventions.md` already blesses under _"Two rejected alternatives"_, where
+  `renderTrailing` "routinely holds a real `Button` with its own wrapper — the Playground's password field".
+- **`renderTrigger` narrows from painting the control to painting its content**, matching
+  `ColorInput.renderContent`. That is the published-contract change this route costs, on `DatePicker`,
+  `DateRangePicker` and `TimePicker`.
+
+**What is genuinely given up** is structural rather than aesthetic: today a consumer may return anything at all
+from `renderTrigger` — a link, a div, two controls — and afterwards they get one button-shaped control whose
+paint is entirely theirs. Recorded because it is the only thing the route takes away.
 
 **60. Padding click focuses a disabled `TagInput`.** `TagInput.tsx:134-139`: the root's `onPointerDown` calls
 `focusField()` with no disabled check; `wrapElement` refuses `mousedown` on the input only. _Fix:_
@@ -662,6 +780,18 @@ drag happened (track a flag in the move handler), step the boundary by `keyStep`
 on, through `moveBoundary`; record the check in `decisions.md`. If declined, it belongs in `backlog.md` beside
 item 22 as the same unclosed criterion.
 
+**Settled with item 63: the criterion is not optional, and the route is tapping the handle that already
+exists.** 2.5.7 is Level AA, and both escapes were checked against the Understanding document rather than
+recalled: a keyboard route does not satisfy it — "achieving keyboard equivalence for a dragging operation does
+not automatically meet this success criterion, unless that equivalent keyboard operation also provides controls
+that can be clicked or tapped with a pointer" — and the "essential" exception needs the functionality to be
+unachievable another way, which `Sortable`'s own tap-to-pick-up route disproves. `decisions.md` argues 2.1.1
+only, so it never reached this.
+
+**For `SplitPane` there is no ambiguity to resolve**: the gutter is its own element with no competing press, so
+a press that ends without a drag steps the boundary by `keyStep` toward the half of the gutter that was pressed.
+Recorded in `decisions.md` with the criterion named.
+
 **63. `Table` resize and reorder are drag-only.** `Essentials/Table/Table.tsx:204-230,314-335,493-505`: resizing is
 press-capture-move and the resizer's `onClick` only stops propagation; reordering is `dragFromPointer` in `"drag"`
 mode and a plain header click sorts. 2.5.7 again; the Accepted-limits entry on the resizer weighs discoverability
@@ -669,6 +799,37 @@ only and never names 2.5.7. `Sortable` already ships the conforming tap-to-pick-
 reorder: in the no-drag branch start a `"tap"` carry and drop on the next header click (the `Sortable.handleClick`
 branch), skipping the sort for that click; resize: on a click with no drag, step the width by `resizeStepPx`
 toward the half of the handle pressed. Record in `decisions.md`; if declined, name 2.5.7 in the Accepted limit.
+
+**Settled by the user: sort and reorder each get their own target, and the whole header stops being one.**
+Their call, taken over the reviewer's single-grip suggestion, and argued: two render slots are not dead weight
+here, because a consumer wants to paint a sortable indicator with its current direction and a reorder affordance
+anyway, so the slots are where those already belong.
+
+**Resize is unaffected** — `renderResizer` already paints into a dedicated box at the cell edge whose `onClick`
+stops propagation, so a press there that ends without a drag steps the width by `resizeStepPx` toward the half
+of the handle pressed. No new target.
+
+**Reorder and sort were the collision.** The reorder drag starts on the whole header cell and a click on the
+whole header cell sorts, so a tap cannot mean both. `Sortable` taps the whole item only because a sortable item
+has no competing click; the Playground's `⠿` is paint, not a target.
+
+So the header cell gains two slots beside `renderResizer`, and loses its own `onClick` sort. Three things that
+decided along the way:
+
+- **It improves the 2.5.8 position rather than worsening it.** Target Size (Minimum) is also Level AA and wants
+  24×24 CSS px unless a 24px circle centred on each undersized target clears every other target. The resizer is
+  8px wide by default (`DEFAULT_RESIZER_WIDTH_PX`) and sits inside a header that is itself clickable, so
+  **2.5.8 fails today**. Removing the header from the target set is what makes the resizer defensible.
+- **The three targets in one cell are a constraint the consumer owns.** Sort, grip and resizer all being under
+  24px means their centres need roughly 24px of clearance from each other, and a narrow column cannot hold
+  three. The library cannot enforce it, so it is documented on the slots.
+- **The keyboard stays on the cell.** The header cell is the roving tab stop and Enter or Space sorts it today.
+  Both new controls are `tabindex="-1"`, so they are pointer affordances and nothing else — one tab stop per
+  cell, which is what the grid pattern wants, and all 2.5.7 asks for.
+
+**Copy the resizer's box-and-paint split deliberately**: the library renders the target, the consumer paints
+inside it, so an unpainted slot is invisible but still hit-testable. That is what stops sorting dying silently
+for a consumer who never paints an arrow.
 
 **64. Non-navigable `Stepper` step.** `Essentials/Stepper/Stepper.tsx:30-39,87-92`: renders
 `<span aria-label aria-current aria-disabled>` with no role; with a tooltip it is reachable, so `wrapElement`
@@ -685,11 +846,59 @@ than hard failures. _Fix:_ Home → `moveBoundary(index, 0)`, End → `moveBound
 `aria-controls={panes[index - 1].id}` when present; make the gutter a `<div tabindex>` or record why the button
 stays. Medium.
 
+**Part (c) is a review error and there is nothing to do.** ARIA in HTML lists `separator` among the roles
+explicitly allowed on `<button>`, beside `checkbox`, `slider`, `switch` and `tab`. `<button role="separator">`
+is conformant; the gutter stays a button.
+
+**Part (b) — settled by the user: the component generates the id when the consumer gives none.** `id` is
+optional on `SplitPanePane`, so today a consumer who supplies none leaves the gutter with no `aria-controls` at
+all — a property the Window Splitter pattern asks for, present or absent according to an unrelated optional
+prop, with nothing telling the consumer it was lost. `SplitPane` therefore falls back to a `createUniqueId` per
+pane, which is what `TimePicker`, `DatePicker` and `ColorInput` already do for their popups.
+
+**The user generalised it: this is the rule everywhere an id is optional**, not a `SplitPane` fix. It is
+library-wide and backbone-independent, so it belongs in `conventions.md` rather than here — write it there in
+the sweep. The shape: where a component needs an element's id in order to write a relationship attribute
+(`aria-controls`, `aria-describedby`, `aria-labelledby`, `aria-activedescendant`), an optional consumer `id` is
+a preference rather than a precondition; the component falls back to `createUniqueId` so the relationship is
+always expressed, and writes an id only onto an element the consumer left unnamed.
+
+**Part (a) — settled by the user: build both Home/End and Enter.** Neither is a conformance gap — Home and End
+are marked optional in the pattern and nothing in WCAG asks for either — so this is a feature call, taken on the
+grounds that the splitter should match the published pattern in full while it is being worked.
+
+- **Home and End** move the divider to the first pane's smallest and largest allowed size: `moveBoundary(index, 0)`
+  and `moveBoundary(index, 1)`, which already clamp. Two branches in `handleGutterKeyDown`.
+- **Enter** collapses the pane and, pressed again, restores the divider to where it was — the omission the review
+  missed, and the more useful of the two, since it is how a sidebar is put away without dragging. It needs a
+  remembered pre-collapse position per divider, which is state the component does not have today, and a ruling on
+  what happens when the sizes change while a pane is collapsed. Settle that while building: the remembered
+  position is dropped when the consumer moves that boundary by any other route, so a restore never puts the
+  divider somewhere the consumer has since overridden.
+
 **66. `Sortable` items announce as static list items.** `Essentials/Sortable/Sortable.tsx:59-72,399-466`: a
 focusable `<div role="listitem">` with Enter/arrow/click handlers. `listitem` is structural, so a screen reader
 gives no hint that Enter does anything until after pick-up (4.1.2). _Fix:_ smallest: keep the list roles and add
 `aria-roledescription` plus an `aria-describedby` pointing at a hidden element holding `zone.getKeyHint(false)`;
 fuller: `listbox`/`option` with `aria-selected` on the carried item. Record in `decisions.md`. Medium.
+
+**Settled by the user: the smaller route — rename the role and describe the keys.** `list` and `listitem` stay;
+the item gains `aria-roledescription` and an `aria-describedby` pointing at hidden text holding the key hint.
+
+**The gap is narrower than the item implies, which is what decided it.** `Carrier` already announces pick-up,
+each move, the drop and the cancel through a polite live region, so once Enter is pressed the whole carry is
+covered. What is missing is only the advertisement on a _resting_ item — that Enter does anything at all. A
+discovery gap, not a silent control.
+
+Why not `listbox`/`option`: `option` means selectable and reordering is not selecting, so `aria-selected` on the
+carried item would claim a selection nobody made, and the role brings selection-follows-focus expectations the
+component does not implement. Against that, `aria-roledescription` is already the house idiom — `Wheel`,
+`Carousel`, `Cuboid`, `FlipCard` and `Barrel` all carry one — and keeping the list roles means the set still
+announces with its position and size, which is what a reorderable list is.
+
+**One thing to build that the item did not name:** `zone.getKeyHint` produces only the _carrying_ sentence
+("Arrow keys choose a place, Enter drops, Escape cancels"). A resting item needs its own, so `CarrierZone` grows
+a second hint for the not-yet-picked-up state.
 
 **67. Disabled `Table` arrow keys.** `Table.tsx:340` returns from the whole key handler when disabled, and
 `handleCellClick` (439) likewise, so a disabled table can be tabbed into but not walked. `decisions.md` says
@@ -750,6 +959,58 @@ effect, or make the second effect skip while the current value is not hex and `h
 (a `hasUserMoved` flag set in the surface's `onInput`). Update the doc to say which notations are read. Medium on
 which fix; the overwrite is certain from the code.
 
+**Settled by the user: option C, widened.** A value the picker cannot read is refused visibly — nothing shown,
+the error flag raised, the consumer's value left alone — which is `conventions.md`'s _"A masked field never
+spells a value approximately"_ applied to colour. Two additions of theirs on top:
+
+- **What counts as readable is widened by adopting a parsing library** rather than by hand-writing one, so the
+  refusal is rare instead of routine.
+- **The value is emitted in the notation it arrived in.** Hand in `hsl(...)` and `hsl(...)` comes back, rather
+  than everything collapsing to hex as it does today. This is what makes the render-props doc's "in whatever
+  notation the consumer handed in" true, where every other route would have meant deleting that sentence.
+
+**The library is `colord`, not `tinycolor2`.** The user named `tinycolor2` and asked for an alternative if there
+was a better one; the deciding facts, checked against the registry rather than recalled:
+
+- `tinycolor2` is at 1.6.0, last published 2023-07-08 — three years stale, and pre-dates the modern CSS colour
+  syntaxes.
+- `colord` is at 2.10.0, published within the last month, **zero dependencies**, ~1.8 KB brotli for the core,
+  written in TypeScript. Decisively, it publishes **`getFormat()`**, which reports which notation an input string
+  was in — that is exactly the round-trip requirement above, and it is the one capability the choice turns on.
+  Named colours and LAB/LCH/HWB/CMYK are opt-in plugins, so only the notations actually read are paid for.
+- `culori` 4.0.2 is the more complete library — full CSS Color 4, `oklch`, and what Tailwind v4 uses — but it is
+  1.1 MB unpacked and is built for colour science rather than for round-tripping a notation, which is what this
+  needs.
+
+**Scope: parsing and formatting only.** `Color` in `ss-utils` stays. It is the companion-type pattern the
+conventions describe, its algebra is used by `ColorArea` and every tracked gradient sample, and none of that is
+what is broken. What it lacks is reading a string that is not hex and writing one back in a chosen notation, and
+that is the whole of what `colord` is brought in for. The dependency therefore lands on `ss-utils`, beside the
+`Color` namespace, not on `components`.
+
+**Two consequences to settle while building, not now.** `ColorInput` has to remember the notation it was handed,
+and there is none to remember when the consumer starts empty — hex is the fallback. And installing `colord` needs
+the user's go-ahead at that point; nothing is installed on the strength of this entry.
+
+**`colord` becomes the engine, not just the parser — the user's call, taken against the recommendation and
+insisted on when it was argued.** The accounting they were answering: of `Color`'s ~40 exports, 32 are things
+`colord` covers (about 20 conversions, 8 `toCss`, the two hex guards, the two colour-equality helpers) and 8 are
+not (the `interpolate` family — `colord`'s `mix` travels LAB by default or RGB on request, and has no
+hue-shortest-arc path in HSL or HSV, which is the documented point of ours). The case put against going this far
+was that the 32 cannot be deleted so much as re-wrapped, because `colord` reports saturation, value and lightness
+as 0–100 where `Color` uses 0–1 fractions, and because a conversion becomes an instance allocation on a path that
+runs per frame per ripple in the tracked gradient samples. The user overruled it.
+
+So: **the conversions, the `toCss` family, the hex guards and the colour-equality helpers go**, and `Color` keeps
+the record types, the eight `interpolate` functions and `getClampedAlpha`.
+
+**Settle first, before any of it is built: whether `Color`'s 0–1 fractions should become `colord`'s 0–100.** The
+user raised the doubt themselves — "I'm not even sure that we were right to shape our type with 0-1" — and it
+decides how much this costs. Aligning to 0–100 removes the rescaling adapters entirely and makes the deletion a
+real deletion; keeping 0–1 means 20 adapters. It also reaches a published prop type, `ColorArea`'s
+`hsvSignal: Signal<Color.HSVA>`, and `ColorArea` reads `hsv.s` straight as a 0–1 ratio, so it is a behavior
+change rather than a rename. Parked at the user's request rather than resolved here.
+
 **78. `ColorArea` double write per drag move.** `Essentials/Input/ColorArea/ColorArea.tsx:39-44` `onDrag` calls
 `props.setAxis("saturation", …)` then `props.setAxis("brightness", …)`; each writes `hsvSignal` and calls
 `props.onInput`, so every pointer move produces two signal writes and two `onInput` calls, the first with the old
@@ -765,6 +1026,27 @@ invisible (2.4.7 Focus Visible). This is the exact case `isFocusableWhenDisabled
 conventions "The second of those two showed up"). _Fix:_ pass `isFocusableWhenDisabled={() => !(access(props.isDisabled) ?? false)}`
 on the day and option wrappers, as `TileBoard` does; alternatively skip disabled cells in the walk. Medium: verify
 against the Playground's disabled-days example before changing.
+
+**Not a decision: 2.4.7 requires the fix and `conventions.md` already chose which one.** Verified against the
+code as the Medium note asked. `getIsDayDisabled` folds the whole-calendar flag, the min/max range and the
+consumer's predicate together; the day wrapper takes it as `isDisabled` with no `isFocusableWhenDisabled`; the
+arrow walk checks nothing (only `pickDay` does), so `moveTo` lands the roving day on a disabled cell and the
+focus effect calls `.focus()` on it. With no focus listeners attached the painter never sees `isFocusVisible`,
+so there is no ring — and `tabIndex` is forced to `-1` on every disabled element, so a calendar whose roving day
+is disabled has no tab stop at all. Both halves of the `TileBoard` case, on a calendar.
+
+**It is observable, not latent.** `CalendarPage`'s _Weekdays_ example and `DatePickerPage` both pass a weekend
+predicate, so arrowing onto a Saturday on either loses the ring today. The `Clock` half has the identical shape
+(`isDisabled` and `isTabbable`, no `isFocusableWhenDisabled`) but no Playground example passes
+`computeIsTimeDisabled`, so that one is latent.
+
+**The skip-the-walk alternative is already ruled out**, under _"The second of those two showed up, and
+`isFocusableWhenDisabled` is the prop it earned"_: a walk that skips disabled items leaves somebody reading with
+a screen reader unable to find out what shape the set is. On a calendar it would also break arrowing off the end
+of the grid to page to the next month.
+
+So the fix is `isFocusableWhenDisabled` on the day and option wrappers, gated on the composite itself being
+enabled, exactly as `TileBoard` and `PatchBoard` already pass it.
 
 **80. `Clock` ref churn.** `Clock.tsx:137-139,157-163`: `setOptionRef` spreads the whole record per option
 (`{ ...prev, [key]: element }`), 146 times for a seconds-and-meridiem clock, and the `scrollIntoView` effect
@@ -884,6 +1166,32 @@ name it"). _Fix:_ make it required and say why in the doc; the Playground page n
 anchor at `document.activeElement`'s adjusted rect when the opener was a key; detect the keyboard case in
 `handleContextMenu` too. Check MDN for the keyboard-invocation shape before writing the detection. Medium.
 
+**The mechanical half is in and the open half was already logged — `backlog.md` item 26 carries it.** The
+ContextMenu key and Shift+F10 open the menu on the region's `keydown`, anchored at whatever inside the region
+holds focus, and a `contextmenu` event arriving at the origin is treated the same way. What does not work is
+that a `keydown` only reaches the region once focus is inside it: `regionRef` is the consumer's element, so a
+region that is a plain box of text has no tab stop and can never receive the key. The Playground's own
+`ContextArea` example is exactly that shape, so the keyboard route it gained does not fire at all. 2.1.1,
+Level A. Item 26 records the user having weighed it and left it, and refused pushing it onto the consumer as
+the "approximation plus a note" shape. This item's status claimed a pending decision without saying which; the
+cross-reference to item 26 was the thing missing.
+
+**Settled by the user: `ContextMenu` renders the region.** `backlog.md` item 26 says what would settle it is a
+ruling on whether a component may write attributes onto a ref a consumer handed it, and that nothing else
+needed that answer yet. Item 59 changed that: faced with the same problem — the library needing to write ARIA
+onto a control the consumer painted — the answer taken there was that the **library owns the element**. Applied
+here, the consumer paints into a region `ContextMenu` renders, so the component owns the `tabindex`, the role
+and the name, and item 26's blocking question stops arising rather than being answered.
+
+- `regionRef` gives way to a render slot. That is a published API change on `ContextMenu`.
+- `regionRef` is already the anchor and the dismiss root as well, and all three keep working once the library
+  owns the element.
+- **The role-and-name half is part of this**, not a follow-up: a focusable box that announces as nothing is the
+  same fault as item 64's `Stepper` span.
+
+**`backlog.md` item 26 closes with this**, so the numbered list renumbers and `brief.md` loses its line for it —
+both in the same change, per `CLAUDE.md`. The reasoning above is what moves to `decisions.md`.
+
 **103. Redundant `ariaLabel`.** `Menu.types.ts:50` re-declares `ariaLabel?: string` that `InteractionControlProps`
 already supplies with its doc; it is the one undocumented member in the type. _Fix:_ delete the line.
 
@@ -919,10 +1227,56 @@ no style carries `opacity` or a `transition` on the corner (only color/filter on
 `opacity` per corner with `transition: opacity …ms`; or (b) correct the two doc blocks and the page hint to say the
 duration times the color and glow change only.
 
+**Settled by the user: (b), and their reasoning replaces the reviewer's.** The fade was designed for the
+corners **container**, not for individual corners, and at that level it works today: the container transitions
+`color` and `filter`, so a consumer fades the whole set by moving `color` toward transparent and the glow
+follows on the same duration. Nothing is missing — the documentation describes the wrong level.
+
+**Per-corner opacity is not merely unnecessary, it would misrender.** The user's objection, and it holds. The
+glow is a `drop-shadow` filter on the container, and a filter is computed from the composited group beneath it
+— so a corner carrying its own opacity has its shadow computed from an already half-transparent shape, and the
+glow fades at a different rate than the corner. A child `opacity` below 1 also opens its own stacking context
+inside the parent's filter context, giving a group within a group whose mid-transition rendering matches
+neither endpoint. Both artifacts appear only while something is changing.
+
+So two sentences change and no behavior does:
+
+- **`visibleCorners`** loses "Leaving one out fades it away rather than removing it at once" and says only which
+  corners are drawn. A dropped corner does disappear at once, and by this design that is correct.
+- **`transitionDurationMs`** says it times the container's color and glow change, which is how the set fades as
+  a whole, rather than claiming a per-corner fade.
+
+The Playground's "Fade (ms)" label stays as it is — it does time a real fade, the container's.
+
+**Recorded for later rather than proposed:** if per-corner fading is ever wanted, `opacity` is the wrong lever
+for the reason above, but animating each corner's arm length to zero sidesteps the compositing entirely.
+
 **109. Zero iterations.** `CellAnimation.types.ts:29` "Zero means it never stops"; `CellAnimation.tsx:27-33,108`
 treat `0` as "ended before the first frame" (`getCurrentIteration() >= 0`). The endless value is `Infinity`, the
 default when absent; the Playground converts its own `0` sentinel before passing. _Fix:_ correct the doc to "Left
 out, it never stops", or adopt the sentinel in the component (behavior change, user's call).
+
+**Settled by the user: correct the library's doc, and move the Playground's sentinel from `0` to `-1`.** The
+component is left alone — absent means `Infinity`, and `0` iterations meaning zero iterations is what every
+animation API means by it, CSS and Web Animations included. Only the sentence is wrong.
+
+**The sentinel moves because `0` was doing two jobs.** The page currently converts its own `0` to `Infinity`, so
+the knob cannot express "run no passes" at all and its label contradicts the component. The user's call is `-1`
+for endless, on the Unix convention — `poll()` and `epoll_wait()` both read a `-1` timeout as "block forever",
+and `RLIM_INFINITY` is the same idea. That frees `0` to mean what the component means, and a count of `0` is a
+demonstrable state rather than a lie: `getHasEnded` is `getCurrentIteration() >= getAnimationIterationCount()`,
+so zero passes shows the `finalFrame` immediately.
+
+What changes:
+
+- **`CellAnimation.types.ts`** — `animationIterationCount`'s block becomes "How many passes to run. Left out, it
+  never stops." No code moves.
+- **`CellAnimationPage.tsx`** — `ENDLESS_ITERATION_COUNT` becomes `-1` and `MIN_ITERATION_COUNT` becomes `-1`
+  (both are `0` today; the step is already `1`, so `-1` is reachable). The `PageProp` label becomes
+  "Iteration count (-1 = endless)" and its `hint` says so — a knob's hint is part of the knob under
+  `conventions.md`.
+- **`-1` stays a Playground spelling and does not enter the library.** A typed `number` prop already has
+  `Infinity`, and two spellings for one value is what the doc fault was.
 
 **110. Size signal without `equals`.** `CellAnimation.tsx:45` `createSignal<Size2d>` with reference equality, written
 with a fresh object per `ResizeObserver` notification; a sub-pixel change re-derives every edge, rebuilds
@@ -1005,6 +1359,40 @@ does nothing" names `Typewriter`'s explicit restart as the exception: "restartin
 exactly when it means something". Code and convention disagree. _Fix:_ confirm which is current, then either
 restart unconditionally (both already clear their timers first) or correct the convention.
 
+**Settled by the user: restart unconditionally — the convention was right and the code is wrong. The boolean
+stays.** Both controllers drop their guard and always restart; `clearAnimation()` already runs first in each, so
+there is nothing to protect against.
+
+**What decided it:** the _internal_ `restartAnimation` has no such guard, and `update()` calls it unconditionally,
+so a window resize mid-animation already restarts the thing. Only the controller wrapper refused, which reads as
+incidental rather than designed — and it made the consumer's explicit request the one route that was denied.
+
+**The user's second ruling is a new library-wide convention: every controller callback returns whether it
+succeeded or failed.** That is why the boolean stays rather than collapsing to `void` once it can only be `true`
+— a restart that is now always honored still reports that it was. The convention is backbone-independent and
+belongs in **`conventions.md`**, written there in the sweep.
+
+It is the readable counterpart to _"Asking for a state a thing is already in does nothing"_: that rule says a
+redundant request changes nothing, and this one is how the caller finds out that is what happened.
+`WheelController.spin` is the clearest case — it is already documented "Does nothing while one is already under
+way" and returns `void`, so today there is no way to learn that.
+
+**Audit to run in the same sweep — 14 commands across 7 controller types return `void` and must return
+`boolean`.** The `get*` members are reads, not callbacks, and are untouched.
+
+- `TrailController` — `play`, `pause`, `seek`
+- `TimelineController` — `zoomBy`, `panBy`, `showSpan`
+- `ScratchCardController` — `reset`, `clear`
+- `SortableGridController` — `turnCw`, `turnCcw`
+- `TypewriterController` — `update`
+- `WheelController` — `spin`
+- `AudioSwitcherController` — `reset`
+
+Already conforming: `ScrambleTextController.restartAnimation` and `TypewriterController.restartAnimation`.
+Each one's implementation and its Playground call sites move with it, and the members need `/** */` blocks
+saying what `false` means — a controller type feeds an `onMount` prop, so it is inside the documented surface,
+and none of these carry a block today.
+
 **126. `Typewriter` resize churn.** `Typewriter.tsx:81-106,136-137`: the `ResizeObserver` calls `update("layout")`
 unthrottled and with no width check; `update` writes the segments to empty and count to zero, then re-parses and
 writes them back, unbatched, so every character span and every `<a>` is destroyed and rebuilt twice per resize
@@ -1035,6 +1423,35 @@ reaches the consumer in `spot`, `fromSpot`/`toSpot`, `renderCell(getSpot)`; the 
 "column, row" in `computePlaceLabel`. `TileBoard` uses `Index2d`. Public type change, so the user's word first.
 _Fix:_ `Index2d` (`.x` → `.col`, `.y` → `.row`) across types, utils, component, test and Playground page. Medium.
 
+**Settled by the user, and widened twice.** The item's reason for holding this back — "public type change, so the
+user's word first" — was inconsistent with the review's own treatment of items 28 and 42, both of which were
+public (`NavigatorCell` was deleted from the barrel outright and `DateValueUtils.getCellOf`'s return type
+changed) and neither of which was flagged. The convention is explicit and `TileBoard` already speaks `Index2d`.
+
+**`SortableGridSize` converts too, and the user gave the general rule:** _width and height are reserved for
+pixel sizes, not counts._ So `SortableGridSize` becomes `{ rowCount, colCount }`, matching what `NavigatorGrid`
+became under item 28. `SortableGridRect` then holds a `{ row, col }` spot beside genuine pixel `width`/`height`,
+which is clearer rather than muddier, because only one of the two is still named for pixels.
+
+**That rule belongs in `conventions.md`**, written in the sweep, as the tally-side companion to _"A grid index
+names its space and its axis, never `x` and `y`"_: a pair counting rows and columns is `{ rowCount, colCount }`
+or an `Index2d` named for what it tallies; `width` and `height` mean pixels.
+
+**`CellAnimation` converts in the same pass — the user's call on scope.** It has the same fault one layer
+deeper and worse: `cellCount`, the cell's own `pos` and the `count` handed to every weight function are all
+`Point2d`, so a grid position and a grid tally are both `{ x, y }` in one file. That is exactly the silent swap
+the convention exists to stop, and it is live rather than theoretical — `isEvenRow` reads `dist.y` and
+`isEvenColumn` reads `dist.x`. It reaches `CellAnimationCellState`, `computeCellWeights`, the thirty-seven
+weight functions, `ScanlineAnimation`, `Mosaic.utils` and two Playground pages.
+
+**`SVGPatternCellCount` is left alone.** It is already `{ rows, cols }`, so it carries no ambiguity; it just
+spells the idea differently from `{ rowCount, colCount }`. Not worth a third pass through the pattern family.
+
+**One check for the build:** this is a rename, not an arithmetic change, so
+`CellAnimation.utils.test.ts`'s pinned known-broken weight values must come out **identical**. `conventions.md`
+records those as deliberately pinned and re-blessed only as part of fixing `backlog.md`'s weight bug — so if any
+of them moves during this conversion, the conversion is wrong, not the test.
+
 **132. `SortableGrid` double `ref`.** `SortableGrid.tsx:645-662`: `{...props}` hands `ref` to the wrapper, which
 calls it; `renderControl` calls `props.ref?.(element)` again (line 661). Same as item 87. _Fix:_ delete line 661.
 
@@ -1059,6 +1476,41 @@ sockets `role="button"` as siblings of the node holder inside `patchBoardSlot`, 
 and item. A reader hears three items and eight loose buttons with no socket-to-node relationship (1.3.1). _Fix:_
 `role="presentation"` on `patchBoardSlot` and `patchBoardNodeHolder`, and move `role="listitem"` up onto the slot
 so a node and its sockets are one item. Changes what the board announces, so the user's word first. Medium.
+
+**Settled by the user: drop the list semantics — the board becomes a group of groups.**
+
+**The item overstates one half.** A socket's `aria-label` is built from `getEndLabel`, which is the node's own
+label plus the socket's, so a socket already announces as "Oscillator out 1, output, connected". The
+socket-to-node relationship is carried by name today; what is missing is only the structural one.
+
+**What is genuinely wrong is the ownership.** `role="list"` has `patchBoardSlot` and `patchBoardNodeHolder`
+beneath it before reaching `role="listitem"`, so the list does not own its items; and the sockets are
+`role="button"` sitting inside that list rather than inside any item. A list whose children are not list items
+is invalid, and that is the 1.3.1 part.
+
+**The item's own fix was incomplete**, which is worth recording so it is not half-applied: it moves
+`role="listitem"` onto the slot without saying what the node div becomes, and that div is the focusable roving
+stop with click and key handlers, so it cannot be left with no role.
+
+**Why C rather than regrouping the list.** A patch board is a node graph, not a list — the nodes are positioned
+freely, there is no order to them, and nothing sets `aria-posinset` or `aria-setsize`, so the list role never
+delivered what a list is for. Keeping it would have meant renaming what a node _is_ (from "list item" to
+"button") purely to satisfy a role that was the wrong shape to begin with. Dropping it makes the
+invalid-ownership problem stop existing rather than papering it.
+
+The shape to build:
+
+- **The board root** keeps its `aria-label` and becomes `role="group"`.
+- **Each slot** becomes `role="group"` named after its node, holding the node control and that node's sockets —
+  so the relationship is structural as well as in the name.
+- **The node div** becomes `role="button"`, which it already behaves as.
+- **The sockets** are unchanged.
+- **`patchBoardNodeHolder` needs no role.** A `group` has no required owned elements, so intervening generic
+  divs are harmless — which is a second reason this route is cleaner than the list.
+
+**Settle while building:** whether the slot group carries the node's name when the node button inside it
+already does. Labelling both means a reader hears the name twice; leaving the group unnamed is normal for a
+pure container and costs nothing, since the node and socket names already identify themselves.
 
 **138. `ScrambleText` rolls everything.** `ScrambleText.tsx:57-61`, `ScrambleText.utils.ts:92-98`: `rollNoise` maps
 over all characters every tick (about 22 a second), including settled, pending and whitespace ones whose noise is
@@ -1097,6 +1549,30 @@ exports only the types (index.ts:150), so a consumer gets `RadioGroupContextType
 move together). For `PlacementBox`, leaving both private is defensible if no exported signature names
 `PlacementBoxContextType`; confirm and decide. Medium on the second.
 
+**The `RadioGroup` half is already done** — the barrel exports both `RadioGroup.context` and
+`RadioGroup.context.types`.
+
+**Settled by the user: export `PlacementBox`'s pair too.** Confirmed first that nothing forced it — no exported
+signature names `PlacementBoxContextType`, and its only consumers are `PlacementBox.tsx` and
+`PlacementItem.tsx`. The user exported it anyway, and gave the reason as a general preference rather than a
+`PlacementBox` judgement: _providing consumers with more tooling is the preferred approach for anything
+non-local._
+
+**That is a convention and belongs in `conventions.md`**, written in the sweep. The shape: **what crosses a
+folder boundary between two public components is exported; only what stays inside one folder is private.** It
+generalises a rule the library already follows without having stated it — `InteractionWrapper` is public
+precisely because `Button`, `Checkbox` and the rest are built on it from other folders, while `ButtonElement`
+stays private because it never leaves `Button`'s. `PlacementBox`'s context crosses from `PlacementBox` to
+`PlacementItem`, so by that test it was always on the public side.
+
+**After this the rule is uniform with nothing left to audit**: all seven `.context.ts` files export their pair,
+`PlacementBox` having been the only one missing.
+
+**One thing the export obliges.** `usePlacementBoxContext` falls back to `UNTRACKED_BOX_CONTEXT` rather than
+throwing, so outside a `PlacementBox` it returns an inert context — right for `PlacementItem`, and a trap for a
+consumer who does not expect it. Its `/** */` block has to say so, since publishing the hook publishes that
+behavior.
+
 **145. Type in a utils namespace.** `Samples/SVGDefs/SVGDefs.utils.ts:32` `export type CycleColorKey` derived from a
 module-private `CYCLE_COLOR_KEYS`; the only `.utils.ts` exporting a type, and it appears in two published
 signatures. Convention: types live in `.types.ts`. _Fix:_ move the tuple constant and the type into
@@ -1118,6 +1594,33 @@ owner first (`create` uses `createEffect`/`onCleanup`).
 `<defs>`. `url(#…)` resolves to the first, so paint is right and the fault invisible. Same in the eight sibling
 files and `band_1v1.tsx:73`. _Fix:_ drop the per-stamp filter (the main def's covers the box) or suffix the id
 with the entry index. Medium.
+
+**Settled by the user, and neither of the two fixes offered above is the one taken.** The sample calls
+`getBaseBlur` once into a const, uses it for the main def, and gives every array entry
+`{ id: sharedFilter.id, renderDefsElement: FunctionUtils.noop }` — so one `<filter>` is declared and all 35
+entries reference it.
+
+**Why this beats both.** Suffixing the id turns 34 inert declarations into 34 real ones, which is strictly more
+work than today. Dropping the per-stamp filter changes what is painted, because the stamps lose their blur.
+Sharing one declaration changes nothing about the paint at all — the browser was only ever using the first of
+the 35, so the other 34 are dead DOM and this is a pure deletion.
+
+**It also needs no type change.** The route the reviewer could not see was that `renderDefsElement` does not
+have to be made optional on `SVGDefs.filter`: Solid's `JSX.Element` includes `undefined`, so a no-op returning
+`void` satisfies it and `Shape` emits nothing for that entry. Both facts checked rather than recalled —
+`FunctionUtils.noop` is in `utils/src/Abstracts/function.ts` and documented for exactly this use, and
+`JSX.Element` is `Node | ArrayElement | string | number | boolean | null | undefined`.
+
+**One wrinkle to handle.** `getBaseBlur` returns `undefined` when `blurWidth` is zero or absent, so the const is
+optional and the entries need `sharedFilter && { id: sharedFilter.id, renderDefsElement: FunctionUtils.noop }`
+rather than reaching for `.id`. That also preserves today's behavior, where no blur means no filter reference.
+
+**Scope:** `spot_trail_1.tsx` and its eight sibling trail and ripple files, plus `band_1v1.tsx:73`.
+Single-entry samples call `getBaseBlur` once and are already correct.
+
+**Not fixed by this, and left as a separate question:** the per-frame cost is unchanged — 35 elements are still
+blurred, through one declaration instead of 35. Only dropping the stamps' blur buys frames, and that wants
+looking at with the blur knob up before anyone decides it.
 
 **148. Untyped knob maps.** `TimedGradient.knobs.ts:35,71`, `TrackedGradient.knobs.ts:280,549`: `KNOBS_BY_FAMILY`
 has no annotation and `DEFAULTS_BY_FAMILY` is `Record<string, Record<string, number>>`; the other three knob
@@ -1172,11 +1675,54 @@ keeps a sample's shape explicit but lets small shared helpers be shared. _Fix:_ 
 `getFalloffStops(color, { coreStop, coreAlpha, falloffSpread, falloffAlpha })`, documented, called from all three;
 verify the paint is unchanged. Medium.
 
+**Not a decision, and the item's premise is wrong in the direction that makes it safe.** "The copies have
+already drifted in shape" is true of the _code_ and not of the arithmetic. All three write the same five stops
+by the same formula — transparent at 0, `falloffAlpha` at `coreStop - falloffSpread`, `coreAlpha` at `coreStop`,
+`falloffAlpha` at `coreStop + falloffSpread`, transparent at 100. What differs is only which defaults object
+supplies the fallbacks: `BAND_DEFAULTS`, `BAND_BLEND_DEFAULTS` (which overrides `coreAlpha` to 0.5 and
+`falloffAlpha` to 0.15) and `BAND_DIAGONAL_DEFAULTS` (which changes only `bandTravel` and `bandAngle`, so it
+ramps identically to `band_1`). The drift is that `band_1v1` factored it into nine lines while the other two
+spell it across twenty verbose ones each.
+
+So the extraction is **provably** paint-neutral rather than needing a visual check — on one condition: the
+helper takes the **resolved** numbers, not the `opts` object. Each sample resolves against its own defaults and
+hands the four values over, which satisfies `CLAUDE.md`'s _"when merging two implementations that disagree on a
+constant, keep both behaviors — a parameter with per-call-site defaults"_ by construction rather than as a
+special case.
+
+Built as `SVGDefsUtils.getFalloffStops(color, { coreStop, coreAlpha, falloffSpread, falloffAlpha })`, documented
+in the `*.utils.ts` style, called from all three.
+
 **159. Five bare numbers.** `Weights/Samples/radarSingle.ts:5`, `spiralSingle.ts:5` and seven siblings call
 `radar(pos, count, origin, 4, 0, 1, 2, 3)`; the trailing numbers land on `quadrantsPerSection, cdoMul, croMul,
 cuoMul, cloMul`, while the ripple samples name theirs (`RIPPLE_PERIOD_CELLS`). Values checked and coherent.
 _Fix:_ name them per sample, or collapse the five positionals into one defs object with spelled-out names
 (nine call sites and two published signatures, so the user's word first). Medium.
+
+**Settled by the user: the defs object, and the shape is to be followed by the rest.**
+`radar(pos, count, origin, { quadrantsPerSection, clockDownMul, clockRightMul, clockUpMul, clockLeftMul })`,
+and `spiral` the same. The four `*Mul` names get spelled out properly on the way — `cdoMul` through `cloMul` are
+unreadable at the definition, which is where they matter most. It is also the house shape already:
+_"SVG / factory arg order — primary args → defs → opts"_.
+
+**The allocation worry is answered by hoisting, not by declining.** These run per cell per frame, so a defs
+object built at the call site would allocate per cell. Each sample declares its defs as a module-level `const`
+and passes it by reference, so nothing is allocated per call and the pinned weight tests cannot move.
+
+**The boundary for "the rest", since the rule is not "every numeric parameter".** A run of **tuning numbers**
+becomes a defs object; genuine **operands** stay positional. Applied across the weights file:
+
+- **`radar` and `spiral`** — five tuning numbers each. Converted; nine sample call sites.
+- **`ripple(spread, maxSpread, periodCells, travelRatio)`** — mixed. `spread` and `maxSpread` are computed
+  operands and stay positional; `periodCells` and `travelRatio` are tuning and become
+  `{ periodCells, travelRatio }`. Eight sample files, which already hoist those two as local consts, so they
+  gain a wrapper rather than new names.
+- **`hashToUnit`, `interleaveBits`, `stride`, `fromOrderedIndex`, `greatestCommonDivisor`** — untouched. These
+  take operands with self-describing names, and `greatestCommonDivisor({ a, b })` would be worse than what is
+  there.
+
+**That boundary belongs in `conventions.md`**, written in the sweep, beside _"One aggregated object per painter"_
+— it is the same argument applied to a utility rather than a render callback.
 
 **160. `NO_ITEMS` as zero.** `PlacementLayouts.utils.ts:23,114-136,181,249-269,345,457,462`: seventeen uses, one
 meaning "no items" (line 110); the rest are an arc length, a loop index, degrees, an offset, a share. Line 153's
@@ -1193,6 +1739,12 @@ another; `Radial.grow` (105) and `Radial.sweepOrthogonal` (111) call `.join(";")
 **162. `swarm` mirror mismatch.** `Keyframes/Samples/swarmCw.ts:11` `scaleX: 30, scaleY: 30` versus
 `swarmCcw.ts:11` `35`, in a pair that mirrors exactly at every other stop; the `35` gives the smoother ramp
 (5,5,5,5,5,10,10,15,20,20). It changes paint, so the user picks. _Fix:_ make both match. Medium.
+
+**Settled by the user: take the `35`.** `swarmCw`'s `scaleX: 30, scaleY: 30` at `at: 0.6` becomes `35`, matching
+`swarmCcw`. The step sizes decide it rather than the values: with `35` the ramp steps 5, 5, 5, 5, 5, 10, 10, 15,
+20, 20 and never decreases, while `30` holds at 5 for one stop too long and then jumps to 15, skipping the 10.
+Every other field in the pair mirrors exactly, so the odd number reads as a typo rather than a choice — which is
+what the user concluded too, having written it years ago.
 
 ### Essentials/Input, first half (late report)
 
@@ -1214,11 +1766,23 @@ effects (or build the halves through a range flavor of `createSplit`); add a spe
 expects the range back. Note item 39 asks the opposite guard question for `createSplit`; the two should be
 decided together.
 
+**Settled with item 39: build the halves through the shared `SignalMirrorUtils.createSplit`** rather than
+adding a guard here. The behavior this item asks for was already recorded in `decisions.md`, so only the
+mechanism was ever open; item 39 carries it.
+
 **165. `ColorInput` picker unreachable.** `ColorInput.tsx:182-195`: the `Popover` has no `hasAutoFocus`, so focus
 stays on the field button; the popup is portalled to the end of the document, so Tab moves to the next page
 control and the dismisser's `focusout` closes the popup. A keyboard user can open the picker but never reach its
 three sliders (2.1.1, 2.4.3). `DatePicker`, `TimePicker`, `DateRangePicker` and `Menu` all pass `hasAutoFocus`.
 _Fix:_ `hasAutoFocus={true}`; add a spec that presses Enter then Tab and expects the saturation slider focused.
+
+**Not a decision: 2.1.1 is Level A and the house already has the answer.** Confirmed against the code —
+`TimePicker`, `DatePicker`, `DateRangePicker` and `Menu` all pass `hasAutoFocus={true}` on their popup, and
+`ColorInput` is the only popup owner in the library that does not. So this is one component failing a pattern
+the other four follow, not a trade-off: a keyboard user can open the picker and then never reach its sliders,
+because Tab leaves the portalled popup and the dismisser's `focusout` shuts it.
+
+Taken with the sweep: `hasAutoFocus={true}` on the `Popover`, plus the spec described above.
 
 **166. Duplicate `id`/`name`.** `DateRangePicker.tsx:97-110`, `DateTimePicker.tsx:17-34`: both `<DateInput {...props}>`
 (and `DatePicker`/`TimePicker`) receive the consumer's `id` and `name` unchanged, so one id lands on two inputs

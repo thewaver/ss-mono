@@ -65,9 +65,29 @@ export const Trail = (props: TrailProps) => {
     const controller: TrailController = {
         getPlace,
         getIsPlaying,
-        play: () => setIsPlaying(true),
-        pause: () => setIsPlaying(false),
-        seek: (progress: number) => setProgress(MathUtils.clamp01(progress)),
+        play: () => {
+            if (untrack(getIsPlaying)) return false;
+
+            setIsPlaying(true);
+
+            return true;
+        },
+        pause: () => {
+            if (!untrack(getIsPlaying)) return false;
+
+            setIsPlaying(false);
+
+            return true;
+        },
+        seek: (progress: number) => {
+            const next = MathUtils.clamp01(progress);
+
+            if (next === untrack(getProgress)) return false;
+
+            setProgress(next);
+
+            return true;
+        },
     };
 
     createEffect(() => {

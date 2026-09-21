@@ -1,6 +1,6 @@
-import { MathUtils, type Point2d, Point2dUtils, type Size2d } from "@thewaver/ss-utils";
+import { type Index2d, MathUtils, type Size2d } from "@thewaver/ss-utils";
 
-import type { WeightFn, WeightOpts } from "./CellAnimationWeights.types";
+import type { RippleDefs, SweepDefs, WeightFn, WeightOpts } from "./CellAnimationWeights.types";
 
 const getBandMax = (from: number, to: number, distanceAt: (index: number) => number) =>
     to < from ? 0 : Math.max(distanceAt(from), distanceAt(to));
@@ -16,24 +16,24 @@ const FIXED_SEED = 0;
 let randomSeed = FIXED_SEED;
 const GOLDEN_RATIO = 0.6180339887498949;
 const getIndexedWeights = (weights: number[][]) => {
-    const indexed = new Map<number, Point2d[]>();
+    const indexed = new Map<number, Index2d[]>();
 
-    for (let y = 0; y < weights.length; y++) {
-        for (let x = 0; x < weights[y].length; x++) {
-            const weight = weights[y][x];
+    for (let row = 0; row < weights.length; row++) {
+        for (let col = 0; col < weights[row].length; col++) {
+            const weight = weights[row][col];
             const bucket = indexed.get(weight);
 
             if (bucket) {
-                bucket.push({ x, y });
+                bucket.push({ col, row });
             } else {
-                indexed.set(weight, [{ x, y }]);
+                indexed.set(weight, [{ col, row }]);
             }
         }
     }
 
     return indexed;
 };
-const getOrderedKeys = (indexed: Map<number, Point2d[]>) => [...indexed.keys()].sort((a, b) => a - b);
+const getOrderedKeys = (indexed: Map<number, Index2d[]>) => [...indexed.keys()].sort((a, b) => a - b);
 const normalizeWeights = (weights: number[][]) => {
     const indexed = getIndexedWeights(weights);
     const orderedKeys = getOrderedKeys(indexed);
@@ -44,7 +44,7 @@ const normalizeWeights = (weights: number[][]) => {
 
     orderedKeys.forEach((key, keyIdx) => {
         for (const pos of indexed.get(key)!) {
-            result[pos.y][pos.x] = MathUtils.roundToDecimalPlaces(
+            result[pos.row][pos.col] = MathUtils.roundToDecimalPlaces(
                 keyIdx / (orderedKeys.length - 1),
                 WEIGHT_ROUNDING_PLACES,
             );
@@ -74,8 +74,8 @@ const makeWeightsUnique = (weights: number[][]) => {
         const bucket = indexed.get(key)!;
 
         bucket.forEach((pos, posIdx) => {
-            result[pos.y][pos.x] = MathUtils.roundToDecimalPlaces(
-                (weights[pos.y][pos.x] + (posIdx / bucket.length) * gap) / maxWeight,
+            result[pos.row][pos.col] = MathUtils.roundToDecimalPlaces(
+                (weights[pos.row][pos.col] + (posIdx / bucket.length) * gap) / maxWeight,
                 WEIGHT_ROUNDING_PLACES,
             );
         });
@@ -85,53 +85,92 @@ const makeWeightsUnique = (weights: number[][]) => {
 };
 
 export namespace CellAnimationWeightUtils {
+    /**
+     * How far apart two cells are on each axis, as a count of cells.
+     *
+     * The grid-space counterpart of a point delta: both distances come back positive, so a caller asking
+     * how far a cell is from the origin does not have to know which side of it the cell fell.
+     *
+     * @param from The cell to measure from.
+     * @param to The cell to measure to.
+     * @returns The row and column gaps, each `0` or more.
+     */
+    export const getCellDelta = (from: Index2d, to: Index2d): Index2d => ({
+        row: Math.abs(to.row - from.row),
+        col: Math.abs(to.col - from.col),
+    });
+
+    /**
+     * The straight-line distance a cell delta stands for.
+     *
+     * @param delta A gap from {@link CellAnimationWeightUtils.getCellDelta}.
+     * @returns The diagonal distance in cells, so a weight can fall off in rings rather than in squares.
+     */
+    export const getCellDistance = (delta: Index2d) => Math.hypot(delta.col, delta.row);
+
+    /** How far a cell sits from the further of the two grid edges it lies between, on each axis. */
+    const getFarthestEdge = (cell: Index2d, count: Index2d): Index2d => ({
+        row: Math.max(count.row - 1 - cell.row, cell.row),
+        col: Math.max(count.col - 1 - cell.col, cell.col),
+    });
+
+    /** Pulls a cell back inside the grid, leaving it alone if it already fits. */
+    const getInsideGrid = (cell: Index2d, count: Index2d): Index2d => ({
+        row: Math.max(Math.min(cell.row, count.row), 0),
+        col: Math.max(Math.min(cell.col, count.col), 0),
+    });
+
     export const WEIGHT_DECIMAL_PLACES = WEIGHT_ROUNDING_PLACES;
 
     export const MIN_MAX_DISTANCE = 1;
 
-    export const toBounds = (count: Point2d): Size2d => ({ width: count.x, height: count.y });
+    export const toBounds = (count: Index2d): Size2d => ({ width: count.col, height: count.row });
 
-    export const getMaxDistance = (origin: Point2d, count: Point2d): Point2d => {
-        const farthest = Point2dUtils.getFarthestBound(origin, toBounds(count));
+    export const getMaxDistance = (origin: Index2d, count: Index2d): Index2d => {
+        const farthest = getFarthestEdge(origin, count);
 
-        return { x: Math.max(farthest.x, MIN_MAX_DISTANCE), y: Math.max(farthest.y, MIN_MAX_DISTANCE) };
+        return { col: Math.max(farthest.col, MIN_MAX_DISTANCE), row: Math.max(farthest.row, MIN_MAX_DISTANCE) };
     };
 
-    export const getRowFlatIndex = (pos: Point2d, count: Point2d) => pos.y * count.x + pos.x;
+    export const getRowFlatIndex = (pos: Index2d, count: Index2d) => pos.row * count.col + pos.col;
 
-    export const getColumnFlatIndex = (pos: Point2d, count: Point2d) => pos.x * count.y + pos.y;
+    export const getColumnFlatIndex = (pos: Index2d, count: Index2d) => pos.col * count.row + pos.row;
 
-    export const getDiagonalDelta = (origin: Point2d, pos: Point2d) => {
-        const delta = { x: pos.x - origin.x, y: pos.y - origin.y };
+    export const getDiagonalDelta = (origin: Index2d, pos: Index2d) => {
+        const delta = { col: pos.col - origin.col, row: pos.row - origin.row };
 
-        return { down: Math.abs(delta.x - delta.y), up: Math.abs(delta.x + delta.y) };
+        return { down: Math.abs(delta.col - delta.row), up: Math.abs(delta.col + delta.row) };
     };
 
-    export const getMaxDiagonalDistance = (origin: Point2d, count: Point2d) => {
-        const far = { x: count.x - 1 - origin.x, y: count.y - 1 - origin.y };
+    export const getMaxDiagonalDistance = (origin: Index2d, count: Index2d) => {
+        const far = { col: count.col - 1 - origin.col, row: count.row - 1 - origin.row };
 
         return {
-            down: Math.max(origin.x + far.y, far.x + origin.y, MIN_MAX_DISTANCE),
-            up: Math.max(origin.x + origin.y, far.x + far.y, MIN_MAX_DISTANCE),
+            down: Math.max(origin.col + far.row, far.col + origin.row, MIN_MAX_DISTANCE),
+            up: Math.max(origin.col + origin.row, far.col + far.row, MIN_MAX_DISTANCE),
         };
     };
 
     export const getMaxDiagonalDistanceInBand = (
-        origin: Point2d,
-        count: Point2d,
+        origin: Index2d,
+        count: Index2d,
         dist: { down: number; up: number },
     ) => {
-        const fallingOrigin = origin.x - origin.y;
-        const risingOrigin = origin.x + origin.y;
+        const fallingOrigin = origin.col - origin.row;
+        const risingOrigin = origin.col + origin.row;
 
         const maxUpInFallingBand = (falling: number) =>
-            getBandMax(Math.ceil(Math.max(0, falling)), Math.floor(Math.min(count.x - 1, count.y - 1 + falling)), (x) =>
-                Math.abs(2 * x - falling - risingOrigin),
+            getBandMax(
+                Math.ceil(Math.max(0, falling)),
+                Math.floor(Math.min(count.col - 1, count.row - 1 + falling)),
+                (col) => Math.abs(2 * col - falling - risingOrigin),
             );
 
         const maxDownInRisingBand = (rising: number) =>
-            getBandMax(Math.ceil(Math.max(0, rising - (count.y - 1))), Math.floor(Math.min(count.x - 1, rising)), (x) =>
-                Math.abs(2 * x - rising - fallingOrigin),
+            getBandMax(
+                Math.ceil(Math.max(0, rising - (count.row - 1))),
+                Math.floor(Math.min(count.col - 1, rising)),
+                (col) => Math.abs(2 * col - rising - fallingOrigin),
             );
 
         return {
@@ -148,16 +187,19 @@ export namespace CellAnimationWeightUtils {
         };
     };
 
-    export const getMirroredPos = (pos: Point2d, origin: Point2d): Point2d => ({ x: origin.x * 2 - pos.x, y: pos.y });
+    export const getMirroredPos = (pos: Index2d, origin: Index2d): Index2d => ({
+        col: origin.col * 2 - pos.col,
+        row: pos.row,
+    });
 
-    export const getRoundedPos = (pos: Point2d): Point2d => ({ x: Math.round(pos.x), y: Math.round(pos.y) });
+    export const getRoundedPos = (pos: Index2d): Index2d => ({ col: Math.round(pos.col), row: Math.round(pos.row) });
 
-    export const getSquareDistance = (dist: Point2d) => Math.max(dist.x, dist.y);
+    export const getSquareDistance = (dist: Index2d) => Math.max(dist.col, dist.row);
 
-    export const getStretchedDistance = (dist: Point2d, maxDist: Point2d) =>
-        Math.max(dist.x / maxDist.x, dist.y / maxDist.y) * Math.max(maxDist.x, maxDist.y);
+    export const getStretchedDistance = (dist: Index2d, maxDist: Index2d) =>
+        Math.max(dist.col / maxDist.col, dist.row / maxDist.row) * Math.max(maxDist.col, maxDist.row);
 
-    export const isEvenStretchedRing = (dist: Point2d, maxDist: Point2d) =>
+    export const isEvenStretchedRing = (dist: Index2d, maxDist: Index2d) =>
         MathUtils.isEven(Math.round(getStretchedDistance(dist, maxDist)));
 
     export const fromOrderedIndex = (ordered: number, total: number) => (total <= 1 ? 1 : 1 - ordered / (total - 1));
@@ -170,22 +212,22 @@ export namespace CellAnimationWeightUtils {
 
     export const getRandomSeed = () => randomSeed;
 
-    export const hashToUnit = (x: number, y: number, seed: number) => {
+    export const hashToUnit = (col: number, row: number, seed: number) => {
         const mixed =
-            Math.imul(x + HASH_OFFSET, HASH_MULTIPLIER_X) ^
-            Math.imul(y + HASH_OFFSET, HASH_MULTIPLIER_Y) ^
+            Math.imul(col + HASH_OFFSET, HASH_MULTIPLIER_X) ^
+            Math.imul(row + HASH_OFFSET, HASH_MULTIPLIER_Y) ^
             Math.imul(seed + HASH_OFFSET, HASH_MULTIPLIER_MIX);
         const folded = Math.imul(mixed ^ (mixed >>> HASH_LOW_SHIFT), HASH_MULTIPLIER_MIX);
 
         return ((folded ^ (folded >>> HASH_HIGH_SHIFT)) >>> 0) / HASH_RANGE;
     };
 
-    export const interleaveBits = (x: number, y: number, bits: number) => {
+    export const interleaveBits = (col: number, row: number, bits: number) => {
         let result = 0;
 
         for (let bit = 0; bit < bits; bit++) {
-            result |= ((x >> bit) & 1) << (bit * 2);
-            result |= ((y >> bit) & 1) << (bit * 2 + 1);
+            result |= ((col >> bit) & 1) << (bit * 2);
+            result |= ((row >> bit) & 1) << (bit * 2 + 1);
         }
 
         return result;
@@ -217,113 +259,101 @@ export namespace CellAnimationWeightUtils {
         return fromOrderedIndex((((index - originIndex + total) % total) * step) % total, total);
     };
 
-    export const ripple = (spread: number, maxSpread: number, periodCells: number, travelRatio: number) => {
+    export const ripple = (spread: number, maxSpread: number, defs: RippleDefs) => {
+        const { periodCells, travelRatio } = defs;
+
         const band = (Math.cos((spread / periodCells) * Math.PI * 2) + 1) * 0.5;
         const falloff = 1 - MathUtils.clamp01(spread / maxSpread);
 
         return MathUtils.lerp(band, falloff, travelRatio);
     };
 
-    export const radar = (
-        pos: Point2d,
-        count: Point2d,
-        origin: Point2d,
-        quadrantsPerSection: number,
-        cdoMul: number,
-        croMul: number,
-        cuoMul: number,
-        cloMul: number,
-    ) => {
-        if (pos.x === origin.x && pos.y === origin.y) return 1;
+    export const radar = (pos: Index2d, count: Index2d, origin: Index2d, defs: SweepDefs) => {
+        const { quadrantsPerSection, clockDownMul, clockRightMul, clockUpMul, clockLeftMul } = defs;
+
+        if (pos.col === origin.col && pos.row === origin.row) return 1;
 
         const maxDist = getMaxDistance(origin, count);
-        const dist = Point2dUtils.getDelta(origin, pos);
-        const maxWeight = Math.max(maxDist.x, maxDist.y) * 2 * quadrantsPerSection;
-        const cellsInRing = Math.max(dist.x, dist.y) * 2;
+        const dist = getCellDelta(origin, pos);
+        const maxWeight = Math.max(maxDist.col, maxDist.row) * 2 * quadrantsPerSection;
+        const cellsInRing = Math.max(dist.col, dist.row) * 2;
         const sectionMaxWeight = maxWeight / quadrantsPerSection;
         const increment = sectionMaxWeight / cellsInRing;
-        const cdo = sectionMaxWeight * cdoMul;
-        const cro = sectionMaxWeight * croMul;
-        const cuo = sectionMaxWeight * cuoMul;
-        const clo = sectionMaxWeight * cloMul;
+        const cdo = sectionMaxWeight * clockDownMul;
+        const cro = sectionMaxWeight * clockRightMul;
+        const cuo = sectionMaxWeight * clockUpMul;
+        const clo = sectionMaxWeight * clockLeftMul;
 
         let result = 0;
 
-        if (dist.x === 0) {
-            result = pos.y < origin.y ? cuo : cdo;
-        } else if (dist.y === 0) {
-            result = pos.x < origin.x ? clo : cro;
-        } else if (pos.x > origin.x) {
-            if (pos.y > origin.y) {
-                result = cdo + (dist.x + Math.max(dist.x - dist.y, 0)) * increment;
-            } else if (pos.y < origin.y) {
-                result = cro + (dist.y + Math.max(dist.y - dist.x, 0)) * increment;
+        if (dist.col === 0) {
+            result = pos.row < origin.row ? cuo : cdo;
+        } else if (dist.row === 0) {
+            result = pos.col < origin.col ? clo : cro;
+        } else if (pos.col > origin.col) {
+            if (pos.row > origin.row) {
+                result = cdo + (dist.col + Math.max(dist.col - dist.row, 0)) * increment;
+            } else if (pos.row < origin.row) {
+                result = cro + (dist.row + Math.max(dist.row - dist.col, 0)) * increment;
             }
-        } else if (pos.x < origin.x) {
-            if (pos.y < origin.y) {
-                result = cuo + (dist.x + Math.max(dist.x - dist.y, 0)) * increment;
-            } else if (pos.y > origin.y) {
-                result = clo + (dist.y + Math.max(dist.y - dist.x, 0)) * increment;
+        } else if (pos.col < origin.col) {
+            if (pos.row < origin.row) {
+                result = cuo + (dist.col + Math.max(dist.col - dist.row, 0)) * increment;
+            } else if (pos.row > origin.row) {
+                result = clo + (dist.row + Math.max(dist.row - dist.col, 0)) * increment;
             }
         }
 
         return 1 - result / (maxWeight - 1);
     };
 
-    export const spiral = (
-        pos: Point2d,
-        count: Point2d,
-        origin: Point2d,
-        quadrantsPerSection: number,
-        cdoMul: number,
-        croMul: number,
-        cuoMul: number,
-        cloMul: number,
-    ) => {
-        if (pos.x === origin.x && pos.y === origin.y) return 1;
+    export const spiral = (pos: Index2d, count: Index2d, origin: Index2d, defs: SweepDefs) => {
+        const { quadrantsPerSection, clockDownMul, clockRightMul, clockUpMul, clockLeftMul } = defs;
+
+        if (pos.col === origin.col && pos.row === origin.row) return 1;
 
         const maxDist = getMaxDistance(origin, count);
-        const dist = Point2dUtils.getDelta(origin, pos);
+        const dist = getCellDelta(origin, pos);
         const sectionDivider = 4 / quadrantsPerSection;
-        const maxWeight = (Math.pow(Math.max(maxDist.x, maxDist.y) * 2 + 1, 2) - 1) / sectionDivider;
+        const maxWeight = (Math.pow(Math.max(maxDist.col, maxDist.row) * 2 + 1, 2) - 1) / sectionDivider;
         const base = 1 - 1 / sectionDivider;
-        const cdo = Math.pow(dist.y * 2 - 1, 2) / sectionDivider + dist.y * cdoMul + base;
-        const cro = Math.pow(dist.x * 2 - 1, 2) / sectionDivider + dist.x * croMul + base;
-        const cuo = Math.pow(dist.y * 2 - 1, 2) / sectionDivider + dist.y * cuoMul + base;
-        const clo = Math.pow(dist.x * 2 - 1, 2) / sectionDivider + dist.x * cloMul + base;
+        const cdo = Math.pow(dist.row * 2 - 1, 2) / sectionDivider + dist.row * clockDownMul + base;
+        const cro = Math.pow(dist.col * 2 - 1, 2) / sectionDivider + dist.col * clockRightMul + base;
+        const cuo = Math.pow(dist.row * 2 - 1, 2) / sectionDivider + dist.row * clockUpMul + base;
+        const clo = Math.pow(dist.col * 2 - 1, 2) / sectionDivider + dist.col * clockLeftMul + base;
 
         let result = 0;
 
-        if (dist.x === 0) {
-            result = pos.y < origin.y ? cuo : cdo;
-        } else if (dist.y === 0) {
-            result = pos.x < origin.x ? clo : cro;
-        } else if (pos.x > origin.x) {
-            if (pos.y > origin.y) {
-                result = dist.y < dist.x ? cro - dist.y : cdo + dist.x;
-            } else if (pos.y < origin.y) {
-                result = dist.x < dist.y ? cuo - dist.x : cro + dist.y;
+        if (dist.col === 0) {
+            result = pos.row < origin.row ? cuo : cdo;
+        } else if (dist.row === 0) {
+            result = pos.col < origin.col ? clo : cro;
+        } else if (pos.col > origin.col) {
+            if (pos.row > origin.row) {
+                result = dist.row < dist.col ? cro - dist.row : cdo + dist.col;
+            } else if (pos.row < origin.row) {
+                result = dist.col < dist.row ? cuo - dist.col : cro + dist.row;
             }
-        } else if (pos.x < origin.x) {
-            if (pos.y < origin.y) {
-                result = dist.y < dist.x ? clo - dist.y : cuo + dist.x;
-            } else if (pos.y > origin.y) {
-                result = dist.x < dist.y ? cdo - dist.x : clo + dist.y;
+        } else if (pos.col < origin.col) {
+            if (pos.row < origin.row) {
+                result = dist.row < dist.col ? clo - dist.row : cuo + dist.col;
+            } else if (pos.row > origin.row) {
+                result = dist.col < dist.row ? cdo - dist.col : clo + dist.row;
             }
         }
 
         return 1 - (result - 1) / maxWeight;
     };
 
-    export const computeCellWeights = (compute: WeightFn, count: Point2d, origin: Point2d, opts?: WeightOpts) => {
-        const boundOrigin = Point2dUtils.getBoundPoint(origin, toBounds(count));
+    export const computeCellWeights = (compute: WeightFn, count: Index2d, origin: Index2d, opts?: WeightOpts) => {
+        const boundOrigin = getInsideGrid(origin, count);
 
         advanceRandomSeed();
 
-        let weights = Array.from({ length: Math.max(count.y, 0) }, (_, y) =>
-            Array.from({ length: Math.max(count.x, 0) }, (_, x) =>
+        let weights = Array.from({ length: Math.max(count.row, 0) }, (_, row) =>
+            Array.from({ length: Math.max(count.col, 0) }, (_, col) =>
                 MathUtils.roundToDecimalPlaces(
-                    MathUtils.clamp01(compute({ x, y }, count, boundOrigin)),
+                    MathUtils.clamp01(compute({ col, row }, count, boundOrigin)),
                     WEIGHT_DECIMAL_PLACES,
                 ),
             ),

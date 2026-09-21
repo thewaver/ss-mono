@@ -135,7 +135,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
     const [getSizerRef, setSizerRef] = createSignal<HTMLElement>();
 
     const rowWindow = VirtualizerUtils.createRowWindow(getSizerRef, () => getFlatRows().length, {
-        getIsEnabled: getIsVirtualized,
+        getIsDisabled: () => !getIsVirtualized(),
         computeEstimatedSize: (index) => props.computeEstimatedNodeHeight?.(index) ?? 0,
         getPinnedRows: () => {
             const roving = getRovingRow();

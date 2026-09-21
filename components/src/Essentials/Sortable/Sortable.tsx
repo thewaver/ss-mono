@@ -50,6 +50,7 @@ const BACKWARD_KEYS: Record<SortableDir | "both", string[]> = {
     both: ["ArrowLeft", "ArrowUp"],
 };
 
+const ITEM_ROLE_DESCRIPTION = "sortable item";
 const PLACED_SIZING: InteractionSizing = "fill";
 const PLACED_ORIENTATION: NavigatorOrientation = "both";
 
@@ -62,7 +63,9 @@ const SortableItemSlot = (props: SortableItemSlotProps) => {
             ref={(element) => props.ref?.(element)}
             class={styles.sortableItem}
             role="listitem"
+            aria-roledescription={ITEM_ROLE_DESCRIPTION}
             aria-label={access(props.label)}
+            aria-describedby={access(props.hintId)}
             aria-posinset={access(props.position)}
             aria-setsize={access(props.setSize)}
             aria-disabled={getIsDisabled() || undefined}
@@ -80,6 +83,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     const itemsSignal = accessSignal(() => props.itemsSignal);
 
     const listId = createUniqueId();
+    const hintId = createUniqueId();
 
     const viewportContext = useViewportContext();
 
@@ -166,6 +170,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         getLabel: () => access(props.ariaLabel),
         getRootRef,
         getIsDisabled,
+        getRestingKeyHint: () => "Press Enter to pick this up and move it.",
         getKeyHint: (hasOtherZones) =>
             hasOtherZones
                 ? "Arrow keys choose a place, Tab changes list, Enter drops, Escape cancels."
@@ -552,6 +557,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
                         setItemElementRef(element);
                     }}
                     id={() => getItemId(index)}
+                    hintId={() => hintId}
                     label={() => props.computeItemLabel(getItem().value)}
                     position={() => index + 1}
                     setSize={() => getItems().length}
@@ -656,6 +662,12 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         />
     );
 
+    const renderRestingHint = () => (
+        <div id={hintId} class={styles.sortableHint}>
+            {zone.getRestingKeyHint()}
+        </div>
+    );
+
     const getCarriedItem = () => CarrierUtils.getCarry()?.value as SortableItem<T> | undefined;
 
     const getCarriedZIndex = () => {
@@ -666,6 +678,8 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
     return (
         <>
+            {renderRestingHint()}
+
             {renderList()}
 
             <Show when={props.renderCarried && getIsSource() && getCarriedPoint()}>

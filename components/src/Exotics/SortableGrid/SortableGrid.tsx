@@ -1,7 +1,7 @@
 import { Index, Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup, onMount } from "solid-js";
 import { Portal } from "solid-js/web";
 
-import type { Point2d } from "@thewaver/ss-utils";
+import type { Index2d, Point2d } from "@thewaver/ss-utils";
 
 import { AnchorUtils } from "../../Abstracts/Anchor/Anchor.utils";
 import type { CarrierZone, Carry, CarryMode, CarryNudge, CarryPlace } from "../../Abstracts/Carrier/Carrier.types";
@@ -28,8 +28,8 @@ import { SortableGridUtils } from "./SortableGrid.utils";
 import * as styles from "./SortableGrid.css";
 
 const DEFAULT_SORTABLE_GRID_GAP = 0;
-const DEFAULT_SORTABLE_GRID_FOOTPRINT = { width: 1, height: 1 };
-const FIRST_SPOT: SortableGridSpot = { x: 0, y: 0 };
+const DEFAULT_SORTABLE_GRID_FOOTPRINT = { colCount: 1, rowCount: 1 };
+const FIRST_SPOT: SortableGridSpot = { col: 0, row: 0 };
 
 const NUDGE_KEYS: Record<string, CarryNudge | undefined> = {
     ArrowRight: { x: 1 },
@@ -38,11 +38,11 @@ const NUDGE_KEYS: Record<string, CarryNudge | undefined> = {
     ArrowUp: { y: -1 },
 };
 
-const STEP_KEYS: Record<string, Point2d | undefined> = {
-    ArrowRight: { x: 1, y: 0 },
-    ArrowLeft: { x: -1, y: 0 },
-    ArrowDown: { x: 0, y: 1 },
-    ArrowUp: { x: 0, y: -1 },
+const STEP_KEYS: Record<string, Index2d | undefined> = {
+    ArrowRight: { row: 0, col: 1 },
+    ArrowLeft: { row: 0, col: -1 },
+    ArrowDown: { row: 1, col: 0 },
+    ArrowUp: { row: -1, col: 0 },
 };
 
 let grabbed: { zone: CarrierZone; spot: SortableGridSpot } | undefined;
@@ -135,10 +135,10 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             cells: SortableGridUtils.getCellRects(shape.cells, getCellSize(), getGap()),
             block: {
                 spot: block.spot,
-                left: block.spot.x * getPitch(),
-                top: block.spot.y * getPitch(),
-                width: getSpan(block.size.width),
-                height: getSpan(block.size.height),
+                left: block.spot.col * getPitch(),
+                top: block.spot.row * getPitch(),
+                width: getSpan(block.size.colCount),
+                height: getSpan(block.size.rowCount),
             },
             outline: SortableGridUtils.getOutline(shape.cells, getCellSize(), getGap()),
         };
@@ -176,8 +176,8 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         if (!grabbed || grabbed.zone !== CarrierUtils.getSourceZone()) return FIRST_SPOT;
 
         return {
-            x: Math.min(grabbed.spot.x, shape.size.width - 1),
-            y: Math.min(grabbed.spot.y, shape.size.height - 1),
+            col: Math.min(grabbed.spot.col, shape.size.colCount - 1),
+            row: Math.min(grabbed.spot.row, shape.size.rowCount - 1),
         };
     };
 
@@ -191,6 +191,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         getLabel: () => access(props.ariaLabel),
         getRootRef,
         getIsDisabled,
+        getRestingKeyHint: () => "Press Enter to pick this up and move it.",
         getKeyHint: (hasOtherZones) =>
             hasOtherZones
                 ? "Arrow keys move it, Tab changes grid, Enter drops, Escape cancels."
@@ -213,8 +214,8 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             const scale = viewportContext.getScale();
             const grab = getGrabSpot(shape);
             const cell = {
-                x: Math.floor(((point.x - rect.left) / scale - getGap()) / getPitch()) - grab.x,
-                y: Math.floor(((point.y - rect.top) / scale - getGap()) / getPitch()) - grab.y,
+                col: Math.floor(((point.x - rect.left) / scale - getGap()) / getPitch()) - grab.col,
+                row: Math.floor(((point.y - rect.top) / scale - getGap()) / getPitch()) - grab.row,
             };
 
             return { ...SortableGridUtils.getClampedSpot(cell, shape.size, getColumns(), getRows()), turns };
@@ -224,7 +225,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             const turns = nudge.turn && getIsTurnable() ? current.turns + nudge.turn : current.turns;
             const shape = getCarriedShape(carry, turns);
             const spot = SortableGridUtils.getClampedSpot(
-                { x: current.x + (nudge.x ?? 0), y: current.y + (nudge.y ?? 0) },
+                { col: current.col + (nudge.x ?? 0), row: current.row + (nudge.y ?? 0) },
                 shape.size,
                 getColumns(),
                 getRows(),
@@ -244,8 +245,8 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             return { ...(spot ?? FIRST_SPOT), turns };
         },
         computeIsSamePlace: (first, second) =>
-            asPlace(first).x === asPlace(second).x &&
-            asPlace(first).y === asPlace(second).y &&
+            asPlace(first).col === asPlace(second).col &&
+            asPlace(first).row === asPlace(second).row &&
             asPlace(first).turns === asPlace(second).turns,
         computeIsPlaceAllowed: (place, carry) => {
             const current = asPlace(place);
@@ -254,7 +255,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             return (
                 SortableGridUtils.getIsInside(current, shape.size, getColumns(), getRows()) &&
                 SortableGridUtils.getIsFree(
-                    SortableGridUtils.getPlacedCells({ x: current.x, y: current.y }, shape),
+                    SortableGridUtils.getPlacedCells({ col: current.col, row: current.row }, shape),
                     getTakenCells(carry),
                 )
             );
@@ -263,7 +264,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             const current = asPlace(place);
             const room = zone.computeIsPlaceAllowed(place, carry) ? "" : ", no room";
 
-            return `column ${current.x + 1}, row ${current.y + 1}${room}`;
+            return `column ${current.col + 1}, row ${current.row + 1}${room}`;
         },
         takeAt: (_unused, carry) => {
             itemsSignal[1]((items) => items.filter((item) => props.computeItemKey(item.value) !== carry.key));
@@ -273,7 +274,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             const item = asItem(carry);
             const placed: SortableGridItem<T> = {
                 ...item,
-                spot: { x: current.x, y: current.y },
+                spot: { col: current.col, row: current.row },
                 footprint: item.footprint ?? DEFAULT_SORTABLE_GRID_FOOTPRINT,
                 turns: current.turns,
             };
@@ -285,7 +286,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                 fromLabel: origin.label,
                 toLabel: access(props.ariaLabel),
                 fromSpot: SortableGridUtils.getIsPlace(origin.place)
-                    ? { x: origin.place.x, y: origin.place.y }
+                    ? { col: origin.place.col, row: origin.place.row }
                     : undefined,
                 toSpot: placed.spot,
             });
@@ -299,7 +300,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                 items.map((item) => {
                     if (props.computeItemKey(item.value) !== carry.key) return item;
 
-                    moved = { ...item, spot: { x: current.x, y: current.y }, turns: current.turns };
+                    moved = { ...item, spot: { col: current.col, row: current.row }, turns: current.turns };
 
                     return moved;
                 }),
@@ -311,7 +312,9 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                 value: moved.value,
                 fromLabel: access(props.ariaLabel),
                 toLabel: access(props.ariaLabel),
-                fromSpot: SortableGridUtils.getIsPlace(fromPlace) ? { x: fromPlace.x, y: fromPlace.y } : undefined,
+                fromSpot: SortableGridUtils.getIsPlace(fromPlace)
+                    ? { col: fromPlace.col, row: fromPlace.row }
+                    : undefined,
                 toSpot: moved.spot,
             });
         },
@@ -326,9 +329,11 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     const getCarriedKey = createMemo(() => (getIsSource() ? CarrierUtils.getCarry()?.key : undefined));
 
     const turn = (step: number) => {
-        if (!getIsTurnable() || !getIsSource()) return;
+        if (!getIsTurnable() || !getIsSource()) return false;
 
         CarrierUtils.aimAtNudge({ turn: step });
+
+        return true;
     };
 
     const controller: SortableGridController = {
@@ -393,7 +398,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     const getItemLabel = (item: SortableGridItem<T>) => {
         const size = SortableGridUtils.getItemShape(item).size;
 
-        return `${props.computeItemLabel(item.value)}, ${size.width} by ${size.height}, column ${item.spot.x + 1}, row ${item.spot.y + 1}`;
+        return `${props.computeItemLabel(item.value)}, ${size.colCount} by ${size.rowCount}, column ${item.spot.col + 1}, row ${item.spot.row + 1}`;
     };
 
     const focusIndex = (index: number) => {
@@ -419,7 +424,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
 
             grabOffset = point
                 ? { x: point.x - origin.x, y: point.y - origin.y }
-                : { x: getSpan(shape.size.width) * 0.5, y: getSpan(shape.size.height) * 0.5 };
+                : { x: getSpan(shape.size.colCount) * 0.5, y: getSpan(shape.size.rowCount) * 0.5 };
 
             setCarriedPoint(from ? ViewportUtils.getAdjustedClientPoint(from, viewportContext) : undefined);
         } else {
@@ -429,8 +434,8 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         grabbed = {
             zone,
             spot: {
-                x: Math.min(Math.floor(grabOffset.x / getPitch()), shape.size.width - 1),
-                y: Math.min(Math.floor(grabOffset.y / getPitch()), shape.size.height - 1),
+                col: Math.min(Math.floor(grabOffset.x / getPitch()), shape.size.colCount - 1),
+                row: Math.min(Math.floor(grabOffset.y / getPitch()), shape.size.rowCount - 1),
             },
         };
 
@@ -633,8 +638,8 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
 
     const getCells = createMemo(() =>
         Array.from({ length: getColumns() * getRows() }, (_unused, index) => ({
-            x: index % getColumns(),
-            y: Math.floor(index / getColumns()),
+            col: index % getColumns(),
+            row: Math.floor(index / getColumns()),
         })),
     );
 
@@ -692,10 +697,10 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                                 <div
                                     class={styles.sortableGridSlot}
                                     style={{
-                                        left: `${getOffset(getItem().spot.x)}px`,
-                                        top: `${getOffset(getItem().spot.y)}px`,
-                                        width: `${getSpan(getItemGeometry().size.width)}px`,
-                                        height: `${getSpan(getItemGeometry().size.height)}px`,
+                                        left: `${getOffset(getItem().spot.col)}px`,
+                                        top: `${getOffset(getItem().spot.row)}px`,
+                                        width: `${getSpan(getItemGeometry().size.colCount)}px`,
+                                        height: `${getSpan(getItemGeometry().size.rowCount)}px`,
                                     }}
                                 >
                                     <InteractionWrapper
@@ -739,10 +744,10 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                             <div
                                 class={styles.sortableGridLanding}
                                 style={{
-                                    left: `${getOffset(getPlace().x)}px`,
-                                    top: `${getOffset(getPlace().y)}px`,
-                                    width: `${getSpan(getLandingGeometry()?.size.width ?? 1)}px`,
-                                    height: `${getSpan(getLandingGeometry()?.size.height ?? 1)}px`,
+                                    left: `${getOffset(getPlace().col)}px`,
+                                    top: `${getOffset(getPlace().row)}px`,
+                                    width: `${getSpan(getLandingGeometry()?.size.colCount ?? 1)}px`,
+                                    height: `${getSpan(getLandingGeometry()?.size.rowCount ?? 1)}px`,
                                 }}
                                 aria-hidden="true"
                             >
@@ -776,8 +781,8 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                             class={styles.sortableGridCarried}
                             style={{
                                 "transform": `translate(${getPoint().x - grabOffset.x}px, ${getPoint().y - grabOffset.y}px)`,
-                                "width": `${getSpan(getCarriedGeometry()?.size.width ?? 1)}px`,
-                                "height": `${getSpan(getCarriedGeometry()?.size.height ?? 1)}px`,
+                                "width": `${getSpan(getCarriedGeometry()?.size.colCount ?? 1)}px`,
+                                "height": `${getSpan(getCarriedGeometry()?.size.rowCount ?? 1)}px`,
                                 "z-index": getCarriedZIndex(),
                             }}
                             aria-hidden="true"

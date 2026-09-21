@@ -22,7 +22,7 @@ const OverheadExampleWrapper = (props: WheelExampleProps) => {
 export const OverheadWheelPage = () => {
     const controls = createWheelsControls();
 
-    const indexSignal = createSignal(0);
+    const targetIndexSignal = createSignal(0);
 
     const [getMarkedIndex, setMarkedIndex] = createSignal(0);
 
@@ -33,12 +33,12 @@ export const OverheadWheelPage = () => {
             component: () => (
                 <OverheadExampleWrapper
                     {...controls.getSharedProps()}
-                    indexSignal={indexSignal}
+                    targetIndexSignal={targetIndexSignal}
                     onSelectedWedgeChange={setMarkedIndex}
                 />
             ),
             readout: () =>
-                `under the marker: ${controls.getWedges()[getMarkedIndex()] ?? "nothing"} — settled on: ${controls.getWedges()[indexSignal[0]()] ?? "nothing"}`,
+                `under the marker: ${controls.getWedges()[getMarkedIndex()] ?? "nothing"} — heading for: ${controls.getWedges()[targetIndexSignal[0]()] ?? "nothing"}`,
             path: `${EXAMPLES_ROOT}/Overhead.tsx`,
         },
     ]);

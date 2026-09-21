@@ -54,9 +54,8 @@ export const PickedExample = (props: Props) => {
                 <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>
             )}
             renderSeparator={() => <PageDateTimeSeparator />}
-            renderTrigger={(getIsOpen, onToggle) => (
-                <PageDatePickerTrigger key={props.key} isOpen={getIsOpen} onToggle={onToggle} />
-            )}
+            triggerId={() => `${access(props.key)}DateTrigger`}
+            renderTrigger={(getFlags) => <PageDatePickerTrigger flags={getFlags} />}
             renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}
             renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
             renderPopup={(renderCalendar, monthSignal) => (
@@ -66,24 +65,17 @@ export const PickedExample = (props: Props) => {
                     {renderCalendar()}
                 </PageCalendarFrame>
             )}
-            renderTimeTrailing={(getFlags, meridiem, trigger) => (
-                <>
-                    <Show when={access(props.isTwelveHour)}>
-                        <PageMeridiemToggle
-                            meridiem={meridiem.getValue}
-                            isDisabled={() => getFlags().isDisabled ?? false}
-                            onToggle={meridiem.toggle}
-                        />
-                    </Show>
-
-                    <PageTimePickerTrigger
-                        key={props.key}
-                        isOpen={trigger.getIsOpen}
+            renderTimeTrailing={(getFlags, meridiem) => (
+                <Show when={access(props.isTwelveHour)}>
+                    <PageMeridiemToggle
+                        meridiem={meridiem.getValue}
                         isDisabled={() => getFlags().isDisabled ?? false}
-                        onToggle={trigger.toggle}
+                        onToggle={meridiem.toggle}
                     />
-                </>
+                </Show>
             )}
+            timeTriggerId={() => `${access(props.key)}TimeTrigger`}
+            renderTimeTrigger={(getFlags) => <PageTimePickerTrigger flags={getFlags} />}
             renderOption={(_unused, getRenderProps) => <PageClockOption renderProps={getRenderProps} />}
             renderUnit={(name) => <PageClockUnit>{name}</PageClockUnit>}
             renderColumn={(renderOptions) => <PageClockColumn>{renderOptions()}</PageClockColumn>}

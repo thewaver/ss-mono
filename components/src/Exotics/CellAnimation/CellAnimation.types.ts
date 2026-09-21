@@ -1,4 +1,4 @@
-import type { CSSAnimationValues, Point2d, Size2d } from "@thewaver/ss-utils";
+import type { CSSAnimationValues, Index2d, Size2d } from "@thewaver/ss-utils";
 
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
@@ -7,8 +7,8 @@ export type CellAnimationFinalFrame = "source" | "cells" | "nothing";
 export type CellAnimationEvaluationResult = CSSAnimationValues;
 
 export type CellAnimationEvaluationDefs = {
-    pos: Point2d;
-    count: Point2d;
+    pos: Index2d;
+    count: Index2d;
     weight: number;
     size: Size2d;
 };
@@ -23,10 +23,10 @@ export type CellAnimationProps = AccessorProps<{
     /**
      * How many cells the picture is cut into, across and down. More cells is a finer animation and more work per frame.
      */
-    cellCount: Point2d;
+    cellCount: Index2d;
     /** How long one pass over the whole grid takes. */
     animationDurationMs?: number;
-    /** How many passes to run. Zero means it never stops. */
+    /** How many passes to run. Left out, it never stops. */
     animationIterationCount?: number;
     /** How long the grid waits between one pass and the next. */
     animationIterationDelayMs?: number;
@@ -38,7 +38,7 @@ export type CellAnimationProps = AccessorProps<{
      * Decides each cell's turn, as a weight per cell. It is what makes a sweep a sweep rather than everything moving at
      * once.
      */
-    computeCellWeights?: (count: Point2d) => number[][];
+    computeCellWeights?: (count: Index2d) => number[][];
     /** What the picture as a whole does over the pass, for an effect that is not per cell. */
     computeRootAnimation?: (timeline: number) => CellAnimationEvaluationResult;
     /** What one cell does on its turn, given where it is and how far through the pass it is. */

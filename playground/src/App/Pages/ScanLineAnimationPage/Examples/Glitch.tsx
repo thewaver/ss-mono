@@ -5,7 +5,7 @@ import type { AccessorProps } from "@thewaver/ss-components";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
 
-const WEIGHT_ORIGIN = { x: 0, y: 0 };
+const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
 const getGlitchBreakpointGroups = (count: number, start: number, end: number) => {
     const result: CellAnimationBreakpoints.BreakpointTupleTriple[] = [];
@@ -93,7 +93,7 @@ export const GlitchExample = ({ keyframeOpts, weightType, ...otherProps }: Props
 
                     if (timeline >= start && timeline <= end) {
                         const shiftGroup = shifts[g];
-                        const shiftVal = shiftGroup ? (shiftGroup[defs.pos.y] ?? 0) : 0;
+                        const shiftVal = shiftGroup ? (shiftGroup[defs.pos.row] ?? 0) : 0;
 
                         return { translateX: shiftVal };
                     }

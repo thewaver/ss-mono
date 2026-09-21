@@ -19,6 +19,13 @@ const cell = (scope: string) => `${scope} [role="gridcell"]`;
 const header = (scope: string) => `${scope} [role="columnheader"]`;
 
 /**
+ * Sorting and reordering each have a control of their own inside the header, because a header cell cannot be
+ * one target for both — so a tap can only ever mean one thing. They are the header's only two buttons, in
+ * that order, and neither is a tab stop: the keyboard route is still the cell's.
+ */
+const sortControl = (scope: string) => `${header(scope)} button >> nth=0`;
+
+/**
  * A cell is addressed by the pair of indices the grid publishes rather than by its text, because the text
  * is the point of the sorting tests: a locator built from a caption would move when the sort moves and
  * every assertion below would quietly follow it.
@@ -60,21 +67,22 @@ test("the grid publishes its size, and every cell says where it sits", async ({ 
  */
 test("a sortable header cycles ascending, descending, then back to no sort at all", async ({ page }) => {
     const sku = page.locator(header(DEFAULT)).first();
+    const skuSort = page.locator(sortControl(DEFAULT)).first();
 
     await expect(sku, "sortable but not yet sorted").toHaveAttribute("aria-sort", "none");
     expect(await readout(page, "default")).toContain("sort: unsorted");
 
-    await sku.click();
+    await skuSort.click();
 
     await expect(sku).toHaveAttribute("aria-sort", "ascending");
     await expect(page.locator(at(DEFAULT, 2, 1)), "BK-6015 is first alphabetically").toHaveText("BK-6015");
 
-    await sku.click();
+    await skuSort.click();
 
     await expect(sku).toHaveAttribute("aria-sort", "descending");
     await expect(page.locator(at(DEFAULT, 2, 1)), "and SP-5199 is last").toHaveText("SP-5199");
 
-    await sku.click();
+    await skuSort.click();
 
     await expect(sku, "the third click returns the rows to the order they arrived in").toHaveAttribute(
         "aria-sort",
@@ -84,7 +92,7 @@ test("a sortable header cycles ascending, descending, then back to no sort at al
 });
 
 test("sorting a number column orders by the number rather than by how it reads", async ({ page }) => {
-    await page.locator(header(DEFAULT)).nth(3).click();
+    await page.locator(header(DEFAULT)).nth(3).locator("button").first().click();
 
     await expect(page.locator(at(DEFAULT, 2, 4)), "zero, not 1,502, which sorts first as text").toHaveText("0");
     await expect(page.locator(at(DEFAULT, 13, 4))).toHaveText("1,840");
@@ -141,7 +149,7 @@ test("arrows walk cell to cell, and carry from one row's end to the next row's s
 });
 
 test("Enter on a header cell sorts it, so the mouse is not the only way in", async ({ page }) => {
-    await page.locator(header(DEFAULT)).first().click();
+    await page.locator(sortControl(DEFAULT)).first().click();
     await expect(page.locator(header(DEFAULT)).first()).toHaveAttribute("aria-sort", "ascending");
 
     await page.keyboard.press("Enter");
@@ -245,7 +253,7 @@ test("a column with no comparator leaves the order to the page", async ({ page }
 
     await expect(category, "not offered as sortable at all").not.toHaveAttribute("aria-sort", /.*/);
 
-    await page.locator(header(CONSUMER_SORTED)).first().click();
+    await page.locator(sortControl(CONSUMER_SORTED)).first().click();
 
     expect(await readout(page, "consumerSorted")).toContain("sort: sku ascending");
     await expect(page.locator(at(CONSUMER_SORTED, 2, 1)), "reordered by the page's own handler").toHaveText("BK-6015");

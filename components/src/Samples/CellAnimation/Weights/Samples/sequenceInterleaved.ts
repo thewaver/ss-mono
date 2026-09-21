@@ -4,7 +4,7 @@ import type { WeightFn } from "../CellAnimationWeights.types";
 import { CellAnimationWeightUtils } from "../CellAnimationWeights.utils";
 
 export const sequenceInterleaved: WeightFn = (pos, count) => {
-    const total = count.x * count.y;
+    const total = count.col * count.row;
     const idx = CellAnimationWeightUtils.getRowFlatIndex(pos, count);
     const pair = Math.floor(idx * 0.5);
 

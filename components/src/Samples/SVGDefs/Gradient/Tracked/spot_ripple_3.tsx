@@ -135,6 +135,9 @@ const createRipple = (
 
 export const spot_ripple_3 = (opts?: GradientRippleSampleOpts): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => {
+        const sharedBlur = SVGDefsUtils.getBaseBlur(id, defs);
+        const sharedBlurRef = SVGDefsUtils.getSharedFilter(sharedBlur);
+
         const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
         return [
@@ -167,7 +170,7 @@ export const spot_ripple_3 = (opts?: GradientRippleSampleOpts): TrackedGradientC
                         });
                     },
                 },
-                filter: SVGDefsUtils.getBaseBlur(id, defs),
+                filter: sharedBlur,
             },
             ...Array.from({ length: opts?.rippleCount ?? DEFAULTS.rippleCount }, (_unused, index) => ({
                 gradientOrPattern: {
@@ -190,7 +193,7 @@ export const spot_ripple_3 = (opts?: GradientRippleSampleOpts): TrackedGradientC
                         });
                     },
                 },
-                filter: SVGDefsUtils.getBaseBlur(id, defs),
+                filter: sharedBlurRef,
                 blend: true,
             })),
         ];

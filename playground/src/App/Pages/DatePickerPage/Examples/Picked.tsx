@@ -1,5 +1,5 @@
 import type { DateInputEra, DateValue, InteractionFlags, MaybeAccessor, TextFieldFlags } from "@thewaver/ss-components";
-import { DatePicker } from "@thewaver/ss-components";
+import { DatePicker, access } from "@thewaver/ss-components";
 
 import { PageCalendarCaption } from "../../../StyledComponents/CalendarCaption/CalendarCaption";
 import {
@@ -52,9 +52,8 @@ export const PickedExample = (props: Props) => {
                     onChange={era.set}
                 />
             )}
-            renderTrigger={(getIsOpen, onToggle) => (
-                <PageDatePickerTrigger key={props.key} isOpen={getIsOpen} onToggle={onToggle} />
-            )}
+            triggerId={() => `${access(props.key)}Trigger`}
+            renderTrigger={(getFlags) => <PageDatePickerTrigger flags={getFlags} />}
             renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}
             renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
             renderPopup={(renderCalendar, monthSignal) => (

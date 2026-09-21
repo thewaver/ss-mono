@@ -19,8 +19,18 @@ export type ScratchCardBrushGeometry = {
 };
 
 export type ScratchCardController = {
-    reset: () => void;
-    clear: () => void;
+    /**
+     * Puts the cover back and throws away everything that was scratched.
+     *
+     * @returns `true`, since it always acts.
+     */
+    reset: () => boolean;
+    /**
+     * Wipes the cover away in one go, as though it had been scratched off.
+     *
+     * @returns `false` when a wipe is already under way.
+     */
+    clear: () => boolean;
 };
 
 export type ScratchCardProps = AccessorProps<{

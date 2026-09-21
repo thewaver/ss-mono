@@ -9,7 +9,7 @@ import type { AccessorProps } from "@thewaver/ss-components";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
 
-const WEIGHT_ORIGIN = { x: 0, y: 0 };
+const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
 type Props = ScanlineAnimationExampleProps &
     AccessorProps<{

@@ -5,5 +5,5 @@ export const sequenceStrideRow: WeightFn = (pos, count, origin) =>
     CellAnimationWeightUtils.stride(
         CellAnimationWeightUtils.getRowFlatIndex(pos, count),
         CellAnimationWeightUtils.getRowFlatIndex(CellAnimationWeightUtils.getRoundedPos(origin), count),
-        count.x * count.y,
+        count.col * count.row,
     );

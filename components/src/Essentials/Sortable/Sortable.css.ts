@@ -59,3 +59,17 @@ export const sortableMarkerPlaced = style({
     height: "100%",
     pointerEvents: "none",
 });
+
+export const sortableHint = style({
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 1,
+    height: 1,
+    margin: -1,
+    padding: 0,
+    overflow: "hidden",
+    clipPath: "inset(50%)",
+    whiteSpace: "nowrap",
+    border: 0,
+});

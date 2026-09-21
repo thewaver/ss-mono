@@ -265,3 +265,82 @@ describe("createValueMirror", () => {
         );
     });
 });
+
+describe("createSplit", () => {
+    const compose = (first: number, second: number) => ({ first, second });
+    const decompose = (whole: { first: number; second: number }): [number, number] => [whole.first, whole.second];
+    const getIsSame = (
+        a: { first: number; second: number } | undefined,
+        b: { first: number; second: number } | undefined,
+    ) => a?.first === b?.first && a?.second === b?.second;
+
+    const build = (initial?: { first: number; second: number }) =>
+        createRoot(() => {
+            const outer = createSignal<{ first: number; second: number } | undefined>(initial);
+            const halves = SignalMirrorUtils.createSplit(outer, { compose, decompose, getIsSame });
+
+            return { outer, ...halves };
+        });
+
+    it("reports nothing until both halves are filled in", () => {
+        const { outer, firstSignal, secondSignal } = build();
+
+        firstSignal[1](1);
+        expect(outer[0]()).toBe(undefined);
+
+        secondSignal[1](2);
+        expect(outer[0]()).toEqual({ first: 1, second: 2 });
+    });
+
+    it("keeps the other half when one is cleared from inside", () => {
+        const { outer, firstSignal, secondSignal } = build({ first: 1, second: 2 });
+
+        secondSignal[1](undefined);
+
+        expect(outer[0](), "the pair is no longer reportable").toBe(undefined);
+        expect(firstSignal[0](), "but the half nobody touched is still held").toBe(1);
+
+        secondSignal[1](3);
+        expect(outer[0](), "so retyping it brings the pair straight back").toEqual({ first: 1, second: 3 });
+    });
+
+    it("clears both halves when the clear comes from outside", () => {
+        const { outer, firstSignal, secondSignal } = build({ first: 1, second: 2 });
+
+        outer[1](undefined);
+
+        expect(firstSignal[0]()).toBe(undefined);
+        expect(secondSignal[0]()).toBe(undefined);
+    });
+
+    it("tells an outside clear from the echo of an inside one", () => {
+        const { outer, firstSignal, secondSignal } = build({ first: 1, second: 2 });
+
+        secondSignal[1](undefined);
+
+        expect(outer[0](), "the pair stops being reportable").toBe(undefined);
+        expect(firstSignal[0](), "and the echo of our own write leaves the held half alone").toBe(1);
+
+        outer[1]({ first: 9, second: 9 });
+
+        expect(firstSignal[0](), "while a real write from outside still reaches both halves").toBe(9);
+    });
+
+    it("cannot see a consumer clearing a value that is already cleared, which is a limit of signals", () => {
+        const { outer, firstSignal, secondSignal } = build({ first: 1, second: 2 });
+
+        secondSignal[1](undefined);
+        outer[1](undefined);
+
+        expect(firstSignal[0](), "the outer value never changed, so nothing was there to hear").toBe(1);
+    });
+
+    it("pushes a whole value in from outside", () => {
+        const { outer, firstSignal, secondSignal } = build();
+
+        outer[1]({ first: 7, second: 8 });
+
+        expect(firstSignal[0]()).toBe(7);
+        expect(secondSignal[0]()).toBe(8);
+    });
+});

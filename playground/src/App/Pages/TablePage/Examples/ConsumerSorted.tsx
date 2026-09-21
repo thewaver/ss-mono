@@ -3,7 +3,12 @@ import { createMemo, createSignal } from "solid-js";
 import type { TableColumn, TableSort } from "@thewaver/ss-components";
 import { Table } from "@thewaver/ss-components";
 
-import { PageTableCellContent, PageTableHeaderContent } from "../../../StyledComponents/TableContent/TableContent";
+import {
+    PageTableCellContent,
+    PageTableHeaderContent,
+    PageTableReorderGrip,
+    PageTableSortControl,
+} from "../../../StyledComponents/TableContent/TableContent";
 import { PARTS } from "../TablePage.const";
 import type { Part, TableExampleProps } from "../TablePage.types";
 
@@ -73,6 +78,8 @@ export const ConsumerSortedExample = (props: TableExampleProps) => {
         <div class={styles.tableFrameShort}>
             <Table
                 columns={getColumns}
+                renderSortControl={(getRenderProps) => <PageTableSortControl renderProps={getRenderProps} />}
+                renderReorderGrip={() => <PageTableReorderGrip />}
                 rows={getRows}
                 sortSignal={props.sortSignal}
                 selectionSignal={props.selectionSignal}

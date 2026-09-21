@@ -188,7 +188,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
 
         if (!cell || !root?.contains(document.activeElement) || root === document.activeElement) return;
 
-        getDayRefs()[cell.y * styles.DAYS_PER_WEEK + cell.x]?.focus();
+        getDayRefs()[cell.row * styles.DAYS_PER_WEEK + cell.col]?.focus();
     });
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -221,14 +221,14 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
         const next = NavigatorUtils.computeNextCell(
             e.key,
             cell,
-            { width: styles.DAYS_PER_WEEK, height: GRID_WEEKS },
+            { rowCount: GRID_WEEKS, colCount: styles.DAYS_PER_WEEK },
             { hasPageKeys: false },
         );
 
         if (!next) return;
 
         e.preventDefault();
-        moveTo(DateValueUtils.addDays(getGridStart(), next.y * styles.DAYS_PER_WEEK + next.x));
+        moveTo(DateValueUtils.addDays(getGridStart(), next.row * styles.DAYS_PER_WEEK + next.col));
     };
 
     return (
@@ -260,6 +260,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
                                 <InteractionWrapper
                                     sizing={"fill"}
                                     isDisabled={() => getIsDayDisabled(getDay())}
+                                    isFocusableWhenDisabled={() => !(access(props.isDisabled) ?? false)}
                                     isTabbable={() => DateValueUtils.isSame(getDay(), getRovingDay())}
                                     extraFlags={(): CalendarRenderProps => ({
                                         day: getDay(),

@@ -39,7 +39,7 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
     };
 
     const setHslaChannel = (channel: "h" | (typeof HSL_CHANNELS)[number], value: number) => {
-        const hsl = { ...getHsla(), [channel]: channel === "h" ? value : value / PERCENT };
+        const hsl = { ...getHsla(), [channel]: value };
 
         props.hsvSignal[1](() => Color.HSLA.toHsva({ ...hsl, a: getAlpha() }));
     };
@@ -130,7 +130,7 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
                     {HSL_CHANNELS.map((channel) => (
                         <PageColorChannel label={channel}>
                             <PageNumberField
-                                value={() => Math.round(getHsla()[channel] * PERCENT)}
+                                value={() => Math.round(getHsla()[channel])}
                                 min={0}
                                 max={() => PERCENT}
                                 width={() => CHANNEL_FIELD_WIDTH}

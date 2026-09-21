@@ -1147,28 +1147,6 @@ actually need designing.
 
 **Nothing is blocked on it** and the shape of the picker has not been argued.
 
-## 26. `ContextMenu` has no keyboard route into a region nobody can focus
-
-**What works now.** The ContextMenu key, and Shift+F10 for keyboards without one, open the menu on the
-region's own `keydown`, anchored against whatever inside the region holds focus rather than at a pointer
-coordinate. A `contextmenu` event that arrives carrying the origin as its point is treated the same way,
-since a menu at 0,0 is unusable however it got there. `decisions.md`'s `ContextMenu` entry records both.
-
-**What does not.** A `keydown` only reaches the region once focus is inside it. `regionRef` is the
-consumer's own element, so a region that is a plain box of text — no focusable descendant, no tab stop of
-its own — can never receive the key, and has no keyboard route to its menu at all. That is 2.1.1 Keyboard
-(Level A) unmet for that shape of region.
-
-**Why it is not simply fixed.** The only fix from inside the component is to put a `tabindex` on an element
-the library did not render, which nothing here does today, and which would hand a tab stop to regions that
-already have focusable content unless the component tested for that first. The user weighed that and chose
-to leave it rather than risk the side effects; asking the consumer to make the region reachable was refused
-as the "approximation plus a note" shape `CLAUDE.md` rules out.
-
-**What would settle it** is a decision about whether a component may write attributes onto a ref a consumer
-handed it. Nothing else in the library needs that answer yet, which is why this is an item rather than a
-convention.
-
 ## Accepted limits
 
 Faults that have been looked at and consciously left alone. Not outstanding work, not numbered, and not part

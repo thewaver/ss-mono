@@ -51,24 +51,17 @@ export const ClockedExample = (props: Props) => {
             renderPlaceholder={(getFlags, hint) => (
                 <PageTextFieldPlaceholder flags={getFlags}>{hint}</PageTextFieldPlaceholder>
             )}
-            renderTrailing={(getFlags, meridiem, trigger) => (
-                <>
-                    <Show when={access(props.isTwelveHour)}>
-                        <PageMeridiemToggle
-                            meridiem={meridiem.getValue}
-                            isDisabled={() => getFlags().isDisabled ?? false}
-                            onToggle={meridiem.toggle}
-                        />
-                    </Show>
-
-                    <PageTimePickerTrigger
-                        key={props.key}
-                        isOpen={trigger.getIsOpen}
+            renderTrailing={(getFlags, meridiem) => (
+                <Show when={access(props.isTwelveHour)}>
+                    <PageMeridiemToggle
+                        meridiem={meridiem.getValue}
                         isDisabled={() => getFlags().isDisabled ?? false}
-                        onToggle={trigger.toggle}
+                        onToggle={meridiem.toggle}
                     />
-                </>
+                </Show>
             )}
+            triggerId={() => `${access(props.key)}Trigger`}
+            renderTrigger={(getFlags) => <PageTimePickerTrigger flags={getFlags} />}
             renderOption={(_unused, getRenderProps) => <PageClockOption renderProps={getRenderProps} />}
             renderUnit={(name) => <PageClockUnit>{name}</PageClockUnit>}
             renderColumn={(renderOptions) => <PageClockColumn>{renderOptions()}</PageClockColumn>}

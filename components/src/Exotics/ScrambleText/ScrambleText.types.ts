@@ -7,6 +7,11 @@ export type ScrambleTextSegment = {
 };
 
 export type ScrambleTextController = {
+    /**
+     * Scrambles the text and settles it again, whether or not it is already running.
+     *
+     * @returns `true`, since it always acts.
+     */
     restartAnimation: () => boolean;
 };
 

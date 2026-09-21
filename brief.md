@@ -100,7 +100,6 @@ They cluster, and no single item owns them.
 | 16  | **`Scroller`**      | The buttons are the consumer's, so the library cannot promise one is named, reachable or in the tab order                                      |
 | 19  | **`OverheadWheel`** | The same again for the hub's control, with the same promise unmade                                                                             |
 | 14  | **`SlideButton`**   | A fixed hold duration is itself an assumption about dexterity, in a control that exists partly to avoid one                                    |
-| 26  | **`ContextMenu`**   | A region with no focusable content cannot receive the ContextMenu key, so its menu has no keyboard route                                       |
 
 ## Planned projects
 

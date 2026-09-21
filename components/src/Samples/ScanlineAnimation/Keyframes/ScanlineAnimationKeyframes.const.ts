@@ -85,7 +85,7 @@ export namespace ScanlineAnimationKeyframes {
         opts?: HorizontalSplitOpts,
     ): ScanlineAnimationEvaluationResult => {
         const mergedOpts = { ...DEFAULT_HORIZONTAL_SPLIT_OPTS, ...opts };
-        const dir = MathUtils.isEven(defs.pos.y) ? -1 : 1;
+        const dir = MathUtils.isEven(defs.pos.row) ? -1 : 1;
         const p = peak(b0, b2, t);
 
         return { translateX: dir * mergedOpts.shiftPercent * p };
@@ -159,7 +159,7 @@ export namespace ScanlineAnimationKeyframes {
     ): ScanlineAnimationEvaluationResult => {
         const mergedOpts = { ...DEFAULT_HORIZONTAL_WAVE_OPTS, ...opts };
         const envelope = peak(b0, b2, t);
-        const phase = ((defs.pos.y / Math.max(defs.count.y, 1)) * mergedOpts.waveCount + t) * Math.PI * 2;
+        const phase = ((defs.pos.row / Math.max(defs.count.row, 1)) * mergedOpts.waveCount + t) * Math.PI * 2;
 
         return { translateX: mergedOpts.shiftPercent * envelope * Math.sin(phase) };
     };
@@ -197,8 +197,11 @@ export namespace ScanlineAnimationKeyframes {
         const mergedOpts = { ...DEFAULT_HORIZONTAL_DROPOUT_OPTS, ...opts };
 
         if (
-            CellAnimationWeightUtils.hashToUnit(defs.pos.y, defs.count.y, CellAnimationWeightUtils.FIXED_HASH_SEED) >=
-            mergedOpts.dropChance
+            CellAnimationWeightUtils.hashToUnit(
+                defs.pos.row,
+                defs.count.row,
+                CellAnimationWeightUtils.FIXED_HASH_SEED,
+            ) >= mergedOpts.dropChance
         )
             return {};
 
@@ -221,7 +224,7 @@ export namespace ScanlineAnimationKeyframes {
         const mergedOpts = { ...DEFAULT_HORIZONTAL_INTERLACE_OPTS, ...opts };
         const envelope = peak(b0, b2, t);
         const field = Math.sin(t * mergedOpts.fieldCount * Math.PI * 2);
-        const dir = MathUtils.isEven(defs.pos.y) ? 1 : -1;
+        const dir = MathUtils.isEven(defs.pos.row) ? 1 : -1;
 
         return { brightness: 100 + mergedOpts.dipPercent * dir * field * envelope };
     };

@@ -13,12 +13,27 @@ import type { ColorAreaRenderProps } from "../ColorArea/ColorArea.types";
 import type { RangeRenderProps } from "../Range/Range.types";
 
 export type ColorInputRenderProps = {
-    /** The color as written, in whatever notation the consumer handed in. */
+    /**
+     * The color as written, in whatever notation the consumer handed in. A value the field could not read is
+     * passed through untouched, so a painter can show the text that was refused.
+     */
     value: string;
-    /** The same color split into hue, saturation, value and alpha, which is what the picker actually moves in. */
+    /**
+     * The same color split into hue, saturation, value and alpha, which is what the picker actually moves in.
+     * Saturation and value are `0`–`100` percentages. Where the value could not be read this is the last color
+     * the picker held, and {@link ColorInputRenderProps.isUnreadable} says so.
+     */
     hsv: Color.HSVA;
     /** Whether the picker is open. */
     isOpen: boolean;
+    /**
+     * Whether the value is a color the field cannot read.
+     *
+     * A field given something it cannot show states that rather than substituting a color of its own, so the
+     * consumer's value is never overwritten — and the error flag is raised for the same reason. Nothing is
+     * written back out while this is true, so the original text survives until it is replaced with a color.
+     */
+    isUnreadable: boolean;
 };
 
 export type ColorInputCbs = {

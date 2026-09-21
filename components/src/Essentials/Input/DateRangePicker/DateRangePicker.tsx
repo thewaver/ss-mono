@@ -1,11 +1,14 @@
 import type { Signal } from "solid-js";
-import { createEffect, createSignal, createUniqueId, untrack } from "solid-js";
+import { createEffect, createMemo, createSignal, createUniqueId, untrack } from "solid-js";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
-import type { DateValue } from "../../../Abstracts/DateValue/DateValue.types";
+import type { DateValue, DateValueRange } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
 import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
+import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
+import { PopupTrigger } from "../../../Primitives/PopupTrigger/PopupTrigger";
+import type { PopupTriggerFlags } from "../../../Primitives/PopupTrigger/PopupTrigger.types";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { DateInput } from "../DateInput/DateInput";
 import { RangeCalendar } from "../RangeCalendar/RangeCalendar";
@@ -14,6 +17,7 @@ import type { DateRangePickerProps } from "./DateRangePicker.types";
 import * as styles from "./DateRangePicker.css";
 
 const DEFAULT_DATE_RANGE_PICKER_PLACEMENT: AnchorPlacement = { x: "left-in", y: "bottom-out" };
+const DEFAULT_DATE_RANGE_PICKER_TRIGGER_LABEL = "Open the calendar";
 const DEFAULT_DATE_RANGE_PICKER_CALENDAR_LABEL = "Choose a date range";
 const DEFAULT_DATE_RANGE_PICKER_START_LABEL = "Start date";
 const DEFAULT_DATE_RANGE_PICKER_END_LABEL = "End date";
@@ -31,37 +35,32 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
 
-    const startSignal = createSignal<DateValue | undefined>(untrack(() => valueSignal[0]()?.start));
-    const endSignal = createSignal<DateValue | undefined>(untrack(() => valueSignal[0]()?.end));
+    const { firstSignal: startSignal, secondSignal: endSignal } = SignalMirrorUtils.createSplit<
+        DateValueRange,
+        DateValue,
+        DateValue
+    >(valueSignal, {
+        compose: (start, end) => DateValueUtils.orderRange(start, end),
+        decompose: (range) => [range.start, range.end],
+        getIsSame: DateValueUtils.isSameRange,
+    });
 
     const monthSignal: Signal<DateValue> = createSignal(
         toMonth(untrack(() => valueSignal[0]()?.start) ?? DateValueUtils.fromDate(new Date())),
     );
 
-    createEffect(() => {
-        const range = valueSignal[0]();
+    const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
-        if (DateValueUtils.isSame(range?.start, untrack(startSignal[0]))) return;
+    const open = () => {
+        if (getIsDisabled()) return;
 
-        startSignal[1](() => range?.start);
-    });
-
-    createEffect(() => {
-        const range = valueSignal[0]();
-
-        if (DateValueUtils.isSame(range?.end, untrack(endSignal[0]))) return;
-
-        endSignal[1](() => range?.end);
-    });
+        setIsOpen(true);
+    };
 
     createEffect(() => {
-        const start = startSignal[0]();
-        const end = endSignal[0]();
-        const next = start && end ? DateValueUtils.orderRange(start, end) : undefined;
+        if (!getIsOpen() || !getIsDisabled()) return;
 
-        if (DateValueUtils.isSameRange(next, untrack(valueSignal[0]))) return;
-
-        valueSignal[1](() => next);
+        setIsOpen(false);
     });
 
     const dismiss = () => {
@@ -115,7 +114,26 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                 id={getEndFieldId}
                 name={access(props.name) && `${access(props.name)}-end`}
                 ariaLabel={() => access(props.endLabel) ?? DEFAULT_DATE_RANGE_PICKER_END_LABEL}
-                renderTrailing={() => props.renderTrigger(getIsOpen, () => (getIsOpen() ? dismiss() : setIsOpen(true)))}
+                renderTrailing={() => (
+                    <InteractionWrapper<PopupTriggerFlags>
+                        isDisabled={getIsDisabled}
+                        extraFlags={() => ({ isOpen: getIsOpen() })}
+                        renderControl={(setElementRef, getRenderProps) => (
+                            <PopupTrigger
+                                ref={setElementRef}
+                                id={props.triggerId}
+                                popupId={() => popupId}
+                                isOpen={getIsOpen}
+                                ariaLabel={() =>
+                                    access(props.triggerAriaLabel) ?? DEFAULT_DATE_RANGE_PICKER_TRIGGER_LABEL
+                                }
+                                flags={getRenderProps}
+                                renderContent={props.renderTrigger}
+                                onToggle={() => (getIsOpen() ? dismiss() : open())}
+                            />
+                        )}
+                    />
+                )}
             />
 
             <Popover

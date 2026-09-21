@@ -4,6 +4,8 @@ import type { Point2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { DateValue, DateValueWeekStart } from "../../../Abstracts/DateValue/DateValue.types";
+import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type { PopupTriggerFlags } from "../../../Primitives/PopupTrigger/PopupTrigger.types";
 import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { CalendarDayRenderer, CalendarWeekdayRenderer } from "../Calendar/Calendar.types";
 import type { DateInputProps } from "../DateInput/DateInput.types";
@@ -24,8 +26,25 @@ export type DatePickerProps = Omit<DateInputProps, "renderTrailing"> &
         computeIsDayDisabled?: (day: DateValue) => boolean;
         /** Whether the calendar is open. It is the only thing that opens or closes it. */
         visibilitySignal?: SignalSource<boolean>;
-        /** Draws the control that opens the calendar. */
-        renderTrigger: (getIsOpen: () => boolean, onToggle: () => void) => JSX.Element;
+        /**
+         * The trigger's own element id, for a consumer that has to reach it from a label or a test.
+         *
+         * It is separate from the field's `id` because the two are different elements now that the component
+         * owns the trigger.
+         */
+        triggerId?: string;
+        /** Names the control that opens the calendar. Defaults to "Open the calendar". */
+        triggerAriaLabel?: string;
+        /**
+         * Draws what sits inside the control that opens the calendar.
+         *
+         * The control itself is the component's — it owns the `aria-haspopup`, `aria-expanded` and
+         * `aria-controls` that tell a reader the calendar belongs to it, and that let the dismisser resolve a
+         * press in the calendar as a press inside this picker's layer rather than outside it. Everything
+         * painted inside is the consumer's, and the element is a blank slate, so nothing about the look is
+         * fixed.
+         */
+        renderTrigger: (getFlags: () => InteractionFlags<PopupTriggerFlags>) => JSX.Element;
         /** Draws one day cell. */
         renderDay: CalendarDayRenderer;
         /** Draws one weekday heading. */

@@ -1,6 +1,6 @@
 import type { Accessor, JSX } from "solid-js";
 
-import type { Point2d } from "@thewaver/ss-utils";
+import type { Index2d, Point2d } from "@thewaver/ss-utils";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type {
@@ -9,14 +9,11 @@ import type {
 } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
-export type SortableGridSpot = {
-    x: number;
-    y: number;
-};
+export type SortableGridSpot = Index2d;
 
 export type SortableGridSize = {
-    width: number;
-    height: number;
+    rowCount: number;
+    colCount: number;
 };
 
 export type SortableGridBox = {
@@ -81,8 +78,18 @@ export type SortableGridTransfer<T> = {
 
 export type SortableGridController = {
     getIsCarrying: Accessor<boolean>;
-    turnCw: () => void;
-    turnCcw: () => void;
+    /**
+     * Turns the block being carried a quarter turn clockwise.
+     *
+     * @returns `false` when nothing is being carried, or when the block cannot be turned.
+     */
+    turnCw: () => boolean;
+    /**
+     * Turns the block being carried a quarter turn counter-clockwise.
+     *
+     * @returns `false` when nothing is being carried, or when the block cannot be turned.
+     */
+    turnCcw: () => boolean;
 };
 
 export type SortableGridItemSlotProps = AccessorProps<{

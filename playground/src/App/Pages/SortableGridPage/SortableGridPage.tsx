@@ -32,7 +32,7 @@ const room = (items: SortableGridItem<Gear>[], columns: number, rows: number) =>
     `${columns * rows - filled(items)} of ${columns * rows} cells free`;
 
 const spots = (items: SortableGridItem<Gear>[]) =>
-    items.map((item) => `${item.value.name} at ${item.spot.x + 1},${item.spot.y + 1}`).join(" | ") || "empty";
+    items.map((item) => `${item.value.name} at ${item.spot.col + 1},${item.spot.row + 1}`).join(" | ") || "empty";
 
 export const SortableGridPage = () => {
     const packSignal = createSignal(PACK);

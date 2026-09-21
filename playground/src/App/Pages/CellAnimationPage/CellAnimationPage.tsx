@@ -11,7 +11,7 @@ import {
     access,
 } from "@thewaver/ss-components";
 import type { CellAnimationFinalFrame, WeightOpts } from "@thewaver/ss-components";
-import type { Point2d, Size2d } from "@thewaver/ss-utils";
+import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
@@ -35,7 +35,7 @@ import * as styles from "./CellAnimationPage.css";
 
 const IMAGE_CONTAINER_SIZE = 480;
 const DEFAULT_SOURCE_RATIO: SVGDefsSources.SourceRatio = "1:1";
-const STRESS_CELL_COUNT: Point2d = { x: 11, y: 11 };
+const STRESS_CELL_COUNT: Index2d = { row: 11, col: 11 };
 const STRESS_ITEM_SIZE = 120;
 const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
     {
@@ -78,9 +78,9 @@ const MAX_DURATION_MS = 10000;
 const DURATION_STEP_MS = 100;
 const MIN_ITERATION_DELAY_MS = 0;
 const MAX_ITERATION_DELAY_MS = 5000;
-const MIN_ITERATION_COUNT = 0;
+const MIN_ITERATION_COUNT = -1;
 const MAX_ITERATION_COUNT = 10;
-const ENDLESS_ITERATION_COUNT = 0;
+const ENDLESS_ITERATION_COUNT = -1;
 const FINAL_FRAMES: CellAnimationFinalFrame[] = ["source", "cells", "nothing"];
 const MIN_HOLD_MS = 0;
 const MAX_HOLD_MS = 5000;
@@ -262,7 +262,7 @@ const StressTestWrapper = (props: CellAnimationSourcedExampleProps) => {
 
     return (
         <>
-            <div>{`${STRESS_CELL_COUNT.x} x ${STRESS_CELL_COUNT.y} cells`}</div>
+            <div>{`${STRESS_CELL_COUNT.col} x ${STRESS_CELL_COUNT.row} cells`}</div>
 
             <StressTest
                 configs={() => STRESS_ITEMS}
@@ -296,7 +296,7 @@ export const CellAnimationPage = () => {
     const [getAnimationIterationDelayMs, setAnimationIterationDelayMs] = createSignal(STARTING_ITERATION_DELAY_MS);
     const [getAnimationIterationCount, setAnimationIterationCount] = createSignal(ENDLESS_ITERATION_COUNT);
     const [getFinalFrame, setFinalFrame] = createSignal<CellAnimationFinalFrame>("cells");
-    const [cellCount, setCellCount] = createStore<Point2d>({ ...STRESS_CELL_COUNT });
+    const [cellCount, setCellCount] = createStore<Index2d>({ ...STRESS_CELL_COUNT });
     const [weightOpts, setWeightOpts] = createStore<WeightOpts>({
         shouldMakeUnique: false,
         shouldNormalize: false,
@@ -371,20 +371,20 @@ export const CellAnimationPage = () => {
                 >
                     <div class={styles.valueList}>
                         <PageNumberField
-                            value={() => cellCount.x}
+                            value={() => cellCount.col}
                             min={() => MIN_CELL_COUNT}
                             max={() => MAX_CELL_COUNT}
                             step={() => CELL_COUNT_STEP}
                             ariaLabel={"Columns"}
-                            onInput={(value) => setCellCount("x", value)}
+                            onInput={(value) => setCellCount("col", value)}
                         />
                         <PageNumberField
-                            value={() => cellCount.y}
+                            value={() => cellCount.row}
                             min={() => MIN_CELL_COUNT}
                             max={() => MAX_CELL_COUNT}
                             step={() => CELL_COUNT_STEP}
                             ariaLabel={"Rows"}
-                            onInput={(value) => setCellCount("y", value)}
+                            onInput={(value) => setCellCount("row", value)}
                         />
                     </div>
                 </PageProp>
@@ -536,8 +536,8 @@ export const CellAnimationPage = () => {
 
                 <PageProp
                     key={"animationIterationCount"}
-                    label={"Iteration count (0 = endless)"}
-                    hint={"How many passes to run. 0 means it never stops."}
+                    label={"Iteration count (-1 = endless)"}
+                    hint={"How many passes to run. -1 means it never stops, and 0 shows the final frame at once."}
                 >
                     <PageNumberField
                         value={getAnimationIterationCount}

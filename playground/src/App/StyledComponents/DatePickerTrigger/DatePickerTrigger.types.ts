@@ -1,8 +1,5 @@
-import type { AccessorProps } from "@thewaver/ss-components";
+import type { AccessorProps, InteractionFlags, PopupTriggerFlags } from "@thewaver/ss-components";
 
 export type DatePickerTriggerProps = AccessorProps<{
-    key: string;
-    isOpen: boolean;
-    isDisabled?: boolean;
-    onToggle: () => void;
+    flags: InteractionFlags<PopupTriggerFlags>;
 }>;

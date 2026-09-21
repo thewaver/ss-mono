@@ -1,16 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import type { Point2d } from "@thewaver/ss-utils";
+import type { Index2d } from "@thewaver/ss-utils";
 
 import { CellAnimationOrigins } from "../Origins/CellAnimationOrigins.const";
 import { CellAnimationWeights } from "./CellAnimationWeights.const";
 
-const ODD_GRID: Point2d = { x: 7, y: 7 };
-const EVEN_COLUMN: Point2d = { x: 1, y: 8 };
-const EVEN_GRID: Point2d = { x: 8, y: 8 };
-const AWKWARD_GRIDS: Point2d[] = [EVEN_GRID, EVEN_COLUMN, { x: 10, y: 4 }, { x: 2, y: 2 }];
+const ODD_GRID: Index2d = { col: 7, row: 7 };
+const EVEN_COLUMN: Index2d = { col: 1, row: 8 };
+const EVEN_GRID: Index2d = { col: 8, row: 8 };
+const AWKWARD_GRIDS: Index2d[] = [EVEN_GRID, EVEN_COLUMN, { col: 10, row: 4 }, { col: 2, row: 2 }];
 
-const centerOf = (count: Point2d) => CellAnimationOrigins.computeOrigin("center", count);
+const centerOf = (count: Index2d) => CellAnimationOrigins.computeOrigin("center", count);
 
 const DETERMINISTIC_WEIGHTS = CellAnimationWeights.WEIGHT_TYPES.filter((type) => !type.startsWith("random"));
 
@@ -25,18 +25,22 @@ describe("CellAnimationWeightsConst", () => {
     });
 
     it("gives a row per y and a column per x", () => {
-        const weights = CellAnimationWeights.computeCellWeights("lineRow", { x: 3, y: 5 }, { x: 0, y: 0 });
+        const weights = CellAnimationWeights.computeCellWeights("lineRow", { col: 3, row: 5 }, { col: 0, row: 0 });
 
         expect(weights).toHaveLength(5);
         expect(weights.every((row) => row.length === 3)).toBe(true);
     });
 
     it("returns an empty grid rather than throwing on a zero count", () => {
-        expect(CellAnimationWeights.computeCellWeights("lineRow", { x: 0, y: 0 }, { x: 0, y: 0 })).toEqual([]);
+        expect(CellAnimationWeights.computeCellWeights("lineRow", { col: 0, row: 0 }, { col: 0, row: 0 })).toEqual([]);
     });
 
     it("stays finite on a single-cell grid, where the farthest bound is zero", () => {
-        const weights = CellAnimationWeights.computeCellWeights("diamondDefault", { x: 1, y: 1 }, { x: 0, y: 0 });
+        const weights = CellAnimationWeights.computeCellWeights(
+            "diamondDefault",
+            { col: 1, row: 1 },
+            { col: 0, row: 0 },
+        );
 
         expect(weights).toEqual([[1]]);
     });
@@ -59,7 +63,7 @@ describe("CellAnimationWeightsConst", () => {
     it.each(CellAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES.filter((type) => !type.startsWith("random")))(
         "leaves %s unchanged when the origin moves",
         (type) => {
-            const fromCorner = CellAnimationWeights.computeCellWeights(type, ODD_GRID, { x: 0, y: 0 });
+            const fromCorner = CellAnimationWeights.computeCellWeights(type, ODD_GRID, { col: 0, row: 0 });
             const fromCenter = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centerOf(ODD_GRID));
 
             expect(fromCorner).toEqual(fromCenter);
@@ -67,7 +71,7 @@ describe("CellAnimationWeightsConst", () => {
     );
 
     it("moves an origin-aware weight when the origin moves", () => {
-        const fromCorner = CellAnimationWeights.computeCellWeights("diamondDefault", ODD_GRID, { x: 0, y: 0 });
+        const fromCorner = CellAnimationWeights.computeCellWeights("diamondDefault", ODD_GRID, { col: 0, row: 0 });
         const fromCenter = CellAnimationWeights.computeCellWeights("diamondDefault", ODD_GRID, centerOf(ODD_GRID));
 
         expect(fromCorner).not.toEqual(fromCenter);
@@ -77,7 +81,7 @@ describe("CellAnimationWeightsConst", () => {
         const weights = CellAnimationWeights.computeCellWeights(
             "lineRow",
             ODD_GRID,
-            { x: 0, y: 0 },
+            { col: 0, row: 0 },
             {
                 shouldNormalize: true,
             },
@@ -91,7 +95,7 @@ describe("CellAnimationWeightsConst", () => {
         const weights = CellAnimationWeights.computeCellWeights(
             "lineRow",
             ODD_GRID,
-            { x: 0, y: 0 },
+            { col: 0, row: 0 },
             {
                 shouldMakeUnique: true,
             },
@@ -126,8 +130,8 @@ describe("CellAnimationWeightsConst", () => {
         for (const count of AWKWARD_GRIDS) {
             const weights = CellAnimationWeights.computeCellWeights(type, count, centerOf(count)).flat();
 
-            expect(Math.min(...weights), `${count.x}x${count.y}`).toBeGreaterThanOrEqual(0);
-            expect(Math.max(...weights), `${count.x}x${count.y}`).toBeLessThanOrEqual(1);
+            expect(Math.min(...weights), `${count.col}x${count.row}`).toBeGreaterThanOrEqual(0);
+            expect(Math.max(...weights), `${count.col}x${count.row}`).toBeLessThanOrEqual(1);
         }
     });
 
@@ -141,7 +145,7 @@ describe("CellAnimationWeightsConst", () => {
     it.each(["sequenceMorton", "sequenceStrideRow", "sequenceStrideColumn"] as const)(
         "starts %s from the origin, rather than from the first cell",
         (type) => {
-            const fromCorner = CellAnimationWeights.computeCellWeights(type, ODD_GRID, { x: 0, y: 0 });
+            const fromCorner = CellAnimationWeights.computeCellWeights(type, ODD_GRID, { col: 0, row: 0 });
             const fromCenter = CellAnimationWeights.computeCellWeights(type, ODD_GRID, centerOf(ODD_GRID));
 
             expect(fromCorner).not.toEqual(fromCenter);
@@ -153,7 +157,7 @@ describe("CellAnimationWeightsConst", () => {
         const center = centerOf(ODD_GRID);
         const ccw = CellAnimationWeights.computeCellWeights("radarSingle", ODD_GRID, center);
         const cw = CellAnimationWeights.computeCellWeights("radarSingleCw", ODD_GRID, center);
-        const axes = (weights: number[][]) => [weights[center.y][ODD_GRID.x - 1], weights[center.y][0]];
+        const axes = (weights: number[][]) => [weights[center.row][ODD_GRID.col - 1], weights[center.row][0]];
 
         expect(axes(ccw), "counter-clockwise reaches the right of the origin before the left").toEqual(
             axes(cw).reverse(),

@@ -333,6 +333,46 @@ about the JSX call rather than about the configuration. So the declaration stays
 intersected or `Omit`-ed without dragging `children` along, and every type that spreads into another would
 inherit a `children` it never renders.
 
+### A component generates the id a relationship attribute needs
+
+Stated by the user, generalised from `SplitPane`. Where a component needs an element's `id` in order to write
+a relationship — `aria-controls`, `aria-describedby`, `aria-labelledby`, `aria-activedescendant` — an optional
+consumer `id` is a **preference, not a precondition**. The component falls back to `createUniqueId` so the
+relationship is always expressed, and writes an id only onto an element the consumer left unnamed.
+
+The fault it closes is that a required property ends up present or absent according to an unrelated optional
+prop, with nothing telling the consumer they lost it. `SplitPane`'s gutter had no `aria-controls` at all unless
+somebody happened to name the pane beside it; `TimePicker`, `DatePicker` and `ColorInput` already did the right
+thing for their popups, so this is the existing practice written down rather than a new one.
+
+### Anything non-local is exported
+
+The user's preference, stated as _providing consumers with more tooling is the preferred approach for anything
+non-local_. **What crosses a folder boundary between two public components is exported; only what stays inside
+one folder is private.**
+
+It names a rule the library already followed without saying so. `InteractionWrapper` is public precisely because
+`Button`, `Checkbox` and the rest are built on it from other folders, while `ButtonElement` stays private because
+it never leaves `Button`'s. `PlacementBox`'s context crosses to `PlacementItem`, so by that test it was always on
+the public side, and it is exported now — which makes all seven `.context.ts` files export their pair.
+
+**Publishing a helper publishes its edge cases too.** `usePlacementBoxContext` answers with an inert context
+outside a box rather than throwing, which is right for `PlacementItem` and a trap for a consumer who does not
+expect it — so its block says so. A doc block is part of the export, not an optional extra.
+
+### Every controller callback reports whether it succeeded
+
+The user's rule. A command handed over at mount returns `boolean`: `true` when it acted, `false` when it
+declined. It is the readable counterpart to _"Asking for a state a thing is already in does nothing"_ — that
+rule says a redundant request changes nothing, and this one is how the caller finds out that is what happened.
+
+`WheelController.spin` is the case that makes the argument: it was documented "Does nothing while one is already
+under way" and returned `void`, so there was no way to learn which had happened. Fourteen commands across seven
+controller types were converted with it.
+
+**The boolean stays even where it can only be `true`.** `restartAnimation` always acts now, and still reports
+that it did, because a caller should not have to know which commands can refuse and which cannot.
+
 ### One namespace per folder, and the file it lives in names it
 
 **A folder exports one namespace, not two.** The user's rule, taken while reading `Abstracts/Anchor`, which
@@ -557,6 +597,20 @@ Shortcut: **if calling `fn(x())` would lose a subscription the callee needs, pas
 `InteractionTrackerUtils.wrapElement(ref, disabled, opts)`, `FocusManagerUtils.autoFocus(ref, visible)`,
 `ElementFader(visible, opts)`, `FrameRateMonitorUtils.create(disabled, opts)`.
 
+**A run of tuning numbers becomes a defs object; genuine operands stay positional.** The user's rule, taken
+over naming each number with a local constant. A function taking `(pos, count, origin, 4, 0, 1, 2, 3)` gives a
+reader nothing to check the order against, and the names it lands on are only visible at the declaration — so
+`radar` and `spiral` take `{ quadrantsPerSection, clockDownMul, clockRightMul, clockUpMul, clockLeftMul }`, and
+`ripple` keeps its two computed operands positional and takes `{ periodCells, travelRatio }` as defs.
+
+The boundary is what the numbers _are_, not how many there are. Operands with self-describing names stay
+positional — `greatestCommonDivisor({ a, b })` would be worse than what it replaced. It is the same argument as
+_"One aggregated object per painter"_, applied to a utility rather than to a render callback.
+
+**A defs object on a per-call path is hoisted, not built at the call site.** These weight functions run once per
+cell per frame, so each sample declares its defs as a module-level `const` and passes it by reference. The
+readability is the point; the allocation is not part of the price.
+
 **An observer's name carries its coordinate space**, because the wrong one fails silently — it returns
 a plausible number wrong by the `Viewport` scale factor. `createViewportRectObserver` polls on
 `requestAnimationFrame` and reports position **and** size through
@@ -615,6 +669,24 @@ much as the tile it addresses is — and the name at the call site is what says 
 This is the same rule as _"an observer's name carries its coordinate space"_ above, on a discrete axis instead
 of a continuous one, and it exists for the same reason: the wrong one fails silently, returning a number that
 looks right.
+
+### `width` and `height` mean pixels; a tally of cells is a count
+
+Stated by the user. A pair counting rows and columns is **`{ rowCount, colCount }`**, or an `Index2d` named at
+the call site for what it tallies. `width` and `height` are reserved for measurements in pixels.
+
+It is the tally-side half of the rule above, and it fails the same way: a `{ width, height }` holding eight
+rows by four columns reads as a size, sits in the same type as a real one, and swaps without complaint.
+`SortableGridSize` was exactly that — a cell count in pixel clothing, beside a `SortableGridRect` whose
+`width` and `height` genuinely were pixels.
+
+The conversions this produced are the evidence for it: `SortableGridRect` now holds a `{ row, col }` spot
+beside pixel `width` and `height`, and the two no longer look alike; `NavigatorGrid` counts `rowCount` and
+`colCount` where it used to measure; and `CellAnimation` had a cell's position and the grid's tally both
+typed `Point2d`, so `isEvenRow` read `dist.y` and `isEvenColumn` read `dist.x` in one file.
+
+**What stays `width` and `height`**: anything a browser would measure. A `Size2d` in pixels, a rect, an
+element's box.
 
 ## Control architecture
 

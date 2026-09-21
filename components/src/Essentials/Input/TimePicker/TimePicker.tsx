@@ -1,15 +1,19 @@
-import { createSignal, createUniqueId } from "solid-js";
+import { createEffect, createMemo, createSignal, createUniqueId } from "solid-js";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
+import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
+import { PopupTrigger } from "../../../Primitives/PopupTrigger/PopupTrigger";
+import type { PopupTriggerFlags } from "../../../Primitives/PopupTrigger/PopupTrigger.types";
 import { access } from "../../../Utils/propUtils";
 import { Clock } from "../Clock/Clock";
 import { TimeInput } from "../TimeInput/TimeInput";
-import type { TimePickerProps, TimePickerTrigger } from "./TimePicker.types";
+import type { TimePickerProps } from "./TimePicker.types";
 
 const DEFAULT_TIME_PICKER_PLACEMENT: AnchorPlacement = { x: "left-in", y: "bottom-out" };
 const DEFAULT_TIME_PICKER_CLOCK_LABEL = "Choose a time";
+const DEFAULT_TIME_PICKER_TRIGGER_LABEL = "Open the clock";
 
 export const TimePicker = (props: TimePickerProps) => {
     const popupId = createUniqueId();
@@ -26,14 +30,19 @@ export const TimePicker = (props: TimePickerProps) => {
         getRootRef()?.querySelector("input")?.focus();
     };
 
+    const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
+
     const open = () => {
+        if (getIsDisabled()) return;
+
         setIsOpen(true);
     };
 
-    const trigger: TimePickerTrigger = {
-        getIsOpen,
-        toggle: () => (getIsOpen() ? dismiss() : open()),
-    };
+    createEffect(() => {
+        if (!getIsOpen() || !getIsDisabled()) return;
+
+        setIsOpen(false);
+    });
 
     const renderClock = () => (
         <Clock
@@ -58,7 +67,30 @@ export const TimePicker = (props: TimePickerProps) => {
         <div ref={setRootRef}>
             <TimeInput
                 {...props}
-                renderTrailing={(getFlags, meridiem) => props.renderTrailing(getFlags, meridiem, trigger)}
+                renderTrailing={(getFieldFlags, meridiem) => (
+                    <>
+                        {props.renderTrailing?.(getFieldFlags, meridiem)}
+
+                        <InteractionWrapper<PopupTriggerFlags>
+                            isDisabled={getIsDisabled}
+                            extraFlags={() => ({ isOpen: getIsOpen() })}
+                            renderControl={(setElementRef, getRenderProps) => (
+                                <PopupTrigger
+                                    ref={setElementRef}
+                                    id={props.triggerId}
+                                    popupId={() => popupId}
+                                    isOpen={getIsOpen}
+                                    ariaLabel={() =>
+                                        access(props.triggerAriaLabel) ?? DEFAULT_TIME_PICKER_TRIGGER_LABEL
+                                    }
+                                    flags={getRenderProps}
+                                    renderContent={(getTriggerFlags) => props.renderTrigger(getTriggerFlags, meridiem)}
+                                    onToggle={() => (getIsOpen() ? dismiss() : open())}
+                                />
+                            )}
+                        />
+                    </>
+                )}
             />
 
             <Popover

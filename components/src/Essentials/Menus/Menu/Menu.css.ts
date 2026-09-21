@@ -30,3 +30,10 @@ export const menuLayoutGroup = style({
 export const menuItemRegion = style({
     pointerEvents: "none",
 });
+
+export const contextMenuRegion = style({
+    display: "flex",
+    flexDirection: "column",
+    minWidth: 0,
+    minHeight: 0,
+});

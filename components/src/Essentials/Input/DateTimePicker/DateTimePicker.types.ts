@@ -38,8 +38,14 @@ export type DateTimePickerProps = Omit<DatePickerProps, "valueSignal" | "ariaLab
         timeVisibilitySignal?: SignalSource<boolean>;
         /** Draws whatever sits between the two halves. */
         renderSeparator?: () => JSX.Element;
-        /** Draws whatever sits after the time field's text, inside the field. */
-        renderTimeTrailing: TimePickerProps["renderTrailing"];
+        /** The clock trigger's own element id. */
+        timeTriggerId?: string;
+        /** Names the control that opens the clock. */
+        timeTriggerAriaLabel?: string;
+        /** Draws whatever else sits after the time field's text, before the control that opens the clock. */
+        renderTimeTrailing?: TimePickerProps["renderTrailing"];
+        /** Draws what sits inside the control that opens the clock. */
+        renderTimeTrigger: TimePickerProps["renderTrigger"];
         /** Draws one clock option. */
         renderOption: ClockOptionRenderer;
         /** Draws the heading for one of the clock's columns. */

@@ -1,4 +1,4 @@
-import { Index, Show, createMemo, createSignal } from "solid-js";
+import { Index, Show, createMemo, createSignal, createUniqueId } from "solid-js";
 
 import { MathUtils } from "@thewaver/ss-utils";
 
@@ -12,12 +12,19 @@ const DEFAULT_SPLIT_PANE_GUTTER_SIZE = 8;
 const DEFAULT_SPLIT_PANE_KEY_STEP = 0.02;
 const NO_GUTTER_DRAGGING = -1;
 const PERCENT = 100;
+const SMALLEST_BOUNDARY = 0;
+const LARGEST_BOUNDARY = 1;
 
 export const SplitPane = (props: SplitPaneProps) => {
     const ratiosSignal = accessSignal(() => props.ratiosSignal);
 
+    const paneIdPrefix = createUniqueId();
+
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getDraggingIndex, setDraggingIndex] = createSignal(NO_GUTTER_DRAGGING);
+    const [getCollapsedBoundaries, setCollapsedBoundaries] = createSignal<Record<number, number>>({});
+
+    const getPaneId = (index: number) => access(props.panes)[index]?.id ?? `${paneIdPrefix}-pane-${index}`;
 
     const getDir = createMemo(() => access(props.dir) ?? DEFAULT_SPLIT_PANE_DIR);
 
@@ -73,7 +80,13 @@ export const SplitPane = (props: SplitPaneProps) => {
         };
     };
 
+    const forgetCollapsed = (index: number) => {
+        setCollapsedBoundaries(({ [index]: _unused, ...rest }) => rest);
+    };
+
     const moveBoundary = (index: number, boundary: number) => {
+        forgetCollapsed(index);
+
         const ratios = [...getRatios()];
         const before = getBoundary(index) - ratios[index];
         const span = ratios[index] + ratios[index + 1];
@@ -107,10 +120,14 @@ export const SplitPane = (props: SplitPaneProps) => {
         return (offset - getGutterSize() * (index + 0.5)) / available;
     };
 
+    let hasDragged = false;
+
     const handleGutterPointerDown = (e: PointerEvent, index: number) => {
         if (e.button !== 0 || getIsDisabled()) return;
 
         e.preventDefault();
+
+        hasDragged = false;
 
         (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
         setDraggingIndex(index);
@@ -123,6 +140,8 @@ export const SplitPane = (props: SplitPaneProps) => {
 
         if (boundary === undefined) return;
 
+        hasDragged = true;
+
         moveBoundary(index, boundary);
     };
 
@@ -131,6 +150,32 @@ export const SplitPane = (props: SplitPaneProps) => {
 
         (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
         setDraggingIndex(NO_GUTTER_DRAGGING);
+
+        if (hasDragged) return;
+
+        const element = e.currentTarget as HTMLElement;
+        const rect = element.getBoundingClientRect();
+        const isRow = getDir() === "row";
+        const offset = isRow ? e.clientX - rect.left : e.clientY - rect.top;
+        const extent = isRow ? rect.width : rect.height;
+        const step = access(props.keyStep) ?? DEFAULT_SPLIT_PANE_KEY_STEP;
+
+        moveBoundary(index, getBoundary(index) + (offset < extent * 0.5 ? -step : step));
+    };
+
+    const toggleCollapsed = (index: number) => {
+        const collapsed = getCollapsedBoundaries()[index];
+
+        if (collapsed !== undefined) {
+            moveBoundary(index, collapsed);
+
+            return;
+        }
+
+        const previous = getBoundary(index);
+
+        moveBoundary(index, SMALLEST_BOUNDARY);
+        setCollapsedBoundaries((prev) => ({ ...prev, [index]: previous }));
     };
 
     const handleGutterKeyDown = (e: KeyboardEvent, index: number) => {
@@ -139,6 +184,20 @@ export const SplitPane = (props: SplitPaneProps) => {
         const isRow = getDir() === "row";
         const decreaseKey = isRow ? "ArrowLeft" : "ArrowUp";
         const increaseKey = isRow ? "ArrowRight" : "ArrowDown";
+
+        if (e.key === "Enter") {
+            e.preventDefault();
+            toggleCollapsed(index);
+
+            return;
+        }
+
+        if (e.key === "Home" || e.key === "End") {
+            e.preventDefault();
+            moveBoundary(index, e.key === "Home" ? SMALLEST_BOUNDARY : LARGEST_BOUNDARY);
+
+            return;
+        }
 
         if (e.key !== decreaseKey && e.key !== increaseKey) return;
 
@@ -169,6 +228,7 @@ export const SplitPane = (props: SplitPaneProps) => {
                                 role="separator"
                                 tabindex={getIsDisabled() ? -1 : 0}
                                 aria-orientation={getDir() === "row" ? "vertical" : "horizontal"}
+                                aria-controls={getPaneId(index - 1)}
                                 aria-label={getPane().gutterAriaLabel}
                                 aria-disabled={getIsDisabled() || undefined}
                                 aria-valuenow={Math.round(getBoundary(index - 1) * PERCENT)}
@@ -187,7 +247,7 @@ export const SplitPane = (props: SplitPaneProps) => {
                             </button>
                         </Show>
 
-                        <div id={getPane().id} class={styles.splitPanePane}>
+                        <div id={getPaneId(index)} class={styles.splitPanePane}>
                             {props.renderPane(getPane, index)}
                         </div>
                     </>

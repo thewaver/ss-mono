@@ -10,21 +10,21 @@ import type { ColorAreaAxis, ColorAreaElementProps, ColorAreaProps, ColorAreaRen
 
 import * as styles from "./ColorArea.css";
 
-const DEFAULT_COLOR_AREA_STEP = 0.01;
+const DEFAULT_COLOR_AREA_STEP = 1;
 const DEFAULT_COLOR_AREA_AXIS_LABELS: Record<ColorAreaAxis, string> = {
     saturation: "Saturation",
     brightness: "Brightness",
 };
 
 const AXES: ColorAreaAxis[] = ["saturation", "brightness"];
-const RATIO_MIN = 0;
+const PERCENT_MIN = 0;
+const PERCENT_MAX = 100;
 const RATIO_MAX = 1;
-const PERCENT = 100;
 
 const readFocusVisibleAxis = (element: HTMLElement, axis: ColorAreaAxis) =>
     InteractionTrackerUtils.computeIsFocusVisible(element) ? axis : undefined;
 
-const getAxisRatio = (hsv: Color.HSVA, axis: ColorAreaAxis) => (axis === "saturation" ? hsv.s : hsv.v);
+const getAxisPercent = (hsv: Color.HSVA, axis: ColorAreaAxis) => (axis === "saturation" ? hsv.s : hsv.v);
 
 const ColorAreaElement = (props: ColorAreaElementProps) => {
     const getAriaLabel = LabelUtils.resolveAriaLabel(
@@ -38,7 +38,7 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
 
     const { getIsDragging } = InteractionTrackerUtils.trackDrag(getSurfaceRef, getIsDisabled, {
         onDrag: (ratio) => {
-            props.setAxes(ratio.x, RATIO_MAX - ratio.y);
+            props.setAxes(ratio.x * PERCENT_MAX, (RATIO_MAX - ratio.y) * PERCENT_MAX);
             getAxisRefs().saturation?.focus();
         },
     });
@@ -48,7 +48,7 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
     });
 
     const syncAxis = (element: HTMLInputElement, axis: ColorAreaAxis) => {
-        const value = `${getAxisRatio(access(props.hsv), axis)}`;
+        const value = `${getAxisPercent(access(props.hsv), axis)}`;
 
         if (element.value === value) return;
 
@@ -99,11 +99,11 @@ const ColorAreaElement = (props: ColorAreaElementProps) => {
                         type="range"
                         name={access(props.name) && `${access(props.name)}-${axis}`}
                         class={styles.colorAreaAxis}
-                        min={RATIO_MIN}
-                        max={RATIO_MAX}
+                        min={PERCENT_MIN}
+                        max={PERCENT_MAX}
                         step={access(props.step)}
                         aria-label={access(props.axisLabels)[axis]}
-                        aria-valuetext={`${Math.round(getAxisRatio(access(props.hsv), axis) * PERCENT)}%`}
+                        aria-valuetext={`${Math.round(getAxisPercent(access(props.hsv), axis))}%`}
                         aria-disabled={getIsDisabled() || undefined}
                         onInput={(e) => {
                             const element = e.currentTarget;
@@ -138,15 +138,19 @@ export const ColorArea = (props: ColorAreaProps) => {
         void props.onInput?.(next);
     };
 
-    const setAxis = (axis: ColorAreaAxis, ratio: number) => {
-        const clamped = MathUtils.clamp01(ratio);
+    const setAxis = (axis: ColorAreaAxis, percent: number) => {
+        const clamped = MathUtils.clamp(percent, PERCENT_MIN, PERCENT_MAX);
         const hsv = hsvSignal[0]();
 
         writeHsv(axis === "saturation" ? { ...hsv, s: clamped } : { ...hsv, v: clamped });
     };
 
     const setAxes = (saturation: number, brightness: number) => {
-        writeHsv({ ...hsvSignal[0](), s: MathUtils.clamp01(saturation), v: MathUtils.clamp01(brightness) });
+        writeHsv({
+            ...hsvSignal[0](),
+            s: MathUtils.clamp(saturation, PERCENT_MIN, PERCENT_MAX),
+            v: MathUtils.clamp(brightness, PERCENT_MIN, PERCENT_MAX),
+        });
     };
 
     return (

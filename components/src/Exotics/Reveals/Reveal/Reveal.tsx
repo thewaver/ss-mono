@@ -48,7 +48,7 @@ export const Reveal = (props: RevealProps) => {
 
     const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRootRef, getIsDisabled);
 
-    const getSize = ElementObserverUtils.createBorderBoxSizeObserver(getRootRef, () => !getIsDisabled());
+    const getSize = ElementObserverUtils.createBorderBoxSizeObserver(getRootRef, getIsDisabled);
 
     const getRadius = createMemo(() => access(props.radius) ?? DEFAULT_REVEAL_RADIUS);
 

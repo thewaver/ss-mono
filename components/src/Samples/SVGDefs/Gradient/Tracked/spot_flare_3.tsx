@@ -60,75 +60,80 @@ const computeGhostColors = (ghost: FlareGhost, color: string, fade: number, opts
 };
 
 export const spot_flare_3 = (opts?: GradientFlareOpts): TrackedGradientConfig => ({
-    computeSVGDefs: (id, __, getRef, defs) => [
-        {
-            color: SVGDefsUtils.getBaseBorderColor(defs),
-        },
-        {
-            gradientOrPattern: {
-                id: `gradient1-${id}`,
-                renderDefsElement: () => {
-                    const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
+    computeSVGDefs: (id, __, getRef, defs) => {
+        const sharedBlur = SVGDefsUtils.getBaseBlur(id, defs);
+        const sharedBlurRef = SVGDefsUtils.getSharedFilter(sharedBlur);
 
-                    return SVGGradientDefsUtils.computeRadialGradient({
-                        id: `gradient1-${id}`,
-                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
-                        origin: () => getReading().boxRatio,
-                        scale: opts?.glowScale ?? DEFAULTS.glowScale,
-                        colors: [
-                            { value: `rgb(from ${defs.colors.primary} r g b / 1)` },
-                            {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.coreAlpha ?? DEFAULTS.coreAlpha})`,
-                                stop: opts?.coreStop ?? DEFAULTS.coreStop,
-                            },
-                            {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? DEFAULTS.falloffAlpha})`,
-                                stop: opts?.falloffStop ?? DEFAULTS.falloffStop,
-                            },
-                            { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
-                        ],
-                    });
-                },
+        return [
+            {
+                color: SVGDefsUtils.getBaseBorderColor(defs),
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-        },
-        ...GHOSTS.map((ghost, index) => ({
-            gradientOrPattern: {
-                id: `gradient${index + 2}-${id}`,
-                renderDefsElement: () => {
-                    const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef ?? NO_REF);
+            {
+                gradientOrPattern: {
+                    id: `gradient1-${id}`,
+                    renderDefsElement: () => {
+                        const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
-                    const getGrowth = () => {
-                        const ratio = getReading().boxRatio;
-                        const distance = MathUtils.clamp01(Math.hypot(ratio.x - 0.5, ratio.y - 0.5) * 2);
-
-                        return MathUtils.lerp(
-                            opts?.ghostNearGrowth ?? DEFAULTS.ghostNearGrowth,
-                            opts?.ghostFarGrowth ?? DEFAULTS.ghostFarGrowth,
-                            distance,
-                        );
-                    };
-
-                    return SVGGradientDefsUtils.computeRadialGradient({
-                        id: `gradient${index + 2}-${id}`,
-                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
-                        origin: () => ({
-                            x: getReading().boxRatio.x + (0.5 - getReading().boxRatio.x) * ghost.reach,
-                            y: getReading().boxRatio.y + (0.5 - getReading().boxRatio.y) * ghost.reach,
-                        }),
-                        scale: () => ghost.scale * getGrowth(),
-                        colors: () =>
-                            computeGhostColors(
-                                ghost,
-                                defs.colors[ghost.colorKey],
-                                SVGDefsUtils.getPointerFade(getReading(), getIsPointerPresent()),
-                                opts,
-                            ),
-                    });
+                        return SVGGradientDefsUtils.computeRadialGradient({
+                            id: `gradient1-${id}`,
+                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            origin: () => getReading().boxRatio,
+                            scale: opts?.glowScale ?? DEFAULTS.glowScale,
+                            colors: [
+                                { value: `rgb(from ${defs.colors.primary} r g b / 1)` },
+                                {
+                                    value: `rgb(from ${defs.colors.primary} r g b / ${opts?.coreAlpha ?? DEFAULTS.coreAlpha})`,
+                                    stop: opts?.coreStop ?? DEFAULTS.coreStop,
+                                },
+                                {
+                                    value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? DEFAULTS.falloffAlpha})`,
+                                    stop: opts?.falloffStop ?? DEFAULTS.falloffStop,
+                                },
+                                { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
+                            ],
+                        });
+                    },
                 },
+                filter: sharedBlur,
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-            blend: true,
-        })),
-    ],
+            ...GHOSTS.map((ghost, index) => ({
+                gradientOrPattern: {
+                    id: `gradient${index + 2}-${id}`,
+                    renderDefsElement: () => {
+                        const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef ?? NO_REF);
+
+                        const getGrowth = () => {
+                            const ratio = getReading().boxRatio;
+                            const distance = MathUtils.clamp01(Math.hypot(ratio.x - 0.5, ratio.y - 0.5) * 2);
+
+                            return MathUtils.lerp(
+                                opts?.ghostNearGrowth ?? DEFAULTS.ghostNearGrowth,
+                                opts?.ghostFarGrowth ?? DEFAULTS.ghostFarGrowth,
+                                distance,
+                            );
+                        };
+
+                        return SVGGradientDefsUtils.computeRadialGradient({
+                            id: `gradient${index + 2}-${id}`,
+                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            origin: () => ({
+                                x: getReading().boxRatio.x + (0.5 - getReading().boxRatio.x) * ghost.reach,
+                                y: getReading().boxRatio.y + (0.5 - getReading().boxRatio.y) * ghost.reach,
+                            }),
+                            scale: () => ghost.scale * getGrowth(),
+                            colors: () =>
+                                computeGhostColors(
+                                    ghost,
+                                    defs.colors[ghost.colorKey],
+                                    SVGDefsUtils.getPointerFade(getReading(), getIsPointerPresent()),
+                                    opts,
+                                ),
+                        });
+                    },
+                },
+                filter: sharedBlurRef,
+                blend: true,
+            })),
+        ];
+    },
 });

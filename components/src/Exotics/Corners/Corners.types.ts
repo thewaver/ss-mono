@@ -11,8 +11,8 @@ export type CornersProps = AccessorProps<{
     cornerLength?: Size2d;
     /** How thick the arms are drawn. */
     strokeThickness?: number;
-    /** How long a corner takes to fade in or out when it is turned on or off. */
+    /** How long the corners take to follow a change of color, which is how the set as a whole fades. */
     transitionDurationMs?: number;
-    /** Which corners are drawn. Leaving one out fades it away rather than removing it at once. */
+    /** Which corners are drawn. One left out is not drawn at all; fading is the container's, through {@link CornersProps.transitionDurationMs}. */
     visibleCorners?: Set<CornerKey>;
 }>;
