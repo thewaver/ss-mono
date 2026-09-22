@@ -150,7 +150,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     const getAngle = createMemo(() => getTurnAngle() + getSwipeRatio() * RotationUtils.getStepAngle(getCount()));
 
     const getSlideLabel = (index: number) =>
-        props.computeSlideLabel?.(index + 1, getCount()) ?? `${index + 1} of ${getCount()}`;
+        props.computeSlideLabel?.(index, getCount()) ?? `${index + 1} of ${getCount()}`;
 
     const getSlideState = (index: number, face: CarouselFace): CarouselSlideState => ({
         index,

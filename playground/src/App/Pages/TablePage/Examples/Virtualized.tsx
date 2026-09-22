@@ -3,6 +3,7 @@ import { createMemo } from "solid-js";
 import type { MaybeAccessor } from "@thewaver/ss-components";
 import { Table } from "@thewaver/ss-components";
 
+import { PageTableReorderGrip, PageTableSortControl } from "../../../StyledComponents/TableContent/TableContent";
 import { createPartColumns } from "../TablePage.const";
 import type { Part, TableExampleProps } from "../TablePage.types";
 
@@ -19,6 +20,8 @@ export const VirtualizedExample = (props: Props) => {
         <div class={styles.tableFrameTall}>
             <Table
                 columns={getColumns}
+                renderSortControl={(getRenderProps) => <PageTableSortControl renderProps={getRenderProps} />}
+                renderReorderGrip={() => <PageTableReorderGrip />}
                 rows={props.rows}
                 sortSignal={props.sortSignal}
                 selectionSignal={props.selectionSignal}

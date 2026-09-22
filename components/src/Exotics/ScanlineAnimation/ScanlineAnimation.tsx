@@ -10,7 +10,7 @@ export const ScanlineAnimation = (props: ScanlineAnimationProps) => {
     return (
         <CellAnimation
             {...otherProps}
-            cellCount={() => ({ x: 1, y: access(local.lineCount) })}
+            cellCount={() => ({ row: access(local.lineCount), col: 1 })}
             computeCellAnimation={(defs, timeline) => local.computeScanlineAnimation(defs, timeline)}
         />
     );

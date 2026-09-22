@@ -31,26 +31,12 @@ export const band_diag_1 = (opts?: GradientBandOpts): TrackedGradientConfig => (
 
                     return SVGGradientDefsUtils.computeLinearGradient({
                         id: `gradient1-${id}`,
-                        colors: [
-                            { value: `rgb(from ${defs.colors.primary} r g b / 0)` },
-                            {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? DEFAULTS.falloffAlpha})`,
-                                stop:
-                                    (opts?.coreStop ?? DEFAULTS.coreStop) -
-                                    (opts?.falloffSpread ?? DEFAULTS.falloffSpread),
-                            },
-                            {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.coreAlpha ?? DEFAULTS.coreAlpha})`,
-                                stop: opts?.coreStop ?? DEFAULTS.coreStop,
-                            },
-                            {
-                                value: `rgb(from ${defs.colors.primary} r g b / ${opts?.falloffAlpha ?? DEFAULTS.falloffAlpha})`,
-                                stop:
-                                    (opts?.coreStop ?? DEFAULTS.coreStop) +
-                                    (opts?.falloffSpread ?? DEFAULTS.falloffSpread),
-                            },
-                            { value: `rgb(from ${defs.colors.primary} r g b / 0)`, stop: 100 },
-                        ],
+                        colors: SVGDefsUtils.getFalloffStops(defs.colors.primary, {
+                            coreStop: opts?.coreStop ?? DEFAULTS.coreStop,
+                            coreAlpha: opts?.coreAlpha ?? DEFAULTS.coreAlpha,
+                            falloffSpread: opts?.falloffSpread ?? DEFAULTS.falloffSpread,
+                            falloffAlpha: opts?.falloffAlpha ?? DEFAULTS.falloffAlpha,
+                        }),
                         angle,
                         scale: BAND_SPAN,
                         offset: () => SVGDefsUtils.offsetDiagonally(getTravel(), angle),

@@ -115,3 +115,13 @@ export const tableMarker = style({
     height: "100%",
     backgroundColor: themeVars.color.primary.main,
 });
+
+export const tableReorderGrip = style({
+    opacity: 0.4,
+    cursor: "grab",
+    selectors: {
+        "&:hover": {
+            opacity: 1,
+        },
+    },
+});

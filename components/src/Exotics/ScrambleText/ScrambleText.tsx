@@ -95,11 +95,7 @@ export const ScrambleText = (props: ScrambleTextProps) => {
     };
 
     const controller = createMemo(() => ({
-        restartAnimation: () => {
-            if (getIsScrambling()) return false;
-
-            return startScrambling();
-        },
+        restartAnimation: () => startScrambling(),
     }));
 
     createEffect(on(getCharacters, () => startScrambling()));

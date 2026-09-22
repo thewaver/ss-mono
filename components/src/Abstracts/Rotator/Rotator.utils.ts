@@ -21,6 +21,9 @@ const DEFAULT_SPIN_DEFS: RotatorSpinDefs = { turns: 3, jitterRatio: 0 };
 /** Fewer than two steps and there is nowhere to rotate to. */
 const MIN_ROTATABLE_STEP_COUNT = 2;
 /** A backstop timer's grace period. A background tab stops delivering frames, and a spin that never finished would leave the component stuck mid-animation. */
+/** A consumer's own move goes straight to the step, with none of a spin's extra revolutions. */
+const NO_TURNS = 0;
+
 const FRAME_STARVATION_SLACK_MS = 100;
 /** Eases in and out, so a spin starts and stops rather than snapping to speed. */
 const SPIN_EASING: EasingFn = EasingUtils.ease;
@@ -47,8 +50,9 @@ export namespace RotatorUtils {
      *
      * @param getIsDisabled Whether the wheel may rotate.
      * @param defs.stepCount How many steps the wheel has. Fewer than two and it cannot rotate.
-     * @param defs.indexSignal The selected step, if the consumer wants to control or observe it. An
-     * internal signal is used when omitted.
+     * @param defs.targetIndexSignal The step the wheel is heading for, if the consumer wants to drive or
+     * observe it. Writing it turns the wheel there; the component writes it as soon as a spin's target is
+     * known, rather than when the spin lands. An internal signal is used when omitted.
      * @param defs.autoSpinSignal Whether idle drift is allowed. On when omitted.
      * @param defs.spinDurationMs How long a spin takes.
      * @param defs.settleDurationMs How long the drift back from an overshoot takes.
@@ -77,7 +81,7 @@ export namespace RotatorUtils {
         const [getIsAwaitingTarget, setIsAwaitingTarget] = createSignal(false);
         const [getIsResting, setIsResting] = createSignal(false);
 
-        const [getIndex, setIndex] = SignalMirrorUtils.createOptional(() => defs.indexSignal, 0);
+        const [getTargetIndex, setTargetIndex] = SignalMirrorUtils.createOptional(() => defs.targetIndexSignal, 0);
         const [getIsAutoSpinEnabled] = SignalMirrorUtils.createOptional(() => defs.autoSpinSignal, true);
 
         let targetIndex: number | undefined;
@@ -120,7 +124,7 @@ export namespace RotatorUtils {
             return isIdling ? "idling" : "still";
         });
 
-        const getSelectedIndex = createMemo(() => RotationUtils.getAngleIndex(getAngle(), getStepCount()));
+        const getCurrentIndex = createMemo(() => RotationUtils.getAngleIndex(getAngle(), getStepCount()));
 
         const getStepLabel = (index: number) =>
             defs.computeStepLabel?.(index, getStepCount()) ?? `${index + 1} of ${getStepCount()}`;
@@ -170,18 +174,22 @@ export namespace RotatorUtils {
             spinFrameId = requestAnimationFrame(advance);
         };
 
+        const land = (index: number) => {
+            setSpinPhase("still");
+            setIsResting(true);
+            setTargetIndex(index);
+
+            LiveAnnouncerUtils.announce(getStepLabel(index));
+        };
+
         const settle = () => {
-            const index = MathUtils.wrapIndex(targetIndex ?? getIndex(), getStepCount());
+            const index = MathUtils.wrapIndex(targetIndex ?? untrack(getTargetIndex), getStepCount());
 
             targetIndex = undefined;
 
-            setSpinPhase("still");
-            setIsResting(true);
-            setIndex(index);
+            land(index);
 
             void defs.onSpinEnd?.(index);
-
-            LiveAnnouncerUtils.announce(getStepLabel(index));
         };
 
         const spin = () => {
@@ -204,6 +212,7 @@ export namespace RotatorUtils {
 
                     setSpinPhase("spinning");
                     setIsAwaitingTarget(false);
+                    setTargetIndex(MathUtils.wrapIndex(index, stepCount));
 
                     turnTo(spinAngle, getSpinDurationMs(), SPIN_EASING, () => {
                         if (jitterAngle === 0) {
@@ -264,7 +273,31 @@ export namespace RotatorUtils {
             });
         });
 
-        createEffect(on(getSelectedIndex, (index) => defs.onStepChange?.(index), { defer: true }));
+        createEffect(
+            on(
+                getTargetIndex,
+                (index) => {
+                    if (untrack(getSpinPhase) !== "still" || untrack(getIsAwaitingTarget)) return;
+
+                    const stepCount = untrack(getStepCount);
+                    const wrapped = MathUtils.wrapIndex(index, stepCount);
+
+                    if (stepCount < MIN_ROTATABLE_STEP_COUNT || wrapped === untrack(getCurrentIndex)) return;
+
+                    setSpinPhase("settling");
+
+                    turnTo(
+                        RotationUtils.getSpinAngle(untrack(getAngle), wrapped, stepCount, NO_TURNS),
+                        untrack(getSettleDurationMs),
+                        SPIN_EASING,
+                        () => land(wrapped),
+                    );
+                },
+                { defer: true },
+            ),
+        );
+
+        createEffect(on(getCurrentIndex, (index) => defs.onStepChange?.(index), { defer: true }));
 
         onCleanup(() => {
             isDisposed = true;
@@ -274,8 +307,8 @@ export namespace RotatorUtils {
 
         return {
             getAngle,
-            getIndex,
-            getSelectedIndex,
+            getTargetIndex,
+            getCurrentIndex,
             getPhase,
             getStepAngle,
             getStepCount,

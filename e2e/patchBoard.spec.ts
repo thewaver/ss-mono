@@ -2,10 +2,10 @@ import { type Page, expect, test } from "@playwright/test";
 
 import { demo, readout } from "./helpers";
 
-const board = (key: string, label: string) => `${demo(key)} [role="list"][aria-label="${label}"]`;
+const board = (key: string, label: string) => `${demo(key)} [role="group"][aria-label="${label}"]`;
 
 const node = (key: string, label: string, boardLabel: string) =>
-    `${board(key, boardLabel)} [role="listitem"][aria-label="${label}"]`;
+    `${board(key, boardLabel)} [role="button"][aria-label="${label}"]`;
 
 /**
  * A socket's accessible name carries the node it belongs to, which side it is and whether it is connected

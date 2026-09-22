@@ -1,10 +1,10 @@
 import type { Signal } from "solid-js";
-import { createEffect, createSignal, untrack } from "solid-js";
 
 import { TimeUtils, type TimeValue } from "@thewaver/ss-utils";
 
 import type { DateValue } from "../DateValue/DateValue.types";
 import { DateValueUtils } from "../DateValue/DateValue.utils";
+import { SignalMirrorUtils } from "../SignalMirror/SignalMirror.utils";
 import type { DateTimeValue } from "./DateTimeValue.types";
 
 /** Milliseconds in a second. */
@@ -77,49 +77,16 @@ export namespace DateTimeValueUtils {
     export const createSplit = (
         signal: Signal<DateTimeValue | undefined>,
     ): { dateSignal: Signal<DateValue | undefined>; timeSignal: Signal<TimeValue | undefined> } => {
-        const [getDate, setDate] = createSignal<DateValue | undefined>(untrack(() => signal[0]()?.date));
-        const [getTime, setTime] = createSignal<TimeValue | undefined>(untrack(() => signal[0]()?.time));
-
-        createEffect(() => {
-            const value = signal[0]();
-
-            if (!value) return;
-
-            setDate(() => value.date);
-            setTime(() => value.time);
-        });
-
-        const emit = () => {
-            const date = untrack(getDate);
-            const time = untrack(getTime);
-            const next = date !== undefined && time !== undefined ? of(date, time) : undefined;
-
-            if (isSame(next, untrack(signal[0]))) return;
-
-            signal[1](() => next);
-        };
-
-        const dateSignal = [
-            getDate,
-            (next: unknown) => {
-                setDate(typeof next === "function" ? (next as never) : () => next as DateValue | undefined);
-                emit();
-
-                return untrack(getDate);
+        const { firstSignal, secondSignal } = SignalMirrorUtils.createSplit<DateTimeValue, DateValue, TimeValue>(
+            signal,
+            {
+                compose: (date, time) => of(date, time),
+                decompose: (value) => [value.date, value.time],
+                getIsSame: isSame,
             },
-        ] as Signal<DateValue | undefined>;
+        );
 
-        const timeSignal = [
-            getTime,
-            (next: unknown) => {
-                setTime(typeof next === "function" ? (next as never) : () => next as TimeValue | undefined);
-                emit();
-
-                return untrack(getTime);
-            },
-        ] as Signal<TimeValue | undefined>;
-
-        return { dateSignal, timeSignal };
+        return { dateSignal: firstSignal, timeSignal: secondSignal };
     };
 
     /**

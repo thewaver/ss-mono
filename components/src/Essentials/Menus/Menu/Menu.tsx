@@ -800,6 +800,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
     const menuId = createUniqueId();
     const getPointerPoint = createPointerPointReader();
 
+    const [getRegionRef, setRegionRef] = createSignal<HTMLElement>();
     const [getAnchorRect, setAnchorRect] = createSignal<Rect | undefined>(undefined, { equals: Rect.isSame });
     const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
 
@@ -831,7 +832,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
     });
 
     createEffect(() => {
-        const region = access(props.regionRef);
+        const region = getRegionRef();
 
         if (!region) return;
 
@@ -877,37 +878,53 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
     });
 
     return (
-        <MenuLevel
-            id={() => menuId}
-            ariaLabel={props.ariaLabel}
-            items={props.items}
-            isOpen={getIsOpen}
-            path={ROOT_PATH}
-            parentExtent={NO_PARENT_EXTENT}
-            rootExtent={NO_PARENT_EXTENT}
-            layoutSize={undefined}
-            anchorRef={props.regionRef}
-            anchorRect={getAnchorRect}
-            triggerRef={props.regionRef}
-            placement={props.placement}
-            offset={props.offset}
-            submenuPlacement={() => access(props.submenuPlacement) ?? DEFAULT_SUBMENU_PLACEMENT}
-            submenuOffset={props.submenuOffset}
-            submenuMode={() => access(props.submenuMode) ?? DEFAULT_SUBMENU_MODE}
-            submenuOpensOn={() => access(props.submenuOpensOn) ?? DEFAULT_SUBMENU_TRIGGER}
-            reservedScreenSize={props.reservedScreenSize}
-            transitionDurationMs={props.transitionDurationMs}
-            openerFlags={() => ({ isOpen: getIsOpen() })}
-            checkedValues={getCheckedValues}
-            computeLayout={props.computeLayout}
-            computeEffect={props.computeEffect}
-            computeCustomText={props.computeCustomText}
-            getPointerPoint={getPointerPoint}
-            renderItem={props.renderItem}
-            renderPopup={props.renderPopup}
-            onPick={pick}
-            onClose={close}
-            onDismiss={close}
-        />
+        <>
+            <div
+                ref={setRegionRef}
+                class={styles.contextMenuRegion}
+                role="group"
+                tabindex={getIsDisabled() ? -1 : 0}
+                aria-label={access(props.regionAriaLabel)}
+                aria-haspopup="menu"
+                aria-expanded={getIsOpen()}
+                aria-controls={getIsOpen() ? menuId : undefined}
+                aria-disabled={getIsDisabled() || undefined}
+            >
+                {props.renderRegion()}
+            </div>
+
+            <MenuLevel
+                id={() => menuId}
+                ariaLabel={props.ariaLabel}
+                items={props.items}
+                isOpen={getIsOpen}
+                path={ROOT_PATH}
+                parentExtent={NO_PARENT_EXTENT}
+                rootExtent={NO_PARENT_EXTENT}
+                layoutSize={undefined}
+                anchorRef={getRegionRef}
+                anchorRect={getAnchorRect}
+                triggerRef={getRegionRef}
+                placement={props.placement}
+                offset={props.offset}
+                submenuPlacement={() => access(props.submenuPlacement) ?? DEFAULT_SUBMENU_PLACEMENT}
+                submenuOffset={props.submenuOffset}
+                submenuMode={() => access(props.submenuMode) ?? DEFAULT_SUBMENU_MODE}
+                submenuOpensOn={() => access(props.submenuOpensOn) ?? DEFAULT_SUBMENU_TRIGGER}
+                reservedScreenSize={props.reservedScreenSize}
+                transitionDurationMs={props.transitionDurationMs}
+                openerFlags={() => ({ isOpen: getIsOpen() })}
+                checkedValues={getCheckedValues}
+                computeLayout={props.computeLayout}
+                computeEffect={props.computeEffect}
+                computeCustomText={props.computeCustomText}
+                getPointerPoint={getPointerPoint}
+                renderItem={props.renderItem}
+                renderPopup={props.renderPopup}
+                onPick={pick}
+                onClose={close}
+                onDismiss={close}
+            />
+        </>
     );
 };

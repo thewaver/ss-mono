@@ -85,11 +85,11 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
     const update = (cause: TypewriterUpdateCause) => {
         const containerRef = getContainerRef();
 
-        if (!containerRef) return;
+        if (!containerRef) return false;
 
         const width = containerRef.clientWidth;
 
-        if (cause === "layout" && width === lastParsedWidth) return;
+        if (cause === "layout" && width === lastParsedWidth) return false;
 
         lastParsedWidth = width;
 
@@ -110,17 +110,15 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
         setIndexedSegments(indexedSegments);
         setAnimatedElementCount(itemCount);
         restartAnimation(cause);
+
+        return true;
     };
 
     const controller = createMemo(() => ({
         restartAnimation: () => {
-            if (!getIsAnimating()) {
-                restartAnimation();
+            restartAnimation();
 
-                return true;
-            }
-
-            return false;
+            return true;
         },
         update,
     }));

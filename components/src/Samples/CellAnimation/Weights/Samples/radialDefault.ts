@@ -1,11 +1,9 @@
-import { Point2dUtils } from "@thewaver/ss-utils";
-
 import type { WeightFn } from "../CellAnimationWeights.types";
 import { CellAnimationWeightUtils } from "../CellAnimationWeights.utils";
 
 export const radialDefault: WeightFn = (pos, count, origin) => {
     const maxDist = CellAnimationWeightUtils.getMaxDistance(origin, count);
-    const dist = Point2dUtils.getDelta(origin, pos);
+    const dist = CellAnimationWeightUtils.getCellDelta(origin, pos);
 
-    return 1 - Point2dUtils.getLength(dist) / Point2dUtils.getLength(maxDist);
+    return 1 - CellAnimationWeightUtils.getCellDistance(dist) / CellAnimationWeightUtils.getCellDistance(maxDist);
 };

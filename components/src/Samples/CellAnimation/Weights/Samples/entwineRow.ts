@@ -1,12 +1,10 @@
-import { Point2dUtils } from "@thewaver/ss-utils";
-
 import { CellAnimationUtils } from "../../../../Exotics/CellAnimation/CellAnimation.utils";
 import type { WeightFn } from "../CellAnimationWeights.types";
 import { CellAnimationWeightUtils } from "../CellAnimationWeights.utils";
 
 export const entwineRow: WeightFn = (pos, count, origin) => {
     const maxDist = CellAnimationWeightUtils.getMaxDistance(origin, count);
-    const dist = Point2dUtils.getDelta(origin, pos);
+    const dist = CellAnimationWeightUtils.getCellDelta(origin, pos);
 
-    return CellAnimationUtils.isEvenRow(dist) ? 1 - dist.x / maxDist.x : dist.x / maxDist.x;
+    return CellAnimationUtils.isEvenRow(dist) ? 1 - dist.col / maxDist.col : dist.col / maxDist.col;
 };

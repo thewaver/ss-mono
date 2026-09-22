@@ -221,7 +221,7 @@ test("a disabled surface attaches no drag and uses no native attribute", async (
     expect(
         await inputValue(page.locator(axis(DISABLED)).first()),
         "clicking it moves nothing, because the listener was never attached",
-    ).toBe("0.6");
+    ).toBe("60");
 });
 
 /**
@@ -249,5 +249,5 @@ test("a disabled surface cannot be reached or moved by the keyboard either", asy
     await expect(
         page.locator(`${DISABLED} [aria-valuetext]`).first(),
         "the announced value agrees with the element, which is what drifting apart would break",
-    ).toHaveAttribute("aria-valuetext", `${Math.round(Number(before) * 100)}%`);
+    ).toHaveAttribute("aria-valuetext", `${Math.round(Number(before))}%`);
 });

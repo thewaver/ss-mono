@@ -28,8 +28,8 @@ export const PageColorAreaContent = (props: ColorAreaContentProps) => {
             style={{
                 ...assignInlineVars({
                     [styles.hueVar]: `${access(props.renderProps).hsv.h}deg`,
-                    [styles.thumbXVar]: `${access(props.renderProps).hsv.s * PERCENT}%`,
-                    [styles.thumbYVar]: `${(1 - access(props.renderProps).hsv.v) * PERCENT}%`,
+                    [styles.thumbXVar]: `${access(props.renderProps).hsv.s}%`,
+                    [styles.thumbYVar]: `${PERCENT - access(props.renderProps).hsv.v}%`,
                 }),
                 height: `${access(props.size)}px`,
             }}

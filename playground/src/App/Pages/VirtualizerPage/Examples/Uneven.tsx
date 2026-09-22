@@ -19,7 +19,7 @@ export const UnevenExample = (props: Props) => {
     const [getSizerRef, setSizerRef] = createSignal<HTMLElement>();
 
     const rowWindow = VirtualizerUtils.createRowWindow(getSizerRef, props.rowCount, {
-        getIsEnabled: () => true,
+        getIsDisabled: () => false,
         computeEstimatedSize: () => ESTIMATED_HEIGHT_PX,
     });
 

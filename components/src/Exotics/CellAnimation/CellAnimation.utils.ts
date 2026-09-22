@@ -1,4 +1,4 @@
-import { type CSSAnimationValues, CSSUtils, MathUtils, type Point2d } from "@thewaver/ss-utils";
+import { type CSSAnimationValues, CSSUtils, type Index2d, MathUtils } from "@thewaver/ss-utils";
 
 /**
  * Applies an animation's numbers to a cell, and answers which cells alternate with which.
@@ -31,14 +31,14 @@ export namespace CellAnimationUtils {
      *
      * @param dist The cell's distance from the animation's origin, in cells.
      */
-    export const isEvenRow = (dist: Point2d) => MathUtils.isEven(dist.y);
+    export const isEvenRow = (dist: Index2d) => MathUtils.isEven(dist.row);
 
     /**
      * Whether a cell sits on an even column.
      *
      * @param dist The cell's distance from the animation's origin, in cells.
      */
-    export const isEvenColumn = (dist: Point2d) => MathUtils.isEven(dist.x);
+    export const isEvenColumn = (dist: Index2d) => MathUtils.isEven(dist.col);
 
     /**
      * Whether a cell sits on an even ring around the origin.
@@ -48,13 +48,13 @@ export namespace CellAnimationUtils {
      *
      * @param dist The cell's distance from the animation's origin, in cells.
      */
-    export const isEvenRing = (dist: Point2d) =>
-        !((!isEvenColumn(dist) && dist.y <= dist.x) || (!isEvenRow(dist) && dist.x <= dist.y));
+    export const isEvenRing = (dist: Index2d) =>
+        !((!isEvenColumn(dist) && dist.row <= dist.col) || (!isEvenRow(dist) && dist.col <= dist.row));
 
     /**
      * Whether a cell sits on a light or a dark square of a checkerboard.
      *
      * @param dist The cell's distance from the animation's origin, in cells.
      */
-    export const isEvenCheckered = (dist: Point2d) => MathUtils.isEven(dist.x + dist.y);
+    export const isEvenCheckered = (dist: Index2d) => MathUtils.isEven(dist.col + dist.row);
 }

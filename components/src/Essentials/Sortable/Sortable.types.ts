@@ -44,6 +44,14 @@ export type SortableItemSlotProps = AccessorProps<{
     id: string;
     /** Names this item for assistive technology. */
     label: string;
+    /**
+     * Points at the hidden text saying what the keyboard does with a resting item.
+     *
+     * The item announces as a list item, which says nothing about being movable, and the live region only
+     * starts describing the keys once something has been picked up — so without this nobody is told that
+     * Enter does anything until after they have pressed it.
+     */
+    hintId: string;
     /** This item's place in the list, counting from one. */
     position: number;
     /** How many items there are, so a reader can be told it is the third of five. */

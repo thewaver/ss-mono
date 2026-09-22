@@ -5,6 +5,7 @@ import { SVGFilterDefsFactory } from "../../Abstracts/SVG/Defs/Filter/SVGFilterD
 import type { CycleColorKey, SVGDefsColors } from "./SVGDefs.types";
 
 const TRANSPARENT_ALPHA = 0;
+const FULL_STOP = 100;
 const POINTER_FADE_START_RATIO = 1;
 const POINTER_FADE_END_RATIO = 2;
 const CYCLE_COLOR_KEYS: CycleColorKey[] = ["primary", "secondary", "tertiary"];
@@ -51,6 +52,46 @@ export namespace SVGDefsUtils {
                           .computeFilterPrimitives({ method: "isolate", elementSize: defs.getSize() }),
               }
             : undefined;
+
+    /**
+     * The five color stops of a band that fades out symmetrically either side of its core.
+     *
+     * Transparent at both ends, the falloff alpha a spread either side of the core, and the core alpha at
+     * the middle — the ramp every band sample draws. It takes the four numbers already resolved rather than
+     * an options object, so each sample keeps its own defaults and two samples asking for different cores
+     * cannot end up sharing one.
+     *
+     * @param color Any CSS color; the stops are built with `rgb(from …)`, so a named color works.
+     * @param defs.coreStop Where the core sits, `0`–`100`.
+     * @param defs.coreAlpha How opaque the core is.
+     * @param defs.falloffSpread How far either side of the core the falloff stops sit.
+     * @param defs.falloffAlpha How opaque the band is at those falloff stops.
+     * @returns Five stops in ascending order, the first with no `stop` of its own so it anchors at the start.
+     */
+    export const getFalloffStops = (
+        color: string,
+        defs: { coreStop: number; coreAlpha: number; falloffSpread: number; falloffAlpha: number },
+    ) => [
+        { value: `rgb(from ${color} r g b / 0)` },
+        { value: `rgb(from ${color} r g b / ${defs.falloffAlpha})`, stop: defs.coreStop - defs.falloffSpread },
+        { value: `rgb(from ${color} r g b / ${defs.coreAlpha})`, stop: defs.coreStop },
+        { value: `rgb(from ${color} r g b / ${defs.falloffAlpha})`, stop: defs.coreStop + defs.falloffSpread },
+        { value: `rgb(from ${color} r g b / 0)`, stop: FULL_STOP },
+    ];
+
+    /**
+     * Points a def at a filter that another def in the same set already declares.
+     *
+     * `Shape` renders every def's `renderDefsElement` and references its `id`, so a set whose entries all
+     * want the same filter would otherwise emit that filter once per entry — same id, every copy after the
+     * first inert. This returns an entry that carries the id and draws nothing, so one declaration serves
+     * the whole set.
+     *
+     * @param filter The filter a sibling def declares, or `undefined` when there is none to share.
+     * @returns A reference to it, or `undefined` so the caller can hand the result straight to `filter`.
+     */
+    export const getSharedFilter = (filter: { id: string } | undefined) =>
+        filter && { id: filter.id, renderDefsElement: () => undefined };
 
     export const getBaseBackgroundColor = (defs: { colors: SVGDefsColors }) =>
         `hsl(from ${defs.colors.background} h s calc(l * 1.5) / 25%)`;

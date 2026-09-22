@@ -7,7 +7,7 @@ export type VirtualizerRow = {
 };
 
 export type VirtualizerRowWindowOpts = {
-    getIsEnabled: Accessor<boolean>;
+    getIsDisabled: Accessor<boolean>;
     computeEstimatedSize: (index: number) => number;
     getPinnedRows?: Accessor<number[]>;
     getOverscan?: Accessor<number>;

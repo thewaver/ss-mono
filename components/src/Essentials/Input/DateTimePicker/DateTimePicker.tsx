@@ -33,7 +33,10 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
                 visibilitySignal={props.timeVisibilitySignal}
                 ariaLabel={() => access(props.timeLabel) ?? DEFAULT_DATE_TIME_PICKER_TIME_LABEL}
                 renderLeading={undefined}
+                triggerId={props.timeTriggerId}
+                triggerAriaLabel={props.timeTriggerAriaLabel}
                 renderTrailing={props.renderTimeTrailing}
+                renderTrigger={props.renderTimeTrigger}
                 renderPopup={props.renderTimePopup}
             />
         </div>

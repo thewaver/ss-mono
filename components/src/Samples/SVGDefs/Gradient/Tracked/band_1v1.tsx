@@ -12,66 +12,65 @@ const DEFAULTS = TrackedGradientKnobs.BAND_BLEND_DEFAULTS;
 
 const NO_REF = () => undefined;
 
-const getBandColors = (color: string, opts?: GradientBandOpts) => {
-    const coreStop = opts?.coreStop ?? DEFAULTS.coreStop;
-    const spread = opts?.falloffSpread ?? DEFAULTS.falloffSpread;
-    const falloffAlpha = opts?.falloffAlpha ?? DEFAULTS.falloffAlpha;
-
-    return [
-        { value: `rgb(from ${color} r g b / 0)` },
-        { value: `rgb(from ${color} r g b / ${falloffAlpha})`, stop: coreStop - spread },
-        { value: `rgb(from ${color} r g b / ${opts?.coreAlpha ?? DEFAULTS.coreAlpha})`, stop: coreStop },
-        { value: `rgb(from ${color} r g b / ${falloffAlpha})`, stop: coreStop + spread },
-        { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
-    ];
-};
+const getBandColors = (color: string, opts?: GradientBandOpts) =>
+    SVGDefsUtils.getFalloffStops(color, {
+        coreStop: opts?.coreStop ?? DEFAULTS.coreStop,
+        coreAlpha: opts?.coreAlpha ?? DEFAULTS.coreAlpha,
+        falloffSpread: opts?.falloffSpread ?? DEFAULTS.falloffSpread,
+        falloffAlpha: opts?.falloffAlpha ?? DEFAULTS.falloffAlpha,
+    });
 
 export const band_1v1 = (opts?: GradientBandOpts): TrackedGradientConfig => ({
-    computeSVGDefs: (id, __, getRef, defs) => [
-        {
-            color: SVGDefsUtils.getBaseBorderColor(defs),
-        },
-        {
-            gradientOrPattern: {
-                id: `gradient1-${id}`,
-                renderDefsElement: () => {
-                    const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
+    computeSVGDefs: (id, __, getRef, defs) => {
+        const sharedBlur = SVGDefsUtils.getBaseBlur(id, defs);
+        const sharedBlurRef = SVGDefsUtils.getSharedFilter(sharedBlur);
 
-                    return SVGGradientDefsUtils.computeLinearGradient({
-                        id: `gradient1-${id}`,
-                        colors: getBandColors(defs.colors.primary, opts),
-                        angle: 0,
-                        scale: BAND_SPAN,
-                        offset: () => ({
-                            x: (getReading().boxRatio.x - 0.5) * (opts?.bandTravel ?? DEFAULTS.bandTravel),
-                            y: 0,
-                        }),
-                    });
-                },
+        return [
+            {
+                color: SVGDefsUtils.getBaseBorderColor(defs),
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-            blend: true,
-        },
-        {
-            gradientOrPattern: {
-                id: `gradient2-${id}`,
-                renderDefsElement: () => {
-                    const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
+            {
+                gradientOrPattern: {
+                    id: `gradient1-${id}`,
+                    renderDefsElement: () => {
+                        const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
-                    return SVGGradientDefsUtils.computeLinearGradient({
-                        id: `gradient2-${id}`,
-                        colors: getBandColors(defs.colors.secondary, opts),
-                        angle: 90,
-                        scale: BAND_SPAN,
-                        offset: () => ({
-                            x: 0,
-                            y: (getReading().boxRatio.y - 0.5) * (opts?.bandTravel ?? DEFAULTS.bandTravel),
-                        }),
-                    });
+                        return SVGGradientDefsUtils.computeLinearGradient({
+                            id: `gradient1-${id}`,
+                            colors: getBandColors(defs.colors.primary, opts),
+                            angle: 0,
+                            scale: BAND_SPAN,
+                            offset: () => ({
+                                x: (getReading().boxRatio.x - 0.5) * (opts?.bandTravel ?? DEFAULTS.bandTravel),
+                                y: 0,
+                            }),
+                        });
+                    },
                 },
+                filter: sharedBlur,
+                blend: true,
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-            blend: true,
-        },
-    ],
+            {
+                gradientOrPattern: {
+                    id: `gradient2-${id}`,
+                    renderDefsElement: () => {
+                        const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
+
+                        return SVGGradientDefsUtils.computeLinearGradient({
+                            id: `gradient2-${id}`,
+                            colors: getBandColors(defs.colors.secondary, opts),
+                            angle: 90,
+                            scale: BAND_SPAN,
+                            offset: () => ({
+                                x: 0,
+                                y: (getReading().boxRatio.y - 0.5) * (opts?.bandTravel ?? DEFAULTS.bandTravel),
+                            }),
+                        });
+                    },
+                },
+                filter: sharedBlurRef,
+                blend: true,
+            },
+        ];
+    },
 });

@@ -218,11 +218,22 @@ This is the same defect as the caption-derived locators that the demo keys repla
 a red answered "did the behavior change" and "has somebody edited the copy" at once, here it answers "did the
 wiring break" and "has somebody restyled it" at once. It bites hardest on pure aesthetics.
 
-**Temporary files go in `.scratch/` at the repo root, never in the system temp folder.** Asked for by the
-user. The harness points at a session directory under `AppData\Local\Temp`, which is three folders up and
+**Temporary files go in `.scratch/` at the repo root, and the system temp folder is usable so long as it is
+cleared straight afterwards.** Asked for by the user, then relaxed by them. The harness points at a session directory under `AppData\Local\Temp`, which is three folders up and
 outside the project entirely; they would rather anything a task needs sit where they can see it. `.scratch` is
 in `.gitignore`, so nothing there can reach a commit. Screenshots, throwaway scripts, spike pages,
 intermediate output — all of it lands there, and it gets deleted once the task that needed it is finished.
+
+**Scratch space of either kind is ephemeral and dies with the session.** Stated by the user. Nothing in it is
+allowed to matter beyond the conversation that made it, so it is never a place to leave something for the next
+session, never a record to point at afterwards, and never a reason to hesitate before deleting. A thing worth
+keeping goes into the code or into one of the five documents; a thing that lives in scratch is by definition
+not that. Clear it when the work that needed it lands, without asking.
+
+**The harness's temp directory is allowed, and the condition is the cleanup.** The user's correction to the
+sentence above: what they object to is not the location but leftovers. So use whichever is convenient, and
+delete what was written as soon as the step that needed it is done rather than at the end of the session —
+a file still sitting there when the work lands is the failure, wherever it lives.
 
 **Never install anything without asking first.** Stated by the user, in those terms, after
 `npx playwright install firefox` put a 101MB browser into their cache to chase a hunch about which browser a

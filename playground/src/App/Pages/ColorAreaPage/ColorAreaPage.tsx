@@ -7,12 +7,11 @@ import type { ColorAreaDropdownExampleProps, ColorAreaExampleProps } from "./Col
 import { DropdownExample } from "./Examples/Dropdown";
 import { SurfaceExample } from "./Examples/Surface";
 
-const PERCENT = 100;
 const EXAMPLES_ROOT = "/src/App/Pages/ColorAreaPage/Examples";
 
-const STARTING_HSV: Color.HSVA = { h: 210, s: 0.7, v: 0.9, a: 1 };
-const STARTING_PICKER_HSV: Color.HSVA = { h: 90, s: 0.5, v: 0.8, a: 1 };
-const STARTING_DISABLED_HSV: Color.HSVA = { h: 0, s: 0.6, v: 0.6, a: 1 };
+const STARTING_HSV: Color.HSVA = { h: 210, s: 70, v: 90, a: 1 };
+const STARTING_PICKER_HSV: Color.HSVA = { h: 90, s: 50, v: 80, a: 1 };
+const STARTING_DISABLED_HSV: Color.HSVA = { h: 0, s: 60, v: 60, a: 1 };
 
 export const ColorAreaPage = () => {
     const popupId = createUniqueId();
@@ -40,7 +39,7 @@ export const ColorAreaPage = () => {
                 key: "bare",
                 name: "The surface alone",
                 readout: () =>
-                    `hsv: ${Math.round(bareSignal[0]().h)}° ${Math.round(bareSignal[0]().s * PERCENT)}% ${Math.round(bareSignal[0]().v * PERCENT)}% — hex: ${Color.HSV.toHex(bareSignal[0]())}`,
+                    `hsv: ${Math.round(bareSignal[0]().h)}° ${Math.round(bareSignal[0]().s)}% ${Math.round(bareSignal[0]().v)}% — hex: ${Color.HSV.toHex(bareSignal[0]())}`,
                 component: () => <SurfaceExample {...bareProps} />,
                 path: `${EXAMPLES_ROOT}/Surface.tsx`,
             },

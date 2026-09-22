@@ -104,7 +104,14 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const getView = createMemo(() => TimelineUtils.clampView(viewSignal[0](), getRange(), getMinViewExtent()));
 
     const setView = (view: TimelineSpan) => {
-        viewSignal[1](() => TimelineUtils.clampView(view, getRange(), getMinViewExtent()));
+        const next = TimelineUtils.clampView(view, getRange(), getMinViewExtent());
+        const current = untrack(getView);
+
+        if (next.start === current.start && next.end === current.end) return false;
+
+        viewSignal[1](() => next);
+
+        return true;
     };
 
     const getItems = createMemo(() => access(props.items));

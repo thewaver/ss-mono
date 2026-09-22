@@ -21,29 +21,29 @@ export const TURNS_COLUMNS = 3;
 export const TURNS_ROWS = 3;
 
 const ELL: SortableGridFootprint = [
-    { x: 0, y: 0 },
-    { x: 0, y: 1 },
-    { x: 0, y: 2 },
-    { x: 1, y: 2 },
+    { row: 0, col: 0 },
+    { row: 1, col: 0 },
+    { row: 2, col: 0 },
+    { row: 2, col: 1 },
 ];
 
 const ZED: SortableGridFootprint = [
-    { x: 0, y: 0 },
-    { x: 1, y: 0 },
-    { x: 1, y: 1 },
-    { x: 2, y: 1 },
+    { row: 0, col: 0 },
+    { row: 0, col: 1 },
+    { row: 1, col: 1 },
+    { row: 1, col: 2 },
 ];
 
 const gear = (
     id: string,
     name: string,
     glyph: string,
-    x: number,
-    y: number,
+    col: number,
+    row: number,
     footprint: SortableGridFootprint,
 ): SortableGridItem<Gear> => ({
     value: { id, name, glyph },
-    spot: { x, y },
+    spot: { row, col },
     footprint,
 });
 
@@ -55,30 +55,30 @@ export const computeGearHue = (value: Gear) =>
     [...value.id].reduce((total, letter) => (total + letter.charCodeAt(0) * HUE_STEP) % HUE_COUNT, 0);
 
 export const PACK: SortableGridItem<Gear>[] = [
-    gear("sword", "Longsword", "\u{1F5E1}", 0, 0, { width: 1, height: 3 }),
-    gear("shield", "Kite Shield", "\u{1F6E1}", 1, 0, { width: 2, height: 2 }),
-    gear("bow", "Hunting Bow", "\u{1F3F9}", 3, 0, { width: 1, height: 4 }),
-    gear("potion", "Potion", "\u{1F9EA}", 1, 2, { width: 1, height: 1 }),
-    gear("bread", "Bread", "\u{1F35E}", 2, 2, { width: 1, height: 1 }),
-    gear("scroll", "Scroll", "\u{1F4DC}", 4, 0, { width: 2, height: 1 }),
+    gear("sword", "Longsword", "\u{1F5E1}", 0, 0, { rowCount: 3, colCount: 1 }),
+    gear("shield", "Kite Shield", "\u{1F6E1}", 1, 0, { rowCount: 2, colCount: 2 }),
+    gear("bow", "Hunting Bow", "\u{1F3F9}", 3, 0, { rowCount: 4, colCount: 1 }),
+    gear("potion", "Potion", "\u{1F9EA}", 1, 2, { rowCount: 1, colCount: 1 }),
+    gear("bread", "Bread", "\u{1F35E}", 2, 2, { rowCount: 1, colCount: 1 }),
+    gear("scroll", "Scroll", "\u{1F4DC}", 4, 0, { rowCount: 1, colCount: 2 }),
     gear("pickaxe", "Pickaxe", "\u{26CF}", 6, 1, ELL),
     gear("chain", "Chain", "\u{26D3}", 0, 3, ZED),
 ];
 
 export const STASH: SortableGridItem<Gear>[] = [
-    gear("gem", "Gem", "\u{1F48E}", 0, 0, { width: 1, height: 1 }),
-    gear("tome", "Tome", "\u{1F4D5}", 1, 0, { width: 2, height: 2 }),
-    gear("rope", "Rope", "\u{1FAA2}", 0, 1, { width: 1, height: 2 }),
+    gear("gem", "Gem", "\u{1F48E}", 0, 0, { rowCount: 1, colCount: 1 }),
+    gear("tome", "Tome", "\u{1F4D5}", 1, 0, { rowCount: 2, colCount: 2 }),
+    gear("rope", "Rope", "\u{1FAA2}", 0, 1, { rowCount: 2, colCount: 1 }),
 ];
 
 export const ARROWS: SortableGridItem<Gear>[] = [
-    gear("broadhead", "Broadhead Arrows", "\u{1F3AF}", 0, 0, { width: 1, height: 2 }),
-    gear("fire", "Fire Arrows", "\u{1F525}", 1, 0, { width: 1, height: 1 }),
+    gear("broadhead", "Broadhead Arrows", "\u{1F3AF}", 0, 0, { rowCount: 2, colCount: 1 }),
+    gear("fire", "Fire Arrows", "\u{1F525}", 1, 0, { rowCount: 1, colCount: 1 }),
 ];
 
 export const TURNS: SortableGridItem<Gear>[] = [
     gear("hook", "Hook", "\u{1FA9D}", 0, 0, ELL),
-    gear("flint", "Flint", "\u{1FAA8}", 1, 0, { width: 1, height: 1 }),
+    gear("flint", "Flint", "\u{1FAA8}", 1, 0, { rowCount: 1, colCount: 1 }),
 ];
 
 export const LOOT: SortableItem<Gear>[] = [

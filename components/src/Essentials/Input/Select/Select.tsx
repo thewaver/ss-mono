@@ -200,7 +200,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
 
     const getIsVirtualized = createMemo(() => props.computeEstimatedOptionHeight !== undefined);
 
-    const getIsAtEnd = ElementObserverUtils.createViewportIntersectionObserver(getEndMarkerRef, getIsOpen);
+    const getIsAtEnd = ElementObserverUtils.createViewportIntersectionObserver(getEndMarkerRef, () => !getIsOpen());
 
     let askedForOptions: SelectItem<T>[] | undefined;
 
@@ -254,7 +254,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     });
 
     const rowWindow = VirtualizerUtils.createRowWindow(getSizerRef, () => getRows().length, {
-        getIsEnabled: () => getIsVirtualized() && getIsOpen(),
+        getIsDisabled: () => !getIsVirtualized() || !getIsOpen(),
         computeEstimatedSize: (index) => {
             const row = getRows()[index];
 

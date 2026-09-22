@@ -1,4 +1,4 @@
-import { MathUtils, type Point2d } from "@thewaver/ss-utils";
+import { type Index2d, MathUtils, type Point2d } from "@thewaver/ss-utils";
 
 import type {
     SortableGridBox,
@@ -23,11 +23,11 @@ const TURN_COUNT = 4;
 const HALF_CELL = 0.5;
 
 /** A cell's coordinates as a string, so cells can go in a set. */
-const toKey = (spot: SortableGridSpot) => `${spot.x},${spot.y}`;
+const toKey = (spot: SortableGridSpot) => `${spot.col},${spot.row}`;
 
 /** Turns a set of cells a quarter turn clockwise about its own top-left corner. */
-const getTurnedOnce = (cells: SortableGridSpot[], height: number) =>
-    cells.map((cell) => ({ x: height - 1 - cell.y, y: cell.x }));
+const getTurnedOnce = (cells: SortableGridSpot[], rowCount: number) =>
+    cells.map((cell) => ({ col: rowCount - 1 - cell.row, row: cell.col }));
 
 /**
  * The outward-facing edges of a set of cells, each pointing clockwise.
@@ -37,14 +37,14 @@ const getTurnedOnce = (cells: SortableGridSpot[], height: number) =>
  */
 const getEdges = (cells: SortableGridSpot[]) => {
     const filled = new Set(cells.map(toKey));
-    const has = (x: number, y: number) => filled.has(toKey({ x, y }));
+    const has = (col: number, row: number) => filled.has(toKey({ col, row }));
     const edges: SortableGridEdge[] = [];
 
-    for (const { x, y } of cells) {
-        if (!has(x, y - 1)) edges.push({ from: { x, y }, to: { x: x + 1, y } });
-        if (!has(x + 1, y)) edges.push({ from: { x: x + 1, y }, to: { x: x + 1, y: y + 1 } });
-        if (!has(x, y + 1)) edges.push({ from: { x: x + 1, y: y + 1 }, to: { x, y: y + 1 } });
-        if (!has(x - 1, y)) edges.push({ from: { x, y: y + 1 }, to: { x, y } });
+    for (const { col, row } of cells) {
+        if (!has(col, row - 1)) edges.push({ from: { col, row }, to: { col: col + 1, row } });
+        if (!has(col + 1, row)) edges.push({ from: { col: col + 1, row }, to: { col: col + 1, row: row + 1 } });
+        if (!has(col, row + 1)) edges.push({ from: { col: col + 1, row: row + 1 }, to: { col, row: row + 1 } });
+        if (!has(col - 1, row)) edges.push({ from: { col, row: row + 1 }, to: { col, row } });
     }
 
     return edges;
@@ -66,7 +66,8 @@ const getLoop = (edges: SortableGridEdge[]) => {
     }
 
     const start = edges.reduce(
-        (best, edge) => (edge.from.y < best.y || (edge.from.y === best.y && edge.from.x < best.x) ? edge.from : best),
+        (best, edge) =>
+            edge.from.row < best.row || (edge.from.row === best.row && edge.from.col < best.col) ? edge.from : best,
         edges[0].from,
     );
 
@@ -95,13 +96,16 @@ const getWithoutCollinear = (loop: SortableGridSpot[]) =>
         const before = loop[(index - 1 + loop.length) % loop.length];
         const after = loop[(index + 1) % loop.length];
 
-        return !((before.x === point.x && point.x === after.x) || (before.y === point.y && point.y === after.y));
+        return !(
+            (before.col === point.col && point.col === after.col) ||
+            (before.row === point.row && point.row === after.row)
+        );
     });
 
 /**
  * Places, turns and moves items that occupy several cells of a grid.
  *
- * An item is described by which cells it fills rather than by a width and a height, so a Tetris
+ * An item is described by which cells it fills rather than by a colCount and a rowCount, so a Tetris
  * piece or an L-shape is as ordinary as a rectangle. Everything else follows from that: a shape's
  * size is worked out from its cells, turning it means turning the cells, and whether it fits means
  * asking about each cell.
@@ -113,7 +117,7 @@ export namespace SortableGridUtils {
     /**
      * The cells a footprint fills, moved to start at the origin.
      *
-     * @param footprint Either a width and a height, for a rectangle, or the cells themselves for
+     * @param footprint Either a colCount and a rowCount, for a rectangle, or the cells themselves for
      * anything else.
      * @returns The cells with the top-left of their bounding box at `0, 0`, so two descriptions of the
      * same shape come out identical.
@@ -122,23 +126,23 @@ export namespace SortableGridUtils {
         if (!Array.isArray(footprint)) {
             const cells: SortableGridSpot[] = [];
 
-            for (let y = 0; y < footprint.height; y++) {
-                for (let x = 0; x < footprint.width; x++) cells.push({ x, y });
+            for (let row = 0; row < footprint.rowCount; row++) {
+                for (let col = 0; col < footprint.colCount; col++) cells.push({ col, row });
             }
 
             return cells;
         }
 
-        const left = Math.min(...footprint.map((cell) => cell.x));
-        const top = Math.min(...footprint.map((cell) => cell.y));
+        const left = Math.min(...footprint.map((cell) => cell.col));
+        const top = Math.min(...footprint.map((cell) => cell.row));
 
-        return footprint.map((cell) => ({ x: cell.x - left, y: cell.y - top }));
+        return footprint.map((cell) => ({ col: cell.col - left, row: cell.row - top }));
     };
 
     /** The bounding box of a set of cells. A shape with holes still reports the box around it. */
     export const getSize = (cells: SortableGridSpot[]): SortableGridSize => ({
-        width: Math.max(...cells.map((cell) => cell.x)) + 1,
-        height: Math.max(...cells.map((cell) => cell.y)) + 1,
+        colCount: Math.max(...cells.map((cell) => cell.col)) + 1,
+        rowCount: Math.max(...cells.map((cell) => cell.row)) + 1,
     });
 
     /**
@@ -153,7 +157,7 @@ export namespace SortableGridUtils {
         let turned = cells;
 
         for (let turn = 0; turn < ((turns % TURN_COUNT) + TURN_COUNT) % TURN_COUNT; turn++) {
-            turned = getTurnedOnce(turned, getSize(turned).height);
+            turned = getTurnedOnce(turned, getSize(turned).rowCount);
         }
 
         return turned;
@@ -187,7 +191,7 @@ export namespace SortableGridUtils {
      * @param shape The shape.
      */
     export const getPlacedCells = (spot: SortableGridSpot, shape: SortableGridShape) =>
-        shape.cells.map((cell) => ({ x: spot.x + cell.x, y: spot.y + cell.y }));
+        shape.cells.map((cell) => ({ col: spot.col + cell.col, row: spot.row + cell.row }));
 
     /** The grid cells an item occupies. */
     export const getItemCells = <T>(item: SortableGridItem<T>) => getPlacedCells(item.spot, getItemShape(item));
@@ -201,11 +205,11 @@ export namespace SortableGridUtils {
      *
      * @param spot The position.
      * @param size The shape's bounding box.
-     * @param columns The grid's width.
-     * @param rows The grid's height.
+     * @param columns The grid's colCount.
+     * @param rows The grid's rowCount.
      */
     export const getIsInside = (spot: SortableGridSpot, size: SortableGridSize, columns: number, rows: number) =>
-        spot.x >= 0 && spot.y >= 0 && spot.x + size.width <= columns && spot.y + size.height <= rows;
+        spot.col >= 0 && spot.row >= 0 && spot.col + size.colCount <= columns && spot.row + size.rowCount <= rows;
 
     /**
      * Whether every one of a shape's cells is unoccupied.
@@ -228,8 +232,8 @@ export namespace SortableGridUtils {
      *
      * @param spot The position the drag asks for.
      * @param size The shape's bounding box.
-     * @param columns The grid's width.
-     * @param rows The grid's height.
+     * @param columns The grid's colCount.
+     * @param rows The grid's rowCount.
      */
     export const getClampedSpot = (
         spot: SortableGridSpot,
@@ -237,8 +241,8 @@ export namespace SortableGridUtils {
         columns: number,
         rows: number,
     ): SortableGridSpot => ({
-        x: MathUtils.clamp(spot.x, 0, Math.max(columns - size.width, 0)),
-        y: MathUtils.clamp(spot.y, 0, Math.max(rows - size.height, 0)),
+        col: MathUtils.clamp(spot.col, 0, Math.max(columns - size.colCount, 0)),
+        row: MathUtils.clamp(spot.row, 0, Math.max(rows - size.rowCount, 0)),
     });
 
     /**
@@ -248,8 +252,8 @@ export namespace SortableGridUtils {
      * another grid.
      *
      * @param shape The shape to place.
-     * @param columns The grid's width.
-     * @param rows The grid's height.
+     * @param columns The grid's colCount.
+     * @param rows The grid's rowCount.
      * @param taken The cells already occupied.
      * @returns The position, or `undefined` when the shape does not fit anywhere.
      */
@@ -259,9 +263,9 @@ export namespace SortableGridUtils {
         rows: number,
         taken: SortableGridSpot[],
     ): SortableGridSpot | undefined => {
-        for (let y = 0; y + shape.size.height <= rows; y++) {
-            for (let x = 0; x + shape.size.width <= columns; x++) {
-                if (getIsFree(getPlacedCells({ x, y }, shape), taken)) return { x, y };
+        for (let row = 0; row + shape.size.rowCount <= rows; row++) {
+            for (let col = 0; col + shape.size.colCount <= columns; col++) {
+                if (getIsFree(getPlacedCells({ col, row }, shape), taken)) return { col, row };
             }
         }
     };
@@ -278,7 +282,9 @@ export namespace SortableGridUtils {
     export const getReadingOrder = (boxes: SortableGridBox[]) =>
         boxes
             .map((box, index) => ({ box, index }))
-            .sort((first, second) => first.box.spot.y - second.box.spot.y || first.box.spot.x - second.box.spot.x)
+            .sort(
+                (first, second) => first.box.spot.row - second.box.spot.row || first.box.spot.col - second.box.spot.col,
+            )
             .map((entry) => entry.index);
 
     /**
@@ -290,17 +296,17 @@ export namespace SortableGridUtils {
      *
      * @param boxes The items' positions and sizes.
      * @param fromIndex Where the cursor is now.
-     * @param step The direction, as a unit step — `{ x: 1, y: 0 }` for right.
+     * @param step The direction, as a unit step — `{ col: 1, row: 0 }` for right.
      * @returns The item's index, or `undefined` when there is nothing that way.
      */
-    export const getNeighborIndex = (boxes: SortableGridBox[], fromIndex: number, step: Point2d) => {
+    export const getNeighborIndex = (boxes: SortableGridBox[], fromIndex: number, step: Index2d) => {
         const from = boxes[fromIndex];
 
         if (!from) return;
 
         const getBoxCenter = (box: SortableGridBox) => ({
-            x: box.spot.x + box.size.width * 0.5,
-            y: box.spot.y + box.size.height * 0.5,
+            col: box.spot.col + box.size.colCount * 0.5,
+            row: box.spot.row + box.size.rowCount * 0.5,
         });
 
         const origin = getBoxCenter(from);
@@ -312,12 +318,12 @@ export namespace SortableGridUtils {
             if (index === fromIndex) return;
 
             const center = getBoxCenter(box);
-            const offset = { x: center.x - origin.x, y: center.y - origin.y };
-            const along = offset.x * step.x + offset.y * step.y;
+            const offset = { col: center.col - origin.col, row: center.row - origin.row };
+            const along = offset.col * step.col + offset.row * step.row;
 
             if (along <= 0) return;
 
-            const across = Math.abs(offset.x * step.y - offset.y * step.x);
+            const across = Math.abs(offset.col * step.row - offset.row * step.col);
             const score = along + across * ACROSS_PENALTY;
 
             if (score >= bestScore) return;
@@ -330,9 +336,9 @@ export namespace SortableGridUtils {
     };
 
     /** The average of a shape's cells, in cell coordinates. A shape with holes centers on its cells rather than on its bounding box. */
-    export const getCenter = (cells: SortableGridSpot[]): Point2d => ({
-        x: cells.reduce((total, cell) => total + cell.x + HALF_CELL, 0) / cells.length,
-        y: cells.reduce((total, cell) => total + cell.y + HALF_CELL, 0) / cells.length,
+    export const getCenter = (cells: SortableGridSpot[]): Index2d => ({
+        col: cells.reduce((total, cell) => total + cell.col + HALF_CELL, 0) / cells.length,
+        row: cells.reduce((total, cell) => total + cell.row + HALF_CELL, 0) / cells.length,
     });
 
     /**
@@ -351,31 +357,31 @@ export namespace SortableGridUtils {
         const center = getCenter(cells);
 
         const getIsSolid = (spot: SortableGridSpot, block: SortableGridSize) => {
-            for (let y = spot.y; y < spot.y + block.height; y++) {
-                for (let x = spot.x; x < spot.x + block.width; x++) {
-                    if (!filled.has(toKey({ x, y }))) return false;
+            for (let row = spot.row; row < spot.row + block.rowCount; row++) {
+                for (let col = spot.col; col < spot.col + block.colCount; col++) {
+                    if (!filled.has(toKey({ col, row }))) return false;
                 }
             }
 
             return true;
         };
 
-        let best: SortableGridBox = { spot: cells[0], size: { width: 1, height: 1 } };
+        let best: SortableGridBox = { spot: cells[0], size: { colCount: 1, rowCount: 1 } };
         let bestArea = 0;
         let bestOffset = Number.POSITIVE_INFINITY;
 
-        for (let y = 0; y < size.height; y++) {
-            for (let x = 0; x < size.width; x++) {
-                for (let height = 1; y + height <= size.height; height++) {
-                    for (let width = 1; x + width <= size.width; width++) {
-                        if (!getIsSolid({ x, y }, { width, height })) continue;
+        for (let row = 0; row < size.rowCount; row++) {
+            for (let col = 0; col < size.colCount; col++) {
+                for (let rowCount = 1; row + rowCount <= size.rowCount; rowCount++) {
+                    for (let colCount = 1; col + colCount <= size.colCount; colCount++) {
+                        if (!getIsSolid({ col, row }, { colCount, rowCount })) continue;
 
-                        const area = width * height;
-                        const offset = Math.hypot(x + width * 0.5 - center.x, y + height * 0.5 - center.y);
+                        const area = colCount * rowCount;
+                        const offset = Math.hypot(col + colCount * 0.5 - center.col, row + rowCount * 0.5 - center.row);
 
                         if (area < bestArea || (area === bestArea && offset >= bestOffset)) continue;
 
-                        best = { spot: { x, y }, size: { width, height } };
+                        best = { spot: { col, row }, size: { colCount, rowCount } };
                         bestArea = area;
                         bestOffset = offset;
                     }
@@ -396,8 +402,8 @@ export namespace SortableGridUtils {
     export const getCellRects = (cells: SortableGridSpot[], cellSize: number, gap: number) =>
         cells.map((cell) => ({
             spot: cell,
-            left: cell.x * (cellSize + gap),
-            top: cell.y * (cellSize + gap),
+            left: cell.col * (cellSize + gap),
+            top: cell.row * (cellSize + gap),
             width: cellSize,
             height: cellSize,
         }));
@@ -424,13 +430,13 @@ export namespace SortableGridUtils {
         return loop.map((point, index) => {
             const before = loop[(index - 1 + loop.length) % loop.length];
             const after = loop[(index + 1) % loop.length];
-            const isAfterVertical = after.x === point.x;
-            const down = isAfterVertical ? after.y > point.y : point.y > before.y;
-            const right = isAfterVertical ? point.x > before.x : after.x > point.x;
+            const isAfterVertical = after.col === point.col;
+            const down = isAfterVertical ? after.row > point.row : point.row > before.row;
+            const right = isAfterVertical ? point.col > before.col : after.col > point.col;
 
             return {
-                x: point.x * pitch - (down ? gap : 0),
-                y: point.y * pitch - (right ? 0 : gap),
+                x: point.col * pitch - (down ? gap : 0),
+                y: point.row * pitch - (right ? 0 : gap),
             };
         });
     };

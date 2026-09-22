@@ -3,7 +3,7 @@ import { CellAnimationWeightUtils } from "../CellAnimationWeights.utils";
 
 export const quadrantDown: WeightFn = (pos, count, origin) => {
     const maxDist = CellAnimationWeightUtils.getMaxDistance(origin, count);
-    const signedDist = { x: origin.x - pos.x, y: origin.y - pos.y };
+    const signedDist = { col: origin.col - pos.col, row: origin.row - pos.row };
 
-    return (1 + (signedDist.x * signedDist.y) / (maxDist.x * maxDist.y)) * 0.5;
+    return (1 + (signedDist.col * signedDist.row) / (maxDist.col * maxDist.row)) * 0.5;
 };

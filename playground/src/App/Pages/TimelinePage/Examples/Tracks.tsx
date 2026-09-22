@@ -76,25 +76,33 @@ export const TracksExample = (props: Props) => {
                 <Button
                     isDisabled={props.isDisabled}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Earlier</PageButtonContent>}
-                    onClick={async () => getController()?.panBy(-PAN_STEP)}
+                    onClick={() => {
+                        getController()?.panBy(-PAN_STEP);
+                    }}
                 />
 
                 <Button
                     isDisabled={props.isDisabled}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Later</PageButtonContent>}
-                    onClick={async () => getController()?.panBy(PAN_STEP)}
+                    onClick={() => {
+                        getController()?.panBy(PAN_STEP);
+                    }}
                 />
 
                 <Button
                     isDisabled={props.isDisabled}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Zoom in</PageButtonContent>}
-                    onClick={async () => getController()?.zoomBy(ZOOM_IN)}
+                    onClick={() => {
+                        getController()?.zoomBy(ZOOM_IN);
+                    }}
                 />
 
                 <Button
                     isDisabled={props.isDisabled}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Zoom out</PageButtonContent>}
-                    onClick={async () => getController()?.zoomBy(ZOOM_OUT)}
+                    onClick={() => {
+                        getController()?.zoomBy(ZOOM_OUT);
+                    }}
                 />
 
                 <Button

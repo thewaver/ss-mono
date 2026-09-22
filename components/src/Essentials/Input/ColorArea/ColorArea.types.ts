@@ -33,7 +33,7 @@ export type ColorAreaState = {
     ariaLabel?: string;
     /** Names each axis separately, since the square carries two values a reader has to tell apart. */
     axisLabels?: Record<ColorAreaAxis, string>;
-    /** How far one press of an arrow key moves the handle. */
+    /** How far one press of an arrow key moves the handle, in the same `0`–`100` percent the axes carry. */
     step?: number;
 };
 

@@ -1,3 +1,6 @@
+import { colord, extend, getFormat } from "colord";
+import namesPlugin from "colord/plugins/names";
+
 const CHANNEL_MAX = 255;
 const HUE_MAX = 360;
 const HUE_HALF = 180;
@@ -13,6 +16,8 @@ const HEX_PATTERN = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
 const HEXA_PATTERN = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 const PERCENT_MAX = 100;
 const PERCENT_DECIMALS = 2;
+
+extend([namesPlugin]);
 const ALPHA_DECIMALS = 3;
 
 // GENERIC
@@ -39,11 +44,25 @@ const mixHue = (from: number, to: number, ratio: number) => {
 };
 
 /**
- * Color values and the conversions between them.
+ * Color values, the conversions between them, and the reading of CSS color strings.
  *
  * Every color space gets a type describing its shape and a namespace of the same name holding
  * its operations, so `Color.HSL` is both the value and the place its functions live. Conversions
  * are named after their destination: `Color.RGB.toHsl` takes an `RGB` and returns an `HSL`.
+ *
+ * **Units follow CSS.** Hue is `0`–`360` degrees, saturation, value and lightness are `0`–`100`
+ * percentages, red, green and blue are `0`–`255`, and alpha alone is a `0`–`1` fraction. The
+ * percentages were `0`–`1` fractions in an earlier build; nothing reads them that way any more.
+ *
+ * **`colord` reads and recognises strings; the arithmetic here converts and blends.** The split is
+ * not a matter of taste. `colord` parses every CSS notation and the named colors, which is a table
+ * and a grammar nobody should hand-write, and it reports which notation a string was written in,
+ * which is what lets a control give a value back in the spelling it was handed. What it cannot do
+ * is hold a color without losing it: its hue-space output is rounded to whole numbers, so a hex
+ * value taken to HSV and back comes out different for **3472 of the 4096** three-digit colors —
+ * `#123456` returns as `#123457`. A picker storing that would shift a shade every time a value
+ * passed through it, which is the exact fault this file exists to avoid. So `parse` uses `colord`
+ * to read and recognise, then re-derives the value through the conversions below.
  *
  * Spaces come in pairs. The plain form carries no transparency; the `A` form adds a required
  * `a` field, and only the `A` forms convert to each other. Inputs are clamped to their valid
@@ -69,7 +88,7 @@ export namespace Color {
         a: number;
     };
 
-    /** Hue in degrees `0`–`360`, plus saturation and value as fractions `0`–`1`. */
+    /** Hue in degrees `0`–`360`, plus saturation and value as percentages `0`–`100`, as CSS writes them. */
     export type HSV = {
         h: number;
         s: number;
@@ -81,7 +100,7 @@ export namespace Color {
         a: number;
     };
 
-    /** Hue in degrees `0`–`360`, plus saturation and lightness as fractions `0`–`1`. */
+    /** Hue in degrees `0`–`360`, plus saturation and lightness as percentages `0`–`100`, as CSS writes them. */
     export type HSL = {
         h: number;
         s: number;
@@ -112,6 +131,76 @@ export namespace Color {
 
     /** Names of the color spaces that carry transparency, for callers that switch on one. */
     export type ValueSpace = "rgba" | "hsla" | "hsva" | "hexa";
+
+    /** The notations a CSS color string can arrive in, as {@link Color.getNotationOf} reports them. */
+    export type Notation = "hex" | "rgb" | "hsl" | "name";
+
+    /**
+     * Reads any CSS color string into hue, saturation, value and alpha.
+     *
+     * Everything `colord` accepts with the names plugin loaded — hex of any length, `rgb()` and `hsl()` in
+     * both the comma and the space syntax, and the named colors. Only the reading is `colord`'s: the value
+     * it answers with is re-derived here, because `colord` rounds its own hue-space output to whole numbers
+     * and a control that stored that would drift a shade every time a value passed through it.
+     *
+     * A control handed something it cannot read should say so rather than substituting a color, which is
+     * why this answers `undefined` instead of falling back to black.
+     *
+     * @param value The string to read.
+     * @returns The color, or `undefined` when the string is not a color this can read.
+     */
+    export const parse = (value: string): Color.HSVA | undefined => {
+        const parsed = colord(value);
+
+        return parsed.isValid() ? RGBA.toHsva(parsed.toRgb()) : undefined;
+    };
+
+    /**
+     * Which notation a color string was written in.
+     *
+     * Paired with {@link Color.toNotation} it is what lets a control hand a value back in the notation it
+     * was given — put `hsl(...)` in and get `hsl(...)` out, rather than everything collapsing to hex.
+     *
+     * @param value The string to inspect.
+     * @returns The notation, or `undefined` when the string is not a color.
+     */
+    export const getNotationOf = (value: string): Color.Notation | undefined => {
+        const format = getFormat(value);
+
+        return format === "hex" || format === "rgb" || format === "hsl" || format === "name" ? format : undefined;
+    };
+
+    /**
+     * Writes a color out in a chosen notation.
+     *
+     * @param hsva The color to write.
+     * @param notation Which spelling to use. `name` has no general inverse, since not every color has a
+     * name, so it is written as hex — the nearest exact thing.
+     * @returns The formatted string.
+     */
+    export const toNotation = (hsva: Color.HSVA, notation: Color.Notation): string => {
+        if (notation === "rgb") return RGBA.toCss(HSVA.toRgba(hsva));
+        if (notation === "hsl") return HSLA.toCss(HSVA.toHsla(hsva));
+
+        return HSVA.getClampedAlpha(hsva) === ALPHA_OPAQUE ? HSV.toHex(hsva) : HSVA.toHexa(hsva);
+    };
+
+    /**
+     * Whether two color strings describe the same color, whatever notation each is written in.
+     *
+     * Replaces the per-space hex comparisons, which could only answer the question for two values already
+     * spelled the same way.
+     *
+     * @param a The first color.
+     * @param b The second color.
+     * @returns `true` when both name the same color and opacity, so `#abcf` matches `#aabbccff` and `red`
+     * matches `#ff0000`. `false` when either cannot be read.
+     */
+    export const isSame = (a: string, b: string) => {
+        const left = colord(a);
+
+        return left.isValid() && colord(b).isValid() && left.isEqual(b);
+    };
 
     /** Operations on {@link Color.RGB} values. */
     export namespace RGB {
@@ -154,9 +243,15 @@ export namespace Color {
          */
         export const toHsl = (rgb: Color.RGB): Color.HSL => {
             const hsv = toHsv(rgb);
-            const l = hsv.v * (1 - hsv.s * 0.5);
+            const v = hsv.v / PERCENT_MAX;
+            const s = hsv.s / PERCENT_MAX;
+            const l = v * (1 - s * 0.5);
 
-            return { h: hsv.h, s: l === 0 || l === 1 ? 0 : (hsv.v - l) / Math.min(l, 1 - l), l };
+            return {
+                h: hsv.h,
+                s: (l === 0 || l === 1 ? 0 : (v - l) / Math.min(l, 1 - l)) * PERCENT_MAX,
+                l: l * PERCENT_MAX,
+            };
         };
 
         /**
@@ -185,8 +280,8 @@ export namespace Color {
 
             return {
                 h: (sector * (HUE_MAX / HUE_SECTORS) + HUE_MAX) % HUE_MAX,
-                s: max === 0 ? 0 : span / max,
-                v: max,
+                s: (max === 0 ? 0 : span / max) * PERCENT_MAX,
+                v: max * PERCENT_MAX,
             };
         };
     }
@@ -279,8 +374,8 @@ export namespace Color {
          * @returns A string such as `hwb(210 7.06% 66.27%)`.
          */
         export const toCss = (hsv: Color.HSV) => {
-            const s = clamp(hsv.s, 0, 1);
-            const v = clamp(hsv.v, 0, 1);
+            const s = clamp(hsv.s, 0, PERCENT_MAX) / PERCENT_MAX;
+            const v = clamp(hsv.v, 0, PERCENT_MAX) / PERCENT_MAX;
 
             return `hwb(${toHue(hsv.h)} ${toPercent(v * (1 - s))} ${toPercent(1 - v)})`;
         };
@@ -293,8 +388,8 @@ export namespace Color {
          */
         export const toRgb = (hsv: Color.HSV): Color.RGB => {
             const h = ((hsv.h % HUE_MAX) + HUE_MAX) % HUE_MAX;
-            const s = clamp(hsv.s, 0, 1);
-            const v = clamp(hsv.v, 0, 1);
+            const s = clamp(hsv.s, 0, PERCENT_MAX) / PERCENT_MAX;
+            const v = clamp(hsv.v, 0, PERCENT_MAX) / PERCENT_MAX;
 
             const sector = h / (HUE_MAX / HUE_SECTORS);
             const offset = sector - Math.floor(sector);
@@ -365,8 +460,8 @@ export namespace Color {
          * @returns A string such as `hwb(210 7.06% 66.27% / 0.5)`.
          */
         export const toCss = (hsva: Color.HSVA) => {
-            const s = clamp(hsva.s, 0, 1);
-            const v = clamp(hsva.v, 0, 1);
+            const s = clamp(hsva.s, 0, PERCENT_MAX) / PERCENT_MAX;
+            const v = clamp(hsva.v, 0, PERCENT_MAX) / PERCENT_MAX;
 
             return `hwb(${toHue(hsva.h)} ${toPercent(v * (1 - s))} ${toPercent(1 - v)} / ${toAlpha(hsva.a)})`;
         };
@@ -427,7 +522,8 @@ export namespace Color {
          * @param hsl The color to format.
          * @returns A string such as `hsl(210 65.38% 20.39%)`.
          */
-        export const toCss = (hsl: Color.HSL) => `hsl(${toHue(hsl.h)} ${toPercent(hsl.s)} ${toPercent(hsl.l)})`;
+        export const toCss = (hsl: Color.HSL) =>
+            `hsl(${toHue(hsl.h)} ${toPercent(hsl.s / PERCENT_MAX)} ${toPercent(hsl.l / PERCENT_MAX)})`;
 
         /**
          * Converts to red, green and blue.
@@ -436,11 +532,15 @@ export namespace Color {
          * @returns The same color as {@link Color.RGB}, with fractional channels.
          */
         export const toRgb = (hsl: Color.HSL): Color.RGB => {
-            const l = clamp(hsl.l, 0, 1);
-            const s = clamp(hsl.s, 0, 1);
+            const l = clamp(hsl.l, 0, PERCENT_MAX) / PERCENT_MAX;
+            const s = clamp(hsl.s, 0, PERCENT_MAX) / PERCENT_MAX;
             const v = l + s * Math.min(l, 1 - l);
 
-            return HSV.toRgb({ h: hsl.h, s: v === 0 ? 0 : 2 * (1 - l / v), v });
+            return HSV.toRgb({
+                h: hsl.h,
+                s: (v === 0 ? 0 : 2 * (1 - l / v)) * PERCENT_MAX,
+                v: v * PERCENT_MAX,
+            });
         };
 
         /**
@@ -482,7 +582,7 @@ export namespace Color {
          * @returns A string such as `hsl(210 65.38% 20.39% / 0.5)`.
          */
         export const toCss = (hsla: Color.HSLA) =>
-            `hsl(${toHue(hsla.h)} ${toPercent(hsla.s)} ${toPercent(hsla.l)} / ${toAlpha(hsla.a)})`;
+            `hsl(${toHue(hsla.h)} ${toPercent(hsla.s / PERCENT_MAX)} ${toPercent(hsla.l / PERCENT_MAX)} / ${toAlpha(hsla.a)})`;
 
         /**
          * Converts to red, green and blue, keeping the opacity.
@@ -538,20 +638,6 @@ export namespace Color {
          */
         export const isHex = (value: string): value is Color.Hex =>
             (value.length === HEX_LENGTH || value.length === HEX_SHORT_LENGTH) && HEX_PATTERN.test(value);
-
-        /**
-         * Compares two hex colors by the color they describe rather than by their text.
-         *
-         * @param a The first color.
-         * @param b The second color.
-         * @returns `true` if both name the same color, so `#abc` and `#aabbcc` match.
-         */
-        export const getIsSameHex = (a: Color.Hex, b: Color.Hex) => {
-            const left = toRgb(a);
-            const right = toRgb(b);
-
-            return left.r === right.r && left.g === right.g && left.b === right.b;
-        };
 
         /**
          * Returns the value as a CSS color.
@@ -621,21 +707,6 @@ export namespace Color {
          */
         export const isHexa = (value: string): value is Color.Hexa =>
             HEXA_LENGTHS.includes(value.length) && HEXA_PATTERN.test(value);
-
-        /**
-         * Compares two hex colors by the color they describe rather than by their text.
-         *
-         * @param a The first color.
-         * @param b The second color.
-         * @returns `true` if both name the same color and opacity, so `#abcf` and `#aabbccff` match,
-         * and a value with no alpha pair matches the same color written as fully opaque.
-         */
-        export const getIsSameHexa = (a: Color.Hexa, b: Color.Hexa) => {
-            const left = toRgba(a);
-            const right = toRgba(b);
-
-            return left.r === right.r && left.g === right.g && left.b === right.b && left.a === right.a;
-        };
 
         /**
          * Returns the value as a CSS color.

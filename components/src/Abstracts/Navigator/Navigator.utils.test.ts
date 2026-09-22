@@ -69,48 +69,52 @@ describe("computeNextPosition", () => {
 });
 
 describe("computeNextCell", () => {
-    const WEEK = { width: 7, height: 6 };
+    const WEEK = { rowCount: 6, colCount: 7 };
 
     it("steps along both axes", () => {
-        expect(NavigatorUtils.computeNextCell("ArrowRight", { x: 2, y: 1 }, WEEK)).toEqual({ x: 3, y: 1 });
-        expect(NavigatorUtils.computeNextCell("ArrowLeft", { x: 2, y: 1 }, WEEK)).toEqual({ x: 1, y: 1 });
-        expect(NavigatorUtils.computeNextCell("ArrowDown", { x: 2, y: 1 }, WEEK)).toEqual({ x: 2, y: 2 });
-        expect(NavigatorUtils.computeNextCell("ArrowUp", { x: 2, y: 1 }, WEEK)).toEqual({ x: 2, y: 0 });
+        expect(NavigatorUtils.computeNextCell("ArrowRight", { row: 1, col: 2 }, WEEK)).toEqual({ row: 1, col: 3 });
+        expect(NavigatorUtils.computeNextCell("ArrowLeft", { row: 1, col: 2 }, WEEK)).toEqual({ row: 1, col: 1 });
+        expect(NavigatorUtils.computeNextCell("ArrowDown", { row: 1, col: 2 }, WEEK)).toEqual({ row: 2, col: 2 });
+        expect(NavigatorUtils.computeNextCell("ArrowUp", { row: 1, col: 2 }, WEEK)).toEqual({ row: 0, col: 2 });
     });
 
     it("carries past the end of a row into the start of the next, rather than wrapping in place", () => {
-        expect(NavigatorUtils.computeNextCell("ArrowRight", { x: 6, y: 1 }, WEEK)).toEqual({ x: 0, y: 2 });
-        expect(NavigatorUtils.computeNextCell("ArrowLeft", { x: 0, y: 1 }, WEEK)).toEqual({ x: 6, y: 0 });
+        expect(NavigatorUtils.computeNextCell("ArrowRight", { row: 1, col: 6 }, WEEK)).toEqual({ row: 2, col: 0 });
+        expect(NavigatorUtils.computeNextCell("ArrowLeft", { row: 1, col: 0 }, WEEK)).toEqual({ row: 0, col: 6 });
     });
 
     it("lets the row leave the grid, which is how a caller knows to move its window", () => {
-        expect(NavigatorUtils.computeNextCell("ArrowUp", { x: 3, y: 0 }, WEEK)).toEqual({ x: 3, y: -1 });
-        expect(NavigatorUtils.computeNextCell("ArrowDown", { x: 3, y: 5 }, WEEK)).toEqual({ x: 3, y: 6 });
-        expect(NavigatorUtils.computeNextCell("ArrowLeft", { x: 0, y: 0 }, WEEK)).toEqual({ x: 6, y: -1 });
+        expect(NavigatorUtils.computeNextCell("ArrowUp", { row: 0, col: 3 }, WEEK)).toEqual({ row: -1, col: 3 });
+        expect(NavigatorUtils.computeNextCell("ArrowDown", { row: 5, col: 3 }, WEEK)).toEqual({ row: 6, col: 3 });
+        expect(NavigatorUtils.computeNextCell("ArrowLeft", { row: 0, col: 0 }, WEEK)).toEqual({ row: -1, col: 6 });
     });
 
     it("reads the edge keys as the ends of the row, not of the grid", () => {
-        expect(NavigatorUtils.computeNextCell("Home", { x: 4, y: 2 }, WEEK)).toEqual({ x: 0, y: 2 });
-        expect(NavigatorUtils.computeNextCell("End", { x: 4, y: 2 }, WEEK)).toEqual({ x: 6, y: 2 });
+        expect(NavigatorUtils.computeNextCell("Home", { row: 2, col: 4 }, WEEK)).toEqual({ row: 2, col: 0 });
+        expect(NavigatorUtils.computeNextCell("End", { row: 2, col: 4 }, WEEK)).toEqual({ row: 2, col: 6 });
     });
 
     it("pages by rows, and by a caller's own page size when it has one", () => {
-        expect(NavigatorUtils.computeNextCell("PageDown", { x: 1, y: 0 }, WEEK)).toEqual({ x: 1, y: 6 });
-        expect(NavigatorUtils.computeNextCell("PageUp", { x: 1, y: 0 }, WEEK)).toEqual({ x: 1, y: -6 });
-        expect(NavigatorUtils.computeNextCell("PageDown", { x: 1, y: 0 }, WEEK, { pageRows: 2 })).toEqual({
-            x: 1,
-            y: 2,
+        expect(NavigatorUtils.computeNextCell("PageDown", { row: 0, col: 1 }, WEEK)).toEqual({ row: 6, col: 1 });
+        expect(NavigatorUtils.computeNextCell("PageUp", { row: 0, col: 1 }, WEEK)).toEqual({ row: -6, col: 1 });
+        expect(NavigatorUtils.computeNextCell("PageDown", { row: 0, col: 1 }, WEEK, { pageRows: 2 })).toEqual({
+            row: 2,
+            col: 1,
         });
     });
 
     it("declines the keys a caller has taken over", () => {
-        expect(NavigatorUtils.computeNextCell("PageDown", { x: 1, y: 0 }, WEEK, { hasPageKeys: false })).toBe(
+        expect(NavigatorUtils.computeNextCell("PageDown", { row: 0, col: 1 }, WEEK, { hasPageKeys: false })).toBe(
             undefined,
         );
-        expect(NavigatorUtils.computeNextCell("Home", { x: 1, y: 0 }, WEEK, { hasEdgeKeys: false })).toBe(undefined);
+        expect(NavigatorUtils.computeNextCell("Home", { row: 0, col: 1 }, WEEK, { hasEdgeKeys: false })).toBe(
+            undefined,
+        );
     });
 
-    it("declines an empty grid rather than dividing by its width", () => {
-        expect(NavigatorUtils.computeNextCell("ArrowRight", { x: 0, y: 0 }, { width: 0, height: 0 })).toBe(undefined);
+    it("declines an empty grid rather than dividing by its column count", () => {
+        expect(NavigatorUtils.computeNextCell("ArrowRight", { row: 0, col: 0 }, { rowCount: 0, colCount: 0 })).toBe(
+            undefined,
+        );
     });
 });

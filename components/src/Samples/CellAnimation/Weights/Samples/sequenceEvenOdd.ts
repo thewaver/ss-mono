@@ -4,7 +4,7 @@ import type { WeightFn } from "../CellAnimationWeights.types";
 import { CellAnimationWeightUtils } from "../CellAnimationWeights.utils";
 
 export const sequenceEvenOdd: WeightFn = (pos, count) => {
-    const total = count.x * count.y;
+    const total = count.col * count.row;
     const idx = CellAnimationWeightUtils.getRowFlatIndex(pos, count);
     const evenCount = Math.ceil(total * 0.5);
 

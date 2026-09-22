@@ -4,7 +4,7 @@ import type { WeightFn } from "../CellAnimationWeights.types";
 import { CellAnimationWeightUtils } from "../CellAnimationWeights.utils";
 
 export const sequenceReverseBinary: WeightFn = (pos, count) => {
-    const total = count.x * count.y;
+    const total = count.col * count.row;
 
     if (total <= 1) return 1;
 

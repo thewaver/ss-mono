@@ -233,6 +233,7 @@ export const Clock = (props: ClockProps) => {
                     <InteractionWrapper
                         sizing={"fill"}
                         isDisabled={() => getIsTimeDisabled(getOption().time)}
+                        isFocusableWhenDisabled={() => !(access(props.isDisabled) ?? false)}
                         isTabbable={getIsHighlighted}
                         extraFlags={(): ClockRenderProps => ({
                             option: getOption(),

@@ -102,6 +102,27 @@ export type TableProps<T> = AccessorProps<{
     computeEstimatedRowHeight?: (index: number) => number;
     /** Draws the grab handle between two columns. */
     renderResizer?: (getRenderProps: () => TableColumnRenderProps) => JSX.Element;
+    /**
+     * Draws what sits inside the control that sorts a column.
+     *
+     * A header cell is no longer a target of its own: sorting and reordering each have their own control, so
+     * a tap can only ever mean one of them. The component renders both boxes and the consumer paints inside,
+     * exactly as {@link TableProps.renderResizer} already works — so an unpainted control is invisible but
+     * still hit-testable, and sorting does not quietly stop working for a consumer who never drew an arrow.
+     *
+     * **Three targets now share a header cell**, and 2.5.8 Target Size wants a 24 CSS pixel circle centred on
+     * each undersized one to clear the others — so their centres need roughly that much space between them,
+     * which is the consumer's to arrange.
+     */
+    renderSortControl?: (getRenderProps: () => TableColumnRenderProps) => JSX.Element;
+    /**
+     * Draws what sits inside the control that picks a column up to move it.
+     *
+     * Tapping it picks the column up; tapping another header drops it there. That is the single-pointer route
+     * 2.5.7 asks for, and it is why reordering needed a control of its own — a tap on the header could not
+     * mean both "sort" and "pick up". Dragging from anywhere on the header still works and is unchanged.
+     */
+    renderReorderGrip?: (getRenderProps: () => TableColumnRenderProps) => JSX.Element;
     /** Draws the line showing where a dragged column would land. */
     renderMarker?: () => JSX.Element;
     /** Runs when the reader sorts by a different column, or reverses the one it is sorted by. */

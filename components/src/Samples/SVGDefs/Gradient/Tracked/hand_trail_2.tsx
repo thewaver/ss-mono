@@ -131,6 +131,9 @@ const createHandStamp = (
 
 export const hand_trail_2 = (opts?: GradientHandTrailOpts): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => {
+        const sharedBlur = SVGDefsUtils.getBaseBlur(id, defs);
+        const sharedBlurRef = SVGDefsUtils.getSharedFilter(sharedBlur);
+
         const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
         return [
@@ -168,7 +171,7 @@ export const hand_trail_2 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
                         );
                     },
                 },
-                filter: SVGDefsUtils.getBaseBlur(id, defs),
+                filter: sharedBlur,
             },
             ...Array.from({ length: STAMP_COUNT }, (_unused, index) => {
                 const stampId = `${index + 2}-${id}`;
@@ -211,7 +214,7 @@ export const hand_trail_2 = (opts?: GradientHandTrailOpts): TrackedGradientConfi
                             );
                         },
                     },
-                    filter: SVGDefsUtils.getBaseBlur(id, defs),
+                    filter: sharedBlurRef,
                 };
             }),
         ];

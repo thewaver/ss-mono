@@ -1,6 +1,6 @@
 import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
 
-import { MathUtils, type Point2d, Size2d } from "@thewaver/ss-utils";
+import { type Index2d, MathUtils, Size2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
@@ -45,18 +45,18 @@ export const CellAnimation = (props: CellAnimationProps) => {
     const [getCurrentIteration, setCurrentIteration] = createSignal(0);
     const [getRootSize, setRootSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });
 
-    const getCellCount = createMemo<Point2d, undefined>(
+    const getCellCount = createMemo<Index2d, undefined>(
         () => {
             const cellCount = access(props.cellCount);
             const rootSize = getRootSize();
 
             return {
-                x: MathUtils.clamp(Math.round(cellCount.x), 1, Math.max(Math.round(rootSize.width), 1)),
-                y: MathUtils.clamp(Math.round(cellCount.y), 1, Math.max(Math.round(rootSize.height), 1)),
+                col: MathUtils.clamp(Math.round(cellCount.col), 1, Math.max(Math.round(rootSize.width), 1)),
+                row: MathUtils.clamp(Math.round(cellCount.row), 1, Math.max(Math.round(rootSize.height), 1)),
             };
         },
         undefined,
-        { equals: (prev, next) => prev.x === next.x && prev.y === next.y },
+        { equals: (prev, next) => prev.col === next.col && prev.row === next.row },
     );
 
     const getPerspective = createMemo(
@@ -67,27 +67,27 @@ export const CellAnimation = (props: CellAnimationProps) => {
 
     const getColumnEdges = createMemo(() => {
         const width = getRootSize().width;
-        const count = getCellCount().x;
+        const count = getCellCount().col;
 
         return Array.from({ length: count + 1 }, (_, idx) => Math.round((idx * width) / count));
     });
 
     const getRowEdges = createMemo(() => {
         const height = getRootSize().height;
-        const count = getCellCount().y;
+        const count = getCellCount().row;
 
         return Array.from({ length: count + 1 }, (_, idx) => Math.round((idx * height) / count));
     });
 
-    const getCellBounds = (pos: Point2d) => {
+    const getCellBounds = (pos: Index2d) => {
         const columns = getColumnEdges();
         const rows = getRowEdges();
 
         return {
-            x: columns[pos.x],
-            y: rows[pos.y],
-            width: columns[pos.x + 1] - columns[pos.x] + CELL_ANIMATION_BLEED_PX,
-            height: rows[pos.y + 1] - rows[pos.y] + CELL_ANIMATION_BLEED_PX,
+            col: columns[pos.col],
+            row: rows[pos.row],
+            width: columns[pos.col + 1] - columns[pos.col] + CELL_ANIMATION_BLEED_PX,
+            height: rows[pos.row + 1] - rows[pos.row] + CELL_ANIMATION_BLEED_PX,
         };
     };
 
@@ -95,10 +95,10 @@ export const CellAnimation = (props: CellAnimationProps) => {
         const count = getCellCount();
         const weights = getCellWeights();
 
-        return Array.from({ length: count.x * count.y }, (_, idx) => {
-            const pos = { x: idx % count.x, y: Math.floor(idx / count.x) };
+        return Array.from({ length: count.col * count.row }, (_, idx) => {
+            const pos = { col: idx % count.col, row: Math.floor(idx / count.col) };
 
-            return { pos, count, weight: weights[pos.y]?.[pos.x] ?? DEFAULT_CELL_ANIMATION_WEIGHT };
+            return { pos, count, weight: weights[pos.row]?.[pos.col] ?? DEFAULT_CELL_ANIMATION_WEIGHT };
         });
     });
 
@@ -252,11 +252,11 @@ export const CellAnimation = (props: CellAnimationProps) => {
                                 <div
                                     class={styles.cellAnimationCell}
                                     style={{
-                                        "left": `${getBounds().x}px`,
-                                        "top": `${getBounds().y}px`,
+                                        "left": `${getBounds().col}px`,
+                                        "top": `${getBounds().row}px`,
                                         "width": `${getBounds().width}px`,
                                         "height": `${getBounds().height}px`,
-                                        "background-position": `${-getBounds().x}px ${-getBounds().y}px`,
+                                        "background-position": `${-getBounds().col}px ${-getBounds().row}px`,
                                         "z-index": `${Math.floor((1 - defs.weight) * CELL_ANIMATION_DEPTH_STEPS)}`,
                                     }}
                                     aria-hidden="true"

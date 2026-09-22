@@ -66,7 +66,7 @@ const measureContentHeight = (element: HTMLElement, minRows: number, maxRows: nu
 
 const createAutoHeight = (
     getRef: Accessor<HTMLElement | undefined>,
-    getIsEnabled: Accessor<boolean>,
+    getIsDisabled: Accessor<boolean>,
     getMinRows: Accessor<number>,
     getMaxRows: Accessor<number | undefined>,
     getValue: Accessor<string>,
@@ -80,7 +80,7 @@ const createAutoHeight = (
     createEffect(() => {
         const ref = getRef();
 
-        if (!ref || !getIsEnabled()) {
+        if (!ref || getIsDisabled()) {
             setHeight(0);
             return;
         }
@@ -95,7 +95,7 @@ const createAutoHeight = (
     createEffect(() => {
         const ref = getRef();
 
-        if (!ref || !getIsEnabled()) return;
+        if (!ref || getIsDisabled()) return;
 
         let lastWidth = ref.clientWidth;
 
@@ -270,8 +270,12 @@ export const TextField = (props: TextFieldProps) => {
 
     const getMaxRows = () => access(props.maxRows);
 
-    const getMinHeight = createAutoHeight(getControlRef, getIsAutoSizing, getMinRows, getMaxRows, () =>
-        props.valueSignal[0](),
+    const getMinHeight = createAutoHeight(
+        getControlRef,
+        () => !getIsAutoSizing(),
+        getMinRows,
+        getMaxRows,
+        () => props.valueSignal[0](),
     );
 
     const getSpreadPadding = createMemo(() => {

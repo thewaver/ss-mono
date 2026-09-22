@@ -119,7 +119,7 @@ const groupOptions = <T extends string>(keys: readonly T[]) => {
 
 const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.ORIGIN_FREE_WEIGHT_TYPES);
 const EXAMPLES_ROOT = "/src/App/Pages/ScanLineAnimationPage/Examples";
-const WEIGHT_ORIGIN = { x: 0, y: 0 };
+const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
 const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
     const modalPlayback = createSignal(true);

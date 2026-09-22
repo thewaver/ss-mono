@@ -60,3 +60,24 @@ export const tableResizer = style({
     touchAction: "none",
     userSelect: "none",
 });
+
+export const tableSortControl = style({
+    display: "flex",
+    border: "none",
+    padding: 0,
+    background: "none",
+    font: "inherit",
+    color: "inherit",
+    cursor: "pointer",
+});
+
+export const tableReorderGrip = style({
+    display: "flex",
+    border: "none",
+    padding: 0,
+    background: "none",
+    font: "inherit",
+    color: "inherit",
+    cursor: "grab",
+    touchAction: "none",
+});

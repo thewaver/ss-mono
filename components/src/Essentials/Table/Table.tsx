@@ -90,22 +90,22 @@ export const Table = <T,>(props: TableProps<T>) => {
 
     const getIsVirtualized = createMemo(() => props.computeEstimatedRowHeight !== undefined);
 
-    const getGrid = createMemo(() => ({ width: getColumns().length, height: getRows().length + 1 }));
+    const getGrid = createMemo(() => ({ rowCount: getRows().length + 1, colCount: getColumns().length }));
 
     const getRovingCell = createMemo(() => {
         const cell = getFocusedCell();
         const grid = getGrid();
 
-        if (grid.width < 1) return cell;
+        if (grid.colCount < 1) return cell;
 
         return {
-            row: MathUtils.clamp(cell.row, HEADER_ROW_INDEX, grid.height - 1),
-            col: MathUtils.clamp(cell.col, 0, grid.width - 1),
+            row: MathUtils.clamp(cell.row, HEADER_ROW_INDEX, grid.rowCount - 1),
+            col: MathUtils.clamp(cell.col, 0, grid.colCount - 1),
         };
     });
 
     const rowWindow = VirtualizerUtils.createRowWindow(getBodyRef, () => getRows().length, {
-        getIsEnabled: getIsVirtualized,
+        getIsDisabled: () => !getIsVirtualized(),
         computeEstimatedSize: (index) => props.computeEstimatedRowHeight?.(index) ?? 0,
         getPinnedRows: () => {
             const cell = getRovingCell();
@@ -178,11 +178,15 @@ export const Table = <T,>(props: TableProps<T>) => {
     let resizeStartX = 0;
     let resizeStartWidth = 0;
 
+    let hasResizeDragged = false;
+
     const handleResizerPointerDown = (e: PointerEvent, column: TableColumn<T>, columnIndex: number) => {
         if (e.button !== 0 || getIsDisabled()) return;
 
         e.preventDefault();
         e.stopPropagation();
+
+        hasResizeDragged = false;
 
         (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
 
@@ -195,15 +199,25 @@ export const Table = <T,>(props: TableProps<T>) => {
     const handleResizerPointerMove = (e: PointerEvent, column: TableColumn<T>) => {
         if (getResizingColumnId() !== column.id) return;
 
+        if (e.clientX !== resizeStartX) hasResizeDragged = true;
+
         resizeColumn(column, resizeStartWidth + e.clientX - resizeStartX);
     };
 
-    const handleResizerPointerUp = (e: PointerEvent, column: TableColumn<T>) => {
+    const handleResizerPointerUp = (e: PointerEvent, column: TableColumn<T>, columnIndex: number) => {
         if (getResizingColumnId() !== column.id) return;
 
         (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
 
         setResizingColumnId(NO_RESIZING);
+
+        if (hasResizeDragged) return;
+
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        const step = access(props.resizeStepPx) ?? DEFAULT_RESIZE_STEP_PX;
+        const towards = e.clientX < rect.left + rect.width * 0.5 ? -step : step;
+
+        resizeColumn(column, getCurrentWidth(column, columnIndex) + towards);
     };
 
     const getIsReorderable = (column: TableColumn<T> | undefined) =>
@@ -248,6 +262,7 @@ export const Table = <T,>(props: TableProps<T>) => {
         getLabel: () => access(props.ariaLabel) ?? "",
         getRootRef: getHeaderRef,
         getIsDisabled: () => getIsDisabled() || props.orderSignal === undefined,
+        getRestingKeyHint: () => "Press Enter to pick this column up and move it.",
         getKeyHint: () => "Enter drops, Escape cancels.",
         computeCanAccept: () => !getIsDisabled() && props.orderSignal !== undefined,
         computePlaceAtPoint: (point) =>
@@ -314,7 +329,7 @@ export const Table = <T,>(props: TableProps<T>) => {
     const handleKeyDown = (e: KeyboardEvent) => {
         const grid = getGrid();
 
-        if (grid.width < 1) return;
+        if (grid.colCount < 1) return;
 
         const from = getRovingCell();
         const column = getColumns()[from.col];
@@ -331,7 +346,9 @@ export const Table = <T,>(props: TableProps<T>) => {
             e.preventDefault();
 
             focusCell(
-                e.key === "Home" ? { row: HEADER_ROW_INDEX, col: 0 } : { row: grid.height - 1, col: grid.width - 1 },
+                e.key === "Home"
+                    ? { row: HEADER_ROW_INDEX, col: 0 }
+                    : { row: grid.rowCount - 1, col: grid.colCount - 1 },
             );
 
             return;
@@ -363,13 +380,13 @@ export const Table = <T,>(props: TableProps<T>) => {
 
                 const to = from.col + (e.key === "ArrowLeft" ? -1 : 1);
 
-                if (to < 0 || to >= grid.width) return;
+                if (to < 0 || to >= grid.colCount) return;
 
                 moveColumn(from.col, to);
                 focusCell({ row: HEADER_ROW_INDEX, col: to });
 
                 LiveAnnouncerUtils.announce(
-                    `${column.header} moved to column ${to + FIRST_ARIA_INDEX} of ${grid.width}.`,
+                    `${column.header} moved to column ${to + FIRST_ARIA_INDEX} of ${grid.colCount}.`,
                 );
 
                 return;
@@ -394,7 +411,7 @@ export const Table = <T,>(props: TableProps<T>) => {
             }
         }
 
-        const next = NavigatorUtils.computeNextCell(e.key, { x: from.col, y: from.row }, grid, {
+        const next = NavigatorUtils.computeNextCell(e.key, from, grid, {
             pageRows: access(props.pageRows) ?? DEFAULT_PAGE_ROWS,
         });
 
@@ -403,8 +420,8 @@ export const Table = <T,>(props: TableProps<T>) => {
         e.preventDefault();
 
         const cell = {
-            row: MathUtils.clamp(next.y, HEADER_ROW_INDEX, grid.height - 1),
-            col: MathUtils.clamp(next.x, 0, grid.width - 1),
+            row: MathUtils.clamp(next.row, HEADER_ROW_INDEX, grid.rowCount - 1),
+            col: MathUtils.clamp(next.col, 0, grid.colCount - 1),
         };
 
         focusCell(cell);
@@ -473,12 +490,84 @@ export const Table = <T,>(props: TableProps<T>) => {
             aria-hidden="true"
             onPointerDown={(e) => handleResizerPointerDown(e, getColumn(), columnIndex)}
             onPointerMove={(e) => handleResizerPointerMove(e, getColumn())}
-            onPointerUp={(e) => handleResizerPointerUp(e, getColumn())}
-            onPointerCancel={(e) => handleResizerPointerUp(e, getColumn())}
+            onPointerUp={(e) => handleResizerPointerUp(e, getColumn(), columnIndex)}
+            onPointerCancel={(e) => handleResizerPointerUp(e, getColumn(), columnIndex)}
             onClick={(e) => e.stopPropagation()}
         >
             {props.renderResizer?.(() => getColumnRenderProps(columnIndex))}
         </div>
+    );
+
+    const handleGripClick = (columnIndex: number) => {
+        const carry = CarrierUtils.getCarry();
+
+        if (!carry) {
+            const column = getColumns()[columnIndex];
+
+            if (!getIsReorderable(column)) return;
+
+            CarrierUtils.start(
+                zone,
+                columnIndex,
+                { groupId: tableId, key: column.id, label: column.header, value: column.id },
+                "tap",
+            );
+            focusCell({ row: HEADER_ROW_INDEX, col: columnIndex });
+
+            return;
+        }
+
+        if (CarrierUtils.getCarryMode() === "drag") return;
+
+        const rect = document
+            .getElementById(getCellId({ row: HEADER_ROW_INDEX, col: columnIndex }))
+            ?.getBoundingClientRect();
+
+        if (rect) CarrierUtils.aimAtPoint(rect.left + rect.width * 0.5, rect.top + rect.height * 0.5);
+
+        CarrierUtils.end("drop");
+    };
+
+    const renderSortControl = (getColumn: Accessor<TableColumn<T>>, columnIndex: number) => (
+        <button
+            type="button"
+            class={styles.tableSortControl}
+            tabindex={-1}
+            aria-hidden="true"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+                e.stopPropagation();
+
+                focusCell({ row: HEADER_ROW_INDEX, col: columnIndex });
+
+                if (getIsDisabled()) return;
+
+                toggleSort(getColumn());
+            }}
+        >
+            {props.renderSortControl?.(() => getColumnRenderProps(columnIndex))}
+        </button>
+    );
+
+    const renderReorderGrip = (columnIndex: number) => (
+        <button
+            type="button"
+            class={styles.tableReorderGrip}
+            tabindex={-1}
+            aria-hidden="true"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+                e.stopPropagation();
+
+                focusCell({ row: HEADER_ROW_INDEX, col: columnIndex });
+
+                if (getIsDisabled()) return;
+
+                handleGripClick(columnIndex);
+            }}
+        >
+            {props.renderReorderGrip?.(() => getColumnRenderProps(columnIndex))}
+        </button>
     );
 
     const renderMarker = (columnIndex: number) => (
@@ -503,19 +592,23 @@ export const Table = <T,>(props: TableProps<T>) => {
                 aria-disabled={getIsDisabled() || undefined}
                 tabindex={getIsRoving(cell) ? 0 : -1}
                 onPointerDown={(e) => handleHeaderPointerDown(e, columnIndex)}
-                onClick={(e) => {
+                onClick={() => {
                     if (hasCarriedClick) {
                         hasCarriedClick = false;
 
                         return;
                     }
 
-                    handleCellClick(e, cell);
+                    focusCell(cell);
                 }}
                 onPointerEnter={() => setHoveredColumn(columnIndex)}
                 onPointerLeave={() => setHoveredColumn(undefined)}
             >
                 {getColumn().renderHeader(getRenderProps)}
+
+                <Show when={getColumn().isSortable === true}>{renderSortControl(getColumn, columnIndex)}</Show>
+
+                <Show when={getRenderProps().isReorderable}>{renderReorderGrip(columnIndex)}</Show>
 
                 <Show when={getRenderProps().isResizable}>{renderResizer(getColumn, columnIndex)}</Show>
 
@@ -582,8 +675,8 @@ export const Table = <T,>(props: TableProps<T>) => {
             class={styles.tableRoot}
             role="grid"
             aria-label={access(props.ariaLabel)}
-            aria-rowcount={getGrid().height}
-            aria-colcount={getGrid().width}
+            aria-rowcount={getGrid().rowCount}
+            aria-colcount={getGrid().colCount}
             aria-multiselectable={getSelectionMode() === "multiple" || undefined}
             aria-disabled={getIsDisabled() || undefined}
             style={assignInlineVars({

@@ -16,7 +16,7 @@ export const PinnedExample = (props: Props) => {
     const [getSizerRef, setSizerRef] = createSignal<HTMLElement>();
 
     const rowWindow = VirtualizerUtils.createRowWindow(getSizerRef, props.rowCount, {
-        getIsEnabled: () => true,
+        getIsDisabled: () => false,
         computeEstimatedSize: () => ROW_HEIGHT_PX,
         getPinnedRows: () => [props.pinnedRow()],
     });

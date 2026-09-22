@@ -60,7 +60,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
         computeSpinDefs: props.computeSpinDefs,
         computeStepLabel: props.computeWedgeLabel,
         onStepChange: props.onSelectedWedgeChange,
-        indexSignal: props.indexSignal,
+        targetIndexSignal: props.targetIndexSignal,
         autoSpinSignal: props.autoSpinSignal,
         onSpinEnd: props.onSpinEnd,
     });
@@ -69,7 +69,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
         props.computeWedgeLabel?.(index, getWedgeCount()) ?? `${index + 1} of ${getWedgeCount()}`;
 
     const getSelectedIndex = createMemo(() =>
-        rotation.getPhase() === "idling" ? undefined : rotation.getSelectedIndex(),
+        rotation.getPhase() === "idling" ? undefined : rotation.getCurrentIndex(),
     );
 
     const getLayout = createMemo(() =>
@@ -166,7 +166,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
     });
 
     const controller: WheelController = {
-        getIndex: rotation.getIndex,
+        getCurrentIndex: rotation.getCurrentIndex,
         getPhase: rotation.getPhase,
         getIsSpinnable: rotation.getIsSpinnable,
         getIsAutoSpinning: () => rotation.getPhase() === "idling",
@@ -202,7 +202,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
                         faceRoleDescription={WEDGE_ROLE_DESCRIPTION}
                         computeFaceDefs={(index, face) => ({
                             ariaLabel: getWedgeLabel(index),
-                            isHidden: face === "back" || index !== rotation.getIndex(),
+                            isHidden: face === "back" || index !== rotation.getTargetIndex(),
                         })}
                         renderFace={renderWedge}
                     />

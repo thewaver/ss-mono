@@ -18,9 +18,26 @@ export type TrailStep = {
 export type TrailController = {
     getPlace: Accessor<TrailPlace>;
     getIsPlaying: Accessor<boolean>;
-    play: () => void;
-    pause: () => void;
-    seek: (progress: number) => void;
+    /**
+     * Starts the traveler moving.
+     *
+     * @returns `false` when it was already playing, since asking for a state a thing is already in does
+     * nothing.
+     */
+    play: () => boolean;
+    /**
+     * Stops the traveler where it is.
+     *
+     * @returns `false` when it was already paused.
+     */
+    pause: () => boolean;
+    /**
+     * Moves the traveler to a point along the path.
+     *
+     * @param progress Where to go, `0`–`1`. Values outside that are clamped rather than refused.
+     * @returns `false` when the clamped position is the one it already holds.
+     */
+    seek: (progress: number) => boolean;
 };
 
 export type TrailProps = AccessorProps<{

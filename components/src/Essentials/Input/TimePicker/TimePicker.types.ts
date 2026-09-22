@@ -4,15 +4,11 @@ import type { Point2d, TimeValue } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type { PopupTriggerFlags } from "../../../Primitives/PopupTrigger/PopupTrigger.types";
 import type { TextFieldFlags } from "../../../Primitives/TextField/TextField.types";
 import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { ClockColumnRenderer, ClockOptionRenderer, ClockSteps, ClockUnitRenderer } from "../Clock/Clock.types";
 import type { TimeInputMeridiem, TimeInputProps } from "../TimeInput/TimeInput.types";
-
-export type TimePickerTrigger = {
-    getIsOpen: () => boolean;
-    toggle: () => void;
-};
 
 export type TimePickerProps = Omit<TimeInputProps, "renderTrailing"> &
     AccessorProps<{
@@ -34,11 +30,33 @@ export type TimePickerProps = Omit<TimeInputProps, "renderTrailing"> &
         computeIsTimeDisabled?: (time: TimeValue) => boolean;
         /** Whether the clock is open. It is the only thing that opens or closes it. */
         visibilitySignal?: SignalSource<boolean>;
-        /** Draws whatever sits after the field's text, inside the field — usually the control that opens the clock. */
-        renderTrailing: (
-            getFlags: () => InteractionFlags<TextFieldFlags>,
+        /**
+         * The trigger's own element id, for a consumer that has to reach it from a label or a test.
+         *
+         * It is separate from the field's `id` because the two are different elements now that the component
+         * owns the trigger.
+         */
+        triggerId?: string;
+        /** Names the control that opens the clock. Defaults to "Open the clock". */
+        triggerAriaLabel?: string;
+        /**
+         * Draws whatever else sits after the field's text, before the control that opens the clock.
+         *
+         * The slot carries two controls on a twelve-hour field — the meridiem toggle and the clock trigger —
+         * and only the trigger is the component's. This is where the rest goes.
+         */
+        renderTrailing?: (getFlags: () => InteractionFlags<TextFieldFlags>, meridiem: TimeInputMeridiem) => JSX.Element;
+        /**
+         * Draws what sits inside the control that opens the clock.
+         *
+         * The control itself is the component's — it owns the `aria-haspopup`, `aria-expanded` and
+         * `aria-controls` that tell a reader the clock belongs to it, and that let the dismisser resolve a
+         * press in the clock as a press inside this picker's layer rather than outside it. Everything painted
+         * inside is the consumer's, and the element is a blank slate, so nothing about the look is fixed.
+         */
+        renderTrigger: (
+            getFlags: () => InteractionFlags<PopupTriggerFlags>,
             meridiem: TimeInputMeridiem,
-            trigger: TimePickerTrigger,
         ) => JSX.Element;
         /** Draws one clock option. */
         renderOption: ClockOptionRenderer;

@@ -30,8 +30,8 @@ export type WheelWedgeState = {
 };
 
 export type WheelController = {
-    /** Which wedge is at the marker. */
-    getIndex: Accessor<number>;
+    /** Which wedge is at the marker right now, which moves while the wheel turns. */
+    getCurrentIndex: Accessor<number>;
     /** What the wheel is doing: still, spinning, settling or idling. */
     getPhase: Accessor<RotatorPhase>;
     /** Whether a spin can be started right now. */
@@ -58,7 +58,10 @@ export type WheelState = {
 };
 
 export type WheelLabels = {
-    /** Names one wedge for assistive technology, and is told how many there are so it can say third of five. */
+    /**
+     * Names one wedge for assistive technology, and is told how many there are so it can say third of five.
+     * The index is zero-based, matching `renderWedge`.
+     */
     computeWedgeLabel?: (index: number, wedgeCount: number) => string;
 };
 
@@ -67,8 +70,13 @@ export type WheelSlots<T> = {
     wedges: MaybeAccessor<T[]>;
     /** How long the wheel waits between steps while turning on its own. Leave it out and it stands still until spun. */
     idleDelayMs?: MaybeAccessor<number | undefined>;
-    /** Which wedge is at the marker. It is the only thing that moves the wheel. */
-    indexSignal?: SignalSource<number>;
+    /**
+     * Which wedge the wheel is heading for. It is the only thing that moves the wheel: writing it turns the
+     * wheel to that wedge, and the wheel writes it as soon as a spin's target is known rather than when the
+     * spin lands — so a consumer reading it mid-spin learns the outcome early. Read `onSpinEnd` instead to
+     * find out only once it arrives, and `onSelectedWedgeChange` for the wedge at the marker right now.
+     */
+    targetIndexSignal?: SignalSource<number>;
     /** Whether the wheel is turning on its own. It is the only thing that starts or stops it. */
     autoSpinSignal?: SignalSource<boolean>;
     /** Chooses which wedge a spin should land on. It may answer later, so the result can come from a server. */

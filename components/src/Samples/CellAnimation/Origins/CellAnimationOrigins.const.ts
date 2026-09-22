@@ -1,15 +1,15 @@
-import type { Point2d } from "@thewaver/ss-utils";
+import type { Index2d } from "@thewaver/ss-utils";
 
-const originRegistry: Record<CellAnimationOrigins.OriginType, (count: Point2d) => Point2d> = {
-    center: (count) => ({ x: (count.x - 1) * 0.5, y: (count.y - 1) * 0.5 }),
-    top: (count) => ({ x: (count.x - 1) * 0.5, y: 0 }),
-    topRight: (count) => ({ x: count.x - 1, y: 0 }),
-    right: (count) => ({ x: count.x - 1, y: (count.y - 1) * 0.5 }),
-    bottomRight: (count) => ({ x: count.x - 1, y: count.y - 1 }),
-    bottom: (count) => ({ x: (count.x - 1) * 0.5, y: count.y - 1 }),
-    bottomLeft: (count) => ({ x: 0, y: count.y - 1 }),
-    left: (count) => ({ x: 0, y: (count.y - 1) * 0.5 }),
-    topLeft: () => ({ x: 0, y: 0 }),
+const originRegistry: Record<CellAnimationOrigins.OriginType, (count: Index2d) => Index2d> = {
+    center: (count) => ({ col: (count.col - 1) * 0.5, row: (count.row - 1) * 0.5 }),
+    top: (count) => ({ col: (count.col - 1) * 0.5, row: 0 }),
+    topRight: (count) => ({ col: count.col - 1, row: 0 }),
+    right: (count) => ({ col: count.col - 1, row: (count.row - 1) * 0.5 }),
+    bottomRight: (count) => ({ col: count.col - 1, row: count.row - 1 }),
+    bottom: (count) => ({ col: (count.col - 1) * 0.5, row: count.row - 1 }),
+    bottomLeft: (count) => ({ col: 0, row: count.row - 1 }),
+    left: (count) => ({ col: 0, row: (count.row - 1) * 0.5 }),
+    topLeft: () => ({ col: 0, row: 0 }),
 };
 
 export namespace CellAnimationOrigins {
@@ -27,5 +27,5 @@ export namespace CellAnimationOrigins {
 
     export type OriginType = (typeof ORIGIN_TYPES)[number];
 
-    export const computeOrigin = (type: OriginType, count: Point2d) => originRegistry[type](count);
+    export const computeOrigin = (type: OriginType, count: Index2d) => originRegistry[type](count);
 }

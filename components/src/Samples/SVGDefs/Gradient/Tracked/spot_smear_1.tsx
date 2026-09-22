@@ -130,6 +130,9 @@ const createTrailStamp = (
 
 export const spot_smear_1 = (opts?: GradientSmearSampleOpts): TrackedGradientConfig => ({
     computeSVGDefs: (id, __, getRef, defs) => {
+        const sharedBlur = SVGDefsUtils.getBaseBlur(id, defs);
+        const sharedBlurRef = SVGDefsUtils.getSharedFilter(sharedBlur);
+
         const { getReading, getIsPointerPresent } = PointerTrackerUtils.create(getRef ?? NO_REF);
 
         return [
@@ -149,7 +152,7 @@ export const spot_smear_1 = (opts?: GradientSmearSampleOpts): TrackedGradientCon
                         });
                     },
                 },
-                filter: SVGDefsUtils.getBaseBlur(id, defs),
+                filter: sharedBlur,
             },
             ...Array.from({ length: STAMP_COUNT }, (_unused, index) => ({
                 gradientOrPattern: {
@@ -168,7 +171,7 @@ export const spot_smear_1 = (opts?: GradientSmearSampleOpts): TrackedGradientCon
                         });
                     },
                 },
-                filter: SVGDefsUtils.getBaseBlur(id, defs),
+                filter: sharedBlurRef,
             })),
         ];
     },

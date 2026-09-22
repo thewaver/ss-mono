@@ -95,6 +95,102 @@ export namespace SignalMirrorUtils {
         accessSignal(() => [getValue, setValue]);
 
     /**
+     * Splits one composite signal into a signal per half.
+     *
+     * Two controls editing one value have a problem: whichever writes first would clear the other half. So
+     * each half is held separately and the pair is written back only once both are filled in, which is what
+     * lets somebody pick a time before picking a day without the value flapping.
+     *
+     * **The hard part is telling an outside clear from the echo of an inside one.** Clearing one half
+     * legitimately sends `undefined` outward, and a moment later that same `undefined` arrives back — at
+     * which point it is indistinguishable from a consumer's Clear button or a form reset. Refusing every
+     * incoming `undefined` keeps the other half but swallows a real clear; accepting every one clears a half
+     * the user never touched. So the split remembers what it last wrote, and clears both halves only when
+     * the `undefined` is *not* that remembered value.
+     *
+     * **One case it cannot see**, and it is a property of signals rather than of this rule: a consumer
+     * clearing a value that is *already* `undefined` — because a half was cleared a moment earlier — writes
+     * nothing new, so no effect runs and the held half stays held. Only a clear that actually changes the
+     * outer value arrives.
+     *
+     * @param signal The whole value's signal.
+     * @param defs.compose Builds the whole value from two present halves. Return `undefined` to report
+     * nothing even when both are there, which is how an invalid pair stays unreported.
+     * @param defs.decompose Splits a whole value into its halves.
+     * @param defs.getIsSame Compares two whole values, so an unchanged write is not passed on.
+     * @returns A signal per half, each usable as an ordinary Solid signal. Either can be set to `undefined`,
+     * which leaves the whole value `undefined` until both are filled in again.
+     */
+    export const createSplit = <TWhole, TFirst, TSecond>(
+        signal: Signal<TWhole | undefined>,
+        defs: {
+            compose: (first: TFirst, second: TSecond) => TWhole | undefined;
+            decompose: (whole: TWhole) => [TFirst, TSecond];
+            getIsSame: (a: TWhole | undefined, b: TWhole | undefined) => boolean;
+        },
+    ): { firstSignal: Signal<TFirst | undefined>; secondSignal: Signal<TSecond | undefined> } => {
+        const initial = untrack(() => signal[0]());
+
+        const [getFirst, setFirst] = createSignal<TFirst | undefined>(initial && defs.decompose(initial)[0]);
+        const [getSecond, setSecond] = createSignal<TSecond | undefined>(initial && defs.decompose(initial)[1]);
+
+        let lastEmitted = initial;
+
+        createEffect(() => {
+            const value = signal[0]();
+
+            if (value === undefined) {
+                if (defs.getIsSame(lastEmitted, undefined)) return;
+
+                lastEmitted = undefined;
+                setFirst(() => undefined);
+                setSecond(() => undefined);
+
+                return;
+            }
+
+            const [first, second] = defs.decompose(value);
+
+            lastEmitted = value;
+            setFirst(() => first);
+            setSecond(() => second);
+        });
+
+        const emit = () => {
+            const first = untrack(getFirst);
+            const second = untrack(getSecond);
+            const next = first !== undefined && second !== undefined ? defs.compose(first, second) : undefined;
+
+            if (defs.getIsSame(next, untrack(signal[0]))) return;
+
+            lastEmitted = next;
+            signal[1](() => next);
+        };
+
+        const firstSignal = [
+            getFirst,
+            (next: unknown) => {
+                setFirst(typeof next === "function" ? (next as never) : () => next as TFirst | undefined);
+                emit();
+
+                return untrack(getFirst);
+            },
+        ] as Signal<TFirst | undefined>;
+
+        const secondSignal = [
+            getSecond,
+            (next: unknown) => {
+                setSecond(typeof next === "function" ? (next as never) : () => next as TSecond | undefined);
+                emit();
+
+                return untrack(getSecond);
+            },
+        ] as Signal<TSecond | undefined>;
+
+        return { firstSignal, secondSignal };
+    };
+
+    /**
      * Mirrors an outer value into an inner signal of the same type.
      *
      * {@link SignalMirrorUtils.createMirror} without the conversions, for when the inner copy exists to

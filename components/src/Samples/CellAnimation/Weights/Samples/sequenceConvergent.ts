@@ -2,7 +2,7 @@ import type { WeightFn } from "../CellAnimationWeights.types";
 import { CellAnimationWeightUtils } from "../CellAnimationWeights.utils";
 
 export const sequenceConvergent: WeightFn = (pos, count) => {
-    const total = count.x * count.y;
+    const total = count.col * count.row;
     const idx = CellAnimationWeightUtils.getRowFlatIndex(pos, count);
     const progress = total <= 1 ? 0.5 : idx / (total - 1);
     const edgeDistance = Math.abs(progress - 0.5) * 2;

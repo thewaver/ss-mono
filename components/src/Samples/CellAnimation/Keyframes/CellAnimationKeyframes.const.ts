@@ -1,4 +1,4 @@
-import type { Point2d } from "@thewaver/ss-utils";
+import type { Index2d } from "@thewaver/ss-utils";
 
 import type {
     CellAnimationEvaluationDefs,
@@ -367,7 +367,7 @@ export namespace CellAnimationKeyframes {
     export const computeAnimation = (
         type: AnimationType,
         breakpoints: CellAnimationBreakpoints.BreakpointTupleTriple,
-        defs: CellAnimationEvaluationDefs & { origin: Point2d },
+        defs: CellAnimationEvaluationDefs & { origin: Index2d },
         timeline: number,
         easing?: CellAnimationBreakpoints.Easing,
     ): CellAnimationEvaluationResult =>

@@ -1,4 +1,4 @@
-import type { CSSAnimationKey, Point2d } from "@thewaver/ss-utils";
+import type { CSSAnimationKey, Index2d } from "@thewaver/ss-utils";
 
 import type {
     CellAnimationEvaluationDefs,
@@ -16,7 +16,7 @@ export type CompiledCellStops = Record<string, CellStopTrack>;
 
 export type CellAnimationFn = (
     timeline: number,
-    defs: CellAnimationEvaluationDefs & { origin: Point2d },
+    defs: CellAnimationEvaluationDefs & { origin: Index2d },
 ) => CellAnimationEvaluationResult;
 
 export type CellZone = {

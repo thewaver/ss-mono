@@ -10,10 +10,10 @@ import type {
     CellAnimationWeights,
     WeightOpts,
 } from "@thewaver/ss-components";
-import type { Point2d } from "@thewaver/ss-utils";
+import type { Index2d } from "@thewaver/ss-utils";
 
 export type CellAnimationExampleProps = AccessorProps<{
-    cellCount: Point2d;
+    cellCount: Index2d;
     originType: CellAnimationOrigins.OriginType;
     weightType: CellAnimationWeights.WeightType;
     weightOpts: WeightOpts;

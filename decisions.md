@@ -13483,3 +13483,251 @@ written onto every run whose color differs from the baseline, which is every col
 would find the text frozen at the color it was parsed with, and the property they would have to know about to
 explain it is one they never wrote. So a fill color set inside a `Typewriter` is lost, and that is the cheaper
 of the two failures.
+
+### `Rotator`, and the difference between where a wheel is and where it is going
+
+Settled by the user, on a fault that read as a stale doc block and turned out to be a missing distinction.
+
+**A wheel has two "current wedge" numbers and only ever named one of them.** The wedge at the marker this
+instant is derived from the angle and moves continuously while the wheel turns; the wedge the wheel is heading
+for is decided once, when a spin's target is known. `indexSignal` held the second and was documented as the
+first — "Which wedge is at the marker. It is the only thing that moves the wheel" — and writing it moved
+nothing.
+
+**The user's framing settled it: current and target.** So the signal is `targetIndexSignal`, and the ambiguity
+existed only because the prop said "index" and left a consumer unable to tell which of the two they were
+holding. Their words: if the name explicitly announces "target", immediate reflection is the correct way.
+
+**A consumer write turns the wheel, which is what a target means.** The behavior falls out of the name rather
+than being bolted onto it, and the doc sentence becomes true as written instead of being corrected away.
+
+**The target is published as soon as it is known, not when the spin lands.** The behavior change this cost:
+`setTargetIndex` now runs when `computeSpinTarget` resolves, so a consumer reading the signal mid-spin learns
+the outcome before the wheel arrives. The user chose that over protecting the surprise by default —
+`onSpinEnd` is there for a consumer who wants to wait, and the Playground's overhead readout says "heading
+for" rather than "settled on" because of it.
+
+**`Rotator` publishes `getCurrentIndex` and `getTargetIndex`, and `WheelController.getIndex` became
+`getCurrentIndex`.** That last one was the outright wrong doc of the three: it said "which wedge is at the
+marker" and held the target.
+
+**The drum's hidden faces were left alone, against the reviewer's suggestion and an earlier reading of mine.**
+A drum un-hides exactly one face for assistive technology, and it reads the **target**. Under a driving target
+that face really is the one at the marker once the wheel rests; and while the wheel idles the library's own
+position is that nothing is selected, so exposing the last landing is stable where tracking the marker would
+churn the accessibility tree once per idle step. `wheel.spec.ts:401` pins that resting face.
+
+**`Carousel` was already target-driven** — you write `indexSignal` and an effect turns the drum to match — so
+the two primitives run the same way round now. `Carousel`'s prop keeps the vaguer name; it has no separate
+current to be confused with.
+
+### Splits, and telling an outside clear from the echo of an inside one
+
+Settled by the user, closing two faults that were one question.
+
+**A split holds two halves and writes the pair outward only when both are filled**, so clearing one half
+legitimately sends `undefined` outward — and a moment later that same `undefined` arrives back, where it is
+indistinguishable from a consumer's Clear button or a form reset.
+
+`DateTimeValue`'s split guarded against the echo by ignoring every incoming `undefined`, which swallowed real
+clears. `DateRangePicker` hand-wrote the same split without the guard and got the opposite failure: clear the
+end date and the start field kept its text with nothing behind it, and retyping the end never brought the range
+back.
+
+**The rule is "ignore my own echo": the split remembers what it last wrote, and clears both halves only when
+the incoming `undefined` is not that value.** One implementation, in
+`SignalMirrorUtils.createSplit`, beside `createOptional`, `createPassThrough` and `createValueMirror` — the same
+family, one signal in and signals out, and nothing in it is date-specific. It takes `compose`, `decompose` and
+an equality test, because a range's halves are the same type and get ordered where a date-and-time pair's are
+not.
+
+**Why one helper rather than two guards:** the divergence is how the `DateRangePicker` fault happened, and
+`conventions.md` names a date-time **range** as the composition coming next, which would have been the third
+hand-written split. `DateTimeValueUtils.createSplit` stays as the named entry point and is now a thin wrapper.
+
+**One case it cannot see, and it is a property of signals rather than of the rule.** A consumer clearing a value
+that is _already_ `undefined` — because a half was cleared a moment earlier — writes nothing new, so no effect
+runs and the held half stays held. Only a clear that actually changes the outer value arrives. Recorded on the
+helper and pinned by a test, so nobody re-derives it as a bug.
+
+### `ColorInput`, and a value the field cannot read
+
+Settled by the user, after the field was found replacing a consumer's `"red"` with `#000000` on mount and
+calling `onInput` to report the change it had just invented.
+
+**A value the field cannot read is refused visibly**: nothing is written back, the error flag is raised, and
+the consumer's text survives. That is `conventions.md`'s _"A masked field never spells a value approximately"_
+applied to color — a control stating that it holds something it cannot show, rather than substituting a
+different well-formed value that would survive a round trip.
+
+**What counts as readable was widened rather than hand-written.** `colord` parses every CSS notation and the
+named colors, which is a grammar and a 148-entry table nobody should write again, and it reports which notation
+a string arrived in.
+
+**The value is emitted in the notation it arrived in.** Hand in `hsl(...)` and `hsl(...)` comes back. This is
+what makes the render-props sentence "in whatever notation the consumer handed in" true, where every other
+route meant deleting it. The notation is remembered per field; hex is the fallback when a consumer starts
+empty, and a named color is written back as hex because not every color has a name.
+
+**`isUnreadable` is published on the render props** so a painter can show the refused text, and the error flag
+is raised alongside it.
+
+### `Color`, and why `colord` reads strings but does not hold them
+
+The user's call was that `colord` should become the engine and `Color`'s own conversions go. Building it turned
+up a measured fact that changed the split, and it is recorded here so nobody re-opens it on taste.
+
+**`colord` rounds its hue-space output to whole numbers.** A hex value taken to HSV and back comes out
+different for **3472 of the 4096** three-digit colors — `#123456` returns as `#123457`. `ColorInput` holds HSVA
+and writes a string out, so it performs that round trip on every mount and every edit. Adopting `colord` as the
+store would have replaced the fault the work was commissioned to fix with a quieter version of itself.
+
+**So the split is by capability rather than by preference.** `colord` **reads and recognises**: `Color.parse`
+accepts any CSS notation, `Color.getNotationOf` reports which one, and `Color.isSame` compares two strings
+across notations — all things the hand-written code could not do at all. The **arithmetic stays**, because it
+keeps full float precision and the conversions are lossless in both directions.
+
+**`Color.parse` uses `colord` to read and then re-derives the value through the conversions here**, which is
+what keeps the precision while still accepting `rebeccapurple`.
+
+**The per-space hex comparisons went.** `Color.Hex.getIsSameHex` and `Color.Hexa.getIsSameHexa` could only
+answer the question for two values already spelled the same way; `Color.isSame` answers it for any two.
+
+**Units moved from `0`–`1` fractions to `0`–`100` percentages**, on the user's call — they had doubted the
+original choice, and a reputable library going the other way settled it. Hue stays `0`–`360`, RGB stays
+`0`–`255`, and alpha alone stays a `0`–`1` fraction, which is what CSS does. `ColorArea`'s axes and its `step`
+prop are in those percentages now, and its default step went from `0.01` to `1`.
+
+### `SplitPane`, and the three things a splitter was missing
+
+Settled by the user, from a review item that was two-thirds right.
+
+**2.5.7 Dragging Movements is Level AA and the gutter had no pointer route but dragging.** Both escapes were
+checked against the Understanding document rather than recalled: a keyboard route does not satisfy it unless
+that route "also provides controls that can be clicked or tapped with a pointer", and the "essential" exception
+needs the functionality to be unachievable another way, which `Sortable`'s own tap route disproves. So a press
+that ends without a drag steps the boundary by `keyStep` toward the half of the gutter it landed on. The gutter
+is its own element with nothing else competing for a press, so there is no ambiguity to resolve.
+
+**`role="separator"` on a `<button>` is conformant, and the review was wrong to flag it.** ARIA in HTML lists
+`separator` among the roles explicitly allowed on `button`, beside `checkbox`, `slider`, `switch` and `tab`.
+The gutter stays a button.
+
+**Home, End and Enter were a feature choice rather than a gap.** APG marks Home and End optional and nothing in
+WCAG asks for either — but the pattern also specifies **Enter** to collapse the primary pane and restore it,
+which the review missed entirely and which is the useful one. All three are built.
+
+**A collapsed boundary remembers where it came from, and forgets on any other move.** `moveBoundary` drops the
+remembered position, and `toggleCollapsed` re-records it afterwards — so a restore can never put the divider
+somewhere the consumer has since overridden by dragging or arrowing.
+
+### `PatchBoard`, a node graph rather than a list
+
+Settled by the user. The board was `role="list"` with two plain divs between it and each `role="listitem"`, and
+the sockets were `role="button"` sitting inside that list rather than inside any item — so the list owned none
+of its items, which is the 1.3.1 part.
+
+**The list semantics went rather than being regrouped.** A patch board's nodes are positioned freely, there is
+no order to them, and nothing sets `aria-posinset` or `aria-setsize`, so the role never delivered what a list is
+for. Keeping it would have meant renaming what a node _is_ purely to satisfy the wrong shape. The board is a
+`group`, each slot is a `group` holding its node and that node's sockets, and the node itself is the `button` it
+already behaved as.
+
+**A `group` has no required owned elements**, so the intervening divs are harmless — which is the second reason
+this beat regrouping the list.
+
+**The socket-to-node relationship was never actually missing.** A socket's name is built from `getEndLabel`,
+which is the node's own label plus the socket's, so it already announced as "Oscillator out 1, output,
+connected". What the change adds is the structural half.
+
+**One thing this broke and the fix it needed.** `CarrierUtils.INTERACTIVE_SELECTOR` matches `[role="button"]`,
+and both node handlers guarded with `closest(INTERACTIVE_SELECTOR)` — so giving the node that role made it
+disqualify itself and a node could no longer be dragged. The guard means "did the press land on something
+interactive _inside_ the node", so it now excludes the handler's own element. The slot group is deliberately
+left unnamed: the node button inside it already carries the name, and labelling both would say it twice.
+
+### `Sortable`, and telling somebody an item can be moved before they press anything
+
+Settled by the user, on 4.1.2. A `Sortable` item is a focusable `role="listitem"` with Enter and arrow
+handlers, so a screen reader announced a static list entry and gave no hint that Enter did anything.
+
+**The gap was narrower than it looked, which is what decided the smaller fix.** `Carrier` already announces
+pick-up, every move, the drop and the cancel through a polite live region — so once Enter is pressed the whole
+carry is covered. What was missing is the advertisement on a _resting_ item. A discovery gap, not a silent
+control.
+
+**So the list roles stay and the item gains `aria-roledescription` plus an `aria-describedby`** pointing at
+hidden text. `listbox`/`option` was rejected: `option` means selectable, reordering is not selecting, and
+`aria-selected` on the carried item would claim a selection nobody made. `aria-roledescription` is also already
+the house idiom — `Wheel`, `Carousel`, `Cuboid`, `FlipCard` and `Barrel` all carry one.
+
+**`CarrierZone` grew `getRestingKeyHint`**, because `getKeyHint` only ever produced the _carrying_ sentence.
+All four zones supply one.
+
+**The hint element lives outside the list root.** Put inside it, it became a child the list's own placement and
+hit-testing walked, and five specs went red. It is a sibling now; `aria-describedby` works by id wherever it
+sits.
+
+### The pickers own their trigger, and `PopupTrigger` is the leaf they share
+
+Settled by the user, on a defect with an awkward cause: a `TimePicker` inside another popover-driven layer
+dismissed that outer layer when you pressed an hour. The dismisser walks up from the pressed element and
+follows `aria-controls` to jump from a portalled popup back to whatever owns it — and nothing wrote that
+attribute, because the trigger was painted entirely by the consumer and `Button` has no way to carry an
+arbitrary ARIA attribute.
+
+**The answer was not to let the consumer write it but to let the library own the element.** The user's words:
+we already use and abuse wrappers, and the thing that matters is that the aesthetics do not become limited.
+That holds by construction — the trigger is an `InteractionWrapper` around a leaf whose class is a pure reset,
+so every pixel still comes from the consumer's `renderTrigger`, and the flags, the decoration slot, the tooltip
+and the disabled machinery all come with the wrapper.
+
+**`Primitives/PopupTrigger` is the shared leaf**, because three pickers needed the same button and a shared
+body belongs in `Primitives` beside `InteractionWrapper` and `TextField`. It carries `aria-haspopup`,
+`aria-expanded` and `aria-controls`, and the last is written only while the popup is open.
+
+**`renderTrigger` narrowed from painting the control to painting its content**, on `DatePicker`,
+`DateRangePicker` and `TimePicker`. What is genuinely given up is structural rather than aesthetic: a consumer
+could previously return anything at all — a link, two controls — and now gets one button-shaped control whose
+paint is entirely theirs.
+
+**Two things the decision did not foresee, both found while building.** `TimePicker`'s trailing slot carries
+**two** controls on a twelve-hour field, the meridiem toggle as well as the trigger — so `renderTrailing`
+survives for the rest and sits beside the owned trigger rather than being replaced by it. And the trigger
+needed a `triggerId`, because the element the specs reach for by `#key` is the library's now rather than the
+consumer's.
+
+### `Table`, and why a header cell stopped being a target
+
+Settled by the user, on 2.5.7 Dragging Movements. Resizing was press-capture-move and reordering was a drag,
+with no single-pointer route to either.
+
+**Resize is unambiguous and needed no new target**: the resizer is already its own element, so a press there
+that ends without a drag steps the width by `resizeStepPx` toward the half of the handle pressed.
+
+**Reorder and sort were the collision.** The reorder drag started on the whole header cell and a click on the
+whole header cell sorted, so a tap could not mean both. `Sortable` gets away with tapping the whole item only
+because a sortable item has no competing click.
+
+**The user's call was that both get their own target and the header stops being one** — over the reviewer's
+suggestion of a single reorder grip. Their argument: two render slots are not dead weight, because a consumer
+wants to paint a sortable indicator with its direction and a reorder affordance anyway, so the slots are where
+those already belong.
+
+**It improves the 2.5.8 position rather than worsening it.** Target Size (Minimum) is also Level AA and wants a
+24 CSS pixel circle centred on each undersized target to clear the others. The resizer is 8px wide and sat
+inside a clickable header, so **2.5.8 failed before this**. Taking the header out of the target set is what
+makes the resizer defensible. The three targets now sharing a cell are a spacing constraint the consumer owns,
+documented on the slots.
+
+**The keyboard stays on the cell.** Both new controls are `tabindex="-1"` and `aria-hidden`, so they are
+pointer affordances and nothing else — one tab stop per cell, which is what the grid pattern wants, and all
+2.5.7 asks for. Enter and Space on the header still sort.
+
+**They focus their own cell before acting**, which the decision did not anticipate: each stops propagation so
+the cell's own click never runs, and without the explicit focus a press left the grid with focus nowhere and
+the next key press went nowhere.
+
+**The box-and-paint split is copied from the resizer deliberately**: the library renders the target, the
+consumer paints inside it, so an unpainted slot is invisible but still hit-testable and sorting cannot die
+silently for a consumer who never draws an arrow.

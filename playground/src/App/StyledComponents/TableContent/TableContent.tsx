@@ -1,5 +1,4 @@
 import type { ParentProps } from "solid-js";
-import { Show } from "solid-js";
 
 import type { TableSortDirection } from "@thewaver/ss-components";
 import { access } from "@thewaver/ss-components";
@@ -36,14 +35,14 @@ export const PageTableHeaderContent = (props: ParentProps<TableHeaderContentProp
         }}
     >
         <div class={styles.tableText}>{props.children}</div>
-
-        <Show when={access(props.renderProps).isSortable}>
-            <div class={styles.tableSortMarker} aria-hidden="true">
-                {getSortMarker(access(props.renderProps).sortDirection)}
-            </div>
-        </Show>
     </div>
 );
+
+export const PageTableSortControl = (props: TableResizerProps) => (
+    <div class={styles.tableSortMarker}>{getSortMarker(access(props.renderProps).sortDirection)}</div>
+);
+
+export const PageTableReorderGrip = () => <div class={styles.tableReorderGrip}>{"\u283F"}</div>;
 
 export const PageTableCellContent = (props: ParentProps<TableCellContentProps>) => (
     <div

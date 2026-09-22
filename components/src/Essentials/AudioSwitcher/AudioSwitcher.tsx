@@ -118,6 +118,8 @@ export const AudioSwitcher = (props: AudioSwitcherProps) => {
     const controller = createMemo(() => ({
         reset: () => {
             getActiveElement().currentTime = 0;
+
+            return true;
         },
     }));
 

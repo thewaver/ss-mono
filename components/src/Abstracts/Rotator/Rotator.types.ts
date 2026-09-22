@@ -15,7 +15,7 @@ export type RotatorDefs = AccessorProps<{
     computeSpinTarget: () => number | Promise<number>;
     computeSpinDefs?: (index: number, stepCount: number) => RotatorSpinDefs;
     computeStepLabel?: (index: number, stepCount: number) => string;
-    indexSignal?: SignalSource<number>;
+    targetIndexSignal?: SignalSource<number>;
     autoSpinSignal?: SignalSource<boolean>;
     onStepChange?: (index: number) => void;
     onSpinEnd?: (index: number) => void;

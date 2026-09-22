@@ -244,6 +244,13 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
 export type ContextMenuProps<T> = AccessorProps<{
     /** Names the menu for assistive technology. */
     ariaLabel: string;
+    /**
+     * Names the region for assistive technology.
+     *
+     * The region is a tab stop, so it has to say what it is — and its own name cannot be the menu's, which
+     * describes what the menu offers rather than what the region holds.
+     */
+    regionAriaLabel: string;
     /** Turns the menu off, so right-clicking the region does nothing out of the ordinary. */
     isDisabled?: boolean;
     /** Where the menu sits against the point it was opened at. */
@@ -267,8 +274,15 @@ export type ContextMenuProps<T> = AccessorProps<{
     /** Draws the surface the items sit on. */
     renderPopup: MenuRenderPopup;
 }> & {
-    /** The region a right-click opens the menu over. */
-    regionRef: MaybeAccessor<HTMLElement | undefined>;
+    /**
+     * Draws the region a right-click opens the menu over.
+     *
+     * The component renders the element itself rather than taking a ref to the consumer's, because it has to
+     * put a `tabindex` and a role on it: a region with no focusable content can never receive the ContextMenu
+     * key, so before this a plain box of text had no keyboard route to its own menu at all (2.1.1, Level A).
+     * Everything drawn inside it is the consumer's.
+     */
+    renderRegion: () => JSX.Element;
     /** The items, in the order they are shown. */
     items: MaybeAccessor<MenuItem<T>[]>;
     /** Which values are currently checked, for the checkbox and radio items among them. */

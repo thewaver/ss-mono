@@ -80,7 +80,10 @@ export type CarouselState = {
 };
 
 export type CarouselLabels = {
-    /** Names one slide for assistive technology, and is told how many there are so it can say third of five. */
+    /**
+     * Names one slide for assistive technology, and is told how many there are so it can say third of five.
+     * The index is zero-based, matching `renderSlide` and `renderPick`.
+     */
     computeSlideLabel?: (index: number, count: number) => string;
     /** Names one of the move controls. */
     computeStepLabel?: (step: CarouselStep) => string;

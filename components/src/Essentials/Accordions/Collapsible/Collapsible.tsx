@@ -68,7 +68,10 @@ export const Collapsible = (props: CollapsibleProps) => {
         false,
     );
 
-    const getContentHeight = ElementObserverUtils.createBorderBoxHeightObserver(getContentRef, getHasPanelContent);
+    const getContentHeight = ElementObserverUtils.createBorderBoxHeightObserver(
+        getContentRef,
+        () => !getHasPanelContent(),
+    );
 
     const { getTransitionTarget, getHasTransitionFinished } = ElementFaderUtils.createFader(getIsExpanded, {
         getTransitionDurationMs,

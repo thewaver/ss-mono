@@ -32,6 +32,7 @@ export type CarrierZone = {
     getRootRef: () => HTMLElement | undefined;
     getIsDisabled: () => boolean;
     getKeyHint: (hasOtherZones: boolean) => string;
+    getRestingKeyHint: () => string;
     computeCanAccept: (carry: Carry) => boolean;
     computePlaceAtPoint: (point: Point2d, carry: Carry) => CarryPlace | undefined;
     computeNudgedPlace: (place: CarryPlace, nudge: CarryNudge, carry: Carry) => CarryPlace | undefined;

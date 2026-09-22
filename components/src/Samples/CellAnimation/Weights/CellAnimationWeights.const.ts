@@ -1,4 +1,4 @@
-import type { Point2d } from "@thewaver/ss-utils";
+import type { Index2d } from "@thewaver/ss-utils";
 
 import type { WeightFn, WeightOpts } from "./CellAnimationWeights.types";
 import { CellAnimationWeightUtils } from "./CellAnimationWeights.utils";
@@ -247,6 +247,6 @@ export namespace CellAnimationWeights {
         zigzagRow,
     };
 
-    export const computeCellWeights = (type: WeightType, count: Point2d, origin: Point2d, opts?: WeightOpts) =>
+    export const computeCellWeights = (type: WeightType, count: Index2d, origin: Index2d, opts?: WeightOpts) =>
         CellAnimationWeightUtils.computeCellWeights(SAMPLE_WEIGHTS[type], count, origin, opts);
 }

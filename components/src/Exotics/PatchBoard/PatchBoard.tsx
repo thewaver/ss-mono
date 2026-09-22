@@ -39,6 +39,12 @@ const NUDGE_KEYS: Record<string, CarryNudge | undefined> = {
     ArrowUp: { y: -1 },
 };
 
+const getIsOnInteractiveDescendant = (e: PointerEvent | MouseEvent) => {
+    const interactive = (e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR);
+
+    return interactive !== null && interactive !== e.currentTarget;
+};
+
 export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     onMount(() => LiveAnnouncerUtils.reserve("polite"));
 
@@ -126,6 +132,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         getLabel: () => access(props.ariaLabel),
         getRootRef,
         getIsDisabled,
+        getRestingKeyHint: () => "Press Enter to pick a cable up from this socket.",
         getKeyHint: () => {
             const carry = CarrierUtils.getCarry();
 
@@ -497,7 +504,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
     const handleNodePointerDown = (node: PatchBoardNode<T>, e: PointerEvent) => {
         if (e.button !== NOTHING || getIsDisabled()) return;
-        if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
+        if (getIsOnInteractiveDescendant(e)) return;
         if (CarrierUtils.getCarry()) return;
 
         const root = getRootRef();
@@ -541,7 +548,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
     const handleNodeClick = (node: PatchBoardNode<T>, e: MouseEvent) => {
         if (getIsDisabled()) return;
-        if ((e.target as HTMLElement).closest(CarrierUtils.INTERACTIVE_SELECTOR)) return;
+        if (getIsOnInteractiveDescendant(e)) return;
 
         if (!CarrierUtils.getCarry()) {
             pickUpNode(node, "tap", { x: e.clientX, y: e.clientY });
@@ -733,7 +740,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
             ref={setRootRef}
             class={styles.patchBoardRoot}
             style={{ width: `${getSize().width}px`, height: `${getSize().height}px` }}
-            role="list"
+            role="group"
             aria-label={getAriaLabel()}
             aria-disabled={getIsDisabled() || undefined}
             onClick={handleRootClick}
@@ -755,6 +762,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                     return (
                         <div
                             class={styles.patchBoardSlot}
+                            role="group"
                             style={{
                                 left: `${getPlacement()?.spot.x ?? getNode().spot.x}px`,
                                 top: `${getPlacement()?.spot.y ?? getNode().spot.y}px`,
@@ -776,7 +784,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                                 setElementRef(element);
                                             }}
                                             class={styles.patchBoardNode}
-                                            role="listitem"
+                                            role="button"
                                             aria-label={getNodeLabel(getNode())}
                                             aria-disabled={(getNode().isDisabled ?? false) || undefined}
                                             onPointerDown={(e) => handleNodePointerDown(getNode(), e)}

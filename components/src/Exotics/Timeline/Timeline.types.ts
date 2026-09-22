@@ -50,9 +50,28 @@ export type TimelineStep = "previous" | "next" | "laneBefore" | "laneAfter" | "f
 
 export type TimelineController = {
     getView: Accessor<TimelineSpan>;
-    zoomBy: (factor: number, focusRatio?: number) => void;
-    panBy: (ratio: number) => void;
-    showSpan: (span: TimelineSpan) => void;
+    /**
+     * Zooms the view in or out about a point.
+     *
+     * @param factor How much to scale the visible extent by; below `1` zooms in.
+     * @param focusRatio Where across the view to keep fixed, `0`–`1`. The middle by default.
+     * @returns `false` when the view was already at the limit and clamping left it unmoved.
+     */
+    zoomBy: (factor: number, focusRatio?: number) => boolean;
+    /**
+     * Slides the view along without changing how much it shows.
+     *
+     * @param ratio How far to travel, as a fraction of the visible extent.
+     * @returns `false` when the view was already against the end of the range.
+     */
+    panBy: (ratio: number) => boolean;
+    /**
+     * Moves and widens the view as little as needed to bring a span into it.
+     *
+     * @param span The span that must end up visible.
+     * @returns `false` when it was already fully in view.
+     */
+    showSpan: (span: TimelineSpan) => boolean;
 };
 
 export type TimelineProps<T> = AccessorProps<{

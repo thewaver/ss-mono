@@ -1,4 +1,6 @@
-import type { NavigatorCell, NavigatorGrid, NavigatorOrientation } from "./Navigator.types";
+import type { Index2d } from "@thewaver/ss-utils";
+
+import type { NavigatorGrid, NavigatorOrientation } from "./Navigator.types";
 
 /** Lists run vertically unless told otherwise. */
 const DEFAULT_NAVIGATION_ORIENTATION: NavigatorOrientation = "column";
@@ -91,47 +93,47 @@ export namespace NavigatorUtils {
      *
      * @param key The key that was pressed.
      * @param from Where the cursor is now.
-     * @param grid How many columns and rows there are.
+     * @param grid How many rows and columns there are.
      * @param opts.pageRows How far Page Up and Page Down jump. The full grid height by default, which
      * in a month grid is one month.
      * @param opts.hasEdgeKeys Pass `false` to leave Home and End alone. They move within the current
      * row, not to the grid's own corners.
      * @param opts.hasPageKeys Pass `false` to leave Page Up and Page Down alone.
      * @returns The new cell, or `undefined` when the key means nothing here or the grid is empty. The
-     * `y` can fall outside the grid; the caller decides what that means.
+     * `row` can fall outside the grid; the caller decides what that means.
      */
     export const computeNextCell = (
         key: string,
-        from: NavigatorCell,
+        from: Index2d,
         grid: NavigatorGrid,
         opts?: { pageRows?: number; hasEdgeKeys?: boolean; hasPageKeys?: boolean },
-    ): NavigatorCell | undefined => {
-        if (grid.width < 1 || grid.height < 1) return;
+    ): Index2d | undefined => {
+        if (grid.colCount < 1 || grid.rowCount < 1) return;
 
-        const carry = (dx: number, dy: number) => {
-            const flat = (from.y + dy) * grid.width + from.x + dx;
+        const carry = (rowDelta: number, colDelta: number) => {
+            const flat = (from.row + rowDelta) * grid.colCount + from.col + colDelta;
 
             return {
-                x: ((flat % grid.width) + grid.width) % grid.width,
-                y: Math.floor(flat / grid.width),
+                row: Math.floor(flat / grid.colCount),
+                col: ((flat % grid.colCount) + grid.colCount) % grid.colCount,
             };
         };
 
-        if (key === "ArrowRight") return carry(1, 0);
-        if (key === "ArrowLeft") return carry(-1, 0);
-        if (key === "ArrowDown") return carry(0, 1);
-        if (key === "ArrowUp") return carry(0, -1);
+        if (key === "ArrowRight") return carry(0, 1);
+        if (key === "ArrowLeft") return carry(0, -1);
+        if (key === "ArrowDown") return carry(1, 0);
+        if (key === "ArrowUp") return carry(-1, 0);
 
         if (opts?.hasPageKeys !== false) {
-            const pageRows = opts?.pageRows ?? grid.height;
+            const pageRows = opts?.pageRows ?? grid.rowCount;
 
-            if (key === "PageUp") return { x: from.x, y: from.y - pageRows };
-            if (key === "PageDown") return { x: from.x, y: from.y + pageRows };
+            if (key === "PageUp") return { row: from.row - pageRows, col: from.col };
+            if (key === "PageDown") return { row: from.row + pageRows, col: from.col };
         }
 
         if (opts?.hasEdgeKeys === false) return;
 
-        if (key === FIRST_KEY) return { x: 0, y: from.y };
-        if (key === LAST_KEY) return { x: grid.width - 1, y: from.y };
+        if (key === FIRST_KEY) return { row: from.row, col: 0 };
+        if (key === LAST_KEY) return { row: from.row, col: grid.colCount - 1 };
     };
 }

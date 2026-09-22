@@ -8,6 +8,7 @@ import {
     toCalendarDate,
     fromDate as toDateValue,
 } from "@internationalized/date";
+import type { Index2d } from "@thewaver/ss-utils";
 
 import type {
     DateValue,
@@ -332,15 +333,15 @@ export namespace DateValueUtils {
      *
      * @param grid A grid from {@link DateValueUtils.getMonthGrid}.
      * @param value The date to look for.
-     * @returns Its column and row, or `undefined` when the grid does not reach it. A date can appear in
-     * the leading or trailing days of a neighboring month's grid, so the answer depends on which grid
-     * is asked.
+     * @returns Its week row and weekday column, or `undefined` when the grid does not reach it. A date
+     * can appear in the leading or trailing days of a neighboring month's grid, so the answer depends on
+     * which grid is asked.
      */
-    export const getCellOf = (grid: DateValueMonthGrid, value: DateValue) => {
-        for (let y = 0; y < grid.weeks.length; y += 1) {
-            const x = grid.weeks[y].findIndex((day) => isSame(day, value));
+    export const getCellOf = (grid: DateValueMonthGrid, value: DateValue): Index2d | undefined => {
+        for (let row = 0; row < grid.weeks.length; row += 1) {
+            const col = grid.weeks[row].findIndex((day) => isSame(day, value));
 
-            if (x >= 0) return { x, y };
+            if (col >= 0) return { row, col };
         }
 
         return undefined;

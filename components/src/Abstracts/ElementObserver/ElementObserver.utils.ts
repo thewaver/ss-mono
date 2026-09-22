@@ -25,7 +25,7 @@ const isSameRectList = (a: (Rect | undefined)[], b: (Rect | undefined)[]) =>
  * Reports an element's size and position as reactive accessors, and keeps them current.
  *
  * Wrappers around `ResizeObserver` and `IntersectionObserver` that fit Solid's shape: an accessor
- * in, an accessor out, observers torn down on cleanup. Each takes an optional enabled accessor so a
+ * in, an accessor out, observers torn down on cleanup. Each takes an optional disabled accessor so a
  * component that is off screen or collapsed can stop measuring, and each de-duplicates its results,
  * so a resize that does not change the numbers does not wake anything downstream.
  */
@@ -34,20 +34,20 @@ export namespace ElementObserverUtils {
      * Watches an element's size, borders and padding included.
      *
      * @param getRef The element to watch. Nothing is measured until it exists.
-     * @param getIsEnabled Pass `false` to stop watching. Omitted means always on.
+     * @param getIsDisabled Pass `true` to stop watching. Omitted means always on.
      * @returns The current size, starting from an immediate measurement rather than waiting for the
      * first observer callback. Zeroes before the element exists.
      */
     export const createBorderBoxSizeObserver = (
         getRef: Accessor<HTMLElement | undefined>,
-        getIsEnabled?: Accessor<boolean>,
+        getIsDisabled?: Accessor<boolean>,
     ) => {
         const [getSize, setSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });
 
         createEffect(() => {
             const ref = getRef();
 
-            if (!ref || getIsEnabled?.() === false) return;
+            if (!ref || getIsDisabled?.()) return;
 
             setSize({ width: ref.offsetWidth, height: ref.offsetHeight });
 
@@ -77,19 +77,19 @@ export namespace ElementObserverUtils {
      *
      * @param getRefs The elements to watch, in the order the sizes should come back. Missing entries
      * are kept as zeroes rather than dropped, so the result always lines up with the input.
-     * @param getIsEnabled Pass `false` to stop watching. Omitted means always on.
+     * @param getIsDisabled Pass `true` to stop watching. Omitted means always on.
      * @returns One size per element.
      */
     export const createBorderBoxSizeListObserver = (
         getRefs: Accessor<Array<HTMLElement | undefined>>,
-        getIsEnabled?: Accessor<boolean>,
+        getIsDisabled?: Accessor<boolean>,
     ) => {
         const [getSizes, setSizes] = createSignal<Size2d[]>(EMPTY_SIZES, { equals: isSameSizeList });
 
         createEffect(() => {
             const refs = getRefs();
 
-            if (getIsEnabled?.() === false) {
+            if (getIsDisabled?.()) {
                 setSizes(EMPTY_SIZES);
 
                 return;
@@ -118,15 +118,15 @@ export namespace ElementObserverUtils {
      * Watches just an element's height.
      *
      * @param getRef The element to watch.
-     * @param getIsEnabled Pass `false` to stop watching. Omitted means always on.
+     * @param getIsDisabled Pass `true` to stop watching. Omitted means always on.
      * @returns The current height. Changes only when the height does, so a width-only resize wakes
      * nothing.
      */
     export const createBorderBoxHeightObserver = (
         getRef: Accessor<HTMLElement | undefined>,
-        getIsEnabled?: Accessor<boolean>,
+        getIsDisabled?: Accessor<boolean>,
     ) => {
-        const getSize = createBorderBoxSizeObserver(getRef, getIsEnabled);
+        const getSize = createBorderBoxSizeObserver(getRef, getIsDisabled);
 
         return createMemo(() => getSize().height);
     };
@@ -135,13 +135,13 @@ export namespace ElementObserverUtils {
      * Watches whether an element is on screen.
      *
      * @param getRef The element to watch.
-     * @param getIsEnabled Pass `false` to stop watching. Omitted means always on.
+     * @param getIsDisabled Pass `true` to stop watching. Omitted means always on.
      * @returns Whether any part of the element is currently visible. `false` before the element exists,
      * while disabled, and until the observer first reports.
      */
     export const createViewportIntersectionObserver = (
         getRef: Accessor<HTMLElement | undefined>,
-        getIsEnabled?: Accessor<boolean>,
+        getIsDisabled?: Accessor<boolean>,
     ) => {
         const [getIsIntersecting, setIsIntersecting] = createSignal(false);
 
@@ -150,7 +150,7 @@ export namespace ElementObserverUtils {
 
             setIsIntersecting(false);
 
-            if (!ref || getIsEnabled?.() === false) return;
+            if (!ref || getIsDisabled?.()) return;
 
             const observer = new IntersectionObserver(([entry]) => {
                 setIsIntersecting(entry.isIntersecting);
