@@ -7,9 +7,13 @@ const HELD = demo("held");
 const DESCRIBED = demo("described");
 const DISABLED = demo("disabled");
 const REACHABLE = demo("reachable");
+const SLIDE_ONLY = demo("slideOnly");
+const HOLD_ONLY = demo("holdOnly");
 
 const HOLD_DURATION_MS = 1000;
 const HOLD_SLACK_MS = 250;
+/** The hold-only demo sets its own, longer than the default so a drag cannot complete it. Keep the two in step. */
+const LONG_HOLD_DURATION_MS = 2000;
 
 const track = (scope: string) => `${scope} button`;
 
@@ -81,12 +85,17 @@ test("a slide that stops short of the end activates nothing", async ({ page }) =
 /**
  * The whole point of the control is that it cannot be triggered by a stray press, so a drag that begins on
  * the empty track must not pick the thumb up. Without the hit test a press at 0.6 would put the thumb under
- * the pointer and a short drag from there would reach the end. The thumb is read before the release rather
- * than after, because a press anywhere also starts a hold — so "it did not move" is no longer the claim;
- * "it did not follow the pointer" is.
+ * the pointer and a short drag from there would reach the end.
+ *
+ * **It is driven against the slide-only demo, and that is what makes it answerable.** On the default button a
+ * press anywhere also starts a hold, and a hold walks the thumb along on its own clock whether or not anything
+ * was grabbed — so a thumb found past the halfway mark meant either "the hit test let a grab through" or "the
+ * press lasted long enough for the hold to get there", and a loaded machine produced the second while the
+ * assertion named the first. A held pointer does nothing under `mode="slide"`, so the only thing that can move
+ * the thumb there is a grab, and the reading has one meaning.
  */
 test("a press on the track away from the thumb is not a grab", async ({ page }) => {
-    const box = (await page.locator(track(DEFAULT)).boundingBox())!;
+    const box = (await page.locator(track(SLIDE_ONLY)).boundingBox())!;
     const y = box.y + box.height * 0.5;
 
     await page.mouse.move(box.x + box.width * 0.6, y);
@@ -94,14 +103,89 @@ test("a press on the track away from the thumb is not a grab", async ({ page }) 
     await page.mouse.move(box.x + box.width, y, { steps: 10 });
 
     expect(
-        (await thumbSpan(page, DEFAULT)).start,
+        (await thumbSpan(page, SLIDE_ONLY)).start,
         "a grab would have carried the thumb to the end with the pointer",
-    ).toBeLessThan(0.5);
+    ).toBe(0);
 
     await page.mouse.up();
 
-    expect(await readout(page, "default"), "so a shortcut from halfway along the track buys nothing").toContain(
+    expect(await readout(page, "slideOnly"), "so a shortcut from halfway along the track buys nothing").toContain(
         "activations: 0",
+    );
+});
+
+/**
+ * The two modes that close one pointer route each. Between them they say what `mode` is for: a consumer who
+ * fears a stray drag across the control takes `"hold"`, and one who fears a stray press takes `"slide"`.
+ *
+ * **Each of these ends by holding Enter, and that is the point rather than a formality.** `mode` governs the
+ * pointer alone, so whichever gesture it closes, the keyboard route is untouched and the button stays
+ * operable without a pointer at all — WCAG 2.1.1, which no setting here is allowed to cost. Asserting it
+ * under both modes is what stops that quietly ceasing to be true.
+ *
+ * The hold-only demo is given a longer hold than the default one, because under that mode a press is a hold:
+ * without it, a drag that took a second on a loaded machine would confirm the action and read as the drag
+ * having been let through.
+ */
+test("a hold-only button ignores the drag, and still answers the keyboard", async ({ page }) => {
+    await slide(page, page.locator(track(HOLD_ONLY)).first(), 0.1, 1);
+
+    expect(await readout(page, "holdOnly"), "carrying the thumb the whole way does nothing").toContain(
+        "activations: 0",
+    );
+
+    await page.locator(track(HOLD_ONLY)).first().focus();
+    await page.keyboard.down("Enter");
+    await page.waitForTimeout(LONG_HOLD_DURATION_MS + HOLD_SLACK_MS);
+    await page.keyboard.up("Enter");
+
+    expect(await readout(page, "holdOnly"), "but holding it down does").toContain("activations: 1");
+});
+
+/**
+ * The two conditions a slide has to meet, asserted one each. The press must start on the thumb, which the test
+ * above checks by pressing away from it, and it must then actually travel — a press that lands on the thumb and
+ * stays there is not a slide, and under `mode="slide"` there is no hold for it to fall back to either. Together
+ * they are what "hold the thumb and drag it" means, and neither on its own is enough.
+ */
+test("a press that lands on the thumb and never moves is not a slide", async ({ page }) => {
+    const box = (await page.locator(track(SLIDE_ONLY)).boundingBox())!;
+    const start = (await thumbSpan(page, SLIDE_ONLY)).center;
+
+    await page.mouse.move(box.x + box.width * start, box.y + box.height * 0.5);
+    await page.mouse.down();
+    await page.waitForTimeout(HOLD_DURATION_MS + HOLD_SLACK_MS);
+
+    expect(
+        (await thumbSpan(page, SLIDE_ONLY)).start,
+        "the thumb stays where it was, because nothing has carried it",
+    ).toBe(0);
+
+    await page.mouse.up();
+
+    expect(await readout(page, "slideOnly"), "and letting go confirms nothing").toContain("activations: 0");
+});
+
+test("a slide-only button ignores a held press, and still answers the keyboard", async ({ page }) => {
+    const box = (await page.locator(track(SLIDE_ONLY)).boundingBox())!;
+
+    await page.mouse.move(box.x + box.width * 0.6, box.y + box.height * 0.5);
+    await page.mouse.down();
+    await page.waitForTimeout(HOLD_DURATION_MS + HOLD_SLACK_MS);
+    await page.mouse.up();
+
+    expect(
+        await readout(page, "slideOnly"),
+        "a press held well past the hold duration is still only a press",
+    ).toContain("activations: 0");
+
+    await page.locator(track(SLIDE_ONLY)).first().focus();
+    await page.keyboard.down("Enter");
+    await page.waitForTimeout(HOLD_DURATION_MS + HOLD_SLACK_MS);
+    await page.keyboard.up("Enter");
+
+    expect(await readout(page, "slideOnly"), "while the same hold from the keyboard confirms").toContain(
+        "activations: 1",
     );
 });
 

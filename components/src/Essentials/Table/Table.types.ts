@@ -1,5 +1,6 @@
 import type { Accessor, JSX } from "solid-js";
 
+import type { SelectionMode } from "../../Abstracts/Selection/Selection.types";
 import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 
 export type TableSortDirection = "ascending" | "descending";
@@ -9,7 +10,7 @@ export type TableSort = {
     direction: TableSortDirection;
 };
 
-export type TableSelectionMode = "none" | "single" | "multiple";
+export type TableSelectionMode = SelectionMode;
 
 export type TableColumnRenderProps = {
     /** Which column this is, by the id the consumer gave it. */

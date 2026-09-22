@@ -60,6 +60,7 @@ export const Preview = (props: PreviewProps) => {
 
     const { getTransitionTarget, getHasTransitionFinished } = ElementFaderUtils.createFader(getIsExpanded, {
         getTransitionDurationMs,
+        getRef: getRootRef,
     });
 
     createEffect(on(getIsExpanded, (isExpanded) => setIsAwaitingScroll(!isExpanded), { defer: true }));

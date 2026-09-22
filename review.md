@@ -60,6 +60,27 @@ pristine copy of the starting commit: `accordion.spec.ts:255`, `slideButton.spec
 `wheel.spec.ts:295`, `wheel.spec.ts:470` and two of the three `scroller.spec.ts` position tests, which
 rotate between themselves run to run. A session seeing those red has not broken them.
 
+**The list was not the whole population.** A full run surfaced a slightly different handful each time —
+`scrambleText.spec.ts:90`, `tabs.spec.ts:198` and `tree.spec.ts:185` each turned up red in a full run and
+green when their own file was run alone. Every one of those has since been traced and fixed, and a full run
+is green. **A red here is now worth reading rather than shrugging at.**
+
+**Some were the spec measuring too early**: the scroller's `waitForRest` could report rest before a smooth
+scroll had begun, and the wheel's pick test read a live region a second after it had been swept. Both now
+wait on the thing itself, counted in animation frames rather than on a clock, and `waitUntilStill` in
+`helpers.ts` is that wait for anything that moves, resizes or scrolls.
+
+**Three were real faults, and each is fixed with its reasoning in `decisions.md`.** `ElementFader` decided a
+transition had finished from a timer rather than from the browser, so `Collapsible` scrolled a section into
+view against a layout that was still moving — which also explains `tabs.spec.ts:198`. `ScrambleText` seeded a
+not-yet-started position's noise with the character it would settle on, so the position briefly showed its own
+answer when it began to churn. `SlideButton`'s track-press test could not tell a refused grab from the hold
+advancing on its own clock, which the new `mode` prop resolves.
+
+**One was left as a measurement rather than a fix**: the drum rests up to about 1.4 pixels outside the room it
+reserves at two wedges, depending on its resting angle, and the user chose to widen the test's allowance to
+1.5 rather than touch the perspective arithmetic. `wheel.spec.ts` carries the numbers and the reasoning.
+
 ### Package files
 
 1. **PEC** README usage example passes children to `Button`, which takes `renderContent`. — **done**

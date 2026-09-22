@@ -1,5 +1,6 @@
 import { createMemo } from "solid-js";
 
+import { SelectionUtils } from "../../../Abstracts/Selection/Selection.utils";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { SelectComposite } from "../Select/Select";
 import { SelectUtils } from "../Select/Select.utils";
@@ -24,10 +25,7 @@ export const MultiSelect = <T,>(props: MultiSelectProps<T>) => {
             computeIsSelected={(value) => valuesSignal[0]().includes(value)}
             renderContent={props.renderContent}
             onPick={(value) => {
-                const selectedValues = valuesSignal[0]();
-                const nextValues = selectedValues.includes(value)
-                    ? selectedValues.filter((selectedValue) => selectedValue !== value)
-                    : [...selectedValues, value];
+                const nextValues = SelectionUtils.getToggled(valuesSignal[0](), value);
 
                 valuesSignal[1](() => nextValues);
 

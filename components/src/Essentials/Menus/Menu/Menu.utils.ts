@@ -1,3 +1,4 @@
+import { SelectionUtils } from "../../../Abstracts/Selection/Selection.utils";
 import type { MenuItem, MenuItemKind, MenuRun } from "./Menu.types";
 
 /** An item that does not say otherwise is a plain command. */
@@ -34,9 +35,7 @@ export namespace MenuUtils {
      */
     export const computeNextChecked = <T>(checked: T[], item: MenuItem<T>, radioGroupValues: T[]): T[] =>
         getKind(item) === "checkbox"
-            ? checked.includes(item.value)
-                ? checked.filter((value) => value !== item.value)
-                : [...checked, item.value]
+            ? SelectionUtils.getToggled(checked, item.value)
             : [...checked.filter((value) => !radioGroupValues.includes(value)), item.value];
 
     /**

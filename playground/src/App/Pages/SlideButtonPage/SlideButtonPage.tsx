@@ -6,7 +6,9 @@ import { DescribedExample } from "./Examples/Described";
 import { DisabledExample } from "./Examples/Disabled";
 import { ErroredExample } from "./Examples/Errored";
 import { HeldExample } from "./Examples/Held";
+import { HoldOnlyExample } from "./Examples/HoldOnly";
 import { ReachableExample } from "./Examples/Reachable";
+import { SlideOnlyExample } from "./Examples/SlideOnly";
 
 const EXAMPLES_ROOT = "/src/App/Pages/SlideButtonPage/Examples";
 const PERCENT = 100;
@@ -19,6 +21,8 @@ export const SlideButtonPage = () => {
     const [getDisabledSends, setDisabledSends] = createSignal(0);
     const [getReachableSends, setReachableSends] = createSignal(0);
     const [getHasError, setHasError] = createSignal(true);
+    const [getSlideOnlySends, setSlideOnlySends] = createSignal(0);
+    const [getHoldOnlySends, setHoldOnlySends] = createSignal(0);
 
     const getExamples = createMemo(() => [
         {
@@ -49,6 +53,34 @@ export const SlideButtonPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Described.tsx`,
+        },
+        {
+            key: "slideOnly",
+            name: "Slide only",
+            readout: () =>
+                `activations: ${getSlideOnlySends()} — a held press does nothing here, so carrying the thumb is the only pointer route, and a held Enter still confirms`,
+            component: () => (
+                <SlideOnlyExample
+                    onActivate={() => {
+                        setSlideOnlySends((prev) => prev + 1);
+                    }}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/SlideOnly.tsx`,
+        },
+        {
+            key: "holdOnly",
+            name: "Hold only",
+            readout: () =>
+                `activations: ${getHoldOnlySends()} — dragging the thumb does nothing here, so a stray drag cannot reach the action, and a held press or a held Enter both can`,
+            component: () => (
+                <HoldOnlyExample
+                    onActivate={() => {
+                        setHoldOnlySends((prev) => prev + 1);
+                    }}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/HoldOnly.tsx`,
         },
         {
             key: "held",

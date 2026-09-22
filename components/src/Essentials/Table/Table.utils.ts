@@ -6,7 +6,7 @@ import type { TableColumn, TableSort, TableSortDirection } from "./Table.types";
 const SORT_CYCLE: (TableSortDirection | undefined)[] = ["ascending", "descending", undefined];
 
 /**
- * Sorting, column ordering, sizing and selection for a table.
+ * Sorting, column ordering and sizing for a table.
  *
  * Rows and columns are reordered as lists of indices rather than by rearranging the data, so the
  * caller's own array is never touched and a row's identity survives a re-sort — which is what lets a
@@ -133,40 +133,4 @@ export namespace TableUtils {
      */
     export const getResizedWidth = <T>(column: TableColumn<T>, width: number) =>
         MathUtils.clamp(width, column.minWidthPx ?? 0, column.maxWidthPx ?? Number.MAX_SAFE_INTEGER);
-
-    /**
-     * Every index between two, both included, whichever way round they were given.
-     *
-     * For a shift-click, which selects from the last clicked row to this one in either direction.
-     */
-    export const getRangeIndices = (from: number, to: number) => {
-        const start = Math.min(from, to);
-        const end = Math.max(from, to);
-
-        return Array.from({ length: end - start + 1 }, (_, offset) => start + offset);
-    };
-
-    /**
-     * The selection after a row is toggled.
-     *
-     * @param selection The current selection.
-     * @param row The row clicked.
-     * @returns A new list with the row added or removed.
-     */
-    export const getToggledSelection = <T>(selection: T[], row: T) =>
-        selection.includes(row) ? selection.filter((entry) => entry !== row) : [...selection, row];
-
-    /**
-     * The selection after a range is added to it.
-     *
-     * Rows already selected are not duplicated, and the existing selection keeps its order, so a
-     * shift-click extending a selection does not disturb what was there.
-     *
-     * @param selection The current selection.
-     * @param added The rows to add.
-     */
-    export const getMergedSelection = <T>(selection: T[], added: T[]) => [
-        ...selection,
-        ...added.filter((row) => !selection.includes(row)),
-    ];
 }

@@ -31,6 +31,7 @@ const PERCENT = 100;
 export const Modal = (props: ModalProps) => {
     const viewportContext = useViewportContext();
 
+    const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getContainerRef, setContainerRef] = createSignal<HTMLElement>();
 
     const getTransitionDurationMs = createMemo(
@@ -53,7 +54,7 @@ export const Modal = (props: ModalProps) => {
 
     const { getIsVisible, getTransitionTarget, getHasTransitionFinished } = ElementFaderUtils.createFader(
         () => props.visibilitySignal[0](),
-        { getTransitionDurationMs, onShow: props.onShow, onHide: props.onHide },
+        { getTransitionDurationMs, getRef: getRootRef, onShow: props.onShow, onHide: props.onHide },
     );
 
     FocusManagerUtils.autoFocus(getContainerRef, getIsVisible, { getInitialRef: () => access(props.initialFocusRef) });
@@ -136,6 +137,7 @@ export const Modal = (props: ModalProps) => {
                 }}
             >
                 <div
+                    ref={setRootRef}
                     class={[styles.modalRoot, styles.modalAlignmentVariants[getAlignment()]].join(" ")}
                     onKeyDown={(e) => FocusManagerUtils.focusTrapKeyDown(e, getContainerRef())}
                 >

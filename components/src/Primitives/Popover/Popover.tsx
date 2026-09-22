@@ -28,6 +28,7 @@ export const Popover = (props: PopoverProps) => {
         () => access(props.isOpen),
         {
             getTransitionDurationMs,
+            getRef: getRootRef,
         },
     );
 

@@ -40,7 +40,7 @@ const checkField = (key: string) => `${prop(key)} input`;
 const DURATION_MS = 500;
 const IDLE_DELAY_MS = 1000;
 const FRAME_SETTLE_MS = 300;
-const OVERFLOW_TOLERANCE_PX = 1;
+const OVERFLOW_TOLERANCE_PX = 1.5;
 const TURN_SAMPLE_COUNT = 16;
 const TURN_SAMPLE_GAP_MS = 150;
 const FETCH_MS = 400;
@@ -292,14 +292,26 @@ test("an idling wheel has picked nothing, and goes back to having picked nothing
         .toEqual([]);
 });
 
+/**
+ * The announcement is collected as the samples are taken rather than read at the end, because a live region
+ * is swept a second after it is written — a reader that never cleared it would hand a screen-reader user a
+ * transcript of the session. The sampling runs longer than the spin does, and longer still on a loaded
+ * machine, so reading the region afterwards was asking "did the wheel announce its prize" and "was the run
+ * quick enough to still be inside the sweep window" in one breath, and answering both in the same red.
+ */
 test("and the pick moves with the wheel while it spins, rather than appearing at the end", async ({ page }) => {
     await page.locator(spin("sideways")).click();
     await page.mouse.move(0, 0);
 
     const seen = new Set<number>();
+    const announced = new Set<string>();
 
     for (let sample = 0; sample < PICK_SAMPLE_COUNT; sample++) {
         (await pickedCards(page, SIDEWAYS)).forEach((index) => seen.add(index));
+
+        const said = ((await page.locator(ANNOUNCER).textContent()) ?? "").trim();
+
+        if (said) announced.add(said);
 
         await page.waitForTimeout(PICK_SAMPLE_GAP_MS);
     }
@@ -309,7 +321,10 @@ test("and the pick moves with the wheel while it spins, rather than appearing at
     const settled = await pickedCards(page, SIDEWAYS);
 
     expect(settled, "and the last one is the prize").toHaveLength(1);
-    await expect(page.locator(ANNOUNCER)).toContainText(`, ${settled[0] + 1} of 8`);
+    expect(
+        [...announced].some((said) => said.includes(`, ${settled[0] + 1} of 8`)),
+        `the wheel said which wedge it came to rest on, and it said ${[...announced].join(" / ")}`,
+    ).toBe(true);
 });
 
 /**
@@ -443,6 +458,15 @@ test("the two drums turn about different axes, which is the whole of what separa
  * enough to pass by eye in the middle of its range and increasingly short outside it, and no unit test over the
  * arithmetic could have found either, because both were self-consistent. What finds it is comparing the box the
  * component reserves against the boxes the faces actually occupy, which is what these do.
+ *
+ * **What the allowance covers, and why it is 1.5 rather than 1.** At two wedges the faces overhang the reserved
+ * edge by between 0.6 and 1.4 pixels. The amount is fixed for a given resting angle and changes with the angle,
+ * so the same test passed or failed on where the drum happened to stop. The user's call was to widen the
+ * allowance rather than reach into the perspective arithmetic, on the grounds that a correction aimed at the
+ * worst angle at the lowest count would move every other count with it, and that a pixel of overhang at the
+ * extreme end of the range is not visible. So the allowance is deliberately a little above the worst reading
+ * measured, and it is the only thing standing between a formula that is right and one that is slightly short —
+ * widening it again is a decision rather than a fix.
  */
 
 const worstOverflow = (page: Page, wheelSelector: string) =>

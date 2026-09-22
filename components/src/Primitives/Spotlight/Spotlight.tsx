@@ -43,6 +43,7 @@ export const Spotlight = (props: SpotlightProps) => {
 
     const { getIsVisible, getTransitionTarget } = ElementFaderUtils.createFader(() => props.visibilitySignal[0](), {
         getTransitionDurationMs,
+        getRef: getPortalRef,
         onShow: props.onShow,
         onHide: props.onHide,
     });

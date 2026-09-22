@@ -91,7 +91,12 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
 
     const getIsFloaterShown = createMemo(() => getSelectedEntry() !== undefined && getFloaterBounds() !== undefined);
 
-    const floaterFader = ElementFaderUtils.createFader(getIsFloaterShown, { getTransitionDurationMs });
+    const [getFloaterRef, setFloaterRef] = createSignal<HTMLElement>();
+
+    const floaterFader = ElementFaderUtils.createFader(getIsFloaterShown, {
+        getTransitionDurationMs,
+        getRef: getFloaterRef,
+    });
 
     createEffect(() => {
         if (floaterFader.getIsVisible()) return;
@@ -173,6 +178,7 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
         floaterFader.getIsVisible() &&
         getFloaterBounds() && (
             <div
+                ref={setFloaterRef}
                 class={styles.radioGroupFloater}
                 style={{ ...getFloaterBounds(), "transition-duration": `${getTransitionDurationMs()}ms` }}
             >

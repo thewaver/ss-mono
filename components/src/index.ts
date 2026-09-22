@@ -49,6 +49,8 @@ export type * from "./Abstracts/SVG/Defs/Filter/SVGFilterDefs.types";
 export type * from "./Abstracts/SVG/Defs/Gradient/SVGGradientDefs.types";
 export * from "./Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
 export * from "./Abstracts/SVG/Defs/Pattern/SVGPatternDefs.utils";
+export type * from "./Abstracts/Selection/Selection.types";
+export * from "./Abstracts/Selection/Selection.utils";
 export * from "./Abstracts/SignalMirror/SignalMirror.utils";
 export type * from "./Abstracts/TextSync/TextSync.types";
 export * from "./Abstracts/TextSync/TextSync.utils";

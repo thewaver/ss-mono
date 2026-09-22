@@ -33,10 +33,13 @@ const DEFAULT_TOASTS_HOTKEY = "F8";
 const TOASTS_Z_INDEX = 200;
 
 const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
+    const [getItemRef, setItemRef] = createSignal<HTMLElement>();
+
     const { getTransitionTarget, getHasTransitionFinished } = ElementFaderUtils.createFader(
         () => !access(props.isExiting),
         {
             getTransitionDurationMs: () => access(props.transitionDurationMs),
+            getRef: getItemRef,
             onShow: () => access(props.toast).onShow?.(),
             onHide: () => access(props.toast).onHide?.(),
         },
@@ -83,7 +86,13 @@ const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
     });
 
     return (
-        <div class={styles.toastsItem} ref={(element) => props.ref(element)}>
+        <div
+            class={styles.toastsItem}
+            ref={(element) => {
+                setItemRef(element);
+                props.ref(element);
+            }}
+        >
             {props.renderToast(
                 () => access(props.toast),
                 getTransitionTarget,

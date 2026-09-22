@@ -8,6 +8,7 @@ import { FormFieldUtils } from "../Input/FormField/FormField.utils";
 import { LabelUtils } from "../Input/Label/Label.utils";
 import type {
     SlideButtonElementProps,
+    SlideButtonMode,
     SlideButtonPress,
     SlideButtonProps,
     SlideButtonRenderProps,
@@ -18,6 +19,7 @@ import * as styles from "./SlideButton.css";
 
 const DEFAULT_SLIDE_BUTTON_THUMB_SIZE = 40;
 const DEFAULT_SLIDE_BUTTON_HOLD_DURATION_MS = 1000;
+const DEFAULT_SLIDE_BUTTON_MODE: SlideButtonMode = "both";
 const DRAG_THRESHOLD_PX = 4;
 const RATIO_MIN = 0;
 const RATIO_MAX = 1;
@@ -36,6 +38,10 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
     let holdFrame: number | undefined;
 
     const getIsDisabled = createMemo(() => access(props.flags).isDisabled ?? false);
+
+    const getCanDragThumb = () => access(props.mode) !== "hold";
+
+    const getCanHoldByPointer = () => access(props.mode) !== "slide";
 
     const getTrackWidth = () => getTrackRef()?.clientWidth ?? 0;
 
@@ -90,7 +96,7 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
                     ratio: ratio.x,
                     isOnThumb: SlideButtonUtils.computeIsOnThumb(ratio.x, access(props.progressRatio), thumbRatio),
                 });
-                startHold();
+                if (getCanHoldByPointer()) startHold();
 
                 return;
             }
@@ -103,7 +109,7 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
                 return;
             }
 
-            if (!press.isOnThumb) return;
+            if (!getCanDragThumb() || !press.isOnThumb) return;
             if (
                 Math.abs(ratio.x - press.ratio) < SlideButtonUtils.computeWidthRatio(getTrackWidth(), DRAG_THRESHOLD_PX)
             ) {
@@ -203,6 +209,8 @@ export const SlideButton = (props: SlideButtonProps) => {
 
     const getHoldDurationMs = createMemo(() => access(props.holdDurationMs) ?? DEFAULT_SLIDE_BUTTON_HOLD_DURATION_MS);
 
+    const getMode = createMemo(() => access(props.mode) ?? DEFAULT_SLIDE_BUTTON_MODE);
+
     return (
         <InteractionWrapper
             {...props}
@@ -218,6 +226,7 @@ export const SlideButton = (props: SlideButtonProps) => {
                     ariaLabel={props.ariaLabel}
                     thumbSize={getThumbSize}
                     holdDurationMs={getHoldDurationMs}
+                    mode={getMode}
                     flags={getRenderProps}
                     progressRatio={getProgressRatio}
                     renderContent={props.renderContent}

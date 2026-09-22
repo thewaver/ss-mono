@@ -8,6 +8,8 @@ import type { CarrierZone, CarryPlace } from "../../Abstracts/Carrier/Carrier.ty
 import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
 import { LiveAnnouncerUtils } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer.utils";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
+import type { SelectionGesture } from "../../Abstracts/Selection/Selection.types";
+import { SelectionUtils } from "../../Abstracts/Selection/Selection.utils";
 import type { VirtualizerRow } from "../../Abstracts/Virtualizer/Virtualizer.types";
 import { VirtualizerUtils } from "../../Abstracts/Virtualizer/Virtualizer.utils";
 import { access } from "../../Utils/propUtils";
@@ -138,49 +140,23 @@ export const Table = <T,>(props: TableProps<T>) => {
         void props.onSortChange?.(next);
     };
 
-    let anchorRowIndex = 0;
+    const selection = SelectionUtils.create(getIsDisabled, {
+        getMode: getSelectionMode,
+        getItems: getRows,
+        selectionSignal: [
+            getSelection,
+            (rows) => {
+                props.selectionSignal?.[1](rows);
 
-    const setSelection = (rows: T[]) => {
-        props.selectionSignal?.[1](rows);
+                void props.onSelectionChange?.(rows);
+            },
+        ],
+    });
 
-        void props.onSelectionChange?.(rows);
-    };
+    const selectRow = (rowIndex: number, gesture?: SelectionGesture) => {
+        const row = getRows()[rowIndex];
 
-    const selectRow = (rowIndex: number, opts?: { isToggling?: boolean; isExtending?: boolean }) => {
-        const mode = getSelectionMode();
-
-        if (mode === "none" || getIsDisabled()) return;
-
-        const rows = getRows();
-        const row = rows[rowIndex];
-
-        if (row === undefined) return;
-
-        if (mode === "single") {
-            anchorRowIndex = rowIndex;
-
-            setSelection(opts?.isToggling && getSelection().includes(row) ? [] : [row]);
-
-            return;
-        }
-
-        if (opts?.isExtending) {
-            const range = TableUtils.getRangeIndices(anchorRowIndex, rowIndex).map((position) => rows[position]);
-
-            setSelection(TableUtils.getMergedSelection(getSelection(), range));
-
-            return;
-        }
-
-        anchorRowIndex = rowIndex;
-
-        setSelection(opts?.isToggling ? TableUtils.getToggledSelection(getSelection(), row) : [row]);
-    };
-
-    const selectAllRows = () => {
-        if (getSelectionMode() !== "multiple" || getIsDisabled()) return;
-
-        setSelection([...getRows()]);
+        if (row !== undefined) selection.pick(row, gesture);
     };
 
     const getCurrentWidth = (column: TableColumn<T>, columnIndex: number) =>
@@ -346,7 +322,7 @@ export const Table = <T,>(props: TableProps<T>) => {
         if (e.key === "a" && (e.ctrlKey || e.metaKey)) {
             e.preventDefault();
 
-            selectAllRows();
+            selection.selectAll();
 
             return;
         }

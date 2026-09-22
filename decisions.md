@@ -4156,6 +4156,44 @@ It now schedules the same idempotent `commit` from both a frame and a 100ms time
 canceling the loser. The frame wins wherever frames exist; where they do not, the state machine advances
 without an animation, which is correct on a page that is not painting.
 
+### `ElementFader`: the end of a transition is the browser's answer, not the duration
+
+**The duration was doing two jobs and was only right for one of them.** It says how long the stylesheet
+animates for, which is what decides when the element may be unmounted — and it was also being used to decide
+when the element has _stopped moving_, which is a different question. A timer set to the duration is a guess
+about a machine that may be busy: it fires on its own schedule whether or not the transition it is timing has
+caught up. Anything that then measures, scrolls to or unmounts the element is acting on a layout that is
+still changing, and the result differs from one run to the next.
+
+**`Collapsible` is where it surfaced and where it was worst.** It waits for the flag, then scrolls the opened
+section into view — and the two `scrollIntoView` calls a frame apart are what an earlier session added when
+one call turned out not to be enough, which is the same bug seen from the other side. On a loaded machine the
+section came to rest a few pixels short of being fully visible, and sometimes did not scroll at all. The
+scroll position it settled on differed between runs of the same click.
+
+**`getRef` is now given the outermost element the library owns, and the transition is over when
+`element.getAnimations({ subtree: true })` all report finished.** The subtree matters because the animated
+element is usually not the library's: a popup's shell belongs to the library and the thing that fades belongs
+to whoever painted it, so watching only the shell would watch nothing. `Animation.finished` is a promise per
+animation, and `Promise.allSettled` over them covers the cancel case, which rejects.
+
+**The timer stays, as the backstop rather than the decision.** Three cases need it: an element that animates
+nothing at all, one carrying an endless animation whose promise never resolves, and a caller with no ref to
+hand over. When real animations are being watched the timer is armed for the duration plus
+`BACKSTOP_GRACE_MS`, so it cannot fire first and call a running transition finished; with nothing to watch it
+is armed for exactly the duration, which is what every caller had before.
+
+**A generation counter guards the settle.** A fade reversed mid-flight starts a second wait while the first
+one's promise is still outstanding, and without the counter the older wait would resolve and report the newer
+transition finished.
+
+**Every consumer was given a ref rather than only the one that showed the fault.** The user's call, and the
+reason is that the flag decides when a `Modal` unmounts and hands focus back, when a `Toasts` item is removed,
+when a `Tabs` or `RadioGroup` floater stops being measured, and when a `Popover`, `Tooltip` or `Spotlight`
+leaves the document — every one of which is the same question the accordion was getting wrong, just with a
+less visible consequence. `Modal` grew a ref on its root; `ToastsItem` keeps its own beside the one it
+forwards; the two floaters grew one each; `Popover`, `Preview` and `Spotlight` already had one to give.
+
 ### Controls: `Progress`, and what a non-interactive Fundamental looks like
 
 The first `Essentials` component that is neither an interaction nor a composition
@@ -7927,6 +7965,46 @@ on for a press anywhere on the track, including one the hit test refused, so the
 signal and a live grab together. A painter keyed on the raw one would drop its transition on a press that moves
 nothing.
 
+### `SlideButton`'s `mode` closes a pointer route, and never the keyboard one
+
+**The user's design, and the second form of it rather than the first.** Asked for as `"slide" | "hold" | "both"`,
+first built gating both routes, then corrected: **`mode` governs the pointer and nothing else.** A held `Enter`
+or `Space` confirms under every mode. That correction is the whole of what makes the prop safe, because the
+hold is not merely _a_ keyboard route — it is the only one, there being no arrow-key walk along the track. A
+version of this prop that gated the keyboard too would have let a consumer produce a button that focus reaches
+and nothing operates.
+
+**What it is for.** The two fears are opposite and a consumer usually has one of them: a stray drag across the
+control, answered by `"hold"`, or a stray press on it, answered by `"slide"`. Both were reachable before only
+by not using the control.
+
+**A slide requires both halves of the gesture, and that is what `"slide"` names.** The press has to land on the
+thumb and then travel past `DRAG_THRESHOLD_PX` before anything is grabbed. Both conditions were already in
+`onDrag` before the prop existed; what the prop adds is that under `"slide"` there is no pointer hold to fall
+back on when one of them is unmet, so a stray press anywhere on the control now does nothing at all rather than
+starting to fill it. Each condition has a test of its own, since either alone would pass a gesture the other
+refuses.
+
+**`"slide"` gives up 2.5.7, and the user ruled that this is the consumer's to give up.** The entry above records
+that the hold exists to answer **WCAG 2.5.7 Dragging Movements**, Level AA — anything operable by dragging must
+also be operable by a single pointer without dragging — and that a keyboard route does not satisfy it, since
+2.5.7 is about pointers. So a slide-only button has dragging as its only pointer route. Raised with the user
+and settled by them: **the library ships a working path and `"both"` is the default; a consumer selecting
+`"slide"` is choosing the violation, the same way they can choose unreadable contrast in a painter or nest a
+button inside a button.** The library's job is to make the conformant configuration the one you get by
+default and to say plainly what the others cost, which the prop's own documentation does. **`"hold"` gives up
+nothing**: it removes the drag, which no criterion requires, and keeps the alternative that two of them do.
+
+**The gates are two predicates rather than one.** `getCanDragThumb` guards the grab inside `onDrag`, and
+`getCanHoldByPointer` guards the `startHold` call on the pointer path alone — the one in the key handler is
+left ungated, which is what keeps the keyboard out of it. Writing it as a single "can hold" check was the first
+version's mistake, because the same function served both callers.
+
+**The hold-only demo sets a longer `holdDurationMs` than the default one**, and the reason is the spec rather
+than the demo: under that mode a press _is_ a hold, so a drag that took a second on a loaded machine would
+confirm the action, and the test asserting that a drag does nothing would have read that as the drag being let
+through. Two seconds is past anything the drag takes and still a reasonable hold for a person.
+
 ### The Playground: an example's source is a folder view, and a sample is a file
 
 Settled with the user. `PageComponents/Examples` exists to put a source-code button next to a
@@ -9661,6 +9739,49 @@ the sort; `getReordered` then reads either list through either order and hands b
 when there is no order to apply, which is the property the old function had and had to keep. The roving cell
 is an `Index2d` from `ss-utils` rather than an `x` / `y` pair, and `NavigatorUtils.computeNextCell` is adapted
 at the one call site rather than changed, since other controls read it.
+
+### `Abstracts/Selection`: the anchor is the abstract's, and the selection is the consumer's
+
+**Three components had written the same toggle before this existed** — `Table`'s `getToggledSelection`,
+`MenuUtils.computeNextChecked`'s checkbox branch and `MultiSelect`'s `onPick`, each spelling "drop it if it
+is in the list, add it at the end if it is not" in its own words. That much is `SelectionUtils.getToggled`,
+with `getMerged` and `getRange` beside it, and it is the same kind of extraction the 1D walk was.
+
+**What is new is that this one owns state, and `conventions.md`'s walk entry is the reason that needed
+arguing.** The walk refused to be a factory because the cursor is already owned by each control and owned
+differently, and the selection is owned differently in exactly the same way: `Table` reads a consumer's
+`selectionSignal`, `Menu` holds a list of checked values, `MultiSelect` has a `valuesSignal`. So the
+selection does not move — `SelectionUtils.create` is handed a getter and a setter for it and never holds one.
+**The anchor is the opposite case: no control has a home for it**, because it is not part of any consumer's
+data and nobody wants it back. It is the memory of where the last plain pick landed, and it exists only so
+that the next shifted pick knows where to measure from. That is what makes a factory right here and wrong
+there, and the rule the two cases produce is in `conventions.md`.
+
+**The anchor is the item, not its position, and that is the whole return on holding it.** `Table`'s was a
+`let anchorRowIndex = 0`, so sorting a column while a run was anchored left the anchor pointing at whichever
+row had since arrived at that index — the run would extend from a row the reader never picked. Holding the
+row itself and resolving it through `indexOf` at the moment a run is taken means the anchor moves with its
+row, and `getRange` takes items rather than indices for the same reason. An anchor whose item has left the
+list resolves to nothing, and the run starts where the gesture landed.
+
+**A write that would leave the same items in the same order does not happen.** Extending a run back over
+ground it already covers produces an equal-but-new array, which `accessSignal`'s `Object.is` check cannot
+see, so `onSelectionChange` used to fire announcing a change that had not occurred. The handle compares
+members before writing, which is _"Asking for a state a thing is already in does nothing"_ applied to a list.
+
+**The branch trio is for a tree, and has no consumer yet.** `getBranchItems`, `getBranchState` and
+`getBranchSelection` are the recursive form of what `Select`'s group header already does with
+`CheckedStateUtils.fromMembers` — a folder that reports ticked, empty or half-ticked by asking what is under
+it, and a press that moves the folder and every descendant together. Two rules are fixed here rather than in
+whatever consumes it first: **a branch's own place in the selection is not read** when deciding what its box
+shows, because a folder follows its contents rather than competing with them, and **a half-ticked box fills
+rather than empties** on the first press. `backlog.md` #13 is the consumer this is waiting for, and building
+it ahead of that was the user's call, taken on the grounds that the tri-state parent is the one part of a
+multi-select `Tree` with nothing left to argue about.
+
+**`TableSelectionMode` is now an alias of `SelectionMode`.** The three modes were `Table`'s own string union
+and are the abstract's vocabulary now, but the name is published, so it stays as an alias rather than being
+renamed out from under a consumer — the same move `SortableDir` made over `CarryDir`.
 
 ### Controls: `Scroller`, and why it renders no button of its own
 
@@ -11824,6 +11945,18 @@ mid-reveal. That is the exact fault `Typewriter` exists to avoid, and the user c
 example. A not-yet-started position is now simply transparent: it takes its full width from the first frame,
 so every line break is settled before anything is revealed, and it is still announced because transparent
 text stays in the accessibility tree.
+
+**A position's noise is seeded with a glyph, never with its own character, and that is not a detail.** The
+noise array is rolled on an interval while whether a position _shows_ its noise is decided from the elapsed
+time on every frame, so the two do not change together. A position that has not started yet holds no noise
+of its own, and it used to fall back to the character it will settle on — harmless while it is pending, since
+nothing is drawn then, but the moment it starts churning the overlay appears carrying that fallback and shows
+the answer until the next tick rolls it. On a loaded machine the ticks spread out and eight positions were
+caught mid-gap at once. `pickGlyph` was never at fault: it is handed the settling character as the one to
+avoid and it avoids it. The seed is now a rolled glyph too, so there is no value a churning position can
+display that is not noise. This is what `scrambleText.spec.ts`'s "never the character it is going to settle
+on" has been checking all along, and it is why that assertion exists rather than being a nicety — a position
+showing its own answer reads as having finished a beat before it has.
 
 **Reduced motion is the consumer's to answer, and the component does not read the preference.** That is the
 house line — the library reads `prefers-reduced-motion` in CSS in one place and never in JavaScript, and

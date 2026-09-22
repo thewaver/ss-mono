@@ -60,7 +60,7 @@ export const ScrambleText = (props: ScrambleTextProps) => {
         setNoise((previous) =>
             getCharacters().map((character, index) =>
                 getIsSettled(index) || getIsPending(index)
-                    ? (previous[index] ?? character)
+                    ? (previous[index] ?? ScrambleTextUtils.pickGlyph(glyphs, character, Math.random()))
                     : ScrambleTextUtils.pickGlyph(glyphs, character, Math.random()),
             ),
         );

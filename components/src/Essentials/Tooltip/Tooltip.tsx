@@ -41,11 +41,12 @@ export const Tooltip = (props: TooltipProps) => {
         () => access(props.focusShowDelayMs) ?? DEFAULT_TOOLTIP_SHOW_ON_FOCUS_DELAY_MS,
     );
 
+    const [getContentRef, setLocalContentRef] = createSignal<HTMLElement>();
+
     const { getIsVisible, getTransitionTarget } = ElementFaderUtils.createFader(getShouldShow, {
         getTransitionDurationMs,
+        getRef: getContentRef,
     });
-
-    const [getContentRef, setLocalContentRef] = createSignal<HTMLElement>();
 
     const { getPlacement, getPosition, getZIndex, setContentRef } = AnchorUtils.createPortalPosition(
         () => access(props.anchorRef),

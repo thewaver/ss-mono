@@ -142,7 +142,12 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
 
     const getIsFloaterShown = createMemo(() => getSelectedIndex() >= 0 && getFloaterBounds() !== undefined);
 
-    const floaterFader = ElementFaderUtils.createFader(getIsFloaterShown, { getTransitionDurationMs });
+    const [getFloaterRef, setFloaterRef] = createSignal<HTMLElement>();
+
+    const floaterFader = ElementFaderUtils.createFader(getIsFloaterShown, {
+        getTransitionDurationMs,
+        getRef: getFloaterRef,
+    });
 
     createEffect(() => {
         if (floaterFader.getIsVisible()) return;
@@ -266,6 +271,7 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
         floaterFader.getIsVisible() &&
         getFloaterBounds() && (
             <div
+                ref={setFloaterRef}
                 class={styles.tabsFloater}
                 style={{ ...getFloaterBounds(), "transition-duration": `${getTransitionDurationMs()}ms` }}
             >

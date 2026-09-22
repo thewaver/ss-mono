@@ -954,6 +954,22 @@ moved to `TabsPage`.
 `computeNextCell` for two axes belongs in the same file when `Calendar` arrives. That is the return on a pure
 function: it grows by gaining a sibling rather than a mode.
 
+**The test this produces, stated so the next extraction does not have to re-derive it: a factory is right
+when the state it would own belongs to nobody else.** The walk failed that — every consumer already held a
+cursor, so a factory holding one would have been a second copy of state the controls keep in their own
+shapes. `SelectionUtils.create` passes it: the selection stays with whoever is drawing the list, exactly as
+the cursor did, but the **anchor** — where the last plain pick landed, which a shifted pick measures its run
+from — is in no consumer's data, is wanted back by nobody, and lives only between two gestures. So the
+question is not "is this module reactive" but **"would a consumer have to hand this state over, or has it
+nowhere else to live"**. The second is a factory; the first is a function taking the state and returning the
+next one.
+
+**The corollary, and the part that is easy to get backwards: transient state is held as the thing, not as
+its position.** An anchor kept as an index is correct until the list is sorted or filtered, at which point it
+silently addresses whatever has since arrived at that index — no error, no warning, just a run extending
+from a row the user never picked. Kept as the item and resolved through `indexOf` when it is used, it moves
+with its row, and an item that has left the list resolves to nothing rather than to the wrong neighbor.
+
 ### A control whose value is a pair holds one composite value, not two signals
 
 **Decided by the user.** Whenever a control's value is naturally a pair — a range's two ends, or a date paired

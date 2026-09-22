@@ -165,3 +165,59 @@ export const clickIsAllowed = (locator: Locator) =>
 
         return !event.defaultPrevented;
     });
+
+/**
+ * Waits until an element has stopped moving, resizing and scrolling, counted in animation frames rather
+ * than on a clock.
+ *
+ * A spec that opens something and then waits a fixed span before measuring is asking two questions at once
+ * — "did it end up in the right place" and "was the machine quick enough to have finished putting it
+ * there" — and the second answers in the same red as the first. Under a full parallel run the second is
+ * the one that fires. Watching frames instead means a loaded machine simply waits longer, while a layout
+ * that is actually wrong still never arrives.
+ *
+ * Two thresholds, and both are needed. **`STILL_FRAMES` frames without movement** is what ends the wait,
+ * matching what Playwright's own actionability check requires before it will click a moving target.
+ * **`MIN_FRAMES` frames before that can count** is what stops the wait ending before the movement has
+ * begun: a transition takes a frame or two to get going, and without the floor a caller that asked
+ * immediately after a click would be told "it is still" about an element that had not yet moved. The floor
+ * is in frames rather than milliseconds so that it stretches on a slow machine for the same reason the
+ * rest of this does.
+ *
+ * @param locator The element to watch.
+ * @param timeoutMs How long to give up after, as a guard against something that never settles. Arriving
+ * late is not the failure being watched for, so it is generous.
+ */
+export const waitUntilStill = (locator: Locator, timeoutMs = 5_000) =>
+    locator.evaluate(
+        (element, limitMs) =>
+            new Promise<void>((resolve, reject) => {
+                const STILL_FRAMES = 2;
+                const MIN_FRAMES = 6;
+                const started = performance.now();
+
+                let previous = "";
+                let frames = 0;
+                let stillFor = 0;
+
+                const step = () => {
+                    const rect = element.getBoundingClientRect();
+                    const current = `${rect.x},${rect.y},${rect.width},${rect.height},${element.scrollLeft},${element.scrollTop}`;
+
+                    stillFor = current === previous ? stillFor + 1 : 0;
+                    previous = current;
+                    frames++;
+
+                    if (frames >= MIN_FRAMES && stillFor >= STILL_FRAMES) return resolve();
+
+                    if (performance.now() - started > limitMs) {
+                        return reject(new Error("the element was still moving when the wait ran out"));
+                    }
+
+                    requestAnimationFrame(step);
+                };
+
+                requestAnimationFrame(step);
+            }),
+        timeoutMs,
+    );

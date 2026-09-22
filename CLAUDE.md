@@ -75,6 +75,17 @@ that runs the moment the file loads", not "IIFE". If a term genuinely is the cle
 the same sentence it first appears in, then use it freely. This applies to written documents as much as to
 chat.
 
+**Plain words, not figurative ones.** Stated by the user more than once, and written here because saying it
+in chat has not made it stick. No idioms, no colloquialisms, no borrowed jargon where an ordinary word is
+available and clearer. Their example: _"large blast radius"_ should have been _"affects many components"_ —
+the figure of speech makes the reader decode an image before they reach the fact, and the fact was one
+short phrase all along. The same goes for _"belt and braces"_, _"low-hanging fruit"_, _"moving the needle"_,
+_"papering over"_ and the rest of the family. **Clarity is the most important thing, always.**
+
+The one exception is a joke. When the reply is being playful — which _"Match their register"_ above invites —
+colorful language is welcome, because there the figure of speech _is_ the point rather than a detour on the
+way to one. Everywhere else, say the thing.
+
 **No code diffs.** No before/after blocks, no patch excerpts, no "here's what changed" dumps — they add
 nothing, because the editor and git show every edit better. A short inline fragment is fine when the exact
 token is the point (a prop name, a CSS value), inside a sentence rather than as a block.

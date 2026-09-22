@@ -305,6 +305,11 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 ],
             },
             {
+                name: "Selection",
+                description:
+                    "Picking items out of a list: one of them, several, or the whole run between two. It keeps no list of its own — what is selected belongs to whichever control is drawing it — and owns only the anchor, the memory of where the last plain pick landed, so that a shifted pick knows where to measure its run from. The anchor is held as the item rather than as a position, which is what lets a run survive the list being sorted or filtered underneath it. A folder's tick box that reports ticked, empty or half-ticked by asking what is under it, and a press that moves the folder and everything inside it together, are the same idea one level down.",
+            },
+            {
                 name: "SignalMirror",
                 description:
                     "A value held in one form on the outside and another on the inside, kept in step in both directions without the loop that normally follows. A picker holding a date while its field holds text is the shape it was built for; so is a component that takes an optional signal from the consumer and quietly falls back to one of its own when none is passed.",

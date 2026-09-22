@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { activeText, demo, offsetHeight, readout, scrollTop, tabIndex } from "./helpers";
+import { activeText, demo, isScrolling, offsetHeight, readout, scrollTop, tabIndex, waitUntilStill } from "./helpers";
 
 const MULTI = demo("multi");
 const SINGLE = demo("single");
@@ -250,13 +250,40 @@ const scrollBox = (page: Page) => page.locator(`${SCROLLED} [data-scroll-box]`);
 
 const EDGE_TOLERANCE_PX = 2;
 
-const SETTLE_MS = 500;
+/**
+ * Both of these wait in three phases, because there are three things that have to be true and only one of
+ * them is about the click.
+ *
+ * **The box has to be overflowing before any of this means anything.** `beforeEach` waits for a header in
+ * the first demo on the page, which says nothing about this one; on a loaded machine the scrolling demo can
+ * still be laying out when the click lands, and a box that is not yet taller than its window has nowhere to
+ * scroll to. That produced the most misleading red of the set — "the box scrolled" answered by a flat zero,
+ * which reads as the feature being broken when it is the page not being ready.
+ *
+ * **Then the panel's height animates**, and only once that is over does `Collapsible` scroll the section
+ * into view. So a wait that watches the panel settle can land in the gap between the two and measure before
+ * anything has scrolled, and a wait on a clock measures wherever the machine happened to have got to.
+ * Waiting for the height to reach its content's, and then for the box to stop moving, is the same sequence
+ * the component performs.
+ */
+const openAndSettle = async (page: Page, index: number) => {
+    await expect
+        .poll(() => isScrolling(scrollBox(page)), { message: "the box has more in it than it can show" })
+        .toBe(true);
+
+    const target = await offsetHeight(page.locator(panel(SCROLLED)).nth(index).locator("> *"));
+
+    await page.locator(header(SCROLLED)).nth(index).click();
+    await expect
+        .poll(() => offsetHeight(page.locator(panel(SCROLLED)).nth(index)), { timeout: TRANSITION_TIMEOUT_MS })
+        .toBe(target);
+    await waitUntilStill(page.locator(panel(SCROLLED)).nth(index));
+};
 
 test("opening a section below the fold brings it into view", async ({ page }) => {
     expect(await scrollTop(scrollBox(page)), "nothing has scrolled yet").toBe(0);
 
-    await page.locator(header(SCROLLED)).nth(2).click();
-    await page.waitForTimeout(SETTLE_MS);
+    await openAndSettle(page, 2);
 
     expect(await scrollTop(scrollBox(page)), "the box scrolled to reach the section").toBeGreaterThan(0);
 
@@ -276,8 +303,7 @@ test("opening a section below the fold brings it into view", async ({ page }) =>
 test("a section taller than the box keeps the pressed header in view rather than scrolling past it", async ({
     page,
 }) => {
-    await page.locator(header(SCROLLED)).nth(3).click();
-    await page.waitForTimeout(SETTLE_MS);
+    await openAndSettle(page, 3);
 
     const box = (await scrollBox(page).boundingBox())!;
     const opened = (await page.locator(panel(SCROLLED)).nth(3).boundingBox())!;

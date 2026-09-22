@@ -72,21 +72,49 @@ test("a step moves the track forward and brings the back button to life", async 
  * is smooth — so a second press landing mid-animation moves less than a full page. That is the component's
  * real behavior rather than a harness artifact, which is why this waits for each scroll to come to rest
  * instead of pressing a fixed number of times and hoping.
+ *
+ * It counts animation frames rather than polling on a clock, and will not call it rest inside the first few
+ * frames. Both matter: a smooth scroll takes a frame or two to get going, so two equal readings taken
+ * straight after the press are two readings of a scroll that has not started, and the caller would go on to
+ * measure a track still sitting where it began. Counting frames also means a loaded machine simply waits
+ * longer rather than reporting rest early.
  */
-const waitForRest = async (page: Page, scope: string) => {
-    let previous = -1;
+const waitForRest = (page: Page, scope: string) =>
+    page.evaluate(
+        (value) =>
+            new Promise<void>((resolve, reject) => {
+                const STILL_FRAMES = 2;
+                const MIN_FRAMES = 6;
+                const LIMIT_MS = 5_000;
+                const started = performance.now();
 
-    await expect
-        .poll(async () => {
-            const { left } = await scrollOf(page, scope);
-            const hasSettled = left === previous;
+                let previous = -1;
+                let frames = 0;
+                let stillFor = 0;
 
-            previous = left;
+                const step = () => {
+                    const track = [...document.querySelectorAll(`${value.scope} div`)].find(
+                        (element) => element.scrollWidth > element.clientWidth,
+                    );
+                    const left = track?.scrollLeft ?? -1;
 
-            return hasSettled;
-        })
-        .toBe(true);
-};
+                    stillFor = left === previous ? stillFor + 1 : 0;
+                    previous = left;
+                    frames++;
+
+                    if (frames >= MIN_FRAMES && stillFor >= STILL_FRAMES) return resolve();
+
+                    if (performance.now() - started > LIMIT_MS) {
+                        return reject(new Error("the track was still moving when the wait ran out"));
+                    }
+
+                    requestAnimationFrame(step);
+                };
+
+                requestAnimationFrame(step);
+            }),
+        { scope },
+    );
 
 test("stepping to the far end kills the forward button and not the other one", async ({ page }) => {
     const buttons = page.locator(`${SPLIT} button`);

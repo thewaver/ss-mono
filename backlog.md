@@ -632,10 +632,13 @@ could not be a child"_. These are the gaps, each with the reason it is still one
   to it. Giving them one means either a second render slot the library positions, or a flag saying where the
   press landed, and neither has been argued.
 - **One selected value, and no checkboxes.** `valueSignal` is `Signal<T | undefined>`, so there is no
-  `aria-multiselectable`, no `Shift`-extended range, and no tri-state parent following its children. That
-  last one is the only part with nothing left to decide: `CheckedState` and `CheckedStateUtils.fromMembers`
-  are a shared abstract already, built for `Select`'s group header, so a tri-state parent here is a call to
-  a function that exists rather than a type to argue about.
+  `aria-multiselectable`, no `Shift`-extended range, and no tri-state parent following its children. **None
+  of the three is arithmetic any more**: `Abstracts/Selection` holds the toggle, the anchored range and
+  `getBranchItems` / `getBranchState` / `getBranchSelection` for a folder that follows its contents, and
+  `Table` drives its whole selection through it. What is left here is the API question the abstract
+  deliberately does not answer — whether `valueSignal` widens to a list, whether that is a breaking change
+  worth making or a second prop, and where a tick box would be drawn given that `renderNode` is the
+  consumer's. See `decisions.md` under _"`Abstracts/Selection`"_.
 
 **The focus rescue was wired to a function nothing could reach, and is now a guard over the visible rows.**
 It used to sit inside `collapse`, checking whether focus was on a descendant before removing the subtree — but

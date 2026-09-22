@@ -166,37 +166,3 @@ describe("getResizedWidth", () => {
         expect(TableUtils.getResizedWidth(NAME, 900)).toBe(900);
     });
 });
-
-describe("getRangeIndices", () => {
-    it("spans the two ends inclusively", () => {
-        expect(TableUtils.getRangeIndices(2, 5)).toEqual([2, 3, 4, 5]);
-    });
-
-    it("reads the same span backwards, since a range has no direction once it is a set of rows", () => {
-        expect(TableUtils.getRangeIndices(5, 2)).toEqual([2, 3, 4, 5]);
-    });
-
-    it("gives one index when both ends are the same row", () => {
-        expect(TableUtils.getRangeIndices(3, 3)).toEqual([3]);
-    });
-});
-
-describe("getToggledSelection", () => {
-    it("adds a row that is not in the selection", () => {
-        expect(TableUtils.getToggledSelection([ROWS[0]], ROWS[1])).toEqual([ROWS[0], ROWS[1]]);
-    });
-
-    it("removes a row that is", () => {
-        expect(TableUtils.getToggledSelection([ROWS[0], ROWS[1]], ROWS[0])).toEqual([ROWS[1]]);
-    });
-});
-
-describe("getMergedSelection", () => {
-    it("keeps what was selected and adds only what is new, so extending never doubles a row", () => {
-        expect(TableUtils.getMergedSelection([ROWS[0], ROWS[1]], [ROWS[1], ROWS[2]])).toEqual([
-            ROWS[0],
-            ROWS[1],
-            ROWS[2],
-        ]);
-    });
-});
