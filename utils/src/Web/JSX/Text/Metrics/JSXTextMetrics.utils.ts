@@ -120,8 +120,6 @@ export namespace JSXTextMetricsUtils {
 
         if (Number.isNaN(fontSize)) return texts.map(() => 0);
 
-        // An empty string measures 0 wide. Dividing by that would give Infinity, which
-        // would drag the whole stack's scale to 0 and blank out every other line.
         const fittedSizes = measureTextWidths(texts, metrics).map((w) =>
             w > 0 ? (fontSize * containerSize.width) / w : 0,
         );

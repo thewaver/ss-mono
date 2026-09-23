@@ -12,10 +12,10 @@ purpose: it answers "what is outstanding", and neither of them is.
 | Section                                                 | Count |
 | ------------------------------------------------------- | ----: |
 | [Missing components](#missing-components)               |     2 |
-| [Blockers and known issues](#blockers-and-known-issues) |    14 |
+| [Blockers and known issues](#blockers-and-known-issues) |    15 |
 | [Deliberately not built](#deliberately-not-built)       |    29 |
 | [Accessibility gaps](#accessibility-gaps)               |     8 |
-| [Planned projects](#planned-projects)                   |     5 |
+| [Planned projects](#planned-projects)                   |     4 |
 
 ---
 
@@ -50,6 +50,7 @@ Something that misbehaves, or a cost nobody has paid down.
 | 24  | **Any placed control**           | A layout guesses each item's box, so content wider than the guess overflows it and, on a ring, overlaps a neighbor                                                                                                                                                                                        |
 | 24  | **Any placed control**           | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into                                                                                                                                                                 |
 | 24  | **`Stepper`, placed**            | `renderBody` is dropped without a word, a curve having nowhere to put a panel                                                                                                                                                                                                                             |
+| 26  | **Anything turning in 3D**       | A component that turns under perspective sets aside room for the bulge, so its box stays bigger than its content even while it is standing still |
 
 ## Deliberately not built
 
@@ -100,6 +101,7 @@ They cluster, and no single item owns them.
 | 16  | **`Scroller`**      | The buttons are the consumer's, so the library cannot promise one is named, reachable or in the tab order                                      |
 | 19  | **`OverheadWheel`** | The same again for the hub's control, with the same promise unmade                                                                             |
 | 14  | **`SlideButton`**   | A fixed hold duration is itself an assumption about dexterity, in a control that exists partly to avoid one                                    |
+| 27  | **`CardStack`**     | A card is sent by a swipe, and the library ships no pointer route that is neither a gesture nor a drag — the consumer's buttons are the only answer |
 
 ## Planned projects
 

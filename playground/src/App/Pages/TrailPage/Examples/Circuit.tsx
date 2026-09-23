@@ -3,6 +3,7 @@ import { createSignal } from "solid-js";
 import { Button, Trail } from "@thewaver/ss-components";
 import type { TrailController } from "@thewaver/ss-components";
 
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageTrailTrack, PageTrailVehicle } from "../../../StyledComponents/TrailContent/TrailContent";
 import type { TrailExampleProps } from "../TrailPage.types";
@@ -21,20 +22,22 @@ export const CircuitExample = (props: Props) => {
 
     return (
         <div class={styles.stack}>
-            <Trail
-                path={CIRCUIT_PATH}
-                size={CIRCUIT_SIZE}
-                durationMs={props.durationMs}
-                isLooping={props.isLooping}
-                isTurning={props.isTurning}
-                progressSignal={props.progressSignal}
-                isPlayingSignal={props.isPlayingSignal}
-                renderTrack={(getPath) => <PageTrailTrack path={getPath} />}
-                renderTraveler={(getPlace) => (
-                    <PageTrailVehicle id={VEHICLE_ID} place={getPlace} label={VEHICLE_LABEL} />
-                )}
-                onMount={setController}
-            />
+            <PageMeasureBox>
+                <Trail
+                    path={CIRCUIT_PATH}
+                    size={CIRCUIT_SIZE}
+                    durationMs={props.durationMs}
+                    isLooping={props.isLooping}
+                    isTurning={props.isTurning}
+                    progressSignal={props.progressSignal}
+                    isPlayingSignal={props.isPlayingSignal}
+                    renderTrack={(getPath) => <PageTrailTrack path={getPath} />}
+                    renderTraveler={(getPlace) => (
+                        <PageTrailVehicle id={VEHICLE_ID} place={getPlace} label={VEHICLE_LABEL} />
+                    )}
+                    onMount={setController}
+                />
+            </PageMeasureBox>
 
             <div class={styles.controls}>
                 <Button

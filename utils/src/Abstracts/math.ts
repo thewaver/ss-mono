@@ -2,16 +2,16 @@ export namespace MathUtils {
     /**
      * Tests whether a whole number is even.
      *
-     * Uses a bit test, so the result is only meaningful for whole numbers within the
-     * 32-bit range. Fractions are truncated before the test.
+     * Only meaningful for whole numbers within the 32-bit range. Fractions are truncated
+     * before the test.
      */
     export const isEven = (value: number) => (value & 1) === 0;
 
     /**
      * Tests whether a whole number is odd.
      *
-     * Uses a bit test, so the result is only meaningful for whole numbers within the
-     * 32-bit range. Fractions are truncated before the test.
+     * Only meaningful for whole numbers within the 32-bit range. Fractions are truncated
+     * before the test.
      */
     export const isOdd = (value: number) => (value & 1) === 1;
 
@@ -58,8 +58,8 @@ export namespace MathUtils {
     /**
      * Rounds a value to a fixed number of decimal places.
      *
-     * Shifts the value using exponent notation rather than multiplying, which avoids
-     * the usual floating-point drift: `roundToDecimalPlaces(1.005, 2)` gives `1.01`.
+     * Free of the usual floating-point drift, so `roundToDecimalPlaces(1.005, 2)` gives
+     * `1.01` rather than `1`.
      *
      * @param value The value to round.
      * @param decimalPlaces How many digits to keep after the point. Defaults to `0`.
@@ -74,9 +74,7 @@ export namespace MathUtils {
      * Restricts a value to a range.
      *
      * Behaves exactly like `Math.min(Math.max(value, min), max)`, including when the bounds are given the
-     * wrong way round — `clamp(1, 5, 3)` is `3`, because the upper bound is applied last. That equivalence is
-     * deliberate rather than incidental: it is what makes replacing a hand-written clamp a change of spelling
-     * rather than a change of behavior.
+     * wrong way round — `clamp(1, 5, 3)` is `3`, because the upper bound is applied last.
      *
      * @param value The value to restrict.
      * @param min The lower bound.
@@ -87,8 +85,7 @@ export namespace MathUtils {
     /**
      * Restricts a value to `0..1`.
      *
-     * The same as `clamp(value, 0, 1)`, named because a ratio is what most callers are holding and
-     * `clamp01(elapsed / duration)` says that where three arguments would bury it.
+     * The same as `clamp(value, 0, 1)`, for the ratios most callers are holding: `clamp01(elapsed / duration)`.
      *
      * @param value The value to restrict.
      */
@@ -104,9 +101,8 @@ export namespace MathUtils {
      * The index is truncated before wrapping, so a fractional index lands on the step it has reached rather
      * than the one it is heading for.
      *
-     * A count of zero or less has nothing to index and reports `0`, which is the only answer that cannot be
-     * out of range. A caller that needs to tell "empty" from "the first one" has to check the count itself,
-     * because this function cannot say it in a number.
+     * A count of zero or less has nothing to index and reports `0`. A caller that needs to tell "empty" from
+     * "the first one" checks the count itself.
      *
      * @param index The index to bring into range. Truncated if fractional.
      * @param count How many there are.
@@ -124,9 +120,8 @@ export namespace MathUtils {
      * It does **not** clamp, so a value outside the range reports a ratio outside `0..1` — which is how a
      * caller can tell overshoot from a boundary. Wrap it in `clamp01` when that distinction is not wanted.
      *
-     * A zero-width range has no meaningful answer and reports `0`. Callers wanting a different answer for
-     * that case should say so themselves, because the right one is theirs rather than this function's: a
-     * slider with no travel sits at the start, while a hold with no duration is already finished.
+     * A zero-width range has no meaningful answer and reports `0`. A caller wanting a different answer for
+     * that case handles it itself.
      *
      * @param value The value to locate.
      * @param from The value that maps to `0`.
@@ -141,10 +136,8 @@ export namespace MathUtils {
      * Does **not** clamp, so a ratio outside `0..1` extrapolates past the ends — which is what makes an
      * overshooting easing curve expressible. Wrap the ratio in `clamp01` when that is not wanted.
      *
-     * Computed as `from + (to - from) * ratio` rather than `from * (1 - ratio) + to * ratio`: the first is
-     * exact at `ratio` of `0` and drifts by a float at `1`, the second is exact at both ends and can
-     * overshoot in between. Landing exactly on `from` matters more here, because `0` is where an animation
-     * starts and where a value at rest sits.
+     * Exact at a ratio of `0`, which answers `from` itself. At a ratio of `1` the answer can sit a float
+     * away from `to`, so a caller needing the end exactly compares the ratio rather than the result.
      *
      * @param from The value at a ratio of `0`.
      * @param to The value at a ratio of `1`.

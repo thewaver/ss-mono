@@ -57,6 +57,8 @@ reading.
 23. `GlassSurface` — what is built and what is not — _open, one item postponed until the platform catches up_
 24. Arbitrary placement across controls, and the picking that has to come with it — _open_
 25. The scanline page is twelve examples of one example — _open_
+26. Components that turn under perspective reserve room they do not need at rest — _open_
+27. `CardStack` — the pointer route the library cannot promise — _open_
 
 ### Build order
 
@@ -1150,6 +1152,48 @@ actually need designing.
 
 **Nothing is blocked on it** and the shape of the picker has not been argued.
 
+## 26. Components that turn under perspective reserve room they do not need at rest
+
+**The user's rule, given while settling how `CardStack` is sized.** A component that turns a face towards the
+viewer is drawn larger on its near side than it really is, so it spills past its own box part-way through a
+turn. That spill is allowed. **What a component's box should be is the size of its content at rest**, and any
+extra width or height set aside for the bulge is room that stands empty whenever nothing is moving.
+
+**The shape of the correction, in the user's words: something turning horizontally should not reserve extra
+vertical space, and something turning vertically should not reserve extra horizontal space.** The reservation
+along the direction the faces actually travel is a different thing and stays.
+
+**`Wheel` keeps its reserved space and is not part of this.** A drum shows several faces at once when it is
+standing still — the ones curving away above and below the front one are genuinely on screen — so what it
+sets aside is content at rest rather than an allowance for motion.
+
+**`FlipCard` is the case that raised it and the easiest one.** `Barrel` sets its root to the girth, which for
+two faces is the face's own width widened by roughly one percent to cover the bulge, and at rest a two-face
+barrel is flat with nothing projecting at all. Whether the fix is a flag on `Barrel` or a `FlipCard` that
+does not ask for the reservation has not been argued.
+
+**Which other components are affected has not been checked.** The pass is to go through everything that
+animates a perspective transform and take out the adjustments that only motion needs.
+
+## 27. `CardStack` — the pointer route the library cannot promise
+
+**The same gap `Timeline` and `Scroller` already carry, and it arrived with the component.** A card is sent by
+a swipe, which is both a path-based gesture and a drag, so **2.5.1 Pointer Gestures** (Level A) and **2.5.7
+Dragging Movements** (Level AA) both ask for a way to do it with a single pointer and no dragging. A keyboard
+does not answer either of them — both are about pointers — and `CardStack`'s arrow keys therefore close 2.1.1
+and nothing else.
+
+**It cannot be discharged inside the component.** The only things that satisfy the two criteria are controls,
+and the component renders none by the rule the library is built on — see _"A component hands out a controller
+and renders no controls of its own"_ in `conventions.md`. `send` is handed out at mount and the props block
+says plainly that anything sending a card without a drag has to be built on it, but **a `CardStack` whose only
+pointer route is the swipe fails 2.5.1 and 2.5.7, and the library cannot promise otherwise.**
+
+**`Carousel`'s answer is not available here.** It attaches its swipe only when `renderControls` was passed, so
+a consumer cannot ask for the gesture without also supplying the route. That trick is open only to a component
+that draws the controls itself, which the user ruled this one must not. The Playground's deck is what
+discharging it looks like: four buttons beside the pile, each calling `send`.
+
 ## Accepted limits
 
 Faults that have been looked at and consciously left alone. Not outstanding work, not numbered, and not part
@@ -1281,18 +1325,10 @@ the box and ends at the source's size, drop the `1 -` from the alpha curve so a 
 brightest as it arrives, own slots by clock tick rather than by distance milestone since there is no travel to
 measure, and wake the clock on the fade the way the `c` variants do.
 
-### `HoloCard` and `CardFan`, built and then deleted
+### `CardFan`, built and then deleted
 
-Both were built as `Exotics` on the user's call and both were removed after they saw them. Recorded so the
-same two sketches are not put to them again, and because each left one finding worth keeping.
-
-**`HoloCard`: "doesn't really deserve to exist right now — it looks just like the example in PointerTracker."**
-Their verdict, and it is the answer to the question that was left open when it was built: whether a page
-example ever earns extraction is a decision for later, and this one did not. The tilt and the sheen live on
-the PointerTracker page, which is where the effect can be read from source. **What it proved and what the
-page kept**: the band of light has to travel against the tilt and further than it, because a reflection is of
-something that is not moving — that is in `decisions.md` under the PointerTracker examples, and it survives
-the component.
+Built as an `Exotic` on the user's call and removed after they saw it. Recorded so the same sketch is not put
+to them again, and because it left findings worth keeping.
 
 **`CardFan`: "ultra-specific. I would delete the component."** Their verdict. **What it proved is worth more
 than the component was**, and is the part to reach for if a hand of overlapping things is ever built again:
@@ -1370,8 +1406,10 @@ example, so nothing is pending there either.
 - **A split-flap board**, the airport departure display whose characters flip through the alphabet one card
   at a time. Their verdict: the drum is already a component and this is that drum again, so it would be a
   second way to spell what `Odometer` and `DrumWheel` do.
-- **A magnifying strip**, the macOS dock's swell around the pointer. Their verdict: it already exists as an
-  example on the `PointerTracker` page, which is the same answer `HoloCard` got.
+- **A magnifying strip**, the macOS dock's swell around the pointer. Their verdict: it already existed as a
+  Playground example, so a component would be a second way to spell it. **That example has since gone with the
+  `PointerTracker` page**, so the reason as recorded no longer holds — the verdict is still theirs, but it now
+  rests on nothing a reader can go and look at.
 - **A ticker**, a strip of content looping seamlessly past. Their verdict: the carousels cover it.
 - **A marquee selection layer**, dragging a rectangle across a board to pick up everything it touches.
   **This one was not turned down on its merits** — "interesting but can't think of a use" — so what it lacks

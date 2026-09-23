@@ -22,6 +22,7 @@ export const card = style({
 export const buttonRow = style({
     display: "flex",
     flex: "none",
+    justifyContent: "center",
 });
 
 export const prize = style({

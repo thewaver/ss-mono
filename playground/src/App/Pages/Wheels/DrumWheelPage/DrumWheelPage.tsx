@@ -2,30 +2,12 @@ import type { Accessor } from "solid-js";
 import { createMemo, createSignal } from "solid-js";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
-import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
-import type { WheelExampleProps } from "../Wheels.types";
 import { createWheelsControls } from "../Wheels.utils";
 import { PageWheelsPanel } from "../WheelsPanel";
 import { OverExample } from "./Examples/Over";
 import { SidewaysExample } from "./Examples/Sideways";
 
 const EXAMPLES_ROOT = "/src/App/Pages/Wheels/DrumWheelPage/Examples";
-
-const SidewaysExampleWrapper = (props: WheelExampleProps) => {
-    return (
-        <PageMeasureBox>
-            <SidewaysExample {...props} />
-        </PageMeasureBox>
-    );
-};
-
-const OverExampleWrapper = (props: WheelExampleProps) => {
-    return (
-        <PageMeasureBox>
-            <OverExample {...props} />
-        </PageMeasureBox>
-    );
-};
 
 export const DrumWheelPage = () => {
     const controls = createWheelsControls();
@@ -44,7 +26,7 @@ export const DrumWheelPage = () => {
             key: "sideways",
             name: "Turning sideways",
             component: () => (
-                <SidewaysExampleWrapper
+                <SidewaysExample
                     {...controls.getSharedProps()}
                     targetIndexSignal={sidewaysIndexSignal}
                     onSelectedWedgeChange={setSidewaysMarkedIndex}
@@ -57,7 +39,7 @@ export const DrumWheelPage = () => {
             key: "reel",
             name: "Turning over",
             component: () => (
-                <OverExampleWrapper
+                <OverExample
                     {...controls.getSharedProps()}
                     targetIndexSignal={reelIndexSignal}
                     onSelectedWedgeChange={setReelMarkedIndex}

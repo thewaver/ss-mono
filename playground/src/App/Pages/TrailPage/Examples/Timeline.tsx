@@ -3,6 +3,7 @@ import { createSignal } from "solid-js";
 import { Range, Trail, accessSignal } from "@thewaver/ss-components";
 import type { TrailController } from "@thewaver/ss-components";
 
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageRangeContent } from "../../../StyledComponents/RangeContent/RangeContent";
 import { PageTrailMarker, PageTrailTrack } from "../../../StyledComponents/TrailContent/TrailContent";
 import type { TrailExampleProps } from "../TrailPage.types";
@@ -24,18 +25,20 @@ export const TimelineExample = (props: Props) => {
 
     return (
         <div class={styles.stack}>
-            <Trail
-                path={TIMELINE_PATH}
-                size={TIMELINE_SIZE}
-                durationMs={props.durationMs}
-                isLooping={props.isLooping}
-                isTurning={props.isTurning}
-                progressSignal={props.progressSignal}
-                isPlayingSignal={props.isPlayingSignal}
-                renderTrack={(getPath) => <PageTrailTrack path={getPath} />}
-                renderTraveler={() => <PageTrailMarker id={MARKER_ID} />}
-                onMount={setController}
-            />
+            <PageMeasureBox>
+                <Trail
+                    path={TIMELINE_PATH}
+                    size={TIMELINE_SIZE}
+                    durationMs={props.durationMs}
+                    isLooping={props.isLooping}
+                    isTurning={props.isTurning}
+                    progressSignal={props.progressSignal}
+                    isPlayingSignal={props.isPlayingSignal}
+                    renderTrack={(getPath) => <PageTrailTrack path={getPath} />}
+                    renderTraveler={() => <PageTrailMarker id={MARKER_ID} />}
+                    onMount={setController}
+                />
+            </PageMeasureBox>
 
             <div class={styles.slider}>
                 <Range

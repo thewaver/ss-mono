@@ -71,7 +71,7 @@ export const Modal = (props: ModalProps) => {
 
     const [getSwipeOffsetRatio, setSwipeOffsetRatio] = createSignal(0);
 
-    const { getIsSwiping } = InteractionTrackerUtils.trackSwipe(
+    const { getIsSwiping } = InteractionTrackerUtils.trackAxialSwipe(
         getContainerRef,
         () => getSwipeDirection() === undefined || access(props.isDismissableOnOverlayClick) === false,
         {

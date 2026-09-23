@@ -39,8 +39,8 @@ export namespace TimeUtils {
     /**
      * Flattens a time into how many seconds of the day have passed at that point.
      *
-     * This is the common currency the comparisons run through, which is why values of
-     * different shapes compare safely — a missing `second` counts as zero.
+     * A missing `second` counts as zero, so values of different shapes flatten to
+     * comparable numbers.
      *
      * @param value The time to flatten.
      * @returns A count from `0` to `86399` for a valid time.
@@ -139,11 +139,9 @@ export namespace TimeUtils {
     /**
      * Reads which half of the day an hour falls in.
      *
-     * One of the three conversions a 12-hour field needs, kept here rather than in the field
-     * because they are the whole of what is easy to get wrong: **midnight reads as 12 am and
-     * noon as 12 pm**, so the mapping is not `hour % 12` in either direction and no type
-     * catches it. The value itself stays 24-hour — a meridiem is a way of reading an hour, not
-     * a fourth field.
+     * **Midnight reads as 12 am and noon as 12 pm**, so the mapping is not `hour % 12` in
+     * either direction. The value itself stays 24-hour — a meridiem is a way of reading an
+     * hour, not a fourth field.
      *
      * @param value The time to read.
      * @returns `"am"` for midnight up to 11:59, `"pm"` from noon onwards.
@@ -242,8 +240,8 @@ export namespace TimeUtils {
     /**
      * Writes the digits a 12-hour field shows, without the meridiem.
      *
-     * The half of the day is deliberately left out — read it with {@link getMeridiem} and show
-     * it however the field wants. So `13:05` writes as `01:05`, and midnight as `12:00`.
+     * The half of the day is left out — read it with {@link getMeridiem} and show it however
+     * the field wants. So `13:05` writes as `01:05`, and midnight as `12:00`.
      *
      * @param value The time to write.
      */

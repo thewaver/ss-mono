@@ -9,11 +9,44 @@ const GREY: Color.Hex = "#808080";
 const CYAN: Color.Hex = "#00ffff";
 const NAVY: Color.Hex = "#123456";
 
+const WHITE: Color.Hex = "#ffffff";
+const BLACK: Color.Hex = "#000000";
+
+const LEVELS: [Color.ContrastLevel, number][] = [
+    ["A", 3],
+    ["AA", 4.5],
+    ["AAA", 7],
+];
+const HUES = [0, 37, 74, 111, 148, 185, 222, 259, 296, 333];
+const SATURATIONS = [0, 25, 60, 100];
+const BACKGROUNDS: string[] = [WHITE, BLACK, GREY, NAVY, "#f0e68c", "hsl(230 40% 12%)"];
+
 const round = (rgb: Color.RGB) => ({
     r: Math.round(rgb.r),
     g: Math.round(rgb.g),
     b: Math.round(rgb.b),
 });
+
+// The WCAG relative luminance formula, written out here rather than taken from the module under
+// test, so that an assertion about contrast is not checking the implementation against itself.
+const luminanceOf = (rgb: Color.RGB) => {
+    const linear = (channel: number) => {
+        const ratio = channel / 255;
+
+        return ratio <= 0.03928 ? ratio / 12.92 : ((ratio + 0.055) / 1.055) ** 2.4;
+    };
+
+    return 0.2126 * linear(rgb.r) + 0.7152 * linear(rgb.g) + 0.0722 * linear(rgb.b);
+};
+
+const contrastAgainst = (hsl: Color.HSL | undefined, other: string) => {
+    if (!hsl) return 0;
+
+    const mine = luminanceOf(Color.HSL.toRgb(hsl));
+    const theirs = luminanceOf(Color.HSVA.toRgba(Color.parse(other) ?? { h: 0, s: 0, v: 0, a: 1 }));
+
+    return (Math.max(mine, theirs) + 0.05) / (Math.min(mine, theirs) + 0.05);
+};
 
 describe("Color.RGB.toHex", () => {
     it("writes six lowercase digits", () => {
@@ -383,5 +416,109 @@ describe("Color.Hexa.interpolate", () => {
 
     it("reads a value with no alpha pair as opaque", () => {
         expect(Color.Hexa.interpolate("#000000", "#ffffff", 0.5)).toBe("#808080ff");
+    });
+});
+
+describe("Color.getContrastingColor", () => {
+    it("keeps the hue and the saturation it was handed", () => {
+        const got = Color.getContrastingColor(210, 80, WHITE, "AA");
+
+        expect(got?.h).toBe(210);
+        expect(got?.s).toBe(80);
+    });
+
+    it("wraps the hue and clamps the saturation", () => {
+        const got = Color.getContrastingColor(-30, 140, WHITE, "AA");
+
+        expect(got?.h).toBe(330);
+        expect(got?.s).toBe(100);
+    });
+
+    it("reaches each named level against a pale background", () => {
+        LEVELS.forEach(([level, wanted]) => {
+            expect(contrastAgainst(Color.getContrastingColor(35, 90, WHITE, level), WHITE)).toBeGreaterThanOrEqual(
+                wanted,
+            );
+        });
+    });
+
+    it("reaches each named level against a dark background", () => {
+        LEVELS.forEach(([level, wanted]) => {
+            expect(contrastAgainst(Color.getContrastingColor(35, 90, NAVY, level), NAVY)).toBeGreaterThanOrEqual(
+                wanted,
+            );
+        });
+    });
+
+    it("reaches a ratio given as a number", () => {
+        expect(contrastAgainst(Color.getContrastingColor(0, 0, GREY, 4), GREY)).toBeGreaterThanOrEqual(4);
+    });
+
+    it("stays within reach after the lightness is rounded", () => {
+        HUES.forEach((hue) =>
+            SATURATIONS.forEach((saturation) =>
+                BACKGROUNDS.forEach((background) =>
+                    LEVELS.forEach(([level, wanted]) => {
+                        const got = Color.getContrastingColor(hue, saturation, background, level);
+
+                        if (got && got.l > 0 && got.l < 100) {
+                            expect(contrastAgainst(got, background)).toBeGreaterThanOrEqual(wanted);
+                        }
+                    }),
+                ),
+            ),
+        );
+    });
+
+    it("lands on the side with the most room when no side is asked for", () => {
+        expect(Color.getContrastingColor(0, 0, WHITE, "AA")?.l).toBeLessThan(50);
+        expect(Color.getContrastingColor(0, 0, NAVY, "AA")?.l).toBeGreaterThan(50);
+    });
+
+    it("lands on the side it is asked for when both can reach the target", () => {
+        expect(Color.getContrastingColor(0, 0, GREY, "A", { prefer: "darker" })?.l).toBeLessThan(50);
+        expect(Color.getContrastingColor(0, 0, GREY, "A", { prefer: "lighter" })?.l).toBeGreaterThan(50);
+    });
+
+    it("crosses to the other side rather than missing the target", () => {
+        const got = Color.getContrastingColor(0, 0, "#111111", 10, { prefer: "darker" });
+
+        expect(got?.l).toBeGreaterThan(50);
+        expect(contrastAgainst(got, "#111111")).toBeGreaterThanOrEqual(10);
+    });
+
+    it("stops at the nearest lightness that passes rather than the most extreme one", () => {
+        const near = Color.getContrastingColor(0, 0, WHITE, "AA");
+        const far = Color.getContrastingColor(0, 0, WHITE, "AAA");
+
+        expect(near?.l).toBeGreaterThan(far?.l ?? 0);
+        expect(near?.l).toBeGreaterThan(0);
+    });
+
+    it("answers with the highest contrast it can manage when the target is out of reach", () => {
+        const got = Color.getContrastingColor(0, 0, GREY, 21);
+
+        expect(got).toEqual({ h: 0, s: 0, l: 0 });
+    });
+
+    it("answers with nothing for an unreachable target when told it must be met", () => {
+        expect(Color.getContrastingColor(0, 0, GREY, 21, { mustMeetTargetContrast: true })).toBeUndefined();
+        expect(Color.getContrastingColor(0, 0, GREY, 3, { mustMeetTargetContrast: true })).toBeDefined();
+    });
+
+    it("answers with nothing when the other color cannot be read", () => {
+        expect(Color.getContrastingColor(0, 0, "not-a-color", "AA")).toBeUndefined();
+    });
+
+    it("takes the other color as a value as well as a string", () => {
+        expect(Color.getContrastingColor(120, 60, { r: 255, g: 255, b: 255 }, "AAA")).toEqual(
+            Color.getContrastingColor(120, 60, WHITE, "AAA"),
+        );
+    });
+
+    it("measures a translucent color as though it were opaque", () => {
+        expect(Color.getContrastingColor(120, 60, "rgb(255 255 255 / 0.1)", "AAA")).toEqual(
+            Color.getContrastingColor(120, 60, WHITE, "AAA"),
+        );
     });
 });

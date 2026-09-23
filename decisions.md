@@ -338,7 +338,7 @@ name rather than a claim that the thing inside is stateless — see _"One namesp
 `conventions.md`. The subjects keep the names argued for here; only the suffix came back.
 
 **`InteractionUtils` is `InteractionTracker`, and the arithmetic that made the name a lie went to
-`ss-utils`.** Most of it tracks — `trackHold`, `trackDrag`, `trackSwipe`, `trackPageHidden`, and
+`ss-utils`.** Most of it tracks — `trackHold`, `trackDrag`, `trackAxialSwipe`, `trackPageHidden`, and
 `wrapElement`, which attaches listeners to report hover, press and focus flags. The four `computeSwipe*`
 functions did not, so `GestureUtils` in `utils/src/Abstracts/gesture.ts` has them, along with `SwipeAxis` and
 `SwipeDirection`. **The name is `Gesture` rather than `Swipe` on the user's call**: a package this small
@@ -520,6 +520,172 @@ only caller in this repo.
 the rest of the family exists because a package of easings missing two thirds of the set is one nobody reaches
 for. **Do not prune it back to what this repo happens to call, and do not read the unused exports as dead
 code.**
+
+### `ss-utils`: the arguments behind the utilities, which their own documentation does not carry
+
+A published `/** */` block says what a caller needs and nothing about why the code is shaped that way — see
+`conventions.md`. These are the whys for `utils/src`, kept here where a future session will find them and a
+consumer will not.
+
+**`MathUtils.clamp` matches `Math.min(Math.max(…))` exactly, including the wrong-way-round case.** The
+equivalence is the point rather than an accident: it is what made replacing a hundred and seventy hand-written
+clamps a change of spelling rather than a change of behavior. Anything that would make `clamp` cleverer —
+swapping reversed bounds, refusing them — breaks that and is not a small change.
+
+**`MathUtils.lerp` is `from + (to - from) * ratio`, not `from * (1 - ratio) + to * ratio`.** The first is
+exact at a ratio of `0` and can be a float out at `1`; the second is exact at both ends and can overshoot in
+between. Landing exactly on `from` matters more here, because `0` is where an animation starts and where a
+value at rest sits.
+
+**`MathUtils.roundToDecimalPlaces` shifts through exponent notation rather than multiplying**, which is what
+keeps `1.005` at two places from coming back as `1`.
+
+**`MathUtils.clamp01` and `wrapIndex` exist to be named.** `clamp01(elapsed / duration)` says "ratio" where
+three arguments bury it, and `wrapIndex` is the ring's answer to `clamp`'s line. Both were hand-written
+repeatedly before they were extracted, which is the argument for a one-line function generally: the cost is
+never the arithmetic, it is the number of places to get it wrong.
+
+**`GestureUtils` measures in ratios of the element, and clamps nothing.** A ratio is what lets one commit
+threshold mean the same thing on a phone and on a desktop. Overshoot is real travel, so `computeSwipeProgress`
+reports past `1` and below `0` and a caller that wants it bounded says so — while `computeSwipeOffset`, which
+exists to be fed to a transform, does clamp, because a modal swiped away should not slide back onto the screen
+when the pointer goes backwards. The commit threshold is the caller's number because a photo in a carousel is
+not a modal being dismissed.
+
+**`RotationUtils` is in degrees throughout**, because the numbers end up in CSS transforms and a reader
+checking one against the other should not have to convert in their head.
+
+**`RotationUtils.getSpinAngle` only ever counts upwards.** A wheel that unwound to reach its target would read
+as a correction rather than a spin, and a transition animating to a smaller number would run backwards — so
+the whole turns are counted from above the current angle, the total is never reset, and at least one turn is
+always added so that a spin onto the step already showing still moves. `getJitterAngle` clamps to half a step
+for the matching reason: past that, `getAngleIndex` reads the step next door, and the wheel would show one
+step while reporting another.
+
+**`TimeUtils.getMeridiem`, `getTwelveHour` and `withMeridiem` live in the namespace rather than in a 12-hour
+field**, because they are the whole of what is easy to get wrong — midnight reads as 12 am and noon as 12 pm,
+so the mapping is `hour % 12` in neither direction and no type catches the mistake.
+
+**`StringUtils.applyTextTransform` capitalizes on `(?<![\p{L}\p{N}])\p{L}` rather than `\b`.** `\b` is
+ASCII-only: it sees no boundary before "état" and one *inside* it, giving "éTat". Matching a letter with no
+letter or digit before it behaves the same way for ASCII and keeps accented words intact. **Do not simplify
+this back to `\b`.**
+
+**`IOUtils.downloadJson` revokes its object URL immediately.** Without the revoke the blob is pinned in memory
+for the lifetime of the page.
+
+**`EasingUtils.protect` clamps the input rather than the output.** Clamping the output would flatten `back`
+and `elastic`, whose whole point is to leave the `0`–`1` range in the middle; clamping the input leaves the
+overshoot alone while still pinning the two ends.
+
+**`Vec2d`, `Vec3d` and `Vec4d` are factories taking key names** so that `Point2d`, `Size2d`, `Index2d`,
+`Vector3d`, `Rect` and `Bounds` share one set of operations without the arithmetic being written six times.
+
+**`ShapeConst`'s `dodecagon` is named for what it is rather than for the circle it stands in for**, because a
+shape here is a list of corners and a circle has none. An exact circle is reachable without a name — a
+`square` whose join radii are half its side rounds into one, every corner's arc sharing the square's own
+center — but that takes a second descriptor the caller has to pass, which is why the twelve-sided entry earns
+its place.
+
+**`ShapeUtils` falls back to an edge length of `1` where two corners sit in the same spot.** The division
+would otherwise produce `NaN` and take the whole path with it, and a path of `NaN` renders as nothing at all.
+With the fallback only that one corner is wrong and the rest of the shape still draws.
+
+**`PolygonUtils.getLineIntersection` passes an epsilon of `1e-6`, looser than `Point2dUtils.intersectLines`'
+own `1e-8`.** Polygon edges that are nearly parallel are better treated as parallel than sent off to a distant
+corner. The number is measured and is the user's; flag a concern rather than changing it.
+
+**`FunctionUtils.trailingThrottle` holds its pending arguments outside the timer's closure.** The timer is
+scheduled once per cooling-off period, so later calls in the same period have to be able to overwrite what the
+run will use — which is what lets the last value through rather than the first.
+
+**`KeyframeUtils` guards its release with a `released` flag.** One caller releasing twice would drive the
+tally below what it should be and delete a rule other callers are still animating with.
+
+**`JSXTextMetricsUtils` treats a measured width of `0` as a fitted size of `0`.** An empty string measures
+nothing, and dividing by that gives `Infinity`, which drags the whole stack's scale to `0` and blanks out
+every other line.
+
+**`JSXTextParserUtils` forces `display`, `visibility` and `white-space` rather than reading them.** Each piece
+is redrawn inline whatever its source was, and the tree being walked hides itself and holds every line
+unwrapped so that spaces survive measurement. The baseline shares those last two, so comparing against it
+would drop them and leave the redrawn text collapsing whitespace that was measured.
+
+**`JSXTextParserUtils.pushStructuralLineBreak` collapses structural breaks only.** Two blocks in a row would
+otherwise close one and open the next, producing a stray blank line between them. Breaks the author wrote — a
+literal newline, or a `<br>` — are content and always push, or `"a\n\nb"` silently loses its blank line.
+**Do not route the explicit sites through it.**
+
+**`JSXTextParserUtils` hands raw text to `measureTextWidths`**, which applies any `text-transform` itself, so
+the transform is applied once rather than twice.
+
+### `Color`: `colord` reads and recognises, and does nothing else
+
+**`colord` parses every CSS notation and the named colors, and reports which notation a string was written in.
+That is the whole of its job here.** The parsing is a table and a grammar nobody should hand-write, and the
+notation report is what lets a control hand a value back in the spelling it was given. What `colord` cannot do
+is hold a color without losing it: its hue-space output is rounded to whole numbers, so a hex value taken to
+HSV and back comes out different for **3472 of the 4096** three-digit colors — `#123456` returns as `#123457`.
+A picker storing that would shift a shade every time a value passed through it, which is the exact fault the
+file exists to prevent. So `Color.parse` uses `colord` to read and recognise, then re-derives the value
+through the conversions in the file.
+
+**Units follow CSS**, and the percentages were `0`–`1` fractions in an earlier build. Nothing reads them that
+way any more.
+
+**An unreadable string answers `undefined` rather than black.** A control handed something it cannot read
+should say so; substituting a color hides the fault at the one place it could still be reported.
+
+**`HSV.toCss` writes `hwb()`.** CSS has no `hsv()` notation, and `hwb()` is HSV under another name that
+converts exactly, so the result stays in a hue-based space instead of falling back to `rgb()`.
+
+**`HSV.interpolate` and `HSL.interpolate` take the increasing direction where two hues are exactly opposite**,
+which is what CSS's own `shorter hue` interpolation does.
+
+### `Color.getContrastingColor`: the hue and saturation are kept and the lightness is solved for
+
+Asked for by the user. Hand it a hue, a saturation, a color to sit against and a WCAG ratio, and it answers
+with the `Color.HSL` whose lightness reaches that ratio.
+
+**The contrast arithmetic is written out rather than taken from `colord`'s `a11y` plugin.** The plugin is
+already in the tree and would have worked. The relative-luminance formula is eight lines straight out of WCAG,
+and the file re-derives everything else for the reason above, so importing a plugin to do it would buy a
+dependency on somebody else's rounding in the one file built to avoid exactly that.
+
+**Two lightnesses reach any reachable target, and that is the whole of the API question.** With hue and
+saturation held still, a color's luminance rises steadily as lightness runs from 0 to 100 — so its contrast
+with a fixed other color falls to 1 where the two match in brightness, then climbs again. One answer is darker
+than the other color and one is lighter, and since no input lightness is given there is nothing to call one of
+them the nearer. The caller has to say, which is what `prefer` is for. It is `darker` / `lighter` / `auto`
+rather than a boolean because the useful default is a third thing: whichever side has more room, meaning the
+lighter side for a dark color and the darker side for a light one.
+
+**The preference only chooses between two passes.** Where the preferred side cannot reach the target and the
+opposite side can, the opposite side is answered with. The contrast is the requirement and the side is a
+preference, so the requirement wins; a caller who would rather have nothing than the wrong side sets
+`mustMeetTargetContrast` and checks. Where neither side reaches the target, the preference is ignored
+entirely and the answer is black or white, whichever contrasts more — a best effort has no side.
+
+**Each answer is the lightness nearest the other color that still passes**, found by bisecting 24 times, the
+count `easing.ts` settled on for the same job. Nearest rather than most extreme, so a color asked to reach AA
+against white comes back a mid-tone rather than near-black, and a caller wanting the extreme asks for a higher
+ratio.
+
+**The lightness is rounded outward.** Rounding to the nearest two decimals can land a ten-thousandth below the
+target, which is the worst way to fail a check — true by construction, false by the value that was returned.
+So the darker answer rounds down and the lighter answer rounds up, and what comes back is a value that has
+been verified rather than one derived from a value that was.
+
+**`A` is `3`.** The user's call, and the number is right even though the letter is not: 3:1 is what WCAG asks
+of large text and of non-text elements such as icons and input borders, while level A carries no contrast
+requirement at all. The type's own documentation says as much, because a consumer reading `"A"` will otherwise
+take it for a conformance level.
+
+**Alpha takes no part.** What a see-through color really contrasts with depends on whatever sits behind it,
+which the function is never told, so a translucent color is measured as though it were opaque.
+
+**The ratio itself is not exported.** `toLuminance` and `toContrastRatio` are module-private, because what was
+asked for was one function.
 
 ### Commands
 
@@ -1555,17 +1721,19 @@ readable by a spec without a race.
 
 ### Every abstract has a menu entry, and a page with no examples is a config entry rather than a file
 
-Asked for by the user: a page for each abstract, description and dependencies only, no examples. The four
-that already had pages — `InteractionTracker`, `PointerTracker`, `SVGFilters`, `Virtualizer` — keep theirs;
-the other twenty-three are new entries in the `Abstracts` category and nothing else, and the three new SVG
-defs pages below bring it to thirty.
+Asked for by the user: a page for each abstract, description and dependencies only, no examples. The first
+build left the four that already had pages — `InteractionTracker`, `PointerTracker`, `SVGFilters`,
+`Virtualizer` — with theirs, and the user later closed that gap: **an abstract's entry carries no examples at
+all, and the pages under `SVG defs` are the one exception.** Those stay because what they demonstrate is the
+output of a factory a consumer calls directly, so there is nothing else in the Playground that shows it;
+everywhere else the abstract is either visible through the component that consumes it or reports numbers a
+page of its own would only print back. An abstract's entry is a line of config.
 
 **`ComponentConfig.component` is optional, and an entry without one routes to `EmptyPage`.** The alternative
-was twenty-three directories each holding a file that returns `null`, plus twenty-three imports at the top of
+was a directory per abstract each holding a file that returns `null`, plus an import each at the top of
 `App.tsx`, which is noise standing in for nothing. `AppContent` already draws the title, the description and
 the dependency chips from the config; the page component only ever supplied the examples under them. So an
-abstract with nothing to demonstrate needs no file, and the day one earns examples it gets a page directory
-like any other and the `component` field comes back.
+abstract needs no file, and pruning one is deleting its directory and dropping the `component` field.
 
 **What this buys is not the pages themselves.** `ROUTES_BY_KEY` is built from the same configs, so a
 dependency chip is a link when the name has an entry and plain text when it does not. Before this, a page
@@ -5808,10 +5976,11 @@ carries, and the attributes worth animating on this pair — `baseFrequency` and
 
 ### The `SVGFilters` page is the factory's, and it is filed under `Abstracts`
 
-Asked for as a page to test the filter defs factory. It is the fourth entry in `Abstracts`, beside
-`InteractionTracker`, `PointerTracker` and `Virtualizer`, on the same test those three answer to: it renders no
-component of its own, and what the page shows is a consumer built on top of something the library only hands
-out. Nothing here is a `Fundamental` or an `Exotic` to demonstrate.
+Asked for as a page to test the filter defs factory. It renders no component of its own — what it shows is a
+consumer built on top of something the library only hands out, and nothing here is a `Fundamental` or an
+`Exotic` to demonstrate. That is also why it survived the prune described under _"Every abstract has a menu
+entry, and a page with no examples is a config entry rather than a file"_: a factory's output has no other
+showing anywhere in the Playground.
 
 **It is named for what is on it, not for the folder it comes from.** The first build was `SVGDefs`, on the
 reasoning that a gradient or a pattern example would be the same page's next section rather than its own menu
@@ -6288,13 +6457,13 @@ over the control, so a ratio is a percentage and no measuring happens on the pai
 
 ### The swipe: one gesture over the drag machinery, an axis it claims, and a verdict at the end
 
-Settled, closing the gesture `Abstract` `backlog.md` #26 asked for. `InteractionTrackerUtils.trackSwipe(ref,
+Settled, closing the gesture `Abstract` `backlog.md` #26 asked for. `InteractionTrackerUtils.trackAxialSwipe(ref,
 disabled, opts)` reports how far a pointer has pushed an element along one axis, and at the release says
 whether that push counts. `Drawer` and `Carousel` are its two consumers.
 
 **Both gestures sit on one private `trackPointer`, and the public pair stay separate.** `trackPointer` owns
 the pointer bookkeeping — which pointer is being followed, capture, the four listeners, and whether a release
-was a release or a cancel. `trackDrag` reports position from it and `trackSwipe` reports travel from it, and
+was a release or a cancel. `trackDrag` reports position from it and `trackAxialSwipe` reports travel from it, and
 neither has a way to express the other's report. The item argued for exactly this: a drag reports **state**
 for as long as it lasts, a swipe reports **an event** with a verdict, and the argument survived the later
 decision that a swipe also reports progress in flight, because the verdict is still a thing a drag has no
@@ -6324,7 +6493,7 @@ under the pointer and a page scrolling during a drag would strand a frozen rect.
 **A swipe takes the pointer over only once it has traveled, and a drag takes it immediately.** `trackDrag`
 captures and calls `preventDefault` on `pointerdown`, which is right for a color surface — a click there
 sets a value. A swipe cannot: the elements it watches are a dialog and a carousel viewport, both full of
-buttons and links, and capturing every press inside them would break all of them. So `trackSwipe` waits until
+buttons and links, and capturing every press inside them would break all of them. So `trackAxialSwipe` waits until
 the travel passes a small slop, then captures, and swallows the one `click` that follows an engaged gesture
 so a swipe that began over a button does not also press it. The slop is a ratio of the element like everything
 else here, which does mean a wide carousel tolerates more jitter than a narrow drawer; a constant in pixels
@@ -6360,7 +6529,7 @@ self-moving content not move under the pointer; a finger on the track is a point
 its recorded meaning — hovered, focus within, page hidden — and the swipe joins the rotation predicate beside
 it rather than being folded into the flag the consumer reads.
 
-**The commit thresholds are per component, not one constant here.** `trackSwipe` takes `getCommitRatio` and
+**The commit thresholds are per component, not one constant here.** `trackAxialSwipe` takes `getCommitRatio` and
 has no default; `Modal` and `Carousel` each name their own. The item recorded that shape, and it is the same
 rule as merging two implementations that disagree on a constant. Neither number is a public prop, for the
 reason `SlideButton` has no threshold prop: a tuned value with no consumer behind it is a guess.
@@ -6387,7 +6556,7 @@ fires, and over a panel that does not scroll the swipe works. A gesture that sil
 and not others is worse than one that does not exist, which is why the limit was worth removing rather than
 documenting.
 
-**So the gesture is claimed on the first touch move, and held for the whole gesture.** `trackSwipe` listens
+**So the gesture is claimed on the first touch move, and held for the whole gesture.** `trackAxialSwipe` listens
 to `touchmove` non-passively and, on the first move that has a direction, walks the scroll chain from the
 touch target up to the tracked element asking whether anything there could still scroll the way the finger is
 pushing. If something can, the gesture is the browser's and the swipe stays out of it; if nothing can — the
@@ -6409,6 +6578,35 @@ the areas that have no scroller of their own. The `touchmove` guard is the secon
 events cannot express it: by the time `pointercancel` arrives the browser has already taken the gesture, and
 there is no pointer-level way to say "not this one". The guard is therefore touch-only and the mouse path
 never reaches it.
+
+#### Two entry points, `trackAxialSwipe` and `trackFreeSwipe`, over one private core
+
+`CardStack` needs all four directions from one gesture, and the function was built around a single axis.
+The user's first suggestion was to run two trackers on the same element and hand each one an axis, which is
+the right mechanism and the wrong number of owners: **each tracker writes `ref.style.touchAction` in an
+effect of its own**, one `pan-y` and the other `pan-x`, so two of them on one element write the same property
+with different values and the last effect to run wins. On a touch screen the browser then keeps scrolling one
+of the two axes and that half of the gesture never arrives. The same split runs through the `touchmove` guard,
+where each tracker asks whether the scroll chain has room along **its** axis and the two can answer
+differently about one finger. A gesture claiming both axes needs `touch-action: none`, which neither of them
+would ever write, and it needs somewhere to arbitrate two verdicts from one diagonal push.
+
+**So the inside of the suggestion was kept and the outside was given one owner.** `trackSwipeGesture` is
+private and takes `getAxis: () => SwipeAxis | undefined`, where `undefined` means free. Exactly three things
+read it — which travel the slop threshold is measured against, which `touch-action` is written, and how the
+verdict is decided — and everything else a swipe competes with is written once. The travel it reports
+internally is always both axes; `trackAxialSwipe` unwraps the one its caller asked for.
+
+**Both names are specific, and that is the user's rule rather than a consequence.** The obvious rename was to
+leave `trackSwipe` alone and add `trackFreeSwipe` beside it, which reads as though the plain one is the
+general case and the other a variant — it is not, they are two equal choices. `trackSwipe` therefore became
+`trackAxialSwipe` in the same change. `Modal` and `Carousel` moved with it and neither changed in any other
+way, since the axial signature is untouched.
+
+**The verdict for a free swipe is one direction, not two.** `GestureUtils.computeFreeSwipeDirection` takes the
+axis traveled furthest and measures only that one against the commit ratio, so a push mostly rightwards and a
+little downwards commits to `right` rather than to both or to neither. `computeTravelAxis` is split out beside
+it because the `touchmove` guard needs the same answer about a finger before any progress has been computed.
 
 ### Controls: `ColorArea`, and the value form a picker has to hold
 
@@ -9997,6 +10195,241 @@ preset the examples render. **Where a family's presets are two views of one shel
 page and not the other is a claim that the behavior is missing**, and that claim should be true or the demo
 should be there.
 
+### `Exotics/PointerEffects`: three wrappers that restyle their content by where the pointer is
+
+`Tilter`, `ShadowCaster` and `LightCatcher` are one family and now sit in one folder, in the library and in
+the Playground's tree. Each wraps arbitrary content, reads the pointer against its own box, and changes one
+thing about how that content looks: it leans, it throws a shadow, or it brightens.
+
+**The name was chosen over `Responders` and `Surfaces`, and its cost was known.** `Responders` reads better in
+the tree — a plural agent noun beside three agent nouns — but says nothing about the pointer, and most of the
+library responds to something. `Surfaces` would have looked like a folder for `Surface` and `GlassSurface`,
+which live in `Composites`. The user took `PointerEffects` for being unambiguous about what is inside, and
+**the cost is that "effect" now means two things**: a function from measurements to CSS values in `Proximity`
+and in `Wheel`'s `computeEffect`, and a component here. Worth knowing before a fourth thing is called one.
+
+**What makes them a family is the shape they share, not the folder.** All three take the pointer's distance
+against their own box, turn it into a strength that is full while the pointer is on the content and fades to
+nothing at a stated range, and spend that strength on exactly one visual property. Any fourth one belongs
+here if it can be described that way and does not otherwise.
+
+**Each builds its own tracker, and that is the accepted cost of the shape.** Compositing two of them over one
+element runs two trackers over the same box. The user weighed this when choosing three small components over
+one general wrapper taking an effect function, and recorded the direction the fix would take: a shared tracker
+passed in, with each component making its own when none is given, the way ids already work. Nothing has been
+built for it.
+
+### `Tilter`: it tracks the area, not the surface that turns
+
+The second component lifted out of the `PointerTracker` page, and the same wrapper shape as `ShadowCaster`.
+The name went through `PlaneTilter` first — the user's image was of something flat being pulled out of its
+plane — and settled on `Tilter` because the wrapper does not care whether what it holds is flat.
+
+**The tracker is on the root, and the rotation is on a child of it.** Putting both on one element is the
+feedback trap: a rotated element's bounding rectangle is not the rectangle it had before the rotation, so the
+reading that caused the turn is taken against a box the turn has already changed. `Proximity`'s magnet entry
+records the same trap from the other side — track the box a thing sits in, not the thing. Splitting them also
+gives the `perspective` somewhere to live, since a rotation about X or Y does nothing without one on an
+ancestor.
+
+**The turn has two falling halves, and only one of them was built first.** The user's description of the
+curve: nothing at full distance, growing as the pointer approaches, and shrinking again once the pointer is
+on the surface and heading for the middle. The inner half came for free — the turn is driven by how far the
+pointer is from the surface's center, so dead center is a card being looked at straight on and it lies flat.
+**The outer half was missing**, because the position is clamped to the surface's own box: a pointer anywhere
+outside read as being exactly on the edge, so the turn stayed at full strength however far away the pointer
+went. `tiltRangePx` is the fix — a multiplier that is `1` while the pointer is on the surface and falls to
+`0` as it walks out to that distance.
+
+**The fade runs from the edge rather than from the center.** Measuring from the center would mean a wide
+surface reaching full strength before the pointer had touched it and a narrow one never quite getting there,
+since the same number would sit at a different place on each. Running it from where the pointer actually
+meets the surface makes the strongest turn happen at the edge for anything, whatever its size, which is also
+where a hand pressing a real card would tip it most.
+
+**What follows from tracking the root is that the consumer sizes the area the tilt answers to.** The turn
+reaches its full angle at the edge of the box the wrapper was given rather than at the edge of the content,
+so a card in a generous box tips gently and the same card in a tight one tips hard. That is a knob without
+being a prop.
+
+**The sheen is a slot, and this is where it differs from `ShadowCaster`.** A specular band has to take the
+corners of whatever is under it, and a wrapper does not know whether its child is a square photo or a card
+rounded to the house radius — a rectangular sheen over a rounded card shows its corners. `ShadowCaster` could
+solve the same problem inside itself because `drop-shadow` reads the content's alpha; nothing equivalent
+exists for a highlight painted over the top. So `renderSheen` is handed the state, including where the band
+should sit, and the consumer draws it with their own corners. Left out, the surface simply turns.
+
+**The band runs against the pointer, not with it.** A highlight that follows the pointer reads as something
+painted on the card; one that slides the opposite way reads as light coming off a surface that has moved.
+`sheenPosition` is reported already inverted, so a painter uses it as a gradient stop without having to know
+that.
+
+**Everything in the state is scaled by `strength`, and forgetting that for the sheen is what made it pop.**
+The falloff was applied to the turn and not to the band, so walking the pointer away flattened the surface
+while the highlight sat where it was at full brightness — and then vanished the moment the pointer left the
+range, because the painter was gating it on `isResting`, which is a yes-or-no. A reflection cannot outlive
+the tilt that produced it. Both now come off one leaned offset, so the band slides back to the middle as the
+surface flattens, and `strength` is published so a painter can fade with it rather than switching on a
+boolean. **`isResting` is kept, but it is the wrong thing to paint from**: it says the surface is not
+answering at all, which is a state to skip work in, not a dimmer.
+
+### `LightCatcher`: the lamp grid, on one element at a time
+
+Asked for by the user after the other two were up, and named to pair with `ShadowCaster` on the metaphor
+already written into it: the pointer is the light in the room, so one thing throws a shadow away from it and
+the other catches it. The effect it replaces was the lamp grid on the pruned `PointerTracker` page, which the
+user was sorry to lose — this is that, made general enough to wrap anything.
+
+**Its falloff is `Tilter`'s and not `ShadowCaster`'s, and the two are different on purpose.** `ShadowCaster`
+measures from the center, because a shadow's length is about how far away the light is and that is a
+center-to-center question. Brightness is about how near the pointer is to the surface, so the ramp runs from
+the surface's edge — full brightness anywhere on the content, fading to resting out at `lightRangePx`. A wide
+panel and a narrow one therefore reach full brightness where they are actually pointed at rather than at a
+distance that depends on their size.
+
+**`restingBrightness` is what turns a row of them into a spotlight.** At its default of `1` the content is
+exactly as the consumer painted it and the pointer only ever adds. Below `1` everything not being pointed at
+is dimmed, so a row stops being a row of lamps that light up and becomes one lamp moving along a dark row —
+the same components, a different idea, and no new prop to express it.
+
+### `ShadowCaster`: a wrapper, and a filter rather than a box shadow
+
+The first of two components lifted out of the `PointerTracker` page as it was pruned. The user's question was
+whether a generic component could be wrapped around content to apply the effect, and the answer was yes — the
+library already says an effect is a function from measurements to CSS values, in `Proximity` and in `Wheel`'s
+`computeEffect`. This is that idea against one element's own box rather than against an arrangement.
+
+**Two small components rather than one general wrapper, and the user took the cost knowingly.** The
+alternative was a single wrapper taking an effect function, with the tilt and the shadow as sample effects,
+the way `Placement`'s layouts and `Proximity`'s effects already are. It was rejected as too much to guess
+from two examples: each of these can be built without predicting what a third would need, and the user's
+reason for preferring it was that components composite. **The cost is a tracker per component**, so wrapping
+one in the other runs two of them over the same element. The user's answer, recorded because it is the shape
+the fix will take: a shared tracker could be passed in, with each component making its own when none is
+given — the same arrangement ids already have. Nothing has been built for it.
+
+**It draws with `filter: drop-shadow()`, not `box-shadow`, and that is what lets it be a wrapper at all.**
+`box-shadow` draws the shadow of an element's own rectangle, so a wrapper using it would put a square shadow
+behind rounded, clipped or partly transparent content — the wrapper does not know the shape its child paints.
+`drop-shadow` follows the rendered alpha instead, so the shadow is correct for whatever the consumer puts
+inside. Checked on MDN rather than recalled: the syntax is `drop-shadow(<offset-x> <offset-y> <blur>? <color>?)`,
+it has been Baseline since September 2016, and the one thing it gives up against `box-shadow` is the spread
+radius, which this effect has no use for. The other cost is that a filter is more expensive to paint.
+
+**The root fills its parent and centers its child.** A wrapper sized to its content cannot resolve a child
+asking for a percentage of it, which is circular; filling instead means a child's `60%` means sixty percent of
+the space the consumer gave the wrapper. The wrapper's own box being larger than the content costs nothing,
+because `drop-shadow` reads the alpha and an empty box contributes none.
+
+**It does not read the reduced-motion preference, and `isDisabled` is how a consumer applies one.** That is
+the recorded rule that nothing in the library consults the preference internally — the library reports and the
+consumer decides. Disabled here means the shadow rests at a short straight-down throw rather than vanishing,
+since a thing with no shadow at all reads as a different design rather than as a stiller one.
+
+**The ramp ends at nothing, and resting is not the same state as far away.** The first build faded the
+shadow to a floor of `0.25` at the edge of the light, which the user caught: at full distance there should be
+no shadow at all. That is the honest end of the metaphor — the pointer is the light, so a pointer out of
+range casts nothing. `minOpacity` therefore defaults to `0`. **What it must not take with it is the resting
+shadow**, which is a different thing wearing the same number: a page with no pointer on it at all, or one
+that has turned the effect off for reduced motion, still wants its content sitting on something. So
+`restingOpacity` is its own prop and keeps the old `0.25`. Reading the two as one value is what produced the
+fault.
+
+**Both components take an `activeRangePx`, and it is separate from the ramp.** Asked for by the user once
+both were up. Without it a pointer anywhere on the page drives every one of these on it, so a wall of cards
+all lean and all throw shadows at once as the pointer crosses — right for a single thing on a quiet page,
+wrong for a grid. Outside the range each rests, which for `Tilter` is flat and for `ShadowCaster` is the short
+straight-down shadow. It is measured from the center rather than from the element's edge, the same way
+`lightRangePx` already was, so the two numbers on `ShadowCaster` can be compared without knowing which basis
+each uses. Left out it means no limit, so nothing that existed before it changes.
+
+**Its own page draws on white rather than in a `PageMeasureBox`**, which is the exception already recorded
+under _"an example borrowing the page's ground is claiming to be the page"_ — a black shadow needs a light
+ground to read against. Nothing about the component asks for a checkerboard either: its box is its parent's,
+and what the page is showing is the shadow rather than the extent.
+
+**The color prop carries no alpha of its own.** Whatever is passed is parsed with `Color.parse` and re-emitted
+with the alpha the distance ramp worked out, so a consumer chooses what the shadow is made of and the near and
+far opacities decide how dark it is. Letting both carry alpha would mean two numbers multiplying into one
+result that neither of them names.
+
+### `CardStack`: the pile keeps the geometry, the consumer keeps the card
+
+Asked for by the user while pruning the `Abstracts` pages: the `InteractionTracker` page's card-stack example
+was the one thing on it worth keeping, so it was lifted out of the Playground and made a component. The name
+was theirs, chosen from a list where the alternatives were `Deck`, which reads as slides to anyone who has
+met a presentation tool, `SwipeDeck`, which pins the component to one of its three routes in, and `Shuffler`,
+which is an agent noun for a thing that does not shuffle.
+
+**Headless, so what the component owns is the pile and never the card.** Which cards exist right now, how far
+the top one has been pushed, which way it is leaving, and the stacking order are geometry, and they go in
+`CardStackCardState`. What a card looks like — its fill, its corners, the tilt it takes as it is pushed — is
+paint, and it is the consumer's, computed from the state they are handed. It is the same split as `Trail`,
+which places the traveler and lets the consumer draw it.
+
+**The pile's own shape is geometry, so `cardGap` and `funnelRatio` are the stack's numbers and not the
+painter's.** The first build left the offset to the consumer, who nudged each card down by its `depth`. A
+painter cannot do it: `depth` says where one card sits, and the shape of the pile needs the count of the
+others, which only the stack has. So the stack sizes and places the card slot, and the consumer paints
+inside a box that is already the right size — the same division as `Trail` placing the traveler.
+
+**The pile fits inside the box, and it is the cards that give up the room.** The rule the user settled on:
+a card is as tall as the box less `(mountedCount - 1) * cardGap`, the bottom-most card sits flush with the
+bottom of the box, and each card above it is lifted by one gap — so the top card's top edge is the box's top
+edge and nothing sticks out. An earlier build had the pile grow upwards out of the box instead, which made
+the box a statement about one card rather than about the stack. Raising the gap now makes every card shorter
+rather than making the stack taller, which is what keeps a consumer's layout still after they change it.
+
+**The funnel is width only, and the widest card is the one on top.** `funnelRatio` takes a share of the
+stack's width off each successive card, so the top card fills the box and the ones behind it narrow —
+`0.08` is eight percent off the second and sixteen off the third. The stack's width is therefore the width
+of its widest card, which is the one being touched. A card narrowed past nothing is held at nothing, since
+a negative width is not a smaller card but an inverted one.
+
+**The box is the container's, not the content's.** The root is `100%` by `100%`, so a consumer sizes the
+stack by whatever they wrap it in and everything above — how tall a card is, how far it is lifted, how wide
+it is — is worked out from that. The alternative, sizing the pile to the tallest card in it, was rejected by
+the user because the box would then change height as tall cards left. Taking the size from the container also
+makes the transforms free: travel arrives as a fraction of the element, so following the pointer is
+`translate` in percentages, and a card leaving flies `1.5` box-widths out whatever the box is.
+
+**It renders the pile and nothing else, and the buttons come from the controller.** The first build had a
+`renderControls` slot drawing them under the pile inside the stack's own box, which was `Carousel`'s shape
+copied. The user rejected it and gave the general rule instead — see _"A component hands out a controller and
+renders no controls of its own"_ in `conventions.md`. Two things went wrong with the slot: the stack's box
+was then the pile plus a toolbar rather than the pile, so nothing wrapping it could frame the pile alone, and
+where the buttons sat was the component's decision rather than the page's.
+
+**Keyboard and pointer are answered by different criteria, and only one of them can be closed from inside.**
+**2.1.1 Keyboard**, Level A, is closed in the component: the root is focusable and the four arrow keys send
+the top card, always, whatever else was passed. **2.5.1 Pointer Gestures**, Level A — _"all functionality that
+uses multipoint or path-based gestures for operation can be operated with a single pointer without a
+path-based gesture, unless a multipoint or path-based gesture is essential"_ — and **2.5.7 Dragging
+Movements**, Level AA — _"all functionality that uses a dragging movement for operation can be achieved by a
+single pointer without dragging, unless dragging is essential or the functionality is determined by the user
+agent and not modified by the author"_ — both bite, because the understanding document for 2.5.1 names a
+swipe as path-based in as many words, and neither is satisfied by a keyboard route, since both are about
+pointers. Sending a card is a discrete choice rather than something the drag is essential to, so the
+exception does not apply.
+
+**So the obligation lands on the consumer, which is `Timeline`'s and `Scroller`'s position rather than
+`Carousel`'s.** `Carousel` closes it by attaching the swipe only when `renderControls` was passed, so nobody
+can ask for the gesture without the route; that is only available to a component that draws the controls, and
+this one does not. What is left is `send`, handed out at mount, and a props block saying plainly that anything
+sending a card without a drag has to be built on it. **A `CardStack` whose only pointer route is the swipe
+fails 2.5.1 and 2.5.7, and the library cannot promise otherwise.** The Playground's deck is what discharging
+it looks like: four buttons beside the pile, each calling `send`.
+
+**A card is sent by one route and leaves by one path.** `send` is what the gesture, the arrow keys and the
+controls all call, so the flight, the callback and the advance happen once and in one order however the card
+was pushed. It refuses while a card is already leaving, which is what stops a fast second press sending two
+cards on one transition.
+
+**`topIndexSignal` rather than a count of what has gone.** An index into `cards` says the same thing and says
+it in the consumer's own terms, so dealing again is setting it to zero and an empty pile is it reaching the
+card count. `mountedCount` is what keeps a long deck cheap: only that many cards are in the document, so the
+cost of a stack does not grow with the deck behind it.
+
 ### `FlipCard`: the smallest thing that can turn a barrel
 
 **A card is not a carousel, and inheriting the carousel's contract was the alternative that got refused.** The
@@ -11297,8 +11730,19 @@ top of the thing it measures is the wrong way round. The box now isolates itself
 box, so the outline is a measurement rather than a frame. It was defaulting to 20px, which quietly made every
 demo on every page smaller than the thing being measured, and three pages had grown a
 `size + MEASURE_BOX_PADDING * 2` expression to cancel it back out. The default is now zero and those
-expressions are gone. **`TypewriterPage` is the one exception and opts in**, because unpadded text is hard to
-read; `MEASURE_BOX_PADDING` stays exported for it.
+expressions are gone. **The components that draw text are the exception and opt in** — `Typewriter`,
+`RichText`, `ScrambleText` — because unpadded text is hard to read; `MEASURE_BOX_PADDING` stays exported for
+them. The user restated the scope later, in those terms: padding belongs to the text components and to nothing
+else, so a demo of anything that is not text hugs its box.
+
+**A demo paints at the full size of its box, and a demo drawn smaller than the box is the same fault from the
+other end.** The `CardStack` sample was painted at 70% of the stack's own size, which put a ring of
+checkerboard inside the outline and made the box read as a frame again — the padding argument exactly, moved
+from the box's style into the content's. The box measures what the component asked for, so the sample fills it.
+
+**`isFilling` is how a box takes the width it is given rather than a number.** A demo of something sized by its
+container has no width of its own to state, and a number written into the page instead is a number that
+overflows the example card as soon as the window is narrower than it was when the number was chosen.
 
 **The box hugs its content, and that is the same point from the other end.** It reports what the component asked for and
 nothing else, so the outline around a demo is a measurement rather than a frame. That was intent and not yet
@@ -11995,7 +12439,7 @@ against a pixel range, eased so the pull is already visible at the far end of it
 the last few pixels. The lamps keep the edge ratio because a lamp's glow really is a property of its shape.
 Both numbers are in the reading precisely so a consumer can pick the one that matches what it is modeling.
 
-**The magnet tracks the box it sits in, not itself, and this is the feedback trap `trackSwipe` already
+**The magnet tracks the box it sits in, not itself, and this is the feedback trap `trackAxialSwipe` already
 documents.** An element that leans towards the pointer moves the very box its reading is measured from, so the
 next reading is taken from the displaced position and the direction wanders as the pointer closes in. The fix
 here is not a frozen rect but a different subject: the tracker watches the stage, which never moves, and the
@@ -12047,9 +12491,9 @@ direction to leave in, so it reports the middle of the right-hand edge, matching
 reporting `0` for the origin.
 
 **One document listener and one frame, shared by every consumer, because an element cannot hear a pointer that
-never touches it.** The listener has to be on the document, and the lamp grid alone calls `create` twelve
-times, so a listener per consumer would be twelve listeners and twelve `getBoundingClientRect` calls per
-pointer event. Instead the module holds the client point and a subscriber set, `pointermove` marks the frame
+never touches it.** The listener has to be on the document, and the case this was designed against — a grid of
+twelve lamps, each reading the pointer against its own box — calls `create` twelve times, so a listener per
+consumer would be twelve listeners and twelve `getBoundingClientRect` calls per pointer event. Instead the module holds the client point and a subscriber set, `pointermove` marks the frame
 dirty, and one `requestAnimationFrame` recomputes every subscriber — the `Dismisser` shape, which
 attaches on the first consumer and detaches on the last. Scroll and resize mark the same frame dirty, since a
 page moving under a still pointer changes every reading.
@@ -12092,10 +12536,12 @@ abstract being the one to hand it out.
 **The Playground gained an `Abstracts` category for it**, ahead of `Exotics`. Nothing that renders no DOM had
 a page before; the alternative was filing it under `Exotics`, which is the folder for things that do render.
 
-#### The dock, the card stack and the tilt's sheen: three examples, and the two things that were not obvious
+#### The dock, the card stack and the tilt's sheen: three findings that outlived the examples
 
-Added to the `PointerTracker` and `InteractionTracker` pages. Two of the three needed a decision that the
-sketch did not contain, and both are the kind that would be got wrong a second time.
+All three began as examples on the `PointerTracker` and `InteractionTracker` pages, and none of those pages
+exists any more — the pages were pruned, the card stack became `CardStack` and the tilt became `Tilter`. What
+is kept here is the part that needed a decision the sketch did not contain, because each is the kind that
+would be got wrong a second time.
 
 **The dock sizes every tile from the row's layout at rest, never from where the tiles currently are.** A dock
 grows the tile under the pointer and its neighbors by less, which means the row's total width changes while
@@ -12110,12 +12556,13 @@ centring the result, so the whole row breathes symmetrically around the pointer.
 seven at full magnification is 285px, so a box sized to the resting row has tiles hanging out of it. The
 constants were chosen against the magnified figure, which is the one worth computing before picking them.
 
-**The card stack empties and re-deals rather than cycling a card to the back.** Sending the flown card
-straight to the bottom of the stack is one line shorter and looks broken: the element survives, so its
-transform changes from off-screen to the back of the deck and the browser animates the difference — the card
-visibly slides back in from the side it just left. Cards are removed from the list instead, which destroys the
-element and leaves nothing to animate, and the deck refills once the last one has gone. That also satisfies
-the house rule that a demo a visitor can move must be a demo they can put back, with no reset button.
+**A card that has gone is destroyed, never cycled to the back of the stack.** Sending the flown card straight
+to the bottom is one line shorter and looks broken: the element survives, so its transform changes from
+off-screen to the back of the deck and the browser animates the difference — the card visibly slides back in
+from the side it just left. The element has to stop existing, so there is nothing left to animate. `CardStack`
+keeps that by mounting a window of the list rather than the whole of it: a card that leaves falls out of the
+window and its element goes with it. What it did not keep is the automatic re-deal — dealing again is a
+command on the controller now, and the Playground puts a button on it.
 
 **The tilt's sheen is a band positioned by its own color stops, and it travels against the tilt.** A
 reflection is of something that is not moving, so it slides the opposite way to the surface and further than
@@ -12140,38 +12587,32 @@ string, and a monitor per preference would be a file each.
 
 **One `MediaQueryList` and one listener per distinct query, however many consumers ask.** A module-level map
 keyed by the query string holds the signal and a subscriber count; the first consumer opens the listener and
-the last closes it, the `Dismisser` shape again. The lamp grid is the case that makes it matter —
-twelve consumers on one page, which as a listener each is what `Rotator` used to do with one wheel and would
-have done badly with twelve. The signal stays in the map after the last consumer leaves, so a page mounting
+the last closes it, the `Dismisser` shape again. Twelve consumers on one page is the case that makes it
+matter — which as a listener each is what `Rotator` used to do with one wheel and would have done badly with
+twelve. The signal stays in the map after the last consumer leaves, so a page mounting
 the same query again reuses it rather than flickering from a stale `false`.
 
 **Nothing in the library reads it internally.** `Rotator` stopped consulting the preference when the wheel's
 enforcement was removed, and `PointerTracker` never did anything with it. Every consumer is a Playground page
 or example, which is the point: the library reports, the consumer decides.
 
-### The Playground's `Abstracts` category, and which four earn a page
+### The Playground's `Abstracts` category
 
 The category exists because `PointerTracker` had nowhere honest to go: `Exotics` is things that render DOM, and
 it renders none. The user's call was to keep the category rather than file it wrongly or ship no page at all —
 the one Abstract with no component consumer would otherwise be the only thing in the library you cannot look
 at.
 
-**Four Abstracts earn a page, and the test is whether anything already shows them.** `PointerTracker` has no
-component consumer at all. `InteractionTracker` is seen today only through a color surface, a drawer and a
-carousel, which show what it is used for rather than what it reports. `Virtualizer` was visible only inside a
-stress-test modal buried in the Select page. Everything else is either already on screen through the component
-that consumes it — `Rotator` through the wheels, `ElementFader` through every overlay, `Dismisser` and
-`FocusManager` through the modal, `Typeahead` through select, `MaskedField` through the inputs, `ColorExtractor`
-through the color input — or would be a page of numbers changing, which is `ElementObserver`, `SignalMirror`,
-`TextSync`, `MediaQueryMonitor`, `LiveAnnouncer` and `FrameRateMonitor`.
-
-**`Anchor` was argued for and rejected by the user: it is already everywhere.** Tooltips, menus, selects and
-the spotlight all position through it, so a page would be a fourth showing of a thing three pages already show.
+**Every Abstract has an entry, and none of them carry examples** apart from the `SVG defs` pages; the rule and
+its reasoning are under _"Every abstract has a menu entry, and a page with no examples is a config entry rather
+than a file"_. `Anchor` was the first case argued that way and rejected before the rule was general: it is
+already everywhere — tooltips, menus, selects and the spotlight all position through it, so a page would be a
+fourth showing of a thing three pages already show.
 
 **This is a Playground answer, not a documentation answer.** The user's note, recorded because it changes the
 shape of the question later: the site is a showcase today and will likely become documentation, and at that
-point every Abstract needs a page whether or not it has anything to demonstrate. The four-page rule is about
-what is worth demonstrating, not about what is worth documenting.
+point every Abstract needs a page whether or not it has anything to demonstrate. What earns examples is a
+question about what is worth demonstrating, not about what is worth documenting.
 
 **Also raised by the user and not built: listing, in each component page's description, which Abstracts it
 uses.** The objection they raised themselves is maintenance — a hand-written list rots the moment a component
@@ -12352,18 +12793,18 @@ before the rule: a card gradient from `primary.dark` to `secondary.main`, and a 
 
 **`color.background.*` is the page's, and nothing else may use it.** Stated by the user after the first pass
 painted every example's stage with a `background.dark` to `background.light` gradient: that family names the
-page's own ground, so an example borrowing it is claiming to be the page. The cast-shadow demo is the one
-exception, and only because a black shadow needs a light ground to read against; it carries a `secondary.dark`
-to `secondary.light` stage of its own.
+page's own ground, so an example borrowing it is claiming to be the page. The shadow-casting demos are the one
+exception, and only because a black shadow needs a light ground to read against; they carry a pale stage of
+their own, which is still true now that they live on `ShadowCaster`'s page.
 
 **What replaces it depends on what the example is showing, and there are three answers.** The correction came
 after a second pass wrapped everything in `PageMeasureBox`, which was as wrong as painting everything.
 
 - **`PageMeasureBox`** — the checkered, dash-bordered wrapper — is for an example whose **outer shell matters**:
   something is measured, something moves inside its bounds, or the point is where the component's box ends.
-  The lamps, magnet and tilt qualify, because every one of them is about a reading taken against a
-  box; so does the swipe, which travels a fraction of its own width. **The interaction flags do not** — nothing
-  moves, nothing is measured, and a box around a hover state is decoration pretending to be information.
+  Anything whose whole point is a reading taken against a box qualifies, and so does a swipe, which travels a
+  fraction of its own width. **A hover state does not** — nothing moves, nothing is measured, and a box around
+  it is decoration pretending to be information.
 - **`color.control.background.main`** is for anything that should read as a control's own surface. The
   virtualizer's lists take it, because a scrolling list of rows is what a select's popup is, and the two
   looking alike is the useful signal.
@@ -12462,7 +12903,7 @@ settled index back into the gap it should sit in.
 spot is a click; press, move and release is a click as well, on the nearest common ancestor. The first build
 let it reach the handler that picks an item up, so releasing a drag immediately picked the same item back up
 in tap-to-place mode: it stayed dimmed, the list stayed lit, and every later press was answered by a state
-machine the user did not know was running. `trackSwipe` had already met this and its answer is copied — a
+machine the user did not know was running. `trackAxialSwipe` had already met this and its answer is copied — a
 capture-phase `click` listener on the list root that swallows exactly one click after a pointer gesture. Worth
 holding onto as the general shape: **any gesture built on pointer events owes the click a decision**, because
 the browser will send one whether or not the gesture wanted it.

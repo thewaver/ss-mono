@@ -118,7 +118,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         void props.onIndexChange?.(next);
     };
 
-    const { getIsSwiping } = InteractionTrackerUtils.trackSwipe(
+    const { getIsSwiping } = InteractionTrackerUtils.trackAxialSwipe(
         getViewportRef,
         () => props.renderControls === undefined || getIsDisabled() || getCount() < MIN_ROTATABLE_COUNT,
         {

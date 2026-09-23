@@ -4,7 +4,6 @@ import { createStore } from "solid-js/store";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
-import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField, PageSelectField } from "../../../StyledComponents/Field/Field";
@@ -12,7 +11,6 @@ import { FrostedExample } from "./Examples/Frosted";
 import { TicketExample } from "./Examples/Ticket";
 import type { ExampleKey, ExampleProgress, ScratchCardExampleProps } from "./ScratchCardPage.types";
 
-import { MEASURE_BOX_PADDING } from "../../../PageComponents/MeasureBox/MeasureBox.css";
 
 const EXAMPLES_ROOT = "/src/App/Pages/Reveals/ScratchCardPage/Examples";
 
@@ -33,7 +31,6 @@ const MIN_THRESHOLD = 0.05;
 const MAX_THRESHOLD = 1;
 const THRESHOLD_STEP = 0.05;
 const RATIO_DIGITS = 2;
-const CARD_WIDTH = 360;
 const CIRCLE = "circle";
 const BRUSH_SHAPES = [CIRCLE, ...ShapeConst.DEFAULT_SHAPES] as const;
 const NOTHING_SCRATCHED = 0;
@@ -83,9 +80,7 @@ export const ScratchCardPage = () => {
                 name: "Ticket",
                 readout: () => describe("ticket", "keep going"),
                 component: () => (
-                    <PageMeasureBox width={() => CARD_WIDTH} padding={() => MEASURE_BOX_PADDING}>
-                        <TicketExample {...exampleProps("ticket")} />
-                    </PageMeasureBox>
+                    <TicketExample {...exampleProps("ticket")} />
                 ),
                 path: `${EXAMPLES_ROOT}/Ticket.tsx`,
             },
@@ -94,9 +89,7 @@ export const ScratchCardPage = () => {
                 name: "Frosted",
                 readout: () => describe("frosted", "what is under it sharpens as the frost goes"),
                 component: () => (
-                    <PageMeasureBox width={() => CARD_WIDTH} padding={() => MEASURE_BOX_PADDING}>
-                        <FrostedExample {...exampleProps("frosted")} />
-                    </PageMeasureBox>
+                    <FrostedExample {...exampleProps("frosted")} />
                 ),
                 path: `${EXAMPLES_ROOT}/Frosted.tsx`,
             },

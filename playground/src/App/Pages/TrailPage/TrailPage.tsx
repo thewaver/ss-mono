@@ -3,7 +3,6 @@ import { createMemo, createSignal } from "solid-js";
 import { MediaQueryMonitorUtils } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
@@ -11,7 +10,6 @@ import { CircuitExample } from "./Examples/Circuit";
 import { TimelineExample } from "./Examples/Timeline";
 import type { TrailExampleProps } from "./TrailPage.types";
 
-import { MEASURE_BOX_PADDING } from "../../PageComponents/MeasureBox/MeasureBox.css";
 
 const EXAMPLES_ROOT = "/src/App/Pages/TrailPage/Examples";
 
@@ -50,13 +48,11 @@ export const TrailPage = () => {
                 readout: () =>
                     `${getPercent(circuitProgressSignal[0]())} round the loop, ${circuitPlayingSignal[0]() ? "running" : "stopped"} — the controller starts it, stops it and sends it back to the start`,
                 component: () => (
-                    <PageMeasureBox padding={() => MEASURE_BOX_PADDING}>
-                        <CircuitExample
-                            {...commonProps}
-                            progressSignal={circuitProgressSignal}
-                            isPlayingSignal={circuitPlayingSignal}
-                        />
-                    </PageMeasureBox>
+                    <CircuitExample
+                        {...commonProps}
+                        progressSignal={circuitProgressSignal}
+                        isPlayingSignal={circuitPlayingSignal}
+                    />
                 ),
                 path: `${EXAMPLES_ROOT}/Circuit.tsx`,
             },
@@ -66,13 +62,11 @@ export const TrailPage = () => {
                 readout: () =>
                     `${getPercent(timelineProgressSignal[0]())} along the path — nothing is running, the slider is what puts the marker there`,
                 component: () => (
-                    <PageMeasureBox padding={() => MEASURE_BOX_PADDING}>
-                        <TimelineExample
-                            {...commonProps}
-                            progressSignal={timelineProgressSignal}
-                            isPlayingSignal={timelinePlayingSignal}
-                        />
-                    </PageMeasureBox>
+                    <TimelineExample
+                        {...commonProps}
+                        progressSignal={timelineProgressSignal}
+                        isPlayingSignal={timelinePlayingSignal}
+                    />
                 ),
                 path: `${EXAMPLES_ROOT}/Timeline.tsx`,
             },

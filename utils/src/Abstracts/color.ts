@@ -16,6 +16,23 @@ const HEX_PATTERN = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i;
 const HEXA_PATTERN = /^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i;
 const PERCENT_MAX = 100;
 const PERCENT_DECIMALS = 2;
+const LUMINANCE_LINEAR_MAX = 0.03928;
+const LUMINANCE_LINEAR_DIVISOR = 12.92;
+const LUMINANCE_GAMMA_OFFSET = 0.055;
+const LUMINANCE_GAMMA_DIVISOR = 1.055;
+const LUMINANCE_GAMMA_EXPONENT = 2.4;
+const LUMINANCE_RED = 0.2126;
+const LUMINANCE_GREEN = 0.7152;
+const LUMINANCE_BLUE = 0.0722;
+const LUMINANCE_MIN = 0;
+const LUMINANCE_MAX = 1;
+const CONTRAST_LEVELS: Record<Color.ContrastLevel, number> = { A: 3, AA: 4.5, AAA: 7 };
+const CONTRAST_OFFSET = 0.05;
+const CONTRAST_MIN = 1;
+const CONTRAST_MAX = 21;
+const LIGHTNESS_BISECTIONS = 24;
+const LIGHTNESS_ROUNDING = 100;
+const HALF = 0.5;
 
 extend([namesPlugin]);
 const ALPHA_DECIMALS = 3;
@@ -43,6 +60,30 @@ const mixHue = (from: number, to: number, ratio: number) => {
     return toHue(from + delta * clamp(ratio, 0, 1));
 };
 
+const toLinearChannel = (value: number) => {
+    const channel = clamp(value, 0, CHANNEL_MAX) / CHANNEL_MAX;
+
+    return channel <= LUMINANCE_LINEAR_MAX
+        ? channel / LUMINANCE_LINEAR_DIVISOR
+        : ((channel + LUMINANCE_GAMMA_OFFSET) / LUMINANCE_GAMMA_DIVISOR) ** LUMINANCE_GAMMA_EXPONENT;
+};
+
+const toLuminance = (rgb: Color.RGB) =>
+    LUMINANCE_RED * toLinearChannel(rgb.r) +
+    LUMINANCE_GREEN * toLinearChannel(rgb.g) +
+    LUMINANCE_BLUE * toLinearChannel(rgb.b);
+
+const toContrastRatio = (first: number, second: number) =>
+    (Math.max(first, second) + CONTRAST_OFFSET) / (Math.min(first, second) + CONTRAST_OFFSET);
+
+const toContrastRgb = (value: string | Color.RGB) => {
+    if (typeof value !== "string") return value;
+
+    const parsed = Color.parse(value);
+
+    return parsed && Color.HSVA.toRgba(parsed);
+};
+
 /**
  * Color values, the conversions between them, and the reading of CSS color strings.
  *
@@ -51,18 +92,7 @@ const mixHue = (from: number, to: number, ratio: number) => {
  * are named after their destination: `Color.RGB.toHsl` takes an `RGB` and returns an `HSL`.
  *
  * **Units follow CSS.** Hue is `0`–`360` degrees, saturation, value and lightness are `0`–`100`
- * percentages, red, green and blue are `0`–`255`, and alpha alone is a `0`–`1` fraction. The
- * percentages were `0`–`1` fractions in an earlier build; nothing reads them that way any more.
- *
- * **`colord` reads and recognises strings; the arithmetic here converts and blends.** The split is
- * not a matter of taste. `colord` parses every CSS notation and the named colors, which is a table
- * and a grammar nobody should hand-write, and it reports which notation a string was written in,
- * which is what lets a control give a value back in the spelling it was handed. What it cannot do
- * is hold a color without losing it: its hue-space output is rounded to whole numbers, so a hex
- * value taken to HSV and back comes out different for **3472 of the 4096** three-digit colors —
- * `#123456` returns as `#123457`. A picker storing that would shift a shade every time a value
- * passed through it, which is the exact fault this file exists to avoid. So `parse` uses `colord`
- * to read and recognise, then re-derives the value through the conversions below.
+ * percentages, red, green and blue are `0`–`255`, and alpha alone is a `0`–`1` fraction.
  *
  * Spaces come in pairs. The plain form carries no transparency; the `A` form adds a required
  * `a` field, and only the `A` forms convert to each other. Inputs are clamped to their valid
@@ -115,8 +145,7 @@ export namespace Color {
     /**
      * A `#` followed by 3 or 6 hexadecimal digits, such as `#f0a` or `#ff00aa`.
      *
-     * Only the leading `#` is checked by the compiler — six hex digits cannot be expressed as a
-     * type without enumerating every combination. Use {@link Hex.isHex} to confirm the rest.
+     * Only the leading `#` is checked by the compiler; use {@link Hex.isHex} to confirm the rest.
      */
     export type Hex = `#${string}`;
 
@@ -125,7 +154,7 @@ export namespace Color {
      *
      * The alpha digits are optional: a 3 or 6 digit value is accepted and read as fully opaque.
      * As with {@link Hex}, only the leading `#` is checked by the compiler; use {@link Hexa.isHexa}
-     * for the rest.
+     * to confirm the rest.
      */
     export type Hexa = `#${string}`;
 
@@ -136,18 +165,52 @@ export namespace Color {
     export type Notation = "hex" | "rgb" | "hsl" | "name";
 
     /**
+     * A contrast ratio named rather than written out, for {@link Color.getContrastingColor}.
+     *
+     * `AA` is `4.5` and `AAA` is `7`, the ratios WCAG asks of normal text. `A` is `3`, which is what
+     * large text — 18pt, or 14pt bold — and non-text things such as icons and input borders have to
+     * reach. WCAG attaches no contrast requirement to level A itself, so read `A` as the name of the
+     * `3` threshold rather than as a conformance level.
+     */
+    export type ContrastLevel = "A" | "AA" | "AAA";
+
+    /**
+     * Which side of the other color to come back on.
+     *
+     * `darker` and `lighter` describe the answer relative to the color it was measured against, so text
+     * on a pale surface wants `darker`. `auto` takes whichever side has more room to move, which is the
+     * lighter side for a dark color and the darker side for a light one.
+     */
+    export type ContrastSide = "darker" | "lighter" | "auto";
+
+    /** Options for {@link Color.getContrastingColor}. */
+    export type ContrastOptions = {
+        /**
+         * Which side of the other color to prefer, `auto` when left out.
+         *
+         * It only chooses between two colors that both reach the target. Where the preferred side cannot
+         * reach it and the opposite side can, the opposite side is answered with rather than refused.
+         */
+        prefer?: Color.ContrastSide;
+        /**
+         * Whether a target nothing can reach answers with `undefined` instead of the closest miss.
+         *
+         * Off when left out, so an unreachable target comes back as black or white — whichever of the two
+         * contrasts more. Turn it on where a color that falls short is worse than no color at all.
+         */
+        mustMeetTargetContrast?: boolean;
+    };
+
+    /**
      * Reads any CSS color string into hue, saturation, value and alpha.
      *
-     * Everything `colord` accepts with the names plugin loaded — hex of any length, `rgb()` and `hsl()` in
-     * both the comma and the space syntax, and the named colors. Only the reading is `colord`'s: the value
-     * it answers with is re-derived here, because `colord` rounds its own hue-space output to whole numbers
-     * and a control that stored that would drift a shade every time a value passed through it.
-     *
-     * A control handed something it cannot read should say so rather than substituting a color, which is
-     * why this answers `undefined` instead of falling back to black.
+     * Reads hex of any length, `rgb()` and `hsl()` in both the comma and the space syntax, and the named
+     * colors. A value taken through here and written back out comes back unchanged, so a control can hold
+     * its color in this form without it drifting.
      *
      * @param value The string to read.
-     * @returns The color, or `undefined` when the string is not a color this can read.
+     * @returns The color, or `undefined` when the string is not a color this can read. Nothing is
+     * substituted for an unreadable value, so a caller wanting a fallback supplies its own.
      */
     export const parse = (value: string): Color.HSVA | undefined => {
         const parsed = colord(value);
@@ -188,9 +251,6 @@ export namespace Color {
     /**
      * Whether two color strings describe the same color, whatever notation each is written in.
      *
-     * Replaces the per-space hex comparisons, which could only answer the question for two values already
-     * spelled the same way.
-     *
      * @param a The first color.
      * @param b The second color.
      * @returns `true` when both name the same color and opacity, so `#abcf` matches `#aabbccff` and `red`
@@ -200,6 +260,85 @@ export namespace Color {
         const left = colord(a);
 
         return left.isValid() && colord(b).isValid() && left.isEqual(b);
+    };
+
+    /**
+     * Finds the lightness that makes a hue and a saturation contrast with another color.
+     *
+     * The hue and the saturation are kept and only the lightness moves, so a color kept for its character
+     * keeps it while becoming readable against a known background. Contrast is WCAG's ratio, running from
+     * `1` for two identical colors to `21` for black against white.
+     *
+     * Any reachable target is reached twice — once by a color darker than the other one and once by a color
+     * lighter than it — and each answer is the nearest to the other color on its own side, so what comes
+     * back is the smallest change that passes rather than the most extreme one. `options.prefer` picks
+     * between the two.
+     *
+     * Opacity takes no part: a translucent color is measured as though it were opaque, because what a
+     * see-through color really contrasts with is whatever happens to be behind it.
+     *
+     * @param hue The hue to keep, in degrees. Wraps, so `-30` and `330` mean the same thing.
+     * @param saturation The saturation to keep, as a percentage, clamped to `0`–`100`.
+     * @param against The color to contrast with, as a CSS color string or a {@link Color.RGB} value.
+     * @param target The ratio to reach, as a number clamped to `1`–`21` or a {@link Color.ContrastLevel}.
+     * @param options Which side to prefer, and whether a miss is acceptable.
+     * @returns The color as {@link Color.HSL}, its lightness carrying two decimals and rounded in the
+     * direction that keeps the target met. `undefined` when `against` is a string that is not a color, and
+     * when nothing reaches the target while `options.mustMeetTargetContrast` is set.
+     */
+    export const getContrastingColor = (
+        hue: number,
+        saturation: number,
+        against: string | Color.RGB,
+        target: number | Color.ContrastLevel,
+        options?: Color.ContrastOptions,
+    ): Color.HSL | undefined => {
+        const other = toContrastRgb(against);
+
+        if (!other) return undefined;
+
+        const h = toHue(hue);
+        const s = clamp(saturation, 0, PERCENT_MAX);
+        const ratio = clamp(typeof target === "number" ? target : CONTRAST_LEVELS[target], CONTRAST_MIN, CONTRAST_MAX);
+        const otherLuminance = toLuminance(other);
+
+        const darkerLimit = (otherLuminance + CONTRAST_OFFSET) / ratio - CONTRAST_OFFSET;
+        const lighterLimit = ratio * (otherLuminance + CONTRAST_OFFSET) - CONTRAST_OFFSET;
+        const widestSide =
+            toContrastRatio(LUMINANCE_MIN, otherLuminance) >= toContrastRatio(LUMINANCE_MAX, otherLuminance)
+                ? "darker"
+                : "lighter";
+
+        const preferred = !options?.prefer || options.prefer === "auto" ? widestSide : options.prefer;
+        const opposite = preferred === "darker" ? "lighter" : "darker";
+        const reaches = { darker: darkerLimit >= LUMINANCE_MIN, lighter: lighterLimit <= LUMINANCE_MAX };
+        const side = reaches[preferred] ? preferred : reaches[opposite] ? opposite : undefined;
+
+        if (!side) {
+            if (options?.mustMeetTargetContrast) return undefined;
+
+            return { h, s, l: widestSide === "darker" ? 0 : PERCENT_MAX };
+        }
+
+        const limit = side === "darker" ? darkerLimit : lighterLimit;
+
+        let low = 0;
+        let high = PERCENT_MAX;
+
+        for (let iteration = 0; iteration < LIGHTNESS_BISECTIONS; iteration++) {
+            const lightness = (low + high) * HALF;
+
+            if (toLuminance(HSL.toRgb({ h, s, l: lightness })) <= limit) low = lightness;
+            else high = lightness;
+        }
+
+        const scaled = low * LIGHTNESS_ROUNDING;
+
+        return {
+            h,
+            s,
+            l: clamp((side === "darker" ? Math.floor(scaled) : Math.ceil(scaled)) / LIGHTNESS_ROUNDING, 0, PERCENT_MAX),
+        };
     };
 
     /** Operations on {@link Color.RGB} values. */
@@ -354,8 +493,7 @@ export namespace Color {
          * @param ratio How far to travel, clamped to `0`–`1`.
          * @returns The blended color. Hue crosses `0` when that is the shorter arc, so blending
          * from `350` to `10` passes through `0` rather than running back down through `180`. Where
-         * the two hues are exactly opposite, the increasing direction is taken, which is what CSS's own
-         * `shorter hue` interpolation does.
+         * the two hues are exactly opposite, the increasing direction is taken.
          */
         export const interpolate = (from: Color.HSV, to: Color.HSV, ratio: number): Color.HSV => ({
             h: mixHue(from.h, to.h, ratio),
@@ -366,9 +504,8 @@ export namespace Color {
         /**
          * Formats the color as a CSS `hwb()` string.
          *
-         * CSS has no `hsv()` notation, so this uses `hwb()` — the same hue with whiteness and
-         * blackness, which is HSV under another name and converts exactly. Nothing is lost, and
-         * the result stays in a hue-based space rather than falling back to `rgb()`.
+         * CSS has no `hsv()` notation, so this writes `hwb()` — the same hue with whiteness and
+         * blackness, which is HSV under another name and converts exactly.
          *
          * @param hsv The color to format.
          * @returns A string such as `hwb(210 7.06% 66.27%)`.
@@ -454,7 +591,8 @@ export namespace Color {
         /**
          * Formats the color as a CSS `hwb()` string with an alpha component.
          *
-         * See {@link HSV.toCss} for why this is `hwb()` rather than an HSV notation.
+         * CSS has no `hsv()` notation, so this writes `hwb()` with an alpha component, as
+         * {@link HSV.toCss} describes.
          *
          * @param hsva The color to format.
          * @returns A string such as `hwb(210 7.06% 66.27% / 0.5)`.
@@ -507,8 +645,7 @@ export namespace Color {
          * @param ratio How far to travel, clamped to `0`–`1`.
          * @returns The blended color. Hue crosses `0` when that is the shorter arc, so blending
          * from `350` to `10` passes through `0` rather than running back down through `180`. Where
-         * the two hues are exactly opposite, the increasing direction is taken, which is what CSS's own
-         * `shorter hue` interpolation does.
+         * the two hues are exactly opposite, the increasing direction is taken.
          */
         export const interpolate = (from: Color.HSL, to: Color.HSL, ratio: number): Color.HSL => ({
             h: mixHue(from.h, to.h, ratio),

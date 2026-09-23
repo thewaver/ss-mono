@@ -45,13 +45,9 @@ export namespace ShapeConst {
     /**
      * The built-in shapes {@link getDefaultShapePoints} knows how to build.
      *
-     * `dodecagon` is a twelve-sided polygon, and it is named for what it is rather than for the circle it
-     * stands in for: a shape here is a list of corners and a circle has none. It sits up to 3.41% of the
-     * radius inside the circle it approximates, so its flats stay visible at the sizes these are drawn at —
-     * which is the point, a rounded shape that never claims to be round. An exact circle is still reachable
-     * without a name — a `square` whose join radii are half its side rounds into one, every corner's arc
-     * sharing the square's own center — but that takes a second descriptor the caller has to pass, which is
-     * the whole reason this entry exists.
+     * `dodecagon` is a twelve-sided polygon rather than a circle: it sits up to 3.41% of the radius inside
+     * the circle it approximates, so its flats stay visible at the sizes these are drawn at. For an exact
+     * circle, take a `square` and give every corner a join radius of half its side.
      */
 
     export const DEFAULT_SHAPES = [
@@ -416,9 +412,6 @@ export namespace ShapeUtils {
             const next = vertices[ObjectUtils.getNextArrayIndex(i, vertexCount)];
             const deltaX = next.x - curr.x;
             const deltaY = next.y - curr.y;
-            // Two corners in the same spot would divide by zero and turn the whole path
-            // into NaN, which renders as nothing at all. Fall back to 1 so only that
-            // corner is wrong and the rest of the shape still draws.
             const edgeLength = Math.hypot(deltaX, deltaY) || 1;
             const vectorToMidpoint = {
                 x: (curr.x + next.x) * 0.5 - polygonCenter.x,

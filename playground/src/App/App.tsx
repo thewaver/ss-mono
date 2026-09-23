@@ -19,6 +19,7 @@ import { BracketPage } from "./Pages/BracketPage/BracketPage";
 import { BreadcrumbsPage } from "./Pages/BreadcrumbsPage/BreadcrumbsPage";
 import { ButtonPage } from "./Pages/ButtonPage/ButtonPage";
 import { CalendarPage } from "./Pages/CalendarPage/CalendarPage";
+import { CardStackPage } from "./Pages/CardStackPage/CardStackPage";
 import { DrumCarouselPage } from "./Pages/Carousels/DrumCarouselPage/DrumCarouselPage";
 import { TrackCarouselPage } from "./Pages/Carousels/TrackCarouselPage/TrackCarouselPage";
 import { CellAnimationPage } from "./Pages/CellAnimationPage/CellAnimationPage";
@@ -42,7 +43,6 @@ import { FormSectionPage } from "./Pages/FormSectionPage/FormSectionPage";
 import { FormationPage } from "./Pages/FormationPage/FormationPage";
 import { GlassSurfacePage } from "./Pages/GlassSurfacePage/GlassSurfacePage";
 import { ImageSwitcherPage } from "./Pages/ImageSwitcherPage/ImageSwitcherPage";
-import { InteractionTrackerPage } from "./Pages/InteractionTrackerPage/InteractionTrackerPage";
 import { LabelPage } from "./Pages/LabelPage/LabelPage";
 import { FanMenuPage } from "./Pages/Menus/FanMenuPage/FanMenuPage";
 import { MenuPage } from "./Pages/Menus/MenuPage/MenuPage";
@@ -56,7 +56,9 @@ import { OdometerPage } from "./Pages/OdometerPage/OdometerPage";
 import { PaginatorPage } from "./Pages/PaginatorPage/PaginatorPage";
 import { ParticleSpawnerPage } from "./Pages/ParticleSpawnerPage/ParticleSpawnerPage";
 import { PatchBoardPage } from "./Pages/PatchBoardPage/PatchBoardPage";
-import { PointerTrackerPage } from "./Pages/PointerTrackerPage/PointerTrackerPage";
+import { LightCatcherPage } from "./Pages/PointerEffects/LightCatcherPage/LightCatcherPage";
+import { ShadowCasterPage } from "./Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage";
+import { TilterPage } from "./Pages/PointerEffects/TilterPage/TilterPage";
 import { PreviewPage } from "./Pages/PreviewPage/PreviewPage";
 import { ProgressPage } from "./Pages/ProgressPage/ProgressPage";
 import { RadioPage } from "./Pages/RadioPage/RadioPage";
@@ -103,7 +105,6 @@ import { TrailPage } from "./Pages/TrailPage/TrailPage";
 import { TreePage } from "./Pages/TreePage/TreePage";
 import { TypewriterPage } from "./Pages/TypewriterPage/TypewriterPage";
 import { ViewportWrapperPage } from "./Pages/ViewportWrapperPage/ViewportWrapperPage";
-import { VirtualizerPage } from "./Pages/VirtualizerPage/VirtualizerPage";
 import { DrumWheelPage } from "./Pages/Wheels/DrumWheelPage/DrumWheelPage";
 import { OverheadWheelPage } from "./Pages/Wheels/OverheadWheelPage/OverheadWheelPage";
 import { PageCheckboxContent } from "./StyledComponents/CheckboxContent/CheckboxContent";
@@ -217,7 +218,6 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 name: "InteractionTracker",
                 description:
                     "Everything the library knows about a pointer on an element: the hover, focus and press flags a painter reads; a hold that stops a carousel while it is looked at; a drag reported as a ratio of the element's own box; and a swipe that reports travel while it lasts and a verdict when it ends.",
-                component: () => <InteractionTrackerPage />,
             },
             {
                 name: "LiveAnnouncer",
@@ -247,8 +247,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "PointerTracker",
                 description:
-                    "Reports where the pointer is relative to one element: the offset from its center, the angle, the distance, and the point where that same line leaves the element. Dividing the two distances gives one shape-aware number — below 1 inside, 1 on the edge, 2 a further element-radius away. It renders nothing at all; every example on this page is a consumer built on top of it.",
-                component: () => <PointerTrackerPage />,
+                    "Reports where the pointer is relative to one element: the offset from its center, the angle, the distance, and the point where that same line leaves the element. Dividing the two distances gives one shape-aware number — below 1 inside, 1 on the edge, 2 a further element-radius away. It renders nothing at all, so what it does is seen through the things built on it: `Tilter` leans a surface away from the pointer and `ShadowCaster` throws a shadow the other way.",
             },
             {
                 name: "Proximity",
@@ -333,7 +332,6 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 name: "Virtualizer",
                 description:
                     "A window over a list too long to mount: it reports which rows should exist right now, where each one starts, and how tall the whole thing would be. Rows can be measured after they mount rather than guessed, and named rows can be pinned so they stay mounted when scrolled away.",
-                component: () => <VirtualizerPage />,
             },
         ],
     },
@@ -743,6 +741,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 component: () => <BracketPage />,
             },
             {
+                name: "CardStack",
+                description:
+                    "A pile of cards where the top one is pushed away in any of the four directions and the next comes up. What is on a card is the consumer's; what belongs here is the pile — which cards exist right now, how far the top one has been pushed, and which way it is leaving — so a painter can tilt, fade or tint from numbers it is handed rather than measuring anything. A push that falls short of the commit ratio springs back. The gesture is attached only when the page draws the buttons that do the same job without a drag, since a swipe on its own would leave anyone who cannot drag with no way through.",
+                component: () => <CardStackPage />,
+            },
+            {
                 name: "CellAnimation",
                 description:
                     "Cuts an image into a grid and animates the cells on a stagger, where a cell's turn comes from a weight rather than from its index. The animations, weights and origins on this page are Playground samples — the component itself only asks for a function from timeline to result.",
@@ -806,6 +810,29 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 description:
                     "Boxes a person places by hand, sockets on their edges, and cables dragged from one socket to another. The board owns the geometry and the wiring rules: a cable stays fixed to its socket while the box it hangs off is dragged, an input already carrying a cable refuses a second, a node cannot be wired to itself, and the consumer can refuse a pair on top of that. Everything a pointer does is also a tap and a keystroke — pick up, aim, drop, Escape to put back — so a graph can be wired without a mouse.",
                 component: () => <PatchBoardPage />,
+            },
+            {
+                name: "PointerEffects",
+                children: [
+                {
+                    name: "LightCatcher",
+                    description:
+                        "Wraps anything and brightens it as the pointer comes near, as though the pointer carried the light in the room. It is brightest with the pointer on the content and fades back to a resting brightness as the pointer walks out to the edge of the light, reaching full strength at the edge of the content rather than at its middle, so a wide thing and a narrow one behave alike. Drop the resting brightness below one and a row of them stops being a row of lamps and becomes a spotlight, because everything not being pointed at is dimmed rather than merely left alone.",
+                    component: () => <LightCatcherPage />,
+                },
+                {
+                    name: "ShadowCaster",
+                    description:
+                        "Wraps anything and throws a shadow away from the pointer, as though the pointer were the light in the room: on the content the shadow is short, dark and tight, and it lengthens, softens and fades as the pointer retreats, until past the light's range it stops changing. It draws with a filter rather than a box shadow, so the shadow traces the shape the content actually paints — a rounded card, a clipped star, a picture with transparency — instead of the rectangle around it.",
+                    component: () => <ShadowCasterPage />,
+                },
+                {
+                    name: "Tilter",
+                    description:
+                        "Wraps anything and leans it away from the pointer, so a flat card or picture reads as a surface being tipped rather than a picture of one. How far it turns at the edges and how near the viewer sits are both set; the specular band that sells it is a slot rather than something drawn here, because a sheen has to take the corners of whatever is underneath it and a wrapper cannot know them. It tracks the area it was given rather than the surface that turns, so the turn cannot feed back into the reading that caused it.",
+                    component: () => <TilterPage />,
+                },
+                ],
             },
             {
                 name: "Reveals",

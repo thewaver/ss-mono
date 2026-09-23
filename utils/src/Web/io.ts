@@ -21,7 +21,6 @@ export namespace IOUtils {
         downloadLink.href = url;
         downloadLink.click();
 
-        // Without this the blob is pinned in memory for the lifetime of the page.
         URL.revokeObjectURL(url);
     };
 }

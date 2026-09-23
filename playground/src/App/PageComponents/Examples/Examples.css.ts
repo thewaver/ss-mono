@@ -44,6 +44,8 @@ export const exampleContainer = style({
 });
 
 export const exampleDemo = style({
+    position: "relative",
+    zIndex: 1,
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",

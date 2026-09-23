@@ -93,10 +93,6 @@ const splitComputedStyle = (style: CSSStyleDeclaration, baselineStyle?: CSSStyle
         }
     }
 
-    // Forced rather than read. Each piece is redrawn inline whatever its source was, and
-    // the tree being walked hides itself and holds every line unwrapped so that spaces
-    // survive measurement. The baseline shares those last two, so the comparison above
-    // would drop them and leave the redrawn text collapsing whitespace that was measured.
     nonMetrics.display = "inline";
     nonMetrics.visibility = "visible";
     nonMetrics["white-space"] = "pre";
@@ -141,11 +137,6 @@ export namespace JSXTextParserUtils {
         const tokens: ElementSegment[] = [];
         const baselineStyle = el.nodeType === Node.ELEMENT_NODE ? getComputedStyle(el as Element) : undefined;
 
-        // Structural breaks only, which is what this collapse was written for: two blocks in
-        // a row would otherwise close one and open the next, producing a stray blank line
-        // between them. Breaks the author wrote — a literal newline, or a <br> — are content
-        // and always push, or "a\n\nb" silently loses its blank line. Do not route the
-        // explicit sites through here.
         const pushStructuralLineBreak = () => {
             if (tokens.at(-1)?.type === "linebreak") return;
 
@@ -363,8 +354,6 @@ export namespace JSXTextParserUtils {
                         getWordSegmenter().segment((s as StyledTextSegment).text),
                     );
                     const texts = StringUtils.mergePunctuation(StringUtils.intlSegmentsArrayToStrings(intlSegments));
-                    // measureTextWidths applies any text-transform itself, so the raw
-                    // text is passed through here and the transform is applied once.
                     const widths = JSXTextMetricsUtils.measureTextWidths(texts, metrics);
 
                     for (let idx = 0; idx < texts.length; idx++) {

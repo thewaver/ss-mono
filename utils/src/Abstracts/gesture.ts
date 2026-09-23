@@ -11,9 +11,7 @@ export namespace GestureUtils {
     /**
      * Finds which axis a swipe direction belongs to.
      *
-     * Left and right are horizontal, up and down are vertical. Trivial, and worth a function because the
-     * alternative is the same two comparisons written wherever a direction has to be turned back into the
-     * axis it came from, each of them a place to get one of the four words wrong.
+     * Left and right are horizontal, up and down are vertical.
      *
      * @param direction The direction to classify.
      */
@@ -24,14 +22,14 @@ export namespace GestureUtils {
      * Finds how far a swipe has traveled along its axis, as a signed ratio.
      *
      * Both points are ratios of the element the gesture is happening in, so `0` is one edge and `1` is the
-     * other, and the answer is in the same terms: `0.5` is half the element's width or height. Expressing it
-     * that way is what lets one commit threshold mean the same thing on a phone and on a desktop.
+     * other, and the answer is in the same terms: `0.5` is half the element's width or height. One commit
+     * threshold therefore means the same thing on a phone and on a desktop.
      *
-     * The off-axis coordinate is ignored rather than folded in, so a pointer wandering diagonally reports
-     * only the part of its travel that counts. The sign says which way: positive is towards the far edge.
+     * The off-axis coordinate takes no part, so a pointer wandering diagonally reports only its travel along
+     * the axis. The sign says which way: positive is towards the far edge.
      *
-     * Neither point is clamped, so a pointer dragged outside the element reports past `1` or below `0`.
-     * That is deliberate — overshoot is real travel, and a caller that wants it bounded says so itself.
+     * Neither point is clamped, so a pointer dragged outside the element reports past `1` or below `0`. A
+     * caller wanting it bounded clamps it itself.
      *
      * @param origin Where the gesture started, as a ratio of the element.
      * @param current Where the pointer is now, as a ratio of the element.
@@ -45,11 +43,10 @@ export namespace GestureUtils {
      *
      * A gesture that ends short of `commitRatio` reports `undefined` rather than a direction: the pointer
      * moved, but not enough to mean anything, and the caller should put whatever it was moving back where it
-     * started. Distinguishing "nowhere" from a direction is the whole reason this returns an optional.
+     * started.
      *
      * The threshold is compared against the absolute travel, so it applies equally in both directions along
-     * the axis. It is the caller's number rather than this function's, because how far is far enough depends
-     * on what is being swiped — a photo in a carousel is not a modal being dismissed.
+     * the axis.
      *
      * @param progressRatio Signed travel along the axis, from `computeSwipeProgress`.
      * @param axis Which axis the gesture is on.
@@ -68,15 +65,41 @@ export namespace GestureUtils {
     };
 
     /**
+     * Finds which axis a two-axis gesture has traveled furthest along.
+     *
+     * A swipe free to go any of the four ways still commits to one of them, so something has to reduce a
+     * diagonal to a single axis. An exact diagonal resolves horizontally, which is arbitrary and only has
+     * to be consistent.
+     *
+     * @param progress Signed travel along each axis, from {@link computeSwipeProgress} run once per axis.
+     */
+    export const computeTravelAxis = (progress: Point2d): SwipeAxis =>
+        Math.abs(progress.x) >= Math.abs(progress.y) ? "horizontal" : "vertical";
+
+    /**
+     * Decides which of the four ways a swipe committed when both axes are live, or that it did not commit.
+     *
+     * Only the axis it traveled furthest along is measured against `commitRatio`, so a drag mostly rightwards
+     * and a little downwards commits to `right` rather than to both or to neither. The other axis takes no
+     * part once the dominant one is chosen.
+     *
+     * @param progress Signed travel along each axis, from {@link computeSwipeProgress} run once per axis.
+     * @param commitRatio How far it must travel to count, as a ratio of the element.
+     */
+    export const computeFreeSwipeDirection = (progress: Point2d, commitRatio: number) => {
+        const axis = computeTravelAxis(progress);
+
+        return computeSwipeDirection(axis === "horizontal" ? progress.x : progress.y, axis, commitRatio);
+    };
+
+    /**
      * Finds how far to shift what is being swiped, as a ratio of `0..1`.
      *
      * Turns the signed travel of `computeSwipeProgress` into a distance in the direction the gesture is
      * committing towards, so a caller can follow the pointer with a transform without reasoning about signs.
-     * Travel the other way reports `0` rather than a negative number: a modal being swiped away should not
-     * slide further onto the screen when the pointer goes backwards.
+     * Travel the other way reports `0` rather than a negative number.
      *
-     * Overshoot is clamped to `1`, which is the element's own extent. Something dragged past its own size
-     * has already left, and there is nothing further to show.
+     * Overshoot is clamped to `1`, which is the element's own extent.
      *
      * @param progressRatio Signed travel along the axis, from `computeSwipeProgress`.
      * @param direction The direction the gesture is committing towards.

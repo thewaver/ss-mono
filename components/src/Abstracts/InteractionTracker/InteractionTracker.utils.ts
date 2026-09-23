@@ -24,6 +24,14 @@ const SWIPE_TOUCH_ACTIONS: Record<SwipeAxis, string> = {
     horizontal: "pan-y",
     vertical: "pan-x",
 };
+/** A swipe free to go any of the four ways leaves the browser no axis to scroll, since it claims both. */
+const FREE_SWIPE_TOUCH_ACTION = "none";
+/** Where a swipe stands before the pointer has moved, and what it is put back to once one ends. */
+const NO_SWIPE_PROGRESS: InteractionDragRatio = { x: 0, y: 0 };
+
+/** Picks one axis out of a pair of travels, so the two swipe trackers agree on which field is which axis. */
+const getAxisTravel = (travel: InteractionDragRatio, axis: SwipeAxis) =>
+    axis === "horizontal" ? travel.x : travel.y;
 
 /** Whether focus left an element's subtree entirely, rather than moving within it. */
 const getHasLeft = (event: FocusEvent) => {
@@ -187,6 +195,183 @@ const trackPointer = (
             ref.removeEventListener("pointermove", onPointerMove);
             document.removeEventListener("pointerup", onPointerEnd);
             document.removeEventListener("pointercancel", onPointerEnd);
+        });
+    });
+
+    return { getIsEngaged };
+};
+
+/**
+ * The whole of a swipe, with the number of live axes left open.
+ *
+ * Both public swipe trackers are this function with `getAxis` answered differently, because everything a
+ * swipe competes with — the deferred ownership, the `touch-action` handed to the browser, the ancestor
+ * scroller that has to be asked whether it still has room, the click swallowed afterwards — is the same
+ * work whether one axis is live or both. Only three things read the axis: which travel the slop threshold
+ * is measured against, which `touch-action` is written, and how the committed direction is decided.
+ *
+ * An `undefined` axis means free: both axes are measured, and the one traveled furthest is the one that
+ * commits.
+ *
+ * @param getRef The element to track.
+ * @param getIsDisabled Whether to ignore swipes.
+ * @param opts.getAxis Which axis is live, or `undefined` for both.
+ * @param opts.getCommitRatio How far the swipe must travel to count, as a fraction of the element.
+ * @param opts.onSwipe Called on every move once the gesture is owned, with signed travel on both axes.
+ * @param opts.onSwipeEnd Called when the swipe finishes, with the committed direction or `undefined`.
+ * @returns `getIsEngaged`.
+ */
+const trackSwipeGesture = (
+    getRef: () => HTMLElement | undefined,
+    getIsDisabled: () => boolean,
+    opts: {
+        getAxis: () => SwipeAxis | undefined;
+        getCommitRatio: () => number;
+        onSwipe: (progress: InteractionDragRatio) => void;
+        onSwipeEnd: (direction: SwipeDirection | undefined) => void;
+    },
+) => {
+    let origin: InteractionDragRatio | undefined;
+    let progress = NO_SWIPE_PROGRESS;
+    let hasPendingClick = false;
+
+    const computeProgress = (start: InteractionDragRatio, ratio: InteractionDragRatio) => ({
+        x: GestureUtils.computeSwipeProgress(start, ratio, "horizontal"),
+        y: GestureUtils.computeSwipeProgress(start, ratio, "vertical"),
+    });
+
+    const getLiveTravel = (value: InteractionDragRatio) => {
+        const axis = opts.getAxis();
+
+        if (axis === undefined) return Math.max(Math.abs(value.x), Math.abs(value.y));
+
+        return Math.abs(getAxisTravel(value, axis));
+    };
+
+    const computeDirection = (value: InteractionDragRatio) => {
+        const axis = opts.getAxis();
+
+        if (axis === undefined) return GestureUtils.computeFreeSwipeDirection(value, opts.getCommitRatio());
+
+        return GestureUtils.computeSwipeDirection(getAxisTravel(value, axis), axis, opts.getCommitRatio());
+    };
+
+    const { getIsEngaged } = trackPointer(getRef, getIsDisabled, {
+        isMeasuredFromStart: true,
+        onDown: (ratio) => {
+            origin = ratio;
+            progress = NO_SWIPE_PROGRESS;
+            hasPendingClick = false;
+        },
+        onMove: (ratio, engage) => {
+            if (!origin) return;
+
+            progress = computeProgress(origin, ratio);
+
+            if (!getIsEngaged()) {
+                if (getLiveTravel(progress) < SWIPE_SLOP_RATIO) return;
+
+                engage();
+            }
+
+            opts.onSwipe(progress);
+        },
+        onEnd: (reason) => {
+            const direction = reason === "cancel" ? undefined : computeDirection(progress);
+
+            origin = undefined;
+            progress = NO_SWIPE_PROGRESS;
+            hasPendingClick = true;
+
+            opts.onSwipeEnd(direction);
+        },
+    });
+
+    createEffect(() => {
+        const ref = getRef();
+
+        if (!ref) return;
+
+        if (getIsDisabled()) {
+            ref.style.touchAction = "";
+
+            return;
+        }
+
+        const axis = opts.getAxis();
+
+        ref.style.touchAction = axis === undefined ? FREE_SWIPE_TOUCH_ACTION : SWIPE_TOUCH_ACTIONS[axis];
+    });
+
+    createEffect(() => {
+        const ref = getRef();
+
+        if (!ref || getIsDisabled()) return;
+
+        let startTouch: { clientX: number; clientY: number } | undefined;
+        let isOwned: boolean | undefined;
+
+        const onTouchStart = (e: TouchEvent) => {
+            const touch = e.touches[0];
+
+            startTouch = touch && { clientX: touch.clientX, clientY: touch.clientY };
+            isOwned = undefined;
+        };
+
+        const onTouchMove = (e: TouchEvent) => {
+            const touch = e.touches[0];
+
+            if (isOwned === undefined) {
+                if (!startTouch || !touch) return;
+
+                const travel = { x: touch.clientX - startTouch.clientX, y: touch.clientY - startTouch.clientY };
+                const axis = opts.getAxis() ?? GestureUtils.computeTravelAxis(travel);
+                const delta = getAxisTravel(travel, axis);
+
+                if (delta === 0) return;
+
+                isOwned = !getHasScrollChainRoom(e.target, ref, axis, delta);
+            }
+
+            if (isOwned && e.cancelable) e.preventDefault();
+        };
+
+        const onTouchEnd = () => {
+            startTouch = undefined;
+            isOwned = undefined;
+        };
+
+        ref.addEventListener("touchstart", onTouchStart, { passive: true });
+        ref.addEventListener("touchmove", onTouchMove, { passive: false });
+        ref.addEventListener("touchend", onTouchEnd, { passive: true });
+        ref.addEventListener("touchcancel", onTouchEnd, { passive: true });
+
+        onCleanup(() => {
+            ref.removeEventListener("touchstart", onTouchStart);
+            ref.removeEventListener("touchmove", onTouchMove);
+            ref.removeEventListener("touchend", onTouchEnd);
+            ref.removeEventListener("touchcancel", onTouchEnd);
+        });
+    });
+
+    createEffect(() => {
+        const ref = getRef();
+
+        if (!ref) return;
+
+        const onClick = (e: MouseEvent) => {
+            if (!hasPendingClick) return;
+
+            hasPendingClick = false;
+
+            e.preventDefault();
+            e.stopPropagation();
+        };
+
+        ref.addEventListener("click", onClick, true);
+
+        onCleanup(() => {
+            ref.removeEventListener("click", onClick, true);
         });
     });
 
@@ -586,14 +771,14 @@ export namespace InteractionTrackerUtils {
     };
 
     /**
-     * Tracks a swipe across an element, and reports which way it committed.
+     * Tracks a swipe along one axis across an element, and reports which way it committed.
      *
-     * The hard part is not the gesture but everything it competes with. Ownership is deferred until the
-     * movement passes a threshold, so a tap is still a tap. `touch-action` is set to leave the other
-     * axis scrollable, so a horizontal swipe does not stop the page scrolling vertically. Touch moves
-     * are canceled by hand once no ancestor scroller has room left, which is what stops a swipe inside
-     * a scroller from fighting it. And the click the browser fires after the gesture is swallowed, so a
-     * swipe on a card does not also open it.
+     * The hard part is not the gesture but everything it competes with, and {@link trackSwipeGesture}
+     * handles that. What belongs to this entry point is the axis: the other one is left to the browser
+     * to scroll, so a horizontal swipe does not stop the page going up and down, and travel across it
+     * takes no part in either the threshold or the verdict.
+     *
+     * Use {@link trackFreeSwipe} where all four directions are wanted.
      *
      * @param getRef The element to track.
      * @param getIsDisabled Whether to ignore swipes.
@@ -606,7 +791,7 @@ export namespace InteractionTrackerUtils {
      * `undefined` when it fell short or the system canceled it.
      * @returns `getIsSwiping`.
      */
-    export const trackSwipe = (
+    export const trackAxialSwipe = (
         getRef: () => HTMLElement | undefined,
         getIsDisabled: () => boolean,
         opts: {
@@ -616,122 +801,51 @@ export namespace InteractionTrackerUtils {
             onSwipeEnd: (direction: SwipeDirection | undefined) => void;
         },
     ) => {
-        let origin: InteractionDragRatio | undefined;
-        let progressRatio = 0;
-        let hasPendingClick = false;
-
-        const { getIsEngaged } = trackPointer(getRef, getIsDisabled, {
-            isMeasuredFromStart: true,
-            onDown: (ratio) => {
-                origin = ratio;
-                progressRatio = 0;
-                hasPendingClick = false;
-            },
-            onMove: (ratio, engage) => {
-                if (!origin) return;
-
-                progressRatio = GestureUtils.computeSwipeProgress(origin, ratio, opts.getAxis());
-
-                if (!getIsEngaged()) {
-                    if (Math.abs(progressRatio) < SWIPE_SLOP_RATIO) return;
-
-                    engage();
-                }
-
-                opts.onSwipe(progressRatio);
-            },
-            onEnd: (reason) => {
-                const direction =
-                    reason === "cancel"
-                        ? undefined
-                        : GestureUtils.computeSwipeDirection(progressRatio, opts.getAxis(), opts.getCommitRatio());
-
-                origin = undefined;
-                progressRatio = 0;
-                hasPendingClick = true;
-
-                opts.onSwipeEnd(direction);
-            },
+        const { getIsEngaged } = trackSwipeGesture(getRef, getIsDisabled, {
+            getAxis: opts.getAxis,
+            getCommitRatio: opts.getCommitRatio,
+            onSwipe: (progress) => opts.onSwipe(getAxisTravel(progress, opts.getAxis())),
+            onSwipeEnd: opts.onSwipeEnd,
         });
 
-        createEffect(() => {
-            const ref = getRef();
+        return { getIsSwiping: getIsEngaged };
+    };
 
-            if (!ref) return;
-
-            ref.style.touchAction = getIsDisabled() ? "" : SWIPE_TOUCH_ACTIONS[opts.getAxis()];
-        });
-
-        createEffect(() => {
-            const ref = getRef();
-
-            if (!ref || getIsDisabled()) return;
-
-            let startTouch: { clientX: number; clientY: number } | undefined;
-            let isOwned: boolean | undefined;
-
-            const onTouchStart = (e: TouchEvent) => {
-                const touch = e.touches[0];
-
-                startTouch = touch && { clientX: touch.clientX, clientY: touch.clientY };
-                isOwned = undefined;
-            };
-
-            const onTouchMove = (e: TouchEvent) => {
-                const touch = e.touches[0];
-
-                if (isOwned === undefined) {
-                    if (!startTouch || !touch) return;
-
-                    const axis = opts.getAxis();
-                    const delta =
-                        axis === "horizontal" ? touch.clientX - startTouch.clientX : touch.clientY - startTouch.clientY;
-
-                    if (delta === 0) return;
-
-                    isOwned = !getHasScrollChainRoom(e.target, ref, axis, delta);
-                }
-
-                if (isOwned && e.cancelable) e.preventDefault();
-            };
-
-            const onTouchEnd = () => {
-                startTouch = undefined;
-                isOwned = undefined;
-            };
-
-            ref.addEventListener("touchstart", onTouchStart, { passive: true });
-            ref.addEventListener("touchmove", onTouchMove, { passive: false });
-            ref.addEventListener("touchend", onTouchEnd, { passive: true });
-            ref.addEventListener("touchcancel", onTouchEnd, { passive: true });
-
-            onCleanup(() => {
-                ref.removeEventListener("touchstart", onTouchStart);
-                ref.removeEventListener("touchmove", onTouchMove);
-                ref.removeEventListener("touchend", onTouchEnd);
-                ref.removeEventListener("touchcancel", onTouchEnd);
-            });
-        });
-
-        createEffect(() => {
-            const ref = getRef();
-
-            if (!ref) return;
-
-            const onClick = (e: MouseEvent) => {
-                if (!hasPendingClick) return;
-
-                hasPendingClick = false;
-
-                e.preventDefault();
-                e.stopPropagation();
-            };
-
-            ref.addEventListener("click", onClick, true);
-
-            onCleanup(() => {
-                ref.removeEventListener("click", onClick, true);
-            });
+    /**
+     * Tracks a swipe free to go any of the four ways, and reports which one it committed to.
+     *
+     * Travel is reported on both axes at once, so a card can follow the pointer wherever it goes rather
+     * than sliding along a rail. The verdict is still one direction: whichever axis was traveled furthest
+     * is the one measured against the commit ratio, and the other is discarded.
+     *
+     * Claiming both axes means the browser is left none to scroll, so an element tracked this way cannot
+     * also be flicked to scroll its page on a touch screen. That is the price of the extra two directions,
+     * and it is why {@link trackAxialSwipe} is the one to reach for wherever a single axis will do.
+     *
+     * @param getRef The element to track.
+     * @param getIsDisabled Whether to ignore swipes.
+     * @param opts.getCommitRatio How far across the element the swipe must travel to count, as a
+     * fraction. Short of it, the swipe ends without a direction and the caller should spring back.
+     * @param opts.onSwipe Called on every move once the gesture is owned, with signed travel on each
+     * axis as a fraction of the element's own width and height.
+     * @param opts.onSwipeEnd Called when the swipe finishes, with the committed direction, or
+     * `undefined` when it fell short or the system canceled it.
+     * @returns `getIsSwiping`.
+     */
+    export const trackFreeSwipe = (
+        getRef: () => HTMLElement | undefined,
+        getIsDisabled: () => boolean,
+        opts: {
+            getCommitRatio: () => number;
+            onSwipe: (progress: InteractionDragRatio) => void;
+            onSwipeEnd: (direction: SwipeDirection | undefined) => void;
+        },
+    ) => {
+        const { getIsEngaged } = trackSwipeGesture(getRef, getIsDisabled, {
+            getAxis: () => undefined,
+            getCommitRatio: opts.getCommitRatio,
+            onSwipe: opts.onSwipe,
+            onSwipeEnd: opts.onSwipeEnd,
         });
 
         return { getIsSwiping: getIsEngaged };

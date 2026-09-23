@@ -4,6 +4,7 @@ import { Button, DrumWheel, access } from "@thewaver/ss-components";
 import type { WheelController } from "@thewaver/ss-components";
 import type { Size2d } from "@thewaver/ss-utils";
 
+import { PageMeasureBox } from "../../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
 import {
     PageWheelBar,
@@ -25,22 +26,26 @@ export const SidewaysExample = ({ wedges, ...otherProps }: Props) => {
 
     return (
         <>
-            <PageWheelMount>
-                <DrumWheel
-                    {...otherProps}
-                    wedges={getWedges}
-                    axis={"row"}
-                    wedgeSize={() => WEDGE_SIZE}
-                    ariaLabel={"Prize drum, turning sideways"}
-                    computeSpinTarget={() => pickPrizeIndex(getWedges().length)}
-                    computeWedgeLabel={(index) => `${getWedges()[index]}, ${index + 1} of ${getWedges().length}`}
-                    renderWedge={(getWedge, getState) => <PageWheelCard state={getState}>{getWedge()}</PageWheelCard>}
-                    renderWedgeBack={(_getWedge, getState) => <PageWheelCard state={getState} />}
-                    onMount={setController}
-                />
+            <PageMeasureBox>
+                <PageWheelMount>
+                    <DrumWheel
+                        {...otherProps}
+                        wedges={getWedges}
+                        axis={"row"}
+                        wedgeSize={() => WEDGE_SIZE}
+                        ariaLabel={"Prize drum, turning sideways"}
+                        computeSpinTarget={() => pickPrizeIndex(getWedges().length)}
+                        computeWedgeLabel={(index) => `${getWedges()[index]}, ${index + 1} of ${getWedges().length}`}
+                        renderWedge={(getWedge, getState) => (
+                            <PageWheelCard state={getState}>{getWedge()}</PageWheelCard>
+                        )}
+                        renderWedgeBack={(_getWedge, getState) => <PageWheelCard state={getState} />}
+                        onMount={setController}
+                    />
 
-                <PageWheelPip side={"top"} />
-            </PageWheelMount>
+                    <PageWheelPip side={"top"} />
+                </PageWheelMount>
+            </PageMeasureBox>
 
             <PageWheelBar>
                 <Button

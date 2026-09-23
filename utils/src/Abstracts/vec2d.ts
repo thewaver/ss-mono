@@ -11,8 +11,7 @@ export type Vec2dString<A extends string, B extends string> = `${Uppercase<A>}${
  *
  * Each entry here is a factory: you call it once with the two key names to get back a
  * ready-made operation, which the concrete types then re-export. `Point2d`, `Size2d`
- * and `Index2d` are all built this way, which is why they share an identical set of
- * operations without repeating the arithmetic.
+ * and `Index2d` are all built this way and share an identical set of operations.
  */
 export namespace Vec2d {
     /**

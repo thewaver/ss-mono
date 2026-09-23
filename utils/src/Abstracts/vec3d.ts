@@ -15,8 +15,7 @@ export type Vec3dString<
  *
  * Each entry here is a factory: you call it once with the three key names to get back a
  * ready-made operation, which the concrete types then re-export. `Vector3d` is built this
- * way, which is why it shares an identical set of operations with the two- and four-number
- * types without repeating the arithmetic.
+ * way, and shares an identical set of operations with the two- and four-number types.
  */
 export namespace Vec3d {
     /**

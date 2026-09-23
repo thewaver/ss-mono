@@ -79,8 +79,6 @@ export namespace KeyframeUtils {
         const activeRule = registry[ruleBody];
         activeRule.count++;
 
-        // Guards against one caller releasing twice, which would drive the tally below
-        // what it should be and delete a rule other callers are still animating with.
         let released = false;
 
         return {

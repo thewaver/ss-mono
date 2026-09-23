@@ -5,7 +5,7 @@ import { MathUtils } from "./math.js";
  *
  * Takes how far through the elapsed time an animation is, as a ratio where `0` is the start and `1` is the
  * end, and answers how far through the change it should be at that instant. Most curves answer within `0` to
- * `1` as well, but the `back` and `elastic` families deliberately leave that range in the middle so that the
+ * `1` as well, but the `back` and `elastic` families leave that range in the middle so that the
  * motion overshoots and settles back; a caller feeding the result to something that cannot take values
  * outside the range has to clamp on its own.
  */

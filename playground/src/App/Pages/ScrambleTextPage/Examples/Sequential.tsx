@@ -3,12 +3,15 @@ import { createSignal } from "solid-js";
 import { Button, ScrambleText, access } from "@thewaver/ss-components";
 import type { ScrambleTextController } from "@thewaver/ss-components";
 
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import type { ScrambleTextExampleProps } from "../ScrambleTextPage.types";
 
+import { MEASURE_BOX_PADDING } from "../../../PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "../ScrambleTextPage.css";
 
 const LINE = "DECRYPTING PAYLOAD FROM THE ARCHIVE";
+const BOX_WIDTH = 320;
 const SINGLE_CHARACTER = 1;
 const ROLLS_PER_CHARACTER = 6;
 const RUN_MULTIPLIER = 4;
@@ -27,16 +30,18 @@ export const SequentialExample = (props: Props) => {
 
     return (
         <div class={styles.stack}>
-            <div class={styles.headline}>
-                <ScrambleText
-                    text={LINE}
-                    glyphs={props.glyphs}
-                    settleDurationMs={getRunDurationMs}
-                    churnDurationMs={getChurnDurationMs}
-                    scrambleIntervalMs={getScrambleIntervalMs}
-                    onMount={setController}
-                />
-            </div>
+            <PageMeasureBox width={() => BOX_WIDTH} padding={() => MEASURE_BOX_PADDING}>
+                <div class={styles.headline}>
+                    <ScrambleText
+                        text={LINE}
+                        glyphs={props.glyphs}
+                        settleDurationMs={getRunDurationMs}
+                        churnDurationMs={getChurnDurationMs}
+                        scrambleIntervalMs={getScrambleIntervalMs}
+                        onMount={setController}
+                    />
+                </div>
+            </PageMeasureBox>
 
             <Button
                 id={"revealAgain"}

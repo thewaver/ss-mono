@@ -4,4 +4,5 @@ export type PageMeasureBoxProps = AccessorProps<{
     width?: number;
     height?: number;
     padding?: number;
+    isFilling?: boolean;
 }>;

@@ -43,8 +43,6 @@ export namespace PolygonUtils {
      * @returns Where they cross, or `p2` if the lines run parallel and never meet.
      */
     export const getLineIntersection = (p1: Point2d, dir1: Point2d, p2: Point2d, dir2: Point2d): Point2d =>
-        // Deliberately looser than the 1e-8 default: polygon edges that are nearly
-        // parallel are better treated as parallel than sent off to a distant corner.
         Point2dUtils.intersectLines(p1, dir1, p2, dir2, 1e-6);
 
     /**

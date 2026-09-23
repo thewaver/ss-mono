@@ -2,6 +2,9 @@ export namespace StringUtils {
     /**
      * Applies a CSS `text-transform` to a string.
      *
+     * `capitalize` raises the first letter of every word, accented words included, so `état` becomes
+     * `État` rather than `éTat`.
+     *
      * @param text The text to change.
      * @param transform One of `uppercase`, `lowercase` or `capitalize`. Anything else,
      * including `none` or nothing at all, returns the text untouched.
@@ -18,10 +21,6 @@ export namespace StringUtils {
             case "lowercase":
                 return text.toLowerCase();
             case "capitalize":
-                // Deliberately not `\b`, which is ASCII-only: it sees no boundary before
-                // "état" and one *inside* it, giving "éTat". Matching a letter that has
-                // no letter or digit before it works the same way for ASCII and keeps
-                // accented words intact.
                 return text.replace(/(?<![\p{L}\p{N}])\p{L}/gu, (m) => m.toUpperCase());
             default:
                 return text;
@@ -73,8 +72,8 @@ export namespace StringUtils {
      * Tests whether a string is punctuation that belongs tight against the word before
      * it — a full stop, a closing bracket, a closing quote.
      *
-     * Opening quotes are deliberately excluded, since those attach to the word that
-     * *follows*. Empty strings are not closing punctuation.
+     * Opening quotes are excluded, since those attach to the word that *follows*.
+     * Empty strings are not closing punctuation.
      */
     export const isClosingPunctuation = (s: string) => /^[\p{Pe}\p{Pf}\p{Po}\p{S}]+$/u.test(s) && !/^\p{Pi}+$/u.test(s);
 

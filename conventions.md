@@ -202,6 +202,21 @@ considered from one never opened.
 
 ## API naming
 
+### When a function grows a sibling, both names get the distinguishing word
+
+Stated by the user when `trackSwipe` grew a second form that claims both axes: the cheap move is to add
+`trackFreeSwipe` and leave the original alone, and the cheap move is wrong. A bare name beside a qualified
+one reads as the general case with a variant hanging off it, so a caller reaches for the bare one by default
+and only looks at the other when the default has already failed them. The two here are equal choices —
+one axis or both — and neither is what you should reach for first.
+
+So the original was renamed in the same change: `trackAxialSwipe` and `trackFreeSwipe`, each saying what it
+is. **Renaming the existing one is part of adding the new one, not a follow-up**, because the moment the pair
+ships with one bare name the asymmetry is in every call site that was written against it.
+
+This is about siblings, not about every function. A name with nothing to be confused with stays as short as
+it can be.
+
 ### `AccessorProps` — props take a constant or an accessor, and carry no `get` prefix
 
 A prop declared `indent: number` is written by the caller as either `indent={12}` or `indent={getIndent}`, and is
@@ -360,6 +375,24 @@ the public side, and it is exported now — which makes all seven `.context.ts` 
 outside a box rather than throwing, which is right for `PlacementItem` and a trap for a consumer who does not
 expect it — so its block says so. A doc block is part of the export, not an optional extra.
 
+### A component hands out a controller and renders no controls of its own
+
+The user's rule, stated in those terms: a component gives the consumer a controller through `onMount`, and
+the buttons that drive it are the consumer's to draw, wherever on the page they want them — "all the way up
+on the moon". A render slot that draws controls inside the component's own box is the wrong shape, because
+it decides the layout on the consumer's behalf and there is no way to overrule it from outside.
+
+**It also keeps the component's box honest.** A component whose box is the thing it draws can be measured,
+sized and framed by whatever wraps it; one that quietly includes a toolbar cannot, and anything the consumer
+puts around it ends up around the toolbar too.
+
+**The accessibility obligation travels with the controller, and the component cannot discharge it.** A
+control operated by dragging or by a path-based gesture needs a single-pointer route that is neither — WCAG
+2.5.7 and 2.5.1 — and the only things that satisfy either are controls, which a component like this does not
+render. So the component's job is to make the route reachable, which is what the controller's commands are,
+and the consumer's job is to wire it to something pressable. A consumer who does not has a gesture-only
+control that fails both, and the library cannot promise otherwise.
+
 ### Every controller callback reports whether it succeeded
 
 The user's rule. A command handed over at mount returns `boolean`: `true` when it acted, `false` when it
@@ -426,6 +459,18 @@ answers and what it guarantees without opening the body. A one-line summary firs
 part that cannot be read off the signature — why the helper exists, what the caller is spared, what happens at
 the edges — then `@param` and `@returns` where they add something the prose has not. `{@link}` a neighbor
 rather than restating it.
+
+**A `/** */` block says what a consumer needs, never why the code is shaped that way.** The user's rule,
+stated in those terms. A block is read by somebody deciding whether to call the thing and what to hand it, so
+it carries the contract, the units, the edges and the failure — and nothing else. The argument behind the
+design belongs in `decisions.md`, which a consumer never sees and a future session always does. **The test is
+whether the sentence would change what a caller writes.** A sentence naming a dependency's shortcomings, a
+rejected alternative, an earlier version of the file, a measurement or a person fails it every time, and so
+does "rather than X" where X is a design that was never shipped. What survives the test often reads like
+reasoning and is not: **why** a value is clamped instead of rejected is reasoning, **that** it is clamped is
+the contract. The shape to watch for is `color.ts`'s paragraph on what `colord` rounds away, with a count of
+affected colors in bold: entirely true, entirely interesting, and of no use at all to somebody trying to work
+out what `parse` gives back. It reads as `decisions.md` because that is what it is.
 
 **A member of an exported props type carries a `/** */` block too, for the same reason.** A component's
 contract is its props type, so a consumer reading that type should learn what each prop is for without

@@ -3,7 +3,6 @@ import { createMemo, createSignal } from "solid-js";
 import { MediaQueryMonitorUtils } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
@@ -12,7 +11,6 @@ import { SequentialExample } from "./Examples/Sequential";
 import { SwapExample } from "./Examples/Swap";
 import type { ScrambleTextExampleProps } from "./ScrambleTextPage.types";
 
-import { MEASURE_BOX_PADDING } from "../../PageComponents/MeasureBox/MeasureBox.css";
 
 const EXAMPLES_ROOT = "/src/App/Pages/ScrambleTextPage/Examples";
 
@@ -58,7 +56,6 @@ const MIN_SCRAMBLE_INTERVAL_MS = 10;
 const MAX_SCRAMBLE_INTERVAL_MS = 200;
 const SCRAMBLE_INTERVAL_STEP_MS = 5;
 const NO_MOTION_DURATION_MS = 0;
-const BOX_WIDTH = 320;
 
 export const ScrambleTextPage = () => {
     const [getSettleDurationMs, setSettleDurationMs] = createSignal(STARTING_SETTLE_DURATION_MS);
@@ -82,9 +79,7 @@ export const ScrambleTextPage = () => {
                 name: "Headline",
                 readout: () => "the controller refuses a restart while a run is still going",
                 component: () => (
-                    <PageMeasureBox width={() => BOX_WIDTH} padding={() => MEASURE_BOX_PADDING}>
-                        <HeadlineExample {...commonProps} />
-                    </PageMeasureBox>
+                    <HeadlineExample {...commonProps} />
                 ),
                 path: `${EXAMPLES_ROOT}/Headline.tsx`,
             },
@@ -94,9 +89,7 @@ export const ScrambleTextPage = () => {
                 readout: () =>
                     "one character at a time, each churning inside its own window and landing before the next starts — which needs a run several times longer than a whole-line churn, or there is no time to see anything happen",
                 component: () => (
-                    <PageMeasureBox width={() => BOX_WIDTH} padding={() => MEASURE_BOX_PADDING}>
-                        <SequentialExample {...commonProps} />
-                    </PageMeasureBox>
+                    <SequentialExample {...commonProps} />
                 ),
                 path: `${EXAMPLES_ROOT}/Sequential.tsx`,
             },
@@ -105,9 +98,7 @@ export const ScrambleTextPage = () => {
                 name: "Swap",
                 readout: () => "nothing asks for a restart here — changing the text is what starts the run",
                 component: () => (
-                    <PageMeasureBox width={() => BOX_WIDTH} padding={() => MEASURE_BOX_PADDING}>
-                        <SwapExample {...commonProps} />
-                    </PageMeasureBox>
+                    <SwapExample {...commonProps} />
                 ),
                 path: `${EXAMPLES_ROOT}/Swap.tsx`,
             },
