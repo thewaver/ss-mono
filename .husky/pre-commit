@@ -1,0 +1,5 @@
+files=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$files" ] && exit 0
+
+printf '%s\n' "$files" | tr '\n' '\0' | xargs -0 npx prettier --write --ignore-unknown
+printf '%s\n' "$files" | tr '\n' '\0' | xargs -0 git add

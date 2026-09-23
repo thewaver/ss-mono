@@ -17,14 +17,16 @@
         "test": "npm run test --workspaces --if-present",
         "verify:dom": "playwright test",
         "verify:dom:ui": "playwright test --ui",
-        "format": "prettier --write ."
+        "format": "prettier --write .",
+        "prepare": "husky"
     },
     "devDependencies": {
-        "@playwright/test": "^1.62.1",
+        "@playwright/test": "^1.63.0",
         "@trivago/prettier-plugin-sort-imports": "^6.0.2",
-        "prettier": "^3.9.6",
+        "husky": "^9.1.7",
+        "prettier": "^3.9.8",
         "typescript": "^6.0.3",
-        "vitest": "^5.0.0"
+        "vitest": "^5.0.1"
     },
     "prettier": {
         "tabWidth": 4,

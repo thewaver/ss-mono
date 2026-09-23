@@ -49,7 +49,7 @@
     "dependencies": {
         "colord": "^2.10.0",
         "csstype": "^3.2.3",
-        "fast-equals": "^6.0.3"
+        "fast-equals": "^6.0.4"
     },
     "devDependencies": {
         "tsup": "^8.5.1"

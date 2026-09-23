@@ -266,12 +266,16 @@ reason — and record alongside it anything a fresh session would otherwise misr
 already red before the work started. This holds whether or not a second machine is running; it is about the
 next session, not about parallelism.
 
-**Do not run Prettier as a verification step.** The user's call. Formatting is going to be a pre-commit
-check, so a `prettier --check` after every edit spends a process to answer a question that is about to be
-answered automatically, and `--write` between edits churns lines nobody asked to move. Write code in the
-house format and leave it; if formatting is genuinely the task, run it once at the end. This says nothing
-about `tsc --noEmit` and the test runs, which answer whether the code works and are still worth running as
-the work goes.
+**Never run Prettier by hand.** The user's call, and it is now absolute rather than a preference: a
+`pre-commit` hook formats every staged file on the way into a commit, so the house format arrives on its own
+(`decisions.md`, _"Formatting is applied on commit, by a hook"_). A `prettier --check` after an edit spends a
+process to answer a question that is about to be answered automatically, and a `--write` between edits churns
+lines nobody asked to move and then shows up in the diff as work the user did not request. Write code in the
+house format and leave it — not after each edit, not once at the end, not before handing over. `npm run format`
+across the whole tree is theirs to run, and is only ever run here when they ask for it in those words.
+
+This says nothing about `tsc --noEmit` and the test runs, which answer whether the code works and are still
+worth running as the work goes.
 
 **Never kill the user's processes.** No `pkill`, no killing a dev server, no stopping anything you did not
 start. They keep `npm start` running while working, and losing it interrupts them. `npm run verify:dom`

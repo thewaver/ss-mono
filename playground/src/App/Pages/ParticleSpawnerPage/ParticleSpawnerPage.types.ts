@@ -8,7 +8,7 @@ import type {
 } from "@thewaver/ss-components";
 import type { Point2d } from "@thewaver/ss-utils";
 
-export type ParticleTravelPattern = "line" | "arc" | "wave" | "spiral" | "orbit" | "bezier" | "zigzag";
+export type ParticleTravelPattern = "line" | "arc" | "wave" | "spiral" | "orbit" | "bezier" | "zigzag" | "scatter";
 
 export type IterationPattern = "burst" | "intermittent" | "continuous";
 

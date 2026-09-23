@@ -385,6 +385,61 @@ const zigzag: ParticleTravelPatternFactory = (knobs) => {
     };
 };
 
+const scatter: ParticleTravelPatternFactory = (knobs) => {
+    const angleById = new Map<number, number>();
+    const radiusById = new Map<number, number>();
+    const turnShareById = new Map<number, number>();
+
+    const getAngle = (id: number) => {
+        const cached = angleById.get(id);
+
+        if (cached !== undefined) return cached;
+
+        const angle = randomBetween(0, Math.PI * 2);
+
+        angleById.set(id, angle);
+
+        return angle;
+    };
+
+    const getRadius = (id: number) => {
+        const cached = radiusById.get(id);
+
+        if (cached !== undefined) return cached;
+
+        const radius = randomBetween(knobs.scatterRadiusMinPx, knobs.scatterRadiusMaxPx);
+
+        radiusById.set(id, radius);
+
+        return radius;
+    };
+
+    const getTurnShare = (id: number) => {
+        const cached = turnShareById.get(id);
+
+        if (cached !== undefined) return cached;
+
+        const turnShare = randomBetween(knobs.scatterTurnShareMin, knobs.scatterTurnShareMax);
+
+        turnShareById.set(id, turnShare);
+
+        return turnShare;
+    };
+
+    return (defs, t) => {
+        if (defs.prefersReducedMotion) return defs.to;
+
+        const angle = getAngle(defs.id);
+        const radius = getRadius(defs.id);
+        const turnShare = getTurnShare(defs.id);
+        const peak = Point2d.add(defs.from, { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius });
+
+        if (t <= turnShare) return lerp(defs.from, peak, EasingUtils.easeOutQuad(t / turnShare));
+
+        return lerp(peak, defs.to, (t - turnShare) / (1 - turnShare));
+    };
+};
+
 export const TRAVEL_PATTERN_FACTORIES: Record<ParticleTravelPattern, ParticleTravelPatternFactory> = {
     line,
     arc,
@@ -393,6 +448,7 @@ export const TRAVEL_PATTERN_FACTORIES: Record<ParticleTravelPattern, ParticleTra
     orbit,
     bezier,
     zigzag,
+    scatter,
 };
 
 export const TRAVEL_PATTERN_KEYS = Object.keys(TRAVEL_PATTERN_FACTORIES) as ParticleTravelPattern[];
@@ -587,6 +643,40 @@ export const TRAVEL_KNOBS_BY_PATTERN: Record<ParticleTravelPattern, ParticleTrav
             step: FIELD_WIDTH_KNOB_STEP,
         },
     },
+    scatter: {
+        scatterRadiusMinPx: {
+            kind: "number",
+            label: "Scatter radius min (px)",
+            hint: "The shortest distance a particle may be thrown before it turns for its target. Each draws its own between this and the maximum.",
+            min: 0,
+            max: 200,
+            step: FIELD_WIDTH_KNOB_STEP,
+        },
+        scatterRadiusMaxPx: {
+            kind: "number",
+            label: "Scatter radius max (px)",
+            hint: "The longest distance a particle may be thrown before it turns for its target. Each draws its own between the minimum and this.",
+            min: 0,
+            max: 200,
+            step: FIELD_WIDTH_KNOB_STEP,
+        },
+        scatterTurnShareMin: {
+            kind: "number",
+            label: "Turn point min",
+            hint: "The earliest point of the trip at which a particle may stop flying outwards and head for its target. Each draws its own between this and the maximum.",
+            min: 0.05,
+            max: 0.9,
+            step: 0.05,
+        },
+        scatterTurnShareMax: {
+            kind: "number",
+            label: "Turn point max",
+            hint: "The latest point of the trip at which a particle may stop flying outwards and head for its target. Each draws its own between the minimum and this.",
+            min: 0.05,
+            max: 0.9,
+            step: 0.05,
+        },
+    },
 };
 
 export const TRAVEL_DEFAULTS_BY_PATTERN: Record<ParticleTravelPattern, Record<string, number>> = {
@@ -602,6 +692,7 @@ export const TRAVEL_DEFAULTS_BY_PATTERN: Record<ParticleTravelPattern, Record<st
         bezierElbowOffsetMaxPx: 70,
     },
     zigzag: { zigzagCountMin: 3, zigzagCountMax: 4, zigzagAmplitudeMinPx: 20, zigzagAmplitudeMaxPx: 35 },
+    scatter: { scatterRadiusMinPx: 40, scatterRadiusMaxPx: 90, scatterTurnShareMin: 0.2, scatterTurnShareMax: 0.35 },
 };
 
 const BURST_SHOT_COUNT = 3;

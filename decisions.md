@@ -567,7 +567,7 @@ field**, because they are the whole of what is easy to get wrong — midnight re
 so the mapping is `hour % 12` in neither direction and no type catches the mistake.
 
 **`StringUtils.applyTextTransform` capitalizes on `(?<![\p{L}\p{N}])\p{L}` rather than `\b`.** `\b` is
-ASCII-only: it sees no boundary before "état" and one *inside* it, giving "éTat". Matching a letter with no
+ASCII-only: it sees no boundary before "état" and one _inside_ it, giving "éTat". Matching a letter with no
 letter or digit before it behaves the same way for ASCII and keeps accented words intact. **Do not simplify
 this back to `\b`.**
 
@@ -702,6 +702,35 @@ npm run typecheck -w components # also -w utils, -w playground
 
 Every script above is run from the repo root. A package's own scripts are reachable with `-w`, as in
 `npm run dev -w components`, which is the watch build for anyone consuming `components/dist` directly.
+
+### Formatting is applied on commit, by a hook
+
+`husky` owns a `pre-commit` hook at `.husky/pre-commit` that runs Prettier over the files a commit is about to
+carry and stages the result, so the house format is applied at the moment it matters instead of depending on
+anybody remembering `npm run format`. The root `prepare` script is `husky`, and npm runs `prepare` after every
+install, so a fresh clone has the hook working after `npm install` with no setup step — `prepare` is what
+points git's `core.hooksPath` at `.husky/_`. The package is current and maintained; nothing has superseded it.
+
+**The hook formats the staged list, not the tree.** `prettier --write .` on every commit would rewrite files
+the commit has nothing to do with and pull them into it. So the hook reads
+`git diff --cached --name-only --diff-filter=ACMR`, hands that list to `prettier --write --ignore-unknown`, and
+`git add`s the same list back. The filter drops deletions, which have no file left to format.
+`--ignore-unknown` is what lets a staged lockfile, image or `.gitignore` pass through untouched rather than
+failing the run, and Prettier reading `.gitignore` on its own account keeps `external/` and `.scratch/` out of
+it without a second list. The list is passed as NUL-separated arguments, so a path with a space in it survives.
+
+**A file staged in part is the cost.** Where a file has some changes staged and others not, the closing
+`git add` stages the whole file and the unstaged half rides into the commit. Avoiding that needs a second
+package — `lint-staged`, which stashes the unstaged half for the duration of the hook — and the hook is four
+lines without it, so it stays as it is. Anyone splitting a file across two commits should format it themselves
+first.
+
+### TypeScript stays on 6 until 7.1
+
+Every other dependency in the repo tracks its latest release; TypeScript is held at 6 deliberately, and the
+user's condition for moving is the 7.1 release rather than 7.0. So an update pass brings everything else
+forward and leaves `typescript` alone, and `npm outdated` reporting it as behind is the expected state rather
+than something to fix.
 
 ### `external/` is a drop-zone, and every tool is told to leave it alone
 
