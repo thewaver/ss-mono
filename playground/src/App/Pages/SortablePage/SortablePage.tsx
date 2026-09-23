@@ -6,6 +6,7 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageSortableRoom } from "../../StyledComponents/SortableContent/SortableContent";
 import { CardsExample } from "./Examples/Cards";
 import { PairExample } from "./Examples/Pair";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 import { RingExample } from "./Examples/Ring";
 import { BOARD, CHEAP_ONLY, HAND, QUEUE } from "./SortablePage.const";
 import type { Card } from "./SortablePage.types";
@@ -17,6 +18,7 @@ const names = (items: SortableItem<Card>[]) => items.map((item) => item.value.na
 export const SortablePage = () => {
     const queueSignal = createSignal(QUEUE);
     const rowSignal = createSignal(HAND);
+    const rightToLeftSignal = createSignal(HAND);
 
     const handSignal = createSignal(HAND);
     const boardSignal = createSignal(BOARD);
@@ -60,11 +62,19 @@ export const SortablePage = () => {
                         itemsSignal={rowSignal}
                         ariaLabel={"Row"}
                         emptyText={"No cards"}
-                        dir={"row"}
+                        orientation={"horizontal"}
                     />
                 </PageSortableRoom>
             ),
             path: `${EXAMPLES_ROOT}/Cards.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            name: "A row in a right-to-left box",
+            readout: () =>
+                `order: ${names(rightToLeftSignal[0]())} — the box around the row sets dir="rtl", so the cards run from the right and a carried card moves on to a later place with the left arrow`,
+            component: () => <RightToLeftExample itemsSignal={rightToLeftSignal} />,
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
         {
             key: "ring",

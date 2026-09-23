@@ -1,7 +1,7 @@
-import type { RadioGroupDir } from "./RadioGroup.types";
+import type { RadioGroupOrientation } from "./RadioGroup.types";
 
 export const RADIO_GROUP_DEFAULTS = {
-    dir: "row" as RadioGroupDir,
+    orientation: "horizontal" as RadioGroupOrientation,
     transitionDurationMs: 200,
     gap: 0,
 };

@@ -8,6 +8,7 @@ export type TileBoardExampleProps = AccessorProps<{
     gap: number;
     shape: ShapeConst.DefaultShape;
     hasShortFirstRow: boolean;
+    taper: number;
     isDisabled: boolean;
     marked: Index2dString[];
     computeIsTileDisabled?: (tile: Index2d) => boolean;

@@ -230,7 +230,7 @@ const swipeDown = async (page: import("@playwright/test").Page, scope: string, f
 };
 
 test("a column carousel claims the other axis and steps the way the finger went", async ({ page }) => {
-    await pickOption(page, "dir", "Up and down");
+    await pickOption(page, "orientation", "Up and down");
 
     await expect(
         page.locator(viewport(MANUAL)),
@@ -252,7 +252,7 @@ test("a column carousel claims the other axis and steps the way the finger went"
  * is the failure this watches for, and it is measured in layout space rather than from a client rect.
  */
 test("a column carousel takes its height from the box around it and gives all of it to one slide", async ({ page }) => {
-    await pickOption(page, "dir", "Up and down");
+    await pickOption(page, "orientation", "Up and down");
 
     const viewportHeight = await page.locator(viewport(MANUAL)).evaluate((element) => element.clientHeight);
     const slideHeight = await page
@@ -321,7 +321,7 @@ test("a drum on the other axis turns end over end, and takes its swipe the same 
     await openDrum(page);
     expect(await faceTransform(page, DRUM), "on the upright axis by default").toContain("rotateY(");
 
-    await pickOption(page, "dir", "Up and down");
+    await pickOption(page, "orientation", "Up and down");
 
     expect(await faceTransform(page, DRUM), "and end over end once it is laid on its side").toContain("rotateX(");
 

@@ -17,7 +17,7 @@ export const TimePicker = (props: TimePickerProps) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
 
-    const getClockLabel = () => access(props.clockLabel) ?? TIME_PICKER_DEFAULTS.clockLabel;
+    const getClockLabel = () => access(props.clockLabel);
 
     const dismiss = () => {
         if (!getIsOpen()) return;
@@ -43,8 +43,8 @@ export const TimePicker = (props: TimePickerProps) => {
     const renderClock = () => (
         <Clock
             valueSignal={props.valueSignal}
-            min={props.minTime}
-            max={props.maxTime}
+            minValue={props.minValue}
+            maxValue={props.maxValue}
             steps={props.clockSteps}
             gap={props.clockGap}
             hasSeconds={props.hasSeconds}
@@ -76,9 +76,7 @@ export const TimePicker = (props: TimePickerProps) => {
                                     id={props.triggerId}
                                     popupId={() => popupId}
                                     isOpen={getIsOpen}
-                                    ariaLabel={() =>
-                                        access(props.triggerAriaLabel) ?? TIME_PICKER_DEFAULTS.triggerAriaLabel
-                                    }
+                                    ariaLabel={props.triggerAriaLabel}
                                     flags={getRenderProps}
                                     renderContent={(getTriggerFlags) => props.renderTrigger(getTriggerFlags, meridiem)}
                                     onToggle={() => (getIsOpen() ? dismiss() : open())}

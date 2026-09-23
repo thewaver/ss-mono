@@ -28,9 +28,11 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
         { [k in "top" | "left" | "width" | "height"]: string } | undefined
     >();
 
-    const getDir = createMemo(() => access(props.dir) ?? RADIO_GROUP_DEFAULTS.dir);
+    const getOrientation = createMemo(() => access(props.orientation) ?? RADIO_GROUP_DEFAULTS.orientation);
 
     const getLayout = createMemo(() => props.computeLayout?.({ itemCount: getEntries().length }));
+
+    const getDirection = NavigatorUtils.createDirectionSignal(getRootRef);
 
     const getTransitionDurationMs = createMemo(
         () => access(props.transitionDurationMs) ?? RADIO_GROUP_DEFAULTS.transitionDurationMs,
@@ -155,7 +157,7 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
             e.key,
             from ? navigable.indexOf(from) : 0,
             navigable.length,
-            { orientation: "both" },
+            { orientation: "both", direction: getLayout() === undefined ? getDirection() : undefined },
         );
 
         if (position === undefined) return;
@@ -189,11 +191,12 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
             ref={setRootRef}
             class={getLayout() === undefined ? styles.radioGroupRoot : styles.radioGroupPlacedRoot}
             style={{
-                "flex-direction": getDir(),
+                "flex-direction": getOrientation() === "horizontal" ? "row" : "column",
                 "gap": `${access(props.gap) ?? RADIO_GROUP_DEFAULTS.gap}px`,
             }}
             role="radiogroup"
             aria-label={access(props.ariaLabel)}
+            aria-required={access(props.isRequired) || undefined}
             aria-invalid={access(props.hasError) || undefined}
             onKeyDown={handleKeyDown}
         >

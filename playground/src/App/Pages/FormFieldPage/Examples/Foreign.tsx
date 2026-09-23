@@ -29,7 +29,7 @@ export const ForeignExample = (props: Props) => {
     return (
         <div class={styles.fieldBox}>
             <FormField
-                dir={props.dir}
+                orientation={props.orientation}
                 gap={props.gap}
                 hasError={props.hasError}
                 message={props.message}

@@ -24,6 +24,8 @@ export const DefaultExample = (props: Props) => {
                 offset={props.offset}
                 transitionDurationMs={props.transitionDurationMs}
                 focusShowDelayMs={props.focusShowDelayMs}
+                hoverShowDelayMs={props.hoverShowDelayMs}
+                skipDelayWindowMs={props.skipDelayWindowMs}
                 renderContent={(getVisibilityTarget, getTransitionDurationMs) => (
                     <PageTooltipContent
                         visibilityTarget={getVisibilityTarget}

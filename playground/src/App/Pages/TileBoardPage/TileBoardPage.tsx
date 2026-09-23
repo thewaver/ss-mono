@@ -22,6 +22,9 @@ const MIN_REACH = 1;
 const MAX_REACH = 4;
 const MIN_GAP = 0;
 const MAX_GAP = 16;
+const MIN_TAPER = 0.2;
+const MAX_TAPER = 1;
+const TAPER_STEP = 0.05;
 const SIZE_STEP = 2;
 const COUNT_STEP = 1;
 const FIELD_WIDTH = 130;
@@ -71,6 +74,7 @@ export const TileBoardPage = () => {
     const [getGap, setGap] = createSignal(TILE_BOARD_DEFAULTS.gap);
     const [getShape, setShape] = createSignal<ShapeConst.DefaultShape>(STARTING_SHAPE);
     const [getHasShortFirstRow, setHasShortFirstRow] = createSignal(false);
+    const [getTaper, setTaper] = createSignal(TILE_BOARD_DEFAULTS.taper);
     const [getReach, setReach] = createSignal(STARTING_REACH);
 
     const [getMarked, setMarked] = createSignal<Index2dString[]>(NO_MARKS);
@@ -81,7 +85,7 @@ export const TileBoardPage = () => {
     const getTileSize = createMemo(() => ({ width: getTileWidth(), height: getTileHeight() }));
 
     const getLayout = createMemo(() =>
-        TileBoardUtils.getLayout(getShape(), getTileCount(), getTileSize(), getHasShortFirstRow()),
+        TileBoardUtils.getLayout(getShape(), getTileCount(), getTileSize(), getHasShortFirstRow(), getTaper()),
     );
 
     const getReachable = createMemo(() => computeTilesWithin(getPiece(), getReach(), getLayout()));
@@ -101,6 +105,7 @@ export const TileBoardPage = () => {
             gap: getGap,
             shape: getShape,
             hasShortFirstRow: getHasShortFirstRow,
+            taper: getTaper,
         };
 
         return [
@@ -267,6 +272,24 @@ export const TileBoardPage = () => {
                         value={getHasShortFirstRow}
                         ariaLabel={"Start on the short row"}
                         onChange={setHasShortFirstRow}
+                    />
+                </PageProp>
+
+                <PageProp
+                    key={"taper"}
+                    label={"Taper"}
+                    hint={
+                        "How wide the top of the board is drawn, as a fraction of the bottom. Below 1 the board leans away, and a piece shrinks as it moves up it."
+                    }
+                >
+                    <PageNumberField
+                        value={getTaper}
+                        min={() => MIN_TAPER}
+                        max={() => MAX_TAPER}
+                        step={() => TAPER_STEP}
+                        width={() => FIELD_WIDTH}
+                        ariaLabel={"Taper"}
+                        onInput={setTaper}
                     />
                 </PageProp>
             </PagePropsPanel>

@@ -1,5 +1,10 @@
 import { DrumCarousel } from "@thewaver/ss-components";
 
+import {
+    computeCarouselRotationLabel,
+    computeCarouselStepLabel,
+    computePositionLabel,
+} from "../../../../PageComponents/Announcements/Announcements.const";
 import { PageCarouselSlide, PageCarouselSlideBack } from "../../../../StyledComponents/CarouselContent/CarouselContent";
 import type { DrumCarouselExampleProps } from "../../Carousels.types";
 
@@ -16,6 +21,9 @@ export const NoControlsExample = (props: Props) => {
             axis={props.axis}
             slideSize={() => SLIDE_SIZE}
             ariaLabel={"Bare barrel sampler"}
+            computeSlideLabel={computePositionLabel}
+            computeStepLabel={computeCarouselStepLabel}
+            computeRotationLabel={computeCarouselRotationLabel}
             renderSlide={(getSlide, getState) => <PageCarouselSlide state={getState}>{getSlide()}</PageCarouselSlide>}
             renderSlideBack={() => <PageCarouselSlideBack />}
         />

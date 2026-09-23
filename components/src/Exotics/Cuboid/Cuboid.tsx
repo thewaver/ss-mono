@@ -12,18 +12,6 @@ const HALF = 0.5;
 
 const FACES: CuboidFace[] = ["front", "right", "back", "left", "top", "bottom"];
 
-const FACE_LABELS: Record<CuboidFace, string> = {
-    front: "Front",
-    right: "Right",
-    back: "Back",
-    left: "Left",
-    top: "Top",
-    bottom: "Bottom",
-};
-
-const CUBOID_ROLE_DESCRIPTION = "box";
-const FACE_ROLE_DESCRIPTION = "face";
-
 export const Cuboid = (props: CuboidProps) => {
     const [getYaw] = accessSignal(() => props.yawSignal);
     const [getPitch] = accessSignal(() => props.pitchSignal);
@@ -34,7 +22,7 @@ export const Cuboid = (props: CuboidProps) => {
 
     const getFacing = createMemo(() => CuboidUtils.getFacing(getYaw(), getPitch()));
 
-    const getFaceLabel = (face: CuboidFace) => props.computeFaceLabel?.(face) ?? FACE_LABELS[face];
+    const getFaceLabel = (face: CuboidFace) => props.computeFaceLabel(face);
 
     const getFaceState = (face: CuboidFace): CuboidFaceState => ({
         face,
@@ -49,7 +37,7 @@ export const Cuboid = (props: CuboidProps) => {
                 height: `${getReservedSize().height}px`,
             }}
             role="group"
-            aria-roledescription={CUBOID_ROLE_DESCRIPTION}
+            aria-roledescription={access(props.roleDescription) ?? CUBOID_DEFAULTS.roleDescription}
             aria-label={access(props.ariaLabel)}
         >
             <div
@@ -84,7 +72,9 @@ export const Cuboid = (props: CuboidProps) => {
                                         transform: CuboidUtils.getFaceTransform(getFace(), getSize()),
                                     }}
                                     role="group"
-                                    aria-roledescription={FACE_ROLE_DESCRIPTION}
+                                    aria-roledescription={
+                                        access(props.faceRoleDescription) ?? CUBOID_DEFAULTS.faceRoleDescription
+                                    }
                                     aria-label={getFaceLabel(getFace())}
                                     aria-hidden={!getIsShowing() || undefined}
                                     inert={!getIsShowing()}

@@ -7,6 +7,7 @@ import type {
 } from "@thewaver/ss-components";
 import { DateInput } from "@thewaver/ss-components";
 
+import { DATE_PART_HINTS } from "../../../PageComponents/Announcements/Announcements.const";
 import { PageEraCycle } from "../../../StyledComponents/EraCycle/EraCycle";
 import {
     PageTextFieldContent,
@@ -31,6 +32,7 @@ export const TypedExample = (props: Props) => {
             locale={() => LOCALE}
             format={props.format}
             ariaLabel={props.ariaLabel}
+            partHints={DATE_PART_HINTS}
             padding={() => FIELD_STEPPER_PADDING}
             gap={() => FIELD_GAP}
             computeTextStyle={computePageTextFieldTextStyle}

@@ -75,6 +75,7 @@ export const TileBoard = (props: TileBoardProps) => {
             access(props.tileCount),
             getPitchSize(),
             access(props.hasShortFirstRow) ?? false,
+            access(props.taper) ?? TILE_BOARD_DEFAULTS.taper,
         ),
     );
 
@@ -202,23 +203,25 @@ export const TileBoard = (props: TileBoardProps) => {
             style={{ width: `${getBoardSize().width}px`, height: `${getBoardSize().height}px` }}
             onKeyDown={handleKeyDown}
         >
-            <Index each={Array.from({ length: Math.max(getLayout().count.row, 0) })}>
-                {(_, rowIndex) => (
-                    <div
-                        class={styles.tileBoardRow}
-                        role="row"
-                        aria-rowindex={rowIndex + FIRST_ARIA_INDEX}
-                        style={{
-                            left: `${TileBoardUtils.getRowOffset(rowIndex, getLayout()) + getGap() * HALF}px`,
-                            top: `${TileBoardUtils.getRowTop(rowIndex, getLayout()) + getGap() * HALF}px`,
-                        }}
-                    >
-                        <Index each={Array.from({ length: TileBoardUtils.getRowLength(rowIndex, getLayout()) })}>
-                            {(_, colIndex) => renderTile(rowIndex, colIndex)}
-                        </Index>
-                    </div>
-                )}
-            </Index>
+            <div class={styles.tileBoardPlane} style={{ transform: TileBoardUtils.getTaperTransform(getLayout()) }}>
+                <Index each={Array.from({ length: Math.max(getLayout().count.row, 0) })}>
+                    {(_, rowIndex) => (
+                        <div
+                            class={styles.tileBoardRow}
+                            role="row"
+                            aria-rowindex={rowIndex + FIRST_ARIA_INDEX}
+                            style={{
+                                left: `${TileBoardUtils.getRowOffset(rowIndex, getLayout()) + getGap() * HALF}px`,
+                                top: `${TileBoardUtils.getRowTop(rowIndex, getLayout()) + getGap() * HALF}px`,
+                            }}
+                        >
+                            <Index each={Array.from({ length: TileBoardUtils.getRowLength(rowIndex, getLayout()) })}>
+                                {(_, colIndex) => renderTile(rowIndex, colIndex)}
+                            </Index>
+                        </div>
+                    )}
+                </Index>
+            </div>
         </div>
     );
 };

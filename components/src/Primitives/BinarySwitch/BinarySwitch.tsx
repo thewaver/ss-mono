@@ -16,6 +16,8 @@ const BinarySwitchElement = (props: BinarySwitchElementProps) => {
 
     const [getElementRef, setElementRef] = createSignal<HTMLInputElement>();
 
+    FormFieldUtils.registerControl(getElementRef);
+
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
     const getIsMixed = () => access(props.isMixed) ?? false;
@@ -52,6 +54,7 @@ const BinarySwitchElement = (props: BinarySwitchElementProps) => {
                 aria-label={getAriaLabel()}
                 aria-describedby={getAriaDescribedBy()}
                 aria-disabled={getIsDisabled() || undefined}
+                aria-required={access(props.isRequired) || undefined}
                 aria-invalid={access(props.flags).hasError || undefined}
                 onClick={(e) => {
                     if (getIsDisabled()) e.preventDefault();
@@ -95,6 +98,7 @@ export const BinarySwitch = (props: BinarySwitchProps) => {
                     isSwitch={props.isSwitch}
                     name={props.name}
                     ariaLabel={props.ariaLabel}
+                    isRequired={props.isRequired}
                     flags={getFlags}
                     isChecked={props.isChecked}
                     isMixed={props.isMixed}

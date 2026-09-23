@@ -2,11 +2,14 @@ import { MathUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
 
 import type {
     PatchBoardEnd,
+    PatchBoardHorizontalBand,
     PatchBoardLink,
     PatchBoardOrientation,
     PatchBoardPlacedSocket,
     PatchBoardPlacement,
+    PatchBoardRegion,
     PatchBoardSocket,
+    PatchBoardVerticalBand,
 } from "./PatchBoard.types";
 
 /** Zero, as a count or a coordinate. */
@@ -15,10 +18,10 @@ const NOTHING = 0;
 const SINGLE = 1;
 /** How many bands each axis is divided into when describing where a node sits. */
 const THIRDS = 3;
-/** What each vertical band is called. */
-const VERTICAL_LABELS = ["top", "middle", "bottom"];
-/** What each horizontal band is called. */
-const HORIZONTAL_LABELS = ["left", "center", "right"];
+/** The vertical bands, top first. */
+const VERTICAL_BANDS: PatchBoardVerticalBand[] = ["top", "middle", "bottom"];
+/** The horizontal bands, left first. */
+const HORIZONTAL_BANDS: PatchBoardHorizontalBand[] = ["left", "center", "right"];
 
 /**
  * Places the sockets of a node graph, and decides which of them may be wired together.
@@ -281,24 +284,25 @@ export namespace PatchBoardUtils {
     };
 
     /**
-     * Where a node sits on the board, in words.
+     * Which third of the board a node sits in, across and down.
      *
      * A dragged node's new position is invisible to a screen reader, and coordinates would mean nothing
-     * read aloud — "middle center" does. The node's center is what places it, so a node overlapping two
-     * bands is described by the one it mostly occupies.
+     * read aloud — a region can be put into words. The node's center is what places it, so a node
+     * overlapping two bands is described by the one it mostly occupies, and a node hanging off the edge
+     * is given the band nearest to it.
      *
      * @param spot The node's position.
      * @param size The node's size.
      * @param bounds The board's size.
-     * @returns A vertical and a horizontal band, as in `"top left"` or `"middle center"`.
+     * @returns A vertical and a horizontal band, such as `top` and `left`, for the consumer to word.
      */
-    export const getRegionLabel = (spot: Point2d, size: Size2d, bounds: Size2d) => {
+    export const getRegion = (spot: Point2d, size: Size2d, bounds: Size2d): PatchBoardRegion => {
         const band = (value: number, extent: number) =>
             MathUtils.clamp(Math.floor((value / Math.max(SINGLE, extent)) * THIRDS), NOTHING, THIRDS - SINGLE);
 
-        const vertical = VERTICAL_LABELS[band(spot.y + size.height * 0.5, bounds.height)];
-        const horizontal = HORIZONTAL_LABELS[band(spot.x + size.width * 0.5, bounds.width)];
-
-        return `${vertical} ${horizontal}`;
+        return {
+            vertical: VERTICAL_BANDS[band(spot.y + size.height * 0.5, bounds.height)],
+            horizontal: HORIZONTAL_BANDS[band(spot.x + size.width * 0.5, bounds.width)],
+        };
     };
 }

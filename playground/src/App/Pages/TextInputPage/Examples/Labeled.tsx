@@ -14,7 +14,7 @@ const LABEL_GAP = 5;
 type Props = TextInputExampleProps;
 
 export const LabelledExample = (props: Props) => (
-    <Label dir={"column"} gap={() => LABEL_GAP}>
+    <Label orientation={"vertical"} gap={() => LABEL_GAP}>
         <PageLabelCaption>Display name</PageLabelCaption>
 
         <TextInput

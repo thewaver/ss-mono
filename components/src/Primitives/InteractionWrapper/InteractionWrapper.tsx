@@ -22,7 +22,6 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
         InteractionTrackerUtils.computeIsReachable(
             getIsDisabled(),
             access(props.isReachableWhenDisabled) ?? false,
-            getTooltipDefs() !== undefined,
             access(props.isFocusableWhenDisabled) ?? false,
         ),
     );
@@ -45,12 +44,6 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
         hasError: access(props.hasError),
         ...(access(props.extraFlags) ?? ({} as TExtra)),
     }));
-
-    if (props.isReachableWhenDisabled && !props.tooltipDefs) {
-        console.warn(
-            "InteractionWrapper: isReachableWhenDisabled has no effect without tooltipDefs — a focusable disabled control with nothing to reveal is worse than one skipped by the tab order.",
-        );
-    }
 
     return (
         <div

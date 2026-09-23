@@ -1,5 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
+import type { CarouselAxis } from "@thewaver/ss-components";
+
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCarouselBox } from "../../../StyledComponents/CarouselContent/CarouselContent";
 import { createCarouselsControls } from "../Carousels.utils";
@@ -12,6 +14,8 @@ const EXAMPLES_ROOT = "/src/App/Pages/Carousels/DrumCarouselPage/Examples";
 
 export const DrumCarouselPage = () => {
     const controls = createCarouselsControls();
+
+    const getAxis = (): CarouselAxis => (controls.orientationSignal[0]() === "horizontal" ? "row" : "column");
 
     const steppedIndexSignal = createSignal(0);
     const rotatingIndexSignal = createSignal(0);
@@ -26,11 +30,7 @@ export const DrumCarouselPage = () => {
                 `slide ${steppedIndexSignal[0]() + 1} of ${controls.getSlideCount()} — the slides sit on the faces of a drum, turning about the axis the direction names and swiped along it`,
             component: () => (
                 <PageCarouselBox>
-                    <SteppedExample
-                        {...controls.getSharedProps()}
-                        indexSignal={steppedIndexSignal}
-                        axis={controls.dirSignal[0]}
-                    />
+                    <SteppedExample {...controls.getSharedProps()} indexSignal={steppedIndexSignal} axis={getAxis} />
                 </PageCarouselBox>
             ),
             path: `${EXAMPLES_ROOT}/Stepped.tsx`,
@@ -45,9 +45,9 @@ export const DrumCarouselPage = () => {
                     <RotatingExample
                         {...controls.getSharedProps()}
                         indexSignal={rotatingIndexSignal}
-                        playingSignal={rotatingPlayingSignal}
+                        playbackSignal={rotatingPlayingSignal}
                         autoplayDelayMs={controls.delaySignal[0]}
-                        axis={controls.dirSignal[0]}
+                        axis={getAxis}
                     />
                 </PageCarouselBox>
             ),
@@ -63,7 +63,7 @@ export const DrumCarouselPage = () => {
                     <NoControlsExample
                         {...controls.getSharedProps()}
                         indexSignal={barelessIndexSignal}
-                        axis={controls.dirSignal[0]}
+                        axis={getAxis}
                     />
                 </PageCarouselBox>
             ),

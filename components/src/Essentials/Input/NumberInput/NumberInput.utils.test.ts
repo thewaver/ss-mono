@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { NumberInputUtils } from "./NumberInput.utils";
 
+const GERMAN = { groupSeparator: ".", decimalSeparator: "," };
+const FRENCH = { groupSeparator: "\u202f", decimalSeparator: "," };
+
 describe("sanitizeText", () => {
     it("drops anything that cannot appear in a number", () => {
         expect(NumberInputUtils.sanitizeText("12ab34")).toBe("1234");
@@ -30,6 +33,20 @@ describe("sanitizeText", () => {
     it("refuses an exponent with no digits in front of it", () => {
         expect(NumberInputUtils.sanitizeText("e5")).toBe("5");
     });
+
+    it("keeps a locale's own separators, and the decimal one only once", () => {
+        expect(NumberInputUtils.sanitizeText("1.000,5", GERMAN)).toBe("1.000,5");
+        expect(NumberInputUtils.sanitizeText("1,5,5", GERMAN)).toBe("1,55");
+    });
+
+    it("keeps a group separator only after a digit of the whole part", () => {
+        expect(NumberInputUtils.sanitizeText(".5", GERMAN)).toBe("5");
+        expect(NumberInputUtils.sanitizeText("1,5.5", GERMAN)).toBe("1,55");
+    });
+
+    it("takes any white space for a locale that groups with a space", () => {
+        expect(NumberInputUtils.sanitizeText("1 000", FRENCH)).toBe("1 000");
+    });
 });
 
 describe("parseValue", () => {
@@ -43,6 +60,29 @@ describe("parseValue", () => {
         expect(NumberInputUtils.parseValue("")).toBeUndefined();
         expect(NumberInputUtils.parseValue("-")).toBeUndefined();
         expect(NumberInputUtils.parseValue("1e")).toBeUndefined();
+    });
+
+    it("reads a German point as grouping and a German comma as the fraction", () => {
+        expect(NumberInputUtils.parseValue("1.000", GERMAN)).toBe(1000);
+        expect(NumberInputUtils.parseValue("1,5", GERMAN)).toBe(1.5);
+        expect(NumberInputUtils.parseValue("-1.234,5", GERMAN)).toBe(-1234.5);
+    });
+
+    it("drops white space grouping under a locale that groups with a space", () => {
+        expect(NumberInputUtils.parseValue("1 000,5", FRENCH)).toBe(1000.5);
+    });
+});
+
+describe("formatValue", () => {
+    it("writes the locale's decimal separator and no grouping", () => {
+        expect(NumberInputUtils.formatValue(1234.5, GERMAN)).toBe("1234,5");
+        expect(NumberInputUtils.formatValue(1234.5)).toBe("1234.5");
+    });
+
+    it("writes what reads back as the same number", () => {
+        for (const value of [0.1, -2.5, 1e21, 1.5e-7, 123456789]) {
+            expect(NumberInputUtils.parseValue(NumberInputUtils.formatValue(value, GERMAN), GERMAN)).toBe(value);
+        }
     });
 });
 
@@ -112,5 +152,25 @@ describe("computeStep", () => {
 
     it("stands still rather than looping when the step is not a step", () => {
         expect(NumberInputUtils.computeStep(7, 1, { step: 0 })).toBe(7);
+    });
+
+    it("moves a whole distance from a value on the ladder", () => {
+        expect(NumberInputUtils.computeStep(20, 1, { min: 0, step: 5 }, 50)).toBe(70);
+        expect(NumberInputUtils.computeStep(20, -1, { min: 0, step: 5 }, 10)).toBe(10);
+    });
+
+    it("counts a distance from the rung behind a value between rungs", () => {
+        expect(NumberInputUtils.computeStep(13, 1, { min: 0, step: 5 }, 10)).toBe(20);
+        expect(NumberInputUtils.computeStep(13, -1, { min: 0, step: 5 }, 10)).toBe(5);
+    });
+
+    it("lands a distance that is not a whole number of steps on the next rung past it", () => {
+        expect(NumberInputUtils.computeStep(10, 1, { min: 0, step: 5 }, 7)).toBe(20);
+        expect(NumberInputUtils.computeStep(10, -1, { min: 0, step: 5 }, 7)).toBe(0);
+    });
+
+    it("holds a distance to the range as a step is held", () => {
+        expect(NumberInputUtils.computeStep(95, 1, { min: 0, max: 100, step: 1 }, 10)).toBe(100);
+        expect(NumberInputUtils.computeStep(0.3, 1, { min: 0, step: 0.1 }, 0.1 * 10)).toBe(1.3);
     });
 });

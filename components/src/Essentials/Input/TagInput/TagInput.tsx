@@ -1,5 +1,6 @@
-import { Index, Show, createMemo } from "solid-js";
+import { Index, Show, createMemo, createSignal } from "solid-js";
 
+import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
@@ -18,7 +19,12 @@ export const TagInput = (props: TagInputProps) => {
 
     const valueSignal = accessSignal(() => props.valueSignal);
 
-    let fieldRef: HTMLInputElement | undefined;
+    const [getFieldRef, setFieldRef] = createSignal<HTMLInputElement>();
+
+    FormFieldUtils.registerControl(getFieldRef);
+
+    const getDirection = NavigatorUtils.createDirectionSignal(getFieldRef);
+
     let tagRefs: (HTMLElement | undefined)[] = [];
 
     const textSignal = SignalMirrorUtils.createOptional(() => props.textSignal, "");
@@ -40,7 +46,7 @@ export const TagInput = (props: TagInputProps) => {
     };
 
     const focusField = () => {
-        fieldRef?.focus();
+        getFieldRef()?.focus();
     };
 
     const addTag = () => {
@@ -82,7 +88,7 @@ export const TagInput = (props: TagInputProps) => {
 
         if (!getIsEmpty() || getTags().length < 1) return;
 
-        if (e.key === "Backspace" || e.key === "ArrowLeft") {
+        if (e.key === "Backspace" || NavigatorUtils.computeLogicalKey(e.key, getDirection()) === "ArrowLeft") {
             e.preventDefault();
             focusTag(getTags().length - 1);
         }
@@ -102,13 +108,15 @@ export const TagInput = (props: TagInputProps) => {
             return;
         }
 
-        if (e.key === "ArrowLeft" && index > 0) {
+        const logicalKey = NavigatorUtils.computeLogicalKey(e.key, getDirection());
+
+        if (logicalKey === "ArrowLeft" && index > 0) {
             e.preventDefault();
             focusTag(index - 1);
             return;
         }
 
-        if (e.key === "ArrowRight") {
+        if (logicalKey === "ArrowRight") {
             e.preventDefault();
 
             if (index < getTags().length - 1) {
@@ -174,7 +182,7 @@ export const TagInput = (props: TagInputProps) => {
 
                         <input
                             ref={(element) => {
-                                fieldRef = element;
+                                setFieldRef(element);
                                 setElementRef(element);
                             }}
                             id={access(props.id)}

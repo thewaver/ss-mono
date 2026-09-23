@@ -162,7 +162,7 @@ export const ColorArea = (props: ColorAreaProps) => {
                     id={props.id}
                     name={props.name}
                     ariaLabel={props.ariaLabel}
-                    axisLabels={() => access(props.axisLabels) ?? COLOR_AREA_DEFAULTS.axisLabels}
+                    axisLabels={props.axisLabels}
                     step={() => access(props.step) ?? COLOR_AREA_DEFAULTS.step}
                     flags={getRenderProps}
                     hsv={() => hsvSignal[0]()}

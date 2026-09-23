@@ -1,6 +1,6 @@
 import type { JSX } from "solid-js";
 
-import type { TimeValue } from "@thewaver/ss-utils";
+import type { TimeValue, TimeValueUnit } from "@thewaver/ss-utils";
 
 import type { DateTimeValue } from "../../../Abstracts/DateTimeValue/DateTimeValue.types";
 import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
@@ -8,22 +8,33 @@ import type { ClockColumnRenderer, ClockOptionRenderer, ClockSteps, ClockUnitRen
 import type { DatePickerProps } from "../DatePicker/DatePicker.types";
 import type { TimePickerProps } from "../TimePicker/TimePicker.types";
 
-export type DateTimePickerProps = Omit<DatePickerProps, "valueSignal" | "ariaLabel" | "visibilitySignal"> &
+export type DateTimePickerProps = Omit<
+    DatePickerProps,
+    "valueSignal" | "ariaLabel" | "visibilitySignal" | "minValue" | "maxValue" | "precision"
+> &
     AccessorProps<{
         /** Names the date half for assistive technology. */
-        dateLabel?: string;
+        dateLabel: string;
         /** Names the time half for assistive technology. */
-        timeLabel?: string;
+        timeLabel: string;
         /** Names the clock popup for assistive technology. */
-        clockLabel?: string;
-        /** The earliest time that can be picked. */
-        minTime?: TimeValue;
-        /** The latest time that can be picked. */
-        maxTime?: TimeValue;
+        clockLabel: string;
+        /**
+         * The earliest moment that can be picked. The calendar stops at its day, and the clock stops at its time
+         * only while that day is the one picked, so every other day offers the whole clock.
+         */
+        minValue?: DateTimeValue;
+        /**
+         * The latest moment that can be picked. The calendar stops at its day, and the clock stops at its time only
+         * while that day is the one picked.
+         */
+        maxValue?: DateTimeValue;
         /** Whether seconds are offered as well as hours and minutes. */
         hasSeconds?: boolean;
         /** Whether times are written as twelve hours with a morning and afternoon marker, or as twenty-four. */
         isTwelveHour?: boolean;
+        /** The letters that stand for each part of the time in the time half's format hint. */
+        segmentHints: Record<TimeValueUnit, string>;
         /** How far apart the offered times are, per unit. */
         clockSteps?: ClockSteps;
         /** The space between the clock's columns. */
@@ -41,7 +52,7 @@ export type DateTimePickerProps = Omit<DatePickerProps, "valueSignal" | "ariaLab
         /** The clock trigger's own element id. */
         timeTriggerId?: string;
         /** Names the control that opens the clock. */
-        timeTriggerAriaLabel?: string;
+        timeTriggerAriaLabel: string;
         /** Draws whatever else sits after the time field's text, before the control that opens the clock. */
         renderTimeTrailing?: TimePickerProps["renderTrailing"];
         /** Draws what sits inside the control that opens the clock. */

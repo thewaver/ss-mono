@@ -27,7 +27,7 @@ export const ModalPage = () => {
             key: "destructiveConfirmation",
             name: "Destructive confirmation",
             readout: () =>
-                `open: ${destructiveVisibility[0]()} | outcome: ${getOutcome()} — the alertdialog role, a required focus target, and no overlay dismissal`,
+                `open: ${destructiveVisibility[0]()} | outcome: ${getOutcome()} — the alertdialog role, a required focus target, and neither overlay nor Escape dismissal`,
             component: () => (
                 <DestructiveConfirmationExample visibilitySignal={destructiveVisibility} onDecide={setOutcome} />
             ),

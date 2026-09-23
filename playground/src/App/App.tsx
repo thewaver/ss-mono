@@ -23,6 +23,7 @@ import { CardStackPage } from "./Pages/CardStackPage/CardStackPage";
 import { DrumCarouselPage } from "./Pages/Carousels/DrumCarouselPage/DrumCarouselPage";
 import { TrackCarouselPage } from "./Pages/Carousels/TrackCarouselPage/TrackCarouselPage";
 import { CellAnimationPage } from "./Pages/CellAnimationPage/CellAnimationPage";
+import { CheckboxGroupPage } from "./Pages/CheckboxGroupPage/CheckboxGroupPage";
 import { CheckboxPage } from "./Pages/CheckboxPage/CheckboxPage";
 import { ClockPage } from "./Pages/ClockPage/ClockPage";
 import { ColorAreaPage } from "./Pages/ColorAreaPage/ColorAreaPage";
@@ -42,8 +43,11 @@ import { FormPage } from "./Pages/FormPage/FormPage";
 import { FormSectionPage } from "./Pages/FormSectionPage/FormSectionPage";
 import { FormationPage } from "./Pages/FormationPage/FormationPage";
 import { GlassSurfacePage } from "./Pages/GlassSurfacePage/GlassSurfacePage";
+import { HoverCardPage } from "./Pages/HoverCardPage/HoverCardPage";
 import { ImageSwitcherPage } from "./Pages/ImageSwitcherPage/ImageSwitcherPage";
 import { LabelPage } from "./Pages/LabelPage/LabelPage";
+import { ListboxPage } from "./Pages/ListboxPage/ListboxPage";
+import { MenubarPage } from "./Pages/MenubarPage/MenubarPage";
 import { FanMenuPage } from "./Pages/Menus/FanMenuPage/FanMenuPage";
 import { MenuPage } from "./Pages/Menus/MenuPage/MenuPage";
 import { WheelMenuPage } from "./Pages/Menus/WheelMenuPage/WheelMenuPage";
@@ -192,7 +196,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "ElementObserver",
                 description:
-                    "Measuring, in the four shapes the library actually needs: one element's box, a list of boxes at once, a height on its own, and a rectangle in viewport coordinates. The last is the odd one out — it re-reads every frame while the thing is visible, because there is no event for the element you are anchored to having moved.",
+                    "Measuring, in the four shapes the library actually needs: one element's box, a list of boxes at once, a height on its own, and a rectangle in viewport coordinates. The last is the odd one out — it re-reads every frame while the thing is visible, because there is no event for the element you are anchored to having moved. Beside them sits the rule a table of contents follows: of a list of elements, the current one is the last whose top has scrolled past a line near the top of the viewport.",
             },
             {
                 name: "Elevation",
@@ -421,6 +425,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 component: () => <FormPage />,
             },
             {
+                name: "HoverCard",
+                description:
+                    "A card of content hung off another element, opened by resting the pointer on it or by keyboard focus, and by a press where nothing can hover. Unlike a tooltip it may hold links and controls, so it is a dialog of its own rather than the element's description: Tab moves focus from the anchor into it, it stays open while focus is inside it, and Escape puts focus back on the anchor. The waiting, the skip window and the bridge across the gap are the hover engine it shares with Tooltip.",
+                component: () => <HoverCardPage />,
+            },
+            {
                 name: "ImageSwitcher",
                 description:
                     "Cross-fades between image sources, loading the next one out of sight first so a slow or missing file never leaves a hole where the old picture was.",
@@ -440,6 +450,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                         description:
                             "One of three presets over a shared binary switch. It is the only one with a third state — indeterminate is a value here, not a styling trick.",
                         component: () => <CheckboxPage />,
+                    },
+                    {
+                        name: "CheckboxGroup",
+                        description:
+                            "Several checkboxes over one list. A box given a value is ticked while the list holds it, and pressing it adds or removes it; there is no walk and no single tab stop, because each box is a choice of its own. A select-all box is the consumer's to draw anywhere, and the group hands it the state to show — ticked, empty or mixed — and the command that ticks or clears every box still enabled.",
+                        component: () => <CheckboxGroupPage />,
                     },
                     {
                         name: "Clock",
@@ -514,6 +530,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                         component: () => <LabelPage />,
                     },
                     {
+                        name: "Listbox",
+                        description:
+                            "Select's option list standing on its own in the page: no field and no popup, always open. The options take focus themselves, so the list is one tab stop and the arrows move focus from option to option. Groups, typeahead, reachable disabled options, windowing and a horizontal walk that follows the page's text direction all come from the same list Select draws in its popup.",
+                        component: () => <ListboxPage />,
+                    },
+                    {
                         name: "MultiSelect",
                         description:
                             "The same list as Select with more than one value held at once: picking does not close it, a picked option can be picked again to drop it, and the field shows what is chosen rather than one label. Groups, a query and options fetched on demand all work as they do for the single-value list, since both are the same shell with a different value.",
@@ -586,6 +608,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                         component: () => <TogglePage />,
                     },
                 ],
+            },
+            {
+                name: "Menubar",
+                description:
+                    "A row of words that each open a menu, built on the toolbar rather than beside it, so it measures itself, walks with the arrows as one tab stop and moves whatever does not fit into an overflow menu, where a word becomes a submenu. What it adds is one rule: while a menu is open, the arrow that moves to the next word closes that menu and opens the next one.",
+                component: () => <MenubarPage />,
             },
             {
                 name: "Menus",

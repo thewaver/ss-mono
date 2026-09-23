@@ -6,7 +6,7 @@ import { assignInlineVars } from "@vanilla-extract/dynamic";
 import { AnchorUtils } from "../../Abstracts/Anchor/Anchor.utils";
 import { DismisserUtils } from "../../Abstracts/Dismisser/Dismisser.utils";
 import { ElementFaderUtils } from "../../Abstracts/ElementFader/ElementFader.utils";
-import { FocusManagerUtils } from "../../Abstracts/FocusManager/FocusManager.utils";
+import { HoverIntentUtils } from "../../Abstracts/HoverIntent/HoverIntent.utils";
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
 import { TOOLTIP_DEFAULTS } from "./Tooltip.const";
@@ -15,20 +15,13 @@ import type { TooltipProps } from "./Tooltip.types";
 import * as styles from "./Tooltip.css";
 
 const ARIA_DESCRIBED_BY_ATTRIBUTE = "aria-describedby";
-const NO_GAP = 0;
 
-const toGap = (value: number | undefined) => Math.max(value ?? NO_GAP, NO_GAP);
+const TOOLTIP_DELAY_GROUP = HoverIntentUtils.createDelayGroup();
 
 export const Tooltip = (props: TooltipProps) => {
     const viewportContext = useViewportContext();
 
     const tooltipId = createUniqueId();
-
-    let focusTimeout: ReturnType<typeof setTimeout> | undefined;
-
-    onCleanup(() => {
-        clearTimeout(focusTimeout);
-    });
 
     const [getShouldShow, setShouldShow] = createSignal(false);
 
@@ -36,9 +29,16 @@ export const Tooltip = (props: TooltipProps) => {
         () => access(props.transitionDurationMs) ?? TOOLTIP_DEFAULTS.transitionDurationMs,
     );
 
-    const getFocusShowDelayMs = createMemo(() => access(props.focusShowDelayMs) ?? TOOLTIP_DEFAULTS.focusShowDelayMs);
-
     const [getContentRef, setLocalContentRef] = createSignal<HTMLElement>();
+
+    const hoverIntent = HoverIntentUtils.create(() => access(props.anchorRef), [getShouldShow, setShouldShow], {
+        delayGroup: TOOLTIP_DELAY_GROUP,
+        getPanelRef: getContentRef,
+        getHoverShowDelayMs: () => access(props.hoverShowDelayMs) ?? TOOLTIP_DEFAULTS.hoverShowDelayMs,
+        getSkipDelayWindowMs: () => access(props.skipDelayWindowMs) ?? TOOLTIP_DEFAULTS.skipDelayWindowMs,
+        getFocusShowDelayMs: () => access(props.focusShowDelayMs) ?? TOOLTIP_DEFAULTS.focusShowDelayMs,
+        isHiddenOnAnchorBlur: true,
+    });
 
     const { getIsVisible, getTransitionTarget } = ElementFaderUtils.createFader(getShouldShow, {
         getTransitionDurationMs,
@@ -56,86 +56,14 @@ export const Tooltip = (props: TooltipProps) => {
         },
     );
 
-    const getBridge = createMemo(() => {
-        const placement = getPlacement();
-        const offset = access(props.offset);
-        const gapX = toGap(offset?.x);
-        const gapY = toGap(offset?.y);
-        const hKind = AnchorUtils.getHBandKind(placement.x);
-        const vKind = AnchorUtils.getVBandKind(placement.y);
-
-        return {
-            top: vKind === "after" ? gapY : NO_GAP,
-            right: hKind === "before" ? gapX : NO_GAP,
-            bottom: vKind === "before" ? gapY : NO_GAP,
-            left: hKind === "after" ? gapX : NO_GAP,
-        };
-    });
-
-    const getIsMovingInto = (e: MouseEvent, element: HTMLElement | undefined) =>
-        e.relatedTarget instanceof Node && element !== undefined && element.contains(e.relatedTarget);
-
-    const handleMouseEnter = () => {
-        clearTimeout(focusTimeout);
-        setShouldShow(true);
-    };
-
-    const handleMouseLeave = (e: MouseEvent) => {
-        if (getIsMovingInto(e, getContentRef())) return;
-
-        clearTimeout(focusTimeout);
-        setShouldShow(false);
-    };
-
-    const handleContentMouseLeave = (e: MouseEvent) => {
-        if (getIsMovingInto(e, access(props.anchorRef))) return;
-
-        clearTimeout(focusTimeout);
-        setShouldShow(false);
-    };
-
-    const handleFocus = () => {
-        clearTimeout(focusTimeout);
-
-        const anchorRef = access(props.anchorRef);
-
-        if (FocusManagerUtils.getIsRestoringFocus()) return;
-        if (anchorRef && !anchorRef.matches(":focus-visible")) return;
-
-        focusTimeout = setTimeout(() => {
-            setShouldShow(true);
-        }, getFocusShowDelayMs());
-    };
-
-    const handleBlur = () => {
-        clearTimeout(focusTimeout);
-        setShouldShow(false);
-    };
+    const getBridge = createMemo(() => HoverIntentUtils.computeBridgeInsets(getPlacement(), access(props.offset)));
 
     DismisserUtils.createLayer(getShouldShow, {
         getRoots: () => [access(props.anchorRef), getContentRef()],
         onDismiss: () => {
-            clearTimeout(focusTimeout);
+            hoverIntent.cancel();
             setShouldShow(false);
         },
-    });
-
-    createEffect(() => {
-        const anchorRef = access(props.anchorRef);
-
-        onCleanup(() => {
-            anchorRef?.removeEventListener("mouseenter", handleMouseEnter);
-            anchorRef?.removeEventListener("mouseleave", handleMouseLeave);
-            anchorRef?.removeEventListener("focus", handleFocus);
-            anchorRef?.removeEventListener("blur", handleBlur);
-        });
-
-        if (!anchorRef) return;
-
-        anchorRef.addEventListener("mouseenter", handleMouseEnter);
-        anchorRef.addEventListener("mouseleave", handleMouseLeave);
-        anchorRef.addEventListener("focus", handleFocus);
-        anchorRef.addEventListener("blur", handleBlur);
     });
 
     createEffect(() => {
@@ -189,8 +117,6 @@ export const Tooltip = (props: TooltipProps) => {
                         }),
                     }}
                     role="tooltip"
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleContentMouseLeave}
                 >
                     {props.renderContent(getTransitionTarget, getTransitionDurationMs, getPlacement)}
                 </div>

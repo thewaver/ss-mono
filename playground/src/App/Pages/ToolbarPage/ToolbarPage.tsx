@@ -9,6 +9,7 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import { PaletteExample } from "./Examples/Palette";
+import { PressedExample } from "./Examples/Pressed";
 import { RefusingExample } from "./Examples/Refusing";
 import { NOTHING_RUN } from "./ToolbarPage.const";
 import type { ToolbarExampleProps } from "./ToolbarPage.types";
@@ -54,6 +55,7 @@ export const ToolbarPage = () => {
     const [getBarWidth, setBarWidth] = createSignal(STARTING_BAR_WIDTH);
     const [getGap, setGap] = createSignal(TOOLBAR_DEFAULTS.gap);
     const [getLastRun, setLastRun] = createSignal(NOTHING_RUN);
+    const pressedValues = createSignal<string[]>([]);
 
     const getExamples = createMemo(() => {
         const commonProps: ToolbarExampleProps = {
@@ -86,6 +88,19 @@ export const ToolbarPage = () => {
                     </ResizableBar>
                 ),
                 path: `${EXAMPLES_ROOT}/Refusing.tsx`,
+            },
+            {
+                key: "pressed",
+                name: "Pressed",
+                span: WIDE_SPAN,
+                readout: () =>
+                    `pressed: ${pressedValues[0]().join(", ") || "nothing"} — each action stays down until pressed again, and one that collapses is a checkbox in the menu, checked from the same list`,
+                component: () => (
+                    <ResizableBar width={getBarWidth} onResize={setBarWidth}>
+                        <PressedExample {...commonProps} pressedValuesSignal={pressedValues} />
+                    </ResizableBar>
+                ),
+                path: `${EXAMPLES_ROOT}/Pressed.tsx`,
             },
             {
                 key: "palette",

@@ -196,17 +196,29 @@ describe("getSteppedSocket", () => {
     });
 });
 
-describe("getRegionLabel", () => {
+describe("getRegion", () => {
     const BOUNDS = { width: 300, height: 300 };
     const SIZE = { width: 20, height: 20 };
 
     it("names the third of the board the node's middle sits in", () => {
-        expect(PatchBoardUtils.getRegionLabel({ x: 0, y: 0 }, SIZE, BOUNDS)).toBe("top left");
-        expect(PatchBoardUtils.getRegionLabel({ x: 140, y: 140 }, SIZE, BOUNDS)).toBe("middle center");
-        expect(PatchBoardUtils.getRegionLabel({ x: 280, y: 280 }, SIZE, BOUNDS)).toBe("bottom right");
+        expect(PatchBoardUtils.getRegion({ x: 0, y: 0 }, SIZE, BOUNDS)).toEqual({
+            vertical: "top",
+            horizontal: "left",
+        });
+        expect(PatchBoardUtils.getRegion({ x: 140, y: 140 }, SIZE, BOUNDS)).toEqual({
+            vertical: "middle",
+            horizontal: "center",
+        });
+        expect(PatchBoardUtils.getRegion({ x: 280, y: 280 }, SIZE, BOUNDS)).toEqual({
+            vertical: "bottom",
+            horizontal: "right",
+        });
     });
 
     it("stays inside the vocabulary when a node hangs off the edge", () => {
-        expect(PatchBoardUtils.getRegionLabel({ x: -100, y: 400 }, SIZE, BOUNDS)).toBe("bottom left");
+        expect(PatchBoardUtils.getRegion({ x: -100, y: 400 }, SIZE, BOUNDS)).toEqual({
+            vertical: "bottom",
+            horizontal: "left",
+        });
     });
 });

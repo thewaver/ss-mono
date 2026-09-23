@@ -24,7 +24,14 @@ export type FlipCardProps = AccessorProps<{
     /** Names the card for assistive technology. */
     ariaLabel: string;
     /** Names one face, so a reader is told which side is showing. */
-    computeFaceLabel?: (face: FlipCardFace) => string;
+    computeFaceLabel: (face: FlipCardFace) => string;
+    /**
+     * What the card is called when it is announced, so a reader hears flip card rather than group. Defaults to
+     * "flip card".
+     */
+    roleDescription?: string;
+    /** What one face is called when it is announced, so a reader hears face rather than group. Defaults to "face". */
+    faceRoleDescription?: string;
     /** Which side is showing. It is the only thing that turns the card. */
     flippedSignal: SignalSource<boolean>;
     /** Draws the front. */

@@ -21,16 +21,16 @@ export const TabbedExample = (props: Props) => {
                 renderButton={(getStep, stepper) => <PageScrollerButton step={getStep} stepper={stepper} />}
             >
                 <Tabs
-                    dir={"row"}
+                    orientation={"horizontal"}
                     tabGap={() => TAB_GAP}
                     ariaLabel={"Months"}
                     tabs={props.tabs}
                     selectedValue={props.selectedValue}
                     onSelectionChange={props.onSelectionChange}
-                    renderGutter={() => <PageTabGutter dir={"row"} />}
+                    renderGutter={() => <PageTabGutter orientation={"horizontal"} />}
                     renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                         <PageTabFloater
-                            dir={"row"}
+                            orientation={"horizontal"}
                             visibilityTarget={getVisibilityTarget}
                             transitionDurationMs={getTransitionDurationMs}
                         />
@@ -38,7 +38,7 @@ export const TabbedExample = (props: Props) => {
                     renderTab={(getTab, getFlags) => (
                         <PageTabContent
                             flags={getFlags}
-                            dir={"row"}
+                            orientation={"horizontal"}
                             isSelected={() => getTab().value === access(props.selectedValue)}
                         >
                             {getTab().value}

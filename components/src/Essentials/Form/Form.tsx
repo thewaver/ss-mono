@@ -26,6 +26,11 @@ export const Form = (props: FormProps) => {
                 setHasSubmitted(true);
 
                 void props.onSubmit?.();
+
+                getEntries()
+                    .find((entry) => entry.getHasError())
+                    ?.getFocusTarget?.()
+                    ?.focus();
             }}
             onReset={(e) => {
                 e.preventDefault();

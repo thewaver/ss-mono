@@ -5,12 +5,13 @@ import { Dynamic } from "solid-js/web";
 import { FlattenerUtils } from "../../Abstracts/Flattener/Flattener.utils";
 import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
+import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { TypeaheadUtils } from "../../Abstracts/Typeahead/Typeahead.utils";
 import { VirtualizerUtils } from "../../Abstracts/Virtualizer/Virtualizer.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
-import { access, accessSignal } from "../../Utils/propUtils";
+import { access } from "../../Utils/propUtils";
 import type { TreeNodeItemProps, TreeProps, TreeRow } from "./Tree.types";
 import { TreeUtils } from "./Tree.utils";
 
@@ -84,10 +85,14 @@ const TreeNodeItem = (props: TreeNodeItemProps) => {
 };
 
 export const Tree = <T,>(props: TreeProps<T>) => {
-    const valueSignal = accessSignal(() => props.valueSignal);
-    const expandedSignal = accessSignal(() => props.expandedSignal);
+    const valueSignal = SignalMirrorUtils.createOptional<T | undefined>(() => props.valueSignal, undefined);
+    const expandedSignal = SignalMirrorUtils.createOptional<T[]>(() => props.expandedSignal, []);
 
     const treeId = createUniqueId();
+
+    const [getRootRef, setRootRef] = createSignal<HTMLElement>();
+
+    const getDirection = NavigatorUtils.createDirectionSignal(getRootRef);
 
     const [getFocusedValue, setFocusedValue] = createSignal<T | undefined>();
 
@@ -103,7 +108,6 @@ export const Tree = <T,>(props: TreeProps<T>) => {
         const isReachable = InteractionTrackerUtils.computeIsReachable(
             row.node.isDisabled ?? false,
             row.node.isReachableWhenDisabled ?? false,
-            row.node.tooltipDefs !== undefined,
         );
 
         return !row.node.isDisabled || isReachable;
@@ -302,7 +306,9 @@ export const Tree = <T,>(props: TreeProps<T>) => {
             return;
         }
 
-        if (e.key === "ArrowRight") {
+        const logicalKey = NavigatorUtils.computeLogicalKey(e.key, getDirection());
+
+        if (logicalKey === "ArrowRight") {
             if (!TreeUtils.getIsBranch(current.node)) return;
 
             e.preventDefault();
@@ -320,7 +326,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
             return;
         }
 
-        if (e.key === "ArrowLeft") {
+        if (logicalKey === "ArrowLeft") {
             if (TreeUtils.getIsBranch(current.node) && current.isExpanded) {
                 e.preventDefault();
 
@@ -340,7 +346,9 @@ export const Tree = <T,>(props: TreeProps<T>) => {
             return;
         }
 
-        const position = NavigatorUtils.computeNextPosition(e.key, navigable.indexOf(current), navigable.length);
+        const position = NavigatorUtils.computeNextPosition(e.key, navigable.indexOf(current), navigable.length, {
+            isLooping: false,
+        });
 
         if (position === undefined) return;
 
@@ -449,6 +457,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
 
     return (
         <div
+            ref={setRootRef}
             role="tree"
             aria-label={access(props.ariaLabel)}
             onKeyDown={handleKeyDown}

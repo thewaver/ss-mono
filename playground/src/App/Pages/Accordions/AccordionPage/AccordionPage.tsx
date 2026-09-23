@@ -30,6 +30,14 @@ export const AccordionPage = () => {
             path: `${EXAMPLES_ROOT}/Sections.tsx`,
         },
         {
+            key: "unheld",
+            name: "Nobody holding the state",
+            readout: () =>
+                "no signal passed — the accordion keeps which sections are open itself, so the page has nothing to show here",
+            component: () => <SectionsExample />,
+            path: `${EXAMPLES_ROOT}/Sections.tsx`,
+        },
+        {
             key: "single",
             name: "One at a time",
             readout: () => `expanded: ${JSON.stringify(singleSignal[0]())} — the component keeps at most one`,

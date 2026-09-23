@@ -9,14 +9,14 @@ import * as styles from "./SplitPaneContent.css";
 export const PageSplitPaneGutter = (props: SplitPaneGutterProps) => {
     return (
         <div
-            class={access(props.dir) === "row" ? styles.rowGutter : styles.columnGutter}
+            class={access(props.orientation) === "horizontal" ? styles.rowGutter : styles.columnGutter}
             classList={{
                 [styles.isDragging]: access(props.flags).isDragging,
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}
             data-gutter
         >
-            <div class={access(props.dir) === "row" ? styles.rowGrip : styles.columnGrip} />
+            <div class={access(props.orientation) === "horizontal" ? styles.rowGrip : styles.columnGrip} />
         </div>
     );
 };

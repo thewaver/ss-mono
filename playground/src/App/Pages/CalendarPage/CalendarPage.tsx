@@ -8,10 +8,13 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageSelectField } from "../../StyledComponents/Field/Field";
-import { MAX_DATE, MIN_DATE, TODAY, WEEK_START_LABELS } from "./CalendarPage.const";
+import { MAX_DATE, MAX_YEAR, MIN_DATE, MIN_YEAR, TODAY, WEEK_START_LABELS } from "./CalendarPage.const";
 import { BoundedExample } from "./Examples/Bounded";
 import { DefaultExample } from "./Examples/Default";
+import { MonthPickerExample } from "./Examples/MonthPicker";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 import { WeekdaysExample } from "./Examples/Weekdays";
+import { YearPickerExample } from "./Examples/YearPicker";
 
 const WEEK_STARTS = [0, 1] as const;
 const CALENDAR_FIELD_WIDTH = 180;
@@ -26,6 +29,7 @@ export const CalendarPage = () => {
     const defaultValue = createSignal<DateValue | undefined>(TODAY);
     const rangedValue = createSignal<DateValue | undefined>();
     const weekdaysValue = createSignal<DateValue | undefined>();
+    const rightToLeftValue = createSignal<DateValue | undefined>(TODAY);
 
     const makeMonthSignal = (): Signal<DateValue> => {
         const signal = createSignal<DateValue>(DateValueUtils.getStartOfMonth(TODAY));
@@ -36,6 +40,12 @@ export const CalendarPage = () => {
     const defaultMonth = makeMonthSignal();
     const rangedMonth = makeMonthSignal();
     const weekdaysMonth = makeMonthSignal();
+    const rightToLeftMonth = makeMonthSignal();
+
+    const monthPickerValue = createSignal<DateValue | undefined>();
+    const yearPickerValue = createSignal<DateValue | undefined>();
+    const monthPickerPage = makeMonthSignal();
+    const yearPickerPage = makeMonthSignal();
 
     const getExamples = createMemo(() => [
         {
@@ -70,6 +80,36 @@ export const CalendarPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Weekdays.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            name: "In a right-to-left box",
+            readout: () =>
+                `value: ${describe(rightToLeftValue[0]())} — the box around the calendar sets dir="rtl", so each week runs from the right and the right arrow moves to the day before`,
+            component: () => (
+                <RightToLeftExample
+                    valueSignal={rightToLeftValue}
+                    monthSignal={rightToLeftMonth}
+                    weekStartsOn={getWeekStartsOn}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
+        },
+        {
+            key: "monthPicker",
+            name: "Month picker",
+            readout: () =>
+                `value: ${describe(monthPickerValue[0]())} — precision="month": the grid holds the year's months, a pick sets the first of the month, and the page keys step a year`,
+            component: () => <MonthPickerExample valueSignal={monthPickerValue} monthSignal={monthPickerPage} />,
+            path: `${EXAMPLES_ROOT}/MonthPicker.tsx`,
+        },
+        {
+            key: "yearPicker",
+            name: "Year picker",
+            readout: () =>
+                `value: ${describe(yearPickerValue[0]())} — precision="year": twelve years to a page, bounded to ${MIN_YEAR.year}–${MAX_YEAR.year}, and a pick sets the first day of the year`,
+            component: () => <YearPickerExample valueSignal={yearPickerValue} monthSignal={yearPickerPage} />,
+            path: `${EXAMPLES_ROOT}/YearPicker.tsx`,
         },
     ]);
 

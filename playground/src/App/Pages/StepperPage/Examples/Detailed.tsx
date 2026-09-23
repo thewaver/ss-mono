@@ -11,7 +11,7 @@ export const DetailedExample = (props: Props) => {
         <Stepper
             steps={props.steps}
             currentValue={props.currentValue}
-            dir={"column"}
+            orientation={"vertical"}
             gap={() => STEPPER_GAP}
             ariaLabel={"Checkout with notes"}
             computeStepAriaLabel={props.computeStepAriaLabel}
@@ -21,13 +21,13 @@ export const DetailedExample = (props: Props) => {
                     flags={getFlags}
                     state={() => getStep().state}
                     ordinal={() => ORDER.indexOf(getStep().value) + 1}
-                    dir={"column"}
+                    orientation={"vertical"}
                 >
                     {LABELS[getStep().value]}
                 </PageStepContent>
             )}
             renderBody={(getStep) => <PageStepBody>{BODIES[getStep().value]}</PageStepBody>}
-            renderConnector={() => <PageStepConnector dir={"column"} isRail={true} />}
+            renderConnector={() => <PageStepConnector orientation={"vertical"} isRail={true} />}
         />
     );
 };

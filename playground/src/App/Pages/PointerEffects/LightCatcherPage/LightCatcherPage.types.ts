@@ -4,4 +4,6 @@ export type LightCatcherExampleProps = {
     lightRangePx: () => number;
     maxBrightness: () => number;
     restingBrightness: () => number;
+    maxLightness: () => number;
+    restingLightness: () => number;
 };

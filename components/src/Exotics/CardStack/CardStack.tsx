@@ -38,9 +38,6 @@ const KEY_DIRECTIONS: Record<string, SwipeDirection> = {
     ArrowDown: "down",
 };
 
-const CARD_STACK_ROLE_DESCRIPTION = "card stack";
-const CARD_ROLE_DESCRIPTION = "card";
-
 export const CardStack = <T,>(props: CardStackProps<T>) => {
     const [getTopIndex, setTopIndex] = SignalMirrorUtils.createOptional(() => props.topIndexSignal, FIRST_INDEX);
 
@@ -84,8 +81,7 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
             .map((card, offset) => ({ card, index: from + offset }));
     });
 
-    const getCardLabel = (card: T, index: number) =>
-        props.computeCardLabel?.(card, index) ?? `${CARD_ROLE_DESCRIPTION} ${index + 1}`;
+    const getCardLabel = (card: T, index: number) => props.computeCardLabel(card, index);
 
     const send = (direction: SwipeDirection) => {
         const cards = getCards();
@@ -176,7 +172,7 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
             ref={setPileRef}
             class={styles.cardStackRoot}
             role="group"
-            aria-roledescription={CARD_STACK_ROLE_DESCRIPTION}
+            aria-roledescription={access(props.roleDescription) ?? CARD_STACK_DEFAULTS.roleDescription}
             aria-label={access(props.ariaLabel)}
             aria-disabled={getIsDisabled() ? "true" : undefined}
             tabindex={0}
@@ -206,7 +202,9 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
                                 "transition-duration": `${getCardTransitionDurationMs(getDepth())}ms`,
                             }}
                             role="group"
-                            aria-roledescription={CARD_ROLE_DESCRIPTION}
+                            aria-roledescription={
+                                access(props.cardRoleDescription) ?? CARD_STACK_DEFAULTS.cardRoleDescription
+                            }
                             aria-label={getCardLabel(entry.card, entry.index)}
                             aria-hidden={getIsTop() ? undefined : "true"}
                             inert={!getIsTop()}

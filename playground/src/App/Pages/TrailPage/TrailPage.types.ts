@@ -5,5 +5,5 @@ export type TrailExampleProps = AccessorProps<{
     isLooping: boolean;
     isTurning: boolean;
     progressSignal: SignalSource<number>;
-    isPlayingSignal: SignalSource<boolean>;
+    playbackSignal: SignalSource<boolean>;
 }>;

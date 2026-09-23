@@ -8,6 +8,8 @@ export const FormFieldContextProvider = FormFieldContext.Provider;
 
 const UNDESCRIBED_CONTEXT: FormFieldContextType = {
     getDescriptionId: () => undefined,
+    registerControl: () => undefined,
+    unregisterControl: () => undefined,
 };
 
 export const useFormFieldContext = (): FormFieldContextType => useContext(FormFieldContext) ?? UNDESCRIBED_CONTEXT;

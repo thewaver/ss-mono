@@ -2,6 +2,10 @@ import { Paginator } from "@thewaver/ss-components";
 import type { PaginatorLinkProps } from "@thewaver/ss-components";
 
 import {
+    computePaginatorPageLabel,
+    computePaginatorStepLabel,
+} from "../../../PageComponents/Announcements/Announcements.const";
+import {
     PagePaginatorDemo,
     PagePaginatorGap,
     PagePaginatorPage,
@@ -27,6 +31,8 @@ export const LinkComponentExample = (props: Props) => {
                 isDisabled={props.isDisabled}
                 gap={() => PAGINATOR_GAP}
                 ariaLabel={"Routed results"}
+                computePageLabel={computePaginatorPageLabel}
+                computeStepLabel={computePaginatorStepLabel}
                 linkComponent={PagePaginatorLink}
                 computeHref={(page) => `#paginator-routed-${page}`}
                 onPageChange={props.onPageChange}

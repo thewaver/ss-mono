@@ -19,11 +19,11 @@ export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "valu
         /** How long the calendar takes to fade in and out. */
         popupTransitionDurationMs?: number;
         /** Names the calendar for assistive technology. */
-        calendarLabel?: string;
+        calendarLabel: string;
         /** Names the start field for assistive technology. */
-        startLabel?: string;
+        startLabel: string;
         /** Names the end field for assistive technology. */
-        endLabel?: string;
+        endLabel: string;
         /** Which day begins a week, which decides the order of the column headings. */
         weekStartsOn?: DateValueWeekStart;
         /** Whether one day can be picked, for rules a plain earliest and latest cannot express. */
@@ -39,8 +39,8 @@ export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "valu
          * owns the trigger.
          */
         triggerId?: string;
-        /** Names the control that opens the calendar. Defaults to "Open the calendar". */
-        triggerAriaLabel?: string;
+        /** Names the control that opens the calendar. */
+        triggerAriaLabel: string;
         /**
          * Draws what sits inside the control that opens the calendar.
          *

@@ -1,5 +1,6 @@
 import { Button, Cuboid } from "@thewaver/ss-components";
 
+import { computeCuboidFaceLabel } from "../../../PageComponents/Announcements/Announcements.const";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageCuboidFace, PageCuboidPad, PageCuboidStack } from "../../../StyledComponents/CuboidContent/CuboidContent";
 import type { CuboidExampleProps } from "../CuboidPage.types";
@@ -29,6 +30,7 @@ export const DefaultExample = (props: Props) => {
                 size={props.size}
                 transitionDurationMs={props.transitionDurationMs}
                 ariaLabel={"Six faces"}
+                computeFaceLabel={computeCuboidFaceLabel}
                 renderFace={(getFace, getState) => <PageCuboidFace face={getFace} state={getState} />}
             />
 

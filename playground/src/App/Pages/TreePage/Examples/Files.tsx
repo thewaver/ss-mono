@@ -5,7 +5,7 @@ import { PageTreeNodeContent } from "../../../StyledComponents/TreeNodeContent/T
 import { FILES } from "../TreePage.const";
 import type { TreeExampleProps } from "../TreePage.types";
 
-type Props = TreeExampleProps & { nodes?: MaybeAccessor<TreeNode<string>[]> };
+type Props = Partial<TreeExampleProps> & { nodes?: MaybeAccessor<TreeNode<string>[]> };
 
 export const FilesExample = (props: Props) => {
     return (

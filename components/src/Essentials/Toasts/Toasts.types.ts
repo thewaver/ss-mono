@@ -1,6 +1,6 @@
 import type { Accessor, JSX } from "solid-js";
 
-import type { CSSMargin, Size2d } from "@thewaver/ss-utils";
+import type { CSSMargin, Size2d, SwipeDirection } from "@thewaver/ss-utils";
 
 import type { AccessorProps, MaybeAccessor, SignalSource } from "../../Utils/typeUtils";
 
@@ -31,10 +31,27 @@ export type Toast<T> = {
 };
 
 export type ToastState = {
+    /** Where this toast sits in the stack, counting from the newest. */
     index: number;
+    /** How many toasts are on screen. */
     count: number;
+    /** Whether this toast's countdown is held, by the pointer or focus being in the stack or by a swipe under way. */
     isPaused: boolean;
+    /** The measured size of every toast on screen, for a painter that offsets piled toasts. */
     sizes: Size2d[];
+    /**
+     * Which way a swipe carries this toast off screen, or `undefined` when it cannot be swiped: swiping is
+     * switched off, or the stack sits in the middle of the screen with no edge to leave by.
+     */
+    swipeDirection: SwipeDirection | undefined;
+    /**
+     * How far a swipe has carried this toast towards `swipeDirection`, from `0` to `1` of its own size. The
+     * toast is not moved for you: the painter applies this as a shift, and it stays where it was left when
+     * the swipe commits, so the exit plays from there.
+     */
+    swipeOffsetRatio: number;
+    /** Whether a finger or pointer is dragging this toast, so the painter can follow it without easing. */
+    isSwiping: boolean;
 };
 
 export type ToastRenderer<T> = (
@@ -62,10 +79,14 @@ export type ToastsItemProps<T> = AccessorProps<{
      * The measured size of every toast on screen, which is what lets a piled toast work out how far to offset itself.
      */
     sizes: Size2d[];
+    /** Which way a swipe dismisses this toast, or `undefined` when a swipe does nothing. */
+    swipeDirection: SwipeDirection | undefined;
     /** Receives the toast element once it exists, so the stack can measure it. */
     ref: (element: HTMLElement) => void;
     /** Runs when this toast's time is up. */
     onElapse: () => void;
+    /** Runs when a swipe carries this toast far enough to dismiss it. */
+    onSwipeDismiss: () => void;
     /** Runs once this toast has finished leaving and can be taken out of the list. */
     onExitEnd: () => void;
 }> & {
@@ -94,6 +115,18 @@ export type ToastsProps<T> = AccessorProps<{
     overflow?: ToastsOverflow;
     /** How long a toast takes to arrive, to leave, and to slide when the stack shifts. */
     transitionDurationMs?: number;
+    /**
+     * Whether a toast can be swiped off screen. Defaults to `true`. The swipe runs towards the edge the stack
+     * sits on — sideways for a stack against the left or right, up or down for one centered along the top or
+     * bottom — and a stack in the middle of the screen cannot be swiped. A committed swipe removes the toast
+     * from `toastsSignal`, as its timer does, and its countdown is held while the swipe is under way. The
+     * toast is not moved for you: `ToastState` hands the painter the direction and the distance to draw.
+     *
+     * A swipe is a drag, and WCAG 2.5.7 requires anything done by dragging to be possible with a single
+     * pointer without one. The close control the painter draws is that route, so a toast that can be swiped
+     * must paint one.
+     */
+    isDismissableOnSwipe?: boolean;
 }> & {
     /** How many toasts may be on screen at once. Leave it out and they all show. */
     limit?: MaybeAccessor<number | undefined>;

@@ -10,11 +10,11 @@ export type BinarySwitchFlags = {
 
 export type BinarySwitchCbs = {
     /** Runs when the switch is turned on or off. */
-    onChange?: (isChecked: boolean) => void | Promise<void>;
+    onChange?: (isChecked: boolean) => void;
     /** Runs when the pointer arrives over the switch. */
-    onMouseEnter?: (e: MouseEvent) => void | Promise<void>;
+    onMouseEnter?: (e: MouseEvent) => void;
     /** Runs when the pointer leaves the switch. */
-    onMouseLeave?: (e: MouseEvent) => void | Promise<void>;
+    onMouseLeave?: (e: MouseEvent) => void;
 };
 
 export type BinarySwitchState = {
@@ -26,6 +26,8 @@ export type BinarySwitchState = {
     name?: string;
     /** Names the switch for assistive technology, where no label already does. */
     ariaLabel?: string;
+    /** Whether a value has to be given. It is announced and not enforced, because the library validates nothing. A radio leaves this to its group. */
+    isRequired?: boolean;
     /** Whether the switch is on. */
     isChecked: boolean;
     /** Whether the switch stands for a group whose members disagree, which is the third state between on and off. */
@@ -41,7 +43,7 @@ export type BinarySwitchProps = Omit<InteractionWrapperProps<BinarySwitchFlags>,
         BinarySwitchCbs & Pick<InteractionControlProps<BinarySwitchFlags>, "id" | "renderContent"> & BinarySwitchState
     >;
 
-export type BinarySwitchPresetProps = Omit<BinarySwitchProps, "type" | "isSwitch" | "name" | "isChecked"> &
+export type BinarySwitchPresetProps = Omit<BinarySwitchProps, "type" | "isSwitch" | "isChecked"> &
     AccessorProps<{
         /** Whether the switch is on. It is the only thing that turns it. */
         checkedSignal: SignalSource<boolean>;

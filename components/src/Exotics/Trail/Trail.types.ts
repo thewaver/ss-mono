@@ -19,19 +19,6 @@ export type TrailController = {
     getPlace: Accessor<TrailPlace>;
     getIsPlaying: Accessor<boolean>;
     /**
-     * Starts the traveler moving.
-     *
-     * @returns `false` when it was already playing, since asking for a state a thing is already in does
-     * nothing.
-     */
-    play: () => boolean;
-    /**
-     * Stops the traveler where it is.
-     *
-     * @returns `false` when it was already paused.
-     */
-    pause: () => boolean;
-    /**
      * Moves the traveler to a point along the path.
      *
      * @param progress Where to go, `0`–`1`. Values outside that are clamped rather than refused.
@@ -56,7 +43,7 @@ export type TrailProps = AccessorProps<{
     /** How far along the path the traveler is. It is the only thing that moves it. */
     progressSignal?: SignalSource<number>;
     /** Whether the traveler is walking. It is the only thing that starts or stops it. */
-    isPlayingSignal?: SignalSource<boolean>;
+    playbackSignal?: SignalSource<boolean>;
     /** Draws the path itself, where it should be visible. */
     renderTrack?: (getPath: Accessor<string>) => JSX.Element;
     /** Draws the traveler, and is told where on the path it is and which way it faces. */

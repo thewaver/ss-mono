@@ -51,8 +51,8 @@ export const TimeInputPage = () => {
             component: () => (
                 <TimeExample
                     valueSignal={shiftSignal}
-                    minTime={() => OPENING_TIME}
-                    maxTime={() => CLOSING_TIME}
+                    minValue={() => OPENING_TIME}
+                    maxValue={() => CLOSING_TIME}
                     ariaLabel={"Shift start"}
                 />
             ),

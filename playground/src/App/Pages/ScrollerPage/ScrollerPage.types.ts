@@ -9,3 +9,13 @@ export type ScrollerTabbedExampleProps = AccessorProps<{
     selectedValue: string;
     onSelectionChange: (value: string) => void;
 }>;
+
+export type TocSection = {
+    id: string;
+    title: string;
+    text: string;
+};
+
+export type ScrollerTableOfContentsExampleProps = {
+    onCurrentChange: (index: number | undefined) => void;
+};

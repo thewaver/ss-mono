@@ -13,7 +13,7 @@ import type { FormFieldExampleProps } from "./FormFieldPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/FormFieldPage/Examples";
 
-const DIRECTIONS: ("column" | "row")[] = ["column", "row"];
+const ORIENTATIONS: ("horizontal" | "vertical")[] = ["vertical", "horizontal"];
 
 const MIN_GAP = 0;
 const MAX_GAP = 40;
@@ -24,7 +24,7 @@ const MESSAGE_WIDTH = 240;
 const STARTING_MESSAGE = "Shown to everyone who can see your posts.";
 
 export const FormFieldPage = () => {
-    const [getDirection, setDirection] = createSignal<"column" | "row">(FORM_FIELD_DEFAULTS.dir);
+    const [getOrientation, setOrientation] = createSignal<"horizontal" | "vertical">(FORM_FIELD_DEFAULTS.orientation);
     const [getGap, setGap] = createSignal(FORM_FIELD_DEFAULTS.gap);
     const [getMessage, setMessage] = createSignal(STARTING_MESSAGE);
     const [getHasError, setHasError] = createSignal(false);
@@ -35,7 +35,7 @@ export const FormFieldPage = () => {
 
     const getExamples = createMemo(() => {
         const commonProps: Omit<FormFieldExampleProps, "valueSignal"> = {
-            dir: getDirection,
+            orientation: getOrientation,
             gap: getGap,
             message: getMessage,
             hasError: getHasError,
@@ -75,16 +75,16 @@ export const FormFieldPage = () => {
         <>
             <PagePropsPanel scope={"global"}>
                 <PageProp
-                    key={"dir"}
-                    label={"Direction"}
+                    key={"orientation"}
+                    label={"Orientation"}
                     hint={"Whether the label sits above the control or beside it."}
                 >
                     <PageSelectField
-                        value={getDirection}
-                        values={() => DIRECTIONS}
+                        value={getOrientation}
+                        values={() => ORIENTATIONS}
                         width={() => FIELD_WIDTH}
-                        ariaLabel={"Direction"}
-                        onChange={(direction) => setDirection(() => direction)}
+                        ariaLabel={"Orientation"}
+                        onChange={(orientation) => setOrientation(() => orientation)}
                     />
                 </PageProp>
 

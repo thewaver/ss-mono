@@ -82,6 +82,7 @@ export const Breadcrumbs = <T,>(props: BreadcrumbsProps<T>) => {
                         <li class={styles.breadcrumbsEntry}>
                             <InteractionWrapper
                                 isDisabled={() => getCrumb().isDisabled ?? false}
+                                isFocusableWhenDisabled={() => getCrumb().isReachableWhenDisabled ?? false}
                                 isTabbable={() => index !== getLastIndex()}
                                 extraFlags={() => ({ isCurrent: index === getLastIndex() })}
                                 renderControl={(setElementRef, getFlags) => (

@@ -11,7 +11,7 @@ export const StackedExample = (props: Props) => {
         <Stepper
             steps={props.steps}
             currentValue={props.currentValue}
-            dir={"column"}
+            orientation={"vertical"}
             gap={() => STEPPER_GAP}
             ariaLabel={"Stacked checkout"}
             computeStepAriaLabel={props.computeStepAriaLabel}
@@ -21,12 +21,12 @@ export const StackedExample = (props: Props) => {
                     flags={getFlags}
                     state={() => getStep().state}
                     ordinal={() => ORDER.indexOf(getStep().value) + 1}
-                    dir={"column"}
+                    orientation={"vertical"}
                 >
                     {LABELS[getStep().value]}
                 </PageStepContent>
             )}
-            renderConnector={() => <PageStepConnector dir={"column"} />}
+            renderConnector={() => <PageStepConnector orientation={"vertical"} />}
         />
     );
 };

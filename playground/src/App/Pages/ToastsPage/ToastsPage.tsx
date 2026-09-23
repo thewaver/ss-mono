@@ -263,7 +263,9 @@ export const ToastsPage = () => {
             <div class={styles.note} data-readout>
                 queued: {getToasts().length}, shown: {getBoundaries().shown}, hidden: {getBoundaries().hidden} — the
                 queue lives at module scope, so raising a notification does not need the raiser to still be mounted.
-                Hover the stack to hold every countdown, or press F8 to put the keyboard in it.
+                Hover the stack to hold every countdown, or press F8 to put the keyboard in it. A toast against the left
+                or right edge, or centered along the top or bottom, can be swiped off that edge; Close is the route for
+                anyone who cannot drag.
             </div>
 
             <Toasts

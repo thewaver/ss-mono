@@ -2,8 +2,8 @@ import type {
     AccessorProps,
     InteractionFlags,
     StepperConnectorDefs,
-    StepperDir,
     StepperFlags,
+    StepperOrientation,
 } from "@thewaver/ss-components";
 
 export type PageStepState = "done" | "current" | "failed" | "skipped" | "ahead";
@@ -12,11 +12,11 @@ export type StepContentProps = AccessorProps<{
     flags: InteractionFlags<StepperFlags>;
     state: PageStepState;
     ordinal: number;
-    dir: StepperDir;
+    orientation: StepperOrientation;
 }>;
 
 export type StepConnectorProps = AccessorProps<{
-    dir: StepperDir;
+    orientation: StepperOrientation;
     isRail?: boolean;
 }>;
 

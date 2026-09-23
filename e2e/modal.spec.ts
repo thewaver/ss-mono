@@ -198,7 +198,7 @@ test.describe("Modal in its alert mode", () => {
         ).toContain("Cancel");
     });
 
-    test("an overlay click cannot dismiss it but Escape can", async ({ page }) => {
+    test("neither an overlay click nor Escape can dismiss it", async ({ page }) => {
         await page.locator(TRIGGER).click();
         await expect(page.locator(ALERT)).toBeVisible();
 
@@ -209,7 +209,10 @@ test.describe("Modal in its alert mode", () => {
         ).toHaveCount(1);
 
         await page.keyboard.press("Escape");
-        await expect(page.locator(ALERT), "Escape still closes it, as every dialog must").toHaveCount(0);
+        await expect(
+            page.locator(ALERT),
+            "Escape is refused too, because this demo turns isDismissableOnEscape off — a stray key is not an answer",
+        ).toHaveCount(1);
         expect(await readout(page, "destructiveConfirmation"), "with no outcome").toContain("nothing decided yet");
     });
 

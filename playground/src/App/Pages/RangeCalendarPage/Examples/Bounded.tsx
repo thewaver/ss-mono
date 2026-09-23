@@ -21,8 +21,8 @@ export const BoundedExample = (props: Props) => {
                 monthSignal={props.monthSignal}
                 today={() => TODAY}
                 locale={() => LOCALE}
-                min={() => MIN_DATE}
-                max={() => MAX_DATE}
+                minValue={() => MIN_DATE}
+                maxValue={() => MAX_DATE}
                 weekStartsOn={props.weekStartsOn}
                 ariaLabel={"Choose a date range within the bounds"}
                 renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}

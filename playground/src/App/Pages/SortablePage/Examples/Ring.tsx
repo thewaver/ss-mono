@@ -3,6 +3,7 @@ import type { Accessor, Signal } from "solid-js";
 import { PlacementLayoutUtils, Sortable } from "@thewaver/ss-components";
 import type { ArcDefs, InteractionFlags, SortableItem, SortableItemFlags } from "@thewaver/ss-components";
 
+import { SORTABLE_ANNOUNCEMENTS } from "../../../PageComponents/Announcements/Announcements.const";
 import {
     PageSortableItemContent,
     PageSortableRingMarker,
@@ -40,6 +41,7 @@ export const RingExample = (props: Props) => (
         <Sortable
             groupId={"ring"}
             ariaLabel={"Ring"}
+            announcements={SORTABLE_ANNOUNCEMENTS}
             gap={LIST_GAP}
             itemsSignal={props.itemsSignal}
             computeLayout={RING_LAYOUT}

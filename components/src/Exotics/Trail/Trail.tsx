@@ -19,7 +19,7 @@ const SAMPLE_STEP_PX = 1;
 
 export const Trail = (props: TrailProps) => {
     const [getProgress, setProgress] = SignalMirrorUtils.createOptional(() => props.progressSignal, NO_PROGRESS);
-    const [getIsPlaying, setIsPlaying] = SignalMirrorUtils.createOptional(() => props.isPlayingSignal, true);
+    const [getIsPlaying, setIsPlaying] = SignalMirrorUtils.createOptional(() => props.playbackSignal, true);
 
     const [getPathRef, setPathRef] = createSignal<SVGPathElement>();
     const [getPathLength, setPathLength] = createSignal(NO_LENGTH);
@@ -65,20 +65,6 @@ export const Trail = (props: TrailProps) => {
     const controller: TrailController = {
         getPlace,
         getIsPlaying,
-        play: () => {
-            if (untrack(getIsPlaying)) return false;
-
-            setIsPlaying(true);
-
-            return true;
-        },
-        pause: () => {
-            if (!untrack(getIsPlaying)) return false;
-
-            setIsPlaying(false);
-
-            return true;
-        },
         seek: (progress: number) => {
             const next = MathUtils.clamp01(progress);
 

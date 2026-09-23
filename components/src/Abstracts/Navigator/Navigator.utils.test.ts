@@ -19,8 +19,10 @@ describe("computeNextPosition", () => {
         expect(NavigatorUtils.computeNextPosition("ArrowRight", 0, LENGTH)).toBeUndefined();
         expect(NavigatorUtils.computeNextPosition("ArrowLeft", 0, LENGTH)).toBeUndefined();
 
-        expect(NavigatorUtils.computeNextPosition("ArrowDown", 0, LENGTH, { orientation: "row" })).toBeUndefined();
-        expect(NavigatorUtils.computeNextPosition("ArrowRight", 0, LENGTH, { orientation: "row" })).toBe(1);
+        expect(
+            NavigatorUtils.computeNextPosition("ArrowDown", 0, LENGTH, { orientation: "horizontal" }),
+        ).toBeUndefined();
+        expect(NavigatorUtils.computeNextPosition("ArrowRight", 0, LENGTH, { orientation: "horizontal" })).toBe(1);
     });
 
     it("takes either axis when the orientation is both", () => {
@@ -68,6 +70,47 @@ describe("computeNextPosition", () => {
     });
 });
 
+describe("computeNextPosition in a right-to-left layout", () => {
+    const opts = { orientation: "horizontal", direction: "rtl" } as const;
+
+    it("steps forward on the left arrow and back on the right", () => {
+        expect(NavigatorUtils.computeNextPosition("ArrowLeft", 0, LENGTH, opts)).toBe(1);
+        expect(NavigatorUtils.computeNextPosition("ArrowRight", 0, LENGTH, opts)).toBe(LENGTH - 1);
+    });
+
+    it("leaves the vertical arrows, Home and End as they are", () => {
+        const both = { orientation: "both", direction: "rtl" } as const;
+
+        expect(NavigatorUtils.computeNextPosition("ArrowDown", 0, LENGTH, both)).toBe(1);
+        expect(NavigatorUtils.computeNextPosition("ArrowUp", 0, LENGTH, both)).toBe(LENGTH - 1);
+        expect(NavigatorUtils.computeNextPosition("Home", 3, LENGTH, opts)).toBe(0);
+        expect(NavigatorUtils.computeNextPosition("End", 3, LENGTH, opts)).toBe(LENGTH - 1);
+    });
+
+    it("mirrors only the two horizontal arrows when a key is read through it", () => {
+        expect(NavigatorUtils.computeLogicalKey("ArrowLeft", "rtl")).toBe("ArrowRight");
+        expect(NavigatorUtils.computeLogicalKey("ArrowRight", "rtl")).toBe("ArrowLeft");
+        expect(NavigatorUtils.computeLogicalKey("ArrowDown", "rtl")).toBe("ArrowDown");
+        expect(NavigatorUtils.computeLogicalKey("ArrowLeft", "ltr")).toBe("ArrowLeft");
+        expect(NavigatorUtils.computeLogicalKey("ArrowLeft", undefined)).toBe("ArrowLeft");
+    });
+});
+
+describe("computeNextPosition without looping", () => {
+    const opts = { isLooping: false };
+
+    it("stays on the last item going forward and on the first going back", () => {
+        expect(NavigatorUtils.computeNextPosition("ArrowDown", LENGTH - 1, LENGTH, opts)).toBe(LENGTH - 1);
+        expect(NavigatorUtils.computeNextPosition("ArrowUp", 0, LENGTH, opts)).toBe(0);
+    });
+
+    it("still steps between the ends and still jumps on Home and End", () => {
+        expect(NavigatorUtils.computeNextPosition("ArrowDown", 1, LENGTH, opts)).toBe(2);
+        expect(NavigatorUtils.computeNextPosition("Home", 3, LENGTH, opts)).toBe(0);
+        expect(NavigatorUtils.computeNextPosition("End", 1, LENGTH, opts)).toBe(LENGTH - 1);
+    });
+});
+
 describe("computeNextCell", () => {
     const WEEK = { rowCount: 6, colCount: 7 };
 
@@ -110,6 +153,23 @@ describe("computeNextCell", () => {
         expect(NavigatorUtils.computeNextCell("Home", { row: 0, col: 1 }, WEEK, { hasEdgeKeys: false })).toBe(
             undefined,
         );
+    });
+
+    it("flips the horizontal arrows under right-to-left and leaves the rest alone", () => {
+        const opts = { direction: "rtl" as const };
+
+        expect(NavigatorUtils.computeNextCell("ArrowRight", { row: 1, col: 2 }, WEEK, opts)).toEqual({
+            row: 1,
+            col: 1,
+        });
+        expect(NavigatorUtils.computeNextCell("ArrowLeft", { row: 1, col: 2 }, WEEK, opts)).toEqual({ row: 1, col: 3 });
+        expect(NavigatorUtils.computeNextCell("ArrowRight", { row: 1, col: 0 }, WEEK, opts)).toEqual({
+            row: 0,
+            col: 6,
+        });
+        expect(NavigatorUtils.computeNextCell("ArrowLeft", { row: 1, col: 6 }, WEEK, opts)).toEqual({ row: 2, col: 0 });
+        expect(NavigatorUtils.computeNextCell("ArrowDown", { row: 1, col: 2 }, WEEK, opts)).toEqual({ row: 2, col: 2 });
+        expect(NavigatorUtils.computeNextCell("Home", { row: 2, col: 4 }, WEEK, opts)).toEqual({ row: 2, col: 0 });
     });
 
     it("declines an empty grid rather than dividing by its column count", () => {

@@ -8,6 +8,7 @@ import { DisabledExample } from "./Examples/Disabled";
 import { ErroredExample } from "./Examples/Errored";
 import { RatingExample } from "./Examples/Rating";
 import { ReachableExample } from "./Examples/Reachable";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 import { SegmentedExample } from "./Examples/Segmented";
 import type { SizeValue } from "./RadioPage.types";
 
@@ -16,6 +17,7 @@ const EXAMPLES_ROOT = "/src/App/Pages/RadioPage/Examples";
 
 export const RadioPage = () => {
     const defaultSignal = createSignal<SizeValue | undefined>(undefined);
+    const rightToLeftSignal = createSignal<SizeValue | undefined>(undefined);
     const segmentedSignal = createSignal<SizeValue>("medium");
     const ratingSignal = createSignal(STARTING_RATING);
     const hoveredRatingSignal = createSignal<number | undefined>(undefined);
@@ -33,6 +35,14 @@ export const RadioPage = () => {
             readout: () => `value: ${defaultSignal[0]()}`,
             component: () => <DefaultExample valueSignal={defaultSignal} />,
             path: `${EXAMPLES_ROOT}/Default.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            name: "In a right-to-left box",
+            readout: () =>
+                `value: ${rightToLeftSignal[0]()} — the box around the radios sets dir="rtl", so they run from the right and the left arrow moves on to the next one, while up and down keep their meaning`,
+            component: () => <RightToLeftExample valueSignal={rightToLeftSignal} />,
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
         {
             key: "segmented",

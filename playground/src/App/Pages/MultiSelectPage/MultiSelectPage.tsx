@@ -4,6 +4,7 @@ import { SelectUtils } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { GROUPED_COUNTRIES } from "../SelectPage/SelectPage.const";
+import { MultiSelectClearableExample } from "./Examples/MultiSelectClearable";
 import { MultiSelectCountriesExample } from "./Examples/MultiSelectCountries";
 import { MultiSelectGroupedExample } from "./Examples/MultiSelectGrouped";
 
@@ -13,6 +14,8 @@ export const MultiSelectPage = () => {
     const countriesSignal = createSignal<string[]>(["Denmark"]);
     const groupedSignal = createSignal<string[]>([]);
     const querySignal = createSignal("");
+    const clearableSignal = createSignal<string[]>(["Belgium", "Sweden"]);
+    const [getClearableChange, setClearableChange] = createSignal("none yet");
 
     const getFilteredGroups = createMemo(() => {
         const query = querySignal[0]().toLocaleLowerCase();
@@ -52,6 +55,21 @@ export const MultiSelectPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/MultiSelectGrouped.tsx`,
+        },
+        {
+            key: "multiSelectClearable",
+            name: "Clearable",
+            readout: () =>
+                `values: [${clearableSignal[0]().join(", ")}] | last change: ${getClearableChange()} — the clear control empties every pick at once`,
+            component: () => (
+                <MultiSelectClearableExample
+                    valuesSignal={clearableSignal}
+                    onSelectionChange={(values) => {
+                        setClearableChange(`[${values.join(", ")}]`);
+                    }}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/MultiSelectClearable.tsx`,
         },
     ]);
 

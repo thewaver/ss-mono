@@ -1,8 +1,20 @@
-import type { DateInputEra, DateValue, InteractionFlags, MaybeAccessor, TextFieldFlags } from "@thewaver/ss-components";
-import { DatePicker, access } from "@thewaver/ss-components";
+import { Show } from "solid-js";
 
+import type {
+    CalendarPrecision,
+    DateInputEra,
+    DateValue,
+    InteractionFlags,
+    MaybeAccessor,
+    TextFieldFlags,
+} from "@thewaver/ss-components";
+import { DatePicker, DateValueUtils, access } from "@thewaver/ss-components";
+
+import { CALENDAR_TRIGGER_LABEL, DATE_PART_HINTS } from "../../../PageComponents/Announcements/Announcements.const";
 import { PageCalendarCaption } from "../../../StyledComponents/CalendarCaption/CalendarCaption";
+import { PageCalendarPagedCaption } from "../../../StyledComponents/CalendarCaption/CalendarPagedCaption";
 import {
+    PageCalendarCell,
     PageCalendarDay,
     PageCalendarFrame,
     PageCalendarWeekday,
@@ -19,23 +31,30 @@ import type { DateExampleProps } from "../DatePickerPage.types";
 
 import { FIELD_GAP, FIELD_STEPPER_PADDING } from "../../../StyledComponents/TextFieldContent/TextFieldContent.css";
 
+const MONTH_CELL_OPTIONS: Intl.DateTimeFormatOptions = { month: "short" };
+
 type Props = DateExampleProps & {
     key: MaybeAccessor<string>;
-    minDate?: MaybeAccessor<DateValue>;
-    maxDate?: MaybeAccessor<DateValue>;
+    precision?: MaybeAccessor<CalendarPrecision>;
+    minValue?: MaybeAccessor<DateValue>;
+    maxValue?: MaybeAccessor<DateValue>;
     computeIsDayDisabled?: (day: DateValue) => boolean;
 };
 
 export const PickedExample = (props: Props) => {
+    const getIsMonthPrecision = () => access(props.precision) === "month";
+
     return (
         <DatePicker
             valueSignal={props.valueSignal}
             calendar={props.calendar}
-            minDate={props.minDate}
-            maxDate={props.maxDate}
+            minValue={props.minValue}
+            maxValue={props.maxValue}
             computeIsDayDisabled={props.computeIsDayDisabled}
+            precision={props.precision}
             ariaLabel={"Date"}
             calendarLabel={"Choose a date"}
+            partHints={DATE_PART_HINTS}
             locale={() => LOCALE}
             padding={() => FIELD_STEPPER_PADDING}
             gap={() => FIELD_GAP}
@@ -53,12 +72,33 @@ export const PickedExample = (props: Props) => {
                 />
             )}
             triggerId={() => `${access(props.key)}Trigger`}
+            triggerAriaLabel={CALENDAR_TRIGGER_LABEL}
             renderTrigger={(getFlags) => <PageDatePickerTrigger flags={getFlags} />}
-            renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}
+            renderDay={(getDay, getRenderProps) => (
+                <Show when={getIsMonthPrecision()} fallback={<PageCalendarDay renderProps={getRenderProps} />}>
+                    <PageCalendarCell renderProps={getRenderProps}>
+                        {DateValueUtils.format(getDay(), MONTH_CELL_OPTIONS, LOCALE)}
+                    </PageCalendarCell>
+                </Show>
+            )}
             renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
             renderPopup={(renderCalendar, monthSignal) => (
                 <PageCalendarFrame>
-                    <PageCalendarCaption monthSignal={monthSignal} key={props.key} locale={() => LOCALE} />
+                    <Show
+                        when={getIsMonthPrecision()}
+                        fallback={
+                            <PageCalendarCaption monthSignal={monthSignal} key={props.key} locale={() => LOCALE} />
+                        }
+                    >
+                        <PageCalendarPagedCaption
+                            key={props.key}
+                            locale={LOCALE}
+                            precision={"month"}
+                            previousLabel={"Previous year"}
+                            nextLabel={"Next year"}
+                            monthSignal={monthSignal}
+                        />
+                    </Show>
 
                     {renderCalendar()}
                 </PageCalendarFrame>

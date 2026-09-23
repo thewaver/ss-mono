@@ -8,6 +8,7 @@ import { LinksExample } from "./Examples/Links";
 import { OutsideExample } from "./Examples/Outside";
 import { RadialExample } from "./Examples/Radial";
 import { RecordValuesExample } from "./Examples/RecordValues";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 import { VirtualizedExample } from "./Examples/Virtualized";
 import {
     FILES_WITH_DISABLED,
@@ -27,6 +28,9 @@ export const TreePage = () => {
 
     const collapsedSignal = createSignal<string | undefined>();
     const collapsedExpandedSignal = createSignal<string[]>([]);
+
+    const rightToLeftSignal = createSignal<string | undefined>();
+    const rightToLeftExpandedSignal = createSignal<string[]>([]);
 
     const disabledSignal = createSignal<string | undefined>();
     const disabledExpandedSignal = createSignal<string[]>(["src", "Lib"]);
@@ -71,6 +75,24 @@ export const TreePage = () => {
             readout: () =>
                 `value: ${collapsedSignal[0]() ?? "undefined"} | expanded: ${JSON.stringify(collapsedExpandedSignal[0]())} — asterisk opens every branch at the level focus is on`,
             component: () => <FilesExample valueSignal={collapsedSignal} expandedSignal={collapsedExpandedSignal} />,
+            path: `${EXAMPLES_ROOT}/Files.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            name: "In a right-to-left box",
+            readout: () =>
+                `value: ${rightToLeftSignal[0]() ?? "undefined"} | expanded: ${JSON.stringify(rightToLeftExpandedSignal[0]())} — the box around the tree sets dir="rtl", so left opens a branch and right closes it or climbs to the parent`,
+            component: () => (
+                <RightToLeftExample valueSignal={rightToLeftSignal} expandedSignal={rightToLeftExpandedSignal} />
+            ),
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
+        },
+        {
+            key: "unheld",
+            name: "Nobody holding the state",
+            readout: () =>
+                "no signals passed — the tree keeps the selection and the open branches itself; a picked node is still marked selected and is still the tree's one tab stop",
+            component: () => <FilesExample />,
             path: `${EXAMPLES_ROOT}/Files.tsx`,
         },
         {

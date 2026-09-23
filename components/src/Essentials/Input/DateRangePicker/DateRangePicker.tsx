@@ -78,12 +78,12 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
         <RangeCalendar
             valueSignal={valueSignal}
             monthSignal={monthSignal}
-            min={props.minDate}
-            max={props.maxDate}
+            minValue={props.minValue}
+            maxValue={props.maxValue}
             isDisabled={props.isDisabled}
             locale={props.locale}
             weekStartsOn={props.weekStartsOn}
-            ariaLabel={() => access(props.calendarLabel) ?? DATE_RANGE_PICKER_DEFAULTS.calendarLabel}
+            ariaLabel={props.calendarLabel}
             computeIsDayDisabled={props.computeIsDayDisabled}
             renderDay={props.renderDay}
             renderWeekday={props.renderWeekday}
@@ -97,7 +97,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                 valueSignal={startSignal}
                 id={access(props.id) && `${access(props.id)}-start`}
                 name={access(props.name) && `${access(props.name)}-start`}
-                ariaLabel={() => access(props.startLabel) ?? DATE_RANGE_PICKER_DEFAULTS.startLabel}
+                ariaLabel={props.startLabel}
             />
 
             {props.renderSeparator?.()}
@@ -107,7 +107,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                 valueSignal={endSignal}
                 id={getEndFieldId}
                 name={access(props.name) && `${access(props.name)}-end`}
-                ariaLabel={() => access(props.endLabel) ?? DATE_RANGE_PICKER_DEFAULTS.endLabel}
+                ariaLabel={props.endLabel}
                 renderTrailing={() => (
                     <InteractionWrapper<PopupTriggerFlags>
                         isDisabled={getIsDisabled}
@@ -118,9 +118,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                                 id={props.triggerId}
                                 popupId={() => popupId}
                                 isOpen={getIsOpen}
-                                ariaLabel={() =>
-                                    access(props.triggerAriaLabel) ?? DATE_RANGE_PICKER_DEFAULTS.triggerAriaLabel
-                                }
+                                ariaLabel={props.triggerAriaLabel}
                                 flags={getRenderProps}
                                 renderContent={props.renderTrigger}
                                 onToggle={() => (getIsOpen() ? dismiss() : open())}
@@ -134,7 +132,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                 id={() => popupId}
                 role={"dialog"}
                 ariaAttributes={() => ({
-                    "aria-label": access(props.calendarLabel) ?? DATE_RANGE_PICKER_DEFAULTS.calendarLabel,
+                    "aria-label": access(props.calendarLabel),
                 })}
                 isOpen={getIsOpen}
                 anchorRef={getRootRef}

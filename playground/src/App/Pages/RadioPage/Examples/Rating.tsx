@@ -10,7 +10,7 @@ const RATING_OPTIONS = [1, 2, 3, 4, 5];
 type Props = RadioRatingExampleProps;
 
 export const RatingExample = (props: Props) => (
-    <RadioGroup valueSignal={props.valueSignal} ariaLabel={"Rating"} dir={"row"} gap={0}>
+    <RadioGroup valueSignal={props.valueSignal} ariaLabel={"Rating"} orientation={"horizontal"} gap={0}>
         <For each={RATING_OPTIONS}>
             {(rating) => (
                 <Radio

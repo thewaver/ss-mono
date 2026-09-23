@@ -7,6 +7,17 @@ export const tileBoardRoot = style({
     pointerEvents: "none",
 });
 
+export const tileBoardPlane = style({
+    display: "block",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 0,
+    height: 0,
+    transformOrigin: "0 0",
+    pointerEvents: "none",
+});
+
 export const tileBoardRow = style({
     display: "block",
     position: "absolute",

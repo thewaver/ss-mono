@@ -22,8 +22,8 @@ export const BoundedExample = (props: Props) => {
                 today={() => TODAY}
                 locale={() => LOCALE}
                 weekStartsOn={props.weekStartsOn}
-                min={() => MIN_DATE}
-                max={() => MAX_DATE}
+                minValue={() => MIN_DATE}
+                maxValue={() => MAX_DATE}
                 ariaLabel={"Choose a date within August"}
                 renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}
                 renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}

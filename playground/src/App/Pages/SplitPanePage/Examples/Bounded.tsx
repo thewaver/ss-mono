@@ -22,7 +22,7 @@ export const BoundedExample = (props: Props) => {
                 renderPane={(_getPane, index) => (
                     <PageSplitPaneBox>{index === 0 ? "Sidebar 120–220px" : "Content min 160px"}</PageSplitPaneBox>
                 )}
-                renderGutter={(getFlags) => <PageSplitPaneGutter flags={getFlags} dir={"row"} />}
+                renderGutter={(getFlags) => <PageSplitPaneGutter flags={getFlags} orientation={"horizontal"} />}
             />
         </PageSplitPaneFrame>
     );

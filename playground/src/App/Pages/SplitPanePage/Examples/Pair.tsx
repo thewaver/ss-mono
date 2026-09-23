@@ -22,7 +22,7 @@ export const PairExample = (props: Props) => {
                 renderPane={(_getPane, index) => (
                     <PageSplitPaneBox>{index === 0 ? "Navigation" : "Content"}</PageSplitPaneBox>
                 )}
-                renderGutter={(getFlags) => <PageSplitPaneGutter flags={getFlags} dir={"row"} />}
+                renderGutter={(getFlags) => <PageSplitPaneGutter flags={getFlags} orientation={"horizontal"} />}
             />
         </PageSplitPaneFrame>
     );

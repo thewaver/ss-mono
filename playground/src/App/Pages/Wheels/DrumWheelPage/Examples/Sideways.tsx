@@ -53,7 +53,9 @@ export const SidewaysExample = ({ wedges, ...otherProps }: Props) => {
                     ariaLabel={"Spin the wheel"}
                     isDisabled={() => !getController()?.getIsSpinnable()}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Spin</PageButtonContent>}
-                    onClick={() => getController()?.spin()}
+                    onClick={() => {
+                        getController()?.spin();
+                    }}
                 />
             </PageWheelBar>
         </>

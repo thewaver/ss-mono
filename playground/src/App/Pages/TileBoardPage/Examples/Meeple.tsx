@@ -17,6 +17,7 @@ export const MeepleExample = ({ shape, piece, ...otherProps }: Props) => {
             access(otherProps.tileCount),
             access(otherProps.tileSize),
             access(otherProps.hasShortFirstRow),
+            access(otherProps.taper),
         ),
     );
 
@@ -36,6 +37,7 @@ export const MeepleExample = ({ shape, piece, ...otherProps }: Props) => {
 
             <PageTileBoardMeeple
                 center={() => TileBoardUtils.getTileCenter(access(piece), getLayout())}
+                scale={() => TileBoardUtils.getTileScale(access(piece), getLayout())}
                 tileSize={otherProps.tileSize}
             />
         </div>

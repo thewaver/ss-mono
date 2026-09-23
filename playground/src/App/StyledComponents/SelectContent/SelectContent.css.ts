@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { SELECT_CLEAR_SIZE } from "../SelectClear/SelectClear.css";
 
 const FIELD_WIDTH = 240;
 const FIELD_HEIGHT = 40;
@@ -70,6 +71,11 @@ export const selectValue = style({
             opacity: 0,
         },
     },
+});
+
+export const selectClearSpace = style({
+    flexShrink: 0,
+    width: SELECT_CLEAR_SIZE,
 });
 
 export const selectChevron = style({

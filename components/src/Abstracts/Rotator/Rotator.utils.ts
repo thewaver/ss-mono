@@ -20,10 +20,9 @@ const DEFAULT_REST_DURATION_MS = 3000;
 const DEFAULT_SPIN_DEFS: RotatorSpinDefs = { turns: 3, jitterRatio: 0 };
 /** Fewer than two steps and there is nowhere to rotate to. */
 const MIN_ROTATABLE_STEP_COUNT = 2;
-/** A backstop timer's grace period. A background tab stops delivering frames, and a spin that never finished would leave the component stuck mid-animation. */
 /** A consumer's own move goes straight to the step, with none of a spin's extra revolutions. */
 const NO_TURNS = 0;
-
+/** A backstop timer's grace period. A background tab stops delivering frames, and a spin that never finished would leave the component stuck mid-animation. */
 const FRAME_STARVATION_SLACK_MS = 100;
 /** Eases in and out, so a spin starts and stops rather than snapping to speed. */
 const SPIN_EASING: EasingFn = EasingUtils.ease;
@@ -63,8 +62,8 @@ export namespace RotatorUtils {
      * it was.
      * @param defs.computeSpinDefs How many turns to take and how far to overshoot, per target. An
      * overshoot is what makes the wheel look like it is losing momentum rather than stopping dead.
-     * @param defs.computeStepLabel How to announce the step landed on. A position out of the total is
-     * announced when omitted.
+     * @param defs.computeStepLabel How to announce the step landed on, given its zero-based index and
+     * the step count.
      * @param defs.onSpinEnd Called with the step landed on.
      * @param defs.onStepChange Called whenever the step under the marker changes, drift included.
      * @returns `getAngle` for the transform to apply, `getIndex` for the settled step, `getSelectedIndex`
@@ -126,8 +125,7 @@ export namespace RotatorUtils {
 
         const getCurrentIndex = createMemo(() => RotationUtils.getAngleIndex(getAngle(), getStepCount()));
 
-        const getStepLabel = (index: number) =>
-            defs.computeStepLabel?.(index, getStepCount()) ?? `${index + 1} of ${getStepCount()}`;
+        const getStepLabel = (index: number) => defs.computeStepLabel(index, getStepCount());
 
         const stopSpinFrames = () => {
             if (spinFrameId !== undefined) cancelAnimationFrame(spinFrameId);
@@ -193,7 +191,7 @@ export namespace RotatorUtils {
         };
 
         const spin = () => {
-            if (!getIsSpinnable()) return;
+            if (!getIsSpinnable()) return false;
 
             setIsResting(false);
             setIsAwaitingTarget(true);
@@ -231,6 +229,8 @@ export namespace RotatorUtils {
 
                     setIsAwaitingTarget(false);
                 });
+
+            return true;
         };
 
         createEffect(() => {

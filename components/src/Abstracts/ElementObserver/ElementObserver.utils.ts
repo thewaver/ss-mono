@@ -5,6 +5,7 @@ import { Bounds, type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import { useViewportContext } from "../Viewport/Viewport.context";
 import { ViewportUtils } from "../Viewport/Viewport.utils";
+import { CURRENT_INDEX_OBSERVER_DEFAULTS } from "./ElementObserver.const";
 
 /** Shared empty result, so a disabled observer does not hand out a new array each time. */
 const EMPTY_SIZES: Size2d[] = [];
@@ -321,5 +322,81 @@ export namespace ElementObserverUtils {
         });
 
         return getRects;
+    };
+
+    /**
+     * Picks the current entry of a list from where each one's top sits against a line.
+     *
+     * The rule a table of contents follows: an entry becomes current once its top has scrolled up past the line,
+     * and stays current until the next one does. Entries are expected in reading order.
+     *
+     * @param tops Each entry's top, in the same coordinates as `line`. A missing entry is never current.
+     * @param line How far down the line sits.
+     * @returns The last entry whose top is at or above the line, or `undefined` while none has reached it.
+     */
+    export const computeCurrentIndex = (tops: (number | undefined)[], line: number) => {
+        let current: number | undefined;
+
+        tops.forEach((top, index) => {
+            if (top !== undefined && top <= line) current = index;
+        });
+
+        return current;
+    };
+
+    /**
+     * Follows which of a list of elements the reader has scrolled to, in viewport coordinates.
+     *
+     * A line is drawn across the viewport at `offsetRatio` of its height from the top, and the current element is
+     * the last one whose top has passed it, by {@link ElementObserverUtils.computeCurrentIndex}. It is re-read on
+     * every scroll, anywhere in the document, and on every resize, which is what a table of contents marking
+     * the section in view needs. Near the end of a page whose last section is shorter than the stretch below the
+     * line, that section's top may never reach it; leave room after it if it has to become current.
+     *
+     * @param getRefs The elements to follow, in reading order. A missing entry is kept in place and never current.
+     * @param getIsDisabled Pass `true` to stop following. Omitted means always on.
+     * @param opts.getOffsetRatio Where the line sits, as a share of the viewport's height from its top. Defaults to
+     * `CURRENT_INDEX_OBSERVER_DEFAULTS.offsetRatio`.
+     * @returns The current element's index, or `undefined` while none has passed the line and while disabled.
+     */
+    export const createViewportCurrentIndexObserver = (
+        getRefs: Accessor<Array<HTMLElement | undefined>>,
+        getIsDisabled?: Accessor<boolean>,
+        opts?: { getOffsetRatio?: Accessor<number> },
+    ) => {
+        const viewportContext = useViewportContext();
+        const [getIndex, setIndex] = createSignal<number | undefined>();
+
+        createEffect(() => {
+            const refs = getRefs();
+            const offsetRatio = opts?.getOffsetRatio?.() ?? CURRENT_INDEX_OBSERVER_DEFAULTS.offsetRatio;
+
+            if (getIsDisabled?.()) {
+                setIndex(undefined);
+
+                return;
+            }
+
+            const update = () => {
+                const line = viewportContext.getSize().height * offsetRatio;
+                const tops = refs.map((ref) =>
+                    ref ? ViewportUtils.getAdjustedBoundingClientRect(ref, viewportContext).y : undefined,
+                );
+
+                setIndex(computeCurrentIndex(tops, line));
+            };
+
+            update();
+
+            document.addEventListener("scroll", update, { capture: true, passive: true });
+            window.addEventListener("resize", update);
+
+            onCleanup(() => {
+                document.removeEventListener("scroll", update, true);
+                window.removeEventListener("resize", update);
+            });
+        });
+
+        return getIndex;
     };
 }

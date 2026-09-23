@@ -40,8 +40,8 @@ export type WheelController = {
     getIsAutoSpinning: Accessor<boolean>;
     /** Whether the turn under way was started by a spin rather than by the idle drift. */
     getIsUserSpinning: Accessor<boolean>;
-    /** Starts a spin. Does nothing while one is already under way. */
-    spin: () => void;
+    /** Starts a spin and reports whether it did. It declines while one is already under way. */
+    spin: () => boolean;
 };
 
 export type WheelState = {
@@ -60,9 +60,19 @@ export type WheelState = {
 export type WheelLabels = {
     /**
      * Names one wedge for assistive technology, and is told how many there are so it can say third of five.
-     * The index is zero-based, matching `renderWedge`.
+     * The index is zero-based, matching `renderWedge`. It is also what is announced when a spin lands.
      */
-    computeWedgeLabel?: (index: number, wedgeCount: number) => string;
+    computeWedgeLabel: (index: number, wedgeCount: number) => string;
+    /**
+     * What the wheel is called when it is announced, so a reader hears wheel rather than group. Defaults to
+     * "wheel".
+     */
+    roleDescription?: string;
+    /**
+     * What one wedge is called when it is announced, so a reader hears wedge rather than group. Defaults to
+     * "wedge".
+     */
+    wedgeRoleDescription?: string;
 };
 
 export type WheelSlots<T> = {

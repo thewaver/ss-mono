@@ -3,6 +3,7 @@ import { createMemo } from "solid-js";
 
 import { Table } from "@thewaver/ss-components";
 
+import { TABLE_ANNOUNCEMENTS } from "../../../PageComponents/Announcements/Announcements.const";
 import {
     PageTableMarker,
     PageTableReorderGrip,
@@ -29,6 +30,7 @@ export const ReorderableExample = (props: Props) => {
                 selectionSignal={props.selectionSignal}
                 orderSignal={props.orderSignal}
                 ariaLabel={"Parts with reorderable columns"}
+                announcements={TABLE_ANNOUNCEMENTS}
                 renderMarker={() => <PageTableMarker />}
             />
         </div>

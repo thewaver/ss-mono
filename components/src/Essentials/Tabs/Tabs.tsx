@@ -88,9 +88,11 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
         () => access(props.transitionDurationMs) ?? TABS_DEFAULTS.transitionDurationMs,
     );
 
-    const getDir = createMemo(() => access(props.dir) ?? TABS_DEFAULTS.dir);
+    const getOrientation = createMemo(() => access(props.orientation) ?? TABS_DEFAULTS.orientation);
 
     const getTabGap = createMemo(() => access(props.tabGap) ?? TABS_DEFAULTS.tabGap);
+
+    const getDirection = NavigatorUtils.createDirectionSignal(getRootRef);
 
     const getLayout = createMemo(() => props.computeLayout?.({ itemCount: access(props.tabs).length }));
 
@@ -114,7 +116,7 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
 
     const getNavigableIndexes = createMemo(() =>
         access(props.tabs).reduce<number[]>((acc, tab, index) => {
-            if (!tab.isDisabled) acc.push(index);
+            if (!tab.isDisabled || tab.isReachableWhenDisabled) acc.push(index);
 
             return acc;
         }, []),
@@ -209,7 +211,8 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
 
         const from = navigable.indexOf(getRovingIndex() ?? navigable[0]);
         const position = NavigatorUtils.computeNextPosition(e.key, from, navigable.length, {
-            orientation: getDir() === "row" ? "row" : "column",
+            orientation: getOrientation(),
+            direction: getLayout() === undefined ? getDirection() : undefined,
         });
 
         if (position === undefined) return;
@@ -217,12 +220,13 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
         e.preventDefault();
 
         const next = navigable[position];
-        const nextValue = access(props.tabs)[next].value;
+        const nextTab = access(props.tabs)[next];
+        const nextValue = nextTab.value;
 
         setFocusedValue(() => nextValue);
         getItemRefs()[next]?.focus();
 
-        if (!access(props.hasAutoActivation)) return;
+        if (!access(props.hasAutoActivation) || nextTab.isDisabled) return;
         if (nextValue === access(props.selectedValue)) return;
 
         props.onSelectionChange?.(nextValue);
@@ -233,8 +237,9 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
 
         const element = (
             <InteractionWrapper
-                sizing={() => (getDir() === "column" || getLayout() !== undefined ? "fill" : "fit-content")}
+                sizing={() => (getOrientation() === "vertical" || getLayout() !== undefined ? "fill" : "fit-content")}
                 isDisabled={() => getTab().isDisabled ?? false}
+                isFocusableWhenDisabled={() => getTab().isReachableWhenDisabled ?? false}
                 isTabbable={() => index === getRovingIndex()}
                 ref={(element) => setItemRef(index, element)}
                 renderControl={(setElementRef, getFlags) => (
@@ -281,10 +286,13 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
         <div
             ref={setRootRef}
             class={styles.tabsRoot}
-            style={{ "flex-direction": getDir(), "gap": `${getTabGap()}px` }}
+            style={{
+                "flex-direction": getOrientation() === "horizontal" ? "row" : "column",
+                "gap": `${getTabGap()}px`,
+            }}
             role="tablist"
             aria-label={access(props.ariaLabel)}
-            aria-orientation={getDir() === "column" ? "vertical" : undefined}
+            aria-orientation={getOrientation()}
             onKeyDown={handleKeyDown}
         >
             {props.renderGutter && <div class={styles.tabsGutter}>{props.renderGutter()}</div>}

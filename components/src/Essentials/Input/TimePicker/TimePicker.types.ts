@@ -19,7 +19,7 @@ export type TimePickerProps = Omit<TimeInputProps, "renderTrailing"> &
         /** How long the clock takes to fade in and out. */
         popupTransitionDurationMs?: number;
         /** Names the clock for assistive technology. */
-        clockLabel?: string;
+        clockLabel: string;
         /** Which country's conventions the times are written in. */
         locale?: string;
         /** How far apart the offered times are, per unit. */
@@ -37,8 +37,8 @@ export type TimePickerProps = Omit<TimeInputProps, "renderTrailing"> &
          * owns the trigger.
          */
         triggerId?: string;
-        /** Names the control that opens the clock. Defaults to "Open the clock". */
-        triggerAriaLabel?: string;
+        /** Names the control that opens the clock. */
+        triggerAriaLabel: string;
         /**
          * Draws whatever else sits after the field's text, before the control that opens the clock.
          *

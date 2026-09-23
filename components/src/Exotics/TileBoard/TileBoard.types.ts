@@ -23,6 +23,7 @@ export type TileBoardLayout = TileBoardTiling & {
     count: Index2d;
     tileSize: Size2d;
     hasShortFirstRow: boolean;
+    taper: number;
 };
 
 export type TileBoardRenderProps = {
@@ -71,6 +72,14 @@ export type TileBoardProps = AccessorProps<{
     gap?: number;
     /** Starts the offset rows at the top instead of the second row, for shapes that stagger. */
     hasShortFirstRow?: boolean;
+    /**
+     * How wide the top of the board is drawn, as a fraction of the bottom, which leans the board away from
+     * the viewer like a table seen from one end. `1`, the default, is flat. The tiles still meet edge to
+     * edge and a press still lands on the tile drawn under it. Something standing on the board rather than
+     * painted into a tile is placed with `TileBoardUtils.getTileCenter` and sized with
+     * `TileBoardUtils.getTileScale`, which both account for it.
+     */
+    taper?: number;
     /** Turns the board off, so no tile responds. */
     isDisabled?: boolean;
     /** Whether one tile is unavailable, which is what paints a move as out of reach. */

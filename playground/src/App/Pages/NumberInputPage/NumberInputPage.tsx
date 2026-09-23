@@ -5,12 +5,13 @@ import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
 import { ErroredExample } from "./Examples/Errored";
 import { FractionalStepExample } from "./Examples/FractionalStep";
+import { GermanExample } from "./Examples/German";
 import { LabelledExample } from "./Examples/Labeled";
 import { ReachableExample } from "./Examples/Reachable";
 import { ReadOnlyExample } from "./Examples/ReadOnly";
 import { SteppedClampedExample } from "./Examples/SteppedClamped";
 import { UnitExample } from "./Examples/Unit";
-import { QUANTITY_MIN, QUANTITY_STEP, RATING_STEP } from "./NumberInputPage.const";
+import { AMOUNT_STEP, GERMAN_LOCALE, QUANTITY_MIN, QUANTITY_STEP, RATING_STEP } from "./NumberInputPage.const";
 
 const EXAMPLES_ROOT = "/src/App/Pages/NumberInputPage/Examples";
 
@@ -19,6 +20,7 @@ export const NumberInputPage = () => {
     const quantitySignal = createSignal<number | undefined>(13);
     const ratingSignal = createSignal<number | undefined>(3.7);
     const unitSignal = createSignal<number | undefined>(72);
+    const germanSignal = createSignal<number | undefined>(1234.5);
     const readOnlySignal = createSignal<number | undefined>(1024);
     const disabledSignal = createSignal<number | undefined>(7);
     const reachableSignal = createSignal<number | undefined>(7);
@@ -47,6 +49,14 @@ export const NumberInputPage = () => {
             readout: () => `value: ${ratingSignal[0]()} — a step of ${RATING_STEP} must not drift`,
             component: () => <FractionalStepExample valueSignal={ratingSignal} />,
             path: `${EXAMPLES_ROOT}/FractionalStep.tsx`,
+        },
+        {
+            key: "german",
+            name: "German conventions",
+            readout: () =>
+                `value: ${germanSignal[0]()} — under ${GERMAN_LOCALE} "1.000" is one thousand and "1,5" is one and a half; PageUp and PageDown move ${AMOUNT_STEP * 10}, ten steps`,
+            component: () => <GermanExample valueSignal={germanSignal} />,
+            path: `${EXAMPLES_ROOT}/German.tsx`,
         },
         {
             key: "unit",

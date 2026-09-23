@@ -9,6 +9,11 @@ export type AccordionSizing = "fit-content" | "fill";
 export type AccordionItem<T> = {
     value: T;
     isDisabled?: boolean;
+    /**
+     * Keeps this section's header in the tab order and the arrow-key walk while it is disabled, so focus can land on it
+     * and a reader hears its name and that it is unavailable. It still cannot be opened or closed.
+     */
+    isReachableWhenDisabled?: boolean;
 };
 
 export type AccordionHeaderRenderer<T> = (
@@ -72,8 +77,12 @@ export type AccordionProps<T> = AccessorProps<{
 }> & {
     /** The sections, in the order they are shown. */
     items: MaybeAccessor<AccordionItem<T>[]>;
-    /** Which sections are open, by item. It is the only thing that opens or closes them. */
-    expandedSignal: SignalSource<T[]>;
+    /**
+     * Which sections are open, by item. Both sides write it: the accordion when a header is pressed, the consumer to
+     * open or close sections from outside. Leave it out and the accordion keeps the state itself, starting with every
+     * section closed.
+     */
+    expandedSignal?: SignalSource<T[]>;
     /** Draws a section's header. */
     renderHeader: AccordionHeaderRenderer<T>;
     /** Draws a section's panel. */

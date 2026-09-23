@@ -39,6 +39,52 @@ describe("getStepTarget", () => {
     });
 });
 
+describe("resolveIndex", () => {
+    it("wraps at both ends when looping", () => {
+        expect(CarouselUtils.resolveIndex(4, 4, true)).toBe(0);
+        expect(CarouselUtils.resolveIndex(-1, 4, true)).toBe(3);
+    });
+
+    it("has nowhere to land past either end when not looping", () => {
+        expect(CarouselUtils.resolveIndex(4, 4, false)).toBeUndefined();
+        expect(CarouselUtils.resolveIndex(-1, 4, false)).toBeUndefined();
+    });
+
+    it("lands inside the range whether looping or not", () => {
+        expect(CarouselUtils.resolveIndex(2, 4, false)).toBe(2);
+        expect(CarouselUtils.resolveIndex(2, 4, true)).toBe(2);
+    });
+});
+
+describe("getStepTarget without looping", () => {
+    it("stays on the end slide rather than coming round", () => {
+        expect(CarouselUtils.getStepTarget("next", 3, 4, false)).toBe(3);
+        expect(CarouselUtils.getStepTarget("previous", 0, 4, false)).toBe(0);
+    });
+
+    it("still walks one slide at a time away from the ends", () => {
+        expect(CarouselUtils.getStepTarget("next", 0, 4, false)).toBe(1);
+        expect(CarouselUtils.getStepTarget("previous", 3, 4, false)).toBe(2);
+    });
+});
+
+describe("getIsStepAtEnd", () => {
+    it("marks Previous on the first slide and Next on the last when not looping", () => {
+        expect(CarouselUtils.getIsStepAtEnd("previous", 0, 4, false)).toBe(true);
+        expect(CarouselUtils.getIsStepAtEnd("next", 3, 4, false)).toBe(true);
+    });
+
+    it("leaves the other step at each end free", () => {
+        expect(CarouselUtils.getIsStepAtEnd("next", 0, 4, false)).toBe(false);
+        expect(CarouselUtils.getIsStepAtEnd("previous", 3, 4, false)).toBe(false);
+    });
+
+    it("never marks a step when looping", () => {
+        expect(CarouselUtils.getIsStepAtEnd("previous", 0, 4, true)).toBe(false);
+        expect(CarouselUtils.getIsStepAtEnd("next", 3, 4, true)).toBe(false);
+    });
+});
+
 describe("getTurnSteps", () => {
     it("counts one step forward as one step forward", () => {
         expect(CarouselUtils.getTurnSteps(0, 1, 4)).toBe(1);

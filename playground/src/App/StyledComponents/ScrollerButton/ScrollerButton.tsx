@@ -14,7 +14,7 @@ export const PageScrollerButton = (props: ScrollerButtonProps) => {
             }
             ariaLabel={() => (getIsPrevious() ? "Scroll back" : "Scroll forward")}
             onClick={() =>
-                getIsPrevious() ? access(props.stepper).stepToPrevious() : access(props.stepper).stepToNext()
+                void (getIsPrevious() ? access(props.stepper).stepToPrevious() : access(props.stepper).stepToNext())
             }
             renderContent={(getFlags) => (
                 <div

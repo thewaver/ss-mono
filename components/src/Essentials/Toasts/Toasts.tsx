@@ -1,7 +1,8 @@
 import { For, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 import { Portal } from "solid-js/web";
 
-import { CSSUtils, StringUtils } from "@thewaver/ss-utils";
+import { CSSUtils, GestureUtils, StringUtils } from "@thewaver/ss-utils";
+import type { SwipeAxis } from "@thewaver/ss-utils";
 
 import { ElementFaderUtils } from "../../Abstracts/ElementFader/ElementFader.utils";
 import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
@@ -16,6 +17,8 @@ import { ToastUtils } from "./Toasts.utils";
 import * as styles from "./Toasts.css";
 
 const TOASTS_Z_INDEX = 200;
+const TOASTS_SWIPE_COMMIT_RATIO = 0.35;
+const TOASTS_SWIPE_FALLBACK_AXIS: SwipeAxis = "horizontal";
 
 const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
     const [getItemRef, setItemRef] = createSignal<HTMLElement>();
@@ -32,11 +35,49 @@ const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
 
     const getDurationMs = createMemo(() => access(props.toast).durationMs);
 
+    const getSwipeDirection = createMemo(() => access(props.swipeDirection));
+
+    const [getSwipeOffsetRatio, setSwipeOffsetRatio] = createSignal(0);
+
+    const { getIsSwiping } = InteractionTrackerUtils.trackAxialSwipe(
+        getItemRef,
+        () => getSwipeDirection() === undefined || access(props.isExiting),
+        {
+            getAxis: () => {
+                const direction = getSwipeDirection();
+
+                return direction ? GestureUtils.computeSwipeAxis(direction) : TOASTS_SWIPE_FALLBACK_AXIS;
+            },
+            getCommitRatio: () => TOASTS_SWIPE_COMMIT_RATIO,
+            onSwipe: (progressRatio) => {
+                const direction = getSwipeDirection();
+
+                if (!direction) return;
+
+                setSwipeOffsetRatio(GestureUtils.computeSwipeOffset(progressRatio, direction));
+            },
+            onSwipeEnd: (direction) => {
+                if (direction !== undefined && direction === getSwipeDirection()) {
+                    props.onSwipeDismiss();
+
+                    return;
+                }
+
+                setSwipeOffsetRatio(0);
+            },
+        },
+    );
+
+    const getIsPaused = createMemo(() => access(props.isPaused) || getIsSwiping());
+
     const getState = createMemo((): ToastState => ({
         index: access(props.index),
         count: access(props.count),
-        isPaused: access(props.isPaused),
+        isPaused: getIsPaused(),
         sizes: access(props.sizes),
+        swipeDirection: getSwipeDirection(),
+        swipeOffsetRatio: getSwipeOffsetRatio(),
+        isSwiping: getIsSwiping(),
     }));
 
     let clockDurationMs: number | undefined;
@@ -52,7 +93,7 @@ const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
             remainingMs = durationMs;
         }
 
-        if (access(props.isPaused)) return;
+        if (getIsPaused()) return;
 
         const startedAtMs = performance.now();
         const elapseTimeout = setTimeout(() => props.onElapse(), remainingMs);
@@ -110,6 +151,12 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
     const getMargins = createMemo(() => access(props.margins) ?? CSSUtils.spreadMargin(0));
 
     const getStackAlignment = createMemo(() => ToastUtils.computeStackAlignment(getAlignment(), getDir()));
+
+    const getSwipeDirection = createMemo(() =>
+        (access(props.isDismissableOnSwipe) ?? TOASTS_DEFAULTS.isDismissableOnSwipe)
+            ? ToastUtils.computeSwipeDirection(getAlignment())
+            : undefined,
+    );
 
     const getIsPaused = InteractionTrackerUtils.trackHold(getRootRef);
 
@@ -273,9 +320,11 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
                                 isPaused={getIsPaused}
                                 transitionDurationMs={getTransitionDurationMs}
                                 sizes={getEntrySizes}
+                                swipeDirection={getSwipeDirection}
                                 ref={(element) => setEntryRef(id, element)}
                                 renderToast={props.renderToast}
                                 onElapse={() => dismiss(id)}
+                                onSwipeDismiss={() => dismiss(id)}
                                 onExitEnd={() => handleExitEnd(id)}
                             />
                         );

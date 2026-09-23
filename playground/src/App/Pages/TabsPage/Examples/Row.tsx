@@ -25,17 +25,17 @@ export const RowExample = (props: Props) => {
     return (
         <div class={styles.rowDemo}>
             <Tabs
-                dir={"row"}
+                orientation={"horizontal"}
                 tabGap={() => ROW_TAB_GAP}
                 ariaLabel={"Example views"}
                 hasAutoActivation={props.hasAutoActivation}
                 tabs={() => access(props.tabs) ?? ROW_TABS}
                 selectedValue={props.selectedValue}
                 onSelectionChange={props.onSelectionChange}
-                renderGutter={() => <PageTabGutter dir={"row"} />}
+                renderGutter={() => <PageTabGutter orientation={"horizontal"} />}
                 renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                     <PageTabFloater
-                        dir={"row"}
+                        orientation={"horizontal"}
                         visibilityTarget={getVisibilityTarget}
                         transitionDurationMs={getTransitionDurationMs}
                     />
@@ -43,7 +43,7 @@ export const RowExample = (props: Props) => {
                 renderTab={(getTab, getFlags) => (
                     <PageTabContent
                         flags={getFlags}
-                        dir={"row"}
+                        orientation={"horizontal"}
                         isSelected={() => getTab().value === access(props.selectedValue)}
                     >
                         {getTab().value}

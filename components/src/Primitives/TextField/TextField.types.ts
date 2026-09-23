@@ -42,6 +42,12 @@ export type TextFieldCbs = {
     computeMaskedText?: (previous: string, next: string, caret: number) => TextSyncMaskResult;
     /** Styles the field's text against its current state. */
     computeTextStyle?: (getFlags: () => InteractionFlags<TextFieldFlags>) => TextFieldTextStyle;
+    /**
+     * Reads the field's text as the number a spin button announces holding, for text not written the way
+     * `Number` reads it — a decimal comma, or grouped thousands. Answer `undefined` for text that is not a number
+     * yet. Left out, the text is read with `Number`. Only means anything on a spin button.
+     */
+    computeSpinValue?: (text: string) => number | undefined;
     /** Draws the placeholder shown while the field is empty. */
     renderPlaceholder?: (getFlags: () => InteractionFlags<TextFieldFlags>, hint: string | undefined) => JSX.Element;
     /** Draws whatever sits before the text, inside the field. */
@@ -49,15 +55,15 @@ export type TextFieldCbs = {
     /** Draws whatever sits after the text, inside the field. */
     renderTrailing?: (getFlags: () => InteractionFlags<TextFieldFlags>) => JSX.Element;
     /** Runs as the reader types. */
-    onInput?: (value: string) => void | Promise<void>;
+    onInput?: (value: string) => void;
     /** Runs on a key pressed while the field has focus. */
-    onKeyDown?: (e: KeyboardEvent) => void | Promise<void>;
+    onKeyDown?: (e: KeyboardEvent) => void;
     /** Runs when the field loses focus, which is where a field that clamps its value does so. */
-    onBlur?: () => void | Promise<void>;
+    onBlur?: () => void;
     /** Runs when the pointer arrives over the field. */
-    onMouseEnter?: (e: MouseEvent) => void | Promise<void>;
+    onMouseEnter?: (e: MouseEvent) => void;
     /** Runs when the pointer leaves the field. */
-    onMouseLeave?: (e: MouseEvent) => void | Promise<void>;
+    onMouseLeave?: (e: MouseEvent) => void;
 };
 
 export type TextFieldState = {
@@ -71,6 +77,8 @@ export type TextFieldState = {
     ariaLabel?: string;
     /** Whether the value can be read and copied but not changed. Unlike disabling it, the field stays focusable. */
     isReadOnly?: boolean;
+    /** Whether a value has to be given. It is announced and not enforced, because the library validates nothing. */
+    isRequired?: boolean;
     /**
      * Whether the field announces itself as something with a value to step up and down, which is what a number field
      * is.
@@ -110,6 +118,8 @@ export type TextFieldElementProps = AccessorProps<
             setLeadingRef: (element: HTMLElement) => void;
             /** Receives the trailing element once it exists, for the same reason. */
             setTrailingRef: (element: HTMLElement) => void;
+            /** ARIA attributes for the field element, for a preset that gives the field a role of its own. */
+            ariaAttributes?: JSX.AriaAttributes;
         }
 >;
 
@@ -127,10 +137,24 @@ export type TextFieldProps = Omit<
                 gap?: number;
                 /** The text in the field. It is the only thing that changes it. */
                 valueSignal: SignalSource<string>;
+                /**
+                 * ARIA attributes for the field element, for a preset that gives the field a role of its own, such as a
+                 * combobox. They are written after the field's own, so a role here replaces the one the field would
+                 * have.
+                 */
+                ariaAttributes?: JSX.AriaAttributes;
             }
     >;
 
 export type TextFieldPresetProps = Omit<
     TextFieldProps,
-    "element" | "isSpinButton" | "isAutoSizing" | "minRows" | "maxRows" | "onKeyDown" | "onBlur"
+    | "element"
+    | "isSpinButton"
+    | "computeSpinValue"
+    | "isAutoSizing"
+    | "minRows"
+    | "maxRows"
+    | "onKeyDown"
+    | "onBlur"
+    | "ariaAttributes"
 >;

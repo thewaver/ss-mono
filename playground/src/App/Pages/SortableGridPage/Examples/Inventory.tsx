@@ -11,6 +11,7 @@ import type {
     SortableGridItemFlags,
 } from "@thewaver/ss-components";
 
+import { SORTABLE_GRID_ANNOUNCEMENTS } from "../../../PageComponents/Announcements/Announcements.const";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import {
     PageSortableGridCell,
@@ -123,6 +124,7 @@ export const InventoryExample = (props: Props) => {
             <SortableGrid
                 groupId={props.groupId}
                 ariaLabel={props.ariaLabel}
+                announcements={SORTABLE_GRID_ANNOUNCEMENTS}
                 columns={() => props.columns ?? PACK_COLUMNS}
                 rows={() => props.rows ?? PACK_ROWS}
                 cellSize={CELL_SIZE}

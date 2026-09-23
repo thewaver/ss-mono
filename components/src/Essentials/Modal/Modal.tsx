@@ -1,4 +1,4 @@
-import { Show, createEffect, createMemo, createSignal } from "solid-js";
+import { Show, createEffect, createMemo, createSignal, onCleanup } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { CSSUtils, GestureUtils, StringUtils } from "@thewaver/ss-utils";
@@ -56,12 +56,16 @@ export const Modal = (props: ModalProps) => {
 
     FocusManagerUtils.autoFocus(getContainerRef, getIsVisible, { getInitialRef: () => access(props.initialFocusRef) });
 
+    const getIsDismissableOnOverlayClick = createMemo(
+        () => access(props.isDismissableOnOverlayClick) ?? MODAL_DEFAULTS.isDismissableOnOverlayClick,
+    );
+
     const handleDismiss = () => {
         props.visibilitySignal[1](false);
     };
 
     const handleOverlayClick = () => {
-        if (access(props.isDismissableOnOverlayClick) === false) return;
+        if (!getIsDismissableOnOverlayClick()) return;
 
         handleDismiss();
     };
@@ -70,7 +74,7 @@ export const Modal = (props: ModalProps) => {
 
     const { getIsSwiping } = InteractionTrackerUtils.trackAxialSwipe(
         getContainerRef,
-        () => getSwipeDirection() === undefined || access(props.isDismissableOnOverlayClick) === false,
+        () => getSwipeDirection() === undefined || !getIsDismissableOnOverlayClick(),
         {
             getAxis: getSwipeAxis,
             getCommitRatio: () => MODAL_SWIPE_COMMIT_RATIO,
@@ -110,10 +114,20 @@ export const Modal = (props: ModalProps) => {
         setSwipeOffsetRatio(0);
     });
 
+    createEffect(() => {
+        const root = getRootRef();
+
+        if (!getIsVisible() || !root) return;
+
+        onCleanup(FocusManagerUtils.sealAround(root));
+        onCleanup(FocusManagerUtils.lockScroll());
+    });
+
     DismisserUtils.createLayer(getIsVisible, {
         getRoots: () => [getContainerRef()],
         onDismiss: (reason) => {
-            if (reason !== "escape") return;
+            if (reason !== "escape" || !(access(props.isDismissableOnEscape) ?? MODAL_DEFAULTS.isDismissableOnEscape))
+                return;
 
             handleDismiss();
         },

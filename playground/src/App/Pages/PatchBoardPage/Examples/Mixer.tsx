@@ -1,5 +1,6 @@
 import { PatchBoard } from "@thewaver/ss-components";
 
+import { PATCH_BOARD_ANNOUNCEMENTS } from "../../../PageComponents/Announcements/Announcements.const";
 import {
     PagePatchCable,
     PagePatchNode,
@@ -15,6 +16,7 @@ export const MixerExample = (props: Props) => {
         <PatchBoard
             groupId={"mixer"}
             ariaLabel={"Mixing desk"}
+            announcements={PATCH_BOARD_ANNOUNCEMENTS}
             size={STANDING_BOARD_SIZE}
             orientation={"vertical"}
             socketSize={props.socketSize}

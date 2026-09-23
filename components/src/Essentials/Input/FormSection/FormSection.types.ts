@@ -10,7 +10,7 @@ export type FormSectionState = {
 
 export type FormSectionProps = AccessorProps<{
     /** Whether the caption sits above the content or beside it. */
-    dir?: "column" | "row";
+    orientation?: "horizontal" | "vertical";
     /** The space between the caption, the content and the message. */
     gap?: number;
     /** Names the section for assistive technology. */

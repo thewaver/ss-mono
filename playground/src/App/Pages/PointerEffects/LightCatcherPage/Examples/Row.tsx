@@ -22,6 +22,8 @@ export const RowExample = (props: Props) => {
                             lightRangePx={props.lightRangePx}
                             maxBrightness={props.maxBrightness}
                             restingBrightness={props.restingBrightness}
+                            maxLightness={props.maxLightness}
+                            restingLightness={props.restingLightness}
                         >
                             <div class={styles.lamp}>{lamp}</div>
                         </LightCatcher>

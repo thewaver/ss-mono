@@ -21,11 +21,14 @@ export const DefaultExample = (props: Props) => {
     return (
         <div class={styles.fieldBox}>
             <FormField
-                dir={props.dir}
+                orientation={props.orientation}
                 gap={props.gap}
                 hasError={props.hasError}
+                isRequired={true}
                 message={props.message}
-                renderCaption={() => <PageFormFieldCaption>Display name</PageFormFieldCaption>}
+                renderCaption={(getState) => (
+                    <PageFormFieldCaption>Display name{getState().isRequired ? " *" : ""}</PageFormFieldCaption>
+                )}
                 renderMessage={(getState) => (
                     <PageFormFieldMessage state={getState}>{access(props.message)}</PageFormFieldMessage>
                 )}
@@ -33,6 +36,7 @@ export const DefaultExample = (props: Props) => {
                     <TextInput
                         valueSignal={props.valueSignal}
                         hasError={() => getState().hasError}
+                        isRequired={() => getState().isRequired}
                         padding={() => FIELD_PADDING}
                         gap={() => FIELD_GAP}
                         computeTextStyle={computePageTextFieldTextStyle}

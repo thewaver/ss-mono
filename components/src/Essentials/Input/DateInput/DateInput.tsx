@@ -7,25 +7,17 @@ import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { DATE_INPUT_DEFAULTS } from "./DateInput.const";
-import type { DateInputEra, DateInputFormat, DateInputProps } from "./DateInput.types";
+import type { DateInputEra, DateInputFormat, DateInputPart, DateInputProps } from "./DateInput.types";
 
 const YEAR_LENGTH = 4;
 const MONTH_LENGTH = 2;
 const DAY_LENGTH = 2;
 const DIGIT_COUNT = YEAR_LENGTH + MONTH_LENGTH + DAY_LENGTH;
 
-type DateInputPart = "year" | "month" | "day";
-
 const PART_LENGTHS: Record<DateInputPart, number> = {
     year: YEAR_LENGTH,
     month: MONTH_LENGTH,
     day: DAY_LENGTH,
-};
-
-const PART_HINTS: Record<DateInputPart, string> = {
-    year: "yyyy",
-    month: "mm",
-    day: "dd",
 };
 
 const FORMATS: Record<DateInputFormat, { parts: DateInputPart[]; separator: string }> = {
@@ -40,10 +32,10 @@ const computeMask = (format: DateInputFormat) => {
     return parts.map((part) => TextSyncUtils.MASK_DIGIT.repeat(PART_LENGTHS[part])).join(separator);
 };
 
-const computeHint = (format: DateInputFormat) => {
+const computeHint = (format: DateInputFormat, partHints: Record<DateInputPart, string>) => {
     const { parts, separator } = FORMATS[format];
 
-    return parts.map((part) => PART_HINTS[part]).join(separator);
+    return parts.map((part) => partHints[part]).join(separator);
 };
 
 const computeBounds = (anchor: DateValue) => {
@@ -130,7 +122,7 @@ export const DateInput = (props: DateInputProps) => {
             day: parts.day!,
         });
 
-        return parsed && DateValueUtils.getIsInRange(parsed, access(props.minDate), access(props.maxDate))
+        return parsed && DateValueUtils.getIsInRange(parsed, access(props.minValue), access(props.maxValue))
             ? parsed
             : undefined;
     };
@@ -163,7 +155,11 @@ export const DateInput = (props: DateInputProps) => {
             if (!value) return;
 
             field.commit(
-                DateValueUtils.clamp(DateValueUtils.withEra(value, next), access(props.minDate), access(props.maxDate)),
+                DateValueUtils.clamp(
+                    DateValueUtils.withEra(value, next),
+                    access(props.minValue),
+                    access(props.maxValue),
+                ),
             );
         },
     };
@@ -175,7 +171,7 @@ export const DateInput = (props: DateInputProps) => {
             element={"input"}
             inputMode={"numeric"}
             computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(getMask(), previous, next, caret)}
-            placeholderHint={() => computeHint(getFormat())}
+            placeholderHint={() => computeHint(getFormat(), access(props.partHints))}
             hasError={() => (access(props.hasError) ?? false) || field.getHasIssue()}
             renderLeading={props.renderLeading && ((getFlags) => props.renderLeading!(getFlags, era))}
             onInput={field.onInput}

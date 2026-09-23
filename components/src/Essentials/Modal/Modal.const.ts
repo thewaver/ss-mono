@@ -4,4 +4,6 @@ export const MODAL_DEFAULTS = {
     transitionDurationMs: 200,
     alignment: "center" as ModalAlignment,
     role: "dialog" as ModalRole,
+    isDismissableOnOverlayClick: true,
+    isDismissableOnEscape: true,
 };

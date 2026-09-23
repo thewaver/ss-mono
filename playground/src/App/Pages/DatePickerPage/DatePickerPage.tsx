@@ -25,6 +25,7 @@ export const DatePickerPage = () => {
     const pickedSignal = createSignal<DateValue | undefined>();
     const boundedSignal = createSignal<DateValue | undefined>();
     const weekdaySignal = createSignal<DateValue | undefined>();
+    const monthSignal = createSignal<DateValue | undefined>();
 
     const getExamples = createMemo(() => [
         {
@@ -44,8 +45,8 @@ export const DatePickerPage = () => {
                     valueSignal={boundedSignal}
                     calendar={getCalendarId}
                     key={"bounded"}
-                    minDate={() => MIN_DATE}
-                    maxDate={() => MAX_DATE}
+                    minValue={() => MIN_DATE}
+                    maxValue={() => MAX_DATE}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Picked.tsx`,
@@ -61,6 +62,21 @@ export const DatePickerPage = () => {
                     calendar={getCalendarId}
                     key={"weekdays"}
                     computeIsDayDisabled={getIsWeekend}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Picked.tsx`,
+        },
+        {
+            key: "monthPrecision",
+            name: "Picking a month",
+            readout: () =>
+                `value: ${describe(monthSignal[0]())} — precision="month" is handed to the calendar, so a pick there sets the first of the month; the field still takes a whole date`,
+            component: () => (
+                <PickedExample
+                    valueSignal={monthSignal}
+                    calendar={getCalendarId}
+                    key={"monthPrecision"}
+                    precision={"month"}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Picked.tsx`,

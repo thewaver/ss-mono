@@ -81,16 +81,16 @@ export const PageSourceView = (props: SourceViewProps) => {
                         renderButton={(getStep, stepper) => <PageScrollerButton step={getStep} stepper={stepper} />}
                     >
                         <Tabs
-                            dir={"row"}
+                            orientation={"horizontal"}
                             tabGap={() => TAB_GAP}
                             ariaLabel={"Source files"}
                             tabs={getTabs}
                             selectedValue={getSelectedGroup}
                             onSelectionChange={selectGroup}
-                            renderGutter={() => <PageTabGutter dir={"row"} />}
+                            renderGutter={() => <PageTabGutter orientation={"horizontal"} />}
                             renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                                 <PageTabFloater
-                                    dir={"row"}
+                                    orientation={"horizontal"}
                                     visibilityTarget={getVisibilityTarget}
                                     transitionDurationMs={getTransitionDurationMs}
                                 />
@@ -98,7 +98,7 @@ export const PageSourceView = (props: SourceViewProps) => {
                             renderTab={(getTab, getFlags) => (
                                 <PageTabContent
                                     flags={getFlags}
-                                    dir={"row"}
+                                    orientation={"horizontal"}
                                     isSelected={() => getTab().value === getSelectedGroup()}
                                 >
                                     {getTab().value.name}

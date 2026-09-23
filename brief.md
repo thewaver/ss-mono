@@ -25,10 +25,11 @@ Whole controls the library does not have. Ordered by the user on 2026-08-15. A s
 rating input, `Skeleton`, `Avatar`, `Badge`, `Card` and `Icon` were dropped on the same day and are not listed
 anywhere.
 
-| #   | What                  | Standing                                                                                                                    |
-| --- | --------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| 9   | **Eyedropper**        | **Postponed until browser support exists.** Picking a color by clicking anywhere on screen. Chromium-only, at 27%           |
-| 4   | **A command palette** | **Bottom of the list.** A search over every action in the app, opened by a shortcut. `Select`'s autocomplete inside a modal |
+| #   | What                  | Standing                                                                                                                                             |
+| --- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 9   | **Eyedropper**        | **Postponed until browser support exists.** Picking a color by clicking anywhere on screen. Chromium-only, at 27%                                    |
+| 4   | **A command palette** | **Bottom of the list.** A search over every action in the app, opened by a shortcut. `Select`'s autocomplete inside a modal                          |
+| 4   | **A scroll area**     | **Bottom of the list.** Custom-drawn scrollbars. CSS `scrollbar-color` and `scrollbar-width` cover the theme case; only a fading overlay bar is left |
 
 ## Blockers and known issues
 
@@ -36,6 +37,7 @@ Something that misbehaves, or a cost nobody has paid down.
 
 | #   | Where                            | What happens                                                                                                                                                                                                                                                                                              |
 | --- | -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 28  | **Native form submit**           | **Pending decision.** `Select` submits nothing, the date and time fields submit their display text, and `Form` hands `onSubmit` no values. One question, lofted, not discarded                                                                                                                            |
 | 20  | **Every anchored layer**         | **Postponed until browser support exists.** A popup paints where its anchor was one frame ago, so it trails during a scroll                                                                                                                                                                               |
 | 23  | **`GlassSurface`, ripple layer** | **Postponed until the platform catches up.** The rippled edge shows a defect under real GPU rendering that clipping it, however it's clipped, either reproduces or replaces with a different one — a known, unresolved gap in `backdrop-filter` plus `feDisplacementMap`, not particular to this codebase |
 | 12  | **`Viewport`, nested**           | Put one inside a box with no height of its own and it draws nothing at all, with no warning to say why                                                                                                                                                                                                    |
@@ -50,7 +52,7 @@ Something that misbehaves, or a cost nobody has paid down.
 | 24  | **Any placed control**           | A layout guesses each item's box, so content wider than the guess overflows it and, on a ring, overlaps a neighbor                                                                                                                                                                                        |
 | 24  | **Any placed control**           | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into                                                                                                                                                                 |
 | 24  | **`Stepper`, placed**            | `renderBody` is dropped without a word, a curve having nowhere to put a panel                                                                                                                                                                                                                             |
-| 26  | **Anything turning in 3D**       | A component that turns under perspective sets aside room for the bulge, so its box stays bigger than its content even while it is standing still |
+| 26  | **Anything turning in 3D**       | A component that turns under perspective sets aside room for the bulge, so its box stays bigger than its content even while it is standing still                                                                                                                                                          |
 
 ## Deliberately not built
 
@@ -92,15 +94,15 @@ A capability a built control does not have, where the reason it does not is sett
 
 They cluster, and no single item owns them.
 
-| #   | Where               | What is missing                                                                                                                                |
-| --- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| 22  | **`Timeline`**      | It pans by dragging and zooms by pinching, and the library ships no pointer route that is neither — the consumer's buttons are the only answer |
-| 15  | **`Spotlight`**     | A prompt cannot hide the rest of the page from a screen reader: `inert` marks a subtree and cannot be lifted off one part of it                |
-| 18  | **Carousels**       | A carousel given no `renderControls` has no keyboard route into it whatsoever                                                                  |
-| 21  | **`Table`**         | A cell holding two controls can be reached but not stepped into — there is no key that moves between them                                      |
-| 16  | **`Scroller`**      | The buttons are the consumer's, so the library cannot promise one is named, reachable or in the tab order                                      |
-| 19  | **`OverheadWheel`** | The same again for the hub's control, with the same promise unmade                                                                             |
-| 14  | **`SlideButton`**   | A fixed hold duration is itself an assumption about dexterity, in a control that exists partly to avoid one                                    |
+| #   | Where               | What is missing                                                                                                                                     |
+| --- | ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 22  | **`Timeline`**      | It pans by dragging and zooms by pinching, and the library ships no pointer route that is neither — the consumer's buttons are the only answer      |
+| 15  | **`Spotlight`**     | A prompt cannot hide the rest of the page from a screen reader: `inert` marks a subtree and cannot be lifted off one part of it                     |
+| 18  | **Carousels**       | A carousel given no `renderControls` has no keyboard route into it whatsoever                                                                       |
+| 21  | **`Table`**         | A cell holding two controls can be reached but not stepped into — there is no key that moves between them                                           |
+| 16  | **`Scroller`**      | The buttons are the consumer's, so the library cannot promise one is named, reachable or in the tab order                                           |
+| 19  | **`OverheadWheel`** | The same again for the hub's control, with the same promise unmade                                                                                  |
+| 14  | **`SlideButton`**   | A fixed hold duration is itself an assumption about dexterity, in a control that exists partly to avoid one                                         |
 | 27  | **`CardStack`**     | A card is sent by a swipe, and the library ships no pointer route that is neither a gesture nor a drag — the consumer's buttons are the only answer |
 
 ## Planned projects

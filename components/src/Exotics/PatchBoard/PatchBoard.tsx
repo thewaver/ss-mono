@@ -48,6 +48,8 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     const linksSignal = accessSignal(() => props.linksSignal);
 
     const boardId = createUniqueId();
+    const nodeHintId = createUniqueId();
+    const socketHintId = createUniqueId();
 
     const viewportContext = useViewportContext();
 
@@ -95,7 +97,10 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         const node = findNode(end.nodeKey);
         const socket = node?.sockets.find((entry) => entry.id === end.socketId);
 
-        return `${node ? getNodeLabel(node) : end.nodeKey} ${socket?.label ?? end.socketId}`;
+        return access(props.announcements).computeEndLabel(
+            node ? getNodeLabel(node) : end.nodeKey,
+            socket?.label ?? end.socketId,
+        );
     };
 
     const getIsEndAllowed = (fromEnd: PatchBoardEnd, toEnd: PatchBoardEnd) => {
@@ -128,14 +133,14 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         getLabel: () => access(props.ariaLabel),
         getRootRef,
         getIsDisabled,
-        getRestingKeyHint: () => "Press Enter to pick a cable up from this socket.",
         getKeyHint: () => {
             const carry = CarrierUtils.getCarry();
 
             return carry && asCarry(carry).kind === "plug"
-                ? "Arrow keys choose a socket, Enter connects, Escape cancels."
-                : "Arrow keys move it, Enter drops, Escape cancels.";
+                ? access(props.announcements).plugKeyHint
+                : access(props.announcements).nodeKeyHint;
         },
+        getAnnouncements: () => access(props.announcements),
         computeCanAccept: (carry) => {
             if (getIsDisabled()) return false;
 
@@ -228,21 +233,22 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         computePlaceLabel: (place, carry) => {
             const current = asPlace(place);
             const value = asCarry(carry);
+            const announcements = access(props.announcements);
 
             if (value.kind === "node") {
                 return current.kind === "spot"
-                    ? PatchBoardUtils.getRegionLabel(current, value.node.size, getSize())
-                    : "off the board";
+                    ? announcements.computeRegionLabel(PatchBoardUtils.getRegion(current, value.node.size, getSize()))
+                    : announcements.offBoardPlaceLabel;
             }
 
-            if (current.kind !== "socket") return "no socket";
+            if (current.kind !== "socket") return announcements.noSocketPlaceLabel;
 
             const isRefused =
                 getCarry() !== undefined &&
                 !PatchBoardUtils.getIsSameEnd(value.from, current) &&
                 !getIsEndAllowed(value.from, current);
 
-            return `${getEndLabel(current)}${isRefused ? ", cannot connect" : ""}`;
+            return announcements.computeSocketPlaceLabel(getEndLabel(current), isRefused);
         },
         takeAt: (_unusedPlace, carry) => {
             const value = asCarry(carry);
@@ -471,7 +477,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
             {
                 groupId: getGroupId(),
                 key: PatchBoardUtils.getEndKey(socket.end),
-                label: `cable from ${getEndLabel(socket.end)}`,
+                label: access(props.announcements).computeCableLabel(getEndLabel(socket.end)),
                 value: { kind: "plug", from: socket.end } satisfies PatchBoardCarry<T>,
             },
             mode,
@@ -491,9 +497,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
         cut.forEach((link) => props.onUnlink?.(link));
 
-        LiveAnnouncerUtils.announce(
-            `${cut.length > SINGLE ? `${cut.length} cables` : "Cable"} unplugged from ${getEndLabel(end)}.`,
-        );
+        LiveAnnouncerUtils.announce(access(props.announcements).computeUnplugged(getEndLabel(end), cut.length));
 
         return true;
     };
@@ -741,6 +745,12 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
             aria-disabled={getIsDisabled() || undefined}
             onClick={handleRootClick}
         >
+            <div id={nodeHintId} class={styles.patchBoardHint}>
+                {access(props.announcements).nodeRestingKeyHint}
+            </div>
+            <div id={socketHintId} class={styles.patchBoardHint}>
+                {access(props.announcements).socketRestingKeyHint}
+            </div>
             <svg
                 class={styles.patchBoardCables}
                 viewBox={`0 0 ${getSize().width} ${getSize().height}`}
@@ -783,6 +793,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                             role="button"
                                             aria-label={getNodeLabel(getNode())}
                                             aria-disabled={(getNode().isDisabled ?? false) || undefined}
+                                            aria-describedby={nodeHintId}
                                             onPointerDown={(e) => handleNodePointerDown(getNode(), e)}
                                             onClick={(e) => handleNodeClick(getNode(), e)}
                                             onKeyDown={(e) => handleStopKeyDown(getKey(), getNode(), undefined, e)}
@@ -863,10 +874,15 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                                         }}
                                                         class={styles.patchBoardSocket}
                                                         role="button"
-                                                        aria-label={`${getEndLabel(getEnd())}, ${getSocket().kind === "in" ? "input" : "output"}${getIsTaken() ? ", connected" : ""}`}
+                                                        aria-label={access(props.announcements).computeSocketLabel(
+                                                            getEndLabel(getEnd()),
+                                                            getSocket().kind,
+                                                            getIsTaken(),
+                                                        )}
                                                         aria-disabled={
                                                             getPlaced()?.isDisabled || getIsLocked() || undefined
                                                         }
+                                                        aria-describedby={socketHintId}
                                                         onPointerDown={(e) => handleSocketPointerDown(getPlaced(), e)}
                                                         onClick={(e) => handleSocketClick(getPlaced(), e)}
                                                         onKeyDown={(e) =>

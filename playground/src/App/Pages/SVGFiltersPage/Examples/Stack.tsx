@@ -3,6 +3,7 @@ import type { Accessor, Signal } from "solid-js";
 import { SVGFilterDefsFactory, Sortable, access } from "@thewaver/ss-components";
 import type { InteractionFlags, SortableItem, SortableItemFlags } from "@thewaver/ss-components";
 
+import { SORTABLE_ANNOUNCEMENTS } from "../../../PageComponents/Announcements/Announcements.const";
 import { PageFilterStage } from "../../../StyledComponents/SVGFiltersContent/SVGFiltersContent";
 import {
     PageSortableItemContent,
@@ -43,7 +44,8 @@ const StepList = (props: {
         <Sortable
             groupId={GROUP_ID}
             ariaLabel={props.caption}
-            dir={() => "column"}
+            announcements={SORTABLE_ANNOUNCEMENTS}
+            orientation={() => "vertical"}
             sizing={"fill"}
             gap={STEP_LIST_GAP}
             minHeight={STEP_LIST_MIN_HEIGHT}
@@ -52,7 +54,7 @@ const StepList = (props: {
             computeItemLabel={computeStepLabel}
             renderItem={renderStep}
             renderCarried={(getItem) => renderStep(getItem, () => RESTING_FLAGS)}
-            renderMarker={(getDir) => <PageSortableMarker dir={getDir} />}
+            renderMarker={(getOrientation) => <PageSortableMarker orientation={getOrientation} />}
             renderDecoration={(getFlags) => <PageSortableSurface flags={getFlags} emptyText={props.emptyText} />}
         />
     </div>

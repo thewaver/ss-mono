@@ -36,6 +36,8 @@ export const TooltipPage = () => {
     const [getOffsetY, setOffsetY] = createSignal(STARTING_OFFSET_Y);
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(TOOLTIP_DEFAULTS.transitionDurationMs);
     const [getFocusShowDelayMs, setFocusShowDelayMs] = createSignal(TOOLTIP_DEFAULTS.focusShowDelayMs);
+    const [getHoverShowDelayMs, setHoverShowDelayMs] = createSignal(TOOLTIP_DEFAULTS.hoverShowDelayMs);
+    const [getSkipDelayWindowMs, setSkipDelayWindowMs] = createSignal(TOOLTIP_DEFAULTS.skipDelayWindowMs);
 
     const getPlacement = createMemo(() => ({ x: getHPlacement(), y: getVPlacement() }));
 
@@ -47,6 +49,8 @@ export const TooltipPage = () => {
             offset: getOffset,
             transitionDurationMs: getTransitionDurationMs,
             focusShowDelayMs: getFocusShowDelayMs,
+            hoverShowDelayMs: getHoverShowDelayMs,
+            skipDelayWindowMs: getSkipDelayWindowMs,
         };
 
         return [
@@ -162,9 +166,7 @@ export const TooltipPage = () => {
                 <PageProp
                     key={"focusShowDelayMs"}
                     label={"Focus delay (ms)"}
-                    hint={
-                        "How long a keyboard focus has to rest on the anchor before the tooltip appears. Hovering shows it at once."
-                    }
+                    hint={"How long a keyboard focus has to rest on the anchor before the tooltip appears."}
                 >
                     <PageNumberField
                         value={getFocusShowDelayMs}
@@ -174,6 +176,42 @@ export const TooltipPage = () => {
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Focus delay in milliseconds"}
                         onInput={setFocusShowDelayMs}
+                    />
+                </PageProp>
+
+                <PageProp
+                    key={"hoverShowDelayMs"}
+                    label={"Hover delay (ms)"}
+                    hint={
+                        "How long the pointer has to rest on the anchor before the tooltip appears. Leave before then and nothing shows."
+                    }
+                >
+                    <PageNumberField
+                        value={getHoverShowDelayMs}
+                        min={() => MIN_DURATION}
+                        max={() => MAX_DURATION}
+                        step={() => DURATION_STEP}
+                        width={() => FIELD_WIDTH}
+                        ariaLabel={"Hover delay in milliseconds"}
+                        onInput={setHoverShowDelayMs}
+                    />
+                </PageProp>
+
+                <PageProp
+                    key={"skipDelayWindowMs"}
+                    label={"Skip window (ms)"}
+                    hint={
+                        "How soon after any tooltip closes a hover opens the next one at once. Wait for one tooltip here, then move to its neighbor."
+                    }
+                >
+                    <PageNumberField
+                        value={getSkipDelayWindowMs}
+                        min={() => MIN_DURATION}
+                        max={() => MAX_DURATION}
+                        step={() => DURATION_STEP}
+                        width={() => FIELD_WIDTH}
+                        ariaLabel={"Skip window in milliseconds"}
+                        onInput={setSkipDelayWindowMs}
                     />
                 </PageProp>
             </PagePropsPanel>

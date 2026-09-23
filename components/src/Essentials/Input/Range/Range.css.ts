@@ -45,6 +45,10 @@ export const rangeElement = style({
     },
 });
 
+export const rangeElementTracked = style({
+    touchAction: "none",
+});
+
 export const rangeOrientationVariants = styleVariants({
     horizontal: {},
     vertical: {

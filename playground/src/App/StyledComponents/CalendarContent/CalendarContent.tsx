@@ -30,6 +30,23 @@ export const PageCalendarDay = (props: CalendarDayProps) => {
     );
 };
 
+export const PageCalendarCell = (props: ParentProps<CalendarDayProps>) => {
+    return (
+        <div
+            class={[styles.calendarDay, styles.isWide].join(" ")}
+            classList={{
+                [styles.isSelected]: access(props.renderProps).isSelected,
+                [styles.isToday]: access(props.renderProps).isToday,
+                [styles.isHovered]: access(props.renderProps).isHovered,
+                [styles.isDisabled]: access(props.renderProps).isDisabled,
+            }}
+            aria-hidden="true"
+        >
+            {props.children}
+        </div>
+    );
+};
+
 export const PageCalendarWeekday = (props: ParentProps) => (
     <div class={styles.calendarWeekday} aria-hidden="true">
         {props.children}

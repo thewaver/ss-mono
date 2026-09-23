@@ -45,7 +45,9 @@ export const Stepper = <TValue, TState>(props: StepperProps<TValue, TState>) => 
         );
     }
 
-    const getDir = createMemo(() => access(props.dir) ?? STEPPER_DEFAULTS.dir);
+    const getOrientation = createMemo(() => access(props.orientation) ?? STEPPER_DEFAULTS.orientation);
+
+    const getFlexDirection = createMemo(() => (getOrientation() === "horizontal" ? "row" : "column"));
 
     const getLastIndex = createMemo(() => access(props.steps).length - 1);
 
@@ -72,6 +74,7 @@ export const Stepper = <TValue, TState>(props: StepperProps<TValue, TState>) => 
                 sizing={getPlacementAt(index) === undefined ? ROW_SIZING : PLACED_SIZING}
                 isDisabled={() => !(getStep().isNavigable ?? false)}
                 isReachableWhenDisabled={() => getTooltipDefs() !== undefined}
+                isFocusableWhenDisabled={() => getStep().isReachableWhenDisabled ?? false}
                 tooltipDefs={getTooltipDefs}
                 extraFlags={() => ({ isCurrent: getStep().value === access(props.currentValue) })}
                 renderControl={(setElementRef, getFlags) => (
@@ -103,7 +106,7 @@ export const Stepper = <TValue, TState>(props: StepperProps<TValue, TState>) => 
     );
 
     const renderEntry = (getStep: Accessor<Step<TValue, TState>>, index: number) => (
-        <li class={styles.stepperEntry} style={{ "flex-direction": getDir() }}>
+        <li class={styles.stepperEntry} style={{ "flex-direction": getFlexDirection() }}>
             {renderControl(getStep, index)}
 
             <Show
@@ -147,8 +150,8 @@ export const Stepper = <TValue, TState>(props: StepperProps<TValue, TState>) => 
             class={styles.stepperList}
             classList={{ [styles.stepperPlacedList]: getLayout() !== undefined }}
             style={{
-                "flex-direction": getLayout() === undefined ? getDir() : undefined,
-                "flex-wrap": getLayout() === undefined && getDir() === "row" ? "wrap" : undefined,
+                "flex-direction": getLayout() === undefined ? getFlexDirection() : undefined,
+                "flex-wrap": getLayout() === undefined && getOrientation() === "horizontal" ? "wrap" : undefined,
                 "gap": getLayout() === undefined ? `${access(props.gap) ?? STEPPER_DEFAULTS.gap}px` : undefined,
             }}
             aria-label={access(props.ariaLabel)}

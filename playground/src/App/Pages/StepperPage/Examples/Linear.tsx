@@ -20,12 +20,12 @@ export const LinearExample = (props: Props) => {
                     flags={getFlags}
                     state={() => getStep().state}
                     ordinal={() => ORDER.indexOf(getStep().value) + 1}
-                    dir={"row"}
+                    orientation={"horizontal"}
                 >
                     {LABELS[getStep().value]}
                 </PageStepContent>
             )}
-            renderConnector={() => <PageStepConnector dir={"row"} />}
+            renderConnector={() => <PageStepConnector orientation={"horizontal"} />}
         />
     );
 };

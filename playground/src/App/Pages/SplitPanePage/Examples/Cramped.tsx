@@ -25,7 +25,7 @@ export const CrampedExample = (props: Props) => {
                     renderPane={(_getPane, index) => (
                         <PageSplitPaneBox>{index === 0 ? "min 250px" : "min 400px"}</PageSplitPaneBox>
                     )}
-                    renderGutter={(getFlags) => <PageSplitPaneGutter flags={getFlags} dir={"row"} />}
+                    renderGutter={(getFlags) => <PageSplitPaneGutter flags={getFlags} orientation={"horizontal"} />}
                 />
             </PageSplitPaneFrame>
         </div>

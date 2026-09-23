@@ -7,7 +7,9 @@ import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
 import { DisabledPairExample } from "./Examples/DisabledPair";
 import { ErroredExample } from "./Examples/Errored";
+import { KnobExample } from "./Examples/Knob";
 import { PairExample } from "./Examples/Pair";
+import { PriceExample } from "./Examples/Price";
 import { ReachableExample } from "./Examples/Reachable";
 import { SteppedExample } from "./Examples/Stepped";
 import { VerticalExample } from "./Examples/Vertical";
@@ -22,8 +24,11 @@ export const RangePage = () => {
     const disabledSignal = createSignal(25);
     const reachableSignal = createSignal(75);
     const erroredSignal = createSignal(90);
+    const knobSignal = createSignal(30);
 
     const priceSignal = createSignal<RangeValues>({ start: 20, end: 80 });
+    const budgetSignal = createSignal<RangeValues>({ start: 100, end: 350 });
+    const [getSettledBudget, setSettledBudget] = createSignal("not yet");
     const verticalPairSignal = createSignal<RangeValues>({ start: 30, end: 70 });
     const disabledPairSignal = createSignal<RangeValues>({ start: 35, end: 65 });
 
@@ -50,12 +55,35 @@ export const RangePage = () => {
             path: `${EXAMPLES_ROOT}/Pair.tsx`,
         },
         {
+            key: "priceRange",
+            name: "Price range, read as prices",
+            readout: () =>
+                `start: ${budgetSignal[0]().start} | end: ${budgetSignal[0]().end} | settled: ${getSettledBudget()} — each thumb reads its value as a price, and "settled" changes only when a drag lets go or a key is pressed`,
+            component: () => (
+                <PriceExample
+                    rangeSignal={budgetSignal}
+                    onChangeEnd={(values) => {
+                        setSettledBudget(values.join("–"));
+                    }}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Price.tsx`,
+        },
+        {
             key: "vertical",
             name: "Vertical",
             readout: () =>
                 `single: ${verticalSignal[0]()} | pair: ${verticalPairSignal[0]().start}–${verticalPairSignal[0]().end}`,
             component: () => <VerticalExample valueSignal={verticalSignal} rangeSignal={verticalPairSignal} />,
             path: `${EXAMPLES_ROOT}/Vertical.tsx`,
+        },
+        {
+            key: "knob",
+            name: "Knob",
+            readout: () =>
+                `value: ${knobSignal[0]()} — computeValueAtPoint reads the pointer by its angle round the center, so dragging turns it; the arrow keys still step it`,
+            component: () => <KnobExample valueSignal={knobSignal} />,
+            path: `${EXAMPLES_ROOT}/Knob.tsx`,
         },
         {
             key: "disabled",

@@ -13,6 +13,7 @@ import {
     access,
 } from "@thewaver/ss-components";
 
+import { COLOR_INPUT_LABELS } from "../../PageComponents/Announcements/Announcements.const";
 import { PageCheckboxContent } from "../CheckboxContent/CheckboxContent";
 import { pageColorPickerSlots } from "../ColorAreaContent/ColorAreaContent";
 import { PageColorInputContent } from "../ColorInputContent/ColorInputContent";
@@ -218,6 +219,7 @@ export const PageColorField = (props: PageColorFieldProps) => {
     return (
         <ColorInput
             valueSignal={[() => access(props.value), props.onInput]}
+            {...COLOR_INPUT_LABELS}
             isDisabled={props.isDisabled}
             ariaLabel={props.ariaLabel}
             renderContent={(getRenderProps) => <PageColorInputContent renderProps={getRenderProps} isCompact={true} />}

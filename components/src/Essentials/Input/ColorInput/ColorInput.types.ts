@@ -9,7 +9,7 @@ import type {
     InteractionWrapperProps,
 } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
-import type { ColorAreaRenderProps } from "../ColorArea/ColorArea.types";
+import type { ColorAreaAxis, ColorAreaRenderProps } from "../ColorArea/ColorArea.types";
 import type { RangeRenderProps } from "../Range/Range.types";
 
 export type ColorInputRenderProps = {
@@ -38,11 +38,11 @@ export type ColorInputRenderProps = {
 
 export type ColorInputCbs = {
     /** Runs as the color changes. */
-    onInput?: (value: string) => void | Promise<void>;
+    onInput?: (value: string) => void;
     /** Runs when the pointer arrives over the field. */
-    onMouseEnter?: (e: MouseEvent) => void | Promise<void>;
+    onMouseEnter?: (e: MouseEvent) => void;
     /** Runs when the pointer leaves the field. */
-    onMouseLeave?: (e: MouseEvent) => void | Promise<void>;
+    onMouseLeave?: (e: MouseEvent) => void;
 };
 
 export type ColorInputState = {
@@ -52,13 +52,15 @@ export type ColorInputState = {
     ariaLabel?: string;
     /**
      * Names the popup the field opens. It is a dialog, so it needs a name of its own; the field's name cannot
-     * serve, because a field named through a `Label` has no `ariaLabel` to borrow. Defaults to "Choose a color".
+     * serve, because a field named through a `Label` has no `ariaLabel` to borrow.
      */
-    pickerLabel?: string;
+    pickerLabel: string;
     /** Names the saturation and brightness square, which has no visible label of its own. */
-    areaLabel?: string;
+    areaLabel: string;
+    /** Names each axis of the saturation and brightness square, which is handed on to its `axisLabels`. */
+    areaAxisLabels: Record<ColorAreaAxis, string>;
     /** Names the hue slider, which has no visible label of its own. */
-    hueLabel?: string;
+    hueLabel: string;
     /** Where the picker sits against the field. */
     placement?: AnchorPlacement;
     /** How far the picker is held clear of the field. */

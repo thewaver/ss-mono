@@ -7,7 +7,7 @@ import type { DateValue, DateValueWeekStart } from "../../../Abstracts/DateValue
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { PopupTriggerFlags } from "../../../Primitives/PopupTrigger/PopupTrigger.types";
 import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
-import type { CalendarDayRenderer, CalendarWeekdayRenderer } from "../Calendar/Calendar.types";
+import type { CalendarDayRenderer, CalendarPrecision, CalendarWeekdayRenderer } from "../Calendar/Calendar.types";
 import type { DateInputProps } from "../DateInput/DateInput.types";
 
 export type DatePickerProps = Omit<DateInputProps, "renderTrailing"> &
@@ -19,9 +19,14 @@ export type DatePickerProps = Omit<DateInputProps, "renderTrailing"> &
         /** How long the calendar takes to fade in and out. */
         popupTransitionDurationMs?: number;
         /** Names the calendar for assistive technology. */
-        calendarLabel?: string;
+        calendarLabel: string;
         /** Which day begins a week, which decides the order of the column headings. */
         weekStartsOn?: DateValueWeekStart;
+        /**
+         * What one cell of the popup's calendar holds — days, months or years — and so what a pick there sets.
+         * It is handed to the calendar as it stands; the field still takes a whole date.
+         */
+        precision?: CalendarPrecision;
         /** Whether one day can be picked, for rules a plain earliest and latest cannot express. */
         computeIsDayDisabled?: (day: DateValue) => boolean;
         /** Whether the calendar is open. It is the only thing that opens or closes it. */
@@ -33,8 +38,8 @@ export type DatePickerProps = Omit<DateInputProps, "renderTrailing"> &
          * owns the trigger.
          */
         triggerId?: string;
-        /** Names the control that opens the calendar. Defaults to "Open the calendar". */
-        triggerAriaLabel?: string;
+        /** Names the control that opens the calendar. */
+        triggerAriaLabel: string;
         /**
          * Draws what sits inside the control that opens the calendar.
          *

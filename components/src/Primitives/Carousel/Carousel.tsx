@@ -27,21 +27,9 @@ import * as styles from "./Carousel.css";
 
 const CAROUSEL_SWIPE_COMMIT_RATIO = 0.2;
 
-const CAROUSEL_ROLE_DESCRIPTION = "carousel";
-const SLIDE_ROLE_DESCRIPTION = "slide";
 const MIN_ROTATABLE_COUNT = 2;
 const SLIDE_PERCENT = 100;
 const SWIPE_RATIO_LIMIT = 1;
-
-const STEP_LABELS: Record<CarouselStep, string> = {
-    previous: "Previous slide",
-    next: "Next slide",
-};
-
-const ROTATION_LABELS = {
-    playing: "Stop automatic slide show",
-    stopped: "Start automatic slide show",
-};
 
 const CarouselControl = (props: CarouselControlProps) => {
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
@@ -74,7 +62,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     const [getTurnAngle, setTurnAngle] = createSignal(0);
 
     const [getIndex, setIndex] = SignalMirrorUtils.createOptional(() => props.indexSignal, 0);
-    const [getIsPlaying, setIsPlaying] = SignalMirrorUtils.createOptional(() => props.playingSignal, true);
+    const [getIsPlaying, setIsPlaying] = SignalMirrorUtils.createOptional(() => props.playbackSignal, true);
 
     const getCount = createMemo(() => access(props.slides).length);
 
@@ -82,15 +70,17 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
+    const getIsLooping = createMemo(() => access(props.isLooping) ?? CAROUSEL_DEFAULTS.isLooping);
+
     const getIsDrum = createMemo(() => access(props.variant) === "drum");
 
-    const getDir = createMemo(() => access(props.dir) ?? CAROUSEL_DEFAULTS.dir);
+    const getOrientation = createMemo(() => access(props.orientation) ?? CAROUSEL_DEFAULTS.orientation);
 
     const getAxis = createMemo(() => access(props.axis) ?? CAROUSEL_DEFAULTS.axis);
 
     const getSlideSize = createMemo(() => access(props.slideSize) ?? CAROUSEL_DEFAULTS.slideSize);
 
-    const getTravelsAcross = createMemo(() => (getIsDrum() ? getAxis() : getDir()) === "row");
+    const getTravelsAcross = createMemo(() => (getIsDrum() ? getAxis() === "row" : getOrientation() === "horizontal"));
 
     const getTransitionDurationMs = createMemo(
         () => access(props.transitionDurationMs) ?? CAROUSEL_DEFAULTS.transitionDurationMs,
@@ -101,9 +91,9 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
     const getIsHeld = InteractionTrackerUtils.trackHold(getRootRef);
 
     const goTo = (index: number) => {
-        const next = CarouselUtils.wrapIndex(index, getCount());
+        const next = CarouselUtils.resolveIndex(index, getCount(), getIsLooping());
 
-        if (next === getCurrentIndex()) return;
+        if (next === undefined || next === getCurrentIndex()) return;
 
         setIndex(next);
 
@@ -141,8 +131,9 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
 
     const getAngle = createMemo(() => getTurnAngle() + getSwipeRatio() * RotationUtils.getStepAngle(getCount()));
 
-    const getSlideLabel = (index: number) =>
-        props.computeSlideLabel?.(index, getCount()) ?? `${index + 1} of ${getCount()}`;
+    const getSlideLabel = (index: number) => props.computeSlideLabel(index, getCount());
+
+    const getSlideRoleDescription = () => access(props.slideRoleDescription) ?? CAROUSEL_DEFAULTS.slideRoleDescription;
 
     const getSlideState = (index: number, face: CarouselFace): CarouselSlideState => ({
         index,
@@ -188,18 +179,29 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
         return index;
     });
 
+    createEffect(() => {
+        if (getIsLooping() || getAutoplayDelayMs() === undefined || !getIsPlaying() || getIsDisabled()) return;
+        if (getCount() < MIN_ROTATABLE_COUNT || getCurrentIndex() !== getCount() - 1) return;
+
+        setIsPlaying(false);
+    });
+
     const renderStepControl = (step: CarouselStep): JSX.Element => {
-        const getTargetIndex = () => CarouselUtils.getStepTarget(step, getCurrentIndex(), getCount());
+        const getTargetIndex = () => CarouselUtils.getStepTarget(step, getCurrentIndex(), getCount(), getIsLooping());
 
         return (
             <InteractionWrapper<CarouselStepRenderProps>
-                isDisabled={() => getIsDisabled() || getCount() < MIN_ROTATABLE_COUNT}
+                isDisabled={() =>
+                    getIsDisabled() ||
+                    getCount() < MIN_ROTATABLE_COUNT ||
+                    CarouselUtils.getIsStepAtEnd(step, getCurrentIndex(), getCount(), getIsLooping())
+                }
                 extraFlags={() => ({ step, targetIndex: getTargetIndex() })}
                 renderControl={(setElementRef, getRenderProps) => (
                     <CarouselControl
                         ref={setElementRef}
                         isCurrent={false}
-                        ariaLabel={() => props.computeStepLabel?.(step) ?? STEP_LABELS[step]}
+                        ariaLabel={() => props.computeStepLabel(step)}
                         flags={getRenderProps}
                         renderContent={() => props.renderStep?.(() => step, getRenderProps)}
                         onActivate={() => goTo(getTargetIndex())}
@@ -234,10 +236,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
                 <CarouselControl
                     ref={setElementRef}
                     isCurrent={false}
-                    ariaLabel={() =>
-                        props.computeRotationLabel?.(getIsPlaying()) ??
-                        (getIsPlaying() ? ROTATION_LABELS.playing : ROTATION_LABELS.stopped)
-                    }
+                    ariaLabel={() => props.computeRotationLabel(getIsPlaying())}
                     flags={getFlags}
                     renderContent={() => props.renderRotationControl?.(getFlags)}
                     onActivate={() => setIsPlaying((prev) => !prev)}
@@ -266,11 +265,11 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
             ref={setRootRef}
             class={styles.carouselRoot}
             style={{
-                height: !getIsDrum() && getDir() === "column" ? "100%" : undefined,
+                height: !getIsDrum() && getOrientation() === "vertical" ? "100%" : undefined,
                 gap: `${access(props.gap) ?? CAROUSEL_DEFAULTS.gap}px`,
             }}
             role="region"
-            aria-roledescription={CAROUSEL_ROLE_DESCRIPTION}
+            aria-roledescription={access(props.roleDescription) ?? CAROUSEL_DEFAULTS.roleDescription}
             aria-label={access(props.ariaLabel)}
         >
             <Show
@@ -280,8 +279,8 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
                         <div
                             class={styles.carouselTrack}
                             style={{
-                                "flex-direction": getDir(),
-                                "height": getDir() === "column" ? "100%" : undefined,
+                                "flex-direction": getOrientation() === "horizontal" ? "row" : "column",
+                                "height": getOrientation() === "vertical" ? "100%" : undefined,
                                 "transform": `translate${getTravelsAcross() ? "X" : "Y"}(${(getSwipeRatio() - getCurrentIndex()) * SLIDE_PERCENT}%)`,
                                 "transition-duration": `${getIsSwiping() ? 0 : getTransitionDurationMs()}ms`,
                             }}
@@ -291,7 +290,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
                                     <div
                                         class={styles.carouselSlide}
                                         role="group"
-                                        aria-roledescription={SLIDE_ROLE_DESCRIPTION}
+                                        aria-roledescription={getSlideRoleDescription()}
                                         aria-label={getSlideLabel(index)}
                                         aria-hidden={index !== getCurrentIndex() || undefined}
                                         inert={index !== getCurrentIndex()}
@@ -311,7 +310,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
                         faceSize={getSlideSize}
                         angle={getAngle}
                         transitionDurationMs={() => (getIsSwiping() ? 0 : getTransitionDurationMs())}
-                        faceRoleDescription={SLIDE_ROLE_DESCRIPTION}
+                        faceRoleDescription={getSlideRoleDescription}
                         computeFaceDefs={(index, face) => ({
                             ariaLabel: getSlideLabel(index),
                             isHidden: face === "back" || index !== getCurrentIndex(),

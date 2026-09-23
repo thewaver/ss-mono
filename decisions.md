@@ -1484,6 +1484,45 @@ tracked effect fires in that gap, formats `undefined` back to `""`, and the two 
 symptom was a caret jumping to the start and digits arriving in reverse. The `ImageSwitcher` shape — an
 effect whose job is one-directional must only depend on the direction it syncs from.
 
+### Controls: `NumberInput`'s page step, and numbers read and written by locale
+
+**PageUp and PageDown move `pageStep`, which defaults to ten times `step`.** The default is worked out in the
+component from a private multiple, because a defaults object keyed by prop name cannot state a value that depends
+on another prop. It is the same arithmetic as one step over a longer distance: `computeStep` takes an optional
+`distance`. A value between steps first falls back to the step behind it, so ten from 13 with a step of 5 gives 20;
+a distance that is not a whole number of steps lands on the next step past it; bounds clamp exactly as for the
+arrows. With `distance` equal to `step` the arithmetic is the old single step, so the existing tests stand.
+
+**`locale` finds its separators with `DecimalUtils.getSeparators`, the same call `CurrencyInput` makes.** Left out,
+it means the reader's own locale, as it does for `Calendar`. Parsing drops group separators and reads the decimal
+separator as the fraction, so under a German locale `1.000` is one thousand and `1,5` is one and a half. While
+typing, a group separator is kept only straight after a digit of the whole part; under a locale that groups with a
+space, any white space counts, because nobody types the non-breaking space the locale actually uses. The field
+writes a number back with the locale's decimal separator and without grouping, only on a step or on leaving the
+field, so what it writes looks like what the reader types and reads back as the same number for every finite value.
+
+**`TextField` gained `computeSpinValue`**, because it read `aria-valuenow` with `Number(text)`, which gets both
+German spellings wrong. The presets omit it beside `isSpinButton`.
+
+### Controls: `Range`'s pointer seam, and `RangeUtils`
+
+`computeValueAtPoint?: (point: Point2d, rect: DOMRect) => number`, both in client coordinates as the pointer
+event and `getBoundingClientRect` give them, on the user's call: one optional prop that turns a knob from a
+component into a formula. When present, `Range` follows the pointer itself: it cancels `pointerdown`, captures the
+pointer, and writes what the function answers on each move. That value is stepped from `min`, then clamped between
+the neighbouring thumb. With two thumbs, the one nearer in value at the press moves, and it takes focus. Keyboard,
+role, bounds, `computeValueText` and `onChangeEnd` are untouched; `onChangeEnd` is reported on release.
+
+**Native input events are ignored while a pointer is being tracked, and the element is put back to the held
+value.** That is `syncElement`'s rule, so a browser that drags the native thumb anyway cannot win. A native `change`
+arriving afterwards finds no recorded starting values and says nothing; keyboard changes still report through
+`change` as before. This has been read but not yet watched in a browser.
+
+**`RangeUtils.computeAngularValue` is the knob formula**: angle about the box's center, degrees with 0 pointing
+right and increasing clockwise, as in `AngleUtils`. The caller gives a start angle and a sweep; a negative sweep
+runs the other way, and a point in the gap goes to the nearer end. It is kept separate from stepping, which is
+`RangeUtils.computeSteppedValue`.
+
 ### Controls: `Range`
 
 `backlog.md` predicted this would be the most architecturally novel control left
@@ -1984,6 +2023,71 @@ never what separated the two; see _"A tooltip can be hovered"_ below.
 `Tooltip` is not renamed. `AnchorPlacement` replaces `TooltipPlacement` (and its `H` / `V` halves) because
 the type is now shared vocabulary.
 
+### `HoverIntent`: the hover engine lifted out of `Tooltip`, and `Tooltip` on top of it
+
+The user asked for a hover card as a preset beside `Tooltip` over one shared engine, rather than as a flag on
+`Tooltip`, because a flag would switch the role, the `aria-describedby` link, the blur rule, the focus key and
+the dismiss registration at once, which is the _"a mode cannot move at runtime"_ argument from `Spotlight`. So
+the part of `Tooltip` that is not about being a tooltip moved to `Abstracts/HoverIntent`: the wait before
+showing, the skip window, the bridge across the offset, and the leave that reads where the pointer is going.
+`Tooltip`'s props did not change, and it behaves as it did.
+
+**It takes the open state; it does not own it.** `HoverIntentUtils.create(getAnchorRef, visibilitySignal, defs)`
+reads and writes a signal the caller holds. `Tooltip` keeps a private one, a hover card has an optional
+`visibilitySignal`, and a consumer's flyout may keep one shared key for a whole menu. By the test in _"The 1D walk
+is a pure function"_, the state it does own is the state nobody else has anywhere to keep: the pending timer,
+whether the pointer is over the anchor or the panel, and the pointer type last seen.
+
+**The skip window is a group, not one module-level number.** `createDelayGroup()` returns the record of the last
+close, and each family of panels declares one at module level. Every tooltip still shares one record; a hover
+card never skips its wait because a tooltip just closed, and the reverse holds too.
+
+**Positioning did not move, because it was already shared.** `AnchorUtils.createPortalPosition` stays the one
+answer to where a panel sits. The engine only computes the bridge, as the pure `computeBridgeInsets(placement,
+offset)`, and each consumer applies it to its own panel; `Tooltip` keeps its `::before`.
+
+**Four options, each needed by exactly one consumer.** `getFocusShowDelayMs` opens on keyboard focus after that
+wait. `isHiddenOnAnchorBlur` is `Tooltip`'s alone, because focus can never be inside a tooltip. `getIsHeld` makes a
+leave close nothing while it answers true, for a panel that stays open while focus is inside it. `isTouchIgnored`
+exists because a touch screen reports a tap as the pointer arriving and staying, so without it a tap opens the
+panel after the hover wait; a component whose press does something of its own switches it on, and `Tooltip`
+leaves it off so a tap still shows a tooltip after the wait, as before.
+
+### Controls: `HoverCard` as a preset over the hover engine and `Popover`
+
+`Drawer` over `Modal` is the shape: a thin component that narrows a vocabulary and adds the behavior the base
+cannot express. What `HoverCard` adds to `Popover` is how it opens and closes.
+
+**It is a `dialog`, not a `tooltip`, and it describes nothing.** A card may hold links and controls, and
+`role="tooltip"` may not. So the panel is a portalled `Popover` with `role="dialog"`, on the dismiss layer, with a
+z-index one above its anchor. It writes no `aria-describedby`: a description is read out whole, and a card is
+somewhere to go. Its name is `ModalNameProps`, reused as is, so one of `ariaLabel` or `ariaLabelledBy` is
+required, as for any dialog. Nothing is written onto the anchor at all.
+
+**It opens three ways.** A mouse resting on the anchor, through the engine. A keyboard focus on the anchor, after
+`focusShowDelayMs`; a focus from a mouse press does not count. A press where there is no hover: on touch a tap
+opens and closes it, which makes it a plain popover there, and is why the anchor should be a button, since a
+link's press would also be followed.
+
+**Tab is the key into it.** The card is portalled to the end of the document, so the next Tab after the anchor
+would otherwise land somewhere else entirely. While the card is open, Tab from the anchor moves into it,
+Shift+Tab from its first item goes back to the anchor, and Tab past its last item goes to whatever follows the
+anchor on the page. Kobalte's and Radix's hover cards document themselves as mouse-only and answer no key at
+all, so there was no reference to match; the focus route here is a deliberate step past them, because a card that
+holds a control has to be reachable by keyboard (WCAG 2.1.1) or the control might as well not be there.
+
+**How it closes.** It stays open while focus is inside it, or while the anchor has keyboard focus, so a pointer
+leaving then closes nothing. It closes when both the pointer and focus have left; a focus leaving the layer
+while the pointer is still over the card is ignored. A press outside closes it. Escape closes it and, when focus
+was inside the card, puts focus back on the anchor, marked as a focus restore so the anchor's own focus path
+does not reopen the card. While it fades out the `Popover` is `inert`, so unlike a tooltip a closing card cannot
+be caught by a pointer arriving during the fade.
+
+**The navigation example does not leave one-open-at-a-time to the dismiss layer alone.** A flyout opened by a
+press holds focus and stays open; hovering another flyout's trigger never passes through the dismiss layer, so
+both would be open. The example keeps one shared "which is open" key, and the dismiss layer still handles a press
+outside, focus leaving and Escape.
+
 ### A tooltip can be hovered, and the offset it is held clear by is bridged rather than left as dead space
 
 Success criterion 1.4.13 asks that content revealed on hover can itself be hovered, so that somebody reading
@@ -2029,6 +2133,43 @@ was run against it precisely because sixteen spec files press `Escape`, and none
 tests the element receiving focus and gives up when there is none — focus leaving for the document body or
 another window would otherwise leave a tooltip standing. The press-outside and focus-out paths it did take
 are near no-ops for a tooltip, since a pointer that presses elsewhere has already left the anchor.
+
+### `Tooltip`: a hover waits, and a shared window lets the next one skip the wait
+
+**A hover waits `hoverShowDelayMs` (700) before showing, as focus waits `focusShowDelayMs`.** Without it, sweeping
+across a row of icon buttons flashed one tooltip per button. Leaving before the delay shows nothing. The leave path
+is untouched: it still reads where the pointer is going rather than using a timer, and a pointer arriving on the
+tooltip itself shows it at once, so the bridge still works during a fade.
+
+**The skip window is one module-level timestamp shared by every tooltip.** When a tooltip that was actually showing
+closes, it records the time; a hover within `skipDelayWindowMs` (300) of that shows at once. Only a real close
+refreshes the window, so a fast sweep across controls that never opened anything keeps every one of them waiting.
+Focus does not use the window. Both numbers start from the Radix pair and are the user's to tune; they live in
+`TOOLTIP_DEFAULTS` and nowhere else.
+
+**One timer serves both ways in, and a mouse focus no longer cancels a pending hover.** Focus clears the pending
+timer only when it is about to start its own, a `:focus-visible` focus. Otherwise clicking a button within the hover
+delay would have cancelled the tooltip for as long as the pointer stayed on the button. Playground demos that a spec
+hovers set `hoverShowDelayMs` to 0; the Tooltip page keeps the defaults and exposes both as knobs.
+
+### Controls: `Range`'s value text, its end-of-change callback, and ids per thumb
+
+**A thumb's value text is `computeValueText(value, index)`, written to that thumb's `aria-valuetext`.** It is a
+`compute*` function rather than `Progress`'s `ariaValueText` string, because the text has parts only the library
+knows: the value, and which thumb holds it. A price range reads "$100" and "$350" rather than two bare numbers. The
+library supplies the number and the index and never the wording, which is the Language of Parts rule. Left out, no
+attribute is written and the number is read as it is.
+
+**`onChangeEnd` rides on the native `change` event.** A range input fires it when a drag lets go and after every
+key press, so each key press is its own change and its own end without any bookkeeping of the pointer. A copy of
+the values is taken on `pointerdown` and `keydown`, and the callback stays silent when the values at `change` match
+it, so a drag that ends where it began reports nothing. A key that meets an end of the track fires no `change` at
+all. It is refused while disabled, like every other write.
+
+**The consumer's `id` is suffixed per thumb, as `name` already was.** A pair's thumbs are `<id>-start` and
+`<id>-end`, and a single thumb keeps the bare id, the two-field rule `DateRangePicker` and `ColorArea` follow.
+Before this the id went on the first thumb only, so a `<label for>` could name one end and never the other. The
+suffix is documented on `rangeSignal`, the prop that makes a pair, rather than by redeclaring `id` to document it.
 
 ### Controls: `Select`, and who owns a floating list
 
@@ -2088,6 +2229,122 @@ than re-deriving the rule.
 **`scrollIntoView({ block: "nearest" })` on the highlighted option** is the only way the library reaches a
 scroll container the painter owns. It runs from an effect on the highlight, so it covers opening onto a
 selection far down the list as well as the walk.
+
+**The popup list is always named, and exactly named only when the consumer asks for it.** ARIA requires a listbox
+to have a name, and `Select`'s popup list had none. `listAriaLabel` gives it an exact one, on the user's call; left
+out, the list's `aria-labelledby` points at the `<label>` element of the `Label` the field sits in, or at the field
+itself when there is no `Label`. Neither fallback is exact: a reference to the `<label>` reads everything inside
+it, the field's current text included, so it gives "Country Portugal"; a reference to the field gives the field's
+`aria-label` if it has one and its content if it does not, because the name computation does not follow a
+referenced element's own labelling. Two alternatives were rejected. Pointing at the `Label`'s caption would be
+exact but needs `Label` to know which child is its caption, which would change its API and every call site. A
+required list name would put a second name on every `Select` whose field is already named. What was built costs
+`Label` one generated id, published through its context as `getLabelId`, and nothing else.
+
+### Controls: `Select` and `MultiSelect` clear slot
+
+**`renderClear` paints a library-owned `Button` laid over the field's end edge.** The button sits beside the field,
+not inside it, because a `<button>` field cannot contain another interactive element. It is drawn only while
+something is picked, and is its own tab stop straight after the field. Escape and the arrows do nothing on it,
+because the field's key handling is on the field element and never reaches its sibling. The painter receives the
+button's own flags (`ButtonFlags`) rather than the field's, so it can paint its own hover and press.
+
+**Pressing it empties the value, runs the change callback, closes the list, and returns focus to the field.** The
+value becomes `undefined` for `Select` and `[]` for `MultiSelect`. Focus has to return to the field because the
+control disappears the moment there is nothing left to clear. `Select`'s `onSelectionChange` widened to
+`T | undefined` for this. `clearAriaLabel` names the control optionally, as `Button`'s `ariaLabel` does; an
+icon-only painter needs it. The control is not measured: it sits at the field's end padding, so the consumer's
+`padding` has to leave room for it, the same padding agreement `TextInput` records.
+
+### Controls: `Listbox` exported, and where focus sits is a setting the list's state is created with
+
+Built from the survey's verdict: `Select`'s option list, standing on its own in the page with no field and no
+popup, always open. `Listbox` and `MultiListbox` are presets over a `ListboxComposite`, in the `Select` /
+`MultiSelect` shape and for the same reason: the value's type changes between them, so a mode flag cannot
+reconcile the two.
+
+**What `Select` and the standalone list share is split in two, and the split follows lifetime.** A `Select`'s
+list is unmounted while its popup is closed, but its keyboard still works: an arrow opens it with the picked
+option highlighted, and typeahead opens it on a match. So the state cannot live inside the drawn list.
+`ListboxUtils.createCursor` holds that state: the highlight (a value resolved to an index, as before), the
+reachable options, the typeahead buffer, and one keyboard handler. The `Select` composite creates it at its root,
+where it outlives the popup. `ListboxOptions` is the drawn half: mounted and windowed rows, group boxes, the end
+marker, and the row window and end observer, gated on an `isLive` prop instead of on the open state. `Select`'s
+popup and the standalone list both draw through it. The keyboard handler is `Select`'s own, generalized with
+`onOpen` / `onClose` / `getIsOpen`; the standalone list leaves those out, so it is always open and nothing closes
+it. The one change in the walk is that the arrow keys are the ones for the list's orientation, with the page's
+text direction applied, so a horizontal list in a right-to-left page walks leftward. `Select` stays vertical.
+
+**The focus model is `focusModel: "activeDescendant" | "roving"`, a required field of the cursor's defs, fixed
+by whoever creates the cursor and never a prop.** A consumer cannot choose it, because the choice follows from
+whether a field exists. Where one does, focus has to stay there, and the popup's `mousedown` refusal is what
+keeps it there. Under `"roving"`, each option's `isTabbable` is true only for the highlighted one, so the list is
+one tab stop; an option taking focus moves the highlight to it; and an effect keyed on the highlight moves focus
+to the highlighted option, but only while focus is already inside the list, so a list at rest never pulls focus.
+`getActiveOptionId` answers nothing under `"roving"`, and `isHighlighted` on an option is true only while
+focus is inside the list, because otherwise a standalone list at rest would paint a highlight on the picked
+option that nobody is on.
+
+**A reachable disabled option in a standalone list also gets `isFocusableWhenDisabled`**, gated on the list
+itself being enabled: the walk stops there, so focus must be able to land there. Under `Select`, focus never lands
+on an option, so only `isReachableWhenDisabled` applies, as before.
+
+**Windowing works only on a vertical list**, because `Virtualizer` measures heights, so a horizontal list mounts
+every option whatever estimate it is given. A windowed standalone list must sit inside something that scrolls,
+because the row window finds its scroll container by walking up from its sizer.
+
+**The listbox element is the library's, and the consumer's surface goes around it rather than inside it.**
+`Select`'s popup root has to carry the role, which is why a consumer div sits between that role and the options
+there. The standalone list has no such constraint, so the container owns its option wrappers directly and a
+consumer's border or scroll box wraps the whole `Listbox`. The popup listbox is named by `aria-labelledby`
+pointing at the field, so it carries the field's name without a second prop.
+
+**It reuses `Select`'s option vocabulary.** `SelectOption`, `SelectItem`, `SelectOptionFlags`, `SelectGroupFlags`
+and `SelectUtils` are the list's data types, imported from `Select`. Renaming them after the list that now owns
+them is a separate question, unasked. `SelectOptionItemProps` moved with the option leaf and is now
+`ListboxOptionItemProps`.
+
+### Controls: `TextInput`'s suggestions, and why they sit on `TextInput` rather than `TextField`
+
+Built from the survey's verdict: autocomplete that accepts free text, as props on `TextInput` over the exported
+list, in a `Popover`, with the combobox wiring `Select`'s field already has. The value stays a string.
+
+**The props are on `TextInput` only, and `TextField` gained one hidden pass-through.** A combobox is a single-line
+field. ARIA in HTML allows a `textarea` no role other than its own, and in a textarea the vertical arrows move
+between lines, which is exactly the keyboard a combobox needs. So `TextArea` must not inherit the props.
+`TextField` still owns the element, so it takes `ariaAttributes`, written after its own attributes, and
+`TextFieldPresetProps` omits it, as it already omits `onKeyDown` and `onBlur`. `TextInput` builds the cursor and
+the popover and passes the keyboard handler and the combobox attributes down through those.
+
+**The suggestion props are a union, because the list's name is required.** A listbox has to be named, so
+`suggestionsAriaLabel` is required whenever `suggestions` is present, and so are `renderSuggestion` and
+`renderSuggestionPopup`, since a list with no painter shows nothing. The union's other branch spells each prop as
+`undefined`, so passing `suggestions` alone does not typecheck. `TextInput` became generic, `<T = string>`,
+because a suggestion is a record as often as it is a string.
+
+**The field's attributes are `Select`'s:** `role="combobox"`, `aria-haspopup="listbox"`,
+`aria-autocomplete="list"`, `aria-expanded`, `aria-controls` while open, and `aria-activedescendant`.
+`autocomplete` defaults to `off` while suggestions are present, so the browser's own autofill list does not open
+on top of ours; a consumer's `autoComplete` still wins.
+
+**Nothing is highlighted until the reader moves into the list, which is the whole difference from `Select`'s
+autocomplete.** The cursor takes `isHighlightExplicit` for this: no fallback to the picked option or to the first
+one. So Enter on typed text leaves the text alone: the event passes through and the list closes. Enter with a
+suggestion highlighted writes that suggestion's text and closes the list. A closed list's first arrow opens it
+and lands on the first suggestion, or on the last for the up arrow. Space types, and Home and End move the caret,
+because the cursor treats the field as filterable.
+
+**The value is never cleared or restored by the list.** Escape and focus leaving close the popup through
+`Popover`'s dismiss layer, and the text stays as typed. A pick writes into `valueSignal` and calls `onInput`, then
+`onSuggestionPick`. The text written is `computeCustomSuggestionText(suggestion)` when given, named after
+`Select`'s `computeCustomText`; otherwise it is the option's text as a screen reader reads it, taken from the
+element the library owns, which is the typeahead decision applied to the value.
+
+**The list is open only while the reader wants it and there is something in it.** Typing and the arrows ask for
+it; a pick, Escape, Tab and leaving the field withdraw the request. While the consumer's filter returns nothing,
+the popup stays shut and `aria-expanded` says so, and it reappears when the list refills. A disabled or read-only
+field never opens it. No suggestion is ever `isSelected`: the value is text, not a pick, so every option carries
+`aria-selected="false"`, and the highlight is announced through the field's `aria-activedescendant`.
 
 ### Controls: `Select`'s autocomplete, and why the consumer filters
 
@@ -2984,6 +3241,25 @@ at the widest the Playground's knobs go — twenty-six elements round the dial �
 rectangle is 53 by 57, so it conforms. The number that would break it is item count rather than any knob: past
 roughly thirty elements an axis-aligned wedge's rectangle narrows below 24, and a root band divides its spread
 evenly with no floor, unlike a deeper band which asks for a target arc length and grows its radius to get it.
+
+### `Tabs`, `Accordion`, `Toolbar`, `Breadcrumbs`, `Stepper`: a disabled item can be kept reachable
+
+**Each item type takes `isReachableWhenDisabled`**, following the WAI-ARIA Authoring Practices on the focusability
+of disabled controls. A reachable disabled item stays in the arrow walk (or the tab order, where there is no walk),
+takes focus with its ring, announces `aria-disabled`, and still refuses activation. `Tabs` with `hasAutoActivation`
+does not select a disabled tab the arrows land on. The default is still to skip, so nothing changes for an item
+that does not set it.
+
+**The tooltip stopped being a condition, on the user's call.** `Menu`, `Select`, `Tree` and `Sortable` items used
+to stay reachable only when they also had a tooltip, on the argument that a reachable disabled item should be able
+to explain itself. The five new item types have no tooltip slot, so the same prop would have meant two things. One
+rule now: the flag keeps the item reachable, full stop. The published guidance asks that disabled items be
+discoverable, not explained, and a reader hearing the name and "disabled" is better served than one who never
+learns the item exists. The tooltip is welcome where an item has one, and the wrapper's warning that the flag did
+nothing without one is gone. `isFocusableWhenDisabled` remains as a component's own insistence for an item its
+container walks (`Calendar`, `Clock`, `TileBoard`, `PatchBoard`), and now means the same thing from the inside.
+With the condition gone, `Toolbar`'s overflow menu carries the flag into the `Menu` it builds, so an action stays
+reachable whether it is in the row or has been collapsed.
 
 ### `RadioGroup` and `Tabs` take a layout too, and the floater stops being measured
 
@@ -4425,6 +4701,23 @@ rather than imported.** A control's natural size is its content; a track's is it
 vocabularies have the same two members, and sharing the type would file a non-interactive component's
 geometry under `InteractionWrapper.types`.
 
+### Controls: `Progress`'s `role`, and the name both roles require
+
+`role?: "progressbar" | "meter"`, default `progressbar` in `PROGRESS_DEFAULTS`, in `Modal`'s `role` shape, on the
+user's call. A meter is a reading of how full something is, so it is heard as a gauge rather than as work that
+will finish; a password strength bar announced as a progress bar was misleading.
+
+**Indeterminate is refused by the type, not ignored at runtime.** `ProgressRoleProps` is a union: under `meter`,
+`value` is required. A value that arrives missing anyway (a lying accessor, untyped JavaScript) is read as `min`,
+so the element never carries `role="meter"` without `aria-valuenow`. The price is that a consumer switching
+`role` at runtime through one accessor cannot satisfy either branch, which is the point.
+
+**The name is required under both roles.** ARIA 1.2 lists `progressbar` and `meter` together as roles whose name
+the author must supply, so `ProgressNameProps` is `Modal`'s one-of union, `ariaLabel` or `ariaLabelledBy`, applied
+to both. The convention _"A role that requires a name makes the prop that names it required"_ had listed
+`progressbar` among the roles that only recommend one; the spec says otherwise, and the convention was corrected
+with this entry.
+
 ### Controls: `Drawer` as a `Modal` preset, and why `AlertDialog` is not one
 
 Settled for `Drawer`, the `Toggle`-over-`Checkbox` shape. `AlertDialog` shipped the same day
@@ -4477,6 +4770,56 @@ element on close. A ref assigned during render is set before effects run, so the
 **`getIsDismissableOnOverlayClick` and `getAriaDescribedBy` are public on `Modal`** — a form with unsaved
 changes wants the first, any dialog can want the second.
 
+### `Modal` has to be named, and it seals the page behind it
+
+Both came out of a survey against the mainstream libraries, and both are things `Modal` was doing by half.
+
+**One of `ariaLabel` and `ariaLabelledBy` is required.** `dialog` and `alertdialog` are roles that require a
+name, so a `Modal` with neither fails WCAG 4.1.2. `Breadcrumbs`, `Toolbar`, `Toasts`, `Sortable` and the
+carousels already made their name required; `Modal` had left both props optional, and so had `Tree` and
+`Table`, whose `ariaLabel` is now required outright. `Modal` is the one that needs a choice, because a dialog
+that shows its own title should point at it rather than repeat it, so `ModalNameProps` is a union of two
+`AccessorProps` blocks, each requiring one name and typing the other as `undefined`. `DrawerProps` composes the
+same union in front of its `Omit`, because `Omit` over a union collapses it to the common shape and would have
+let the name back out. The Playground's props-table plugin reads a property's first declaration for its written
+type, which for a union member declared `undefined` would have shown `undefined`; it now takes the first
+declaration that is not, which is the only change to the plugin.
+
+**Everything beside the dialog is made `inert`, through `FocusManagerUtils.sealAround`.** `aria-modal` is a
+promise that the page behind cannot be reached, and a reader that ignores it (VoiceOver has) could walk the page
+regardless. `Spotlight`'s guide mode already walked from its layer to `<body>` marking every sibling inert;
+that loop is now the shared function, with one correction to it: a live region is left alone, because the
+`LiveAnnouncer`'s regions hang off `<body>` and an inert region announces nothing, which would have silenced
+the very announcements the layer makes. A sibling already inert is skipped and not restored, so two layers
+stacked undo only their own work.
+
+**The document stops scrolling behind it, through `FocusManagerUtils.lockScroll`.** `overflow: hidden` on the
+root, with the width the scrollbar took handed back as `padding-right` so nothing shifts. The root is the one
+thing a wheel over the dialog can still reach: the Playground's own scroller is a sibling subtree of the
+portal, not an ancestor, so it was never in the chain. A `Modal` opened over another finds the lock in place,
+measures no scrollbar, and restores the outer one's `hidden` when it closes, so the outer lifts the lock.
+
+### `Modal`: Escape can be refused, and refusing both routes is the consumer's responsibility
+
+**`isDismissableOnEscape` defaults to on and is read where the dismiss layer handles `"escape"`.** The alert-dialog
+pattern allows Escape, so the default stays. But a dialog that must be answered sometimes cannot let a stray key
+count as an answer, and Radix, Mantine and MUI all let it be refused. The key is still consumed by the topmost
+layer, so a refused Escape does not fall through to a layer below.
+
+**Both flags off with nothing inside that closes the dialog is a keyboard trap**, and the library cannot see
+whether the consumer painted a close control. The doc block says it plainly instead of the library guessing. The
+alert-dialog demo switches both off and paints Delete and Cancel inside.
+
+### `Drawer`: why swipe-to-close follows `isDismissableOnOverlayClick`
+
+**The swipe stays tied to the backdrop tap.** It looks like one flag governing two unrelated gestures, and Mantine
+and Vaul do keep them apart, but here the pairing is required. A swipe is a dragging movement, and WCAG 2.5.7 needs
+a single-pointer way to do what it does. The backdrop tap is the only such way the library can promise; a close
+button inside the panel is the consumer's to paint and may not exist. So a drawer that cannot be tapped away cannot
+be swiped away either, and the flag's doc block says so. The user's call, made when a survey listed the coupling as
+an accident; the other direction, a tap-only drawer with the swipe off, breaks nothing under 2.5.7 and waits for
+somebody to need it.
+
 ### Controls: `FileInput` and `ColorInput`, where the UA owns the activation
 
 Both are the `TextInput` arrangement (overlay geometry, wrapper, flags, private
@@ -4507,13 +4850,51 @@ side of one rule — withhold what the element already draws, hand over what it 
 
 - **`ColorInput`** assigns `value` when it differs, so a snapping owner ("nearest of four") sees its
   correction reach the element instead of the picker's raw color.
-- **`FileInput`** cannot be pushed into an arbitrary state, because a `FileList` cannot be constructed. Only
-  the empty case is expressible, via `element.value = ""`, and it is the case that matters: an owner that
-  rejects a file and writes `[]` back would otherwise leave the input holding it, and **re-picking the same
-  file fires no `change` event**, so the user cannot retry what they were just told to fix.
+- **`FileInput`** writes its value back so the element holds exactly what the owner holds; see the next entry,
+  which also reverses the drag-and-drop scoping this entry first recorded.
 
-**Scoped without drag-and-drop, deliberately.** A drop target belongs to whatever surface accepts the drop,
-and adding it would give `FileInput` a second activation path.
+### `FileInput`: a limit on what the control holds is the control's
+
+**A limit on what the control can hold is the control's; a judgment about what the value means is the
+consumer's.** Stated by the user. So a file refused as it lands, for count, size or type, is not validation, the
+way a mask refusing a character is not. The precedent is the native `accept`, which narrows what the control
+takes before a value exists. _"The form story: the library wires, the consumer validates"_ is untouched by this:
+nothing here looks at a value the control already holds, and whether the files that were kept are the right ones
+is still the consumer's question, answered through `hasError`.
+
+**Three limits, checked in one order, reported in one call.** `accept`, `maxSizeBytes` and `maxFiles` are read
+for every file that arrives, from the picker or from a drop, in arrival order: type first, then size, then count,
+and a file is refused for the first it fails. Only files that passed type and size take up room, so the ones
+refused for count are those that arrived after the control was full, and the earliest are kept. Accepted files
+go into the value; the refused ones go to `onReject` together, each with its reason. An arrival with nothing
+accepted leaves the value as it was and still reports. The reason is `"count" | "size" | "type"`, a value rather
+than a sentence, because the words a reader is told are the consumer's (_"The library says what a component is,
+and nothing else a reader hears"_). The checks live in `FileInputUtils.admitFiles`, and the type check re-runs
+`accept` itself: the dialog can be switched to show every file, and a drop is never filtered by the browser.
+
+**`maxFiles` on a single control is documented as meaningless rather than typed away.** A control without
+`isMultiple` holds one file whatever `maxFiles` says. A union that forbids the pair needs `isMultiple` to be a
+literal, and an accessor cannot be one, so the type would refuse legitimate reactive call sites.
+
+**The drop area reverses the earlier scoping.** It was left out because a drop target seemed to belong to
+whatever surface accepts the drop, and because it adds a second way in. The second way in is now the point, and
+the surface is the control's own box: `FileInputUtils.trackDrop` listens on the wrapper's root, takes only
+drags carrying files, counts `dragenter` against `dragleave` so crossing the painter's children does not
+flicker, and publishes `isDragOver` in the render props so the painter draws the target. A disabled control
+still cancels the drag, so the browser neither opens the file nor lets the native input take it, and it shows a
+refused cursor and never reports `isDragOver`.
+
+**The picker press is the single-pointer route, and the consumer may not hide it.** A drop is a drag, so WCAG
+2.5.7 needs a single press that reaches the same result, and the press on the control already is one. The doc
+block on `isDragOver` says a consumer may not cover the control or paint it as a place to drop alone.
+
+**`syncElement` now writes any value, not only the empty one.** A `FileList` can be built through
+`new DataTransfer()` and assigned to `element.files`, which is what the e2e helper `pickFiles` already does
+(Chrome 59, Firefox 62, Safari 14.1, per MDN's compatibility data). It had to be, once refusal existed: a partly
+refused pick would otherwise leave the refused files in the element, where a native submit sends them, and a
+dropped file would never reach the element at all. The empty case is still `element.value = ""`, and it is still
+what lets the same file be picked again after an owner writes `[]` back, since re-picking the same file fires no
+`change` event.
 
 ### Controls: `Stepper`, where the state vocabulary is the consumer's
 
@@ -4782,6 +5163,31 @@ now derives the trail from the pressed crumb's index, and the panel's `Reset` is
 
 **Not built:** collapsing a long trail behind an overflow menu. It needs a decision about where the hidden
 crumbs go, and nothing has asked.
+
+### Controls: `CheckboxGroup`, and `Checkbox`'s `value` opt-in
+
+`CheckboxGroup` is `RadioGroup`'s context shape with the walk taken out, on the user's call. It holds one list,
+`valueSignal: SignalSource<T[]>`, optional with a list of its own starting empty, and renders `role="group"` named
+by a required `ariaLabel`. There is no roving tab stop: each member is a separate choice rather than one spelling
+of a single value, so each is its own tab stop and Space toggles it, which is the one thing that separates this
+group from the radio one.
+
+**A `Checkbox` opts in by being given a `value`.** `value` is generic, so it is declared beside the
+`AccessorProps` block. Inside a group, a box with a value is ticked when the list holds it, and pressing it adds
+or removes it. Outside a group, or without a value, the box answers to `checkedSignal` as before. `checkedSignal`
+became optional with a private fallback, so a group member does not need a dummy signal; `BinarySwitchPresetProps`
+was not changed, so `Toggle` keeps its required signal.
+
+**The select-all box is the consumer's, and the group hands it a controller through `onMount`.**
+`CheckboxGroupController` carries `getCheckedState()`, folded with `CheckedStateUtils.fromMembers`, and
+`setIsEveryChecked(isChecked)`, which answers whether anything changed. A render slot was rejected by _"A component
+hands out a controller and renders no controls of its own"_: the parent box is a control, and a slot would fix
+where it sits. The consumer passes `[() => state === true, setIsEveryChecked]` as the parent's `checkedSignal` and
+`state === "mixed"` as its `isMixed`.
+
+**Disabled members are left out of the count while any member is enabled, and select-all leaves them as they
+are.** Counting a disabled unticked member would leave the parent mixed forever, because pressing it could never
+tick that member.
 
 ### `RadioGroup` takes a floater, and both floater observers are guarded
 
@@ -5615,6 +6021,27 @@ entry transition starts and when the exit transition starts, not when either fin
 and departures are already visible to them; what an effect over their own array cannot see is the transition
 boundary, which is the whole of what these two add.
 
+### `Toasts`: swipe to dismiss follows the stack's edge, and the painter draws the slide
+
+**The direction comes from the alignment, the way Drawer's comes from its edge.** `ToastUtils.computeSwipeDirection`
+sends a toast off the side it sits against: a stack against the left or right edge, corners included, swipes
+sideways, which also leaves the page's vertical scroll to the browser; a stack centered along the top or bottom
+swipes up or down; `middle-center` has no edge to leave by and cannot be swiped, as a centered `Modal` cannot.
+
+**A committed swipe removes the toast from `toastsSignal`**, the same path the timer takes and the same thing a
+consumer's close control does, so the toast leaves through its ordinary exit. The toast's countdown is held while
+the swipe is under way, per toast, beside the stack-wide hold on hover and focus.
+
+**Unlike Drawer, the library does not move the toast.** `Modal` writes its swipe transform onto its own container
+because that container is the library's element. A toast's box belongs to the painter, which already draws the
+pile offset and the entry and exit. So `ToastState` hands over `swipeDirection`, `swipeOffsetRatio` and `isSwiping`,
+and the painter composes the shift with whatever else it draws. The offset is left where it was on commit, so the
+exit plays from where the finger let go.
+
+**WCAG 2.5.7 is met by the consumer's close control.** A swipe is a drag, and the single-pointer alternative is a
+pressable control. The library renders none inside a toast, so `isDismissableOnSwipe`'s doc block says a swipeable
+toast must paint one, the same shape as _"A component hands out a controller and renders no controls of its own"_.
+
 ### `Toasts`: what the painter gets, and why position is not fully delegated
 
 **`renderToast(getToast, getVisibilityTarget, getTransitionDurationMs, getState)` opens with `Modal`'s
@@ -5715,6 +6142,15 @@ consumer, and the first inside the library.
 
 **`AccordionFlags` is gone rather than aliased to `CollapsibleFlags`**, following the `TextField` extraction:
 old names went with it and the Playground's painter was renamed. One shape, one name.
+
+### `Accordion`, `Collapsible`, `Preview`, `Tree`: two-way state is optional
+
+**`expandedSignal` on all four, and `valueSignal` on `Tree`, follow the carousels' index and the popups'
+visibility**: `SignalMirrorUtils.createOptional` returns the consumer's signal when one is passed and the
+component's own when not. Nothing in these four needed the consumer to hold the state, and they were the only
+two-way props left required; a navigation tree nobody selects from still had to supply a selection signal. Left
+alone, the tree still marks the activated node selected, still makes it the single tab stop and still calls
+`onSelectionChange`. The internal signals start closed, collapsed and with nothing selected.
 
 ### Controls: `Accordion`, and where auto-height measurement lives
 
@@ -6137,6 +6573,65 @@ the same `Intl` path the day labels use. Politely, because paging is something t
 than news. The previous month arrives as the effect's own argument, so the first run has nothing to compare
 against and a calendar never talks about itself as it mounts.
 
+### `Navigator` is told the direction, and one observer tells everyone
+
+**A horizontal walk flips under right-to-left**, so `NavigatorUtils.computeNextPosition` takes `direction` beside
+`orientation`: under `"rtl"` ArrowLeft steps forward and ArrowRight steps back, and the vertical arrows, Home and
+End do not change. A control that handles its own horizontal keys reads them through
+`NavigatorUtils.computeLogicalKey` and keeps its left-to-right logic as written: `Menu`'s submenu keys,
+`SplitPane`'s grow and shrink keys, `Tree`'s expand and collapse keys. `Drawer`'s edges stay physical, on the
+user's call.
+
+**The direction comes from `NavigatorUtils.createDirectionSignal(getRef)`**, which reads
+`getComputedStyle(ref).direction` once the owner has mounted and again whenever any `dir` attribute in the
+document changes. It reads after mount rather than when the ref arrives, because Solid hands a ref over before the
+element is in the document, and a detached element has no computed direction. Every reader on the page shares one
+`MutationObserver` on `document.documentElement` (`attributeFilter: ["dir"]`, `subtree: true`), counted up and
+down like `Menu`'s pointer reader. A stylesheet that flips `direction` with no `dir` attribute changing is picked
+up at the next such change, not at once; that is the accepted cost of watching an attribute rather than polling
+style.
+
+**Which element, and which layouts.** A component whose popup is portalled reads the element that stays in place:
+`Menu` its anchor or trigger, `ContextMenu` its region, because the popup has left the right-to-left box and would
+always answer left-to-right. Only a layout in the flow of text is told the direction: `Tabs` and `Toolbar` pass it
+when there is no `computeLayout`, and `Menu` flips its submenu keys only when it is not laid out, since a placed
+layout positions its items with physical `left` and `top` and its arrows stay physical too.
+
+**The grid walk flips like the list walk.** `computeNextCell` takes `direction` beside `pageRows`: under `"rtl"`
+ArrowRight moves to the previous column and ArrowLeft to the next, still carrying between rows, so in a `Calendar`
+or `RangeCalendar` ArrowRight is yesterday, which is where yesterday is drawn in a week that runs from the right.
+Rows, the page keys, Home and End do not change. `RadioGroup`, `Sortable`, `Clock` and `Table` pass the direction to
+their walkers, and a control that can be placed by a layout (`RadioGroup`, `Sortable`) passes it only when there is
+none, as `Tabs` does. `Sortable`'s keyboard carry reads its arrows through `computeLogicalKey` before deciding
+forward or back, so choosing a place follows the walk; `Table`'s Ctrl-arrow resize and Shift-arrow column move and
+`TagInput`'s hop between its field and its tags read the logical key too.
+
+**A pointer in a right-to-left row measures from the right edge.** `SplitPane`'s drag and click-to-step, `Table`'s
+resize drag and click-to-step, and `Range`'s choice of which thumb a press brings forward all count from the start
+edge, which under `"rtl"` is the right one, so a drag moves the boundary with the finger.
+`CarrierUtils.computeDropIndex` takes an optional `direction` for the same reason: without it a drop into a
+right-to-left `Sortable` row or `Table` header landed at the start almost every time. `Sortable`'s insertion marker
+sits between the left edge of the item before and the right edge of the item after, and `Table`'s drop markers and
+resize handle sit on logical edges (`insetInlineStart`, `insetInlineEnd`), so they move with the columns.
+
+**The default submenu side follows the direction; a side the consumer gave does not.** `MENU_DEFAULTS.submenuPlacement`
+holds one placement per direction, `right-out` under `ltr` and `left-out` under `rtl`, and `Menu` and `ContextMenu`
+read it with the direction they already hold for their keys, so a submenu opens on the side the opening arrow points
+to. It is still one entry keyed by the prop's name, as the defaults rule asks; only its value is keyed a second time,
+and a consumer reading the constant gets the pair. A consumer's `submenuPlacement` is used as given in either
+direction, because a consumer who named a side meant that side.
+
+**What stays physical.** Anything placed at fixed coordinates: `SortableGrid`, `TileBoard`, `PatchBoard`, `Bracket`
+and `Timeline` position their items with `left`, so the first column is on the left whatever the text direction, and
+their arrows keep pointing where the items are. `CardStack`'s arrows throw a card toward a screen side and report
+that side to `onSend`, and `Drawer`'s edges stay physical on the user's call.
+
+**`Tree` alone asks the walker not to wrap.** The tree pattern, React Aria and Ark stop at the ends: ArrowDown on
+the last visible node and ArrowUp on the first do nothing. `computeNextPosition` takes `isLooping: false`, named
+after the carousels' prop since it is the same idea, and at an end returns the position it was given rather than
+`undefined`, so the tree still claims the key and the page does not scroll. Home and End still reach the ends. The
+user's call, made with the Playground's own left navigation in mind, where wrapping had been handy.
+
 ### `NavigatorUtils.computeNextCell`: the two-axis walk never wraps and never clamps
 
 Settled, beside the 1D walk rather than replacing it, and deliberately different at the edges.
@@ -6150,6 +6645,32 @@ first or last day. `x` is always in range, because carrying is what puts it ther
 **Page keys mean a page of rows, and a caller for whom they mean something else turns them off.** A month is
 not six weeks, so `Calendar` passes `hasPageKeys: false` and does month arithmetic itself. `hasEdgeKeys`
 works as before, and `Home` / `End` are the ends of the **row**, not of the grid.
+
+### Controls: `Calendar`'s `precision`
+
+`precision?: "day" | "month" | "year"`, default `day` in `CALENDAR_DEFAULTS`, on `Calendar` and `CalendarComposite`
+and passed through by `DatePicker`, on the user's call. `RangeCalendar` does not take it: a range of months needs
+its end on the last day of the month, which is a separate question. `DateTimePicker` omits it, since a moment has
+a day.
+
+**One page model at every precision.** A page is what the grid shows (a month of days, a year of months, twelve
+years), and a cell is named by its first day. `CalendarUtils` holds the arithmetic: page start, cells, grid shape,
+cell start and end, same-cell, bounds, page step and long step.
+
+**What keeps its kind.** `monthSignal` still says which page is shown. The two-axis walk is
+`NavigatorUtils.computeNextCell` over the page's shape, and a step off either end carries into the neighbouring
+page, as the day grid already did through its outside-month days; only Home and End on a short last row clamp to
+the last cell. `minValue`/`maxValue` leave a cell pickable while any of its days is inside, and a pick is clamped
+into them. `computeIsDayDisabled` receives the cell's first day. The paging announcement fires when the page start
+changes, and names a year page through `Intl`'s own range formatting, with the same add-the-era rule for a past
+era.
+
+**The year page runs in twelves from year 1 of the era**, so 2017 to 2028 is one page, which keeps pages aligned
+within eras. **Shift with the page keys is a year under `day` and twelve pages above it**; under `day` it stays
+`addYears` rather than twelve months, because a Hebrew leap year has thirteen months.
+
+**Zooming through the header is not built.** The header is the consumer's, and `CalendarUtils.stepPage` is what it
+pages with; a header that steps from days to months to years is a later question.
 
 ### Controls: `RangeCalendar`, `DateRangePicker`, and the half-entered state
 
@@ -6165,7 +6686,7 @@ who knows one knows both. `DateRangePicker` sits beside `DatePicker` the same wa
 `<label for>` reaches whichever the browser finds first, and one `name` submits two fields under one key —
 a form receives `date=2026-01-01&date=2026-01-08` and cannot tell which end is which. The suffix is not
 documented on the `id` prop itself because both types inherit it from `DateInputProps`, and redeclaring a
-prop only to document it is the drift that got the `locale` redeclarations deleted.
+prop only to document it is the drift that got the `locale` redeclarations deleted. `Range` does the same for its two thumbs, submitting `-start` and `-end`; a one-thumb range keeps the bare name.
 
 **`DateRangePicker`'s Escape returns focus to the end field, which is where the trigger lives.** The calendar
 is opened from the trailing slot of the second field, so focus has to go back to that field rather than to
@@ -6818,6 +7339,20 @@ _between_ two segments. What it keeps is everything about the field being one in
 `renderTrailing` untouched, the measured adornment inset still applying, `computeTextStyle` still styling the
 value. Verified on the masked `DatePicker`.
 
+### Date and time bounds are `minValue` and `maxValue`
+
+**Every date and time control takes `minValue`/`maxValue`**: Calendar, RangeCalendar, Clock, DateInput, DatePicker,
+DateRangePicker, TimeInput, TimePicker, DateTimePicker. The three earlier spellings (`min`/`max`, `minDate`/`maxDate`,
+`minTime`/`maxTime`) came from each control working around the numeric `min`/`max` it removes from `TextField`. One
+name across all of them is what React Aria uses, and it leaves `TextField`'s numeric pair alone.
+
+**DateTimePicker takes one pair, typed as its combined value.** A `DateTimeValue` bound is a moment, not a day plus
+a separate time. So the calendar stops at the bound's day, and the clock stops at the bound's time only while that
+day is the one picked; on every other day the clock is offered the whole day, because an accessorized bound cannot
+answer `undefined`. A time rule that should apply every day, such as opening hours, is `computeIsTimeDisabled`'s
+job. Known edge: a time picked before any day can end up outside the bound once the bound's own day is then
+picked, because the clock only learns its limit from the day.
+
 ### Controls: `DateInput`'s format states the order, and the mask follows from it
 
 Settled, with the mask. `getFormat` takes `"iso"`, `"day-month-year"` or `"month-day-year"`,
@@ -6910,6 +7445,14 @@ reads it inside a tracking scope, so a format change re-renders it anyway.
 The prop behind it is `getPlaceholderHint` on `TextField`, `Omit`ted by `DateInput` and `TimeInput` for the
 reason they omit `getMask` — they own the format. A hand-built `TextField` or `TextInput` sets neither and its
 painter is handed `undefined`.
+
+### `Menu`: `staysOpenOnPick` is the item's to say
+
+**Whether a pick closes the menu is the item's decision.** The kind-based default stands: a checkbox stays open, a
+radio or a command closes. `staysOpenOnPick` overrides it, for a command pressed repeatedly such as zoom in.
+`MenuUtils.getStaysOpenOnPick` is the one place the rule lives, so `Menu` and `ContextMenu` cannot drift apart. It
+reaches the wheel and fan menus through the shared item type, where the default is the right one, because the pick
+animation there is the menu leaving.
 
 ### `ContextMenu`: the same menu, opened by a right-click at a point
 
@@ -7188,6 +7731,31 @@ call, not something to re-bless while closing a range violation. So the extremes
 share them, and the tests pin the range across every deterministic entry on the grids that overshoot rather
 than pinning the old out-of-range numbers.
 
+### Controls: `Form` moves focus to the first field in error on submit
+
+**After the handler returns, focus goes to the first registered field whose `hasError` is true.** Registration
+order is the order the fields were first drawn. The handler always runs, because the library does not decide that
+a form may not be sent. Focusing after the handler rather than before means an error the handler reports
+synchronously also counts, and a field whose error depends on `hasSubmitted` counts too, because that flag is set
+before either step. Validation that arrives later, after a request comes back, moves nothing: its timing belongs to
+the consumer.
+
+**`FormField` knows its message but not its control, so the control hands its element up through the field's
+context.** `registerControl` and `unregisterControl` sit on `FormFieldContextType` beside `getDescriptionId`, and a
+control calls `FormFieldUtils.registerControl(getElement)` beside its `resolveAriaDescribedBy` call. The two travel
+together because the element that carries the field's description is the element that should take focus for it.
+The field holds the latest element registered and lets go only of the one it holds, so a control that swaps its
+element (`Select` between its button and its filter input) ends up registered either way. The field passes the
+element on to `Form` as its entry's `getFocusTarget`, and `FormSection` answers with its own first failing field's.
+
+**The first entry in error decides, and focus does not skip past it.** If it has nothing to focus, focus stays where
+it was, because jumping to a later field would take the reader past the first thing that needs fixing. Every control that reads the field's
+description registers its element beside that read, so `TextField`, `BinarySwitch`, `TagInput`, `FileInput`,
+`ColorInput`, `SlideButton`, `Range` and `Select` all take focus this way. A `FormSection` in error only on its own
+word, with no field inside it failing ("these two do not match"), sends focus to its first field, on the user's call: the
+reader lands inside the thing that is wrong and can read the section's message from there, and for a mismatch which
+of the two fields is retyped is arbitrary anyway.
+
 ### The form story: the library wires, the consumer validates
 
 Settled, on the user's call. It closes the largest open item, and the decision is the whole of
@@ -7240,6 +7808,16 @@ rather than a conflict.
 `Radio`; `Select`, `ColorInput`, `FileInput` and `Range` each make the same one-line call. `SlideButton` is the
 one control that is not a field and reads it anyway — see the entry under its own heading. The plain `Button`,
 `Menu` and the navigational controls do not, and nothing has asked.
+
+**`aria-required` is in, because it is announcement.** Rejecting the native `required` attribute (a browser
+bubble, which is paint) and rejecting validation (rules, which are the consumer's) left the ARIA state
+unconsidered, and every mainstream library writes it. It paints nothing and enforces nothing; it tells the
+reader that a value is expected, which is exactly the half the library owns. So `isRequired` sits on
+`TextField` (and every preset over it), `BinarySwitch` for `Checkbox` and `Toggle`, `RadioGroup` (a `Radio`
+omits it, since the group is the field), `Range`, and the `Select` family, each writing `aria-required` on the
+element that carries the role. `FormField` takes it too and hands it out in `FormFieldState` beside `hasError`,
+so the caption and the control read one value. Nothing checks it: a required field left empty submits like any
+other, and the consumer's own validation says otherwise.
 
 ### `FormSection`: the collecting stops at the nearest one
 
@@ -7862,6 +8440,74 @@ field is also the way to put the demo back where it started.
 `pointer-events: none` and the control inside re-enables it — `Tabs` composes the same style for the same
 reason. A control that forgets it renders correctly, measures correctly, and cannot be clicked.
 
+### Controls: `Toolbar`'s `pressedValuesSignal`, and why a toggle group is a toolbar
+
+**A toolbar holds actions that do something; with `pressedValuesSignal` its actions hold states that stay
+pressed.** The reference libraries ship this as a separate toggle group (Radix, Kobalte, Ark, MUI's
+ToggleButtonGroup, Mantine's Chip.Group): several independent pressed buttons behind one tab stop. Every part of
+that already existed here. `Button` carries `isPressed` through the shared wrapper, `Navigator` walks the row, and
+`Toolbar` owns the single tab stop and the overflow. So a toggle group is one optional two-way list on `Toolbar`
+rather than a second component, on the user's call. Single choice is still `RadioGroup`'s Segmented variant; this
+is the multiple-choice case that was missing.
+
+**Present, every action is a toggle button; absent, nothing changes.** An action whose value is in the list
+writes `aria-pressed="true"`. Every other action writes `"false"` rather than leaving the attribute off, because a
+toolbar that mixed toggle buttons with plain buttons would announce the plain ones as something they are not.
+Pressing an action adds its value to the list or takes it out, and `onActivate` still runs, so a consumer who only
+wants to hear about presses keeps the callback it already had. The painter sees `isPressed` in its flags through
+`InteractionWrapper`, as `Button`'s does.
+
+**A collapsed action becomes a checkbox item in the overflow menu, checked from the same list.** The overflow
+`Menu` is handed `pressedValuesSignal` as its `checkedSignal`, so an action pressed in the row is checked in the
+menu and the other way round, and the state survives the collapse. The row and the menu toggle through one rule,
+`MenuUtils.computeNextChecked`, rather than two copies of it.
+
+### Controls: `Menubar`, a preset over `Toolbar`, and the open-follows-focus rule
+
+**`Menubar` is `Toolbar` with its role fixed to `menubar`, in the `SelectComposite` arrangement.**
+`ToolbarComposite` takes `role: "toolbar" | "menubar"`. `Toolbar` and `Menubar` each fix it and omit it, the way
+`Checkbox` omits `type`, which is the shape the user chose so that layout, Formation's animation, the measured
+collapse, the walk and right-to-left are written once. Under `toolbar` the children are buttons. Under `menubar`
+each child is a `Menu` whose trigger is a `menuitem`, and `Menu` already writes `aria-haspopup="menu"` and
+`aria-expanded` on it. The overflow trigger becomes a `menuitem` too, because every child of a menubar has to be
+one. The base sits in `Essentials/Toolbar` rather than `Primitives/`, beside `SelectComposite`'s precedent.
+
+**`role` is a plain literal rather than an accessor, and the props type is a union keyed on it.** The role
+decides the type of `actions` (a word carries the `items` of its menu) and of `renderAction` (a word's painter is
+told `isOpen`). A setting that can change at runtime cannot decide a type. So the composite's props are the
+shared half together with one of two role halves, and each preset is the shared half plus its own half with
+`role` omitted.
+
+**A collapsed word becomes a submenu of the overflow menu, which `Menu` already supported.** The overflow item
+carries the word's `items`. One `renderItem`, one `renderPopup` and one `checkedSignal` serve every menu the bar
+opens, the overflow menu included, so a View checkbox keeps its state whether View is in the row or in the
+overflow.
+
+**The one rule `Menubar` adds: while a menu is open, the arrow that moves to the next or previous word closes
+that menu and opens the next one.** Which menu is open is one value in the composite, the stop that is open, and
+each `Menu` reads and writes it through its own `visibilitySignal`. That makes one-open-at-a-time a property of
+the state rather than something each menu has to arrange, with one side effect: a menu whose word drops out of
+the row while it is open closes. The switch happens in a fixed order: the old menu closes, which returns focus to
+its own word; focus moves to the next word; only then does the next menu open, so its popup records the new word
+as where focus came from and Escape leaves focus there. The switch is taken only for left and right arrows that
+the open menu did not use itself: a key that opens or closes a submenu arrives already claimed and is left alone,
+as are Home, End and the vertical arrows, which belong to the menu. Moving the pointer from one open menu to
+another word does not switch menus; desktop menubars do that, and it was not asked for.
+
+**A key pressed inside a popup reaches the bar's handler, and the handler has to know that.** Solid passes
+delegated events through a portal back to where the portal was declared, so a key pressed inside any menu's popup
+reaches the toolbar root after the menu has handled it. The handler ignores keys that are already claimed, and
+keys from outside its own row, apart from the menubar's two arrows while a menu is open. Before this, ArrowRight,
+Home and End inside the plain toolbar's overflow menu also moved focus out to the row, a defect fixed on sight.
+
+**A menubar's triggers are `menuitem`s through `Menu`'s `triggerRole`.** `Menu`'s `role` prop comes from
+`InteractionWrapper` and lands on the wrapper div, not on the button that takes focus. So the role a trigger
+announces is its own prop, `triggerRole: "button" | "menuitem"`, defaulting to `button` and written on the trigger
+button itself, beside the `aria-haspopup="menu"`, `aria-expanded` and `aria-controls` that `Menu` already writes.
+`ToolbarComposite` passes `menuitem` for every word and, under the `menubar` role only, for the overflow trigger,
+because every child of a menubar has to be one. `FanMenu` and `WheelMenu` take the prop from `MenuProps` and
+default to `button`; `ContextMenu` has no trigger button, so it does not apply.
+
 ### Controls: `Tree`, and the group box that could not be a child
 
 `Tree` is `role="tree"` with expand and collapse, one selected value, and a keyboard
@@ -8069,6 +8715,38 @@ follows the radius of the element it is drawn on, which is the `treeitem` rather
 `TileBoard` had already met this and answered it the same way — a `globalStyle` selecting the role that
 `:has()` the painter. Nothing about it is the library's: the control owns focus and the page owns paint, so a
 page that paints a circle owns making the ring round.
+
+### Controls: `Button`, and a press that waits for its answer
+
+**`onClick` is the one callback in the library that may answer with a promise, and `Button` waits for it.** Every
+other callback typed `void | Promise<void>` was narrowed to `void`, because nothing awaited them and the type
+promised handling the component did not do. The button is the exception because it is the one control whose
+second press, while the first is still running, is a real fault: a form submitted twice, a payment sent twice. So
+when `onClick` returns a promise, the button holds `isPending` until it settles, hands that state to the painter
+through `ButtonFlags` the way `isPressed` and `isDisabled` arrive, writes `aria-busy="true"`, and refuses further
+presses.
+
+**It does not go `aria-disabled` while pending.** Disabled means "this cannot be used"; pending means "this is
+doing what you asked". A pending button keeps its focus and its tab stop, so a keyboard user is not thrown out of
+the place they pressed, and a reader hears "busy" rather than "unavailable". A rejection is not caught: the
+pending state clears and the error reaches the page as it would without the button in between.
+
+**The cost is a type that is not plain `void`.** A command that answers `boolean`, such as a stepper's
+`stepToNext`, cannot be passed straight to `onClick`, because TypeScript only discards a return value when the
+target type is exactly `void`. The call site wraps it in `void (...)`.
+
+### Controls: `Button` refuses activation while pending, without going disabled
+
+**A pending button stays silent the way a disabled one does, and still writes no `aria-disabled`.** `onClick`, the
+pointer callbacks and the wrapper's `onActivation` are all refused; `onActivation` is wrapped inside `Button` rather
+than gated in `InteractionWrapper`, because being pending is `Button`'s own state and the wrapper knows nothing of
+it. Pointer enter and leave stay live, because hovering is not pressing. The wrapper still reports `isActive` and
+`isHovered`, so a painter that ignores `isPending` can still draw a press; reading the flag is the painter's job.
+
+**A refused click calls `preventDefault`.** Returning early stopped `onClick` but not the browser's default action,
+so an `aria-disabled` `type="submit"` button still submitted its form, where a native `disabled` one never does,
+and a pending one would have submitted twice. Cancelling the click also cancels the implicit submission that Enter
+in a text field dispatches through the form's submit button.
 
 ### Controls: `SlideButton`, and why the gesture is the only thing it owns
 
@@ -9967,6 +10645,61 @@ when there is no order to apply, which is the property the old function had and 
 is an `Index2d` from `ss-utils` rather than an `x` / `y` pair, and `NavigatorUtils.computeNextCell` is adapted
 at the one call site rather than changed, since other controls read it.
 
+### `Carrier` speaks in the consumer's words, and the zone carries them
+
+The convention _"The library says what a component is, and nothing else a reader hears"_ landed on the drag
+engine hardest, because it is the component that talks most: pick-up, every nudge, every zone change, the drop
+and each way a drop can fail were eight English templates inside `Carrier.utils.ts`, and the four zones added
+their own key hints and place labels.
+
+**The words ride on the zone.** `CarrierZone` gained `getAnnouncements: () => CarrierAnnouncements`, eight
+`compute*` functions taking the parts the engine knows (the item's label, the zones' labels, the place label,
+the key hint). The engine reads the source zone's words for pick-up, cancel and left-in-place, and the target
+zone's for aimed, entered, refused and dropped, because that is the zone whose consumer knows what a "place"
+there is called. A module-level `announcements` would have been simpler, and wrong: two lists on one page can
+belong to two consumers with two vocabularies.
+
+**Each drag component takes one required `announcements` prop, typed for itself.** `SortableAnnouncements`,
+`TableAnnouncements`, `SortableGridAnnouncements` and `PatchBoardAnnouncements` each extend the shared type with
+the strings only that component has — a resting hint, a place label built from an index and a count, a column
+move, a socket's name. Indexes handed to these count from zero, like every other label prop. Capitalizing the
+first word is the consumer's, so `startSentence` went; a sentence's shape is not the library's to know.
+
+**A resting hint nobody heard was deleted rather than made a prop.** `Table`, `SortableGrid` and `PatchBoard`
+each defined `getRestingKeyHint`, and nothing displayed it — only `Sortable` puts its hint on the resting item.
+So the member left `CarrierZone`, and whether those three should advertise their keys before a press is a
+separate question, unasked.
+
+**The same pass made the label props required everywhere a default had been English.** `Carousel`'s
+`computeSlideLabel`, `computeStepLabel` and `computeRotationLabel`, `Wheel`'s `computeWedgeLabel`, `Paginator`'s
+`ariaLabel`, `computePageLabel` and `computeStepLabel`, `Cuboid`'s and `FlipCard`'s `computeFaceLabel`,
+`CardStack`'s `computeCardLabel`; each `STEP_LABELS`- and `FACE_LABELS`-style constant went with it. The role
+descriptions those components spoke ("carousel", "slide", "wheel", "wedge", "sortable item", "box", "face", "flip
+card", "card stack", "card") stayed as defaults in each `.const.ts` behind `roleDescription` and an inner
+`*RoleDescription` prop, the one exception the convention allows. The Playground keeps the text in
+`PageComponents/Announcements/Announcements.const.ts`, word for word what the library used to say, so the specs
+that listen for it still hear it.
+
+**The pickers and color controls followed, and two format hints turned out to be text too.** `DatePicker`,
+`DateRangePicker`, `TimePicker`, `DateTimePicker`, `ColorInput` and `ColorArea` had labels with English defaults
+("Open the calendar", "Choose a color", "Saturation"); the defaults went and the props are required, which
+emptied `DateTimePicker.const.ts` and so deleted it. `DateInput` and `TimeInput` were building their placeholder
+hints from "yyyy", "mm", "dd" and "hh", "mm", "ss", which a page displays and a consumer could not change, so
+each takes them per part now (`partHints`, `segmentHints`) and still owns the order and the separators, which are
+the format's and not the language's. `ColorInput` gained `areaAxisLabels` for the `ColorArea` it draws itself.
+The library's remaining English is developer-facing: a console warning, an error message.
+
+**`Table`'s words are required exactly when its columns can move.** A table without an `orderSignal` never speaks
+any of them, so `TableOrderProps` is a union: `orderSignal` and `announcements` together, or neither. It is the
+same shape as `Modal`'s two names, chosen by the user over a prop that every read-only table would carry unused.
+
+**The three zones that had no resting hint now have one, in `Sortable`'s shape.** A hidden element inside the
+component carries the sentence, and every element that Enter picks up points at it with `aria-describedby`: a
+reorderable `Table` header, a `SortableGrid` item, and both a `PatchBoard` node and socket, which pick up
+different things and so say different sentences (`nodeRestingKeyHint`, `socketRestingKeyHint`). The user's call,
+for the reason the `Sortable` entry gives: a focusable thing with an Enter handler and no advertisement of it is
+a discovery gap on 4.1.2. `Table`'s hint lives inside the `orderSignal` union with the rest of its words.
+
 ### `Abstracts/Selection`: the anchor is the abstract's, and the selection is the consumer's
 
 **Three components had written the same toggle before this existed** — `Table`'s `getToggledSelection`,
@@ -10009,6 +10742,15 @@ multi-select `Tree` with nothing left to argue about.
 **`TableSelectionMode` is now an alias of `SelectionMode`.** The three modes were `Table`'s own string union
 and are the abstract's vocabulary now, but the name is published, so it stays as an alias rather than being
 renamed out from under a consumer — the same move `SortableDir` made over `CarryDir`.
+
+### The stepper handles report whether they moved
+
+**`ScrollerStepper` and `NumberInputStepper` return `boolean` from every command**, although they are handed out
+through a render slot rather than at mount. _"Every controller callback reports whether it succeeded"_ is about the
+caller being able to find out that nothing happened, and a render slot's caller has the same need.
+`stepToPrevious`/`stepToNext` answer `false` at the matching end; `stepUp`/`stepDown` answer `false` when the field
+refuses writes or the value did not move; `startStepping*` answers `false` and does not start repeating when its
+first step is refused; `stopStepping` answers `false` when nothing was repeating.
 
 ### Controls: `Scroller`, and why it renders no button of its own
 
@@ -10174,6 +10916,24 @@ and was refused for the reason `DrumWheel` can require `wedgeSize` and this cann
 direction and meaningless in the other is a shape the type cannot state, which is the same objection that
 keeps a drum carousel out of `Carousel`'s own props.
 
+### `Carousel`: stopping at the ends is one rule, and rotation stops by writing the signal
+
+**`isLooping`, on by default, decides every way the index moves.** A step, a swipe, a pick and the next turn of
+automatic rotation all go through `CarouselUtils.resolveIndex`, which answers "nowhere" for an index past either
+end of a carousel that does not loop. So no path can wrap where another would stop. A step control at an end is
+disabled through the same `isDisabled` the shared wrapper already carries, so it goes `aria-disabled` and refuses
+like any other disabled control; its `targetIndex` reports the slide already showing. A swipe past an end is
+refused on release, and the track or drum springs back the way a short swipe does.
+
+**Rotation stopping on the last slide is written to `playbackSignal`, not held privately.** When looping is off and
+rotation is live, reaching the last slide writes `false`, so the rotation control offers "start" rather than a
+pause that pauses nothing. The same effect refuses a `true` written while the last slide shows, which is the
+invariant-against-the-state rule `Select` and `Menu` follow for a disabled popup. Pressing play on the last slide
+of a non-looping carousel is therefore undone at once; there is nowhere to rotate to.
+
+**The drum takes the flag only so both presets take the same props.** It is a closed ring whose last face sits
+beside its first, so looping is the right default there, and its doc block says so.
+
 ### `TrackCarousel` and `DrumCarousel`: one behavior, two ways of showing it
 
 A carousel and a drum wheel are the same picture driven by different arithmetic, which is what `Barrel` was
@@ -10320,6 +11080,21 @@ distance that depends on their size.
 exactly as the consumer painted it and the pointer only ever adds. Below `1` everything not being pointed at
 is dimmed, so a row stops being a row of lamps that light up and becomes one lamp moving along a dark row —
 the same components, a different idea, and no new prop to express it.
+
+**Lightness sits beside brightness as a second pair of amounts, with no switch choosing between them.** The
+user asked for a toggle between brightness, lightness or both, and chose this over a mode prop once the two
+were set side by side. Brightness scales every channel, so black stays black and bright colors clip; lightness
+fades toward white, so the dark parts lift most. They are on different scales — a multiplier untouched at `1`,
+a fraction untouched at `0` — so they cannot share one pair of numbers, and once each has its own pair, "off" is
+already expressible as leaving that pair untouched. A mode prop would have said the same thing a second time
+and allowed the two to contradict each other, such as a lightness-only mode with a `maxBrightness` that is
+silently ignored. The cost accepted is that lightness alone means also passing `maxBrightness={1}`.
+
+**Lightness is a filter chain, not an overlay.** CSS has no `lightness()` function, but
+`invert(1) brightness(1 − l) invert(1)` computes `c + l(1 − c)` on every channel, which is exactly a fade
+toward white by `l`. It keeps the effect on the one `filter` property the family is defined by, needs no extra
+element over the content, and the chain is left off entirely while lightness is at `0`, so a consumer who
+never touches it pays for no inverts.
 
 ### `ShadowCaster`: a wrapper, and a filter rather than a box shadow
 
@@ -11645,6 +12420,22 @@ is unit-tested against those strings, which is cheaper than reading them off a r
 frame and wants no transition at all, so the property is declared and the duration left unset, which is a
 transition of zero. A carousel steps its angle in one jump and asks for the duration it already publishes.
 Both behaviors live side by side rather than one winning.
+
+### `ElementObserver`: the current-index helper
+
+`createViewportCurrentIndexObserver(getRefs, getIsDisabled?, { getOffsetRatio? })` answers the index of the last
+element whose top has passed a line at `offsetRatio` of the viewport's height, or `undefined` while none has. It is
+what a table of contents that follows the scroll needs, and it is an abstract rather than a component, on the
+user's call: the `nav` of links and the `aria-current` mark are the consumer's markup. The rule itself is the pure
+`computeCurrentIndex(tops, line)`, so it is tested without a DOM. `offsetRatio` is a tuned value, so its default
+lives in `CURRENT_INDEX_OBSERVER_DEFAULTS` (0.2) and is the user's.
+
+It re-reads on capture-phase `scroll` anywhere in the document and on `resize`, with no frame loop, because
+nothing about the answer changes without one of those. It measures through
+`ViewportUtils.getAdjustedBoundingClientRect` against the viewport context's height, which is the space its name
+claims. A last section shorter than the stretch below the line can never become current; that is the consumer's
+layout, and the doc block says so. The Playground example sits on the Scroller page, because an abstract's menu
+entry carries no examples.
 
 ### `ElementObserver` reports a size, and the height observer is a view of it
 
@@ -13245,7 +14036,7 @@ and it should not be rebuilt because the tile under it re-rendered. That consume
 the board and needs one thing from the library: **where is tile 2,3 on screen.**
 
 `TileBoardUtils.getTileCenter(tile, layout)` answers it, and the `layout` a consumer needs is the same
-`getLayout(shape, count, tileSize, hasShortFirstRow)` they already build for `getNeighborTiles`. It carries
+`getLayout(shape, count, tileSize, hasShortFirstRow, taper)` they already build for `getNeighborTiles`. It carries
 the short row's half-tile shift and steps by the **pitch** rather than the tile, which is what makes it right
 for a flat-top hexagon at one and a half tiles across and a triangle at half a tile.
 
@@ -13282,6 +14073,64 @@ fine.
 **Both Playground examples put their pieces on that layer**, one piece or several, and the piece stands on
 the tile's middle rather than being centerd on it: `translate(-50%, -100%)` puts its base on the point
 `getTileCenter` returns, which is how a piece on a board is drawn. The board is unaware of any of it.
+
+#### `taper` leans the board away, and the browser draws it through one matrix
+
+Asked for by the user for the pieces: a meeple moved from a bottom row to a top row has to shrink, and the
+board doing that arithmetic beats every consumer re-deriving it. **`taper` is the top edge's width as a
+fraction of the bottom edge's**, the user's definition, defaulting to `1` for flat.
+
+**The whole board is transformed as one sheet, the user's choice over two others.** Drawing each row a little
+smaller than the one below breaks the tessellation — a narrower row of hexagons does not sit in the notches of
+a wider one, and the mismatch grows towards the edges. Working out each tile's tapered outline in script
+leaves the painted content a rectangle, which would then need a 3D transform per tile anyway. One transform on
+the root keeps every tile meeting its neighbors exactly, and hit testing goes through it for free: the browser
+inverts the matrix when it finds what a press landed on, so the clipped hit layers still decide, and
+`tileBoard.spec.ts` presses the drawn middle of a top-row tile and a short-row tile to show it.
+
+**It is a single `matrix3d`, not `perspective` plus `rotateX`, because the ratio already fixes the drawing.**
+A tilt angle and a viewing distance are two numbers, but the taper only fixes one combination of them, and
+the only thing the other changes is an extra uniform vertical squash of the whole board — the top row's height
+relative to the bottom row's is always `taper²`, whatever the angle. So the ratio decides everything except
+that squash, and the matrix is the version with none: the tallest drawing any lean produces, and one number in
+the API rather than two that must be kept in step. The bottom edge stays exactly where it was and at full
+size, every row is pulled towards the vertical middle line, and the board is drawn `taper` times its flat
+height with its top at the top of its box.
+
+**The root's box is the drawn size**, full width and `taper` times the height, so a tapered board reserves no
+empty band above itself — unlike backlog item 26, the drawing does not move, so the box can be exact. **The
+transform sits on `tileBoardPlane`, a sizeless layer between the root and the rows, not on the root.** On the
+root it bent the root's own box as well: the box the board reported to the page was that shorter box pushed
+through the lean, 400 by 80 for a board drawn 600 by 240, so anything anchoring to the board or scrolling it
+into view read the wrong rectangle. The plane is applied from its top left corner and the matrix is built for
+the flat board's height, which is what maps the flat rows into the shorter box.
+
+**Thin lines break up in the far rows, and no CSS switch changes it.** The browser paints the board flat at
+full size and then squeezes the picture — to half its width and a quarter of its height at the top, for a
+taper of `0.5` — so a 1px outline there covers a fraction of a pixel and is sampled in and out, which draws it
+dashed. `will-change: transform`, `backface-visibility: hidden` and `shape-rendering: geometricPrecision`
+leave the pixels identical, and `transform-style: preserve-3d` changes a few without improving anything. What
+does work, checked on an isolated page, is a line drawn thicker by as much as its row is squeezed. **The
+user's call is to leave it**: the board does not hand painters a squeeze factor, and a consumer who wants solid
+far rows draws thicker lines themselves — `getTileScale` is the horizontal squeeze and its square the vertical
+one, if they want to match it. A flat board
+gets no transform at all, so it is not pushed onto a compositor layer for an identity matrix.
+
+**Everything a consumer places beside the board is answered as drawn.** `getTileCenter` and `getBoardSize`
+include the taper; `getTileScale` is what a piece standing on a tile is multiplied by — `1` on the bottom
+edge, the taper on the top one, following perspective in between, which is exactly how much the tile under it
+is narrowed. `getDrawnPoint` and `getDrawnScale` answer the same for any point on the flat board, for a
+piece that stands somewhere other than a tile's middle. **`getTaperTransform` and `getDrawnPoint` are two
+writings of the same map**, one for the browser and one for script, so a unit test applies the matrix to
+points by hand and compares — the two cannot drift apart silently.
+
+**The taper is held between `0.01` and `1`.** At `0` the top edge collapses to a point and the bottom edge's
+perspective divisor reaches zero, so the far side would be drawn at infinity; above `1` the top would be wider
+than the box. Both are clamped in `getLayout`, so the component and a consumer's own layout agree.
+
+**The Playground's meeple scales its width, and `width` joins `left` and `top` in its transition**, so a piece
+changes size smoothly as it walks up or down the board rather than snapping at the end of the move. It keeps
+`translate(-50%, -100%)`, whose percentages follow its own size, so its foot stays on the point it is given.
 
 **The Playground's second example is the proof, and it is deliberately not a tile's content.** The piece is a
 sibling of the board, positioned from `getTileCenter`, `pointer-events: none` so the tile beneath it is still
@@ -13605,6 +14454,14 @@ outside is drawn anyway. So the viewBox is exactly the shape's own box and one u
 call and is useless here: it reports the geometry before the viewBox is applied, so it would have gone on
 passing throughout. `getBoundingClientRect` sees what was actually drawn. Only the lower bound is pinned,
 because a stroke sits half outside the shape and how thick it is belongs to the painter.
+
+### Playback is `playbackSignal` everywhere, and `Trail` lost its `play` and `pause`
+
+**The carousels' `playingSignal` and `Trail`'s `isPlayingSignal` are both `playbackSignal`**, matching
+CellAnimation, ScanlineAnimation, AudioSwitcher and ParticleSpawner. **`Trail`'s `play()` and `pause()` commands are
+gone**, because each only wrote the playback state, and _"Playback is a signal; a rewind is a command"_ puts that
+in the signal. `seek` stays as the rewind-shaped command, and the controller keeps `getIsPlaying` for reading. The
+Playground's Play and Pause buttons write the signal directly.
 
 ### `Trail`: a path, one traveler, and a frame loop chosen over the CSS the platform already has
 

@@ -1,17 +1,17 @@
-import type { AccessorProps, InteractionFlags, TabsDir } from "@thewaver/ss-components";
+import type { AccessorProps, InteractionFlags, TabsOrientation } from "@thewaver/ss-components";
 
 export type TabContentProps = AccessorProps<{
     flags: InteractionFlags;
-    dir: TabsDir;
+    orientation: TabsOrientation;
     isSelected: boolean;
 }>;
 
 export type TabDecorationProps = AccessorProps<{
-    dir: TabsDir;
+    orientation: TabsOrientation;
 }>;
 
 export type TabFloaterProps = AccessorProps<{
-    dir: TabsDir;
+    orientation: TabsOrientation;
     visibilityTarget: 0 | 1;
     transitionDurationMs: number;
 }>;

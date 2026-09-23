@@ -1,5 +1,6 @@
 import { Button, FlipCard } from "@thewaver/ss-components";
 
+import { computeFlipCardFaceLabel } from "../../../PageComponents/Announcements/Announcements.const";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import {
     PageFlipCardBack,
@@ -23,6 +24,7 @@ export const DefaultExample = (props: Props) => {
                 size={() => CARD_SIZE}
                 transitionDurationMs={props.transitionDurationMs}
                 ariaLabel={"Nine of hearts"}
+                computeFaceLabel={computeFlipCardFaceLabel}
                 renderFront={(getState) => <PageFlipCardFront state={getState}>9 ♥</PageFlipCardFront>}
                 renderBack={(getState) => <PageFlipCardBack state={getState}>♠ ♦ ♣</PageFlipCardBack>}
             />

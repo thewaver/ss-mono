@@ -11,7 +11,7 @@ import type {
 } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 
-export type StepperDir = "row" | "column";
+export type StepperOrientation = "horizontal" | "vertical";
 
 export type StepperFlags = {
     isCurrent: boolean;
@@ -21,6 +21,12 @@ export type Step<TValue, TState> = {
     value: TValue;
     state: TState;
     isNavigable?: boolean;
+    /**
+     * Keeps this step in the tab order while it cannot be navigated to, so focus can land on it and a reader hears
+     * its name and that it is unavailable. It still cannot be chosen. A step with a tooltip is kept reachable anyway,
+     * so its explanation can be read.
+     */
+    isReachableWhenDisabled?: boolean;
     id?: string;
 };
 
@@ -41,7 +47,7 @@ export type StepperItemProps<TValue, TState> = AccessorProps<Omit<InteractionCon
 
 export type StepperProps<TValue, TState> = AccessorProps<{
     /** Whether the steps run across the page or down it. */
-    dir?: StepperDir;
+    orientation?: StepperOrientation;
     /** The space between steps. */
     gap?: number;
     /** Names the stepper for assistive technology. */

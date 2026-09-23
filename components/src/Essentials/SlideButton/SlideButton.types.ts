@@ -15,11 +15,11 @@ export type SlideButtonRenderProps = {
 
 export type SlideButtonCbs = {
     /** Runs once the slide or the hold has been completed. */
-    onActivate?: () => void | Promise<void>;
+    onActivate?: () => void;
     /** Runs when the pointer arrives over the button. */
-    onMouseEnter?: (e: MouseEvent) => void | Promise<void>;
+    onMouseEnter?: (e: MouseEvent) => void;
     /** Runs when the pointer leaves the button. */
-    onMouseLeave?: (e: MouseEvent) => void | Promise<void>;
+    onMouseLeave?: (e: MouseEvent) => void;
 };
 
 export type SlideButtonMode = "slide" | "hold" | "both";

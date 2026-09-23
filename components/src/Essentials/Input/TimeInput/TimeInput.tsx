@@ -14,7 +14,6 @@ const SEPARATOR = ":";
 const SEPARATOR_LENGTH = SEPARATOR.length;
 const SEGMENT_STRIDE = SEGMENT_LENGTH + SEPARATOR_LENGTH;
 const SEGMENT_UNITS: TimeValueUnit[] = ["hour", "minute", "second"];
-const SEGMENT_HINTS: Record<TimeValueUnit, string> = { hour: "hh", minute: "mm", second: "ss" };
 const STEP_KEYS: Record<string, number> = { ArrowUp: 1, ArrowDown: -1 };
 const DEFAULT_MERIDIEM: TimeValueMeridiem = "am";
 
@@ -35,9 +34,9 @@ const getSegmentAt = (caret: number) => {
 const computeMask = (segmentCount: number) =>
     Array.from({ length: segmentCount }, () => TextSyncUtils.MASK_DIGIT.repeat(SEGMENT_LENGTH)).join(SEPARATOR);
 
-const computeHint = (segmentCount: number) =>
+const computeHint = (segmentCount: number, segmentHints: Record<TimeValueUnit, string>) =>
     SEGMENT_UNITS.slice(0, segmentCount)
-        .map((unit) => SEGMENT_HINTS[unit])
+        .map((unit) => segmentHints[unit])
         .join(SEPARATOR);
 
 const getHasImpossibleSegment = (digits: string, segmentCount: number, isTwelveHour: boolean) => {
@@ -81,7 +80,7 @@ export const TimeInput = (props: TimeInputProps) => {
 
         const parsed = parseText(TextSyncUtils.formatWithMask(untrack(getMask), digits));
 
-        return parsed && TimeUtils.getIsInRange(parsed, access(props.minTime), access(props.maxTime))
+        return parsed && TimeUtils.getIsInRange(parsed, access(props.minValue), access(props.maxValue))
             ? parsed
             : undefined;
     };
@@ -117,7 +116,7 @@ export const TimeInput = (props: TimeInputProps) => {
             if (!value) return;
 
             field.commit(
-                TimeUtils.clamp(TimeUtils.withMeridiem(value, next), access(props.minTime), access(props.maxTime)),
+                TimeUtils.clamp(TimeUtils.withMeridiem(value, next), access(props.minValue), access(props.maxValue)),
             );
         },
         toggle: () => {
@@ -137,8 +136,8 @@ export const TimeInput = (props: TimeInputProps) => {
         const segment = getSegmentAt(element.selectionStart ?? 0);
         const stepped = TimeUtils.clamp(
             TimeUtils.addUnit(value, segment.unit, delta),
-            access(props.minTime),
-            access(props.maxTime),
+            access(props.minValue),
+            access(props.maxValue),
         );
 
         e.preventDefault();
@@ -155,7 +154,7 @@ export const TimeInput = (props: TimeInputProps) => {
             element={"input"}
             inputMode={"numeric"}
             computeMaskedText={(previous, next, caret) => TextSyncUtils.applyMask(getMask(), previous, next, caret)}
-            placeholderHint={() => computeHint(getSegmentCount())}
+            placeholderHint={() => computeHint(getSegmentCount(), access(props.segmentHints))}
             hasError={() => (access(props.hasError) ?? false) || field.getHasIssue()}
             renderTrailing={props.renderTrailing && ((getFlags) => props.renderTrailing!(getFlags, meridiem))}
             onInput={field.onInput}

@@ -13,4 +13,9 @@ export type ImageSwitcherProps = AccessorProps<{
     transitionDurationMs?: number;
     /** Runs once the picture has loaded, which is when the crossfade can start rather than when it was asked for. */
     onLoad?: GlobalEventHandlers["onload"];
+    /**
+     * Runs when the picture fails to load. The switcher still moves on to it rather than holding the old one, so
+     * this is where to hand it a fallback `src`.
+     */
+    onError?: (e: Event) => void;
 }>;

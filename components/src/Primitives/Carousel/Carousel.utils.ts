@@ -11,15 +11,48 @@ export namespace CarouselUtils {
     export const wrapIndex = MathUtils.wrapIndex;
 
     /**
+     * Where an index lands, or nowhere when it runs off the end of a carousel that does not loop.
+     *
+     * The one rule for every way a carousel moves — a step, a swipe, a pick, the next turn of automatic
+     * rotation — so none of them can wrap where another would stop.
+     *
+     * @param index The index asked for, which may lie outside the range.
+     * @param count How many items there are.
+     * @param isLooping Whether running off one end comes round to the other.
+     * @returns The index brought into range, or `undefined` when it is outside the range and the carousel
+     * does not loop.
+     */
+    export const resolveIndex = (index: number, count: number, isLooping: boolean) => {
+        if (!isLooping && (index < 0 || index >= count)) return undefined;
+
+        return wrapIndex(index, count);
+    };
+
+    /**
      * Which item a step control moves to.
      *
      * @param step `"previous"` or `"next"`.
      * @param index The current item.
      * @param count How many items there are.
-     * @returns The new index, wrapped — so stepping past either end continues round.
+     * @param isLooping Whether stepping past either end continues round. Defaults to `true`.
+     * @returns The new index — wrapped when looping, and otherwise the current index where the step would
+     * run off the end, so a control there can tell it has nowhere to go.
      */
-    export const getStepTarget = (step: CarouselStep, index: number, count: number) =>
-        wrapIndex(index + (step === "previous" ? -1 : 1), count);
+    export const getStepTarget = (step: CarouselStep, index: number, count: number, isLooping = true) =>
+        resolveIndex(index + (step === "previous" ? -1 : 1), count, isLooping) ?? wrapIndex(index, count);
+
+    /**
+     * Whether a step control has nowhere to go.
+     *
+     * @param step `"previous"` or `"next"`.
+     * @param index The current item.
+     * @param count How many items there are.
+     * @param isLooping Whether stepping past either end continues round.
+     * @returns `true` only on a carousel that does not loop, for Previous on the first item and Next on the
+     * last; a looping carousel always has somewhere to step.
+     */
+    export const getIsStepAtEnd = (step: CarouselStep, index: number, count: number, isLooping: boolean) =>
+        resolveIndex(index + (step === "previous" ? -1 : 1), count, isLooping) === undefined;
 
     /**
      * How many places to turn to get from one item to another, the shorter way round.

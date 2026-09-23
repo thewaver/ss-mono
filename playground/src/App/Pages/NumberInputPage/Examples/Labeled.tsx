@@ -18,7 +18,7 @@ const GUEST_MAX = 8;
 type Props = NumberInputExampleProps;
 
 export const LabelledExample = (props: Props) => (
-    <Label dir={"column"} gap={() => LABEL_GAP}>
+    <Label orientation={"vertical"} gap={() => LABEL_GAP}>
         <PageLabelCaption>Guests</PageLabelCaption>
 
         <NumberInput

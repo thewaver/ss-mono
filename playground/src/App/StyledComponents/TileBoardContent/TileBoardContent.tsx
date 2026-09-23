@@ -49,7 +49,7 @@ export const PageTileBoardMeeple = (props: PageTileBoardMeepleProps) => {
             style={{
                 left: `${access(props.center).x}px`,
                 top: `${access(props.center).y}px`,
-                width: `${access(props.tileSize).width * MEEPLE_WIDTH_RATIO}px`,
+                width: `${access(props.tileSize).width * MEEPLE_WIDTH_RATIO * access(props.scale)}px`,
             }}
             data-meeple
             aria-hidden={"true"}

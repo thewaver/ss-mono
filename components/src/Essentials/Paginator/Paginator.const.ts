@@ -5,5 +5,4 @@ export const PAGINATOR_DEFAULTS = {
     siblingCount: 1,
     boundaryCount: 1,
     gap: 0,
-    ariaLabel: "Pagination",
 };

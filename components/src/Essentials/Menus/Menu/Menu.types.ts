@@ -4,6 +4,7 @@ import type { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
+import type { NavigatorDirection } from "../../../Abstracts/Navigator/Navigator.types";
 import type { PlacementLayoutFn, PlacementRect } from "../../../Abstracts/Placement/Placement.types";
 import type { ProximityEffectFn } from "../../../Abstracts/Proximity/Proximity.types";
 import type {
@@ -23,6 +24,8 @@ export type MenuItemKind = "command" | "checkbox" | "radio";
 
 export type MenuSubmenuMode = "cascade" | "replace";
 
+export type MenuTriggerRole = "button" | "menuitem";
+
 export type MenuSubmenuTrigger = "hover" | "press";
 
 export type MenuItemFlags = {
@@ -39,7 +42,19 @@ export type MenuItem<T> = {
     kind?: MenuItemKind;
     items?: MenuItem<T>[];
     isDisabled?: boolean;
+    /**
+     * Keeps this item in the arrow-key walk while it is disabled, so the highlight can land on it and a reader hears
+     * its name and that it is unavailable. It still cannot be picked. Takes effect only when the item has a tooltip
+     * to reveal.
+     */
     isReachableWhenDisabled?: boolean;
+    /**
+     * Whether the menu stays open after this item is picked. Left out, a checkbox item keeps the menu open and a radio
+     * item or a command closes it. Set it on a command that is worth repeating, such as zooming in, and the menu stays
+     * put for the next press. On the wheel and fan menus the default is the right one, since the pick animation there
+     * is the menu leaving.
+     */
+    staysOpenOnPick?: boolean;
     tooltipDefs?: InteractionTooltipDefs<MenuItemFlags>;
 };
 
@@ -47,6 +62,8 @@ export type MenuTriggerProps = AccessorProps<
     InteractionControlProps<MenuFlags> & {
         /** Identifies the menu this trigger opens, so the trigger can point at it. */
         menuId: string;
+        /** The role the trigger announces, written on the element that takes focus. */
+        role: MenuTriggerRole;
         /** Whether holding the trigger down opens the menu, rather than needing a full click. */
         isHoldable: boolean;
         /** Runs when the trigger is activated and the menu should open or close. */
@@ -107,6 +124,11 @@ export type MenuLevelProps<T> = AccessorProps<{
     ariaLabel?: string;
     /** Whether this level is open. */
     isOpen: boolean;
+    /**
+     * Which way text runs where the menu was opened, which decides which horizontal arrow opens a submenu and which
+     * closes one.
+     */
+    direction: NavigatorDirection;
     /** Which item was opened at each level above, so a level knows where it sits in the chain. */
     path: number[];
     /** How wide the level above is, which a nested layout needs in order to grow outward from it. */
@@ -202,7 +224,11 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         placement?: AnchorPlacement;
         /** How far the menu is held clear of its trigger. */
         offset?: Point2d;
-        /** Where a submenu sits against the item that opens it. */
+        /**
+         * Where a submenu sits against the item that opens it. Left out, a submenu opens beside its item on
+         * the side the opening arrow points to: the right, or the left where the menu's trigger sits in
+         * right-to-left text. Given, it is used as it stands in either direction.
+         */
         submenuPlacement?: AnchorPlacement;
         /** How far a submenu is held clear of the item that opens it. */
         submenuOffset?: Point2d;
@@ -212,6 +238,12 @@ export type MenuProps<T> = Omit<InteractionWrapperProps<MenuFlags>, "renderContr
         submenuOpensOn?: MenuSubmenuTrigger;
         /** Whether holding the trigger down opens the menu, rather than needing a full click. */
         opensOnHold?: boolean;
+        /**
+         * The role the trigger announces, written on the button that takes focus rather than on the box around it.
+         * Left out, the trigger is a button. A menubar passes `menuitem`, because every child of a menubar has to be
+         * one, and the trigger still announces the menu it opens and whether that menu is open.
+         */
+        triggerRole?: MenuTriggerRole;
         /** Screen room to stay out of, for a consumer with a fixed header or sidebar the menu must not slide under. */
         reservedScreenSize?: Size2d;
         /** How long the menu takes to fade in and out. */
@@ -257,7 +289,11 @@ export type ContextMenuProps<T> = AccessorProps<{
     placement?: AnchorPlacement;
     /** How far the menu is held clear of the point it was opened at. */
     offset?: Point2d;
-    /** Where a submenu sits against the item that opens it. */
+    /**
+     * Where a submenu sits against the item that opens it. Left out, a submenu opens beside its item on the
+     * side the opening arrow points to: the right, or the left where the region sits in right-to-left
+     * text. Given, it is used as it stands in either direction.
+     */
     submenuPlacement?: AnchorPlacement;
     /** How far a submenu is held clear of the item that opens it. */
     submenuOffset?: Point2d;

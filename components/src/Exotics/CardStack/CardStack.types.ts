@@ -81,8 +81,15 @@ export type CardStackProps<T> = AccessorProps<{
     isDisabled?: boolean;
     /** Names the stack for assistive technology. */
     ariaLabel: string;
-    /** Names one card, so a reader hears what it is rather than group. */
-    computeCardLabel?: (card: T, index: number) => string;
+    /** Names one card, so a reader hears what it is rather than group. The index counts from zero. */
+    computeCardLabel: (card: T, index: number) => string;
+    /**
+     * What the stack is called when it is announced, so a reader hears card stack rather than group. Defaults to
+     * "card stack".
+     */
+    roleDescription?: string;
+    /** What one card is called when it is announced, so a reader hears card rather than group. Defaults to "card". */
+    cardRoleDescription?: string;
 }> & {
     /** The cards, top of the pile first. */
     cards: MaybeAccessor<T[]>;

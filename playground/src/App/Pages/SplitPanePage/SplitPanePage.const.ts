@@ -5,6 +5,11 @@ export const PAIR: SplitPaneEntry[] = [
     { id: "split-pair-end" },
 ];
 
+export const RIGHT_TO_LEFT: SplitPaneEntry[] = [
+    { id: "split-rtl-start", gutterAriaLabel: "Resize navigation" },
+    { id: "split-rtl-end" },
+];
+
 export const BOUNDED: SplitPaneEntry[] = [
     { id: "split-bounded-start", minPx: 120, maxPx: 220, gutterAriaLabel: "Resize sidebar" },
     { id: "split-bounded-end", minPx: 160 },

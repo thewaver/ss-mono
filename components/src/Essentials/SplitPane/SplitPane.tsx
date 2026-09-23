@@ -2,6 +2,8 @@ import { Index, Show, createMemo, createSignal, createUniqueId } from "solid-js"
 
 import { MathUtils } from "@thewaver/ss-utils";
 
+import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
+import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { access, accessSignal } from "../../Utils/propUtils";
 import { SPLIT_PANE_DEFAULTS } from "./SplitPane.const";
 import type { SplitPaneProps } from "./SplitPane.types";
@@ -24,7 +26,9 @@ export const SplitPane = (props: SplitPaneProps) => {
 
     const getPaneId = (index: number) => access(props.panes)[index]?.id ?? `${paneIdPrefix}-pane-${index}`;
 
-    const getDir = createMemo(() => access(props.dir) ?? SPLIT_PANE_DEFAULTS.dir);
+    const getOrientation = createMemo(() => access(props.orientation) ?? SPLIT_PANE_DEFAULTS.orientation);
+
+    const getIsHorizontal = createMemo(() => getOrientation() === "horizontal");
 
     const getGutterSize = createMemo(() => access(props.gutterSize) ?? SPLIT_PANE_DEFAULTS.gutterSize);
 
@@ -59,12 +63,14 @@ export const SplitPane = (props: SplitPaneProps) => {
             .slice(0, index + 1)
             .reduce((total, ratio) => total + ratio, 0);
 
+    const getRootSize = ElementObserverUtils.createBorderBoxSizeObserver(getRootRef);
+
+    const getDirection = NavigatorUtils.createDirectionSignal(getRootRef);
+
     const getAvailablePx = () => {
-        const root = getRootRef();
+        const size = getRootSize();
 
-        if (!root) return 0;
-
-        return (getDir() === "row" ? root.offsetWidth : root.offsetHeight) - getTotalGutterSize();
+        return (getIsHorizontal() ? size.width : size.height) - getTotalGutterSize();
     };
 
     const computeRatioBounds = (index: number, available: number) => {
@@ -82,10 +88,8 @@ export const SplitPane = (props: SplitPaneProps) => {
         setCollapsedBoundaries(({ [index]: _unused, ...rest }) => rest);
     };
 
-    const moveBoundary = (index: number, boundary: number) => {
-        forgetCollapsed(index);
-
-        const ratios = [...getRatios()];
+    const computeBoundaryLimits = (index: number) => {
+        const ratios = getRatios();
         const before = getBoundary(index) - ratios[index];
         const span = ratios[index] + ratios[index + 1];
         const available = getAvailablePx();
@@ -93,12 +97,27 @@ export const SplitPane = (props: SplitPaneProps) => {
         const end = computeRatioBounds(index + 1, available);
         const floor = Math.max(before, before + start.min, before + span - end.max);
         const ceiling = Math.min(before + span, before + start.max, before + span - end.min);
-        const next = ceiling < floor ? floor : MathUtils.clamp(boundary, floor, ceiling);
+
+        return { before, span, floor, ceiling: Math.max(ceiling, floor) };
+    };
+
+    const moveBoundary = (index: number, boundary: number) => {
+        forgetCollapsed(index);
+
+        const ratios = [...getRatios()];
+        const { before, span, floor, ceiling } = computeBoundaryLimits(index);
+        const next = MathUtils.clamp(boundary, floor, ceiling);
 
         ratios[index] = next - before;
         ratios[index + 1] = before + span - next;
 
         ratiosSignal[1](() => ratios);
+    };
+
+    const computePointerOffset = (e: PointerEvent, rect: DOMRect) => {
+        if (!getIsHorizontal()) return e.clientY - rect.top;
+
+        return getDirection() === "rtl" ? rect.right - e.clientX : e.clientX - rect.left;
     };
 
     const computePointerBoundary = (e: PointerEvent, index: number) => {
@@ -107,13 +126,13 @@ export const SplitPane = (props: SplitPaneProps) => {
         if (!root) return undefined;
 
         const rect = root.getBoundingClientRect();
-        const isRow = getDir() === "row";
-        const total = isRow ? rect.width : rect.height;
+        const isHorizontal = getIsHorizontal();
+        const total = isHorizontal ? rect.width : rect.height;
         const available = total - getTotalGutterSize();
 
         if (available <= 0) return undefined;
 
-        const offset = isRow ? e.clientX - rect.left : e.clientY - rect.top;
+        const offset = computePointerOffset(e, rect);
 
         return (offset - getGutterSize() * (index + 0.5)) / available;
     };
@@ -153,9 +172,9 @@ export const SplitPane = (props: SplitPaneProps) => {
 
         const element = e.currentTarget as HTMLElement;
         const rect = element.getBoundingClientRect();
-        const isRow = getDir() === "row";
-        const offset = isRow ? e.clientX - rect.left : e.clientY - rect.top;
-        const extent = isRow ? rect.width : rect.height;
+        const isHorizontal = getIsHorizontal();
+        const offset = computePointerOffset(e, rect);
+        const extent = isHorizontal ? rect.width : rect.height;
         const step = access(props.keyStep) ?? SPLIT_PANE_DEFAULTS.keyStep;
 
         moveBoundary(index, getBoundary(index) + (offset < extent * 0.5 ? -step : step));
@@ -179,9 +198,10 @@ export const SplitPane = (props: SplitPaneProps) => {
     const handleGutterKeyDown = (e: KeyboardEvent, index: number) => {
         if (getIsDisabled()) return;
 
-        const isRow = getDir() === "row";
-        const decreaseKey = isRow ? "ArrowLeft" : "ArrowUp";
-        const increaseKey = isRow ? "ArrowRight" : "ArrowDown";
+        const isHorizontal = getIsHorizontal();
+        const decreaseKey = isHorizontal ? "ArrowLeft" : "ArrowUp";
+        const increaseKey = isHorizontal ? "ArrowRight" : "ArrowDown";
+        const key = NavigatorUtils.computeLogicalKey(e.key, getDirection());
 
         if (e.key === "Enter") {
             e.preventDefault();
@@ -197,13 +217,13 @@ export const SplitPane = (props: SplitPaneProps) => {
             return;
         }
 
-        if (e.key !== decreaseKey && e.key !== increaseKey) return;
+        if (key !== decreaseKey && key !== increaseKey) return;
 
         e.preventDefault();
 
         const step = access(props.keyStep) ?? SPLIT_PANE_DEFAULTS.keyStep;
 
-        moveBoundary(index, getBoundary(index) + (e.key === decreaseKey ? -step : step));
+        moveBoundary(index, getBoundary(index) + (key === decreaseKey ? -step : step));
     };
 
     return (
@@ -211,7 +231,7 @@ export const SplitPane = (props: SplitPaneProps) => {
             ref={setRootRef}
             class={styles.splitPaneRoot}
             style={{
-                [getDir() === "row" ? "grid-template-columns" : "grid-template-rows"]: getTemplate(),
+                [getIsHorizontal() ? "grid-template-columns" : "grid-template-rows"]: getTemplate(),
             }}
             role="group"
             aria-label={access(props.ariaLabel)}
@@ -225,13 +245,13 @@ export const SplitPane = (props: SplitPaneProps) => {
                                 class={styles.splitPaneGutter}
                                 role="separator"
                                 tabindex={getIsDisabled() ? -1 : 0}
-                                aria-orientation={getDir() === "row" ? "vertical" : "horizontal"}
+                                aria-orientation={getIsHorizontal() ? "vertical" : "horizontal"}
                                 aria-controls={getPaneId(index - 1)}
                                 aria-label={getPane().gutterAriaLabel}
                                 aria-disabled={getIsDisabled() || undefined}
                                 aria-valuenow={Math.round(getBoundary(index - 1) * PERCENT)}
-                                aria-valuemin={0}
-                                aria-valuemax={PERCENT}
+                                aria-valuemin={Math.round(computeBoundaryLimits(index - 1).floor * PERCENT)}
+                                aria-valuemax={Math.round(computeBoundaryLimits(index - 1).ceiling * PERCENT)}
                                 onPointerDown={(e) => handleGutterPointerDown(e, index - 1)}
                                 onPointerMove={(e) => handleGutterPointerMove(e, index - 1)}
                                 onPointerUp={(e) => handleGutterPointerUp(e, index - 1)}

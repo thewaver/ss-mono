@@ -12,14 +12,14 @@ export const ColumnExample = (props: Props) => {
     return (
         <div class={styles.columnDemo}>
             <Tabs
-                dir={"column"}
+                orientation={"vertical"}
                 ariaLabel={"Example sections"}
                 tabs={() => COLUMN_TABS}
                 selectedValue={props.selectedValue}
                 onSelectionChange={props.onSelectionChange}
                 renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                     <PageTabFloater
-                        dir={"column"}
+                        orientation={"vertical"}
                         visibilityTarget={getVisibilityTarget}
                         transitionDurationMs={getTransitionDurationMs}
                     />
@@ -27,7 +27,7 @@ export const ColumnExample = (props: Props) => {
                 renderTab={(getTab, getFlags) => (
                     <PageTabContent
                         flags={getFlags}
-                        dir={"column"}
+                        orientation={"vertical"}
                         isSelected={() => getTab().value === access(props.selectedValue)}
                     >
                         {getTab().value}

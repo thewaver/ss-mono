@@ -12,12 +12,13 @@ type Props = SelectExampleProps;
 
 export const LabelledExample = (props: Props) => {
     return (
-        <Label dir={"column"} gap={() => LABEL_GAP}>
+        <Label orientation={"vertical"} gap={() => LABEL_GAP}>
             <PageLabelCaption>Country</PageLabelCaption>
 
             <Select
                 valueSignal={props.valueSignal}
                 options={() => COUNTRIES}
+                listAriaLabel={"Country"}
                 renderContent={(getSelectedOption, getFlags) => (
                     <PageSelectContent flags={getFlags}>{getSelectedOption()?.value ?? PLACEHOLDER}</PageSelectContent>
                 )}

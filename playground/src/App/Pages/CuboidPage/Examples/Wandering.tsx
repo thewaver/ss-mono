@@ -4,6 +4,7 @@ import type { CuboidFace } from "@thewaver/ss-components";
 import { Cuboid, CuboidUtils, access } from "@thewaver/ss-components";
 import { ObjectUtils } from "@thewaver/ss-utils";
 
+import { computeCuboidFaceLabel } from "../../../PageComponents/Announcements/Announcements.const";
 import { PageCuboidFace, PageCuboidStack } from "../../../StyledComponents/CuboidContent/CuboidContent";
 import type { CuboidWanderingExampleProps } from "../CuboidPage.types";
 
@@ -58,6 +59,7 @@ export const WanderingExample = (props: Props) => {
                 size={props.size}
                 transitionDurationMs={props.transitionDurationMs}
                 ariaLabel={"Six faces, turning by themselves"}
+                computeFaceLabel={computeCuboidFaceLabel}
                 renderFace={(getFace, getState) => <PageCuboidFace face={getFace} state={getState} />}
             />
         </PageCuboidStack>

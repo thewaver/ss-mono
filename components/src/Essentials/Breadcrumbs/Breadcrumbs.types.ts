@@ -13,6 +13,11 @@ export type Breadcrumb<T> = {
     value: T;
     href?: string;
     isDisabled?: boolean;
+    /**
+     * Keeps this crumb in the tab order while it is disabled, so focus can land on it and a reader hears its name and
+     * that it is unavailable. It still cannot be followed.
+     */
+    isReachableWhenDisabled?: boolean;
     id?: string;
 };
 
@@ -42,7 +47,7 @@ export type BreadcrumbsProps<T> = AccessorProps<{
     /** Draws whatever sits between two crumbs. */
     renderSeparator?: () => JSX.Element;
 }> & {
-    /** The crumbs, from the root to where the reader is now. Whatever does not fit collapses into a menu. */
+    /** The crumbs, from the root to where the reader is now. */
     crumbs: MaybeAccessor<Breadcrumb<T>[]>;
     /** Draws one crumb. */
     renderCrumb: (getCrumb: Accessor<Breadcrumb<T>>, getFlags: () => InteractionFlags<BreadcrumbsFlags>) => JSX.Element;

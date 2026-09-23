@@ -5,3 +5,5 @@ export const RATING_MIN = 0;
 export const RATING_MAX = 5;
 export const RATING_STEP = 0.1;
 export const FIELD_WIDTH = 180;
+export const GERMAN_LOCALE = "de-DE";
+export const AMOUNT_STEP = 0.5;

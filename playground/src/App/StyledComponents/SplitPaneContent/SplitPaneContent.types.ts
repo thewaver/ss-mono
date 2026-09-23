@@ -2,7 +2,7 @@ import type { AccessorProps, InteractionFlags, SplitPaneGutterFlags } from "@the
 
 export type SplitPaneGutterProps = AccessorProps<{
     flags: InteractionFlags<SplitPaneGutterFlags>;
-    dir: "row" | "column";
+    orientation: "horizontal" | "vertical";
 }>;
 
 export type SplitPaneCompareSide = "start" | "end";

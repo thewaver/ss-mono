@@ -1,5 +1,6 @@
 import { PatchBoard } from "@thewaver/ss-components";
 
+import { PATCH_BOARD_ANNOUNCEMENTS } from "../../../PageComponents/Announcements/Announcements.const";
 import {
     PagePatchCable,
     PagePatchNode,
@@ -15,6 +16,7 @@ export const ChainExample = (props: Props) => {
         <PatchBoard
             groupId={"chain"}
             ariaLabel={"Signal chain"}
+            announcements={PATCH_BOARD_ANNOUNCEMENTS}
             size={BOARD_SIZE}
             socketSize={props.socketSize}
             isLocked={props.isLocked}

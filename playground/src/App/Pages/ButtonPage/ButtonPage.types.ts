@@ -13,3 +13,8 @@ export type ButtonErroredExampleProps = ButtonExampleProps &
     AccessorProps<{
         hasError: boolean;
     }>;
+
+export type ButtonCopyExampleProps = {
+    text: string;
+    onCopy: () => void;
+};

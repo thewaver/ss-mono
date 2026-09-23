@@ -27,13 +27,6 @@ const PLACED_SIZING: InteractionSizing = "fill";
 const LEADING_STEPS: PaginatorStep[] = ["first", "previous"];
 const TRAILING_STEPS: PaginatorStep[] = ["next", "last"];
 
-const STEP_LABELS: Record<PaginatorStep, string> = {
-    first: "First page",
-    previous: "Previous page",
-    next: "Next page",
-    last: "Last page",
-};
-
 const PaginatorItem = (props: PaginatorItemProps) => {
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
@@ -157,7 +150,7 @@ export const Paginator = (props: PaginatorProps) => {
                         ref={setElementRef}
                         href={() => (getIsStepDisabled() ? undefined : props.computeHref?.(getTargetPage()))}
                         isCurrent={false}
-                        ariaLabel={() => props.computeStepLabel?.(getStep(), getTargetPage()) ?? STEP_LABELS[getStep()]}
+                        ariaLabel={() => props.computeStepLabel(getStep(), getTargetPage())}
                         flags={getRenderProps}
                         linkComponent={props.linkComponent}
                         renderContent={() => props.renderStep(getStep, getRenderProps)}
@@ -184,9 +177,7 @@ export const Paginator = (props: PaginatorProps) => {
                         ref={setElementRef}
                         href={() => props.computeHref?.(getEntry().page)}
                         isCurrent={() => getRenderProps().isCurrent}
-                        ariaLabel={() =>
-                            props.computePageLabel?.(getEntry().page, getPageCount()) ?? `Page ${getEntry().page}`
-                        }
+                        ariaLabel={() => props.computePageLabel(getEntry().page, getPageCount())}
                         flags={getRenderProps}
                         linkComponent={props.linkComponent}
                         renderContent={() => props.renderPage(getEntry, getRenderProps)}
@@ -233,7 +224,7 @@ export const Paginator = (props: PaginatorProps) => {
         <nav
             class={styles.paginatorRoot}
             style={{ gap: `${access(props.gap) ?? PAGINATOR_DEFAULTS.gap}px` }}
-            aria-label={access(props.ariaLabel) ?? PAGINATOR_DEFAULTS.ariaLabel}
+            aria-label={access(props.ariaLabel)}
         >
             <Show when={getLayout()} fallback={renderRow()}>
                 {(getResolved) => (

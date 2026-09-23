@@ -9,22 +9,14 @@ import * as styles from "./FlipCard.css";
 
 const FACES: FlipCardFace[] = ["front", "back"];
 
-const FACE_LABELS: Record<FlipCardFace, string> = {
-    front: "Front",
-    back: "Back",
-};
-
 const FLIP_ANGLE_DEG = 180;
-
-const FLIP_CARD_ROLE_DESCRIPTION = "flip card";
-const FACE_ROLE_DESCRIPTION = "face";
 
 export const FlipCard = (props: FlipCardProps) => {
     const [getIsFlipped] = accessSignal(() => props.flippedSignal);
 
     const getShownFace = createMemo((): FlipCardFace => (getIsFlipped() ? "back" : "front"));
 
-    const getFaceLabel = (face: FlipCardFace) => props.computeFaceLabel?.(face) ?? FACE_LABELS[face];
+    const getFaceLabel = (face: FlipCardFace) => props.computeFaceLabel(face);
 
     const getState = (face: FlipCardFace): FlipCardState => ({
         face,
@@ -35,7 +27,7 @@ export const FlipCard = (props: FlipCardProps) => {
         <div
             class={styles.flipCardRoot}
             role="group"
-            aria-roledescription={FLIP_CARD_ROLE_DESCRIPTION}
+            aria-roledescription={access(props.roleDescription) ?? FLIP_CARD_DEFAULTS.roleDescription}
             aria-label={access(props.ariaLabel)}
         >
             <Barrel<FlipCardFace>
@@ -46,7 +38,7 @@ export const FlipCard = (props: FlipCardProps) => {
                 transitionDurationMs={() =>
                     access(props.transitionDurationMs) ?? FLIP_CARD_DEFAULTS.transitionDurationMs
                 }
-                faceRoleDescription={FACE_ROLE_DESCRIPTION}
+                faceRoleDescription={() => access(props.faceRoleDescription) ?? FLIP_CARD_DEFAULTS.faceRoleDescription}
                 computeFaceDefs={(index) => ({
                     ariaLabel: getFaceLabel(FACES[index]!),
                     isHidden: FACES[index] !== getShownFace(),

@@ -7,8 +7,9 @@ import { ColumnExample } from "./Examples/Column";
 import { HoneycombExample } from "./Examples/Honeycomb";
 import { LinkComponentExample } from "./Examples/LinkComponent";
 import { LinksExample } from "./Examples/Links";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 import { RowExample } from "./Examples/Row";
-import { AUTOMATIC_TABS } from "./TabsPage.const";
+import { AUTOMATIC_TABS, REACHABLE_TABS } from "./TabsPage.const";
 
 const EXAMPLES_ROOT = "/src/App/Pages/TabsPage/Examples";
 
@@ -18,6 +19,8 @@ export const TabsPage = () => {
     const [getLinkValue, setLinkValue] = createSignal("Docs");
     const [getCustomLinkValue, setCustomLinkValue] = createSignal("Docs");
     const [getAutoValue, setAutoValue] = createSignal("Render");
+    const [getReachableValue, setReachableValue] = createSignal("Render");
+    const [getRightToLeftValue, setRightToLeftValue] = createSignal("Render");
     const [getDisabledValue, setDisabledValue] = createSignal("Draft");
     const [getClearableValue, setClearableValue] = createSignal<string | undefined>("One");
     const [getHoneycombValue, setHoneycombValue] = createSignal("Overview");
@@ -55,6 +58,33 @@ export const TabsPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Row.tsx`,
+        },
+        {
+            key: "reachable",
+            span: 2,
+            name: "A disabled tab the arrows still reach",
+            readout: () =>
+                `selected: ${getReachableValue()} — Metrics is disabled but stays in the arrow walk, so focus lands on it and a reader hears that it is unavailable; pressing it still selects nothing`,
+            component: () => (
+                <RowExample
+                    selectedValue={getReachableValue}
+                    tabs={() => REACHABLE_TABS}
+                    idPrefix={"reachable"}
+                    onSelectionChange={setReachableValue}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Row.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            span: 2,
+            name: "Tabs in a right-to-left box",
+            readout: () =>
+                `selected: ${getRightToLeftValue()} — the box around the tabs sets dir="rtl", so they run from the right and the left arrow moves on to the next tab`,
+            component: () => (
+                <RightToLeftExample selectedValue={getRightToLeftValue} onSelectionChange={setRightToLeftValue} />
+            ),
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
         {
             key: "honeycomb",

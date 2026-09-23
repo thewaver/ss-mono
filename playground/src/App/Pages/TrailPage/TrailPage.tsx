@@ -33,7 +33,7 @@ export const TrailPage = () => {
     const getPercent = (progress: number) => `${Math.round(progress * PERCENT)}%`;
 
     const getExamples = createMemo(() => {
-        const commonProps: Omit<TrailExampleProps, "progressSignal" | "isPlayingSignal"> = {
+        const commonProps: Omit<TrailExampleProps, "progressSignal" | "playbackSignal"> = {
             durationMs: getDurationMs,
             isLooping: getIsLooping,
             isTurning: getIsTurning,
@@ -44,12 +44,12 @@ export const TrailPage = () => {
                 key: "circuit",
                 name: "Circuit",
                 readout: () =>
-                    `${getPercent(circuitProgressSignal[0]())} round the loop, ${circuitPlayingSignal[0]() ? "running" : "stopped"} — the controller starts it, stops it and sends it back to the start`,
+                    `${getPercent(circuitProgressSignal[0]())} round the loop, ${circuitPlayingSignal[0]() ? "running" : "stopped"} — the playback signal starts and stops it, and the controller sends it back to the start`,
                 component: () => (
                     <CircuitExample
                         {...commonProps}
                         progressSignal={circuitProgressSignal}
-                        isPlayingSignal={circuitPlayingSignal}
+                        playbackSignal={circuitPlayingSignal}
                     />
                 ),
                 path: `${EXAMPLES_ROOT}/Circuit.tsx`,
@@ -63,7 +63,7 @@ export const TrailPage = () => {
                     <TimelineExample
                         {...commonProps}
                         progressSignal={timelineProgressSignal}
-                        isPlayingSignal={timelinePlayingSignal}
+                        playbackSignal={timelinePlayingSignal}
                     />
                 ),
                 path: `${EXAMPLES_ROOT}/Timeline.tsx`,

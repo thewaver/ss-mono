@@ -1,6 +1,6 @@
-import type { LabelDir } from "./Label.types";
+import type { LabelOrientation } from "./Label.types";
 
 export const LABEL_DEFAULTS = {
-    dir: "row" as LabelDir,
+    orientation: "horizontal" as LabelOrientation,
     gap: 10,
 };

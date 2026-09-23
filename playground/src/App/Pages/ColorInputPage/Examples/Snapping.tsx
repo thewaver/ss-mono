@@ -1,5 +1,6 @@
 import { ColorInput } from "@thewaver/ss-components";
 
+import { COLOR_INPUT_LABELS } from "../../../PageComponents/Announcements/Announcements.const";
 import { pageColorPickerSlots } from "../../../StyledComponents/ColorAreaContent/ColorAreaContent";
 import { PageColorInputContent } from "../../../StyledComponents/ColorInputContent/ColorInputContent";
 import { toNearestPaletteColor } from "../ColorInputPage.const";
@@ -12,6 +13,7 @@ export const SnappingExample = (props: Props) => (
         {...pageColorPickerSlots}
         valueSignal={props.valueSignal}
         ariaLabel={"Palette color"}
+        {...COLOR_INPUT_LABELS}
         renderContent={(getRenderProps) => <PageColorInputContent renderProps={getRenderProps} />}
         onInput={(value) => {
             props.valueSignal[1](toNearestPaletteColor(value));

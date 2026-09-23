@@ -4,4 +4,6 @@ export const WHEEL_DEFAULTS = {
     axis: "row" as WheelAxis,
     wedgeSize: { width: 0, height: 0 },
     markerDegrees: -90,
+    roleDescription: "wheel",
+    wedgeRoleDescription: "wedge",
 };

@@ -393,3 +393,114 @@ test("the reach knob widens the ring of tiles that will take the piece", async (
     expect(near, "one step out is the six tiles sharing an edge with a central hexagon").toBe(6);
     expect(far, "and two steps adds the twelve around those").toBe(18);
 });
+
+/**
+ * A taper leans the board away from the viewer: the top row is drawn narrower than the bottom one, and the
+ * rows close up towards the top. The browser draws it through one 3D transform on the board, so these ask
+ * what only a browser can answer — that the tiles are drawn smaller the further up they are, that a press
+ * still lands on the tile drawn under it rather than the one the flat layout would have put there, and
+ * that a piece drawn beside the board stands on its tile and shrinks with it.
+ */
+const TAPER = "0.5";
+const FOOT_LIFT_PX = 2;
+
+const setTaper = async (page: Page) => {
+    const field = page.locator(`${prop("taper")} input`);
+
+    await field.fill(TAPER);
+    await field.blur();
+};
+
+const drawnWidthOf = (page: Page, selector: string, index: number) =>
+    page.evaluate((args) => document.querySelectorAll(args.selector)[args.index].getBoundingClientRect().width, {
+        selector,
+        index,
+    });
+
+test("a tapered board draws its top row narrower than its bottom row", async ({ page }) => {
+    const flatTop = await drawnWidthOf(page, tile(MARKED), 0);
+
+    await setTaper(page);
+
+    const count = await page.locator(tile(MARKED)).count();
+    const top = await drawnWidthOf(page, tile(MARKED), 0);
+    const bottom = await drawnWidthOf(page, tile(MARKED), count - 1);
+
+    expect(top, "the far row shrinks").toBeLessThan(flatTop);
+    expect(top, "and is drawn smaller than the near one").toBeLessThan(bottom);
+});
+
+test("a tapered board reports the box it is drawn in, not a box bent by its own lean", async ({ page }) => {
+    await setTaper(page);
+
+    const box = await page.evaluate((scope) => {
+        const grid = document.querySelector(`${scope} [role="grid"]`) as HTMLElement;
+        const drawn = grid.getBoundingClientRect();
+
+        return { layout: grid.offsetWidth / grid.offsetHeight, drawn: drawn.width / drawn.height };
+    }, MARKED);
+
+    expect(box.drawn, "the box on screen has the shape layout gave it").toBeCloseTo(box.layout, 2);
+});
+
+test("on a tapered board a press on a drawn tile marks that tile, not the one the flat layout had there", async ({
+    page,
+}) => {
+    await setTaper(page);
+
+    const fullRowTiles = await page
+        .locator(`${row(MARKED)} >> nth=0`)
+        .locator('[role="gridcell"]')
+        .count();
+
+    for (const index of [1, fullRowTiles]) {
+        const box = (await page.locator(hitLayer(MARKED)).nth(index).boundingBox())!;
+
+        await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    }
+
+    const marked = await readout(page, "default");
+
+    expect(marked, "a tile on the top row").toContain("ROW0_COL1");
+    expect(marked, "and the first tile of the short row beneath it").toContain("ROW1_COL0");
+});
+
+test("on a tapered board a piece stands on its tile and is smaller at the top than at the bottom", async ({ page }) => {
+    await setTaper(page);
+
+    const reach = page.locator(`${MEEPLE} ${prop("reach")} input`);
+
+    await reach.fill("4");
+    await reach.blur();
+
+    const standing = (index: number) =>
+        page.evaluate(
+            (args) => {
+                const meeple = document.querySelector(`${args.scope} [data-meeple]`) as HTMLElement;
+                const cell = document.querySelectorAll(args.selector)[args.index] as HTMLElement;
+                const piece = meeple.getBoundingClientRect();
+                const under = document.elementFromPoint(piece.x + piece.width * 0.5, piece.bottom - args.lift);
+
+                return { isOnTile: cell.contains(under), width: Math.round(piece.width) };
+            },
+            { scope: MEEPLE, selector: tile(MEEPLE), index, lift: FOOT_LIFT_PX },
+        );
+
+    const count = await page.locator(tile(MEEPLE)).count();
+
+    await page.locator(hitLayer(MEEPLE)).nth(1).click();
+    await expect
+        .poll(async () => (await standing(1)).isOnTile, { message: "its foot is on the top row tile" })
+        .toBe(true);
+
+    const farWidth = (await standing(1)).width;
+
+    await page
+        .locator(hitLayer(MEEPLE))
+        .nth(count - 2)
+        .click();
+    await expect
+        .poll(async () => (await standing(count - 2)).isOnTile, { message: "and then on the bottom row tile" })
+        .toBe(true);
+    await expect.poll(async () => (await standing(count - 2)).width).toBeGreaterThan(farWidth);
+});

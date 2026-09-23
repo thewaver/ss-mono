@@ -12,6 +12,8 @@ import * as styles from "./LightCatcher.css";
 
 const FULL_STRENGTH = 1;
 const NO_STRENGTH = 0;
+const UNTOUCHED_LIGHTNESS = 0;
+const FULL_LIGHTNESS = 1;
 
 export const LightCatcher = (props: ParentProps<LightCatcherProps>) => {
     const [getRef, setRef] = createSignal<HTMLElement>();
@@ -48,8 +50,27 @@ export const LightCatcher = (props: ParentProps<LightCatcherProps>) => {
         ),
     );
 
+    const getLightness = createMemo(() =>
+        MathUtils.clamp01(
+            MathUtils.lerp(
+                access(props.restingLightness) ?? LIGHT_CATCHER_DEFAULTS.restingLightness,
+                access(props.maxLightness) ?? LIGHT_CATCHER_DEFAULTS.maxLightness,
+                getStrength(),
+            ),
+        ),
+    );
+
+    const getFilter = createMemo(() => {
+        const brightness = `brightness(${getBrightness()})`;
+        const lightness = getLightness();
+
+        if (lightness === UNTOUCHED_LIGHTNESS) return brightness;
+
+        return `${brightness} invert(1) brightness(${FULL_LIGHTNESS - lightness}) invert(1)`;
+    });
+
     return (
-        <div ref={setRef} class={styles.lightCatcherRoot} style={{ filter: `brightness(${getBrightness()})` }}>
+        <div ref={setRef} class={styles.lightCatcherRoot} style={{ filter: getFilter() }}>
             {props.children}
         </div>
     );

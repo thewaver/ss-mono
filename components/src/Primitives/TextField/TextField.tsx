@@ -124,6 +124,8 @@ const TextFieldElement = (props: TextFieldElementProps) => {
 
     const [getElementRef, setElementRef] = createSignal<TextSyncElement>();
 
+    FormFieldUtils.registerControl(getElementRef);
+
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
     const getIsReadOnly = () => access(props.flags).isReadOnly;
@@ -137,6 +139,8 @@ const TextFieldElement = (props: TextFieldElementProps) => {
     const getIsSpinButton = () => access(props.isSpinButton) ?? false;
 
     const getValueNow = () => {
+        if (props.computeSpinValue) return props.computeSpinValue(access(props.value));
+
         const parsed = Number(access(props.value));
 
         return access(props.value) !== "" && Number.isFinite(parsed) ? parsed : undefined;
@@ -200,7 +204,9 @@ const TextFieldElement = (props: TextFieldElementProps) => {
                 aria-valuemax={getIsSpinButton() ? access(props.max) : undefined}
                 aria-disabled={getIsDisabled() || undefined}
                 aria-readonly={getIsReadOnly() || undefined}
+                aria-required={access(props.isRequired) || undefined}
                 aria-invalid={access(props.flags).hasError || undefined}
+                {...access(props.ariaAttributes)}
                 onInput={(e: InputEvent & { currentTarget: TextSyncElement }) => handleInput(e.currentTarget)}
                 onCompositionStart={handleCompositionStart}
                 onCompositionEnd={(e: CompositionEvent & { currentTarget: TextSyncElement }) =>
@@ -318,9 +324,11 @@ export const TextField = (props: TextFieldProps) => {
                     name={props.name}
                     ariaLabel={props.ariaLabel}
                     isSpinButton={props.isSpinButton}
+                    isRequired={props.isRequired}
                     autoComplete={props.autoComplete}
                     inputMode={props.inputMode}
                     computeMaskedText={props.computeMaskedText}
+                    computeSpinValue={props.computeSpinValue}
                     placeholderHint={props.placeholderHint}
                     min={props.min}
                     max={props.max}
@@ -339,6 +347,7 @@ export const TextField = (props: TextFieldProps) => {
                     renderPlaceholder={props.renderPlaceholder}
                     renderLeading={props.renderLeading}
                     renderTrailing={props.renderTrailing}
+                    ariaAttributes={props.ariaAttributes}
                     onInput={(value) => {
                         props.valueSignal[1](value);
 

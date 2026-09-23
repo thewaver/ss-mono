@@ -26,6 +26,10 @@ const MIN_BRIGHTNESS = 0;
 const MAX_BRIGHTNESS = 5;
 const BRIGHTNESS_STEP = 0.05;
 
+const MIN_LIGHTNESS = 0;
+const MAX_LIGHTNESS = 1;
+const LIGHTNESS_STEP = 0.05;
+
 const FIELD_WIDTH = 110;
 const BOX_HEIGHT = 200;
 const ROW_SPAN = 2;
@@ -36,6 +40,8 @@ export const LightCatcherPage = () => {
     const [getLightRangePx, setLightRangePx] = createSignal(LIGHT_CATCHER_DEFAULTS.lightRangePx);
     const [getMaxBrightness, setMaxBrightness] = createSignal(LIGHT_CATCHER_DEFAULTS.maxBrightness);
     const [getRestingBrightness, setRestingBrightness] = createSignal(LIGHT_CATCHER_DEFAULTS.restingBrightness);
+    const [getMaxLightness, setMaxLightness] = createSignal(LIGHT_CATCHER_DEFAULTS.maxLightness);
+    const [getRestingLightness, setRestingLightness] = createSignal(LIGHT_CATCHER_DEFAULTS.restingLightness);
 
     const getExamples = createMemo(() => {
         const commonProps: LightCatcherExampleProps = {
@@ -44,6 +50,8 @@ export const LightCatcherPage = () => {
             lightRangePx: getLightRangePx,
             maxBrightness: getMaxBrightness,
             restingBrightness: getRestingBrightness,
+            maxLightness: getMaxLightness,
+            restingLightness: getRestingLightness,
         };
 
         return [
@@ -81,7 +89,7 @@ export const LightCatcherPage = () => {
                     key={"isDisabled"}
                     label={"Disabled"}
                     hint={
-                        "Stops the surface answering the pointer and leaves it at its resting brightness. It is what a page honoring a reduced-motion preference passes."
+                        "Stops the surface answering the pointer and leaves it at its resting brightness and lightness. It is what a page honoring a reduced-motion preference passes."
                     }
                 >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
@@ -152,6 +160,40 @@ export const LightCatcherPage = () => {
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Resting brightness"}
                         onInput={setRestingBrightness}
+                    />
+                </PageProp>
+
+                <PageProp
+                    key={"maxLightness"}
+                    label={"Max lightness"}
+                    hint={
+                        "How far the surface fades toward white with the pointer on it. 0 is untouched. Unlike brightness it lifts the dark parts most, and the two stack."
+                    }
+                >
+                    <PageNumberField
+                        value={getMaxLightness}
+                        min={() => MIN_LIGHTNESS}
+                        max={() => MAX_LIGHTNESS}
+                        step={() => LIGHTNESS_STEP}
+                        width={() => FIELD_WIDTH}
+                        ariaLabel={"Maximum lightness"}
+                        onInput={setMaxLightness}
+                    />
+                </PageProp>
+
+                <PageProp
+                    key={"restingLightness"}
+                    label={"Resting lightness"}
+                    hint={"How far the surface fades toward white with nothing near it. 0 is untouched."}
+                >
+                    <PageNumberField
+                        value={getRestingLightness}
+                        min={() => MIN_LIGHTNESS}
+                        max={() => MAX_LIGHTNESS}
+                        step={() => LIGHTNESS_STEP}
+                        width={() => FIELD_WIDTH}
+                        ariaLabel={"Resting lightness"}
+                        onInput={setRestingLightness}
                     />
                 </PageProp>
             </PagePropsPanel>

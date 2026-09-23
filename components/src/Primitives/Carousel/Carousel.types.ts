@@ -9,7 +9,7 @@ import type { InteractionControlProps } from "../InteractionWrapper/InteractionW
 
 export type CarouselVariant = "track" | "drum";
 
-export type CarouselDir = "row" | "column";
+export type CarouselOrientation = "horizontal" | "vertical";
 
 export type CarouselAxis = BarrelAxis;
 
@@ -31,7 +31,10 @@ export type CarouselSlideState = {
 export type CarouselStepRenderProps = {
     /** Which way this control moves the carousel. */
     step: CarouselStep;
-    /** Which slide this control would move to, so a control at the end can tell it would wrap around. */
+    /**
+     * Which slide this control would move to, so a control at the end can tell it would wrap around. On a
+     * carousel that does not loop, a control at the end is disabled and this is the slide already showing.
+     */
     targetIndex: number;
 };
 
@@ -75,6 +78,15 @@ export type CarouselState = {
     gap?: number;
     /** Turns the carousel off, so neither its controls nor its swipes do anything. */
     isDisabled?: boolean;
+    /**
+     * Whether stepping past the last slide comes round to the first, and back from the first to the last.
+     * Defaults to `true`. When off, the Previous control on the first slide and the Next control on the last
+     * are disabled and refuse, a swipe past either end springs back, and automatic rotation stops on the last
+     * slide by writing `false` to `playbackSignal`. A drum carousel is a closed ring whose last face sits
+     * beside its first, so the default is the right one there: turned off, the drum stops against a seam
+     * nothing on screen shows.
+     */
+    isLooping?: boolean;
     /** Names the carousel for assistive technology. */
     ariaLabel: string;
 };
@@ -82,13 +94,24 @@ export type CarouselState = {
 export type CarouselLabels = {
     /**
      * Names one slide for assistive technology, and is told how many there are so it can say third of five.
-     * The index is zero-based, matching `renderSlide` and `renderPick`.
+     * The index is zero-based, matching `renderSlide` and `renderPick`. It is also what is announced when a
+     * different slide comes up, and what names each picker.
      */
-    computeSlideLabel?: (index: number, count: number) => string;
+    computeSlideLabel: (index: number, count: number) => string;
     /** Names one of the move controls. */
-    computeStepLabel?: (step: CarouselStep) => string;
+    computeStepLabel: (step: CarouselStep) => string;
     /** Names the play and pause control, told which state it is in. */
-    computeRotationLabel?: (isPlaying: boolean) => string;
+    computeRotationLabel: (isPlaying: boolean) => string;
+    /**
+     * What the carousel is called when it is announced, so a reader hears carousel rather than region. Defaults to
+     * "carousel".
+     */
+    roleDescription?: string;
+    /**
+     * What one slide is called when it is announced, so a reader hears slide rather than group. Defaults to
+     * "slide".
+     */
+    slideRoleDescription?: string;
 };
 
 export type CarouselSlots<T> = {
@@ -97,7 +120,7 @@ export type CarouselSlots<T> = {
     /** Which slide is showing. It is the only thing that moves the carousel. */
     indexSignal?: SignalSource<number>;
     /** Whether the carousel is advancing by itself. It is the only thing that starts or stops it. */
-    playingSignal?: SignalSource<boolean>;
+    playbackSignal?: SignalSource<boolean>;
     /** Draws one slide. It is handed where the slide stands relative to the one showing. */
     renderSlide: (getSlide: Accessor<T>, getState: Accessor<CarouselSlideState>) => JSX.Element;
     /** Draws one of the move controls. */
@@ -127,7 +150,7 @@ export type CarouselProps<T> = AccessorProps<
             /** Which of the carousel's looks this is. */
             variant: CarouselVariant;
             /** Which way the slides run. */
-            dir?: CarouselDir;
+            orientation?: CarouselOrientation;
             /** Which way round the slides turn. */
             axis?: CarouselAxis;
             /** How large one slide is. */
@@ -143,7 +166,7 @@ export type TrackCarouselProps<T> = AccessorProps<
     CarouselState &
         CarouselLabels & {
             /** Which way the slides run. */
-            dir?: CarouselDir;
+            orientation?: CarouselOrientation;
         }
 > &
     CarouselSlots<T>;

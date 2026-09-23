@@ -2,6 +2,7 @@ import type { Accessor, JSX } from "solid-js";
 
 import type { Index2d, Point2d } from "@thewaver/ss-utils";
 
+import type { CarrierAnnouncements } from "../../Abstracts/Carrier/Carrier.types";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type {
     InteractionTooltipDefs,
@@ -10,6 +11,22 @@ import type {
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
 export type SortableGridSpot = Index2d;
+
+export type SortableGridAnnouncements = CarrierAnnouncements & {
+    /** Describes every item while nothing is picked up, telling a keyboard user that Enter picks it up. */
+    restingKeyHint: string;
+    /** Tells a keyboard user which keys move, drop and cancel a carried item, when there is no other grid to go to. */
+    keyHint: string;
+    /** The same, for when another grid would take the item too, so the key that moves between grids is mentioned. */
+    keyHintAcrossZones: string;
+    /**
+     * Names a spot in the grid, which is what the pick-up, move and drop announcements say the item is at.
+     *
+     * @param spot The cell the item's corner would sit in, counting rows and columns from zero.
+     * @param hasRoom Whether the item fits there, so a reader is told before dropping that it would be refused.
+     */
+    computePlaceLabel: (spot: SortableGridSpot, hasRoom: boolean) => string;
+};
 
 export type SortableGridSize = {
     rowCount: number;
@@ -95,6 +112,8 @@ export type SortableGridController = {
 export type SortableGridItemSlotProps = AccessorProps<{
     /** Identifies this item, so the grid can point focus at it. */
     id: string;
+    /** Points the item at the grid's resting key hint, so a reader hears how to pick it up. */
+    hintId: string;
     /** Names this item for assistive technology. */
     label: string;
     /** This item's place among the items, counting from one. */
@@ -130,6 +149,11 @@ export type SortableGridProps<T> = Omit<InteractionWrapperProps<SortableGridFlag
         groupId: string;
         /** Names the grid for assistive technology. */
         ariaLabel: string;
+        /**
+         * Everything the grid says aloud while an item is moved, and the key hints and spot names those
+         * announcements are built from. There is no default: every word a reader hears comes from here.
+         */
+        announcements: SortableGridAnnouncements;
         /** How many cells across the grid is. */
         columns: number;
         /** How many cells down the grid is. */

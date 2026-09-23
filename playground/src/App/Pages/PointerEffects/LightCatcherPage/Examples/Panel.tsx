@@ -15,6 +15,8 @@ export const PanelExample = (props: Props) => {
                 lightRangePx={props.lightRangePx}
                 maxBrightness={props.maxBrightness}
                 restingBrightness={props.restingBrightness}
+                maxLightness={props.maxLightness}
+                restingLightness={props.restingLightness}
             >
                 <div class={styles.panelCard}>Come nearer</div>
             </LightCatcher>

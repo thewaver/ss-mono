@@ -40,8 +40,8 @@ export const DateRangePickerPage = () => {
                     valueSignal={boundedValue}
                     calendar={getCalendarId}
                     key={"bounded"}
-                    minDate={() => MIN_DATE}
-                    maxDate={() => MAX_DATE}
+                    minValue={() => MIN_DATE}
+                    maxValue={() => MAX_DATE}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Picked.tsx`,

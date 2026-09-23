@@ -360,6 +360,39 @@ prop, with nothing telling the consumer they lost it. `SplitPane`'s gutter had n
 somebody happened to name the pane beside it; `TimePicker`, `DatePicker` and `ColorInput` already did the right
 thing for their popups, so this is the existing practice written down rather than a new one.
 
+### A role that requires a name makes the prop that names it required
+
+WCAG 4.1.2 says a component's name is exposed to assistive technology, and ARIA lists the roles whose name may
+not be omitted: `dialog`, `alertdialog`, `tree`, `grid`, `navigation` with a sibling, `toolbar`, `region`. A
+component that renders one of those and leaves `ariaLabel` optional is one that can fail the criterion on the
+consumer's behalf, silently, because the type said the prop was fine to skip.
+
+So where the role requires a name, the prop is required: `ariaLabel: string`, with the doc block saying why. A
+component that shows its own title offers `ariaLabelledBy` as the alternative, and then the two are a union in
+which exactly one is required (`Modal`'s `ModalNameProps`), never two optionals with a runtime warning, because
+a type fails before the page is opened and a warning fails after. Where a role only recommends a name
+(`form` with no landmark duty) the prop stays optional. `progressbar` is not such a role: ARIA 1.2 lists it beside
+`meter` as name-required, so `Progress` demands one under either role.
+
+### The library says what a component is, and nothing else a reader hears
+
+Stated by the user. The one English string a component may ship is its `aria-roledescription`, the word a screen
+reader uses for what the thing is ("carousel", "wedge", "sortable item"), and even that is a default behind a
+`roleDescription` prop. Every other phrase a reader hears or a sighted user reads — an announcement, a key hint,
+a place label, a button's name, a face's name — is the consumer's, arrives through a required prop, and has no
+default.
+
+The reason is WCAG 3.1.2, Language of Parts: a hardcoded phrase is read in the page's declared language, so a
+German page with an English "picked up from" fails it, and a default is a hardcoded phrase that happens to be
+overridable. It also settles who owns wording: the consumer writes the sentence, the library hands over the parts
+it alone knows. So text with parts is a `compute*` function taking those parts — an item's label, a zone's label,
+a place label, a count, an index from zero — and never a half-built sentence to be completed. Text without parts
+is a plain `string` prop. Where a component has several, they travel as one required object (`announcements`),
+typed per component and sharing `CarrierAnnouncements` where the drag engine is what speaks.
+
+What stays in the library: a number, a percent sign, a date formatted through the consumer's locale, and text the
+consumer already supplied.
+
 ### Anything non-local is exported
 
 The user's preference, stated as _providing consumers with more tooling is the preferred approach for anything
@@ -559,6 +592,25 @@ did and what a merge should leave behind. The namespace holds the published surf
 
 **A file holding more than one namespace is a separate question and is not covered here.** Nothing in
 `Abstracts` does; where one turns up elsewhere, ask before merging.
+
+### `orientation` is the one axis word, and its values are `horizontal` and `vertical`
+
+Stated by the user. A control that lays its children along one axis and walks them with the arrow keys takes
+`orientation: "horizontal" | "vertical"`: Tabs, Sortable, SplitPane, Stepper, RadioGroup, Label, FormField,
+FormSection, the carousels, Range, Bracket and PatchBoard all do. The values are ARIA's own, so wherever a control
+writes `aria-orientation` the prop is written straight through, and a consumer reading the DOM sees the word they
+passed. SplitPane's divider is the one exception: a separator's orientation is the opposite of the panes'.
+
+**Why not `dir`, and why not `row`/`column`.** In HTML `dir` is text direction, left-to-right or right-to-left, and
+the keyboard now reads that too (_"The 1D walk"_), so a prop called `dir` meaning "which axis" would sit beside code
+reading `dir` meaning "which language". And `row` and `col` are reserved here for cells in a grid (_"A grid index
+names its space and its axis"_): a Table's `row` is a horizontal line of cells in a vertical stack, so `dir="row"`
+on a horizontal list pointed the same word two ways.
+
+**What keeps its own word.** A direction rather than an axis stays a direction: Staircase's `dir: "up" | "down"`,
+Toasts' stacking direction. A thing that turns names what it turns about: Barrel, Wheel, FlipCard and the drum
+carousel keep `axis: "row" | "column"`. Older `decisions.md` entries say `dir` and `row`/`column` where a control
+was built before this rule; read them as `orientation` and `horizontal`/`vertical`.
 
 ### Prop prefixes
 
@@ -1076,8 +1128,9 @@ parameter, no collection argument, no reactivity — every caller maps back thro
 keeps it in `*Utils` rather than the `Anchor` / `ElementFader` family.
 
 **Two options, both because a caller was already gating on them.** `orientation` decides which arrows step —
-`"row"` or `"column"` for `Tabs` by its `dir`, `"both"` for `RadioGroup`, `"column"` for `Select` and `Menu`,
-where the horizontal arrows must stay with the caret. It defaults to `"column"`, the narrowest: a default
+`"horizontal"` or `"vertical"` for `Tabs` by its `orientation`, `"both"` for `RadioGroup`, `"vertical"` for
+`Select` and `Menu`, where the horizontal arrows must stay with the caret. It defaults to `"vertical"`, the
+narrowest: a default
 that ignores a key is recoverable, one that hijacks `ArrowLeft` inside a text field is a bug. `hasEdgeKeys`
 gates `Home` / `End`.
 

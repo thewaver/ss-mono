@@ -2,8 +2,9 @@ import { Show, createEffect, createMemo, createSignal, createUniqueId, on, onCle
 
 import { ElementFaderUtils } from "../../Abstracts/ElementFader/ElementFader.utils";
 import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
+import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
-import { access, accessSignal } from "../../Utils/propUtils";
+import { access } from "../../Utils/propUtils";
 import { PREVIEW_DEFAULTS } from "./Preview.const";
 import type { PreviewFlags, PreviewProps, PreviewTriggerProps } from "./Preview.types";
 
@@ -33,7 +34,7 @@ const PreviewTrigger = (props: PreviewTriggerProps) => {
 };
 
 export const Preview = (props: PreviewProps) => {
-    const expandedSignal = accessSignal(() => props.expandedSignal);
+    const expandedSignal = SignalMirrorUtils.createOptional(() => props.expandedSignal, false);
 
     const contentId = createUniqueId();
 

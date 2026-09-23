@@ -20,6 +20,14 @@ export const CollapsiblePage = () => {
             path: `${EXAMPLES_ROOT}/Panel.tsx`,
         },
         {
+            key: "unheld",
+            name: "Nobody holding the state",
+            readout: () =>
+                "no signal passed — the collapsible keeps whether it is open itself, so the page has nothing to show here",
+            component: () => <PanelExample />,
+            path: `${EXAMPLES_ROOT}/Panel.tsx`,
+        },
+        {
             key: "filled",
             name: "Filling its container, built on first open",
             readout: () =>

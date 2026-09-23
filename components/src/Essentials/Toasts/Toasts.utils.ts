@@ -1,3 +1,5 @@
+import type { SwipeDirection } from "@thewaver/ss-utils";
+
 import type {
     ToastsAlignment,
     ToastsDir,
@@ -16,6 +18,17 @@ const EDGE_BY_ALIGNMENT = {
     right: "flex-end",
 } as const;
 
+/** The way a toast leaves by swiping, for each horizontal edge and then for each vertical one. */
+const SWIPE_DIRECTION_BY_HORIZONTAL: Partial<Record<ToastsHorizontalAlignment, SwipeDirection>> = {
+    left: "left",
+    right: "right",
+};
+
+const SWIPE_DIRECTION_BY_VERTICAL: Partial<Record<ToastsVerticalAlignment, SwipeDirection>> = {
+    top: "up",
+    bottom: "down",
+};
+
 /** Each flex edge's mirror, for a reversed stack where the flex direction has already flipped what `flex-start` means. */
 const OPPOSITE_EDGE = {
     "flex-start": "flex-end",
@@ -23,7 +36,7 @@ const OPPOSITE_EDGE = {
     "flex-end": "flex-start",
 } as const;
 
-/** Turns a toast stack's corner into the flex properties that put it there. */
+/** Turns a toast stack's corner into the flex properties that put it there, and the way a toast is swiped off. */
 export namespace ToastUtils {
     /**
      * The flex alignment for a corner and a stacking direction.
@@ -49,5 +62,21 @@ export namespace ToastUtils {
             justifyContent: isReversed ? OPPOSITE_EDGE[main] : main,
             alignItems: cross,
         };
+    };
+
+    /**
+     * Which way a toast is swiped to dismiss it, for the corner or edge its stack sits at.
+     *
+     * The swipe carries the toast off the nearest edge of the screen. A stack against the left or right
+     * edge is swiped sideways, corners included; a stack centered along the top or bottom is swiped up or down; a stack in the middle of the screen has
+     * no edge to leave by.
+     *
+     * @param alignment The corner, as a vertical and a horizontal edge — `"bottom-right"` and the like.
+     * @returns The direction, or `undefined` for `"middle-center"`.
+     */
+    export const computeSwipeDirection = (alignment: ToastsAlignment): SwipeDirection | undefined => {
+        const [vertical, horizontal] = alignment.split("-") as [ToastsVerticalAlignment, ToastsHorizontalAlignment];
+
+        return SWIPE_DIRECTION_BY_HORIZONTAL[horizontal] ?? SWIPE_DIRECTION_BY_VERTICAL[vertical];
     };
 }

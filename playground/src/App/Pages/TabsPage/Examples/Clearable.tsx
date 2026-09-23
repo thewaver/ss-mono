@@ -14,17 +14,17 @@ export const ClearableExample = (props: Props) => {
     return (
         <PageControlColumn>
             <Tabs
-                dir={"row"}
+                orientation={"horizontal"}
                 tabGap={() => ROW_TAB_GAP}
                 ariaLabel={"Clearable views"}
                 transitionDurationMs={() => CLEARABLE_TRANSITION_DURATION_MS}
                 tabs={() => CLEARABLE_TABS}
                 selectedValue={props.selectedValue}
                 onSelectionChange={props.onSelectionChange}
-                renderGutter={() => <PageTabGutter dir={"row"} />}
+                renderGutter={() => <PageTabGutter orientation={"horizontal"} />}
                 renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                     <PageTabFloater
-                        dir={"row"}
+                        orientation={"horizontal"}
                         visibilityTarget={getVisibilityTarget}
                         transitionDurationMs={getTransitionDurationMs}
                     />
@@ -32,7 +32,7 @@ export const ClearableExample = (props: Props) => {
                 renderTab={(getTab, getFlags) => (
                     <PageTabContent
                         flags={getFlags}
-                        dir={"row"}
+                        orientation={"horizontal"}
                         isSelected={() => getTab().value === access(props.selectedValue)}
                     >
                         {getTab().value}

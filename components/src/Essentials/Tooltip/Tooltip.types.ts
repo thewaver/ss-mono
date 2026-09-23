@@ -25,10 +25,23 @@ export type TooltipProps = AccessorProps<{
     /** How long the tooltip takes to fade in and out. */
     transitionDurationMs?: number;
     /**
-     * How long a keyboard focus has to rest on the anchor before the tooltip appears. Hovering shows it at
-     * once; only focus waits, so tabbing through a row of controls does not flash a tooltip per stop.
+     * How long a keyboard focus has to rest on the anchor before the tooltip appears, so tabbing through a
+     * row of controls does not flash a tooltip per stop.
      */
     focusShowDelayMs?: number;
+    /**
+     * How long the pointer has to rest on the anchor before the tooltip appears, so sweeping across a row of
+     * controls does not flash a tooltip per control. Leaving before then shows nothing. Set it to `0` to
+     * show on hover at once.
+     */
+    hoverShowDelayMs?: number;
+    /**
+     * How soon after any tooltip on the page has closed a hover opens this one at once, without waiting out
+     * `hoverShowDelayMs`. Every tooltip shares one record of when the last one closed, so once a reader has
+     * waited for one tooltip, moving to its neighbor shows the next straight away. Focus always waits
+     * `focusShowDelayMs`.
+     */
+    skipDelayWindowMs?: number;
     /**
      * The element the tooltip is anchored to and watches. It is also what gets `aria-describedby` while the
      * tooltip is up, which is how the tooltip is announced at all.

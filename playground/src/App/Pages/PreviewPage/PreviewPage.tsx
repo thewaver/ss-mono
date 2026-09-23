@@ -36,6 +36,16 @@ export const PreviewPage = () => {
             path: `${EXAMPLES_ROOT}/Text.tsx`,
         },
         {
+            key: "unheld",
+            name: "Nobody holding the state",
+            readout: () =>
+                "no signal passed — the preview keeps whether it is expanded itself, so the page has nothing to show here",
+            component: () => (
+                <TextExample collapsedHeight={() => COLLAPSED_HEIGHT} paragraphs={() => LONG_PARAGRAPHS} />
+            ),
+            path: `${EXAMPLES_ROOT}/Text.tsx`,
+        },
+        {
             key: "short",
             name: "Less than fits",
             readout: () => `expanded: ${shortSignal[0]()} — same component, same height, no control and no fade at all`,

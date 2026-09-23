@@ -24,6 +24,19 @@ describe("getKind", () => {
     });
 });
 
+describe("getStaysOpenOnPick", () => {
+    it("keeps the menu open for a checkbox and closes it for a command or a radio when the item says nothing", () => {
+        expect(MenuUtils.getStaysOpenOnPick(items[0])).toBe(false);
+        expect(MenuUtils.getStaysOpenOnPick(items[1])).toBe(true);
+        expect(MenuUtils.getStaysOpenOnPick(items[2])).toBe(false);
+    });
+
+    it("takes the item's own answer over its kind", () => {
+        expect(MenuUtils.getStaysOpenOnPick({ value: "zoom", staysOpenOnPick: true })).toBe(true);
+        expect(MenuUtils.getStaysOpenOnPick({ value: "wrap", kind: "checkbox", staysOpenOnPick: false })).toBe(false);
+    });
+});
+
 describe("getRadioGroupValues", () => {
     it("gathers the whole run a radio row belongs to, from anywhere inside it", () => {
         expect(MenuUtils.getRadioGroupValues(items, 2)).toEqual(["small", "medium", "large"]);

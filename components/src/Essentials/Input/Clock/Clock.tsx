@@ -63,6 +63,8 @@ export const Clock = (props: ClockProps) => {
     const [getHighlighted, setHighlighted] = createSignal<TimeValue | undefined>();
     const [getHighlightedUnit, setHighlightedUnit] = createSignal<ClockUnit | undefined>();
 
+    const getDirection = NavigatorUtils.createDirectionSignal(getRootRef);
+
     const getIsTwelveHour = createMemo(() => access(props.isTwelveHour) ?? false);
 
     const getHasSeconds = createMemo(() => access(props.hasSeconds) ?? false);
@@ -74,7 +76,7 @@ export const Clock = (props: ClockProps) => {
     const withShape = (time: TimeValue) => (getHasSeconds() ? { ...time, second: time.second ?? 0 } : time);
 
     const getBase = createMemo(() =>
-        withShape(valueSignal[0]() ?? TimeUtils.clamp(getNow(), access(props.min), access(props.max))),
+        withShape(valueSignal[0]() ?? TimeUtils.clamp(getNow(), access(props.minValue), access(props.maxValue))),
     );
 
     const getUnits = createMemo<ClockUnit[]>(() => {
@@ -130,7 +132,7 @@ export const Clock = (props: ClockProps) => {
 
     const getIsTimeDisabled = (time: TimeValue) =>
         (access(props.isDisabled) ?? false) ||
-        !TimeUtils.getIsInRange(time, access(props.min), access(props.max)) ||
+        !TimeUtils.getIsInRange(time, access(props.minValue), access(props.maxValue)) ||
         (props.computeIsTimeDisabled?.(time) ?? false);
 
     const setOptionRef = (unit: ClockUnit, index: number, element: HTMLElement) => {
@@ -195,7 +197,7 @@ export const Clock = (props: ClockProps) => {
         }
 
         const nextIndex = NavigatorUtils.computeNextPosition(e.key, index, column.readings.length, {
-            orientation: "column",
+            orientation: "vertical",
         });
 
         if (nextIndex !== undefined) {
@@ -208,7 +210,8 @@ export const Clock = (props: ClockProps) => {
         }
 
         const nextUnitIndex = NavigatorUtils.computeNextPosition(e.key, unitIndex, columns.length, {
-            orientation: "row",
+            orientation: "horizontal",
+            direction: getDirection(),
             hasEdgeKeys: false,
         });
 

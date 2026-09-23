@@ -5,8 +5,9 @@ import { MathUtils } from "@thewaver/ss-utils";
 
 import { ElementFaderUtils } from "../../../Abstracts/ElementFader/ElementFader.utils";
 import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
+import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
-import { access, accessSignal } from "../../../Utils/propUtils";
+import { access } from "../../../Utils/propUtils";
 import { COLLAPSIBLE_DEFAULTS } from "./Collapsible.const";
 import type { CollapsibleFlags, CollapsibleProps, CollapsibleTriggerProps } from "./Collapsible.types";
 
@@ -38,7 +39,7 @@ const CollapsibleTrigger = (props: CollapsibleTriggerProps) => {
 };
 
 export const Collapsible = (props: CollapsibleProps) => {
-    const expandedSignal = accessSignal(() => props.expandedSignal);
+    const expandedSignal = SignalMirrorUtils.createOptional(() => props.expandedSignal, false);
 
     const triggerId = createUniqueId();
     const panelId = createUniqueId();

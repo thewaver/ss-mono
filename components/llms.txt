@@ -15,9 +15,9 @@ Grouped by the source tree's own top-level folders.
 
 ### Essentials — the standard control and layout set
 Accordion, Collapsible, AudioSwitcher, Breadcrumbs, Button, Calendar, RangeCalendar, Checkbox,
-Clock, ColorArea, ColorInput, CurrencyInput, DateInput, DatePicker, DateRangePicker,
-DateTimePicker, DrumCarousel, TrackCarousel, Drawer, FanMenu, FileInput, Form, FormField,
-FormSection, ImageSwitcher, Label, Menu, Modal, MultiSelect, NumberInput, Paginator, Preview,
+CheckboxGroup, Clock, ColorArea, ColorInput, CurrencyInput, DateInput, DatePicker, DateRangePicker,
+DateTimePicker, DrumCarousel, TrackCarousel, Drawer, HoverCard, FanMenu, FileInput, Form, FormField,
+FormSection, ImageSwitcher, Label, Listbox, MultiListbox, Menu, Menubar, Modal, MultiSelect, NumberInput, Paginator, Preview,
 Progress, Radio, RadioGroup, Range, Scroller, Select, SlideButton, Sortable, SpotlightGuide,
 SpotlightHint, SpotlightPrompt, SplitPane, Stepper, Table, Tabs, TagInput, TextArea, TextInput,
 TimeInput, TimePicker, Toasts, Toggle, Toolbar, Tooltip, Tree, ViewportWrapper, WheelMenu.

@@ -60,6 +60,7 @@ const SortableGridItemSlot = (props: SortableGridItemSlotProps) => {
             aria-posinset={access(props.position)}
             aria-setsize={access(props.setSize)}
             aria-disabled={getIsDisabled() || undefined}
+            aria-describedby={access(props.hintId)}
             onPointerDown={props.onPointerDown}
             onKeyDown={props.onKeyDown}
             onClick={props.onClick}
@@ -89,6 +90,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
     const itemsSignal = accessSignal(() => props.itemsSignal);
 
     const gridId = createUniqueId();
+    const hintId = createUniqueId();
 
     const viewportContext = useViewportContext();
 
@@ -191,11 +193,9 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         getLabel: () => access(props.ariaLabel),
         getRootRef,
         getIsDisabled,
-        getRestingKeyHint: () => "Press Enter to pick this up and move it.",
         getKeyHint: (hasOtherZones) =>
-            hasOtherZones
-                ? "Arrow keys move it, Tab changes grid, Enter drops, Escape cancels."
-                : "Arrow keys move it, Enter drops, Escape cancels.",
+            hasOtherZones ? access(props.announcements).keyHintAcrossZones : access(props.announcements).keyHint,
+        getAnnouncements: () => access(props.announcements),
         computeCanAccept: (carry) => {
             if (getIsDisabled() || getIsLocked()) return false;
 
@@ -262,9 +262,11 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         },
         computePlaceLabel: (place, carry) => {
             const current = asPlace(place);
-            const room = zone.computeIsPlaceAllowed(place, carry) ? "" : ", no room";
 
-            return `column ${current.col + 1}, row ${current.row + 1}${room}`;
+            return access(props.announcements).computePlaceLabel(
+                { col: current.col, row: current.row },
+                zone.computeIsPlaceAllowed(place, carry),
+            );
         },
         takeAt: (_unused, carry) => {
             itemsSignal[1]((items) => items.filter((item) => props.computeItemKey(item.value) !== carry.key));
@@ -376,7 +378,6 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             const isReachable = InteractionTrackerUtils.computeIsReachable(
                 item.isDisabled ?? false,
                 item.isReachableWhenDisabled ?? false,
-                item.tooltipDefs !== undefined,
             );
 
             if (!item.isDisabled || isReachable) acc.push(index);
@@ -719,6 +720,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                                                     setItemElementRef(element);
                                                 }}
                                                 id={() => getItemId(index)}
+                                                hintId={() => hintId}
                                                 label={() => getItemLabel(getItem())}
                                                 position={() => getReadingOrder().indexOf(index) + 1}
                                                 setSize={() => getItems().length}
@@ -759,6 +761,9 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                             </div>
                         )}
                     </Show>
+                    <div id={hintId} class={styles.sortableGridHint}>
+                        {access(props.announcements).restingKeyHint}
+                    </div>
                 </div>
             )}
         />

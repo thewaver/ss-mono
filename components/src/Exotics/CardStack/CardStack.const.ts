@@ -4,4 +4,6 @@ export const CARD_STACK_DEFAULTS = {
     mountedCount: 5,
     cardGap: 4,
     funnelRatio: 0.05,
+    roleDescription: "card stack",
+    cardRoleDescription: "card",
 };

@@ -59,6 +59,7 @@ reading.
 25. The scanline page is twelve examples of one example — _open_
 26. Components that turn under perspective reserve room they do not need at rest — _open_
 27. `CardStack` — the pointer route the library cannot promise — _open_
+28. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
 
 ### Build order
 
@@ -234,7 +235,7 @@ these is an accepted limit, because none is a fault; they are simply not wanted.
 
 ### Next up, in the user's order
 
-**Nothing is queued here.** `Stepper` was the last of them and shipped on **2026-08-15**.
+**Nothing is queued here.**
 
 **`Breadcrumbs`, `TagInput`, `SplitPane` and `Stepper` were all built on 2026-08-15** and are no longer here; their decisions are in
 `decisions.md`. What each left behind as a gap is recorded there rather than reopened as an item: a
@@ -253,12 +254,24 @@ recorded there rather than reopened as an item: no column pinning, no grouping o
 expandable rows, no inline cell editing, no filtering, and no key that steps into a cell holding more than one
 control.
 
-- **A command palette.** Mostly assembled already — `Select`'s autocomplete inside a `Modal`, since typing to
+- **A command palette.** To be reopened: the list now stands alone as `Listbox`, `TextInput` opens a list of
+  suggestions with the combobox wiring, and `Modal` seals the page behind it, so what was two missing pieces is
+  now closer to one, a document-level hotkey registry, plus a check that the windowed list handles groups. Before
+  those landed it was mostly assembled already — `Select`'s autocomplete inside a `Modal`, since typing to
   narrow a list is what the autocomplete does. What separates it from `Menu` is that it is opened by a
   shortcut rather than by a button, and holds every action in the application rather than the few that relate
   to one element. Two pieces are missing: results gathered from several sources and shown in labeled groups,
   which is the grouped-and-windowed case item 2 leaves open, and a document-level hotkey, which wants the
   register-and-stack shape `Dismisser` has rather than a listener per consumer.
+
+- **A scroll area with custom scrollbars.** Radix, Ark, Mantine and PrimeReact each ship one: the native bar hidden,
+  the content and viewport measured, a thumb drawn to mirror the scroll, dragged and clicked. Nothing here draws a
+  thumb, so it would be new machinery rather than a prop, and it is every reference library's longest-lived source
+  of bugs: overlay bars on macOS, touch scrolling on iOS, `scrollbar-gutter`, right-to-left, nested areas. Placed
+  last by the user because CSS now covers the reason it existed: `scrollbar-color` and `scrollbar-width` style
+  the native bar in every current browser, and the expectation is that the platform's customization only grows.
+  What CSS still cannot give is an overlay bar that fades when idle; that is the one thing a consumer would come
+  here for, and the one thing this item would build.
 
 **_Elsewhere._** Ark UI's set is the widest of the headless libraries and is the most useful scope check
 available: it has a tree view, a pagination component, a **segment group** — a segmented control as its
@@ -1193,6 +1206,26 @@ pointer route is the swipe fails 2.5.1 and 2.5.7, and the library cannot promise
 a consumer cannot ask for the gesture without also supplying the route. That trick is open only to a component
 that draws the controls itself, which the user ruled this one must not. The Playground's deck is what
 discharging it looks like: four buttons beside the pile, each calling `send`.
+
+## 28. The submit story — what a native submit carries, and what `Form` hands `onSubmit`
+
+Three findings from the survey against the reference libraries were lofted here rather than settled one by one,
+because they are one question. **The user's word: lofted, not discarded.**
+
+- `Select` and `MultiSelect` have no `name` and render no native element, so a plain `<form>` around them submits
+  nothing. Radix, Kobalte and Ark render a hidden native input so `name` submits. `Checkbox` and `Toggle` got their
+  `name` back separately, since they already render a native input.
+- `DateInput`, `DatePicker` and `TimeInput` put `name` on the visible field, so a native submit sends the display
+  text, `23/09/2026` or `09/23/2026` by format, rather than a value a server can parse. React Aria sends ISO through
+  a hidden input. Inferred from the shared `TextField`, not traced.
+- `Form` cancels the browser's own submit and hands `onSubmit` nothing, so today `name` matters only to a consumer
+  who reads the fields themselves or uses a plain `<form>` without `Form`.
+
+The first two are the same change, a hidden input carrying a machine-readable value, and both wait on the third:
+whether the library's `Form` is ever going to carry values, or whether the native submit is the route a consumer
+who wants values takes. _"The form story"_ in `decisions.md` says the library never computes a form's data, and
+that entry is what this item would revisit. Focus moving to the first field in error on submit was built
+separately and does not depend on this.
 
 ## Accepted limits
 

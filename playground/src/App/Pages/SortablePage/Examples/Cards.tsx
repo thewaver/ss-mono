@@ -3,6 +3,7 @@ import type { Accessor, Signal } from "solid-js";
 import { Sortable, access } from "@thewaver/ss-components";
 import type { InteractionFlags, MaybeAccessor, SortableItem, SortableItemFlags } from "@thewaver/ss-components";
 
+import { SORTABLE_ANNOUNCEMENTS } from "../../../PageComponents/Announcements/Announcements.const";
 import {
     PageSortableItemContent,
     PageSortableMarker,
@@ -16,7 +17,7 @@ type Props = {
     itemsSignal: Signal<SortableItem<Card>[]>;
     ariaLabel: string;
     emptyText: string;
-    dir?: MaybeAccessor<"row" | "column">;
+    orientation?: MaybeAccessor<"horizontal" | "vertical">;
     isDisabled?: MaybeAccessor<boolean>;
     isLocked?: MaybeAccessor<boolean>;
     computeCanAccept?: (value: Card, fromLabel: string) => boolean;
@@ -35,7 +36,8 @@ export const CardsExample = (props: Props) => (
     <Sortable
         groupId={props.groupId}
         ariaLabel={props.ariaLabel}
-        dir={() => access(props.dir) ?? "column"}
+        announcements={SORTABLE_ANNOUNCEMENTS}
+        orientation={props.orientation}
         gap={LIST_GAP}
         minHeight={72}
         isDisabled={() => access(props.isDisabled) ?? false}
@@ -46,7 +48,7 @@ export const CardsExample = (props: Props) => (
         computeCanAccept={props.computeCanAccept}
         renderItem={renderCard}
         renderCarried={(getItem) => renderCard(getItem, () => RESTING_FLAGS)}
-        renderMarker={(getDir) => <PageSortableMarker dir={getDir} />}
+        renderMarker={(getOrientation) => <PageSortableMarker orientation={getOrientation} />}
         renderDecoration={(getFlags) => <PageSortableSurface flags={getFlags} emptyText={props.emptyText} />}
         onTransfer={(transfer) => props.onTransfer?.(transfer.toLabel)}
     />
