@@ -1,6 +1,6 @@
 import { For, createSignal } from "solid-js";
 
-import { ParticleSpawner } from "@thewaver/ss-components";
+import { ParticleSpawner, access } from "@thewaver/ss-components";
 
 import { computeParticleGlow } from "../ParticleSpawnerPage.const";
 import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
@@ -23,6 +23,7 @@ export const GridExample = (props: ParticleSpawnerExampleProps) => {
                     <div
                         ref={(el) => setTargetRefAt(index(), el)}
                         class={styles.targetMarker}
+                        classList={{ [styles.isHiddenMarker]: access(props.areTargetsHidden) }}
                         style={{ left: "90%", top }}
                     />
                 )}

@@ -57,6 +57,10 @@ export const movingTargetMarker = style([
     },
 ]);
 
+export const isHiddenMarker = style({
+    visibility: "hidden",
+});
+
 export const particle = style({
     width: PARTICLE_SIZE_PX,
     height: PARTICLE_SIZE_PX,

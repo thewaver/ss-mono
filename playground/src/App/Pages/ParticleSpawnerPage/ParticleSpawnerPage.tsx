@@ -8,7 +8,7 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
-import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { DiagonalExample } from "./Examples/Diagonal";
 import { GridExample } from "./Examples/Grid";
 import { MovingTargetExample } from "./Examples/MovingTarget";
@@ -108,6 +108,8 @@ export const ParticleSpawnerPage = () => {
     const [getIterationPatternKey, setIterationPatternKey] =
         createSignal<IterationPattern>(STARTING_ITERATION_PATTERN_KEY);
 
+    const [getAreTargetsHidden, setAreTargetsHidden] = createSignal(false);
+
     const [travelDefs, setTravelDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
     const playback = createSignal(true);
 
@@ -135,6 +137,7 @@ export const ParticleSpawnerPage = () => {
             spawnDelayMs: getSpawnDelayMs,
             spawnIterationPatterns: () => ITERATION_PATTERNS[getIterationPatternKey()](),
             computeParticlePos: (defs, t) => getComputeParticlePos()(defs, t),
+            areTargetsHidden: getAreTargetsHidden,
             playbackSignal: playback,
         };
 
@@ -348,6 +351,20 @@ export const ParticleSpawnerPage = () => {
                             width={() => FIELD_WIDTH}
                             ariaLabel={"Overshoot percent"}
                             onInput={setOvershootPercent}
+                        />
+                    </PageProp>
+
+                    <PageProp
+                        key={"areTargetsHidden"}
+                        label={"Hide targets"}
+                        hint={
+                            "Takes the target markers out of sight while leaving them where they are, so the particles still land on them."
+                        }
+                    >
+                        <PageCheckField
+                            value={getAreTargetsHidden}
+                            ariaLabel={"Hide targets"}
+                            onChange={setAreTargetsHidden}
                         />
                     </PageProp>
 

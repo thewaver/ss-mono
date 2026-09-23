@@ -1,6 +1,6 @@
 import { createSignal } from "solid-js";
 
-import { ParticleSpawner } from "@thewaver/ss-components";
+import { ParticleSpawner, access } from "@thewaver/ss-components";
 
 import { computeParticleGlow } from "../ParticleSpawnerPage.const";
 import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
@@ -12,7 +12,12 @@ export const VerticalExample = (props: ParticleSpawnerExampleProps) => {
 
     return (
         <div class={styles.demoArea}>
-            <div ref={setTargetRef} class={styles.targetMarker} style={{ left: "50%", top: "85%" }} />
+            <div
+                ref={setTargetRef}
+                class={styles.targetMarker}
+                classList={{ [styles.isHiddenMarker]: access(props.areTargetsHidden) }}
+                style={{ left: "50%", top: "85%" }}
+            />
 
             <div class={styles.spawnerRoot} style={{ left: "50%", top: "15%" }}>
                 <div class={styles.spawnerMarker} />
