@@ -8,4 +8,5 @@ export type PlacementBoxContextType = {
     getOverreach: () => number;
     getPrefersReducedMotion: () => boolean;
     getComputeEffect: () => ProximityEffectFn | undefined;
+    getTransitionDurationMs: () => number;
 };

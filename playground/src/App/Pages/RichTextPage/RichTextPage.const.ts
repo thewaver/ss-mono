@@ -26,3 +26,16 @@ export const DIFF_CONTENT = [
     "[add][b]two tags of its own[/b][/add] and paint them [sub]the way every other tag is painted[/sub]",
     "[add]however it likes[/add].",
 ].join(" ");
+
+export const GLOSSARY_CONTENT = [
+    'The keep was raised by masons paid in [term tip="A weight of silver, not a coin — eight ounces, counted rather than struck."]marks[/term]',
+    'rather than in coin, and every payment was cut into a [term tip="A split stick notched with the sum, one half kept by each side."][i]tally[/i][/term],',
+    "which is why the accounts survive at all.",
+].join(" ");
+
+export const LINKS_CONTENT = [
+    'Every link here is drawn by the page: this one goes to the [a href="/tooltip"]Tooltip page[/a],',
+    'this one [a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a"]leaves the site[/a],',
+    'this one is [a href="/shape"][b]bold inside a link[/b][/a], and',
+    '[a href="javascript:alert(1)"]this one[/a] was turned down by the page, so it prints as typed.',
+].join(" ");

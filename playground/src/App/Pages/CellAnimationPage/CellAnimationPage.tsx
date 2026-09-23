@@ -1,4 +1,5 @@
 import { createMemo, createSignal } from "solid-js";
+import type { Signal } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import {
@@ -31,6 +32,8 @@ import {
 import knight_profile from "../../knight_profile.webp";
 import type { CellAnimationExampleProps, CellAnimationSourcedExampleProps } from "./CellAnimationPage.types";
 import { DefaultExample } from "./Examples/Default";
+import { ScrubExample } from "./Examples/Scrub";
+import { WipeExample } from "./Examples/Wipe";
 
 import * as styles from "./CellAnimationPage.css";
 
@@ -66,6 +69,8 @@ const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
 ];
 
 const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Default.tsx";
+const SCRUB_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Scrub.tsx";
+const WIPE_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Wipe.tsx";
 const DRAWN_SOURCE_PATH = "/src/App/PageComponents/SVGDefsSources/SVGDefsSources.const.ts";
 
 const MIN_CELL_COUNT = 1;
@@ -85,6 +90,7 @@ const ENDLESS_ITERATION_COUNT = -1;
 const FINAL_FRAMES: CellAnimationFinalFrame[] = ["source", "cells", "nothing"];
 const MIN_HOLD_MS = 0;
 const MAX_HOLD_MS = 5000;
+const PERCENT = 100;
 
 const computeContainerWidth = (size: Size2d) => (IMAGE_CONTAINER_SIZE * size.width) / Math.max(size.width, size.height);
 
@@ -255,6 +261,32 @@ const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
     );
 };
 
+const ScrubExampleWrapper = (props: CellAnimationExampleProps & { progressSignal: Signal<number> }) => {
+    return (
+        <>
+            <div class={styles.exampleRoot}>
+                <ScrubExample {...props} src={() => knight_profile} />
+            </div>
+
+            <PagePropsPanel scope={"local"}>
+                <PageProp
+                    key={"scrubIsPlaying"}
+                    label={"Playing"}
+                    hint={
+                        "Runs the pass on its own, and the slider follows it. Stopped, the slider is the only thing that moves the grid."
+                    }
+                >
+                    <PageCheckField
+                        value={props.playbackSignal[0]}
+                        ariaLabel={"Playing"}
+                        onChange={props.playbackSignal[1]}
+                    />
+                </PageProp>
+            </PagePropsPanel>
+        </>
+    );
+};
+
 const StressTestWrapper = (props: CellAnimationSourcedExampleProps) => {
     const modalPlayback = createSignal(true);
 
@@ -286,6 +318,8 @@ const StressTestWrapper = (props: CellAnimationSourcedExampleProps) => {
 
 export const CellAnimationPage = () => {
     const playback = createSignal(true);
+    const scrubPlayback = createSignal(false);
+    const scrubProgress = createSignal(0);
 
     const [getOriginType, setOriginType] = createSignal<CellAnimationOrigins.OriginType>("center");
     const [getWeightType, setWeightType] = createSignal<CellAnimationWeights.WeightType>("diamondDefault");
@@ -350,6 +384,28 @@ export const CellAnimationPage = () => {
                     "the same for the patterns, which flow on without a pause — a repeating fill has no beat to be out of step with",
                 component: () => <PatternExampleWrapper {...commonProps} />,
                 path: DRAWN_SOURCE_PATH,
+            },
+            {
+                key: "scrub",
+                name: "Scrubbed by a slider",
+                readout: () =>
+                    `${Math.round(scrubProgress[0]() * PERCENT)}% through the pass, ${scrubPlayback[0]() ? "running" : "stopped"} — the progress signal is written by the component while it plays, and writing it moves the pass there`,
+                component: () => (
+                    <ScrubExampleWrapper
+                        {...commonProps}
+                        playbackSignal={scrubPlayback}
+                        progressSignal={scrubProgress}
+                    />
+                ),
+                path: SCRUB_EXAMPLE_PATH,
+            },
+            {
+                key: "wipe",
+                name: "A screen wipe",
+                readout: () =>
+                    "a solid-color picture fixed over the whole viewport, its cells growing in by the chosen weight and going back out after a hold; the lozenge is each cell turned 45° and grown past its box until it covers it, and there is no circle, since a cell can only be transformed and filtered, not reshaped",
+                component: () => <WipeExample {...commonProps} />,
+                path: WIPE_EXAMPLE_PATH,
             },
             {
                 key: "stressTest",
@@ -491,7 +547,7 @@ export const CellAnimationPage = () => {
                     key={"smoothness01"}
                     label={"Smoothness (0-1)"}
                     hint={
-                        "How much a cell's own movement overlaps its neighbours'. 0 makes each cell wait its turn; 1 blurs them into one sweep."
+                        "How much a cell's own movement overlaps its neighbors'. 0 makes each cell wait its turn; 1 blurs them into one sweep."
                     }
                 >
                     <PageNumberField

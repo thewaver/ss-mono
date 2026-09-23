@@ -234,3 +234,67 @@ describe("computeTicks", () => {
         expect(TimelineUtils.computeTicks(span(10, 10), { step: 1, majorStep: 5 })).toEqual([]);
     });
 });
+
+describe("computeMarkers", () => {
+    it("places each marker as a share of the view and says whether it is on screen", () => {
+        expect(TimelineUtils.computeMarkers([25, 50, 80], span(20, 70))).toEqual([
+            { value: 25, ratio: 0.1, isInView: true },
+            { value: 50, ratio: 0.6, isInView: true },
+            { value: 80, ratio: 1.2, isInView: false },
+        ]);
+    });
+
+    it("counts a marker on either edge of the view as in view", () => {
+        const markers = TimelineUtils.computeMarkers([20, 70], span(20, 70));
+
+        expect(markers.map((marker) => marker.isInView)).toEqual([true, true]);
+    });
+});
+
+describe("moveEdge", () => {
+    it("moves only the edge it was asked to", () => {
+        expect(TimelineUtils.moveEdge(span(10, 20), "end", 35, RANGE)).toEqual(span(10, 35));
+        expect(TimelineUtils.moveEdge(span(10, 20), "start", 4, RANGE)).toEqual(span(4, 20));
+    });
+
+    it("stops an edge at the other one rather than turning the span inside out", () => {
+        expect(TimelineUtils.moveEdge(span(10, 20), "end", 2, RANGE)).toEqual(span(10, 10));
+        expect(TimelineUtils.moveEdge(span(10, 20), "start", 50, RANGE)).toEqual(span(20, 20));
+    });
+
+    it("keeps the edge inside the range", () => {
+        expect(TimelineUtils.moveEdge(span(10, 20), "end", 400, RANGE)).toEqual(span(10, 100));
+        expect(TimelineUtils.moveEdge(span(10, 20), "start", -5, RANGE)).toEqual(span(0, 20));
+    });
+});
+
+describe("computeSteppedEdgeValue", () => {
+    const toWhole = (value: number) => Math.round(value);
+    const toTens = (value: number) => Math.round(value / 10) * 10;
+
+    it("moves one step either way when nothing snaps", () => {
+        expect(TimelineUtils.computeSteppedEdgeValue(40, 1, 5, RANGE)).toBe(45);
+        expect(TimelineUtils.computeSteppedEdgeValue(40, -1, 5, RANGE)).toBe(35);
+    });
+
+    it("lands on the very next snapped value when the snap is finer than the step", () => {
+        expect(TimelineUtils.computeSteppedEdgeValue(40.4, 1, 30, RANGE, toWhole)).toBe(41);
+        expect(TimelineUtils.computeSteppedEdgeValue(40.4, -1, 30, RANGE, toWhole)).toBe(40);
+        expect(TimelineUtils.computeSteppedEdgeValue(40, 1, 30, RANGE, toWhole)).toBe(41);
+    });
+
+    it("keeps stepping until a coarser snap gives a new value, so every press moves one notch", () => {
+        expect(TimelineUtils.computeSteppedEdgeValue(40, 1, 1, RANGE, toTens)).toBe(50);
+        expect(TimelineUtils.computeSteppedEdgeValue(40, -1, 1, RANGE, toTens)).toBe(30);
+    });
+
+    it("stops at the ends of the range, and stays put when it is already there", () => {
+        expect(TimelineUtils.computeSteppedEdgeValue(98, 1, 5, RANGE)).toBe(100);
+        expect(TimelineUtils.computeSteppedEdgeValue(100, 1, 1, RANGE, toTens)).toBe(100);
+        expect(TimelineUtils.computeSteppedEdgeValue(0, -1, 1, RANGE, toTens)).toBe(0);
+    });
+
+    it("moves nothing for a step of nothing", () => {
+        expect(TimelineUtils.computeSteppedEdgeValue(40, 1, 0, RANGE, toTens)).toBe(40);
+    });
+});

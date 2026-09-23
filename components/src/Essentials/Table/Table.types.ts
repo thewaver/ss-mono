@@ -156,8 +156,8 @@ export type TableProps<T> = TableOrderProps &
          * exactly as {@link TableProps.renderResizer} already works — so an unpainted control is invisible but
          * still hit-testable, and sorting does not quietly stop working for a consumer who never drew an arrow.
          *
-         * **Three targets now share a header cell**, and 2.5.8 Target Size wants a 24 CSS pixel circle centred on
-         * each undersized one to clear the others — so their centres need roughly that much space between them,
+         * **Three targets now share a header cell**, and 2.5.8 Target Size wants a 24 CSS pixel circle centered on
+         * each undersized one to clear the others — so their centers need roughly that much space between them,
          * which is the consumer's to arrange.
          */
         renderSortControl?: (getRenderProps: () => TableColumnRenderProps) => JSX.Element;

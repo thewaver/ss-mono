@@ -1,8 +1,28 @@
-import { style } from "@vanilla-extract/css";
+import { createVar, keyframes, style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
 
 const panel = (from: string, to: string) => `linear-gradient(180deg, ${from}, ${to})`;
+
+export const fadeDurationVar = createVar();
+
+const fadeIn = keyframes({
+    "0%": { opacity: 0 },
+    "100%": { opacity: 1 },
+});
+
+const fadeOut = keyframes({
+    "0%": { opacity: 1 },
+    "100%": { opacity: 0 },
+});
+
+export const isEntering = style({
+    animation: `${fadeIn} ${fadeDurationVar} ease-out`,
+});
+
+export const isLeaving = style({
+    animation: `${fadeOut} ${fadeDurationVar} ease-in forwards`,
+});
 
 export const stack = style({
     display: "flex",

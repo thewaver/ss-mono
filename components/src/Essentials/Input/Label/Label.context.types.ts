@@ -1,4 +1,4 @@
 export type LabelContextType = {
-    getIsLabelled: () => boolean;
+    getIsLabeled: () => boolean;
     getLabelId: () => string | undefined;
 };

@@ -19,6 +19,42 @@ export const timelineTick = style({
     width: 0,
 });
 
+export const timelineMarkers = style({
+    position: "absolute",
+    inset: 0,
+    pointerEvents: "none",
+});
+
+export const timelineMarker = style({
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    width: 0,
+});
+
+export const timelineHint = style({
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 1,
+    height: 1,
+    margin: -1,
+    padding: 0,
+    overflow: "hidden",
+    clipPath: "inset(50%)",
+    whiteSpace: "nowrap",
+    border: 0,
+});
+
+export const timelineEdge = style({
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    pointerEvents: "all",
+    touchAction: "none",
+    cursor: "ew-resize",
+});
+
 export const timelineList = style({
     position: "absolute",
     inset: 0,

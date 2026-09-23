@@ -10,7 +10,7 @@ const LABEL_GAP = 5;
 
 type Props = SelectExampleProps;
 
-export const LabelledExample = (props: Props) => {
+export const LabeledExample = (props: Props) => {
     return (
         <Label orientation={"vertical"} gap={() => LABEL_GAP}>
             <PageLabelCaption>Country</PageLabelCaption>

@@ -96,7 +96,7 @@ test("changing a joint radius redraws the path", async ({ page }) => {
  * animation is that a new defs record produces new `animate` elements. That is the contract and it has never
  * had a guard: the builders used to carry a `Show ... keyed` that looked like it owned the reset and could
  * never fire, because it read a plain object rather than anything reactive. It is gone, and this is what
- * takes its place. If the defs are ever memoised so the same record survives a change, this fails.
+ * takes its place. If the defs are ever memoized so the same record survives a change, this fails.
  */
 test("an animated def is rebuilt when its animation changes, which is what resets it", async ({ page }) => {
     const hold = () =>

@@ -22,3 +22,24 @@ describe("computeCurrentIndex", () => {
         expect(ElementObserverUtils.computeCurrentIndex([-50, undefined, 100], 120)).toBe(2);
     });
 });
+
+describe("computeViewportProgress", () => {
+    it("is nothing while the element has yet to come up past the bottom edge", () => {
+        expect(ElementObserverUtils.computeViewportProgress(800, 200, 800)).toBe(0);
+        expect(ElementObserverUtils.computeViewportProgress(1200, 200, 800)).toBe(0);
+    });
+
+    it("is everything once the element's bottom has gone past the top edge", () => {
+        expect(ElementObserverUtils.computeViewportProgress(-200, 200, 800)).toBe(1);
+        expect(ElementObserverUtils.computeViewportProgress(-900, 200, 800)).toBe(1);
+    });
+
+    it("runs in a straight line between the two", () => {
+        expect(ElementObserverUtils.computeViewportProgress(300, 200, 800)).toBe(0.5);
+        expect(ElementObserverUtils.computeViewportProgress(550, 200, 800)).toBe(0.25);
+    });
+
+    it("is nothing when there is no height to travel through", () => {
+        expect(ElementObserverUtils.computeViewportProgress(0, 0, 0)).toBe(0);
+    });
+});

@@ -111,3 +111,37 @@ describe("getIsWhitespace", () => {
         ]);
     });
 });
+
+describe("getCarriedIndices", () => {
+    const carry = (previous: string, next: string) =>
+        ScrambleTextUtils.getCarriedIndices(Array.from(previous), Array.from(next));
+
+    it("carries every character over when nothing changed", () => {
+        expect(carry("ABC", "ABC")).toEqual([0, 1, 2]);
+    });
+
+    it("keeps the pairing after an insertion, which a position-by-position comparison would lose", () => {
+        expect(carry("BUILD READY", "BUILD 2 READY")).toEqual([0, 1, 2, 3, 4, 5, undefined, undefined, 6, 7, 8, 9, 10]);
+    });
+
+    it("keeps the pairing after a deletion", () => {
+        expect(carry("ABXCD", "ABCD")).toEqual([0, 1, 3, 4]);
+    });
+
+    it("marks a replaced character as new and keeps the ones around it", () => {
+        expect(carry("1.4.2", "1.4.3")).toEqual([0, 1, 2, 3, undefined]);
+    });
+
+    it("finds nothing to carry from an empty text, and has nothing to pair into one", () => {
+        expect(carry("", "AB")).toEqual([undefined, undefined]);
+        expect(carry("AB", "")).toEqual([]);
+    });
+
+    it("keeps the earlier characters of the new text when two pairings are equally long", () => {
+        expect(carry("AB", "BA")).toEqual([1, undefined]);
+    });
+
+    it("tells case apart, since a changed case is a changed character", () => {
+        expect(carry("ab", "aB")).toEqual([0, undefined]);
+    });
+});

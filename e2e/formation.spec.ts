@@ -72,7 +72,7 @@ test("a position written as a fraction of the width lands at that fraction of th
     expect(ratio, "and it lands inside the formation rather than somewhere the viewport put it").toBeLessThan(1);
     expect(
         (leftEdge + rightEdge) / 2 / box.hostWidth,
-        "a cliff is centerd in the formation however far its places lean",
+        "a cliff is centered in the formation however far its places lean",
     ).toBeCloseTo(0.5, 2);
 });
 
@@ -153,4 +153,109 @@ test("the arrangement sits the same distance from every edge of the box it asked
     ).toBeLessThanOrEqual(1);
 
     expect(Math.abs(edges.left - edges.right), "and the same across").toBeLessThanOrEqual(1);
+});
+
+/**
+ * Items are keyed by themselves, so taking one out keeps the elements of the items that stay. Each item
+ * element is stamped with the name it shows, the first item is taken out, and every element that carries a
+ * stamp must still show the name it was stamped with — a stamp that disagrees means the element was handed
+ * somebody else's contents. The item count is left alone, so exactly one item comes in at the end to replace
+ * the one that went, and it is the only element allowed to carry no stamp.
+ *
+ * The item taken out is the first one, not the last: dropping the last leaves every other element where it was
+ * whether items are keyed by position or by identity, so only a removal from the front can tell the two apart.
+ * The name is read without the item's position number, which is meant to change when an item ahead of it goes.
+ */
+test("taking an item out leaves the other items' elements where they were", async ({ page }) => {
+    const before = await page.locator(item(FORMATION)).count();
+    const readName = (text: string) => text.trim().replace(/^\d+\s*/, "");
+
+    await page.evaluate(
+        ([selector, pattern]) => {
+            for (const element of document.querySelectorAll(selector)) {
+                (element as HTMLElement).dataset.stamp = (element as HTMLElement).innerText
+                    .trim()
+                    .replace(new RegExp(pattern), "");
+            }
+        },
+        [item(FORMATION), "^\\d+\\s*"] as const,
+    );
+
+    await page.locator(numberField("skippedCount")).fill("1");
+    await page.locator(numberField("skippedCount")).blur();
+
+    await expect
+        .poll(() => page.locator(`${item(FORMATION)}:not([data-stamp])`).count(), {
+            message: "one item came in at the end to take the place of the one that went",
+        })
+        .toBe(1);
+    await expect(page.locator(item(FORMATION))).toHaveCount(before);
+
+    const survivors = (
+        await page.evaluate(
+            (selector) =>
+                [...document.querySelectorAll(selector)].map((element) => ({
+                    stamp: (element as HTMLElement).dataset.stamp,
+                    text: (element as HTMLElement).innerText,
+                })),
+            item(FORMATION),
+        )
+    )
+        .filter((survivor) => survivor.stamp !== undefined)
+        .map((survivor) => ({ stamp: survivor.stamp, name: readName(survivor.text) }));
+
+    expect(survivors, "every item that stayed kept its own element").toHaveLength(before - 1);
+    expect(
+        survivors.filter((survivor) => survivor.stamp !== survivor.name),
+        "and none was handed another item's contents",
+    ).toEqual([]);
+});
+
+/**
+ * With a glide set, changing the arrangement starts a transition on every item that moves; at zero, it
+ * writes no transition at all and the items jump. `getAnimations()` is the browser's own answer to whether
+ * anything is moving, so it is what both halves read — the duration and easing are not the spec's business.
+ */
+const pickArrangement = async (page: import("@playwright/test").Page, key: string) => {
+    await page.locator(`${prop("layoutKey")} [role="combobox"]`).click();
+    await page.getByRole("option", { name: key, exact: true }).click();
+};
+
+const runningAnimations = (page: import("@playwright/test").Page) =>
+    page.evaluate(
+        (selector) =>
+            [...document.querySelectorAll(selector)].reduce(
+                (count, element) => count + element.getAnimations().length,
+                0,
+            ),
+        item(FORMATION),
+    );
+
+test("with a glide set, changing the arrangement moves the items there rather than jumping", async ({ page }) => {
+    await page.locator(numberField("transitionDurationMs")).fill("1000");
+    await page.locator(numberField("transitionDurationMs")).blur();
+
+    await pickArrangement(page, "ring");
+
+    await expect
+        .poll(() => runningAnimations(page), { message: "the items are gliding to the new arrangement" })
+        .toBeGreaterThan(0);
+});
+
+test("with the glide at zero, changing the arrangement moves the items at once", async ({ page }) => {
+    await page.locator(numberField("transitionDurationMs")).fill("0");
+    await page.locator(numberField("transitionDurationMs")).blur();
+
+    const written = () =>
+        page
+            .locator(item(FORMATION))
+            .first()
+            .evaluate((element) => `${element.style.left} ${element.style.top}`);
+    const before = await written();
+
+    await pickArrangement(page, "ring");
+
+    await expect.poll(written, { message: "the arrangement did change" }).not.toBe(before);
+
+    expect(await runningAnimations(page), "and nothing is in flight on the way there").toBe(0);
 });

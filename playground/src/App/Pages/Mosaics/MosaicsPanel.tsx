@@ -2,11 +2,14 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import {
+    DURATION_STEP_MS,
     FIELD_WIDTH,
     GAP_STEP,
     ITEM_COUNT_STEP,
+    MAX_DURATION_MS,
     MAX_GAP,
     MAX_ITEM_COUNT,
+    MIN_DURATION_MS,
     MIN_GAP,
     MIN_ITEM_COUNT,
     SIZE_ANCHORS,
@@ -63,6 +66,24 @@ export const PageMosaicsPanel = (props: Props) => {
                     width={() => FIELD_WIDTH}
                     ariaLabel={"Fixed side"}
                     onChange={(anchor) => controls.sizeAnchorSignal[1](() => anchor)}
+                />
+            </PageProp>
+
+            <PageProp
+                key={"transitionDurationMs"}
+                label={"Glide (ms)"}
+                hint={
+                    "How long a tile takes to glide to its new place when tiles are added, taken out or resized. Resizing the mosaic itself never glides. At 0 tiles move at once, and under reduced motion they always do."
+                }
+            >
+                <PageNumberField
+                    value={controls.transitionDurationMsSignal[0]}
+                    min={() => MIN_DURATION_MS}
+                    max={() => MAX_DURATION_MS}
+                    step={() => DURATION_STEP_MS}
+                    width={() => FIELD_WIDTH}
+                    ariaLabel={"Glide duration in milliseconds"}
+                    onInput={controls.transitionDurationMsSignal[1]}
                 />
             </PageProp>
         </PagePropsPanel>

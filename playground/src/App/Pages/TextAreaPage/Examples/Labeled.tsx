@@ -14,7 +14,7 @@ const LABEL_GAP = 5;
 
 type Props = TextAreaExampleProps;
 
-export const LabelledExample = (props: Props) => (
+export const LabeledExample = (props: Props) => (
     <Label orientation={"vertical"} gap={() => LABEL_GAP}>
         <PageLabelCaption>Bio</PageLabelCaption>
 

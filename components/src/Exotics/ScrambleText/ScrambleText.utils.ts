@@ -6,6 +6,8 @@ import type { ScrambleTextSegment } from "./ScrambleText.types";
 const SINGLE_CHARACTER = 1;
 /** The start of the animation. */
 const NO_TIME = 0;
+/** The length of a match against an empty tail. */
+const NO_MATCH = 0;
 
 /**
  * Schedules the character-by-character reveal of scrambled text.
@@ -98,5 +100,55 @@ export namespace ScrambleTextUtils {
         const picked = Math.min(Math.floor(roll * count), count - SINGLE_CHARACTER);
 
         return glyphs[excludedAt < 0 || picked < excludedAt ? picked : picked + SINGLE_CHARACTER];
+    };
+
+    /**
+     * Pairs each character of a new text with the one it was carried over from in the old text.
+     *
+     * This is what lets a text change scramble only what changed. The pairing is a longest common
+     * subsequence rather than a position-by-position comparison, so an insertion or a deletion shifts the
+     * characters after it along without breaking their pairing: adding a word at the front of a line still
+     * finds every character that was already there. Where two pairings are equally long, the one that keeps
+     * the earlier characters of the new text wins, so the answer never depends on anything but the two texts.
+     * The table it builds is the product of the two lengths, which is nothing for a line and too much for a
+     * page.
+     *
+     * @param previous The old text, split into characters.
+     * @param next The new text, split into characters.
+     * @returns One entry per character of `next`: the index in `previous` it was carried over from, or
+     * `undefined` for a character the old text did not have.
+     */
+    export const getCarriedIndices = (previous: string[], next: string[]) => {
+        const lengths = Array.from({ length: previous.length + SINGLE_CHARACTER }, () =>
+            new Array<number>(next.length + SINGLE_CHARACTER).fill(NO_MATCH),
+        );
+
+        for (let from = previous.length - SINGLE_CHARACTER; from >= 0; from--) {
+            for (let to = next.length - SINGLE_CHARACTER; to >= 0; to--) {
+                lengths[from][to] =
+                    previous[from] === next[to]
+                        ? lengths[from + SINGLE_CHARACTER][to + SINGLE_CHARACTER] + SINGLE_CHARACTER
+                        : Math.max(lengths[from + SINGLE_CHARACTER][to], lengths[from][to + SINGLE_CHARACTER]);
+            }
+        }
+
+        const carried = new Array<number | undefined>(next.length).fill(undefined);
+
+        let from = 0;
+        let to = 0;
+
+        while (from < previous.length && to < next.length) {
+            if (previous[from] === next[to]) {
+                carried[to] = from;
+                from++;
+                to++;
+            } else if (lengths[from + SINGLE_CHARACTER][to] >= lengths[from][to + SINGLE_CHARACTER]) {
+                from++;
+            } else {
+                to++;
+            }
+        }
+
+        return carried;
     };
 }

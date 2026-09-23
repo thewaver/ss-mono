@@ -34,7 +34,7 @@ export const SequentialExample = (props: Props) => {
                 <div class={styles.headline}>
                     <ScrambleText
                         text={LINE}
-                        glyphs={props.glyphs}
+                        computeGlyphs={props.computeGlyphs}
                         settleDurationMs={getRunDurationMs}
                         churnDurationMs={getChurnDurationMs}
                         scrambleIntervalMs={getScrambleIntervalMs}

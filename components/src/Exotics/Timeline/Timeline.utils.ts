@@ -1,4 +1,6 @@
 import type {
+    TimelineEdge,
+    TimelineMarker,
     TimelinePlacement,
     TimelineSpan,
     TimelineStep,
@@ -21,6 +23,10 @@ const MAJOR_FACTOR = 3;
 const MAX_TICKS = 512;
 /** Slack for comparing values that arrived by division, where a whole number may be off in its last bits. */
 const EPSILON = 1e-9;
+/** How many steps an edge looks ahead for the next snapped value before giving up. */
+const MAX_SNAP_PROBES = 256;
+/** How many times the gap before the next snapped value is halved, which is past the precision of a double. */
+const MAX_HALVINGS = 64;
 
 /** Whether a value falls on a step, allowing for floating-point drift. */
 const isMultipleOf = (value: number, step: number) => Math.abs(value / step - Math.round(value / step)) < EPSILON;
@@ -287,6 +293,98 @@ export namespace TimelineUtils {
                     Math.abs(first.span.start - from.span.start) - Math.abs(second.span.start - from.span.start) ||
                     first.order - second.order,
             )[NOTHING]?.index;
+    };
+
+    /**
+     * Where each marker falls in the current view.
+     *
+     * @param values The marked points in time.
+     * @param view The part of the range on screen.
+     * @returns One marker per value, in the same order, carrying its value, its position as a fraction of the
+     * view — outside `0` to `1` when it is off screen — and whether it is in view, ends included.
+     */
+    export const computeMarkers = (values: number[], view: TimelineSpan): TimelineMarker[] =>
+        values.map((value) => ({
+            value,
+            ratio: toRatio(value, view),
+            isInView: value >= view.start && value <= view.end,
+        }));
+
+    /**
+     * Moves one edge of a span to a value, keeping the span whole.
+     *
+     * The value is held inside the range, and an edge is stopped at the other one rather than passing it, so the
+     * result is never inside out; at the limit the span has no extent at all.
+     *
+     * @param span The span before the move.
+     * @param edge Which edge to move.
+     * @param value Where to move it.
+     * @param range Everything the timeline covers.
+     * @returns A new span. The edge not being moved is left where it was.
+     */
+    export const moveEdge = (span: TimelineSpan, edge: TimelineEdge, value: number, range: TimelineSpan) => {
+        const held = Math.min(Math.max(value, range.start), range.end);
+
+        return edge === "start"
+            ? { start: Math.min(held, span.end), end: span.end }
+            : { start: span.start, end: Math.max(held, span.start) };
+    };
+
+    /**
+     * Where one key press should move an edge.
+     *
+     * Without a snap it is one step along. With one, it is the nearest value the snap gives beyond the current one
+     * in that direction — the next notch, however fine or coarse the snap is against the step, so one press is
+     * always one notch.
+     *
+     * @param value Where the edge is.
+     * @param direction `1` for later, `-1` for earlier.
+     * @param step How far one press travels when nothing snaps, such as the ruler's tick step, and how far ahead
+     * the next notch is looked for at a time when something does. Zero or less moves nothing.
+     * @param range Everything the timeline covers. Nothing is looked for beyond it.
+     * @param computeSnapValue Rounds a value to where an edge may land. Expected never to decrease as its input
+     * grows, which every rounding does.
+     * @returns The new value, held inside the range, or `value` itself when there is nowhere further to go.
+     */
+    export const computeSteppedEdgeValue = (
+        value: number,
+        direction: number,
+        step: number,
+        range: TimelineSpan,
+        computeSnapValue?: (value: number) => number,
+    ) => {
+        if (step <= NOTHING || direction === NOTHING) return value;
+
+        const toward = Math.sign(direction);
+        const clampToRange = (next: number) => Math.min(Math.max(next, range.start), range.end);
+
+        if (!computeSnapValue) return clampToRange(value + toward * step);
+
+        const snapAt = (distance: number) => clampToRange(computeSnapValue(value + toward * distance));
+        const getHasMoved = (distance: number) => (snapAt(distance) - value) * toward > EPSILON;
+
+        let reached: number | undefined;
+
+        for (let probe = SINGLE; probe <= MAX_SNAP_PROBES && reached === undefined; probe++) {
+            const distance = step * probe;
+
+            if (getHasMoved(distance)) reached = distance;
+            else if (value + toward * distance < range.start || value + toward * distance > range.end) break;
+        }
+
+        if (reached === undefined) return value;
+
+        let short = reached - step;
+        let far = reached;
+
+        for (let halving = NOTHING; halving < MAX_HALVINGS; halving++) {
+            const middle = (short + far) * 0.5;
+
+            if (getHasMoved(middle)) far = middle;
+            else short = middle;
+        }
+
+        return snapAt(far);
     };
 
     /**

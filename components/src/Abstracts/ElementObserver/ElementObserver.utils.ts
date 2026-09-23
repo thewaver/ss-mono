@@ -1,7 +1,7 @@
 import type { Accessor, Setter } from "solid-js";
 import { createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 
-import { Bounds, type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
+import { Bounds, MathUtils, type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import { useViewportContext } from "../Viewport/Viewport.context";
 import { ViewportUtils } from "../Viewport/Viewport.utils";
@@ -398,5 +398,73 @@ export namespace ElementObserverUtils {
         });
 
         return getIndex;
+    };
+
+    /**
+     * How far an element has traveled through a viewport of a given height, from `0` to `1`.
+     *
+     * `0` while the element's top is still at or below the viewport's bottom edge, `1` once its bottom has
+     * gone past the top edge, and a straight line between the two, so the whole of the element's passage
+     * across the screen is covered.
+     *
+     * @param top The element's top, measured from the viewport's top.
+     * @param height The element's height, in the same space.
+     * @param viewportHeight The viewport's height, in the same space.
+     * @returns The share of the passage covered, clamped to `0`–`1`. `0` when there is no height to travel.
+     */
+    export const computeViewportProgress = (top: number, height: number, viewportHeight: number) => {
+        const passage = viewportHeight + height;
+
+        if (passage <= 0) return 0;
+
+        return MathUtils.clamp01((viewportHeight - top) / passage);
+    };
+
+    /**
+     * Follows how far an element has traveled through the viewport as the page scrolls, in viewport coordinates.
+     *
+     * The number {@link ElementObserverUtils.computeViewportProgress} gives, re-read on every scroll anywhere in the
+     * document and on every resize. It is the getter half of a progress signal — a trail, an animation or anything
+     * else that takes `0`–`1` can be driven by the page's scroll position with it, with its own playback off.
+     *
+     * @param getRef The element to follow. Nothing is measured until it exists.
+     * @param getIsDisabled Pass `true` to stop following. Omitted means always on.
+     * @returns `0` while the element has yet to come up from below the viewport, `1` once it has left through the
+     * top, and the share in between while it crosses. `0` before the element exists and while disabled.
+     */
+    export const createViewportProgressObserver = (
+        getRef: Accessor<HTMLElement | undefined>,
+        getIsDisabled?: Accessor<boolean>,
+    ) => {
+        const viewportContext = useViewportContext();
+        const [getProgress, setProgress] = createSignal(0);
+
+        createEffect(() => {
+            const ref = getRef();
+
+            if (!ref || getIsDisabled?.()) {
+                setProgress(0);
+
+                return;
+            }
+
+            const update = () => {
+                const rect = ViewportUtils.getAdjustedBoundingClientRect(ref, viewportContext);
+
+                setProgress(computeViewportProgress(rect.y, rect.height, viewportContext.getSize().height));
+            };
+
+            update();
+
+            document.addEventListener("scroll", update, { capture: true, passive: true });
+            window.addEventListener("resize", update);
+
+            onCleanup(() => {
+                document.removeEventListener("scroll", update, true);
+                window.removeEventListener("resize", update);
+            });
+        });
+
+        return getProgress;
     };
 }

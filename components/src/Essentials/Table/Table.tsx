@@ -225,14 +225,20 @@ export const Table = <T,>(props: TableProps<T>) => {
         resizeColumn(column, getCurrentWidth(column, columnIndex) + towards);
     };
 
+    const handleResizerPointerCancel = (column: TableColumn<T>) => {
+        if (getResizingColumnId() !== column.id) return;
+
+        setResizingColumnId(NO_RESIZING);
+    };
+
     const getIsReorderable = (column: TableColumn<T> | undefined) =>
         column !== undefined && (column.isReorderable ?? false) && props.orderSignal !== undefined;
 
     const moveColumn = (fromIndex: number, toIndex: number) => {
         const columns = getColumns();
 
-        if (!getIsReorderable(columns[fromIndex]) || getIsDisabled()) return;
-        if (toIndex < 0 || toIndex >= columns.length) return;
+        if (!getIsReorderable(columns[fromIndex]) || getIsDisabled()) return false;
+        if (toIndex < 0 || toIndex >= columns.length) return false;
 
         const next = CarrierUtils.computeMovedOrder(
             columns.map((column) => column.id),
@@ -243,6 +249,8 @@ export const Table = <T,>(props: TableProps<T>) => {
         props.orderSignal?.[1](next);
 
         void props.onOrderChange?.(next);
+
+        return true;
     };
 
     const asColumnIndex = (place: CarryPlace) => place as number;
@@ -362,7 +370,7 @@ export const Table = <T,>(props: TableProps<T>) => {
         const logicalKey = NavigatorUtils.computeLogicalKey(e.key, getDirection());
 
         if (from.row === HEADER_ROW_INDEX) {
-            if (e.key === "Enter" || e.key === " ") {
+            if (NavigatorUtils.getIsActivationKey(e.key)) {
                 e.preventDefault();
 
                 toggleSort(column);
@@ -383,13 +391,10 @@ export const Table = <T,>(props: TableProps<T>) => {
             if (e.shiftKey && (logicalKey === "ArrowLeft" || logicalKey === "ArrowRight")) {
                 e.preventDefault();
 
-                if (!getIsReorderable(column)) return;
-
                 const to = from.col + (logicalKey === "ArrowLeft" ? -1 : 1);
 
-                if (to < 0 || to >= grid.colCount) return;
+                if (!moveColumn(from.col, to)) return;
 
-                moveColumn(from.col, to);
                 focusCell({ row: HEADER_ROW_INDEX, col: to });
 
                 LiveAnnouncerUtils.announce(getAnnouncements().computeColumnMoved(column.header, to, grid.colCount));
@@ -444,12 +449,6 @@ export const Table = <T,>(props: TableProps<T>) => {
 
         if (getIsDisabled()) return;
 
-        if (cell.row === HEADER_ROW_INDEX) {
-            toggleSort(getColumns()[cell.col]);
-
-            return;
-        }
-
         selectRow(cell.row - 1, { isToggling: e.ctrlKey || e.metaKey, isExtending: e.shiftKey });
     };
 
@@ -497,7 +496,7 @@ export const Table = <T,>(props: TableProps<T>) => {
             onPointerDown={(e) => handleResizerPointerDown(e, getColumn(), columnIndex)}
             onPointerMove={(e) => handleResizerPointerMove(e, getColumn())}
             onPointerUp={(e) => handleResizerPointerUp(e, getColumn(), columnIndex)}
-            onPointerCancel={(e) => handleResizerPointerUp(e, getColumn(), columnIndex)}
+            onPointerCancel={() => handleResizerPointerCancel(getColumn())}
             onClick={(e) => e.stopPropagation()}
         >
             {props.renderResizer?.(() => getColumnRenderProps(columnIndex))}

@@ -5,7 +5,7 @@ export const placementItem = style({
     gridTemplate: "100% / 100%",
     placeItems: "center",
     position: "absolute",
-    transform: "translate(-50%, -50%)",
+    translate: "-50% -50%",
     pointerEvents: "all",
 });
 

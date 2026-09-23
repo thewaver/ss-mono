@@ -9,11 +9,14 @@ import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageCom
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
+import { BurstExample } from "./Examples/Burst";
 import { DiagonalExample } from "./Examples/Diagonal";
 import { GridExample } from "./Examples/Grid";
+import { ManyToOneExample } from "./Examples/ManyToOne";
 import { MovingTargetExample } from "./Examples/MovingTarget";
 import { MultipleTargetsExample } from "./Examples/MultipleTargets";
 import { RadialExample } from "./Examples/Radial";
+import { RoundTripExample } from "./Examples/RoundTrip";
 import { SingleTargetExample } from "./Examples/SingleTarget";
 import { VerticalExample } from "./Examples/Vertical";
 import {
@@ -191,6 +194,36 @@ export const ParticleSpawnerPage = () => {
                     </PageMeasureBox>
                 ),
                 path: `${EXAMPLES_ROOT}/Radial.tsx`,
+            },
+            {
+                key: "manyToOne",
+                name: "Many to one (many spawners, 1 target)",
+                component: () => (
+                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                        <ManyToOneExample {...commonProps} />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/ManyToOne.tsx`,
+            },
+            {
+                key: "burst",
+                name: "Burst on press",
+                component: () => (
+                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                        <BurstExample {...commonProps} />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/Burst.tsx`,
+            },
+            {
+                key: "roundTrip",
+                name: "Round trip (a relay on arrival)",
+                component: () => (
+                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                        <RoundTripExample {...commonProps} />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/RoundTrip.tsx`,
             },
             {
                 key: "multipleTargets",

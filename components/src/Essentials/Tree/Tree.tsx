@@ -288,7 +288,7 @@ export const Tree = <T,>(props: TreeProps<T>) => {
             return;
         }
 
-        if (e.key === "Enter" || e.key === " ") {
+        if (NavigatorUtils.getIsActivationKey(e.key)) {
             if (current.node.href) {
                 if (e.key === "Enter") return;
 

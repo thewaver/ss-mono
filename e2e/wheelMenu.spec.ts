@@ -61,7 +61,7 @@ test("a submenu is a wider band round the center its parent already had", async 
     levels.forEach((level, depth) => {
         if (depth === 0) return;
 
-        expect(level.centerX, "every level is centerd on the same point the root was").toBeCloseTo(
+        expect(level.centerX, "every level is centered on the same point the root was").toBeCloseTo(
             levels[0].centerX,
             0,
         );

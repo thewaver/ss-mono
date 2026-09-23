@@ -6,7 +6,7 @@ import {
     PagePatchNode,
     PagePatchSocket,
 } from "../../../StyledComponents/PatchBoardContent/PatchBoardContent";
-import { BOARD_SIZE } from "../PatchBoardPage.const";
+import { BOARD_HEIGHT_RATIO } from "../PatchBoardPage.const";
 import type { PatchBoardExampleProps } from "../PatchBoardPage.types";
 
 type Props = PatchBoardExampleProps;
@@ -17,7 +17,7 @@ export const ChainExample = (props: Props) => {
             groupId={"chain"}
             ariaLabel={"Signal chain"}
             announcements={PATCH_BOARD_ANNOUNCEMENTS}
-            size={BOARD_SIZE}
+            heightRatio={BOARD_HEIGHT_RATIO}
             socketSize={props.socketSize}
             isLocked={props.isLocked}
             isDisabled={props.isDisabled}

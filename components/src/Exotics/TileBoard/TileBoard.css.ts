@@ -7,6 +7,10 @@ export const tileBoardRoot = style({
     pointerEvents: "none",
 });
 
+export const tileBoardIsSweepable = style({
+    touchAction: "none",
+});
+
 export const tileBoardPlane = style({
     display: "block",
     position: "absolute",

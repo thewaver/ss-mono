@@ -22,7 +22,7 @@ export const MEETINGS: Meeting[] = [
     { name: "Pairing", room: "Desk", from: at(13), to: at(15, 30) },
     { name: "All hands", room: "Hall", from: at(14), to: at(15) },
     { name: "Retro", room: "Blue room", from: at(15, 30), to: at(16, 30) },
-    { name: "Budget", room: "Blue room", from: at(16), to: at(17), isCancelled: true },
+    { name: "Budget", room: "Blue room", from: at(16), to: at(17), isCanceled: true },
     { name: "Handover", room: "Desk", from: at(17, 30), to: at(18) },
 ];
 
@@ -44,6 +44,10 @@ export const CLIPS: Clip[] = [
     { name: "Lower third", track: 2, from: 28, to: 40 },
     { name: "Credits", track: 2, from: 160, to: 178 },
 ];
+
+export const TRIM_TRACKS = ["Video", "Audio"];
+
+export const TRIM_CLIPS: Clip[] = CLIPS.filter((clip) => clip.track < TRIM_TRACKS.length);
 
 export const formatClock = (minutes: number) => {
     const hour = Math.floor(minutes / MINUTES_PER_HOUR);

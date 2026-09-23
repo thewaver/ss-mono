@@ -20,6 +20,12 @@ export type WheelExampleProps = AccessorProps<{
 
 export type WheelSharedProps = Omit<WheelExampleProps, "targetIndexSignal" | "onSelectedWedgeChange">;
 
+export type WheelReelsExampleProps = WheelSharedProps &
+    AccessorProps<{
+        onSpinStart: () => void;
+        onAllStopped: (indices: number[]) => void;
+    }>;
+
 export type WheelsControls = {
     wedgeCountSignal: Signal<number>;
     spinDurationSignal: Signal<number>;

@@ -26,9 +26,9 @@ export const WanderingExample = (props: Props) => {
     let previousFacing: CuboidFace | undefined;
 
     const turnToNeighbor = () => {
-        const facing = CuboidUtils.getFacing(getYaw(), getPitch());
+        const facing = CuboidUtils.getFacingFromTurns(getYaw(), getPitch());
         const neighbors = TURNS.map(
-            ([yaw, pitch]) => [CuboidUtils.getFacing(getYaw() + yaw, getPitch() + pitch), yaw, pitch] as const,
+            ([yaw, pitch]) => [CuboidUtils.getFacingFromTurns(getYaw() + yaw, getPitch() + pitch), yaw, pitch] as const,
         ).filter(([turned]) => turned !== facing);
         const unvisited = neighbors.filter(([turned]) => turned !== previousFacing);
         const [[, yawTurn, pitchTurn]] = ObjectUtils.getRandomArrayValues(unvisited.length > 0 ? unvisited : neighbors);

@@ -85,3 +85,48 @@ export const textHighlight = style({
     paintOrder: "stroke fill",
     WebkitTextStroke: "4px black",
 });
+
+export const typewriterCaretBlink = keyframes({
+    "0%": {
+        opacity: 1,
+    },
+    "50%": {
+        opacity: 0,
+    },
+});
+
+export const phraseStack = style({
+    display: "flex",
+    flexDirection: "column",
+    gap: themeVars.spacing.full,
+    alignItems: "flex-start",
+});
+
+export const phraseLine = style({
+    alignSelf: "stretch",
+    display: "flex",
+    alignItems: "baseline",
+    gap: themeVars.spacing.half,
+    fontSize: themeVars.fontSize.large,
+});
+
+export const phraseSlot = style({
+    flex: 1,
+    minWidth: 0,
+});
+
+export const phraseCaret = style({
+    display: "inline-block",
+    width: "2px",
+    height: "1em",
+    marginLeft: "1px",
+    verticalAlign: "text-bottom",
+    background: "currentColor",
+});
+
+export const phraseCaretBlinking = style({
+    animationName: typewriterCaretBlink,
+    animationDuration: "1s",
+    animationTimingFunction: "steps(1)",
+    animationIterationCount: "infinite",
+});

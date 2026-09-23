@@ -1,4 +1,4 @@
-import { type Index2d, MathUtils, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
+import { Index2d, type Index2dString, MathUtils, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import type { TileBoardLayout, TileBoardTiling } from "./TileBoard.types";
 
@@ -492,6 +492,120 @@ export namespace TileBoardUtils {
      */
     export const getNeighborTiles = (tile: Index2d, layout: TileBoardLayout): Index2d[] =>
         computeNeighbors(tile, layout).filter((neighbor) => getIsOnBoard(neighbor, layout));
+
+    /**
+     * Every tile a piece could reach in a given number of steps, one neighbor per step.
+     *
+     * A step goes from a tile to one of its {@link TileBoardUtils.getNeighborTiles}, so the answer follows the
+     * board's own adjacency whatever the shape: six ways out of a hexagon, three out of a triangle. A blocked tile
+     * is never entered, so it is not in the answer and nothing beyond it is reached through it.
+     *
+     * @param from Where the piece stands. It is not in the answer.
+     * @param reach How many steps may be taken. Nothing is reached below one.
+     * @param layout The board's layout.
+     * @param computeIsBlocked Whether a tile may not be stepped on. Every tile is open when it is left out.
+     * @returns The tiles, nearest first, each once.
+     */
+    export const getTilesWithin = (
+        from: Index2d,
+        reach: number,
+        layout: TileBoardLayout,
+        computeIsBlocked?: (tile: Index2d) => boolean,
+    ): Index2d[] => {
+        const seen = new Set([Index2d.toString(from)]);
+        const within: Index2d[] = [];
+
+        let edge = [from];
+
+        for (let step = 0; step < reach && edge.length > 0; step++) {
+            const next: Index2d[] = [];
+
+            for (const tile of edge) {
+                for (const neighbor of getNeighborTiles(tile, layout)) {
+                    const key = Index2d.toString(neighbor);
+
+                    if (seen.has(key)) continue;
+
+                    seen.add(key);
+
+                    if (computeIsBlocked?.(neighbor)) continue;
+
+                    next.push(neighbor);
+                    within.push(neighbor);
+                }
+            }
+
+            edge = next;
+        }
+
+        return within;
+    };
+
+    /**
+     * The shortest way from one tile to another, stepping from neighbor to neighbor.
+     *
+     * Steps follow {@link TileBoardUtils.getNeighborTiles}, so the route is as short as the board's own
+     * adjacency allows, and it goes round blocked tiles rather than through them. Where several routes are
+     * equally short, the one taken is the same every time for the same board.
+     *
+     * @param from Where the route starts. It is never checked against `computeIsBlocked`, since it is where the
+     * piece already stands.
+     * @param to Where the route ends.
+     * @param layout The board's layout.
+     * @param computeIsBlocked Whether a tile may not be stepped on. Every tile is open when it is left out.
+     * @returns The tiles in order, `from` first and `to` last, so its length less one is the number of steps.
+     * Just `from` when the two are the same tile, and `undefined` when either is off the board, `to` is blocked,
+     * or nothing open joins them.
+     */
+    export const getShortestRoute = (
+        from: Index2d,
+        to: Index2d,
+        layout: TileBoardLayout,
+        computeIsBlocked?: (tile: Index2d) => boolean,
+    ): Index2d[] | undefined => {
+        if (!getIsOnBoard(from, layout) || !getIsOnBoard(to, layout)) return;
+        if (Index2d.isSame(from, to)) return [from];
+        if (computeIsBlocked?.(to)) return;
+
+        const cameFrom = new Map<Index2dString, Index2d>();
+        const seen = new Set([Index2d.toString(from)]);
+
+        let edge = [from];
+
+        while (edge.length > 0) {
+            const next: Index2d[] = [];
+
+            for (const tile of edge) {
+                for (const neighbor of getNeighborTiles(tile, layout)) {
+                    const key = Index2d.toString(neighbor);
+
+                    if (seen.has(key)) continue;
+
+                    seen.add(key);
+
+                    if (computeIsBlocked?.(neighbor)) continue;
+
+                    cameFrom.set(key, tile);
+
+                    if (!Index2d.isSame(neighbor, to)) {
+                        next.push(neighbor);
+
+                        continue;
+                    }
+
+                    const route = [neighbor];
+
+                    for (let back = cameFrom.get(key); back; back = cameFrom.get(Index2d.toString(back))) {
+                        route.unshift(back);
+                    }
+
+                    return route;
+                }
+            }
+
+            edge = next;
+        }
+    };
 
     /** The top-left tile. */
     export const getFirstTile = (): Index2d => ({ row: FIRST_INDEX, col: FIRST_INDEX });

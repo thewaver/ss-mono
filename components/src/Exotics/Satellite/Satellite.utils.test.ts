@@ -8,7 +8,7 @@ const SATELLITE = { width: 20, height: 20 };
 const NO_OFFSET = { x: 0, y: 0 };
 
 const layoutOf = (placement: AnchorPlacement, offset = NO_OFFSET, satellite = SATELLITE) =>
-    SatelliteUtils.computeLayout(SUBJECT, satellite, placement, offset);
+    SatelliteUtils.computeLayout(SUBJECT, [{ size: satellite, placement, offset }]);
 
 const spell = (placement: AnchorPlacement, offset = NO_OFFSET, satellite = SATELLITE) => {
     const layout = layoutOf(placement, offset, satellite);
@@ -18,8 +18,8 @@ const spell = (placement: AnchorPlacement, offset = NO_OFFSET, satellite = SATEL
         layout.padding.paddingTop,
         layout.padding.paddingRight,
         layout.padding.paddingBottom,
-        layout.satelliteOffset.x,
-        layout.satelliteOffset.y,
+        layout.satelliteOffsets[0].x,
+        layout.satelliteOffsets[0].y,
     ].join(" ");
 };
 
@@ -57,15 +57,57 @@ describe("computeLayout", () => {
 
     it("reports no padding at all before either element has been measured", () => {
         expect(
-            SatelliteUtils.computeLayout(
-                { width: 0, height: 0 },
-                { width: 0, height: 0 },
-                { x: "right-out", y: "top-out" },
-                NO_OFFSET,
-            ),
+            SatelliteUtils.computeLayout({ width: 0, height: 0 }, [
+                { size: { width: 0, height: 0 }, placement: { x: "right-out", y: "top-out" }, offset: NO_OFFSET },
+            ]),
         ).toEqual({
             padding: { paddingLeft: 0, paddingTop: 0, paddingRight: 0, paddingBottom: 0 },
-            satelliteOffset: { x: 0, y: 0 },
+            satelliteOffsets: [{ x: 0, y: 0 }],
         });
+    });
+
+    it("grows nothing and places nothing when there are no satellites", () => {
+        expect(SatelliteUtils.computeLayout(SUBJECT, [])).toEqual({
+            padding: { paddingLeft: 0, paddingTop: 0, paddingRight: 0, paddingBottom: 0 },
+            satelliteOffsets: [],
+        });
+    });
+});
+
+describe("computeLayout with several satellites", () => {
+    const entry = (placement: AnchorPlacement, size = SATELLITE, offset = NO_OFFSET) => ({ size, placement, offset });
+
+    it("grows each side by the furthest overhang any satellite has there", () => {
+        const layout = SatelliteUtils.computeLayout(SUBJECT, [
+            entry({ x: "right-out", y: "top-out" }),
+            entry({ x: "left-out", y: "center" }, { width: 30, height: 30 }),
+            entry({ x: "right-out", y: "center" }, { width: 12, height: 12 }),
+        ]);
+
+        expect(layout.padding).toEqual({ paddingLeft: 30, paddingTop: 20, paddingRight: 20, paddingBottom: 0 });
+    });
+
+    it("shifts every satellite by the same padding, so one that needed none still moves with the rest", () => {
+        const layout = SatelliteUtils.computeLayout(SUBJECT, [
+            entry({ x: "left-out", y: "top-out" }),
+            entry({ x: "right-in", y: "bottom-in" }),
+        ]);
+
+        expect(layout.satelliteOffsets).toEqual([
+            { x: 0, y: 0 },
+            { x: 100, y: 100 },
+        ]);
+    });
+
+    it("gives the offsets back in the order the satellites were given", () => {
+        const layout = SatelliteUtils.computeLayout(SUBJECT, [
+            entry({ x: "center", y: "center" }),
+            entry({ x: "left-in", y: "top-in" }),
+        ]);
+
+        expect(layout.satelliteOffsets).toEqual([
+            { x: 40, y: 40 },
+            { x: 0, y: 0 },
+        ]);
     });
 });

@@ -158,3 +158,139 @@ test("markup in the string arrives as text and not as elements", async ({ page }
     await expect(page.locator(`${PREVIEW} b`), "and nothing was parsed into an element").toHaveCount(0);
     await expect(page.locator(`${PREVIEW} img`), "including one that would have made a request").toHaveCount(0);
 });
+
+const GLOSSARY = demo("glossary");
+const LINKS = demo("links");
+const TERM = `${GLOSSARY} span[tabindex="0"]`;
+const TOOLTIP = '[role="tooltip"]';
+
+const describingTip = (page: Page, index: number) =>
+    page.evaluate(
+        (args) => {
+            const term = document.querySelectorAll(args.selector)[args.index];
+            const ids = term?.getAttribute("aria-describedby")?.split(/\s+/) ?? [];
+            const tooltip = ids
+                .map((id) => document.getElementById(id))
+                .find((element) => element?.getAttribute("role") === "tooltip");
+
+            return tooltip ? (tooltip.textContent ?? "").trim() : null;
+        },
+        { selector: TERM, index },
+    );
+
+/**
+ * A `[term tip="…"]` is drawn by the page's `renderTag` as a focusable word with a `Tooltip` on it. What a
+ * person can do with it is reach it — by pointer and by Tab — and have the tip announced, which is the anchor's
+ * `aria-describedby` pointing at a live tooltip. The tip's words are the attribute's value, so the check is that
+ * the attribute stayed out of the prose and reached the tooltip, not what the tip says.
+ *
+ * Each term is read through the tooltip it points at rather than through "the tooltip on the page": while one
+ * fades out the next is already in, so for a moment there are two.
+ */
+test("a glossary term is a word you can tab to, and its tip is announced when you do", async ({ page }) => {
+    await expect(page.locator(TERM), "both terms in the passage became focusable words").toHaveCount(2);
+    await expect(page.locator(GLOSSARY), "and neither tag's attribute leaked into the prose").not.toContainText("tip=");
+    await expect(page.locator(TOOLTIP), "nothing is announced before anything is reached").toHaveCount(0);
+
+    await page.locator(TERM).first().focus();
+
+    await expect
+        .poll(() => describingTip(page, 0), { message: "the focused term is described by its tip" })
+        .toBeTruthy();
+
+    await page.keyboard.press("Tab");
+
+    await expect(page.locator(TERM).nth(1), "Tab moves from one term to the next").toBeFocused();
+    await expect
+        .poll(() => describingTip(page, 1), { message: "and the next term's tip is announced in its turn" })
+        .toBeTruthy();
+    await expect(page.locator(TERM).nth(1), "with focus still on that term once its tip is up").toBeFocused();
+
+    const tip = (await describingTip(page, 1))!;
+
+    expect(
+        await page.locator(GLOSSARY).evaluate((element, value) => element.textContent!.includes(value), tip),
+        "and the tip's text is the attribute, not a copy of the prose",
+    ).toBe(false);
+});
+
+test("hovering a glossary term shows its tip, and each term carries its own", async ({ page }) => {
+    const tips: string[] = [];
+
+    for (let index = 0; index < 2; index++) {
+        await page.locator(TERM).nth(index).hover();
+        await expect
+            .poll(() => describingTip(page, index), { message: `hovering term ${index + 1} shows its tip` })
+            .toBeTruthy();
+
+        tips.push((await describingTip(page, index))!);
+    }
+
+    expect(tips[0], "the two terms carry different tips, so each attribute went to its own tag").not.toBe(tips[1]);
+});
+
+/**
+ * `renderTag` hands its children over as a function, so a tag inside a term goes through the same `renderTag`
+ * and class map as any other. The `[i]` inside the second term therefore carries the very class the legend's
+ * `[i]` carries — which is the default map surviving a tag the page draws itself.
+ */
+test("a tag nested inside a glossary term is still painted", async ({ page }) => {
+    const legendItalic = (await paintedRuns(page, LEGEND)).find((run) => run.text === "italic" && run.className !== "");
+    const nested = await page.evaluate((selector) => {
+        const inner = document.querySelectorAll(selector)[1]?.querySelector("span");
+
+        return inner ? { className: inner.className, text: (inner.textContent ?? "").trim() } : null;
+    }, TERM);
+
+    expect(nested, "the second term holds a run of its own").not.toBeNull();
+    expect(nested!.className, "carrying the class the legend's [i] carries").toBe(legendItalic!.className);
+    await expect(page.locator(GLOSSARY), "and no bracket of it is left on screen").not.toContainText("[i]");
+});
+
+/**
+ * The Links example accepts only addresses that start `https://`, `/` (and not `//`) or `#`, and hands every
+ * other tag back to the component, which prints it as typed. So each link the page drew carries an address of
+ * one of those kinds, the `javascript:` one is no element at all, and its markup is on the screen exactly once.
+ */
+test("allowed addresses become links, and a javascript: address prints as typed", async ({ page }) => {
+    const links = page.locator(`${LINKS} a`);
+    const hrefs = await links.evaluateAll((elements) => elements.map((element) => element.getAttribute("href") ?? ""));
+
+    expect(hrefs.length, "the passage's three safe links were drawn").toBe(3);
+
+    for (const href of hrefs) {
+        expect(href, "each drawn link carries an address of an accepted kind").toMatch(/^(https:\/\/|\/(?!\/)|#)/);
+    }
+
+    await expect(page.locator(`${LINKS} a[href^="javascript"]`), "the unsafe address became no link").toHaveCount(0);
+    await expect(page.locator(LINKS), "its markup is printed as it was typed").toContainText(
+        '[a href="javascript:alert(1)"]this one[/a]',
+    );
+    expect(
+        ((await page.locator(LINKS).textContent()) ?? "").split("[a ").length - 1,
+        "and it is the only bracket left on screen, so every accepted one was consumed",
+    ).toBe(1);
+
+    const legendBold = (await paintedRuns(page, LEGEND)).find((run) => run.text === "bold" && run.className !== "");
+    const boldInLink = await page.locator(`${LINKS} a span`).first().getAttribute("class");
+
+    expect(boldInLink, "a [b] inside a link is painted with the default class").toBe(legendBold!.className);
+});
+
+/**
+ * An attribute is markup only where the consumer allowed that name on that tag. The free-typing example allows
+ * none, so a bracket carrying one is prose: the opening tag prints as typed, and its closing tag, with nothing
+ * left to close, prints too. The same `[b]` without the attribute is painted, which is what shows it was the
+ * attribute and not the tag that turned it down.
+ */
+test("a bracket asking for an attribute it was not allowed prints as text", async ({ page }) => {
+    await page.locator(FIELD).fill('A [b title="x"]word[/b] and a [b]word[/b].');
+
+    await expect(page.locator(PREVIEW), "the bracket with an attribute is printed whole").toContainText(
+        '[b title="x"]word[/b]',
+    );
+    await expect(page.locator(`${PREVIEW} span`), "and only the plain [b] became a run").toHaveCount(1);
+    expect(await page.locator(`${PREVIEW} span`).getAttribute("class"), "painted like the legend's [b]").toBe(
+        (await paintedRuns(page, LEGEND)).find((run) => run.text === "bold" && run.className !== "")!.className,
+    );
+});

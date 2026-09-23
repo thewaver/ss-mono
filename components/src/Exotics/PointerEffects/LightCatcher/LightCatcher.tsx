@@ -4,6 +4,7 @@ import { createMemo, createSignal } from "solid-js";
 import { MathUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerUtils } from "../../../Abstracts/PointerTracker/PointerTracker.utils";
+import { SmootherUtils } from "../../../Abstracts/Smoother/Smoother.utils";
 import { access } from "../../../Utils/propUtils";
 import { LIGHT_CATCHER_DEFAULTS } from "./LightCatcher.const";
 import type { LightCatcherProps } from "./LightCatcher.types";
@@ -42,11 +43,22 @@ export const LightCatcher = (props: ParentProps<LightCatcherProps>) => {
         return MathUtils.clamp01((rangePx - distance) / (rangePx - edgeDistance));
     });
 
+    const getEased = SmootherUtils.create(
+        () => [getStrength()],
+        () => access(props.smoothingMs) ?? LIGHT_CATCHER_DEFAULTS.smoothingMs,
+    );
+
+    const getLitStrength = createMemo(() => {
+        const [strength] = getEased();
+
+        return strength;
+    });
+
     const getBrightness = createMemo(() =>
         MathUtils.lerp(
             access(props.restingBrightness) ?? LIGHT_CATCHER_DEFAULTS.restingBrightness,
             access(props.maxBrightness) ?? LIGHT_CATCHER_DEFAULTS.maxBrightness,
-            getStrength(),
+            getLitStrength(),
         ),
     );
 
@@ -55,7 +67,7 @@ export const LightCatcher = (props: ParentProps<LightCatcherProps>) => {
             MathUtils.lerp(
                 access(props.restingLightness) ?? LIGHT_CATCHER_DEFAULTS.restingLightness,
                 access(props.maxLightness) ?? LIGHT_CATCHER_DEFAULTS.maxLightness,
-                getStrength(),
+                getLitStrength(),
             ),
         ),
     );

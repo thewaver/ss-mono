@@ -5,4 +5,5 @@ export const BRACKET_DEFAULTS = {
     crossGap: 12,
     orientation: "horizontal" as BracketOrientation,
     rootSide: "end" as BracketRootSide,
+    layerHeaderSize: 24,
 };

@@ -12,7 +12,7 @@ import { ClearableExample } from "./Examples/Clearable";
 import { CountriesExample } from "./Examples/Countries";
 import { DeliveriesExample } from "./Examples/Deliveries";
 import { HoursExample } from "./Examples/Hours";
-import { LabelledExample } from "./Examples/Labeled";
+import { LabeledExample } from "./Examples/Labeled";
 import { OnDemandExample } from "./Examples/OnDemand";
 import { ReachableExample } from "./Examples/Reachable";
 import { VirtualizedExample } from "./Examples/Virtualized";
@@ -72,7 +72,7 @@ export const SelectPage = () => {
     const erroredSignal = createSignal<string | undefined>();
     const disabledSignal = createSignal<string | undefined>("Sweden");
     const reachableSignal = createSignal<string | undefined>("Sweden");
-    const labelledSignal = createSignal<string | undefined>();
+    const labeledSignal = createSignal<string | undefined>();
     const clearableSignal = createSignal<string | undefined>("Estonia");
     const [getClearableChange, setClearableChange] = createSignal("none yet");
     const stressSignal = createSignal<Delivery | undefined>();
@@ -367,8 +367,8 @@ export const SelectPage = () => {
         {
             key: "label",
             name: "In a Label",
-            readout: () => `value: ${labelledSignal[0]() ?? "undefined"} — the caption opens the list`,
-            component: () => <LabelledExample valueSignal={labelledSignal} />,
+            readout: () => `value: ${labeledSignal[0]() ?? "undefined"} — the caption opens the list`,
+            component: () => <LabeledExample valueSignal={labeledSignal} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
     ]);

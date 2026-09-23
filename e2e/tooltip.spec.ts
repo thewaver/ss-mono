@@ -35,7 +35,7 @@ test("hovering portals a tooltip and points the anchor at it", async ({ page }) 
             (selector) => !document.querySelector(selector)!.contains(document.querySelector('[role="tooltip"]')),
             ANCHOR,
         ),
-        "portalled out of the anchor rather than nested inside it",
+        "portaled out of the anchor rather than nested inside it",
     ).toBe(true);
     expect(
         await page.evaluate((selector) => {

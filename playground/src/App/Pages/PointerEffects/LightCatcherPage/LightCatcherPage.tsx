@@ -30,12 +30,17 @@ const MIN_LIGHTNESS = 0;
 const MAX_LIGHTNESS = 1;
 const LIGHTNESS_STEP = 0.05;
 
+const MIN_SMOOTHING_MS = 0;
+const MAX_SMOOTHING_MS = 1000;
+const SMOOTHING_STEP_MS = 10;
+
 const FIELD_WIDTH = 110;
 const BOX_HEIGHT = 200;
 const ROW_SPAN = 2;
 
 export const LightCatcherPage = () => {
     const [getIsDisabled, setIsDisabled] = createSignal(false);
+    const [getSmoothingMs, setSmoothingMs] = createSignal(LIGHT_CATCHER_DEFAULTS.smoothingMs);
     const [getActiveRangePx, setActiveRangePx] = createSignal(STARTING_ACTIVE_RANGE_PX);
     const [getLightRangePx, setLightRangePx] = createSignal(LIGHT_CATCHER_DEFAULTS.lightRangePx);
     const [getMaxBrightness, setMaxBrightness] = createSignal(LIGHT_CATCHER_DEFAULTS.maxBrightness);
@@ -47,6 +52,7 @@ export const LightCatcherPage = () => {
         const commonProps: LightCatcherExampleProps = {
             isDisabled: getIsDisabled,
             activeRangePx: getActiveRangePx,
+            smoothingMs: getSmoothingMs,
             lightRangePx: getLightRangePx,
             maxBrightness: getMaxBrightness,
             restingBrightness: getRestingBrightness,
@@ -93,6 +99,24 @@ export const LightCatcherPage = () => {
                     }
                 >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
+                </PageProp>
+
+                <PageProp
+                    key={"smoothingMs"}
+                    label={"Smoothing (ms)"}
+                    hint={
+                        "How long the light takes to catch up with the pointer. At 0 it follows exactly; raised, it glows on after the pointer and fades behind it."
+                    }
+                >
+                    <PageNumberField
+                        value={getSmoothingMs}
+                        min={() => MIN_SMOOTHING_MS}
+                        max={() => MAX_SMOOTHING_MS}
+                        step={() => SMOOTHING_STEP_MS}
+                        width={() => FIELD_WIDTH}
+                        ariaLabel={"Smoothing in milliseconds"}
+                        onInput={setSmoothingMs}
+                    />
                 </PageProp>
 
                 <PageProp

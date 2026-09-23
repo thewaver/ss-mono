@@ -6,6 +6,8 @@ const panel = (from: string, to: string) => `linear-gradient(135deg, ${from}, ${
 
 export const CONNECTOR_FROM_COLOR = themeVars.color.primary.dark;
 export const CONNECTOR_TO_COLOR = themeVars.color.primary.light;
+export const ROUTE_FROM_COLOR = themeVars.color.secondary.dark;
+export const ROUTE_TO_COLOR = themeVars.color.secondary.light;
 
 export const board = style({
     color: themeVars.color.primary.dark,
@@ -29,6 +31,20 @@ export const node = style({
 export const nodeFocused = style({
     borderColor: themeVars.color.primary.main,
     color: themeVars.color.primary.main,
+});
+
+export const nodeOnRoute = style({
+    boxShadow: `0 0 0 2px ${themeVars.color.secondary.main}`,
+});
+
+export const layerHeader = style({
+    display: "grid",
+    placeItems: "center",
+    width: "100%",
+    height: "100%",
+    color: themeVars.color.background.contrast,
+    fontSize: themeVars.fontSize.xSmall,
+    textAlign: "center",
 });
 
 export const nodeRoot = style({

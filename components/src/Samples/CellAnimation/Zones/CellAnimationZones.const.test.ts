@@ -25,7 +25,7 @@ describe("CellAnimationZonesConst", () => {
         expect(inZone("right", { col: 5, row: 3 })).toBe(true);
     });
 
-    it("numbers the quadrants anticlockwise from the top right", () => {
+    it("numbers the quadrants counterclockwise from the top right", () => {
         expect(inZone("quadrant1", { col: 5, row: 1 })).toBe(true);
         expect(inZone("quadrant2", { col: 1, row: 1 })).toBe(true);
         expect(inZone("quadrant3", { col: 1, row: 5 })).toBe(true);

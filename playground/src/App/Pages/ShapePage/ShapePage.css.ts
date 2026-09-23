@@ -1,4 +1,4 @@
-import { createVar, style } from "@vanilla-extract/css";
+import { createVar, globalStyle, style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
 
@@ -49,4 +49,21 @@ export const exampleInner = style({
     border: "2px dashed #FFFFFF40",
     width: "100%",
     height: "100%",
+});
+
+export const morphHost = style({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: themeVars.spacing.double,
+});
+
+export const wrapText = style({
+    maxWidth: 520,
+    lineHeight: 1.6,
+});
+
+globalStyle(`${wrapText} > :first-child`, {
+    float: "left",
+    shapeMargin: themeVars.spacing.double,
 });

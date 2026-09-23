@@ -81,10 +81,12 @@ export type WheelSlots<T> = {
     /** How long the wheel waits between steps while turning on its own. Leave it out and it stands still until spun. */
     idleDelayMs?: MaybeAccessor<number | undefined>;
     /**
-     * Which wedge the wheel is heading for. It is the only thing that moves the wheel: writing it turns the
-     * wheel to that wedge, and the wheel writes it as soon as a spin's target is known rather than when the
-     * spin lands — so a consumer reading it mid-spin learns the outcome early. Read `onSpinEnd` instead to
-     * find out only once it arrives, and `onSelectedWedgeChange` for the wedge at the marker right now.
+     * Which wedge the wheel is heading for. Writing it turns the wheel to that wedge, unless a spin is already
+     * under way, in which case the write is ignored. It is not the only thing that moves the wheel: a spin
+     * does too, and so does the wheel's own turning between spins, which leaves this holding the wedge it last
+     * landed on. The wheel writes it as soon as a spin's target is known rather than when the spin lands — so
+     * a consumer reading it mid-spin learns the outcome early. Read `onSpinEnd` instead to find out only once
+     * it arrives, and `onSelectedWedgeChange` for the wedge at the marker right now.
      */
     targetIndexSignal?: SignalSource<number>;
     /** Whether the wheel is turning on its own. It is the only thing that starts or stops it. */

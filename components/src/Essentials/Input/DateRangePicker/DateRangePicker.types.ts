@@ -10,8 +10,18 @@ import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { CalendarDayRenderer, CalendarWeekdayRenderer } from "../Calendar/Calendar.types";
 import type { DateInputProps } from "../DateInput/DateInput.types";
 
-export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "valueSignal" | "ariaLabel"> &
+export type DateRangePickerProps = Omit<
+    DateInputProps,
+    "renderTrailing" | "valueSignal" | "ariaLabel" | "id" | "name"
+> &
     AccessorProps<{
+        /**
+         * The fields' element id. The start field takes `<id>-start` and the end field `<id>-end`, so a label can
+         * name each one and no id lands on two elements.
+         */
+        id?: string;
+        /** The fields' name when they are submitted as part of a form. They submit as `<name>-start` and `<name>-end`. */
+        name?: string;
         /** Where the calendar sits against the fields. */
         placement?: AnchorPlacement;
         /** How far the calendar is held clear of the fields. */

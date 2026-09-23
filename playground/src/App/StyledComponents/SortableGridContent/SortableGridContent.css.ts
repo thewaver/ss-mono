@@ -9,6 +9,7 @@ export const isAllowed = style({});
 export const isReceiving = style({});
 export const isCarrying = style({});
 export const isOdd = style({});
+export const isBlocked = style({});
 
 export const tileHue = createVar();
 
@@ -21,6 +22,11 @@ export const sortableGridCell = style({
     selectors: {
         [`&.${isOdd}`]: {
             backgroundColor: `rgb(from currentColor r g b / 10%)`,
+        },
+        [`&.${isBlocked}`]: {
+            borderColor: `rgb(from currentColor r g b / 45%)`,
+            backgroundColor: `rgb(from currentColor r g b / 30%)`,
+            backgroundImage: `repeating-linear-gradient(45deg, rgb(from currentColor r g b / 35%) 0 3px, transparent 3px 7px)`,
         },
     },
 });

@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, inlineStyle, readout } from "./helpers";
+import { demo, readout, turnDegrees } from "./helpers";
 
 const list = (key: string, label: string) => `${demo(key)} [role="list"][aria-label="${label}"]`;
 const item = (key: string, label: string) => `${demo(key)} [role="listitem"][aria-label="${label}"]`;
@@ -497,10 +497,11 @@ test("a ring marks the gap it would land in, turned to lie across it", async ({ 
         .locator(`${RING} [role="presentation"]`)
         .filter({ has: page.locator("[data-marker]") })
         .last();
-    const turn = await inlineStyle(box, "transform");
+    const turn = await turnDegrees(box);
 
-    expect(turn, "the mark is placed the way an item is, and turned as well as moved").toContain("rotate(");
-    expect(turn, "and the turn is a real bearing rather than none at all").not.toContain("rotate(0deg)");
+    expect(turn % 360, "the mark is placed the way an item is, and turned to a real bearing as well as moved").not.toBe(
+        0,
+    );
 
     await page.mouse.up();
     await expect(marker, "and it goes once the card is put down").toHaveCount(0);
@@ -536,8 +537,7 @@ test("the four gaps of a ring are a quarter turn apart, the last one included", 
         await page.mouse.move(center.x + spot.x, center.y + spot.y, { steps: 6 });
         await expect(placed.last()).toBeAttached();
 
-        const turn = await inlineStyle(placed.last(), "transform");
-        const degrees = Number(/rotate\((-?[\d.]+)deg\)/.exec(turn)?.[1]);
+        const degrees = await turnDegrees(placed.last());
 
         bearings.push(((degrees % 360) + 360) % 360);
     }

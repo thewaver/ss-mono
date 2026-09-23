@@ -1,6 +1,7 @@
-import { For, createMemo, createSignal, onCleanup, onMount } from "solid-js";
+import { For, batch, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
 
-import type { Point2d, SwipeDirection } from "@thewaver/ss-utils";
+import { GestureUtils } from "@thewaver/ss-utils";
+import type { Point2d, SwipeAxis, SwipeDirection } from "@thewaver/ss-utils";
 
 import type { InteractionDragRatio } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
@@ -15,6 +16,7 @@ const MIN_MOUNTED_COUNT = 1;
 const FIRST_INDEX = 0;
 const TOP_DEPTH = 0;
 const BOTTOM_STEP = 1;
+const SINGLE_AXIS = 1;
 const FULL_WIDTH = 1;
 const NO_WIDTH = 0;
 const PERCENT = 100;
@@ -44,11 +46,22 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
     const [getPileRef, setPileRef] = createSignal<HTMLElement>();
     const [getTravel, setTravel] = createSignal(NO_TRAVEL);
     const [getLeavingTo, setLeavingTo] = createSignal<SwipeDirection>();
+    const [getReturningFrom, setReturningFrom] = createSignal<SwipeDirection>();
+
+    const departures = new Map<number, SwipeDirection>();
 
     let leaveTimeout: ReturnType<typeof setTimeout> | undefined;
+    let returnFrame: ReturnType<typeof requestAnimationFrame> | undefined;
+
+    const cancelReturn = () => {
+        if (returnFrame !== undefined) cancelAnimationFrame(returnFrame);
+
+        returnFrame = undefined;
+    };
 
     onCleanup(() => {
         clearTimeout(leaveTimeout);
+        cancelReturn();
     });
 
     const getCards = createMemo(() => access(props.cards));
@@ -69,7 +82,19 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
 
     const getPileExtentPx = createMemo(() => (getMountedCount() - BOTTOM_STEP) * getCardGap());
 
+    const getAllowedDirections = createMemo(
+        () => access(props.allowedDirections) ?? CARD_STACK_DEFAULTS.allowedDirections,
+    );
+
+    const getSwipeAxis = createMemo((): SwipeAxis | undefined => {
+        const axes = new Set(getAllowedDirections().map(GestureUtils.computeSwipeAxis));
+
+        return axes.size === SINGLE_AXIS ? [...axes][0] : undefined;
+    });
+
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
+
+    const getIsMoving = () => getLeavingTo() !== undefined || getReturningFrom() !== undefined;
 
     const getIsEmpty = createMemo(() => getTopIndex() >= getCards().length);
 
@@ -87,7 +112,8 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
         const cards = getCards();
         const index = getTopIndex();
 
-        if (getIsDisabled() || getLeavingTo() !== undefined || index >= cards.length) return false;
+        if (getIsDisabled() || getIsMoving() || index >= cards.length) return false;
+        if (!getAllowedDirections().includes(direction)) return false;
 
         const card = cards[index]!;
 
@@ -97,6 +123,8 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
         clearTimeout(leaveTimeout);
 
         leaveTimeout = setTimeout(() => {
+            departures.set(index, direction);
+
             setLeavingTo(undefined);
             setTopIndex(index + 1);
 
@@ -108,31 +136,83 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
         return true;
     };
 
-    const deal = () => {
-        if (getTopIndex() === FIRST_INDEX && getLeavingTo() === undefined) return false;
+    const recall = () => {
+        const previous = Math.min(getTopIndex(), getCards().length) - BOTTOM_STEP;
 
-        clearTimeout(leaveTimeout);
+        if (getIsDisabled() || getIsMoving() || previous < FIRST_INDEX) return false;
 
-        setLeavingTo(undefined);
-        setTravel(NO_TRAVEL);
-        setTopIndex(FIRST_INDEX);
+        const direction = departures.get(previous);
+
+        departures.delete(previous);
+
+        const isFlying = direction !== undefined && getTransitionDurationMs() !== NO_DURATION;
+
+        batch(() => {
+            setTravel(NO_TRAVEL);
+            setReturningFrom(isFlying ? direction : undefined);
+            setTopIndex(previous);
+        });
+
+        if (!isFlying) return true;
+
+        returnFrame = requestAnimationFrame(() => {
+            returnFrame = requestAnimationFrame(() => {
+                returnFrame = undefined;
+
+                setReturningFrom(undefined);
+            });
+        });
 
         return true;
     };
 
-    const controls: CardStackControls = { getTopIndex, getIsEmpty, send, deal };
+    const deal = () => {
+        if (getTopIndex() === FIRST_INDEX && !getIsMoving()) return false;
 
-    const { getIsSwiping } = InteractionTrackerUtils.trackFreeSwipe(getPileRef, () => getIsDisabled() || getIsEmpty(), {
-        getCommitRatio,
-        onSwipe: setTravel,
-        onSwipeEnd: (direction) => {
+        clearTimeout(leaveTimeout);
+        cancelReturn();
+        departures.clear();
+
+        batch(() => {
+            setLeavingTo(undefined);
+            setReturningFrom(undefined);
             setTravel(NO_TRAVEL);
+            setTopIndex(FIRST_INDEX);
+        });
 
-            if (direction === undefined) return;
+        return true;
+    };
 
-            send(direction);
-        },
-    });
+    const controls: CardStackControls = { getTopIndex, getIsEmpty, send, recall, deal };
+
+    const getIsSwipeDisabled = () => getIsDisabled() || getIsEmpty() || getAllowedDirections().length === 0;
+
+    const onSwipeEnd = (direction: SwipeDirection | undefined) => {
+        setTravel(NO_TRAVEL);
+
+        if (direction === undefined) return;
+
+        send(direction);
+    };
+
+    const getSwipeTracker = createMemo(
+        on(getSwipeAxis, (axis) =>
+            axis === undefined
+                ? InteractionTrackerUtils.trackFreeSwipe(getPileRef, getIsSwipeDisabled, {
+                      getCommitRatio,
+                      onSwipe: setTravel,
+                      onSwipeEnd,
+                  })
+                : InteractionTrackerUtils.trackAxialSwipe(getPileRef, getIsSwipeDisabled, {
+                      getAxis: () => axis,
+                      getCommitRatio,
+                      onSwipe: (ratio) => setTravel(axis === "horizontal" ? { x: ratio, y: 0 } : { x: 0, y: ratio }),
+                      onSwipeEnd,
+                  }),
+        ),
+    );
+
+    const getIsSwiping = () => getSwipeTracker().getIsSwiping();
 
     const getCardHeight = () => `calc(${PERCENT}% - ${getPileExtentPx()}px)`;
 
@@ -146,14 +226,16 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
 
         if (depth !== TOP_DEPTH) return stacked;
 
-        const leavingTo = getLeavingTo();
-        const offset = leavingTo === undefined ? getTravel() : LEAVE_OFFSETS[leavingTo];
+        const away = getLeavingTo() ?? getReturningFrom();
+        const offset = away === undefined ? getTravel() : LEAVE_OFFSETS[away];
 
         return `translate(${offset.x * PERCENT}%, ${offset.y * PERCENT}%) ${stacked}`;
     };
 
     const getCardTransitionDurationMs = (depth: number) =>
-        depth === TOP_DEPTH && getIsSwiping() ? NO_DURATION : getTransitionDurationMs();
+        depth === TOP_DEPTH && (getIsSwiping() || getReturningFrom() !== undefined)
+            ? NO_DURATION
+            : getTransitionDurationMs();
 
     const onKeyDown = (e: KeyboardEvent) => {
         const direction = KEY_DIRECTIONS[e.key];
@@ -189,6 +271,7 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
                         isTop: getIsTop(),
                         travel: getIsTop() ? getTravel() : NO_TRAVEL,
                         leavingTo: getIsTop() ? getLeavingTo() : undefined,
+                        returningFrom: getIsTop() ? getReturningFrom() : undefined,
                     }));
 
                     return (

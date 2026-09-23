@@ -43,6 +43,15 @@ export type LightCatcherProps = AccessorProps<{
      */
     restingLightness?: number;
     /**
+     * How long the surface takes to catch up with the pointer, in milliseconds. `0`, the default, follows it
+     * exactly.
+     *
+     * The brightness and lightness ease towards where the pointer says they should be, closing about two-thirds
+     * of the gap in this time, however fast or slow the screen draws — so a row of these glows on after the
+     * pointer and fades behind it, rather than switching.
+     */
+    smoothingMs?: number;
+    /**
      * Stops the surface answering the pointer, leaving it at its resting brightness and lightness.
      *
      * It is what a consumer honoring a reduced-motion preference passes, since the library never reads that

@@ -1,6 +1,6 @@
 import type { Signal } from "solid-js";
 
-import type { AccessorProps, CuboidSize } from "@thewaver/ss-components";
+import type { AccessorProps, CuboidController, CuboidSize } from "@thewaver/ss-components";
 
 export type CuboidExampleProps = AccessorProps<{
     size: CuboidSize;
@@ -12,4 +12,11 @@ export type CuboidExampleProps = AccessorProps<{
 export type CuboidWanderingExampleProps = CuboidExampleProps &
     AccessorProps<{
         turnIntervalMs: number | undefined;
+    }>;
+
+export type CuboidUprightExampleProps = CuboidExampleProps &
+    AccessorProps<{
+        isUpright: boolean;
+        isDraggable: boolean;
+        controllerSignal: Signal<CuboidController | undefined>;
     }>;

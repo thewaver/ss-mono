@@ -1,8 +1,8 @@
 import type { AccessorProps } from "@thewaver/ss-components";
 
 export type ScrambleTextExampleProps = AccessorProps<{
-    glyphs: string | undefined;
     settleDurationMs: number;
     scrambleIntervalMs: number;
+    computeGlyphs?: (character: string) => string;
     computeCharacterWeights?: (count: number) => number[];
 }>;

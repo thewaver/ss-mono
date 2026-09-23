@@ -93,7 +93,10 @@ export const PageSortableGridItemContent = (props: SortableGridItemContentProps)
 export const PageSortableGridCell = (props: SortableGridCellProps) => (
     <div
         class={styles.sortableGridCell}
-        classList={{ [styles.isOdd]: (access(props.spot).col + access(props.spot).row) % 2 === 1 }}
+        classList={{
+            [styles.isOdd]: (access(props.spot).col + access(props.spot).row) % 2 === 1,
+            [styles.isBlocked]: access(props.isBlocked) ?? false,
+        }}
     />
 );
 

@@ -12,6 +12,12 @@ export type ScratchCardExampleProps = AccessorProps<{
     computePoints: () => ((size: Size2d) => Point2d[]) | undefined;
 };
 
+export type ScratchCardWindowsExampleProps = Omit<ScratchCardExampleProps, "onScratch" | "onClear"> &
+    AccessorProps<{
+        onWindowScratch: (index: number, clearedRatio: number) => void;
+        onWindowClear: (index: number) => void;
+    }>;
+
 export type ExampleKey = "ticket" | "frosted";
 
 export type ExampleProgress = {

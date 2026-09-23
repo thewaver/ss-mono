@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { TextArea } from "@thewaver/ss-components";
+import { RICH_TEXT_DEFAULTS, TextArea } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
@@ -15,6 +15,8 @@ import { PageTextFieldPlaceholder } from "../../StyledComponents/TextFieldPlaceh
 import { CustomInputExample } from "./Examples/CustomInput";
 import { CustomTagsExample } from "./Examples/CustomTags";
 import { DefaultTagsExample } from "./Examples/DefaultTags";
+import { GlossaryExample } from "./Examples/Glossary";
+import { LinksExample } from "./Examples/Links";
 import { FIELD_WIDTH, MAX_ROWS, MIN_ROWS, PREVIEW_WIDTH, STARTING_CONTENT } from "./RichTextPage.const";
 
 import { MEASURE_BOX_PADDING } from "../../PageComponents/MeasureBox/MeasureBox.css";
@@ -25,7 +27,7 @@ const EXAMPLES_ROOT = "/src/App/Pages/RichTextPage/Examples";
 
 export const RichTextPage = () => {
     const contentSignal = createSignal(STARTING_CONTENT);
-    const [getRemoveOtherTags, setRemoveOtherTags] = createSignal(false);
+    const [getRemoveOtherTags, setRemoveOtherTags] = createSignal(RICH_TEXT_DEFAULTS.removeOtherTags);
 
     const getExamples = createMemo(() => [
         {
@@ -39,6 +41,18 @@ export const RichTextPage = () => {
             name: "Custom Tags",
             component: () => <CustomTagsExample />,
             path: `${EXAMPLES_ROOT}/CustomTags.tsx`,
+        },
+        {
+            key: "glossary",
+            name: "Glossary",
+            component: () => <GlossaryExample />,
+            path: `${EXAMPLES_ROOT}/Glossary.tsx`,
+        },
+        {
+            key: "links",
+            name: "Links",
+            component: () => <LinksExample />,
+            path: `${EXAMPLES_ROOT}/Links.tsx`,
         },
         {
             key: "customInput",

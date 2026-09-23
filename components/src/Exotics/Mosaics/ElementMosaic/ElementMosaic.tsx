@@ -1,4 +1,4 @@
-import { createMemo, createSignal } from "solid-js";
+import { type Accessor, createMemo, createSignal, onCleanup } from "solid-js";
 
 import type { Size2d } from "@thewaver/ss-utils";
 
@@ -13,31 +13,48 @@ import * as styles from "./ElementMosaic.css";
 const EMPTY_SIZE: Size2d = { width: 0, height: 0 };
 
 export const ElementMosaic = <T,>(props: ElementMosaicProps<T>) => {
-    const [getItemRefs, setItemRefs] = createSignal<Array<HTMLElement | undefined>>([]);
+    const [getItemElements, setItemElements] = createSignal(new Map<HTMLElement, Accessor<number>>());
+
+    const getItemRefs = createMemo(() => {
+        const refs: Array<HTMLElement | undefined> = [];
+
+        for (const [element, getIndex] of getItemElements()) refs[getIndex()] = element;
+
+        return refs;
+    });
 
     const getMeasuredSizes = ElementObserverUtils.createBorderBoxSizeListObserver(getItemRefs);
 
     const getSizes = createMemo(() => access(props.items).map((_, index) => getMeasuredSizes()[index] ?? EMPTY_SIZE));
 
-    const setItemRefAt = (index: number, element: HTMLElement) =>
-        setItemRefs((refs) => {
-            const next = [...refs];
+    const addItemElement = (element: HTMLElement, getIndex: Accessor<number>) => {
+        setItemElements((elements) => new Map(elements).set(element, getIndex));
 
-            next[index] = element;
+        onCleanup(() => {
+            setItemElements((elements) => {
+                const next = new Map(elements);
 
-            return next;
+                next.delete(element);
+
+                return next;
+            });
         });
+    };
 
     return (
         <Mosaic
             sizeAnchor={props.sizeAnchor}
             gap={props.gap}
+            transitionDurationMs={props.transitionDurationMs}
             sizes={getSizes}
+            keys={props.items}
             isItemSized={false}
             computePlacements={MosaicUtils.packFixed}
-            renderItem={(index, getState) => (
-                <div ref={(element) => setItemRefAt(index, element)} class={styles.elementMosaicItem}>
-                    {props.renderItem(() => access(props.items)[index], getState)}
+            ariaLabel={props.ariaLabel}
+            onActivate={props.onActivate}
+            renderItem={(getIndex, getState) => (
+                <div ref={(element) => addItemElement(element, getIndex)} class={styles.elementMosaicItem}>
+                    {props.renderItem(() => access(props.items)[getIndex()], getState)}
                 </div>
             )}
         />

@@ -50,8 +50,9 @@ export namespace RotatorUtils {
      * @param getIsDisabled Whether the wheel may rotate.
      * @param defs.stepCount How many steps the wheel has. Fewer than two and it cannot rotate.
      * @param defs.targetIndexSignal The step the wheel is heading for, if the consumer wants to drive or
-     * observe it. Writing it turns the wheel there; the component writes it as soon as a spin's target is
-     * known, rather than when the spin lands. An internal signal is used when omitted.
+     * observe it. Writing it turns the wheel there, unless a spin is under way; the component writes it as
+     * soon as a spin's target is known, rather than when the spin lands, and idle drift leaves it alone. An
+     * internal signal is used when omitted.
      * @param defs.autoSpinSignal Whether idle drift is allowed. On when omitted.
      * @param defs.spinDurationMs How long a spin takes.
      * @param defs.settleDurationMs How long the drift back from an overshoot takes.
@@ -66,8 +67,8 @@ export namespace RotatorUtils {
      * the step count.
      * @param defs.onSpinEnd Called with the step landed on.
      * @param defs.onStepChange Called whenever the step under the marker changes, drift included.
-     * @returns `getAngle` for the transform to apply, `getIndex` for the settled step, `getSelectedIndex`
-     * for whatever is under the marker right now, `getPhase` — `"still"`, `"idling"`, `"spinning"` or
+     * @returns `getAngle` for the transform to apply, `getTargetIndex` for the step the wheel is heading
+     * for, `getCurrentIndex` for whatever is under the marker right now, `getPhase` — `"still"`, `"idling"`, `"spinning"` or
      * `"settling"` — `getStepAngle` and `getStepCount` for laying the steps out, `getIsRotatable`,
      * `getIsSpinnable` for enabling the button, `getIsAwaitingTarget` for the wait on an asynchronous
      * target, and `spin` to start one.

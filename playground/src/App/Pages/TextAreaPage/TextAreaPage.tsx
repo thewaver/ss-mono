@@ -6,7 +6,7 @@ import { AutoSizingCappedExample } from "./Examples/AutoSizingCapped";
 import { DisabledExample } from "./Examples/Disabled";
 import { ErroredExample } from "./Examples/Errored";
 import { FixedHeightExample } from "./Examples/FixedHeight";
-import { LabelledExample } from "./Examples/Labeled";
+import { LabeledExample } from "./Examples/Labeled";
 import { ReachableExample } from "./Examples/Reachable";
 import { ReadOnlyExample } from "./Examples/ReadOnly";
 import { LONG_TEXT, MAX_ROWS, MIN_ROWS, REVIEW_LIMIT } from "./TextAreaPage.const";
@@ -21,7 +21,7 @@ export const TextAreaPage = () => {
     const disabledSignal = createSignal("Cannot be edited");
     const reachableSignal = createSignal("Cannot be edited either");
     const erroredSignal = createSignal("Too short");
-    const labelledSignal = createSignal("");
+    const labeledSignal = createSignal("");
 
     const getExamples = createMemo(() => [
         {
@@ -77,8 +77,8 @@ export const TextAreaPage = () => {
         {
             key: "label",
             name: "In a Label",
-            readout: () => `length: ${labelledSignal[0]().length}`,
-            component: () => <LabelledExample valueSignal={labelledSignal} />,
+            readout: () => `length: ${labeledSignal[0]().length}`,
+            component: () => <LabeledExample valueSignal={labeledSignal} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
     ]);

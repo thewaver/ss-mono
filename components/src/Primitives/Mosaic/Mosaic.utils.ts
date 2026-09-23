@@ -1,6 +1,6 @@
 import type { Size2d } from "@thewaver/ss-utils";
 
-import type { MosaicPackDefs, MosaicPlacement } from "./Mosaic.types";
+import type { MosaicPackDefs, MosaicPlacement, MosaicStep } from "./Mosaic.types";
 
 /** One flat stretch of the packing frontier: where it starts, how wide it runs, and how high it stands. */
 type MosaicSkylineSegment = {
@@ -226,6 +226,78 @@ const cutIntoReadingOrder = (
     return cutIntoReadingOrder(placements, !isBanded, true);
 };
 
+/** How far two placements share the horizontal axis. Zero or less when they sit side by side. */
+const getSideOverlap = (a: MosaicPlacement, b: MosaicPlacement) =>
+    Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x);
+
+/** Whether one placement sits wholly below another, allowing for edges a fraction of a pixel apart. */
+const getIsBelow = (upper: MosaicPlacement, lower: MosaicPlacement) =>
+    lower.y + CUT_TOLERANCE_PX >= upper.y + upper.height;
+
+/**
+ * Whether some of a candidate can be seen from the starting tile, looking straight up or down.
+ *
+ * Only the stretch the two share across is looked through, and every other candidate lying between them
+ * blocks what it covers of that stretch. A candidate blocked across the whole of it is behind something
+ * nearer, so a step would skip over a tile to reach it.
+ */
+const getIsInSight = (
+    from: MosaicPlacement,
+    candidate: MosaicPlacement,
+    candidates: MosaicPlacement[],
+    isDown: boolean,
+) => {
+    const start = Math.max(from.x, candidate.x);
+    const end = Math.min(from.x + from.width, candidate.x + candidate.width);
+
+    const blocks = candidates
+        .filter(
+            (other) => other !== candidate && (isDown ? getIsBelow(other, candidate) : getIsBelow(candidate, other)),
+        )
+        .map((other) => ({ start: Math.max(start, other.x), end: Math.min(end, other.x + other.width) }))
+        .filter((block) => block.end > block.start)
+        .sort((a, b) => a.start - b.start);
+
+    let reached = start;
+
+    for (const block of blocks) {
+        if (block.start > reached + CUT_TOLERANCE_PX) return true;
+
+        reached = Math.max(reached, block.end);
+    }
+
+    return reached + CUT_TOLERANCE_PX < end;
+};
+
+/**
+ * The tile a vertical step lands on: the one in sight below or above that shares the most width with the
+ * starting tile, and the earliest in reading order where two share the same amount.
+ */
+const findVerticalStep = (from: MosaicPlacement, placements: MosaicPlacement[], isDown: boolean) => {
+    const candidates = placements.filter(
+        (placement) =>
+            placement !== from &&
+            getSideOverlap(from, placement) > CUT_TOLERANCE_PX &&
+            (isDown ? getIsBelow(from, placement) : getIsBelow(placement, from)),
+    );
+
+    let best: MosaicPlacement | undefined;
+    let bestOverlap = 0;
+
+    for (const candidate of candidates) {
+        if (!getIsInSight(from, candidate, candidates, isDown)) continue;
+
+        const overlap = getSideOverlap(from, candidate);
+
+        if (overlap > bestOverlap + CUT_TOLERANCE_PX) {
+            best = candidate;
+            bestOverlap = overlap;
+        }
+    }
+
+    return best;
+};
+
 /**
  * Packs items of differing sizes into a mosaic, and works out what order to read them in.
  *
@@ -393,4 +465,33 @@ export namespace MosaicUtils {
      * @returns The same placements, reordered.
      */
     export const sortIntoReadingOrder = (placements: MosaicPlacement[]) => cutIntoReadingOrder(placements, true, false);
+
+    /**
+     * Which tile a keyboard step moves to.
+     *
+     * Left and right follow the reading order, since that is the order a mosaic has; up and down follow
+     * the geometry instead, because the tile after this one in reading order may be anywhere. A vertical
+     * step goes to the tile directly below or above — one not hidden behind a nearer tile across the whole
+     * width the two share — that shares the most width with this one, and the earlier in reading order on
+     * a tie. None of the steps wraps.
+     *
+     * @param step `"previous"`, `"next"`, `"up"`, `"down"`, `"first"` or `"last"`.
+     * @param fromIndex The item the cursor is on, counting in the order the items were given.
+     * @param placements The packed placements, in reading order, as
+     * {@link MosaicUtils.sortIntoReadingOrder} gives them. Only these can be landed on.
+     * @returns The item to move to, in the order the items were given, or `undefined` when there is none
+     * that way or the starting item was not placed.
+     */
+    export const computeStepIndex = (step: MosaicStep, fromIndex: number, placements: MosaicPlacement[]) => {
+        const at = placements.findIndex((placement) => placement.index === fromIndex);
+
+        if (at < 0) return undefined;
+
+        if (step === "first") return placements[0]?.index;
+        if (step === "last") return placements[placements.length - 1]?.index;
+        if (step === "previous") return placements[at - 1]?.index;
+        if (step === "next") return placements[at + 1]?.index;
+
+        return findVerticalStep(placements[at], placements, step === "down")?.index;
+    };
 }

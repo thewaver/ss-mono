@@ -72,3 +72,43 @@ describe("getAngle", () => {
         expect(TrailUtils.getAngle({ x: 0, y: 0 }, { x: 10, y: 10 })).toBe(45);
     });
 });
+
+describe("getRunExtent", () => {
+    it("is one lap when looping, whatever the spacing", () => {
+        expect(TrailUtils.getRunExtent([0, 0.2, 0.4], true)).toBe(1);
+    });
+
+    it("lasts until the furthest-back traveler arrives when the path stops", () => {
+        expect(TrailUtils.getRunExtent([0, 0.2, 0.4], false)).toBe(1.4);
+    });
+
+    it("is one pass for a lone traveler, and ignores offsets ahead of the lead", () => {
+        expect(TrailUtils.getRunExtent([0], false)).toBe(1);
+        expect(TrailUtils.getRunExtent([-0.5], false)).toBe(1);
+        expect(TrailUtils.getRunExtent([], false)).toBe(1);
+    });
+});
+
+describe("getTravelerProgress", () => {
+    it("is the run's progress for the lead of a lone traveler, ends included", () => {
+        expect(TrailUtils.getTravelerProgress(QUARTER, 0, 1, false)).toBe(QUARTER);
+        expect(TrailUtils.getTravelerProgress(1, 0, 1, true)).toBe(1);
+        expect(TrailUtils.getTravelerProgress(0, 0, 1, true)).toBe(0);
+    });
+
+    it("keeps a follower waiting at the start of a path that stops, until the lead is its offset ahead", () => {
+        expect(TrailUtils.getTravelerProgress(0.1, HALF_WAY, 1.5, false)).toBe(0);
+        expect(TrailUtils.getTravelerProgress(HALF_WAY, HALF_WAY, 1.5, false)).toBeCloseTo(QUARTER);
+    });
+
+    it("parks the lead at the end while the followers are still arriving, and brings the last in at the finish", () => {
+        expect(TrailUtils.getTravelerProgress(0.8, 0, 1.5, false)).toBe(1);
+        expect(TrailUtils.getTravelerProgress(1, HALF_WAY, 1.5, false)).toBe(1);
+    });
+
+    it("wraps a follower round the end of a looping path, so it is out on the path from the start", () => {
+        expect(TrailUtils.getTravelerProgress(0, QUARTER, 1, true)).toBe(0.75);
+        expect(TrailUtils.getTravelerProgress(0.1, QUARTER, 1, true)).toBeCloseTo(0.85);
+        expect(TrailUtils.getTravelerProgress(HALF_WAY, QUARTER, 1, true)).toBe(QUARTER);
+    });
+});

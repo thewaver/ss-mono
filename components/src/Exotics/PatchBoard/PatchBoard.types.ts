@@ -32,7 +32,7 @@ export type PatchBoardAnnouncements = CarrierAnnouncements & {
     plugKeyHint: string;
     /**
      * Names where a carried node would land, which is what the move and drop announcements say it is at. A
-     * position in pixels would mean nothing read aloud, so the board says which third of it the node is in.
+     * position as numbers would mean nothing read aloud, so the board says which third of it the node is in.
      */
     computeRegionLabel: (region: PatchBoardRegion) => string;
     /** Names the place a carried node is at when it is somehow not on the board at all. */
@@ -85,10 +85,19 @@ export type PatchBoardSocket = {
 };
 
 export type PatchBoardNode<T> = {
+    /** The consumer's own record for the node, handed back to every callback that names it. */
     value: T;
+    /**
+     * Where the node's top left corner sits, as fractions of the board's width on both axes — so `y: 0.5` is
+     * half a width down, not half the height. Written in one unit, a node keeps its shape and its place when
+     * the board is drawn wider or narrower.
+     */
     spot: Point2d;
+    /** How large the node is, as fractions of the board's width on both axes, the same unit as `spot`. */
     size: Size2d;
+    /** The node's inputs and outputs, spread along the edges that `orientation` gives each kind. */
     sockets: PatchBoardSocket[];
+    /** Turns the node off: it cannot be picked up, and none of its sockets take or give a cable. */
     isDisabled?: boolean;
 };
 
@@ -143,14 +152,26 @@ export type PatchBoardCarry<T> =
       };
 
 export type PatchBoardCableDefs = {
+    /** Tells one cable from another, stable for as long as the same two sockets are joined. */
     key: string;
+    /**
+     * Where the cable starts, as fractions of the board's width on both axes. The board's own drawing
+     * surface is scaled to match, so a path written in these numbers lands on the sockets at any width.
+     */
     from: Point2d;
+    /** Where the cable ends, in the same unit as `from`. */
     to: Point2d;
+    /** Which kind of socket the cable starts from, so the painter knows which way it leaves. */
     fromKind: PatchBoardSocketKind;
+    /** Which way the board runs, so the painter knows whether to bow the cable sideways or up and down. */
     orientation: PatchBoardOrientation;
+    /** Whether this is the cable still being carried rather than one already plugged in. */
     isPending: boolean;
+    /** Whether the carried cable would be allowed where it is aimed. Always true for a plugged-in cable. */
     isAllowed: boolean;
 };
+
+export type PatchBoardSnapFn = (spot: Point2d) => Point2d;
 
 export type PatchBoardNodeFlags = {
     isCarried: boolean;
@@ -175,23 +196,44 @@ export type PatchBoardProps<T> = AccessorProps<{
      * name those announcements are built from. There is no default: every word a reader hears comes from here.
      */
     announcements: PatchBoardAnnouncements;
-    /** How large the board is. */
-    size: Size2d;
+    /**
+     * The board's height as a fraction of its width. The board takes whatever width its container gives it
+     * and every spot, size and distance on it is a fraction of that width, so this is the one number that
+     * says what shape it is. Zooming is the consumer scaling the board, or giving it more width.
+     */
+    heightRatio: number;
     /** Which way the board runs, which decides where a node's inputs and outputs sit. */
     orientation?: PatchBoardOrientation;
-    /** How large one socket is drawn. */
+    /** How large one socket is drawn, as a fraction of the board's width. */
     socketSize?: number;
-    /** How close a cable end has to get to a socket before it counts as landing on it. */
+    /**
+     * How close a cable end has to get to a socket before it counts as landing on it, as a fraction of the
+     * board's width.
+     */
     socketReach?: number;
-    /** How far one press of an arrow key moves a node, for moving without a pointer. */
+    /**
+     * How far one press of an arrow key moves a node, as a fraction of the board's width, for moving without
+     * a pointer. With `computeSnapSpot` given it is how finely the board looks for the next snapped spot.
+     */
     stepSize?: number;
+    /**
+     * Pulls a spot a node is moved to onto one the board allows, such as the nearest point of a grid. It is
+     * applied while the node is carried, so the node moves in snapped steps under the pointer, and to every
+     * keyboard move, where an arrow key goes to the next snapped spot in its direction rather than by
+     * `stepSize`. The node is still held inside the board afterwards. Left out, a node goes anywhere.
+     */
+    computeSnapSpot?: PatchBoardSnapFn;
     /** Turns the board off, so nothing on it responds. */
     isDisabled?: boolean;
     /** Freezes the wiring as it stands: cables still show, but none can be made, moved or pulled out. */
     isLocked?: boolean;
     /** The cables currently wired. It is the only thing that adds or removes one. */
     linksSignal: SignalSource<PatchBoardLink[]>;
-    /** Whether a cable between two given sockets is allowed, so a board can refuse a connection that makes no sense. */
+    /**
+     * Whether a cable between two given sockets is allowed, so a board can refuse a connection that makes no
+     * sense. Asked only after the board's own refusals have passed. `PatchBoardUtils.getClosesLoop` answers
+     * the common rule that a signal may not find its way back to where it came from.
+     */
     computeCanLink?: (link: PatchBoardLink) => boolean;
     /** Draws one socket. */
     renderSocket?: (

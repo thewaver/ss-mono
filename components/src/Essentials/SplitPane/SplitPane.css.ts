@@ -19,6 +19,7 @@ export const splitPaneGutter = style({
     background: "none",
     color: "inherit",
     font: "inherit",
+    touchAction: "none",
 
     selectors: {
         '&[aria-orientation="vertical"]': {

@@ -11,6 +11,7 @@ export const ElementsExample = (props: Props) => {
             items={props.items}
             gap={props.gap}
             sizeAnchor={props.sizeAnchor}
+            transitionDurationMs={props.transitionDurationMs}
             renderItem={(getItem, getState) => (
                 <PageMosaicTile state={getState} width={() => getItem().width} height={() => getItem().height}>
                     {getItem().name}

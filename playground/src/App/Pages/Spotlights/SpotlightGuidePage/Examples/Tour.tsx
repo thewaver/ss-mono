@@ -56,6 +56,7 @@ export const TourExample = (props: Props) => {
                 </div>
 
                 <Button
+                    id={"tourAdd"}
                     ref={setAddRef}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Add to basket</PageButtonContent>}
                     onClick={() => {
@@ -74,12 +75,14 @@ export const TourExample = (props: Props) => {
                 </div>
 
                 <Button
+                    id={"tourCheckout"}
                     ref={setCheckoutRef}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Checkout</PageButtonContent>}
                 />
             </PageControlRow>
 
             <Button
+                id={"tourStart"}
                 renderContent={(getFlags) => (
                     <PageButtonContent flags={getFlags}>
                         {access(props.resumeStep) === undefined

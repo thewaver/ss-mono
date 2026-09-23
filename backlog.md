@@ -60,6 +60,8 @@ reading.
 26. Components that turn under perspective reserve room they do not need at rest — _open_
 27. `CardStack` — the pointer route the library cannot promise — _open_
 28. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
+29. Work that has never been watched running — _open_
+30. Choices the add-ons round made on the user's behalf — _pending decision_
 
 ### Build order
 
@@ -312,8 +314,8 @@ coverage than it is.
 **Nothing checks appearance, and nothing will** — screenshot baselines are an accepted limit rather than a
 pending decision; see the section at the end of this file. So the parity rule that forced
 `aria-disabled`-everywhere — that disabled and disabled-but-reachable must look _identical_ — is checked by eye,
-permanently, and the same goes for `CellAnimation`, `ScanlineAnimation` and `ScreenWiper`, which have a
-Playground page and no spec because what they produce is motion over time. A DOM-reading spec over those three
+permanently, and the same goes for `CellAnimation` and `ScanlineAnimation`, which have a
+Playground page and no spec because what they produce is motion over time. A DOM-reading spec over those two
 would assert structure and call it coverage; nothing else here will reach them.
 
 **A callback nothing on the page consumes is invisible to a suite that drives the page**, and `onMount`
@@ -1227,6 +1229,45 @@ who wants values takes. _"The form story"_ in `decisions.md` says the library ne
 that entry is what this item would revisit. Focus moving to the first field in error on submit was built
 separately and does not depend on this.
 
+## 29. Work that has never been watched running
+
+Nothing here is known to be broken. Each of these was built and passes its checks, but has not been looked at
+the way the user asked for, or cannot be reached by a spec yet.
+
+- **Right-to-left.** `e2e/rightToLeft.spec.ts` covers Tabs, RadioGroup, Calendar, SplitPane, Menu, Sortable and
+  Tree with `dir="rtl"`. Not covered, and each needs a right-to-left demo before a spec can reach it: Table (the
+  resize drag, click-to-step, Shift-arrow to move a column, the drop markers), Clock, TagInput's hop between the
+  field and its tags, which thumb Range picks, RangeCalendar, ContextMenu, a pointer drop into a mirrored Sortable
+  row and where its marker lands, a consumer-set `submenuPlacement` inside a right-to-left box, and flipping `dir`
+  while the page is open.
+- **Two parts of the Exotics add-ons round are waiting for the user's eye.** Everything from that round now has
+  specs, and these two pass them too, but they were built for the user to judge by looking. The first is
+  Cuboid's `isUpright`: once a face has been turned the right way up, pressing left and then right no longer
+  brings you back, and pressing up repeatedly goes front, top, back, top, back and never reaches the bottom.
+  The second is editing a Timeline item's edges from the keyboard: Enter takes hold of the end, Home and End
+  choose which edge, the arrows move it, Enter or Space drops it, and Escape puts it back. The glide settings on
+  Formation and the mosaics start at 0, so nothing moves until the "Glide (ms)" knob is raised.
+
+## 30. Choices the add-ons round made on the user's behalf
+
+The agents building the Exotics add-ons had to pick these to finish the work. Each is a working answer, and each
+is the user's to confirm or change.
+
+- **Numbers picked rather than measured.** PatchBoard's defaults, converted from pixels to shares of the board's
+  width: `socketSize` 0.03, `socketReach` 0.06 and `stepSize` 0.02 (the old 14, 28 and 8 pixels on a board 460
+  pixels wide). The threshold at which `Smoother` counts a value as settled, 0.001. Reveal's `stepSize`, 20
+  pixels per arrow press. Cuboid's drag: dragging one box width turns it a quarter turn, and letting go past half
+  of that counts.
+- **Whether Shape should accept a class or a style for its outer box.** The text-wrap example has to reach it with
+  a child selector, because Shape takes neither.
+- **PatchBoard node sizes are called `width` and `height` while holding shares of the board's width.**
+  `conventions.md` says those two words mean pixels. `PlacementRect` already bends the same rule.
+- **A paused CellAnimation now shows its cut-up grid at the current point instead of the whole picture.** Before
+  anything has run, that is the first frame. Resizing the window or switching tabs also no longer starts the
+  pass over. Both follow from making the pass scrubbable.
+- **Odometer reels under reduced motion drop only their extra turns.** Each reel keeps its own duration, so a
+  slow reel still turns its one step slowly. Falling back to `turnDurationMs` there is the alternative.
+
 ## Accepted limits
 
 Faults that have been looked at and consciously left alone. Not outstanding work, not numbered, and not part
@@ -1286,7 +1327,7 @@ package's contract.
 
 What this permanently gives up is worth naming so nobody re-proposes it as a gap: the `aria-disabled`-parity
 rule — that disabled and disabled-but-reachable look identical — is checked by eye and only by eye, and
-`CellAnimation`, `ScanlineAnimation` and `ScreenWiper` will keep their Playground pages and no specs, because
+`CellAnimation` and `ScanlineAnimation` will keep their Playground pages and no specs, because
 motion over time is the one thing a DOM-reading suite cannot see. Item 10 records the blind spot; this is the
 decision not to close it.
 
@@ -1329,6 +1370,33 @@ answer to "what is next for development"** — see the note at the top of this f
 commitment, and an entry that already carries the user's verdict is recorded here so that the same sketch is
 not put to them twice. An entry leaves this section in one of two directions: upward into a numbered item, which is the user's
 decision to take, or into `conventions.md` / `decisions.md` if building it settles something.
+
+### A pointer tracker the pointer effects can share, and where else a reading can come from
+
+Raised by the user during the Exotics add-ons review, and parked here for further discussion. `ShadowCaster`,
+`LightCatcher` and `Tilter` each read the pointer on their own, through `PointerTrackerUtils.create`, so five
+cards on a page run five trackers and cannot be told to follow anything but the pointer.
+
+What the user wants is one tracker that several effects can be handed and share, with each effect creating its
+own when none is handed in. Two ideas from the same review were folded into this rather than built separately,
+because both are a different source for the same reading:
+
+- **A light point the consumer supplies**, so a sun moving across a banner lights every card under it with no
+  pointer involved. A point driven by a path, the scroll position or anything else would be the same thing.
+- **The phone's tilt**, so the effects do something on a device with no pointer. The browser reports it through
+  `deviceorientation` events. Per MDN, `DeviceOrientationEvent.requestPermission()` (Safari) needs a secure
+  (HTTPS) page and has to be called from a user action such as a button press, so the page's own button asks.
+  WCAG 2.5.4 Motion Actuation was checked: it covers functionality operated by moving the device, and a
+  decorative tilt operates nothing.
+
+`Reveal`'s idea of a hole that wanders by itself as a demo is the same kind of source and belongs here too.
+`smoothingMs`, which makes an effect trail the pointer, was built on each effect straight away because the user
+wanted to see it first. It is expected to move into the shared tracker if one is built. One thing to settle
+when it does: it smooths what each effect draws rather than the pointer reading, so that the moments the
+pointer leaves the window or goes out of range glide too. Smoothing a shared reading instead would lose that.
+
+Nothing has been argued yet about the tracker's shape: what it hands out, how an effect accepts one, or how a
+source that is not the pointer plugs into it.
 
 ### `Samples` holds two kinds of file, and only one of them is a sample
 
@@ -1425,6 +1493,58 @@ different kind of change from a new dropdown entry and wants deciding on its own
   sets, rather than staggering N independent cells.
 - **The root animation moving against the cells** — the whole picture drifting one way while its cells move
   the other. `computeRootAnimation` exists and only the Glitch example on the ScanlineAnimation page uses it.
+
+### Spheres, and the three things the word can mean
+
+Raised by the user: the library has cubes and barrels and no spheres. A cube and a barrel work because their
+surfaces are flat pieces the browser can turn in 3D; a sphere has none, so "a sphere" means one of three things.
+
+- **Things placed on a sphere, with the browser doing the 3D.** Items at a latitude and longitude, a painted disk
+  behind them, the browser hiding whatever goes round the back. Cheap and made of real elements, but there is nothing
+  on the surface between the items, and lines between them cannot be drawn that way. Example: TagCloud.js.
+- **A sphere computed by us and drawn flat.** Points, lines along the surface and arcs above it worked out every
+  frame and drawn in SVG, the way the zoomable hierarchies draw — which is how D3's parabolic arcs example is made. A
+  filled shape on the surface has to be cut exactly at the visible edge, and a picture wrapped round it needs canvas
+  or WebGL.
+- **A sphere built from many flat faces.** Built as `Die`, which the user wanted for dice first, with a test beside
+  it: a d20 split into four up to four times. At 320 faces it froze the user's browser while every die ran fine, so
+  this reading does not scale to a sphere, and the test was dropped. It also showed that painted light turns with the
+  solid rather than staying put, since a face's shading is worked out once from which way it points. What survived is
+  a hundred-sided die, which is as many faces as a die needs.
+
+Whether the first two are wanted is the open question.
+
+### A fourth round of Exotics candidates, and what became of each
+
+Eight were sketched for the user, each with a published example. **`Sunburst`** and **`CirclePacking`** were
+chosen and are built, and the user added **`Icicle`** from D3's gallery on top, which with `Treemap` completes its
+zoomable hierarchies; the reasoning that fixed their shape is in `decisions.md`, and nothing about them is
+outstanding.
+
+**Not yet looked at.** The user had not seen the other six when the first two were picked, so none of them has a
+verdict: **a Sankey diagram**, **a pan-and-zoom surface**, **a piano keyboard**, **an audio waveform**, **a
+force-directed graph** and **a crossword**.
+
+### A third round of Exotics candidates, and what became of each
+
+Seven were sketched for the user, each with a published example to look at. **`Treemap`** was chosen and is
+built, following D3's zoomable treemap; the reasoning that fixed its shape is in `decisions.md`, and nothing
+about it is outstanding.
+
+**Named and not discussed.** The other six have never been argued either way, so none of them is turned down:
+
+- **A word cloud** — words sized by weight, packed around a center without overlapping.
+- **A jigsaw** — a picture cut into interlocking pieces that snap together and then move as one group.
+- **A picture with pinned markers** — markers at fractions of a picture's size, each opening a popup, which
+  have to follow the visible part when the picture is cropped to fill its box.
+- **A grid that glides when it changes** — filter or sort a list and every item slides to its new place. The
+  user asked whether this is `Mosaic` with a transition on its pieces. Only partly: `Mosaic` does place pieces
+  by position, so a transition would make them glide on a resize, but it keeps track of a piece by its place in
+  the list rather than by which item it is, so filtering makes the wrong item appear to move, and it picks the
+  arrangement itself rather than keeping the consumer's order. The idea is closer to an `Abstract` that gives
+  motion to any layout than to a new layout.
+- **A physics box** — real elements dropped into a box, falling, stacking and thrown.
+- **A drawing pad** — freehand strokes, smoothed, handed back as an SVG path.
 
 ### A second round of Exotics candidates, and what became of each
 

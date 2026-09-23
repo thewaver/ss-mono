@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { type Index2d, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
+import { Index2d, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { TileBoardUtils } from "./TileBoard.utils";
 
@@ -16,6 +16,8 @@ const LOZENGE = layoutOf("lozenge");
 const SQUARE = layoutOf("square");
 const TRIANGLE = layoutOf("triangle-up");
 const SIDEWAYS_TRIANGLE = layoutOf("triangle-right");
+
+const at = (row: number, col: number): Index2d => ({ row, col });
 
 const fromTopLeft = (points: Point2d[]) => {
     const first = points.reduce((best, point) =>
@@ -391,6 +393,108 @@ describe("getNeighborTiles", () => {
             { row: 0, col: 1 },
             { row: 1, col: 0 },
         ]);
+    });
+});
+
+describe("getTilesWithin", () => {
+    const keysOf = (tiles: Index2d[]) => tiles.map((tile) => `${tile.row}:${tile.col}`);
+
+    it("is a tile's own neighbors at one step, on every kind of board", () => {
+        for (const layout of [HEXAGON, FLAT_HEXAGON, LOZENGE, SQUARE, TRIANGLE, SIDEWAYS_TRIANGLE]) {
+            expect(TileBoardUtils.getTilesWithin(at(2, 1), 1, layout)).toEqual(
+                TileBoardUtils.getNeighborTiles(at(2, 1), layout),
+            );
+        }
+    });
+
+    it("spreads over a square board as a diamond, which is what four ways out gives", () => {
+        const expected = [];
+
+        for (let row = 0; row < COUNT.row; row++) {
+            for (let col = 0; col < COUNT.col; col++) {
+                const steps = Math.abs(row - 2) + Math.abs(col - 1);
+
+                if (steps > 0 && steps <= 2) expected.push(`${row}:${col}`);
+            }
+        }
+
+        expect(keysOf(TileBoardUtils.getTilesWithin(at(2, 1), 2, SQUARE)).sort()).toEqual(expected.sort());
+    });
+
+    it("answers nearest first, each tile once, and never the tile it started from", () => {
+        const within = keysOf(TileBoardUtils.getTilesWithin(at(2, 1), 2, HEXAGON));
+        const near = keysOf(TileBoardUtils.getNeighborTiles(at(2, 1), HEXAGON));
+
+        expect(within.slice(0, near.length)).toEqual(near);
+        expect(new Set(within).size).toBe(within.length);
+        expect(within).not.toContain("2:1");
+    });
+
+    it("follows a triangle's three ways out, which change as the triangles turn over", () => {
+        expect(keysOf(TileBoardUtils.getTilesWithin(at(0, 0), 2, TRIANGLE))).toEqual(["0:1", "1:0", "0:2", "1:1"]);
+    });
+
+    it("neither enters a blocked tile nor reaches anything through it", () => {
+        const isBlocked = (tile: Index2d) => Index2d.isSame(tile, at(0, 1)) || Index2d.isSame(tile, at(1, 0));
+
+        expect(TileBoardUtils.getTilesWithin(at(0, 0), 3, SQUARE, isBlocked)).toEqual([]);
+    });
+
+    it("reaches nothing with no steps to take", () => {
+        expect(TileBoardUtils.getTilesWithin(at(2, 1), 0, HEXAGON)).toEqual([]);
+    });
+});
+
+describe("getShortestRoute", () => {
+    const expectJoined = (route: Index2d[], layout: typeof HEXAGON) => {
+        route.slice(1).forEach((tile, index) => {
+            expect(TileBoardUtils.getNeighborTiles(route[index], layout)).toContainEqual(tile);
+        });
+    };
+
+    it("crosses a hexagon board one row per step", () => {
+        const route = TileBoardUtils.getShortestRoute(at(0, 0), at(4, 0), HEXAGON)!;
+
+        expect(route).toHaveLength(5);
+        expect(route[0]).toEqual(at(0, 0));
+        expect(route[4]).toEqual(at(4, 0));
+        expectJoined(route, HEXAGON);
+    });
+
+    it("takes a flat-top hexagon two rows in one step, which is where its flat edge points", () => {
+        expect(TileBoardUtils.getShortestRoute(at(0, 0), at(2, 0), FLAT_HEXAGON)).toEqual([at(0, 0), at(2, 0)]);
+    });
+
+    it("walks a row of triangles tile by tile", () => {
+        const route = TileBoardUtils.getShortestRoute(at(0, 0), at(0, 3), TRIANGLE)!;
+
+        expect(route).toEqual([at(0, 0), at(0, 1), at(0, 2), at(0, 3)]);
+    });
+
+    it("goes round a blocked tile rather than through it", () => {
+        const isBlocked = (tile: Index2d) => Index2d.isSame(tile, at(0, 1));
+        const route = TileBoardUtils.getShortestRoute(at(0, 0), at(0, 2), SQUARE, isBlocked)!;
+
+        expect(route).toHaveLength(5);
+        expect(route).not.toContainEqual(at(0, 1));
+        expectJoined(route, SQUARE);
+    });
+
+    it("answers nothing when a wall of blocked tiles cuts the two apart", () => {
+        const isBlocked = (tile: Index2d) => tile.col === 1;
+
+        expect(TileBoardUtils.getShortestRoute(at(0, 0), at(0, 3), SQUARE, isBlocked)).toBeUndefined();
+    });
+
+    it("answers nothing for a blocked destination or one off the board", () => {
+        const isBlocked = (tile: Index2d) => Index2d.isSame(tile, at(0, 3));
+
+        expect(TileBoardUtils.getShortestRoute(at(0, 0), at(0, 3), SQUARE, isBlocked)).toBeUndefined();
+        expect(TileBoardUtils.getShortestRoute(at(0, 0), at(1, 3), HEXAGON)).toBeUndefined();
+    });
+
+    it("is just the one tile when it starts where it ends", () => {
+        expect(TileBoardUtils.getShortestRoute(at(2, 1), at(2, 1), HEXAGON)).toEqual([at(2, 1)]);
     });
 });
 

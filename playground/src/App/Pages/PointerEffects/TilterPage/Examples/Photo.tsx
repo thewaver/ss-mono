@@ -12,6 +12,7 @@ export const PhotoExample = (props: Props) => {
         <Tilter
             isDisabled={props.isDisabled}
             activeRangePx={props.activeRangePx}
+            smoothingMs={props.smoothingMs}
             tiltRangePx={props.tiltRangePx}
             maxTiltDegrees={props.maxTiltDegrees}
             perspectivePx={props.perspectivePx}

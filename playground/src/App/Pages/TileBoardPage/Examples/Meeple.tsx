@@ -10,7 +10,7 @@ import * as styles from "../TileBoardPage.css";
 
 type Props = TileBoardMeepleExampleProps;
 
-export const MeepleExample = ({ shape, piece, ...otherProps }: Props) => {
+export const MeepleExample = ({ shape, piece, marked, ...otherProps }: Props) => {
     const getLayout = createMemo(() =>
         TileBoardUtils.getLayout(
             access(shape),
@@ -30,7 +30,10 @@ export const MeepleExample = ({ shape, piece, ...otherProps }: Props) => {
                 renderTile={(getTile, getRenderProps) => (
                     <PageTileBoardTile
                         renderProps={getRenderProps}
-                        isMarked={() => Index2d.isSame(getTile(), access(piece))}
+                        isMarked={() =>
+                            Index2d.isSame(getTile(), access(piece)) ||
+                            (access(marked) ?? []).includes(Index2d.toString(getTile()))
+                        }
                     />
                 )}
             />

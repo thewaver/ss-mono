@@ -1,13 +1,15 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { CUBOID_DEFAULTS, CuboidUtils } from "@thewaver/ss-components";
+import type { CuboidController } from "@thewaver/ss-components";
+import { CUBOID_DEFAULTS, CuboidUtils, MediaQueryMonitorUtils } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
-import type { CuboidExampleProps } from "./CuboidPage.types";
+import type { CuboidExampleProps, CuboidUprightExampleProps } from "./CuboidPage.types";
 import { DefaultExample } from "./Examples/Default";
+import { UprightExample } from "./Examples/Upright";
 import { WanderingExample } from "./Examples/Wandering";
 
 const MIN_EXTENT = 40;
@@ -24,6 +26,7 @@ const MIN_TURN_INTERVAL_MS = 200;
 const MAX_TURN_INTERVAL_MS = 5000;
 const TURN_INTERVAL_STEP_MS = 100;
 const STARTING_TURN_INTERVAL_MS = 1000;
+const NO_MOTION_DURATION_MS = 0;
 
 const FIELD_WIDTH = 110;
 const EXAMPLES_ROOT = "/src/App/Pages/CuboidPage/Examples";
@@ -68,6 +71,39 @@ const WanderingExampleWrapper = (props: CuboidExampleProps) => {
     );
 };
 
+const UprightExampleWrapper = (props: Omit<CuboidUprightExampleProps, "isUpright" | "isDraggable">) => {
+    const [getIsUpright, setIsUpright] = createSignal(true);
+    const [getIsDraggable, setIsDraggable] = createSignal(true);
+
+    return (
+        <>
+            <UprightExample {...props} isUpright={getIsUpright} isDraggable={getIsDraggable} />
+
+            <PagePropsPanel scope={"local"}>
+                <PageProp
+                    key={"isUpright"}
+                    label={"Stays upright"}
+                    hint={
+                        "Every press turns the box a quarter turn about the screen's own axis, as you see it, and the face it lands on is then spun until it reads the right way up. Off, the box goes back to reading the two counts as a pose, where the far side shows upside down once it has been tipped over the top."
+                    }
+                >
+                    <PageCheckField value={getIsUpright} ariaLabel={"Stays upright"} onChange={setIsUpright} />
+                </PageProp>
+
+                <PageProp
+                    key={"isDraggable"}
+                    label={"Draggable"}
+                    hint={
+                        "Lets the box be turned by dragging it. It follows the pointer, and on release settles on the nearest face, writing the turns to the same two counts the buttons do."
+                    }
+                >
+                    <PageCheckField value={getIsDraggable} ariaLabel={"Draggable"} onChange={setIsDraggable} />
+                </PageProp>
+            </PagePropsPanel>
+        </>
+    );
+};
+
 export const CuboidPage = () => {
     const [getWidth, setWidth] = createSignal(STARTING_WIDTH);
     const [getHeight, setHeight] = createSignal(STARTING_HEIGHT);
@@ -78,6 +114,13 @@ export const CuboidPage = () => {
     const pitchSignal = createSignal(0);
     const wanderingYawSignal = createSignal(0);
     const wanderingPitchSignal = createSignal(0);
+    const uprightYawSignal = createSignal(0);
+    const uprightPitchSignal = createSignal(0);
+    const uprightControllerSignal = createSignal<CuboidController>();
+
+    const getPrefersReducedMotion = MediaQueryMonitorUtils.createReducedMotion();
+
+    const getTurnDurationMs = () => (getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : getTransitionDurationMs());
 
     const getSize = createMemo(() => ({ width: getWidth(), height: getHeight(), depth: getDepth() }));
 
@@ -86,13 +129,13 @@ export const CuboidPage = () => {
             key: "default",
             name: "Six faces, two turns",
             readout: () =>
-                `${CuboidUtils.getFacing(yawSignal[0](), pitchSignal[0]())} — across ${yawSignal[0]()}, up ${pitchSignal[0]()}; the two counts are quarter turns rather than a face, so the box always takes the way it was pushed`,
+                `${CuboidUtils.getFacingFromTurns(yawSignal[0](), pitchSignal[0]())} — across ${yawSignal[0]()}, up ${pitchSignal[0]()}; the two counts are quarter turns rather than a face, so the box always takes the way it was pushed`,
             component: () => (
                 <DefaultExample
                     yawSignal={yawSignal}
                     pitchSignal={pitchSignal}
                     size={getSize}
-                    transitionDurationMs={getTransitionDurationMs}
+                    transitionDurationMs={getTurnDurationMs}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,
@@ -101,16 +144,32 @@ export const CuboidPage = () => {
             key: "wandering",
             name: "Turning to a neighbor on its own",
             readout: () =>
-                `${CuboidUtils.getFacing(wanderingYawSignal[0](), wanderingPitchSignal[0]())} — every tick takes one quarter turn at random, discarding the ones that would leave the same face in view or turn back to the face it just left, so the box only ever moves on to a new face sharing an edge with this one`,
+                `${CuboidUtils.getFacingFromTurns(wanderingYawSignal[0](), wanderingPitchSignal[0]())} — every tick takes one quarter turn at random, discarding the ones that would leave the same face in view or turn back to the face it just left, so the box only ever moves on to a new face sharing an edge with this one`,
             component: () => (
                 <WanderingExampleWrapper
                     yawSignal={wanderingYawSignal}
                     pitchSignal={wanderingPitchSignal}
                     size={getSize}
-                    transitionDurationMs={getTransitionDurationMs}
+                    transitionDurationMs={getTurnDurationMs}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Wandering.tsx`,
+        },
+        {
+            key: "upright",
+            name: "Upright, by name, and by hand",
+            readout: () =>
+                `${uprightControllerSignal[0]()?.getFacing() ?? "front"} — across ${uprightYawSignal[0]()}, up ${uprightPitchSignal[0]()}; the counts only record the presses here, so the box keeps its own orientation and the face names ask it for the shortest way round`,
+            component: () => (
+                <UprightExampleWrapper
+                    yawSignal={uprightYawSignal}
+                    pitchSignal={uprightPitchSignal}
+                    controllerSignal={uprightControllerSignal}
+                    size={getSize}
+                    transitionDurationMs={getTurnDurationMs}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Upright.tsx`,
         },
     ]);
 
@@ -156,7 +215,9 @@ export const CuboidPage = () => {
                 <PageProp
                     key={"transitionDurationMs"}
                     label={"Turn duration (ms)"}
-                    hint={"How long one turn from face to face takes."}
+                    hint={
+                        "How long one turn from face to face takes, and how long the box takes to settle after a drag. It is off while the visitor has asked for reduced motion."
+                    }
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
@@ -164,6 +225,7 @@ export const CuboidPage = () => {
                         max={() => MAX_DURATION_MS}
                         step={() => DURATION_STEP_MS}
                         width={() => FIELD_WIDTH}
+                        isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Turn duration in milliseconds"}
                         onInput={setTransitionDurationMs}
                     />

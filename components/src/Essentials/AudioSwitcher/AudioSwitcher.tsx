@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
+import { createEffect, createMemo, createSignal, on, onCleanup, onMount, untrack } from "solid-js";
 
 import { AudioUtils, MathUtils } from "@thewaver/ss-utils";
 
@@ -18,6 +18,8 @@ type Fade = {
 
 export const AudioSwitcher = (props: AudioSwitcherProps) => {
     const fades = new Map<HTMLAudioElement, Fade>();
+    const startingElements = new Set<HTMLAudioElement>();
+    const stoppedWhileStarting = new Set<HTMLAudioElement>();
 
     let isMounted = false;
 
@@ -71,9 +73,19 @@ export const AudioSwitcher = (props: AudioSwitcherProps) => {
         clearFade(element);
 
         element.volume = 0;
+        startingElements.add(element);
+        stoppedWhileStarting.delete(element);
         element
             .play()
             .then(() => {
+                startingElements.delete(element);
+
+                if (stoppedWhileStarting.delete(element)) {
+                    element.pause();
+
+                    return;
+                }
+
                 if (!isMounted || element !== getActiveElement()) return;
                 if (getFadeDirection(element) === "out") return;
 
@@ -81,6 +93,8 @@ export const AudioSwitcher = (props: AudioSwitcherProps) => {
                 startFade(element, "in", fadeInTick);
             })
             .catch((err) => {
+                startingElements.delete(element);
+                stoppedWhileStarting.delete(element);
                 console.warn("Playback prevented by browser autoplay restrictions:", err);
                 setIsPlaying(false);
                 clearFade(element);
@@ -113,6 +127,18 @@ export const AudioSwitcher = (props: AudioSwitcherProps) => {
 
         if (AudioUtils.isPlaying(active) && getFadeDirection(active) !== "out") fadeOut(active);
     });
+
+    createEffect(
+        on(
+            getIsPlaying,
+            (isPlaying) => {
+                const active = untrack(getActiveElement);
+
+                if (!isPlaying && startingElements.has(active)) stoppedWhileStarting.add(active);
+            },
+            { defer: true },
+        ),
+    );
 
     const controller = createMemo(() => ({
         reset: () => {

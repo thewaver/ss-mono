@@ -7,7 +7,7 @@ import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
 import { EditableExample } from "./Examples/Editable";
 import { ErroredExample } from "./Examples/Errored";
-import { LabelledExample } from "./Examples/Labeled";
+import { LabeledExample } from "./Examples/Labeled";
 import { NumberFieldExample } from "./Examples/NumberField";
 import { OneTimeCodeExample } from "./Examples/OneTimeCode";
 import { PasswordExample } from "./Examples/Password";
@@ -26,7 +26,7 @@ export const TextInputPage = () => {
     const disabledSignal = createSignal("Cannot be edited");
     const reachableSignal = createSignal("Cannot be edited either");
     const erroredSignal = createSignal("not-an-email");
-    const labelledSignal = createSignal("");
+    const labeledSignal = createSignal("");
     const codeSignal = createSignal("");
     const pinSignal = createSignal("");
     const amountSignal = createSignal("");
@@ -143,8 +143,8 @@ export const TextInputPage = () => {
         {
             key: "label",
             name: "In a Label",
-            readout: () => `value: "${labelledSignal[0]()}"`,
-            component: () => <LabelledExample valueSignal={labelledSignal} />,
+            readout: () => `value: "${labeledSignal[0]()}"`,
+            component: () => <LabeledExample valueSignal={labeledSignal} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
     ]);

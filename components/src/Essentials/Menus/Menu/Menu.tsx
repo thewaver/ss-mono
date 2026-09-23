@@ -133,8 +133,10 @@ const MenuItemView = (props: MenuItemViewProps) => {
 
     const getIsOpen = () => access(props.flags).isOpen;
 
+    const getIsHighlighted = createMemo(() => access(props.flags).isHighlighted ?? false);
+
     createEffect(() => {
-        if (!access(props.flags).isHighlighted) return;
+        if (!getIsHighlighted()) return;
 
         getElementRef()?.scrollIntoView({ block: "nearest" });
     });
@@ -426,7 +428,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
             return;
         }
 
-        if (e.key === "Enter" || e.key === " ") {
+        if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();
 
             if (highlightedIndex === undefined || items[highlightedIndex].isDisabled) return;
@@ -723,7 +725,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
     const handleTriggerKeyDown = (e: KeyboardEvent) => {
         if (getIsDisabled()) return;
 
-        if (e.key !== "Enter" && e.key !== " " && e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+        if (!NavigatorUtils.getIsActivationKey(e.key) && e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
 
         e.preventDefault();
 

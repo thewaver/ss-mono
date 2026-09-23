@@ -6,7 +6,7 @@ import { CompactExample } from "./Examples/Compact";
 import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
 import { ErroredExample } from "./Examples/Errored";
-import { LabelledExample } from "./Examples/Labeled";
+import { LabeledExample } from "./Examples/Labeled";
 import { ReachableExample } from "./Examples/Reachable";
 import { SnappingExample } from "./Examples/Snapping";
 
@@ -19,7 +19,7 @@ export const ColorInputPage = () => {
     const disabledSignal = createSignal("#888888");
     const reachableSignal = createSignal("#888888");
     const erroredSignal = createSignal("#000000");
-    const labelledSignal = createSignal("#ff0055");
+    const labeledSignal = createSignal("#ff0055");
 
     const getExamples = createMemo(() => [
         {
@@ -67,8 +67,8 @@ export const ColorInputPage = () => {
         {
             key: "label",
             name: "In a Label",
-            readout: () => `value: ${labelledSignal[0]()} — the caption opens the picker`,
-            component: () => <LabelledExample valueSignal={labelledSignal} />,
+            readout: () => `value: ${labeledSignal[0]()} — the caption opens the picker`,
+            component: () => <LabeledExample valueSignal={labeledSignal} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
     ]);

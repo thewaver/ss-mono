@@ -7,3 +7,9 @@ export type TrailExampleProps = AccessorProps<{
     progressSignal: SignalSource<number>;
     playbackSignal: SignalSource<boolean>;
 }>;
+
+export type TrailScrollExampleProps = Omit<TrailExampleProps, "progressSignal" | "playbackSignal"> &
+    AccessorProps<{
+        isFollowing: boolean;
+        onProgressChange: (progress: number) => void;
+    }>;

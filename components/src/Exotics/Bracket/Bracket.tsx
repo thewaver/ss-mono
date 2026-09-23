@@ -1,4 +1,4 @@
-import { For, Index, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
+import { For, Index, Show, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { access } from "../../Utils/propUtils";
@@ -25,7 +25,8 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
     const boardId = createUniqueId();
 
     const [getNodeRefs, setNodeRefs] = createSignal<Record<string, HTMLElement | undefined>>({});
-    const [getFocusedId, setFocusedId] = createSignal<string>();
+    const [getLastFocusedId, setLastFocusedId] = createSignal<string>();
+    const [getHasFocus, setHasFocus] = createSignal(false);
 
     const getRootNode = createMemo(() => access(props.root));
 
@@ -43,6 +44,12 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
 
     const getIsHorizontal = createMemo(() => getOrientation() === "horizontal");
 
+    const getHeaderExtent = createMemo(() =>
+        props.renderLayerHeader ? (access(props.layerHeaderSize) ?? BRACKET_DEFAULTS.layerHeaderSize) : NOTHING,
+    );
+
+    const getFocusedId = createMemo(() => (getHasFocus() ? getLastFocusedId() : undefined));
+
     const getLayerExtent = createMemo(() => (getIsHorizontal() ? getNodeSize().width : getNodeSize().height));
 
     const getCrossExtent = createMemo(() => (getIsHorizontal() ? getNodeSize().height : getNodeSize().width));
@@ -53,7 +60,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
 
     const getLayerSpan = createMemo(() => getLayout().layerCount * getLayerPitch() - getLayerGap());
 
-    const getCrossSpan = createMemo(() => getLayout().leafCount * getCrossPitch() - getCrossGap());
+    const getCrossSpan = createMemo(() => getHeaderExtent() + getLayout().leafCount * getCrossPitch() - getCrossGap());
 
     const getBoardSize = createMemo(() =>
         getIsHorizontal()
@@ -67,23 +74,28 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
         return path.reduce<BracketNode<T>>((node, index) => node.children![index], getRootNode());
     };
 
-    const getLayerStart = (placement: BracketPlacement) => {
-        const fromStart = placement.layer * getLayerPitch();
+    const getLayerStart = (layer: number) => {
+        const fromStart = layer * getLayerPitch();
 
         return getRootSide() === "start" ? fromStart : getLayerSpan() - fromStart - getLayerExtent();
     };
 
-    const getCrossStart = (placement: BracketPlacement) => placement.cross * getCrossPitch();
+    const getCrossStart = (placement: BracketPlacement) => getHeaderExtent() + placement.cross * getCrossPitch();
 
     const getInset = (placement: BracketPlacement) =>
         getIsHorizontal()
-            ? { left: getLayerStart(placement), top: getCrossStart(placement) }
-            : { left: getCrossStart(placement), top: getLayerStart(placement) };
+            ? { left: getLayerStart(placement.layer), top: getCrossStart(placement) }
+            : { left: getCrossStart(placement), top: getLayerStart(placement.layer) };
+
+    const getHeaderBox = (layer: number) =>
+        getIsHorizontal()
+            ? { left: getLayerStart(layer), top: NOTHING, width: getLayerExtent(), height: getHeaderExtent() }
+            : { left: NOTHING, top: getLayerStart(layer), width: getHeaderExtent(), height: getLayerExtent() };
 
     const getCrossCenter = (placement: BracketPlacement) => getCrossStart(placement) + getCrossExtent() * HALF;
 
     const getFacingEdge = (placement: BracketPlacement, isTowardRoot: boolean) =>
-        BracketUtils.getFacingEdge(getLayerStart(placement), getLayerExtent(), getRootSide(), isTowardRoot);
+        BracketUtils.getFacingEdge(getLayerStart(placement.layer), getLayerExtent(), getRootSide(), isTowardRoot);
 
     const getPoint = (along: number, across: number) =>
         getIsHorizontal() ? { x: along, y: across } : { x: across, y: along };
@@ -107,6 +119,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                             orientation: getOrientation(),
                             from,
                             to: getPoint(getFacingEdge(child, true), getCrossCenter(child)),
+                            isOnFocusedRoute: BracketUtils.getIsOnRoute(childId, getFocusedId()),
                         },
                     ];
                 });
@@ -119,11 +132,13 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
 
     const getNodeIds = createMemo(() => getLayout().placements.map((placement) => placement.id));
 
+    const getLayers = createMemo(() => Array.from({ length: getLayout().layerCount }, (_unused, layer) => layer));
+
     const getStops = createMemo(() => getLayout().placements.filter((placement) => !placement.isDisabled));
 
     const getRovingId = createMemo(() => {
         const stops = getStops();
-        const focused = getFocusedId();
+        const focused = getLastFocusedId();
 
         if (focused !== undefined && stops.some((placement) => placement.id === focused)) return focused;
 
@@ -153,6 +168,10 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
         if (key === acrossLayer[SINGLE]) return "next";
     };
 
+    const activate = (id: string) => {
+        props.onActivate?.(getNodeAt(id).value, getPlacementById().get(id) ?? MISSING_PLACEMENT);
+    };
+
     const handleKeyDown = (e: KeyboardEvent) => {
         const from = getRovingId();
 
@@ -160,7 +179,7 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
 
         if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();
-            props.onActivate?.(getNodeAt(from).value);
+            activate(from);
 
             return;
         }
@@ -174,14 +193,61 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
         if (next === undefined) return;
 
         e.preventDefault();
-        setFocusedId(next);
+        setLastFocusedId(next);
         getNodeRefs()[next]?.focus();
+    };
+
+    const renderItem = (id: string) => {
+        const getPlacement = createMemo(() => getPlacementById().get(id) ?? MISSING_PLACEMENT);
+        const getIsNodeDisabled = () => getPlacement().isDisabled;
+
+        return (
+            <li
+                class={styles.bracketItem}
+                style={{
+                    left: `${getInset(getPlacement()).left}px`,
+                    top: `${getInset(getPlacement()).top}px`,
+                    width: `${getNodeSize().width}px`,
+                    height: `${getNodeSize().height}px`,
+                }}
+            >
+                <div
+                    ref={(element) => setNodeRef(id, element)}
+                    class={styles.bracketNode}
+                    role="button"
+                    tabindex={getIsNodeDisabled() ? undefined : id === getRovingId() ? 0 : -1}
+                    aria-disabled={getIsNodeDisabled() || undefined}
+                    onFocus={() => {
+                        setLastFocusedId(id);
+                        setHasFocus(true);
+                    }}
+                    onBlur={() => setHasFocus(false)}
+                    onClick={() => {
+                        if (getIsNodeDisabled()) return;
+
+                        setLastFocusedId(id);
+                        activate(id);
+                    }}
+                >
+                    {props.renderNode(
+                        () => getNodeAt(id),
+                        () => ({
+                            placement: getPlacement(),
+                            isFocused: getFocusedId() === id,
+                            isOnFocusedRoute: BracketUtils.getIsOnRoute(id, getFocusedId()),
+                        }),
+                    )}
+                </div>
+            </li>
+        );
     };
 
     return (
         <div
             class={styles.bracketRoot}
             style={{ width: `${getBoardSize().width}px`, height: `${getBoardSize().height}px` }}
+            role={props.renderLayerHeader ? "group" : undefined}
+            aria-label={props.renderLayerHeader ? access(props.ariaLabel) : undefined}
             onKeyDown={handleKeyDown}
         >
             <svg
@@ -192,45 +258,48 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
                 <Index each={getConnectors()}>{(getDefs) => <>{props.renderConnector?.(getDefs)}</>}</Index>
             </svg>
 
-            <ul class={styles.bracketList} aria-label={access(props.ariaLabel)}>
-                <For each={getNodeIds()}>
-                    {(id) => {
-                        const getPlacement = createMemo(() => getPlacementById().get(id) ?? MISSING_PLACEMENT);
-                        const getIsNodeDisabled = () => getPlacement().isDisabled;
+            <Show
+                when={props.renderLayerHeader}
+                fallback={
+                    <ul class={styles.bracketList} aria-label={access(props.ariaLabel)}>
+                        <For each={getNodeIds()}>{renderItem}</For>
+                    </ul>
+                }
+            >
+                {(getRenderLayerHeader) => (
+                    <For each={getLayers()}>
+                        {(layer) => {
+                            const headerId = `${boardId}-layer-${layer}`;
+                            const getLayerNodeIds = createMemo(() =>
+                                getLayout()
+                                    .placements.filter((placement) => placement.layer === layer)
+                                    .map((placement) => placement.id),
+                            );
 
-                        return (
-                            <li
-                                class={styles.bracketItem}
-                                style={{
-                                    left: `${getInset(getPlacement()).left}px`,
-                                    top: `${getInset(getPlacement()).top}px`,
-                                    width: `${getNodeSize().width}px`,
-                                    height: `${getNodeSize().height}px`,
-                                }}
-                            >
-                                <div
-                                    ref={(element) => setNodeRef(id, element)}
-                                    class={styles.bracketNode}
-                                    role="button"
-                                    tabindex={getIsNodeDisabled() ? undefined : id === getRovingId() ? 0 : -1}
-                                    aria-disabled={getIsNodeDisabled() || undefined}
-                                    onClick={() => {
-                                        if (getIsNodeDisabled()) return;
+                            return (
+                                <>
+                                    <div
+                                        id={headerId}
+                                        class={styles.bracketLayerHeader}
+                                        style={{
+                                            left: `${getHeaderBox(layer).left}px`,
+                                            top: `${getHeaderBox(layer).top}px`,
+                                            width: `${getHeaderBox(layer).width}px`,
+                                            height: `${getHeaderBox(layer).height}px`,
+                                        }}
+                                    >
+                                        {getRenderLayerHeader()(layer)}
+                                    </div>
 
-                                        setFocusedId(id);
-                                        props.onActivate?.(getNodeAt(id).value);
-                                    }}
-                                >
-                                    {props.renderNode(
-                                        () => getNodeAt(id),
-                                        () => ({ placement: getPlacement(), isFocused: getFocusedId() === id }),
-                                    )}
-                                </div>
-                            </li>
-                        );
-                    }}
-                </For>
-            </ul>
+                                    <ul class={styles.bracketList} aria-labelledby={headerId}>
+                                        <For each={getLayerNodeIds()}>{renderItem}</For>
+                                    </ul>
+                                </>
+                            );
+                        }}
+                    </For>
+                )}
+            </Show>
         </div>
     );
 };

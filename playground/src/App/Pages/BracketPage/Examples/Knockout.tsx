@@ -1,12 +1,15 @@
-import { Bracket } from "@thewaver/ss-components";
+import { Bracket, access } from "@thewaver/ss-components";
 import type { BracketNode } from "@thewaver/ss-components";
 
-import { branch, renderBracketNode, seed } from "../BracketPage.const";
+import { branch, computeBracketLayerHeader, renderBracketNode, seed } from "../BracketPage.const";
 import type { BracketExampleProps } from "../BracketPage.types";
 
 import * as styles from "../BracketPage.css";
 
 const NODE_SIZE = { width: 96, height: 34 };
+const ROUND_NAMES = ["Final", "Semifinals", "Quarterfinals", "Entrants"];
+const ACROSS_HEADER_SIZE = 24;
+const DOWN_HEADER_SIZE = 96;
 
 const DRAW: BracketNode<string> = branch(
     "Final",
@@ -30,10 +33,14 @@ export const KnockoutExample = (props: Props) => {
                 crossGap={props.crossGap}
                 orientation={props.orientation}
                 rootSide={props.rootSide}
+                layerHeaderSize={() =>
+                    access(props.orientation) === "horizontal" ? ACROSS_HEADER_SIZE : DOWN_HEADER_SIZE
+                }
                 ariaLabel={"Knockout draw"}
                 onActivate={props.onActivate}
                 renderConnector={props.renderConnector}
                 renderNode={renderBracketNode}
+                renderLayerHeader={computeBracketLayerHeader(ROUND_NAMES)}
             />
         </div>
     );

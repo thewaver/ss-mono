@@ -306,7 +306,7 @@ export namespace AnchorUtils {
     /**
      * Reads the highest `z-index` written on an element or any of its ancestors.
      *
-     * Content portalled out of the anchor's subtree leaves that stacking behind, so it has to be given
+     * Content portaled out of the anchor's subtree leaves that stacking behind, so it has to be given
      * an index of its own to land above whatever the anchor was sitting under. This reads what the
      * document already says, as opposed to {@link ElevationUtils.getBase}, which reads what other
      * components have registered; a popup needs to clear both.
@@ -330,7 +330,7 @@ export namespace AnchorUtils {
     };
 
     /**
-     * Runs the whole positioning cycle for portalled content, as reactive accessors.
+     * Runs the whole positioning cycle for portaled content, as reactive accessors.
      *
      * This is the piece a popover-shaped component actually uses. It measures the anchor and the
      * content, chooses a placement that fits, clamps the result into the free space, and reports a

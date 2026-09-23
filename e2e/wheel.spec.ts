@@ -20,7 +20,7 @@ import { example, prop } from "./helpers";
  * turning under the pointer, it rests after a spin, and it comes back once the rest has run out.
  *
  * No wheel renders a button any more: the page builds its own and drives it through the handle the wheel hands
- * over at mount. The overhead one is centerd over the wheel by a box the page owns, and each drum's
+ * over at mount. The overhead one is centered over the wheel by a box the page owns, and each drum's
  * sits in a bar the page puts under the barrel — outside the wheel altogether. That is why the spin locator is
  * scoped to the example rather than to the wheel, and why the button's disabled state is checked here at all:
  * it is now the page reading `getIsSpinnable` off the handle rather than the library disabling its own control.

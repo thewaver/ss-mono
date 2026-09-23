@@ -4,4 +4,5 @@ export const LIGHT_CATCHER_DEFAULTS = {
     restingBrightness: 1,
     maxLightness: 0,
     restingLightness: 0,
+    smoothingMs: 0,
 };

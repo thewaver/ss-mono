@@ -3,7 +3,14 @@ import { globalStyle, style } from "@vanilla-extract/css";
 export const patchBoardRoot = style({
     display: "block",
     position: "relative",
+    containerType: "inline-size",
+    width: "100%",
     pointerEvents: "all",
+});
+
+export const patchBoardSpacer = style({
+    width: "100%",
+    pointerEvents: "none",
 });
 
 export const patchBoardCables = style({

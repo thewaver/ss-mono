@@ -4,6 +4,7 @@ import { createStore } from "solid-js/store";
 import { GestureUtils, MathUtils } from "@thewaver/ss-utils";
 import type { SwipeAxis, SwipeDirection } from "@thewaver/ss-utils";
 
+import { NavigatorUtils } from "../Navigator/Navigator.utils";
 import type {
     InteractionActivation,
     InteractionDragEndReason,
@@ -538,7 +539,7 @@ export namespace InteractionTrackerUtils {
         const onKeyDown = (e: KeyboardEvent) => {
             readFocusVisible(e.currentTarget as HTMLElement);
 
-            if (e.key !== "Enter" && e.key !== " ") return;
+            if (!NavigatorUtils.getIsActivationKey(e.key)) return;
 
             setActiveByKey(true);
         };
@@ -714,7 +715,7 @@ export namespace InteractionTrackerUtils {
             };
 
             const onKeyDown = (e: KeyboardEvent) => {
-                if (e.repeat || (e.key !== "Enter" && e.key !== " ")) return;
+                if (e.repeat || !NavigatorUtils.getIsActivationKey(e.key)) return;
 
                 activate(CENTER_RATIO);
             };

@@ -418,7 +418,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
             return;
         }
 
-        if (e.key === "Enter" || e.key === " ") {
+        if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();
 
             if (isCarrying) {

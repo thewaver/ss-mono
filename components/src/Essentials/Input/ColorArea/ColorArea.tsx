@@ -151,6 +151,7 @@ export const ColorArea = (props: ColorAreaProps) => {
     return (
         <InteractionWrapper
             {...props}
+            isTabbable={false}
             extraFlags={(): ColorAreaRenderProps => ({
                 hsv: hsvSignal[0](),
                 isDragging: getIsDragging(),

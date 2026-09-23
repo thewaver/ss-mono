@@ -55,3 +55,10 @@ export const cuboidPad = style({
     alignItems: "center",
     gap: themeVars.spacing.half,
 });
+
+export const cuboidRow = style({
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: themeVars.spacing.half,
+});

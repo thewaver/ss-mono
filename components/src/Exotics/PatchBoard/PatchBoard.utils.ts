@@ -8,6 +8,7 @@ import type {
     PatchBoardPlacedSocket,
     PatchBoardPlacement,
     PatchBoardRegion,
+    PatchBoardSnapFn,
     PatchBoardSocket,
     PatchBoardVerticalBand,
 } from "./PatchBoard.types";
@@ -16,6 +17,8 @@ import type {
 const NOTHING = 0;
 /** One socket or one step. */
 const SINGLE = 1;
+/** How much further along a snapped spot has to be, as a fraction of the board's width, to count as a move. */
+const SNAP_TOLERANCE = 0.000001;
 /** How many bands each axis is divided into when describing where a node sits. */
 const THIRDS = 3;
 /** The vertical bands, top first. */
@@ -49,7 +52,7 @@ export namespace PatchBoardUtils {
     export const getLinkKey = (link: PatchBoardLink) => `${getEndKey(link.from)}-${getEndKey(link.to)}`;
 
     /**
-     * Where a socket sits, in board coordinates.
+     * Where a socket sits, in the same unit as the node's own spot and size.
      *
      * Sockets of one kind are spread evenly along their own edge, with a share of the edge left at each
      * end, so the outermost socket does not sit in the node's corner. Outputs go on the far edge and
@@ -120,7 +123,7 @@ export namespace PatchBoardUtils {
      *
      * @param placed Every socket on the board.
      * @param point The wire's loose end.
-     * @param reach How far the snap carries.
+     * @param reach How far the snap carries, in the same unit as the points.
      * @returns The socket, or `undefined` when none is close enough.
      */
     export const getNearestSocket = (placed: PatchBoardPlacedSocket[], point: Point2d, reach: number) => {
@@ -210,12 +213,81 @@ export namespace PatchBoardUtils {
      *
      * @param spot Where the drag wants to put it.
      * @param size The node's size.
-     * @param bounds The board's size.
+     * @param bounds The board's size, in the same unit as the spot.
      */
     export const getClampedSpot = (spot: Point2d, size: Size2d, bounds: Size2d): Point2d => ({
         x: MathUtils.clamp(spot.x, NOTHING, Math.max(NOTHING, bounds.width - size.width)),
         y: MathUtils.clamp(spot.y, NOTHING, Math.max(NOTHING, bounds.height - size.height)),
     });
+
+    /**
+     * The next spot a snap allows in one direction, for moving a node over a grid by keyboard.
+     *
+     * An arrow key on a snapped board has to go to the next allowed spot rather than by a fixed step, or a
+     * step smaller than the grid would snap straight back to where it started and the key would do nothing.
+     * So the direction is probed one stride at a time, each probe is snapped, and the first snapped spot
+     * that is further along the direction than the start is the answer. A snap finer than the stride can be
+     * stepped over, which is what makes the stride the finest move the key makes.
+     *
+     * @param spot Where the node is now. It need not be a snapped spot itself.
+     * @param stride One probe's move, which also says the direction, such as `{ x: 0.02, y: 0 }` for right.
+     * @param reach How far to probe before giving up; the board's longer side covers every spot on it.
+     * @param computeSnapSpot The snap to apply to each probe.
+     * @returns The snapped spot, which may lie outside the board and is for the caller to clamp, or
+     * `undefined` when the stride is zero or nothing further along is within reach.
+     */
+    export const getNextSnappedSpot = (
+        spot: Point2d,
+        stride: Point2d,
+        reach: number,
+        computeSnapSpot: PatchBoardSnapFn,
+    ) => {
+        const length = Math.hypot(stride.x, stride.y);
+
+        if (length <= NOTHING) return undefined;
+
+        const probeCount = Math.floor(reach / length);
+
+        for (let probe = SINGLE; probe <= probeCount; probe++) {
+            const snapped = computeSnapSpot({ x: spot.x + stride.x * probe, y: spot.y + stride.y * probe });
+            const progress = ((snapped.x - spot.x) * stride.x + (snapped.y - spot.y) * stride.y) / length;
+
+            if (progress > SNAP_TOLERANCE) return snapped;
+        }
+
+        return undefined;
+    };
+
+    /**
+     * Whether a new link would let a signal find its way back to the node it came from.
+     *
+     * Made for a consumer's `computeCanLink`, since the board itself allows loops: a feedback path is
+     * legitimate on some boards and nonsense on others. Links are followed from output to input, node to
+     * node, starting at the new link's input; reaching the new link's output node means the link closes a
+     * loop. A link from a node to itself closes one trivially. Which socket on a node a link uses does not
+     * matter, only which node it reaches.
+     *
+     * @param links The board's existing links, without the new one.
+     * @param link The link being asked about.
+     * @returns `true` when adding the link would make a loop.
+     */
+    export const getClosesLoop = (links: PatchBoardLink[], link: PatchBoardLink) => {
+        const visited = new Set<string>();
+        const pending = [link.to.nodeKey];
+
+        for (let nodeKey = pending.pop(); nodeKey !== undefined; nodeKey = pending.pop()) {
+            if (nodeKey === link.from.nodeKey) return true;
+            if (visited.has(nodeKey)) continue;
+
+            visited.add(nodeKey);
+
+            links.forEach((entry) => {
+                if (entry.from.nodeKey === nodeKey) pending.push(entry.to.nodeKey);
+            });
+        }
+
+        return false;
+    };
 
     /**
      * The nodes sorted top to bottom, then left to right.
@@ -293,12 +365,14 @@ export namespace PatchBoardUtils {
      *
      * @param spot The node's position.
      * @param size The node's size.
-     * @param bounds The board's size.
+     * @param bounds The board's size, in the same unit as the spot. An empty axis puts every node in its first band.
      * @returns A vertical and a horizontal band, such as `top` and `left`, for the consumer to word.
      */
     export const getRegion = (spot: Point2d, size: Size2d, bounds: Size2d): PatchBoardRegion => {
         const band = (value: number, extent: number) =>
-            MathUtils.clamp(Math.floor((value / Math.max(SINGLE, extent)) * THIRDS), NOTHING, THIRDS - SINGLE);
+            extent > NOTHING
+                ? MathUtils.clamp(Math.floor((value / extent) * THIRDS), NOTHING, THIRDS - SINGLE)
+                : NOTHING;
 
         return {
             vertical: VERTICAL_BANDS[band(spot.y + size.height * 0.5, bounds.height)],

@@ -43,6 +43,8 @@ export const previewText = style({
 
 export const diffText = style([previewText, { maxWidth: PREVIEW_WIDTH }]);
 
+export const proseText = style([previewText, { maxWidth: PREVIEW_WIDTH, lineHeight: 1.6 }]);
+
 export const addedText = style({
     color: themeVars.color.success.contrast,
     backgroundColor: themeVars.color.success.dark,
@@ -56,4 +58,28 @@ export const removedText = style({
     padding: `0 ${themeVars.spacing.half}`,
     borderRadius: themeVars.borderRadius.half,
     textDecorationLine: "line-through",
+});
+
+export const glossaryTerm = style({
+    borderBottom: "1px dotted currentColor",
+    cursor: "help",
+
+    selectors: {
+        "&:focus-visible": {
+            outline: `2px solid ${themeVars.color.outline.main}`,
+            outlineOffset: 2,
+        },
+    },
+});
+
+export const link = style({
+    color: themeVars.color.primary.main,
+    textDecorationLine: "underline",
+
+    selectors: {
+        "&:focus-visible": {
+            outline: `2px solid ${themeVars.color.outline.main}`,
+            outlineOffset: 2,
+        },
+    },
 });

@@ -68,6 +68,11 @@ export type SortableGridItemFlags = {
     isCarried: boolean;
 };
 
+export type SortableGridCellFlags = {
+    /** Whether nothing may land on this cell, so it can be drawn as a wall. */
+    isBlocked: boolean;
+};
+
 export type SortableGridFlags = {
     isCarrying: boolean;
     isReceiving: boolean;
@@ -107,6 +112,16 @@ export type SortableGridController = {
      * @returns `false` when nothing is being carried, or when the block cannot be turned.
      */
     turnCcw: () => boolean;
+    /**
+     * Pulls every item straight up as far as it will slide, stopping at other items and at blocked cells.
+     *
+     * Items keep their column and their turn, and nothing jumps past what is in its way. Called from `onTransfer`
+     * it keeps the grid packed after every move; called from a button it tidies up once. Nothing is reported
+     * through `onTransfer` for what it moves.
+     *
+     * @returns `false` when nothing moved, or while an item is being carried out of or into this grid.
+     */
+    compact: () => boolean;
 };
 
 export type SortableGridItemSlotProps = AccessorProps<{
@@ -166,6 +181,12 @@ export type SortableGridProps<T> = Omit<InteractionWrapperProps<SortableGridFlag
         isLocked?: boolean;
         /** Whether an item can be turned on the spot as well as moved. */
         isTurnable?: boolean;
+        /**
+         * Whether a cell is blocked, which is a wall: no item lands on it or overlaps it, an item arriving from
+         * elsewhere is put clear of it, the arrow keys step a carried item over it, and `renderCell` is told so it
+         * can be drawn. Every cell is open when this is left out.
+         */
+        computeIsSpotBlocked?: (spot: SortableGridSpot) => boolean;
     }> & {
         /** The items and where they sit. It is the only thing that moves them. */
         itemsSignal: SignalSource<SortableGridItem<T>[]>;
@@ -189,8 +210,8 @@ export type SortableGridProps<T> = Omit<InteractionWrapperProps<SortableGridFlag
             getItem: Accessor<SortableGridItem<T>>,
             getGeometry: Accessor<SortableGridGeometry>,
         ) => JSX.Element;
-        /** Draws one empty cell of the grid. */
-        renderCell?: (getSpot: Accessor<SortableGridSpot>) => JSX.Element;
+        /** Draws one empty cell of the grid, told whether it is blocked. */
+        renderCell?: (getSpot: Accessor<SortableGridSpot>, getFlags: Accessor<SortableGridCellFlags>) => JSX.Element;
         /** Draws where a carried item would land, and whether landing there is allowed. */
         renderLanding?: (getIsAllowed: () => boolean, getGeometry: Accessor<SortableGridGeometry>) => JSX.Element;
         /** Runs when an item is moved, here or to another grid. */

@@ -8,6 +8,10 @@ export const ITEM_COUNT_STEP = 1;
 export const MIN_GAP = 0;
 export const MAX_GAP = 24;
 export const GAP_STEP = 2;
+export const MIN_DURATION_MS = 0;
+export const MAX_DURATION_MS = 3000;
+export const DURATION_STEP_MS = 100;
+export const PICKED_GROWTH = 1.5;
 export const FIELD_WIDTH = 130;
 export const MOSAIC_EXTENT = 380;
 

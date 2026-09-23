@@ -4,6 +4,7 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DefaultExample } from "./Examples/Default";
 import { DestructiveConfirmationExample } from "./Examples/DestructiveConfirmation";
 import { LayeredExample } from "./Examples/Layered";
+import { TextOnlyExample } from "./Examples/TextOnly";
 
 const EXAMPLES_ROOT = "/src/App/Pages/ModalPage/Examples";
 
@@ -12,6 +13,7 @@ export const ModalPage = () => {
     const destructiveVisibility = createSignal(false);
     const layeredVisibility = createSignal(false);
     const layeredSignal = createSignal<string | undefined>();
+    const textOnlyVisibility = createSignal(false);
 
     const [getOutcome, setOutcome] = createSignal("nothing decided yet");
 
@@ -40,6 +42,14 @@ export const ModalPage = () => {
                 `open: ${layeredVisibility[0]()} | country: ${layeredSignal[0]() ?? "undefined"} — Escape closes the innermost layer only`,
             component: () => <LayeredExample visibilitySignal={layeredVisibility} valueSignal={layeredSignal} />,
             path: `${EXAMPLES_ROOT}/Layered.tsx`,
+        },
+        {
+            key: "textOnly",
+            name: "Nothing focusable inside",
+            readout: () =>
+                `open: ${textOnlyVisibility[0]()} — with nothing to focus inside, the dialog takes focus itself`,
+            component: () => <TextOnlyExample visibilitySignal={textOnlyVisibility} />,
+            path: `${EXAMPLES_ROOT}/TextOnly.tsx`,
         },
     ]);
 

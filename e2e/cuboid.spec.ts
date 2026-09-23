@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
-import { demo, prop, readout } from "./helpers";
+import { demo, prop, readout, waitUntilStill } from "./helpers";
 
 /**
  * The box is driven by two counts of quarter turns rather than by naming a face, so every check here presses
@@ -122,4 +122,151 @@ test("the box paints inside the room it reserves, at rest and all the way round"
 
         await page.waitForTimeout(SAMPLE_GAP_MS);
     }
+});
+
+/**
+ * The third box keeps its own orientation instead of reading the counts as a pose, so which face comes up is
+ * asked of the box through the page's readout and the face that is in reach, never worked out from the
+ * counts. It turns by a keyframe animation on its body rather than by a transition, so a settle is waited
+ * out by the animation list emptying and the face standing still — not by a span of time.
+ *
+ * "Reads upright" is a relationship between two things the page draws on every face: a title above a line
+ * of body text. On screen, a face the right way up has its title above its body; turned on its side the two
+ * sit beside each other, and upside down the body is on top. That is checked in painted positions, so it
+ * holds whatever the face looks like and whatever size the box is.
+ */
+const UPRIGHT = demo("upright");
+
+const uprightBox = `${UPRIGHT} [aria-roledescription="box"]`;
+const uprightBody = `${uprightBox} > div > div`;
+const uprightFacing = `${UPRIGHT} [aria-roledescription="face"]:not([aria-hidden="true"])`;
+
+const DRAG_STEPS = 12;
+
+const settleUpright = async (page: Page) => {
+    await expect
+        .poll(() => page.locator(uprightBody).evaluate((element) => element.getAnimations().length), {
+            message: "the box finishes turning",
+        })
+        .toBe(0);
+    await waitUntilStill(page.locator(uprightFacing));
+};
+
+const uprightFacingName = (page: Page) => page.locator(uprightFacing).getAttribute("aria-label");
+
+const uprightReadoutFace = async (page: Page) => (await readout(page, "upright")).split(" ")[0];
+
+const readsUpright = (page: Page) =>
+    page.locator(uprightFacing).evaluate((face) => {
+        const [title, body] = [...face.firstElementChild!.children].map((part) => {
+            const rect = part.getBoundingClientRect();
+
+            return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+        });
+        const down = body!.y - title!.y;
+
+        return down > Math.abs(body!.x - title!.x);
+    });
+
+const pressUpright = async (page: Page, id: string) => {
+    await page.locator(`#${id}`).click();
+    await settleUpright(page);
+};
+
+test("naming a face brings that face round, the right way up", async ({ page }) => {
+    for (const face of ["Top", "Left", "Bottom", "Back", "Right", "Front"]) {
+        await pressUpright(page, `turnTo${face}`);
+
+        expect(await uprightFacingName(page), `asking for the ${face} brings it to the front`).toBe(face);
+        expect(await uprightReadoutFace(page), "and the page is told the same").toBe(face.toLowerCase());
+        expect(await readsUpright(page), `and the ${face} reads the right way up`).toBe(true);
+    }
+});
+
+test("the turn buttons tip the box about the screen's own axes, and every face lands upright", async ({ page }) => {
+    await pressUpright(page, "uprightPitchUp");
+
+    expect(await uprightFacingName(page)).toBe("Top");
+    expect(await readsUpright(page)).toBe(true);
+
+    await pressUpright(page, "uprightYawRight");
+
+    expect(await uprightFacingName(page), "from the lid, across brings a side").toBe("Right");
+    expect(await readsUpright(page), "spun to read the right way up").toBe(true);
+
+    await pressUpright(page, "uprightYawLeft");
+
+    expect(
+        await uprightFacingName(page),
+        "and back again lands on the front, not the lid, because the face was righted in between",
+    ).toBe("Front");
+    expect(await readsUpright(page)).toBe(true);
+
+    for (const expected of ["Top", "Back", "Top"]) {
+        await pressUpright(page, "uprightPitchUp");
+
+        expect(
+            await uprightFacingName(page),
+            "going on up swaps the lid and the side behind it, since a righted side always has the lid above it",
+        ).toBe(expected);
+        expect(await readsUpright(page), `and the ${expected} still reads upright, never inverted`).toBe(true);
+    }
+});
+
+test("with upright off, the same presses leave the far side upside down", async ({ page }) => {
+    await page.locator(`${prop("isUpright")} input`).uncheck();
+    await settleUpright(page);
+
+    await pressUpright(page, "uprightPitchUp");
+    await pressUpright(page, "uprightPitchUp");
+
+    expect(await uprightFacingName(page)).toBe("Back");
+    expect(await readsUpright(page), "which is what the upright check tells apart").toBe(false);
+
+    await page.locator(`${prop("isUpright")} input`).check();
+    await settleUpright(page);
+
+    expect(await readsUpright(page), "and turning upright back on rights the face in view").toBe(true);
+});
+
+/**
+ * A drag is measured against the box's own width, so it is written as fractions of it: one box width is one
+ * quarter turn, and a release rounds to the nearest whole turn.
+ */
+const dragAcross = async (page: Page, from: number, to: number, onHeld?: () => Promise<void>) => {
+    const box = (await page.locator(`${uprightBox} > div`).boundingBox())!;
+    const y = box.y + box.height * 0.5;
+
+    await page.mouse.move(box.x + box.width * from, y);
+    await page.mouse.down();
+    await page.mouse.move(box.x + box.width * to, y, { steps: DRAG_STEPS });
+    await onHeld?.();
+    await page.mouse.up();
+};
+
+test("dragging turns the box while held, and letting go settles it on a face", async ({ page }) => {
+    const restingTransform = await page.locator(uprightBody).evaluate((element) => getComputedStyle(element).transform);
+
+    await dragAcross(page, 0.9, 0.1, async () => {
+        expect(
+            await page.locator(uprightBody).evaluate((element) => getComputedStyle(element).transform),
+            "the box follows the pointer while it is held",
+        ).not.toBe(restingTransform);
+    });
+    await settleUpright(page);
+
+    expect(await uprightFacingName(page), "pulling the front away to the left brings the right side round").toBe(
+        "Right",
+    );
+    expect(await uprightReadoutFace(page)).toBe("right");
+    expect(await readout(page, "upright"), "and the drag is recorded as a press across").toContain("across 1");
+    expect(await readsUpright(page)).toBe(true);
+});
+
+test("a drag let go short of half a turn springs back to the face it started on", async ({ page }) => {
+    await dragAcross(page, 0.6, 0.4);
+    await settleUpright(page);
+
+    expect(await uprightFacingName(page)).toBe("Front");
+    expect(await readout(page, "upright"), "and nothing is recorded").toContain("across 0, up 0");
 });

@@ -1,4 +1,5 @@
 import { AngleUtils } from "./angle.js";
+import { MathUtils } from "./math.js";
 import { Size2d } from "./size.js";
 import { Vec2d, type Vec2dString } from "./vec2d.js";
 
@@ -61,7 +62,7 @@ export namespace Point2dUtils {
     });
 
     /**
-     * Rotates a direction a quarter turn anticlockwise, giving the direction at right
+     * Rotates a direction a quarter turn counterclockwise, giving the direction at right
      * angles to it.
      *
      * The length is unchanged, so feed it a result from {@link getNormal} if you want a
@@ -117,6 +118,23 @@ export namespace Point2dUtils {
      * it reports `0`.
      */
     export const getAngle = (p: Point2d): number => AngleUtils.fromRadians(Math.atan2(p.y, p.x));
+
+    /**
+     * Finds the point a given ratio of the way from one point to another, along the straight line
+     * between them.
+     *
+     * Each axis is blended on its own with {@link MathUtils.lerp}, so it carries the same guarantees:
+     * no clamping, so a ratio outside `0..1` carries on past either end, and a ratio of `0` answers
+     * `from` exactly. Blending two outlines point by point is one call per pair.
+     *
+     * @param from The point at a ratio of `0`.
+     * @param to The point at a ratio of `1`.
+     * @param ratio How far between the two.
+     */
+    export const lerp = (from: Point2d, to: Point2d, ratio: number): Point2d => ({
+        x: MathUtils.lerp(from.x, to.x, ratio),
+        y: MathUtils.lerp(from.y, to.y, ratio),
+    });
 
     /** Measures how far a point sits from the origin, in a straight line. */
     export const getLength = (p: Point2d): number => Math.hypot(p.x, p.y);

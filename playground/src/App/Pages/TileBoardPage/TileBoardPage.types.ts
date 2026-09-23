@@ -13,6 +13,10 @@ export type TileBoardExampleProps = AccessorProps<{
     marked: Index2dString[];
     computeIsTileDisabled?: (tile: Index2d) => boolean;
     onTileActivate: (tile: Index2d) => void;
+    onTileSweep?: (tile: Index2d) => void;
 }>;
 
-export type TileBoardMeepleExampleProps = Omit<TileBoardExampleProps, "marked"> & { piece: MaybeAccessor<Index2d> };
+export type TileBoardMeepleExampleProps = Omit<TileBoardExampleProps, "marked"> & {
+    piece: MaybeAccessor<Index2d>;
+    marked?: MaybeAccessor<Index2dString[]>;
+};

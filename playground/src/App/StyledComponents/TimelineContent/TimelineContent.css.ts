@@ -9,6 +9,12 @@ export const isMajor = style({});
 export const isHovered = style({});
 export const isFocusVisible = style({});
 export const isDisabled = style({});
+export const isHeldStart = style({});
+export const isHeldEnd = style({});
+
+const MARKER_WIDTH = 2;
+const MARKER_HEAD = 8;
+const HELD_EDGE_WIDTH = 3;
 
 export const timelineFrame = style({
     display: "flex",
@@ -106,6 +112,12 @@ export const timelineBlock = style({
             outline: `${FOCUS_RING_WIDTH}px solid ${themeVars.color.outline.main}`,
             outlineOffset: 1,
         },
+        [`&.${isHeldStart}`]: {
+            boxShadow: `inset ${HELD_EDGE_WIDTH}px 0 0 ${themeVars.color.outline.main}`,
+        },
+        [`&.${isHeldEnd}`]: {
+            boxShadow: `inset -${HELD_EDGE_WIDTH}px 0 0 ${themeVars.color.outline.main}`,
+        },
         [`&.${isDisabled}`]: {
             filter: themeVars.disabled.filter,
             opacity: themeVars.disabled.opacity,
@@ -158,4 +170,34 @@ export const timelineControls = style({
     flexWrap: "wrap",
     alignItems: "center",
     gap: themeVars.spacing.half,
+});
+
+export const timelineMarker = style({
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: -MARKER_WIDTH * 0.5,
+    width: MARKER_WIDTH,
+
+    selectors: {
+        "&::before": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            left: (MARKER_WIDTH - MARKER_HEAD) * 0.5,
+            width: MARKER_HEAD,
+            height: MARKER_HEAD,
+            clipPath: "polygon(0% 0%, 100% 0%, 50% 100%)",
+            backgroundColor: "inherit",
+        },
+    },
+});
+
+export const timelineMarkerTones = styleVariants({
+    now: {
+        backgroundColor: themeVars.color.error.main,
+    },
+    playhead: {
+        backgroundColor: themeVars.color.secondary.main,
+    },
 });

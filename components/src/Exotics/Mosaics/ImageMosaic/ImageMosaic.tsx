@@ -24,6 +24,8 @@ export const ImageMosaic = (props: ImageMosaicProps) => {
     const release = (src: string) => {
         const image = requested.get(src);
 
+        buffered = Object.fromEntries(Object.entries(buffered).filter(([key]) => key !== src));
+
         if (!image) return;
 
         image.onload = null;
@@ -82,6 +84,8 @@ export const ImageMosaic = (props: ImageMosaicProps) => {
 
     const getSizes = createMemo(() => access(props.sources).map((source) => getSizeBySrc()[source.src] ?? EMPTY_SIZE));
 
+    const getKeys = createMemo(() => access(props.sources).map((source) => source.src));
+
     const getTargetAspectRatio = createMemo(() => {
         const targetAspectRatio = access(props.targetAspectRatio) ?? IMAGE_MOSAIC_DEFAULTS.targetAspectRatio;
 
@@ -92,15 +96,19 @@ export const ImageMosaic = (props: ImageMosaicProps) => {
         <Mosaic
             sizeAnchor={props.sizeAnchor}
             gap={props.gap}
+            transitionDurationMs={props.transitionDurationMs}
             sizes={getSizes}
+            keys={getKeys}
             isItemSized={true}
             computePlacements={(defs) => MosaicUtils.packScaled(defs, getTargetAspectRatio())}
-            renderItem={(index, getState) => {
+            ariaLabel={props.ariaLabel}
+            onActivate={props.onActivate}
+            renderItem={(getIndex, getState) => {
                 const renderImage = () => (
                     <img
                         class={styles.imageMosaicImage}
-                        src={access(props.sources)[index]?.src}
-                        alt={access(props.sources)[index]?.alt}
+                        src={access(props.sources)[getIndex()]?.src}
+                        alt={access(props.sources)[getIndex()]?.alt}
                         decoding="async"
                     />
                 );

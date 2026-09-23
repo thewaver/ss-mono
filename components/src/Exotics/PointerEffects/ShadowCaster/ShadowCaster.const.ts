@@ -10,4 +10,5 @@ export const SHADOW_CASTER_DEFAULTS = {
     minOpacity: 0,
     restingOpacity: 0.25,
     color: "#000000",
+    smoothingMs: 0,
 };

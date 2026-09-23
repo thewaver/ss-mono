@@ -10,9 +10,16 @@ import type { TimePickerProps } from "../TimePicker/TimePicker.types";
 
 export type DateTimePickerProps = Omit<
     DatePickerProps,
-    "valueSignal" | "ariaLabel" | "visibilitySignal" | "minValue" | "maxValue" | "precision"
+    "valueSignal" | "ariaLabel" | "visibilitySignal" | "minValue" | "maxValue" | "precision" | "id" | "name"
 > &
     AccessorProps<{
+        /**
+         * The halves' element id. The date field takes `<id>-date` and the time field `<id>-time`, so a label can
+         * name each one and no id lands on two elements.
+         */
+        id?: string;
+        /** The halves' name when they are submitted as part of a form. They submit as `<name>-date` and `<name>-time`. */
+        name?: string;
         /** Names the date half for assistive technology. */
         dateLabel: string;
         /** Names the time half for assistive technology. */

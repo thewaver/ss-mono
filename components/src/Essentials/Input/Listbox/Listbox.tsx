@@ -24,8 +24,10 @@ const ListboxOptionItem = (props: ListboxOptionItemProps) => {
 
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
+    const getIsHighlighted = createMemo(() => access(props.flags).isHighlighted ?? false);
+
     createEffect(() => {
-        if (!access(props.flags).isHighlighted || !access(props.isSelfScrolling)) return;
+        if (!getIsHighlighted() || !access(props.isSelfScrolling)) return;
 
         getElementRef()?.scrollIntoView({ block: "nearest" });
     });

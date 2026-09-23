@@ -1,6 +1,6 @@
 import { For, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 
-import { ObjectUtils, ShapeUtils, Size2d } from "@thewaver/ss-utils";
+import { ObjectUtils, type Point2d, ShapeUtils, Size2d } from "@thewaver/ss-utils";
 
 import { access } from "../../Utils/propUtils";
 import type { ShapeProps, ShapeStrokeGeom } from "./Shape.types";
@@ -8,6 +8,13 @@ import type { ShapeProps, ShapeStrokeGeom } from "./Shape.types";
 import * as styles from "./Shape.css";
 
 const DEFAULT_STROKE_GEOM: ShapeStrokeGeom = { thicknesses: [0] };
+const MIN_OUTLINE_POINTS = 3;
+
+const toShapeOutside = (points: Point2d[]) => {
+    if (points.length < MIN_OUTLINE_POINTS) return undefined;
+
+    return `polygon(${points.map((point) => `${point.x}px ${point.y}px`).join(", ")}) border-box`;
+};
 
 export const Shape = (props: ShapeProps) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
@@ -56,6 +63,8 @@ export const Shape = (props: ShapeProps) => {
         });
     });
 
+    const getShapeOutside = createMemo(() => toShapeOutside(getPaths()[0].outerPoints));
+
     onMount(() => {
         let rootResizeObserver: ResizeObserver | undefined;
 
@@ -74,7 +83,7 @@ export const Shape = (props: ShapeProps) => {
     });
 
     return (
-        <div ref={setRootRef} class={styles.shapeRoot}>
+        <div ref={setRootRef} class={styles.shapeRoot} style={{ "shape-outside": getShapeOutside() }}>
             {getFillDefs() && (
                 <svg
                     class={styles.shapeFillSVG}

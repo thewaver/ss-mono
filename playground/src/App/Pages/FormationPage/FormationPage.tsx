@@ -3,6 +3,7 @@ import { createStore } from "solid-js/store";
 
 import type { PlacementLayoutEntry, ProximityEffectEntry, SampleKnob } from "@thewaver/ss-components";
 import {
+    FORMATION_DEFAULTS,
     PlacementLayoutKnobs,
     PlacementLayouts,
     ProximityEffectKnobs,
@@ -22,6 +23,13 @@ import type { FormationExampleProps } from "./FormationPage.types";
 const MIN_ITEM_COUNT = 1;
 const MAX_ITEM_COUNT = 12;
 const ITEM_COUNT_STEP = 1;
+const MIN_SKIPPED_COUNT = 0;
+const MIN_DURATION_MS = 0;
+const MAX_DURATION_MS = 3000;
+const DURATION_STEP_MS = 100;
+const MIN_STAGGER_MS = 0;
+const MAX_STAGGER_MS = 500;
+const STAGGER_STEP_MS = 10;
 const FIELD_WIDTH = 130;
 const FORMATION_WIDTH = 380;
 const EXAMPLES_ROOT = "/src/App/Pages/FormationPage/Examples";
@@ -61,10 +69,13 @@ const DefaultExampleWrapper = (props: FormationExampleProps) => {
 
 export const FormationPage = () => {
     const [getItemCount, setItemCount] = createSignal(STARTING_ITEM_COUNT);
+    const [getSkippedCount, setSkippedCount] = createSignal(MIN_SKIPPED_COUNT);
     const [getLayoutKey, setLayoutKey] = createSignal<PlacementLayouts.SampleKey>(STARTING_LAYOUT_KEY);
     const [getEffectKey, setEffectKey] = createSignal<EffectKey>(STARTING_EFFECT_KEY);
     const [getShapeKind, setShapeKind] = createSignal<ShapeConst.DefaultShape>(STARTING_SHAPE_KIND);
     const [getIsStackedInReverse, setIsStackedInReverse] = createSignal(false);
+    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(FORMATION_DEFAULTS.transitionDurationMs);
+    const [getStaggerMs, setStaggerMs] = createSignal(FORMATION_DEFAULTS.staggerMs);
     const [layoutDefs, setLayoutDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
     const [effectDefs, setEffectDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
 
@@ -105,7 +116,7 @@ export const FormationPage = () => {
             : ({ family, defs: getPickedEffectDefs() } as unknown as ProximityEffectEntry);
     });
 
-    const getItems = createMemo(() => NAMES.slice(0, getItemCount()));
+    const getItems = createMemo(() => NAMES.slice(getSkippedCount(), getSkippedCount() + getItemCount()));
 
     const getExamples = createMemo(() => {
         const commonProps: FormationExampleProps = {
@@ -114,6 +125,8 @@ export const FormationPage = () => {
             layoutEntry: getLayoutEntry,
             effectEntry: getEffectEntry,
             shapeKind: getShapeKind,
+            transitionDurationMs: getTransitionDurationMs,
+            staggerMs: getStaggerMs,
         };
 
         return [
@@ -201,6 +214,24 @@ export const FormationPage = () => {
                     </PageProp>
 
                     <PageProp
+                        key={"skippedCount"}
+                        label={"Skip from the start"}
+                        hint={
+                            "Leaves out that many items from the front of the list, so an item can be taken out from the start rather than the end."
+                        }
+                    >
+                        <PageNumberField
+                            value={getSkippedCount}
+                            min={() => MIN_SKIPPED_COUNT}
+                            max={() => NAMES.length - MIN_ITEM_COUNT}
+                            step={() => ITEM_COUNT_STEP}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Skip from the start"}
+                            onInput={setSkippedCount}
+                        />
+                    </PageProp>
+
+                    <PageProp
                         key={"isStackedInReverse"}
                         label={"Earlier items in front"}
                         hint={
@@ -221,6 +252,40 @@ export const FormationPage = () => {
                             width={() => FIELD_WIDTH}
                             ariaLabel={"Item shape"}
                             onChange={(shape) => setShapeKind(() => shape)}
+                        />
+                    </PageProp>
+
+                    <PageProp
+                        key={"transitionDurationMs"}
+                        label={"Glide (ms)"}
+                        hint={
+                            "How long an item takes to glide to its new place when the arrangement, the item count or a knob changes. At 0 it moves at once, and under reduced motion it always does."
+                        }
+                    >
+                        <PageNumberField
+                            value={getTransitionDurationMs}
+                            min={() => MIN_DURATION_MS}
+                            max={() => MAX_DURATION_MS}
+                            step={() => DURATION_STEP_MS}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Glide duration in milliseconds"}
+                            onInput={setTransitionDurationMs}
+                        />
+                    </PageProp>
+
+                    <PageProp
+                        key={"staggerMs"}
+                        label={"Stagger (ms)"}
+                        hint={"How much later each item sets off than the one before it, while gliding is on."}
+                    >
+                        <PageNumberField
+                            value={getStaggerMs}
+                            min={() => MIN_STAGGER_MS}
+                            max={() => MAX_STAGGER_MS}
+                            step={() => STAGGER_STEP_MS}
+                            width={() => FIELD_WIDTH}
+                            ariaLabel={"Stagger in milliseconds"}
+                            onInput={setStaggerMs}
                         />
                     </PageProp>
                 </PagePropsPanel>

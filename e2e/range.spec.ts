@@ -1,6 +1,6 @@
 import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { activeMatches, attributesOf, demo, inputValue, readout, tabIndex } from "./helpers";
+import { activeMatches, attributesOf, demo, inputValue, readout, tabIndex, turnDegrees } from "./helpers";
 
 const DEFAULT = demo("default");
 const STEPPED = demo("stepped");
@@ -9,6 +9,7 @@ const DISABLED = demo("disabled");
 const DISABLED_PAIR = demo("disabledPair");
 const REACHABLE = demo("reachable");
 const ERRORED = demo("errored");
+const KNOB = demo("knob");
 
 const thumbs = (scope: string) => `${scope} input[type="range"]`;
 
@@ -179,4 +180,84 @@ test("the owner's error reaches the element as ARIA, and leaves when the owner's
         "aria-invalid",
         "true",
     );
+});
+
+/**
+ * The knob's travel as the example sets it: the lowest value at 135° (down and to the left, with 0° pointing
+ * right and angles growing clockwise) and 270° of sweep from there, so straight up is the middle of the
+ * scale and straight right is five sixths of it. A point is named by where it sits on the knob's box, and
+ * the box is read from the native input, which is laid over the knob edge to edge and is the rectangle the
+ * component itself measures.
+ */
+const knobPoint = async (page: Page, where: "top" | "right" | "left") => {
+    const box = (await page.locator(thumbs(KNOB)).boundingBox())!;
+    const center = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
+    const reach = Math.min(box.width, box.height) * 0.4;
+
+    if (where === "top") return { x: center.x, y: center.y - reach };
+
+    return { x: center.x + (where === "right" ? reach : -reach), y: center.y };
+};
+
+const KNOB_POINTER = `${KNOB} [style*="rotate("]`;
+
+test("the knob is still one named slider the keyboard steps", async ({ page }) => {
+    const input = page.locator(thumbs(KNOB));
+
+    await expect(input, "a knob is the same native range input underneath").toHaveCount(1);
+    await expect(input, "named for a screen reader").toHaveAttribute("aria-label", "Gain");
+    expect(await valueOf(input), "starting where the owner put it").toBe(30);
+
+    await input.focus();
+    await page.keyboard.press("ArrowRight");
+
+    expect(await valueOf(input), "and the arrow keys still step it").toBe(31);
+    expect(await readout(page, "knob"), "which the owner hears").toContain("value: 31");
+});
+
+/**
+ * With `computeValueAtPoint` given, `Range` cancels the press so the browser never moves its own thumb,
+ * and follows the pointer by the angle round the center instead. The points below are picked so the two
+ * readings disagree: a native horizontal range pressed at the right edge would jump to its top end and at
+ * the left edge to its bottom, while the knob reads five sixths and one sixth of the way round.
+ */
+test("pressing the knob reads the pointer's angle, not the native thumb's position", async ({ page }) => {
+    const input = page.locator(thumbs(KNOB));
+    const right = await knobPoint(page, "right");
+
+    await page.mouse.move(right.x, right.y);
+    await page.mouse.down();
+
+    expect(await valueOf(input), "a press at the right reads five sixths of the way round").toBe(83);
+    expect(await readout(page, "knob"), "and the owner is told at once").toContain("value: 83");
+    await expect(input, "the press takes focus, so the keyboard carries on from there").toBeFocused();
+
+    await page.mouse.up();
+
+    expect(await valueOf(input), "letting go leaves it where the angle said").toBe(83);
+});
+
+test("dragging round the knob turns it, and the browser's own thumb never wins", async ({ page }) => {
+    const input = page.locator(thumbs(KNOB));
+    const top = await knobPoint(page, "top");
+    const left = await knobPoint(page, "left");
+    const turnedBefore = await turnDegrees(page.locator(KNOB_POINTER));
+
+    await page.mouse.move(top.x, top.y);
+    await page.mouse.down();
+
+    expect(await valueOf(input), "straight up is the middle of the scale").toBe(50);
+    expect(await turnDegrees(page.locator(KNOB_POINTER)), "and the painted pointer turns with it").toBeGreaterThan(
+        turnedBefore,
+    );
+
+    await page.mouse.move(left.x, left.y, { steps: 8 });
+
+    expect(await valueOf(input), "dragging anticlockwise to the left turns it down to one sixth").toBe(17);
+    expect(await readout(page, "knob"), "and the owner follows every move").toContain("value: 17");
+
+    await page.mouse.up();
+
+    expect(await valueOf(input), "letting go keeps the value the drag ended on").toBe(17);
+    expect(await readout(page, "knob")).toContain("value: 17");
 });

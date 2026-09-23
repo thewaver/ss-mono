@@ -15,16 +15,16 @@ export const Label = (props: LabelProps) => {
     const labelId = createUniqueId();
 
     const innerContext: LabelContextType = {
-        getIsLabelled: () => true,
-        getLabelId: () => (context.getIsLabelled() ? context.getLabelId() : labelId),
+        getIsLabeled: () => true,
+        getLabelId: () => (context.getIsLabeled() ? context.getLabelId() : labelId),
     };
 
     const getOrientation = createMemo(() => access(props.orientation) ?? LABEL_DEFAULTS.orientation);
 
     return (
         <Dynamic
-            component={context.getIsLabelled() ? "div" : "label"}
-            id={context.getIsLabelled() ? undefined : labelId}
+            component={context.getIsLabeled() ? "div" : "label"}
+            id={context.getIsLabeled() ? undefined : labelId}
             class={styles.labelRoot}
             style={{
                 "flex-direction": getOrientation() === "horizontal" ? "row" : "column",

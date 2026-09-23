@@ -82,8 +82,8 @@ export type InteractionWrapperProps<TExtra extends object = {}> = AccessorProps<
     extraFlags?: MaybeAccessor<TExtra>;
     /**
      * Runs when the control is activated, by pointer or by key. It is told how far the control was dragged
-     * and how many activations have landed in quick succession, so a drag and a double click are both
-     * readable from one callback.
+     * and how many presses have landed since mount, a count that goes up by one each time — a change in it is
+     * what lets a repeated press restart an effect that is already running.
      */
     onActivation?: (activation: InteractionActivation) => void;
     /**

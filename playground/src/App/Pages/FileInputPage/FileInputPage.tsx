@@ -8,7 +8,7 @@ import { DisabledExample } from "./Examples/Disabled";
 import { DropZoneExample } from "./Examples/DropZone";
 import { ErroredExample } from "./Examples/Errored";
 import { ImagesExample } from "./Examples/Images";
-import { LabelledExample } from "./Examples/Labeled";
+import { LabeledExample } from "./Examples/Labeled";
 import { MultipleExample } from "./Examples/Multiple";
 import { ReachableExample } from "./Examples/Reachable";
 import { RejectingSetterExample } from "./Examples/RejectingSetter";
@@ -31,7 +31,7 @@ export const FileInputPage = () => {
     const disabledSignal = createSignal<File[]>([]);
     const reachableSignal = createSignal<File[]>([]);
     const erroredSignal = createSignal<File[]>([]);
-    const labelledSignal = createSignal<File[]>([]);
+    const labeledSignal = createSignal<File[]>([]);
     const dropZoneSignal = createSignal<File[]>([]);
 
     const [getRejection, setRejection] = createSignal("");
@@ -97,8 +97,8 @@ export const FileInputPage = () => {
         {
             key: "label",
             name: "In a Label",
-            readout: () => `files: ${describe(labelledSignal[0]())} — the caption opens the dialog`,
-            component: () => <LabelledExample filesSignal={labelledSignal} />,
+            readout: () => `files: ${describe(labeledSignal[0]())} — the caption opens the dialog`,
+            component: () => <LabeledExample filesSignal={labeledSignal} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
         {

@@ -56,6 +56,8 @@ export type TileBoardTileProps = AccessorProps<
         renderContent: (getRenderProps: () => InteractionFlags<TileBoardRenderProps>) => JSX.Element;
         /** Runs when this tile is activated. */
         onActivate: () => void;
+        /** Receives the layer that takes the pointer, so the board can tell which tile is under a sweeping press. */
+        hitRef?: (element: HTMLElement) => void;
     }
 >;
 
@@ -90,4 +92,16 @@ export type TileBoardProps = AccessorProps<{
     renderTile: TileBoardTileRenderer;
     /** Runs when a tile is activated. */
     onTileActivate: (tile: Index2d) => void;
+    /**
+     * Runs for each tile a press is dragged across, so one stroke can paint or clear a run of tiles. Sweeping is
+     * on only while this is given.
+     *
+     * A sweep starts when a press moves onto a second tile: the tile it began on is reported then, and every tile
+     * entered after it, each once per press however often the pointer comes back. A press that never leaves its
+     * tile is a click and goes to `onTileActivate` instead, and the click at the end of a sweep is swallowed, so
+     * no tile is acted on twice. Refused tiles are passed over without being reported. Touch sweeps as the mouse
+     * does, and a touch that lands on a tile drags across the board rather than scrolling the page. Pressing the
+     * tiles one at a time, or walking them with the keyboard, reaches everything a sweep does.
+     */
+    onTileSweep?: (tile: Index2d) => void;
 }>;

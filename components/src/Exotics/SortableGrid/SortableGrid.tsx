@@ -1,4 +1,14 @@
-import { Index, Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup, onMount } from "solid-js";
+import {
+    Index,
+    Show,
+    createEffect,
+    createMemo,
+    createSignal,
+    createUniqueId,
+    onCleanup,
+    onMount,
+    untrack,
+} from "solid-js";
 import { Portal } from "solid-js/web";
 
 import type { Index2d, Point2d } from "@thewaver/ss-utils";
@@ -8,6 +18,7 @@ import type { CarrierZone, Carry, CarryMode, CarryNudge, CarryPlace } from "../.
 import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
 import { ElevationUtils } from "../../Abstracts/Elevation/Elevation.utils";
 import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
+import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { ViewportUtils } from "../../Abstracts/Viewport/Viewport.utils";
 import { LabelUtils } from "../../Essentials/Input/Label/Label.utils";
@@ -123,6 +134,19 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
 
     const getGroupId = createMemo(() => access(props.groupId));
 
+    const getCells = createMemo(() =>
+        Array.from({ length: getColumns() * getRows() }, (_unused, index) => ({
+            col: index % getColumns(),
+            row: Math.floor(index / getColumns()),
+        })),
+    );
+
+    const getIsSpotBlocked = (spot: SortableGridSpot) => props.computeIsSpotBlocked?.(spot) ?? false;
+
+    const getBlockedSpots = createMemo(() =>
+        props.computeIsSpotBlocked === undefined ? [] : getCells().filter(getIsSpotBlocked),
+    );
+
     const getSpan = (cells: number) => cells * getPitch() - getGap();
 
     const getOffset = (cell: number) => getGap() + cell * getPitch();
@@ -183,10 +207,12 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         };
     };
 
-    const getTakenCells = (carry: Carry) =>
-        getItems()
+    const getTakenCells = (carry: Carry) => [
+        ...getBlockedSpots(),
+        ...getItems()
             .filter((item) => props.computeItemKey(item.value) !== carry.key)
-            .flatMap(SortableGridUtils.getItemCells);
+            .flatMap(SortableGridUtils.getItemCells),
+    ];
 
     const zone: CarrierZone = {
         getGroupId,
@@ -224,11 +250,13 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             const current = asPlace(place);
             const turns = nudge.turn && getIsTurnable() ? current.turns + nudge.turn : current.turns;
             const shape = getCarriedShape(carry, turns);
-            const spot = SortableGridUtils.getClampedSpot(
-                { col: current.col + (nudge.x ?? 0), row: current.row + (nudge.y ?? 0) },
-                shape.size,
+            const spot = SortableGridUtils.getSteppedSpot(
+                current,
+                { col: nudge.x ?? 0, row: nudge.y ?? 0 },
+                shape,
                 getColumns(),
                 getRows(),
+                getBlockedSpots(),
             );
 
             return { ...spot, turns };
@@ -338,10 +366,25 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         return true;
     };
 
+    const compact = () =>
+        untrack(() => {
+            if (CarrierUtils.getCarry() && (getIsSource() || getIsReceiving())) return false;
+
+            const items = itemsSignal[0]();
+            const compacted = SortableGridUtils.getCompacted(items, getBlockedSpots());
+
+            if (compacted.every((item, index) => item === items[index])) return false;
+
+            itemsSignal[1](compacted);
+
+            return true;
+        });
+
     const controller: SortableGridController = {
         getIsCarrying: getIsSource,
         turnCw: () => turn(1),
         turnCcw: () => turn(-1),
+        compact,
     };
 
     const getLandingPlace = createMemo(() => {
@@ -496,7 +539,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
             return;
         }
 
-        if (e.key === "Enter" || e.key === " ") {
+        if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();
 
             if (isCarrying) {
@@ -637,13 +680,6 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
         props.onMount?.(controller);
     });
 
-    const getCells = createMemo(() =>
-        Array.from({ length: getColumns() * getRows() }, (_unused, index) => ({
-            col: index % getColumns(),
-            row: Math.floor(index / getColumns()),
-        })),
-    );
-
     const renderGrid = () => (
         <InteractionWrapper
             {...props}
@@ -683,7 +719,13 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
                             aria-hidden="true"
                         >
                             <Index each={getCells()}>
-                                {(getCell) => <div class={styles.sortableGridCell}>{props.renderCell?.(getCell)}</div>}
+                                {(getCell) => (
+                                    <div class={styles.sortableGridCell}>
+                                        {props.renderCell?.(getCell, () => ({
+                                            isBlocked: getIsSpotBlocked(getCell()),
+                                        }))}
+                                    </div>
+                                )}
                             </Index>
                         </div>
                     </Show>

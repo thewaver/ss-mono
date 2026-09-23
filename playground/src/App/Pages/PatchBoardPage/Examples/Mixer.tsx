@@ -6,7 +6,7 @@ import {
     PagePatchNode,
     PagePatchSocket,
 } from "../../../StyledComponents/PatchBoardContent/PatchBoardContent";
-import { AMP_NODE_KEY, MIXER_NODE_KEY, STANDING_BOARD_SIZE } from "../PatchBoardPage.const";
+import { AMP_NODE_KEY, MIXER_NODE_KEY, STANDING_BOARD_HEIGHT_RATIO } from "../PatchBoardPage.const";
 import type { PatchBoardExampleProps } from "../PatchBoardPage.types";
 
 type Props = PatchBoardExampleProps;
@@ -17,7 +17,7 @@ export const MixerExample = (props: Props) => {
             groupId={"mixer"}
             ariaLabel={"Mixing desk"}
             announcements={PATCH_BOARD_ANNOUNCEMENTS}
-            size={STANDING_BOARD_SIZE}
+            heightRatio={STANDING_BOARD_HEIGHT_RATIO}
             orientation={"vertical"}
             socketSize={props.socketSize}
             isLocked={props.isLocked}

@@ -1,4 +1,4 @@
-import type { SortableGridFootprint, SortableGridItem, SortableItem } from "@thewaver/ss-components";
+import type { SortableGridFootprint, SortableGridItem, SortableGridSpot, SortableItem } from "@thewaver/ss-components";
 
 import type { Gear } from "./SortableGridPage.types";
 
@@ -85,6 +85,24 @@ export const LOOT: SortableItem<Gear>[] = [
     { value: { id: "pouch", name: "Coin Pouch", glyph: "\u{1F4B0}" } },
     { value: { id: "key", name: "Iron Key", glyph: "\u{1F5DD}" } },
     { value: { id: "herb", name: "Herb", glyph: "\u{1F33F}" } },
+];
+
+export const WALLS: SortableGridSpot[] = [
+    { row: 1, col: 2 },
+    { row: 1, col: 3 },
+    { row: 2, col: 7 },
+];
+
+export const computeIsWall = (spot: SortableGridSpot) =>
+    WALLS.some((wall) => wall.row === spot.row && wall.col === spot.col);
+
+export const SCATTERED: SortableGridItem<Gear>[] = [
+    gear("sword", "Longsword", "\u{1F5E1}", 0, 2, { rowCount: 3, colCount: 1 }),
+    gear("shield", "Kite Shield", "\u{1F6E1}", 2, 3, { rowCount: 2, colCount: 2 }),
+    gear("scroll", "Scroll", "\u{1F4DC}", 4, 2, { rowCount: 1, colCount: 2 }),
+    gear("pickaxe", "Pickaxe", "\u{26CF}", 6, 2, ELL),
+    gear("bread", "Bread", "\u{1F35E}", 1, 4, { rowCount: 1, colCount: 1 }),
+    gear("potion", "Potion", "\u{1F9EA}", 5, 4, { rowCount: 1, colCount: 1 }),
 ];
 
 export const ARROW_IDS = ARROWS.map((item) => item.value.id);

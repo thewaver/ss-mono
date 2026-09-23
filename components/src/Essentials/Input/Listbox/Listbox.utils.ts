@@ -76,7 +76,8 @@ export namespace ListboxUtils {
      * @param opts.getOrientation Which arrows walk the list. Vertical when left out.
      * @param opts.getDirection The page's text direction, which decides which horizontal arrow moves forward.
      * @param opts.computeCustomText The text an option is found by when the reader types, where its element has none
-     * to read — an option out of view in a windowed list, or one drawn without text.
+     * to read — an option out of view in a windowed list, or one drawn without text. Left out, such an option is found
+     * by its value written out as text, so a windowed list of plain strings still answers typing.
      * @param opts.onOpen Asked for when a key should open the list.
      * @param opts.onClose Asked for when a key or a pick should close it.
      * @param opts.onPick Told which value was picked.
@@ -148,9 +149,16 @@ export namespace ListboxUtils {
             return getOptionId(highlightedIndex);
         });
 
-        const computeOptionText = (index: number) =>
-            opts.computeCustomText?.(getFlatOptions()[index]) ??
-            TypeaheadUtils.getElementText(document.getElementById(getOptionId(index)));
+        const computeOptionText = (index: number) => {
+            const option = getFlatOptions()[index];
+            const custom = opts.computeCustomText?.(option);
+
+            if (custom !== undefined) return custom;
+
+            const painted = TypeaheadUtils.getElementText(document.getElementById(getOptionId(index)));
+
+            return painted.length > 0 ? painted : String(option.value);
+        };
 
         createEffect(() => {
             if (getIsOpen()) return;
@@ -228,7 +236,7 @@ export namespace ListboxUtils {
                 return;
             }
 
-            if (e.key === "Enter" || (e.key === " " && !isFilterable)) {
+            if (NavigatorUtils.getIsActivationKey(e.key) && (e.key !== " " || !isFilterable)) {
                 const highlightedIndex = getHighlightedIndex();
 
                 if (opts.isHighlightExplicit && (!isOpen || highlightedIndex === undefined)) {

@@ -6,7 +6,7 @@ import { DisabledExample } from "./Examples/Disabled";
 import { ErroredExample } from "./Examples/Errored";
 import { FractionalStepExample } from "./Examples/FractionalStep";
 import { GermanExample } from "./Examples/German";
-import { LabelledExample } from "./Examples/Labeled";
+import { LabeledExample } from "./Examples/Labeled";
 import { ReachableExample } from "./Examples/Reachable";
 import { ReadOnlyExample } from "./Examples/ReadOnly";
 import { SteppedClampedExample } from "./Examples/SteppedClamped";
@@ -25,7 +25,7 @@ export const NumberInputPage = () => {
     const disabledSignal = createSignal<number | undefined>(7);
     const reachableSignal = createSignal<number | undefined>(7);
     const erroredSignal = createSignal<number | undefined>(0);
-    const labelledSignal = createSignal<number | undefined>(undefined);
+    const labeledSignal = createSignal<number | undefined>(undefined);
 
     const getExamples = createMemo(() => [
         {
@@ -96,8 +96,8 @@ export const NumberInputPage = () => {
         {
             key: "label",
             name: "In a Label",
-            readout: () => `value: ${labelledSignal[0]()}`,
-            component: () => <LabelledExample valueSignal={labelledSignal} />,
+            readout: () => `value: ${labeledSignal[0]()}`,
+            component: () => <LabeledExample valueSignal={labeledSignal} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
     ]);

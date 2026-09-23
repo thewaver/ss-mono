@@ -67,3 +67,14 @@ export const particle = style({
     borderRadius: "50%",
     backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.success.light}, ${themeVars.color.success.dark})`,
 });
+
+export const burstRoot = style({
+    position: "absolute",
+    transform: "translate(-50%, -50%)",
+});
+
+export const spawnerOverlay = style({
+    position: "absolute",
+    inset: 0,
+    pointerEvents: "none",
+});

@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { readout } from "./helpers";
+import { example, prop, readout } from "./helpers";
 
 const MARKER = "#timelineMarker";
 const VEHICLE = "#circuitVehicle";
@@ -195,4 +195,187 @@ test("the traveler stays on the path all the way round, at every angle", async (
         await page.locator(PLAY).click();
         await page.waitForTimeout(A_SIXTH_OF_A_LAP_MS);
     }
+});
+
+const CONVOY_PLAY = "#convoyPlay";
+const CONVOY_PAUSE = "#convoyPause";
+const CONVOY_REWIND = "#convoyRewind";
+const CONVOY_COUNT = 4;
+const convoyVehicle = (index: number) => `#convoyVehicle${index}`;
+const SCROLL_MARKER = "#scrollMarker";
+
+/**
+ * How far along the path a traveler is, in the path's own length units: the point on the curve nearest the
+ * traveler's center, found the same way `distanceFromPath` finds its distance. Positions along the path are
+ * what a convoy promises to keep apart, so the spacing is measured along the curve rather than across the box.
+ */
+const arcPositionOf = (page: Page, travelerSelector: string) =>
+    page.evaluate((selector) => {
+        const traveler = document.querySelector(selector);
+        const path = traveler?.parentElement?.parentElement?.querySelector("svg path") as SVGPathElement | null;
+
+        if (!traveler || !path) throw new Error("nothing is traveling");
+
+        const box = traveler.getBoundingClientRect();
+        const center = { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
+        const matrix = path.getScreenCTM();
+        const length = path.getTotalLength();
+
+        if (!matrix) throw new Error("the path is not on screen");
+
+        let nearest = Infinity;
+        let nearestAt = 0;
+
+        for (let at = 0; at <= length; at += 0.5) {
+            const point = path.getPointAtLength(at);
+            const distance = Math.hypot(
+                point.x * matrix.a + point.y * matrix.c + matrix.e - center.x,
+                point.x * matrix.b + point.y * matrix.d + matrix.f - center.y,
+            );
+
+            if (distance < nearest) {
+                nearest = distance;
+                nearestAt = at;
+            }
+        }
+
+        return { at: nearestAt, length };
+    }, travelerSelector);
+
+const convoyPositions = async (page: Page) => {
+    const positions = [];
+
+    for (let index = 0; index < CONVOY_COUNT; index++) positions.push(await arcPositionOf(page, convoyVehicle(index)));
+
+    return positions;
+};
+
+/** The gap from each traveler back to the one behind it, along the path, wrapping round the end on a loop. */
+const convoyGaps = async (page: Page) => {
+    const positions = await convoyPositions(page);
+    const length = positions[0].length;
+
+    return positions.slice(1).map((behind, index) => (positions[index].at - behind.at + length) % length);
+};
+
+/** Half a unit of search resolution either side, plus a rounding of the transform the browser paints. */
+const ALONG_PATH_TOLERANCE = 2;
+
+/**
+ * Four travelers on one clock, each a fixed share of the path behind the one in front — the page gives them
+ * even shares, so the gaps along the curve come back equal to each other, and equal again a moment later
+ * after all four have moved on.
+ */
+test("the travelers of a convoy keep their spacing along the path as they go", async ({ page }) => {
+    await expect
+        .poll(() => progressOf(page, "convoy"), { message: "the convoy sets off on its own" })
+        .toBeGreaterThan(0);
+    await page.locator(CONVOY_PAUSE).click();
+
+    const first = await convoyGaps(page);
+    const leadBefore = await arcPositionOf(page, convoyVehicle(0));
+
+    for (const gap of first) {
+        expect(Math.abs(gap - first[0]), "every gap is the same as the first").toBeLessThan(ALONG_PATH_TOLERANCE);
+    }
+
+    await page.locator(CONVOY_PLAY).click();
+    await expect
+        .poll(async () => Math.abs((await arcPositionOf(page, convoyVehicle(0))).at - leadBefore.at))
+        .toBeGreaterThan(10);
+    await page.locator(CONVOY_PAUSE).click();
+
+    const second = await convoyGaps(page);
+
+    for (const [index, gap] of second.entries()) {
+        expect(Math.abs(gap - first[index]), "and it is the same gap after they have all moved on").toBeLessThan(
+            ALONG_PATH_TOLERANCE,
+        );
+    }
+});
+
+/**
+ * On a path that stops, the followers do not wrap round behind the lead: they all wait at the start, and each
+ * sets off only once the lead is its share ahead. So from a rewind, all four are at the same spot, and the
+ * moment the lead has left, the last follower is still sitting there.
+ */
+test("on a run that does not loop, the followers wait at the start until the lead is their share ahead", async ({
+    page,
+}) => {
+    await page.locator(`${prop("isLooping")} input`).uncheck();
+    await page.locator(CONVOY_PAUSE).click();
+    await page.locator(CONVOY_REWIND).click();
+
+    const parked = await convoyPositions(page);
+
+    for (const position of parked) {
+        expect(Math.abs(position.at - parked[0].at), "all four start on the same spot").toBeLessThan(
+            ALONG_PATH_TOLERANCE,
+        );
+    }
+
+    await page.locator(CONVOY_PLAY).click();
+    await expect
+        .poll(async () => (await arcPositionOf(page, convoyVehicle(0))).at - parked[0].at, {
+            message: "the lead sets off",
+        })
+        .toBeGreaterThan(ALONG_PATH_TOLERANCE);
+    await page.locator(CONVOY_PAUSE).click();
+
+    const lead = await arcPositionOf(page, convoyVehicle(0));
+    const last = await arcPositionOf(page, convoyVehicle(CONVOY_COUNT - 1));
+
+    expect(lead.at, "the lead has left the start").toBeGreaterThan(parked[0].at + ALONG_PATH_TOLERANCE);
+    expect(Math.abs(last.at - parked[0].at), "while the last of them is still waiting there").toBeLessThan(
+        ALONG_PATH_TOLERANCE,
+    );
+});
+
+/**
+ * The fourth example runs no clock at all: how far the page has been scrolled past it is its progress. The
+ * Playground scrolls inside its own frame rather than the window, so the scroll is a wheel over the page,
+ * which is what a person does, and the readout and the marker are read back after each one. The example is
+ * the last on the page, so bringing it into view can leave the page at the bottom of its scroll; it is
+ * backed off first so that there is room to scroll down.
+ *
+ * At the suite's own window size the whole Trail page fits and nothing scrolls, so this test narrows the
+ * window's height: `Viewport` keeps the window's aspect ratio, so a short, wide window gives the page less
+ * height than its content and the page frame starts to scroll.
+ */
+const SHORT_WINDOW = { width: 1600, height: 500 };
+
+const scrollPage = async (page: Page, byY: number) => {
+    const box = (await page.locator(example("scroll")).boundingBox())!;
+
+    await page.mouse.move(box.x + box.width * 0.5, box.y + 4);
+    await page.mouse.wheel(0, byY);
+    await page.waitForTimeout(A_FEW_FRAMES_MS);
+};
+
+test("scrolling the page moves the scroll-driven traveler forward, and scrolling back moves it back", async ({
+    page,
+}) => {
+    await page.setViewportSize(SHORT_WINDOW);
+    await page.reload();
+    await page.locator(example("scroll")).scrollIntoViewIfNeeded();
+    await scrollPage(page, -150);
+
+    const startProgress = await progressOf(page, "scroll");
+    const start = await arcPositionOf(page, SCROLL_MARKER);
+
+    await scrollPage(page, 150);
+
+    const forwardProgress = await progressOf(page, "scroll");
+    const forward = await arcPositionOf(page, SCROLL_MARKER);
+
+    expect(forwardProgress, "scrolling down takes the readout on").toBeGreaterThan(startProgress);
+    expect(forward.at, "and the traveler further along its path").toBeGreaterThan(start.at);
+
+    await scrollPage(page, -150);
+
+    const backProgress = await progressOf(page, "scroll");
+    const back = await arcPositionOf(page, SCROLL_MARKER);
+
+    expect(backProgress, "scrolling up brings the readout back").toBeLessThan(forwardProgress);
+    expect(back.at, "and the traveler back along the path").toBeLessThan(forward.at);
 });

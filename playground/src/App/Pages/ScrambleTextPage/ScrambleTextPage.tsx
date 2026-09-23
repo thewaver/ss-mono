@@ -1,11 +1,17 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { MediaQueryMonitorUtils, SCRAMBLE_TEXT_DEFAULTS } from "@thewaver/ss-components";
+import {
+    MediaQueryMonitorUtils,
+    SCRAMBLE_TEXT_DEFAULTS,
+    ScrambleTextGlyphs,
+    ScrambleTextWeights,
+} from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
+import { ChangedOnlyExample } from "./Examples/ChangedOnly";
 import { HeadlineExample } from "./Examples/Headline";
 import { SequentialExample } from "./Examples/Sequential";
 import { SwapExample } from "./Examples/Swap";
@@ -13,38 +19,9 @@ import type { ScrambleTextExampleProps } from "./ScrambleTextPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/ScrambleTextPage/Examples";
 
-const GLYPH_SETS = ["library", "hexadecimal", "katakana", "binary"] as const;
-const GLYPH_SET_MAP: Record<(typeof GLYPH_SETS)[number], string | undefined> = {
-    library: undefined,
-    hexadecimal: "0123456789ABCDEF",
-    katakana: "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホ",
-    binary: "01",
-};
+const GLYPH_SETS = ["library", ...ScrambleTextGlyphs.SAMPLE_KEYS] as const;
 
-const SETTLE_ORDERS = ["leftToRight", "rightToLeft", "fromMiddle", "scattered"] as const;
-const GOLDEN_RATIO_CONJUGATE = 0.618033988749895;
-const SINGLE_CHARACTER = 1;
-const HALF = 0.5;
-const FULL_WEIGHT = 1;
-
-const SETTLE_ORDER_MAP: Record<(typeof SETTLE_ORDERS)[number], ((count: number) => number[]) | undefined> = {
-    leftToRight: undefined,
-    rightToLeft: (count) =>
-        Array.from(
-            { length: count },
-            (_unused, index) => FULL_WEIGHT - index / Math.max(count - SINGLE_CHARACTER, SINGLE_CHARACTER),
-        ),
-    fromMiddle: (count) => {
-        const middle = (count - SINGLE_CHARACTER) * HALF;
-
-        return Array.from(
-            { length: count },
-            (_unused, index) => Math.abs(index - middle) / Math.max(middle, SINGLE_CHARACTER),
-        );
-    },
-    scattered: (count) =>
-        Array.from({ length: count }, (_unused, index) => (index * GOLDEN_RATIO_CONJUGATE) % FULL_WEIGHT),
-};
+const SETTLE_ORDERS = ["leftToRight", ...ScrambleTextWeights.SAMPLE_KEYS] as const;
 
 const MIN_SETTLE_DURATION_MS = 0;
 const MAX_SETTLE_DURATION_MS = 4000;
@@ -64,17 +41,28 @@ export const ScrambleTextPage = () => {
 
     const getExamples = createMemo(() => {
         const commonProps: ScrambleTextExampleProps = {
-            glyphs: () => GLYPH_SET_MAP[getGlyphSet()],
             settleDurationMs: () => (getPrefersReducedMotion() ? NO_MOTION_DURATION_MS : getSettleDurationMs()),
             scrambleIntervalMs: getScrambleIntervalMs,
-            computeCharacterWeights: (count) => SETTLE_ORDER_MAP[getSettleOrder()]?.(count) ?? [],
+            computeGlyphs: (character) => {
+                const glyphSet = getGlyphSet();
+
+                return glyphSet === "library"
+                    ? SCRAMBLE_TEXT_DEFAULTS.computeGlyphs()
+                    : ScrambleTextGlyphs.SAMPLE_GLYPHS[glyphSet](character);
+            },
+            computeCharacterWeights: (count) => {
+                const settleOrder = getSettleOrder();
+
+                return settleOrder === "leftToRight" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[settleOrder](count);
+            },
         };
 
         return [
             {
                 key: "headline",
                 name: "Headline",
-                readout: () => "the controller refuses a restart while a run is still going",
+                readout: () =>
+                    "a restart asked for mid-run throws away the run in progress and plays again from the start",
                 component: () => <HeadlineExample {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Headline.tsx`,
             },
@@ -92,6 +80,14 @@ export const ScrambleTextPage = () => {
                 readout: () => "nothing asks for a restart here — changing the text is what starts the run",
                 component: () => <SwapExample {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Swap.tsx`,
+            },
+            {
+                key: "changedOnly",
+                name: "Changed Only",
+                readout: () =>
+                    "only what differs from the last text scrambles, and the characters an insertion pushes along stay put",
+                component: () => <ChangedOnlyExample {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/ChangedOnly.tsx`,
             },
         ];
     });
@@ -137,7 +133,9 @@ export const ScrambleTextPage = () => {
                 <PageProp
                     key={"glyphSet"}
                     label={"Glyphs"}
-                    hint={"Which characters the unsettled positions are drawn from."}
+                    hint={
+                        "Which characters the unsettled positions are drawn from. Matched churns a digit among digits and a letter among letters of its own case."
+                    }
                 >
                     <PageSelectField
                         value={getGlyphSet}

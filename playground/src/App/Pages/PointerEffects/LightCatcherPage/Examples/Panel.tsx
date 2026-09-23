@@ -12,6 +12,7 @@ export const PanelExample = (props: Props) => {
             <LightCatcher
                 isDisabled={props.isDisabled}
                 activeRangePx={props.activeRangePx}
+                smoothingMs={props.smoothingMs}
                 lightRangePx={props.lightRangePx}
                 maxBrightness={props.maxBrightness}
                 restingBrightness={props.restingBrightness}

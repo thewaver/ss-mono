@@ -15,7 +15,8 @@ const SETTLE_MS = 200;
 /**
  * The OS color dialog is gone, so everything here is drivable for the first time: the surface is a real
  * element with a real drag, and the hue slider is a native range. What is worth asserting is that the value
- * still leaves as a hex string, since that is the whole of the control's public contract.
+ * comes back in the notation it was handed in — hex, on this page — since that round trip is the control's
+ * public contract.
  */
 const dragAcross = async (page: Page, selector: string, from: [number, number], to: [number, number]) => {
     const box = (await page.locator(selector).boundingBox())!;
@@ -38,7 +39,7 @@ test("the control is a popup button rather than a native color input", async ({ 
         "dialog",
     );
     await expect(page.locator(field(DEFAULT)), "and says whether it is open").toHaveAttribute("aria-expanded", "false");
-    await expect(page.locator(POPUP), "with nothing portalled until it is").toHaveCount(0);
+    await expect(page.locator(POPUP), "with nothing portaled until it is").toHaveCount(0);
 });
 
 test("opening it points the field at the popup and back", async ({ page }) => {
@@ -87,6 +88,27 @@ test("the hue slider is a real range and moves the same value", async ({ page })
     await page.keyboard.press("ArrowRight");
 
     expect(Number(await inputValue(hue)), "an arrow moves it").toBeGreaterThan(Number(before));
+});
+
+/**
+ * The popup is portaled to the end of the document, so if opening it left focus on the field, Tab would go
+ * to the next control on the page, the popup would read that as focus leaving and close, and a keyboard user
+ * could open the picker without ever reaching a slider in it. Opening has to move focus into the picker, so
+ * the first Tab lands on its first control — the saturation axis of the surface.
+ */
+test("opening it from the keyboard puts the sliders within one Tab", async ({ page }) => {
+    await page.locator(field(DEFAULT)).focus();
+    await page.keyboard.press("Enter");
+
+    await expect(page.locator(POPUP), "opening it moves focus into the picker").toBeFocused();
+
+    await page.keyboard.press("Tab");
+
+    await expect(page.locator(POPUP), "Tab does not carry focus out and close it").toBeVisible();
+    await expect(
+        page.locator(`${POPUP} [role="group"] input[type="range"]`).first(),
+        "and lands on the picker's first control, the saturation axis",
+    ).toBeFocused();
 });
 
 test("Escape closes it and hands focus back to the field", async ({ page }) => {

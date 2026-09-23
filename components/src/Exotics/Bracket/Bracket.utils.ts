@@ -77,6 +77,21 @@ export namespace BracketUtils {
         isTowardRoot: boolean,
     ) => layerStart + ((rootSide === "start") !== isTowardRoot ? layerExtent : NOTHING);
 
+    /**
+     * Whether a node lies on the route from another node to the root.
+     *
+     * Ids are paths through the tree, so a node is on the route exactly when its id is the other node's id
+     * or a leading part of it ending at a separator — `0.1` is on the route from `0.1.0`, and `0.1` is not
+     * on the route from `0.10`.
+     *
+     * @param id The node being asked about.
+     * @param fromId Where the route starts. `undefined`, for nothing focused, gives no route at all.
+     * @returns `true` for the starting node itself and every node between it and the root, the root
+     * included.
+     */
+    export const getIsOnRoute = (id: string, fromId: string | undefined) =>
+        fromId !== undefined && (fromId === id || fromId.startsWith(`${id}.`));
+
     /** Orders placements by layer, then across the layer. This is drawing order and also keyboard order. */
     export const compareByPlace = (first: BracketPlacement, second: BracketPlacement) =>
         first.layer - second.layer || first.cross - second.cross;

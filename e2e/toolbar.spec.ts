@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { activeText, attributesOf, demo, example, prop } from "./helpers";
+import { accessibleText, activeText, attributesOf, demo, example, prop, readout } from "./helpers";
 
 /**
  * The toolbar decides what fits by measuring, so nothing here writes down a width or a number of buttons:
@@ -252,4 +252,150 @@ test("a ring keeps the single tab stop, and both pairs of arrows walk it", async
     expect(await activeText(page), "and so does ArrowDown, a ring having no single axis").toBe(
         await buttons.nth(2).textContent(),
     );
+});
+
+/**
+ * With `pressedValuesSignal` every action is a toggle button, so the checks are the ones a toggle group
+ * owes: `aria-pressed` written on every action (a `"false"` rather than no attribute, since a mixed row would
+ * announce plain buttons as something they are not), a press that flips it and the owner's list together,
+ * the same single tab stop, and a collapsed action that turns up as a checked checkbox in the menu. Which
+ * actions are pressed is read back from the page's readout by the action's own text, never a written-down
+ * name. What the painter draws for "pressed" is nobody's business here; that it hears the state is, and that
+ * is read as its mark's class coming back different from an unpressed neighbor's and then the same again.
+ */
+const PRESSED = example("pressed");
+const PRESSED_ACTION = `${PRESSED} ${TOOLBAR} > div:not([aria-hidden]) button:not([aria-haspopup])`;
+const CHECKBOX_ITEM = '[role="menu"] [role="menuitemcheckbox"]';
+
+const markClass = (page: Page, index: number) =>
+    page.locator(PRESSED_ACTION).nth(index).locator("span").first().getAttribute("class");
+
+test.describe("a toolbar of pressed actions", () => {
+    test.beforeEach(async ({ page }) => {
+        await setBarWidth(page, WIDE_PX);
+    });
+
+    test("every action is a toggle button, and none starts pressed", async ({ page }) => {
+        const pressed = await attributesOf(page, PRESSED_ACTION, "aria-pressed");
+
+        expect(pressed.length, "the row holds actions").toBeGreaterThan(1);
+        expect(pressed, "each says it is not pressed rather than leaving the attribute off").toEqual(
+            pressed.map(() => "false"),
+        );
+        expect(await readout(page, "pressed"), "and the owner's list is empty").toContain("pressed: nothing");
+    });
+
+    test("a press holds the action down until it is pressed again, and the owner's list follows", async ({ page }) => {
+        const first = page.locator(PRESSED_ACTION).first();
+        const name = ((await first.textContent()) ?? "").trim();
+        const unpressedMark = await markClass(page, 1);
+
+        await first.click();
+
+        await expect(first, "the press stays down").toHaveAttribute("aria-pressed", "true");
+        await expect(page.locator(PRESSED_ACTION).nth(1), "and the others are untouched").toHaveAttribute(
+            "aria-pressed",
+            "false",
+        );
+        expect(await readout(page, "pressed"), "the owner's list holds the pressed action").toContain(name);
+        expect(await markClass(page, 0), "and the painter hears the state").not.toBe(unpressedMark);
+
+        await first.click();
+
+        await expect(first, "a second press lets it back up").toHaveAttribute("aria-pressed", "false");
+        expect(await readout(page, "pressed"), "and takes it out of the list").toContain("pressed: nothing");
+        expect(await markClass(page, 0), "the painter draws it as its neighbors again").toBe(unpressedMark);
+    });
+
+    test("several actions can be down at once, since they are independent toggles", async ({ page }) => {
+        const names = (await page.locator(PRESSED_ACTION).allTextContents()).map((text) => text.trim());
+
+        await page.locator(PRESSED_ACTION).nth(0).click();
+        await page.locator(PRESSED_ACTION).nth(1).click();
+
+        await expect(
+            page.locator(PRESSED_ACTION).nth(0),
+            "pressing a second does not release the first",
+        ).toHaveAttribute("aria-pressed", "true");
+        await expect(page.locator(PRESSED_ACTION).nth(1)).toHaveAttribute("aria-pressed", "true");
+
+        const text = await readout(page, "pressed");
+
+        expect(text, "the list holds both").toContain(names[0]);
+        expect(text).toContain(names[1]);
+    });
+
+    test("the row is one tab stop, the arrows walk it, and Space and Enter toggle", async ({ page }) => {
+        expect(
+            (await attributesOf(page, PRESSED_ACTION, "tabindex")).filter((value) => value === "0").length,
+            "one stop for the whole row",
+        ).toBe(1);
+
+        const names = (await page.locator(PRESSED_ACTION).allTextContents()).map((text) => text.trim());
+
+        await page.locator(PRESSED_ACTION).first().focus();
+        await page.keyboard.press("ArrowRight");
+        expect(await focusedText(page), "the arrows move along the row").toBe(names[1]);
+
+        await page.keyboard.press(" ");
+        await expect(page.locator(PRESSED_ACTION).nth(1), "Space presses the focused action").toHaveAttribute(
+            "aria-pressed",
+            "true",
+        );
+
+        await page.keyboard.press("Enter");
+        await expect(page.locator(PRESSED_ACTION).nth(1), "and Enter lets it back up").toHaveAttribute(
+            "aria-pressed",
+            "false",
+        );
+        expect(await focusedText(page), "without the focus moving").toBe(names[1]);
+    });
+
+    test("a collapsed action is a checkbox in the menu, checked from the same list", async ({ page }) => {
+        const name = ((await page.locator(PRESSED_ACTION).first().textContent()) ?? "").trim();
+
+        await page.locator(PRESSED_ACTION).first().click();
+        await setBarWidth(page, TIGHT_PX);
+
+        const collapsed = await readCollapsed(page, PRESSED);
+
+        expect(collapsed, "at the tightest width the pressed action has left the row").toContain(name);
+
+        await page.locator(`${PRESSED} ${TOOLBAR} > div:not([aria-hidden]) button`).last().click();
+
+        const items = page.locator(CHECKBOX_ITEM);
+
+        await expect(items.first()).toBeVisible();
+
+        expect(
+            await Promise.all((await items.all()).map((item) => accessibleText(item))),
+            "every collapsed action is a checkbox item, named without the painter's check mark",
+        ).toEqual(collapsed);
+        await expect(items.filter({ hasText: name }), "the one pressed in the row arrives checked").toHaveAttribute(
+            "aria-checked",
+            "true",
+        );
+
+        const other = collapsed.find((text) => text !== name)!;
+
+        await expect(items.filter({ hasText: other }), "and one never pressed arrives unchecked").toHaveAttribute(
+            "aria-checked",
+            "false",
+        );
+
+        await items.filter({ hasText: other }).click();
+
+        expect(await readout(page, "pressed"), "checking it in the menu presses it in the owner's list").toContain(
+            other,
+        );
+
+        await page.keyboard.press("Escape");
+        await setBarWidth(page, WIDE_PX);
+
+        await expect(
+            page.locator(PRESSED_ACTION).filter({ hasText: other }),
+            "and it comes back to the row pressed",
+        ).toHaveAttribute("aria-pressed", "true");
+        await expect(page.locator(PRESSED_ACTION).filter({ hasText: name })).toHaveAttribute("aria-pressed", "true");
+    });
 });

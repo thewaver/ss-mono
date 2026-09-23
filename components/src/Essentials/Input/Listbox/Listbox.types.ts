@@ -138,8 +138,9 @@ export type ListboxCompositeProps<T> = AccessorProps<{
     /** Whether a given value counts as picked, for a consumer whose values are not compared by identity. */
     computeIsSelected: (value: T) => boolean;
     /**
-     * The text an option is found by when the reader types, where that is not its visible text. A windowed list needs
-     * it, because an option out of view has no text to read.
+     * The text an option is found by when the reader types, where that is not its visible text. An option out of view
+     * in a windowed list has no text to read, so without this it is found by its value written out as text — enough
+     * for a list of plain strings, and the reason to give it for anything else.
      */
     computeCustomText?: (option: SelectOption<T>) => string;
     /**

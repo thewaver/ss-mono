@@ -25,7 +25,7 @@ TimeInput, TimePicker, Toasts, Toggle, Toolbar, Tooltip, Tree, ViewportWrapper, 
 ### Exotics — visual and motion effects
 Bracket, CellAnimation, Corners, Cuboid, ElementMosaic, ImageMosaic, FlipCard, Formation,
 Odometer, ParticleSpawner, PatchBoard, Reveal, RichText, Satellite, ScanlineAnimation,
-ScrambleText, ScratchCard, ScreenWiper, Shape, SortableGrid, Staircase, TileBoard, Timeline,
+ScrambleText, ScratchCard, Shape, SortableGrid, Staircase, TileBoard, Timeline,
 Trail, Typewriter, DrumWheel, OverheadWheel.
 
 ### Composites — assemblies of the above

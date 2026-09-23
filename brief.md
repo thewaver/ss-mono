@@ -12,7 +12,7 @@ purpose: it answers "what is outstanding", and neither of them is.
 | Section                                                 | Count |
 | ------------------------------------------------------- | ----: |
 | [Missing components](#missing-components)               |     2 |
-| [Blockers and known issues](#blockers-and-known-issues) |    15 |
+| [Blockers and known issues](#blockers-and-known-issues) |    23 |
 | [Deliberately not built](#deliberately-not-built)       |    29 |
 | [Accessibility gaps](#accessibility-gaps)               |     8 |
 | [Planned projects](#planned-projects)                   |     4 |
@@ -53,6 +53,13 @@ Something that misbehaves, or a cost nobody has paid down.
 | 24  | **Any placed control**           | Nothing stops a layout outgrowing the room it is in — a ring can reach past the screen, and a placed toolbar has nothing to collapse into                                                                                                                                                                 |
 | 24  | **`Stepper`, placed**            | `renderBody` is dropped without a word, a curve having nowhere to put a panel                                                                                                                                                                                                                             |
 | 26  | **Anything turning in 3D**       | A component that turns under perspective sets aside room for the bulge, so its box stays bigger than its content even while it is standing still                                                                                                                                                          |
+| 29  | **Right-to-left**                | Table, Clock, TagInput, Range, RangeCalendar, ContextMenu, Sortable drops, submenu placement and a live `dir` flip have never been checked right-to-left                                                                                                                                                  |
+| 29  | **Exotics add-ons**              | Specs cover the round; Cuboid's upright mode and Timeline's edge keys are waiting for the user's eye                                                                                                                                                                                                      |
+| 30  | **Picked values**                | **Pending decision.** PatchBoard's defaults, `Smoother`'s settle threshold, Reveal's step and Cuboid's drag scale were picked, not measured                                                                                                                                                               |
+| 30  | **`Shape`**                      | **Pending decision.** Whether its outer box should take a class or a style, so a float needs no child selector                                                                                                                                                                                            |
+| 30  | **`PatchBoard`**                 | **Pending decision.** Node sizes are named `width` and `height` while holding shares of the board, against the naming rule                                                                                                                                                                                |
+| 30  | **`CellAnimation`**              | **Pending decision.** Paused, it shows the cut grid rather than the whole picture, and a resize no longer restarts the pass                                                                                                                                                                               |
+| 30  | **`Odometer`**                   | **Pending decision.** Under reduced motion a reel keeps its own duration and drops only its extra turns                                                                                                                                                                                                   |
 
 ## Deliberately not built
 

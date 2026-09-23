@@ -1,10 +1,11 @@
 import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import type { SampleKnob } from "@thewaver/ss-components";
+import type { SampleKnob, ScanlineAnimationOrientation } from "@thewaver/ss-components";
 import {
     CellAnimationBreakpoints,
     CellAnimationWeights,
+    SCANLINE_ANIMATION_DEFAULTS,
     ScanlineAnimation,
     ScanlineAnimationKeyframeKnobs,
     ScanlineAnimationKeyframes,
@@ -61,6 +62,7 @@ const MIN_DURATION_MS = 100;
 const MAX_DURATION_MS = 5000;
 const DURATION_STEP_MS = 100;
 const MIN_ITERATION_DELAY_MS = 0;
+const ORIENTATIONS: ScanlineAnimationOrientation[] = ["horizontal", "vertical"];
 
 const STARTING_LINE_COUNT = 120;
 const STARTING_DURATION_MS = 2000;
@@ -194,7 +196,7 @@ const SmoothnessInput = (props: { getter: () => number; setter: (value: number) 
             key={"smoothness01"}
             label={"Smoothness (0-1)"}
             hint={
-                "How much one line's movement overlaps its neighbours'. 0 makes each line wait its turn; 1 blurs them into one sweep."
+                "How much one line's movement overlaps its neighbors'. 0 makes each line wait its turn; 1 blurs them into one sweep."
             }
         >
             <PageNumberField
@@ -647,6 +649,7 @@ export const ScanlineAnimationPage = () => {
 
     const [getSrc, setSrc] = createSignal(knight);
     const [getLineCount, setLineCount] = createSignal(STARTING_LINE_COUNT);
+    const [getOrientation, setOrientation] = createSignal(SCANLINE_ANIMATION_DEFAULTS.orientation);
     const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(STARTING_DURATION_MS);
     const [getAnimationIterationDelayMs, setAnimationIterationDelayMs] = createSignal(STARTING_ITERATION_DELAY_MS);
     const [getWeightType, setWeightType] = createSignal<CellAnimationWeights.OriginFreeWeightType>("sequenceLinear");
@@ -660,6 +663,7 @@ export const ScanlineAnimationPage = () => {
             playbackSignal: playback,
             src: getSrc,
             lineCount: getLineCount,
+            orientation: getOrientation,
             weightType: getWeightType,
             animationDurationMs: getAnimationDurationMs,
             animationIterationDelayMs: getAnimationIterationDelayMs,
@@ -786,6 +790,21 @@ export const ScanlineAnimationPage = () => {
                         step={() => LINE_COUNT_STEP}
                         ariaLabel={"Line count"}
                         onInput={setLineCount}
+                    />
+                </PageProp>
+
+                <PageProp
+                    key={"orientation"}
+                    label={"Orientation"}
+                    hint={
+                        "Which way the lines run: rows across the picture, or columns down it. The samples here were written for rows, so on columns they still push sideways and some read their place off the row."
+                    }
+                >
+                    <PageSelectField
+                        value={getOrientation}
+                        values={() => ORIENTATIONS}
+                        ariaLabel={"Orientation"}
+                        onChange={(orientation) => setOrientation(() => orientation)}
                     />
                 </PageProp>
 

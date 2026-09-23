@@ -1,4 +1,4 @@
-import { Index, Show, createMemo, createSignal, createUniqueId } from "solid-js";
+import { Index, Show, createComputed, createMemo, createSignal, createUniqueId, on } from "solid-js";
 
 import { MathUtils } from "@thewaver/ss-utils";
 
@@ -22,7 +22,9 @@ export const SplitPane = (props: SplitPaneProps) => {
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getDraggingIndex, setDraggingIndex] = createSignal(NO_GUTTER_DRAGGING);
-    const [getCollapsedBoundaries, setCollapsedBoundaries] = createSignal<Record<number, number>>({});
+    const [getCollapsedBoundaries, setCollapsedBoundaries] = createSignal<
+        Record<number, { restore: number; collapsedAt: number }>
+    >({});
 
     const getPaneId = (index: number) => access(props.panes)[index]?.id ?? `${paneIdPrefix}-pane-${index}`;
 
@@ -87,6 +89,21 @@ export const SplitPane = (props: SplitPaneProps) => {
     const forgetCollapsed = (index: number) => {
         setCollapsedBoundaries(({ [index]: _unused, ...rest }) => rest);
     };
+
+    createComputed(
+        on(
+            getRatios,
+            () =>
+                setCollapsedBoundaries((prev) =>
+                    Object.fromEntries(
+                        Object.entries(prev).filter(
+                            ([index, entry]) => getBoundary(Number(index)) === entry.collapsedAt,
+                        ),
+                    ),
+                ),
+            { defer: true },
+        ),
+    );
 
     const computeBoundaryLimits = (index: number) => {
         const ratios = getRatios();
@@ -180,19 +197,25 @@ export const SplitPane = (props: SplitPaneProps) => {
         moveBoundary(index, getBoundary(index) + (offset < extent * 0.5 ? -step : step));
     };
 
+    const handleGutterPointerCancel = (index: number) => {
+        if (getDraggingIndex() !== index) return;
+
+        setDraggingIndex(NO_GUTTER_DRAGGING);
+    };
+
     const toggleCollapsed = (index: number) => {
         const collapsed = getCollapsedBoundaries()[index];
 
         if (collapsed !== undefined) {
-            moveBoundary(index, collapsed);
+            moveBoundary(index, collapsed.restore);
 
             return;
         }
 
-        const previous = getBoundary(index);
+        const restore = getBoundary(index);
 
         moveBoundary(index, SMALLEST_BOUNDARY);
-        setCollapsedBoundaries((prev) => ({ ...prev, [index]: previous }));
+        setCollapsedBoundaries((prev) => ({ ...prev, [index]: { restore, collapsedAt: getBoundary(index) } }));
     };
 
     const handleGutterKeyDown = (e: KeyboardEvent, index: number) => {
@@ -255,7 +278,7 @@ export const SplitPane = (props: SplitPaneProps) => {
                                 onPointerDown={(e) => handleGutterPointerDown(e, index - 1)}
                                 onPointerMove={(e) => handleGutterPointerMove(e, index - 1)}
                                 onPointerUp={(e) => handleGutterPointerUp(e, index - 1)}
-                                onPointerCancel={(e) => handleGutterPointerUp(e, index - 1)}
+                                onPointerCancel={() => handleGutterPointerCancel(index - 1)}
                                 onKeyDown={(e) => handleGutterKeyDown(e, index - 1)}
                             >
                                 {props.renderGutter(() => ({

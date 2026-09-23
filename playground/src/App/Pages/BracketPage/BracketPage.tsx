@@ -15,12 +15,13 @@ import { OrgChartExample } from "./Examples/OrgChart";
 import { SkillTreeExample } from "./Examples/SkillTree";
 
 import { MEASURE_BOX_PADDING } from "../../PageComponents/MeasureBox/MeasureBox.css";
-import { CONNECTOR_FROM_COLOR, CONNECTOR_TO_COLOR } from "./BracketPage.css";
+import { CONNECTOR_FROM_COLOR, CONNECTOR_TO_COLOR, ROUTE_FROM_COLOR, ROUTE_TO_COLOR } from "./BracketPage.css";
 
 const EXAMPLES_ROOT = "/src/App/Pages/BracketPage/Examples";
 
 const CONNECTOR_RADIUS = 14;
 const CONNECTOR_WIDTH = 2;
+const ROUTE_CONNECTOR_WIDTH = 3;
 const ORIENTATIONS: BracketOrientation[] = ["horizontal", "vertical"];
 const ROOT_SIDES: BracketRootSide[] = ["end", "start"];
 const MIN_LAYER_GAP = 10;
@@ -45,14 +46,14 @@ export const BracketPage = () => {
             crossGap: getCrossGap,
             orientation: getOrientation,
             rootSide: getRootSide,
-            onActivate: setPicked,
+            onActivate: (value, placement) => setPicked(`${value}, node ${placement.id} in layer ${placement.layer}`),
             renderConnector: (getDefs) =>
                 BracketConnectors.SAMPLE_CONNECTORS[getConnector()]({
                     defs: getDefs(),
                     radius: CONNECTOR_RADIUS,
-                    width: CONNECTOR_WIDTH,
-                    fromColor: CONNECTOR_FROM_COLOR,
-                    toColor: CONNECTOR_TO_COLOR,
+                    width: getDefs().isOnFocusedRoute ? ROUTE_CONNECTOR_WIDTH : CONNECTOR_WIDTH,
+                    fromColor: getDefs().isOnFocusedRoute ? ROUTE_FROM_COLOR : CONNECTOR_FROM_COLOR,
+                    toColor: getDefs().isOnFocusedRoute ? ROUTE_TO_COLOR : CONNECTOR_TO_COLOR,
                 }),
         };
 
@@ -62,7 +63,7 @@ export const BracketPage = () => {
                 name: "Knockout",
                 span: WIDE_SPAN,
                 readout: () =>
-                    `picked: ${getPicked()} — a full draw, every node feeding exactly two, and one seed withdrawn so the walk steps past it`,
+                    `picked: ${getPicked()} — a full draw with its rounds named, every node feeding exactly two, and one seed withdrawn so the walk steps past it; focus a seed and its road to the final lights up`,
                 component: () => (
                     <PageMeasureBox padding={() => MEASURE_BOX_PADDING}>
                         <KnockoutExample {...commonProps} />
@@ -87,7 +88,7 @@ export const BracketPage = () => {
                 key: "skillTree",
                 name: "Skill tree",
                 readout: () =>
-                    "a chain of single children, which is what a bye looks like — each one level with the last",
+                    "a chain of single children, which is what a bye looks like — each one level with the last, under headers that turn with the board",
                 component: () => (
                     <PageMeasureBox padding={() => MEASURE_BOX_PADDING}>
                         <SkillTreeExample {...commonProps} />
