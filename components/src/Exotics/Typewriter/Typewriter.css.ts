@@ -37,3 +37,7 @@ export const typewriterBlockLikeAtomic = style({
     width: "100%",
     animationFillMode: "both",
 });
+
+export const typewriterErased = style({
+    visibility: "hidden",
+});

@@ -1,19 +1,27 @@
 import { createMemo, createSignal } from "solid-js";
 
+import type { FileInputRejection } from "@thewaver/ss-components";
+
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
+import { DropZoneExample } from "./Examples/DropZone";
 import { ErroredExample } from "./Examples/Errored";
 import { ImagesExample } from "./Examples/Images";
-import { LabelledExample } from "./Examples/Labeled";
+import { LabeledExample } from "./Examples/Labeled";
 import { MultipleExample } from "./Examples/Multiple";
 import { ReachableExample } from "./Examples/Reachable";
 import { RejectingSetterExample } from "./Examples/RejectingSetter";
-import { MAX_ATTACHMENT_BYTES } from "./FileInputPage.const";
+import { DROP_ZONE_REASON_TEXT, MAX_ATTACHMENT_BYTES } from "./FileInputPage.const";
 
 const EXAMPLES_ROOT = "/src/App/Pages/FileInputPage/Examples";
 
 const describe = (files: File[]) => (files.length ? files.map((file) => file.name).join(", ") : "none");
+
+const describeRejections = (rejections: FileInputRejection[]) =>
+    rejections.length
+        ? rejections.map((rejection) => `${rejection.file.name}: ${DROP_ZONE_REASON_TEXT[rejection.reason]}`).join(", ")
+        : "none";
 
 export const FileInputPage = () => {
     const defaultSignal = createSignal<File[]>([]);
@@ -23,9 +31,11 @@ export const FileInputPage = () => {
     const disabledSignal = createSignal<File[]>([]);
     const reachableSignal = createSignal<File[]>([]);
     const erroredSignal = createSignal<File[]>([]);
-    const labelledSignal = createSignal<File[]>([]);
+    const labeledSignal = createSignal<File[]>([]);
+    const dropZoneSignal = createSignal<File[]>([]);
 
     const [getRejection, setRejection] = createSignal("");
+    const [getDropZoneRejections, setDropZoneRejections] = createSignal<FileInputRejection[]>([]);
 
     const getExamples = createMemo(() => [
         {
@@ -87,9 +97,19 @@ export const FileInputPage = () => {
         {
             key: "label",
             name: "In a Label",
-            readout: () => `files: ${describe(labelledSignal[0]())} — the caption opens the dialog`,
-            component: () => <LabelledExample filesSignal={labelledSignal} />,
+            readout: () => `files: ${describe(labeledSignal[0]())} — the caption opens the dialog`,
+            component: () => <LabeledExample filesSignal={labeledSignal} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,
+        },
+        {
+            key: "dropZone",
+            name: "Drop area with limits",
+            readout: () =>
+                `files: ${describe(dropZoneSignal[0]())} — refused: ${describeRejections(getDropZoneRejections())}`,
+            component: () => (
+                <DropZoneExample filesSignal={dropZoneSignal} onRejectionsChange={setDropZoneRejections} />
+            ),
+            path: `${EXAMPLES_ROOT}/DropZone.tsx`,
         },
     ]);
 

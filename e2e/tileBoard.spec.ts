@@ -393,3 +393,394 @@ test("the reach knob widens the ring of tiles that will take the piece", async (
     expect(near, "one step out is the six tiles sharing an edge with a central hexagon").toBe(6);
     expect(far, "and two steps adds the twelve around those").toBe(18);
 });
+
+/**
+ * A taper leans the board away from the viewer: the top row is drawn narrower than the bottom one, and the
+ * rows close up towards the top. The browser draws it through one 3D transform on the board, so these ask
+ * what only a browser can answer — that the tiles are drawn smaller the further up they are, that a press
+ * still lands on the tile drawn under it rather than the one the flat layout would have put there, and
+ * that a piece drawn beside the board stands on its tile and shrinks with it.
+ */
+const TAPER = "0.5";
+const FOOT_LIFT_PX = 2;
+
+const setTaper = async (page: Page) => {
+    const field = page.locator(`${prop("taper")} input`);
+
+    await field.fill(TAPER);
+    await field.blur();
+};
+
+const drawnWidthOf = (page: Page, selector: string, index: number) =>
+    page.evaluate((args) => document.querySelectorAll(args.selector)[args.index].getBoundingClientRect().width, {
+        selector,
+        index,
+    });
+
+test("a tapered board draws its top row narrower than its bottom row", async ({ page }) => {
+    const flatTop = await drawnWidthOf(page, tile(MARKED), 0);
+
+    await setTaper(page);
+
+    const count = await page.locator(tile(MARKED)).count();
+    const top = await drawnWidthOf(page, tile(MARKED), 0);
+    const bottom = await drawnWidthOf(page, tile(MARKED), count - 1);
+
+    expect(top, "the far row shrinks").toBeLessThan(flatTop);
+    expect(top, "and is drawn smaller than the near one").toBeLessThan(bottom);
+});
+
+test("a tapered board reports the box it is drawn in, not a box bent by its own lean", async ({ page }) => {
+    await setTaper(page);
+
+    const box = await page.evaluate((scope) => {
+        const grid = document.querySelector(`${scope} [role="grid"]`) as HTMLElement;
+        const drawn = grid.getBoundingClientRect();
+
+        return { layout: grid.offsetWidth / grid.offsetHeight, drawn: drawn.width / drawn.height };
+    }, MARKED);
+
+    expect(box.drawn, "the box on screen has the shape layout gave it").toBeCloseTo(box.layout, 2);
+});
+
+test("on a tapered board a press on a drawn tile marks that tile, not the one the flat layout had there", async ({
+    page,
+}) => {
+    await setTaper(page);
+
+    const fullRowTiles = await page
+        .locator(`${row(MARKED)} >> nth=0`)
+        .locator('[role="gridcell"]')
+        .count();
+
+    for (const index of [1, fullRowTiles]) {
+        const box = (await page.locator(hitLayer(MARKED)).nth(index).boundingBox())!;
+
+        await page.mouse.click(box.x + box.width * 0.5, box.y + box.height * 0.5);
+    }
+
+    const marked = await readout(page, "default");
+
+    expect(marked, "a tile on the top row").toContain("ROW0_COL1");
+    expect(marked, "and the first tile of the short row beneath it").toContain("ROW1_COL0");
+});
+
+test("on a tapered board a piece stands on its tile and is smaller at the top than at the bottom", async ({ page }) => {
+    await setTaper(page);
+
+    const reach = page.locator(`${MEEPLE} ${prop("reach")} input`);
+
+    await reach.fill("4");
+    await reach.blur();
+
+    const standing = (index: number) =>
+        page.evaluate(
+            (args) => {
+                const meeple = document.querySelector(`${args.scope} [data-meeple]`) as HTMLElement;
+                const cell = document.querySelectorAll(args.selector)[args.index] as HTMLElement;
+                const piece = meeple.getBoundingClientRect();
+                const under = document.elementFromPoint(piece.x + piece.width * 0.5, piece.bottom - args.lift);
+
+                return { isOnTile: cell.contains(under), width: Math.round(piece.width) };
+            },
+            { scope: MEEPLE, selector: tile(MEEPLE), index, lift: FOOT_LIFT_PX },
+        );
+
+    const count = await page.locator(tile(MEEPLE)).count();
+
+    await page.locator(hitLayer(MEEPLE)).nth(1).click();
+    await expect
+        .poll(async () => (await standing(1)).isOnTile, { message: "its foot is on the top row tile" })
+        .toBe(true);
+
+    const farWidth = (await standing(1)).width;
+
+    await page
+        .locator(hitLayer(MEEPLE))
+        .nth(count - 2)
+        .click();
+    await expect
+        .poll(async () => (await standing(count - 2)).isOnTile, { message: "and then on the bottom row tile" })
+        .toBe(true);
+    await expect.poll(async () => (await standing(count - 2)).width).toBeGreaterThan(farWidth);
+});
+
+/**
+ * Whether a tile is lit is the Playground's own drawing, so it is read the way the rules for this suite ask:
+ * not by what the lit class paints, but by which tiles carry the class a lit tile was given. The tile the
+ * Playground draws sits inside the board's paint layer, and the only class it toggles is the lit one — so a
+ * tile is lit exactly when its class list differs from a tile that is known not to be.
+ */
+const ROUTE = demo("route");
+const PAINT = demo("paint");
+
+const tileNamed = (scope: string, label: string) => `${tile(scope)}[aria-label="${label}"]`;
+
+const drawnClasses = (page: Page, scope: string) =>
+    page.locator(tile(scope)).evaluateAll((cells) =>
+        cells.map((cell) => ({
+            label: cell.getAttribute("aria-label") ?? "",
+            className: cell.firstElementChild?.firstElementChild?.className ?? "",
+            isDisabled: cell.getAttribute("aria-disabled") === "true",
+        })),
+    );
+
+const litLabels = async (page: Page, scope: string, restingClassName: string) =>
+    (await drawnClasses(page, scope)).filter((cell) => cell.className !== restingClassName).map((cell) => cell.label);
+
+/**
+ * The route example starts every route from the piece on the first tile, and at rest that tile is the only
+ * lit one. So the class it wears is the lit class and the class every other tile wears is the resting one,
+ * and both are taken from the page rather than written here.
+ */
+const routeClasses = async (page: Page) => {
+    const cells = await drawnClasses(page, ROUTE);
+    const lit = cells.find((cell) => cell.label === "Row 1, tile 1")?.className ?? "";
+    const resting = cells.find((cell) => cell.className !== lit)?.className ?? "";
+
+    return { lit, resting };
+};
+
+/**
+ * Two tiles are neighbors when their centers are no further apart than a little over the closest pair on
+ * the board: on a hexagon board every edge-sharing pair sits at one of two nearly equal distances, and the
+ * next-nearest tiles are half as far again. Measured from the page, so no tile size is written here.
+ */
+const NEIGHBOR_SLACK = 1.3;
+
+const routeGraph = (page: Page) =>
+    page.locator(tile(ROUTE)).evaluateAll((cells, slack) => {
+        const centers = cells.map((cell) => {
+            const box = cell.getBoundingClientRect();
+
+            return { x: box.left + box.width * 0.5, y: box.top + box.height * 0.5 };
+        });
+        const distance = (a: number, b: number) => Math.hypot(centers[a].x - centers[b].x, centers[a].y - centers[b].y);
+
+        let closest = Infinity;
+
+        for (let a = 0; a < cells.length; a++) {
+            for (let b = a + 1; b < cells.length; b++) closest = Math.min(closest, distance(a, b));
+        }
+
+        return cells.map((_, a) =>
+            cells
+                .map((__, b) => b)
+                .filter((b) => b !== a && distance(a, b) <= closest * slack)
+                .map((b) => cells[b].getAttribute("aria-label") ?? ""),
+        );
+    }, NEIGHBOR_SLACK);
+
+const checkRoute = async (page: Page, destination: string) => {
+    const { lit, resting } = await routeClasses(page);
+    const cells = await drawnClasses(page, ROUTE);
+    const graph = await routeGraph(page);
+    const neighbors = new Map(cells.map((cell, index) => [cell.label, graph[index]]));
+    const onRoute = cells.filter((cell) => cell.className === lit).map((cell) => cell.label);
+    const rocks = new Set(cells.filter((cell) => cell.isDisabled).map((cell) => cell.label));
+
+    expect(lit, "the lit class and the resting class are different classes").not.toBe(resting);
+    expect(onRoute, "the route starts on the piece").toContain("Row 1, tile 1");
+    expect(onRoute, "and ends on the tile pressed").toContain(destination);
+    expect(
+        onRoute.filter((label) => rocks.has(label)),
+        "and not one tile of it is a rock",
+    ).toEqual([]);
+
+    /**
+     * A route is a line of tiles: the two ends each touch one other lit tile, and every tile between touches
+     * exactly two. A lit tile touching three would mean the line doubled back on itself, which a shortest
+     * route never does.
+     */
+    for (const label of onRoute) {
+        const litNeighbors = (neighbors.get(label) ?? []).filter((next) => onRoute.includes(next)).length;
+        const isEnd = label === "Row 1, tile 1" || label === destination;
+
+        expect(litNeighbors, `${label} touches ${isEnd ? "one" : "two"} other tiles of the route`).toBe(isEnd ? 1 : 2);
+    }
+
+    /**
+     * And it is the shortest such line: a walk outward from the piece over the measured neighbors, never
+     * entering a rock, reaches the destination in exactly as many steps as the lit route has.
+     */
+    const reached = new Map([["Row 1, tile 1", 0]]);
+    const queue = ["Row 1, tile 1"];
+
+    while (queue.length > 0) {
+        const current = queue.shift()!;
+
+        for (const next of neighbors.get(current) ?? []) {
+            if (reached.has(next) || rocks.has(next)) continue;
+
+            reached.set(next, reached.get(current)! + 1);
+            queue.push(next);
+        }
+    }
+
+    expect(onRoute.length - 1, "and no shorter way round the rocks exists").toBe(reached.get(destination));
+};
+
+/**
+ * The first tile of the third row sits straight below two rocks, so the way there from the piece has to go
+ * the long way round. Pressing it lights a route that starts on the piece, ends on the pressed tile, touches
+ * no rock and is as short as a way round can be.
+ */
+test("pressing a tile lights the shortest route to it, going round the rocks", async ({ page }) => {
+    await page.locator(tileNamed(ROUTE, "Row 3, tile 1")).click();
+
+    await checkRoute(page, "Row 3, tile 1");
+});
+
+/**
+ * The same from the keyboard: the board is walked with the arrows and Enter asks for the route, exactly as a
+ * press does.
+ */
+test("Enter on a tile lights the route to it, the same as a press", async ({ page }) => {
+    await page.locator(tile(ROUTE)).first().focus();
+    await page.keyboard.press("ArrowDown");
+    await page.keyboard.press("ArrowDown");
+
+    expect(await activeLabel(page), "the walk reached the first tile of the third row").toBe("Row 3, tile 1");
+
+    await page.keyboard.press("Enter");
+
+    await checkRoute(page, "Row 3, tile 1");
+});
+
+/**
+ * A rock refuses a press, so pressing one asks for no route and the board stays as it was.
+ */
+test("a press on a rock asks for no route", async ({ page }) => {
+    const { resting } = await routeClasses(page);
+    const before = await litLabels(page, ROUTE, resting);
+    const rock = (await drawnClasses(page, ROUTE)).find((cell) => cell.isDisabled)?.label ?? "";
+
+    expect(rock, "the board has a rock to press").not.toBe("");
+
+    await page.locator(tileNamed(ROUTE, rock)).click({ force: true });
+
+    expect(await litLabels(page, ROUTE, resting), "nothing new was lit").toEqual(before);
+});
+
+/**
+ * Sweeping. A press that moves across tiles paints each one it passes, a press that stays on one tile is a
+ * click and toggles that tile, and the click the browser fires when a sweep ends is swallowed so that the
+ * last tile swept is not toggled straight back off. At rest nothing is painted, so every tile carries the
+ * resting class and anything that carries another has been painted.
+ */
+const restingPaintClass = async (page: Page) => {
+    const classNames = [...new Set((await drawnClasses(page, PAINT)).map((cell) => cell.className))];
+
+    expect(classNames, "at rest every tile of the paint board is drawn the same").toHaveLength(1);
+
+    return classNames[0];
+};
+
+const centerOf = async (page: Page, selector: string) => {
+    const box = await page.locator(selector).boundingBox();
+
+    if (!box) throw new Error("the board has no such tile");
+
+    return { x: box.x + box.width * 0.5, y: box.y + box.height * 0.5 };
+};
+
+const sweep = async (page: Page, labels: string[]) => {
+    const points = [];
+
+    for (const label of labels) points.push(await centerOf(page, tileNamed(PAINT, label)));
+
+    await page.mouse.move(points[0].x, points[0].y);
+    await page.mouse.down();
+
+    for (const point of points.slice(1)) await page.mouse.move(point.x, point.y, { steps: 8 });
+
+    await page.mouse.up();
+};
+
+test("a press dragged across tiles paints every tile it passes", async ({ page }) => {
+    await page.locator(PAINT).scrollIntoViewIfNeeded();
+
+    const resting = await restingPaintClass(page);
+
+    await sweep(page, ["Row 1, tile 1", "Row 1, tile 3"]);
+
+    expect((await litLabels(page, PAINT, resting)).sort(), "the start, the tile passed over and the end").toEqual([
+        "Row 1, tile 1",
+        "Row 1, tile 2",
+        "Row 1, tile 3",
+    ]);
+});
+
+/**
+ * The browser follows a press that moved with a click on the tile it ended on. Were that click to reach the
+ * toggle, the last tile swept would be painted by the sweep and cleared again by the click. Sweeping back
+ * over tiles already painted leaves them painted too, because a sweep paints rather than toggles.
+ */
+test("the click at the end of a sweep does not toggle the last tile back off", async ({ page }) => {
+    await page.locator(PAINT).scrollIntoViewIfNeeded();
+
+    const resting = await restingPaintClass(page);
+
+    await sweep(page, ["Row 1, tile 1", "Row 1, tile 2"]);
+
+    expect(await litLabels(page, PAINT, resting), "the tile the sweep ended on stayed painted").toContain(
+        "Row 1, tile 2",
+    );
+
+    await sweep(page, ["Row 1, tile 2", "Row 1, tile 1"]);
+
+    expect(
+        (await litLabels(page, PAINT, resting)).sort(),
+        "sweeping back over painted tiles leaves them painted",
+    ).toEqual(["Row 1, tile 1", "Row 1, tile 2"]);
+});
+
+/**
+ * A press that never leaves its tile is not a sweep at all: it is a click, and the page gives clicks the
+ * toggle. So it paints one tile, the same press again clears it, and a press that wobbles a little without
+ * crossing into the next tile is still just a click.
+ */
+test("a single press toggles one tile, and a wobble inside the tile is still a single press", async ({ page }) => {
+    await page.locator(PAINT).scrollIntoViewIfNeeded();
+
+    const resting = await restingPaintClass(page);
+    const target = tileNamed(PAINT, "Row 3, tile 3");
+
+    await page.locator(target).click();
+
+    expect(await litLabels(page, PAINT, resting), "one press painted that tile and no other").toEqual([
+        "Row 3, tile 3",
+    ]);
+
+    await page.locator(target).click();
+
+    expect(await litLabels(page, PAINT, resting), "and the same press again cleared it").toEqual([]);
+
+    const center = await centerOf(page, target);
+
+    await page.mouse.move(center.x, center.y);
+    await page.mouse.down();
+    await page.mouse.move(center.x + 6, center.y + 4, { steps: 4 });
+    await page.mouse.up();
+
+    expect(await litLabels(page, PAINT, resting), "a wobble inside the tile toggled it exactly once").toEqual([
+        "Row 3, tile 3",
+    ]);
+});
+
+/**
+ * The keyboard route to the same board is Enter, which reaches the toggle like a click does.
+ */
+test("Enter toggles the focused tile on the paint board", async ({ page }) => {
+    const resting = await restingPaintClass(page);
+
+    await page.locator(tile(PAINT)).first().focus();
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("Enter");
+
+    expect(await litLabels(page, PAINT, resting), "the focused tile was painted").toEqual(["Row 1, tile 2"]);
+
+    await page.keyboard.press("Enter");
+
+    expect(await litLabels(page, PAINT, resting), "and cleared again").toEqual([]);
+});

@@ -271,6 +271,93 @@ export namespace SortableGridUtils {
     };
 
     /**
+     * Where an arrow key moves a carried shape, stepping over any spot that would put it on a blocked cell.
+     *
+     * The shape moves one cell in the direction given, clamped to the grid as
+     * {@link SortableGridUtils.getClampedSpot} does. If that leaves any of its cells on a blocked one, it keeps
+     * going the same way until it reaches a spot clear of every blocked cell. Other items are not blocked cells
+     * and are not stepped over: a place they fill can still be aimed at and refused.
+     *
+     * @param spot Where the shape is now.
+     * @param step The direction, as a unit step — `{ col: 1, row: 0 }` for right.
+     * @param shape The shape being moved, turns applied.
+     * @param columns The grid's colCount.
+     * @param rows The grid's rowCount.
+     * @param blocked The cells nothing may land on.
+     * @returns The first clear spot that way, or the plain one-cell step when there is none before the edge, so a
+     * shape that fits nowhere clear can still be moved.
+     */
+    export const getSteppedSpot = (
+        spot: SortableGridSpot,
+        step: Index2d,
+        shape: SortableGridShape,
+        columns: number,
+        rows: number,
+        blocked: SortableGridSpot[],
+    ): SortableGridSpot => {
+        const advance = (from: SortableGridSpot) =>
+            getClampedSpot({ col: from.col + step.col, row: from.row + step.row }, shape.size, columns, rows);
+        const first = advance(spot);
+
+        let previous = spot;
+        let current = first;
+
+        while (current.col !== previous.col || current.row !== previous.row) {
+            if (getIsFree(getPlacedCells(current, shape), blocked)) return current;
+
+            previous = current;
+            current = advance(current);
+        }
+
+        return first;
+    };
+
+    /**
+     * The items with every one pulled upward as far as it will slide.
+     *
+     * Each item moves straight up in its own column, one row at a time, until the next row up would put one of
+     * its cells on another item, on a blocked cell or off the top of the grid. Items are taken top first, and the
+     * pass is repeated until nothing moves, so an item freed by one below it sliding away still gets pulled up.
+     * Nothing is turned and nothing moves sideways, so an item never jumps past something in its way.
+     *
+     * @param items The items where they are now.
+     * @param blocked The cells nothing may land on.
+     * @returns The items in the same order. An item that did not move is the same object it was, so a caller
+     * can tell whether anything changed by comparing each entry.
+     */
+    export const getCompacted = <T>(
+        items: SortableGridItem<T>[],
+        blocked: SortableGridSpot[],
+    ): SortableGridItem<T>[] => {
+        const placed = [...items];
+
+        let hasMoved = true;
+
+        while (hasMoved) {
+            hasMoved = false;
+
+            for (const index of getReadingOrder(placed.map(getItemBox))) {
+                const item = placed[index];
+                const shape = getItemShape(item);
+                const taken = [...blocked, ...placed.filter((_unused, other) => other !== index).flatMap(getItemCells)];
+
+                let row = item.spot.row;
+
+                while (row > 0 && getIsFree(getPlacedCells({ col: item.spot.col, row: row - 1 }, shape), taken)) {
+                    row -= 1;
+                }
+
+                if (row === item.spot.row) continue;
+
+                placed[index] = { ...item, spot: { col: item.spot.col, row } };
+                hasMoved = true;
+            }
+        }
+
+        return placed;
+    };
+
+    /**
      * The items sorted top to bottom, then left to right.
      *
      * Position is what a sighted user navigates by, so the keyboard should follow it rather than the

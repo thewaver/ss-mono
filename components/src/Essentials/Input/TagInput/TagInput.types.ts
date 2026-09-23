@@ -22,11 +22,11 @@ export type TagInputCbs = {
     /** Names one tag for assistive technology, so a reader hears what removing it would do. */
     computeTagAriaLabel?: (tag: string) => string;
     /** Runs when a tag is added or removed. */
-    onTagsChange?: (tags: string[]) => void | Promise<void>;
+    onTagsChange?: (tags: string[]) => void;
     /** Runs when the pointer arrives over the field. */
-    onMouseEnter?: (e: MouseEvent) => void | Promise<void>;
+    onMouseEnter?: (e: MouseEvent) => void;
     /** Runs when the pointer leaves the field. */
-    onMouseLeave?: (e: MouseEvent) => void | Promise<void>;
+    onMouseLeave?: (e: MouseEvent) => void;
 };
 
 export type TagInputState = {

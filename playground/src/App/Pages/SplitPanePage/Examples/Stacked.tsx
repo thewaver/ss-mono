@@ -16,12 +16,12 @@ export const StackedExample = (props: Props) => {
             <SplitPane
                 panes={() => PAIR}
                 ratiosSignal={props.ratiosSignal}
-                dir={"column"}
+                orientation={"vertical"}
                 gutterSize={props.gutterSize}
                 isDisabled={props.isDisabled}
                 ariaLabel={"Stacked panes"}
                 renderPane={(_getPane, index) => <PageSplitPaneBox>{index === 0 ? "Top" : "Bottom"}</PageSplitPaneBox>}
-                renderGutter={(getFlags) => <PageSplitPaneGutter flags={getFlags} dir={"column"} />}
+                renderGutter={(getFlags) => <PageSplitPaneGutter flags={getFlags} orientation={"vertical"} />}
             />
         </PageSplitPaneFrame>
     );

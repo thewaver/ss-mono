@@ -8,6 +8,7 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
 import { DeckExample } from "./Examples/Deck";
+import { EndlessExample } from "./Examples/Endless";
 
 const EXAMPLES_ROOT = "/src/App/Pages/CardStackPage/Examples";
 
@@ -44,6 +45,9 @@ export const CardStackPage = () => {
     const [getLastSend, setLastSend] = createSignal<{ direction: SwipeDirection; card: string }>();
     const [getIsEmpty, setIsEmpty] = createSignal(false);
 
+    const [getLastEndlessSend, setLastEndlessSend] = createSignal<{ direction: SwipeDirection; card: string }>();
+    const [getLoadedCount, setLoadedCount] = createSignal(0);
+
     const getExamples = createMemo(() => [
         {
             key: "deck",
@@ -71,9 +75,35 @@ export const CardStackPage = () => {
                         setIsEmpty(false);
                         setLastSend(undefined);
                     }}
+                    onRecall={() => setIsEmpty(false)}
                 />
             ),
             path: `${EXAMPLES_ROOT}/Deck.tsx`,
+        },
+        {
+            key: "endless",
+            name: "A deck that never runs out",
+            readout: () => {
+                const last = getLastEndlessSend();
+
+                if (!last)
+                    return "left or right only — an upward push springs back, and on a touch screen it scrolls the page instead";
+
+                return `${last.card} went ${last.direction} — ${getLoadedCount()} cards loaded so far, more arrive as the pile runs low`;
+            },
+            component: () => (
+                <EndlessExample
+                    isDisabled={getIsDisabled}
+                    commitRatio={getCommitRatio}
+                    transitionDurationMs={getTransitionDurationMs}
+                    mountedCount={getMountedCount}
+                    cardGap={getCardGap}
+                    funnelRatio={getFunnelRatio}
+                    onSend={(direction, card) => setLastEndlessSend({ direction, card })}
+                    onLoad={setLoadedCount}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Endless.tsx`,
         },
     ]);
 

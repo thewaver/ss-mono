@@ -2,7 +2,7 @@ import { Index, createMemo, createSignal, createUniqueId } from "solid-js";
 
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
-import { access, accessSignal } from "../../../Utils/propUtils";
+import { access } from "../../../Utils/propUtils";
 import { Collapsible } from "../Collapsible/Collapsible";
 import { ACCORDION_DEFAULTS } from "./Accordion.const";
 import type { AccordionProps, AccordionSectionProps } from "./Accordion.types";
@@ -22,6 +22,7 @@ const AccordionSection = <T,>(props: AccordionSectionProps<T>) => {
             ref={props.ref}
             id={() => headerId}
             isDisabled={() => access(props.item).isDisabled ?? false}
+            isFocusableWhenDisabled={() => access(props.item).isReachableWhenDisabled ?? false}
             headingLevel={props.headingLevel}
             isScrolledIntoViewOnExpand={props.isScrolledIntoViewOnExpand}
             isPanelBuiltOnExpand={props.isPanelBuiltOnExpand}
@@ -38,7 +39,7 @@ const AccordionSection = <T,>(props: AccordionSectionProps<T>) => {
 };
 
 export const Accordion = <T,>(props: AccordionProps<T>) => {
-    const expandedSignal = accessSignal(() => props.expandedSignal);
+    const expandedSignal = SignalMirrorUtils.createOptional<T[]>(() => props.expandedSignal, []);
 
     const [getHeaderRefs, setHeaderRefs] = createSignal<(HTMLElement | undefined)[]>([]);
 
@@ -58,7 +59,7 @@ export const Accordion = <T,>(props: AccordionProps<T>) => {
 
     const getNavigableIndexes = createMemo(() =>
         access(props.items).reduce<number[]>((acc, item, index) => {
-            if (!item.isDisabled) acc.push(index);
+            if (!item.isDisabled || item.isReachableWhenDisabled) acc.push(index);
 
             return acc;
         }, []),

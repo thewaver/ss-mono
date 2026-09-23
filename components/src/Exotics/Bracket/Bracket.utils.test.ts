@@ -111,3 +111,25 @@ describe("computeStepId", () => {
         expect(BracketUtils.computeStepId("next", "9.9", placements)).toBeUndefined();
     });
 });
+
+describe("getIsOnRoute", () => {
+    it("holds the starting node and every node between it and the root", () => {
+        expect(["0", "0.1", "0.1.0"].map((id) => BracketUtils.getIsOnRoute(id, "0.1.0"))).toEqual([true, true, true]);
+    });
+
+    it("leaves out siblings, cousins and the nodes that feed the start", () => {
+        expect(["0.0", "0.1.1", "0.1.0.0"].map((id) => BracketUtils.getIsOnRoute(id, "0.1.0"))).toEqual([
+            false,
+            false,
+            false,
+        ]);
+    });
+
+    it("reads a separator rather than a shared prefix, so a tenth child is not on its first sibling's route", () => {
+        expect(BracketUtils.getIsOnRoute("0.1", "0.10")).toBe(false);
+    });
+
+    it("has no route when nothing is focused", () => {
+        expect(BracketUtils.getIsOnRoute("0", undefined)).toBe(false);
+    });
+});

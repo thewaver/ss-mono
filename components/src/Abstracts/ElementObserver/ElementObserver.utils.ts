@@ -1,10 +1,11 @@
 import type { Accessor, Setter } from "solid-js";
 import { createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 
-import { Bounds, type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
+import { Bounds, MathUtils, type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import { useViewportContext } from "../Viewport/Viewport.context";
 import { ViewportUtils } from "../Viewport/Viewport.utils";
+import { CURRENT_INDEX_OBSERVER_DEFAULTS } from "./ElementObserver.const";
 
 /** Shared empty result, so a disabled observer does not hand out a new array each time. */
 const EMPTY_SIZES: Size2d[] = [];
@@ -321,5 +322,149 @@ export namespace ElementObserverUtils {
         });
 
         return getRects;
+    };
+
+    /**
+     * Picks the current entry of a list from where each one's top sits against a line.
+     *
+     * The rule a table of contents follows: an entry becomes current once its top has scrolled up past the line,
+     * and stays current until the next one does. Entries are expected in reading order.
+     *
+     * @param tops Each entry's top, in the same coordinates as `line`. A missing entry is never current.
+     * @param line How far down the line sits.
+     * @returns The last entry whose top is at or above the line, or `undefined` while none has reached it.
+     */
+    export const computeCurrentIndex = (tops: (number | undefined)[], line: number) => {
+        let current: number | undefined;
+
+        tops.forEach((top, index) => {
+            if (top !== undefined && top <= line) current = index;
+        });
+
+        return current;
+    };
+
+    /**
+     * Follows which of a list of elements the reader has scrolled to, in viewport coordinates.
+     *
+     * A line is drawn across the viewport at `offsetRatio` of its height from the top, and the current element is
+     * the last one whose top has passed it, by {@link ElementObserverUtils.computeCurrentIndex}. It is re-read on
+     * every scroll, anywhere in the document, and on every resize, which is what a table of contents marking
+     * the section in view needs. Near the end of a page whose last section is shorter than the stretch below the
+     * line, that section's top may never reach it; leave room after it if it has to become current.
+     *
+     * @param getRefs The elements to follow, in reading order. A missing entry is kept in place and never current.
+     * @param getIsDisabled Pass `true` to stop following. Omitted means always on.
+     * @param opts.getOffsetRatio Where the line sits, as a share of the viewport's height from its top. Defaults to
+     * `CURRENT_INDEX_OBSERVER_DEFAULTS.offsetRatio`.
+     * @returns The current element's index, or `undefined` while none has passed the line and while disabled.
+     */
+    export const createViewportCurrentIndexObserver = (
+        getRefs: Accessor<Array<HTMLElement | undefined>>,
+        getIsDisabled?: Accessor<boolean>,
+        opts?: { getOffsetRatio?: Accessor<number> },
+    ) => {
+        const viewportContext = useViewportContext();
+        const [getIndex, setIndex] = createSignal<number | undefined>();
+
+        createEffect(() => {
+            const refs = getRefs();
+            const offsetRatio = opts?.getOffsetRatio?.() ?? CURRENT_INDEX_OBSERVER_DEFAULTS.offsetRatio;
+
+            if (getIsDisabled?.()) {
+                setIndex(undefined);
+
+                return;
+            }
+
+            const update = () => {
+                const line = viewportContext.getSize().height * offsetRatio;
+                const tops = refs.map((ref) =>
+                    ref ? ViewportUtils.getAdjustedBoundingClientRect(ref, viewportContext).y : undefined,
+                );
+
+                setIndex(computeCurrentIndex(tops, line));
+            };
+
+            update();
+
+            document.addEventListener("scroll", update, { capture: true, passive: true });
+            window.addEventListener("resize", update);
+
+            onCleanup(() => {
+                document.removeEventListener("scroll", update, true);
+                window.removeEventListener("resize", update);
+            });
+        });
+
+        return getIndex;
+    };
+
+    /**
+     * How far an element has traveled through a viewport of a given height, from `0` to `1`.
+     *
+     * `0` while the element's top is still at or below the viewport's bottom edge, `1` once its bottom has
+     * gone past the top edge, and a straight line between the two, so the whole of the element's passage
+     * across the screen is covered.
+     *
+     * @param top The element's top, measured from the viewport's top.
+     * @param height The element's height, in the same space.
+     * @param viewportHeight The viewport's height, in the same space.
+     * @returns The share of the passage covered, clamped to `0`–`1`. `0` when there is no height to travel.
+     */
+    export const computeViewportProgress = (top: number, height: number, viewportHeight: number) => {
+        const passage = viewportHeight + height;
+
+        if (passage <= 0) return 0;
+
+        return MathUtils.clamp01((viewportHeight - top) / passage);
+    };
+
+    /**
+     * Follows how far an element has traveled through the viewport as the page scrolls, in viewport coordinates.
+     *
+     * The number {@link ElementObserverUtils.computeViewportProgress} gives, re-read on every scroll anywhere in the
+     * document and on every resize. It is the getter half of a progress signal — a trail, an animation or anything
+     * else that takes `0`–`1` can be driven by the page's scroll position with it, with its own playback off.
+     *
+     * @param getRef The element to follow. Nothing is measured until it exists.
+     * @param getIsDisabled Pass `true` to stop following. Omitted means always on.
+     * @returns `0` while the element has yet to come up from below the viewport, `1` once it has left through the
+     * top, and the share in between while it crosses. `0` before the element exists and while disabled.
+     */
+    export const createViewportProgressObserver = (
+        getRef: Accessor<HTMLElement | undefined>,
+        getIsDisabled?: Accessor<boolean>,
+    ) => {
+        const viewportContext = useViewportContext();
+        const [getProgress, setProgress] = createSignal(0);
+
+        createEffect(() => {
+            const ref = getRef();
+
+            if (!ref || getIsDisabled?.()) {
+                setProgress(0);
+
+                return;
+            }
+
+            const update = () => {
+                const rect = ViewportUtils.getAdjustedBoundingClientRect(ref, viewportContext);
+
+                setProgress(computeViewportProgress(rect.y, rect.height, viewportContext.getSize().height));
+            };
+
+            update();
+
+            document.addEventListener("scroll", update, { capture: true, passive: true });
+            window.addEventListener("resize", update);
+
+            onCleanup(() => {
+                document.removeEventListener("scroll", update, true);
+                window.removeEventListener("resize", update);
+            });
+        });
+
+        return getProgress;
     };
 }

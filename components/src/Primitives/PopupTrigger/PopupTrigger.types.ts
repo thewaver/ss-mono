@@ -12,7 +12,7 @@ export type PopupTriggerProps = AccessorProps<
          * The popup's own element id.
          *
          * It is written as `aria-controls` while the popup is open, which is what tells a screen reader the
-         * two belong together — and what lets the dismisser resolve a press inside a portalled popup as a
+         * two belong together — and what lets the dismisser resolve a press inside a portaled popup as a
          * press inside this control's layer rather than outside it.
          */
         popupId: string;

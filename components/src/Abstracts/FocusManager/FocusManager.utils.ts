@@ -155,6 +155,73 @@ export namespace FocusManagerUtils {
      * rather than a close button, say. Read once, when focus moves in, so a later change does not steal
      * focus from the user.
      */
+    /**
+     * Makes everything beside a layer inert, so neither focus nor a screen reader can reach the page behind it.
+     *
+     * Walks from the layer up to `<body>` and marks every sibling along the way, which is what `aria-modal`
+     * promises and what a reader that ignores it needs. Live regions are left alone, because an inert region
+     * announces nothing and the layer's own announcements go through them. A sibling that was already inert is
+     * left as it was, so two layers stacked on one another undo only their own work.
+     *
+     * @param layer The element to leave reachable, along with everything inside it.
+     * @returns A function that lifts the seal, restoring exactly the elements this call marked.
+     */
+    export const sealAround = (layer: HTMLElement) => {
+        const sealed: HTMLElement[] = [];
+
+        let node: HTMLElement | null = layer;
+
+        while (node && node !== document.body) {
+            const parent: HTMLElement | null = node.parentElement;
+
+            if (!parent) break;
+
+            for (const child of parent.children) {
+                if (
+                    child === node ||
+                    !(child instanceof HTMLElement) ||
+                    child.inert ||
+                    child.hasAttribute("aria-live")
+                ) {
+                    continue;
+                }
+
+                child.inert = true;
+                sealed.push(child);
+            }
+
+            node = parent;
+        }
+
+        return () => {
+            for (const sibling of sealed) sibling.inert = false;
+        };
+    };
+
+    /**
+     * Stops the document scrolling behind a layer, without the page shifting as its scrollbar disappears.
+     *
+     * The width the scrollbar took is handed to the root as padding, so the content stays where it was. A layer
+     * opened over another finds the lock already in place and leaves it, so the outer one lifts it.
+     *
+     * @returns A function that restores the root's scrolling exactly as this call found it.
+     */
+    export const lockScroll = () => {
+        const documentRoot = document.documentElement;
+        const previousOverflow = documentRoot.style.overflow;
+        const previousPaddingRight = documentRoot.style.paddingRight;
+        const scrollbarWidth = window.innerWidth - documentRoot.clientWidth;
+
+        documentRoot.style.overflow = "hidden";
+
+        if (scrollbarWidth > 0) documentRoot.style.paddingRight = `${scrollbarWidth}px`;
+
+        return () => {
+            documentRoot.style.overflow = previousOverflow;
+            documentRoot.style.paddingRight = previousPaddingRight;
+        };
+    };
+
     export const autoFocus = (
         getRef: () => HTMLElement | undefined,
         getIsVisible: () => boolean,

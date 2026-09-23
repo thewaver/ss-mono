@@ -113,9 +113,10 @@ test("the edge keys reach the ends of the visible list, not of a level", async (
     expect(await activeText(page)).toContain("src");
 
     await page.keyboard.press("ArrowUp");
-    expect(await activeText(page), "and the walk wraps rather than stopping, as it does everywhere else").toContain(
-        "README.md",
-    );
+    expect(
+        await activeText(page),
+        "and the walk stops at the ends rather than wrapping, as the tree pattern says",
+    ).toContain("src");
 });
 
 test("the asterisk opens every branch at the level focus is on", async ({ page }) => {

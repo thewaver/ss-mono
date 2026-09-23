@@ -1,14 +1,15 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { Button, ODOMETER_DEFAULTS } from "@thewaver/ss-components";
+import { Button, ODOMETER_DEFAULTS, OdometerReels } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
-import { PageNumberField } from "../../StyledComponents/Field/Field";
+import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { CounterExample } from "./Examples/Counter";
+import { ReelsExample } from "./Examples/Reels";
 import type { OdometerExampleProps } from "./OdometerPage.types";
 
 import { MEASURE_BOX_PADDING } from "../../PageComponents/MeasureBox/MeasureBox.css";
@@ -32,6 +33,12 @@ const GROUP_SIZE = 3;
 const FIRST = 0;
 const BOX_WIDTH = 380;
 const BOX_HEIGHT = 130;
+const REEL_DIGITS = 4;
+const REEL_PAD = "0";
+const REEL_RANGE = 10 ** REEL_DIGITS;
+const STARTING_REEL_VALUE = 7;
+const STARTING_REEL_KEY: OdometerReels.SampleKey = "leftToRight";
+const FIELD_WIDTH = 130;
 
 const group = (value: number) => {
     const digits = String(Math.abs(value));
@@ -42,10 +49,20 @@ const group = (value: number) => {
     return value < ZERO ? `-${grouped}` : grouped;
 };
 
+const pad = (value: number) => String(value).padStart(REEL_DIGITS, REEL_PAD);
+
+const pull = (value: number) => {
+    const next = Math.floor(Math.random() * REEL_RANGE);
+
+    return next === value ? (next + SMALL_STEP) % REEL_RANGE : next;
+};
+
 export const OdometerPage = () => {
     const [getValue, setValue] = createSignal(STARTING_VALUE);
     const [getTurnMs, setTurnMs] = createSignal(ODOMETER_DEFAULTS.turnDurationMs);
     const [getCascadeMs, setCascadeMs] = createSignal(ODOMETER_DEFAULTS.cascadeDelayMs);
+    const [getReelValue, setReelValue] = createSignal(STARTING_REEL_VALUE);
+    const [getReelKey, setReelKey] = createSignal<OdometerReels.SampleKey>(STARTING_REEL_KEY);
 
     const step = (delta: number) => setValue((value) => Math.min(Math.max(value + delta, MIN_VALUE), MAX_VALUE));
 
@@ -61,7 +78,7 @@ export const OdometerPage = () => {
                 key: "counter",
                 name: "Counter",
                 readout: () =>
-                    "every column that has to carry waits for the one to its right, a column going nine to zero keeps turning forward rather than rewinding, and crossing zero turns the whole number back the other way",
+                    "every column that has to carry waits for the one to its right, a column going nine to zero keeps turning forward rather than rewinding, and crossing zero turns the whole number back the other way, and a digit or separator arriving or going grows in or shrinks away while it fades",
                 component: () => (
                     <div class={styles.stack}>
                         <PageMeasureBox
@@ -106,6 +123,54 @@ export const OdometerPage = () => {
                     </div>
                 ),
                 path: `${EXAMPLES_ROOT}/Counter.tsx`,
+            },
+            {
+                key: "reels",
+                name: "Reels",
+                readout: () =>
+                    "every column spins at once and stops in the order its reel gives, taking extra whole turns on the way; with less motion asked for it only turns as far as its digit needs",
+                component: () => (
+                    <div class={styles.stack}>
+                        <PageMeasureBox
+                            width={() => BOX_WIDTH}
+                            height={() => BOX_HEIGHT}
+                            padding={() => MEASURE_BOX_PADDING}
+                        >
+                            <ReelsExample text={() => pad(getReelValue())} reelKey={getReelKey} />
+                        </PageMeasureBox>
+
+                        <div class={styles.controls}>
+                            <Button
+                                id={"pullReels"}
+                                renderContent={(getFlags) => (
+                                    <PageButtonContent flags={getFlags}>Pull</PageButtonContent>
+                                )}
+                                onClick={() => {
+                                    setReelValue(pull);
+                                }}
+                            />
+                        </div>
+
+                        <PagePropsPanel scope={"local"}>
+                            <PageProp
+                                key={"reelKey"}
+                                label={"Reel"}
+                                hint={
+                                    "How many extra turns each column makes and how long it takes, which decides the order the columns stop in."
+                                }
+                            >
+                                <PageSelectField
+                                    value={getReelKey}
+                                    values={() => OdometerReels.SAMPLE_KEYS}
+                                    width={() => FIELD_WIDTH}
+                                    ariaLabel={"Reel"}
+                                    onChange={(key) => setReelKey(() => key)}
+                                />
+                            </PageProp>
+                        </PagePropsPanel>
+                    </div>
+                ),
+                path: `${EXAMPLES_ROOT}/Reels.tsx`,
             },
         ];
     });

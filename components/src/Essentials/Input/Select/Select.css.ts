@@ -48,32 +48,10 @@ export const selectFilterField = style({
     },
 });
 
-export const selectEndMarker = style({
-    width: "100%",
-    height: 1,
-    marginTop: -1,
-});
-
-export const selectSizer = style({
-    position: "relative",
-    width: "100%",
-});
-
-export const selectSizerRow = style({
+export const selectClear = style({
     position: "absolute",
     top: 0,
-    left: 0,
-    width: "100%",
-});
-
-export const selectOption = style({
-    width: "100%",
-    cursor: "pointer",
-    pointerEvents: "all",
-
-    selectors: {
-        "&[aria-disabled='true']": {
-            cursor: "not-allowed",
-        },
-    },
+    bottom: 0,
+    display: "flex",
+    alignItems: "center",
 });

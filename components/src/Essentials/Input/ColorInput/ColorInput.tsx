@@ -27,12 +27,19 @@ const ColorInputField = (props: ColorInputFieldProps) => {
     );
     const getAriaDescribedBy = FormFieldUtils.resolveAriaDescribedBy();
 
+    const [getElementRef, setElementRef] = createSignal<HTMLElement>();
+
+    FormFieldUtils.registerControl(getElementRef);
+
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
     return (
         <button
             id={access(props.id)}
-            ref={(element) => props.ref?.(element)}
+            ref={(element) => {
+                setElementRef(element);
+                props.ref?.(element);
+            }}
             type="button"
             class={styles.colorInputField}
             aria-label={getAriaLabel()}
@@ -149,7 +156,8 @@ export const ColorInput = (props: ColorInputProps) => {
                 hsvSignal={hsvSignal}
                 sizing={"fill"}
                 isDisabled={getIsDisabled}
-                ariaLabel={() => access(props.areaLabel) ?? COLOR_INPUT_DEFAULTS.areaLabel}
+                ariaLabel={props.areaLabel}
+                axisLabels={props.areaAxisLabels}
                 renderContent={props.renderArea}
             />
 
@@ -159,7 +167,7 @@ export const ColorInput = (props: ColorInputProps) => {
                 isDisabled={getIsDisabled}
                 max={() => HUE_MAX}
                 step={() => HUE_STEP}
-                ariaLabel={() => access(props.hueLabel) ?? COLOR_INPUT_DEFAULTS.hueLabel}
+                ariaLabel={props.hueLabel}
                 renderContent={props.renderHue}
             />
         </>
@@ -200,7 +208,7 @@ export const ColorInput = (props: ColorInputProps) => {
                 id={() => popupId}
                 role={"dialog"}
                 ariaAttributes={() => ({
-                    "aria-label": access(props.pickerLabel) ?? COLOR_INPUT_DEFAULTS.pickerLabel,
+                    "aria-label": access(props.pickerLabel),
                 })}
                 isOpen={getIsOpen}
                 anchorRef={getFieldRef}

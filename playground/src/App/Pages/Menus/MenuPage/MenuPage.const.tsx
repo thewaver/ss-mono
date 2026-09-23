@@ -5,7 +5,7 @@ import type { AnchorPlacement, InteractionFlags, MenuItem, MenuItemFlags } from 
 import { PageMenuItemContent } from "../../../StyledComponents/MenuItemContent/MenuItemContent";
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
-import type { Action } from "./MenuPage.types";
+import type { Action, Destination } from "./MenuPage.types";
 
 const LAYER_COUNT = 20;
 
@@ -28,6 +28,21 @@ export const VIEW_OPTIONS: MenuItem<Action>[] = [
     { value: { name: "Large" }, kind: "radio" },
     { value: { name: "Reset view" } },
 ];
+
+export const ZOOM_ACTIONS: MenuItem<Action>[] = [
+    { value: { name: "Zoom in", shortcut: "Ctrl++" }, staysOpenOnPick: true },
+    { value: { name: "Zoom out", shortcut: "Ctrl+-" }, staysOpenOnPick: true },
+    { value: { name: "Reset zoom", shortcut: "Ctrl+0" } },
+];
+
+export const ZOOM_STEP_PERCENT = 10;
+
+export const ZOOM_RESET_PERCENT = 100;
+
+export const ZOOM_STEPS: Record<string, number | undefined> = {
+    "Zoom in": ZOOM_STEP_PERCENT,
+    "Zoom out": -ZOOM_STEP_PERCENT,
+};
 
 export const VIEW_DEFAULTS: Action[] = [VIEW_OPTIONS[0].value, VIEW_OPTIONS[4].value];
 
@@ -114,6 +129,50 @@ export const renderMenuItem = (
     getFlags: () => InteractionFlags<MenuItemFlags>,
 ) => (
     <PageMenuItemContent flags={getFlags} kind={() => getItem().kind} shortcut={() => getItem().value.shortcut ?? ""}>
+        {getItem().value.name}
+    </PageMenuItemContent>
+);
+
+type DestinationTree = { name: string; children?: DestinationTree[] };
+
+const DESTINATION_TREE: DestinationTree[] = [
+    {
+        name: "Europe",
+        children: [
+            { name: "France", children: [{ name: "Paris" }, { name: "Lyon" }, { name: "Marseille" }] },
+            { name: "Portugal", children: [{ name: "Lisbon" }, { name: "Porto" }] },
+        ],
+    },
+    {
+        name: "Asia",
+        children: [
+            { name: "Japan", children: [{ name: "Tokyo" }, { name: "Kyoto" }] },
+            { name: "Vietnam", children: [{ name: "Hanoi" }, { name: "Hue" }] },
+        ],
+    },
+    {
+        name: "South America",
+        children: [{ name: "Peru", children: [{ name: "Lima" }, { name: "Cusco" }] }],
+    },
+];
+
+const toDestinationItems = (nodes: DestinationTree[], parentPath: string[]): MenuItem<Destination>[] =>
+    nodes.map((node) => {
+        const path = [...parentPath, node.name];
+
+        return {
+            value: { name: node.name, path, isLeaf: node.children === undefined },
+            items: node.children && toDestinationItems(node.children, path),
+        };
+    });
+
+export const DESTINATIONS = toDestinationItems(DESTINATION_TREE, []);
+
+export const renderDestinationItem = (
+    getItem: Accessor<MenuItem<Destination>>,
+    getFlags: () => InteractionFlags<MenuItemFlags>,
+) => (
+    <PageMenuItemContent flags={getFlags} kind={() => getItem().kind} shortcut={""}>
         {getItem().value.name}
     </PageMenuItemContent>
 );

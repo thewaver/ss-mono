@@ -8,4 +8,5 @@ export const TOASTS_DEFAULTS = {
     hotkey: "F8",
     ariaLive: "polite" as ToastsAriaLive,
     gap: 10,
+    isDismissableOnSwipe: true,
 };

@@ -2,6 +2,7 @@ import type { Accessor, JSX } from "solid-js";
 
 import type { Index2d, Point2d } from "@thewaver/ss-utils";
 
+import type { CarrierAnnouncements } from "../../Abstracts/Carrier/Carrier.types";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type {
     InteractionTooltipDefs,
@@ -10,6 +11,22 @@ import type {
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
 export type SortableGridSpot = Index2d;
+
+export type SortableGridAnnouncements = CarrierAnnouncements & {
+    /** Describes every item while nothing is picked up, telling a keyboard user that Enter picks it up. */
+    restingKeyHint: string;
+    /** Tells a keyboard user which keys move, drop and cancel a carried item, when there is no other grid to go to. */
+    keyHint: string;
+    /** The same, for when another grid would take the item too, so the key that moves between grids is mentioned. */
+    keyHintAcrossZones: string;
+    /**
+     * Names a spot in the grid, which is what the pick-up, move and drop announcements say the item is at.
+     *
+     * @param spot The cell the item's corner would sit in, counting rows and columns from zero.
+     * @param hasRoom Whether the item fits there, so a reader is told before dropping that it would be refused.
+     */
+    computePlaceLabel: (spot: SortableGridSpot, hasRoom: boolean) => string;
+};
 
 export type SortableGridSize = {
     rowCount: number;
@@ -51,6 +68,11 @@ export type SortableGridItemFlags = {
     isCarried: boolean;
 };
 
+export type SortableGridCellFlags = {
+    /** Whether nothing may land on this cell, so it can be drawn as a wall. */
+    isBlocked: boolean;
+};
+
 export type SortableGridFlags = {
     isCarrying: boolean;
     isReceiving: boolean;
@@ -90,11 +112,23 @@ export type SortableGridController = {
      * @returns `false` when nothing is being carried, or when the block cannot be turned.
      */
     turnCcw: () => boolean;
+    /**
+     * Pulls every item straight up as far as it will slide, stopping at other items and at blocked cells.
+     *
+     * Items keep their column and their turn, and nothing jumps past what is in its way. Called from `onTransfer`
+     * it keeps the grid packed after every move; called from a button it tidies up once. Nothing is reported
+     * through `onTransfer` for what it moves.
+     *
+     * @returns `false` when nothing moved, or while an item is being carried out of or into this grid.
+     */
+    compact: () => boolean;
 };
 
 export type SortableGridItemSlotProps = AccessorProps<{
     /** Identifies this item, so the grid can point focus at it. */
     id: string;
+    /** Points the item at the grid's resting key hint, so a reader hears how to pick it up. */
+    hintId: string;
     /** Names this item for assistive technology. */
     label: string;
     /** This item's place among the items, counting from one. */
@@ -130,6 +164,11 @@ export type SortableGridProps<T> = Omit<InteractionWrapperProps<SortableGridFlag
         groupId: string;
         /** Names the grid for assistive technology. */
         ariaLabel: string;
+        /**
+         * Everything the grid says aloud while an item is moved, and the key hints and spot names those
+         * announcements are built from. There is no default: every word a reader hears comes from here.
+         */
+        announcements: SortableGridAnnouncements;
         /** How many cells across the grid is. */
         columns: number;
         /** How many cells down the grid is. */
@@ -142,6 +181,12 @@ export type SortableGridProps<T> = Omit<InteractionWrapperProps<SortableGridFlag
         isLocked?: boolean;
         /** Whether an item can be turned on the spot as well as moved. */
         isTurnable?: boolean;
+        /**
+         * Whether a cell is blocked, which is a wall: no item lands on it or overlaps it, an item arriving from
+         * elsewhere is put clear of it, the arrow keys step a carried item over it, and `renderCell` is told so it
+         * can be drawn. Every cell is open when this is left out.
+         */
+        computeIsSpotBlocked?: (spot: SortableGridSpot) => boolean;
     }> & {
         /** The items and where they sit. It is the only thing that moves them. */
         itemsSignal: SignalSource<SortableGridItem<T>[]>;
@@ -165,8 +210,8 @@ export type SortableGridProps<T> = Omit<InteractionWrapperProps<SortableGridFlag
             getItem: Accessor<SortableGridItem<T>>,
             getGeometry: Accessor<SortableGridGeometry>,
         ) => JSX.Element;
-        /** Draws one empty cell of the grid. */
-        renderCell?: (getSpot: Accessor<SortableGridSpot>) => JSX.Element;
+        /** Draws one empty cell of the grid, told whether it is blocked. */
+        renderCell?: (getSpot: Accessor<SortableGridSpot>, getFlags: Accessor<SortableGridCellFlags>) => JSX.Element;
         /** Draws where a carried item would land, and whether landing there is allowed. */
         renderLanding?: (getIsAllowed: () => boolean, getGeometry: Accessor<SortableGridGeometry>) => JSX.Element;
         /** Runs when an item is moved, here or to another grid. */

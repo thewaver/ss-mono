@@ -12,9 +12,11 @@ export const FrostedExample = (props: Props) => {
             <Reveal
                 radius={props.radius}
                 softness={props.softness}
+                stepSize={props.stepSize}
                 joinRadii={props.joinRadii}
                 lameExponents={props.lameExponents}
                 isDisabled={props.isDisabled}
+                ariaLabel={"A frosted cover over a note"}
                 computePoints={props.computePoints()}
                 renderContent={() => (
                     <div class={styles.content}>

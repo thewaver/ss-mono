@@ -19,11 +19,11 @@ export type ColorAreaRenderProps = {
 
 export type ColorAreaCbs = {
     /** Runs as the color changes. */
-    onInput?: (hsv: Color.HSVA) => void | Promise<void>;
+    onInput?: (hsv: Color.HSVA) => void;
     /** Runs when the pointer arrives over the square. */
-    onMouseEnter?: (e: MouseEvent) => void | Promise<void>;
+    onMouseEnter?: (e: MouseEvent) => void;
     /** Runs when the pointer leaves the square. */
-    onMouseLeave?: (e: MouseEvent) => void | Promise<void>;
+    onMouseLeave?: (e: MouseEvent) => void;
 };
 
 export type ColorAreaState = {
@@ -32,7 +32,7 @@ export type ColorAreaState = {
     /** Names the square for assistive technology. */
     ariaLabel?: string;
     /** Names each axis separately, since the square carries two values a reader has to tell apart. */
-    axisLabels?: Record<ColorAreaAxis, string>;
+    axisLabels: Record<ColorAreaAxis, string>;
     /** How far one press of an arrow key moves the handle, in the same `0`–`100` percent the axes carry. */
     step?: number;
 };

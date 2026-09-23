@@ -1,6 +1,6 @@
-import { type Page, expect, test } from "@playwright/test";
+import { type Locator, type Page, expect, test } from "@playwright/test";
 
-import { activeText, demo, readout, scrollTop } from "./helpers";
+import { activeText, demo, readout, scrollTop, waitUntilStill } from "./helpers";
 
 const HINT = demo("hint");
 const PROMPT = demo("prompt");
@@ -9,7 +9,7 @@ const GUIDE = demo("guide");
 const SETTLE_MS = 300;
 
 /**
- * The overlay is portalled and every part of it is styled through a hashed class, so these key on what the
+ * The overlay is portaled and every part of it is styled through a hashed class, so these key on what the
  * geometry produces rather than on names: one transparent layer carries an inline `clip-path` with the
  * highlighted rect cut out of it, which is what keeps the pointer off everything but the hole, and the
  * corner polygons are what the consumer's `renderHighlight` draws. The even-odd fill rule is what makes the
@@ -26,7 +26,7 @@ const SPOTLIGHT_Z_INDEX = 10;
 
 const button = (scope: string, name: string) => `${scope} button:has-text("${name}")`;
 
-/** The popup is portalled out of its variant container, so its own buttons are scoped to the dialog. */
+/** The popup is portaled out of its variant container, so its own buttons are scoped to the dialog. */
 const popupButton = (name: string) => `${POPUP} button:has-text("${name}")`;
 
 const isFocusInsidePopup = (page: Page) =>
@@ -72,7 +72,7 @@ const openHint = (page: Page) => open(page, "/spotlight-hint", HINT);
 const openPrompt = (page: Page) => open(page, "/spotlight-prompt", PROMPT);
 const openGuide = (page: Page) => open(page, "/spotlight-guide", GUIDE);
 
-test("nothing is portalled before anything is highlighted", async ({ page }) => {
+test("nothing is portaled before anything is highlighted", async ({ page }) => {
     await openHint(page);
     await expect(page.locator(BLOCKER), "nothing is holding the pointer off the page").toHaveCount(0);
     await expect(page.locator(CORNERS), "and no highlight decoration").toHaveCount(0);
@@ -291,4 +291,196 @@ test("a guide can be abandoned, and says so", async ({ page }) => {
 
     await expect(page.locator(POPUP)).toHaveCount(0);
     expect(await readout(page, "guide")).toContain("skipped");
+});
+
+/**
+ * The shop tour is a guide with a step the reader performs rather than reads. A guide seals the whole page, so
+ * it cannot also let the reader press the button it is pointing at; the example hands over instead — on the
+ * waiting step the guide closes and a prompt lights the one control, and using that control reopens the guide
+ * on the next step. These follow that relay end to end, and check that each half is the mode it claims to be
+ * at the moment it is live.
+ *
+ * The demo's add, checkout and start buttons are found by the ids the page gave them, and the popup's three
+ * actions, which carry none, by where they sit rather than by what they say: skip, back and forward in that
+ * order. The step and status are read from the
+ * page's readout, which is the page's own statement of where the tour is.
+ */
+test.describe("a tour with a step the reader does", () => {
+    const TOUR = demo("tour");
+    const STEP_COUNT = 4;
+    const WAITING_STEP = 2;
+
+    const addButton = (page: Page) => page.locator("#tourAdd");
+    const checkoutButton = (page: Page) => page.locator("#tourCheckout");
+    const startButton = (page: Page) => page.locator("#tourStart");
+
+    const skipAction = (page: Page) => page.locator(`${POPUP} button`).nth(0);
+    const backAction = (page: Page) => page.locator(`${POPUP} button`).nth(1);
+    const forwardAction = (page: Page) => page.locator(`${POPUP} button`).nth(2);
+
+    const stepReadout = async (page: Page) => Number(/step: (\d+) of/.exec(await readout(page, "tour"))?.[1]);
+
+    const isActive = (locator: Locator) => locator.evaluate((element) => document.activeElement === element);
+
+    const blockerClip = (page: Page) =>
+        page.locator(BLOCKER).evaluate((element) => (element as HTMLElement).style.clipPath);
+
+    const start = async (page: Page) => {
+        await startButton(page).click();
+        await expect(page.locator(POPUP)).toBeVisible();
+    };
+
+    const reachWaitingStep = async (page: Page) => {
+        await start(page);
+
+        for (let step = 1; step < WAITING_STEP; step++) await forwardAction(page).click();
+
+        await expect.poll(() => stepReadout(page)).toBe(WAITING_STEP);
+    };
+
+    test.beforeEach(async ({ page }) => {
+        await openGuide(page);
+        await expect(page.locator(TOUR)).toBeVisible();
+    });
+
+    test("opens as a named modal on its first step, with Back unavailable", async ({ page }) => {
+        const alreadyInert = await inertCount(page);
+
+        await start(page);
+        await waitUntilStill(page.locator(POPUP));
+
+        expect(await stepReadout(page), "it starts at the beginning").toBe(1);
+        expect(await readout(page, "tour")).toContain(`of ${STEP_COUNT}`);
+        await expect(page.locator(POPUP)).toHaveAttribute("aria-modal", "true");
+        expect(await page.locator(POPUP).getAttribute("aria-label"), "and names itself").toBeTruthy();
+        await expect.poll(() => isFocusInsidePopup(page), { message: "focus lands inside it" }).toBe(true);
+        expect(await inertCount(page), "and the page around it is sealed").toBeGreaterThan(alreadyInert);
+
+        await expect(backAction(page), "there is nowhere to go back to").toHaveAttribute("aria-disabled", "true");
+
+        await backAction(page).click({ force: true });
+        expect(await stepReadout(page), "so pressing it anyway does nothing").toBe(1);
+    });
+
+    test("forward and back step through the tour, and the highlight follows", async ({ page }) => {
+        await start(page);
+        await waitUntilStill(page.locator(POPUP));
+
+        const atFirstStep = await blockerClip(page);
+
+        await forwardAction(page).click();
+        expect(await stepReadout(page)).toBe(2);
+        await expect(backAction(page), "Back comes to life after the first step").not.toHaveAttribute(
+            "aria-disabled",
+            "true",
+        );
+        await expect
+            .poll(() => blockerClip(page), { message: "the hole in the overlay moves to the next element" })
+            .not.toBe(atFirstStep);
+
+        await backAction(page).click();
+        expect(await stepReadout(page), "Back returns a step").toBe(1);
+        await expect(page.locator(POPUP), "without closing the tour").toBeVisible();
+    });
+
+    /**
+     * The handover is the example's whole point, and every half of it is checked: the guide lets go of the page
+     * (nothing it sealed stays inert, or the button could not be pressed), the prompt takes over and pulls focus
+     * to the one live control, the other controls stay out of reach while it holds, and pressing the lit
+     * control does the real work and brings the guide back on the next step with focus inside it again.
+     */
+    test("the waiting step hands over to a prompt, and doing the step brings the guide back", async ({ page }) => {
+        const alreadyInert = await inertCount(page);
+
+        await reachWaitingStep(page);
+        await forwardAction(page).click();
+
+        await expect(page.locator(POPUP), "the guide closes rather than sealing the button away").toHaveCount(0);
+        await expect(page.locator(BLOCKER), "and one clipped layer is left, the prompt's").toHaveCount(1);
+        await expect(page.locator("[inert]"), "the guide has unsealed the page").toHaveCount(alreadyInert);
+        expect(await stepReadout(page), "the tour has not moved on by itself").toBe(WAITING_STEP);
+        expect(await readout(page, "tour"), "and nothing has been added yet").toContain("basket: 0");
+
+        await page.keyboard.press("Tab");
+        expect(await isActive(addButton(page)), "focus is pulled to the one control the step is about").toBe(true);
+
+        await checkoutButton(page)
+            .click({ force: true, timeout: 2000 })
+            .catch(() => undefined);
+        expect(await isActive(checkoutButton(page)), "and the other controls stay out of reach").toBe(false);
+
+        await addButton(page).click();
+
+        expect(await readout(page, "tour"), "the button does its real job").toContain("basket: 1");
+        await expect(page.locator(POPUP), "and the guide comes back").toBeVisible();
+        expect(await stepReadout(page), "on the step after the one the reader did").toBe(WAITING_STEP + 1);
+        await expect.poll(() => isFocusInsidePopup(page), { message: "with focus back inside it" }).toBe(true);
+        await expect(page.locator(BLOCKER), "and only the guide's overlay is left").toHaveCount(1);
+    });
+
+    test("the last step finishes the tour and hands the page back", async ({ page }) => {
+        const alreadyInert = await inertCount(page);
+
+        await reachWaitingStep(page);
+        await forwardAction(page).click();
+        await expect(page.locator(POPUP)).toHaveCount(0);
+        await addButton(page).click();
+        await expect(page.locator(POPUP)).toBeVisible();
+
+        while ((await stepReadout(page)) < STEP_COUNT) await forwardAction(page).click();
+
+        await forwardAction(page).click();
+
+        await expect(page.locator(POPUP), "finishing closes it").toHaveCount(0);
+        await expect(page.locator(BLOCKER), "with no overlay left behind").toHaveCount(0);
+        expect(await readout(page, "tour")).toContain("finished");
+        await expect(page.locator("[inert]"), "and the page is handed back").toHaveCount(alreadyInert);
+    });
+
+    test("skipping ends it from any step and says so", async ({ page }) => {
+        await start(page);
+        await forwardAction(page).click();
+        expect(await stepReadout(page)).toBe(2);
+
+        await skipAction(page).click();
+
+        await expect(page.locator(POPUP)).toHaveCount(0);
+        await expect(page.locator(BLOCKER)).toHaveCount(0);
+        expect(await readout(page, "tour")).toContain("skipped");
+    });
+
+    /**
+     * The step is kept for the session, so a reader who reloads part-way is offered the tour where they left
+     * it rather than from the start. Ending it — finished or skipped — clears the memory, which the second
+     * reload checks.
+     */
+    test("a reload part-way offers to resume at the same step, and ending it forgets", async ({ page }) => {
+        await start(page);
+        await forwardAction(page).click();
+        await expect.poll(() => stepReadout(page)).toBe(2);
+        await forwardAction(page).click();
+        await expect(page.locator(POPUP)).toHaveCount(0);
+        await addButton(page).click();
+        await expect.poll(() => stepReadout(page)).toBe(3);
+
+        await page.reload();
+        await expect(page.locator(TOUR)).toBeVisible();
+
+        expect(await readout(page, "tour"), "the page knows a tour was left part-way").toContain("paused");
+        await expect(page.locator(POPUP), "without opening it unasked").toHaveCount(0);
+
+        await start(page);
+        expect(await stepReadout(page), "starting again resumes where it was left").toBe(3);
+
+        await skipAction(page).click();
+        await expect(page.locator(POPUP)).toHaveCount(0);
+
+        await page.reload();
+        await expect(page.locator(TOUR)).toBeVisible();
+
+        expect(await readout(page, "tour"), "once ended, there is nothing to resume").toContain("not started");
+
+        await start(page);
+        expect(await stepReadout(page), "and it starts from the beginning").toBe(1);
+    });
 });

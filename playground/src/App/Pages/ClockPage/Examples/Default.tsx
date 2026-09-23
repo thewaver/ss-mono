@@ -18,8 +18,8 @@ type Props = {
     isTwelveHour?: MaybeAccessor<boolean>;
     hasSeconds?: MaybeAccessor<boolean>;
     steps?: MaybeAccessor<ClockSteps>;
-    min?: MaybeAccessor<TimeValue>;
-    max?: MaybeAccessor<TimeValue>;
+    minValue?: MaybeAccessor<TimeValue>;
+    maxValue?: MaybeAccessor<TimeValue>;
 };
 
 export const DefaultExample = (props: Props) => {
@@ -32,8 +32,8 @@ export const DefaultExample = (props: Props) => {
                 isTwelveHour={props.isTwelveHour}
                 hasSeconds={props.hasSeconds}
                 steps={props.steps}
-                min={props.min}
-                max={props.max}
+                minValue={props.minValue}
+                maxValue={props.maxValue}
                 renderOption={(_unused, getRenderProps) => <PageClockOption renderProps={getRenderProps} />}
                 renderUnit={(name) => <PageClockUnit>{name}</PageClockUnit>}
                 renderColumn={(renderOptions) => <PageClockColumn>{renderOptions()}</PageClockColumn>}

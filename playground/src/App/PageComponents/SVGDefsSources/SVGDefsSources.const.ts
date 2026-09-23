@@ -125,11 +125,7 @@ export namespace SVGDefsSources {
             ),
         );
 
-    export const GRADIENT_KEYS = Object.keys(
-        SVGDefsSamples.Gradient.Timed.SAMPLE_ENTRIES,
-    ) as SVGDefsSamples.Gradient.Timed.SampleKey[];
+    export const GRADIENT_KEYS = SVGDefsSamples.Gradient.Timed.SAMPLE_KEYS;
 
-    export const PATTERN_KEYS = Object.keys(
-        SVGDefsSamples.Pattern.SAMPLE_CONFIGS,
-    ) as SVGDefsSamples.Pattern.SampleKey[];
+    export const PATTERN_KEYS = SVGDefsSamples.Pattern.SAMPLE_KEYS;
 }

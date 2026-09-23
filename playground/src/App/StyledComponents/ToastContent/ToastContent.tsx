@@ -12,6 +12,7 @@ const POSITION_OFFSET = 1;
 const PILE_PEEK = 14;
 const PILE_SCALE_STEP = 0.04;
 const PILE_MIN_SCALE = 0.8;
+const PERCENT = 100;
 
 const computePileShift = (state: ToastState, dir: ToastsDir, gap: number) => {
     const isColumn = dir === "column" || dir === "column-reverse";
@@ -32,6 +33,16 @@ const computePileShift = (state: ToastState, dir: ToastsDir, gap: number) => {
     };
 };
 
+const computeSwipeShift = (state: ToastState) => {
+    const direction = state.swipeDirection;
+
+    if (direction === undefined || state.swipeOffsetRatio === 0) return undefined;
+
+    const distance = state.swipeOffsetRatio * PERCENT * (direction === "left" || direction === "up" ? -1 : 1);
+
+    return direction === "left" || direction === "right" ? `translateX(${distance}%)` : `translateY(${distance}%)`;
+};
+
 export const PageToastContent = (props: ToastContentProps) => {
     const getPile = createMemo(() =>
         access(props.stacking) === "pile"
@@ -39,13 +50,21 @@ export const PageToastContent = (props: ToastContentProps) => {
             : undefined,
     );
 
+    const getTransform = createMemo(() => {
+        const pile = getPile();
+        const transforms = [
+            computeSwipeShift(access(props.state)),
+            pile && `translate${pile.isColumn ? "Y" : "X"}(${pile.shift}px) scale(${pile.scale})`,
+        ].filter(Boolean);
+
+        return transforms.length > 0 ? transforms.join(" ") : undefined;
+    });
+
     return (
         <div
             style={{
-                "transition": `transform ${access(props.transitionDurationMs)}ms`,
-                "transform": getPile()
-                    ? `translate${getPile()!.isColumn ? "Y" : "X"}(${getPile()!.shift}px) scale(${getPile()!.scale})`
-                    : undefined,
+                "transition": `transform ${access(props.state).isSwiping ? 0 : access(props.transitionDurationMs)}ms`,
+                "transform": getTransform(),
                 "transform-origin": "center",
             }}
         >

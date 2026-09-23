@@ -18,3 +18,5 @@ export const PageCuboidFace = (props: CuboidFaceProps) => {
 export const PageCuboidStack = (props: ParentProps) => <div class={styles.cuboidStack}>{props.children}</div>;
 
 export const PageCuboidPad = (props: ParentProps) => <div class={styles.cuboidPad}>{props.children}</div>;
+
+export const PageCuboidRow = (props: ParentProps) => <div class={styles.cuboidRow}>{props.children}</div>;

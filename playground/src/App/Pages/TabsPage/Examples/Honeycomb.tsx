@@ -29,7 +29,7 @@ export const HoneycombExample = (props: Props) => {
                     onSelectionChange={props.onSelectionChange}
                     renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                         <PageTabHexFloater
-                            dir={"row"}
+                            orientation={"horizontal"}
                             visibilityTarget={getVisibilityTarget}
                             transitionDurationMs={getTransitionDurationMs}
                         />

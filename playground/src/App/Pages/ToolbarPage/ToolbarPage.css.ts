@@ -21,3 +21,17 @@ export const bar = style({
     borderRadius: themeVars.borderRadius.full,
     backgroundColor: themeVars.color.control.background.main,
 });
+
+const PRESSED_MARK_PX = 3;
+
+export const isPressed = style({});
+
+export const pressedMark = style({
+    borderBottom: `${PRESSED_MARK_PX}px solid transparent`,
+
+    selectors: {
+        [`&.${isPressed}`]: {
+            borderBottomColor: "currentColor",
+        },
+    },
+});

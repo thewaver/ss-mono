@@ -19,19 +19,6 @@ export type TrailController = {
     getPlace: Accessor<TrailPlace>;
     getIsPlaying: Accessor<boolean>;
     /**
-     * Starts the traveler moving.
-     *
-     * @returns `false` when it was already playing, since asking for a state a thing is already in does
-     * nothing.
-     */
-    play: () => boolean;
-    /**
-     * Stops the traveler where it is.
-     *
-     * @returns `false` when it was already paused.
-     */
-    pause: () => boolean;
-    /**
      * Moves the traveler to a point along the path.
      *
      * @param progress Where to go, `0`–`1`. Values outside that are clamped rather than refused.
@@ -53,14 +40,34 @@ export type TrailProps = AccessorProps<{
     isTurning?: boolean;
     /** Turns the trail off, so the traveler stands still. */
     isDisabled?: boolean;
-    /** How far along the path the traveler is. It is the only thing that moves it. */
+    /**
+     * Puts several travelers on the one path, each this share of the path behind the lead, which is `0`.
+     *
+     * One entry per traveler, in the order `renderTraveler` is handed their indices, so `[0, 0.1, 0.2]` is a
+     * lead and two followers a tenth of the path apart. Every traveler runs off the same clock and the same
+     * progress. On a looping path the followers come round behind the lead from the start; on one that stops,
+     * they wait bunched at the start until the lead is their offset ahead, and the run ends when the last one
+     * arrives. Offsets below zero count as zero. Leaving it out is a lone traveler.
+     */
+    followerOffsets?: number[];
+    /**
+     * How far the run has gone, `0` to `1`. It is the only thing that moves the travelers.
+     *
+     * With a lone traveler it is that traveler's place along the path. With followers on a path that stops,
+     * the run lasts until the last of them arrives, so `1` is everybody at the end.
+     */
     progressSignal?: SignalSource<number>;
     /** Whether the traveler is walking. It is the only thing that starts or stops it. */
-    isPlayingSignal?: SignalSource<boolean>;
+    playbackSignal?: SignalSource<boolean>;
     /** Draws the path itself, where it should be visible. */
     renderTrack?: (getPath: Accessor<string>) => JSX.Element;
-    /** Draws the traveler, and is told where on the path it is and which way it faces. */
-    renderTraveler: (getPlace: Accessor<TrailPlace>) => JSX.Element;
+    /**
+     * Draws a traveler, and is told where on the path it is and which way it faces.
+     *
+     * Called once per entry of `followerOffsets`, with that entry's index, so the lead and its followers can
+     * be drawn differently.
+     */
+    renderTraveler: (getPlace: Accessor<TrailPlace>, index: number) => JSX.Element;
     /** Runs each time the traveler reaches the end of the path. */
     onLap?: () => void;
     /** Hands the consumer a controller once the trail is up, for driving it from outside. */

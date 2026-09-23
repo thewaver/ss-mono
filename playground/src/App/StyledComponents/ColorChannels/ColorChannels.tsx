@@ -69,7 +69,7 @@ export const PageColorChannels = (props: PageColorChannelsProps) => {
     return (
         <>
             <PageColorPickerRow>
-                <RadioGroup valueSignal={spaceSignal} dir={"row"} gap={5} ariaLabel={"Color space"}>
+                <RadioGroup valueSignal={spaceSignal} orientation={"horizontal"} gap={5} ariaLabel={"Color space"}>
                     {SPACES.map((space) => (
                         <Radio
                             value={() => space}

@@ -47,7 +47,12 @@ const TileBoardTile = (props: TileBoardTileProps) => {
         >
             <div class={styles.tileBoardPaint}>{props.renderContent(() => access(props.flags))}</div>
 
-            <div class={styles.tileBoardHit} style={{ "clip-path": access(props.clipPath) }} aria-hidden="true" />
+            <div
+                ref={(element) => props.hitRef?.(element)}
+                class={styles.tileBoardHit}
+                style={{ "clip-path": access(props.clipPath) }}
+                aria-hidden="true"
+            />
         </div>
     );
 };
@@ -56,6 +61,7 @@ export const TileBoard = (props: TileBoardProps) => {
     const boardId = createUniqueId();
 
     const tileRefs = new Map<string, HTMLElement>();
+    const hitTiles = new Map<Element, Index2d>();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getHighlighted, setHighlighted] = createSignal<Index2d>(TileBoardUtils.getFirstTile());
@@ -75,6 +81,7 @@ export const TileBoard = (props: TileBoardProps) => {
             access(props.tileCount),
             getPitchSize(),
             access(props.hasShortFirstRow) ?? false,
+            access(props.taper) ?? TILE_BOARD_DEFAULTS.taper,
         ),
     );
 
@@ -104,6 +111,100 @@ export const TileBoard = (props: TileBoardProps) => {
         moveTo(tile);
         props.onTileActivate(tile);
     };
+
+    const getIsSweepable = createMemo(() => props.onTileSweep !== undefined && !getIsDisabled());
+
+    let sweep: { pointerId: number; from: Index2d; entered: Set<string>; hasLeft: boolean } | undefined;
+    let isClickSwallowed = false;
+
+    const sweepInto = (tile: Index2d) => {
+        if (getIsTileDisabled(tile)) return;
+
+        props.onTileSweep?.(tile);
+    };
+
+    const handleSweepMove = (e: PointerEvent) => {
+        if (!sweep || e.pointerId !== sweep.pointerId) return;
+
+        if (e.buttons === 0) {
+            endSweep();
+
+            return;
+        }
+
+        const element = document.elementFromPoint(e.clientX, e.clientY);
+        const tile = element ? hitTiles.get(element) : undefined;
+
+        if (!tile) return;
+
+        const key = Index2d.toString(tile);
+
+        if (sweep.entered.has(key)) return;
+
+        sweep.entered.add(key);
+
+        if (!sweep.hasLeft) {
+            sweep.hasLeft = true;
+            sweepInto(sweep.from);
+        }
+
+        sweepInto(tile);
+    };
+
+    const handleSweepEnd = (e: PointerEvent) => {
+        if (!sweep || e.pointerId !== sweep.pointerId) return;
+
+        isClickSwallowed = sweep.hasLeft;
+
+        endSweep();
+    };
+
+    const endSweep = () => {
+        sweep = undefined;
+
+        document.removeEventListener("pointermove", handleSweepMove);
+        document.removeEventListener("pointerup", handleSweepEnd);
+        document.removeEventListener("pointercancel", handleSweepEnd);
+    };
+
+    const handlePointerDown = (e: PointerEvent) => {
+        isClickSwallowed = false;
+
+        if (sweep || e.button !== 0 || !getIsSweepable()) return;
+
+        const from = hitTiles.get(e.target as Element);
+
+        if (!from) return;
+
+        sweep = { pointerId: e.pointerId, from, entered: new Set([Index2d.toString(from)]), hasLeft: false };
+
+        document.addEventListener("pointermove", handleSweepMove);
+        document.addEventListener("pointerup", handleSweepEnd);
+        document.addEventListener("pointercancel", handleSweepEnd);
+    };
+
+    const handleClickCapture = (e: MouseEvent) => {
+        if (!isClickSwallowed) return;
+
+        isClickSwallowed = false;
+
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
+    createEffect(() => {
+        const root = getRootRef();
+
+        if (!root) return;
+
+        root.addEventListener("click", handleClickCapture, true);
+
+        onCleanup(() => {
+            root.removeEventListener("click", handleClickCapture, true);
+        });
+    });
+
+    onCleanup(endSweep);
 
     createEffect(() => {
         const tile = getRovingTile();
@@ -149,6 +250,14 @@ export const TileBoard = (props: TileBoardProps) => {
             tileRefs.delete(key);
         });
 
+        const setHitRef = (element: HTMLElement) => {
+            hitTiles.set(element, tile);
+
+            onCleanup(() => {
+                hitTiles.delete(element);
+            });
+        };
+
         return (
             <div
                 class={styles.tileBoardCell}
@@ -182,6 +291,7 @@ export const TileBoard = (props: TileBoardProps) => {
                             clipPath={() => (getIsFlipped() ? getFlippedClipPath() : getClipPath())}
                             renderContent={(getFlags) => props.renderTile(getTile, getFlags)}
                             onActivate={() => activateTile(tile)}
+                            hitRef={setHitRef}
                         />
                     )}
                 />
@@ -194,6 +304,7 @@ export const TileBoard = (props: TileBoardProps) => {
             ref={setRootRef}
             id={boardId}
             class={styles.tileBoardRoot}
+            classList={{ [styles.tileBoardIsSweepable]: getIsSweepable() }}
             role="grid"
             aria-label={access(props.ariaLabel)}
             aria-rowcount={getLayout().count.row}
@@ -201,24 +312,27 @@ export const TileBoard = (props: TileBoardProps) => {
             aria-disabled={getIsDisabled() || undefined}
             style={{ width: `${getBoardSize().width}px`, height: `${getBoardSize().height}px` }}
             onKeyDown={handleKeyDown}
+            onPointerDown={handlePointerDown}
         >
-            <Index each={Array.from({ length: Math.max(getLayout().count.row, 0) })}>
-                {(_, rowIndex) => (
-                    <div
-                        class={styles.tileBoardRow}
-                        role="row"
-                        aria-rowindex={rowIndex + FIRST_ARIA_INDEX}
-                        style={{
-                            left: `${TileBoardUtils.getRowOffset(rowIndex, getLayout()) + getGap() * HALF}px`,
-                            top: `${TileBoardUtils.getRowTop(rowIndex, getLayout()) + getGap() * HALF}px`,
-                        }}
-                    >
-                        <Index each={Array.from({ length: TileBoardUtils.getRowLength(rowIndex, getLayout()) })}>
-                            {(_, colIndex) => renderTile(rowIndex, colIndex)}
-                        </Index>
-                    </div>
-                )}
-            </Index>
+            <div class={styles.tileBoardPlane} style={{ transform: TileBoardUtils.getTaperTransform(getLayout()) }}>
+                <Index each={Array.from({ length: Math.max(getLayout().count.row, 0) })}>
+                    {(_, rowIndex) => (
+                        <div
+                            class={styles.tileBoardRow}
+                            role="row"
+                            aria-rowindex={rowIndex + FIRST_ARIA_INDEX}
+                            style={{
+                                left: `${TileBoardUtils.getRowOffset(rowIndex, getLayout()) + getGap() * HALF}px`,
+                                top: `${TileBoardUtils.getRowTop(rowIndex, getLayout()) + getGap() * HALF}px`,
+                            }}
+                        >
+                            <Index each={Array.from({ length: TileBoardUtils.getRowLength(rowIndex, getLayout()) })}>
+                                {(_, colIndex) => renderTile(rowIndex, colIndex)}
+                            </Index>
+                        </div>
+                    )}
+                </Index>
+            </div>
         </div>
     );
 };

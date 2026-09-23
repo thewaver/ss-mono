@@ -78,6 +78,32 @@ test("clearing one field clears the value, because the pair is one value", async
 });
 
 /**
+ * Clearing a half empties the value but must not empty the other half behind the user's back: the start field
+ * still shows its date, so retyping the end is a complete pair again and has to be reported as one. The two
+ * halves used to follow the cleared value down to nothing, which left the start field showing text with no
+ * value behind it and the retyped pair never reaching the owner.
+ */
+test("retyping a cleared field brings the range back", async ({ page }) => {
+    await typeInto(page, field(PICKED, 0), "20260810");
+    await typeInto(page, field(PICKED, 1), "20260814");
+
+    await expect.poll(() => readout(page, "picked")).toContain("2026-08-10 to 2026-08-14");
+
+    await page.locator(field(PICKED, 1)).fill("");
+    await page.locator(field(PICKED, 1)).blur();
+
+    await expect.poll(() => readout(page, "picked")).toContain("none");
+
+    await typeInto(page, field(PICKED, 1), "20260816");
+
+    await expect
+        .poll(() => readout(page, "picked"), {
+            message: "the start the field still shows and the retyped end are one range again",
+        })
+        .toContain("2026-08-10 to 2026-08-16");
+});
+
+/**
  * The calendar in the popup and the two fields are two ways into the same signal, so a span picked in the
  * grid has to arrive in the fields. This is the pairing that would break first if the value were two signals.
  */

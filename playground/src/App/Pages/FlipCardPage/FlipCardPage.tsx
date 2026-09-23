@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import type { FlipCardAxis } from "@thewaver/ss-components";
+import type { FlipCardAxis, FlipCardTurnDirection } from "@thewaver/ss-components";
 import { FLIP_CARD_DEFAULTS } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -8,6 +8,7 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
+import { PressedExample } from "./Examples/Pressed";
 
 const AXES: FlipCardAxis[] = ["row", "column"];
 const AXIS_LABELS: Record<FlipCardAxis, string> = {
@@ -27,6 +28,9 @@ export const FlipCardPage = () => {
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(FLIP_CARD_DEFAULTS.transitionDurationMs);
 
     const flippedSignal = createSignal(false);
+    const pressedFlippedSignal = createSignal(false);
+
+    const [getLastTurn, setLastTurn] = createSignal<FlipCardTurnDirection>();
 
     const getExamples = createMemo(() => [
         {
@@ -42,6 +46,28 @@ export const FlipCardPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Default.tsx`,
+        },
+        {
+            key: "pressed",
+            name: "Turned toward the edge pressed",
+            readout: () => {
+                const side = pressedFlippedSignal[0]() ? "back" : "front";
+                const lastTurn = getLastTurn();
+
+                if (!lastTurn)
+                    return `${side} — press an edge to turn the card that way, or slide to lean it without turning`;
+
+                return `${side} — the last turn went ${lastTurn}, and the next lean follows it`;
+            },
+            component: () => (
+                <PressedExample
+                    flippedSignal={pressedFlippedSignal}
+                    axis={getAxis}
+                    transitionDurationMs={getTransitionDurationMs}
+                    onTurn={setLastTurn}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Pressed.tsx`,
         },
     ]);
 

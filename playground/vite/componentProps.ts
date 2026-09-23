@@ -82,7 +82,9 @@ const buildPropsMap = (entryFile: string, utilsEntry: string) => {
         const entries: PropEntry[] = [];
 
         for (const property of checker.getPropertiesOfType(declared)) {
-            const declaration = property.declarations?.[0];
+            const declaration =
+                property.declarations?.find((candidate) => toWrittenType(candidate) !== "undefined") ??
+                property.declarations?.[0];
 
             if (!getIsOwnDeclaration(declaration, path.dirname(entryFile))) continue;
 

@@ -13,6 +13,7 @@ import type {
 } from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { TextFieldTextStyle } from "../../../Primitives/TextField/TextField.types";
 import type { AccessorProps, MaybeAccessor, SignalSource } from "../../../Utils/typeUtils";
+import type { ButtonFlags } from "../../Button/Button.types";
 
 export type SelectFlags = {
     isOpen: boolean;
@@ -49,6 +50,8 @@ export type SelectFieldProps = AccessorProps<
     InteractionControlProps<SelectFlags> & {
         /** Identifies the list the field opens, so the field can point at it. */
         listboxId: string;
+        /** Whether a value has to be given. It is announced and not enforced, because the library validates nothing. */
+        isRequired?: boolean;
         /**
          * Identifies the option the keyboard is currently on, which is how the reader is told what is highlighted
          * without focus leaving the field.
@@ -71,24 +74,21 @@ export type SelectFieldProps = AccessorProps<
     }
 >;
 
-export type SelectOptionItemProps = AccessorProps<
-    InteractionControlProps<SelectOptionFlags> & {
-        /**
-         * Whether this option scrolls itself into view when it becomes the highlighted one, which a list that windows
-         * its options does for itself.
-         */
-        isSelfScrolling: boolean;
-        /** Runs when this option is picked. */
-        onSelect: () => void;
-    }
->;
-
 export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>, "renderControl" | "extraFlags"> &
     AccessorProps<{
         /** Identifies the select, and is what the field and list compose their own ids from. */
         id?: string;
         /** Names the select for assistive technology. */
         ariaLabel?: string;
+        /**
+         * Names the popup list for assistive technology, written as its `aria-label`. Left out, the list is named after
+         * the `Label` the select sits in, or after the field when there is none. The `Label` fallback reads everything
+         * inside the label, the field's current text included, so pass this where the list's name should be exactly the
+         * caption.
+         */
+        listAriaLabel?: string;
+        /** Whether a value has to be given. It is announced and not enforced, because the library validates nothing. */
+        isRequired?: boolean;
         /** Where the list sits against the field. */
         placement?: AnchorPlacement;
         /** How far the list is held clear of the field. */
@@ -129,6 +129,15 @@ export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>,
         ) => JSX.Element;
         /** Runs when the reader reaches the end of the list, for a consumer fetching more options as they scroll. */
         onReachEnd?: () => void;
+        /** Names the clear control for assistive technology, where what it draws has no text of its own. */
+        clearAriaLabel?: string;
+        /**
+         * Draws a control inside the field that empties it, and is handed that control's own state. It is drawn only
+         * while something is picked, sits after the field as a tab stop of its own, and pressing it empties the value,
+         * runs the change callback and returns focus to the field. Escape and the arrow keys do nothing on it. It is
+         * laid over the field's end edge and is not measured, so the field's `padding` has to leave room for it.
+         */
+        renderClear?: (getFlags: () => InteractionFlags<ButtonFlags>) => JSX.Element;
     }> & {
         /** The options, in the order they are shown. An entry carrying children becomes a group. */
         options: MaybeAccessor<SelectItem<T>[]>;
@@ -152,11 +161,13 @@ export type SelectCompositeProps<T> = Omit<InteractionWrapperProps<SelectFlags>,
         renderGroup?: (getGroup: Accessor<SelectOptionGroup<T>>, getFlags: () => SelectGroupFlags) => JSX.Element;
         /** Runs when an option is picked. */
         onPick: (value: T) => void;
+        /** Runs when the clear control is pressed, to empty whatever is picked. */
+        onClear: () => void;
     };
 
 export type SelectPresetProps<T> = Omit<
     SelectCompositeProps<T>,
-    "selectedOptions" | "isMultiple" | "computeIsSelected" | "renderContent" | "onPick"
+    "selectedOptions" | "isMultiple" | "computeIsSelected" | "renderContent" | "onPick" | "onClear"
 >;
 
 export type SelectProps<T> = SelectPresetProps<T> & {
@@ -167,6 +178,6 @@ export type SelectProps<T> = SelectPresetProps<T> & {
         getSelectedOption: Accessor<SelectOption<T> | undefined>,
         getFlags: () => InteractionFlags<SelectFlags>,
     ) => JSX.Element;
-    /** Runs when a different option is picked. */
-    onSelectionChange?: (value: T) => void;
+    /** Runs when a different option is picked, and with `undefined` when the clear control empties the field. */
+    onSelectionChange?: (value: T | undefined) => void;
 };

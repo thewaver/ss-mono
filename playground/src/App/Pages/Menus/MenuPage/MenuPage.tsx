@@ -1,27 +1,51 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
+import { CascaderExample } from "./Examples/Cascader";
 import { ContextAreaExample } from "./Examples/ContextArea";
 import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
 import { DrivenExample } from "./Examples/Driven";
 import { PlacedAboveExample } from "./Examples/PlacedAbove";
 import { ReachableExample } from "./Examples/Reachable";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 import { StatefulExample } from "./Examples/Stateful";
 import { SubmenusExample } from "./Examples/Submenus";
-import { ACTIONS_WITH_DISABLED, ACTIONS_WITH_REACHABLE, LAYERS, NOTHING_RUN, VIEW_DEFAULTS } from "./MenuPage.const";
+import {
+    ACTIONS_WITH_DISABLED,
+    ACTIONS_WITH_REACHABLE,
+    LAYERS,
+    NOTHING_RUN,
+    VIEW_DEFAULTS,
+    ZOOM_ACTIONS,
+    ZOOM_RESET_PERCENT,
+    ZOOM_STEPS,
+    ZOOM_STEP_PERCENT,
+} from "./MenuPage.const";
+import type { Action } from "./MenuPage.types";
 
-const EXAMPLES_ROOT = "/src/App/Pages/MenuPage/Examples";
+const EXAMPLES_ROOT = "/src/App/Pages/Menus/MenuPage/Examples";
 
 export const MenuPage = () => {
     const [getLastAction, setLastAction] = createSignal(NOTHING_RUN);
     const [getLastDisabledAction, setLastDisabledAction] = createSignal(NOTHING_RUN);
     const [getLastReachableAction, setLastReachableAction] = createSignal(NOTHING_RUN);
     const [getLastNestedAction, setLastNestedAction] = createSignal(NOTHING_RUN);
+    const [getLastRightToLeftAction, setLastRightToLeftAction] = createSignal(NOTHING_RUN);
     const [getLastFlippedAction, setLastFlippedAction] = createSignal(NOTHING_RUN);
     const [getLastLayerAction, setLastLayerAction] = createSignal(NOTHING_RUN);
     const [getLastDrivenAction, setLastDrivenAction] = createSignal(NOTHING_RUN);
     const [getLastContextAction, setLastContextAction] = createSignal(NOTHING_RUN);
+
+    const [getZoomPercent, setZoomPercent] = createSignal(ZOOM_RESET_PERCENT);
+
+    const cascaderPathSignal = createSignal<string[]>([]);
+
+    const applyZoom = (action: Action) => {
+        const step = ZOOM_STEPS[action.name];
+
+        setZoomPercent((prev) => (step === undefined ? ZOOM_RESET_PERCENT : Math.max(prev + step, ZOOM_STEP_PERCENT)));
+    };
 
     const drivenVisibility = createSignal(false);
     const viewSignal = createSignal(VIEW_DEFAULTS);
@@ -57,6 +81,14 @@ export const MenuPage = () => {
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
+            key: "staysOpen",
+            name: "Commands worth repeating",
+            readout: () =>
+                `zoom: ${getZoomPercent()}% — Zoom in and Zoom out leave the menu open so they can be pressed again, and Reset zoom closes it`,
+            component: () => <DefaultExample items={() => ZOOM_ACTIONS} caption={"Zoom"} onActivate={applyZoom} />,
+            path: `${EXAMPLES_ROOT}/Default.tsx`,
+        },
+        {
             key: "disabledItems",
             name: "Disabled items",
             readout: () => `${getLastDisabledAction()} — arrows skip Paste and Duplicate`,
@@ -86,6 +118,22 @@ export const MenuPage = () => {
             readout: () => `${getLastNestedAction()} — ArrowRight steps in, ArrowLeft steps back out`,
             component: () => <SubmenusExample onActivate={(action) => setLastNestedAction(action.name)} />,
             path: `${EXAMPLES_ROOT}/Submenus.tsx`,
+        },
+        {
+            key: "cascader",
+            name: "Cascader",
+            readout: () =>
+                `path: [${cascaderPathSignal[0]().join(", ")}] — the trigger shows the path picked so far, and only a leaf writes it; a branch just opens the next level`,
+            component: () => <CascaderExample pathSignal={cascaderPathSignal} />,
+            path: `${EXAMPLES_ROOT}/Cascader.tsx`,
+        },
+        {
+            key: "rightToLeft",
+            name: "Submenus in a right-to-left box",
+            readout: () =>
+                `${getLastRightToLeftAction()} — the box around the trigger sets dir="rtl", so a submenu opens on the left, ArrowLeft steps in and ArrowRight steps back out`,
+            component: () => <RightToLeftExample onActivate={(action) => setLastRightToLeftAction(action.name)} />,
+            path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
         },
         {
             key: "placedAbove",

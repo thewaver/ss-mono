@@ -1,5 +1,6 @@
 export type FormEntry = {
     getHasError: () => boolean;
+    getFocusTarget?: () => HTMLElement | undefined;
 };
 
 export type FormContextType = {

@@ -31,6 +31,13 @@ export const MultiSelect = <T,>(props: MultiSelectProps<T>) => {
 
                 void props.onSelectionChange?.(nextValues);
             }}
+            onClear={() => {
+                if (valuesSignal[0]().length < 1) return;
+
+                valuesSignal[1](() => []);
+
+                void props.onSelectionChange?.([]);
+            }}
         />
     );
 };

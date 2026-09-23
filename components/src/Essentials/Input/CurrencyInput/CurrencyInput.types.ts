@@ -10,6 +10,7 @@ export type CurrencyInputProps = Omit<
     | "computeMaskedText"
     | "placeholderHint"
     | "isSpinButton"
+    | "computeSpinValue"
     | "isAutoSizing"
     | "minRows"
     | "maxRows"

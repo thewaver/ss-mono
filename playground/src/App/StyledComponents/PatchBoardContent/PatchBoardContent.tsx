@@ -4,7 +4,7 @@ import type { PagePatchCableProps, PagePatchNodeProps, PagePatchSocketProps } fr
 
 import * as styles from "./PatchBoardContent.css";
 
-const MIN_BOW = 40;
+const MIN_BOW = 0.09;
 const BOW_RATIO = 0.55;
 
 export const PagePatchNode = (props: PagePatchNodeProps) => {

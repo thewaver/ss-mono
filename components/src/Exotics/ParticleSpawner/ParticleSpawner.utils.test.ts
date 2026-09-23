@@ -3,6 +3,11 @@ import { describe, expect, it, vi } from "vitest";
 import { ParticleSpawnerUtils } from "./ParticleSpawner.utils";
 
 describe("ParticleSpawnerUtils", () => {
+    it("rounds a requested count and treats a negative one as none", () => {
+        expect(ParticleSpawnerUtils.toParticleCount(2.6)).toBe(3);
+        expect(ParticleSpawnerUtils.toParticleCount(-4)).toBe(0);
+    });
+
     it("picks no target when there are none to pick from", () => {
         expect(ParticleSpawnerUtils.pickRandomTarget(0)).toBeUndefined();
     });

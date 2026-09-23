@@ -12,3 +12,13 @@ export type MenuExampleProps = {
 export type MenuDrivenExampleProps = MenuExampleProps & {
     visibilitySignal: Signal<boolean>;
 };
+
+export type Destination = {
+    name: string;
+    path: string[];
+    isLeaf: boolean;
+};
+
+export type MenuCascaderExampleProps = {
+    pathSignal: Signal<string[]>;
+};

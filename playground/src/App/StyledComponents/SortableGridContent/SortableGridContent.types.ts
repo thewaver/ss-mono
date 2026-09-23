@@ -20,6 +20,7 @@ export type SortableGridItemContentProps = AccessorProps<{
 
 export type SortableGridCellProps = AccessorProps<{
     spot: SortableGridSpot;
+    isBlocked?: boolean;
 }>;
 
 export type SortableGridLandingProps = AccessorProps<{

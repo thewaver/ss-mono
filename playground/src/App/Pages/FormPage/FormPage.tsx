@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { FocusOnErrorExample } from "./Examples/FocusOnError";
 import { SignUpExample } from "./Examples/SignUp";
 import type { FormExampleProps } from "./FormPage.types";
 
@@ -12,6 +13,11 @@ export const FormPage = () => {
     const termsSignal = createSignal(false);
 
     const [getOutcome, setOutcome] = createSignal("not submitted");
+
+    const planSignal = createSignal<string | undefined>();
+    const topicsSignal = createSignal<string[]>([]);
+
+    const [getFocusOutcome, setFocusOutcome] = createSignal("not submitted");
 
     const getExamples = createMemo(() => {
         const commonProps: FormExampleProps = {
@@ -33,6 +39,29 @@ export const FormPage = () => {
                 readout: () => `outcome: ${getOutcome()}`,
                 component: () => <SignUpExample {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/SignUp.tsx`,
+            },
+            {
+                key: "focusOnError",
+                name: "Submitting moves focus to the first error",
+                readout: () =>
+                    `outcome: ${getFocusOutcome()} — the handler runs either way, and afterwards focus lands on the first field reporting an error`,
+                component: () => (
+                    <FocusOnErrorExample
+                        planSignal={planSignal}
+                        topicsSignal={topicsSignal}
+                        onSubmit={() => {
+                            setFocusOutcome(
+                                `submitted as ${planSignal[0]() ?? "no plan"}, [${topicsSignal[0]().join(", ")}]`,
+                            );
+                        }}
+                        onReset={() => {
+                            planSignal[1](undefined);
+                            topicsSignal[1]([]);
+                            setFocusOutcome("not submitted");
+                        }}
+                    />
+                ),
+                path: `${EXAMPLES_ROOT}/FocusOnError.tsx`,
             },
         ];
     });

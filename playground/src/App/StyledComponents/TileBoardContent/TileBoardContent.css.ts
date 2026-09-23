@@ -64,5 +64,5 @@ export const tileBoardMeeple = style({
     boxShadow: themeVars.shadow.medium,
     filter: `drop-shadow(0 0 ${GLOW_NEAR} ${themeVars.color.primary.main}) drop-shadow(0 0 ${GLOW_FAR} ${themeVars.color.primary.main})`,
     pointerEvents: "none",
-    transition: `left ${themeVars.animation.duration}, top ${themeVars.animation.duration}`,
+    transition: `left ${themeVars.animation.duration}, top ${themeVars.animation.duration}, width ${themeVars.animation.duration}`,
 });

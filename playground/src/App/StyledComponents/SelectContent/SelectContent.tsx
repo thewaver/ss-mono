@@ -1,4 +1,5 @@
 import type { ParentProps } from "solid-js";
+import { Show } from "solid-js";
 
 import type { InteractionFlags, SelectFlags, TextFieldTextStyle } from "@thewaver/ss-components";
 import { access } from "@thewaver/ss-components";
@@ -31,6 +32,9 @@ export const PageSelectContent = (props: ParentProps<SelectContentProps>) => {
             }}
         >
             <div class={styles.selectValue}>{props.children}</div>
+            <Show when={access(props.hasClearSpace) && !access(props.flags).isEmpty}>
+                <div class={styles.selectClearSpace} />
+            </Show>
             <div class={styles.selectChevron} />
         </div>
     );

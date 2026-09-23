@@ -24,6 +24,12 @@ export type CardStackCardState<T> = {
      * length of one transition, which is the window a painter has to fade the card or spin it.
      */
     leavingTo: SwipeDirection | undefined;
+    /**
+     * Which side a recalled card is about to come back from, or `undefined` otherwise. It is set only for the
+     * moment the card sits off to the side it left by, before it starts back, so whatever a painter draws for
+     * it is the pose the card returns from — the reverse of `leavingTo`, which is the pose it leaves toward.
+     */
+    returningFrom: SwipeDirection | undefined;
 };
 
 export type CardStackControls = {
@@ -35,9 +41,20 @@ export type CardStackControls = {
      * Sends the top card away, as a press or a key would.
      *
      * @param direction Which way it leaves.
-     * @returns `false` when the pile is empty or a card is already on its way out.
+     * @returns `false` when the pile is empty, the direction is not among `allowedDirections`, or a card is
+     * already on its way out or back.
      */
     send: (direction: SwipeDirection) => boolean;
+    /**
+     * Brings the last card that left back onto the top of the pile, returning from the side it left by.
+     *
+     * A card that was moved past by setting `topIndexSignal` rather than sent has no side to come back from,
+     * so it reappears in place.
+     *
+     * @returns `false` when no card has left yet, the stack is disabled, or a card is already on its way out or
+     * back.
+     */
+    recall: () => boolean;
     /**
      * Puts every card back on the pile.
      *
@@ -77,12 +94,28 @@ export type CardStackProps<T> = AccessorProps<{
      * card narrowed past nothing is held at nothing rather than turning inside out.
      */
     funnelRatio?: number;
+    /**
+     * Which ways a card may be sent. All four by default.
+     *
+     * A direction left out is refused by every route: a swipe that way springs back, its arrow key does
+     * nothing and lets the page scroll, and `send` returns `false`. When the ones left in share one axis the
+     * stack claims only that axis, so a touch screen can still scroll the page along the other; with both axes
+     * in play it claims both, and the page cannot be flicked from on top of the stack.
+     */
+    allowedDirections?: SwipeDirection[];
     /** Turns the stack off, so no card moves by gesture, key or control. */
     isDisabled?: boolean;
     /** Names the stack for assistive technology. */
     ariaLabel: string;
-    /** Names one card, so a reader hears what it is rather than group. */
-    computeCardLabel?: (card: T, index: number) => string;
+    /** Names one card, so a reader hears what it is rather than group. The index counts from zero. */
+    computeCardLabel: (card: T, index: number) => string;
+    /**
+     * What the stack is called when it is announced, so a reader hears card stack rather than group. Defaults to
+     * "card stack".
+     */
+    roleDescription?: string;
+    /** What one card is called when it is announced, so a reader hears card rather than group. Defaults to "card". */
+    cardRoleDescription?: string;
 }> & {
     /** The cards, top of the pile first. */
     cards: MaybeAccessor<T[]>;

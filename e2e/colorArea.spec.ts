@@ -79,7 +79,7 @@ test("the sliders keep the keyboard, and report a percentage rather than a raw r
 });
 
 test("the dropdown is a dialog holding the surface and a hue slider", async ({ page }) => {
-    await expect(page.locator(POPUP), "nothing is portalled before it opens").toHaveCount(0);
+    await expect(page.locator(POPUP), "nothing is portaled before it opens").toHaveCount(0);
 
     await page.locator(`${DROPDOWN} button`).first().click();
 

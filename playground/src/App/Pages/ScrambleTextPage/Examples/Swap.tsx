@@ -9,7 +9,7 @@ import type { ScrambleTextExampleProps } from "../ScrambleTextPage.types";
 import { MEASURE_BOX_PADDING } from "../../../PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "../ScrambleTextPage.css";
 
-const STATUSES = ["CONNECTING", "HANDSHAKE", "AUTHORISED", "STREAMING", "IDLE"];
+const STATUSES = ["CONNECTING", "HANDSHAKE", "AUTHORIZED", "STREAMING", "IDLE"];
 const BOX_WIDTH = 320;
 const FIRST_STATUS = 0;
 
@@ -24,7 +24,7 @@ export const SwapExample = (props: Props) => {
                 <div class={styles.headline}>
                     <ScrambleText
                         text={() => STATUSES[getStatusIndex()]}
-                        glyphs={props.glyphs}
+                        computeGlyphs={props.computeGlyphs}
                         settleDurationMs={props.settleDurationMs}
                         scrambleIntervalMs={props.scrambleIntervalMs}
                         computeCharacterWeights={props.computeCharacterWeights}

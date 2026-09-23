@@ -7,3 +7,8 @@ export type CalendarExampleProps = AccessorProps<{
     valueSignal: Signal<DateValue | undefined>;
     monthSignal: Signal<DateValue>;
 }>;
+
+export type CalendarPrecisionExampleProps = {
+    valueSignal: Signal<DateValue | undefined>;
+    monthSignal: Signal<DateValue>;
+};

@@ -9,14 +9,17 @@ import * as styles from "./ScrambleText.css";
 
 const NO_DELAY = 0;
 const NO_ELAPSED = 0;
+const NOTHING_KEPT: boolean[] = [];
 
 export const ScrambleText = (props: ScrambleTextProps) => {
     const [getElapsedMs, setElapsedMs] = createSignal(NO_ELAPSED);
     const [getNoise, setNoise] = createSignal<string[]>([]);
     const [getIsScrambling, setIsScrambling] = createSignal(false);
+    const [getKept, setKept] = createSignal(NOTHING_KEPT);
 
     let scrambleInterval: ReturnType<typeof setInterval> | undefined;
     let startedAtMs = NO_ELAPSED;
+    let runSettleTimes: number[] = [];
 
     onCleanup(() => {
         clearInterval(scrambleInterval);
@@ -26,7 +29,11 @@ export const ScrambleText = (props: ScrambleTextProps) => {
 
     const getSegments = createMemo(() => ScrambleTextUtils.getSegments(getCharacters()));
 
-    const getGlyphs = createMemo(() => Array.from(access(props.glyphs) ?? SCRAMBLE_TEXT_DEFAULTS.glyphs));
+    const getGlyphSets = createMemo(() => {
+        const computeGlyphs = props.computeGlyphs ?? SCRAMBLE_TEXT_DEFAULTS.computeGlyphs;
+
+        return getCharacters().map((character) => Array.from(computeGlyphs(character)));
+    });
 
     const getSettleDurationMs = createMemo(
         () => access(props.settleDurationMs) ?? SCRAMBLE_TEXT_DEFAULTS.settleDurationMs,
@@ -52,19 +59,22 @@ export const ScrambleText = (props: ScrambleTextProps) => {
 
     const getStartTimes = createMemo(() => ScrambleTextUtils.getStartTimes(getSettleTimes(), getChurnDurationMs()));
 
-    const getIsSettled = (index: number) => !getIsScrambling() || getElapsedMs() >= getSettleTimes()[index];
+    const getIsSettled = (index: number) =>
+        !getIsScrambling() || !!getKept()[index] || getElapsedMs() >= getSettleTimes()[index];
 
     const getIsPending = (index: number) => getIsScrambling() && getElapsedMs() < getStartTimes()[index];
 
     const rollNoise = () => {
-        const glyphs = getGlyphs();
+        const glyphSets = getGlyphSets();
 
         setNoise((previous) =>
-            getCharacters().map((character, index) =>
-                getIsSettled(index) || getIsPending(index)
-                    ? (previous[index] ?? ScrambleTextUtils.pickGlyph(glyphs, character, Math.random()))
-                    : ScrambleTextUtils.pickGlyph(glyphs, character, Math.random()),
-            ),
+            getCharacters().map((character, index) => {
+                if (ScrambleTextUtils.getIsWhitespace(character)) return character;
+
+                return getIsSettled(index) || getIsPending(index)
+                    ? (previous[index] ?? ScrambleTextUtils.pickGlyph(glyphSets[index], character, Math.random()))
+                    : ScrambleTextUtils.pickGlyph(glyphSets[index], character, Math.random());
+            }),
         );
     };
 
@@ -73,10 +83,29 @@ export const ScrambleText = (props: ScrambleTextProps) => {
         setIsScrambling(false);
     };
 
-    const startScrambling = () => {
+    const getWasSettled = () => {
+        const elapsedMs = Date.now() - startedAtMs;
+        const kept = getKept();
+
+        return runSettleTimes.map(
+            (settleTime, index) => !getIsScrambling() || !!kept[index] || elapsedMs >= settleTime,
+        );
+    };
+
+    const getKeptAfterChange = (previous: string[], characters: string[]) => {
+        const wasSettled = getWasSettled();
+
+        return ScrambleTextUtils.getCarriedIndices(previous, characters).map(
+            (from) => from !== undefined && wasSettled[from],
+        );
+    };
+
+    const startScrambling = (kept = NOTHING_KEPT) => {
         stopScrambling();
 
         startedAtMs = Date.now();
+        runSettleTimes = getSettleTimes();
+        setKept(kept);
         setElapsedMs(NO_ELAPSED);
         rollNoise();
         setIsScrambling(true);
@@ -100,7 +129,13 @@ export const ScrambleText = (props: ScrambleTextProps) => {
         restartAnimation: () => startScrambling(),
     }));
 
-    createEffect(on(getCharacters, () => startScrambling()));
+    createEffect(
+        on(getCharacters, (characters, previous) =>
+            startScrambling(
+                previous && access(props.changedOnly) ? getKeptAfterChange(previous, characters) : NOTHING_KEPT,
+            ),
+        ),
+    );
 
     onMount(() => {
         props.onMount?.(controller());

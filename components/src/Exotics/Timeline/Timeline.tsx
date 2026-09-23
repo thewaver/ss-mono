@@ -1,6 +1,7 @@
 import {
     For,
     Index,
+    Show,
     batch,
     createEffect,
     createMemo,
@@ -11,7 +12,12 @@ import {
     untrack,
 } from "solid-js";
 
+import type { Point2d } from "@thewaver/ss-utils";
+
+import type { CarrierZone, Carry, CarryMode, CarryPlace } from "../../Abstracts/Carrier/Carrier.types";
+import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
 import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
+import { LiveAnnouncerUtils } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer.utils";
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
@@ -19,6 +25,8 @@ import { access } from "../../Utils/propUtils";
 import { TIMELINE_DEFAULTS } from "./Timeline.const";
 import type {
     TimelineController,
+    TimelineEdge,
+    TimelineEdgeCarry,
     TimelineItemProps,
     TimelineItemRenderProps,
     TimelinePlacement,
@@ -41,6 +49,18 @@ const PRIMARY_BUTTON = 0;
 const PINCH_POINTERS = 2;
 const DRAG_SLOP = 4;
 const ZOOM_RATE = 0.0015;
+const HOLD_KEY = "Enter";
+const NO_MARKERS: number[] = [];
+
+const EDGE_BY_KEY: Record<string, TimelineEdge> = {
+    Home: "start",
+    End: "end",
+};
+
+const NUDGE_BY_KEY: Record<string, number> = {
+    ArrowRight: SINGLE,
+    ArrowLeft: -SINGLE,
+};
 
 const STEP_BY_KEY: Record<string, TimelineStep> = {
     ArrowRight: "next",
@@ -61,6 +81,7 @@ const TimelineItem = (props: TimelineItemProps) => {
             class={styles.timelineControl}
             role="button"
             aria-label={props.ariaLabel}
+            aria-describedby={props.ariaDescribedBy}
             aria-disabled={getIsDisabled() || undefined}
             onFocus={() => props.onFocused()}
             onClick={() => {
@@ -75,11 +96,15 @@ const TimelineItem = (props: TimelineItemProps) => {
 };
 
 export const Timeline = <T,>(props: TimelineProps<T>) => {
+    onMount(() => LiveAnnouncerUtils.reserve("polite"));
+
     const timelineId = createUniqueId();
+    const hintId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const itemRefs = new Map<number, HTMLElement>();
     const [getFocusedIndex, setFocusedIndex] = createSignal<number>();
+    const [getHeldEdge, setHeldEdge] = createSignal<TimelineEdge>("end");
 
     const pointerXs = new Map<number, number>();
 
@@ -88,6 +113,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     let panFrom: number | undefined;
     let pinchGap: number | undefined;
     let pinchCenter: number | undefined;
+    let edgeGrabOffset = NOTHING;
 
     const getSize = ElementObserverUtils.createBorderBoxSizeObserver(getRootRef);
 
@@ -139,10 +165,86 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     const getIsItemDisabled = (index: number) =>
         getIsDisabled() || (props.computeIsItemDisabled?.(getItems()[index], index) ?? false);
 
+    const getIsEditable = createMemo(() => props.onSpanChange !== undefined && !getIsDisabled());
+
+    const getEdgeAnnouncements = createMemo(
+        () => access(props.edgeAnnouncements) ?? TIMELINE_DEFAULTS.edgeAnnouncements,
+    );
+
+    const getEdgeGrabSize = createMemo(() => access(props.edgeGrabSize) ?? TIMELINE_DEFAULTS.edgeGrabSize);
+
+    const asEdgeCarry = (carry: Carry) => carry.value as TimelineEdgeCarry;
+
+    const asSpan = (place: CarryPlace) => place as TimelineSpan;
+
+    const zone: CarrierZone = {
+        getGroupId: () => timelineId,
+        getLabel: () => access(props.ariaLabel) ?? "",
+        getRootRef,
+        getIsDisabled: () => !getIsEditable(),
+        getKeyHint: () => getEdgeAnnouncements().heldKeyHint,
+        getAnnouncements: getEdgeAnnouncements,
+        computeCanAccept: () => getIsEditable(),
+        computePlaceAtPoint: (point) => {
+            const place = CarrierUtils.getTargetPlace();
+
+            if (place === undefined) return undefined;
+
+            const value = TimelineUtils.toValue(getPointerRatio(point.x), getView()) - edgeGrabOffset;
+            const snapped = props.computeSnapValue?.(value) ?? value;
+
+            return TimelineUtils.moveEdge(asSpan(place), untrack(getHeldEdge), snapped, getRange());
+        },
+        computeNudgedPlace: (place, nudge) => {
+            const span = asSpan(place);
+            const edge = untrack(getHeldEdge);
+            const value = TimelineUtils.computeSteppedEdgeValue(
+                span[edge],
+                nudge.x ?? NOTHING,
+                getSteps().step,
+                getRange(),
+                props.computeSnapValue,
+            );
+
+            return TimelineUtils.moveEdge(span, edge, value, getRange());
+        },
+        computeEntryPlace: (carry) => getSpans()[asEdgeCarry(carry).index],
+        computeIsSamePlace: (first, second) =>
+            asSpan(first).start === asSpan(second).start && asSpan(first).end === asSpan(second).end,
+        computeIsPlaceAllowed: () => true,
+        computePlaceLabel: (place) => getEdgeAnnouncements().computePlaceLabel(untrack(getHeldEdge), asSpan(place)),
+        takeAt: () => undefined,
+        putAt: () => undefined,
+        moveAt: (_unusedFrom, toPlace, carry) => {
+            const index = asEdgeCarry(carry).index;
+
+            props.onSpanChange?.(getItems()[index], index, asSpan(toPlace));
+        },
+    };
+
+    CarrierUtils.registerZone(zone);
+
+    const getEdgeCarry = () => (CarrierUtils.getSourceZone() === zone ? CarrierUtils.getCarry() : undefined);
+
+    const getHeldIndex = createMemo(() => {
+        const carry = getEdgeCarry();
+
+        return carry && asEdgeCarry(carry).index;
+    });
+
+    const getShownSpans = createMemo(() => {
+        const index = getHeldIndex();
+        const place = CarrierUtils.getTargetPlace();
+
+        if (index === undefined || place === undefined) return getSpans();
+
+        return getSpans().map((span, at) => (at === index ? asSpan(place) : span));
+    });
+
     const getOrder = createMemo(() => TimelineUtils.computeOrder(getSpans(), getLanes()));
 
     const getPlacements = createMemo(() =>
-        TimelineUtils.computePlacements(getSpans(), getLanes(), getOrder(), getView()),
+        TimelineUtils.computePlacements(getShownSpans(), getLanes(), getOrder(), getView()),
     );
 
     const getStops = createMemo(() =>
@@ -181,6 +283,8 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
     );
 
     const getTicks = createMemo(() => TimelineUtils.computeTicks(getView(), getSteps()));
+
+    const getMarkers = createMemo(() => TimelineUtils.computeMarkers(access(props.markers) ?? NO_MARKERS, getView()));
 
     const setItemRef = (index: number, element: HTMLElement) => {
         itemRefs.set(index, element);
@@ -261,6 +365,123 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
     const getWidth = () => getSize().width;
 
+    const focusItem = (index: number) => {
+        const element = itemRefs.get(index);
+
+        setFocusedIndex(index);
+
+        if (element === undefined) return;
+
+        element.tabIndex = ROVING_TAB_INDEX;
+        element.focus();
+    };
+
+    const pickUpEdge = (index: number, edge: TimelineEdge, mode: CarryMode, from?: Point2d) => {
+        if (!getIsEditable() || getIsItemDisabled(index)) return;
+
+        const span = getSpans()[index];
+
+        edgeGrabOffset =
+            from === undefined ? NOTHING : TimelineUtils.toValue(getPointerRatio(from.x), getView()) - span[edge];
+
+        setHeldEdge(edge);
+
+        CarrierUtils.start(
+            zone,
+            span,
+            {
+                groupId: timelineId,
+                key: `${index}`,
+                label: props.computeItemAriaLabel?.(getItems()[index], index) ?? "",
+                value: { index } satisfies TimelineEdgeCarry,
+            },
+            mode,
+        );
+    };
+
+    const revealHeldEdge = () => {
+        const place = CarrierUtils.getTargetPlace();
+
+        if (place === undefined) return;
+
+        const value = asSpan(place)[untrack(getHeldEdge)];
+
+        setView(TimelineUtils.revealView({ start: value, end: value }, getView(), getRange()));
+    };
+
+    const holdEdge = (edge: TimelineEdge) => {
+        const carry = getEdgeCarry();
+        const place = CarrierUtils.getTargetPlace();
+
+        if (!carry || place === undefined || edge === untrack(getHeldEdge)) return;
+
+        setHeldEdge(edge);
+
+        LiveAnnouncerUtils.announce(
+            getEdgeAnnouncements().computeAimed(zone.computePlaceLabel(place, carry), zone.getLabel()),
+        );
+    };
+
+    const handleEdgePointerDown = (index: number, edge: TimelineEdge, e: PointerEvent) => {
+        if (e.button !== PRIMARY_BUTTON && e.pointerType === "mouse") return;
+
+        e.stopPropagation();
+
+        const root = getRootRef();
+
+        if (!root || CarrierUtils.getCarry()) return;
+
+        CarrierUtils.dragFromPointer(root, e, (from) => pickUpEdge(index, edge, "drag", from));
+    };
+
+    const handleEdgeClick = (index: number, edge: TimelineEdge, e: MouseEvent) => {
+        e.stopPropagation();
+
+        if (CarrierUtils.getCarry()) return;
+
+        pickUpEdge(index, edge, "tap");
+        focusItem(index);
+    };
+
+    const handleFocusOut = (e: FocusEvent) => {
+        if (!getEdgeCarry() || CarrierUtils.getCarryMode() !== "key") return;
+        if (getRootRef()?.contains(e.relatedTarget as Node | null)) return;
+
+        CarrierUtils.end("cancel");
+    };
+
+    const handleHeldKeyDown = (e: KeyboardEvent) => {
+        if (!getEdgeCarry() || CarrierUtils.getCarryMode() === "drag") return false;
+
+        const edge = EDGE_BY_KEY[e.key];
+        const nudge = NUDGE_BY_KEY[e.key];
+
+        if (e.key === "Escape") {
+            e.preventDefault();
+            CarrierUtils.end("cancel");
+
+            return true;
+        }
+
+        if (NavigatorUtils.getIsActivationKey(e.key)) {
+            e.preventDefault();
+            CarrierUtils.end("drop");
+
+            return true;
+        }
+
+        if (edge === undefined && nudge === undefined) return STEP_BY_KEY[e.key] !== undefined;
+
+        e.preventDefault();
+
+        if (edge !== undefined) holdEdge(edge);
+        if (nudge !== undefined) CarrierUtils.aimAtNudge({ x: nudge });
+
+        revealHeldEdge();
+
+        return true;
+    };
+
     const endGesture = (e: PointerEvent) => {
         pointerXs.delete(e.pointerId);
         pinchGap = undefined;
@@ -339,6 +560,15 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
         if (from === undefined || getIsDisabled()) return;
 
+        if (handleHeldKeyDown(e)) return;
+
+        if (e.key === HOLD_KEY && getIsEditable()) {
+            e.preventDefault();
+            pickUpEdge(from, "end", "key");
+
+            return;
+        }
+
         if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();
             activateItem(from);
@@ -357,6 +587,54 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         e.preventDefault();
         moveTo(next);
     };
+
+    createEffect(() => {
+        if (!getEdgeCarry()) return;
+
+        const trackPoint = (e: PointerEvent) => {
+            if (CarrierUtils.getCarryMode() !== "tap") return;
+
+            CarrierUtils.aimAtPoint(e.clientX, e.clientY);
+        };
+
+        document.addEventListener("pointermove", trackPoint, true);
+
+        onCleanup(() => {
+            document.removeEventListener("pointermove", trackPoint, true);
+        });
+    });
+
+    createEffect(() => {
+        const root = getRootRef();
+
+        if (!root) return;
+
+        const dropAtClick = (e: MouseEvent) => {
+            if (!getEdgeCarry() || CarrierUtils.getCarryMode() === "drag") return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            CarrierUtils.aimAtPoint(e.clientX, e.clientY);
+            CarrierUtils.end("drop");
+        };
+
+        root.addEventListener("click", dropAtClick, true);
+
+        onCleanup(() => {
+            root.removeEventListener("click", dropAtClick, true);
+        });
+    });
+
+    createEffect(() => {
+        if (getIsEditable() || !getEdgeCarry()) return;
+
+        CarrierUtils.end("cancel");
+    });
+
+    onCleanup(() => {
+        if (CarrierUtils.getSourceZone() === zone) CarrierUtils.end("cancel");
+    });
 
     const renderItem = (index: number) => {
         const getPlacement = () => getPlacementOf(index);
@@ -380,8 +658,9 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                     extraFlags={(): TimelineItemRenderProps => ({
                         index,
                         placement: getPlacement(),
-                        span: getSpans()[index],
+                        span: getShownSpans()[index],
                         isFocused: getFocusedIndex() === index,
+                        heldEdge: getHeldIndex() === index ? getHeldEdge() : undefined,
                     })}
                     ref={(element) => setItemRef(index, element)}
                     renderControl={(setElementRef, getFlags) => (
@@ -389,6 +668,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                             id={`${timelineId}-item-${index}`}
                             ref={setElementRef}
                             ariaLabel={props.computeItemAriaLabel?.(getItems()[index], index)}
+                            ariaDescribedBy={getIsEditable() ? hintId : undefined}
 
                             flags={getFlags()}
                             renderContent={(getItemFlags) => props.renderItem(() => getItems()[index], getItemFlags)}
@@ -397,6 +677,24 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                         />
                     )}
                 />
+
+                <Show when={getIsEditable() && !getIsItemDisabled(index)}>
+                    <div
+                        class={styles.timelineEdge}
+                        style={{ left: `${-getEdgeGrabSize() * 0.5}px`, width: `${getEdgeGrabSize()}px` }}
+                        aria-hidden="true"
+                        onPointerDown={(e) => handleEdgePointerDown(index, "start", e)}
+                        onClick={(e) => handleEdgeClick(index, "start", e)}
+                    />
+
+                    <div
+                        class={styles.timelineEdge}
+                        style={{ right: `${-getEdgeGrabSize() * 0.5}px`, width: `${getEdgeGrabSize()}px` }}
+                        aria-hidden="true"
+                        onPointerDown={(e) => handleEdgePointerDown(index, "end", e)}
+                        onClick={(e) => handleEdgeClick(index, "end", e)}
+                    />
+                </Show>
             </li>
         );
     };
@@ -411,6 +709,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                 "touch-action": getIsPannable() || getIsZoomable() ? "pan-y" : undefined,
             }}
             onKeyDown={handleKeyDown}
+            onFocusOut={handleFocusOut}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={endGesture}
@@ -427,9 +726,25 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
                 </Index>
             </div>
 
+            <Show when={getIsEditable()}>
+                <div id={hintId} class={styles.timelineHint}>
+                    {getEdgeAnnouncements().restingKeyHint}
+                </div>
+            </Show>
+
             <ul class={styles.timelineList} role="list" aria-label={access(props.ariaLabel)}>
                 <For each={getRenderedIndices()}>{(index) => renderItem(index)}</For>
             </ul>
+
+            <div class={styles.timelineMarkers} aria-hidden="true">
+                <Index each={getMarkers()}>
+                    {(getMarker, index) => (
+                        <div class={styles.timelineMarker} style={{ left: `${getMarker().ratio * PERCENT}%` }}>
+                            {props.renderMarker?.(getMarker, index)}
+                        </div>
+                    )}
+                </Index>
+            </div>
         </div>
     );
 };

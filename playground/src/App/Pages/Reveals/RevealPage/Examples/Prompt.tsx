@@ -12,9 +12,11 @@ export const PromptExample = (props: Props) => {
             <Reveal
                 radius={props.radius}
                 softness={props.softness}
+                stepSize={props.stepSize}
                 joinRadii={props.joinRadii}
                 lameExponents={props.lameExponents}
                 isDisabled={props.isDisabled}
+                ariaLabel={"A cover that knows when it is being looked under"}
                 computePoints={props.computePoints()}
                 renderContent={() => (
                     <div class={styles.content}>

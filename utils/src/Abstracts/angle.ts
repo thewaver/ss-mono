@@ -66,7 +66,7 @@ export namespace AngleUtils {
      *
      * @param from The bearing being turned away from.
      * @param to The bearing being turned toward.
-     * @returns The turn in degrees, negative anticlockwise and positive clockwise, from `-180`
+     * @returns The turn in degrees, negative counterclockwise and positive clockwise, from `-180`
      * (exclusive) to `180` (inclusive). Two bearings exactly opposite each other have no shorter way
      * round and report `180`.
      */

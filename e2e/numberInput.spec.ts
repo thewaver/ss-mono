@@ -17,7 +17,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("the field is a text input announcing itself as a spin button", async ({ page }) => {
-    await expect(page.locator(QUANTITY), "the element is text, so no value is ever sanitised away").toHaveAttribute(
+    await expect(page.locator(QUANTITY), "the element is text, so no value is ever sanitized away").toHaveAttribute(
         "type",
         "text",
     );

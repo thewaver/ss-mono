@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { SortableGridBox, SortableGridSpot } from "./SortableGrid.types";
+import type { SortableGridBox, SortableGridFootprint, SortableGridItem, SortableGridSpot } from "./SortableGrid.types";
 import { SortableGridUtils } from "./SortableGrid.utils";
 
 const box = (col: number, row: number, colCount: number, rowCount: number): SortableGridBox => ({
@@ -11,6 +11,12 @@ const box = (col: number, row: number, colCount: number, rowCount: number): Sort
 const at = (col: number, row: number): SortableGridSpot => ({ col, row });
 
 const ELL = [at(0, 0), at(0, 1), at(0, 2), at(1, 2)];
+
+const item = (value: string, col: number, row: number, footprint: SortableGridFootprint, turns = 0) =>
+    ({ value, spot: at(col, row), footprint, turns }) satisfies SortableGridItem<string>;
+
+const spotsOf = (items: SortableGridItem<string>[]) =>
+    items.map((entry) => `${entry.value}@${entry.spot.col},${entry.spot.row}`);
 
 const keys = (cells: SortableGridSpot[]) => cells.map((cell) => `${cell.col},${cell.row}`).sort();
 
@@ -91,6 +97,81 @@ describe("getFreeSpot", () => {
         const shape = SortableGridUtils.getShape({ colCount: 2, rowCount: 1 }, 0);
 
         expect(SortableGridUtils.getFreeSpot(shape, 1, 1, [])).toBeUndefined();
+    });
+});
+
+describe("getSteppedSpot", () => {
+    const ONE = SortableGridUtils.getShape({ colCount: 1, rowCount: 1 }, 0);
+    const WIDE = SortableGridUtils.getShape({ colCount: 2, rowCount: 1 }, 0);
+    const RIGHT = { col: 1, row: 0 };
+
+    it("moves one cell when nothing is blocked", () => {
+        expect(SortableGridUtils.getSteppedSpot(at(0, 0), RIGHT, ONE, COLUMNS, ROWS, [])).toEqual(at(1, 0));
+    });
+
+    it("steps over a wall to the first spot clear of it", () => {
+        expect(SortableGridUtils.getSteppedSpot(at(0, 0), RIGHT, ONE, COLUMNS, ROWS, [at(1, 0), at(2, 0)])).toEqual(
+            at(3, 0),
+        );
+    });
+
+    it("counts every cell of the shape, so a wide one clears the wall with all of itself", () => {
+        expect(SortableGridUtils.getSteppedSpot(at(0, 0), RIGHT, WIDE, COLUMNS, ROWS, [at(2, 0)])).toEqual(at(3, 0));
+    });
+
+    it("takes the plain step when there is nothing clear before the edge", () => {
+        expect(SortableGridUtils.getSteppedSpot(at(3, 0), RIGHT, ONE, COLUMNS, ROWS, [at(4, 0), at(5, 0)])).toEqual(
+            at(4, 0),
+        );
+    });
+
+    it("stays put against the edge", () => {
+        expect(SortableGridUtils.getSteppedSpot(at(5, 0), RIGHT, ONE, COLUMNS, ROWS, [])).toEqual(at(5, 0));
+    });
+});
+
+describe("getCompacted", () => {
+    it("slides an item straight up until something is in its way", () => {
+        const items = [item("a", 0, 0, { colCount: 1, rowCount: 1 }), item("b", 0, 3, { colCount: 1, rowCount: 1 })];
+
+        expect(spotsOf(SortableGridUtils.getCompacted(items, []))).toEqual(["a@0,0", "b@0,1"]);
+    });
+
+    it("stops under a blocked cell rather than jumping past it", () => {
+        const items = [item("a", 1, 3, { colCount: 1, rowCount: 1 })];
+
+        expect(spotsOf(SortableGridUtils.getCompacted(items, [at(1, 1)]))).toEqual(["a@1,2"]);
+    });
+
+    it("lets a shape slide into the notch of another, since fit is cell by cell", () => {
+        const gamma = [at(0, 0), at(1, 0), at(0, 1), at(0, 2)];
+        const items = [item("gamma", 0, 0, gamma), item("dot", 1, 3, { colCount: 1, rowCount: 1 })];
+
+        expect(spotsOf(SortableGridUtils.getCompacted(items, []))).toEqual(["gamma@0,0", "dot@1,1"]);
+    });
+
+    it("keeps an item's turn and moves it by its turned shape", () => {
+        const items = [
+            item("bar", 0, 0, { colCount: 3, rowCount: 1 }),
+            item("post", 2, 3, { colCount: 3, rowCount: 1 }, 1),
+        ];
+        const compacted = SortableGridUtils.getCompacted(items, []);
+
+        expect(spotsOf(compacted)).toEqual(["bar@0,0", "post@2,1"]);
+        expect(compacted[1].turns).toBe(1);
+    });
+
+    it("goes round again, so an item freed by another sliding away is pulled up too", () => {
+        const items = [item("ell", 0, 1, ELL), item("dot", 1, 2, { colCount: 1, rowCount: 1 })];
+
+        expect(spotsOf(SortableGridUtils.getCompacted(items, []))).toEqual(["ell@0,0", "dot@1,0"]);
+    });
+
+    it("hands back the same objects when nothing moves, so a caller can tell", () => {
+        const items = [item("a", 0, 0, { colCount: 1, rowCount: 1 }), item("b", 1, 0, { colCount: 1, rowCount: 2 })];
+        const compacted = SortableGridUtils.getCompacted(items, []);
+
+        expect(compacted.every((entry, index) => entry === items[index])).toBe(true);
     });
 });
 

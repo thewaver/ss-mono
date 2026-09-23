@@ -28,6 +28,7 @@ export const FailedExample = (props: Props) => {
                 return {
                     placement: () => ({ x: "center", y: "top-out" }),
                     offset: () => ({ x: 0, y: 10 }),
+                    hoverShowDelayMs: 0,
                     renderContent: (getVisibilityTarget, getTransitionDurationMs) => (
                         <PageTooltipContent
                             visibilityTarget={getVisibilityTarget}
@@ -44,12 +45,12 @@ export const FailedExample = (props: Props) => {
                     flags={getFlags}
                     state={() => getStep().state}
                     ordinal={() => ORDER.indexOf(getStep().value) + 1}
-                    dir={"row"}
+                    orientation={"horizontal"}
                 >
                     {LABELS[getStep().value]}
                 </PageStepContent>
             )}
-            renderConnector={() => <PageStepConnector dir={"row"} />}
+            renderConnector={() => <PageStepConnector orientation={"horizontal"} />}
         />
     );
 };

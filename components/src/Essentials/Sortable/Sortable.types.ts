@@ -1,6 +1,6 @@
 import type { Accessor, JSX } from "solid-js";
 
-import type { CarryDir } from "../../Abstracts/Carrier/Carrier.types";
+import type { CarrierAnnouncements, CarryOrientation } from "../../Abstracts/Carrier/Carrier.types";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { PlacementLayoutFn } from "../../Abstracts/Placement/Placement.types";
 import type { ProximityEffectFn } from "../../Abstracts/Proximity/Proximity.types";
@@ -10,7 +10,7 @@ import type {
 } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
-export type SortableDir = CarryDir;
+export type SortableOrientation = CarryOrientation;
 
 export type SortableItemFlags = {
     isCarried: boolean;
@@ -39,11 +39,33 @@ export type SortableTransfer<T> = {
     toIndex: number;
 };
 
+export type SortableAnnouncements = CarrierAnnouncements & {
+    /**
+     * Tells a keyboard user how to start moving an item. It is read out with every item as it takes focus, since
+     * nothing else says the item can be moved at all.
+     */
+    restingKeyHint: string;
+    /** Tells a keyboard user which keys move, drop and cancel a carried item, when there is no other list to go to. */
+    keyHint: string;
+    /** The same, for when another list would take the item too, so the key that moves between lists is mentioned. */
+    keyHintAcrossZones: string;
+    /**
+     * Names a place in the list, which is what the pick-up, move and drop announcements say the item is at.
+     *
+     * @param index The place, counting from zero.
+     * @param count How many places there are, which counts one extra while an item from another list is on its way
+     * in.
+     */
+    computePlaceLabel: (index: number, count: number) => string;
+};
+
 export type SortableItemSlotProps = AccessorProps<{
     /** Identifies this item, so the list can point focus at it. */
     id: string;
     /** Names this item for assistive technology. */
     label: string;
+    /** What this item is called when it is announced, in place of list item. */
+    roleDescription: string;
     /**
      * Points at the hidden text saying what the keyboard does with a resting item.
      *
@@ -83,14 +105,24 @@ export type SortableProps<T> = Omit<InteractionWrapperProps<SortableFlags>, "ren
         groupId: string;
         /** Names the list for assistive technology. */
         ariaLabel: string;
+        /**
+         * Everything the list says aloud while an item is moved, and the key hints and place names those
+         * announcements are built from. There is no default: every word a reader hears comes from here.
+         */
+        announcements: SortableAnnouncements;
+        /**
+         * What an item is called when it is announced, so a reader hears it named as something that moves rather
+         * than as a plain list item. Defaults to "sortable item".
+         */
+        itemRoleDescription?: string;
         /** Whether the items run across the page or down it. */
-        dir?: SortableDir;
+        orientation?: SortableOrientation;
         /** The space between items. */
         gap?: number;
         /** Freezes the list as it stands: items still show, but none can be moved. */
         isLocked?: boolean;
         /** Draws the line showing where a carried item would land. */
-        renderMarker?: (getDir: () => SortableDir) => JSX.Element;
+        renderMarker?: (getOrientation: () => SortableOrientation) => JSX.Element;
     }> & {
         /** The items, in their current order. It is the only thing that reorders them. */
         itemsSignal: SignalSource<SortableItem<T>[]>;

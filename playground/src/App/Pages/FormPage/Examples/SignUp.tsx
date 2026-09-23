@@ -76,7 +76,7 @@ export const SignUpExample = (props: Props) => {
                     />
 
                     <FormField
-                        dir={"row"}
+                        orientation={"horizontal"}
                         hasError={() => !props.termsSignal[0]()}
                         message={() => (props.termsSignal[0]() ? "" : "Required.")}
                         renderCaption={() => <PageFormFieldCaption>Accept the terms</PageFormFieldCaption>}

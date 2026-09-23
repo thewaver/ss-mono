@@ -34,6 +34,7 @@ const ImagesExampleWrapper = (props: MosaicSharedProps) => {
                     sources={getSources}
                     gap={props.gap}
                     sizeAnchor={props.sizeAnchor}
+                    transitionDurationMs={props.transitionDurationMs}
                     shapeKey={getShapeKey}
                     isDecorated={getIsDecorated}
                 />

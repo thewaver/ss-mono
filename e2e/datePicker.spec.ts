@@ -167,7 +167,7 @@ test("a half-typed date leaves the previous value alone until it is complete", a
 
 test("the trigger opens a calendar over the field", async ({ page }) => {
     await openDatePicker(page);
-    await expect(page.locator(POPUP), "nothing is portalled before it opens").toHaveCount(0);
+    await expect(page.locator(POPUP), "nothing is portaled before it opens").toHaveCount(0);
 
     await page.locator(trigger("picked")).click();
 

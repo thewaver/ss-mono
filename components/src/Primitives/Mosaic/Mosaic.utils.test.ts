@@ -257,3 +257,75 @@ describe("packScaled", () => {
         expect(spell(packed)).toBe("1@0,0 100x100");
     });
 });
+
+describe("computeStepIndex", () => {
+    const wall = MosaicUtils.sortIntoReadingOrder([
+        at(0, 0, 0, 100, 50),
+        at(1, 100, 0, 100, 50),
+        at(2, 0, 50, 60, 50),
+        at(3, 60, 50, 140, 50),
+        at(4, 0, 100, 200, 50),
+    ]);
+
+    it("walks the reading order sideways and stops at either end", () => {
+        expect(MosaicUtils.computeStepIndex("next", 1, wall)).toBe(2);
+        expect(MosaicUtils.computeStepIndex("previous", 2, wall)).toBe(1);
+        expect(MosaicUtils.computeStepIndex("previous", 0, wall)).toBeUndefined();
+        expect(MosaicUtils.computeStepIndex("next", 4, wall)).toBeUndefined();
+    });
+
+    it("goes to the first and last tile in reading order", () => {
+        expect(MosaicUtils.computeStepIndex("first", 3, wall)).toBe(0);
+        expect(MosaicUtils.computeStepIndex("last", 0, wall)).toBe(4);
+    });
+
+    it("steps down to the tile below sharing the most width", () => {
+        expect(MosaicUtils.computeStepIndex("down", 0, wall)).toBe(2);
+        expect(MosaicUtils.computeStepIndex("down", 1, wall)).toBe(3);
+        expect(MosaicUtils.computeStepIndex("down", 3, wall)).toBe(4);
+        expect(MosaicUtils.computeStepIndex("down", 4, wall)).toBeUndefined();
+    });
+
+    it("steps up the same way", () => {
+        expect(MosaicUtils.computeStepIndex("up", 3, wall)).toBe(1);
+        expect(MosaicUtils.computeStepIndex("up", 2, wall)).toBe(0);
+        expect(MosaicUtils.computeStepIndex("up", 0, wall)).toBeUndefined();
+    });
+
+    it("never jumps past nearer tiles to one sharing more width further down", () => {
+        const rows = MosaicUtils.sortIntoReadingOrder([
+            at(0, 0, 0, 100, 50),
+            at(1, 0, 50, 50, 50),
+            at(2, 50, 50, 50, 50),
+            at(3, 0, 100, 200, 50),
+        ]);
+
+        expect(MosaicUtils.computeStepIndex("down", 0, rows), "the two halves hide the wide tile between them").toBe(1);
+        expect(MosaicUtils.computeStepIndex("up", 3, rows)).toBe(1);
+    });
+
+    it("sees past a narrow tile to a wider one where the narrow one leaves a gap", () => {
+        const tower = MosaicUtils.sortIntoReadingOrder([
+            at(0, 0, 0, 200, 50),
+            at(1, 0, 50, 40, 50),
+            at(2, 0, 100, 200, 50),
+        ]);
+
+        expect(MosaicUtils.computeStepIndex("down", 0, tower)).toBe(2);
+        expect(MosaicUtils.computeStepIndex("down", 1, tower)).toBe(2);
+    });
+
+    it("takes the earlier tile in reading order when two share the same width", () => {
+        const split = MosaicUtils.sortIntoReadingOrder([
+            at(0, 0, 0, 100, 50),
+            at(1, 0, 50, 50, 50),
+            at(2, 50, 50, 50, 50),
+        ]);
+
+        expect(MosaicUtils.computeStepIndex("down", 0, split)).toBe(1);
+    });
+
+    it("answers nothing for an item that was not placed", () => {
+        expect(MosaicUtils.computeStepIndex("next", 9, wall)).toBeUndefined();
+    });
+});

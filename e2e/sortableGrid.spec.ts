@@ -218,7 +218,7 @@ test("an L turned one way fits and the other way does not", async ({ page }) => 
     await page.keyboard.press("Shift+r");
     await page.keyboard.press("Enter");
 
-    expect(await sizeOf(page, "turns", "Bench", "Hook"), "and anticlockwise is taken").toBe("3x2");
+    expect(await sizeOf(page, "turns", "Bench", "Hook"), "and counterclockwise is taken").toBe("3x2");
 });
 
 /**
@@ -341,4 +341,229 @@ test("the painted shape is the size of the item it belongs to, at every ratio", 
     for (const item of drawn) {
         expect(item.isCovered, `${item.name} is painted over the whole of its own box`).toBe(true);
     }
+});
+
+/**
+ * Walls. The walled pack marks three cells as blocked: two side by side on the second row, in the third and
+ * fourth columns, and one on the third row in the last column. Everything that asks what is taken asks about
+ * the walls too, so an item cannot land on one or reach over one, and the keyboard walk treats a wall as a
+ * thing to step over rather than a place to aim at — while an item in the way is still aimed at, because
+ * items move and walls do not.
+ */
+const WALLS = "walls";
+const WALLS_LABEL = "Walled pack";
+const WALL_ROW_TWO_COLUMN_THREE = 10;
+const ROW_ONE_COLUMN_THREE = 2;
+
+test("a pointer drop onto a wall is refused, and the item stays where it was", async ({ page }) => {
+    await page.locator(demo(WALLS)).scrollIntoViewIfNeeded();
+
+    const before = await spotOf(page, WALLS, WALLS_LABEL, "Potion");
+    const from = await page.locator(item(WALLS, "Potion", WALLS_LABEL)).boundingBox();
+    const to = await cellPoint(page, WALLS, WALLS_LABEL, WALL_ROW_TWO_COLUMN_THREE);
+
+    if (!from) throw new Error("a drag needs a box to start from");
+
+    await page.mouse.move(from.x + from.width * 0.5, from.y + from.height * 0.5);
+    await page.mouse.down();
+    await page.mouse.move(from.x + from.width * 0.5 + 20, from.y + from.height * 0.5, { steps: 5 });
+    await page.mouse.move(to.x, to.y, { steps: 10 });
+    await page.mouse.up();
+
+    await expect(page.locator(`${ANNOUNCER} > *`), "the drag did pick the potion up").not.toHaveCount(0);
+
+    expect(await spotOf(page, WALLS, WALLS_LABEL, "Potion"), "but it did not land on the wall").toBe(before);
+});
+
+/**
+ * A wall does not have to be under the pointer to refuse: the shield is two by two, so dropping its top-left
+ * cell on the first row puts its lower half over both walls on the second row. The drop is refused as a
+ * whole rather than landing with part of the shield inside a wall.
+ */
+test("a pointer drop that would reach over a wall is refused", async ({ page }) => {
+    await page.locator(demo(WALLS)).scrollIntoViewIfNeeded();
+
+    const before = await spotOf(page, WALLS, WALLS_LABEL, "Kite Shield");
+    const from = await page.locator(item(WALLS, "Kite Shield", WALLS_LABEL)).boundingBox();
+    const to = await cellPoint(page, WALLS, WALLS_LABEL, ROW_ONE_COLUMN_THREE);
+
+    if (!from) throw new Error("a drag needs a box to start from");
+
+    await page.mouse.move(from.x + from.width * 0.25, from.y + from.height * 0.25);
+    await page.mouse.down();
+    await page.mouse.move(from.x + from.width * 0.25 + 20, from.y + from.height * 0.25, { steps: 5 });
+    await page.mouse.move(to.x, to.y, { steps: 10 });
+    await page.mouse.up();
+
+    await expect(page.locator(`${ANNOUNCER} > *`), "the drag did pick the shield up").not.toHaveCount(0);
+
+    expect(await spotOf(page, WALLS, WALLS_LABEL, "Kite Shield"), "but it is still where it started").toBe(before);
+});
+
+/**
+ * The arrow keys walk a carried item over walls. The potion is lifted from the bottom row and walked up its
+ * column — past the scroll, which is an item and so is aimed at on the way, and announced as having no room —
+ * to the second row, then left. One step left is a free cell; the next two cells along are the walls, so
+ * the step after that goes straight over both and arrives at the second column. The drop is taken there.
+ */
+test("the arrows step a carried item over walls, but not over another item", async ({ page }) => {
+    await page.locator(item(WALLS, "Potion", WALLS_LABEL)).focus();
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("ArrowUp");
+    await page.keyboard.press("ArrowUp");
+
+    await expect(page.locator(ANNOUNCER), "the scroll's cell is aimed at, not stepped over").toContainText("no room");
+
+    await page.keyboard.press("ArrowUp");
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("ArrowLeft");
+    await page.keyboard.press("Enter");
+
+    expect(await spotOf(page, WALLS, WALLS_LABEL, "Potion"), "one step went over both walls at once").toBe("2,2");
+});
+
+/**
+ * When there is no clear spot before the edge, the step falls back to a plain one-cell move so that the item
+ * can still be moved at all — but that does not make the wall a place to land. The shield is walked up once
+ * into free space, then once more, where every row above it runs into the walls; the aim is announced as
+ * having no room, and the drop is refused.
+ */
+test("a keyboard drop that would reach over a wall is refused", async ({ page }) => {
+    const before = await spotOf(page, WALLS, WALLS_LABEL, "Kite Shield");
+
+    await page.locator(item(WALLS, "Kite Shield", WALLS_LABEL)).focus();
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("ArrowUp");
+    await page.keyboard.press("ArrowUp");
+
+    await expect(page.locator(ANNOUNCER), "the aim over the walls has no room").toContainText("no room");
+
+    await page.keyboard.press("Enter");
+
+    expect(await spotOf(page, WALLS, WALLS_LABEL, "Kite Shield"), "so the shield stays where it was picked up").toBe(
+        before,
+    );
+});
+
+/**
+ * "Tidy up" calls the controller's `compact()`, which slides each item straight up its own column until the
+ * next row would collide — gravity rather than repacking. So every item keeps its column and never ends up
+ * lower than it was, at least one of the scattered items rises, and a wall stops what is under it: the
+ * shield comes to rest on the row just below the two walls rather than jumping past them, and the pickaxe's
+ * foot is held by the wall in the last column.
+ */
+const WALLED_ITEMS = ["Longsword", "Kite Shield", "Scroll", "Pickaxe", "Bread", "Potion"];
+
+const spotsOf = async (page: Page, key: string, gridLabel: string, labels: string[]) => {
+    const found: Record<string, { col: number; row: number }> = {};
+
+    for (const label of labels) {
+        const [col, row] = (await spotOf(page, key, gridLabel, label)).split(",").map(Number);
+
+        found[label] = { col, row };
+    }
+
+    return found;
+};
+
+test("Tidy up slides every item straight up, and a wall holds what is under it", async ({ page }) => {
+    const before = await spotsOf(page, WALLS, WALLS_LABEL, WALLED_ITEMS);
+
+    await page.locator(demo(WALLS)).getByRole("button").click();
+
+    const after = await spotsOf(page, WALLS, WALLS_LABEL, WALLED_ITEMS);
+
+    for (const label of WALLED_ITEMS) {
+        expect(after[label].col, `${label} kept its column`).toBe(before[label].col);
+        expect(after[label].row, `${label} did not move down`).toBeLessThanOrEqual(before[label].row);
+    }
+
+    expect(
+        WALLED_ITEMS.filter((label) => after[label].row < before[label].row).length,
+        "and the scattered items did rise",
+    ).toBeGreaterThan(0);
+
+    expect(await spotOf(page, WALLS, WALLS_LABEL, "Kite Shield"), "the shield rests just below the walls").toBe("3,3");
+    expect(await spotOf(page, WALLS, WALLS_LABEL, "Pickaxe"), "the pickaxe's foot is held by the wall").toBe("7,2");
+});
+
+/**
+ * A grid that is already packed has nothing to slide, so a second tidy-up leaves every item where the first
+ * one put it.
+ */
+test("Tidy up on a grid that is already packed moves nothing", async ({ page }) => {
+    const tidy = page.locator(demo(WALLS)).getByRole("button");
+
+    await tidy.click();
+
+    const packed = await spotsOf(page, WALLS, WALLS_LABEL, WALLED_ITEMS);
+
+    await tidy.click();
+
+    expect(await spotsOf(page, WALLS, WALLS_LABEL, WALLED_ITEMS), "the second tidy-up changed nothing").toEqual(packed);
+});
+
+/**
+ * The dashboard example calls `compact()` from `onTransfer`, so every drop is followed by a slide. The bread
+ * is walked three cells right with the keyboard, into the empty column under the scroll, and dropped two rows
+ * below the scroll; it does not stay there, but slides up in that column until it sits directly under it.
+ */
+const DASHBOARD = "dashboard";
+const DASHBOARD_LABEL = "Packed pack";
+const ROW_FIVE_COLUMN_SIX = 37;
+
+const rowOf = async (page: Page, key: string, gridLabel: string, label: string) =>
+    Number((await spotOf(page, key, gridLabel, label)).split(",")[1]);
+
+const colOf = async (page: Page, key: string, gridLabel: string, label: string) =>
+    Number((await spotOf(page, key, gridLabel, label)).split(",")[0]);
+
+test("a grid packed after every move slides a keyboard drop up to close the hole", async ({ page }) => {
+    const scrollRow = await rowOf(page, DASHBOARD, DASHBOARD_LABEL, "Scroll");
+    const scrollCol = await colOf(page, DASHBOARD, DASHBOARD_LABEL, "Scroll");
+    const breadRow = await rowOf(page, DASHBOARD, DASHBOARD_LABEL, "Bread");
+
+    await page.locator(item(DASHBOARD, "Bread", DASHBOARD_LABEL)).focus();
+    await page.keyboard.press("Enter");
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("Enter");
+
+    expect(breadRow, "the bread was dropped below the row under the scroll").toBeGreaterThan(scrollRow + 1);
+    expect(await colOf(page, DASHBOARD, DASHBOARD_LABEL, "Bread"), "it stayed in the column it was dropped in").toBe(
+        scrollCol + 1,
+    );
+    expect(await rowOf(page, DASHBOARD, DASHBOARD_LABEL, "Bread"), "and slid up to sit under the scroll").toBe(
+        scrollRow + 1,
+    );
+});
+
+/**
+ * The same by pointer: the potion is dragged to the bottom row, under the scroll's second cell, and the grid
+ * slides it up that column until it meets the scroll.
+ */
+test("a grid packed after every move slides a pointer drop up to close the hole", async ({ page }) => {
+    await page.locator(demo(DASHBOARD)).scrollIntoViewIfNeeded();
+
+    const scrollRow = await rowOf(page, DASHBOARD, DASHBOARD_LABEL, "Scroll");
+    const scrollCol = await colOf(page, DASHBOARD, DASHBOARD_LABEL, "Scroll");
+    const from = await page.locator(item(DASHBOARD, "Potion", DASHBOARD_LABEL)).boundingBox();
+    const to = await cellPoint(page, DASHBOARD, DASHBOARD_LABEL, ROW_FIVE_COLUMN_SIX);
+
+    if (!from) throw new Error("a drag needs a box to start from");
+
+    await page.mouse.move(from.x + from.width * 0.5, from.y + from.height * 0.5);
+    await page.mouse.down();
+    await page.mouse.move(from.x + from.width * 0.5 + 20, from.y + from.height * 0.5, { steps: 5 });
+    await page.mouse.move(to.x, to.y, { steps: 10 });
+    await page.mouse.up();
+
+    expect(
+        await colOf(page, DASHBOARD, DASHBOARD_LABEL, "Potion"),
+        "the potion is in the column it was dropped in, under the scroll's second cell",
+    ).toBe(scrollCol + 1);
+    expect(await rowOf(page, DASHBOARD, DASHBOARD_LABEL, "Potion"), "and has slid up to the scroll").toBe(
+        scrollRow + 1,
+    );
 });

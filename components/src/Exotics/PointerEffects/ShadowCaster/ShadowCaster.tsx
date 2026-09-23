@@ -4,6 +4,7 @@ import { createMemo, createSignal } from "solid-js";
 import { Color, MathUtils, Point2dUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerUtils } from "../../../Abstracts/PointerTracker/PointerTracker.utils";
+import { SmootherUtils } from "../../../Abstracts/Smoother/Smoother.utils";
 import { access } from "../../../Utils/propUtils";
 import { SHADOW_CASTER_DEFAULTS } from "./ShadowCaster.const";
 import type { ShadowCasterProps } from "./ShadowCaster.types";
@@ -70,21 +71,26 @@ export const ShadowCaster = (props: ParentProps<ShadowCasterProps>) => {
         );
     });
 
+    const getShadow = SmootherUtils.create(
+        () => [getThrow().x, getThrow().y, getBlurPx(), getAlpha()],
+        () => access(props.smoothingMs) ?? SHADOW_CASTER_DEFAULTS.smoothingMs,
+    );
+
     const getColor = createMemo(() => {
         const parsed = Color.parse(access(props.color) ?? SHADOW_CASTER_DEFAULTS.color) ?? FALLBACK_COLOR;
-        const alpha = getAlpha();
+        const [, , , alpha] = getShadow();
 
         return Color.RGBA.toCss(Color.HSVA.toRgba({ ...parsed, a: alpha }));
     });
 
+    const getFilter = createMemo(() => {
+        const [x, y, blurPx] = getShadow();
+
+        return `drop-shadow(${x}px ${y}px ${blurPx}px ${getColor()})`;
+    });
+
     return (
-        <div
-            ref={setRef}
-            class={styles.shadowCasterRoot}
-            style={{
-                filter: `drop-shadow(${getThrow().x}px ${getThrow().y}px ${getBlurPx()}px ${getColor()})`,
-            }}
-        >
+        <div ref={setRef} class={styles.shadowCasterRoot} style={{ filter: getFilter() }}>
             {props.children}
         </div>
     );

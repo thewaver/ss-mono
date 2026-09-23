@@ -9,8 +9,10 @@ import type {
     SortableGridGeometry,
     SortableGridItem,
     SortableGridItemFlags,
+    SortableGridSpot,
 } from "@thewaver/ss-components";
 
+import { SORTABLE_GRID_ANNOUNCEMENTS } from "../../../PageComponents/Announcements/Announcements.const";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import {
     PageSortableGridCell,
@@ -44,7 +46,10 @@ type Props = {
     isLocked?: MaybeAccessor<boolean>;
     isTurnable?: MaybeAccessor<boolean>;
     hasTurnButtons?: boolean;
+    hasTidyButton?: boolean;
+    isCompacting?: boolean;
     computeCanAccept?: (value: Gear, fromLabel: string) => boolean;
+    computeIsSpotBlocked?: (spot: SortableGridSpot) => boolean;
 };
 
 const RESTING_FLAGS: InteractionFlags<SortableGridItemFlags> = { isCarried: false };
@@ -57,6 +62,12 @@ export const InventoryExample = (props: Props) => {
     const turn = (step: number) => {
         if (step > 0) getController()?.turnCw();
         else getController()?.turnCcw();
+    };
+
+    const handleMount = (controller: SortableGridController) => {
+        setController(controller);
+
+        if (props.isCompacting) controller.compact();
     };
 
     const renderGear = (
@@ -105,7 +116,7 @@ export const InventoryExample = (props: Props) => {
             <Show when={props.hasTurnButtons}>
                 <div class={styles.sortableGridTurnControls}>
                     <Button
-                        ariaLabel={"Turn anticlockwise"}
+                        ariaLabel={"Turn counterclockwise"}
                         isDisabled={() => !getController()?.getIsCarrying()}
                         onClick={() => turn(-1)}
                         renderContent={(getFlags) => <PageButtonContent flags={getFlags}>{"↺"}</PageButtonContent>}
@@ -120,9 +131,24 @@ export const InventoryExample = (props: Props) => {
                 </div>
             </Show>
 
+            <Show when={props.hasTidyButton}>
+                <div class={styles.sortableGridTurnControls}>
+                    <Button
+                        ariaLabel={"Tidy up"}
+                        onClick={() => {
+                            getController()?.compact();
+                        }}
+                        renderContent={(getFlags) => (
+                            <PageButtonContent flags={getFlags}>{"Tidy up"}</PageButtonContent>
+                        )}
+                    />
+                </div>
+            </Show>
+
             <SortableGrid
                 groupId={props.groupId}
                 ariaLabel={props.ariaLabel}
+                announcements={SORTABLE_GRID_ANNOUNCEMENTS}
                 columns={() => props.columns ?? PACK_COLUMNS}
                 rows={() => props.rows ?? PACK_ROWS}
                 cellSize={CELL_SIZE}
@@ -134,16 +160,22 @@ export const InventoryExample = (props: Props) => {
                 computeItemKey={computeGearKey}
                 computeItemLabel={computeGearLabel}
                 computeCanAccept={props.computeCanAccept}
+                computeIsSpotBlocked={props.computeIsSpotBlocked}
                 renderItem={renderGear}
                 renderCarried={(getItem, getGeometry) => renderGear(getItem, () => RESTING_FLAGS, getGeometry)}
-                renderCell={(getSpot) => <PageSortableGridCell spot={getSpot} />}
+                renderCell={(getSpot, getFlags) => (
+                    <PageSortableGridCell spot={getSpot} isBlocked={() => getFlags().isBlocked} />
+                )}
                 renderLanding={(getIsAllowed, getGeometry) => (
                     <PageSortableGridLanding isAllowed={getIsAllowed} geometry={getGeometry} />
                 )}
                 renderDecoration={(getFlags) => (
                     <PageSortableGridSurface flags={getFlags} emptyText={props.emptyText} />
                 )}
-                onMount={setController}
+                onTransfer={() => {
+                    if (props.isCompacting) getController()?.compact();
+                }}
+                onMount={handleMount}
             />
         </div>
     );

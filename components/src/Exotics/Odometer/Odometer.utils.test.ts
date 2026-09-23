@@ -107,3 +107,117 @@ describe("getRestingAngle", () => {
         expect(OdometerUtils.getRestingAngle(1)).toBe(324);
     });
 });
+
+describe("computeReelAngle", () => {
+    it("adds whole turns the way the number is going, forward being the same sign as a step up", () => {
+        expect(OdometerUtils.computeReelAngle(2, "up")).toBe(-720);
+        expect(OdometerUtils.computeReelAngle(1, "down")).toBe(360);
+    });
+
+    it("adds nothing when no digit changed, so a reel does not spin for a sign alone", () => {
+        expect(OdometerUtils.computeReelAngle(3, "same")).toBe(0);
+    });
+});
+
+describe("computeShownSlots", () => {
+    const phases = (shown: { phase: string }[]) => shown.map((entry) => entry.phase);
+
+    it("grows a slot in where the new list is longer", () => {
+        const shown = OdometerUtils.computeShownSlots([{ slot: "a", phase: "shown" }], ["a", "b"], false);
+
+        expect(phases(shown)).toEqual(["shown", "entering"]);
+    });
+
+    it("keeps a lost slot, holding what it showed, so it can shrink away", () => {
+        const shown = OdometerUtils.computeShownSlots(
+            [
+                { slot: "a", phase: "shown" },
+                { slot: "b", phase: "shown" },
+            ],
+            ["x"],
+            false,
+        );
+
+        expect(shown).toEqual([
+            { slot: "x", phase: "shown" },
+            { slot: "b", phase: "leaving" },
+        ]);
+    });
+
+    it("turns a leaving slot round when the text asks for it again", () => {
+        const shown = OdometerUtils.computeShownSlots(
+            [
+                { slot: "a", phase: "shown" },
+                { slot: "b", phase: "leaving" },
+            ],
+            ["a", "c"],
+            false,
+        );
+
+        expect(shown[1]).toEqual({ slot: "c", phase: "entering" });
+    });
+
+    it("still counts a slot as entering if it had not finished growing", () => {
+        const shown = OdometerUtils.computeShownSlots([{ slot: "a", phase: "entering" }], ["b"], false);
+
+        expect(phases(shown)).toEqual(["entering"]);
+    });
+
+    it("changes the width at once when motion is reduced: nothing enters, nothing lingers", () => {
+        const shown = OdometerUtils.computeShownSlots(
+            [
+                { slot: "a", phase: "shown" },
+                { slot: "b", phase: "shown" },
+            ],
+            ["a"],
+            true,
+        );
+
+        expect(shown).toEqual([{ slot: "a", phase: "shown" }]);
+        expect(phases(OdometerUtils.computeShownSlots([], ["a", "b"], true))).toEqual(["shown", "shown"]);
+    });
+});
+
+describe("settleShownSlot", () => {
+    it("marks a grown slot as shown and leaves the others alone", () => {
+        const before = [
+            { slot: "a", phase: "shown" as const },
+            { slot: "b", phase: "entering" as const },
+        ];
+
+        expect(OdometerUtils.settleShownSlot(before, 1)[1].phase).toBe("shown");
+        expect(OdometerUtils.settleShownSlot(before, 1)[0]).toBe(before[0]);
+    });
+
+    it("does nothing to a slot that is no longer entering", () => {
+        const before = [{ slot: "a", phase: "leaving" as const }];
+
+        expect(OdometerUtils.settleShownSlot(before, 0)).toBe(before);
+    });
+});
+
+describe("dropShownSlot", () => {
+    it("cuts the list at a slot that has shrunk away, taking the leaving tail with it", () => {
+        const before = [
+            { slot: "a", phase: "shown" as const },
+            { slot: "b", phase: "leaving" as const },
+            { slot: "c", phase: "leaving" as const },
+        ];
+
+        expect(OdometerUtils.dropShownSlot(before, 1)).toEqual([{ slot: "a", phase: "shown" }]);
+    });
+
+    it("keeps a slot that came back before its shrink ended", () => {
+        const before = [{ slot: "a", phase: "entering" as const }];
+
+        expect(OdometerUtils.dropShownSlot(before, 0)).toBe(before);
+    });
+});
+
+describe("getSlotFlags", () => {
+    it("tells the painter which way the slot is going", () => {
+        expect(OdometerUtils.getSlotFlags("entering")).toEqual({ isEntering: true, isLeaving: false });
+        expect(OdometerUtils.getSlotFlags("shown")).toEqual({ isEntering: false, isLeaving: false });
+        expect(OdometerUtils.getSlotFlags("leaving")).toEqual({ isEntering: false, isLeaving: true });
+    });
+});

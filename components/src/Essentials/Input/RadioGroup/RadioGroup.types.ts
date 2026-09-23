@@ -4,12 +4,12 @@ import type { PlacementLayoutFn } from "../../../Abstracts/Placement/Placement.t
 import type { ProximityEffectFn } from "../../../Abstracts/Proximity/Proximity.types";
 import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 
-export type RadioGroupDir = "column" | "row";
+export type RadioGroupOrientation = "horizontal" | "vertical";
 
 export type RadioGroupProps<T> = ParentProps<
     AccessorProps<{
         /** Whether the options run across the page or down it. */
-        dir?: RadioGroupDir;
+        orientation?: RadioGroupOrientation;
         /** The space between options. */
         gap?: number;
         /** The group's name when it is submitted as part of a form. */
@@ -18,6 +18,8 @@ export type RadioGroupProps<T> = ParentProps<
         ariaLabel?: string;
         /** Puts the group into its error look. */
         hasError?: boolean;
+        /** Whether a value has to be given. It is announced and not enforced, because the library validates nothing. */
+        isRequired?: boolean;
         /** How long the marker takes to slide from one option to the next. */
         transitionDurationMs?: number;
     }> & {

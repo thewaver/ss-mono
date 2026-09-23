@@ -1,13 +1,19 @@
 import { createEffect, createMemo, createSignal, onCleanup, untrack } from "solid-js";
 
+import { DecimalUtils } from "@thewaver/ss-utils";
+
 import { TextField } from "../../../Primitives/TextField/TextField";
 import { access } from "../../../Utils/propUtils";
 import { NUMBER_INPUT_DEFAULTS } from "./NumberInput.const";
 import type { NumberInputProps, NumberInputStepDefs, NumberInputStepper } from "./NumberInput.types";
 import { NumberInputUtils } from "./NumberInput.utils";
 
+const PAGE_STEP_MULTIPLE = 10;
+
 export const NumberInput = (props: NumberInputProps) => {
-    const textSignal = createSignal(NumberInputUtils.formatValue(props.valueSignal[0]()));
+    const getSeparators = createMemo(() => DecimalUtils.getSeparators(access(props.locale)));
+
+    const textSignal = createSignal(NumberInputUtils.formatValue(props.valueSignal[0](), getSeparators()));
 
     const getStepDefs = createMemo((): NumberInputStepDefs => ({
         min: access(props.min),
@@ -15,9 +21,11 @@ export const NumberInput = (props: NumberInputProps) => {
         step: access(props.step) ?? NUMBER_INPUT_DEFAULTS.step,
     }));
 
+    const getPageStep = () => access(props.pageStep) ?? getStepDefs().step * PAGE_STEP_MULTIPLE;
+
     const getIsWritable = () => !(access(props.isDisabled) ?? false) && !(access(props.isReadOnly) ?? false);
 
-    const getTypedValue = () => NumberInputUtils.parseValue(textSignal[0]());
+    const getTypedValue = () => NumberInputUtils.parseValue(textSignal[0](), getSeparators());
 
     const getHasRangeIssue = () => {
         const value = getTypedValue();
@@ -32,33 +40,43 @@ export const NumberInput = (props: NumberInputProps) => {
     };
 
     const applyValue = (value: number | undefined) => {
-        textSignal[1](NumberInputUtils.formatValue(value));
+        textSignal[1](NumberInputUtils.formatValue(value, getSeparators()));
 
         if (untrack(() => props.valueSignal[0]()) === value) return;
 
         reportValue(value);
     };
 
-    const stepValue = (direction: 1 | -1) => {
-        if (!getIsWritable()) return;
+    const stepValue = (direction: 1 | -1, distance?: number) => {
+        if (!getIsWritable()) return false;
 
-        applyValue(NumberInputUtils.computeStep(getTypedValue(), direction, getStepDefs()));
+        const current = getTypedValue();
+        const next = NumberInputUtils.computeStep(current, direction, getStepDefs(), distance);
+
+        applyValue(next);
+
+        return next !== current;
     };
 
     let repeatDelay: ReturnType<typeof setTimeout> | undefined;
     let repeatInterval: ReturnType<typeof setInterval> | undefined;
 
     const stopStepping = () => {
+        const wasStepping = repeatDelay !== undefined || repeatInterval !== undefined;
+
         clearTimeout(repeatDelay);
         clearInterval(repeatInterval);
 
         repeatDelay = undefined;
         repeatInterval = undefined;
+
+        return wasStepping;
     };
 
     const startStepping = (direction: 1 | -1) => {
         stopStepping();
-        stepValue(direction);
+
+        if (!stepValue(direction)) return false;
 
         repeatDelay = setTimeout(
             () => {
@@ -69,6 +87,8 @@ export const NumberInput = (props: NumberInputProps) => {
             },
             access(props.repeatDelayMs) ?? NUMBER_INPUT_DEFAULTS.repeatDelayMs,
         );
+
+        return true;
     };
 
     onCleanup(stopStepping);
@@ -96,9 +116,11 @@ export const NumberInput = (props: NumberInputProps) => {
     createEffect(() => {
         const value = props.valueSignal[0]();
 
-        if (NumberInputUtils.parseValue(untrack(textSignal[0])) === value) return;
+        const separators = getSeparators();
 
-        textSignal[1](NumberInputUtils.formatValue(value));
+        if (NumberInputUtils.parseValue(untrack(textSignal[0]), separators) === value) return;
+
+        textSignal[1](NumberInputUtils.formatValue(value, separators));
     });
 
     return (
@@ -109,14 +131,15 @@ export const NumberInput = (props: NumberInputProps) => {
             type={"text"}
             inputMode={() => access(props.inputMode) ?? NUMBER_INPUT_DEFAULTS.inputMode}
             isSpinButton={true}
+            computeSpinValue={(text) => NumberInputUtils.parseValue(text, getSeparators())}
             hasError={() => (access(props.hasError) ?? false) || getHasRangeIssue()}
             renderTrailing={props.renderTrailing && ((getFlags) => props.renderTrailing!(getFlags, stepper))}
             onInput={(text) => {
-                const sanitized = NumberInputUtils.sanitizeText(text);
+                const sanitized = NumberInputUtils.sanitizeText(text, getSeparators());
 
                 textSignal[1](sanitized);
 
-                const value = NumberInputUtils.parseValue(sanitized);
+                const value = NumberInputUtils.parseValue(sanitized, getSeparators());
 
                 if (value !== undefined && !NumberInputUtils.getIsInRange(value, getStepDefs())) return;
 
@@ -133,6 +156,12 @@ export const NumberInput = (props: NumberInputProps) => {
                 } else if (e.key === "ArrowDown") {
                     e.preventDefault();
                     stepValue(-1);
+                } else if (e.key === "PageUp") {
+                    e.preventDefault();
+                    stepValue(1, getPageStep());
+                } else if (e.key === "PageDown") {
+                    e.preventDefault();
+                    stepValue(-1, getPageStep());
                 } else if (e.key === "Home" && min !== undefined) {
                     e.preventDefault();
                     applyValue(min);

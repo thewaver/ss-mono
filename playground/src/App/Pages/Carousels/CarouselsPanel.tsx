@@ -5,14 +5,14 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import {
     DELAY_STEP_MS,
-    DIRS,
-    DIR_FIELD_WIDTH,
-    DIR_LABELS,
     FIELD_WIDTH,
     MAX_DELAY_MS,
     MAX_SLIDE_COUNT,
     MIN_DELAY_MS,
     MIN_SLIDE_COUNT,
+    ORIENTATIONS,
+    ORIENTATION_FIELD_WIDTH,
+    ORIENTATION_LABELS,
     SLIDE_COUNT_STEP,
 } from "./Carousels.const";
 import type { CarouselsControls } from "./Carousels.types";
@@ -20,6 +20,7 @@ import type { CarouselsControls } from "./Carousels.types";
 type Props = {
     controls: CarouselsControls;
     hasDelay?: boolean;
+    hasLooping?: boolean;
 };
 
 export const PageCarouselsPanel = (props: Props) => {
@@ -58,19 +59,35 @@ export const PageCarouselsPanel = (props: Props) => {
             </Show>
 
             <PageProp
-                key={"dir"}
-                label={"Direction"}
+                key={"orientation"}
+                label={"Orientation"}
                 hint={"Which way the slides run, and so which way the arrows and the arrow keys move."}
             >
                 <PageSelectField
-                    value={controls.dirSignal[0]}
-                    values={() => DIRS}
-                    computeLabel={(dir) => DIR_LABELS[dir]}
-                    width={() => DIR_FIELD_WIDTH}
-                    ariaLabel={"Direction"}
-                    onChange={(dir) => controls.dirSignal[1](() => dir)}
+                    value={controls.orientationSignal[0]}
+                    values={() => ORIENTATIONS}
+                    computeLabel={(orientation) => ORIENTATION_LABELS[orientation]}
+                    width={() => ORIENTATION_FIELD_WIDTH}
+                    ariaLabel={"Orientation"}
+                    onChange={(orientation) => controls.orientationSignal[1](() => orientation)}
                 />
             </PageProp>
+
+            <Show when={props.hasLooping}>
+                <PageProp
+                    key={"isLooping"}
+                    label={"Looping"}
+                    hint={
+                        "Whether stepping past the last slide comes round to the first. Off, the end controls are disabled, a swipe past an end springs back, and rotation stops on the last slide."
+                    }
+                >
+                    <PageCheckField
+                        value={controls.isLoopingSignal[0]}
+                        ariaLabel={"Looping"}
+                        onChange={controls.isLoopingSignal[1]}
+                    />
+                </PageProp>
+            </Show>
 
             <PageProp
                 key={"isDisabled"}

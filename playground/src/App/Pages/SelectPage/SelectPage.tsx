@@ -8,10 +8,11 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { AirportsExample } from "./Examples/Airports";
 import { AutocompleteExample } from "./Examples/Autocomplete";
 import { AutocompleteOnDemandExample } from "./Examples/AutocompleteOnDemand";
+import { ClearableExample } from "./Examples/Clearable";
 import { CountriesExample } from "./Examples/Countries";
 import { DeliveriesExample } from "./Examples/Deliveries";
 import { HoursExample } from "./Examples/Hours";
-import { LabelledExample } from "./Examples/Labeled";
+import { LabeledExample } from "./Examples/Labeled";
 import { OnDemandExample } from "./Examples/OnDemand";
 import { ReachableExample } from "./Examples/Reachable";
 import { VirtualizedExample } from "./Examples/Virtualized";
@@ -71,7 +72,9 @@ export const SelectPage = () => {
     const erroredSignal = createSignal<string | undefined>();
     const disabledSignal = createSignal<string | undefined>("Sweden");
     const reachableSignal = createSignal<string | undefined>("Sweden");
-    const labelledSignal = createSignal<string | undefined>();
+    const labeledSignal = createSignal<string | undefined>();
+    const clearableSignal = createSignal<string | undefined>("Estonia");
+    const [getClearableChange, setClearableChange] = createSignal("none yet");
     const stressSignal = createSignal<Delivery | undefined>();
     const stressVisibility = createSignal(false);
     const groupedStressSignal = createSignal<Delivery | undefined>();
@@ -172,6 +175,21 @@ export const SelectPage = () => {
             readout: () => `value: ${preselectedSignal[0]() ?? "undefined"} — reopening highlights it`,
             component: () => <CountriesExample valueSignal={preselectedSignal} />,
             path: `${EXAMPLES_ROOT}/Countries.tsx`,
+        },
+        {
+            key: "clearable",
+            name: "Clearable",
+            readout: () =>
+                `value: ${clearableSignal[0]() ?? "undefined"} | last change: ${getClearableChange()} — the clear control is its own tab stop after the field, drawn only while something is picked`,
+            component: () => (
+                <ClearableExample
+                    valueSignal={clearableSignal}
+                    onSelectionChange={(value) => {
+                        setClearableChange(value ?? "undefined");
+                    }}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Clearable.tsx`,
         },
         {
             key: "recordValues",
@@ -349,8 +367,8 @@ export const SelectPage = () => {
         {
             key: "label",
             name: "In a Label",
-            readout: () => `value: ${labelledSignal[0]() ?? "undefined"} — the caption opens the list`,
-            component: () => <LabelledExample valueSignal={labelledSignal} />,
+            readout: () => `value: ${labeledSignal[0]() ?? "undefined"} — the caption opens the list`,
+            component: () => <LabeledExample valueSignal={labeledSignal} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
     ]);

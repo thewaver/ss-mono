@@ -1,5 +1,6 @@
 import { DateInput, DateTimeValueUtils, TimeInput } from "@thewaver/ss-components";
 
+import { DATE_PART_HINTS, TIME_SEGMENT_HINTS } from "../../../PageComponents/Announcements/Announcements.const";
 import {
     PageTextFieldContent,
     computePageTextFieldTextStyle,
@@ -21,6 +22,7 @@ export const PairedExample = (props: Props) => {
             <DateInput
                 valueSignal={dateSignal}
                 ariaLabel={"Date"}
+                partHints={DATE_PART_HINTS}
                 locale={() => LOCALE}
                 padding={() => FIELD_STEPPER_PADDING}
                 gap={() => FIELD_GAP}
@@ -34,6 +36,7 @@ export const PairedExample = (props: Props) => {
             <TimeInput
                 valueSignal={timeSignal}
                 ariaLabel={"Time"}
+                segmentHints={TIME_SEGMENT_HINTS}
                 padding={() => FIELD_STEPPER_PADDING}
                 gap={() => FIELD_GAP}
                 computeTextStyle={computePageTextFieldTextStyle}

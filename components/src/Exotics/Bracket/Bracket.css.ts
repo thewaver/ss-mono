@@ -31,3 +31,7 @@ export const bracketNode = style({
         },
     },
 });
+
+export const bracketLayerHeader = style({
+    position: "absolute",
+});

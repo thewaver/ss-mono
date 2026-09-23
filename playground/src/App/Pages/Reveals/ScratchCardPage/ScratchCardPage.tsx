@@ -10,7 +10,13 @@ import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField, PageSelectField } from "../../../StyledComponents/Field/Field";
 import { FrostedExample } from "./Examples/Frosted";
 import { TicketExample } from "./Examples/Ticket";
-import type { ExampleKey, ExampleProgress, ScratchCardExampleProps } from "./ScratchCardPage.types";
+import { WindowsExample } from "./Examples/Windows";
+import type {
+    ExampleKey,
+    ExampleProgress,
+    ScratchCardExampleProps,
+    ScratchCardWindowsExampleProps,
+} from "./ScratchCardPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/Reveals/ScratchCardPage/Examples";
 
@@ -30,6 +36,8 @@ const RATIO_DIGITS = 2;
 const CIRCLE = "circle";
 const BRUSH_SHAPES = [CIRCLE, ...ShapeConst.DEFAULT_SHAPES] as const;
 const NOTHING_SCRATCHED = 0;
+const WINDOW_COUNT = 3;
+const FIRST_WINDOW = 1;
 
 export const ScratchCardPage = () => {
     const [getPrecision, setPrecision] = createSignal(SCRATCH_CARD_DEFAULTS.precision);
@@ -49,6 +57,9 @@ export const ScratchCardPage = () => {
         ticket: { ratio: NOTHING_SCRATCHED, hasCleared: false },
         frosted: { ratio: NOTHING_SCRATCHED, hasCleared: false },
     });
+    const [getWindowProgress, setWindowProgress] = createStore<ExampleProgress[]>(
+        Array.from({ length: WINDOW_COUNT }, () => ({ ratio: NOTHING_SCRATCHED, hasCleared: false })),
+    );
 
     const getExamples = createMemo(() => {
         const exampleProps = (key: ExampleKey): ScratchCardExampleProps => ({
@@ -64,6 +75,30 @@ export const ScratchCardPage = () => {
             },
             onClear: () => setProgress(key, "hasCleared", true),
         });
+
+        const windowsProps: ScratchCardWindowsExampleProps = {
+            brushRadius: getBrushRadius,
+            precision: getPrecision,
+            softness: getSoftness,
+            computePoints: getComputePoints,
+            clearThreshold: getThreshold,
+            onWindowScratch: (index, ratio) => {
+                setWindowProgress(index, "ratio", ratio);
+
+                if (ratio === NOTHING_SCRATCHED) setWindowProgress(index, "hasCleared", false);
+            },
+            onWindowClear: (index) => setWindowProgress(index, "hasCleared", true),
+        };
+
+        const describeWindows = () =>
+            getWindowProgress
+                .map(
+                    (progress, index) =>
+                        `window ${index + FIRST_WINDOW}: ${
+                            progress.hasCleared ? "cleared" : `${(progress.ratio * 100).toFixed(RATIO_DIGITS)}%`
+                        }`,
+                )
+                .join(" · ");
 
         const describe = (key: ExampleKey, whileGoing: string) =>
             `${(getProgress[key].ratio * MAX_THRESHOLD * 100).toFixed(RATIO_DIGITS)}% rubbed off — ${
@@ -84,6 +119,13 @@ export const ScratchCardPage = () => {
                 readout: () => describe("frosted", "what is under it sharpens as the frost goes"),
                 component: () => <FrostedExample {...exampleProps("frosted")} />,
                 path: `${EXAMPLES_ROOT}/Frosted.tsx`,
+            },
+            {
+                key: "windows",
+                name: "Ticket with windows",
+                readout: describeWindows,
+                component: () => <WindowsExample {...windowsProps} />,
+                path: `${EXAMPLES_ROOT}/Windows.tsx`,
             },
         ];
     });

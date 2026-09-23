@@ -1,4 +1,4 @@
 export const FORM_FIELD_DEFAULTS = {
-    dir: "column" as const,
+    orientation: "vertical" as const,
     gap: 5,
 };

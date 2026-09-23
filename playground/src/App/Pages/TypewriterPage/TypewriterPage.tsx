@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { TextArea } from "@thewaver/ss-components";
+import { ScrambleTextWeights, TextArea } from "@thewaver/ss-components";
 import type { AccessorProps } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -15,6 +15,7 @@ import {
 import { PageTextFieldPlaceholder } from "../../StyledComponents/TextFieldPlaceholder/TextFieldPlaceholder";
 import { ComplexExample } from "./Examples/Complex";
 import { CustomInputExample } from "./Examples/CustomInput";
+import { PhrasesExample } from "./Examples/Phrases";
 import type { TypewriterExampleProps } from "./TypewriterPage.types";
 
 import { MEASURE_BOX_PADDING } from "../../PageComponents/MeasureBox/MeasureBox.css";
@@ -29,6 +30,8 @@ const TEXT_EFFECT_MAP: Record<(typeof TEXT_EFFECTS)[number], string> = {
     drop: styles.typewriterDrop,
     slide: styles.typewriterSlide,
 };
+
+const ARRIVAL_ORDERS = ["leftToRight", ...ScrambleTextWeights.SAMPLE_KEYS] as const;
 
 const CUSTOM_TEXT_WIDTH = 320;
 const CUSTOM_TEXT_MIN_ROWS = 6;
@@ -48,6 +51,14 @@ const ComplexExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
     return (
         <PageMeasureBox width={width} padding={() => MEASURE_BOX_PADDING}>
             <ComplexExample {...props} />
+        </PageMeasureBox>
+    );
+};
+
+const PhrasesExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
+    return (
+        <PageMeasureBox width={width} padding={() => MEASURE_BOX_PADDING}>
+            <PhrasesExample {...props} />
         </PageMeasureBox>
     );
 };
@@ -86,11 +97,17 @@ const CustomInputExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => 
 export const TypewriterPage = () => {
     const [getTextContainerWidth, setTextContainerWidth] = createSignal(STARTING_WIDTH);
     const [getTextEffect, setTextEffect] = createSignal<(typeof TEXT_EFFECTS)[number]>(TEXT_EFFECTS[0]);
+    const [getArrivalOrder, setArrivalOrder] = createSignal<(typeof ARRIVAL_ORDERS)[number]>(ARRIVAL_ORDERS[0]);
 
     const getExamples = createMemo(() => {
         const commonProps: ExampleWrapperProps = {
             width: getTextContainerWidth,
             animationName: () => TEXT_EFFECT_MAP[getTextEffect()],
+            computeCharacterWeights: (count) => {
+                const arrivalOrder = getArrivalOrder();
+
+                return arrivalOrder === "leftToRight" ? [] : ScrambleTextWeights.SAMPLE_WEIGHTS[arrivalOrder](count);
+            },
         };
 
         return [
@@ -105,6 +122,14 @@ export const TypewriterPage = () => {
                 name: "Custom Input",
                 component: () => <CustomInputExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/CustomInput.tsx`,
+            },
+            {
+                key: "phrases",
+                name: "Phrases",
+                readout: () =>
+                    "the example owns the loop: each run's end either holds the phrase and switches to erasing, or moves to the next phrase and types it, and the caret is moved by each character's own animation starting",
+                component: () => <PhrasesExampleWrapper {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/Phrases.tsx`,
             },
         ];
     });
@@ -139,6 +164,21 @@ export const TypewriterPage = () => {
                         values={() => TEXT_EFFECTS}
                         ariaLabel={"Effect"}
                         onChange={(effect) => setTextEffect(() => effect)}
+                    />
+                </PageProp>
+
+                <PageProp
+                    key={"arrivalOrder"}
+                    label={"Arrival order"}
+                    hint={
+                        "The order the characters arrive in: left to right, from the middle out, scattered, and so on. Erasing runs it backwards. The caret is meant for left to right, and jumps about under the others."
+                    }
+                >
+                    <PageSelectField
+                        value={getArrivalOrder}
+                        values={() => ARRIVAL_ORDERS}
+                        ariaLabel={"Arrival order"}
+                        onChange={(arrivalOrder) => setArrivalOrder(() => arrivalOrder)}
                     />
                 </PageProp>
             </PagePropsPanel>

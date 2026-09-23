@@ -288,7 +288,7 @@ export namespace DateValueUtils {
      * Tests whether a date satisfies a minimum and a maximum, both included.
      *
      * Unlike {@link DateValueUtils.getIsWithin} this takes the bounds separately and treats a missing
-     * one as no limit, which is what a picker's `min` and `max` props mean.
+     * one as no limit, which is what a picker's `minValue` and `maxValue` props mean.
      */
     export const getIsInRange = (value: DateValue, min?: DateValue, max?: DateValue) =>
         (!min || compare(value, min) >= 0) && (!max || compare(value, max) <= 0);

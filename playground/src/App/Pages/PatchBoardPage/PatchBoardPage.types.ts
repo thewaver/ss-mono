@@ -16,3 +16,9 @@ export type PatchBoardExampleProps = AccessorProps<{
     onUnlink: (link: PatchBoardLink) => void;
     onMove: (nodeKey: string) => void;
 }>;
+
+export type PatchBoardZoomExampleProps = PatchBoardExampleProps &
+    AccessorProps<{
+        zoom: number;
+        onZoomChange: (zoom: number) => void;
+    }>;

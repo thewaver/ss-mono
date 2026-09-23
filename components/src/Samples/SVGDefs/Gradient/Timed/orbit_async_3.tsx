@@ -7,106 +7,111 @@ import { SVGDefsUtils } from "../../SVGDefs.utils";
 import { TimedGradientKnobs } from "../TimedGradient.knobs";
 
 export const orbit_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => ({
-    computeSVGDefs: (id, __, ___, defs) => [
-        {
-            color: SVGDefsUtils.getBaseBorderColor(defs),
-        },
-        {
-            gradientOrPattern: {
-                id: `gradient1-${id}`,
-                renderDefsElement: () =>
-                    SVGGradientDefsUtils.computeLinearGradient(
-                        {
-                            id: `gradient1-${id}`,
-                            colors: [
-                                { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
-                                { value: defs.colors.primary },
-                                { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
-                            ],
-                        },
-                        SVGAnimations.Linear.rotate(
-                            MathUtils.getIntermediateValues(
-                                0,
-                                360,
-                                opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+    computeSVGDefs: (id, __, ___, defs) => {
+        const sharedBlur = SVGDefsUtils.getBaseBlur(id, defs);
+        const sharedBlurRef = SVGDefsUtils.getSharedFilter(sharedBlur);
+
+        return [
+            {
+                color: SVGDefsUtils.getBaseBorderColor(defs),
+            },
+            {
+                gradientOrPattern: {
+                    id: `gradient1-${id}`,
+                    renderDefsElement: () =>
+                        SVGGradientDefsUtils.computeLinearGradient(
+                            {
+                                id: `gradient1-${id}`,
+                                colors: [
+                                    { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
+                                    { value: defs.colors.primary },
+                                    { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
+                                ],
+                            },
+                            SVGAnimations.Linear.rotate(
+                                MathUtils.getIntermediateValues(
+                                    0,
+                                    360,
+                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                ),
+                                defs,
                             ),
-                            defs,
                         ),
-                    ),
+                },
+                filter: sharedBlur,
+                blend: true,
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-            blend: true,
-        },
-        {
-            gradientOrPattern: {
-                id: `gradient2-${id}`,
-                renderDefsElement: () =>
-                    SVGGradientDefsUtils.computeLinearGradient(
-                        {
-                            id: `gradient2-${id}`,
-                            colors: [
-                                { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary) },
-                                { value: defs.colors.secondary },
-                                { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary) },
-                            ],
-                        },
-                        SVGAnimations.Linear.rotate(
-                            [
-                                ...MathUtils.getIntermediateValues(
-                                    0,
-                                    360,
-                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
-                                ),
-                                ...MathUtils.getIntermediateValues(
-                                    0,
-                                    360,
-                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
-                                ),
-                            ],
-                            defs,
+            {
+                gradientOrPattern: {
+                    id: `gradient2-${id}`,
+                    renderDefsElement: () =>
+                        SVGGradientDefsUtils.computeLinearGradient(
+                            {
+                                id: `gradient2-${id}`,
+                                colors: [
+                                    { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary) },
+                                    { value: defs.colors.secondary },
+                                    { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary) },
+                                ],
+                            },
+                            SVGAnimations.Linear.rotate(
+                                [
+                                    ...MathUtils.getIntermediateValues(
+                                        0,
+                                        360,
+                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        0,
+                                        360,
+                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                    ),
+                                ],
+                                defs,
+                            ),
                         ),
-                    ),
+                },
+                filter: sharedBlurRef,
+                blend: true,
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-            blend: true,
-        },
-        {
-            gradientOrPattern: {
-                id: `gradient3-${id}`,
-                renderDefsElement: () =>
-                    SVGGradientDefsUtils.computeLinearGradient(
-                        {
-                            id: `gradient3-${id}`,
-                            colors: [
-                                { value: SVGDefsUtils.getTransparentColor(defs.colors.tertiary) },
-                                { value: defs.colors.tertiary },
-                                { value: SVGDefsUtils.getTransparentColor(defs.colors.tertiary) },
-                            ],
-                        },
-                        SVGAnimations.Linear.rotate(
-                            [
-                                ...MathUtils.getIntermediateValues(
-                                    0,
-                                    360,
-                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
-                                ),
-                                ...MathUtils.getIntermediateValues(
-                                    0,
-                                    360,
-                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
-                                ),
-                                ...MathUtils.getIntermediateValues(
-                                    0,
-                                    360,
-                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
-                                ),
-                            ],
-                            defs,
+            {
+                gradientOrPattern: {
+                    id: `gradient3-${id}`,
+                    renderDefsElement: () =>
+                        SVGGradientDefsUtils.computeLinearGradient(
+                            {
+                                id: `gradient3-${id}`,
+                                colors: [
+                                    { value: SVGDefsUtils.getTransparentColor(defs.colors.tertiary) },
+                                    { value: defs.colors.tertiary },
+                                    { value: SVGDefsUtils.getTransparentColor(defs.colors.tertiary) },
+                                ],
+                            },
+                            SVGAnimations.Linear.rotate(
+                                [
+                                    ...MathUtils.getIntermediateValues(
+                                        0,
+                                        360,
+                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        0,
+                                        360,
+                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        0,
+                                        360,
+                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                    ),
+                                ],
+                                defs,
+                            ),
                         ),
-                    ),
+                },
+                filter: sharedBlurRef,
+                blend: true,
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-            blend: true,
-        },
-    ],
+        ];
+    },
 });

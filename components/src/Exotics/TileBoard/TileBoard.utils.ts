@@ -1,4 +1,4 @@
-import { type Index2d, MathUtils, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
+import { Index2d, type Index2dString, MathUtils, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import type { TileBoardLayout, TileBoardTiling } from "./TileBoard.types";
 
@@ -16,6 +16,10 @@ const HALF = 0.5;
 const POINTS_UP = "triangle-up";
 /** The triangle shape whose unflipped tiles point rightwards. */
 const POINTS_RIGHT = "triangle-right";
+/** A top row as wide as the bottom one, which is a board drawn flat. */
+const NO_TAPER = 1;
+/** The narrowest top row a taper may ask for, since a top row of no width would put the bottom one at infinity. */
+const MIN_TAPER = 0.01;
 
 const DODECAGON_ROW_PITCH = Math.sqrt(3) * HALF;
 
@@ -111,6 +115,21 @@ const computeIsShortRow = (row: number, layout: TileBoardLayout) =>
  */
 const computeIsFlippedTile = (tile: Index2d, layout: TileBoardLayout) =>
     layout.tileFlip !== "none" && MathUtils.isOdd(tile.row + tile.col);
+
+/**
+ * The board's size before any taper, which is the sheet the taper is applied to.
+ *
+ * At module level for the same reason as {@link computeIsShortRow}; the published
+ * {@link TileBoardUtils.getBoardSize} is the size as drawn.
+ */
+const computeFlatBoardSize = (layout: TileBoardLayout): Size2d => {
+    if (layout.count.row < 1 || layout.count.col < 1) return EMPTY_SIZE;
+
+    return {
+        width: layout.pitch.width * (layout.count.col - 1) + layout.tileSize.width,
+        height: layout.pitch.height * (layout.count.row - 1) + layout.tileSize.height,
+    };
+};
 
 /**
  * Which tiles touch a given one, before checking whether they are on the board.
@@ -241,18 +260,22 @@ export namespace TileBoardUtils {
      * @param tileSize One tile's size.
      * @param hasShortFirstRow Whether the first row is the offset, one-tile-shorter one. Only matters
      * for shapes with offset rows, and lets two boards be joined without a seam.
+     * @param taper How wide the top of the board is drawn, as a fraction of the bottom. `1` is a flat
+     * board; anything less leans it away from the viewer. Held between a hundredth and `1`.
      */
     export const getLayout = (
         shape: ShapeConst.DefaultShape,
         count: Index2d,
         tileSize: Size2d,
         hasShortFirstRow: boolean,
+        taper: number,
     ): TileBoardLayout => ({
         ...getTiling(shape, tileSize),
         shape,
         count,
         tileSize,
         hasShortFirstRow,
+        taper: MathUtils.clamp(taper, MIN_TAPER, NO_TAPER),
     });
 
     /**
@@ -294,32 +317,121 @@ export namespace TileBoardUtils {
     export const getRowTop = (row: number, layout: TileBoardLayout) => row * layout.pitch.height;
 
     /**
-     * A tile's center, in board pixels.
+     * How much the taper shrinks whatever is drawn at a point on the board.
+     *
+     * The bottom edge is drawn at full size and the top edge at the layout's taper, and in between the
+     * shrink follows perspective rather than a straight line — the rows nearer the top close up faster,
+     * as the far side of a real table does. A piece standing on the board rather than painted into it is
+     * scaled by this, so it is the same size as the tile beneath it wherever it stands.
+     *
+     * @param point A point on the untapered board, in the coordinates {@link TileBoardUtils.getTileCenter}
+     * would use with no taper.
+     * @param layout The board's layout.
+     * @returns `1` along the bottom edge and on a flat board, the taper along the top edge.
+     */
+    export const getDrawnScale = (point: Point2d, layout: TileBoardLayout) => {
+        const height = computeFlatBoardSize(layout).height;
+
+        if (layout.taper === NO_TAPER || height === 0) return NO_TAPER;
+
+        return layout.taper / (1 - ((1 - layout.taper) * point.y) / height);
+    };
+
+    /**
+     * Where a point on the board is drawn once the taper is applied.
+     *
+     * The bottom edge stays where it was, every row is pulled in towards the board's middle by its
+     * {@link TileBoardUtils.getDrawnScale}, and the rows close up vertically by the same perspective, so
+     * the whole board is drawn `taper` times its flat height with its top at the top of its box.
+     *
+     * @param point A point on the untapered board.
+     * @param layout The board's layout.
+     * @returns The point as drawn, measured from the board's top left corner, which is what a piece
+     * positioned beside the board needs.
+     */
+    export const getDrawnPoint = (point: Point2d, layout: TileBoardLayout): Point2d => {
+        const middle = computeFlatBoardSize(layout).width * HALF;
+        const scale = getDrawnScale(point, layout);
+
+        return {
+            x: middle + (point.x - middle) * scale,
+            y: point.y * layout.taper * scale,
+        };
+    };
+
+    /**
+     * The CSS transform that draws a flat board tapered.
+     *
+     * One `matrix3d`, applied from the board's top left corner, that sends every point exactly where
+     * {@link TileBoardUtils.getDrawnPoint} says it goes. The browser then draws the tiles, their paint and
+     * their hit layers through it, so the tiles still meet edge to edge and a press lands on the tile drawn
+     * under it.
+     *
+     * @param layout The board's layout.
+     * @returns The transform, or `undefined` for a flat or empty board, which needs none.
+     */
+    export const getTaperTransform = (layout: TileBoardLayout) => {
+        const size = computeFlatBoardSize(layout);
+        const taper = layout.taper;
+
+        if (taper === NO_TAPER || size.height === 0) return;
+
+        const recede = (1 - taper) / size.height;
+        const middle = size.width * HALF;
+
+        return `matrix3d(${[
+            [taper, 0, 0, 0],
+            [-middle * recede, taper * taper, 0, -recede],
+            [0, 0, taper, 0],
+            [middle * (1 - taper), 0, 0, 1],
+        ]
+            .flat()
+            .join(", ")})`;
+    };
+
+    /**
+     * A tile's center, where the board draws it.
      *
      * @param tile Which tile.
      * @param layout The board's layout.
+     * @returns The middle of the tile's box, taper included, measured from the board's top left corner.
      */
-    export const getTileCenter = (tile: Index2d, layout: TileBoardLayout): Point2d => ({
-        x: getRowOffset(tile.row, layout) + tile.col * layout.pitch.width + layout.tileSize.width * HALF,
-        y: getRowTop(tile.row, layout) + layout.tileSize.height * HALF,
-    });
+    export const getTileCenter = (tile: Index2d, layout: TileBoardLayout): Point2d =>
+        getDrawnPoint(
+            {
+                x: getRowOffset(tile.row, layout) + tile.col * layout.pitch.width + layout.tileSize.width * HALF,
+                y: getRowTop(tile.row, layout) + layout.tileSize.height * HALF,
+            },
+            layout,
+        );
 
     /**
-     * The whole board's size.
+     * How much the taper shrinks a piece standing on a tile.
+     *
+     * Read at the tile's center, so a piece drawn at {@link TileBoardUtils.getTileCenter} and scaled by
+     * this matches the tile it stands on, and grows or shrinks as it moves down or up the board.
+     *
+     * @param tile Which tile.
+     * @param layout The board's layout.
+     * @returns `1` on a flat board.
+     */
+    export const getTileScale = (tile: Index2d, layout: TileBoardLayout) =>
+        getDrawnScale({ x: 0, y: getRowTop(tile.row, layout) + layout.tileSize.height * HALF }, layout);
+
+    /**
+     * The whole board's size, as drawn.
      *
      * The pitch covers the gaps between tile centers and one full tile is added for the last one, since
-     * a tile extends past its own center.
+     * a tile extends past its own center. A taper keeps the bottom edge's width and draws the board
+     * `taper` times as tall.
      *
      * @param layout The board's layout.
      * @returns The size, or nothing for a board with no rows or columns.
      */
     export const getBoardSize = (layout: TileBoardLayout): Size2d => {
-        if (layout.count.row < 1 || layout.count.col < 1) return EMPTY_SIZE;
+        const size = computeFlatBoardSize(layout);
 
-        return {
-            width: layout.pitch.width * (layout.count.col - 1) + layout.tileSize.width,
-            height: layout.pitch.height * (layout.count.row - 1) + layout.tileSize.height,
-        };
+        return { width: size.width, height: size.height * layout.taper };
     };
 
     /**
@@ -380,6 +492,120 @@ export namespace TileBoardUtils {
      */
     export const getNeighborTiles = (tile: Index2d, layout: TileBoardLayout): Index2d[] =>
         computeNeighbors(tile, layout).filter((neighbor) => getIsOnBoard(neighbor, layout));
+
+    /**
+     * Every tile a piece could reach in a given number of steps, one neighbor per step.
+     *
+     * A step goes from a tile to one of its {@link TileBoardUtils.getNeighborTiles}, so the answer follows the
+     * board's own adjacency whatever the shape: six ways out of a hexagon, three out of a triangle. A blocked tile
+     * is never entered, so it is not in the answer and nothing beyond it is reached through it.
+     *
+     * @param from Where the piece stands. It is not in the answer.
+     * @param reach How many steps may be taken. Nothing is reached below one.
+     * @param layout The board's layout.
+     * @param computeIsBlocked Whether a tile may not be stepped on. Every tile is open when it is left out.
+     * @returns The tiles, nearest first, each once.
+     */
+    export const getTilesWithin = (
+        from: Index2d,
+        reach: number,
+        layout: TileBoardLayout,
+        computeIsBlocked?: (tile: Index2d) => boolean,
+    ): Index2d[] => {
+        const seen = new Set([Index2d.toString(from)]);
+        const within: Index2d[] = [];
+
+        let edge = [from];
+
+        for (let step = 0; step < reach && edge.length > 0; step++) {
+            const next: Index2d[] = [];
+
+            for (const tile of edge) {
+                for (const neighbor of getNeighborTiles(tile, layout)) {
+                    const key = Index2d.toString(neighbor);
+
+                    if (seen.has(key)) continue;
+
+                    seen.add(key);
+
+                    if (computeIsBlocked?.(neighbor)) continue;
+
+                    next.push(neighbor);
+                    within.push(neighbor);
+                }
+            }
+
+            edge = next;
+        }
+
+        return within;
+    };
+
+    /**
+     * The shortest way from one tile to another, stepping from neighbor to neighbor.
+     *
+     * Steps follow {@link TileBoardUtils.getNeighborTiles}, so the route is as short as the board's own
+     * adjacency allows, and it goes round blocked tiles rather than through them. Where several routes are
+     * equally short, the one taken is the same every time for the same board.
+     *
+     * @param from Where the route starts. It is never checked against `computeIsBlocked`, since it is where the
+     * piece already stands.
+     * @param to Where the route ends.
+     * @param layout The board's layout.
+     * @param computeIsBlocked Whether a tile may not be stepped on. Every tile is open when it is left out.
+     * @returns The tiles in order, `from` first and `to` last, so its length less one is the number of steps.
+     * Just `from` when the two are the same tile, and `undefined` when either is off the board, `to` is blocked,
+     * or nothing open joins them.
+     */
+    export const getShortestRoute = (
+        from: Index2d,
+        to: Index2d,
+        layout: TileBoardLayout,
+        computeIsBlocked?: (tile: Index2d) => boolean,
+    ): Index2d[] | undefined => {
+        if (!getIsOnBoard(from, layout) || !getIsOnBoard(to, layout)) return;
+        if (Index2d.isSame(from, to)) return [from];
+        if (computeIsBlocked?.(to)) return;
+
+        const cameFrom = new Map<Index2dString, Index2d>();
+        const seen = new Set([Index2d.toString(from)]);
+
+        let edge = [from];
+
+        while (edge.length > 0) {
+            const next: Index2d[] = [];
+
+            for (const tile of edge) {
+                for (const neighbor of getNeighborTiles(tile, layout)) {
+                    const key = Index2d.toString(neighbor);
+
+                    if (seen.has(key)) continue;
+
+                    seen.add(key);
+
+                    if (computeIsBlocked?.(neighbor)) continue;
+
+                    cameFrom.set(key, tile);
+
+                    if (!Index2d.isSame(neighbor, to)) {
+                        next.push(neighbor);
+
+                        continue;
+                    }
+
+                    const route = [neighbor];
+
+                    for (let back = cameFrom.get(key); back; back = cameFrom.get(Index2d.toString(back))) {
+                        route.unshift(back);
+                    }
+
+                    return route;
+                }
+            }
+
+            edge = next;
+        }
+    };
 
     /** The top-left tile. */
     export const getFirstTile = (): Index2d => ({ row: FIRST_INDEX, col: FIRST_INDEX });

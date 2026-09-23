@@ -54,7 +54,7 @@ export namespace PolygonUtils {
      *
      * @param pts The corners, in order. Never modified.
      * @param shift How far to move each edge. The sign that means "inwards" depends on
-     * whether the corners run clockwise or anticlockwise.
+     * whether the corners run clockwise or counterclockwise.
      * @returns A new array with one corner per input corner.
      */
     export function insetPolygon(pts: Point2d[], shift: number): Point2d[] {

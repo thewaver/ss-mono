@@ -33,7 +33,7 @@ export const CompareExample = (props: Props) => {
                         alt={PICTURES[index].alt}
                     />
                 )}
-                renderGutter={(getFlags) => <PageSplitPaneGutter flags={getFlags} dir={"row"} />}
+                renderGutter={(getFlags) => <PageSplitPaneGutter flags={getFlags} orientation={"horizontal"} />}
             />
         </PageSplitPaneCompareFrame>
     );

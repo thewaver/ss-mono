@@ -11,6 +11,7 @@ import { BoundedExample } from "./Examples/Bounded";
 import { CompareExample } from "./Examples/Compare";
 import { CrampedExample } from "./Examples/Cramped";
 import { PairExample } from "./Examples/Pair";
+import { RightToLeftExample } from "./Examples/RightToLeft";
 import { StackedExample } from "./Examples/Stacked";
 import { TripleExample } from "./Examples/Triple";
 import type { SplitPaneExampleProps } from "./SplitPanePage.types";
@@ -23,6 +24,7 @@ const PERCENT = 100;
 const EXAMPLES_ROOT = "/src/App/Pages/SplitPanePage/Examples";
 
 const STARTING_PAIR = [0.3, 0.7];
+const STARTING_RIGHT_TO_LEFT = [0.3, 0.7];
 const STARTING_BOUNDED = [0.3, 0.7];
 const STARTING_CRAMPED = [0.5, 0.5];
 const STARTING_TRIPLE = [0.25, 0.5, 0.25];
@@ -36,6 +38,7 @@ export const SplitPanePage = () => {
     const [getIsDisabled, setIsDisabled] = createSignal(false);
 
     const pairSignal = createSignal(STARTING_PAIR);
+    const rightToLeftSignal = createSignal(STARTING_RIGHT_TO_LEFT);
     const boundedSignal = createSignal(STARTING_BOUNDED);
     const crampedSignal = createSignal(STARTING_CRAMPED);
     const tripleSignal = createSignal(STARTING_TRIPLE);
@@ -44,6 +47,7 @@ export const SplitPanePage = () => {
 
     const reset = () => {
         pairSignal[1](STARTING_PAIR);
+        rightToLeftSignal[1](STARTING_RIGHT_TO_LEFT);
         boundedSignal[1](STARTING_BOUNDED);
         crampedSignal[1](STARTING_CRAMPED);
         tripleSignal[1](STARTING_TRIPLE);
@@ -64,6 +68,14 @@ export const SplitPanePage = () => {
                 readout: () => `ratios: ${percent(pairSignal[0]())} — drag the gutter or arrow it with the keyboard`,
                 component: () => <PairExample {...commonProps} ratiosSignal={pairSignal} />,
                 path: `${EXAMPLES_ROOT}/Pair.tsx`,
+            },
+            {
+                key: "rightToLeft",
+                name: "In a right-to-left box",
+                readout: () =>
+                    `ratios: ${percent(rightToLeftSignal[0]())} — the box around the panes sets dir="rtl", so the first pane sits on the right and the gutter follows the pointer and the arrow keys from that side`,
+                component: () => <RightToLeftExample {...commonProps} ratiosSignal={rightToLeftSignal} />,
+                path: `${EXAMPLES_ROOT}/RightToLeft.tsx`,
             },
             {
                 key: "bounded",

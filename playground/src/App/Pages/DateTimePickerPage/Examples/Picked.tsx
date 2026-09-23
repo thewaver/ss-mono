@@ -3,6 +3,12 @@ import { Show } from "solid-js";
 import { DateTimePicker, access } from "@thewaver/ss-components";
 import type { MaybeAccessor } from "@thewaver/ss-components";
 
+import {
+    CALENDAR_TRIGGER_LABEL,
+    CLOCK_TRIGGER_LABEL,
+    DATE_PART_HINTS,
+    TIME_SEGMENT_HINTS,
+} from "../../../PageComponents/Announcements/Announcements.const";
 import { PageCalendarCaption } from "../../../StyledComponents/CalendarCaption/CalendarCaption";
 import {
     PageCalendarDay,
@@ -45,6 +51,8 @@ export const PickedExample = (props: Props) => {
             timeLabel={"Time"}
             calendarLabel={"Choose a date"}
             clockLabel={"Choose a time"}
+            partHints={DATE_PART_HINTS}
+            segmentHints={TIME_SEGMENT_HINTS}
             locale={() => LOCALE}
             padding={() => FIELD_STEPPER_PADDING}
             gap={() => FIELD_GAP}
@@ -55,6 +63,7 @@ export const PickedExample = (props: Props) => {
             )}
             renderSeparator={() => <PageDateTimeSeparator />}
             triggerId={() => `${access(props.key)}DateTrigger`}
+            triggerAriaLabel={CALENDAR_TRIGGER_LABEL}
             renderTrigger={(getFlags) => <PageDatePickerTrigger flags={getFlags} />}
             renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}
             renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
@@ -75,6 +84,7 @@ export const PickedExample = (props: Props) => {
                 </Show>
             )}
             timeTriggerId={() => `${access(props.key)}TimeTrigger`}
+            timeTriggerAriaLabel={CLOCK_TRIGGER_LABEL}
             renderTimeTrigger={(getFlags) => <PageTimePickerTrigger flags={getFlags} />}
             renderOption={(_unused, getRenderProps) => <PageClockOption renderProps={getRenderProps} />}
             renderUnit={(name) => <PageClockUnit>{name}</PageClockUnit>}

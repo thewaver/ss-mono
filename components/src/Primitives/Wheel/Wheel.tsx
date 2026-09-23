@@ -16,8 +16,6 @@ import type { WheelController, WheelFace, WheelProps, WheelWedgeState } from "./
 
 import * as styles from "./Wheel.css";
 
-const WHEEL_ROLE_DESCRIPTION = "wheel";
-const WEDGE_ROLE_DESCRIPTION = "wedge";
 const ROOT_PATH: number[] = [];
 const NO_PARENT_EXTENT = 0;
 const FIRST_WEDGE = 0;
@@ -63,8 +61,11 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
         onSpinEnd: props.onSpinEnd,
     });
 
-    const getWedgeLabel = (index: number) =>
-        props.computeWedgeLabel?.(index, getWedgeCount()) ?? `${index + 1} of ${getWedgeCount()}`;
+    const getWedgeLabel = (index: number) => props.computeWedgeLabel(index, getWedgeCount());
+
+    const getRoleDescription = () => access(props.roleDescription) ?? WHEEL_DEFAULTS.roleDescription;
+
+    const getWedgeRoleDescription = () => access(props.wedgeRoleDescription) ?? WHEEL_DEFAULTS.wedgeRoleDescription;
 
     const getSelectedIndex = createMemo(() =>
         rotation.getPhase() === "idling" ? undefined : rotation.getCurrentIndex(),
@@ -191,7 +192,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
                 <div
                     class={styles.drumWheelRoot}
                     role="group"
-                    aria-roledescription={WHEEL_ROLE_DESCRIPTION}
+                    aria-roledescription={getRoleDescription()}
                     aria-label={access(props.ariaLabel)}
                 >
                     <Barrel<T>
@@ -199,7 +200,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
                         axis={getAxis}
                         faceSize={getWedgeSize}
                         angle={rotation.getAngle}
-                        faceRoleDescription={WEDGE_ROLE_DESCRIPTION}
+                        faceRoleDescription={getWedgeRoleDescription}
                         computeFaceDefs={(index, face) => ({
                             ariaLabel: getWedgeLabel(index),
                             isHidden: face === "back" || index !== rotation.getTargetIndex(),
@@ -213,7 +214,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
                 ref={setWheelRef}
                 class={styles.overheadWheelRoot}
                 role="group"
-                aria-roledescription={WHEEL_ROLE_DESCRIPTION}
+                aria-roledescription={getRoleDescription()}
                 aria-label={access(props.ariaLabel)}
             >
                 <Index each={access(props.wedges)}>
@@ -228,7 +229,7 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
                                     filter: getEffect()?.filter || undefined,
                                 }}
                                 role="group"
-                                aria-roledescription={WEDGE_ROLE_DESCRIPTION}
+                                aria-roledescription={getWedgeRoleDescription()}
                                 aria-label={getWedgeLabel(index)}
                             >
                                 {renderWedge(getWedge, index, "front")}

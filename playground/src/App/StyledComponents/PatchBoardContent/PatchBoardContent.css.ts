@@ -116,6 +116,7 @@ export const patchCable = style({
     stroke: themeVars.color.primary.main,
     strokeWidth: 2,
     strokeLinecap: "round",
+    vectorEffect: "non-scaling-stroke",
 
     selectors: {
         [`&.${isPending}`]: {

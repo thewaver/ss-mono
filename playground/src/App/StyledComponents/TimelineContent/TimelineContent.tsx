@@ -1,4 +1,4 @@
-import { For } from "solid-js";
+import { For, Show } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
@@ -6,6 +6,7 @@ import type {
     PageTimelineBlockProps,
     PageTimelineFrameProps,
     PageTimelineLanesProps,
+    PageTimelineMarkerProps,
     PageTimelineTickProps,
 } from "./TimelineContent.types";
 
@@ -53,6 +54,12 @@ export const PageTimelineTick = (props: PageTimelineTickProps) => (
     </>
 );
 
+export const PageTimelineMarker = (props: PageTimelineMarkerProps) => (
+    <Show when={access(props.marker).isInView}>
+        <div class={`${styles.timelineMarker} ${styles.timelineMarkerTones[access(props.tone)]}`} />
+    </Show>
+);
+
 export const PageTimelineBlock = (props: PageTimelineBlockProps) => {
     const getFlags = () => access(props.flags);
 
@@ -63,6 +70,8 @@ export const PageTimelineBlock = (props: PageTimelineBlockProps) => {
                 [styles.isHovered]: getFlags().isHovered,
                 [styles.isFocusVisible]: getFlags().isFocusVisible,
                 [styles.isDisabled]: getFlags().isDisabled,
+                [styles.isHeldStart]: getFlags().heldEdge === "start",
+                [styles.isHeldEnd]: getFlags().heldEdge === "end",
             }}
         >
             <span class={styles.timelineBlockName}>{access(props.name)}</span>

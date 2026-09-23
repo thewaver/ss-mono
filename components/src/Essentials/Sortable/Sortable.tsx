@@ -31,25 +31,24 @@ import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access, accessSignal } from "../../Utils/propUtils";
 import { LabelUtils } from "../Input/Label/Label.utils";
 import { SORTABLE_DEFAULTS } from "./Sortable.const";
-import type { SortableDir, SortableItem, SortableItemSlotProps, SortableProps } from "./Sortable.types";
+import type { SortableItem, SortableItemSlotProps, SortableOrientation, SortableProps } from "./Sortable.types";
 
 import * as styles from "./Sortable.css";
 
 const NO_SIZE = 0;
 
-const FORWARD_KEYS: Record<SortableDir | "both", string[]> = {
-    row: ["ArrowRight"],
-    column: ["ArrowDown"],
+const FORWARD_KEYS: Record<SortableOrientation | "both", string[]> = {
+    horizontal: ["ArrowRight"],
+    vertical: ["ArrowDown"],
     both: ["ArrowRight", "ArrowDown"],
 };
 
-const BACKWARD_KEYS: Record<SortableDir | "both", string[]> = {
-    row: ["ArrowLeft"],
-    column: ["ArrowUp"],
+const BACKWARD_KEYS: Record<SortableOrientation | "both", string[]> = {
+    horizontal: ["ArrowLeft"],
+    vertical: ["ArrowUp"],
     both: ["ArrowLeft", "ArrowUp"],
 };
 
-const ITEM_ROLE_DESCRIPTION = "sortable item";
 const PLACED_SIZING: InteractionSizing = "fill";
 const PLACED_ORIENTATION: NavigatorOrientation = "both";
 
@@ -62,7 +61,7 @@ const SortableItemSlot = (props: SortableItemSlotProps) => {
             ref={(element) => props.ref?.(element)}
             class={styles.sortableItem}
             role="listitem"
-            aria-roledescription={ITEM_ROLE_DESCRIPTION}
+            aria-roledescription={access(props.roleDescription)}
             aria-label={access(props.label)}
             aria-describedby={access(props.hintId)}
             aria-posinset={access(props.position)}
@@ -101,7 +100,9 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
     const getIsLocked = createMemo(() => access(props.isLocked) ?? false);
 
-    const getDir = createMemo(() => access(props.dir) ?? SORTABLE_DEFAULTS.dir);
+    const getOrientation = createMemo(() => access(props.orientation) ?? SORTABLE_DEFAULTS.orientation);
+
+    const getDirection = NavigatorUtils.createDirectionSignal(getRootRef);
 
     const getItems = createMemo(() => itemsSignal[0]());
 
@@ -169,11 +170,9 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         getLabel: () => access(props.ariaLabel),
         getRootRef,
         getIsDisabled,
-        getRestingKeyHint: () => "Press Enter to pick this up and move it.",
         getKeyHint: (hasOtherZones) =>
-            hasOtherZones
-                ? "Arrow keys choose a place, Tab changes list, Enter drops, Escape cancels."
-                : "Arrow keys choose a place, Enter drops, Escape cancels.",
+            hasOtherZones ? access(props.announcements).keyHintAcrossZones : access(props.announcements).keyHint,
+        getAnnouncements: () => access(props.announcements),
         computeCanAccept: (carry) => {
             if (getIsDisabled() || getIsLocked()) return false;
 
@@ -188,7 +187,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
             if (placed !== undefined) return placed;
 
             return CarrierUtils.computeSettledIndex(
-                CarrierUtils.computeDropIndex(getItemRects(), point.x, point.y, getDir()),
+                CarrierUtils.computeDropIndex(getItemRects(), point.x, point.y, getOrientation(), getDirection()),
                 sourceIndex ?? 0,
                 sourceIndex !== undefined,
             );
@@ -203,7 +202,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         computeEntryPlace: () => getSourceIndex() ?? getItems().length,
         computeIsSamePlace: (a, b) => a === b,
         computeIsPlaceAllowed: () => true,
-        computePlaceLabel: (place) => `place ${asIndex(place) + 1} of ${getPlaceCount()}`,
+        computePlaceLabel: (place) => access(props.announcements).computePlaceLabel(asIndex(place), getPlaceCount()),
         takeAt: (place) => {
             const index = asIndex(place);
 
@@ -284,21 +283,26 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
         const rects = getItemRects();
         const rootRect = root.getBoundingClientRect();
-        const isRow = getDir() === "row";
-        const scrolled = isRow ? root.scrollLeft : root.scrollTop;
-        const span = isRow ? root.scrollWidth : root.scrollHeight;
+        const isHorizontal = getOrientation() === "horizontal";
+        const isReversed = isHorizontal && getDirection() === "rtl";
+        const scrolled = isHorizontal ? root.scrollLeft : root.scrollTop;
+        const span = isHorizontal ? root.scrollWidth : root.scrollHeight;
+        const firstEnd = isReversed ? root.clientWidth : 0;
+        const lastEnd = isReversed ? root.clientWidth - span : span;
 
-        if (rects.length < 1) return span * 0.5;
+        if (rects.length < 1) return (firstEnd + lastEnd) * 0.5;
 
         const scale = viewportContext.getScale();
 
-        const startOf = (rect: DOMRect) =>
-            (isRow ? rect.left - rootRect.left : rect.top - rootRect.top) / scale + scrolled;
-        const endOf = (rect: DOMRect) =>
-            (isRow ? rect.right - rootRect.left : rect.bottom - rootRect.top) / scale + scrolled;
+        const nearEdgeOf = (rect: DOMRect) =>
+            (isHorizontal ? rect.left - rootRect.left : rect.top - rootRect.top) / scale + scrolled;
+        const farEdgeOf = (rect: DOMRect) =>
+            (isHorizontal ? rect.right - rootRect.left : rect.bottom - rootRect.top) / scale + scrolled;
+        const startOf = isReversed ? farEdgeOf : nearEdgeOf;
+        const endOf = isReversed ? nearEdgeOf : farEdgeOf;
 
-        const before = markerIndex > 0 ? endOf(rects[markerIndex - 1]) : 0;
-        const after = markerIndex < rects.length ? startOf(rects[markerIndex]) : span;
+        const before = markerIndex > 0 ? endOf(rects[markerIndex - 1]) : firstEnd;
+        const after = markerIndex < rects.length ? startOf(rects[markerIndex]) : lastEnd;
 
         return (before + after) * 0.5;
     });
@@ -308,7 +312,6 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
             const isReachable = InteractionTrackerUtils.computeIsReachable(
                 item.isDisabled ?? false,
                 item.isReachableWhenDisabled ?? false,
-                item.tooltipDefs !== undefined,
             );
 
             if (!item.isDisabled || isReachable) acc.push(index);
@@ -415,7 +418,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
             return;
         }
 
-        if (e.key === "Enter" || e.key === " ") {
+        if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();
 
             if (isCarrying) {
@@ -437,15 +440,17 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         }
 
         const isPlaced = getLayout() !== undefined;
-        const isForward = FORWARD_KEYS[isPlaced ? "both" : getDir()].includes(e.key);
-        const isBackward = BACKWARD_KEYS[isPlaced ? "both" : getDir()].includes(e.key);
+        const direction = isPlaced ? undefined : getDirection();
+        const logicalKey = NavigatorUtils.computeLogicalKey(e.key, direction);
+        const isForward = FORWARD_KEYS[isPlaced ? "both" : getOrientation()].includes(logicalKey);
+        const isBackward = BACKWARD_KEYS[isPlaced ? "both" : getOrientation()].includes(logicalKey);
 
         if (isCarrying) {
             if (!isForward && !isBackward) return;
 
             e.preventDefault();
             CarrierUtils.aimAtNudge(
-                getDir() === "row" && !isPlaced ? { x: isForward ? 1 : -1 } : { y: isForward ? 1 : -1 },
+                getOrientation() === "horizontal" && !isPlaced ? { x: isForward ? 1 : -1 } : { y: isForward ? 1 : -1 },
             );
 
             return;
@@ -453,7 +458,8 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
         const navigable = getNavigableIndexes();
         const position = NavigatorUtils.computeNextPosition(e.key, navigable.indexOf(index), navigable.length, {
-            orientation: isPlaced ? PLACED_ORIENTATION : getDir(),
+            orientation: isPlaced ? PLACED_ORIENTATION : getOrientation(),
+            direction,
         });
 
         if (position === undefined) return;
@@ -539,7 +545,11 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
     const renderItemAt = (getItem: Accessor<SortableItem<T>>, index: number) => (
         <InteractionWrapper
             sizing={() =>
-                getPlacementAt(index) !== undefined ? PLACED_SIZING : getDir() === "row" ? "fit-content" : "fill"
+                getPlacementAt(index) !== undefined
+                    ? PLACED_SIZING
+                    : getOrientation() === "horizontal"
+                      ? "fit-content"
+                      : "fill"
             }
             isDisabled={() => getItem().isDisabled ?? false}
             isReachableWhenDisabled={() => getItem().isReachableWhenDisabled ?? false}
@@ -558,6 +568,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
                     id={() => getItemId(index)}
                     hintId={() => hintId}
                     label={() => props.computeItemLabel(getItem().value)}
+                    roleDescription={() => access(props.itemRoleDescription) ?? SORTABLE_DEFAULTS.itemRoleDescription}
                     position={() => index + 1}
                     setSize={() => getItems().length}
                     flags={getItemFlags}
@@ -605,7 +616,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
                         setElementRef(element);
                         props.ref?.(element);
                     }}
-                    class={getDir() === "row" ? styles.sortableRow : styles.sortableColumn}
+                    class={getOrientation() === "horizontal" ? styles.sortableRow : styles.sortableColumn}
                     style={{
                         gap: `${access(props.gap) ?? SORTABLE_DEFAULTS.gap}px`,
                         padding: `${getEndRoom()}px`,
@@ -625,7 +636,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
                                 {(placement: PlacementRect) => (
                                     <PlacementItem placement={() => placement}>
                                         <div class={styles.sortableMarkerPlaced} aria-hidden="true">
-                                            {props.renderMarker?.(getDir)}
+                                            {props.renderMarker?.(getOrientation)}
                                         </div>
                                     </PlacementItem>
                                 )}
@@ -636,9 +647,13 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
                     <Show when={props.renderMarker && getLayout() === undefined && getMarkerOffset()} keyed>
                         {(offset: number) => (
                             <div
-                                class={getDir() === "row" ? styles.sortableMarkerRow : styles.sortableMarkerColumn}
+                                class={
+                                    getOrientation() === "horizontal"
+                                        ? styles.sortableMarkerRow
+                                        : styles.sortableMarkerColumn
+                                }
                                 style={
-                                    getDir() === "row"
+                                    getOrientation() === "horizontal"
                                         ? {
                                               left: `${offset}px`,
                                               top: `${getEndRoom()}px`,
@@ -652,7 +667,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
                                 }
                                 aria-hidden="true"
                             >
-                                {props.renderMarker?.(getDir)}
+                                {props.renderMarker?.(getOrientation)}
                             </div>
                         )}
                     </Show>
@@ -663,7 +678,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
     const renderRestingHint = () => (
         <div id={hintId} class={styles.sortableHint}>
-            {zone.getRestingKeyHint()}
+            {access(props.announcements).restingKeyHint}
         </div>
     );
 

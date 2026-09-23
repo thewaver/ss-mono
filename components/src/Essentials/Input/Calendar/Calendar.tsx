@@ -1,4 +1,4 @@
-import { Index, createEffect, createMemo, createSignal, createUniqueId, onMount } from "solid-js";
+import { Index, Show, createEffect, createMemo, createSignal, createUniqueId, onMount } from "solid-js";
 
 import type { DateValue } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
@@ -7,18 +7,32 @@ import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { CALENDAR_DEFAULTS } from "./Calendar.const";
-import type { CalendarCompositeProps, CalendarDayProps, CalendarProps, CalendarRenderProps } from "./Calendar.types";
+import type {
+    CalendarCompositeProps,
+    CalendarDayProps,
+    CalendarPrecision,
+    CalendarProps,
+    CalendarRenderProps,
+} from "./Calendar.types";
+import { CalendarUtils } from "./Calendar.utils";
 
 import * as styles from "./Calendar.css";
 
-const GRID_WEEKS = 6;
-const MONTH_STEP = 1;
-const YEAR_STEP = 1;
+const PAGE_STEP = 1;
+const LEAP_STEP = 1;
 
-const DAY_LABEL_OPTIONS: Intl.DateTimeFormatOptions = { day: "numeric", month: "long", year: "numeric" };
-const MONTH_ANNOUNCE_OPTIONS: Intl.DateTimeFormatOptions = { month: "long", year: "numeric" };
-const PAST_ERA_DAY_LABEL_OPTIONS: Intl.DateTimeFormatOptions = { ...DAY_LABEL_OPTIONS, era: "short" };
-const PAST_ERA_MONTH_ANNOUNCE_OPTIONS: Intl.DateTimeFormatOptions = { ...MONTH_ANNOUNCE_OPTIONS, era: "short" };
+const CELL_LABEL_OPTIONS: Record<CalendarPrecision, Intl.DateTimeFormatOptions> = {
+    day: { day: "numeric", month: "long", year: "numeric" },
+    month: { month: "long", year: "numeric" },
+    year: { year: "numeric" },
+};
+const PAGE_ANNOUNCE_OPTIONS: Record<CalendarPrecision, Intl.DateTimeFormatOptions> = {
+    day: { month: "long", year: "numeric" },
+    month: { year: "numeric" },
+    year: { year: "numeric" },
+};
+
+const withEra = (options: Intl.DateTimeFormatOptions): Intl.DateTimeFormatOptions => ({ ...options, era: "short" });
 
 const CalendarDay = (props: CalendarDayProps) => {
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
@@ -52,12 +66,17 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
     const gridId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
-    const [getDayRefs, setDayRefs] = createSignal<(HTMLElement | undefined)[]>([]);
     const [getHighlighted, setHighlighted] = createSignal<DateValue | undefined>();
+
+    const getDirection = NavigatorUtils.createDirectionSignal(getRootRef);
+
+    const getPrecision = createMemo(() => access(props.precision) ?? CALENDAR_DEFAULTS.precision);
 
     const getWeekStartsOn = createMemo(() => access(props.weekStartsOn) ?? CALENDAR_DEFAULTS.weekStartsOn);
 
     const getMonth = createMemo(() => monthSignal[0]());
+
+    const getPageStart = createMemo(() => CalendarUtils.getPageStart(getMonth(), getPrecision()));
 
     const getToday = createMemo(() =>
         DateValueUtils.withCalendar(
@@ -66,7 +85,18 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
         ),
     );
 
-    const getGrid = createMemo(() => DateValueUtils.getMonthGrid(getMonth(), getWeekStartsOn()));
+    const getCells = createMemo(() => CalendarUtils.getCells(getMonth(), getPrecision(), getWeekStartsOn()));
+
+    const getShape = createMemo(() => CalendarUtils.getGridShape(getMonth(), getPrecision()));
+
+    const getRows = createMemo(() => {
+        const cells = getCells();
+        const colCount = getShape().colCount;
+
+        return Array.from({ length: Math.ceil(cells.length / colCount) }, (_, row) =>
+            cells.slice(row * colCount, (row + 1) * colCount),
+        );
+    });
 
     const getCurrentEraId = createMemo(() => {
         const eras = DateValueUtils.getEras(getMonth(), access(props.locale));
@@ -74,20 +104,35 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
         return eras[eras.length - 1].id;
     });
 
-    const getGridStart = createMemo(() => getGrid().weeks[0][0]);
+    const getFirstCell = createMemo(() => getCells()[0]);
 
-    const getDayLabelFormatters = createMemo(() => {
-        const start = getGridStart();
+    const getCellLabelFormatters = createMemo(() => {
+        const first = getFirstCell();
+        const options = CELL_LABEL_OPTIONS[getPrecision()];
         const locale = access(props.locale);
 
         return {
-            currentEra: DateValueUtils.createFormatter(start, DAY_LABEL_OPTIONS, locale),
-            pastEra: DateValueUtils.createFormatter(start, PAST_ERA_DAY_LABEL_OPTIONS, locale),
+            currentEra: DateValueUtils.createFormatter(first, options, locale),
+            pastEra: DateValueUtils.createFormatter(first, withEra(options), locale),
         };
     });
 
-    const computeDayLabel = (day: DateValue) =>
-        getDayLabelFormatters()[day.era === getCurrentEraId() ? "currentEra" : "pastEra"](day);
+    const computeCellLabel = (cell: DateValue) =>
+        getCellLabelFormatters()[cell.era === getCurrentEraId() ? "currentEra" : "pastEra"](cell);
+
+    const computePageLabel = () => {
+        const precision = getPrecision();
+        const start = getPageStart();
+        const locale = access(props.locale);
+        const baseOptions = PAGE_ANNOUNCE_OPTIONS[precision];
+        const options = start.era === getCurrentEraId() ? baseOptions : withEra(baseOptions);
+
+        if (precision !== "year") return DateValueUtils.format(start, options, locale);
+
+        const cells = getCells();
+
+        return CalendarUtils.formatSpan(cells[0], cells[cells.length - 1], options, locale);
+    };
 
     const getWeekdayNames = createMemo(() =>
         DateValueUtils.getWeekdayNames(
@@ -97,54 +142,52 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
         ),
     );
 
+    const computeCellIndex = (value: DateValue | undefined) => {
+        const index = getCells().findIndex((cell) => CalendarUtils.getIsSameCell(cell, value, getPrecision()));
+
+        return index < 0 ? undefined : index;
+    };
+
     const getIsDayDisabled = (day: DateValue) =>
         (access(props.isDisabled) ?? false) ||
-        !DateValueUtils.getIsInRange(day, access(props.min), access(props.max)) ||
+        !CalendarUtils.getIsCellInBounds(day, getPrecision(), access(props.minValue), access(props.maxValue)) ||
         (props.computeIsDayDisabled?.(day) ?? false);
 
     const getRovingDay = createMemo(() => {
         const highlighted = getHighlighted();
 
-        if (highlighted && DateValueUtils.getCellOf(getGrid(), highlighted)) return highlighted;
+        if (highlighted && computeCellIndex(highlighted) !== undefined) return highlighted;
 
         const anchor = props.computeAnchorDay?.();
 
-        if (anchor && DateValueUtils.getCellOf(getGrid(), anchor)) return anchor;
+        if (anchor && computeCellIndex(anchor) !== undefined) return anchor;
 
         const today = getToday();
 
-        if (DateValueUtils.getCellOf(getGrid(), today)) return today;
+        if (computeCellIndex(today) !== undefined) return today;
 
-        return DateValueUtils.getStartOfMonth(getMonth());
+        return getPageStart();
     });
 
-    const setDayRef = (index: number, element: HTMLElement) => {
-        setDayRefs((prev) => {
-            const next = [...prev];
-
-            next[index] = element;
-
-            return next;
-        });
-    };
+    const clampToBounds = (day: DateValue) => DateValueUtils.clamp(day, access(props.minValue), access(props.maxValue));
 
     const moveTo = (day: DateValue) => {
-        const clamped = DateValueUtils.clamp(day, access(props.min), access(props.max));
-
-        const month = DateValueUtils.getStartOfMonth(clamped);
+        const clamped = clampToBounds(day);
 
         setHighlighted(() => clamped);
 
-        if (!DateValueUtils.isSame(month, DateValueUtils.getStartOfMonth(getMonth()))) {
-            monthSignal[1](() => month);
+        if (!DateValueUtils.isSame(CalendarUtils.getPageStart(clamped, getPrecision()), getPageStart())) {
+            monthSignal[1](() => DateValueUtils.getStartOfMonth(clamped));
         }
     };
 
     const pickDay = (day: DateValue) => {
         if (getIsDayDisabled(day)) return;
 
-        setHighlighted(() => day);
-        props.onPick(day);
+        const picked = clampToBounds(CalendarUtils.getCellStart(day, getPrecision()));
+
+        setHighlighted(() => picked);
+        props.onPick(picked);
     };
 
     const getPaintedRange = createMemo(() => props.computeRange?.(getRovingDay()));
@@ -158,35 +201,25 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
     });
 
     createEffect<DateValue | undefined>((previous) => {
-        const month = getMonth();
+        const pageStart = getPageStart();
 
-        if (
-            previous &&
-            !DateValueUtils.isSame(DateValueUtils.getStartOfMonth(previous), DateValueUtils.getStartOfMonth(month))
-        ) {
-            LiveAnnouncerUtils.announce(
-                DateValueUtils.format(
-                    month,
-                    month.era === getCurrentEraId() ? MONTH_ANNOUNCE_OPTIONS : PAST_ERA_MONTH_ANNOUNCE_OPTIONS,
-                    access(props.locale),
-                ),
-            );
-        }
+        if (previous && !DateValueUtils.isSame(previous, pageStart)) LiveAnnouncerUtils.announce(computePageLabel());
 
-        return month;
+        return pageStart;
     });
 
     createEffect(() => {
-        const cell = DateValueUtils.getCellOf(getGrid(), getRovingDay());
+        const cell = getCells()[computeCellIndex(getRovingDay()) ?? -1];
         const root = getRootRef();
 
         if (!cell || !root?.contains(document.activeElement) || root === document.activeElement) return;
 
-        getDayRefs()[cell.row * styles.DAYS_PER_WEEK + cell.col]?.focus();
+        document.getElementById(`${gridId}-day-${DateValueUtils.toIso(cell)}`)?.focus();
     });
 
     const handleKeyDown = (e: KeyboardEvent) => {
         const roving = getRovingDay();
+        const precision = getPrecision();
 
         if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();
@@ -201,28 +234,38 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
             e.preventDefault();
             moveTo(
                 e.shiftKey
-                    ? DateValueUtils.addYears(roving, direction * YEAR_STEP)
-                    : DateValueUtils.addMonths(roving, direction * MONTH_STEP),
+                    ? CalendarUtils.stepLeap(roving, precision, direction * LEAP_STEP)
+                    : CalendarUtils.stepPage(roving, precision, direction * PAGE_STEP),
             );
 
             return;
         }
 
-        const cell = DateValueUtils.getCellOf(getGrid(), roving);
+        const index = computeCellIndex(roving);
 
-        if (!cell) return;
+        if (index === undefined) return;
 
-        const next = NavigatorUtils.computeNextCell(
-            e.key,
-            cell,
-            { rowCount: GRID_WEEKS, colCount: styles.DAYS_PER_WEEK },
-            { hasPageKeys: false },
-        );
+        const shape = getShape();
+        const from = { row: Math.floor(index / shape.colCount), col: index % shape.colCount };
+        const next = NavigatorUtils.computeNextCell(e.key, from, shape, {
+            direction: getDirection(),
+            hasPageKeys: false,
+        });
 
         if (!next) return;
 
         e.preventDefault();
-        moveTo(DateValueUtils.addDays(getGridStart(), next.row * styles.DAYS_PER_WEEK + next.col));
+
+        const flat = next.row * shape.colCount + next.col;
+        const lastIndex = getCells().length - 1;
+
+        moveTo(
+            CalendarUtils.getCellAt(
+                getFirstCell(),
+                next.row === from.row ? Math.min(flat, lastIndex) : flat,
+                precision,
+            ),
+        );
     };
 
     return (
@@ -230,49 +273,59 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
             ref={setRootRef}
             id={gridId}
             class={styles.calendarRoot}
-            style={{ gap: `${access(props.gap) ?? CALENDAR_DEFAULTS.gap}px` }}
+            style={{
+                "grid-template-columns": `repeat(${getShape().colCount}, 1fr)`,
+                "gap": `${access(props.gap) ?? CALENDAR_DEFAULTS.gap}px`,
+            }}
             role="grid"
             aria-label={access(props.ariaLabel)}
             aria-disabled={access(props.isDisabled) || undefined}
             onKeyDown={handleKeyDown}
         >
-            <div class={styles.calendarRow} role="row">
-                <Index each={getWeekdayNames()}>
-                    {(getName, index) => (
-                        <div class={styles.calendarWeekday} role="columnheader" aria-label={getName()}>
-                            {props.renderWeekday?.(getName(), index)}
-                        </div>
-                    )}
-                </Index>
-            </div>
+            <Show when={getPrecision() === "day"}>
+                <div class={styles.calendarRow} style={{ "grid-column": `span ${getShape().colCount}` }} role="row">
+                    <Index each={getWeekdayNames()}>
+                        {(getName, index) => (
+                            <div class={styles.calendarWeekday} role="columnheader" aria-label={getName()}>
+                                {props.renderWeekday?.(getName(), index)}
+                            </div>
+                        )}
+                    </Index>
+                </div>
+            </Show>
 
-            <Index each={getGrid().weeks}>
-                {(getWeek, weekIndex) => (
-                    <div class={styles.calendarRow} role="row">
-                        <Index each={getWeek()}>
-                            {(getDay, dayIndex) => (
+            <Index each={getRows()}>
+                {(getRow) => (
+                    <div class={styles.calendarRow} style={{ "grid-column": `span ${getShape().colCount}` }} role="row">
+                        <Index each={getRow()}>
+                            {(getDay) => (
                                 <InteractionWrapper
                                     sizing={"fill"}
                                     isDisabled={() => getIsDayDisabled(getDay())}
                                     isFocusableWhenDisabled={() => !(access(props.isDisabled) ?? false)}
-                                    isTabbable={() => DateValueUtils.isSame(getDay(), getRovingDay())}
+                                    isTabbable={() =>
+                                        CalendarUtils.getIsSameCell(getDay(), getRovingDay(), getPrecision())
+                                    }
                                     extraFlags={(): CalendarRenderProps => ({
                                         day: getDay(),
                                         isSelected: props.computeIsSelected(getDay()),
-                                        isToday: DateValueUtils.isSame(getDay(), getToday()),
-                                        isOutsideMonth: getDay().month !== getMonth().month,
-                                        isHighlighted: DateValueUtils.isSame(getDay(), getRovingDay()),
+                                        isToday: CalendarUtils.getIsSameCell(getDay(), getToday(), getPrecision()),
+                                        isOutsideMonth: getPrecision() === "day" && getDay().month !== getMonth().month,
+                                        isHighlighted: CalendarUtils.getIsSameCell(
+                                            getDay(),
+                                            getRovingDay(),
+                                            getPrecision(),
+                                        ),
                                         isInRange: DateValueUtils.getIsWithin(getDay(), getPaintedRange()),
                                         isRangeStart: DateValueUtils.isSame(getDay(), getPaintedRange()?.start),
                                         isRangeEnd: DateValueUtils.isSame(getDay(), getPaintedRange()?.end),
                                     })}
-                                    ref={(element) => setDayRef(weekIndex * styles.DAYS_PER_WEEK + dayIndex, element)}
                                     renderControl={(setElementRef, getRenderProps) => (
                                         <CalendarDay
                                             ref={setElementRef}
                                             id={() => `${gridId}-day-${DateValueUtils.toIso(getDay())}`}
                                             flags={getRenderProps}
-                                            ariaLabel={() => computeDayLabel(getDay())}
+                                            ariaLabel={() => computeCellLabel(getDay())}
                                             renderContent={(getDayFlags) => props.renderDay(getDay, getDayFlags)}
                                             onSelect={() => pickDay(getDay())}
                                         />
@@ -290,10 +343,12 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
 export const Calendar = (props: CalendarProps) => {
     const valueSignal = accessSignal(() => props.valueSignal);
 
+    const getPrecision = () => access(props.precision) ?? CALENDAR_DEFAULTS.precision;
+
     return (
         <CalendarComposite
             {...props}
-            computeIsSelected={(day) => DateValueUtils.isSame(day, valueSignal[0]())}
+            computeIsSelected={(day) => CalendarUtils.getIsSameCell(day, valueSignal[0](), getPrecision())}
             computeAnchorDay={() => valueSignal[0]()}
             onPick={(day) => valueSignal[1](() => day)}
         />

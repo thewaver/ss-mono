@@ -20,7 +20,7 @@ export const TripleExample = (props: Props) => {
                 isDisabled={props.isDisabled}
                 ariaLabel={"Three panes"}
                 renderPane={(_getPane, index) => <PageSplitPaneBox>Pane {index + 1}</PageSplitPaneBox>}
-                renderGutter={(getFlags) => <PageSplitPaneGutter flags={getFlags} dir={"row"} />}
+                renderGutter={(getFlags) => <PageSplitPaneGutter flags={getFlags} orientation={"horizontal"} />}
             />
         </PageSplitPaneFrame>
     );

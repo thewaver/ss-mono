@@ -44,8 +44,8 @@ export const ClockPage = () => {
                 <DefaultExample
                     valueSignal={boundedSignal}
                     steps={() => BOOKING_STEPS}
-                    min={() => OPENING_TIME}
-                    max={() => CLOSING_TIME}
+                    minValue={() => OPENING_TIME}
+                    maxValue={() => CLOSING_TIME}
                     ariaLabel={"Booking time"}
                 />
             ),

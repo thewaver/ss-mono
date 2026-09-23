@@ -23,7 +23,9 @@ import { CardStackPage } from "./Pages/CardStackPage/CardStackPage";
 import { DrumCarouselPage } from "./Pages/Carousels/DrumCarouselPage/DrumCarouselPage";
 import { TrackCarouselPage } from "./Pages/Carousels/TrackCarouselPage/TrackCarouselPage";
 import { CellAnimationPage } from "./Pages/CellAnimationPage/CellAnimationPage";
+import { CheckboxGroupPage } from "./Pages/CheckboxGroupPage/CheckboxGroupPage";
 import { CheckboxPage } from "./Pages/CheckboxPage/CheckboxPage";
+import { CirclePackingPage } from "./Pages/CirclePackingPage/CirclePackingPage";
 import { ClockPage } from "./Pages/ClockPage/ClockPage";
 import { ColorAreaPage } from "./Pages/ColorAreaPage/ColorAreaPage";
 import { ColorInputPage } from "./Pages/ColorInputPage/ColorInputPage";
@@ -34,6 +36,7 @@ import { DateInputPage } from "./Pages/DateInputPage/DateInputPage";
 import { DatePickerPage } from "./Pages/DatePickerPage/DatePickerPage";
 import { DateRangePickerPage } from "./Pages/DateRangePickerPage/DateRangePickerPage";
 import { DateTimePickerPage } from "./Pages/DateTimePickerPage/DateTimePickerPage";
+import { DiePage } from "./Pages/DiePage/DiePage";
 import { DrawerPage } from "./Pages/DrawerPage/DrawerPage";
 import { FileInputPage } from "./Pages/FileInputPage/FileInputPage";
 import { FlipCardPage } from "./Pages/FlipCardPage/FlipCardPage";
@@ -42,8 +45,12 @@ import { FormPage } from "./Pages/FormPage/FormPage";
 import { FormSectionPage } from "./Pages/FormSectionPage/FormSectionPage";
 import { FormationPage } from "./Pages/FormationPage/FormationPage";
 import { GlassSurfacePage } from "./Pages/GlassSurfacePage/GlassSurfacePage";
+import { HoverCardPage } from "./Pages/HoverCardPage/HoverCardPage";
+import { IciclePage } from "./Pages/IciclePage/IciclePage";
 import { ImageSwitcherPage } from "./Pages/ImageSwitcherPage/ImageSwitcherPage";
 import { LabelPage } from "./Pages/LabelPage/LabelPage";
+import { ListboxPage } from "./Pages/ListboxPage/ListboxPage";
+import { MenubarPage } from "./Pages/MenubarPage/MenubarPage";
 import { FanMenuPage } from "./Pages/Menus/FanMenuPage/FanMenuPage";
 import { MenuPage } from "./Pages/Menus/MenuPage/MenuPage";
 import { WheelMenuPage } from "./Pages/Menus/WheelMenuPage/WheelMenuPage";
@@ -74,7 +81,6 @@ import { SVGPatternsPage } from "./Pages/SVGPatternsPage/SVGPatternsPage";
 import { SatellitePage } from "./Pages/SatellitePage/SatellitePage";
 import { ScanlineAnimationPage } from "./Pages/ScanLineAnimationPage/ScanLineAnimationPage";
 import { ScrambleTextPage } from "./Pages/ScrambleTextPage/ScrambleTextPage";
-import { ScreenWiperPage } from "./Pages/ScreenWiperPage/ScreenWiperPage";
 import { ScrollerPage } from "./Pages/ScrollerPage/ScrollerPage";
 import { SelectPage } from "./Pages/SelectPage/SelectPage";
 import { ShapePage } from "./Pages/ShapePage/ShapePage";
@@ -87,6 +93,7 @@ import { SpotlightHintPage } from "./Pages/Spotlights/SpotlightHintPage/Spotligh
 import { SpotlightPromptPage } from "./Pages/Spotlights/SpotlightPromptPage/SpotlightPromptPage";
 import { StaircasePage } from "./Pages/StaircasePage/StaircasePage";
 import { StepperPage } from "./Pages/StepperPage/StepperPage";
+import { SunburstPage } from "./Pages/SunburstPage/SunburstPage";
 import { SurfacePage } from "./Pages/SurfacePage/SurfacePage";
 import { TablePage } from "./Pages/TablePage/TablePage";
 import { TabsPage } from "./Pages/TabsPage/TabsPage";
@@ -103,6 +110,7 @@ import { ToolbarPage } from "./Pages/ToolbarPage/ToolbarPage";
 import { TooltipPage } from "./Pages/TooltipPage/TooltipPage";
 import { TrailPage } from "./Pages/TrailPage/TrailPage";
 import { TreePage } from "./Pages/TreePage/TreePage";
+import { TreemapPage } from "./Pages/TreemapPage/TreemapPage";
 import { TypewriterPage } from "./Pages/TypewriterPage/TypewriterPage";
 import { ViewportWrapperPage } from "./Pages/ViewportWrapperPage/ViewportWrapperPage";
 import { DrumWheelPage } from "./Pages/Wheels/DrumWheelPage/DrumWheelPage";
@@ -192,7 +200,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "ElementObserver",
                 description:
-                    "Measuring, in the four shapes the library actually needs: one element's box, a list of boxes at once, a height on its own, and a rectangle in viewport coordinates. The last is the odd one out — it re-reads every frame while the thing is visible, because there is no event for the element you are anchored to having moved.",
+                    "Measuring, in the four shapes the library actually needs: one element's box, a list of boxes at once, a height on its own, and a rectangle in viewport coordinates. The last is the odd one out — it re-reads every frame while the thing is visible, because there is no event for the element you are anchored to having moved. Beside them sits the rule a table of contents follows: of a list of elements, the current one is the last whose top has scrolled past a line near the top of the viewport.",
             },
             {
                 name: "Elevation",
@@ -288,7 +296,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                                     {
                                         name: "TrackedGradients",
                                         description:
-                                            "The same gradients, driven by the pointer rather than by a clock. Each one reads the element it is painting and turns the pointer's position inside that box into an origin or an offset, so there is no duration to set and no iteration to choose — the highlight simply is wherever the pointer is, and travels off the surface when the pointer leaves. A key names the mark it draws, then the treatment applied to it, then how many of the shared colors it uses. Three marks: a band slides under the pointer, a spot is a pool centerd on it, and a hand throws a wedge out towards it. The treatments are what happens next — a trail leaves the mark behind at every position it passed through and fades it where it lies, a smear stretches each of those along the way the pointer was going, a ripple expands them into rings, and a flare hangs a chain of ghosts off the mark on the axis through the center. A trailing c blends the colors continuously on a clock and freezes each mark at the color the source had when it was laid. The second example is four boxes rather than one, because each reads the pointer against its own box and only neighbors can show whether they agree.",
+                                            "The same gradients, driven by the pointer rather than by a clock. Each one reads the element it is painting and turns the pointer's position inside that box into an origin or an offset, so there is no duration to set and no iteration to choose — the highlight simply is wherever the pointer is, and travels off the surface when the pointer leaves. A key names the mark it draws, then the treatment applied to it, then how many of the shared colors it uses. Three marks: a band slides under the pointer, a spot is a pool centered on it, and a hand throws a wedge out towards it. The treatments are what happens next — a trail leaves the mark behind at every position it passed through and fades it where it lies, a smear stretches each of those along the way the pointer was going, a ripple expands them into rings, and a flare hangs a chain of ghosts off the mark on the axis through the center. A trailing c blends the colors continuously on a clock and freezes each mark at the color the source had when it was laid. The second example is four boxes rather than one, because each reads the pointer against its own box and only neighbors can show whether they agree.",
                                         component: () => <TrackedGradientsPage />,
                                     },
                                 ],
@@ -312,6 +320,11 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 name: "SignalMirror",
                 description:
                     "A value held in one form on the outside and another on the inside, kept in step in both directions without the loop that normally follows. A picker holding a date while its field holds text is the shape it was built for; so is a component that takes an optional signal from the consumer and quietly falls back to one of its own when none is passed.",
+            },
+            {
+                name: "Smoother",
+                description:
+                    "Makes a set of numbers trail the values driving them instead of jumping to them. Each one closes the same share of the gap in the same time whatever the screen's frame rate, and frames are asked for only while something is still moving. It renders nothing, so it is seen through the pointer effects: `Tilter`, `ShadowCaster` and `LightCatcher` each take a smoothing time that lets them lag the pointer and settle softly.",
             },
             {
                 name: "TextSync",
@@ -411,7 +424,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Drawer",
                 description:
-                    "A modal that arrives from an edge. It is a preset rather than a mode, because a panel cannot become a centerd dialog while it is open.",
+                    "A modal that arrives from an edge. It is a preset rather than a mode, because a panel cannot become a centered dialog while it is open.",
                 component: () => <DrawerPage />,
             },
             {
@@ -419,6 +432,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 description:
                     "Association and announcement, and nothing else. The library generates the ids and wires a control to its message; whether a value is valid is the consumer's to decide and to report.",
                 component: () => <FormPage />,
+            },
+            {
+                name: "HoverCard",
+                description:
+                    "A card of content hung off another element, opened by resting the pointer on it or by keyboard focus, and by a press where nothing can hover. Unlike a tooltip it may hold links and controls, so it is a dialog of its own rather than the element's description: Tab moves focus from the anchor into it, it stays open while focus is inside it, and Escape puts focus back on the anchor. The waiting, the skip window and the bridge across the gap are the hover engine it shares with Tooltip.",
+                component: () => <HoverCardPage />,
             },
             {
                 name: "ImageSwitcher",
@@ -440,6 +459,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                         description:
                             "One of three presets over a shared binary switch. It is the only one with a third state — indeterminate is a value here, not a styling trick.",
                         component: () => <CheckboxPage />,
+                    },
+                    {
+                        name: "CheckboxGroup",
+                        description:
+                            "Several checkboxes over one list. A box given a value is ticked while the list holds it, and pressing it adds or removes it; there is no walk and no single tab stop, because each box is a choice of its own. A select-all box is the consumer's to draw anywhere, and the group hands it the state to show — ticked, empty or mixed — and the command that ticks or clears every box still enabled.",
+                        component: () => <CheckboxGroupPage />,
                     },
                     {
                         name: "Clock",
@@ -514,6 +539,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                         component: () => <LabelPage />,
                     },
                     {
+                        name: "Listbox",
+                        description:
+                            "Select's option list standing on its own in the page: no field and no popup, always open. The options take focus themselves, so the list is one tab stop and the arrows move focus from option to option. Groups, typeahead, reachable disabled options, windowing and a horizontal walk that follows the page's text direction all come from the same list Select draws in its popup.",
+                        component: () => <ListboxPage />,
+                    },
+                    {
                         name: "MultiSelect",
                         description:
                             "The same list as Select with more than one value held at once: picking does not close it, a picked option can be picked again to drop it, and the field shows what is chosen rather than one label. Groups, a query and options fetched on demand all work as they do for the single-value list, since both are the same shell with a different value.",
@@ -586,6 +617,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                         component: () => <TogglePage />,
                     },
                 ],
+            },
+            {
+                name: "Menubar",
+                description:
+                    "A row of words that each open a menu, built on the toolbar rather than beside it, so it measures itself, walks with the arrows as one tab stop and moves whatever does not fit into an overflow menu, where a word becomes a submenu. What it adds is one rule: while a menu is open, the arrow that moves to the next word closes that menu and opens the next one.",
+                component: () => <MenubarPage />,
             },
             {
                 name: "Menus",
@@ -714,7 +751,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Tooltip",
                 description:
-                    "A description hung off another element, shown while the pointer is over it and, after a pause, while it holds keyboard focus. It is handed the element rather than wrapping it, so anything with a ref can carry one, and it points that element at the tooltip with aria-describedby only while the tooltip is on screen, which is what gets it read out without leaving a reference to something that has gone. It is portalled out to the top layer so nothing it grew out of can clip it, and it asks Anchor where to sit.",
+                    "A description hung off another element, shown while the pointer is over it and, after a pause, while it holds keyboard focus. It is handed the element rather than wrapping it, so anything with a ref can carry one, and it points that element at the tooltip with aria-describedby only while the tooltip is on screen, which is what gets it read out without leaving a reference to something that has gone. It is portaled out to the top layer so nothing it grew out of can clip it, and it asks Anchor where to sit.",
                 component: () => <TooltipPage />,
             },
             {
@@ -726,7 +763,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "ViewportWrapper",
                 description:
-                    "Scales everything inside it to one design size. It is terminal: anything measured, anchored or portalled within it works in the viewport's coordinates rather than the window's, and wrappers nest — an inner one composes its scale with the outer one's.",
+                    "Scales everything inside it to one design size. It is terminal: anything measured, anchored or portaled within it works in the viewport's coordinates rather than the window's, and wrappers nest — an inner one composes its scale with the outer one's.",
                 component: () => <ViewportWrapperPage />,
             },
         ],
@@ -737,7 +774,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Bracket",
                 description:
-                    "A tree drawn in layers with elbow connectors between a node and the nodes that feed it — a knockout draw being the arrangement it was asked for, and an org chart or a skill tree the same component with a different tree. A node sits centerd between the ones it feeds from, which propagates upward and is the whole of the layout; a node with one child sits level with it, which is what a bye looks like. The arrows walk a layer and step between layers, on one tab stop.",
+                    "A tree drawn in layers with elbow connectors between a node and the nodes that feed it — a knockout draw being the arrangement it was asked for, and an org chart or a skill tree the same component with a different tree. A node sits centered between the ones it feeds from, which propagates upward and is the whole of the layout; a node with one child sits level with it, which is what a bye looks like. The arrows walk a layer and step between layers, on one tab stop.",
                 component: () => <BracketPage />,
             },
             {
@@ -753,6 +790,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 component: () => <CellAnimationPage />,
             },
             {
+                name: "CirclePacking",
+                description:
+                    "The same tree as Treemap and Sunburst, drawn as circles inside circles: a leaf's area is its weight, and a branch is the smallest circle around its children. Pressing a circle with circles inside it zooms into it, on a path that pulls back before traveling when the jump is far; a press anywhere else goes back to the top, and Escape goes up one level. The packing is D3's, seeded, so the same tree always packs the same way.",
+                component: () => <CirclePackingPage />,
+            },
+            {
                 name: "Corners",
                 description:
                     "Four L-shaped brackets drawn just inside an element's box, on a layer that takes no pointer and says nothing to a screen reader. Each bracket is a single polygon rather than two rules meeting, so the two arm lengths and the thickness are numbers instead of a border pretending to be one, and any of the four can be left out. The color transitions rather than switching, which is what lets a control light its corners as it is pressed and let them fade as it is released.",
@@ -761,8 +804,14 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Cuboid",
                 description:
-                    "Six faces on a box that is only a cube when you make it one: width, height and depth are given separately, and each face is sized from the two extents it spans. Two counts of quarter turns drive it, one across and one up, so it always turns the way it was pushed rather than working out a route to a face.",
+                    "Six faces on a box that is only a cube when you make it one: width, height and depth are given separately, and each face is sized from the two extents it spans. Two counts of quarter turns drive it, one across and one up, so it always turns the way it was pushed. Kept upright, it remembers how it actually lies instead: every press is a quarter turn about the screen's own axis, the face it lands on is spun to read the right way up, and its controller can turn it to a face by name. It can also be dragged, settling on the nearest face when let go.",
                 component: () => <CuboidPage />,
+            },
+            {
+                name: "Die",
+                description:
+                    "Any convex solid built from flat faces — the six tabletop dice and a hundred-sided one ship as samples — turned in 3D so one face is towards the viewer. A roll asks the page which face to land on, tumbles, and lands on it the right way up, then says which face came up; the face can also be set directly, and the die turns there without tumbling. Every face is a real element clipped to its outline, which is cheap for a die and does not scale to a sphere.",
+                component: () => <DiePage />,
             },
             {
                 name: "FlipCard",
@@ -775,6 +824,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 description:
                     "Places a set of items into an arrangement — a cliff, a whorl of three, a zigzag — from a function that answers with a position per item. Every position is a fraction of the formation's own width, so the whole thing scales with the container and nothing is measured in JavaScript.",
                 component: () => <FormationPage />,
+            },
+            {
+                name: "Icicle",
+                description:
+                    "The same tree as Treemap, Sunburst and CirclePacking, drawn in columns: the node in view fills the first at full height, its children share the next in proportion to what they weigh, theirs the one after. Pressing any cell — a leaf too — brings it to the left at full height while the rest slides out of the way, and pressing the leftmost cell or Escape goes back up. The arrows walk up and down a column and across to a parent or its children.",
+                component: () => <IciclePage />,
             },
             {
                 name: "Mosaics",
@@ -854,7 +909,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "RichText",
                 description:
-                    "Paints a plain string that carries bracketed tags — [b], [i], [s], [u], [li] — so text arriving from a server or a file can say which of its words are emphasized without bringing markup along. Nothing is handed to the browser as HTML: the string is parsed into a tree of runs and painted with classes the consumer supplies, and a tag it does not recognize is either left on screen exactly as typed or dropped, whichever the consumer asks for.",
+                    "Paints a plain string that carries bracketed tags — [b], [i], [s], [u], [li] — so text arriving from a server or a file can say which of its words are emphasized without bringing markup along. Nothing is handed to the browser as HTML: the string is parsed into a tree of runs and painted with classes the consumer supplies, or with elements of the consumer's own such as a link or a tooltip, and a tag it does not recognize is either left on screen exactly as typed or dropped, whichever the consumer asks for. A tag carries attributes only where the consumer has allowed them, so a bracket in ordinary prose stays prose.",
                 component: () => <RichTextPage />,
             },
             {
@@ -876,12 +931,6 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 component: () => <ScrambleTextPage />,
             },
             {
-                name: "ScreenWiper",
-                description:
-                    "Covers and uncovers the screen with a tessellation of staggered cells. Each cell is one div clipped by CSS rather than an SVG shape, because several hundred independent transforms composite far better than one viewport-sized SVG.",
-                component: () => <ScreenWiperPage />,
-            },
-            {
                 name: "Shape",
                 description:
                     "Draws a border and a fill around arbitrary children, from a point list rather than a CSS box. It only reaches for SVG when the paint needs it and stays a plain div when it does not.",
@@ -900,6 +949,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 component: () => <StaircasePage />,
             },
             {
+                name: "Sunburst",
+                description:
+                    "Treemap's tree drawn as rings: the branch in the middle, its children in the first ring, theirs in the second, each arc's share of its ring in proportion to what it weighs. Pressing an arc with rings outside it zooms into it, its arc opening out to the whole circle while everything outside it squeezes away, and Escape zooms back out. The middle is the page's own button, driven through the signal the two share, so the way back out is drawn by whoever draws the rest.",
+                component: () => <SunburstPage />,
+            },
+            {
                 name: "TileBoard",
                 description:
                     "A board of tiles that interlock, and every built-in shape tessellates: the offset rows and short alternate row a hexagon or a lozenge needs, the half-tile overlap and turned-over neighbors a triangle needs, or neither for a square. The board owns the geometry and the keyboard — a transparent layer wearing the tile's own shape takes the pointer, so a press lands on the tile you can see rather than on its rectangle while a piece standing taller than its tile still hangs over the row above, and the arrows walk every tile whether it will take a press or not. What a tile looks like, and what it means, are the consumer's.",
@@ -916,6 +971,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 description:
                     "One element traveling a path the consumer draws, on a frame loop rather than a CSS animation, so where it is right now is a value anything can read. It reports the point and the direction of travel at every frame and can turn the traveler to face along it; the controller plays, pauses and seeks, which is what lets a slider put it anywhere on the path.",
                 component: () => <TrailPage />,
+            },
+            {
+                name: "Treemap",
+                description:
+                    "A tree drawn as a box divided into rectangles, each one's area in proportion to what it weighs — a leaf its own weight, a branch everything under it. One level is shown at a time: pressing a branch zooms into it, its tile growing to fill the box while its children fade in, and Escape zooms back out. Every level is tiled as though it filled the whole box, so what is inside a tile before the zoom is exactly what fills the box after it. The way back up is the page's own button, driven through the signal the two share.",
+                component: () => <TreemapPage />,
             },
             {
                 name: "TypeWriter",

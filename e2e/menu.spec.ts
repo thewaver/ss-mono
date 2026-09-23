@@ -254,7 +254,7 @@ test.describe("an open state the consumer owns", () => {
     const toggleButton = "#menuToggle";
 
     test("a button that is not the trigger opens the menu", async ({ page }) => {
-        await expect(page.locator(MENU), "nothing is portalled to begin with").toHaveCount(0);
+        await expect(page.locator(MENU), "nothing is portaled to begin with").toHaveCount(0);
         expect(await readout(page, "driven")).toContain("the menu is closed");
 
         await page.locator(toggleButton).click();
@@ -437,7 +437,7 @@ test.describe("a menu opened by a right-click", () => {
 /**
  * A hover the pointer did not cause must not move the highlight. The browser re-runs hit-testing whenever
  * anything changes under a stationary cursor and reports the result as a fresh `mouseenter`, so a menu that
- * covers its own opener — a wheel is centerd on its trigger — would otherwise open and immediately hand the
+ * covers its own opener — a wheel is centered on its trigger — would otherwise open and immediately hand the
  * highlight to whatever happens to sit beneath the pointer. `Menu` tells the two apart by the point on
  * record: a real enter arrives with coordinates that differ from the last movement, an invented one matches.
  *
@@ -473,4 +473,95 @@ test("a hover nothing caused leaves the highlight where it is", async ({ page })
 
     await other.hover();
     expect(await highlightAt(page, 0), "and moving there for real still moves it").toContain("Duplicate");
+});
+
+/**
+ * A cascader is a `Menu` whose records nest and whose trigger shows the choice so far, so the machinery is
+ * all the submenu cases above; what is new is the contract the example layers over it. Only a leaf is a
+ * choice — a branch opens the next level and writes nothing — and the path that arrives is the whole route
+ * to the leaf, which the trigger then names so a screen reader hears the current value on the button itself.
+ * Names are the records' own, which is why they are safe to key on here.
+ */
+test.describe("a cascader built on nested items", () => {
+    const pathReadout = async (page: Page) => /path: \[(.*?)\]/.exec(await readout(page, "cascader"))?.[1] ?? null;
+
+    test("a branch opens the next level and writes nothing, and only a leaf is picked", async ({ page }) => {
+        expect(await pathReadout(page), "nothing is chosen to begin with").toBe("");
+
+        await openedWithHighlight(page, "cascader");
+        expect(await highlightAt(page, 0)).toBe("Europe");
+
+        await page.keyboard.press("Enter");
+        await openedLevel(page, 1);
+        expect(await pathReadout(page), "Enter on a branch opens it rather than choosing it").toBe("");
+        expect(await highlightAt(page, 1)).toBe("France");
+
+        await page.keyboard.press("Enter");
+        await openedLevel(page, 2);
+        expect(await pathReadout(page), "and so on down").toBe("");
+
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("Enter");
+
+        await expect(page.locator(MENU), "a leaf closes every level").toHaveCount(0);
+        expect(await pathReadout(page), "and writes the whole route to itself").toBe("Europe, France, Lyon");
+        expect(await activeMatches(page, trigger("cascader")), "handing focus back to the trigger").toBe(true);
+    });
+
+    test("the trigger's name carries the path picked so far", async ({ page }) => {
+        const before = await page.locator(trigger("cascader")).getAttribute("aria-label");
+
+        await page.locator(trigger("cascader")).click();
+        await itemAt(page, 0, "Asia").click();
+        await openedLevel(page, 1);
+        await itemAt(page, 1, "Japan").click();
+        await openedLevel(page, 2);
+        await itemAt(page, 2, "Kyoto").click();
+
+        await expect(page.locator(MENU)).toHaveCount(0);
+        expect(await pathReadout(page), "the pointer reaches a leaf the same way").toBe("Asia, Japan, Kyoto");
+
+        const after = await page.locator(trigger("cascader")).getAttribute("aria-label");
+
+        expect(after, "the name changed with the choice").not.toBe(before);
+        expect(after, "and names every step of it, in order").toMatch(/Asia.*Japan.*Kyoto/);
+        await expect(page.locator(trigger("cascader")), "which is also what the button shows").toContainText(
+            /Asia.*Japan.*Kyoto/,
+        );
+    });
+
+    test("a second pick replaces the first, and backing out keeps it", async ({ page }) => {
+        await openedWithHighlight(page, "cascader");
+        await page.keyboard.press("Enter");
+        await openedLevel(page, 1);
+        await page.keyboard.press("Enter");
+        await openedLevel(page, 2);
+        await page.keyboard.press("Enter");
+        await expect(page.locator(MENU)).toHaveCount(0);
+        expect(await pathReadout(page)).toBe("Europe, France, Paris");
+
+        await openedWithHighlight(page, "cascader");
+        await page.keyboard.press("End");
+        await page.keyboard.press("ArrowRight");
+        await openedLevel(page, 1);
+        await page.keyboard.press("ArrowLeft");
+        await expect(page.locator(MENU)).toHaveCount(1);
+        await page.keyboard.press("Escape");
+
+        await expect(page.locator(MENU)).toHaveCount(0);
+        expect(await pathReadout(page), "leaving without reaching a leaf changes nothing").toBe(
+            "Europe, France, Paris",
+        );
+
+        await openedWithHighlight(page, "cascader");
+        await page.keyboard.press("End");
+        await page.keyboard.press("ArrowRight");
+        await openedLevel(page, 1);
+        await page.keyboard.press("ArrowRight");
+        await openedLevel(page, 2);
+        await page.keyboard.press("Enter");
+
+        await expect(page.locator(MENU)).toHaveCount(0);
+        expect(await pathReadout(page), "and a new leaf replaces the whole route").toBe("South America, Peru, Lima");
+    });
 });

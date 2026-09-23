@@ -269,3 +269,173 @@ test.describe("another calendar system", () => {
         ).toHaveCount(26);
     });
 });
+
+/**
+ * `precision` changes what a cell is — a month or a year rather than a day — while keeping the grid, the
+ * roving tab stop and the carry across a page's edge. Cells are still located by accessible name, which at
+ * these precisions is the month and year or the bare year, because that is what a screen reader reads out.
+ * No column headers are expected: a weekday heading means nothing over a grid of months.
+ */
+const MONTH_PICKER = demo("monthPicker");
+const YEAR_PICKER = demo("yearPicker");
+
+test.describe("a month picker", () => {
+    test("holds the year's twelve months, each named with its year, and today's month is the tab stop", async ({
+        page,
+    }) => {
+        await expect(page.locator(cell(MONTH_PICKER)), "one cell per month").toHaveCount(12);
+        await expect(page.locator(`${MONTH_PICKER} [role="columnheader"]`), "and no weekday headings").toHaveCount(0);
+        await expect(page.locator(cell(MONTH_PICKER)).first()).toHaveAttribute("aria-label", "January 2026");
+        await expect(
+            page.locator(`${cell(MONTH_PICKER)}[aria-current="date"]`),
+            "the month holding today is the current one",
+        ).toHaveAttribute("aria-label", "August 2026");
+        await expect(page.locator(roving(MONTH_PICKER)), "and it is the grid's one tab stop").toHaveAttribute(
+            "aria-label",
+            "August 2026",
+        );
+    });
+
+    test("a pick sets the first of the month and marks the cell selected", async ({ page }) => {
+        await page.locator(day(MONTH_PICKER, "March 2026")).click();
+
+        expect(await readout(page, "monthPicker"), "the owner receives a date on the first").toContain(
+            "value: 2026-03-01",
+        );
+        await expect(page.locator(`${cell(MONTH_PICKER)}[aria-selected="true"]`)).toHaveAttribute(
+            "aria-label",
+            "March 2026",
+        );
+    });
+
+    test("the arrows walk months by row and column and carry into the next year", async ({ page }) => {
+        await page.locator(roving(MONTH_PICKER)).focus();
+
+        await page.keyboard.press("ArrowRight");
+        expect(await activeLabel(page), "a column is one month").toBe("September 2026");
+
+        await page.keyboard.press("ArrowDown");
+        expect(await activeLabel(page), "a row is as many months as there are columns").toBe("December 2026");
+
+        await page.keyboard.press("ArrowRight");
+        expect(await activeLabel(page), "and a step off the last month carries into the next year").toBe(
+            "January 2027",
+        );
+        await expect(page.locator(cell(MONTH_PICKER)).first(), "taking the page with it").toHaveAttribute(
+            "aria-label",
+            "January 2027",
+        );
+    });
+
+    test("the page keys step a year, and Shift steps twelve", async ({ page }) => {
+        await page.locator(roving(MONTH_PICKER)).focus();
+
+        await page.keyboard.press("PageDown");
+        expect(await activeLabel(page), "the same month a year on").toBe("August 2027");
+
+        await page.keyboard.press("PageUp");
+        expect(await activeLabel(page)).toBe("August 2026");
+
+        await page.keyboard.press("Shift+PageDown");
+        expect(await activeLabel(page), "Shift is twelve pages above day precision, not one year").toBe("August 2038");
+    });
+
+    test("Enter picks the month the keyboard is on", async ({ page }) => {
+        await page.locator(roving(MONTH_PICKER)).focus();
+        await page.keyboard.press("ArrowLeft");
+        await page.keyboard.press("Enter");
+
+        expect(await readout(page, "monthPicker")).toContain("value: 2026-07-01");
+    });
+
+    test("the header pages a year at a time, and the page is announced", async ({ page }) => {
+        await page.locator("#monthPickerNextPage").click();
+
+        await expect(page.locator(cell(MONTH_PICKER)).first(), "the next page is the next year").toHaveAttribute(
+            "aria-label",
+            "January 2027",
+        );
+        await expect(page.locator(ANNOUNCER), "and the region says which year it landed on").toContainText("2027");
+
+        await page.locator("#monthPickerPreviousPage").click();
+        await page.locator("#monthPickerPreviousPage").click();
+
+        await expect(page.locator(cell(MONTH_PICKER)).first()).toHaveAttribute("aria-label", "January 2025");
+    });
+});
+
+test.describe("a year picker", () => {
+    test("pages in twelves from year 1 of the era, and refuses the years outside its bounds", async ({ page }) => {
+        await expect(page.locator(cell(YEAR_PICKER)), "twelve years to a page").toHaveCount(12);
+        await expect(
+            page.locator(cell(YEAR_PICKER)).first(),
+            "the page holding today starts where the twelves from year 1 put it, not at today",
+        ).toHaveAttribute("aria-label", "2017");
+        await expect(page.locator(`${cell(YEAR_PICKER)}[aria-current="date"]`)).toHaveAttribute("aria-label", "2026");
+        await expect(
+            page.locator(`${cell(YEAR_PICKER)}[aria-disabled="true"]`),
+            "the two years before the minimum are unavailable",
+        ).toHaveCount(2);
+        await expect(page.locator(day(YEAR_PICKER, "2019")), "and the minimum itself is not").not.toHaveAttribute(
+            "aria-disabled",
+        );
+    });
+
+    test("a pick sets the first day of the year, and a refused year picks nothing", async ({ page }) => {
+        await page.locator(day(YEAR_PICKER, "2017")).dispatchEvent("click");
+        expect(await readout(page, "yearPicker"), "a year before the minimum is refused").toContain("value: none");
+
+        await page.locator(day(YEAR_PICKER, "2020")).click();
+        expect(await readout(page, "yearPicker"), "an allowed one reaches the owner as 1 January").toContain(
+            "value: 2020-01-01",
+        );
+        await expect(page.locator(`${cell(YEAR_PICKER)}[aria-selected="true"]`)).toHaveAttribute("aria-label", "2020");
+    });
+
+    test("the arrows carry past the page's last year into the next twelve", async ({ page }) => {
+        await page.locator(roving(YEAR_PICKER)).focus();
+
+        await page.keyboard.press("ArrowUp");
+        expect(await activeLabel(page), "a row up is one row of years back").toBe("2023");
+
+        await page.keyboard.press("ArrowDown");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+        await page.keyboard.press("ArrowRight");
+
+        expect(await activeLabel(page), "a step off the last cell lands on the next year").toBe("2029");
+        await expect(page.locator(cell(YEAR_PICKER)).first(), "on the next page of twelve").toHaveAttribute(
+            "aria-label",
+            "2029",
+        );
+    });
+
+    test("the keyboard stops at the bounds rather than landing on a refused year", async ({ page }) => {
+        await page.locator(roving(YEAR_PICKER)).focus();
+
+        await page.keyboard.press("PageUp");
+        expect(await activeLabel(page), "a page back from today clamps to the minimum").toBe("2019");
+
+        await page.keyboard.press("ArrowUp");
+        expect(await activeLabel(page), "and a row back from the minimum stays on it").toBe("2019");
+
+        await page.keyboard.press("Shift+PageDown");
+        expect(await activeLabel(page), "a long step forward clamps to the maximum").toBe("2031");
+
+        await page.keyboard.press("Enter");
+        expect(await readout(page, "yearPicker")).toContain("value: 2031-01-01");
+    });
+
+    test("the header pages twelve years at a time and announces the span", async ({ page }) => {
+        await page.locator("#yearPickerNextPage").click();
+
+        await expect(page.locator(cell(YEAR_PICKER)).first()).toHaveAttribute("aria-label", "2029");
+        await expect(
+            page.locator(`${cell(YEAR_PICKER)}[aria-disabled="true"]`),
+            "every year after the maximum is refused",
+        ).toHaveCount(9);
+        await expect(page.locator(ANNOUNCER), "and the region names the page as a span of years").toContainText(
+            /2029\D+2040/,
+        );
+    });
+});

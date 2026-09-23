@@ -56,6 +56,16 @@ export type TilterProps = AccessorProps<{
      */
     perspectivePx?: number;
     /**
+     * How long the surface takes to catch up with the pointer, in milliseconds. `0`, the default, follows it
+     * exactly.
+     *
+     * The turn, the sheen and `strength` ease towards where the pointer says they should be, closing about
+     * two-thirds of the gap in this time, however fast or slow the screen draws — so the surface lags a quick
+     * movement and settles softly, and it glides back flat rather than snapping when the pointer leaves.
+     * `boxRatio` is not eased: it is where the pointer actually is.
+     */
+    smoothingMs?: number;
+    /**
      * Stops the surface following the pointer, leaving it flat.
      *
      * It is what a consumer honoring a reduced-motion preference passes, since the library never reads that

@@ -10,4 +10,8 @@ export type RangePairExampleProps = {
     rangeSignal: Signal<RangeValues>;
 };
 
+export type RangePriceExampleProps = RangePairExampleProps & {
+    onChangeEnd: (values: number[]) => void;
+};
+
 export type RangeVerticalExampleProps = RangeExampleProps & RangePairExampleProps;

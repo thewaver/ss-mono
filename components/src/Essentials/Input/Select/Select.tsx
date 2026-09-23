@@ -1,34 +1,21 @@
-import type { Accessor, JSX } from "solid-js";
-import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueId, untrack } from "solid-js";
+import type { JSX } from "solid-js";
+import { Show, createEffect, createMemo, createSignal, createUniqueId } from "solid-js";
 
 import { CSSUtils, StringUtils } from "@thewaver/ss-utils";
 
-import { CheckedStateUtils } from "../../../Abstracts/CheckedState/CheckedState.utils";
-import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
-import { FlattenerUtils } from "../../../Abstracts/Flattener/Flattener.utils";
-import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/InteractionTracker.utils";
-import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
 import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
-import { TypeaheadUtils } from "../../../Abstracts/Typeahead/Typeahead.utils";
-import type { VirtualizerRow } from "../../../Abstracts/Virtualizer/Virtualizer.types";
-import { VirtualizerUtils } from "../../../Abstracts/Virtualizer/Virtualizer.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { access, accessSignal } from "../../../Utils/propUtils";
+import { Button } from "../../Button/Button";
 import { FormFieldUtils } from "../FormField/FormField.utils";
+import { useLabelContext } from "../Label/Label.context";
 import { LabelUtils } from "../Label/Label.utils";
+import { ListboxOptions } from "../Listbox/Listbox";
+import { ListboxUtils } from "../Listbox/Listbox.utils";
 import { SELECT_DEFAULTS } from "./Select.const";
-import type {
-    SelectCompositeProps,
-    SelectFieldProps,
-    SelectGroupFlags,
-    SelectItem,
-    SelectOption,
-    SelectOptionGroup,
-    SelectOptionItemProps,
-    SelectProps,
-} from "./Select.types";
+import type { SelectCompositeProps, SelectFieldProps, SelectProps } from "./Select.types";
 import { SelectUtils } from "./Select.utils";
 
 import * as styles from "./Select.css";
@@ -63,6 +50,9 @@ const SelectField = (props: SelectFieldProps) => {
         },
         get "aria-disabled"() {
             return getIsDisabled() || undefined;
+        },
+        get "aria-required"() {
+            return access(props.isRequired) || undefined;
         },
         get "aria-invalid"() {
             return access(props.flags).hasError || undefined;
@@ -127,58 +117,25 @@ const SelectField = (props: SelectFieldProps) => {
     );
 };
 
-const SelectOptionItem = (props: SelectOptionItemProps) => {
-    const [getElementRef, setElementRef] = createSignal<HTMLElement>();
-
-    const getIsDisabled = () => access(props.flags).isDisabled ?? false;
-
-    createEffect(() => {
-        if (!access(props.flags).isHighlighted || !access(props.isSelfScrolling)) return;
-
-        getElementRef()?.scrollIntoView({ block: "nearest" });
-    });
-
-    return (
-        <div
-            id={access(props.id)}
-            ref={(element) => {
-                setElementRef(element);
-                props.ref?.(element);
-            }}
-            class={styles.selectOption}
-            role="option"
-            aria-disabled={getIsDisabled() || undefined}
-            aria-selected={access(props.flags).isSelected}
-            onClick={() => {
-                if (getIsDisabled()) return;
-
-                props.onSelect();
-            }}
-        >
-            {props.renderContent(() => access(props.flags))}
-        </div>
-    );
-};
-
 export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     const listboxId = createUniqueId();
+    const fallbackFieldId = createUniqueId();
+
+    const labelContext = useLabelContext();
+
+    const getFieldId = () => access(props.id) ?? fallbackFieldId;
+
+    const getListAriaLabel = () => access(props.listAriaLabel);
 
     const [getFieldRef, setFieldRef] = createSignal<HTMLElement>();
-    const [getEndMarkerRef, setEndMarkerRef] = createSignal<HTMLElement>();
-    const [getSizerRef, setSizerRef] = createSignal<HTMLElement>();
     const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
     const [getHasPopoverSettled, setHasPopoverSettled] = createSignal(true);
-    const [getHighlightedValue, setHighlightedValue] = createSignal<T | undefined>();
-
-    const typeahead = TypeaheadUtils.createBuffer();
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
     const getIsMultiple = createMemo(() => access(props.isMultiple) ?? false);
 
     const getIsFilterable = createMemo(() => props.querySignal !== undefined);
-
-    const getHasMoreOptions = createMemo(() => access(props.hasMoreOptions) ?? false);
 
     const getQuery = createMemo(() => props.querySignal?.[0]() ?? EMPTY_QUERY);
 
@@ -191,103 +148,6 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     });
 
     const getTextInset = createMemo(() => CSSUtils.spreadableToStyle(getSpreadPadding(), StringUtils.camelToKebabCase));
-
-    const getItemRows = createMemo(() => SelectUtils.getItemRows(access(props.options)));
-
-    const getFlatOptions = createMemo(() => SelectUtils.getFlatOptions(access(props.options)));
-
-    const getRows = createMemo(() => FlattenerUtils.getFlatRows(getItemRows()));
-
-    const getIsVirtualized = createMemo(() => props.computeEstimatedOptionHeight !== undefined);
-
-    const getIsAtEnd = ElementObserverUtils.createViewportIntersectionObserver(getEndMarkerRef, () => !getIsOpen());
-
-    let askedForOptions: SelectItem<T>[] | undefined;
-
-    createEffect(() => {
-        if (!getIsAtEnd() || !getHasMoreOptions()) return;
-
-        const options = untrack(() => access(props.options));
-
-        if (askedForOptions === options) return;
-
-        askedForOptions = options;
-
-        props.onReachEnd?.();
-    });
-
-    createEffect(() => {
-        if (getIsOpen()) return;
-
-        askedForOptions = undefined;
-    });
-
-    const getNavigableIndexes = createMemo(() =>
-        getFlatOptions().reduce<number[]>((acc, option, index) => {
-            const isReachable = InteractionTrackerUtils.computeIsReachable(
-                option.isDisabled ?? false,
-                option.isReachableWhenDisabled ?? false,
-                option.tooltipDefs !== undefined,
-            );
-
-            if (!option.isDisabled || isReachable) acc.push(index);
-
-            return acc;
-        }, []),
-    );
-
-    const getHighlightedIndex = createMemo(() => {
-        const navigable = getNavigableIndexes();
-        const options = getFlatOptions();
-        const highlightedValue = getHighlightedValue();
-
-        const highlightedIndex = navigable.find((index) => options[index].value === highlightedValue);
-
-        if (highlightedIndex !== undefined) return highlightedIndex;
-
-        const selectedValue = access(props.selectedOptions)[0]?.value;
-        const selectedIndex = navigable.find((index) => options[index].value === selectedValue);
-
-        if (!getIsFiltering() && selectedIndex !== undefined) return selectedIndex;
-
-        return navigable[0];
-    });
-
-    const rowWindow = VirtualizerUtils.createRowWindow(getSizerRef, () => getRows().length, {
-        getIsDisabled: () => !getIsVirtualized() || !getIsOpen(),
-        computeEstimatedSize: (index) => {
-            const row = getRows()[index];
-
-            return row?.isEntry !== true
-                ? (props.computeEstimatedGroupHeight?.(row?.position ?? 0) ??
-                      props.computeEstimatedOptionHeight?.(0) ??
-                      0)
-                : (props.computeEstimatedOptionHeight?.(row.entryOffset) ?? 0);
-        },
-        getPinnedRows: () => {
-            const highlightedIndex = getHighlightedIndex();
-
-            if (highlightedIndex === undefined) return EMPTY_SELECTION;
-
-            const rowIndex = FlattenerUtils.getEntryRowIndex(getRows(), highlightedIndex);
-
-            return rowIndex === -1 ? EMPTY_SELECTION : [rowIndex];
-        },
-    });
-
-    const getOptionId = (index: number) => `${listboxId}-option-${index}`;
-
-    const computeOptionText = (index: number) =>
-        props.computeCustomText?.(getFlatOptions()[index]) ??
-        TypeaheadUtils.getElementText(document.getElementById(getOptionId(index)));
-
-    const getActiveOptionId = createMemo(() => {
-        const highlightedIndex = getHighlightedIndex();
-
-        if (!getIsOpen() || highlightedIndex === undefined) return;
-
-        return getOptionId(highlightedIndex);
-    });
 
     const open = () => {
         if (getIsDisabled()) return;
@@ -304,23 +164,34 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
         setIsOpen(false);
     };
 
-    createEffect(() => {
-        if (getIsOpen()) return;
-
-        setHighlightedValue(() => undefined);
+    const cursor = ListboxUtils.createCursor<T>({
+        focusModel: "activeDescendant",
+        getListboxId: () => listboxId,
+        getOptions: () => access(props.options),
+        getSelectedOptions: () => access(props.selectedOptions),
+        getIsDisabled,
+        getIsMultiple,
+        getIsOpen,
+        getIsFilterable,
+        getIsFiltering,
+        getHasMoreOptions: () => access(props.hasMoreOptions) ?? false,
+        computeCustomText: props.computeCustomText,
+        onOpen: open,
+        onClose: close,
+        onPick: (value) => props.onPick(value),
     });
 
-    const pickValue = (value: T) => {
-        props.onPick(value);
-
-        if (getIsMultiple()) {
-            setHighlightedValue(() => value);
-
-            return;
-        }
+    const clearValue = () => {
+        if (getIsDisabled()) return;
 
         close();
+
+        props.onClear();
+
+        getFieldRef()?.focus();
     };
+
+    FormFieldUtils.registerControl(getFieldRef);
 
     createEffect(() => {
         if (getIsOpen() || !getHasPopoverSettled() || getQuery() === EMPTY_QUERY) return;
@@ -328,234 +199,18 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
         props.querySignal?.[1](EMPTY_QUERY);
     });
 
-    createEffect(() => {
-        if (!rowWindow.getIsLive()) return;
-
-        const highlightedIndex = getHighlightedIndex();
-
-        if (highlightedIndex === undefined) return;
-
-        const rowIndex = FlattenerUtils.getEntryRowIndex(getRows(), highlightedIndex);
-
-        if (rowIndex === -1) return;
-
-        rowWindow.scrollToRow(rowIndex);
-    });
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-        if (getIsDisabled()) return;
-
-        const options = getFlatOptions();
-        const navigable = getNavigableIndexes();
-        const isOpen = getIsOpen();
-
-        if (e.key === "Tab") {
-            if (isOpen) close();
-
-            return;
-        }
-
-        const query = getIsFilterable() ? undefined : typeahead.push(e);
-
-        if (query !== undefined) {
-            e.preventDefault();
-            open();
-
-            const from = navigable.indexOf(getHighlightedIndex() ?? -1);
-            const position = TypeaheadUtils.computeNextIndex(query, from, navigable.length, (index) =>
-                computeOptionText(navigable[index]),
-            );
-
-            if (position === undefined) return;
-
-            setHighlightedValue(() => options[navigable[position]].value);
-
-            return;
-        }
-
-        if (e.key === "Enter" || (e.key === " " && !getIsFilterable())) {
-            e.preventDefault();
-
-            if (!isOpen) {
-                open();
-
-                return;
-            }
-
-            const highlightedIndex = getHighlightedIndex();
-
-            if (highlightedIndex === undefined || options[highlightedIndex].isDisabled) return;
-
-            pickValue(options[highlightedIndex].value);
-
-            return;
-        }
-
-        if (navigable.length < 1) return;
-
-        const isArrow = e.key === "ArrowDown" || e.key === "ArrowUp";
-        const from = navigable.indexOf(getHighlightedIndex() ?? navigable[0]);
-        const position = NavigatorUtils.computeNextPosition(e.key, from, navigable.length, {
-            hasEdgeKeys: !getIsFilterable(),
-        });
-
-        if (position === undefined) return;
-
-        const hasWrapped =
-            (position === 0 && from === navigable.length - 1) || (position === navigable.length - 1 && from === 0);
-
-        if (isArrow && hasWrapped && getHasMoreOptions()) return;
-
-        const next = isOpen || !isArrow ? navigable[position] : getHighlightedIndex();
-
-        if (next === undefined) return;
-
-        e.preventDefault();
-
-        const nextValue = options[next].value;
-
-        open();
-        setHighlightedValue(() => nextValue);
-    };
-
-    const computeGroupFlags = (group: SelectOptionGroup<T>): SelectGroupFlags => ({
-        checkedState: CheckedStateUtils.fromMembers(
-            group.options.map((option) => props.computeIsSelected(option.value)),
-        ),
-    });
-
-    const renderOptionSlot = (getOption: Accessor<SelectOption<T>>, getFlatIndex: Accessor<number>) => (
-        <InteractionWrapper
-            sizing={"fill"}
-            isDisabled={() => getOption().isDisabled ?? false}
-            isReachableWhenDisabled={() => getOption().isReachableWhenDisabled ?? false}
-            isTabbable={false}
-            tooltipDefs={() => getOption().tooltipDefs}
-            extraFlags={() => ({
-                isHighlighted: getFlatIndex() === getHighlightedIndex(),
-                isSelected: props.computeIsSelected(getOption().value),
-            })}
-            renderControl={(setElementRef, getFlags) => (
-                <SelectOptionItem
-                    ref={setElementRef}
-                    id={() => getOptionId(getFlatIndex())}
-                    isSelfScrolling={() => !getIsVirtualized()}
-                    flags={getFlags}
-                    renderContent={(getOptionFlags) => props.renderOption(getOption, getOptionFlags)}
-                    onSelect={() => pickValue(getOption().value)}
-                />
-            )}
-        />
-    );
-
-    const renderMountedOptions = () => (
-        <Index each={access(props.options)}>
-            {(getItem, index) => (
-                <Show
-                    when={SelectUtils.getIsGroup(getItem())}
-                    fallback={renderOptionSlot(
-                        () => getItem() as SelectOption<T>,
-                        () => getItemRows()[index].entryOffset,
-                    )}
-                >
-                    <div role="group" aria-label={(getItem() as SelectOptionGroup<T>).label}>
-                        {props.renderGroup?.(
-                            () => getItem() as SelectOptionGroup<T>,
-                            () => computeGroupFlags(getItem() as SelectOptionGroup<T>),
-                        )}
-
-                        <Index each={(getItem() as SelectOptionGroup<T>).options}>
-                            {(getOption, groupIndex) =>
-                                renderOptionSlot(getOption, () => getItemRows()[index].entryOffset + groupIndex)
-                            }
-                        </Index>
-                    </div>
-                </Show>
-            )}
-        </Index>
-    );
-
-    const renderWindowedRow = (row: VirtualizerRow) => {
-        const getRow = () => getRows()[row.index];
-
-        return (
-            <div
-                class={styles.selectSizerRow}
-                style={{ transform: `translateY(${rowWindow.getRowStart(row)}px)` }}
-                ref={(element) => rowWindow.measureRow(element, row.index)}
-            >
-                <Show
-                    when={getRow().isEntry}
-                    fallback={props.renderGroup?.(
-                        () => getRow().node as SelectOptionGroup<T>,
-                        () => computeGroupFlags(getRow().node as SelectOptionGroup<T>),
-                    )}
-                >
-                    {renderOptionSlot(
-                        () => getRow().node as SelectOption<T>,
-                        () => getRow().entryOffset,
-                    )}
-                </Show>
-            </div>
-        );
-    };
-
-    const getWindowedRuns = createMemo(() => {
-        const runs: {
-            groupIndex: number | undefined;
-            group: SelectOptionGroup<T> | undefined;
-            rows: VirtualizerRow[];
-        }[] = [];
-
-        for (const row of rowWindow.getRows()) {
-            const source = getRows()[row.index];
-            const groupIndex = source === undefined ? undefined : SelectUtils.getGroupRowIndex(source);
-            const last = runs[runs.length - 1];
-
-            if (last && last.groupIndex === groupIndex) {
-                last.rows.push(row);
-
-                continue;
-            }
-
-            runs.push({
-                groupIndex,
-                group: groupIndex === undefined ? undefined : (getRows()[groupIndex].node as SelectOptionGroup<T>),
-                rows: [row],
-            });
-        }
-
-        return runs;
-    });
-
-    const renderWindowedOptions = () => (
-        <div ref={setSizerRef} class={styles.selectSizer} style={{ height: `${rowWindow.getTotalSize()}px` }}>
-            <For each={getWindowedRuns()}>
-                {(run) => (
-                    <Show when={run.group} fallback={<For each={run.rows}>{renderWindowedRow}</For>} keyed>
-                        {(group: SelectOptionGroup<T>) => (
-                            <div role="group" aria-label={group.label}>
-                                <For each={run.rows}>{renderWindowedRow}</For>
-                            </div>
-                        )}
-                    </Show>
-                )}
-            </For>
-        </div>
-    );
-
     const renderOptions = () => (
-        <>
-            <Show when={getIsVirtualized()} fallback={renderMountedOptions()}>
-                {renderWindowedOptions()}
-            </Show>
-
-            <Show when={getHasMoreOptions() && access(props.options)} keyed>
-                {(_items: SelectItem<T>[]) => (
-                    <div ref={setEndMarkerRef} class={styles.selectEndMarker} aria-hidden="true" />
-                )}
-            </Show>
-        </>
+        <ListboxOptions
+            cursor={cursor}
+            isLive={getIsOpen}
+            hasMoreOptions={props.hasMoreOptions}
+            computeEstimatedOptionHeight={props.computeEstimatedOptionHeight}
+            computeEstimatedGroupHeight={props.computeEstimatedGroupHeight}
+            computeIsSelected={props.computeIsSelected}
+            renderOption={props.renderOption}
+            renderGroup={props.renderGroup}
+            onReachEnd={props.onReachEnd}
+        />
     );
 
     return (
@@ -574,10 +229,11 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                 <>
                     <SelectField
                         ref={setElementRef}
-                        id={props.id}
+                        id={getFieldId}
                         ariaLabel={props.ariaLabel}
+                        isRequired={props.isRequired}
                         listboxId={() => listboxId}
-                        activeOptionId={getActiveOptionId}
+                        activeOptionId={cursor.getActiveOptionId}
                         isFilterable={getIsFilterable}
                         query={getQuery}
                         textInset={getTextInset}
@@ -587,19 +243,37 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
                             props.renderContent(() => access(props.selectedOptions), getFieldFlags)
                         }
                         onToggle={() => (getIsOpen() && !getIsFilterable() ? close() : open())}
-                        onKeyDown={handleKeyDown}
+                        onKeyDown={cursor.handleKeyDown}
                         onQueryInput={(query) => {
                             open();
-                            setHighlightedValue(() => undefined);
+                            cursor.highlight(undefined);
 
                             props.querySignal?.[1](query);
                         }}
                     />
 
+                    <Show when={props.renderClear && access(props.selectedOptions).length > 0}>
+                        <div class={styles.selectClear} style={{ right: `${getSpreadPadding().paddingRight}px` }}>
+                            <Button
+                                isDisabled={getIsDisabled}
+                                ariaLabel={props.clearAriaLabel}
+                                renderContent={(getClearFlags) => props.renderClear?.(getClearFlags)}
+                                onClick={clearValue}
+                            />
+                        </div>
+                    </Show>
+
                     <Popover
                         id={() => listboxId}
                         role={"listbox"}
-                        ariaAttributes={() => ({ "aria-multiselectable": getIsMultiple() || undefined })}
+                        ariaAttributes={() => ({
+                            "aria-label": getListAriaLabel(),
+                            "aria-labelledby":
+                                getListAriaLabel() === undefined
+                                    ? (labelContext.getLabelId() ?? getFieldId())
+                                    : undefined,
+                            "aria-multiselectable": getIsMultiple() || undefined,
+                        })}
                         placement={props.placement}
                         offset={props.offset}
                         reservedScreenSize={props.reservedScreenSize}
@@ -651,6 +325,13 @@ export const Select = <T,>(props: SelectProps<T>) => {
                 valueSignal[1](() => value);
 
                 void props.onSelectionChange?.(value);
+            }}
+            onClear={() => {
+                if (valueSignal[0]() === undefined) return;
+
+                valueSignal[1](() => undefined);
+
+                void props.onSelectionChange?.(undefined);
             }}
         />
     );

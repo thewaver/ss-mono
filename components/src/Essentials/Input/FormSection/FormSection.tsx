@@ -27,7 +27,11 @@ export const FormSection = (props: FormSectionProps) => {
     }));
 
     if (outerContext) {
-        const entry = { getHasError: () => !getIsValid() };
+        const entry: FormEntry = {
+            getHasError: () => !getIsValid(),
+            getFocusTarget: () =>
+                (getEntries().find((held) => held.getHasError()) ?? getEntries()[0])?.getFocusTarget?.(),
+        };
 
         outerContext.register(entry);
 
@@ -38,7 +42,10 @@ export const FormSection = (props: FormSectionProps) => {
         <fieldset
             class={styles.formSectionRoot}
             style={{
-                "flex-direction": access(props.dir) ?? FORM_SECTION_DEFAULTS.dir,
+                "flex-direction":
+                    (access(props.orientation) ?? FORM_SECTION_DEFAULTS.orientation) === "horizontal"
+                        ? "row"
+                        : "column",
                 "gap": `${access(props.gap) ?? FORM_SECTION_DEFAULTS.gap}px`,
             }}
             aria-label={access(props.ariaLabel)}

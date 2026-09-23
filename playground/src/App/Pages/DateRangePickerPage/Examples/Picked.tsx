@@ -1,6 +1,7 @@
 import type { DateValue, MaybeAccessor } from "@thewaver/ss-components";
 import { DateRangePicker, access } from "@thewaver/ss-components";
 
+import { CALENDAR_TRIGGER_LABEL, DATE_PART_HINTS } from "../../../PageComponents/Announcements/Announcements.const";
 import { PageCalendarCaption } from "../../../StyledComponents/CalendarCaption/CalendarCaption";
 import {
     PageCalendarDay,
@@ -21,8 +22,8 @@ import { FIELD_GAP, FIELD_STEPPER_PADDING } from "../../../StyledComponents/Text
 
 type Props = DateRangeExampleProps & {
     key: MaybeAccessor<string>;
-    minDate?: MaybeAccessor<DateValue>;
-    maxDate?: MaybeAccessor<DateValue>;
+    minValue?: MaybeAccessor<DateValue>;
+    maxValue?: MaybeAccessor<DateValue>;
 };
 
 export const PickedExample = (props: Props) => {
@@ -30,11 +31,12 @@ export const PickedExample = (props: Props) => {
         <DateRangePicker
             valueSignal={props.valueSignal}
             calendar={props.calendar}
-            minDate={props.minDate}
-            maxDate={props.maxDate}
+            minValue={props.minValue}
+            maxValue={props.maxValue}
             startLabel={"Start date"}
             endLabel={"End date"}
             calendarLabel={"Choose a date range"}
+            partHints={DATE_PART_HINTS}
             locale={() => LOCALE}
             padding={() => FIELD_STEPPER_PADDING}
             gap={() => FIELD_GAP}
@@ -45,6 +47,7 @@ export const PickedExample = (props: Props) => {
             )}
             renderSeparator={() => <PageDateRangeSeparator />}
             triggerId={() => `${access(props.key)}Trigger`}
+            triggerAriaLabel={CALENDAR_TRIGGER_LABEL}
             renderTrigger={(getFlags) => <PageDatePickerTrigger flags={getFlags} />}
             renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}
             renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}

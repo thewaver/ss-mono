@@ -59,12 +59,13 @@ export const DatePicker = (props: DatePickerProps) => {
         <Calendar
             valueSignal={props.valueSignal}
             monthSignal={monthSignal}
-            min={props.minDate}
-            max={props.maxDate}
+            minValue={props.minValue}
+            maxValue={props.maxValue}
             isDisabled={props.isDisabled}
             locale={props.locale}
             weekStartsOn={props.weekStartsOn}
-            ariaLabel={() => access(props.calendarLabel) ?? DATE_PICKER_DEFAULTS.calendarLabel}
+            precision={props.precision}
+            ariaLabel={props.calendarLabel}
             computeIsDayDisabled={props.computeIsDayDisabled}
             renderDay={props.renderDay}
             renderWeekday={props.renderWeekday}
@@ -85,9 +86,7 @@ export const DatePicker = (props: DatePickerProps) => {
                                 id={props.triggerId}
                                 popupId={() => popupId}
                                 isOpen={getIsOpen}
-                                ariaLabel={() =>
-                                    access(props.triggerAriaLabel) ?? DATE_PICKER_DEFAULTS.triggerAriaLabel
-                                }
+                                ariaLabel={props.triggerAriaLabel}
                                 flags={getRenderProps}
                                 renderContent={props.renderTrigger}
                                 onToggle={() => (getIsOpen() ? dismiss() : open())}
@@ -101,7 +100,7 @@ export const DatePicker = (props: DatePickerProps) => {
                 id={() => popupId}
                 role={"dialog"}
                 ariaAttributes={() => ({
-                    "aria-label": access(props.calendarLabel) ?? DATE_PICKER_DEFAULTS.calendarLabel,
+                    "aria-label": access(props.calendarLabel),
                 })}
                 isOpen={getIsOpen}
                 anchorRef={getRootRef}

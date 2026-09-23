@@ -44,7 +44,9 @@ export const OverheadExample = ({ wedges, ...otherProps }: Props) => {
                     renderContent={(getFlags) => (
                         <PageWheelSpin flags={getFlags} phase={() => getController()?.getPhase()} />
                     )}
-                    onClick={() => getController()?.spin()}
+                    onClick={() => {
+                        getController()?.spin();
+                    }}
                 />
             </PageWheelCenter>
         </PageWheelStack>

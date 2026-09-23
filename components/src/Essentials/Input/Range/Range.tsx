@@ -4,12 +4,14 @@ import { MathUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/InteractionTracker.utils";
+import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../../Utils/propUtils";
 import { FormFieldUtils } from "../FormField/FormField.utils";
 import { LabelUtils } from "../Label/Label.utils";
 import { RANGE_DEFAULTS } from "./Range.const";
 import type { RangeElementProps, RangeProps, RangeRenderProps, RangeSpan } from "./Range.types";
+import { RangeUtils } from "./Range.utils";
 
 import * as styles from "./Range.css";
 
@@ -27,12 +29,39 @@ const RangeElement = (props: RangeElementProps) => {
     const [getActiveThumb, setActiveThumb] = createSignal(0);
     const [getElementRefs, setElementRefs] = createSignal<HTMLInputElement[]>([]);
 
+    const getDirection = NavigatorUtils.createDirectionSignal(() => getElementRefs()[0]);
+
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
 
     const getThumbMin = (index: number) => (index === 0 ? access(props.min) : access(props.values)[index - 1]);
 
     const getThumbMax = (index: number) =>
         index === access(props.values).length - 1 ? access(props.max) : access(props.values)[index + 1];
+
+    const suffixForThumb = (base: string | undefined, index: number) => {
+        if (!base || access(props.values).length < 2) return base;
+
+        return `${base}-${index === 0 ? "start" : "end"}`;
+    };
+
+    let valuesAtChangeStart: number[] | undefined;
+
+    const markChangeStart = () => {
+        valuesAtChangeStart = access(props.values);
+    };
+
+    const reportChangeEnd = () => {
+        const values = access(props.values);
+        const startValues = valuesAtChangeStart;
+
+        valuesAtChangeStart = undefined;
+
+        if (getIsDisabled()) return;
+
+        if (startValues && startValues.every((value, index) => value === values[index])) return;
+
+        void props.onChangeEnd?.(values);
+    };
 
     const syncElement = (element: HTMLInputElement, index: number) => {
         element.value = `${access(props.values)[index]}`;
@@ -42,33 +71,82 @@ const RangeElement = (props: RangeElementProps) => {
         const isVertical = access(props.orientation) === "vertical";
         const rect = element.getBoundingClientRect();
         const span = isVertical ? rect.height : rect.width;
-        const offset = isVertical ? rect.bottom - e.clientY : e.clientX - rect.left;
+        const horizontalOffset = getDirection() === "rtl" ? rect.right - e.clientX : e.clientX - rect.left;
+        const offset = isVertical ? rect.bottom - e.clientY : horizontalOffset;
         const travel = Math.max(span - access(props.thumbSize), MIN_TRACK_TRAVEL_PX);
         const ratio = MathUtils.clamp01((offset - access(props.thumbSize) * 0.5) / travel);
 
         return access(props.min) + ratio * (access(props.max) - access(props.min));
     };
 
-    const raiseNearestThumb = (e: PointerEvent, element: HTMLInputElement) => {
+    const computeNearestThumb = (pointerValue: number) => {
         const values = access(props.values);
-
-        if (values.length < 2) return;
-
-        const pointerValue = readPointerValue(e, element);
         const distances = values.map((value) => Math.abs(value - pointerValue));
         const shortest = Math.min(...distances);
         const isTied = distances.filter((distance) => distance === shortest).length > 1;
 
-        if (isTied) {
-            setActiveThumb(pointerValue > values[0] ? values.length - 1 : 0);
-        } else {
-            setActiveThumb(distances.indexOf(shortest));
-        }
+        if (isTied) return pointerValue > values[0] ? values.length - 1 : 0;
+
+        return distances.indexOf(shortest);
+    };
+
+    const raiseNearestThumb = (e: PointerEvent, element: HTMLInputElement) => {
+        if (access(props.values).length < 2) return;
+
+        setActiveThumb(computeNearestThumb(readPointerValue(e, element)));
+    };
+
+    let trackedPointerId: number | undefined;
+    let trackedThumb = 0;
+
+    const readTrackedValue = (e: PointerEvent, element: HTMLInputElement) =>
+        props.computeValueAtPoint?.({ x: e.clientX, y: e.clientY }, element.getBoundingClientRect()) ??
+        access(props.values)[trackedThumb];
+
+    const writeTrackedValue = (rawValue: number) => {
+        if (getIsDisabled()) return;
+
+        const value = MathUtils.clamp(
+            RangeUtils.computeSteppedValue(rawValue, {
+                min: access(props.min),
+                max: access(props.max),
+                step: access(props.step),
+            }),
+            getThumbMin(trackedThumb),
+            getThumbMax(trackedThumb),
+        );
+
+        if (value !== access(props.values)[trackedThumb]) props.setValue(trackedThumb, value);
+    };
+
+    const startTracking = (e: PointerEvent, element: HTMLInputElement) => {
+        if (e.button !== 0 || getIsDisabled()) return;
+
+        e.preventDefault();
+
+        const rawValue = readTrackedValue(e, element);
+
+        trackedThumb = computeNearestThumb(rawValue);
+        trackedPointerId = e.pointerId;
+
+        setActiveThumb(trackedThumb);
+        element.setPointerCapture(e.pointerId);
+        getElementRefs()[trackedThumb]?.focus({ preventScroll: true });
+        writeTrackedValue(rawValue);
+    };
+
+    const stopTracking = (e: PointerEvent) => {
+        if (trackedPointerId !== e.pointerId) return;
+
+        trackedPointerId = undefined;
+        reportChangeEnd();
     };
 
     createRenderEffect(() => {
         getElementRefs().forEach(syncElement);
     });
+
+    FormFieldUtils.registerControl(() => getElementRefs()[0]);
 
     InteractionTrackerUtils.wrapExtraControls(() => getElementRefs().slice(1), getIsDisabled, {
         getIsTabbable: props.isTabbable === undefined ? undefined : () => access(props.isTabbable)!,
@@ -81,7 +159,7 @@ const RangeElement = (props: RangeElementProps) => {
             <Index each={access(props.values)}>
                 {(_getValue, index) => (
                     <input
-                        id={index === 0 ? access(props.id) : undefined}
+                        id={suffixForThumb(access(props.id), index)}
                         ref={(element) => {
                             setElementRefs((refs) => {
                                 const next = [...refs];
@@ -94,10 +172,12 @@ const RangeElement = (props: RangeElementProps) => {
                             if (index === 0) props.ref?.(element);
                         }}
                         type="range"
-                        name={access(props.name)}
-                        class={[styles.rangeElement, styles.rangeOrientationVariants[access(props.orientation)]].join(
-                            " ",
-                        )}
+                        name={suffixForThumb(access(props.name), index)}
+                        class={[
+                            styles.rangeElement,
+                            styles.rangeOrientationVariants[access(props.orientation)],
+                            props.computeValueAtPoint ? styles.rangeElementTracked : "",
+                        ].join(" ")}
                         style={{
                             ...assignInlineVars({ [styles.thumbSizeVar]: `${access(props.thumbSize)}px` }),
                             "z-index": index === getActiveThumb() ? 1 : undefined,
@@ -106,23 +186,46 @@ const RangeElement = (props: RangeElementProps) => {
                         max={getThumbMax(index)}
                         step={access(props.step)}
                         aria-label={access(props.thumbLabels)?.[index] ?? getAriaLabel()}
+                        aria-valuetext={props.computeValueText?.(access(props.values)[index], index)}
                         aria-describedby={getAriaDescribedBy()}
                         aria-orientation={access(props.orientation) === "vertical" ? "vertical" : undefined}
                         aria-disabled={getIsDisabled() || undefined}
+                        aria-required={access(props.isRequired) || undefined}
                         aria-invalid={access(props.flags).hasError || undefined}
-                        onPointerDown={(e) => raiseNearestThumb(e, e.currentTarget)}
-                        onPointerMove={(e) => {
-                            if (e.buttons === 0) raiseNearestThumb(e, e.currentTarget);
+                        onPointerDown={(e) => {
+                            markChangeStart();
+
+                            if (props.computeValueAtPoint) startTracking(e, e.currentTarget);
+                            else raiseNearestThumb(e, e.currentTarget);
                         }}
+                        onPointerMove={(e) => {
+                            const element = e.currentTarget;
+
+                            if (trackedPointerId === e.pointerId) writeTrackedValue(readTrackedValue(e, element));
+                            else if (e.buttons === 0 && !props.computeValueAtPoint) raiseNearestThumb(e, element);
+                        }}
+                        onPointerUp={stopTracking}
+                        onPointerCancel={stopTracking}
+                        onLostPointerCapture={stopTracking}
                         onFocus={(e) => props.setFocusVisibleThumb(readFocusVisibleThumb(e.currentTarget, index))}
-                        onKeyDown={(e) => props.setFocusVisibleThumb(readFocusVisibleThumb(e.currentTarget, index))}
+                        onKeyDown={(e) => {
+                            markChangeStart();
+                            props.setFocusVisibleThumb(readFocusVisibleThumb(e.currentTarget, index));
+                        }}
                         onBlur={() => props.setFocusVisibleThumb(undefined)}
                         onInput={(e) => {
                             const element = e.currentTarget;
 
-                            if (!getIsDisabled()) props.setValue(index, element.valueAsNumber);
+                            if (!getIsDisabled() && trackedPointerId === undefined) {
+                                props.setValue(index, element.valueAsNumber);
+                            }
 
                             syncElement(element, index);
+                        }}
+                        onChange={() => {
+                            if (props.computeValueAtPoint && valuesAtChangeStart === undefined) return;
+
+                            reportChangeEnd();
                         }}
                         onMouseEnter={(e) => {
                             if (getIsDisabled()) return;
@@ -208,6 +311,7 @@ export const Range = (props: RangeProps) => {
                     name={props.name}
                     ariaLabel={props.ariaLabel}
                     thumbLabels={props.thumbLabels}
+                    isRequired={props.isRequired}
                     orientation={getOrientation}
                     min={getMin}
                     max={getMax}
@@ -219,6 +323,9 @@ export const Range = (props: RangeProps) => {
                     setValue={setValue}
                     setFocusVisibleThumb={setFocusVisibleThumb}
                     renderContent={props.renderContent}
+                    computeValueText={props.computeValueText}
+                    computeValueAtPoint={props.computeValueAtPoint}
+                    onChangeEnd={props.onChangeEnd}
                     onMouseEnter={props.onMouseEnter}
                     onMouseLeave={props.onMouseLeave}
                 />

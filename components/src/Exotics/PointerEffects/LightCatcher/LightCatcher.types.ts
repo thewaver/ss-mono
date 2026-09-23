@@ -4,8 +4,8 @@ export type LightCatcherProps = AccessorProps<{
     /**
      * How near the pointer has to be before the surface answers it at all, in pixels from its center.
      *
-     * Left out, it answers a pointer anywhere on the page. Set, the surface sits at its resting brightness
-     * until the pointer comes inside the range, which is what stops a page full of these from all lifting at
+     * Left out, it answers a pointer anywhere on the page. Set, the surface sits at its resting brightness and
+     * lightness until the pointer comes inside the range, which is what stops a page full of these from all lifting at
      * once as the pointer crosses it.
      */
     activeRangePx?: number;
@@ -28,7 +28,31 @@ export type LightCatcherProps = AccessorProps<{
      */
     restingBrightness?: number;
     /**
-     * Stops the surface answering the pointer, leaving it at its resting brightness.
+     * How far the surface is faded toward white with the pointer on it, from `0`, untouched, to `1`, white.
+     *
+     * Where brightness scales every color up, so black stays black and bright colors wash out, lightness lifts
+     * the dark parts most, so a dark surface looks lit from the front rather than glowing. The two stack, and
+     * either one left untouched at both ends is simply not applied — there is no switch between them.
+     */
+    maxLightness?: number;
+    /**
+     * How far the surface is faded toward white with the pointer out of reach, turned off, or absent from the
+     * page.
+     *
+     * It defaults to `0`, the content exactly as the consumer painted it.
+     */
+    restingLightness?: number;
+    /**
+     * How long the surface takes to catch up with the pointer, in milliseconds. `0`, the default, follows it
+     * exactly.
+     *
+     * The brightness and lightness ease towards where the pointer says they should be, closing about two-thirds
+     * of the gap in this time, however fast or slow the screen draws — so a row of these glows on after the
+     * pointer and fades behind it, rather than switching.
+     */
+    smoothingMs?: number;
+    /**
+     * Stops the surface answering the pointer, leaving it at its resting brightness and lightness.
      *
      * It is what a consumer honoring a reduced-motion preference passes, since the library never reads that
      * preference itself — only the consumer knows whether a brightening surface is motion worth suppressing.

@@ -17,6 +17,7 @@ export const DefaultExample = ({ shape, marked, ...otherProps }: Props) => {
             access(otherProps.tileCount),
             access(otherProps.tileSize),
             access(otherProps.hasShortFirstRow),
+            access(otherProps.taper),
         ),
     );
 
@@ -38,6 +39,7 @@ export const DefaultExample = ({ shape, marked, ...otherProps }: Props) => {
                 {(key) => (
                     <PageTileBoardMeeple
                         center={() => TileBoardUtils.getTileCenter(Index2dString.fromString(key), getLayout())}
+                        scale={() => TileBoardUtils.getTileScale(Index2dString.fromString(key), getLayout())}
                         tileSize={otherProps.tileSize}
                     />
                 )}

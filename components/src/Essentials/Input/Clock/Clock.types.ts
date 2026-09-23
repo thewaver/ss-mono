@@ -55,9 +55,9 @@ export type ClockProps = AccessorProps<{
     /** What counts as now, so a consumer can hold it still rather than letting it follow the clock. */
     now?: TimeValue;
     /** The earliest time that can be picked. */
-    min?: TimeValue;
+    minValue?: TimeValue;
     /** The latest time that can be picked. */
-    max?: TimeValue;
+    maxValue?: TimeValue;
     /** How far apart the offered times are, per unit. */
     steps?: ClockSteps;
     /** Whether seconds are offered as well as hours and minutes. */

@@ -482,14 +482,14 @@ export namespace ShapeUtils {
     };
 
     /**
-     * Builds the SVG outlines for a shape with rounded, bevelled or scooped corners and
+     * Builds the SVG outlines for a shape with rounded, beveled or scooped corners and
      * an optional thick outline.
      *
      * Corners are drawn as superellipse curves, the same family of curves CSS
      * `corner-shape` uses, so a shape here can be made to match a CSS-styled box.
      * Radii too large for their edge are scaled down rather than overlapping.
      *
-     * Results are cached forever, since the maths is not cheap and real workloads reuse
+     * Results are cached forever, since the math is not cheap and real workloads reuse
      * the same shapes heavily. Nothing is ever evicted; call {@link clearPathCache} if
      * the memory needs reclaiming.
      *

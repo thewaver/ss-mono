@@ -4,6 +4,7 @@ import { Show, createMemo, createSignal } from "solid-js";
 import { MathUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerUtils } from "../../../Abstracts/PointerTracker/PointerTracker.utils";
+import { SmootherUtils } from "../../../Abstracts/Smoother/Smoother.utils";
 import { access } from "../../../Utils/propUtils";
 import { TILTER_DEFAULTS } from "./Tilter.const";
 import type { TilterProps, TilterState } from "./Tilter.types";
@@ -51,11 +52,26 @@ export const Tilter = (props: ParentProps<TilterProps>) => {
         return MathUtils.clamp01((rangePx - distance) / (rangePx - edgeDistance));
     });
 
-    const getLeanedOffset = createMemo(() => {
-        const ratio = getBoxRatio();
-        const strength = getStrength();
+    const getLean = SmootherUtils.create(
+        () => {
+            const ratio = getBoxRatio();
+            const strength = getStrength();
 
-        return { x: (ratio.x - CENTER) * strength, y: (ratio.y - CENTER) * strength };
+            return [(ratio.x - CENTER) * strength, (ratio.y - CENTER) * strength, strength];
+        },
+        () => access(props.smoothingMs) ?? TILTER_DEFAULTS.smoothingMs,
+    );
+
+    const getLeanedOffset = createMemo(() => {
+        const [x, y] = getLean();
+
+        return { x, y };
+    });
+
+    const getLeanedStrength = createMemo(() => {
+        const [, , strength] = getLean();
+
+        return strength;
     });
 
     const getTilt = createMemo(() => {
@@ -77,7 +93,7 @@ export const Tilter = (props: ParentProps<TilterProps>) => {
         tilt: getTilt(),
         boxRatio: getBoxRatio(),
         sheenPosition: getSheenPosition(),
-        strength: getStrength(),
+        strength: getLeanedStrength(),
         isResting: getIsResting(),
     }));
 

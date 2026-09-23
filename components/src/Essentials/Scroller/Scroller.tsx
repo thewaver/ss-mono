@@ -18,6 +18,11 @@ const readMetrics = (track: HTMLElement) => ({
     total: track.scrollWidth,
 });
 
+const getIsAtStartOf = (metrics: { start: number }) => metrics.start <= SCROLL_EPSILON;
+
+const getIsAtEndOf = (metrics: { start: number; visible: number; total: number }) =>
+    metrics.start + metrics.visible >= metrics.total - SCROLL_EPSILON;
+
 const computeScrollRange = (metrics: { visible: number; total: number }) =>
     Math.max(metrics.total - metrics.visible, 0);
 
@@ -72,19 +77,25 @@ export const Scroller = (props: ScrollerProps) => {
 
     const getButtonPlacement = createMemo(() => access(props.buttonPlacement) ?? SCROLLER_DEFAULTS.buttonPlacement);
 
+    const stepTo = (step: ScrollerStep) => {
+        const track = getTrackRef();
+
+        if (!track) return false;
+
+        const metrics = readMetrics(track);
+
+        if (step === "previous" ? getIsAtStartOf(metrics) : getIsAtEndOf(metrics)) return false;
+
+        track.scrollTo({ left: computeStepTarget(track, step) });
+
+        return true;
+    };
+
     const stepper: ScrollerStepper = {
-        getIsAtStart: () => getMetrics().start <= SCROLL_EPSILON,
-        getIsAtEnd: () => getMetrics().start + getMetrics().visible >= getMetrics().total - SCROLL_EPSILON,
-        stepToPrevious: () => {
-            const track = getTrackRef();
-
-            if (track) track.scrollTo({ left: computeStepTarget(track, "previous") });
-        },
-        stepToNext: () => {
-            const track = getTrackRef();
-
-            if (track) track.scrollTo({ left: computeStepTarget(track, "next") });
-        },
+        getIsAtStart: () => getIsAtStartOf(getMetrics()),
+        getIsAtEnd: () => getIsAtEndOf(getMetrics()),
+        stepToPrevious: () => stepTo("previous"),
+        stepToNext: () => stepTo("next"),
     };
 
     const getIsScrollable = createMemo(() => getMetrics().total > getMetrics().visible + SCROLL_EPSILON);

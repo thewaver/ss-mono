@@ -74,15 +74,15 @@ export type PaginatorProps = AccessorProps<{
     /** Turns the paginator off, so none of its pages or controls respond. */
     isDisabled?: boolean;
     /** Names the paginator for assistive technology. */
-    ariaLabel?: string;
+    ariaLabel: string;
     /** The component to draw navigating entries with. */
     linkComponent?: Component<PaginatorLinkProps>;
     /** Where one page navigates to, for a paginator of links rather than of buttons. */
     computeHref?: (page: number) => string;
     /** Names one page for assistive technology, and is told how many there are so it can say page three of ten. */
-    computePageLabel?: (page: number, pageCount: number) => string;
-    /** Names one of the move controls. */
-    computeStepLabel?: (step: PaginatorStep, targetPage: number) => string;
+    computePageLabel: (page: number, pageCount: number) => string;
+    /** Names one of the move controls, and is told which page it would go to. */
+    computeStepLabel: (step: PaginatorStep, targetPage: number) => string;
     /** Arranges the entries, for a paginator that is something other than a straight run. */
     computeLayout?: PlacementLayoutFn;
     /** What the entries do as the pointer nears them. */

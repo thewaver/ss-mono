@@ -40,8 +40,8 @@ export type WheelController = {
     getIsAutoSpinning: Accessor<boolean>;
     /** Whether the turn under way was started by a spin rather than by the idle drift. */
     getIsUserSpinning: Accessor<boolean>;
-    /** Starts a spin. Does nothing while one is already under way. */
-    spin: () => void;
+    /** Starts a spin and reports whether it did. It declines while one is already under way. */
+    spin: () => boolean;
 };
 
 export type WheelState = {
@@ -60,9 +60,19 @@ export type WheelState = {
 export type WheelLabels = {
     /**
      * Names one wedge for assistive technology, and is told how many there are so it can say third of five.
-     * The index is zero-based, matching `renderWedge`.
+     * The index is zero-based, matching `renderWedge`. It is also what is announced when a spin lands.
      */
-    computeWedgeLabel?: (index: number, wedgeCount: number) => string;
+    computeWedgeLabel: (index: number, wedgeCount: number) => string;
+    /**
+     * What the wheel is called when it is announced, so a reader hears wheel rather than group. Defaults to
+     * "wheel".
+     */
+    roleDescription?: string;
+    /**
+     * What one wedge is called when it is announced, so a reader hears wedge rather than group. Defaults to
+     * "wedge".
+     */
+    wedgeRoleDescription?: string;
 };
 
 export type WheelSlots<T> = {
@@ -71,10 +81,12 @@ export type WheelSlots<T> = {
     /** How long the wheel waits between steps while turning on its own. Leave it out and it stands still until spun. */
     idleDelayMs?: MaybeAccessor<number | undefined>;
     /**
-     * Which wedge the wheel is heading for. It is the only thing that moves the wheel: writing it turns the
-     * wheel to that wedge, and the wheel writes it as soon as a spin's target is known rather than when the
-     * spin lands — so a consumer reading it mid-spin learns the outcome early. Read `onSpinEnd` instead to
-     * find out only once it arrives, and `onSelectedWedgeChange` for the wedge at the marker right now.
+     * Which wedge the wheel is heading for. Writing it turns the wheel to that wedge, unless a spin is already
+     * under way, in which case the write is ignored. It is not the only thing that moves the wheel: a spin
+     * does too, and so does the wheel's own turning between spins, which leaves this holding the wedge it last
+     * landed on. The wheel writes it as soon as a spin's target is known rather than when the spin lands — so
+     * a consumer reading it mid-spin learns the outcome early. Read `onSpinEnd` instead to find out only once
+     * it arrives, and `onSelectedWedgeChange` for the wedge at the marker right now.
      */
     targetIndexSignal?: SignalSource<number>;
     /** Whether the wheel is turning on its own. It is the only thing that starts or stops it. */

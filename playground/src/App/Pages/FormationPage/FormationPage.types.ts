@@ -7,4 +7,6 @@ export type FormationExampleProps = AccessorProps<{
     layoutEntry: PlacementLayoutEntry;
     effectEntry: ProximityEffectEntry | undefined;
     shapeKind: ShapeConst.DefaultShape;
+    transitionDurationMs: number;
+    staggerMs: number;
 }>;

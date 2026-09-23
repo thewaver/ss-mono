@@ -61,6 +61,33 @@ describe("Point2dUtils.getLength", () => {
     });
 });
 
+describe("Point2dUtils.lerp", () => {
+    it("walks along the straight line between two points", () => {
+        expect(Point2dUtils.lerp({ x: 0, y: 0 }, { x: 10, y: 20 }, 0.5)).toEqual({ x: 5, y: 10 });
+        expect(Point2dUtils.lerp({ x: 10, y: -10 }, { x: 20, y: 10 }, 0.25)).toEqual({ x: 12.5, y: -5 });
+    });
+
+    it("lands exactly on both ends", () => {
+        expect(Point2dUtils.lerp({ x: 0.1, y: 0.7 }, { x: 0.3, y: 0.9 }, 0)).toEqual({ x: 0.1, y: 0.7 });
+        expect(Point2dUtils.lerp({ x: 1, y: 2 }, { x: 3, y: 4 }, 1)).toEqual({ x: 3, y: 4 });
+    });
+
+    it("carries on past the ends rather than clamping", () => {
+        expect(Point2dUtils.lerp({ x: 0, y: 0 }, { x: 10, y: 10 }, 1.5)).toEqual({ x: 15, y: 15 });
+        expect(Point2dUtils.lerp({ x: 0, y: 0 }, { x: 10, y: 10 }, -0.5)).toEqual({ x: -5, y: -5 });
+    });
+
+    it("leaves both points alone", () => {
+        const from = { x: 1, y: 1 };
+        const to = { x: 3, y: 3 };
+
+        Point2dUtils.lerp(from, to, 0.5);
+
+        expect(from).toEqual({ x: 1, y: 1 });
+        expect(to).toEqual({ x: 3, y: 3 });
+    });
+});
+
 describe("Point2dUtils.getAngle", () => {
     it("uses screen coordinates, so 90 points down", () => {
         expect(Point2dUtils.getAngle({ x: 1, y: 0 })).toBe(0);

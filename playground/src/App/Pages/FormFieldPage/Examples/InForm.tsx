@@ -25,7 +25,7 @@ export const InFormExample = (props: Props) => {
             renderContent={(getState) => (
                 <div class={styles.formStack}>
                     <FormField
-                        dir={props.dir}
+                        orientation={props.orientation}
                         gap={props.gap}
                         hasError={props.hasError}
                         message={props.message}

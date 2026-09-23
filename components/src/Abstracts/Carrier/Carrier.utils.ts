@@ -3,7 +3,16 @@ import { batch, createSignal, onCleanup } from "solid-js";
 import type { Point2d } from "@thewaver/ss-utils";
 
 import { LiveAnnouncerUtils } from "../LiveAnnouncer/LiveAnnouncer.utils";
-import type { CarrierZone, Carry, CarryDir, CarryEndReason, CarryMode, CarryNudge, CarryPlace } from "./Carrier.types";
+import type { NavigatorDirection } from "../Navigator/Navigator.types";
+import type {
+    CarrierZone,
+    Carry,
+    CarryEndReason,
+    CarryMode,
+    CarryNudge,
+    CarryOrientation,
+    CarryPlace,
+} from "./Carrier.types";
 
 type CarryState = {
     carry: Carry;
@@ -21,9 +30,6 @@ const DRAG_SLOP_PX = 4;
 const zones: CarrierZone[] = [];
 
 const [getCarryState, setCarryState] = createSignal<CarryState | undefined>();
-
-/** Capitalizes a place label so it can open an announcement. */
-const startSentence = (text: string) => text.charAt(0).toUpperCase() + text.slice(1);
 
 /** The mounted, enabled zones belonging to one group. */
 const getGroupZones = (groupId: string) =>
@@ -61,7 +67,9 @@ const findZoneAt = (x: number, y: number, groupId: string) => {
  * A place is whatever a zone wants it to be — an index, a pair of grid coordinates, a cell plus a
  * rotation — and is never inspected here; the zone is asked to compare, nudge, label and validate
  * its own places. Every step announces itself to a screen reader, so the keyboard route is not a
- * second-class one.
+ * second-class one. The words come from the zones, through {@link CarrierZone}'s `getAnnouncements`:
+ * the source zone's are used for picking up, canceling and leaving in place, and the target zone's for
+ * moving, entering, refusing and dropping.
  */
 export namespace CarrierUtils {
     /**
@@ -83,16 +91,29 @@ export namespace CarrierUtils {
      * @param rects The items' measured rectangles, in the order they are drawn.
      * @param x The pointer's screen position.
      * @param y The pointer's screen position.
-     * @param dir Which axis the items run along.
+     * @param orientation Which axis the items run along.
+     * @param direction Which way a horizontal row runs. Under `"rtl"` the first item is on the right, so
+     * the pointer lands before an item while it is right of the item's middle. Vertical items are
+     * unaffected. Leave it out for a row that runs left to right.
      * @returns A gap number from `0` up to and including the item count, so `rects.length` means "after
      * everything".
      */
-    export const computeDropIndex = (rects: DOMRect[], x: number, y: number, dir: CarryDir): number => {
+    export const computeDropIndex = (
+        rects: DOMRect[],
+        x: number,
+        y: number,
+        orientation: CarryOrientation,
+        direction?: NavigatorDirection,
+    ): number => {
+        const isHorizontal = orientation === "horizontal";
+        const isReversed = isHorizontal && direction === "rtl";
+
         for (let index = 0; index < rects.length; index++) {
             const rect = rects[index];
-            const middle = dir === "row" ? rect.left + rect.width * 0.5 : rect.top + rect.height * 0.5;
+            const middle = isHorizontal ? rect.left + rect.width * 0.5 : rect.top + rect.height * 0.5;
+            const along = isHorizontal ? x : y;
 
-            if ((dir === "row" ? x : y) < middle) return index;
+            if (isReversed ? along > middle : along < middle) return index;
         }
 
         return rects.length;
@@ -202,22 +223,30 @@ export namespace CarrierUtils {
      * @param from The zone the item is leaving.
      * @param place Where in that zone it sits.
      * @param carry The item, its group and the label announcements use.
-     * @param mode How the carry was begun. The keyboard route announces the available keys as well,
-     * since its user cannot see the drop targets move.
+     * @param mode How the carry was begun. The keyboard route announces the item's place and the
+     * available keys as well, since its user cannot see the drop targets move. Worded by the source
+     * zone's `computePickedUp` or `computePickedUpByKey`.
      */
     export const start = (from: CarrierZone, place: CarryPlace, carry: Carry, mode: CarryMode) => {
         const state: CarryState = { carry, from, fromPlace: place, to: from, toPlace: place, mode };
 
         setCarryState(state);
 
+        const announcements = from.getAnnouncements();
+
         if (mode !== "key") {
-            LiveAnnouncerUtils.announce(`${carry.label} picked up from ${from.getLabel()}.`);
+            LiveAnnouncerUtils.announce(announcements.computePickedUp(carry.label, from.getLabel()));
 
             return;
         }
 
         LiveAnnouncerUtils.announce(
-            `${carry.label} picked up from ${from.getLabel()}, ${from.computePlaceLabel(place, carry)}. ${from.getKeyHint(getAcceptingZones(state).length > 1)}`,
+            announcements.computePickedUpByKey(
+                carry.label,
+                from.getLabel(),
+                from.computePlaceLabel(place, carry),
+                from.getKeyHint(getAcceptingZones(state).length > 1),
+            ),
         );
     };
 
@@ -253,8 +282,9 @@ export namespace CarrierUtils {
      * Moves the aim by one step within the zone it is already in, for the keyboard route.
      *
      * The zone decides what a step means, so an arrow key can walk a list by one row, a grid by one
-     * cell, or turn a piece on the spot. Announces where the aim landed. Does nothing when the zone
-     * refuses the step, which is how the ends of a list stop the cursor.
+     * cell, or turn a piece on the spot. Announces where the aim landed, worded by the zone's
+     * `computeAimed`. Does nothing when the zone refuses the step, which is how the ends of a list stop
+     * the cursor.
      *
      * @param nudge How far to move along each axis, and how far to turn.
      */
@@ -270,7 +300,9 @@ export namespace CarrierUtils {
         setCarryState({ ...state, toPlace: place });
 
         LiveAnnouncerUtils.announce(
-            `${startSentence(state.to.computePlaceLabel(place, state.carry))} in ${state.to.getLabel()}.`,
+            state.to
+                .getAnnouncements()
+                .computeAimed(state.to.computePlaceLabel(place, state.carry), state.to.getLabel()),
         );
     };
 
@@ -278,7 +310,8 @@ export namespace CarrierUtils {
      * Moves the aim to another zone, for the keyboard route.
      *
      * Only the zones that would accept the item are visited, wrapping round at the ends, and the new
-     * zone chooses where the cursor enters it. Does nothing when the item has nowhere else to go.
+     * zone chooses where the cursor enters it and words the announcement, through its
+     * `computeZoneEntered`. Does nothing when the item has nowhere else to go.
      *
      * @param step `1` for the next zone, `-1` for the previous.
      */
@@ -297,14 +330,18 @@ export namespace CarrierUtils {
 
         setCarryState({ ...state, to, toPlace: place });
 
-        LiveAnnouncerUtils.announce(`${to.getLabel()}, ${to.computePlaceLabel(place, state.carry)}.`);
+        LiveAnnouncerUtils.announce(
+            to.getAnnouncements().computeZoneEntered(to.getLabel(), to.computePlaceLabel(place, state.carry)),
+        );
     };
 
     /**
      * Finishes the carry in flight, committing it or putting the item back.
      *
      * The four outcomes are all announced, because none of them is visible to a screen reader: the
-     * carry was canceled, the item did not move, the place refused it, or the move went through. A
+     * carry was canceled, the item did not move, the place refused it, or the move went through. The
+     * first two are worded by the source zone's `computeReturned` and `computeLeftInPlace`, the last two
+     * by the target zone's `computeRefused` and `computeDropped`. A
      * move within one zone is handed to that zone's `moveAt`; a move between zones is a `takeAt` and a
      * `putAt` batched together, so consumers see one update rather than a moment with the item in
      * neither place.
@@ -319,7 +356,9 @@ export namespace CarrierUtils {
         if (!state) return;
 
         if (reason === "cancel") {
-            LiveAnnouncerUtils.announce(`${state.carry.label} returned to ${state.from.getLabel()}.`);
+            LiveAnnouncerUtils.announce(
+                state.from.getAnnouncements().computeReturned(state.carry.label, state.from.getLabel()),
+            );
 
             return;
         }
@@ -327,14 +366,16 @@ export namespace CarrierUtils {
         const isSameZone = state.to === state.from;
 
         if (isSameZone && state.to.computeIsSamePlace(state.toPlace, state.fromPlace)) {
-            LiveAnnouncerUtils.announce(`${state.carry.label} left where it was.`);
+            LiveAnnouncerUtils.announce(state.from.getAnnouncements().computeLeftInPlace(state.carry.label));
 
             return;
         }
 
         if (!state.to.computeIsPlaceAllowed(state.toPlace, state.carry)) {
             LiveAnnouncerUtils.announce(
-                `${state.carry.label} does not fit in ${state.to.getLabel()}, returned to ${state.from.getLabel()}.`,
+                state.to
+                    .getAnnouncements()
+                    .computeRefused(state.carry.label, state.to.getLabel(), state.from.getLabel()),
             );
 
             return;
@@ -350,7 +391,13 @@ export namespace CarrierUtils {
         }
 
         LiveAnnouncerUtils.announce(
-            `${state.carry.label} dropped in ${state.to.getLabel()}, ${state.to.computePlaceLabel(state.toPlace, state.carry)}.`,
+            state.to
+                .getAnnouncements()
+                .computeDropped(
+                    state.carry.label,
+                    state.to.getLabel(),
+                    state.to.computePlaceLabel(state.toPlace, state.carry),
+                ),
         );
     };
 

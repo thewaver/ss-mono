@@ -71,10 +71,10 @@ test("a column list declares its orientation and takes the other pair of arrows"
         page.locator(list(COLUMN)),
         "a stacked list has to say so, since a tab list is horizontal by default",
     ).toHaveAttribute("aria-orientation", "vertical");
-    await expect(page.locator(list(ROW)), "and a row leaves the default alone").not.toHaveAttribute(
-        "aria-orientation",
-        "horizontal",
-    );
+    await expect(
+        page.locator(list(ROW)),
+        "and a row says so as well, since the orientation prop is written through as given",
+    ).toHaveAttribute("aria-orientation", "horizontal");
 
     await page.locator(`${tab(COLUMN)}[tabindex="0"]`).focus();
     expect(await activeText(page)).toBe("Overview");

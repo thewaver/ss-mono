@@ -8,10 +8,15 @@ export type TileBoardExampleProps = AccessorProps<{
     gap: number;
     shape: ShapeConst.DefaultShape;
     hasShortFirstRow: boolean;
+    taper: number;
     isDisabled: boolean;
     marked: Index2dString[];
     computeIsTileDisabled?: (tile: Index2d) => boolean;
     onTileActivate: (tile: Index2d) => void;
+    onTileSweep?: (tile: Index2d) => void;
 }>;
 
-export type TileBoardMeepleExampleProps = Omit<TileBoardExampleProps, "marked"> & { piece: MaybeAccessor<Index2d> };
+export type TileBoardMeepleExampleProps = Omit<TileBoardExampleProps, "marked"> & {
+    piece: MaybeAccessor<Index2d>;
+    marked?: MaybeAccessor<Index2dString[]>;
+};

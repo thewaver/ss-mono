@@ -20,6 +20,15 @@ export namespace MenuUtils {
     export const getIsStateful = <T>(item: MenuItem<T>) => getKind(item) !== "command";
 
     /**
+     * Whether picking an item leaves the menu open.
+     *
+     * The item's own `staysOpenOnPick` when it gives one. Otherwise it follows the kind: a checkbox keeps
+     * the menu open so several can be toggled in one visit, and a radio choice or a command closes it.
+     * `Menu` and `ContextMenu` both ask here, so the two cannot disagree.
+     */
+    export const getStaysOpenOnPick = <T>(item: MenuItem<T>) => item.staysOpenOnPick ?? getKind(item) === "checkbox";
+
+    /**
      * The checked list a menu should hold after one of its stateful items is picked.
      *
      * A checkbox toggles, so it comes out of the list when it was in it and goes in when it was not. A

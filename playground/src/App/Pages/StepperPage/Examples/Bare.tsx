@@ -20,7 +20,7 @@ export const BareExample = (props: Props) => {
                     flags={getFlags}
                     state={() => getStep().state}
                     ordinal={() => ORDER.indexOf(getStep().value) + 1}
-                    dir={"row"}
+                    orientation={"horizontal"}
                 >
                     {LABELS[getStep().value]}
                 </PageStepContent>

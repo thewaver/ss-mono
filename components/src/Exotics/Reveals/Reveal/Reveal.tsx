@@ -19,6 +19,13 @@ const BLUR_SPREAD = 3;
 const BLUR_MARGIN = 2;
 const HALF = 0.5;
 
+const NUDGE_KEYS: Record<string, Point2d | undefined> = {
+    ArrowRight: { x: 1, y: 0 },
+    ArrowLeft: { x: -1, y: 0 },
+    ArrowDown: { x: 0, y: 1 },
+    ArrowUp: { x: 0, y: -1 },
+};
+
 const buildHoleImage = (
     radius: number,
     softness: number,
@@ -49,13 +56,37 @@ export const Reveal = (props: RevealProps) => {
 
     const getSize = ElementObserverUtils.createBorderBoxSizeObserver(getRootRef, getIsDisabled);
 
+    const [getKeyboardPoint, setKeyboardPoint] = createSignal<Point2d>();
+
     const getRadius = createMemo(() => access(props.radius) ?? REVEAL_DEFAULTS.radius);
 
-    const getIsRevealing = createMemo(
-        () => !getIsDisabled() && getIsPointerPresent() && getReading().edgeRatio <= INSIDE_EDGE_RATIO,
+    const getIsPointerInside = createMemo(() => getIsPointerPresent() && getReading().edgeRatio <= INSIDE_EDGE_RATIO);
+
+    const getIsKeyboardDriven = createMemo(() => !getIsDisabled() && getKeyboardPoint() !== undefined);
+
+    const getIsRevealing = createMemo(() => getIsKeyboardDriven() || (!getIsDisabled() && getIsPointerInside()));
+
+    const getHasHole = createMemo(
+        () => (getIsKeyboardDriven() || (!getIsDisabled() && getIsPointerPresent())) && getRadius() > NO_HOLE_RADIUS,
     );
 
-    const getHasHole = createMemo(() => !getIsDisabled() && getIsPointerPresent() && getRadius() > NO_HOLE_RADIUS);
+    const getCenter = () => ({ x: getSize().width * HALF, y: getSize().height * HALF });
+
+    const getPointerPoint = () => ({
+        x: getReading().boxRatio.x * getSize().width,
+        y: getReading().boxRatio.y * getSize().height,
+    });
+
+    const getHoleCenter = createMemo(() => {
+        const keyboardPoint = getKeyboardPoint();
+
+        if (!getIsKeyboardDriven() || !keyboardPoint) return getPointerPoint();
+
+        return {
+            x: MathUtils.clamp(keyboardPoint.x, 0, getSize().width),
+            y: MathUtils.clamp(keyboardPoint.y, 0, getSize().height),
+        };
+    });
 
     const getHoleImage = createMemo(() =>
         buildHoleImage(
@@ -70,22 +101,49 @@ export const Reveal = (props: RevealProps) => {
     const getMaskStyle = createMemo<JSX.CSSProperties>(() => {
         if (!getHasHole()) return {};
 
-        const size = getSize();
-        const reading = getReading();
+        const center = getHoleCenter();
         const radius = getRadius();
         const diameter = radius * 2;
-        const hole = {
-            x: reading.boxRatio.x * size.width - radius,
-            y: reading.boxRatio.y * size.height - radius,
-            width: diameter,
-            height: diameter,
-        };
+        const hole = { x: center.x - radius, y: center.y - radius, width: diameter, height: diameter };
 
         return CutoutUtils.getMaskStyle([{ ...hole, image: getHoleImage() }]);
     });
 
+    const handleFocus = () => {
+        if (getIsDisabled() || !getRootRef()?.matches(":focus-visible")) return;
+
+        setKeyboardPoint(getCenter());
+    };
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+        const nudge = NUDGE_KEYS[e.key];
+
+        if (getIsDisabled() || !nudge || e.altKey || e.ctrlKey || e.metaKey) return;
+
+        e.preventDefault();
+
+        const from = getIsKeyboardDriven() ? getHoleCenter() : getIsPointerInside() ? getPointerPoint() : getCenter();
+        const stepSize = access(props.stepSize) ?? REVEAL_DEFAULTS.stepSize;
+
+        setKeyboardPoint({
+            x: MathUtils.clamp(from.x + nudge.x * stepSize, 0, getSize().width),
+            y: MathUtils.clamp(from.y + nudge.y * stepSize, 0, getSize().height),
+        });
+    };
+
     return (
-        <div ref={setRootRef} class={styles.revealRoot}>
+        <div
+            ref={setRootRef}
+            class={styles.revealRoot}
+            role="group"
+            tabindex={getIsDisabled() ? undefined : 0}
+            aria-label={access(props.ariaLabel)}
+            aria-disabled={getIsDisabled() || undefined}
+            onFocus={handleFocus}
+            onBlur={() => setKeyboardPoint(undefined)}
+            onPointerMove={() => setKeyboardPoint(undefined)}
+            onKeyDown={handleKeyDown}
+        >
             {props.renderContent()}
 
             <div class={styles.revealCover}>{props.renderCover(getIsRevealing, getMaskStyle)}</div>

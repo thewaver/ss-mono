@@ -1,6 +1,6 @@
-import type { StepperDir } from "./Stepper.types";
+import type { StepperOrientation } from "./Stepper.types";
 
 export const STEPPER_DEFAULTS = {
-    dir: "row" as StepperDir,
+    orientation: "horizontal" as StepperOrientation,
     gap: 0,
 };

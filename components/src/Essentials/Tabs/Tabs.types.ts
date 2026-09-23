@@ -6,7 +6,7 @@ import type { ProximityEffectFn } from "../../Abstracts/Proximity/Proximity.type
 import type { InteractionControlProps } from "../../Primitives/InteractionWrapper/InteractionWrapper.types";
 import type { AccessorProps, MaybeAccessor } from "../../Utils/typeUtils";
 
-export type TabsDir = "column" | "row";
+export type TabsOrientation = "horizontal" | "vertical";
 
 export type TabLinkProps = JSX.AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
 
@@ -14,6 +14,11 @@ export type Tab<T> = {
     value: T;
     href?: string;
     isDisabled?: boolean;
+    /**
+     * Keeps this tab in the arrow-key walk while it is disabled, so focus can land on it and a reader hears its name
+     * and that it is unavailable. It still cannot be selected, by pointer, by key or by the arrows reaching it.
+     */
+    isReachableWhenDisabled?: boolean;
     id?: string;
     panelId?: string;
 };
@@ -43,7 +48,7 @@ export type TabsItemProps<T> = AccessorProps<
 
 export type TabsProps<T> = AccessorProps<{
     /** Whether the tabs run across the page or down it, which also decides which arrow keys walk them. */
-    dir?: TabsDir;
+    orientation?: TabsOrientation;
     /**
      * Selects a tab as soon as the arrow keys reach it, rather than waiting for Enter or Space. Leave it off when
      * selecting a tab is expensive.

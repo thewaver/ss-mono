@@ -2,6 +2,7 @@ import { TimeInput, access } from "@thewaver/ss-components";
 import type { MaybeAccessor } from "@thewaver/ss-components";
 import type { TimeValue } from "@thewaver/ss-utils";
 
+import { TIME_SEGMENT_HINTS } from "../../../PageComponents/Announcements/Announcements.const";
 import { PageMeridiemToggle } from "../../../StyledComponents/MeridiemToggle/MeridiemToggle";
 import {
     PageTextFieldContent,
@@ -17,8 +18,8 @@ type Props = TimeExampleProps & {
     ariaLabel: MaybeAccessor<string>;
     isTwelveHour?: MaybeAccessor<boolean>;
     hasSeconds?: MaybeAccessor<boolean>;
-    minTime?: MaybeAccessor<TimeValue>;
-    maxTime?: MaybeAccessor<TimeValue>;
+    minValue?: MaybeAccessor<TimeValue>;
+    maxValue?: MaybeAccessor<TimeValue>;
 };
 
 export const TimeExample = (props: Props) => {
@@ -27,9 +28,10 @@ export const TimeExample = (props: Props) => {
             valueSignal={props.valueSignal}
             isTwelveHour={props.isTwelveHour}
             hasSeconds={props.hasSeconds}
-            minTime={props.minTime}
-            maxTime={props.maxTime}
+            minValue={props.minValue}
+            maxValue={props.maxValue}
             ariaLabel={props.ariaLabel}
+            segmentHints={TIME_SEGMENT_HINTS}
             padding={() => FIELD_STEPPER_PADDING}
             gap={() => FIELD_GAP}
             computeTextStyle={computePageTextFieldTextStyle}

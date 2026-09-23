@@ -1,11 +1,22 @@
 import type { Point2d, Rect } from "@thewaver/ss-utils";
 
 /**
- * The two pieces of a particle's motion that are not the caller's own evaluator: picking a target
- * when none is asked for, measuring where that target actually is, and writing the answer onto the
- * particle's element without going through Solid.
+ * The pieces of a particle's motion that are not the caller's own evaluator: settling how many a
+ * round sends, picking a target when none is asked for, measuring where that target actually is, and
+ * writing the answer onto the particle's element without going through Solid.
  */
 export namespace ParticleSpawnerUtils {
+    /**
+     * Turns a requested particle count into one a round can send.
+     *
+     * A fractional count is rounded rather than truncated, and a negative one is treated as none, so a caller
+     * handing over a computed number never asks for an impossible round.
+     *
+     * @param count The count asked for.
+     * @returns A whole number, `0` or more.
+     */
+    export const toParticleCount = (count: number): number => Math.max(0, Math.round(count));
+
     /**
      * Picks a random target index, used when a spawner is given no `computeTarget` of its own.
      *

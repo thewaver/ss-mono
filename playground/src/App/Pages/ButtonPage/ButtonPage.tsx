@@ -1,12 +1,15 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { CopyExample } from "./Examples/Copy";
 import { DecoratedExample } from "./Examples/Decorated";
 import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
 import { ErroredExample } from "./Examples/Errored";
+import { PendingExample } from "./Examples/Pending";
 import { ReachableExample } from "./Examples/Reachable";
 
+const COPY_TEXT = "npm install @thewaver/ss-components";
 const EXAMPLES_ROOT = "/src/App/Pages/ButtonPage/Examples";
 
 export const ButtonPage = () => {
@@ -15,6 +18,8 @@ export const ButtonPage = () => {
     const [getDisabledClicks, setDisabledClicks] = createSignal(0);
     const [getReachableClicks, setReachableClicks] = createSignal(0);
     const [getHasError, setHasError] = createSignal(true);
+    const [getSaves, setSaves] = createSignal(0);
+    const [getCopies, setCopies] = createSignal(0);
 
     const getExamples = createMemo(() => [
         {
@@ -83,6 +88,35 @@ export const ButtonPage = () => {
                 />
             ),
             path: `${EXAMPLES_ROOT}/Errored.tsx`,
+        },
+        {
+            key: "pending",
+            name: "Pending",
+            readout: () =>
+                `saves: ${getSaves()} — the handler answers with a promise that takes a second, and presses that land before it settles are ignored`,
+            component: () => (
+                <PendingExample
+                    onClick={() => {
+                        setSaves((prev) => prev + 1);
+                    }}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Pending.tsx`,
+        },
+        {
+            key: "copy",
+            name: "Copy to the clipboard",
+            readout: () =>
+                `copies: ${getCopies()} — the handler answers with the clipboard's own promise, so the button is pending while it writes, then says Copied for two seconds and announces it`,
+            component: () => (
+                <CopyExample
+                    text={COPY_TEXT}
+                    onCopy={() => {
+                        setCopies((prev) => prev + 1);
+                    }}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Copy.tsx`,
         },
     ]);
 

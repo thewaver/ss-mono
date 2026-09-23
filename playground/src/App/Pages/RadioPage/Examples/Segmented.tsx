@@ -17,7 +17,7 @@ export const SegmentedExample = (props: Props) => (
         <RadioGroup
             valueSignal={props.valueSignal}
             ariaLabel={"Segmented size"}
-            dir={"row"}
+            orientation={"horizontal"}
             gap={0}
             renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                 <PageRadioSegmentFloater

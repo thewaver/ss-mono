@@ -8,7 +8,7 @@ const layers: DismisserLayerDefs[] = [];
 /**
  * Tests whether a node belongs to a layer, following ownership as well as nesting.
  *
- * Walking up the DOM is not enough on its own, because a submenu portalled to the end of the
+ * Walking up the DOM is not enough on its own, because a submenu portaled to the end of the
  * document is not inside its parent menu. So the walk also steps sideways: an element whose id
  * something points at with `aria-controls` continues the walk from that controller, which is what
  * keeps a menu open while the user is in the popup it opened. A trigger button counts as inside
@@ -101,7 +101,7 @@ export namespace DismisserUtils {
     /**
      * Tests whether a node belongs to a layer, following ownership as well as nesting.
      *
-     * Walking up the DOM is not enough on its own, because a submenu portalled to the end of the
+     * Walking up the DOM is not enough on its own, because a submenu portaled to the end of the
      * document is not inside its parent menu. So the walk also steps sideways: an element whose id
      * something points at with `aria-controls` continues the walk from that controller, which is what
      * keeps a menu open while the user is in the popup it opened. A trigger button counts as inside

@@ -10,4 +10,9 @@ export type CardStackDeckExampleProps = {
     onSend: (direction: SwipeDirection, card: string) => void;
     onEmpty: () => void;
     onDeal: () => void;
+    onRecall: () => void;
+};
+
+export type CardStackEndlessExampleProps = Omit<CardStackDeckExampleProps, "onEmpty" | "onDeal" | "onRecall"> & {
+    onLoad: (count: number) => void;
 };

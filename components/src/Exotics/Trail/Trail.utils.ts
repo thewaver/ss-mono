@@ -37,6 +37,49 @@ export namespace TrailUtils {
     };
 
     /**
+     * How many path lengths one run covers, for a set of travelers spaced behind the lead.
+     *
+     * A looping run is always one lap, since the followers simply come round behind the lead. A run that
+     * stops at the end has to last until the furthest-back traveler arrives, so it is one path length plus
+     * the largest offset. Offsets below zero count as zero.
+     *
+     * @param offsets Each traveler's distance behind the lead, as a share of the path.
+     * @param isLooping Whether the run starts again from the beginning.
+     * @returns `1` or more. Multiply the duration of one pass by it to keep every traveler at the speed a
+     * lone one would travel.
+     */
+    export const getRunExtent = (offsets: readonly number[], isLooping: boolean) =>
+        isLooping ? FULL_LAP : FULL_LAP + offsets.reduce((most, offset) => Math.max(most, offset), NOTHING);
+
+    /**
+     * Where one traveler is along the path, given how far the whole run has gone.
+     *
+     * On a looping run the traveler sits its offset behind the lead and wraps round the end, so a follower
+     * is already out on the path when the run starts. A traveler with no offset is exactly the run's
+     * progress, so one sent to `1` is at the end rather than wrapped back to the start. On a run that stops, it waits at the start until the
+     * lead has put its offset between them, and then parks at the end once it gets there.
+     *
+     * @param runProgress How far the run has gone, from `0` to `1`.
+     * @param offset The traveler's distance behind the lead, as a share of the path. Below zero counts as
+     * zero.
+     * @param extent The run's length in path lengths, from {@link getRunExtent}.
+     * @param isLooping Whether the run starts again from the beginning.
+     * @returns The traveler's own progress along the path, from `0` to `1`.
+     */
+    export const getTravelerProgress = (runProgress: number, offset: number, extent: number, isLooping: boolean) => {
+        const behind = Math.max(NOTHING, offset);
+        const head = MathUtils.clamp01(runProgress) * extent;
+
+        const along = head - behind;
+
+        if (!isLooping || (along >= NOTHING && along <= FULL_LAP)) return MathUtils.clamp01(along);
+
+        const wrapped = along % FULL_LAP;
+
+        return wrapped < NOTHING ? wrapped + FULL_LAP : wrapped;
+    };
+
+    /**
      * The stretch of the path to sample around a position, for working out the heading.
      *
      * Clamped at both ends, so a traveler near the start or the end takes a shorter, one-sided sample

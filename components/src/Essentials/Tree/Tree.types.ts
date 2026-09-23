@@ -57,8 +57,11 @@ export type TreeNodeItemProps = AccessorProps<
 >;
 
 export type TreeProps<T> = AccessorProps<{
-    /** Names the tree for assistive technology. */
-    ariaLabel?: string;
+    /**
+     * Names the tree for assistive technology. It is required because nothing else can name it, and a reader landing on an
+     * unnamed tree is told only that it is one.
+     */
+    ariaLabel: string;
     /** The component to draw navigating nodes with, for a tree of links rather than of choices. */
     linkComponent?: Component<TreeLinkProps>;
     /**
@@ -72,10 +75,19 @@ export type TreeProps<T> = AccessorProps<{
     computeLayout?: PlacementLayoutFn;
     /** What the nodes do as the pointer nears them. */
     computeEffect?: ProximityEffectFn;
-    /** Which node is selected. It is the only thing that selects one. */
-    valueSignal: SignalSource<T | undefined>;
-    /** Which nodes are open. It is the only thing that opens or closes them. */
-    expandedSignal: SignalSource<T[]>;
+    /**
+     * Which node is selected. Both sides write it: the tree when a node is activated, the consumer to select one from
+     * outside. Leave it out and the tree keeps the selection itself, starting with nothing selected. A node activated
+     * then is still selected, still announced as selected and still the tree's single tab stop, even though nobody
+     * outside is told; `onSelectionChange` still runs.
+     */
+    valueSignal?: SignalSource<T | undefined>;
+    /**
+     * Which nodes are open, by value. Both sides write it: the tree when a branch is expanded or collapsed, the
+     * consumer to open or close branches from outside. Leave it out and the tree keeps the state itself, starting
+     * with every branch closed.
+     */
+    expandedSignal?: SignalSource<T[]>;
     /** The text a node is found by when the reader types, where that is not its visible text. */
     computeCustomText?: (node: TreeNode<T>) => string;
     /** Draws one node. It is handed the interaction state and where the node sits in the tree. */

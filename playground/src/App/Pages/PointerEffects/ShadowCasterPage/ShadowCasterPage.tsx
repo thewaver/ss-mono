@@ -33,10 +33,15 @@ const MAX_ACTIVE_RANGE_PX = 1200;
 const ACTIVE_RANGE_STEP_PX = 20;
 const STARTING_ACTIVE_RANGE_PX = 1200;
 
+const MIN_SMOOTHING_MS = 0;
+const MAX_SMOOTHING_MS = 1000;
+const SMOOTHING_STEP_MS = 10;
+
 const FIELD_WIDTH = 110;
 
 export const ShadowCasterPage = () => {
     const [getIsDisabled, setIsDisabled] = createSignal(false);
+    const [getSmoothingMs, setSmoothingMs] = createSignal(SHADOW_CASTER_DEFAULTS.smoothingMs);
     const [getActiveRangePx, setActiveRangePx] = createSignal(STARTING_ACTIVE_RANGE_PX);
     const [getLightRangePx, setLightRangePx] = createSignal(SHADOW_CASTER_DEFAULTS.lightRangePx);
     const [getMaxThrowPx, setMaxThrowPx] = createSignal(SHADOW_CASTER_DEFAULTS.maxThrowPx);
@@ -51,6 +56,7 @@ export const ShadowCasterPage = () => {
         const commonProps: ShadowCasterExampleProps = {
             isDisabled: getIsDisabled,
             activeRangePx: getActiveRangePx,
+            smoothingMs: getSmoothingMs,
             lightRangePx: getLightRangePx,
             maxThrowPx: getMaxThrowPx,
             minBlurPx: getMinBlurPx,
@@ -92,6 +98,24 @@ export const ShadowCasterPage = () => {
                     }
                 >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
+                </PageProp>
+
+                <PageProp
+                    key={"smoothingMs"}
+                    label={"Smoothing (ms)"}
+                    hint={
+                        "How long the shadow takes to catch up with the pointer. At 0 it follows exactly; raised, it swings after a quick movement and eases back to rest."
+                    }
+                >
+                    <PageNumberField
+                        value={getSmoothingMs}
+                        min={() => MIN_SMOOTHING_MS}
+                        max={() => MAX_SMOOTHING_MS}
+                        step={() => SMOOTHING_STEP_MS}
+                        width={() => FIELD_WIDTH}
+                        ariaLabel={"Smoothing in milliseconds"}
+                        onInput={setSmoothingMs}
+                    />
                 </PageProp>
 
                 <PageProp

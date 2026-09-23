@@ -10,6 +10,7 @@ const across: BracketConnectorDefs = {
     orientation: "horizontal",
     from: { x: 200, y: 100 },
     to: { x: 100, y: 40 },
+    isOnFocusedRoute: false,
 };
 
 const down: BracketConnectorDefs = {
@@ -19,6 +20,7 @@ const down: BracketConnectorDefs = {
     orientation: "vertical",
     from: { x: 100, y: 200 },
     to: { x: 40, y: 300 },
+    isOnFocusedRoute: false,
 };
 
 const level: BracketConnectorDefs = { ...across, to: { x: 100, y: 100 } };

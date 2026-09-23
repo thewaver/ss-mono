@@ -1,11 +1,12 @@
 import { PatchBoard } from "@thewaver/ss-components";
 
+import { PATCH_BOARD_ANNOUNCEMENTS } from "../../../PageComponents/Announcements/Announcements.const";
 import {
     PagePatchCable,
     PagePatchNode,
     PagePatchSocket,
 } from "../../../StyledComponents/PatchBoardContent/PatchBoardContent";
-import { BOARD_SIZE } from "../PatchBoardPage.const";
+import { BOARD_HEIGHT_RATIO } from "../PatchBoardPage.const";
 import type { PatchBoardExampleProps } from "../PatchBoardPage.types";
 
 type Props = PatchBoardExampleProps;
@@ -15,7 +16,8 @@ export const ChainExample = (props: Props) => {
         <PatchBoard
             groupId={"chain"}
             ariaLabel={"Signal chain"}
-            size={BOARD_SIZE}
+            announcements={PATCH_BOARD_ANNOUNCEMENTS}
+            heightRatio={BOARD_HEIGHT_RATIO}
             socketSize={props.socketSize}
             isLocked={props.isLocked}
             isDisabled={props.isDisabled}

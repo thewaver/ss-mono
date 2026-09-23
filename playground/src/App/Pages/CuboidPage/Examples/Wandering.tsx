@@ -4,6 +4,7 @@ import type { CuboidFace } from "@thewaver/ss-components";
 import { Cuboid, CuboidUtils, access } from "@thewaver/ss-components";
 import { ObjectUtils } from "@thewaver/ss-utils";
 
+import { computeCuboidFaceLabel } from "../../../PageComponents/Announcements/Announcements.const";
 import { PageCuboidFace, PageCuboidStack } from "../../../StyledComponents/CuboidContent/CuboidContent";
 import type { CuboidWanderingExampleProps } from "../CuboidPage.types";
 
@@ -25,9 +26,9 @@ export const WanderingExample = (props: Props) => {
     let previousFacing: CuboidFace | undefined;
 
     const turnToNeighbor = () => {
-        const facing = CuboidUtils.getFacing(getYaw(), getPitch());
+        const facing = CuboidUtils.getFacingFromTurns(getYaw(), getPitch());
         const neighbors = TURNS.map(
-            ([yaw, pitch]) => [CuboidUtils.getFacing(getYaw() + yaw, getPitch() + pitch), yaw, pitch] as const,
+            ([yaw, pitch]) => [CuboidUtils.getFacingFromTurns(getYaw() + yaw, getPitch() + pitch), yaw, pitch] as const,
         ).filter(([turned]) => turned !== facing);
         const unvisited = neighbors.filter(([turned]) => turned !== previousFacing);
         const [[, yawTurn, pitchTurn]] = ObjectUtils.getRandomArrayValues(unvisited.length > 0 ? unvisited : neighbors);
@@ -58,6 +59,7 @@ export const WanderingExample = (props: Props) => {
                 size={props.size}
                 transitionDurationMs={props.transitionDurationMs}
                 ariaLabel={"Six faces, turning by themselves"}
+                computeFaceLabel={computeCuboidFaceLabel}
                 renderFace={(getFace, getState) => <PageCuboidFace face={getFace} state={getState} />}
             />
         </PageCuboidStack>

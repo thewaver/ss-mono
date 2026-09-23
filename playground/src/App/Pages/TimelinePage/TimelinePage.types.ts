@@ -5,7 +5,7 @@ export type Meeting = {
     room: string;
     from: number;
     to: number;
-    isCancelled?: boolean;
+    isCanceled?: boolean;
 };
 
 export type Clip = {
@@ -22,3 +22,9 @@ export type TimelineExampleProps = AccessorProps<{
     viewSignal: SignalSource<TimelineSpan>;
     onPick: (name: string) => void;
 }>;
+
+export type TimelineTrimExampleProps = TimelineExampleProps &
+    AccessorProps<{
+        clipsSignal: SignalSource<Clip[]>;
+        onTrim: (clip: Clip) => void;
+    }>;

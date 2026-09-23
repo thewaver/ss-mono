@@ -141,28 +141,7 @@ export const Spotlight = (props: SpotlightProps) => {
 
         if (!getIsVisible() || access(props.mode) !== "guide" || !portal) return;
 
-        const sealed: HTMLElement[] = [];
-
-        let node: HTMLElement | null = portal;
-
-        while (node && node !== document.body) {
-            const parent: HTMLElement | null = node.parentElement;
-
-            if (!parent) break;
-
-            for (const child of parent.children) {
-                if (child === node || !(child instanceof HTMLElement) || child.inert) continue;
-
-                child.inert = true;
-                sealed.push(child);
-            }
-
-            node = parent;
-        }
-
-        onCleanup(() => {
-            for (const sibling of sealed) sibling.inert = false;
-        });
+        onCleanup(FocusManagerUtils.sealAround(portal));
     });
 
     onMount(() => {

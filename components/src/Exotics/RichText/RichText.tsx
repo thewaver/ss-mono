@@ -2,7 +2,8 @@ import { createMemo } from "solid-js";
 import type { JSX } from "solid-js";
 
 import { access } from "../../Utils/propUtils";
-import type { RichTextNode, RichTextProps } from "./RichText.types";
+import { RICH_TEXT_DEFAULTS } from "./RichText.const";
+import type { RichTextNode, RichTextProps, RichTextRenderDefs } from "./RichText.types";
 import { RichTextUtils } from "./RichText.utils";
 
 import * as styles from "./RichText.css";
@@ -15,30 +16,33 @@ const DEFAULT_RICH_TEXT_CLASSES = {
     li: styles.listItem,
 } as const;
 
-const renderNodes = (
-    nodes: RichTextNode[],
-    classMap: Record<string, string>,
-    removeUnknownTags?: boolean,
-): JSX.Element[] => {
+const renderNodes = (nodes: RichTextNode[], defs: RichTextRenderDefs): JSX.Element[] => {
     return nodes.map((node) => {
         if (node.type === "text") {
             return <>{node.content}</>;
         }
 
-        const className = classMap[node.tag];
+        const renderChildren = () => renderNodes(node.children, defs);
+        const rendered = defs.renderTag?.(node.tag, renderChildren, node.attributes);
 
-        if (className) {
-            return <span class={className}>{renderNodes(node.children, classMap, removeUnknownTags)}</span>;
+        if (rendered !== undefined) {
+            return rendered;
         }
 
-        if (removeUnknownTags) {
-            return <>{renderNodes(node.children, classMap, removeUnknownTags)}</>;
+        const className = Object.hasOwn(defs.classMap, node.tag) ? defs.classMap[node.tag] : undefined;
+
+        if (className) {
+            return <span class={className}>{renderChildren()}</span>;
+        }
+
+        if (defs.removeUnknownTags) {
+            return <>{renderChildren()}</>;
         }
 
         return (
             <>
-                <span>{`[${node.tag}]`}</span>
-                {renderNodes(node.children, classMap, removeUnknownTags)}
+                <span>{node.openingMarkup}</span>
+                {renderChildren()}
                 <span>{`[/${node.tag}]`}</span>
             </>
         );
@@ -46,15 +50,20 @@ const renderNodes = (
 };
 
 export const RichText = (props: RichTextProps) => {
-    const getParsedTree = createMemo(() => RichTextUtils.parseContent(access(props.content)));
+    const getParsedTree = createMemo(() =>
+        RichTextUtils.parseContent(
+            access(props.content),
+            access(props.allowedAttributes) ?? RICH_TEXT_DEFAULTS.allowedAttributes,
+        ),
+    );
 
     return (
         <>
-            {renderNodes(
-                getParsedTree(),
-                props.computeClassNames?.(DEFAULT_RICH_TEXT_CLASSES) ?? DEFAULT_RICH_TEXT_CLASSES,
-                access(props.removeOtherTags),
-            )}
+            {renderNodes(getParsedTree(), {
+                classMap: props.computeClassNames?.(DEFAULT_RICH_TEXT_CLASSES) ?? DEFAULT_RICH_TEXT_CLASSES,
+                removeUnknownTags: access(props.removeOtherTags) ?? RICH_TEXT_DEFAULTS.removeOtherTags,
+                renderTag: props.renderTag,
+            })}
         </>
     );
 };

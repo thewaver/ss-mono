@@ -6,6 +6,7 @@ export type ImagesExampleProps = AccessorProps<{
     sources: MosaicImageSource[];
     gap: number;
     sizeAnchor: MosaicSizeAnchor;
+    transitionDurationMs: number;
     shapeKey: MosaicImages.SampleShapeKey;
     isDecorated: boolean;
 }>;

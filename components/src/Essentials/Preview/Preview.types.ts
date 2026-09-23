@@ -49,8 +49,11 @@ export type PreviewProps = Omit<
         isScrolledIntoViewOnCollapse?: boolean;
         /** How long the content takes to expand and collapse. */
         transitionDurationMs?: number;
-        /** Whether the content is expanded. It is the only thing that expands or collapses it. */
-        expandedSignal: SignalSource<boolean>;
+        /**
+         * Whether the content is expanded. Both sides write it: the preview when its trigger is pressed, the consumer to
+         * expand or collapse it from outside. Leave it out and the preview keeps the state itself, starting collapsed.
+         */
+        expandedSignal?: SignalSource<boolean>;
         /** Draws the content being previewed. */
         renderContent: () => JSX.Element;
         /** Draws the trigger. */

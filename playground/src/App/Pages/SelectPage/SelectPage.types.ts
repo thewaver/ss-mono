@@ -17,6 +17,11 @@ export type SelectExampleProps = AccessorProps<{
     options?: SelectItem<string>[];
 }>;
 
+export type SelectClearableExampleProps = {
+    valueSignal: Signal<string | undefined>;
+    onSelectionChange: (value: string | undefined) => void;
+};
+
 export type SelectAirportExampleProps = {
     valueSignal: Signal<Airport | undefined>;
 };

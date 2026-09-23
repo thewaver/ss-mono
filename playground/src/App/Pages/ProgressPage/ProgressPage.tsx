@@ -2,11 +2,13 @@ import { createMemo, createSignal, onCleanup, onMount } from "solid-js";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DeterminateExample } from "./Examples/Determinate";
+import { DiskMeterExample } from "./Examples/DiskMeter";
 import { ErroredExample } from "./Examples/Errored";
 import { FillingContainerExample } from "./Examples/FillingContainer";
 import { IndeterminateExample } from "./Examples/Indeterminate";
 import { LiveRangeExample } from "./Examples/LiveRange";
 import { OutOfRangeExample } from "./Examples/OutOfRange";
+import { RingExample } from "./Examples/Ring";
 import type { ProgressExampleProps } from "./ProgressPage.types";
 
 const UPLOAD_TOTAL_BYTES = 2_400_000;
@@ -68,6 +70,22 @@ export const ProgressPage = () => {
                 readout: () => "value: 0.62 — the transfer stalled, and hasError is the owner's to say",
                 component: () => <ErroredExample />,
                 path: `${EXAMPLES_ROOT}/Errored.tsx`,
+            },
+            {
+                key: "diskMeter",
+                name: "Disk usage, as a meter",
+                readout: () =>
+                    'role="meter" — a reading of how full the disk is rather than work that will finish, so it is announced as a gauge and has no indeterminate state',
+                component: () => <DiskMeterExample />,
+                path: `${EXAMPLES_ROOT}/DiskMeter.tsx`,
+            },
+            {
+                key: "ring",
+                name: "Drawn as a ring",
+                readout: () =>
+                    `${getUploadedBytes()} of ${UPLOAD_TOTAL_BYTES} bytes — the same upload as the live range, painted round a circle; the component is unchanged`,
+                component: () => <RingExample {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/Ring.tsx`,
             },
             {
                 key: "fillingContainer",

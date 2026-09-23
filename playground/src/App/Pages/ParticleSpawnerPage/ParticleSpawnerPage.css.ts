@@ -57,9 +57,24 @@ export const movingTargetMarker = style([
     },
 ]);
 
+export const isHiddenMarker = style({
+    visibility: "hidden",
+});
+
 export const particle = style({
     width: PARTICLE_SIZE_PX,
     height: PARTICLE_SIZE_PX,
     borderRadius: "50%",
     backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.success.light}, ${themeVars.color.success.dark})`,
+});
+
+export const burstRoot = style({
+    position: "absolute",
+    transform: "translate(-50%, -50%)",
+});
+
+export const spawnerOverlay = style({
+    position: "absolute",
+    inset: 0,
+    pointerEvents: "none",
 });

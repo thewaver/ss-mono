@@ -3,6 +3,7 @@ import type { Point2d, Size2d } from "@thewaver/ss-utils";
 export type RevealExampleProps = {
     radius: () => number;
     softness: () => number;
+    stepSize: () => number;
     joinRadii: () => number[];
     lameExponents: () => number[];
     isDisabled: () => boolean;

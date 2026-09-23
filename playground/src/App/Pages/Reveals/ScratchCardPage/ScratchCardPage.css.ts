@@ -78,3 +78,22 @@ export const coinRubbing = style({
     borderStyle: "solid",
     backgroundColor: `rgb(from ${themeVars.color.secondary.contrast} r g b / 35%)`,
 });
+
+export const windows = style({
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: themeVars.spacing.full,
+    padding: themeVars.spacing.full,
+    borderRadius: themeVars.borderRadius.full,
+    backgroundImage: panel(themeVars.color.primary.dark, themeVars.color.primary.light),
+});
+
+export const windowPrize = style({
+    display: "grid",
+    placeItems: "center",
+    padding: themeVars.spacing.double,
+    backgroundImage: panel(themeVars.color.surface.dark, themeVars.color.surface.light),
+    color: themeVars.color.primary.main,
+    fontFamily: "monospace",
+    fontSize: themeVars.fontSize.xLarge,
+});

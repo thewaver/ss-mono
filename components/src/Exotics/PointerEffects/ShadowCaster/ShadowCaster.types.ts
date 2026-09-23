@@ -56,6 +56,15 @@ export type ShadowCasterProps = AccessorProps<{
      */
     color?: string;
     /**
+     * How long the shadow takes to catch up with the pointer, in milliseconds. `0`, the default, follows it
+     * exactly.
+     *
+     * The throw, the blur and the darkness all ease towards where the pointer says they should be, closing about
+     * two-thirds of the gap in this time, however fast or slow the screen draws — so the shadow swings after a
+     * quick movement rather than with it, and eases back to rest rather than snapping there.
+     */
+    smoothingMs?: number;
+    /**
      * Stops the shadow following the pointer, leaving it at rest.
      *
      * It is what a consumer honoring a reduced-motion preference passes, since the library never reads that

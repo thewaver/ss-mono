@@ -32,6 +32,8 @@ const SlideButtonElement = (props: SlideButtonElementProps) => {
     const [getGrabRatio, setGrabRatio] = createSignal<number>();
     const [getIsHolding, setIsHolding] = createSignal(false);
 
+    FormFieldUtils.registerControl(getTrackRef);
+
     let holdFrame: number | undefined;
 
     const getIsDisabled = createMemo(() => access(props.flags).isDisabled ?? false);

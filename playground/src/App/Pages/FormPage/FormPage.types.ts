@@ -7,3 +7,10 @@ export type FormExampleProps = {
     onSubmit: () => void;
     onReset: () => void;
 };
+
+export type FormFocusExampleProps = {
+    planSignal: Signal<string | undefined>;
+    topicsSignal: Signal<string[]>;
+    onSubmit: () => void;
+    onReset: () => void;
+};

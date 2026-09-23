@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createEffect, createSignal, onCleanup, untrack } from "solid-js";
 
 import { Button, Timeline, accessSignal } from "@thewaver/ss-components";
 import type { TimelineController } from "@thewaver/ss-components";
@@ -9,6 +9,7 @@ import {
     PageTimelineControls,
     PageTimelineFrame,
     PageTimelineLanes,
+    PageTimelineMarker,
     PageTimelineRow,
     PageTimelineTick,
     PageTimelineTrack,
@@ -25,11 +26,45 @@ const ZOOM_IN = 0.6;
 const ZOOM_OUT = 1 / ZOOM_IN;
 const PAN_STEP = 0.4;
 const TONES = ["info", "alert", "success", "error"] as const;
+const MS_PER_SECOND = 1000;
 
 export const TracksExample = (props: Props) => {
     const [getController, setController] = createSignal<TimelineController>();
 
+    const [getPlayhead, setPlayhead] = createSignal(REEL.start);
+    const [getIsPlaying, setIsPlaying] = createSignal(false);
+
     const viewSignal = accessSignal(() => props.viewSignal);
+
+    createEffect(() => {
+        if (!getIsPlaying()) return;
+
+        let frameId: number | undefined;
+        let lastMs = performance.now();
+
+        const advance = () => {
+            const nowMs = performance.now();
+            const next = untrack(getPlayhead) + (nowMs - lastMs) / MS_PER_SECOND;
+
+            lastMs = nowMs;
+
+            if (next >= REEL.end) {
+                setPlayhead(REEL.end);
+                setIsPlaying(false);
+
+                return;
+            }
+
+            setPlayhead(next);
+            frameId = requestAnimationFrame(advance);
+        };
+
+        frameId = requestAnimationFrame(advance);
+
+        onCleanup(() => {
+            if (frameId !== undefined) cancelAnimationFrame(frameId);
+        });
+    });
 
     return (
         <PageTimelineFrame>
@@ -49,6 +84,7 @@ export const TracksExample = (props: Props) => {
                         isZoomable={props.isZoomable}
                         isDisabled={props.isDisabled}
                         viewSignal={props.viewSignal}
+                        markers={() => [getPlayhead()]}
                         ariaLabel={"Cut of the episode"}
                         computeSpan={(clip) => ({ start: clip.from, end: clip.to })}
                         computeLane={(clip) => clip.track}
@@ -58,6 +94,7 @@ export const TracksExample = (props: Props) => {
                         renderTick={(getTick) => (
                             <PageTimelineTick tick={getTick} label={() => formatStopwatch(getTick().value)} />
                         )}
+                        renderMarker={(getMarker) => <PageTimelineMarker marker={getMarker} tone={"playhead"} />}
                         renderItem={(getClip, getFlags) => (
                             <PageTimelineBlock
                                 flags={getFlags}
@@ -74,6 +111,25 @@ export const TracksExample = (props: Props) => {
 
             <PageTimelineControls>
                 <Button
+                    id={"tracksPlay"}
+                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Play</PageButtonContent>}
+                    onClick={() => {
+                        if (getPlayhead() >= REEL.end) setPlayhead(REEL.start);
+
+                        setIsPlaying(true);
+                    }}
+                />
+
+                <Button
+                    id={"tracksPause"}
+                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Pause</PageButtonContent>}
+                    onClick={() => {
+                        setIsPlaying(false);
+                    }}
+                />
+
+                <Button
+                    id={"tracksEarlier"}
                     isDisabled={props.isDisabled}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Earlier</PageButtonContent>}
                     onClick={() => {
@@ -82,6 +138,7 @@ export const TracksExample = (props: Props) => {
                 />
 
                 <Button
+                    id={"tracksLater"}
                     isDisabled={props.isDisabled}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Later</PageButtonContent>}
                     onClick={() => {
@@ -90,6 +147,7 @@ export const TracksExample = (props: Props) => {
                 />
 
                 <Button
+                    id={"tracksZoomIn"}
                     isDisabled={props.isDisabled}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Zoom in</PageButtonContent>}
                     onClick={() => {
@@ -98,6 +156,7 @@ export const TracksExample = (props: Props) => {
                 />
 
                 <Button
+                    id={"tracksZoomOut"}
                     isDisabled={props.isDisabled}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Zoom out</PageButtonContent>}
                     onClick={() => {
@@ -106,6 +165,7 @@ export const TracksExample = (props: Props) => {
                 />
 
                 <Button
+                    id={"tracksWholeReel"}
                     isDisabled={props.isDisabled}
                     renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Whole reel</PageButtonContent>}
                     onClick={async () => {

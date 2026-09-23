@@ -43,14 +43,14 @@ const tableMarker = style({
     pointerEvents: "none",
 });
 
-export const tableMarkerBefore = style([tableMarker, { left: 0 }]);
+export const tableMarkerBefore = style([tableMarker, { insetInlineStart: 0 }]);
 
-export const tableMarkerAfter = style([tableMarker, { right: 0 }]);
+export const tableMarkerAfter = style([tableMarker, { insetInlineEnd: 0 }]);
 
 export const tableResizer = style({
     position: "absolute",
     top: 0,
-    right: 0,
+    insetInlineEnd: 0,
     bottom: 0,
     width: tableResizerWidthVar,
     padding: 0,
@@ -80,4 +80,18 @@ export const tableReorderGrip = style({
     color: "inherit",
     cursor: "grab",
     touchAction: "none",
+});
+
+export const tableHint = style({
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: 1,
+    height: 1,
+    margin: -1,
+    padding: 0,
+    overflow: "hidden",
+    clipPath: "inset(50%)",
+    whiteSpace: "nowrap",
+    border: 0,
 });

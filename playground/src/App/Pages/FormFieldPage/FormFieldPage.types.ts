@@ -4,7 +4,7 @@ import type { AccessorProps } from "@thewaver/ss-components";
 
 export type FormFieldExampleProps = AccessorProps<{
     valueSignal: Signal<string>;
-    dir: "column" | "row";
+    orientation: "horizontal" | "vertical";
     gap: number;
     message: string;
     hasError: boolean;

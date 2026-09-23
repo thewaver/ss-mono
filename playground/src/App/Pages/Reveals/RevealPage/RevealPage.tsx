@@ -32,6 +32,9 @@ const SOFTNESS_STEP = 0.05;
 const STARTING_SHAPE: RevealShape = CIRCLE;
 const STARTING_JOIN_RADIUS = 0;
 const STARTING_LAME_EXPONENT = 1;
+const MIN_STEP_SIZE = 5;
+const MAX_STEP_SIZE = 80;
+const STEP_SIZE_STEP = 5;
 const FIELD_WIDTH = 110;
 const SHAPE_FIELD_WIDTH = 170;
 
@@ -41,6 +44,7 @@ export const RevealPage = () => {
     const [getJoinRadius, setJoinRadius] = createSignal(STARTING_JOIN_RADIUS);
     const [getLameExponent, setLameExponent] = createSignal(STARTING_LAME_EXPONENT);
     const [getSoftness, setSoftness] = createSignal(REVEAL_DEFAULTS.softness);
+    const [getStepSize, setStepSize] = createSignal(REVEAL_DEFAULTS.stepSize);
     const [getIsDisabled, setIsDisabled] = createSignal(false);
 
     const getIsCircle = createMemo(() => getShape() === CIRCLE);
@@ -57,6 +61,7 @@ export const RevealPage = () => {
         const commonProps = {
             radius: getRadius,
             softness: getSoftness,
+            stepSize: getStepSize,
             joinRadii: () => [getJoinRadius()],
             lameExponents: () => [getLameExponent()],
             isDisabled: getIsDisabled,
@@ -176,9 +181,29 @@ export const RevealPage = () => {
                 </PageProp>
 
                 <PageProp
+                    key={"stepSize"}
+                    label={"Step size (px)"}
+                    hint={
+                        "How far one press of an arrow key moves the window. Tab to a reveal and it opens at the center; the arrow keys move it from there."
+                    }
+                >
+                    <PageNumberField
+                        value={getStepSize}
+                        min={() => MIN_STEP_SIZE}
+                        max={() => MAX_STEP_SIZE}
+                        step={() => STEP_SIZE_STEP}
+                        width={() => FIELD_WIDTH}
+                        ariaLabel={"Step size in pixels"}
+                        onInput={setStepSize}
+                    />
+                </PageProp>
+
+                <PageProp
                     key={"isDisabled"}
                     label={"Disabled"}
-                    hint={"Stops the window following the pointer, leaving whatever is underneath covered."}
+                    hint={
+                        "Stops the window following the pointer or the keyboard, leaving whatever is underneath covered."
+                    }
                 >
                     <PageCheckField value={getIsDisabled} ariaLabel={"Disabled"} onChange={setIsDisabled} />
                 </PageProp>

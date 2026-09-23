@@ -27,6 +27,8 @@ import {
     PageSelectField,
 } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
+import { MorphExample } from "./Examples/Morph";
+import { TextWrapExample } from "./Examples/TextWrap";
 import type { ShapeExampleProps } from "./ShapePage.types";
 
 import * as styles from "./ShapePage.css";
@@ -90,7 +92,8 @@ const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
     },
 ];
 
-const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/ShapePage/Examples/Default.tsx";
+const EXAMPLES_ROOT = "/src/App/Pages/ShapePage/Examples";
+const DEFAULT_EXAMPLE_PATH = `${EXAMPLES_ROOT}/Default.tsx`;
 
 const StressTestWrapper = ({
     shouldClipChildren,
@@ -272,6 +275,22 @@ export const ShapePage = () => {
                 name: "Default",
                 component: () => <DefaultExampleWrapper {...commonProps} />,
                 path: DEFAULT_EXAMPLE_PATH,
+            },
+            {
+                key: "morph",
+                name: "Morph",
+                readout: () =>
+                    "one number from 0 to 1 is read inside computePoints and blends two outlines of eight points each, their corner radii and their exponents with them; under reduced motion the press jumps straight to the other shape",
+                component: () => <MorphExample {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/Morph.tsx`,
+            },
+            {
+                key: "textWrap",
+                name: "Text Wrap",
+                readout: () =>
+                    "the shape writes its outline as shape-outside, so floating it is all the page does for the text to follow the edge",
+                component: () => <TextWrapExample {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/TextWrap.tsx`,
             },
             {
                 key: "stressTest",

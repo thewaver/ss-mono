@@ -24,7 +24,7 @@ export const HeadlineExample = (props: Props) => {
                 <div class={styles.headline}>
                     <ScrambleText
                         text={HEADLINE}
-                        glyphs={props.glyphs}
+                        computeGlyphs={props.computeGlyphs}
                         settleDurationMs={props.settleDurationMs}
                         scrambleIntervalMs={props.scrambleIntervalMs}
                         computeCharacterWeights={props.computeCharacterWeights}

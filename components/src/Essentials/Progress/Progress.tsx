@@ -17,11 +17,14 @@ export const Progress = (props: ProgressProps) => {
 
     const getMax = createMemo(() => access(props.max) ?? PROGRESS_DEFAULTS.max);
 
+    const getRole = createMemo(() => access(props.role) ?? PROGRESS_DEFAULTS.role);
+
     const getState = createMemo((): ProgressState => {
         const min = getMin();
         const max = getMax();
         const span = max - min;
-        const value = access(props.value);
+        const given = access(props.value);
+        const value = given === undefined && getRole() === "meter" ? min : given;
 
         return {
             value,
@@ -47,7 +50,7 @@ export const Progress = (props: ProgressProps) => {
         <div
             id={access(props.id)}
             class={[styles.progressRoot, styles.progressSizingVariants[getSizing()]].join(" ")}
-            role="progressbar"
+            role={getRole()}
             aria-label={access(props.ariaLabel)}
             aria-labelledby={access(props.ariaLabelledBy)}
             aria-valuemin={getMin()}

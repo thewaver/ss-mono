@@ -41,3 +41,29 @@ export const panelBody = style({
     boxSizing: "border-box",
     lineHeight: 1.5,
 });
+
+export const stage = style({
+    display: "flex",
+    flexDirection: "column",
+    gap: themeVars.spacing.full,
+});
+
+export const followStage = style({
+    position: "relative",
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: themeVars.spacing.double,
+    padding: themeVars.spacing.double,
+});
+
+export const followSlot = style({
+    display: "flex",
+});
+
+export const followBox = style({
+    position: "absolute",
+    pointerEvents: "none",
+    transitionProperty: "left, top, width, height",
+});

@@ -28,3 +28,7 @@ export const PageSatelliteBadge = (props: ParentProps<PageSatelliteBadgeProps>) 
         </div>
     );
 };
+
+export const PageSatellitePill = (props: ParentProps) => {
+    return <div class={styles.satellitePill}>{props.children}</div>;
+};

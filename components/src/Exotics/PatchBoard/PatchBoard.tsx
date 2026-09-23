@@ -1,11 +1,12 @@
 import { Index, createEffect, createMemo, createSignal, createUniqueId, onCleanup, onMount } from "solid-js";
 
-import type { Point2d } from "@thewaver/ss-utils";
+import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
 import type { CarrierZone, Carry, CarryMode, CarryNudge, CarryPlace } from "../../Abstracts/Carrier/Carrier.types";
 import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
 import { LiveAnnouncerUtils } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer.utils";
-import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
+import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
+import { PlacementUtils } from "../../Abstracts/Placement/Placement.utils";
 import { LabelUtils } from "../../Essentials/Input/Label/Label.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../Utils/propUtils";
@@ -27,6 +28,7 @@ import * as styles from "./PatchBoard.css";
 const COARSE_STEP_FACTOR = 4;
 const NOTHING = 0;
 const SINGLE = 1;
+const FULL_WIDTH = 1;
 
 const NUDGE_KEYS: Record<string, CarryNudge | undefined> = {
     ArrowRight: { x: 1 },
@@ -48,8 +50,8 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     const linksSignal = accessSignal(() => props.linksSignal);
 
     const boardId = createUniqueId();
-
-    const viewportContext = useViewportContext();
+    const nodeHintId = createUniqueId();
+    const socketHintId = createUniqueId();
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getFocusedStop, setFocusedStop] = createSignal<string>();
@@ -65,7 +67,9 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
     const getLinks = createMemo(() => linksSignal[0]());
 
-    const getSize = createMemo(() => access(props.size));
+    const getHeightRatio = createMemo(() => access(props.heightRatio));
+
+    const getBounds = createMemo((): Size2d => ({ width: FULL_WIDTH, height: getHeightRatio() }));
 
     const getGroupId = createMemo(() => access(props.groupId));
 
@@ -95,13 +99,17 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         const node = findNode(end.nodeKey);
         const socket = node?.sockets.find((entry) => entry.id === end.socketId);
 
-        return `${node ? getNodeLabel(node) : end.nodeKey} ${socket?.label ?? end.socketId}`;
+        return access(props.announcements).computeEndLabel(
+            node ? getNodeLabel(node) : end.nodeKey,
+            socket?.label ?? end.socketId,
+        );
     };
 
+    const getPlacedSocket = (end: PatchBoardEnd) => getPlacedSocketByEndKey().get(PatchBoardUtils.getEndKey(end));
+
     const getIsEndAllowed = (fromEnd: PatchBoardEnd, toEnd: PatchBoardEnd) => {
-        const placed = getPlacedSockets();
-        const from = PatchBoardUtils.findSocket(placed, fromEnd);
-        const to = PatchBoardUtils.findSocket(placed, toEnd);
+        const from = getPlacedSocket(fromEnd);
+        const to = getPlacedSocket(toEnd);
 
         if (!from || !to) return false;
         if (getIsLocked()) return false;
@@ -118,9 +126,37 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         if (!root) return undefined;
 
         const rect = root.getBoundingClientRect();
-        const scale = viewportContext.getScale();
 
-        return { x: (point.x - rect.left) / scale, y: (point.y - rect.top) / scale };
+        if (rect.width <= NOTHING) return undefined;
+
+        return { x: (point.x - rect.left) / rect.width, y: (point.y - rect.top) / rect.width };
+    };
+
+    const getSnappedSpot = (spot: Point2d) => props.computeSnapSpot?.(spot) ?? spot;
+
+    const getNudgedSpot = (spot: Point2d, nudge: CarryNudge, size: Size2d) => {
+        const step = getStepSize();
+        const x = nudge.x ?? NOTHING;
+        const y = nudge.y ?? NOTHING;
+        const bounds = getBounds();
+        const computeSnapSpot = props.computeSnapSpot;
+
+        if (!computeSnapSpot) {
+            return PatchBoardUtils.getClampedSpot({ x: spot.x + x * step, y: spot.y + y * step }, size, bounds);
+        }
+
+        const stride = { x: Math.sign(x) * step, y: Math.sign(y) * step };
+        const reach = Math.max(bounds.width, bounds.height);
+
+        let next = spot;
+
+        for (let count = Math.max(Math.abs(x), Math.abs(y)); count > NOTHING; count--) {
+            const snapped = PatchBoardUtils.getNextSnappedSpot(next, stride, reach, computeSnapSpot) ?? next;
+
+            next = PatchBoardUtils.getClampedSpot(snapped, size, bounds);
+        }
+
+        return next;
     };
 
     const zone: CarrierZone = {
@@ -128,14 +164,14 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         getLabel: () => access(props.ariaLabel),
         getRootRef,
         getIsDisabled,
-        getRestingKeyHint: () => "Press Enter to pick a cable up from this socket.",
         getKeyHint: () => {
             const carry = CarrierUtils.getCarry();
 
             return carry && asCarry(carry).kind === "plug"
-                ? "Arrow keys choose a socket, Enter connects, Escape cancels."
-                : "Arrow keys move it, Enter drops, Escape cancels.";
+                ? access(props.announcements).plugKeyHint
+                : access(props.announcements).nodeKeyHint;
         },
+        getAnnouncements: () => access(props.announcements),
         computeCanAccept: (carry) => {
             if (getIsDisabled()) return false;
 
@@ -143,7 +179,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
             if (value.kind === "node") return true;
 
-            return !getIsLocked() && PatchBoardUtils.findSocket(getPlacedSockets(), value.from) !== undefined;
+            return !getIsLocked() && getPlacedSocket(value.from) !== undefined;
         },
         computePlaceAtPoint: (point, carry) => {
             const board = getBoardPoint(point);
@@ -156,9 +192,9 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                 return {
                     kind: "spot",
                     ...PatchBoardUtils.getClampedSpot(
-                        { x: board.x - grabOffset.x, y: board.y - grabOffset.y },
+                        getSnappedSpot({ x: board.x - grabOffset.x, y: board.y - grabOffset.y }),
                         value.node.size,
-                        getSize(),
+                        getBounds(),
                     ),
                 };
             }
@@ -174,19 +210,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
             if (value.kind === "node") {
                 if (current.kind !== "spot") return undefined;
 
-                const step = getStepSize();
-
-                return {
-                    kind: "spot",
-                    ...PatchBoardUtils.getClampedSpot(
-                        {
-                            x: current.x + (nudge.x ?? NOTHING) * step,
-                            y: current.y + (nudge.y ?? NOTHING) * step,
-                        },
-                        value.node.size,
-                        getSize(),
-                    ),
-                };
+                return { kind: "spot", ...getNudgedSpot(current, nudge, value.node.size) };
             }
 
             const step = (nudge.x ?? NOTHING) + (nudge.y ?? NOTHING);
@@ -228,21 +252,22 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         computePlaceLabel: (place, carry) => {
             const current = asPlace(place);
             const value = asCarry(carry);
+            const announcements = access(props.announcements);
 
             if (value.kind === "node") {
                 return current.kind === "spot"
-                    ? PatchBoardUtils.getRegionLabel(current, value.node.size, getSize())
-                    : "off the board";
+                    ? announcements.computeRegionLabel(PatchBoardUtils.getRegion(current, value.node.size, getBounds()))
+                    : announcements.offBoardPlaceLabel;
             }
 
-            if (current.kind !== "socket") return "no socket";
+            if (current.kind !== "socket") return announcements.noSocketPlaceLabel;
 
             const isRefused =
                 getCarry() !== undefined &&
                 !PatchBoardUtils.getIsSameEnd(value.from, current) &&
                 !getIsEndAllowed(value.from, current);
 
-            return `${getEndLabel(current)}${isRefused ? ", cannot connect" : ""}`;
+            return announcements.computeSocketPlaceLabel(getEndLabel(current), isRefused);
         },
         takeAt: (_unusedPlace, carry) => {
             const value = asCarry(carry);
@@ -294,9 +319,8 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
             if (current.kind !== "socket") return;
 
-            const placed = getPlacedSockets();
-            const from = PatchBoardUtils.findSocket(placed, value.from);
-            const to = PatchBoardUtils.findSocket(placed, current);
+            const from = getPlacedSocket(value.from);
+            const to = getPlacedSocket(current);
             const link = from && to && PatchBoardUtils.getLink(from, to);
 
             if (!link) return;
@@ -471,7 +495,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
             {
                 groupId: getGroupId(),
                 key: PatchBoardUtils.getEndKey(socket.end),
-                label: `cable from ${getEndLabel(socket.end)}`,
+                label: access(props.announcements).computeCableLabel(getEndLabel(socket.end)),
                 value: { kind: "plug", from: socket.end } satisfies PatchBoardCarry<T>,
             },
             mode,
@@ -491,9 +515,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
         cut.forEach((link) => props.onUnlink?.(link));
 
-        LiveAnnouncerUtils.announce(
-            `${cut.length > SINGLE ? `${cut.length} cables` : "Cable"} unplugged from ${getEndLabel(end)}.`,
-        );
+        LiveAnnouncerUtils.announce(access(props.announcements).computeUnplugged(getEndLabel(end), cut.length));
 
         return true;
     };
@@ -597,7 +619,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
             return;
         }
 
-        if (e.key === "Enter" || e.key === " ") {
+        if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();
 
             if (isCarrying) {
@@ -721,6 +743,18 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
     });
 
     createEffect(() => {
+        const place = getAimedPlace();
+
+        if (!place || place.kind === "free" || CarrierUtils.getCarryMode() !== "key") return;
+
+        const stopKey = place.kind === "spot" ? getCarriedNodeKey() : PatchBoardUtils.getEndKey(place);
+
+        if (stopKey === undefined) return;
+
+        stopRefs.get(stopKey)?.scrollIntoView({ block: "nearest", inline: "nearest" });
+    });
+
+    createEffect(() => {
         if (!getIsDisabled() || !getCarry()) return;
 
         CarrierUtils.end("cancel");
@@ -735,17 +769,23 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
             id={boardId}
             ref={setRootRef}
             class={styles.patchBoardRoot}
-            style={{ width: `${getSize().width}px`, height: `${getSize().height}px` }}
             role="group"
             aria-label={getAriaLabel()}
             aria-disabled={getIsDisabled() || undefined}
             onClick={handleRootClick}
         >
-            <svg
-                class={styles.patchBoardCables}
-                viewBox={`0 0 ${getSize().width} ${getSize().height}`}
+            <div
+                class={styles.patchBoardSpacer}
+                style={{ height: PlacementUtils.toContainerWidth(getHeightRatio()) }}
                 aria-hidden="true"
-            >
+            />
+            <div id={nodeHintId} class={styles.patchBoardHint}>
+                {access(props.announcements).nodeRestingKeyHint}
+            </div>
+            <div id={socketHintId} class={styles.patchBoardHint}>
+                {access(props.announcements).socketRestingKeyHint}
+            </div>
+            <svg class={styles.patchBoardCables} viewBox={`0 0 ${FULL_WIDTH} ${getHeightRatio()}`} aria-hidden="true">
                 <Index each={getCableDefs()}>{(getDefs) => <>{props.renderCable(getDefs)}</>}</Index>
             </svg>
 
@@ -760,10 +800,10 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                             class={styles.patchBoardSlot}
                             role="group"
                             style={{
-                                left: `${getPlacement()?.spot.x ?? getNode().spot.x}px`,
-                                top: `${getPlacement()?.spot.y ?? getNode().spot.y}px`,
-                                width: `${getNode().size.width}px`,
-                                height: `${getNode().size.height}px`,
+                                left: PlacementUtils.toContainerWidth(getPlacement()?.spot.x ?? getNode().spot.x),
+                                top: PlacementUtils.toContainerWidth(getPlacement()?.spot.y ?? getNode().spot.y),
+                                width: PlacementUtils.toContainerWidth(getNode().size.width),
+                                height: PlacementUtils.toContainerWidth(getNode().size.height),
                             }}
                         >
                             <div class={styles.patchBoardNodeHolder}>
@@ -783,6 +823,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                             role="button"
                                             aria-label={getNodeLabel(getNode())}
                                             aria-disabled={(getNode().isDisabled ?? false) || undefined}
+                                            aria-describedby={nodeHintId}
                                             onPointerDown={(e) => handleNodePointerDown(getNode(), e)}
                                             onClick={(e) => handleNodeClick(getNode(), e)}
                                             onKeyDown={(e) => handleStopKeyDown(getKey(), getNode(), undefined, e)}
@@ -804,6 +845,11 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                     const getStopKey = createMemo(() => PatchBoardUtils.getEndKey(getEnd()));
 
                                     const getPlaced = createMemo(() => getPlacedSocketByEndKey().get(getStopKey()));
+
+                                    const getOffset = createMemo(() => ({
+                                        x: (getPlaced()?.point.x ?? NOTHING) - (getPlacement()?.spot.x ?? NOTHING),
+                                        y: (getPlaced()?.point.y ?? NOTHING) - (getPlacement()?.spot.y ?? NOTHING),
+                                    }));
 
                                     const getIsTaken = createMemo(
                                         () => PatchBoardUtils.getLinksAt(getLinks(), getEnd()).length > NOTHING,
@@ -833,10 +879,10 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                         <div
                                             class={styles.patchBoardSocketHolder}
                                             style={{
-                                                left: `${(getPlaced()?.point.x ?? NOTHING) - (getPlacement()?.spot.x ?? NOTHING)}px`,
-                                                top: `${(getPlaced()?.point.y ?? NOTHING) - (getPlacement()?.spot.y ?? NOTHING)}px`,
-                                                width: `${getSocketSize()}px`,
-                                                height: `${getSocketSize()}px`,
+                                                left: PlacementUtils.toContainerWidth(getOffset().x),
+                                                top: PlacementUtils.toContainerWidth(getOffset().y),
+                                                width: PlacementUtils.toContainerWidth(getSocketSize()),
+                                                height: PlacementUtils.toContainerWidth(getSocketSize()),
                                             }}
                                         >
                                             <InteractionWrapper
@@ -863,10 +909,15 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                                                         }}
                                                         class={styles.patchBoardSocket}
                                                         role="button"
-                                                        aria-label={`${getEndLabel(getEnd())}, ${getSocket().kind === "in" ? "input" : "output"}${getIsTaken() ? ", connected" : ""}`}
+                                                        aria-label={access(props.announcements).computeSocketLabel(
+                                                            getEndLabel(getEnd()),
+                                                            getSocket().kind,
+                                                            getIsTaken(),
+                                                        )}
                                                         aria-disabled={
                                                             getPlaced()?.isDisabled || getIsLocked() || undefined
                                                         }
+                                                        aria-describedby={socketHintId}
                                                         onPointerDown={(e) => handleSocketPointerDown(getPlaced(), e)}
                                                         onClick={(e) => handleSocketClick(getPlaced(), e)}
                                                         onKeyDown={(e) =>

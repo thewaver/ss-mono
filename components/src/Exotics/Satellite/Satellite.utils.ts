@@ -1,54 +1,54 @@
 import type { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
-import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
 import { AnchorUtils } from "../../Abstracts/Anchor/Anchor.utils";
-import type { SatelliteLayout } from "./Satellite.types";
+import type { SatelliteLayout, SatelliteLayoutEntry } from "./Satellite.types";
 
 /**
- * Reserves room in the layout for something hanging off the corner of an element.
+ * Reserves room in the layout for things hanging off the edges of an element.
  *
  * A badge or a status dot placed over an element's corner sticks out of it, and would be clipped or
  * overlap its neighbors. So instead of positioning it absolutely and hoping, the wrapper is padded
- * by however much the badge overhangs, and the whole assembly takes up the room it really needs.
+ * by however much the satellites overhang, and the whole assembly takes up the room it really needs.
  */
 export namespace SatelliteUtils {
     /**
-     * Works out the padding and offset for a satellite in a given corner.
+     * Works out the one padding and the per-satellite offsets for any number of satellites.
      *
-     * The badge's position is worked out first, as if it were being anchored freely; whatever that puts
-     * outside the subject becomes padding on that side, and the badge is then shifted back inside the
-     * padded box. So a badge fully inside its corner needs no padding, and one hanging half out needs
-     * half its size.
+     * Each satellite's position is worked out first, as if it were being anchored freely to the subject;
+     * whatever that puts outside the subject becomes padding on that side, and each side takes the
+     * furthest overhang any satellite has there. Every satellite is then shifted by the same padding, so
+     * they all land in one padded box. A satellite fully inside the subject needs no padding, one hanging
+     * half out needs half its size, and two on the same side need only the larger of the two.
      *
-     * @param subjectSize The element the satellite hangs off.
-     * @param satelliteSize The satellite's own size.
-     * @param placement Which corner, and whether the satellite sits inside or outside the edges.
-     * @param offset A nudge from that corner.
-     * @returns The `padding` for the wrapper and the `satelliteOffset` for the satellite inside it.
+     * @param subjectSize The element the satellites hang off.
+     * @param entries Each satellite's own size, placement and nudge, in the order the offsets should come back.
+     * @returns The `padding` for the wrapper, and one offset per entry inside the padded box. No entries
+     * gives no padding and no offsets.
      */
-    export const computeLayout = (
-        subjectSize: Size2d,
-        satelliteSize: Size2d,
-        placement: AnchorPlacement,
-        offset: Point2d,
-    ): SatelliteLayout => {
+    export const computeLayout = (subjectSize: Size2d, entries: SatelliteLayoutEntry[]): SatelliteLayout => {
         const subjectRect: Rect = { x: 0, y: 0, width: subjectSize.width, height: subjectSize.height };
-        const shift: Point2d = {
-            x: AnchorUtils.getHPlacementShift(placement.x, subjectRect, satelliteSize) + offset.x,
-            y: AnchorUtils.getVPlacementShift(placement.y, subjectRect, satelliteSize) + offset.y,
-        };
+        const shifts: Point2d[] = entries.map((entry) => ({
+            x: AnchorUtils.getHPlacementShift(entry.placement.x, subjectRect, entry.size) + entry.offset.x,
+            y: AnchorUtils.getVPlacementShift(entry.placement.y, subjectRect, entry.size) + entry.offset.y,
+        }));
+
+        const paddingLeft = Math.max(0, ...shifts.map((shift) => -shift.x));
+        const paddingTop = Math.max(0, ...shifts.map((shift) => -shift.y));
 
         return {
             padding: {
-                paddingLeft: Math.max(0, -shift.x),
-                paddingTop: Math.max(0, -shift.y),
-                paddingRight: Math.max(0, shift.x + satelliteSize.width - subjectSize.width),
-                paddingBottom: Math.max(0, shift.y + satelliteSize.height - subjectSize.height),
+                paddingLeft,
+                paddingTop,
+                paddingRight: Math.max(
+                    0,
+                    ...shifts.map((shift, index) => shift.x + entries[index].size.width - subjectSize.width),
+                ),
+                paddingBottom: Math.max(
+                    0,
+                    ...shifts.map((shift, index) => shift.y + entries[index].size.height - subjectSize.height),
+                ),
             },
-            satelliteOffset: {
-                x: Math.max(0, shift.x),
-                y: Math.max(0, shift.y),
-            },
+            satelliteOffsets: shifts.map((shift) => ({ x: shift.x + paddingLeft, y: shift.y + paddingTop })),
         };
     };
 }

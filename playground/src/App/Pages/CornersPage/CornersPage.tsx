@@ -10,6 +10,8 @@ import { PageCheckField, PageColorField, PageNumberField } from "../../StyledCom
 import type { CornersExampleProps } from "./CornersPage.types";
 import { ControlExample } from "./Examples/Control";
 import { DefaultExample } from "./Examples/Default";
+import { DrawOnExample } from "./Examples/DrawOn";
+import { FocusFollowExample } from "./Examples/FocusFollow";
 import { OverlayExample } from "./Examples/Overlay";
 
 const EXAMPLES_ROOT = "/src/App/Pages/CornersPage/Examples";
@@ -84,6 +86,22 @@ export const CornersPage = () => {
                 component: () => <OverlayExample {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Overlay.tsx`,
             },
+            {
+                key: "focusFollow",
+                name: "Following focus and hover",
+                readout: () =>
+                    "one set of marks glides to whichever control is hovered or reached by the keyboard, around the control's own focus ring rather than instead of it — and jumps rather than glides under reduced motion",
+                component: () => <FocusFollowExample {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/FocusFollow.tsx`,
+            },
+            {
+                key: "drawOn",
+                name: "Drawn on",
+                readout: () =>
+                    "the arm length grows from nothing as the marks appear, so they draw out of each corner — at full length at once under reduced motion",
+                component: () => <DrawOnExample {...commonProps} />,
+                path: `${EXAMPLES_ROOT}/DrawOn.tsx`,
+            },
         ];
     });
 
@@ -145,7 +163,9 @@ export const CornersPage = () => {
                 <PageProp
                     key={"transitionDurationMs"}
                     label={"Fade (ms)"}
-                    hint={"How long a corner takes to fade in or out when it is turned on or off."}
+                    hint={
+                        "How long the corners take to follow a change of color, which is how the set as a whole fades. The following and drawn-on examples also glide and grow over this time."
+                    }
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}

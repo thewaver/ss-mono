@@ -3,6 +3,7 @@ import type { Accessor, Signal } from "solid-js";
 import { Sortable } from "@thewaver/ss-components";
 import type { InteractionFlags, SortableGridItem, SortableItem, SortableItemFlags } from "@thewaver/ss-components";
 
+import { SORTABLE_ANNOUNCEMENTS } from "../../../PageComponents/Announcements/Announcements.const";
 import {
     PageSortableItemContent,
     PageSortableMarker,
@@ -37,6 +38,7 @@ export const LootExample = (props: Props) => (
                 <Sortable
                     groupId={props.groupId}
                     ariaLabel={"Ground"}
+                    announcements={SORTABLE_ANNOUNCEMENTS}
                     gap={GRID_GAP}
                     minHeight={72}
                     itemsSignal={props.lootSignal}
@@ -44,7 +46,7 @@ export const LootExample = (props: Props) => (
                     computeItemLabel={computeGearLabel}
                     renderItem={renderLoot}
                     renderCarried={(getItem) => renderLoot(getItem, () => RESTING_FLAGS)}
-                    renderMarker={(getDir) => <PageSortableMarker dir={getDir} />}
+                    renderMarker={(getOrientation) => <PageSortableMarker orientation={getOrientation} />}
                     renderDecoration={(getFlags) => <PageSortableSurface flags={getFlags} emptyText={"Nothing left"} />}
                 />
             </div>

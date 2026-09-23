@@ -1,6 +1,6 @@
 import type { JSX } from "solid-js";
 
-import type { TimeValue, TimeValueMeridiem } from "@thewaver/ss-utils";
+import type { TimeValue, TimeValueMeridiem, TimeValueUnit } from "@thewaver/ss-utils";
 
 import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { TextFieldFlags, TextFieldProps } from "../../../Primitives/TextField/TextField.types";
@@ -21,6 +21,7 @@ export type TimeInputProps = Omit<
     | "computeMaskedText"
     | "placeholderHint"
     | "isSpinButton"
+    | "computeSpinValue"
     | "isAutoSizing"
     | "minRows"
     | "maxRows"
@@ -34,13 +35,18 @@ export type TimeInputProps = Omit<
 > &
     AccessorProps<{
         /** The earliest time that can be entered. */
-        minTime?: TimeValue;
+        minValue?: TimeValue;
         /** The latest time that can be entered. */
-        maxTime?: TimeValue;
+        maxValue?: TimeValue;
         /** Whether seconds are part of the value as well as hours and minutes. */
         hasSeconds?: boolean;
         /** Whether times are written as twelve hours with a morning and afternoon marker, or as twenty-four. */
         isTwelveHour?: boolean;
+        /**
+         * The letters that stand for each part of the time in the format hint handed to `renderPlaceholder`. The
+         * field joins them with a colon, and leaves out seconds when the time has none.
+         */
+        segmentHints: Record<TimeValueUnit, string>;
         /** The time. It is the only thing that changes it. */
         valueSignal: SignalSource<TimeValue | undefined>;
         /** Draws whatever sits after the field's text, inside the field. */

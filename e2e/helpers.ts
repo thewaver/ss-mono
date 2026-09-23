@@ -58,6 +58,19 @@ export const inlineStyle = (locator: Locator, property: string) =>
 export const computedStyle = (locator: Locator, property: string) =>
     locator.evaluate((element, name) => getComputedStyle(element).getPropertyValue(name), property);
 
+/**
+ * How far an element is turned, in degrees, whichever way the turn was written: the `rotate` property, a
+ * `rotate(…)` inside `transform`, or both added together. A spec asks whether something is turned, and where
+ * the stylesheet happens to write the angle is not part of that question.
+ */
+export const turnDegrees = (locator: Locator) =>
+    locator.evaluate((element) => {
+        const own = /(-?[\d.]+)deg/.exec(getComputedStyle(element).rotate)?.[1];
+        const inTransform = /rotate\((-?[\d.]+)deg\)/.exec((element as HTMLElement).style.transform)?.[1];
+
+        return Number(own ?? 0) + Number(inTransform ?? 0);
+    });
+
 export const selectionRange = (locator: Locator) =>
     locator.evaluate((element) => ({
         start: (element as HTMLInputElement).selectionStart,

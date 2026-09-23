@@ -2,6 +2,10 @@ import { Paginator, PlacementLayoutUtils } from "@thewaver/ss-components";
 import type { BandDefs, PaginatorStep } from "@thewaver/ss-components";
 
 import {
+    computePaginatorPageLabel,
+    computePaginatorStepLabel,
+} from "../../../PageComponents/Announcements/Announcements.const";
+import {
     PagePaginatorDemo,
     PagePaginatorDialGap,
     PagePaginatorDialPage,
@@ -31,6 +35,8 @@ export const DialExample = (props: Props) => {
                     boundaryCount={props.boundaryCount}
                     isDisabled={props.isDisabled}
                     ariaLabel={"Results round a dial"}
+                    computePageLabel={computePaginatorPageLabel}
+                    computeStepLabel={computePaginatorStepLabel}
                     steps={() => DIAL_STEPS}
                     computeLayout={DIAL_LAYOUT}
                     onPageChange={props.onPageChange}

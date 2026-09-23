@@ -1,6 +1,12 @@
 import { RotationUtils } from "@thewaver/ss-utils";
 
-import type { OdometerDirection, OdometerSlot } from "./Odometer.types";
+import type {
+    OdometerDirection,
+    OdometerShownSlot,
+    OdometerSlot,
+    OdometerSlotFlags,
+    OdometerSlotPhase,
+} from "./Odometer.types";
 
 /** Digits on a wheel. */
 const DIGIT_COUNT = 10;
@@ -10,6 +16,10 @@ const NOTHING = 0;
 const SINGLE = 1;
 /** Marks a slot that is not a digit, and seeds the digit count so the first digit is numbered zero. */
 const NO_DIGIT = -1;
+/** One whole turn of a wheel, in degrees. */
+const FULL_TURN_DEG = 360;
+/** No angle at all, for a wheel that makes no extra turns. */
+const NO_ANGLE = 0;
 
 /** The digits in the order they appear around a wheel. */
 const DIGIT_FACES = Array.from({ length: DIGIT_COUNT }, (_unused, index) => String(index));
@@ -134,4 +144,94 @@ export namespace OdometerUtils {
 
             return behind.length * delayMs;
         });
+
+    /**
+     * How far a reel's extra whole turns carry a wheel, in degrees.
+     *
+     * The turns go the way the whole display is going, so a reel spinning up lands on its digit still moving
+     * forward rather than doubling back. Added on top of {@link computeAngleDelta}, which is what gets the
+     * wheel to its digit.
+     *
+     * @param extraTurns How many whole turns to add.
+     * @param direction Which way the display is turning.
+     * @returns The extra angle, negative going up as the step angles are, and nothing when nothing changed.
+     */
+    export const computeReelAngle = (extraTurns: number, direction: OdometerDirection) => {
+        if (direction === "same") return NO_ANGLE;
+
+        return (direction === "up" ? -extraTurns : extraTurns) * FULL_TURN_DEG;
+    };
+
+    /**
+     * Which slots are on show once a list of slots has changed, and whether each is arriving or leaving.
+     *
+     * Slots are matched by position, as the component keys them. A position the new list has and the old one
+     * did not is entering; a position the old list had and the new one has lost stays in the list as leaving,
+     * holding what it last showed, so it can shrink away before it goes. A leaving slot that the new list
+     * fills again is entering once more, which is what lets a shrink turn round halfway. With `isInstant` set
+     * nothing enters or leaves: the list is simply the new one, every slot shown.
+     *
+     * @param shown The slots on show now.
+     * @param next The slots the text now asks for.
+     * @param isInstant Whether width changes happen at once, for a visitor who has asked for less motion.
+     * @returns The slots to show, as long as the longer of the two lists unless `isInstant`.
+     */
+    export const computeShownSlots = <S>(
+        shown: OdometerShownSlot<S>[],
+        next: S[],
+        isInstant: boolean,
+    ): OdometerShownSlot<S>[] => {
+        const kept = next.map((slot, index): OdometerShownSlot<S> => {
+            const previous = shown[index];
+
+            if (isInstant) return { slot, phase: "shown" };
+
+            if (previous === undefined || previous.phase === "leaving") return { slot, phase: "entering" };
+
+            return { slot, phase: previous.phase };
+        });
+
+        if (isInstant) return kept;
+
+        const leaving = shown
+            .slice(next.length)
+            .map((entry): OdometerShownSlot<S> => ({ slot: entry.slot, phase: "leaving" }));
+
+        return [...kept, ...leaving];
+    };
+
+    /**
+     * Marks an entering slot as fully shown, once it has grown to its width.
+     *
+     * @param shown The slots on show.
+     * @param index The slot that has finished growing.
+     * @returns The same list with that slot shown, or the list untouched when the slot is no longer entering.
+     */
+    export const settleShownSlot = <S>(shown: OdometerShownSlot<S>[], index: number) =>
+        shown[index]?.phase === "entering"
+            ? shown.map((entry, position) => (position === index ? { ...entry, phase: "shown" as const } : entry))
+            : shown;
+
+    /**
+     * Removes a leaving slot, once it has shrunk to nothing.
+     *
+     * Leaving slots are always the tail of the list, and the ones after this slot started leaving no later than
+     * it did, so they go with it.
+     *
+     * @param shown The slots on show.
+     * @param index The slot that has finished shrinking.
+     * @returns The list cut short at that slot, or the list untouched when the slot is no longer leaving.
+     */
+    export const dropShownSlot = <S>(shown: OdometerShownSlot<S>[], index: number) =>
+        shown[index]?.phase === "leaving" ? shown.slice(NOTHING, index) : shown;
+
+    /**
+     * What a slot's painter is told about its phase.
+     *
+     * @param phase Whether the slot is entering, shown or leaving.
+     */
+    export const getSlotFlags = (phase: OdometerSlotPhase): OdometerSlotFlags => ({
+        isEntering: phase === "entering",
+        isLeaving: phase === "leaving",
+    });
 }

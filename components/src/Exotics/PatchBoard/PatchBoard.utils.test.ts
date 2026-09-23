@@ -196,17 +196,100 @@ describe("getSteppedSocket", () => {
     });
 });
 
-describe("getRegionLabel", () => {
+describe("getRegion", () => {
     const BOUNDS = { width: 300, height: 300 };
     const SIZE = { width: 20, height: 20 };
 
     it("names the third of the board the node's middle sits in", () => {
-        expect(PatchBoardUtils.getRegionLabel({ x: 0, y: 0 }, SIZE, BOUNDS)).toBe("top left");
-        expect(PatchBoardUtils.getRegionLabel({ x: 140, y: 140 }, SIZE, BOUNDS)).toBe("middle center");
-        expect(PatchBoardUtils.getRegionLabel({ x: 280, y: 280 }, SIZE, BOUNDS)).toBe("bottom right");
+        expect(PatchBoardUtils.getRegion({ x: 0, y: 0 }, SIZE, BOUNDS)).toEqual({
+            vertical: "top",
+            horizontal: "left",
+        });
+        expect(PatchBoardUtils.getRegion({ x: 140, y: 140 }, SIZE, BOUNDS)).toEqual({
+            vertical: "middle",
+            horizontal: "center",
+        });
+        expect(PatchBoardUtils.getRegion({ x: 280, y: 280 }, SIZE, BOUNDS)).toEqual({
+            vertical: "bottom",
+            horizontal: "right",
+        });
     });
 
     it("stays inside the vocabulary when a node hangs off the edge", () => {
-        expect(PatchBoardUtils.getRegionLabel({ x: -100, y: 400 }, SIZE, BOUNDS)).toBe("bottom left");
+        expect(PatchBoardUtils.getRegion({ x: -100, y: 400 }, SIZE, BOUNDS)).toEqual({
+            vertical: "bottom",
+            horizontal: "left",
+        });
+    });
+});
+
+describe("getRegion on a board measured in fractions of its width", () => {
+    it("reads the height against the board's own height ratio rather than against one whole width", () => {
+        const board = { width: 1, height: 0.5 };
+        const region = PatchBoardUtils.getRegion({ x: 0.45, y: 0.4 }, { width: 0.1, height: 0.05 }, board);
+
+        expect(region).toEqual({ vertical: "bottom", horizontal: "center" });
+    });
+});
+
+describe("getNextSnappedSpot", () => {
+    const CELL = 0.125;
+    const toGrid = (spot: { x: number; y: number }) => ({
+        x: Math.round(spot.x / CELL) * CELL,
+        y: Math.round(spot.y / CELL) * CELL,
+    });
+
+    it("goes to the next grid point along, however many small strides that takes", () => {
+        expect(PatchBoardUtils.getNextSnappedSpot({ x: 0.25, y: 0.125 }, { x: 0.02, y: 0 }, 1, toGrid)).toEqual({
+            x: 0.375,
+            y: 0.125,
+        });
+    });
+
+    it("goes the other way for a stride pointing back", () => {
+        expect(PatchBoardUtils.getNextSnappedSpot({ x: 0.25, y: 0.125 }, { x: 0, y: -0.02 }, 1, toGrid)).toEqual({
+            x: 0.25,
+            y: 0,
+        });
+    });
+
+    it("moves forward from a spot between grid points, never back to the point behind it", () => {
+        const next = PatchBoardUtils.getNextSnappedSpot({ x: 0.3, y: 0 }, { x: 0.02, y: 0 }, 1, toGrid);
+
+        expect(next?.x).toBe(0.375);
+    });
+
+    it("answers with nothing when the stride is zero or no grid point is within reach", () => {
+        expect(PatchBoardUtils.getNextSnappedSpot({ x: 0, y: 0 }, { x: 0, y: 0 }, 1, toGrid)).toBeUndefined();
+        expect(PatchBoardUtils.getNextSnappedSpot({ x: 0, y: 0 }, { x: 0.02, y: 0 }, 0.04, toGrid)).toBeUndefined();
+    });
+});
+
+describe("getClosesLoop", () => {
+    const link = (from: string, to: string): PatchBoardLink => ({
+        from: { nodeKey: from, socketId: "out" },
+        to: { nodeKey: to, socketId: "in" },
+    });
+
+    const CHAIN = [link("input", "filter"), link("filter", "delay"), link("delay", "reverb")];
+
+    it("refuses a link from the end of a chain back to a node earlier in it", () => {
+        expect(PatchBoardUtils.getClosesLoop(CHAIN, link("reverb", "filter"))).toBe(true);
+    });
+
+    it("allows a link that only runs further down the chain, even one skipping a node", () => {
+        expect(PatchBoardUtils.getClosesLoop(CHAIN, link("filter", "reverb"))).toBe(false);
+        expect(PatchBoardUtils.getClosesLoop(CHAIN, link("reverb", "output"))).toBe(false);
+    });
+
+    it("counts a node wired to itself as a loop", () => {
+        expect(PatchBoardUtils.getClosesLoop([], link("delay", "delay"))).toBe(true);
+    });
+
+    it("finds a loop through a branch, and stops on a loop already on the board", () => {
+        const branched = [...CHAIN, link("filter", "chorus"), link("chorus", "chorus"), link("chorus", "mix")];
+
+        expect(PatchBoardUtils.getClosesLoop(branched, link("mix", "input"))).toBe(true);
+        expect(PatchBoardUtils.getClosesLoop(branched, link("mix", "output"))).toBe(false);
     });
 });

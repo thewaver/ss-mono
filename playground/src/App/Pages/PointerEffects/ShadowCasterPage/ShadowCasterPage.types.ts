@@ -1,6 +1,7 @@
 export type ShadowCasterExampleProps = {
     isDisabled: () => boolean;
     activeRangePx: () => number;
+    smoothingMs: () => number;
     lightRangePx: () => number;
     maxThrowPx: () => number;
     minBlurPx: () => number;

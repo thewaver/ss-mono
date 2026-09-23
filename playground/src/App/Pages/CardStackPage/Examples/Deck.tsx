@@ -23,6 +23,7 @@ const BOX_HEIGHT = 240;
 
 const MAX_TILT_DEGREES = 20;
 const SHOWN = 1;
+const FIRST_INDEX = 0;
 const GONE = 0;
 
 type Props = CardStackDeckExampleProps;
@@ -48,7 +49,10 @@ export const DeckExample = (props: Props) => {
                             class={styles.deckCard}
                             style={{
                                 "transform": `rotate(${getState().travel.x * MAX_TILT_DEGREES}deg)`,
-                                "opacity": getState().leavingTo === undefined ? SHOWN : GONE,
+                                "opacity":
+                                    getState().leavingTo === undefined && getState().returningFrom === undefined
+                                        ? SHOWN
+                                        : GONE,
                                 "transition-duration": `${props.transitionDurationMs()}ms`,
                             }}
                         >
@@ -77,6 +81,18 @@ export const DeckExample = (props: Props) => {
                         />
                     )}
                 </For>
+
+                <Button
+                    id={"recall"}
+                    isDisabled={() =>
+                        props.isDisabled() || (getControls()?.getTopIndex() ?? FIRST_INDEX) === FIRST_INDEX
+                    }
+                    ariaLabel={"Bring the last card back"}
+                    renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Recall</PageButtonContent>}
+                    onClick={() => {
+                        if (getControls()?.recall()) props.onRecall();
+                    }}
+                />
 
                 <Show when={getControls()?.getIsEmpty()}>
                     <Button

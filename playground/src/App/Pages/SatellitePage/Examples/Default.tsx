@@ -1,21 +1,31 @@
 import { Satellite, access } from "@thewaver/ss-components";
 
 import { PageSatelliteBadge, PageSatelliteSubject } from "../../../StyledComponents/SatelliteContent/SatelliteContent";
-import type { SatelliteExampleProps } from "../SatellitePage.types";
+import type { SatelliteDefaultExampleProps } from "../SatellitePage.types";
 
-type Props = SatelliteExampleProps;
+type Props = SatelliteDefaultExampleProps;
 
-export const DefaultExample = ({ subjectWidth, subjectHeight, badgeSize, hasSatellite, ...otherProps }: Props) => {
+export const DefaultExample = (props: Props) => {
     return (
         <Satellite
-            {...otherProps}
-            renderSatellite={
-                access(hasSatellite)
-                    ? () => <PageSatelliteBadge size={badgeSize}>{access(badgeSize)}</PageSatelliteBadge>
-                    : undefined
+            satellites={() =>
+                access(props.hasSatellite)
+                    ? [
+                          {
+                              placement: props.placement,
+                              offset: props.offset,
+                              isBehindSubject: props.isBehindSubject,
+                              renderSatellite: () => (
+                                  <PageSatelliteBadge size={props.badgeSize}>
+                                      {access(props.badgeSize)}
+                                  </PageSatelliteBadge>
+                              ),
+                          },
+                      ]
+                    : []
             }
         >
-            <PageSatelliteSubject width={subjectWidth} height={subjectHeight}>
+            <PageSatelliteSubject width={props.subjectWidth} height={props.subjectHeight}>
                 Subject
             </PageSatelliteSubject>
         </Satellite>

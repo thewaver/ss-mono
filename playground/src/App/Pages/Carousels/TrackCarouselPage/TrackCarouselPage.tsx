@@ -23,10 +23,14 @@ export const TrackCarouselPage = () => {
             key: "manual",
             name: "Stepped by hand",
             readout: () =>
-                `slide ${manualIndexSignal[0]() + 1} of ${controls.getSlideCount()} — stepping past either end wraps round, which is what separates this from the scroller; a column takes its height from the box the page puts round it`,
+                `slide ${manualIndexSignal[0]() + 1} of ${controls.getSlideCount()} — ${controls.isLoopingSignal[0]() ? "stepping past either end wraps round, which is what separates this from the scroller" : "looping is off, so Previous on the first slide and Next on the last are disabled, and a swipe past an end springs back"}; a column takes its height from the box the page puts round it`,
             component: () => (
                 <PageCarouselBox>
-                    <SteppedExample {...controls.getSharedProps()} indexSignal={manualIndexSignal} />
+                    <SteppedExample
+                        {...controls.getSharedProps()}
+                        isLooping={controls.isLoopingSignal[0]}
+                        indexSignal={manualIndexSignal}
+                    />
                 </PageCarouselBox>
             ),
             path: `${EXAMPLES_ROOT}/Stepped.tsx`,
@@ -35,13 +39,14 @@ export const TrackCarouselPage = () => {
             key: "rotating",
             name: "Rotating on its own",
             readout: () =>
-                `slide ${rotatingIndexSignal[0]() + 1} of ${controls.getSlideCount()} | ${rotatingPlayingSignal[0]() ? "playing" : "stopped"} — it holds while the pointer is over it, while anything inside it has focus, and while the tab is in the background`,
+                `slide ${rotatingIndexSignal[0]() + 1} of ${controls.getSlideCount()} | ${rotatingPlayingSignal[0]() ? "playing" : "stopped"} — it holds while the pointer is over it, while anything inside it has focus, and while the tab is in the background${controls.isLoopingSignal[0]() ? "" : "; with looping off it stops for good on the last slide"}`,
             component: () => (
                 <PageCarouselBox>
                     <RotatingExample
                         {...controls.getSharedProps()}
+                        isLooping={controls.isLoopingSignal[0]}
                         indexSignal={rotatingIndexSignal}
-                        playingSignal={rotatingPlayingSignal}
+                        playbackSignal={rotatingPlayingSignal}
                         autoplayDelayMs={controls.delaySignal[0]}
                     />
                 </PageCarouselBox>
@@ -64,7 +69,7 @@ export const TrackCarouselPage = () => {
 
     return (
         <>
-            <PageCarouselsPanel controls={controls} hasDelay={true} />
+            <PageCarouselsPanel controls={controls} hasDelay={true} hasLooping={true} />
 
             <PageExamples items={getExamples} />
         </>

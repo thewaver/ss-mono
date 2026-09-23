@@ -4,125 +4,130 @@ import type { TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
 
 export const merge_diag_async_4 = (): TimedGradientConfig => ({
-    computeSVGDefs: (id, __, ___, defs) => [
-        {
-            color: SVGDefsUtils.getBaseBorderColor(defs),
-        },
-        {
-            gradientOrPattern: {
-                id: `gradient1-${id}`,
-                renderDefsElement: () =>
-                    SVGGradientDefsUtils.computeLinearGradient(
-                        {
-                            id: `gradient1-${id}`,
-                            colors: [
-                                { value: defs.colors.primary },
-                                { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
-                            ],
-                            angle: 45,
-                            offset: SVGDefsUtils.offsetDiagonally(-1.25, 45),
-                        },
-                        (x1, y1, x2, y2) =>
-                            SVGAnimations.Linear.sweepDiagonal(
-                                x1,
-                                y1,
-                                x2,
-                                y2,
-                                45,
-                                [0, 1.25, 2.5, 1.25, 0, 0, 0, 0],
-                                defs,
-                            ),
-                    ),
+    computeSVGDefs: (id, __, ___, defs) => {
+        const sharedBlur = SVGDefsUtils.getBaseBlur(id, defs);
+        const sharedBlurRef = SVGDefsUtils.getSharedFilter(sharedBlur);
+
+        return [
+            {
+                color: SVGDefsUtils.getBaseBorderColor(defs),
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-            blend: true,
-        },
-        {
-            gradientOrPattern: {
-                id: `gradient2-${id}`,
-                renderDefsElement: () =>
-                    SVGGradientDefsUtils.computeLinearGradient(
-                        {
-                            id: `gradient2-${id}`,
-                            colors: [
-                                { value: defs.colors.secondary },
-                                { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary) },
-                            ],
-                            angle: 135,
-                            offset: SVGDefsUtils.offsetDiagonally(-1.25, 135),
-                        },
-                        (x1, y1, x2, y2) =>
-                            SVGAnimations.Linear.sweepDiagonal(
-                                x1,
-                                y1,
-                                x2,
-                                y2,
-                                135,
-                                [0, 0, 0, 1.25, 2.5, 1.25, 0, 0],
-                                defs,
-                            ),
-                    ),
+            {
+                gradientOrPattern: {
+                    id: `gradient1-${id}`,
+                    renderDefsElement: () =>
+                        SVGGradientDefsUtils.computeLinearGradient(
+                            {
+                                id: `gradient1-${id}`,
+                                colors: [
+                                    { value: defs.colors.primary },
+                                    { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
+                                ],
+                                angle: 45,
+                                offset: SVGDefsUtils.offsetDiagonally(-1.25, 45),
+                            },
+                            (x1, y1, x2, y2) =>
+                                SVGAnimations.Linear.sweepDiagonal(
+                                    x1,
+                                    y1,
+                                    x2,
+                                    y2,
+                                    45,
+                                    [0, 1.25, 2.5, 1.25, 0, 0, 0, 0],
+                                    defs,
+                                ),
+                        ),
+                },
+                filter: sharedBlur,
+                blend: true,
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-            blend: true,
-        },
-        {
-            gradientOrPattern: {
-                id: `gradient3-${id}`,
-                renderDefsElement: () =>
-                    SVGGradientDefsUtils.computeLinearGradient(
-                        {
-                            id: `gradient3-${id}`,
-                            colors: [
-                                { value: defs.colors.primary },
-                                { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
-                            ],
-                            angle: 225,
-                            offset: SVGDefsUtils.offsetDiagonally(-1.25, 225),
-                        },
-                        (x1, y1, x2, y2) =>
-                            SVGAnimations.Linear.sweepDiagonal(
-                                x1,
-                                y1,
-                                x2,
-                                y2,
-                                225,
-                                [0, 0, 1.25, 2.5, 1.25, 0, 0, 0],
-                                defs,
-                            ),
-                    ),
+            {
+                gradientOrPattern: {
+                    id: `gradient2-${id}`,
+                    renderDefsElement: () =>
+                        SVGGradientDefsUtils.computeLinearGradient(
+                            {
+                                id: `gradient2-${id}`,
+                                colors: [
+                                    { value: defs.colors.secondary },
+                                    { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary) },
+                                ],
+                                angle: 135,
+                                offset: SVGDefsUtils.offsetDiagonally(-1.25, 135),
+                            },
+                            (x1, y1, x2, y2) =>
+                                SVGAnimations.Linear.sweepDiagonal(
+                                    x1,
+                                    y1,
+                                    x2,
+                                    y2,
+                                    135,
+                                    [0, 0, 0, 1.25, 2.5, 1.25, 0, 0],
+                                    defs,
+                                ),
+                        ),
+                },
+                filter: sharedBlurRef,
+                blend: true,
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-            blend: true,
-        },
-        {
-            gradientOrPattern: {
-                id: `gradient4-${id}`,
-                renderDefsElement: () =>
-                    SVGGradientDefsUtils.computeLinearGradient(
-                        {
-                            id: `gradient4-${id}`,
-                            colors: [
-                                { value: defs.colors.secondary },
-                                { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary) },
-                            ],
-                            angle: 315,
-                            offset: SVGDefsUtils.offsetDiagonally(-1.25, 315),
-                        },
-                        (x1, y1, x2, y2) =>
-                            SVGAnimations.Linear.sweepDiagonal(
-                                x1,
-                                y1,
-                                x2,
-                                y2,
-                                315,
-                                [0, 0, 0, 0, 1.25, 2.5, 1.25, 0],
-                                defs,
-                            ),
-                    ),
+            {
+                gradientOrPattern: {
+                    id: `gradient3-${id}`,
+                    renderDefsElement: () =>
+                        SVGGradientDefsUtils.computeLinearGradient(
+                            {
+                                id: `gradient3-${id}`,
+                                colors: [
+                                    { value: defs.colors.primary },
+                                    { value: SVGDefsUtils.getTransparentColor(defs.colors.primary) },
+                                ],
+                                angle: 225,
+                                offset: SVGDefsUtils.offsetDiagonally(-1.25, 225),
+                            },
+                            (x1, y1, x2, y2) =>
+                                SVGAnimations.Linear.sweepDiagonal(
+                                    x1,
+                                    y1,
+                                    x2,
+                                    y2,
+                                    225,
+                                    [0, 0, 1.25, 2.5, 1.25, 0, 0, 0],
+                                    defs,
+                                ),
+                        ),
+                },
+                filter: sharedBlurRef,
+                blend: true,
             },
-            filter: SVGDefsUtils.getBaseBlur(id, defs),
-            blend: true,
-        },
-    ],
+            {
+                gradientOrPattern: {
+                    id: `gradient4-${id}`,
+                    renderDefsElement: () =>
+                        SVGGradientDefsUtils.computeLinearGradient(
+                            {
+                                id: `gradient4-${id}`,
+                                colors: [
+                                    { value: defs.colors.secondary },
+                                    { value: SVGDefsUtils.getTransparentColor(defs.colors.secondary) },
+                                ],
+                                angle: 315,
+                                offset: SVGDefsUtils.offsetDiagonally(-1.25, 315),
+                            },
+                            (x1, y1, x2, y2) =>
+                                SVGAnimations.Linear.sweepDiagonal(
+                                    x1,
+                                    y1,
+                                    x2,
+                                    y2,
+                                    315,
+                                    [0, 0, 0, 0, 1.25, 2.5, 1.25, 0],
+                                    defs,
+                                ),
+                        ),
+                },
+                filter: sharedBlurRef,
+                blend: true,
+            },
+        ];
+    },
 });

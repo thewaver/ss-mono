@@ -14,12 +14,14 @@ import {
     PACK,
     PACK_COLUMNS,
     PACK_ROWS,
+    SCATTERED,
     STASH,
     STASH_COLUMNS,
     STASH_ROWS,
     TURNS,
     TURNS_COLUMNS,
     TURNS_ROWS,
+    computeIsWall,
 } from "./SortableGridPage.const";
 import type { Gear } from "./SortableGridPage.types";
 
@@ -55,6 +57,10 @@ export const SortableGridPage = () => {
 
     const disabledSignal = createSignal(PACK);
 
+    const walledSignal = createSignal(SCATTERED);
+
+    const dashboardSignal = createSignal(PACK);
+
     const getExamples = createMemo(() => [
         {
             key: "pack",
@@ -77,7 +83,7 @@ export const SortableGridPage = () => {
             key: "turns",
             name: "An L turns two ways",
             readout: () =>
-                `${spots(turnsSignal[0]())} — clockwise puts the hook's arm where the flint is and is refused, anticlockwise fits`,
+                `${spots(turnsSignal[0]())} — clockwise puts the hook's arm where the flint is and is refused, counterclockwise fits`,
             component: () => (
                 <InventoryExample
                     groupId={"turns"}
@@ -174,6 +180,40 @@ export const SortableGridPage = () => {
             span: 2,
             component: () => <LootExample groupId={"loot"} lootSignal={lootSignal} packSignal={lootPackSignal} />,
             path: `${EXAMPLES_ROOT}/Loot.tsx`,
+        },
+        {
+            key: "walls",
+            name: "Walls, and a tidy-up",
+            readout: () =>
+                `${spots(walledSignal[0]())} — nothing lands on a hatched cell, and Tidy up pulls everything upward`,
+            component: () => (
+                <InventoryExample
+                    groupId={"walls"}
+                    itemsSignal={walledSignal}
+                    ariaLabel={"Walled pack"}
+                    emptyText={"Empty pack"}
+                    isTurnable={true}
+                    hasTidyButton={true}
+                    computeIsSpotBlocked={computeIsWall}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Inventory.tsx`,
+        },
+        {
+            key: "dashboard",
+            name: "Packed after every move",
+            readout: () => `${spots(dashboardSignal[0]())} — each drop is followed by compact(), so no hole stays open`,
+            component: () => (
+                <InventoryExample
+                    groupId={"dashboard"}
+                    itemsSignal={dashboardSignal}
+                    ariaLabel={"Packed pack"}
+                    emptyText={"Empty pack"}
+                    isTurnable={true}
+                    isCompacting={true}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Inventory.tsx`,
         },
         {
             key: "disabled",

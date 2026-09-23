@@ -20,10 +20,15 @@ export const renderBracketNode = (getNode: Accessor<BracketNode<string>>, getSta
         class={styles.node}
         classList={{
             [styles.nodeFocused]: getState().isFocused,
+            [styles.nodeOnRoute]: getState().isOnFocusedRoute,
             [styles.nodeRoot]: getState().placement.layer === ROOT_LAYER,
             [styles.nodeDisabled]: getState().placement.isDisabled,
         }}
     >
         {getNode().value}
     </div>
+);
+
+export const computeBracketLayerHeader = (names: string[]) => (layer: number) => (
+    <div class={styles.layerHeader}>{names[layer]}</div>
 );

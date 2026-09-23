@@ -3,6 +3,7 @@ import { style } from "@vanilla-extract/css";
 export const satelliteRoot = style({
     position: "relative",
     width: "fit-content",
+    isolation: "isolate",
 });
 
 export const satelliteSubject = style({

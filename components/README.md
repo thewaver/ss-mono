@@ -35,15 +35,15 @@ handling) every component depends on.
 
 - **Form controls** — `TextInput`, `TextArea`, `NumberInput`, `CurrencyInput`,
   `DateInput`, `DatePicker`, `DateRangePicker`, `TimeInput`, `TimePicker`, `Calendar`,
-  `RangeCalendar`, `ColorInput`, `ColorArea`, `Select`, `MultiSelect`, `Checkbox`, `Radio`,
+  `RangeCalendar`, `ColorInput`, `ColorArea`, `Select`, `MultiSelect`, `Listbox`, `MultiListbox`, `Checkbox`, `CheckboxGroup`, `Radio`,
   `RadioGroup`, `Range`, `Toggle`, `FileInput`, `TagInput`, plus `Form`, `FormField` and
   `FormSection` for wiring labels, descriptions and errors together.
-- **Overlays & navigation** — `Modal`, `Drawer`, `Popover`, `Tooltip`, `Menu`, `WheelMenu`,
+- **Overlays & navigation** — `Modal`, `Drawer`, `HoverCard`, `Popover`, `Tooltip`, `Menu`, `Menubar`, `WheelMenu`,
   `FanMenu`, `Tabs`, `Accordion`, `Collapsible`, `Breadcrumbs`, `Paginator`, `Stepper`,
   `SplitPane`, `Toasts`.
 - **Layout & data** — `Table`, `Tree`, `Scroller`, `Sortable`, `SortableGrid`, `ViewportWrapper`,
   `Surface`, `GlassSurface`, `TrackCarousel`, `DrumCarousel`, `Progress`, `Toolbar`.
-- **Visual & motion** — `Shape`, `RichText`, `CellAnimation`, `ScanlineAnimation`, `ScreenWiper`,
+- **Visual & motion** — `Shape`, `RichText`, `CellAnimation`, `ScanlineAnimation`,
   `Odometer`, `Typewriter`, `ScrambleText`, `FlipCard`, `Cuboid`, `Bracket`, `Formation`,
   `ParticleSpawner`, `PatchBoard`, `Reveal`, `ScratchCard`, `Satellite`, `Staircase`, `TileBoard`,
   `Timeline`, `Trail`, `DrumWheel`, `OverheadWheel`, `ElementMosaic`, `ImageMosaic`.

@@ -8,5 +8,6 @@ export type PageTileBoardTileProps = AccessorProps<{
 
 export type PageTileBoardMeepleProps = AccessorProps<{
     center: Point2d;
+    scale: number;
     tileSize: Size2d;
 }>;

@@ -25,7 +25,11 @@ const resolveInsideField = (descriptionId: string | undefined, getAriaDescribedB
 
     const dispose = createRoot((disposeRoot) => {
         FormFieldContextProvider({
-            value: { getDescriptionId: () => descriptionId },
+            value: {
+                getDescriptionId: () => descriptionId,
+                registerControl: () => undefined,
+                unregisterControl: () => undefined,
+            },
             get children() {
                 resolved = FormFieldUtils.resolveAriaDescribedBy(getAriaDescribedBy);
 
@@ -75,7 +79,11 @@ describe("resolveAriaDescribedBy", () => {
 
         const dispose = createRoot((disposeRoot) => {
             FormFieldContextProvider({
-                value: { getDescriptionId: () => descriptionId },
+                value: {
+                    getDescriptionId: () => descriptionId,
+                    registerControl: () => undefined,
+                    unregisterControl: () => undefined,
+                },
                 get children() {
                     resolved = FormFieldUtils.resolveAriaDescribedBy();
 

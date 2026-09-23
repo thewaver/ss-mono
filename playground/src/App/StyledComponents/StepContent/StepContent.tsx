@@ -17,7 +17,7 @@ const MARKER_GLYPHS = {
 export const PageStepContent = (props: ParentProps<StepContentProps>) => {
     return (
         <div
-            class={access(props.dir) === "row" ? styles.rowStep : styles.columnStep}
+            class={access(props.orientation) === "horizontal" ? styles.rowStep : styles.columnStep}
             classList={{
                 [styles.isCurrent]: access(props.flags).isCurrent,
                 [styles.isHovered]: access(props.flags).isHovered,
@@ -36,7 +36,7 @@ export const PageStepContent = (props: ParentProps<StepContentProps>) => {
 export const PageStepConnector = (props: StepConnectorProps) => {
     const getColumnClass = () => (access(props.isRail) === true ? styles.columnRailConnector : styles.columnConnector);
 
-    return <span class={access(props.dir) === "row" ? styles.rowConnector : getColumnClass()} />;
+    return <span class={access(props.orientation) === "horizontal" ? styles.rowConnector : getColumnClass()} />;
 };
 
 export const PageStepArcCell = (props: ParentProps) => <div class={styles.arcCell}>{props.children}</div>;

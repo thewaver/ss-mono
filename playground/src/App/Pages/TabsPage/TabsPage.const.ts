@@ -27,6 +27,20 @@ export const AUTOMATIC_TABS = withIds("automatic", [
     { value: "Export" },
 ]);
 
+export const REACHABLE_TABS = withIds("reachable", [
+    { value: "Render" },
+    { value: "Source" },
+    { value: "Metrics", isDisabled: true, isReachableWhenDisabled: true },
+    { value: "Export" },
+]);
+
+export const RIGHT_TO_LEFT_TABS = withIds("rtl", [
+    { value: "Render" },
+    { value: "Source" },
+    { value: "Metrics", isDisabled: true },
+    { value: "Export" },
+]);
+
 export const COLUMN_TABS = withIds("column", [
     { value: "Overview" },
     { value: "Details" },

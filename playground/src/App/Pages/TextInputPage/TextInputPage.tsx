@@ -2,17 +2,20 @@ import { createMemo, createSignal } from "solid-js";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { BothAdornmentsExample } from "./Examples/BothAdornments";
+import { CitiesExample } from "./Examples/Cities";
 import { DefaultExample } from "./Examples/Default";
 import { DisabledExample } from "./Examples/Disabled";
+import { EditableExample } from "./Examples/Editable";
 import { ErroredExample } from "./Examples/Errored";
-import { LabelledExample } from "./Examples/Labeled";
+import { LabeledExample } from "./Examples/Labeled";
 import { NumberFieldExample } from "./Examples/NumberField";
+import { OneTimeCodeExample } from "./Examples/OneTimeCode";
 import { PasswordExample } from "./Examples/Password";
 import { ReachableExample } from "./Examples/Reachable";
 import { ReadOnlyExample } from "./Examples/ReadOnly";
 import { RefusingSetterExample } from "./Examples/RefusingSetter";
 import { TransformingSetterExample } from "./Examples/TransformingSetter";
-import { PIN_LENGTH, QUANTITY_STEP } from "./TextInputPage.const";
+import { CITIES, PIN_LENGTH, QUANTITY_STEP } from "./TextInputPage.const";
 
 const EXAMPLES_ROOT = "/src/App/Pages/TextInputPage/Examples";
 
@@ -23,12 +26,24 @@ export const TextInputPage = () => {
     const disabledSignal = createSignal("Cannot be edited");
     const reachableSignal = createSignal("Cannot be edited either");
     const erroredSignal = createSignal("not-an-email");
-    const labelledSignal = createSignal("");
+    const labeledSignal = createSignal("");
     const codeSignal = createSignal("");
     const pinSignal = createSignal("");
     const amountSignal = createSignal("");
     const quantitySignal = createSignal("10");
     const revealSignal = createSignal(false);
+    const citySignal = createSignal("");
+    const oneTimeCodeSignal = createSignal("");
+    const editableSignal = createSignal("Ada Lovelace");
+    const editingSignal = createSignal(false);
+
+    const getCitySuggestions = createMemo(() => {
+        const query = citySignal[0]().trim().toLocaleLowerCase();
+
+        if (!query) return [];
+
+        return CITIES.filter((city) => city.name.toLocaleLowerCase().startsWith(query));
+    });
 
     const getExamples = createMemo(() => [
         {
@@ -51,6 +66,30 @@ export const TextInputPage = () => {
             readout: () => `value: "${pinSignal[0]()}" — letters are refused, ${PIN_LENGTH} digits max`,
             component: () => <RefusingSetterExample valueSignal={pinSignal} />,
             path: `${EXAMPLES_ROOT}/RefusingSetter.tsx`,
+        },
+        {
+            key: "suggestions",
+            name: "Suggestions",
+            readout: () =>
+                `value: "${citySignal[0]()}" — ${getCitySuggestions().length} suggested; any text is kept, and Enter only picks once the arrows have moved into the list`,
+            component: () => <CitiesExample valueSignal={citySignal} suggestions={getCitySuggestions} />,
+            path: `${EXAMPLES_ROOT}/Cities.tsx`,
+        },
+        {
+            key: "oneTimeCode",
+            name: "One-time code",
+            readout: () =>
+                `value: "${oneTimeCodeSignal[0]()}" — one field painted as ${PIN_LENGTH} cells, the next empty one marked while focused`,
+            component: () => <OneTimeCodeExample valueSignal={oneTimeCodeSignal} />,
+            path: `${EXAMPLES_ROOT}/OneTimeCode.tsx`,
+        },
+        {
+            key: "editable",
+            name: "Edit in place",
+            readout: () =>
+                `value: "${editableSignal[0]()}" | editing: ${editingSignal[0]()} — Enter or leaving keeps the edit, Escape puts the old text back`,
+            component: () => <EditableExample valueSignal={editableSignal} editingSignal={editingSignal} />,
+            path: `${EXAMPLES_ROOT}/Editable.tsx`,
         },
         {
             key: "password",
@@ -104,8 +143,8 @@ export const TextInputPage = () => {
         {
             key: "label",
             name: "In a Label",
-            readout: () => `value: "${labelledSignal[0]()}"`,
-            component: () => <LabelledExample valueSignal={labelledSignal} />,
+            readout: () => `value: "${labeledSignal[0]()}"`,
+            component: () => <LabeledExample valueSignal={labeledSignal} />,
             path: `${EXAMPLES_ROOT}/Labeled.tsx`,
         },
     ]);

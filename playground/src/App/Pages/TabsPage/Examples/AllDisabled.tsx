@@ -9,16 +9,16 @@ type Props = TabsExampleProps;
 export const AllDisabledExample = (props: Props) => {
     return (
         <Tabs
-            dir={"row"}
+            orientation={"horizontal"}
             tabGap={() => ROW_TAB_GAP}
             ariaLabel={"Unavailable views"}
             tabs={() => DISABLED_TABS}
             selectedValue={props.selectedValue}
             onSelectionChange={props.onSelectionChange}
-            renderGutter={() => <PageTabGutter dir={"row"} />}
+            renderGutter={() => <PageTabGutter orientation={"horizontal"} />}
             renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                 <PageTabFloater
-                    dir={"row"}
+                    orientation={"horizontal"}
                     visibilityTarget={getVisibilityTarget}
                     transitionDurationMs={getTransitionDurationMs}
                 />
@@ -26,7 +26,7 @@ export const AllDisabledExample = (props: Props) => {
             renderTab={(getTab, getFlags) => (
                 <PageTabContent
                     flags={getFlags}
-                    dir={"row"}
+                    orientation={"horizontal"}
                     isSelected={() => getTab().value === access(props.selectedValue)}
                 >
                     {getTab().value}

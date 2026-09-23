@@ -1,11 +1,12 @@
 import { PatchBoard } from "@thewaver/ss-components";
 
+import { PATCH_BOARD_ANNOUNCEMENTS } from "../../../PageComponents/Announcements/Announcements.const";
 import {
     PagePatchCable,
     PagePatchNode,
     PagePatchSocket,
 } from "../../../StyledComponents/PatchBoardContent/PatchBoardContent";
-import { AMP_NODE_KEY, MIXER_NODE_KEY, STANDING_BOARD_SIZE } from "../PatchBoardPage.const";
+import { AMP_NODE_KEY, MIXER_NODE_KEY, STANDING_BOARD_HEIGHT_RATIO } from "../PatchBoardPage.const";
 import type { PatchBoardExampleProps } from "../PatchBoardPage.types";
 
 type Props = PatchBoardExampleProps;
@@ -15,7 +16,8 @@ export const MixerExample = (props: Props) => {
         <PatchBoard
             groupId={"mixer"}
             ariaLabel={"Mixing desk"}
-            size={STANDING_BOARD_SIZE}
+            announcements={PATCH_BOARD_ANNOUNCEMENTS}
+            heightRatio={STANDING_BOARD_HEIGHT_RATIO}
             orientation={"vertical"}
             socketSize={props.socketSize}
             isLocked={props.isLocked}

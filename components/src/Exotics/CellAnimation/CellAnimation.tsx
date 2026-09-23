@@ -1,4 +1,4 @@
-import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
+import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount, untrack } from "solid-js";
 
 import { type Index2d, MathUtils, Size2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
@@ -15,6 +15,7 @@ const DEFAULT_CELL_ANIMATION_WEIGHT = 0;
 const CELL_ANIMATION_PERSPECTIVE_RATIO = 1.5;
 const CELL_ANIMATION_BLEED_PX = 1;
 const CELL_ANIMATION_DEPTH_STEPS = 100;
+const NO_PROGRESS = 0;
 
 export const CellAnimation = (props: CellAnimationProps) => {
     const getAnimationDurationMs = createMemo(
@@ -38,6 +39,8 @@ export const CellAnimation = (props: CellAnimationProps) => {
     const [getContainerRef, setContainerRef] = createSignal<HTMLElement>();
     const [getIsWindowVisible, setIsWindowVisible] = createSignal(true);
     const [getIsPlaying] = SignalMirrorUtils.createOptional(() => props.playbackSignal, true);
+    const [getProgress, setProgress] = SignalMirrorUtils.createOptional(() => props.progressSignal, NO_PROGRESS);
+    const [getCellRefs, setCellRefs] = createSignal<HTMLElement[]>([], { equals: false });
     const [getCurrentIteration, setCurrentIteration] = createSignal(0);
     const [getRootSize, setRootSize] = createSignal<Size2d>({ width: 0, height: 0 }, { equals: Size2d.isSame });
 
@@ -108,7 +111,9 @@ export const CellAnimation = (props: CellAnimationProps) => {
 
     const getIsSourceRevealed = createMemo(() => getHasEnded() && getFinalFrame() === "source");
 
-    const getTimeline = createMemo(() => ({ source: getSource(), iteration: getCurrentIteration() }));
+    const getIsRunning = createMemo(
+        () => getIsPlaying() && getIsWindowVisible() && !getHasEnded() && !!getRootRef() && !!getContainerRef(),
+    );
 
     const getEvaluationDefs = createMemo<CellAnimationEvaluationDefs[]>(() =>
         getCellDefs().map((defs) => {
@@ -118,35 +123,38 @@ export const CellAnimation = (props: CellAnimationProps) => {
         }),
     );
 
-    createEffect(on(getSource, () => setCurrentIteration(0)));
+    createEffect(
+        on(
+            getSource,
+            () => {
+                setCurrentIteration(0);
+                setProgress(NO_PROGRESS);
+            },
+            { defer: true },
+        ),
+    );
 
     createEffect(() => {
-        let rafId: ReturnType<typeof requestAnimationFrame>;
-        let timeout: ReturnType<typeof setTimeout>;
-
-        onCleanup(() => {
-            cancelAnimationFrame(rafId);
-            clearTimeout(timeout);
-        });
-
-        const rootRef = getRootRef();
         const containerRef = getContainerRef();
-        const duration = getAnimationDurationMs();
-        const iterationDelay = getAnimationIterationDelayMs();
-        const maxIterations = getAnimationIterationCount();
-        const { iteration } = getTimeline();
-        const isWindowVisible = getIsWindowVisible();
-        const isPlaying = getIsPlaying();
+
+        getEvaluationDefs();
+
+        setCellRefs(
+            containerRef && getAreCellsMounted()
+                ? (Array.from(containerRef.querySelectorAll(":scope > div")) as HTMLElement[])
+                : [],
+        );
+    });
+
+    createEffect(() => {
+        const rootRef = getRootRef();
+        const cells = getCellRefs();
         const cellDefs = getEvaluationDefs();
+        const t = MathUtils.clamp01(getProgress());
 
-        if (!isWindowVisible || !isPlaying || !rootRef || !containerRef || iteration >= maxIterations) return;
+        if (!rootRef) return;
 
-        const cells = Array.from(containerRef.querySelectorAll(":scope > div")) as HTMLElement[];
-        const start = performance.now();
-
-        const tick = (now: number) => {
-            const t = Math.min(1, (now - start) / duration);
-
+        untrack(() => {
             if (props.computeRootAnimation) {
                 CellAnimationUtils.assignAnimationProps(rootRef, props.computeRootAnimation(t));
             }
@@ -154,26 +162,55 @@ export const CellAnimation = (props: CellAnimationProps) => {
             for (let i = 0; i < cells.length && i < cellDefs.length; i++) {
                 CellAnimationUtils.assignAnimationProps(cells[i], props.computeCellAnimation(cellDefs[i], t));
             }
+        });
+    });
 
-            if (t >= 1) {
-                props.onIterationEnd?.();
+    createEffect(() => {
+        if (!getIsRunning()) return;
 
-                if (getCurrentIteration() + 1 >= maxIterations) {
-                    props.onAnimationEnd?.();
-                    setCurrentIteration((v) => v + 1);
-                } else {
-                    timeout = setTimeout(() => {
-                        setCurrentIteration((v) => v + 1);
-                    }, iterationDelay);
-                }
+        let frameId: ReturnType<typeof requestAnimationFrame> | undefined;
+        let timeout: ReturnType<typeof setTimeout> | undefined;
+        let lastMs = performance.now();
+
+        onCleanup(() => {
+            if (frameId !== undefined) cancelAnimationFrame(frameId);
+
+            clearTimeout(timeout);
+        });
+
+        const advance = (nowMs: number) => {
+            const durationMs = getAnimationDurationMs();
+            const elapsedMs = Math.max(nowMs - lastMs, 0);
+            const next =
+                durationMs > 0 ? Math.min(MathUtils.clamp01(untrack(getProgress)) + elapsedMs / durationMs, 1) : 1;
+
+            lastMs = nowMs;
+            setProgress(next);
+
+            if (next < 1) {
+                frameId = requestAnimationFrame(advance);
 
                 return;
             }
 
-            rafId = requestAnimationFrame(tick);
+            props.onIterationEnd?.();
+
+            if (untrack(getCurrentIteration) + 1 >= getAnimationIterationCount()) {
+                props.onAnimationEnd?.();
+                setCurrentIteration((v) => v + 1);
+
+                return;
+            }
+
+            timeout = setTimeout(() => {
+                setProgress(NO_PROGRESS);
+                setCurrentIteration((v) => v + 1);
+                lastMs = performance.now();
+                frameId = requestAnimationFrame(advance);
+            }, getAnimationIterationDelayMs());
         };
 
-        rafId = requestAnimationFrame(tick);
+        frameId = requestAnimationFrame(advance);
     });
 
     createEffect(() => {

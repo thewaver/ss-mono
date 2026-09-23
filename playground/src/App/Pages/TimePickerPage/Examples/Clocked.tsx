@@ -4,6 +4,7 @@ import type { ClockSteps, MaybeAccessor } from "@thewaver/ss-components";
 import { TimePicker, access } from "@thewaver/ss-components";
 import type { TimeValue } from "@thewaver/ss-utils";
 
+import { CLOCK_TRIGGER_LABEL, TIME_SEGMENT_HINTS } from "../../../PageComponents/Announcements/Announcements.const";
 import {
     PageClockColumn,
     PageClockFrame,
@@ -28,8 +29,8 @@ type Props = TimeExampleProps & {
     isTwelveHour?: MaybeAccessor<boolean>;
     hasSeconds?: MaybeAccessor<boolean>;
     clockSteps?: MaybeAccessor<ClockSteps>;
-    minTime?: MaybeAccessor<TimeValue>;
-    maxTime?: MaybeAccessor<TimeValue>;
+    minValue?: MaybeAccessor<TimeValue>;
+    maxValue?: MaybeAccessor<TimeValue>;
 };
 
 export const ClockedExample = (props: Props) => {
@@ -39,10 +40,11 @@ export const ClockedExample = (props: Props) => {
             isTwelveHour={props.isTwelveHour}
             hasSeconds={props.hasSeconds}
             clockSteps={props.clockSteps}
-            minTime={props.minTime}
-            maxTime={props.maxTime}
+            minValue={props.minValue}
+            maxValue={props.maxValue}
             ariaLabel={props.ariaLabel}
             clockLabel={"Choose a time"}
+            segmentHints={TIME_SEGMENT_HINTS}
             locale={() => LOCALE}
             padding={() => FIELD_STEPPER_PADDING}
             gap={() => FIELD_GAP}
@@ -61,6 +63,7 @@ export const ClockedExample = (props: Props) => {
                 </Show>
             )}
             triggerId={() => `${access(props.key)}Trigger`}
+            triggerAriaLabel={CLOCK_TRIGGER_LABEL}
             renderTrigger={(getFlags) => <PageTimePickerTrigger flags={getFlags} />}
             renderOption={(_unused, getRenderProps) => <PageClockOption renderProps={getRenderProps} />}
             renderUnit={(name) => <PageClockUnit>{name}</PageClockUnit>}

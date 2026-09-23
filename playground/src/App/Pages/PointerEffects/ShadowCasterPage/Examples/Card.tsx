@@ -12,6 +12,7 @@ export const CardExample = (props: Props) => {
             <ShadowCaster
                 isDisabled={props.isDisabled}
                 activeRangePx={props.activeRangePx}
+                smoothingMs={props.smoothingMs}
                 lightRangePx={props.lightRangePx}
                 maxThrowPx={props.maxThrowPx}
                 minBlurPx={props.minBlurPx}

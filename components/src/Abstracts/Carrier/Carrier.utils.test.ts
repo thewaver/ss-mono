@@ -10,27 +10,36 @@ const COLUMN = [rect(0, 0, 100, 40), rect(0, 40, 100, 40), rect(0, 80, 100, 40)]
 
 describe("computeDropIndex", () => {
     it("lands before an item while the pointer is in its leading half", () => {
-        expect(CarrierUtils.computeDropIndex(ROW, 10, 20, "row")).toBe(0);
-        expect(CarrierUtils.computeDropIndex(ROW, 120, 20, "row")).toBe(1);
+        expect(CarrierUtils.computeDropIndex(ROW, 10, 20, "horizontal")).toBe(0);
+        expect(CarrierUtils.computeDropIndex(ROW, 120, 20, "horizontal")).toBe(1);
     });
 
     it("lands after an item once the pointer passes its middle", () => {
-        expect(CarrierUtils.computeDropIndex(ROW, 60, 20, "row")).toBe(1);
-        expect(CarrierUtils.computeDropIndex(ROW, 160, 20, "row")).toBe(2);
+        expect(CarrierUtils.computeDropIndex(ROW, 60, 20, "horizontal")).toBe(1);
+        expect(CarrierUtils.computeDropIndex(ROW, 160, 20, "horizontal")).toBe(2);
     });
 
     it("lands past the end when the pointer is beyond every item", () => {
-        expect(CarrierUtils.computeDropIndex(ROW, 400, 20, "row")).toBe(3);
-        expect(CarrierUtils.computeDropIndex(COLUMN, 50, 400, "column")).toBe(3);
+        expect(CarrierUtils.computeDropIndex(ROW, 400, 20, "horizontal")).toBe(3);
+        expect(CarrierUtils.computeDropIndex(COLUMN, 50, 400, "vertical")).toBe(3);
     });
 
     it("reads the axis it was given rather than the one the rects suggest", () => {
-        expect(CarrierUtils.computeDropIndex(COLUMN, 50, 10, "column")).toBe(0);
-        expect(CarrierUtils.computeDropIndex(COLUMN, 50, 50, "column")).toBe(1);
+        expect(CarrierUtils.computeDropIndex(COLUMN, 50, 10, "vertical")).toBe(0);
+        expect(CarrierUtils.computeDropIndex(COLUMN, 50, 50, "vertical")).toBe(1);
+    });
+
+    it("counts a right-to-left row from its right end", () => {
+        const reversed = [...ROW].reverse();
+
+        expect(CarrierUtils.computeDropIndex(reversed, 290, 20, "horizontal", "rtl")).toBe(0);
+        expect(CarrierUtils.computeDropIndex(reversed, 240, 20, "horizontal", "rtl")).toBe(1);
+        expect(CarrierUtils.computeDropIndex(reversed, 10, 20, "horizontal", "rtl")).toBe(3);
+        expect(CarrierUtils.computeDropIndex(COLUMN, 50, 50, "vertical", "rtl")).toBe(1);
     });
 
     it("puts an empty container's only landing place at nought", () => {
-        expect(CarrierUtils.computeDropIndex([], 50, 50, "row")).toBe(0);
+        expect(CarrierUtils.computeDropIndex([], 50, 50, "horizontal")).toBe(0);
     });
 });
 

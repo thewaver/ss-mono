@@ -49,3 +49,20 @@ describe("computeStackAlignment", () => {
         });
     });
 });
+
+describe("computeSwipeDirection", () => {
+    it("sends a toast off the side it sits against, corners included", () => {
+        expect(ToastUtils.computeSwipeDirection("bottom-right")).toBe("right");
+        expect(ToastUtils.computeSwipeDirection("top-left")).toBe("left");
+        expect(ToastUtils.computeSwipeDirection("middle-right")).toBe("right");
+    });
+
+    it("sends a toast centered along the top or bottom off that edge", () => {
+        expect(ToastUtils.computeSwipeDirection("top-center")).toBe("up");
+        expect(ToastUtils.computeSwipeDirection("bottom-center")).toBe("down");
+    });
+
+    it("has no way off for a stack in the middle of the screen", () => {
+        expect(ToastUtils.computeSwipeDirection("middle-center")).toBeUndefined();
+    });
+});

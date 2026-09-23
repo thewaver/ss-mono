@@ -48,6 +48,12 @@ export type ElementSegment = StyledTextSegment | LineBreakSegment | AtomicElemen
 const lineBreakToken: LineBreakSegment = { type: "linebreak" };
 
 /**
+ * The break standing for the edge of a block element, kept apart from {@link lineBreakToken} only by
+ * identity, so the walk can tell a break the content asked for from one it inferred.
+ */
+const structuralLineBreakToken: LineBreakSegment = { type: "linebreak" };
+
+/**
  * Splits text into words, built on first use.
  *
  * `undefined` means "not tried yet". Deliberately lazy so nothing runs while the file
@@ -66,6 +72,10 @@ const getWordSegmenter = () => (wordSegmenter ??= new Intl.Segmenter(undefined, 
  * already resolves it to the same value, and the destination sits outside the tree being
  * walked — comparing against the immediate parent instead drops a color or a shadow set
  * two or more levels up, which then never arrives.
+ *
+ * `visibility` is never forced. The source being walked is usually a hidden copy, and the
+ * destination is what decides whether the result is showing — forcing `visible` onto every
+ * piece would stop the caller from hiding it with a class.
  */
 const splitComputedStyle = (style: CSSStyleDeclaration, baselineStyle?: CSSStyleDeclaration) => {
     const metrics: TextMetricsStyle = {};
@@ -94,7 +104,6 @@ const splitComputedStyle = (style: CSSStyleDeclaration, baselineStyle?: CSSStyle
     }
 
     nonMetrics.display = "inline";
-    nonMetrics.visibility = "visible";
     nonMetrics["white-space"] = "pre";
 
     return { metrics, nonMetrics };
@@ -117,8 +126,11 @@ export namespace JSXTextParserUtils {
      *
      * Each run of text carries the styles actually in force on it, read from the live
      * page, so the result can be re-measured or re-drawn faithfully. Block elements
-     * become breaks around their contents; `<br>` and newlines become breaks in place;
-     * childless elements such as images are carried through whole as a copy.
+     * become breaks between their contents and whatever sits beside them — never before
+     * the first piece or after the last, where there is nothing to separate, so the result
+     * never ends on an empty line the source did not draw; `<br>` and newlines become
+     * breaks in place, wherever they are; childless elements such as images are carried
+     * through whole as a copy.
      *
      * Inherited properties are weighed against `el` itself rather than against each
      * piece's own parent, since `el` is the context the result will be redrawn in — so a
@@ -140,7 +152,7 @@ export namespace JSXTextParserUtils {
         const pushStructuralLineBreak = () => {
             if (tokens.at(-1)?.type === "linebreak") return;
 
-            tokens.push(lineBreakToken);
+            tokens.push(structuralLineBreakToken);
         };
 
         const walk = (node: Node, meta: StyledTextSegmentMeta) => {
@@ -230,6 +242,8 @@ export namespace JSXTextParserUtils {
                 title: "",
             },
         });
+
+        if (tokens.at(-1) === structuralLineBreakToken) tokens.pop();
 
         return tokens;
     };

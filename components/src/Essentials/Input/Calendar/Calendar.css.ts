@@ -1,16 +1,12 @@
 import { style } from "@vanilla-extract/css";
 
-export const DAYS_PER_WEEK = 7;
-
 export const calendarRoot = style({
     display: "grid",
-    gridTemplateColumns: `repeat(${DAYS_PER_WEEK}, 1fr)`,
     width: "fit-content",
 });
 
 export const calendarRow = style({
     display: "grid",
-    gridColumn: `span ${DAYS_PER_WEEK}`,
     gridTemplateColumns: "subgrid",
 });
 

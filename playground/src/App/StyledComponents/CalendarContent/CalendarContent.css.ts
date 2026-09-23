@@ -4,6 +4,7 @@ import { themeVars } from "../../Theme.css";
 import { FIELD_HEIGHT } from "../TextFieldContent/TextFieldContent.css";
 
 const CELL_SIZE = 46;
+const WIDE_CELL_WIDTH = 92;
 
 export const isSelected = style({});
 export const isToday = style({});
@@ -13,6 +14,7 @@ export const isDisabled = style({});
 export const isInRange = style({});
 export const isRangeStart = style({});
 export const isRangeEnd = style({});
+export const isWide = style({});
 
 export const calendarDay = style({
     display: "flex",
@@ -27,6 +29,9 @@ export const calendarDay = style({
     transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,
 
     selectors: {
+        [`&.${isWide}`]: {
+            width: WIDE_CELL_WIDTH,
+        },
         [`&.${isOutsideMonth}`]: {
             opacity: 0.5,
         },

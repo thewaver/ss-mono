@@ -57,9 +57,8 @@ export type InteractionWrapperProps<TExtra extends object = {}> = AccessorProps<
         /** The smallest height the control may shrink to, for the same reason as the width. */
         minHeight?: number;
         /**
-         * Keeps a disabled control in the tab order so its tooltip can still be read — which is the point of
-         * disabling it in a way that still explains itself. Only means anything while the control is
-         * disabled, and only pairs with a tooltip.
+         * Keeps a disabled control reachable by keyboard, so a reader learns it exists, hears that it is disabled,
+         * and reads its tooltip if it has one. Only means anything while the control is disabled.
          */
         isReachableWhenDisabled?: boolean;
         /**
@@ -83,13 +82,13 @@ export type InteractionWrapperProps<TExtra extends object = {}> = AccessorProps<
     extraFlags?: MaybeAccessor<TExtra>;
     /**
      * Runs when the control is activated, by pointer or by key. It is told how far the control was dragged
-     * and how many activations have landed in quick succession, so a drag and a double click are both
-     * readable from one callback.
+     * and how many presses have landed since mount, a count that goes up by one each time — a change in it is
+     * what lets a repeated press restart an effect that is already running.
      */
     onActivation?: (activation: InteractionActivation) => void;
     /**
-     * A tooltip for the control, anchored and shown by the wrapper. Supplying one is also what makes
-     * `isReachableWhenDisabled` worth setting, since it is the thing that becomes reachable.
+     * A tooltip for the control, anchored and shown by the wrapper. On a disabled control kept reachable, it is
+     * where the reason for the disabling can be read.
      */
     tooltipDefs?: MaybeAccessor<InteractionTooltipDefs<TExtra> | undefined>;
     /**

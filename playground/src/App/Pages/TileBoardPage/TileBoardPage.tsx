@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { TILE_BOARD_DEFAULTS, type TileBoardLayout, TileBoardUtils } from "@thewaver/ss-components";
+import { TILE_BOARD_DEFAULTS, TileBoardUtils } from "@thewaver/ss-components";
 import { Index2d, type Index2dString, ShapeConst } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -9,6 +9,7 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import { MeepleExample } from "./Examples/Meeple";
+import { PaintExample } from "./Examples/Paint";
 
 const EXAMPLES_ROOT = "/src/App/Pages/TileBoardPage/Examples";
 
@@ -22,6 +23,9 @@ const MIN_REACH = 1;
 const MAX_REACH = 4;
 const MIN_GAP = 0;
 const MAX_GAP = 16;
+const MIN_TAPER = 0.2;
+const MAX_TAPER = 1;
+const TAPER_STEP = 0.05;
 const SIZE_STEP = 2;
 const COUNT_STEP = 1;
 const FIELD_WIDTH = 130;
@@ -33,35 +37,20 @@ const STARTING_TILE_HEIGHT = 72;
 const STARTING_REACH = 1;
 const STARTING_SHAPE: ShapeConst.DefaultShape = "hexagon-pointy-top";
 const STARTING_PIECE: Index2d = { row: 2, col: 2 };
+const ROUTE_START: Index2d = { row: 0, col: 0 };
+const ROCKS: Index2d[] = [
+    { row: 1, col: 0 },
+    { row: 1, col: 1 },
+    { row: 2, col: 2 },
+    { row: 3, col: 1 },
+    { row: 3, col: 2 },
+];
 
 const NO_MARKS: Index2dString[] = [];
 
 const describeTile = (tile: Index2d) => `row ${tile.row + 1}, tile ${tile.col + 1}`;
 
-const computeTilesWithin = (from: Index2d, reach: number, layout: TileBoardLayout) => {
-    const seen = new Set([Index2d.toString(from)]);
-    const within: Index2d[] = [];
-
-    let edge = [from];
-
-    for (let step = 0; step < reach; step += 1) {
-        const next: Index2d[] = [];
-
-        for (const tile of edge) {
-            for (const neighbor of TileBoardUtils.getNeighborTiles(tile, layout)) {
-                if (seen.has(Index2d.toString(neighbor))) continue;
-
-                seen.add(Index2d.toString(neighbor));
-                next.push(neighbor);
-                within.push(neighbor);
-            }
-        }
-
-        edge = next;
-    }
-
-    return within;
-};
+const computeIsRock = (tile: Index2d) => ROCKS.some((rock) => Index2d.isSame(rock, tile));
 
 export const TileBoardPage = () => {
     const [getRows, setRows] = createSignal(STARTING_ROWS);
@@ -71,20 +60,55 @@ export const TileBoardPage = () => {
     const [getGap, setGap] = createSignal(TILE_BOARD_DEFAULTS.gap);
     const [getShape, setShape] = createSignal<ShapeConst.DefaultShape>(STARTING_SHAPE);
     const [getHasShortFirstRow, setHasShortFirstRow] = createSignal(false);
+    const [getTaper, setTaper] = createSignal(TILE_BOARD_DEFAULTS.taper);
     const [getReach, setReach] = createSignal(STARTING_REACH);
 
     const [getMarked, setMarked] = createSignal<Index2dString[]>(NO_MARKS);
     const [getPiece, setPiece] = createSignal<Index2d>(STARTING_PIECE);
+    const [getDestination, setDestination] = createSignal<Index2d>();
+    const [getPainted, setPainted] = createSignal<Index2dString[]>(NO_MARKS);
 
     const getTileCount = createMemo((): Index2d => ({ row: getRows(), col: getCols() }));
 
     const getTileSize = createMemo(() => ({ width: getTileWidth(), height: getTileHeight() }));
 
     const getLayout = createMemo(() =>
-        TileBoardUtils.getLayout(getShape(), getTileCount(), getTileSize(), getHasShortFirstRow()),
+        TileBoardUtils.getLayout(getShape(), getTileCount(), getTileSize(), getHasShortFirstRow(), getTaper()),
     );
 
-    const getReachable = createMemo(() => computeTilesWithin(getPiece(), getReach(), getLayout()));
+    const getReachable = createMemo(() => TileBoardUtils.getTilesWithin(getPiece(), getReach(), getLayout()));
+
+    const getRoute = createMemo(() => {
+        const destination = getDestination();
+
+        if (!destination) return;
+
+        return TileBoardUtils.getShortestRoute(ROUTE_START, destination, getLayout(), computeIsRock);
+    });
+
+    const paint = (tile: Index2d) => {
+        const key = Index2d.toString(tile);
+
+        setPainted((previous) => (previous.includes(key) ? previous : [...previous, key]));
+    };
+
+    const togglePaint = (tile: Index2d) => {
+        const key = Index2d.toString(tile);
+
+        setPainted((previous) =>
+            previous.includes(key) ? previous.filter((painted) => painted !== key) : [...previous, key],
+        );
+    };
+
+    const describeRoute = () => {
+        const destination = getDestination();
+        const route = getRoute();
+
+        if (!destination) return "press a tile to trace the shortest way there from the piece, around the rocks";
+        if (!route) return `no way round the rocks to ${describeTile(destination)}`;
+
+        return `${route.length - 1} steps to ${describeTile(destination)}, going round the faded rocks`;
+    };
 
     const toggleMark = (tile: Index2d) => {
         const key = Index2d.toString(tile);
@@ -101,6 +125,7 @@ export const TileBoardPage = () => {
             gap: getGap,
             shape: getShape,
             hasShortFirstRow: getHasShortFirstRow,
+            taper: getTaper,
         };
 
         return [
@@ -162,6 +187,40 @@ export const TileBoardPage = () => {
                     </>
                 ),
                 path: `${EXAMPLES_ROOT}/Meeple.tsx`,
+            },
+            {
+                key: "route",
+                name: "The shortest way round",
+                readout: describeRoute,
+                component: () => (
+                    <MeepleExample
+                        {...commonProps}
+                        ariaLabel={"Board with rocks on it"}
+                        isDisabled={false}
+                        piece={ROUTE_START}
+                        marked={() => (getRoute() ?? []).map(Index2d.toString)}
+                        computeIsTileDisabled={computeIsRock}
+                        onTileActivate={(tile) => setDestination(() => tile)}
+                    />
+                ),
+                path: `${EXAMPLES_ROOT}/Meeple.tsx`,
+            },
+            {
+                key: "paint",
+                name: "Paint by sweeping",
+                readout: () =>
+                    `${getPainted().length} painted — drag across tiles to paint them, or press one to paint or clear it`,
+                component: () => (
+                    <PaintExample
+                        {...commonProps}
+                        ariaLabel={"Board to paint"}
+                        isDisabled={false}
+                        marked={getPainted}
+                        onTileActivate={togglePaint}
+                        onTileSweep={paint}
+                    />
+                ),
+                path: `${EXAMPLES_ROOT}/Paint.tsx`,
             },
             {
                 key: "disabled",
@@ -267,6 +326,24 @@ export const TileBoardPage = () => {
                         value={getHasShortFirstRow}
                         ariaLabel={"Start on the short row"}
                         onChange={setHasShortFirstRow}
+                    />
+                </PageProp>
+
+                <PageProp
+                    key={"taper"}
+                    label={"Taper"}
+                    hint={
+                        "How wide the top of the board is drawn, as a fraction of the bottom. Below 1 the board leans away, and a piece shrinks as it moves up it."
+                    }
+                >
+                    <PageNumberField
+                        value={getTaper}
+                        min={() => MIN_TAPER}
+                        max={() => MAX_TAPER}
+                        step={() => TAPER_STEP}
+                        width={() => FIELD_WIDTH}
+                        ariaLabel={"Taper"}
+                        onInput={setTaper}
                     />
                 </PageProp>
             </PagePropsPanel>

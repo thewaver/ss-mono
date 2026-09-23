@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { type Index2d, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
+import { Index2d, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { TileBoardUtils } from "./TileBoard.utils";
 
@@ -8,7 +8,7 @@ const COUNT: Index2d = { row: 5, col: 4 };
 const TILE: Size2d = { width: 80, height: 60 };
 
 const layoutOf = (shape: ShapeConst.DefaultShape, hasShortFirstRow = false) =>
-    TileBoardUtils.getLayout(shape, COUNT, TILE, hasShortFirstRow);
+    TileBoardUtils.getLayout(shape, COUNT, TILE, hasShortFirstRow, 1);
 
 const HEXAGON = layoutOf("hexagon-pointy-top");
 const FLAT_HEXAGON = layoutOf("hexagon-flat-top");
@@ -16,6 +16,8 @@ const LOZENGE = layoutOf("lozenge");
 const SQUARE = layoutOf("square");
 const TRIANGLE = layoutOf("triangle-up");
 const SIDEWAYS_TRIANGLE = layoutOf("triangle-right");
+
+const at = (row: number, col: number): Index2d => ({ row, col });
 
 const fromTopLeft = (points: Point2d[]) => {
     const first = points.reduce((best, point) =>
@@ -151,7 +153,7 @@ describe("getRowLength", () => {
     });
 
     it("never reports a negative length for a board one tile wide", () => {
-        const layout = TileBoardUtils.getLayout("hexagon-pointy-top", { row: 2, col: 1 }, TILE, false);
+        const layout = TileBoardUtils.getLayout("hexagon-pointy-top", { row: 2, col: 1 }, TILE, false, 1);
 
         expect(TileBoardUtils.getRowLength(1, layout)).toBe(0);
     });
@@ -186,7 +188,7 @@ describe("getTileCenter", () => {
     });
 
     it("is the middle of the tile's box, which a gap does not move", () => {
-        const gapped = TileBoardUtils.getLayout("hexagon-pointy-top", COUNT, TILE, false);
+        const gapped = TileBoardUtils.getLayout("hexagon-pointy-top", COUNT, TILE, false, 1);
 
         expect(TileBoardUtils.getTileCenter({ row: 2, col: 3 }, gapped)).toEqual({ x: 280, y: 120 });
     });
@@ -201,15 +203,95 @@ describe("getBoardSize", () => {
     });
 
     it("is one tile in each direction for a board of one, where nothing overlaps anything", () => {
-        const layout = TileBoardUtils.getLayout("hexagon-pointy-top", { row: 1, col: 1 }, TILE, false);
+        const layout = TileBoardUtils.getLayout("hexagon-pointy-top", { row: 1, col: 1 }, TILE, false, 1);
 
         expect(TileBoardUtils.getBoardSize(layout)).toEqual({ width: 80, height: 60 });
     });
 
     it("takes no room at all when there is nothing to lay out", () => {
-        const layout = TileBoardUtils.getLayout("hexagon-pointy-top", { row: 0, col: 4 }, TILE, false);
+        const layout = TileBoardUtils.getLayout("hexagon-pointy-top", { row: 0, col: 4 }, TILE, false, 1);
 
         expect(TileBoardUtils.getBoardSize(layout)).toEqual({ width: 0, height: 0 });
+    });
+});
+
+describe("the taper", () => {
+    const TAPERED = TileBoardUtils.getLayout("hexagon-pointy-top", COUNT, TILE, false, 0.5);
+    const FLAT_SIZE = TileBoardUtils.getBoardSize(HEXAGON);
+
+    const applyTransform = (transform: string, point: Point2d): Point2d => {
+        const m = transform.slice("matrix3d(".length, -1).split(",").map(Number);
+        const w = m[3] * point.x + m[7] * point.y + m[15];
+
+        return { x: (m[0] * point.x + m[4] * point.y + m[12]) / w, y: (m[1] * point.x + m[5] * point.y + m[13]) / w };
+    };
+
+    it("keeps the bottom edge where it was and draws the top edge at the taper's width, about the middle", () => {
+        const bottomLeft = TileBoardUtils.getDrawnPoint({ x: 0, y: FLAT_SIZE.height }, TAPERED);
+        const topLeft = TileBoardUtils.getDrawnPoint({ x: 0, y: 0 }, TAPERED);
+        const topRight = TileBoardUtils.getDrawnPoint({ x: FLAT_SIZE.width, y: 0 }, TAPERED);
+
+        expect(bottomLeft).toEqual({ x: 0, y: FLAT_SIZE.height * 0.5 });
+        expect(topLeft).toEqual({ x: FLAT_SIZE.width * 0.25, y: 0 });
+        expect(topRight.x - topLeft.x).toBe(FLAT_SIZE.width * 0.5);
+    });
+
+    it("draws the board as tall as the taper and as wide as its bottom edge", () => {
+        expect(TileBoardUtils.getBoardSize(TAPERED)).toEqual({
+            width: FLAT_SIZE.width,
+            height: FLAT_SIZE.height * 0.5,
+        });
+    });
+
+    it("closes the rows up faster towards the top, as perspective does, rather than evenly", () => {
+        const rowTops = [0, 1, 2, 3].map((row) => TileBoardUtils.getTileCenter({ row, col: 0 }, TAPERED).y);
+        const spacings = rowTops.slice(1).map((top, index) => top - rowTops[index]);
+
+        expect(spacings[0]).toBeLessThan(spacings[1]);
+        expect(spacings[1]).toBeLessThan(spacings[2]);
+    });
+
+    it("shrinks a piece by nothing at the bottom edge and by the taper at the top", () => {
+        expect(TileBoardUtils.getDrawnScale({ x: 0, y: FLAT_SIZE.height }, TAPERED)).toBe(1);
+        expect(TileBoardUtils.getDrawnScale({ x: 0, y: 0 }, TAPERED)).toBe(0.5);
+        expect(TileBoardUtils.getTileScale({ row: 0, col: 0 }, TAPERED)).toBeLessThan(
+            TileBoardUtils.getTileScale({ row: 4, col: 0 }, TAPERED),
+        );
+    });
+
+    it("scales a piece by exactly how much the tile beneath it is narrowed", () => {
+        const tile = { row: 1, col: 1 };
+        const flatCenter = TileBoardUtils.getTileCenter(tile, HEXAGON);
+        const left = TileBoardUtils.getDrawnPoint({ x: flatCenter.x - 10, y: flatCenter.y }, TAPERED);
+        const right = TileBoardUtils.getDrawnPoint({ x: flatCenter.x + 10, y: flatCenter.y }, TAPERED);
+
+        expect((right.x - left.x) / 20).toBeCloseTo(TileBoardUtils.getTileScale(tile, TAPERED));
+    });
+
+    it("draws through the transform exactly where getDrawnPoint says a piece should stand", () => {
+        const transform = TileBoardUtils.getTaperTransform(TAPERED)!;
+
+        for (const point of [
+            { x: 0, y: 0 },
+            { x: 130, y: 70 },
+            { x: FLAT_SIZE.width, y: FLAT_SIZE.height },
+        ]) {
+            const drawn = TileBoardUtils.getDrawnPoint(point, TAPERED);
+            const transformed = applyTransform(transform, point);
+
+            expect(transformed.x).toBeCloseTo(drawn.x);
+            expect(transformed.y).toBeCloseTo(drawn.y);
+        }
+    });
+
+    it("leaves a flat board untransformed and every point where it was", () => {
+        expect(TileBoardUtils.getTaperTransform(HEXAGON)).toBeUndefined();
+        expect(TileBoardUtils.getDrawnPoint({ x: 30, y: 40 }, HEXAGON)).toEqual({ x: 30, y: 40 });
+    });
+
+    it("holds a taper of nothing or more than the whole width inside the range it can draw", () => {
+        expect(TileBoardUtils.getLayout("square", COUNT, TILE, false, 0).taper).toBeGreaterThan(0);
+        expect(TileBoardUtils.getLayout("square", COUNT, TILE, false, 2).taper).toBe(1);
     });
 });
 
@@ -314,6 +396,108 @@ describe("getNeighborTiles", () => {
     });
 });
 
+describe("getTilesWithin", () => {
+    const keysOf = (tiles: Index2d[]) => tiles.map((tile) => `${tile.row}:${tile.col}`);
+
+    it("is a tile's own neighbors at one step, on every kind of board", () => {
+        for (const layout of [HEXAGON, FLAT_HEXAGON, LOZENGE, SQUARE, TRIANGLE, SIDEWAYS_TRIANGLE]) {
+            expect(TileBoardUtils.getTilesWithin(at(2, 1), 1, layout)).toEqual(
+                TileBoardUtils.getNeighborTiles(at(2, 1), layout),
+            );
+        }
+    });
+
+    it("spreads over a square board as a diamond, which is what four ways out gives", () => {
+        const expected = [];
+
+        for (let row = 0; row < COUNT.row; row++) {
+            for (let col = 0; col < COUNT.col; col++) {
+                const steps = Math.abs(row - 2) + Math.abs(col - 1);
+
+                if (steps > 0 && steps <= 2) expected.push(`${row}:${col}`);
+            }
+        }
+
+        expect(keysOf(TileBoardUtils.getTilesWithin(at(2, 1), 2, SQUARE)).sort()).toEqual(expected.sort());
+    });
+
+    it("answers nearest first, each tile once, and never the tile it started from", () => {
+        const within = keysOf(TileBoardUtils.getTilesWithin(at(2, 1), 2, HEXAGON));
+        const near = keysOf(TileBoardUtils.getNeighborTiles(at(2, 1), HEXAGON));
+
+        expect(within.slice(0, near.length)).toEqual(near);
+        expect(new Set(within).size).toBe(within.length);
+        expect(within).not.toContain("2:1");
+    });
+
+    it("follows a triangle's three ways out, which change as the triangles turn over", () => {
+        expect(keysOf(TileBoardUtils.getTilesWithin(at(0, 0), 2, TRIANGLE))).toEqual(["0:1", "1:0", "0:2", "1:1"]);
+    });
+
+    it("neither enters a blocked tile nor reaches anything through it", () => {
+        const isBlocked = (tile: Index2d) => Index2d.isSame(tile, at(0, 1)) || Index2d.isSame(tile, at(1, 0));
+
+        expect(TileBoardUtils.getTilesWithin(at(0, 0), 3, SQUARE, isBlocked)).toEqual([]);
+    });
+
+    it("reaches nothing with no steps to take", () => {
+        expect(TileBoardUtils.getTilesWithin(at(2, 1), 0, HEXAGON)).toEqual([]);
+    });
+});
+
+describe("getShortestRoute", () => {
+    const expectJoined = (route: Index2d[], layout: typeof HEXAGON) => {
+        route.slice(1).forEach((tile, index) => {
+            expect(TileBoardUtils.getNeighborTiles(route[index], layout)).toContainEqual(tile);
+        });
+    };
+
+    it("crosses a hexagon board one row per step", () => {
+        const route = TileBoardUtils.getShortestRoute(at(0, 0), at(4, 0), HEXAGON)!;
+
+        expect(route).toHaveLength(5);
+        expect(route[0]).toEqual(at(0, 0));
+        expect(route[4]).toEqual(at(4, 0));
+        expectJoined(route, HEXAGON);
+    });
+
+    it("takes a flat-top hexagon two rows in one step, which is where its flat edge points", () => {
+        expect(TileBoardUtils.getShortestRoute(at(0, 0), at(2, 0), FLAT_HEXAGON)).toEqual([at(0, 0), at(2, 0)]);
+    });
+
+    it("walks a row of triangles tile by tile", () => {
+        const route = TileBoardUtils.getShortestRoute(at(0, 0), at(0, 3), TRIANGLE)!;
+
+        expect(route).toEqual([at(0, 0), at(0, 1), at(0, 2), at(0, 3)]);
+    });
+
+    it("goes round a blocked tile rather than through it", () => {
+        const isBlocked = (tile: Index2d) => Index2d.isSame(tile, at(0, 1));
+        const route = TileBoardUtils.getShortestRoute(at(0, 0), at(0, 2), SQUARE, isBlocked)!;
+
+        expect(route).toHaveLength(5);
+        expect(route).not.toContainEqual(at(0, 1));
+        expectJoined(route, SQUARE);
+    });
+
+    it("answers nothing when a wall of blocked tiles cuts the two apart", () => {
+        const isBlocked = (tile: Index2d) => tile.col === 1;
+
+        expect(TileBoardUtils.getShortestRoute(at(0, 0), at(0, 3), SQUARE, isBlocked)).toBeUndefined();
+    });
+
+    it("answers nothing for a blocked destination or one off the board", () => {
+        const isBlocked = (tile: Index2d) => Index2d.isSame(tile, at(0, 3));
+
+        expect(TileBoardUtils.getShortestRoute(at(0, 0), at(0, 3), SQUARE, isBlocked)).toBeUndefined();
+        expect(TileBoardUtils.getShortestRoute(at(0, 0), at(1, 3), HEXAGON)).toBeUndefined();
+    });
+
+    it("is just the one tile when it starts where it ends", () => {
+        expect(TileBoardUtils.getShortestRoute(at(2, 1), at(2, 1), HEXAGON)).toEqual([at(2, 1)]);
+    });
+});
+
 describe("getLastTile", () => {
     it("lands on the end of the last row, whichever kind of row that is", () => {
         expect(TileBoardUtils.getLastTile(HEXAGON)).toEqual({ row: 4, col: 3 });
@@ -379,7 +563,7 @@ describe("computeNextTile", () => {
     });
 
     it("answers nothing for an empty board rather than an index nothing can hold", () => {
-        const layout = TileBoardUtils.getLayout("hexagon-pointy-top", { row: 0, col: 0 }, TILE, false);
+        const layout = TileBoardUtils.getLayout("hexagon-pointy-top", { row: 0, col: 0 }, TILE, false, 1);
 
         expect(TileBoardUtils.computeNextTile("ArrowRight", { row: 0, col: 0 }, layout)).toBeUndefined();
     });

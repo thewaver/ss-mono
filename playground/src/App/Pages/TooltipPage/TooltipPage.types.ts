@@ -6,4 +6,6 @@ export type TooltipExampleProps = AccessorProps<{
     offset: Point2d;
     transitionDurationMs: number;
     focusShowDelayMs: number;
+    hoverShowDelayMs: number;
+    skipDelayWindowMs: number;
 }>;

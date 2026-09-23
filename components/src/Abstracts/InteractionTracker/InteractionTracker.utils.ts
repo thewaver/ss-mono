@@ -4,6 +4,7 @@ import { createStore } from "solid-js/store";
 import { GestureUtils, MathUtils } from "@thewaver/ss-utils";
 import type { SwipeAxis, SwipeDirection } from "@thewaver/ss-utils";
 
+import { NavigatorUtils } from "../Navigator/Navigator.utils";
 import type {
     InteractionActivation,
     InteractionDragEndReason,
@@ -401,22 +402,21 @@ export namespace InteractionTrackerUtils {
     /**
      * Whether a disabled control should still be reachable by keyboard.
      *
-     * A `disabled` control cannot be focused, so a keyboard user can never read the tooltip explaining
-     * why it is disabled — which is the one thing they most need. So a disabled control that has a
-     * tooltip stays in the tab order, and a caller can insist on it regardless.
+     * A `disabled` control cannot be focused, so a keyboard user never learns it exists, let alone why it
+     * is off. A control that opts in stays reachable: it takes focus, announces that it is disabled, and
+     * reads whatever tooltip it has. The tooltip is welcome and not required, so that a disabled item with
+     * nothing to say is still discoverable.
      *
      * @param isDisabled Whether the control is disabled. An enabled control is reachable anyway, so
      * this reports `false` for one.
-     * @param isReachableWhenDisabled Whether the control opts into this behavior.
-     * @param hasTooltip Whether there is anything to read once focused.
-     * @param isFocusableWhenDisabled Forces reachability, tooltip or not.
+     * @param isReachableWhenDisabled Whether the consumer opted in.
+     * @param isFocusableWhenDisabled A component's own insistence, for an item its container walks.
      */
     export const computeIsReachable = (
         isDisabled: boolean,
         isReachableWhenDisabled: boolean,
-        hasTooltip: boolean,
         isFocusableWhenDisabled = false,
-    ) => isDisabled && ((isReachableWhenDisabled && hasTooltip) || isFocusableWhenDisabled);
+    ) => isDisabled && (isReachableWhenDisabled || isFocusableWhenDisabled);
 
     /**
      * Manages the tab order of an element's secondary controls.
@@ -539,7 +539,7 @@ export namespace InteractionTrackerUtils {
         const onKeyDown = (e: KeyboardEvent) => {
             readFocusVisible(e.currentTarget as HTMLElement);
 
-            if (e.key !== "Enter" && e.key !== " ") return;
+            if (!NavigatorUtils.getIsActivationKey(e.key)) return;
 
             setActiveByKey(true);
         };
@@ -715,7 +715,7 @@ export namespace InteractionTrackerUtils {
             };
 
             const onKeyDown = (e: KeyboardEvent) => {
-                if (e.repeat || (e.key !== "Enter" && e.key !== " ")) return;
+                if (e.repeat || !NavigatorUtils.getIsActivationKey(e.key)) return;
 
                 activate(CENTER_RATIO);
             };

@@ -15,3 +15,11 @@ export const mosaicSizedItem = style({
 globalStyle(`${mosaicSizedItem} > *`, {
     gridArea: "1 / 1",
 });
+
+export const mosaicTileButton = style({
+    display: "grid",
+});
+
+globalStyle(`${mosaicTileButton} > *`, {
+    gridArea: "1 / 1",
+});

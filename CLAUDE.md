@@ -100,6 +100,11 @@ unless they ask to see something, and the offer to draw one is not made unprompt
 own page, an article — and only by a hand-built sketch when they ask for a sketch in those words. Building one
 costs a great deal more than finding one, and they will say when the effort is wanted.
 
+**A proposed component comes with a published example of it.** Asked for by the user after a list of Exotics
+candidates arrived as prose alone: every candidate carries a link to something already built elsewhere that
+looks like it, even when only an approximation exists, so they can see it rather than imagine it. The same
+rule as above applies — find it, never build it.
+
 **Short.** They have asked for shorter output more than once. Cut the survey of alternatives and give the
 recommendation. An acknowledgement or a decision is one or two lines. Do not recap work already reported,
 do not re-list open items they have already seen, and do not close by offering next steps unless asked.
@@ -116,6 +121,8 @@ prose answers in a row were called too verbose. One heading per option, then bul
 one line each, then the question. No paragraphs around it, no preamble, no recommendation dressed as
 narrative — the trade-offs stand side by side so they can be compared by eye. If an option is a non-starter
 it still gets listed with the reason as its con, rather than argued away in a sentence above the list.
+
+**An option with no real con is not a question.** Stated by the user, after being asked to pick between passing a node's placement as a second argument — whose only con read "none worth naming" — and two weaker alternatives. If one option wins outright, it is the decision: take it, say so in a line, and move on. A pros-and-cons list is for trade-offs that exist.
 
 **Every option carries a letter in its heading** — `A`, `B`, `C`, never `1`, `2`, `3`. Asked for by the user.
 A one-character answer is what makes the list usable when they are replying by voice, and letters keep it

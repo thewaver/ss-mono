@@ -8,12 +8,15 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
-import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
+import { BurstExample } from "./Examples/Burst";
 import { DiagonalExample } from "./Examples/Diagonal";
 import { GridExample } from "./Examples/Grid";
+import { ManyToOneExample } from "./Examples/ManyToOne";
 import { MovingTargetExample } from "./Examples/MovingTarget";
 import { MultipleTargetsExample } from "./Examples/MultipleTargets";
 import { RadialExample } from "./Examples/Radial";
+import { RoundTripExample } from "./Examples/RoundTrip";
 import { SingleTargetExample } from "./Examples/SingleTarget";
 import { VerticalExample } from "./Examples/Vertical";
 import {
@@ -108,6 +111,8 @@ export const ParticleSpawnerPage = () => {
     const [getIterationPatternKey, setIterationPatternKey] =
         createSignal<IterationPattern>(STARTING_ITERATION_PATTERN_KEY);
 
+    const [getAreTargetsHidden, setAreTargetsHidden] = createSignal(false);
+
     const [travelDefs, setTravelDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
     const playback = createSignal(true);
 
@@ -135,6 +140,7 @@ export const ParticleSpawnerPage = () => {
             spawnDelayMs: getSpawnDelayMs,
             spawnIterationPatterns: () => ITERATION_PATTERNS[getIterationPatternKey()](),
             computeParticlePos: (defs, t) => getComputeParticlePos()(defs, t),
+            areTargetsHidden: getAreTargetsHidden,
             playbackSignal: playback,
         };
 
@@ -188,6 +194,36 @@ export const ParticleSpawnerPage = () => {
                     </PageMeasureBox>
                 ),
                 path: `${EXAMPLES_ROOT}/Radial.tsx`,
+            },
+            {
+                key: "manyToOne",
+                name: "Many to one (many spawners, 1 target)",
+                component: () => (
+                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                        <ManyToOneExample {...commonProps} />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/ManyToOne.tsx`,
+            },
+            {
+                key: "burst",
+                name: "Burst on press",
+                component: () => (
+                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                        <BurstExample {...commonProps} />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/Burst.tsx`,
+            },
+            {
+                key: "roundTrip",
+                name: "Round trip (a relay on arrival)",
+                component: () => (
+                    <PageMeasureBox width={() => BOX_WIDTH} height={() => BOX_HEIGHT}>
+                        <RoundTripExample {...commonProps} />
+                    </PageMeasureBox>
+                ),
+                path: `${EXAMPLES_ROOT}/RoundTrip.tsx`,
             },
             {
                 key: "multipleTargets",
@@ -348,6 +384,20 @@ export const ParticleSpawnerPage = () => {
                             width={() => FIELD_WIDTH}
                             ariaLabel={"Overshoot percent"}
                             onInput={setOvershootPercent}
+                        />
+                    </PageProp>
+
+                    <PageProp
+                        key={"areTargetsHidden"}
+                        label={"Hide targets"}
+                        hint={
+                            "Takes the target markers out of sight while leaving them where they are, so the particles still land on them."
+                        }
+                    >
+                        <PageCheckField
+                            value={getAreTargetsHidden}
+                            ariaLabel={"Hide targets"}
+                            onChange={setAreTargetsHidden}
                         />
                     </PageProp>
 

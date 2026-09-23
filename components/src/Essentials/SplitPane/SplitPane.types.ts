@@ -3,7 +3,7 @@ import type { Accessor, JSX } from "solid-js";
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
-export type SplitPaneDir = "row" | "column";
+export type SplitPaneOrientation = "horizontal" | "vertical";
 
 export type SplitPaneGutterFlags = {
     isDragging: boolean;
@@ -17,8 +17,8 @@ export type SplitPaneEntry = {
 };
 
 export type SplitPaneProps = AccessorProps<{
-    /** Whether the panes sit side by side or stacked. */
-    dir?: SplitPaneDir;
+    /** Whether the panes sit side by side, `"horizontal"`, or stacked, `"vertical"`. The dividers run the other way, so a horizontal split has upright dividers. */
+    orientation?: SplitPaneOrientation;
     /** How wide the draggable divider between two panes is. */
     gutterSize?: number;
     /** How far one press of an arrow key moves a divider. */

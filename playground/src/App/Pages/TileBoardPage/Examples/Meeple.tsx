@@ -10,13 +10,14 @@ import * as styles from "../TileBoardPage.css";
 
 type Props = TileBoardMeepleExampleProps;
 
-export const MeepleExample = ({ shape, piece, ...otherProps }: Props) => {
+export const MeepleExample = ({ shape, piece, marked, ...otherProps }: Props) => {
     const getLayout = createMemo(() =>
         TileBoardUtils.getLayout(
             access(shape),
             access(otherProps.tileCount),
             access(otherProps.tileSize),
             access(otherProps.hasShortFirstRow),
+            access(otherProps.taper),
         ),
     );
 
@@ -29,13 +30,17 @@ export const MeepleExample = ({ shape, piece, ...otherProps }: Props) => {
                 renderTile={(getTile, getRenderProps) => (
                     <PageTileBoardTile
                         renderProps={getRenderProps}
-                        isMarked={() => Index2d.isSame(getTile(), access(piece))}
+                        isMarked={() =>
+                            Index2d.isSame(getTile(), access(piece)) ||
+                            (access(marked) ?? []).includes(Index2d.toString(getTile()))
+                        }
                     />
                 )}
             />
 
             <PageTileBoardMeeple
                 center={() => TileBoardUtils.getTileCenter(access(piece), getLayout())}
+                scale={() => TileBoardUtils.getTileScale(access(piece), getLayout())}
                 tileSize={otherProps.tileSize}
             />
         </div>

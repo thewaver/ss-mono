@@ -22,6 +22,7 @@ export const ImageSwitcher = (props: ImageSwitcherProps) => {
     createEffect(() => {
         const src = access(props.src);
         const onLoad = props.onLoad;
+        const onError = props.onError;
 
         if (src === untrack(getCurrentImage)) return;
 
@@ -48,9 +49,10 @@ export const ImageSwitcher = (props: ImageSwitcherProps) => {
             swap();
             onLoad?.call(img, e);
         };
-        img.onerror = () => {
+        img.onerror = (e) => {
             console.warn(`ImageSwitcher: failed to preload image: ${src}`);
             swap();
+            if (typeof e !== "string") onError?.(e);
         };
         img.src = src;
     });

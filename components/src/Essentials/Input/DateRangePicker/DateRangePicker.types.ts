@@ -10,8 +10,18 @@ import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 import type { CalendarDayRenderer, CalendarWeekdayRenderer } from "../Calendar/Calendar.types";
 import type { DateInputProps } from "../DateInput/DateInput.types";
 
-export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "valueSignal" | "ariaLabel"> &
+export type DateRangePickerProps = Omit<
+    DateInputProps,
+    "renderTrailing" | "valueSignal" | "ariaLabel" | "id" | "name"
+> &
     AccessorProps<{
+        /**
+         * The fields' element id. The start field takes `<id>-start` and the end field `<id>-end`, so a label can
+         * name each one and no id lands on two elements.
+         */
+        id?: string;
+        /** The fields' name when they are submitted as part of a form. They submit as `<name>-start` and `<name>-end`. */
+        name?: string;
         /** Where the calendar sits against the fields. */
         placement?: AnchorPlacement;
         /** How far the calendar is held clear of the fields. */
@@ -19,11 +29,11 @@ export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "valu
         /** How long the calendar takes to fade in and out. */
         popupTransitionDurationMs?: number;
         /** Names the calendar for assistive technology. */
-        calendarLabel?: string;
+        calendarLabel: string;
         /** Names the start field for assistive technology. */
-        startLabel?: string;
+        startLabel: string;
         /** Names the end field for assistive technology. */
-        endLabel?: string;
+        endLabel: string;
         /** Which day begins a week, which decides the order of the column headings. */
         weekStartsOn?: DateValueWeekStart;
         /** Whether one day can be picked, for rules a plain earliest and latest cannot express. */
@@ -39,8 +49,8 @@ export type DateRangePickerProps = Omit<DateInputProps, "renderTrailing" | "valu
          * owns the trigger.
          */
         triggerId?: string;
-        /** Names the control that opens the calendar. Defaults to "Open the calendar". */
-        triggerAriaLabel?: string;
+        /** Names the control that opens the calendar. */
+        triggerAriaLabel: string;
         /**
          * Draws what sits inside the control that opens the calendar.
          *

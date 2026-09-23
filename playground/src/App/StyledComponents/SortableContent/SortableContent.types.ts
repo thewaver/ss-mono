@@ -1,9 +1,9 @@
 import type {
     AccessorProps,
     InteractionFlags,
-    SortableDir,
     SortableFlags,
     SortableItemFlags,
+    SortableOrientation,
 } from "@thewaver/ss-components";
 
 export type SortableItemContentProps = AccessorProps<{
@@ -18,5 +18,5 @@ export type SortableSurfaceProps = AccessorProps<{
 }>;
 
 export type SortableMarkerProps = AccessorProps<{
-    dir: SortableDir;
+    orientation: SortableOrientation;
 }>;

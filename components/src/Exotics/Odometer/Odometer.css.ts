@@ -42,3 +42,7 @@ export const odometerDigitFace = style({
     width: "100%",
     height: "100%",
 });
+
+export const odometerFixedClipped = style({
+    overflow: "hidden",
+});

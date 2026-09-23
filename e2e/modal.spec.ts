@@ -6,7 +6,7 @@ const DIALOG = '[role="dialog"]';
 const ALERT = '[role="alertdialog"]';
 const OVERLAY_INSET = 4;
 
-/** The overlay's center is under the dialog for a centerd one, so a corner is the only reliable point. */
+/** The overlay's center is under the dialog for a centered one, so a corner is the only reliable point. */
 const clickOverlayCorner = async (page: Page) => {
     const box = (await page.locator('[aria-modal="true"]').evaluate((element) => {
         const overlay = element.parentElement!.firstElementChild!;
@@ -73,6 +73,43 @@ test.describe("Modal", () => {
     });
 });
 
+/**
+ * A dialog holding only text has no child to hand focus to, and that is the case that used to leave focus on
+ * the trigger behind the overlay: the trap listens on the dialog's own subtree, so a Tab pressed from the
+ * trigger never reached it and walked the page instead. The dialog itself is the fallback target, which is
+ * what `initialFocusRef`'s documentation promises.
+ */
+test.describe("Modal with nothing focusable inside", () => {
+    const TRIGGER = `${demo("textOnly")} button`;
+
+    test.beforeEach(async ({ page }) => {
+        await page.goto("/modal");
+        await expect(page.locator(TRIGGER)).toBeVisible();
+    });
+
+    test("the dialog takes focus itself, so Tab does not walk the page behind it", async ({ page }) => {
+        await page.locator(TRIGGER).click();
+        await expect(page.locator(DIALOG)).toBeVisible();
+
+        await expect(page.locator(DIALOG), "with no child to focus, the dialog is the one holding focus").toBeFocused();
+
+        await page.keyboard.press("Tab");
+
+        expect(
+            await page.evaluate((selector) => {
+                const active = document.activeElement;
+
+                return !active || active === document.body || !!document.querySelector(selector)?.contains(active);
+            }, DIALOG),
+            "and Tab reaches nothing on the page behind the overlay",
+        ).toBe(true);
+
+        await page.keyboard.press("Escape");
+        await expect(page.locator(DIALOG), "Escape still closes it").toHaveCount(0);
+        await expect(page.locator(TRIGGER), "and focus goes back to the trigger").toBeFocused();
+    });
+});
+
 test.describe("Drawer", () => {
     const TRIGGER = `${demo("left")} button`;
 
@@ -93,7 +130,7 @@ test.describe("Drawer", () => {
 
         const box = (await page.locator(DIALOG).boundingBox())!;
 
-        expect(Math.round(box.x), "a left drawer sits against the left edge rather than being centerd").toBe(0);
+        expect(Math.round(box.x), "a left drawer sits against the left edge rather than being centered").toBe(0);
         expect(box.height > 600, "and stretches down the cross axis, which is the placement the library owns").toBe(
             true,
         );
@@ -198,7 +235,7 @@ test.describe("Modal in its alert mode", () => {
         ).toContain("Cancel");
     });
 
-    test("an overlay click cannot dismiss it but Escape can", async ({ page }) => {
+    test("neither an overlay click nor Escape can dismiss it", async ({ page }) => {
         await page.locator(TRIGGER).click();
         await expect(page.locator(ALERT)).toBeVisible();
 
@@ -209,7 +246,10 @@ test.describe("Modal in its alert mode", () => {
         ).toHaveCount(1);
 
         await page.keyboard.press("Escape");
-        await expect(page.locator(ALERT), "Escape still closes it, as every dialog must").toHaveCount(0);
+        await expect(
+            page.locator(ALERT),
+            "Escape is refused too, because this demo turns isDismissableOnEscape off — a stray key is not an answer",
+        ).toHaveCount(1);
         expect(await readout(page, "destructiveConfirmation"), "with no outcome").toContain("nothing decided yet");
     });
 

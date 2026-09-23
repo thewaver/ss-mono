@@ -1,6 +1,6 @@
 import { For, createSignal } from "solid-js";
 
-import { ParticleSpawner } from "@thewaver/ss-components";
+import { ParticleSpawner, access } from "@thewaver/ss-components";
 
 import { computeParticleGlow } from "../ParticleSpawnerPage.const";
 import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
@@ -28,7 +28,12 @@ export const RadialExample = (props: ParticleSpawnerExampleProps) => {
         <div class={styles.demoArea}>
             <For each={TARGET_POSITIONS}>
                 {(position, index) => (
-                    <div ref={(el) => setTargetRefAt(index(), el)} class={styles.targetMarker} style={position} />
+                    <div
+                        ref={(el) => setTargetRefAt(index(), el)}
+                        class={styles.targetMarker}
+                        classList={{ [styles.isHiddenMarker]: access(props.areTargetsHidden) }}
+                        style={position}
+                    />
                 )}
             </For>
 

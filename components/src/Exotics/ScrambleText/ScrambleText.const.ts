@@ -1,5 +1,7 @@
+const DEFAULT_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&@*+=<>/\\";
+
 export const SCRAMBLE_TEXT_DEFAULTS = {
-    glyphs: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&@*+=<>/\\",
+    computeGlyphs: (): string => DEFAULT_GLYPHS,
     settleDurationMs: 1000,
     scrambleIntervalMs: 50,
 };

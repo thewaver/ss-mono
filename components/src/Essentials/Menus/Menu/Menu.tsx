@@ -95,6 +95,7 @@ const MenuTrigger = (props: MenuTriggerProps) => {
             type="button"
             class={styles.menuTrigger}
             classList={{ [styles.menuTriggerHoldable]: access(props.isHoldable) }}
+            role={access(props.role)}
             aria-haspopup="menu"
             aria-label={getAriaLabel()}
             aria-disabled={getIsDisabled() || undefined}
@@ -132,8 +133,10 @@ const MenuItemView = (props: MenuItemViewProps) => {
 
     const getIsOpen = () => access(props.flags).isOpen;
 
+    const getIsHighlighted = createMemo(() => access(props.flags).isHighlighted ?? false);
+
     createEffect(() => {
-        if (!access(props.flags).isHighlighted) return;
+        if (!getIsHighlighted()) return;
 
         getElementRef()?.scrollIntoView({ block: "nearest" });
     });
@@ -188,7 +191,6 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
             const isReachable = InteractionTrackerUtils.computeIsReachable(
                 item.isDisabled ?? false,
                 item.isReachableWhenDisabled ?? false,
-                item.tooltipDefs !== undefined,
             );
 
             if (!item.isDisabled || isReachable) acc.push(index);
@@ -426,7 +428,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
             return;
         }
 
-        if (e.key === "Enter" || e.key === " ") {
+        if (NavigatorUtils.getIsActivationKey(e.key)) {
             e.preventDefault();
 
             if (highlightedIndex === undefined || items[highlightedIndex].isDisabled) return;
@@ -436,6 +438,8 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
             return;
         }
 
+        const logicalKey = NavigatorUtils.computeLogicalKey(e.key, access(props.direction));
+
         if (e.key === LEVEL_CLOSE_KEY && getIsLaidOut() && access(props.path).length > ROOT_LEVEL) {
             e.preventDefault();
             e.stopImmediatePropagation();
@@ -444,7 +448,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
             return;
         }
 
-        if (!getIsLaidOut() && e.key === SUBMENU_OPEN_KEY && highlightedIndex !== undefined) {
+        if (!getIsLaidOut() && logicalKey === SUBMENU_OPEN_KEY && highlightedIndex !== undefined) {
             if (items[highlightedIndex].isDisabled || !computeHasSubmenu(highlightedIndex)) return;
 
             e.preventDefault();
@@ -453,7 +457,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
             return;
         }
 
-        if (!getIsLaidOut() && e.key === SUBMENU_CLOSE_KEY && access(props.path).length > ROOT_LEVEL) {
+        if (!getIsLaidOut() && logicalKey === SUBMENU_CLOSE_KEY && access(props.path).length > ROOT_LEVEL) {
             e.preventDefault();
             props.onClose();
 
@@ -520,6 +524,7 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
                                 labelledBy={() => getItemId(index)}
                                 items={() => getItem().items!}
                                 isOpen={getIsSubmenuOpen}
+                                direction={props.direction}
                                 path={() => [...access(props.path), index]}
                                 parentExtent={() => getLayout()?.extent ?? NO_PARENT_EXTENT}
                                 rootExtent={() => getRootExtent()}
@@ -645,6 +650,9 @@ export const Menu = <T,>(props: MenuProps<T>) => {
 
     const [getTriggerRef, setTriggerRef] = createSignal<HTMLElement>();
     const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
+
+    const getDirection = NavigatorUtils.createDirectionSignal(() => access(props.anchorRef) ?? getTriggerRef());
+
     const [getInitialHighlightPosition, setInitialHighlightPosition] = createSignal<MenuHighlightPosition>("first");
     const [getFlickOrigin, setFlickOrigin] = createSignal<Point2d | undefined>();
 
@@ -685,7 +693,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
 
         props.onActivate(item.value);
 
-        if (kind !== "checkbox") close();
+        if (!MenuUtils.getStaysOpenOnPick(item)) close();
     };
 
     const handleTriggerPress = (e: PointerEvent) => {
@@ -717,7 +725,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
     const handleTriggerKeyDown = (e: KeyboardEvent) => {
         if (getIsDisabled()) return;
 
-        if (e.key !== "Enter" && e.key !== " " && e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+        if (!NavigatorUtils.getIsActivationKey(e.key) && e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
 
         e.preventDefault();
 
@@ -739,6 +747,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         id={getTriggerId}
                         ariaLabel={props.ariaLabel}
                         menuId={() => menuId}
+                        role={() => access(props.triggerRole) ?? MENU_DEFAULTS.triggerRole}
                         flags={getFlags}
                         renderContent={props.renderContent}
                         isHoldable={getIsHoldable}
@@ -752,6 +761,7 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         labelledBy={getTriggerId}
                         items={props.items}
                         isOpen={getIsOpen}
+                        direction={getDirection}
                         path={ROOT_PATH}
                         parentExtent={NO_PARENT_EXTENT}
                         rootExtent={NO_PARENT_EXTENT}
@@ -761,7 +771,9 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         triggerRef={getTriggerRef}
                         placement={props.placement}
                         offset={props.offset}
-                        submenuPlacement={() => access(props.submenuPlacement) ?? MENU_DEFAULTS.submenuPlacement}
+                        submenuPlacement={() =>
+                            access(props.submenuPlacement) ?? MENU_DEFAULTS.submenuPlacement[getDirection()]
+                        }
                         submenuOffset={props.submenuOffset}
                         submenuMode={() => access(props.submenuMode) ?? MENU_DEFAULTS.submenuMode}
                         submenuOpensOn={() => access(props.submenuOpensOn) ?? MENU_DEFAULTS.submenuOpensOn}
@@ -800,6 +812,8 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
     const [getAnchorRect, setAnchorRect] = createSignal<Rect | undefined>(undefined, { equals: Rect.isSame });
     const [getIsOpen, setIsOpen] = SignalMirrorUtils.createOptional(() => props.visibilitySignal, false);
 
+    const getDirection = NavigatorUtils.createDirectionSignal(getRegionRef);
+
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
     const close = () => {
@@ -818,7 +832,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
 
         props.onActivate(item.value);
 
-        if (kind !== "checkbox") close();
+        if (!MenuUtils.getStaysOpenOnPick(item)) close();
     };
 
     createEffect(() => {
@@ -894,6 +908,7 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
                 ariaLabel={props.ariaLabel}
                 items={props.items}
                 isOpen={getIsOpen}
+                direction={getDirection}
                 path={ROOT_PATH}
                 parentExtent={NO_PARENT_EXTENT}
                 rootExtent={NO_PARENT_EXTENT}
@@ -903,7 +918,9 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
                 triggerRef={getRegionRef}
                 placement={props.placement}
                 offset={props.offset}
-                submenuPlacement={() => access(props.submenuPlacement) ?? MENU_DEFAULTS.submenuPlacement}
+                submenuPlacement={() =>
+                    access(props.submenuPlacement) ?? MENU_DEFAULTS.submenuPlacement[getDirection()]
+                }
                 submenuOffset={props.submenuOffset}
                 submenuMode={() => access(props.submenuMode) ?? MENU_DEFAULTS.submenuMode}
                 submenuOpensOn={() => access(props.submenuOpensOn) ?? MENU_DEFAULTS.submenuOpensOn}

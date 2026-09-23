@@ -1,12 +1,21 @@
-import { style } from "@vanilla-extract/css";
+import { globalStyle, style } from "@vanilla-extract/css";
 
-import { themeVars } from "../../../Theme.css";
+import { FOCUS_RING_WIDTH, themeVars } from "../../../Theme.css";
 
 const panel = (from: string, to: string) => `linear-gradient(135deg, ${from}, ${to})`;
 
 export const root = style({
     borderRadius: themeVars.borderRadius.full,
     overflow: "hidden",
+    selectors: {
+        "&:has(> :focus-visible)": {
+            outline: `${FOCUS_RING_WIDTH}px solid ${themeVars.color.outline.main}`,
+        },
+    },
+});
+
+globalStyle(`${root} > :focus-visible`, {
+    outline: "0 none",
 });
 
 export const content = style({

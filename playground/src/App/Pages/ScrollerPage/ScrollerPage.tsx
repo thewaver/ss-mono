@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { Tab } from "@thewaver/ss-components";
+import { CURRENT_INDEX_OBSERVER_DEFAULTS } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -9,6 +10,8 @@ import { PageNumberField } from "../../StyledComponents/Field/Field";
 import { ChipsExample } from "./Examples/Chips";
 import { FocusableChildrenExample } from "./Examples/FocusableChildren";
 import { TabbedExample } from "./Examples/Tabbed";
+import { TableOfContentsExample } from "./Examples/TableOfContents";
+import { TOC_SECTIONS } from "./ScrollerPage.const";
 
 import * as styles from "./ScrollerPage.css";
 
@@ -40,6 +43,7 @@ export const ScrollerPage = () => {
     const [getItemCount, setItemCount] = createSignal(STARTING_ITEM_COUNT);
     const [getSelectedMonth, setSelectedMonth] = createSignal(MONTHS[0]);
     const progressSignal = createSignal(0);
+    const [getCurrentSection, setCurrentSection] = createSignal<number | undefined>();
 
     const getLabels = createMemo(() => Array.from({ length: getItemCount() }, (_, index) => `Item ${index + 1}`));
 
@@ -93,6 +97,20 @@ export const ScrollerPage = () => {
         },
     ]);
 
+    const getLongPageExamples = createMemo(() => [
+        {
+            key: "tableOfContents",
+            name: "Table of contents following the page",
+            readout: () => {
+                const current = getCurrentSection();
+
+                return `current: ${current === undefined ? "none" : TOC_SECTIONS[current].title} — ElementObserverUtils.createViewportCurrentIndexObserver marks the last heading whose top has scrolled past a line ${CURRENT_INDEX_OBSERVER_DEFAULTS.offsetRatio * PERCENT}% of the way down the window, and pressing a link scrolls to its heading`;
+            },
+            component: () => <TableOfContentsExample onCurrentChange={setCurrentSection} />,
+            path: `${EXAMPLES_ROOT}/TableOfContents.tsx`,
+        },
+    ]);
+
     return (
         <div class={styles.root}>
             <PagePropsPanel scope={"global"}>
@@ -124,6 +142,8 @@ export const ScrollerPage = () => {
             </PagePropsPanel>
 
             <PageExamples items={getExamples} minColumnWidth={400} />
+
+            <PageExamples items={getLongPageExamples} layout={"flow"} />
         </div>
     );
 };

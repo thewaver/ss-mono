@@ -10,7 +10,7 @@ import * as styles from "./TabContent.css";
 export const PageTabContent = (props: ParentProps<TabContentProps>) => {
     return (
         <div
-            class={access(props.dir) === "row" ? styles.rowTab : styles.columnTab}
+            class={access(props.orientation) === "horizontal" ? styles.rowTab : styles.columnTab}
             classList={{
                 [styles.isSelected]: access(props.isSelected),
                 [styles.isHovered]: access(props.flags).isHovered,
@@ -38,7 +38,7 @@ export const PageTabCell = (props: ParentProps<TabCellProps>) => {
 };
 
 export const PageTabGutter = (props: TabDecorationProps) => {
-    return <div class={access(props.dir) === "row" ? styles.rowTabGutter : undefined} data-gutter />;
+    return <div class={access(props.orientation) === "horizontal" ? styles.rowTabGutter : undefined} data-gutter />;
 };
 
 export const PageTabHexFloater = (props: TabFloaterProps) => {
@@ -55,7 +55,7 @@ export const PageTabHexFloater = (props: TabFloaterProps) => {
 export const PageTabFloater = (props: TabFloaterProps) => {
     return (
         <div
-            class={access(props.dir) === "row" ? styles.rowTabFloater : styles.columnTabFloater}
+            class={access(props.orientation) === "horizontal" ? styles.rowTabFloater : styles.columnTabFloater}
             classList={{ [styles.isVisible]: access(props.visibilityTarget) === 1 }}
             style={{ "transition-duration": `${access(props.transitionDurationMs)}ms` }}
             data-floater

@@ -7,6 +7,8 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
 import { CircuitExample } from "./Examples/Circuit";
+import { ConvoyExample } from "./Examples/Convoy";
+import { ScrollExample } from "./Examples/Scroll";
 import { TimelineExample } from "./Examples/Timeline";
 import type { TrailExampleProps } from "./TrailPage.types";
 
@@ -29,11 +31,14 @@ export const TrailPage = () => {
     const circuitPlayingSignal = createSignal(!getPrefersReducedMotion());
     const timelineProgressSignal = createSignal(HALF_WAY);
     const timelinePlayingSignal = createSignal(false);
+    const convoyProgressSignal = createSignal(0);
+    const convoyPlayingSignal = createSignal(!getPrefersReducedMotion());
+    const [getScrollProgress, setScrollProgress] = createSignal(0);
 
     const getPercent = (progress: number) => `${Math.round(progress * PERCENT)}%`;
 
     const getExamples = createMemo(() => {
-        const commonProps: Omit<TrailExampleProps, "progressSignal" | "isPlayingSignal"> = {
+        const commonProps: Omit<TrailExampleProps, "progressSignal" | "playbackSignal"> = {
             durationMs: getDurationMs,
             isLooping: getIsLooping,
             isTurning: getIsTurning,
@@ -44,12 +49,12 @@ export const TrailPage = () => {
                 key: "circuit",
                 name: "Circuit",
                 readout: () =>
-                    `${getPercent(circuitProgressSignal[0]())} round the loop, ${circuitPlayingSignal[0]() ? "running" : "stopped"} — the controller starts it, stops it and sends it back to the start`,
+                    `${getPercent(circuitProgressSignal[0]())} round the loop, ${circuitPlayingSignal[0]() ? "running" : "stopped"} — the playback signal starts and stops it, and the controller sends it back to the start`,
                 component: () => (
                     <CircuitExample
                         {...commonProps}
                         progressSignal={circuitProgressSignal}
-                        isPlayingSignal={circuitPlayingSignal}
+                        playbackSignal={circuitPlayingSignal}
                     />
                 ),
                 path: `${EXAMPLES_ROOT}/Circuit.tsx`,
@@ -63,10 +68,40 @@ export const TrailPage = () => {
                     <TimelineExample
                         {...commonProps}
                         progressSignal={timelineProgressSignal}
-                        isPlayingSignal={timelinePlayingSignal}
+                        playbackSignal={timelinePlayingSignal}
                     />
                 ),
                 path: `${EXAMPLES_ROOT}/Timeline.tsx`,
+            },
+            {
+                key: "convoy",
+                name: "Convoy",
+                readout: () =>
+                    `${getPercent(convoyProgressSignal[0]())} of the run, ${convoyPlayingSignal[0]() ? "running" : "stopped"} — four travelers on one clock, each a share of the path behind the one in front; with looping off they wait at the start and the run ends when the last one arrives`,
+                component: () => (
+                    <ConvoyExample
+                        {...commonProps}
+                        progressSignal={convoyProgressSignal}
+                        playbackSignal={convoyPlayingSignal}
+                    />
+                ),
+                path: `${EXAMPLES_ROOT}/Convoy.tsx`,
+            },
+            {
+                key: "scroll",
+                name: "Driven by scrolling",
+                readout: () =>
+                    getPrefersReducedMotion()
+                        ? "reduced motion is on, so the marker stays at the start instead of following the scroll"
+                        : `${getPercent(getScrollProgress())} of the way through the window — nothing is running, scrolling the page is what moves the marker`,
+                component: () => (
+                    <ScrollExample
+                        {...commonProps}
+                        isFollowing={() => !getPrefersReducedMotion()}
+                        onProgressChange={setScrollProgress}
+                    />
+                ),
+                path: `${EXAMPLES_ROOT}/Scroll.tsx`,
             },
         ];
     });
@@ -77,7 +112,7 @@ export const TrailPage = () => {
                 <PageProp
                     key={"durationMs"}
                     label={"Lap duration (ms)"}
-                    hint={"How long the traveller takes to walk the path once, end to end."}
+                    hint={"How long the traveler takes to walk the path once, end to end."}
                 >
                     <PageNumberField
                         value={getDurationMs}
@@ -92,7 +127,7 @@ export const TrailPage = () => {
                 <PageProp
                     key={"isLooping"}
                     label={"Loops"}
-                    hint={"Sends the traveller round again as soon as it reaches the end, instead of stopping there."}
+                    hint={"Sends the traveler round again as soon as it reaches the end, instead of stopping there."}
                 >
                     <PageCheckField value={getIsLooping} ariaLabel={"Loops"} onChange={setIsLooping} />
                 </PageProp>
@@ -101,7 +136,7 @@ export const TrailPage = () => {
                     key={"isTurning"}
                     label={"Faces along the path"}
                     hint={
-                        "Turns the traveller to point the way it is going, instead of leaving it upright the whole way round."
+                        "Turns the traveler to point the way it is going, instead of leaving it upright the whole way round."
                     }
                 >
                     <PageCheckField value={getIsTurning} ariaLabel={"Faces along the path"} onChange={setIsTurning} />

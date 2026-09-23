@@ -11,7 +11,7 @@ import type { PageViewKey, PageViewTabsProps } from "./ViewTabs.types";
 import * as styles from "./ViewTabs.css";
 
 const TAB_GAP = 20;
-const TAB_DIR = "row";
+const TAB_ORIENTATION = "horizontal";
 
 const PageViewTabLink = (props: TabLinkProps) => <A {...props} data-view-tab={props.href} />;
 
@@ -30,22 +30,26 @@ export const PageViewTabs = (props: PageViewTabsProps) => {
     return (
         <div class={styles.viewTabs} data-view-tabs>
             <Tabs
-                dir={TAB_DIR}
+                orientation={TAB_ORIENTATION}
                 tabGap={() => TAB_GAP}
                 ariaLabel={"Page views"}
                 tabs={getTabs}
                 selectedValue={getSelected}
                 linkComponent={PageViewTabLink}
-                renderGutter={() => <PageTabGutter dir={TAB_DIR} />}
+                renderGutter={() => <PageTabGutter orientation={TAB_ORIENTATION} />}
                 renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
                     <PageTabFloater
-                        dir={TAB_DIR}
+                        orientation={TAB_ORIENTATION}
                         visibilityTarget={getVisibilityTarget}
                         transitionDurationMs={getTransitionDurationMs}
                     />
                 )}
                 renderTab={(getTab, getFlags) => (
-                    <PageTabContent flags={getFlags} dir={TAB_DIR} isSelected={() => getTab().value === getSelected()}>
+                    <PageTabContent
+                        flags={getFlags}
+                        orientation={TAB_ORIENTATION}
+                        isSelected={() => getTab().value === getSelected()}
+                    >
                         {PAGE_VIEW_LABELS[getTab().value]}
                     </PageTabContent>
                 )}

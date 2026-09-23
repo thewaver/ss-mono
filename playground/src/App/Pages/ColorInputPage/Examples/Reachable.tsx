@@ -1,5 +1,6 @@
 import { ColorInput } from "@thewaver/ss-components";
 
+import { COLOR_INPUT_LABELS } from "../../../PageComponents/Announcements/Announcements.const";
 import { pageColorPickerSlots } from "../../../StyledComponents/ColorAreaContent/ColorAreaContent";
 import { PageColorInputContent } from "../../../StyledComponents/ColorInputContent/ColorInputContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
@@ -14,6 +15,7 @@ export const ReachableExample = (props: Props) => (
         isDisabled={true}
         isReachableWhenDisabled={true}
         ariaLabel={"Disabled but reachable color"}
+        {...COLOR_INPUT_LABELS}
         renderContent={(getRenderProps) => <PageColorInputContent renderProps={getRenderProps} />}
         tooltipDefs={() => ({
             placement: () => ({ x: "center", y: "top-out" }),

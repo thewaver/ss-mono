@@ -39,6 +39,9 @@ export const Table = <T,>(props: TableProps<T>) => {
     onMount(() => LiveAnnouncerUtils.reserve("polite"));
 
     const tableId = createUniqueId();
+    const hintId = createUniqueId();
+
+    const getAnnouncements = () => access(props.announcements)!;
 
     const [getBodyRef, setBodyRef] = createSignal<HTMLElement>();
     const [getHeaderRef, setHeaderRef] = createSignal<HTMLElement>();
@@ -46,6 +49,8 @@ export const Table = <T,>(props: TableProps<T>) => {
     const [getHoveredRow, setHoveredRow] = createSignal<number>();
     const [getHoveredColumn, setHoveredColumn] = createSignal<number>();
     const [getResizingColumnId, setResizingColumnId] = createSignal(NO_RESIZING);
+
+    const getDirection = NavigatorUtils.createDirectionSignal(getHeaderRef);
 
     const getDeclaredColumns = createMemo(() => access(props.columns));
 
@@ -198,7 +203,9 @@ export const Table = <T,>(props: TableProps<T>) => {
 
         if (e.clientX !== resizeStartX) hasResizeDragged = true;
 
-        resizeColumn(column, resizeStartWidth + e.clientX - resizeStartX);
+        const travel = e.clientX - resizeStartX;
+
+        resizeColumn(column, resizeStartWidth + (getDirection() === "rtl" ? -travel : travel));
     };
 
     const handleResizerPointerUp = (e: PointerEvent, column: TableColumn<T>, columnIndex: number) => {
@@ -212,9 +219,16 @@ export const Table = <T,>(props: TableProps<T>) => {
 
         const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
         const step = access(props.resizeStepPx) ?? TABLE_DEFAULTS.resizeStepPx;
-        const towards = e.clientX < rect.left + rect.width * 0.5 ? -step : step;
+        const isLeftHalf = e.clientX < rect.left + rect.width * 0.5;
+        const towards = isLeftHalf === (getDirection() === "rtl") ? step : -step;
 
         resizeColumn(column, getCurrentWidth(column, columnIndex) + towards);
+    };
+
+    const handleResizerPointerCancel = (column: TableColumn<T>) => {
+        if (getResizingColumnId() !== column.id) return;
+
+        setResizingColumnId(NO_RESIZING);
     };
 
     const getIsReorderable = (column: TableColumn<T> | undefined) =>
@@ -223,8 +237,8 @@ export const Table = <T,>(props: TableProps<T>) => {
     const moveColumn = (fromIndex: number, toIndex: number) => {
         const columns = getColumns();
 
-        if (!getIsReorderable(columns[fromIndex]) || getIsDisabled()) return;
-        if (toIndex < 0 || toIndex >= columns.length) return;
+        if (!getIsReorderable(columns[fromIndex]) || getIsDisabled()) return false;
+        if (toIndex < 0 || toIndex >= columns.length) return false;
 
         const next = CarrierUtils.computeMovedOrder(
             columns.map((column) => column.id),
@@ -235,6 +249,8 @@ export const Table = <T,>(props: TableProps<T>) => {
         props.orderSignal?.[1](next);
 
         void props.onOrderChange?.(next);
+
+        return true;
     };
 
     const asColumnIndex = (place: CarryPlace) => place as number;
@@ -256,15 +272,15 @@ export const Table = <T,>(props: TableProps<T>) => {
 
     const zone: CarrierZone = {
         getGroupId: () => tableId,
-        getLabel: () => access(props.ariaLabel) ?? "",
+        getLabel: () => access(props.ariaLabel),
         getRootRef: getHeaderRef,
         getIsDisabled: () => getIsDisabled() || props.orderSignal === undefined,
-        getRestingKeyHint: () => "Press Enter to pick this column up and move it.",
-        getKeyHint: () => "Enter drops, Escape cancels.",
+        getKeyHint: () => getAnnouncements().keyHint,
+        getAnnouncements,
         computeCanAccept: () => !getIsDisabled() && props.orderSignal !== undefined,
         computePlaceAtPoint: (point) =>
             CarrierUtils.computeSettledIndex(
-                CarrierUtils.computeDropIndex(getHeaderRects(), point.x, point.y, "row"),
+                CarrierUtils.computeDropIndex(getHeaderRects(), point.x, point.y, "horizontal", getDirection()),
                 getSourceColumnIndex() ?? 0,
                 true,
             ),
@@ -278,7 +294,7 @@ export const Table = <T,>(props: TableProps<T>) => {
         computeEntryPlace: () => getSourceColumnIndex() ?? 0,
         computeIsSamePlace: (a, b) => a === b,
         computeIsPlaceAllowed: () => true,
-        computePlaceLabel: (place) => `column ${asColumnIndex(place) + 1} of ${getColumns().length}`,
+        computePlaceLabel: (place) => getAnnouncements().computePlaceLabel(asColumnIndex(place), getColumns().length),
         takeAt: () => undefined,
         putAt: () => undefined,
         moveAt: (fromPlace, toPlace) => moveColumn(asColumnIndex(fromPlace), asColumnIndex(toPlace)),
@@ -351,8 +367,10 @@ export const Table = <T,>(props: TableProps<T>) => {
             return;
         }
 
+        const logicalKey = NavigatorUtils.computeLogicalKey(e.key, getDirection());
+
         if (from.row === HEADER_ROW_INDEX) {
-            if (e.key === "Enter" || e.key === " ") {
+            if (NavigatorUtils.getIsActivationKey(e.key)) {
                 e.preventDefault();
 
                 toggleSort(column);
@@ -360,31 +378,26 @@ export const Table = <T,>(props: TableProps<T>) => {
                 return;
             }
 
-            if (e.ctrlKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+            if (e.ctrlKey && (logicalKey === "ArrowLeft" || logicalKey === "ArrowRight")) {
                 e.preventDefault();
 
                 const step = access(props.resizeStepPx) ?? TABLE_DEFAULTS.resizeStepPx;
 
-                resizeColumn(column, getCurrentWidth(column, from.col) + (e.key === "ArrowLeft" ? -step : step));
+                resizeColumn(column, getCurrentWidth(column, from.col) + (logicalKey === "ArrowLeft" ? -step : step));
 
                 return;
             }
 
-            if (e.shiftKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
+            if (e.shiftKey && (logicalKey === "ArrowLeft" || logicalKey === "ArrowRight")) {
                 e.preventDefault();
 
-                if (!getIsReorderable(column)) return;
+                const to = from.col + (logicalKey === "ArrowLeft" ? -1 : 1);
 
-                const to = from.col + (e.key === "ArrowLeft" ? -1 : 1);
+                if (!moveColumn(from.col, to)) return;
 
-                if (to < 0 || to >= grid.colCount) return;
-
-                moveColumn(from.col, to);
                 focusCell({ row: HEADER_ROW_INDEX, col: to });
 
-                LiveAnnouncerUtils.announce(
-                    `${column.header} moved to column ${to + FIRST_ARIA_INDEX} of ${grid.colCount}.`,
-                );
+                LiveAnnouncerUtils.announce(getAnnouncements().computeColumnMoved(column.header, to, grid.colCount));
 
                 return;
             }
@@ -410,6 +423,7 @@ export const Table = <T,>(props: TableProps<T>) => {
 
         const next = NavigatorUtils.computeNextCell(e.key, from, grid, {
             pageRows: access(props.pageRows) ?? TABLE_DEFAULTS.pageRows,
+            direction: getDirection(),
         });
 
         if (next === undefined) return;
@@ -434,12 +448,6 @@ export const Table = <T,>(props: TableProps<T>) => {
         focusCell(cell);
 
         if (getIsDisabled()) return;
-
-        if (cell.row === HEADER_ROW_INDEX) {
-            toggleSort(getColumns()[cell.col]);
-
-            return;
-        }
 
         selectRow(cell.row - 1, { isToggling: e.ctrlKey || e.metaKey, isExtending: e.shiftKey });
     };
@@ -488,7 +496,7 @@ export const Table = <T,>(props: TableProps<T>) => {
             onPointerDown={(e) => handleResizerPointerDown(e, getColumn(), columnIndex)}
             onPointerMove={(e) => handleResizerPointerMove(e, getColumn())}
             onPointerUp={(e) => handleResizerPointerUp(e, getColumn(), columnIndex)}
-            onPointerCancel={(e) => handleResizerPointerUp(e, getColumn(), columnIndex)}
+            onPointerCancel={() => handleResizerPointerCancel(getColumn())}
             onClick={(e) => e.stopPropagation()}
         >
             {props.renderResizer?.(() => getColumnRenderProps(columnIndex))}
@@ -587,6 +595,7 @@ export const Table = <T,>(props: TableProps<T>) => {
                 aria-colindex={columnIndex + FIRST_ARIA_INDEX}
                 aria-sort={getColumn().isSortable === true ? (getRenderProps().sortDirection ?? "none") : undefined}
                 aria-disabled={getIsDisabled() || undefined}
+                aria-describedby={getIsReorderable(getColumn()) ? hintId : undefined}
                 tabindex={getIsRoving(cell) ? 0 : -1}
                 onPointerDown={(e) => handleHeaderPointerDown(e, columnIndex)}
                 onClick={() => {
@@ -687,6 +696,12 @@ export const Table = <T,>(props: TableProps<T>) => {
                     <Index each={getColumns()}>{renderHeaderCell}</Index>
                 </div>
             </div>
+
+            <Show when={props.orderSignal !== undefined}>
+                <div id={hintId} class={styles.tableHint}>
+                    {getAnnouncements().restingKeyHint}
+                </div>
+            </Show>
 
             <div
                 ref={setBodyRef}
