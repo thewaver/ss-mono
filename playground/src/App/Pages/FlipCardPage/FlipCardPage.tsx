@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { FlipCardAxis } from "@thewaver/ss-components";
+import { FLIP_CARD_DEFAULTS } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -17,14 +18,13 @@ const AXIS_LABELS: Record<FlipCardAxis, string> = {
 const MIN_DURATION_MS = 0;
 const MAX_DURATION_MS = 3000;
 const DURATION_STEP_MS = 100;
-const STARTING_DURATION_MS = 600;
 const FIELD_WIDTH = 110;
 const SELECT_WIDTH = 220;
 const EXAMPLES_ROOT = "/src/App/Pages/FlipCardPage/Examples";
 
 export const FlipCardPage = () => {
     const [getAxis, setAxis] = createSignal<FlipCardAxis>("row");
-    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(STARTING_DURATION_MS);
+    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(FLIP_CARD_DEFAULTS.transitionDurationMs);
 
     const flippedSignal = createSignal(false);
 

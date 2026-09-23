@@ -2,13 +2,11 @@ import { Show, createMemo, createUniqueId, onCleanup } from "solid-js";
 
 import { access } from "../../../Utils/propUtils";
 import { useFormContext } from "../../Form/Form.context";
+import { FORM_FIELD_DEFAULTS } from "./FormField.const";
 import { FormFieldContextProvider } from "./FormField.context";
 import type { FormFieldProps, FormFieldState } from "./FormField.types";
 
 import * as styles from "./FormField.css";
-
-const DEFAULT_FORM_FIELD_DIR = "column";
-const DEFAULT_FORM_FIELD_GAP = 5;
 
 export const FormField = (props: FormFieldProps) => {
     const messageId = createUniqueId();
@@ -32,8 +30,8 @@ export const FormField = (props: FormFieldProps) => {
         <div
             class={styles.formFieldRoot}
             style={{
-                "flex-direction": access(props.dir) ?? DEFAULT_FORM_FIELD_DIR,
-                "gap": `${access(props.gap) ?? DEFAULT_FORM_FIELD_GAP}px`,
+                "flex-direction": access(props.dir) ?? FORM_FIELD_DEFAULTS.dir,
+                "gap": `${access(props.gap) ?? FORM_FIELD_DEFAULTS.gap}px`,
             }}
         >
             {props.renderCaption?.(getState)}

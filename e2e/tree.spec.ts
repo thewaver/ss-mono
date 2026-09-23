@@ -362,9 +362,9 @@ test("and stops being busy once the children turn up", async ({ page }) => {
     const packages = page.locator(node(LAZY)).filter({ hasText: "packages" }).first();
 
     await packages.click();
-    await expect(page.locator(node(LAZY)).filter({ hasText: "core" }), "the fetch lands", {
+    await expect(page.locator(node(LAZY)).filter({ hasText: "core" }), "the fetch lands").toBeVisible({
         timeout: REMOTE_LOAD_DELAY_MS * 4,
-    }).toBeVisible();
+    });
 
     await expect(packages, "nothing is outstanding any more").not.toHaveAttribute("aria-busy");
     await expect(page.locator(`${LAZY} [role="group"]`).first(), "and the placeholder is gone").not.toContainText(
@@ -382,15 +382,15 @@ test("a branch that arrives unfetched behaves like the one that delivered it", a
 
     const core = page.locator(node(LAZY)).filter({ hasText: "core" }).first();
 
-    await expect(core, { timeout: REMOTE_LOAD_DELAY_MS * 4 }).toBeVisible();
+    await expect(core).toBeVisible({ timeout: REMOTE_LOAD_DELAY_MS * 4 });
     await expect(core, "it arrived as a branch with no children").toHaveAttribute("aria-expanded", "false");
 
     await core.click();
 
     await expect(core, "and opens the same way").toHaveAttribute("aria-busy", "true");
-    await expect(page.locator(node(LAZY)).filter({ hasText: "index.ts" }), "down to the fetch", {
+    await expect(page.locator(node(LAZY)).filter({ hasText: "index.ts" }), "down to the fetch").toBeVisible({
         timeout: REMOTE_LOAD_DELAY_MS * 4,
-    }).toBeVisible();
+    });
     await expect(core).not.toHaveAttribute("aria-busy");
 });
 

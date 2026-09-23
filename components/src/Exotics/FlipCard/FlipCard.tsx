@@ -2,12 +2,10 @@ import { createMemo } from "solid-js";
 
 import { Barrel } from "../../Primitives/Barrel/Barrel";
 import { access, accessSignal } from "../../Utils/propUtils";
-import type { FlipCardAxis, FlipCardFace, FlipCardProps, FlipCardState } from "./FlipCard.types";
+import { FLIP_CARD_DEFAULTS } from "./FlipCard.const";
+import type { FlipCardFace, FlipCardProps, FlipCardState } from "./FlipCard.types";
 
 import * as styles from "./FlipCard.css";
-
-const DEFAULT_FLIP_CARD_AXIS: FlipCardAxis = "row";
-const DEFAULT_FLIP_CARD_TRANSITION_DURATION_MS = 400;
 
 const FACES: FlipCardFace[] = ["front", "back"];
 
@@ -42,11 +40,11 @@ export const FlipCard = (props: FlipCardProps) => {
         >
             <Barrel<FlipCardFace>
                 faces={FACES}
-                axis={() => access(props.axis) ?? DEFAULT_FLIP_CARD_AXIS}
+                axis={() => access(props.axis) ?? FLIP_CARD_DEFAULTS.axis}
                 faceSize={() => access(props.size)}
                 angle={() => (getIsFlipped() ? -FLIP_ANGLE_DEG : 0)}
                 transitionDurationMs={() =>
-                    access(props.transitionDurationMs) ?? DEFAULT_FLIP_CARD_TRANSITION_DURATION_MS
+                    access(props.transitionDurationMs) ?? FLIP_CARD_DEFAULTS.transitionDurationMs
                 }
                 faceRoleDescription={FACE_ROLE_DESCRIPTION}
                 computeFaceDefs={(index) => ({

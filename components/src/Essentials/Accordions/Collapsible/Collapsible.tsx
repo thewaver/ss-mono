@@ -7,17 +7,10 @@ import { ElementFaderUtils } from "../../../Abstracts/ElementFader/ElementFader.
 import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
-import type {
-    CollapsibleFlags,
-    CollapsibleProps,
-    CollapsibleSizing,
-    CollapsibleTriggerProps,
-} from "./Collapsible.types";
+import { COLLAPSIBLE_DEFAULTS } from "./Collapsible.const";
+import type { CollapsibleFlags, CollapsibleProps, CollapsibleTriggerProps } from "./Collapsible.types";
 
 import * as styles from "./Collapsible.css";
-
-const DEFAULT_COLLAPSIBLE_TRANSITION_DURATION_MS = 200;
-const DEFAULT_COLLAPSIBLE_SIZING: CollapsibleSizing = "fill";
 
 const HEADING_TAGS = ["h1", "h2", "h3", "h4", "h5", "h6"] as const;
 
@@ -58,10 +51,10 @@ export const Collapsible = (props: CollapsibleProps) => {
     const getIsExpanded = () => expandedSignal[0]();
 
     const getTransitionDurationMs = createMemo(
-        () => access(props.transitionDurationMs) ?? DEFAULT_COLLAPSIBLE_TRANSITION_DURATION_MS,
+        () => access(props.transitionDurationMs) ?? COLLAPSIBLE_DEFAULTS.transitionDurationMs,
     );
 
-    const getSizing = createMemo(() => access(props.sizing) ?? DEFAULT_COLLAPSIBLE_SIZING);
+    const getSizing = createMemo(() => access(props.sizing) ?? COLLAPSIBLE_DEFAULTS.sizing);
 
     const getHasPanelContent = createMemo(
         (hasContent: boolean) => hasContent || access(props.isPanelBuiltOnExpand) !== true || getIsExpanded(),

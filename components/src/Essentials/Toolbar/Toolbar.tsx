@@ -10,12 +10,12 @@ import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
 import { Menu } from "../Menus/Menu/Menu";
 import type { MenuItem } from "../Menus/Menu/Menu.types";
+import { TOOLBAR_DEFAULTS } from "./Toolbar.const";
 import type { ToolbarAction, ToolbarProps } from "./Toolbar.types";
 import { ToolbarUtils } from "./Toolbar.utils";
 
 import * as styles from "./Toolbar.css";
 
-const DEFAULT_TOOLBAR_GAP = 0;
 const OVERFLOW_STOP = -1;
 const NO_WIDTH = 0;
 const ROW_SIZING: InteractionSizing = "fit-content";
@@ -29,7 +29,7 @@ export const Toolbar = <T,>(props: ToolbarProps<T>) => {
     const [getItemRefs, setItemRefs] = createSignal<(HTMLElement | undefined)[]>([]);
     const [getFocusedStop, setFocusedStop] = createSignal<number>();
 
-    const getGap = createMemo(() => access(props.gap) ?? DEFAULT_TOOLBAR_GAP);
+    const getGap = createMemo(() => access(props.gap) ?? TOOLBAR_DEFAULTS.gap);
 
     const getActions = createMemo(() => access(props.actions));
 

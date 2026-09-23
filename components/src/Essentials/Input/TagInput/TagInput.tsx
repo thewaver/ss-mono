@@ -5,12 +5,10 @@ import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/Inter
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { FormFieldUtils } from "../FormField/FormField.utils";
 import { LabelUtils } from "../Label/Label.utils";
+import { TAG_INPUT_DEFAULTS } from "./TagInput.const";
 import type { TagInputProps } from "./TagInput.types";
 
 import * as styles from "./TagInput.css";
-
-const DEFAULT_TAG_INPUT_GAP = 5;
-const DEFAULT_TAG_INPUT_PADDING = 0;
 
 export const TagInput = (props: TagInputProps) => {
     const getAriaLabel = LabelUtils.resolveAriaLabel(
@@ -133,8 +131,8 @@ export const TagInput = (props: TagInputProps) => {
                     <div
                         class={styles.tagInputRoot}
                         style={{
-                            gap: `${access(props.gap) ?? DEFAULT_TAG_INPUT_GAP}px`,
-                            padding: `${access(props.padding) ?? DEFAULT_TAG_INPUT_PADDING}px`,
+                            gap: `${access(props.gap) ?? TAG_INPUT_DEFAULTS.gap}px`,
+                            padding: `${access(props.padding) ?? TAG_INPUT_DEFAULTS.padding}px`,
                         }}
                         role="group"
                         aria-label={access(props.ariaLabel)}

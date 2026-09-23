@@ -3,7 +3,6 @@ import { createEffect, createMemo, createSignal, createUniqueId, untrack } from 
 
 import { Color } from "@thewaver/ss-utils";
 
-import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { Popover } from "../../../Primitives/Popover/Popover";
@@ -12,14 +11,11 @@ import { ColorArea } from "../ColorArea/ColorArea";
 import { FormFieldUtils } from "../FormField/FormField.utils";
 import { LabelUtils } from "../Label/Label.utils";
 import { Range } from "../Range/Range";
+import { COLOR_INPUT_DEFAULTS } from "./ColorInput.const";
 import type { ColorInputFieldProps, ColorInputProps, ColorInputRenderProps } from "./ColorInput.types";
 
 import * as styles from "./ColorInput.css";
 
-const DEFAULT_COLOR_INPUT_PLACEMENT: AnchorPlacement = { x: "left-in", y: "bottom-out" };
-const DEFAULT_COLOR_INPUT_PICKER_LABEL = "Choose a color";
-const DEFAULT_COLOR_INPUT_AREA_LABEL = "Saturation and brightness";
-const DEFAULT_COLOR_INPUT_HUE_LABEL = "Hue";
 const STARTING_COLOR: Color.HSVA = { h: 0, s: 0, v: 0, a: 1 };
 const DEFAULT_NOTATION: Color.Notation = "hex";
 const HUE_MAX = 360;
@@ -153,7 +149,7 @@ export const ColorInput = (props: ColorInputProps) => {
                 hsvSignal={hsvSignal}
                 sizing={"fill"}
                 isDisabled={getIsDisabled}
-                ariaLabel={() => access(props.areaLabel) ?? DEFAULT_COLOR_INPUT_AREA_LABEL}
+                ariaLabel={() => access(props.areaLabel) ?? COLOR_INPUT_DEFAULTS.areaLabel}
                 renderContent={props.renderArea}
             />
 
@@ -163,7 +159,7 @@ export const ColorInput = (props: ColorInputProps) => {
                 isDisabled={getIsDisabled}
                 max={() => HUE_MAX}
                 step={() => HUE_STEP}
-                ariaLabel={() => access(props.hueLabel) ?? DEFAULT_COLOR_INPUT_HUE_LABEL}
+                ariaLabel={() => access(props.hueLabel) ?? COLOR_INPUT_DEFAULTS.hueLabel}
                 renderContent={props.renderHue}
             />
         </>
@@ -204,11 +200,11 @@ export const ColorInput = (props: ColorInputProps) => {
                 id={() => popupId}
                 role={"dialog"}
                 ariaAttributes={() => ({
-                    "aria-label": access(props.pickerLabel) ?? DEFAULT_COLOR_INPUT_PICKER_LABEL,
+                    "aria-label": access(props.pickerLabel) ?? COLOR_INPUT_DEFAULTS.pickerLabel,
                 })}
                 isOpen={getIsOpen}
                 anchorRef={getFieldRef}
-                placement={() => access(props.placement) ?? DEFAULT_COLOR_INPUT_PLACEMENT}
+                placement={() => access(props.placement) ?? COLOR_INPUT_DEFAULTS.placement}
                 offset={props.offset}
                 transitionDurationMs={props.transitionDurationMs}
                 hasAutoFocus={true}

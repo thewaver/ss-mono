@@ -375,6 +375,27 @@ the public side, and it is exported now — which makes all seven `.context.ts` 
 outside a box rather than throwing, which is right for `PlacementItem` and a trap for a consumer who does not
 expect it — so its block says so. A doc block is part of the export, not an optional extra.
 
+### A prop default is stated once, in the component's `.const.ts`, and the Playground imports it
+
+The user's rule, and the fault that prompted it: a component held its defaults as private module constants,
+the Playground page wrote its own copies to seed the knobs, and nothing tied the two together. Nothing
+complains when they drift, so a page can paint one number while a consumer who passes nothing gets another.
+It is the same argument that gave the tracked gradients one home for theirs, one level up.
+
+**Every prop default lives in `<Component>.const.ts` as one exported object keyed by prop name** —
+`TILTER_DEFAULTS = { maxTiltDegrees: 15, ... }` — the component reads
+`access(props.maxTiltDegrees) ?? TILTER_DEFAULTS.maxTiltDegrees`, the barrel exports the file, and a page
+seeds its signal off the same object. A constant that is not a prop default stays private in the component,
+because it is not a thing anybody else is entitled to.
+
+**Where the two disagreed, the Playground's number was taken as current.** The user's call when the sweep
+ran: a page is looked at constantly and a library default is not, so the page is where a number gets tuned
+and the stale copy is the private one. Fourteen defaults changed hands that way.
+
+**A string default in the object may need `as const` or a cast.** A module-level `const role = "presentation"`
+has the literal type; the same value inside an object widens to `string` and stops satisfying a union. Write
+`as <Type>` where the prop has a named union and `as const` where it does not.
+
 ### A component hands out a controller and renders no controls of its own
 
 The user's rule, stated in those terms: a component gives the consumer a controller through `onMount`, and
@@ -1525,6 +1546,22 @@ them breaks a hit test that was right.
 it (`package.json` publishes only `dist`, but the folder is the library and the library is what it tests);
 `playground/src` would bundle it into the demo. It drives the _built_ Playground over a socket and imports
 nothing from either tree. `npm run verify:dom` is the entry point; `verify:dom:ui` opens Playwright's runner.
+
+**A test that the machine's load can move runs alone, tagged `@solo`.** The user's rule. A few tests measure
+something a busy machine changes — a scroll that has to settle, a wheel's painted box read while it is
+turning, a sampling loop that has to finish inside a live region's sweep window. They fail perhaps one run in
+three under a full parallel sweep and pass every time on their own. That red is about the machine and not the
+code, and leaving it in place is worse than useless: it teaches everybody to re-run rather than to look, and
+the next real break is read as one more flake.
+
+**The config carries it, so nobody has to remember.** The `chromium` project excludes the tag and a second
+`solo` project runs the tagged ones afterwards with one worker and nothing else in flight, through
+`dependencies`. One `npm run verify:dom` still does the whole thing.
+
+**The tag is earned, not guessed.** Watch the test fail in a sweep and pass on its own before tagging it —
+one that fails both ways is broken and belongs in neither project. And the solo project is skipped entirely
+when the main one goes red, which is right: a real failure is the thing to look at, not the load-sensitive
+handful behind it.
 
 **Playwright, rather than a driver of our own.** This suite used to be about 900 lines of hand-written
 DevTools Protocol plumbing with no dependency, justified because a dependency would need a second tsconfig

@@ -1,15 +1,10 @@
 import { createEffect, createMemo, createSignal, onCleanup, untrack } from "solid-js";
 
 import { TextField } from "../../../Primitives/TextField/TextField";
-import type { TextFieldMode } from "../../../Primitives/TextField/TextField.types";
 import { access } from "../../../Utils/propUtils";
+import { NUMBER_INPUT_DEFAULTS } from "./NumberInput.const";
 import type { NumberInputProps, NumberInputStepDefs, NumberInputStepper } from "./NumberInput.types";
 import { NumberInputUtils } from "./NumberInput.utils";
-
-const DEFAULT_NUMBER_INPUT_STEP = 1;
-const DEFAULT_NUMBER_INPUT_MODE: TextFieldMode = "decimal";
-const DEFAULT_NUMBER_INPUT_REPEAT_DELAY_MS = 400;
-const DEFAULT_NUMBER_INPUT_REPEAT_INTERVAL_MS = 60;
 
 export const NumberInput = (props: NumberInputProps) => {
     const textSignal = createSignal(NumberInputUtils.formatValue(props.valueSignal[0]()));
@@ -17,7 +12,7 @@ export const NumberInput = (props: NumberInputProps) => {
     const getStepDefs = createMemo((): NumberInputStepDefs => ({
         min: access(props.min),
         max: access(props.max),
-        step: access(props.step) ?? DEFAULT_NUMBER_INPUT_STEP,
+        step: access(props.step) ?? NUMBER_INPUT_DEFAULTS.step,
     }));
 
     const getIsWritable = () => !(access(props.isDisabled) ?? false) && !(access(props.isReadOnly) ?? false);
@@ -69,10 +64,10 @@ export const NumberInput = (props: NumberInputProps) => {
             () => {
                 repeatInterval = setInterval(
                     () => stepValue(direction),
-                    access(props.repeatIntervalMs) ?? DEFAULT_NUMBER_INPUT_REPEAT_INTERVAL_MS,
+                    access(props.repeatIntervalMs) ?? NUMBER_INPUT_DEFAULTS.repeatIntervalMs,
                 );
             },
-            access(props.repeatDelayMs) ?? DEFAULT_NUMBER_INPUT_REPEAT_DELAY_MS,
+            access(props.repeatDelayMs) ?? NUMBER_INPUT_DEFAULTS.repeatDelayMs,
         );
     };
 
@@ -112,7 +107,7 @@ export const NumberInput = (props: NumberInputProps) => {
             valueSignal={textSignal}
             element={"input"}
             type={"text"}
-            inputMode={() => access(props.inputMode) ?? DEFAULT_NUMBER_INPUT_MODE}
+            inputMode={() => access(props.inputMode) ?? NUMBER_INPUT_DEFAULTS.inputMode}
             isSpinButton={true}
             hasError={() => (access(props.hasError) ?? false) || getHasRangeIssue()}
             renderTrailing={props.renderTrailing && ((getFlags) => props.renderTrailing!(getFlags, stepper))}

@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { PatchBoardLink } from "@thewaver/ss-components";
+import { PATCH_BOARD_DEFAULTS } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
@@ -19,12 +20,11 @@ const EXAMPLES_ROOT = "/src/App/Pages/PatchBoardPage/Examples";
 const MIN_SOCKET_SIZE = 8;
 const MAX_SOCKET_SIZE = 28;
 const SOCKET_SIZE_STEP = 2;
-const STARTING_SOCKET_SIZE = 14;
 const WIDE_SPAN = 2;
 const NOTHING_DONE = "nothing yet";
 
 export const PatchBoardPage = () => {
-    const [getSocketSize, setSocketSize] = createSignal(STARTING_SOCKET_SIZE);
+    const [getSocketSize, setSocketSize] = createSignal(PATCH_BOARD_DEFAULTS.socketSize);
     const [getIsLocked, setIsLocked] = createSignal(false);
     const [getIsDisabled, setIsDisabled] = createSignal(false);
     const [getChainAction, setChainAction] = createSignal(NOTHING_DONE);

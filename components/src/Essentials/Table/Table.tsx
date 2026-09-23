@@ -13,6 +13,7 @@ import { SelectionUtils } from "../../Abstracts/Selection/Selection.utils";
 import type { VirtualizerRow } from "../../Abstracts/Virtualizer/Virtualizer.types";
 import { VirtualizerUtils } from "../../Abstracts/Virtualizer/Virtualizer.utils";
 import { access } from "../../Utils/propUtils";
+import { TABLE_DEFAULTS } from "./Table.const";
 import type {
     TableCellRenderProps,
     TableColumn,
@@ -26,10 +27,6 @@ import * as styles from "./Table.css";
 
 const HEADER_ROW_INDEX = 0;
 const FIRST_ARIA_INDEX = 1;
-
-const DEFAULT_RESIZE_STEP_PX = 8;
-const DEFAULT_RESIZER_WIDTH_PX = 8;
-const DEFAULT_PAGE_ROWS = 10;
 
 const NO_RESIZING = "";
 
@@ -214,7 +211,7 @@ export const Table = <T,>(props: TableProps<T>) => {
         if (hasResizeDragged) return;
 
         const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-        const step = access(props.resizeStepPx) ?? DEFAULT_RESIZE_STEP_PX;
+        const step = access(props.resizeStepPx) ?? TABLE_DEFAULTS.resizeStepPx;
         const towards = e.clientX < rect.left + rect.width * 0.5 ? -step : step;
 
         resizeColumn(column, getCurrentWidth(column, columnIndex) + towards);
@@ -366,7 +363,7 @@ export const Table = <T,>(props: TableProps<T>) => {
             if (e.ctrlKey && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
                 e.preventDefault();
 
-                const step = access(props.resizeStepPx) ?? DEFAULT_RESIZE_STEP_PX;
+                const step = access(props.resizeStepPx) ?? TABLE_DEFAULTS.resizeStepPx;
 
                 resizeColumn(column, getCurrentWidth(column, from.col) + (e.key === "ArrowLeft" ? -step : step));
 
@@ -412,7 +409,7 @@ export const Table = <T,>(props: TableProps<T>) => {
         }
 
         const next = NavigatorUtils.computeNextCell(e.key, from, grid, {
-            pageRows: access(props.pageRows) ?? DEFAULT_PAGE_ROWS,
+            pageRows: access(props.pageRows) ?? TABLE_DEFAULTS.pageRows,
         });
 
         if (next === undefined) return;
@@ -681,7 +678,7 @@ export const Table = <T,>(props: TableProps<T>) => {
             aria-disabled={getIsDisabled() || undefined}
             style={assignInlineVars({
                 [styles.tableTemplateVar]: getTemplate(),
-                [styles.tableResizerWidthVar]: `${access(props.resizerWidthPx) ?? DEFAULT_RESIZER_WIDTH_PX}px`,
+                [styles.tableResizerWidthVar]: `${access(props.resizerWidthPx) ?? TABLE_DEFAULTS.resizerWidthPx}px`,
             })}
             onKeyDown={handleKeyDown}
         >

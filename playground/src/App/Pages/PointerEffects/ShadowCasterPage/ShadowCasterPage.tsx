@@ -1,5 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { SHADOW_CASTER_DEFAULTS } from "@thewaver/ss-components";
+
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
@@ -13,27 +15,18 @@ const EXAMPLES_ROOT = "/src/App/Pages/PointerEffects/ShadowCasterPage/Examples";
 const MIN_LIGHT_RANGE_PX = 80;
 const MAX_LIGHT_RANGE_PX = 1200;
 const LIGHT_RANGE_STEP_PX = 20;
-const STARTING_LIGHT_RANGE_PX = 400;
 
 const MIN_THROW_PX = 0;
 const MAX_THROW_PX = 120;
 const THROW_STEP_PX = 2;
-const STARTING_MAX_THROW_PX = 48;
 
 const MIN_BLUR_PX = 0;
 const MAX_BLUR_PX = 60;
 const BLUR_STEP_PX = 1;
-const STARTING_MIN_BLUR_PX = 4;
-const STARTING_MAX_BLUR_PX = 20;
 
 const MIN_OPACITY = 0;
 const MAX_OPACITY = 1;
 const OPACITY_STEP = 0.05;
-const STARTING_MAX_OPACITY = 0.85;
-const STARTING_MIN_OPACITY = 0;
-const STARTING_RESTING_OPACITY = 0.25;
-
-const STARTING_COLOR = "#000000";
 
 const MIN_ACTIVE_RANGE_PX = 40;
 const MAX_ACTIVE_RANGE_PX = 1200;
@@ -45,14 +38,14 @@ const FIELD_WIDTH = 110;
 export const ShadowCasterPage = () => {
     const [getIsDisabled, setIsDisabled] = createSignal(false);
     const [getActiveRangePx, setActiveRangePx] = createSignal(STARTING_ACTIVE_RANGE_PX);
-    const [getLightRangePx, setLightRangePx] = createSignal(STARTING_LIGHT_RANGE_PX);
-    const [getMaxThrowPx, setMaxThrowPx] = createSignal(STARTING_MAX_THROW_PX);
-    const [getMinBlurPx, setMinBlurPx] = createSignal(STARTING_MIN_BLUR_PX);
-    const [getMaxBlurPx, setMaxBlurPx] = createSignal(STARTING_MAX_BLUR_PX);
-    const [getMaxOpacity, setMaxOpacity] = createSignal(STARTING_MAX_OPACITY);
-    const [getMinOpacity, setMinOpacity] = createSignal(STARTING_MIN_OPACITY);
-    const [getRestingOpacity, setRestingOpacity] = createSignal(STARTING_RESTING_OPACITY);
-    const [getColor, setColor] = createSignal(STARTING_COLOR);
+    const [getLightRangePx, setLightRangePx] = createSignal(SHADOW_CASTER_DEFAULTS.lightRangePx);
+    const [getMaxThrowPx, setMaxThrowPx] = createSignal(SHADOW_CASTER_DEFAULTS.maxThrowPx);
+    const [getMinBlurPx, setMinBlurPx] = createSignal(SHADOW_CASTER_DEFAULTS.minBlurPx);
+    const [getMaxBlurPx, setMaxBlurPx] = createSignal(SHADOW_CASTER_DEFAULTS.maxBlurPx);
+    const [getMaxOpacity, setMaxOpacity] = createSignal(SHADOW_CASTER_DEFAULTS.maxOpacity);
+    const [getMinOpacity, setMinOpacity] = createSignal(SHADOW_CASTER_DEFAULTS.minOpacity);
+    const [getRestingOpacity, setRestingOpacity] = createSignal(SHADOW_CASTER_DEFAULTS.restingOpacity);
+    const [getColor, setColor] = createSignal(SHADOW_CASTER_DEFAULTS.color);
 
     const getExamples = createMemo(() => {
         const commonProps: ShadowCasterExampleProps = {

@@ -4,15 +4,12 @@ import type { ParentProps } from "solid-js";
 import { type ElementSegment, JSXTextParserUtils } from "@thewaver/ss-utils";
 
 import { access } from "../../Utils/propUtils";
+import { TYPEWRITER_DEFAULTS } from "./Typewriter.const";
 import type { TypewriterProps, TypewriterUpdateCause } from "./Typewriter.types";
 
 import * as styles from "./Typewriter.css";
 
 const EMPTY_SEGMENTS: (ElementSegment & { startIndex: number })[] = [];
-const DEFAULT_TYPEWRITER_ANIMATION_NAME = styles.typewriterFade;
-const DEFAULT_TYPEWRITER_ANIMATION_DURATION_MS = 500;
-const DEFAULT_TYPEWRITER_ANIMATION_DELAY_MS = 10;
-const DEFAULT_TYPEWRITER_INITIAL_ANIMATION_DELAY_MS = 0;
 
 export const Typewriter = (props: ParentProps<TypewriterProps>) => {
     const [getContainerRef, setContainerRef] = createSignal<HTMLElement>();
@@ -29,18 +26,18 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
         clearTimeout(animationToggleTimeout);
     });
 
-    const getAnimationName = createMemo(() => access(props.animationName) ?? DEFAULT_TYPEWRITER_ANIMATION_NAME);
+    const getAnimationName = createMemo(() => access(props.animationName) ?? TYPEWRITER_DEFAULTS.animationName);
 
     const getAnimationDurationMs = createMemo(
-        () => access(props.animationDurationMs) ?? DEFAULT_TYPEWRITER_ANIMATION_DURATION_MS,
+        () => access(props.animationDurationMs) ?? TYPEWRITER_DEFAULTS.animationDurationMs,
     );
 
     const getAnimationDelayMs = createMemo(
-        () => access(props.animationDelayMs) ?? DEFAULT_TYPEWRITER_ANIMATION_DELAY_MS,
+        () => access(props.animationDelayMs) ?? TYPEWRITER_DEFAULTS.animationDelayMs,
     );
 
     const getInitialAnimationDelayMs = createMemo(
-        () => access(props.initialAnimationDelayMs) ?? DEFAULT_TYPEWRITER_INITIAL_ANIMATION_DELAY_MS,
+        () => access(props.initialAnimationDelayMs) ?? TYPEWRITER_DEFAULTS.initialAnimationDelayMs,
     );
 
     const getAnimationBase = createMemo(() =>

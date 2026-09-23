@@ -1,19 +1,16 @@
 import { Show, createEffect, createMemo, createSignal } from "solid-js";
 import { Portal } from "solid-js/web";
 
-import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
 import { AnchorUtils } from "../../Abstracts/Anchor/Anchor.utils";
 import { DismisserUtils } from "../../Abstracts/Dismisser/Dismisser.utils";
 import { ElementFaderUtils } from "../../Abstracts/ElementFader/ElementFader.utils";
 import { FocusManagerUtils } from "../../Abstracts/FocusManager/FocusManager.utils";
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
+import { POPOVER_DEFAULTS } from "./Popover.const";
 import type { PopoverProps } from "./Popover.types";
 
 import * as styles from "./Popover.css";
-
-const DEFAULT_POPOVER_PLACEMENT: AnchorPlacement = { x: "left-in", y: "bottom-out" };
-const DEFAULT_POPOVER_TRANSITION_DURATION_MS = 200;
 
 export const Popover = (props: PopoverProps) => {
     const viewportContext = useViewportContext();
@@ -21,7 +18,7 @@ export const Popover = (props: PopoverProps) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
 
     const getTransitionDurationMs = createMemo(
-        () => access(props.transitionDurationMs) ?? DEFAULT_POPOVER_TRANSITION_DURATION_MS,
+        () => access(props.transitionDurationMs) ?? POPOVER_DEFAULTS.transitionDurationMs,
     );
 
     const { getIsVisible, getTransitionTarget, getHasTransitionFinished } = ElementFaderUtils.createFader(
@@ -34,7 +31,7 @@ export const Popover = (props: PopoverProps) => {
 
     const { getAnchorRect, getIsAnchorOnScreen, getPlacement, getPosition, getZIndex, setContentRef } =
         AnchorUtils.createPortalPosition(() => access(props.anchorRef), getIsVisible, {
-            getPlacement: () => access(props.placement) ?? DEFAULT_POPOVER_PLACEMENT,
+            getPlacement: () => access(props.placement) ?? POPOVER_DEFAULTS.placement,
             getOffset: props.offset === undefined ? undefined : () => access(props.offset)!,
             getReservedScreenSize:
                 props.reservedScreenSize === undefined ? undefined : () => access(props.reservedScreenSize)!,

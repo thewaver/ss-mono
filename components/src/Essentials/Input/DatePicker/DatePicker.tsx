@@ -1,7 +1,6 @@
 import type { Signal } from "solid-js";
 import { createEffect, createMemo, createSignal, createUniqueId, untrack } from "solid-js";
 
-import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { DateValue } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
 import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
@@ -12,11 +11,8 @@ import type { PopupTriggerFlags } from "../../../Primitives/PopupTrigger/PopupTr
 import { access } from "../../../Utils/propUtils";
 import { Calendar } from "../Calendar/Calendar";
 import { DateInput } from "../DateInput/DateInput";
+import { DATE_PICKER_DEFAULTS } from "./DatePicker.const";
 import type { DatePickerProps } from "./DatePicker.types";
-
-const DEFAULT_DATE_PICKER_PLACEMENT: AnchorPlacement = { x: "left-in", y: "bottom-out" };
-const DEFAULT_DATE_PICKER_TRIGGER_LABEL = "Open the calendar";
-const DEFAULT_DATE_PICKER_CALENDAR_LABEL = "Choose a date";
 
 const toMonth = (value: DateValue): DateValue => DateValueUtils.getStartOfMonth(value);
 
@@ -68,7 +64,7 @@ export const DatePicker = (props: DatePickerProps) => {
             isDisabled={props.isDisabled}
             locale={props.locale}
             weekStartsOn={props.weekStartsOn}
-            ariaLabel={() => access(props.calendarLabel) ?? DEFAULT_DATE_PICKER_CALENDAR_LABEL}
+            ariaLabel={() => access(props.calendarLabel) ?? DATE_PICKER_DEFAULTS.calendarLabel}
             computeIsDayDisabled={props.computeIsDayDisabled}
             renderDay={props.renderDay}
             renderWeekday={props.renderWeekday}
@@ -89,7 +85,9 @@ export const DatePicker = (props: DatePickerProps) => {
                                 id={props.triggerId}
                                 popupId={() => popupId}
                                 isOpen={getIsOpen}
-                                ariaLabel={() => access(props.triggerAriaLabel) ?? DEFAULT_DATE_PICKER_TRIGGER_LABEL}
+                                ariaLabel={() =>
+                                    access(props.triggerAriaLabel) ?? DATE_PICKER_DEFAULTS.triggerAriaLabel
+                                }
                                 flags={getRenderProps}
                                 renderContent={props.renderTrigger}
                                 onToggle={() => (getIsOpen() ? dismiss() : open())}
@@ -103,11 +101,11 @@ export const DatePicker = (props: DatePickerProps) => {
                 id={() => popupId}
                 role={"dialog"}
                 ariaAttributes={() => ({
-                    "aria-label": access(props.calendarLabel) ?? DEFAULT_DATE_PICKER_CALENDAR_LABEL,
+                    "aria-label": access(props.calendarLabel) ?? DATE_PICKER_DEFAULTS.calendarLabel,
                 })}
                 isOpen={getIsOpen}
                 anchorRef={getRootRef}
-                placement={() => access(props.placement) ?? DEFAULT_DATE_PICKER_PLACEMENT}
+                placement={() => access(props.placement) ?? DATE_PICKER_DEFAULTS.placement}
                 offset={props.offset}
                 transitionDurationMs={props.popupTransitionDurationMs}
                 hasAutoFocus={true}

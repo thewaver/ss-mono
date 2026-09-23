@@ -280,7 +280,7 @@ const openAndSettle = async (page: Page, index: number) => {
     await waitUntilStill(page.locator(panel(SCROLLED)).nth(index));
 };
 
-test("opening a section below the fold brings it into view", async ({ page }) => {
+test("opening a section below the fold brings it into view", { tag: "@solo" }, async ({ page }) => {
     expect(await scrollTop(scrollBox(page)), "nothing has scrolled yet").toBe(0);
 
     await openAndSettle(page, 2);
@@ -300,21 +300,23 @@ test("opening a section below the fold brings it into view", async ({ page }) =>
  * show cannot be brought fully into view, and scrolling to its far edge would push the header someone just
  * pressed off the top. So the header wins, and the panel is cut at the bottom instead.
  */
-test("a section taller than the box keeps the pressed header in view rather than scrolling past it", async ({
-    page,
-}) => {
-    await openAndSettle(page, 3);
+test(
+    "a section taller than the box keeps the pressed header in view rather than scrolling past it",
+    { tag: "@solo" },
+    async ({ page }) => {
+        await openAndSettle(page, 3);
 
-    const box = (await scrollBox(page).boundingBox())!;
-    const opened = (await page.locator(panel(SCROLLED)).nth(3).boundingBox())!;
-    const pressed = (await page.locator(header(SCROLLED)).nth(3).boundingBox())!;
+        const box = (await scrollBox(page).boundingBox())!;
+        const opened = (await page.locator(panel(SCROLLED)).nth(3).boundingBox())!;
+        const pressed = (await page.locator(header(SCROLLED)).nth(3).boundingBox())!;
 
-    expect(opened.height, "the panel really is more than the box can show").toBeGreaterThan(box.height);
-    expect(pressed.y, "the header is still inside the box").toBeGreaterThanOrEqual(box.y - EDGE_TOLERANCE_PX);
-    expect(pressed.y, "and sits at its top, so as much of the panel as fits is showing").toBeLessThan(
-        box.y + pressed.height,
-    );
-});
+        expect(opened.height, "the panel really is more than the box can show").toBeGreaterThan(box.height);
+        expect(pressed.y, "the header is still inside the box").toBeGreaterThanOrEqual(box.y - EDGE_TOLERANCE_PX);
+        expect(pressed.y, "and sits at its top, so as much of the panel as fits is showing").toBeLessThan(
+            box.y + pressed.height,
+        );
+    },
+);
 
 /**
  * The lazy panel, and the reason it is worth having rather than being the same trade twice. A panel is kept

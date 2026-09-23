@@ -10,14 +10,11 @@ import { FormFieldUtils } from "../../Essentials/Input/FormField/FormField.utils
 import { LabelUtils } from "../../Essentials/Input/Label/Label.utils";
 import { access } from "../../Utils/propUtils";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
-import type { TextFieldElementProps, TextFieldProps, TextFieldType } from "./TextField.types";
+import { TEXT_FIELD_DEFAULTS } from "./TextField.const";
+import type { TextFieldElementProps, TextFieldProps } from "./TextField.types";
 
 import * as styles from "./TextField.css";
 
-const DEFAULT_TEXT_FIELD_TYPE: TextFieldType = "text";
-const DEFAULT_TEXT_FIELD_PADDING = 0;
-const DEFAULT_TEXT_FIELD_GAP = 0;
-const DEFAULT_TEXT_FIELD_MIN_ROWS = 2;
 const FALLBACK_LINE_HEIGHT_RATIO = 1.2;
 
 const createAdornmentWidth = (getRef: Accessor<HTMLElement | undefined>) => {
@@ -135,7 +132,7 @@ const TextFieldElement = (props: TextFieldElementProps) => {
 
     const getIsAutoSizing = () => getIsTextArea() && (access(props.isAutoSizing) ?? false);
 
-    const getType = () => (getIsTextArea() ? undefined : (access(props.type) ?? DEFAULT_TEXT_FIELD_TYPE));
+    const getType = () => (getIsTextArea() ? undefined : (access(props.type) ?? TEXT_FIELD_DEFAULTS.type));
 
     const getIsSpinButton = () => access(props.isSpinButton) ?? false;
 
@@ -266,7 +263,7 @@ export const TextField = (props: TextFieldProps) => {
         () => access(props.element) === "textarea" && (access(props.isAutoSizing) ?? false),
     );
 
-    const getMinRows = () => access(props.minRows) ?? DEFAULT_TEXT_FIELD_MIN_ROWS;
+    const getMinRows = () => access(props.minRows) ?? TEXT_FIELD_DEFAULTS.minRows;
 
     const getMaxRows = () => access(props.maxRows);
 
@@ -279,12 +276,12 @@ export const TextField = (props: TextFieldProps) => {
     );
 
     const getSpreadPadding = createMemo(() => {
-        const padding = access(props.padding) ?? DEFAULT_TEXT_FIELD_PADDING;
+        const padding = access(props.padding) ?? TEXT_FIELD_DEFAULTS.padding;
 
         return typeof padding === "number" ? CSSUtils.spreadPadding(padding) : padding;
     });
 
-    const getGap = () => access(props.gap) ?? DEFAULT_TEXT_FIELD_GAP;
+    const getGap = () => access(props.gap) ?? TEXT_FIELD_DEFAULTS.gap;
 
     const computeInset = (edge: number, adornmentWidth: number) =>
         edge + (adornmentWidth ? adornmentWidth + getGap() : 0);

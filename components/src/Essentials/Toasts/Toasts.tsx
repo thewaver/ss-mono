@@ -9,27 +9,12 @@ import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/Inte
 import { LiveAnnouncerUtils } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer.utils";
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { access, accessSignal } from "../../Utils/propUtils";
-import type {
-    Toast,
-    ToastState,
-    ToastsAlignment,
-    ToastsAriaLive,
-    ToastsDir,
-    ToastsItemProps,
-    ToastsOverflow,
-    ToastsProps,
-} from "./Toasts.types";
+import { TOASTS_DEFAULTS } from "./Toasts.const";
+import type { Toast, ToastState, ToastsItemProps, ToastsProps } from "./Toasts.types";
 import { ToastUtils } from "./Toasts.utils";
 
 import * as styles from "./Toasts.css";
 
-const DEFAULT_TOASTS_TRANSITION_DURATION_MS = 200;
-const DEFAULT_TOASTS_ALIGNMENT: ToastsAlignment = "bottom-right";
-const DEFAULT_TOASTS_DIR: ToastsDir = "column";
-const DEFAULT_TOASTS_ARIA_LIVE: ToastsAriaLive = "polite";
-const DEFAULT_TOASTS_OVERFLOW: ToastsOverflow = "dismiss-oldest";
-const DEFAULT_TOASTS_GAP = 10;
-const DEFAULT_TOASTS_HOTKEY = "F8";
 const TOASTS_Z_INDEX = 200;
 
 const ToastsItem = <T,>(props: ToastsItemProps<T>) => {
@@ -113,14 +98,14 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
     const [getEntryRefs, setEntryRefs] = createSignal<Record<string, HTMLElement>>({});
 
     const getTransitionDurationMs = createMemo(
-        () => access(props.transitionDurationMs) ?? DEFAULT_TOASTS_TRANSITION_DURATION_MS,
+        () => access(props.transitionDurationMs) ?? TOASTS_DEFAULTS.transitionDurationMs,
     );
 
-    const getAlignment = createMemo(() => access(props.alignment) ?? DEFAULT_TOASTS_ALIGNMENT);
+    const getAlignment = createMemo(() => access(props.alignment) ?? TOASTS_DEFAULTS.alignment);
 
-    const getDir = createMemo(() => access(props.dir) ?? DEFAULT_TOASTS_DIR);
+    const getDir = createMemo(() => access(props.dir) ?? TOASTS_DEFAULTS.dir);
 
-    const getOverflow = createMemo(() => access(props.overflow) ?? DEFAULT_TOASTS_OVERFLOW);
+    const getOverflow = createMemo(() => access(props.overflow) ?? TOASTS_DEFAULTS.overflow);
 
     const getMargins = createMemo(() => access(props.margins) ?? CSSUtils.spreadMargin(0));
 
@@ -136,9 +121,9 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
         setEntryRefs((prev) => (prev[id] === element ? prev : { ...prev, [id]: element }));
     };
 
-    const getHotkey = createMemo(() => access(props.hotkey) ?? DEFAULT_TOASTS_HOTKEY);
+    const getHotkey = createMemo(() => access(props.hotkey) ?? TOASTS_DEFAULTS.hotkey);
 
-    const getAnnouncementPoliteness = createMemo(() => access(props.ariaLive) ?? DEFAULT_TOASTS_ARIA_LIVE);
+    const getAnnouncementPoliteness = createMemo(() => access(props.ariaLive) ?? TOASTS_DEFAULTS.ariaLive);
 
     onMount(() => {
         if (props.computeAnnouncement === undefined) return;
@@ -266,7 +251,7 @@ export const Toasts = <T,>(props: ToastsProps<T>) => {
                     "flex-direction": getDir(),
                     "justify-content": getStackAlignment().justifyContent,
                     "align-items": getStackAlignment().alignItems,
-                    "gap": `${access(props.gap) ?? DEFAULT_TOASTS_GAP}px`,
+                    "gap": `${access(props.gap) ?? TOASTS_DEFAULTS.gap}px`,
                     "z-index": TOASTS_Z_INDEX,
                 }}
                 role="region"

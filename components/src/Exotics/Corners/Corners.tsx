@@ -1,30 +1,24 @@
 import { For, createMemo } from "solid-js";
 import type { ParentProps } from "solid-js";
 
-import { Size2d } from "@thewaver/ss-utils";
-
 import { access } from "../../Utils/propUtils";
-import type { CornerKey, CornersProps } from "./Corners.types";
+import { CORNERS_DEFAULTS } from "./Corners.const";
+import type { CornersProps } from "./Corners.types";
 
 import * as styles from "./Corners.css";
-
-const DEFAULT_CORNERS_TRANSITION_DURATION_MS = 200;
-const DEFAULT_CORNERS_STROKE_THICKNESS = 4;
-const DEFAULT_CORNERS_CORNER_LENGTH: Size2d = { width: 20, height: 20 };
-const DEFAULT_CORNERS_VISIBLE_CORNERS: Set<CornerKey> = new Set(["bottomLeft", "bottomRight", "topLeft", "topRight"]);
 
 export const Corners = (props: ParentProps<CornersProps>) => {
     const getColor = createMemo(() => access(props.color) ?? "currentColor");
 
     const getTransitionDurationMs = createMemo(
-        () => access(props.transitionDurationMs) ?? DEFAULT_CORNERS_TRANSITION_DURATION_MS,
+        () => access(props.transitionDurationMs) ?? CORNERS_DEFAULTS.transitionDurationMs,
     );
 
-    const getCornerLength = createMemo(() => access(props.cornerLength) ?? DEFAULT_CORNERS_CORNER_LENGTH);
+    const getCornerLength = createMemo(() => access(props.cornerLength) ?? CORNERS_DEFAULTS.cornerLength);
 
-    const getStrokeThickness = createMemo(() => access(props.strokeThickness) ?? DEFAULT_CORNERS_STROKE_THICKNESS);
+    const getStrokeThickness = createMemo(() => access(props.strokeThickness) ?? CORNERS_DEFAULTS.strokeThickness);
 
-    const getVisibleCorners = createMemo(() => [...(access(props.visibleCorners) ?? DEFAULT_CORNERS_VISIBLE_CORNERS)]);
+    const getVisibleCorners = createMemo(() => [...(access(props.visibleCorners) ?? CORNERS_DEFAULTS.visibleCorners)]);
 
     return (
         <div class={styles.cornersRoot}>

@@ -6,15 +6,13 @@ import type { PlacementRect } from "../../../Abstracts/Placement/Placement.types
 import { PlacementUtils } from "../../../Abstracts/Placement/Placement.utils";
 import { PlacementBox } from "../../../Primitives/PlacementBox/PlacementBox";
 import { access, accessSignal } from "../../../Utils/propUtils";
+import { RADIO_GROUP_DEFAULTS } from "./RadioGroup.const";
 import { RadioGroupContextProvider } from "./RadioGroup.context";
 import type { RadioGroupContextType, RadioGroupEntry } from "./RadioGroup.context.types";
-import type { RadioGroupDir, RadioGroupProps } from "./RadioGroup.types";
+import type { RadioGroupProps } from "./RadioGroup.types";
 
 import * as styles from "./RadioGroup.css";
 
-const DEFAULT_RADIO_GROUP_DIR: RadioGroupDir = "row";
-const DEFAULT_RADIO_GROUP_GAP = 0;
-const DEFAULT_RADIO_GROUP_TRANSITION_DURATION_MS = 200;
 const NO_ANGLE = 0;
 const HALF = 0.5;
 const MISSING_ENTRY = -1;
@@ -30,12 +28,12 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
         { [k in "top" | "left" | "width" | "height"]: string } | undefined
     >();
 
-    const getDir = createMemo(() => access(props.dir) ?? DEFAULT_RADIO_GROUP_DIR);
+    const getDir = createMemo(() => access(props.dir) ?? RADIO_GROUP_DEFAULTS.dir);
 
     const getLayout = createMemo(() => props.computeLayout?.({ itemCount: getEntries().length }));
 
     const getTransitionDurationMs = createMemo(
-        () => access(props.transitionDurationMs) ?? DEFAULT_RADIO_GROUP_TRANSITION_DURATION_MS,
+        () => access(props.transitionDurationMs) ?? RADIO_GROUP_DEFAULTS.transitionDurationMs,
     );
 
     const getOrderedEntries = createMemo(() => {
@@ -192,7 +190,7 @@ export const RadioGroup = <T,>(props: RadioGroupProps<T>) => {
             class={getLayout() === undefined ? styles.radioGroupRoot : styles.radioGroupPlacedRoot}
             style={{
                 "flex-direction": getDir(),
-                "gap": `${access(props.gap) ?? DEFAULT_RADIO_GROUP_GAP}px`,
+                "gap": `${access(props.gap) ?? RADIO_GROUP_DEFAULTS.gap}px`,
             }}
             role="radiogroup"
             aria-label={access(props.ariaLabel)}

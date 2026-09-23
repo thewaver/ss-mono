@@ -6,9 +6,9 @@ import { InteractionWrapper } from "../../Primitives/InteractionWrapper/Interact
 import { access } from "../../Utils/propUtils";
 import { FormFieldUtils } from "../Input/FormField/FormField.utils";
 import { LabelUtils } from "../Input/Label/Label.utils";
+import { SLIDE_BUTTON_DEFAULTS } from "./SlideButton.const";
 import type {
     SlideButtonElementProps,
-    SlideButtonMode,
     SlideButtonPress,
     SlideButtonProps,
     SlideButtonRenderProps,
@@ -17,9 +17,6 @@ import { SlideButtonUtils } from "./SlideButton.utils";
 
 import * as styles from "./SlideButton.css";
 
-const DEFAULT_SLIDE_BUTTON_THUMB_SIZE = 40;
-const DEFAULT_SLIDE_BUTTON_HOLD_DURATION_MS = 1000;
-const DEFAULT_SLIDE_BUTTON_MODE: SlideButtonMode = "both";
 const DRAG_THRESHOLD_PX = 4;
 const RATIO_MIN = 0;
 const RATIO_MAX = 1;
@@ -205,11 +202,11 @@ export const SlideButton = (props: SlideButtonProps) => {
     const [getIsDragging, setIsDragging] = createSignal(false);
     const [getIsHolding, setIsHolding] = createSignal(false);
 
-    const getThumbSize = createMemo(() => access(props.thumbSize) ?? DEFAULT_SLIDE_BUTTON_THUMB_SIZE);
+    const getThumbSize = createMemo(() => access(props.thumbSize) ?? SLIDE_BUTTON_DEFAULTS.thumbSize);
 
-    const getHoldDurationMs = createMemo(() => access(props.holdDurationMs) ?? DEFAULT_SLIDE_BUTTON_HOLD_DURATION_MS);
+    const getHoldDurationMs = createMemo(() => access(props.holdDurationMs) ?? SLIDE_BUTTON_DEFAULTS.holdDurationMs);
 
-    const getMode = createMemo(() => access(props.mode) ?? DEFAULT_SLIDE_BUTTON_MODE);
+    const getMode = createMemo(() => access(props.mode) ?? SLIDE_BUTTON_DEFAULTS.mode);
 
     return (
         <InteractionWrapper

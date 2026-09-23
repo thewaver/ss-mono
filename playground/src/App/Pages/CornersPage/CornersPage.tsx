@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { CornerKey } from "@thewaver/ss-components";
+import { CORNERS_DEFAULTS } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -34,15 +35,12 @@ const FIELD_WIDTH = 110;
 
 const STARTING_COLOR = "#ffd400";
 const STARTING_LENGTH = 24;
-const STARTING_THICKNESS = 4;
-const STARTING_TRANSITION_DURATION_MS = 200;
-
 export const CornersPage = () => {
     const [getColor, setColor] = createSignal(STARTING_COLOR);
     const [getLengthAcross, setLengthAcross] = createSignal(STARTING_LENGTH);
     const [getLengthDown, setLengthDown] = createSignal(STARTING_LENGTH);
-    const [getStrokeThickness, setStrokeThickness] = createSignal(STARTING_THICKNESS);
-    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(STARTING_TRANSITION_DURATION_MS);
+    const [getStrokeThickness, setStrokeThickness] = createSignal(CORNERS_DEFAULTS.strokeThickness);
+    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(CORNERS_DEFAULTS.transitionDurationMs);
     const [getHiddenCorners, setHiddenCorners] = createSignal<CornerKey[]>([]);
 
     const getCornerLength = createMemo(() => ({ width: getLengthAcross(), height: getLengthDown() }));

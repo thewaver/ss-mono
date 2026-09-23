@@ -9,13 +9,11 @@ import { InteractionWrapper } from "../../Primitives/InteractionWrapper/Interact
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
-import type { Tab, TabPanelProps, TabsDir, TabsItemProps, TabsProps } from "./Tabs.types";
+import { TABS_DEFAULTS } from "./Tabs.const";
+import type { Tab, TabPanelProps, TabsItemProps, TabsProps } from "./Tabs.types";
 
 import * as styles from "./Tabs.css";
 
-const DEFAULT_TABS_TRANSITION_DURATION_MS = 200;
-const DEFAULT_TABS_GAP = 0;
-const DEFAULT_TABS_DIR: TabsDir = "row";
 const NO_ANGLE = 0;
 const HALF = 0.5;
 
@@ -87,12 +85,12 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
     >();
 
     const getTransitionDurationMs = createMemo(
-        () => access(props.transitionDurationMs) ?? DEFAULT_TABS_TRANSITION_DURATION_MS,
+        () => access(props.transitionDurationMs) ?? TABS_DEFAULTS.transitionDurationMs,
     );
 
-    const getDir = createMemo(() => access(props.dir) ?? DEFAULT_TABS_DIR);
+    const getDir = createMemo(() => access(props.dir) ?? TABS_DEFAULTS.dir);
 
-    const getTabGap = createMemo(() => access(props.tabGap) ?? DEFAULT_TABS_GAP);
+    const getTabGap = createMemo(() => access(props.tabGap) ?? TABS_DEFAULTS.tabGap);
 
     const getLayout = createMemo(() => props.computeLayout?.({ itemCount: access(props.tabs).length }));
 

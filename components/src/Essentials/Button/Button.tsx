@@ -1,11 +1,10 @@
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
 import { LabelUtils } from "../Input/Label/Label.utils";
-import type { ButtonElementProps, ButtonProps, ButtonType } from "./Button.types";
+import { BUTTON_DEFAULTS } from "./Button.const";
+import type { ButtonElementProps, ButtonProps } from "./Button.types";
 
 import * as styles from "./Button.css";
-
-const DEFAULT_BUTTON_TYPE: ButtonType = "button";
 
 const ButtonElement = (props: ButtonElementProps) => {
     const getAriaLabel = LabelUtils.resolveAriaLabel(
@@ -18,7 +17,7 @@ const ButtonElement = (props: ButtonElementProps) => {
         <button
             id={access(props.id)}
             ref={(element) => props.ref?.(element)}
-            type={access(props.type) ?? DEFAULT_BUTTON_TYPE}
+            type={access(props.type) ?? BUTTON_DEFAULTS.type}
             class={styles.buttonElement}
             aria-label={getAriaLabel()}
             aria-disabled={getIsDisabled() || undefined}

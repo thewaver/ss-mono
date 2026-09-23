@@ -13,6 +13,7 @@ import { ViewportUtils } from "../../Abstracts/Viewport/Viewport.utils";
 import { LabelUtils } from "../../Essentials/Input/Label/Label.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../Utils/propUtils";
+import { SORTABLE_GRID_DEFAULTS } from "./SortableGrid.const";
 import type {
     SortableGridController,
     SortableGridGeometry,
@@ -27,7 +28,6 @@ import { SortableGridUtils } from "./SortableGrid.utils";
 
 import * as styles from "./SortableGrid.css";
 
-const DEFAULT_SORTABLE_GRID_GAP = 0;
 const DEFAULT_SORTABLE_GRID_FOOTPRINT = { colCount: 1, rowCount: 1 };
 const FIRST_SPOT: SortableGridSpot = { col: 0, row: 0 };
 
@@ -113,7 +113,7 @@ export const SortableGrid = <T,>(props: SortableGridProps<T>) => {
 
     const getCellSize = createMemo(() => access(props.cellSize));
 
-    const getGap = createMemo(() => access(props.gap) ?? DEFAULT_SORTABLE_GRID_GAP);
+    const getGap = createMemo(() => access(props.gap) ?? SORTABLE_GRID_DEFAULTS.gap);
 
     const getPitch = createMemo(() => getCellSize() + getGap());
 

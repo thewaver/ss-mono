@@ -4,12 +4,10 @@ import { ElementFaderUtils } from "../../Abstracts/ElementFader/ElementFader.uti
 import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../Utils/propUtils";
-import type { PreviewFlags, PreviewProps, PreviewSizing, PreviewTriggerProps } from "./Preview.types";
+import { PREVIEW_DEFAULTS } from "./Preview.const";
+import type { PreviewFlags, PreviewProps, PreviewTriggerProps } from "./Preview.types";
 
 import * as styles from "./Preview.css";
-
-const DEFAULT_PREVIEW_TRANSITION_DURATION_MS = 200;
-const DEFAULT_PREVIEW_SIZING: PreviewSizing = "fill";
 
 const PreviewTrigger = (props: PreviewTriggerProps) => {
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
@@ -47,10 +45,10 @@ export const Preview = (props: PreviewProps) => {
     const getIsExpanded = () => expandedSignal[0]();
 
     const getTransitionDurationMs = createMemo(
-        () => access(props.transitionDurationMs) ?? DEFAULT_PREVIEW_TRANSITION_DURATION_MS,
+        () => access(props.transitionDurationMs) ?? PREVIEW_DEFAULTS.transitionDurationMs,
     );
 
-    const getSizing = createMemo(() => access(props.sizing) ?? DEFAULT_PREVIEW_SIZING);
+    const getSizing = createMemo(() => access(props.sizing) ?? PREVIEW_DEFAULTS.sizing);
 
     const getContentHeight = ElementObserverUtils.createBorderBoxHeightObserver(getContentRef);
 

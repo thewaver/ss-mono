@@ -9,12 +9,12 @@ import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { LabelUtils } from "../../Essentials/Input/Label/Label.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../Utils/propUtils";
+import { PATCH_BOARD_DEFAULTS } from "./PatchBoard.const";
 import type {
     PatchBoardCableDefs,
     PatchBoardCarry,
     PatchBoardEnd,
     PatchBoardNode,
-    PatchBoardOrientation,
     PatchBoardPlace,
     PatchBoardPlacedSocket,
     PatchBoardPlacement,
@@ -24,10 +24,6 @@ import { PatchBoardUtils } from "./PatchBoard.utils";
 
 import * as styles from "./PatchBoard.css";
 
-const DEFAULT_ORIENTATION: PatchBoardOrientation = "horizontal";
-const DEFAULT_SOCKET_SIZE = 14;
-const DEFAULT_SOCKET_REACH = 28;
-const DEFAULT_STEP_SIZE = 8;
 const COARSE_STEP_FACTOR = 4;
 const NOTHING = 0;
 const SINGLE = 1;
@@ -77,13 +73,13 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
     const getIsLocked = createMemo(() => access(props.isLocked) ?? false);
 
-    const getOrientation = createMemo(() => access(props.orientation) ?? DEFAULT_ORIENTATION);
+    const getOrientation = createMemo(() => access(props.orientation) ?? PATCH_BOARD_DEFAULTS.orientation);
 
-    const getSocketSize = createMemo(() => access(props.socketSize) ?? DEFAULT_SOCKET_SIZE);
+    const getSocketSize = createMemo(() => access(props.socketSize) ?? PATCH_BOARD_DEFAULTS.socketSize);
 
-    const getSocketReach = createMemo(() => access(props.socketReach) ?? DEFAULT_SOCKET_REACH);
+    const getSocketReach = createMemo(() => access(props.socketReach) ?? PATCH_BOARD_DEFAULTS.socketReach);
 
-    const getStepSize = createMemo(() => access(props.stepSize) ?? DEFAULT_STEP_SIZE);
+    const getStepSize = createMemo(() => access(props.stepSize) ?? PATCH_BOARD_DEFAULTS.stepSize);
 
     const getNodeKey = (node: PatchBoardNode<T>) => props.computeNodeKey(node.value);
 

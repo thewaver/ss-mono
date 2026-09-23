@@ -7,12 +7,11 @@ import type { TextSyncGroupDefs } from "../../../Abstracts/TextSync/TextSync.typ
 import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import { access } from "../../../Utils/propUtils";
+import { CURRENCY_INPUT_DEFAULTS } from "./CurrencyInput.const";
 import type { CurrencyInputProps } from "./CurrencyInput.types";
 
-const DEFAULT_CURRENCY_INPUT_DECIMALS = 2;
-
 export const CurrencyInput = (props: CurrencyInputProps) => {
-    const getDecimals = createMemo(() => access(props.decimals) ?? DEFAULT_CURRENCY_INPUT_DECIMALS);
+    const getDecimals = createMemo(() => access(props.decimals) ?? CURRENCY_INPUT_DEFAULTS.decimals);
 
     const getHasSign = () => access(props.hasSign) ?? false;
 

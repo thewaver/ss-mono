@@ -2,23 +2,12 @@ import { For, Index, createMemo, createSignal, createUniqueId, onCleanup } from 
 
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { access } from "../../Utils/propUtils";
-import type {
-    BracketConnectorDefs,
-    BracketNode,
-    BracketOrientation,
-    BracketPlacement,
-    BracketProps,
-    BracketRootSide,
-    BracketStep,
-} from "./Bracket.types";
+import { BRACKET_DEFAULTS } from "./Bracket.const";
+import type { BracketConnectorDefs, BracketNode, BracketPlacement, BracketProps, BracketStep } from "./Bracket.types";
 import { BracketUtils } from "./Bracket.utils";
 
 import * as styles from "./Bracket.css";
 
-const DEFAULT_LAYER_GAP = 40;
-const DEFAULT_CROSS_GAP = 12;
-const DEFAULT_ORIENTATION: BracketOrientation = "horizontal";
-const DEFAULT_ROOT_SIDE: BracketRootSide = "end";
 const HALF = 0.5;
 const NOTHING = 0;
 const SINGLE = 1;
@@ -44,13 +33,13 @@ export const Bracket = <T,>(props: BracketProps<T>) => {
 
     const getNodeSize = createMemo(() => access(props.nodeSize));
 
-    const getLayerGap = createMemo(() => access(props.layerGap) ?? DEFAULT_LAYER_GAP);
+    const getLayerGap = createMemo(() => access(props.layerGap) ?? BRACKET_DEFAULTS.layerGap);
 
-    const getCrossGap = createMemo(() => access(props.crossGap) ?? DEFAULT_CROSS_GAP);
+    const getCrossGap = createMemo(() => access(props.crossGap) ?? BRACKET_DEFAULTS.crossGap);
 
-    const getOrientation = createMemo(() => access(props.orientation) ?? DEFAULT_ORIENTATION);
+    const getOrientation = createMemo(() => access(props.orientation) ?? BRACKET_DEFAULTS.orientation);
 
-    const getRootSide = createMemo(() => access(props.rootSide) ?? DEFAULT_ROOT_SIDE);
+    const getRootSide = createMemo(() => access(props.rootSide) ?? BRACKET_DEFAULTS.rootSide);
 
     const getIsHorizontal = createMemo(() => getOrientation() === "horizontal");
 

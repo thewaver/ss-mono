@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { type TileBoardLayout, TileBoardUtils } from "@thewaver/ss-components";
+import { TILE_BOARD_DEFAULTS, type TileBoardLayout, TileBoardUtils } from "@thewaver/ss-components";
 import { Index2d, type Index2dString, ShapeConst } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -30,7 +30,6 @@ const STARTING_ROWS = 5;
 const STARTING_COLS = 5;
 const STARTING_TILE_WIDTH = 72;
 const STARTING_TILE_HEIGHT = 72;
-const STARTING_GAP = 4;
 const STARTING_REACH = 1;
 const STARTING_SHAPE: ShapeConst.DefaultShape = "hexagon-pointy-top";
 const STARTING_PIECE: Index2d = { row: 2, col: 2 };
@@ -69,7 +68,7 @@ export const TileBoardPage = () => {
     const [getCols, setCols] = createSignal(STARTING_COLS);
     const [getTileWidth, setTileWidth] = createSignal(STARTING_TILE_WIDTH);
     const [getTileHeight, setTileHeight] = createSignal(STARTING_TILE_HEIGHT);
-    const [getGap, setGap] = createSignal(STARTING_GAP);
+    const [getGap, setGap] = createSignal(TILE_BOARD_DEFAULTS.gap);
     const [getShape, setShape] = createSignal<ShapeConst.DefaultShape>(STARTING_SHAPE);
     const [getHasShortFirstRow, setHasShortFirstRow] = createSignal(false);
     const [getReach, setReach] = createSignal(STARTING_REACH);

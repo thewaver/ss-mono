@@ -6,15 +6,10 @@ import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/I
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { LabelUtils } from "../Label/Label.utils";
+import { COLOR_AREA_DEFAULTS } from "./ColorArea.const";
 import type { ColorAreaAxis, ColorAreaElementProps, ColorAreaProps, ColorAreaRenderProps } from "./ColorArea.types";
 
 import * as styles from "./ColorArea.css";
-
-const DEFAULT_COLOR_AREA_STEP = 1;
-const DEFAULT_COLOR_AREA_AXIS_LABELS: Record<ColorAreaAxis, string> = {
-    saturation: "Saturation",
-    brightness: "Brightness",
-};
 
 const AXES: ColorAreaAxis[] = ["saturation", "brightness"];
 const PERCENT_MIN = 0;
@@ -167,8 +162,8 @@ export const ColorArea = (props: ColorAreaProps) => {
                     id={props.id}
                     name={props.name}
                     ariaLabel={props.ariaLabel}
-                    axisLabels={() => access(props.axisLabels) ?? DEFAULT_COLOR_AREA_AXIS_LABELS}
-                    step={() => access(props.step) ?? DEFAULT_COLOR_AREA_STEP}
+                    axisLabels={() => access(props.axisLabels) ?? COLOR_AREA_DEFAULTS.axisLabels}
+                    step={() => access(props.step) ?? COLOR_AREA_DEFAULTS.step}
                     flags={getRenderProps}
                     hsv={() => hsvSignal[0]()}
                     isTabbable={props.isTabbable}

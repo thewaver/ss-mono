@@ -814,24 +814,24 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "PointerEffects",
                 children: [
-                {
-                    name: "LightCatcher",
-                    description:
-                        "Wraps anything and brightens it as the pointer comes near, as though the pointer carried the light in the room. It is brightest with the pointer on the content and fades back to a resting brightness as the pointer walks out to the edge of the light, reaching full strength at the edge of the content rather than at its middle, so a wide thing and a narrow one behave alike. Drop the resting brightness below one and a row of them stops being a row of lamps and becomes a spotlight, because everything not being pointed at is dimmed rather than merely left alone.",
-                    component: () => <LightCatcherPage />,
-                },
-                {
-                    name: "ShadowCaster",
-                    description:
-                        "Wraps anything and throws a shadow away from the pointer, as though the pointer were the light in the room: on the content the shadow is short, dark and tight, and it lengthens, softens and fades as the pointer retreats, until past the light's range it stops changing. It draws with a filter rather than a box shadow, so the shadow traces the shape the content actually paints — a rounded card, a clipped star, a picture with transparency — instead of the rectangle around it.",
-                    component: () => <ShadowCasterPage />,
-                },
-                {
-                    name: "Tilter",
-                    description:
-                        "Wraps anything and leans it away from the pointer, so a flat card or picture reads as a surface being tipped rather than a picture of one. How far it turns at the edges and how near the viewer sits are both set; the specular band that sells it is a slot rather than something drawn here, because a sheen has to take the corners of whatever is underneath it and a wrapper cannot know them. It tracks the area it was given rather than the surface that turns, so the turn cannot feed back into the reading that caused it.",
-                    component: () => <TilterPage />,
-                },
+                    {
+                        name: "LightCatcher",
+                        description:
+                            "Wraps anything and brightens it as the pointer comes near, as though the pointer carried the light in the room. It is brightest with the pointer on the content and fades back to a resting brightness as the pointer walks out to the edge of the light, reaching full strength at the edge of the content rather than at its middle, so a wide thing and a narrow one behave alike. Drop the resting brightness below one and a row of them stops being a row of lamps and becomes a spotlight, because everything not being pointed at is dimmed rather than merely left alone.",
+                        component: () => <LightCatcherPage />,
+                    },
+                    {
+                        name: "ShadowCaster",
+                        description:
+                            "Wraps anything and throws a shadow away from the pointer, as though the pointer were the light in the room: on the content the shadow is short, dark and tight, and it lengthens, softens and fades as the pointer retreats, until past the light's range it stops changing. It draws with a filter rather than a box shadow, so the shadow traces the shape the content actually paints — a rounded card, a clipped star, a picture with transparency — instead of the rectangle around it.",
+                        component: () => <ShadowCasterPage />,
+                    },
+                    {
+                        name: "Tilter",
+                        description:
+                            "Wraps anything and leans it away from the pointer, so a flat card or picture reads as a surface being tipped rather than a picture of one. How far it turns at the edges and how near the viewer sits are both set; the specular band that sells it is a slot rather than something drawn here, because a sheen has to take the corners of whatever is underneath it and a wrapper cannot know them. It tracks the area it was given rather than the surface that turns, so the turn cannot feed back into the reading that caused it.",
+                        component: () => <TilterPage />,
+                    },
                 ],
             },
             {

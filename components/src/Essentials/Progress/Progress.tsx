@@ -3,21 +3,19 @@ import { createMemo } from "solid-js";
 import { MathUtils } from "@thewaver/ss-utils";
 
 import { access } from "../../Utils/propUtils";
-import type { ProgressProps, ProgressSizing, ProgressState } from "./Progress.types";
+import { PROGRESS_DEFAULTS } from "./Progress.const";
+import type { ProgressProps, ProgressState } from "./Progress.types";
 
 import * as styles from "./Progress.css";
 
-const DEFAULT_PROGRESS_SIZING: ProgressSizing = "fill";
-const DEFAULT_PROGRESS_MIN = 0;
-const DEFAULT_PROGRESS_MAX = 1;
 const COMPLETE_RATIO = 1;
 
 export const Progress = (props: ProgressProps) => {
-    const getSizing = createMemo(() => access(props.sizing) ?? DEFAULT_PROGRESS_SIZING);
+    const getSizing = createMemo(() => access(props.sizing) ?? PROGRESS_DEFAULTS.sizing);
 
-    const getMin = createMemo(() => access(props.min) ?? DEFAULT_PROGRESS_MIN);
+    const getMin = createMemo(() => access(props.min) ?? PROGRESS_DEFAULTS.min);
 
-    const getMax = createMemo(() => access(props.max) ?? DEFAULT_PROGRESS_MAX);
+    const getMax = createMemo(() => access(props.max) ?? PROGRESS_DEFAULTS.max);
 
     const getState = createMemo((): ProgressState => {
         const min = getMin();

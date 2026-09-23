@@ -1,17 +1,16 @@
 import { Index, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
-import { Index2d, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
+import { Index2d, type Point2d, type Size2d } from "@thewaver/ss-utils";
 
 import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
+import { TILE_BOARD_DEFAULTS } from "./TileBoard.const";
 import type { TileBoardProps, TileBoardRenderProps, TileBoardTileProps } from "./TileBoard.types";
 import { TileBoardUtils } from "./TileBoard.utils";
 
 import * as styles from "./TileBoard.css";
 
-const DEFAULT_TILE_SHAPE: ShapeConst.DefaultShape = "hexagon-pointy-top";
-const DEFAULT_GAP = 0;
 const FIRST_ARIA_INDEX = 1;
 const HALF = 0.5;
 const MIN_CLIP_POINTS = 3;
@@ -61,7 +60,7 @@ export const TileBoard = (props: TileBoardProps) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getHighlighted, setHighlighted] = createSignal<Index2d>(TileBoardUtils.getFirstTile());
 
-    const getGap = createMemo(() => access(props.gap) ?? DEFAULT_GAP);
+    const getGap = createMemo(() => access(props.gap) ?? TILE_BOARD_DEFAULTS.gap);
 
     const getPitchSize = createMemo(() => access(props.tileSize));
 
@@ -72,7 +71,7 @@ export const TileBoard = (props: TileBoardProps) => {
 
     const getLayout = createMemo(() =>
         TileBoardUtils.getLayout(
-            access(props.tileShape) ?? DEFAULT_TILE_SHAPE,
+            access(props.tileShape) ?? TILE_BOARD_DEFAULTS.tileShape,
             access(props.tileCount),
             getPitchSize(),
             access(props.hasShortFirstRow) ?? false,

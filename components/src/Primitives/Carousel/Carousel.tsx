@@ -1,7 +1,6 @@
 import type { Accessor, JSX } from "solid-js";
 import { Index, Show, createEffect, createMemo, createSignal, onCleanup, onMount } from "solid-js";
 
-import type { Size2d } from "@thewaver/ss-utils";
 import { MathUtils, RotationUtils } from "@thewaver/ss-utils";
 
 import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
@@ -10,11 +9,10 @@ import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.uti
 import { access } from "../../Utils/propUtils";
 import { Barrel } from "../Barrel/Barrel";
 import { InteractionWrapper } from "../InteractionWrapper/InteractionWrapper";
+import { CAROUSEL_DEFAULTS } from "./Carousel.const";
 import type {
-    CarouselAxis,
     CarouselControlProps,
     CarouselControls,
-    CarouselDir,
     CarouselFace,
     CarouselPickRenderProps,
     CarouselProps,
@@ -26,12 +24,6 @@ import type {
 import { CarouselUtils } from "./Carousel.utils";
 
 import * as styles from "./Carousel.css";
-
-const DEFAULT_CAROUSEL_DIR: CarouselDir = "row";
-const DEFAULT_CAROUSEL_AXIS: CarouselAxis = "row";
-const DEFAULT_CAROUSEL_SLIDE_SIZE: Size2d = { width: 0, height: 0 };
-const DEFAULT_CAROUSEL_TRANSITION_DURATION_MS = 400;
-const DEFAULT_CAROUSEL_GAP = 0;
 
 const CAROUSEL_SWIPE_COMMIT_RATIO = 0.2;
 
@@ -92,16 +84,16 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
 
     const getIsDrum = createMemo(() => access(props.variant) === "drum");
 
-    const getDir = createMemo(() => access(props.dir) ?? DEFAULT_CAROUSEL_DIR);
+    const getDir = createMemo(() => access(props.dir) ?? CAROUSEL_DEFAULTS.dir);
 
-    const getAxis = createMemo(() => access(props.axis) ?? DEFAULT_CAROUSEL_AXIS);
+    const getAxis = createMemo(() => access(props.axis) ?? CAROUSEL_DEFAULTS.axis);
 
-    const getSlideSize = createMemo(() => access(props.slideSize) ?? DEFAULT_CAROUSEL_SLIDE_SIZE);
+    const getSlideSize = createMemo(() => access(props.slideSize) ?? CAROUSEL_DEFAULTS.slideSize);
 
     const getTravelsAcross = createMemo(() => (getIsDrum() ? getAxis() : getDir()) === "row");
 
     const getTransitionDurationMs = createMemo(
-        () => access(props.transitionDurationMs) ?? DEFAULT_CAROUSEL_TRANSITION_DURATION_MS,
+        () => access(props.transitionDurationMs) ?? CAROUSEL_DEFAULTS.transitionDurationMs,
     );
 
     const getAutoplayDelayMs = createMemo(() => access(props.autoplayDelayMs));
@@ -275,7 +267,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
             class={styles.carouselRoot}
             style={{
                 height: !getIsDrum() && getDir() === "column" ? "100%" : undefined,
-                gap: `${access(props.gap) ?? DEFAULT_CAROUSEL_GAP}px`,
+                gap: `${access(props.gap) ?? CAROUSEL_DEFAULTS.gap}px`,
             }}
             role="region"
             aria-roledescription={CAROUSEL_ROLE_DESCRIPTION}

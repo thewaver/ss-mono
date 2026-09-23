@@ -3,12 +3,10 @@ import { Show, createMemo, createSignal, createUniqueId, onCleanup } from "solid
 import { access } from "../../../Utils/propUtils";
 import { FormContextProvider, useFormContext } from "../../Form/Form.context";
 import type { FormEntry } from "../../Form/Form.context.types";
+import { FORM_SECTION_DEFAULTS } from "./FormSection.const";
 import type { FormSectionProps, FormSectionState } from "./FormSection.types";
 
 import * as styles from "./FormSection.css";
-
-const DEFAULT_FORM_SECTION_DIR = "column";
-const DEFAULT_FORM_SECTION_GAP = 5;
 
 export const FormSection = (props: FormSectionProps) => {
     const messageId = createUniqueId();
@@ -40,8 +38,8 @@ export const FormSection = (props: FormSectionProps) => {
         <fieldset
             class={styles.formSectionRoot}
             style={{
-                "flex-direction": access(props.dir) ?? DEFAULT_FORM_SECTION_DIR,
-                "gap": `${access(props.gap) ?? DEFAULT_FORM_SECTION_GAP}px`,
+                "flex-direction": access(props.dir) ?? FORM_SECTION_DEFAULTS.dir,
+                "gap": `${access(props.gap) ?? FORM_SECTION_DEFAULTS.gap}px`,
             }}
             aria-label={access(props.ariaLabel)}
             aria-describedby={getHasMessage() ? messageId : undefined}

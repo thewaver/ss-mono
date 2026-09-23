@@ -2,12 +2,10 @@ import { DateTimeValueUtils } from "../../../Abstracts/DateTimeValue/DateTimeVal
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { DatePicker } from "../DatePicker/DatePicker";
 import { TimePicker } from "../TimePicker/TimePicker";
+import { DATE_TIME_PICKER_DEFAULTS } from "./DateTimePicker.const";
 import type { DateTimePickerProps } from "./DateTimePicker.types";
 
 import * as styles from "./DateTimePicker.css";
-
-const DEFAULT_DATE_TIME_PICKER_DATE_LABEL = "Date";
-const DEFAULT_DATE_TIME_PICKER_TIME_LABEL = "Time";
 
 export const DateTimePicker = (props: DateTimePickerProps) => {
     const { dateSignal, timeSignal } = DateTimeValueUtils.createSplit(accessSignal(() => props.valueSignal));
@@ -20,7 +18,7 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
                 id={access(props.id) && `${access(props.id)}-date`}
                 name={access(props.name) && `${access(props.name)}-date`}
                 visibilitySignal={props.dateVisibilitySignal}
-                ariaLabel={() => access(props.dateLabel) ?? DEFAULT_DATE_TIME_PICKER_DATE_LABEL}
+                ariaLabel={() => access(props.dateLabel) ?? DATE_TIME_PICKER_DEFAULTS.dateLabel}
             />
 
             {props.renderSeparator?.()}
@@ -31,7 +29,7 @@ export const DateTimePicker = (props: DateTimePickerProps) => {
                 id={access(props.id) && `${access(props.id)}-time`}
                 name={access(props.name) && `${access(props.name)}-time`}
                 visibilitySignal={props.timeVisibilitySignal}
-                ariaLabel={() => access(props.timeLabel) ?? DEFAULT_DATE_TIME_PICKER_TIME_LABEL}
+                ariaLabel={() => access(props.timeLabel) ?? DATE_TIME_PICKER_DEFAULTS.timeLabel}
                 renderLeading={undefined}
                 triggerId={props.timeTriggerId}
                 triggerAriaLabel={props.timeTriggerAriaLabel}

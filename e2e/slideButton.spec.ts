@@ -127,7 +127,7 @@ test("a press on the track away from the thumb is not a grab", async ({ page }) 
  * without it, a drag that took a second on a loaded machine would confirm the action and read as the drag
  * having been let through.
  */
-test("a hold-only button ignores the drag, and still answers the keyboard", async ({ page }) => {
+test("a hold-only button ignores the drag, and still answers the keyboard", { tag: "@solo" }, async ({ page }) => {
     await slide(page, page.locator(track(HOLD_ONLY)).first(), 0.1, 1);
 
     expect(await readout(page, "holdOnly"), "carrying the thumb the whole way does nothing").toContain(

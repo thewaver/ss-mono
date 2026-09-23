@@ -16,6 +16,7 @@ import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
+import { TIMELINE_DEFAULTS } from "./Timeline.const";
 import type {
     TimelineController,
     TimelineItemProps,
@@ -29,9 +30,6 @@ import { TimelineUtils } from "./Timeline.utils";
 
 import * as styles from "./Timeline.css";
 
-const DEFAULT_LANE_GAP = 4;
-const DEFAULT_AXIS_SIZE = 0;
-const DEFAULT_MIN_TICK_GAP = 64;
 const DEFAULT_FOCUS_RATIO = 0.5;
 const MIN_VIEW_SHARE = 0.001;
 const PERCENT = 100;
@@ -130,9 +128,9 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
 
     const getLaneSize = createMemo(() => access(props.laneSize));
 
-    const getLaneGap = createMemo(() => access(props.laneGap) ?? DEFAULT_LANE_GAP);
+    const getLaneGap = createMemo(() => access(props.laneGap) ?? TIMELINE_DEFAULTS.laneGap);
 
-    const getAxisSize = createMemo(() => access(props.axisSize) ?? DEFAULT_AXIS_SIZE);
+    const getAxisSize = createMemo(() => access(props.axisSize) ?? TIMELINE_DEFAULTS.axisSize);
 
     const getHeight = createMemo(() => getAxisSize() + getLaneCount() * (getLaneSize() + getLaneGap()) - getLaneGap());
 
@@ -177,7 +175,7 @@ export const Timeline = <T,>(props: TimelineProps<T>) => {
         TimelineUtils.chooseSteps(
             TimelineUtils.getExtent(getView()),
             getSize().width,
-            access(props.minTickGap) ?? DEFAULT_MIN_TICK_GAP,
+            access(props.minTickGap) ?? TIMELINE_DEFAULTS.minTickGap,
             access(props.tickSteps),
         ),
     );

@@ -4,13 +4,10 @@ import { MathUtils } from "@thewaver/ss-utils";
 
 import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access } from "../../Utils/propUtils";
-import type { ScrollerButtonPlacement, ScrollerProps, ScrollerStep, ScrollerStepper } from "./Scroller.types";
+import { SCROLLER_DEFAULTS } from "./Scroller.const";
+import type { ScrollerProps, ScrollerStep, ScrollerStepper } from "./Scroller.types";
 
 import * as styles from "./Scroller.css";
-
-const DEFAULT_SCROLLER_GAP = 0;
-const DEFAULT_SCROLLER_PADDING = 0;
-const DEFAULT_SCROLLER_BUTTON_PLACEMENT: ScrollerButtonPlacement = "split";
 
 const SCROLL_EPSILON = 1;
 const RATIO_MIN = 0;
@@ -69,11 +66,11 @@ export const Scroller = (props: ScrollerProps) => {
     const [getTrackRef, setTrackRef] = createSignal<HTMLElement>();
     const [getMetrics, setMetrics] = createSignal({ start: 0, visible: 0, total: 0 });
 
-    const getGap = createMemo(() => access(props.gap) ?? DEFAULT_SCROLLER_GAP);
+    const getGap = createMemo(() => access(props.gap) ?? SCROLLER_DEFAULTS.gap);
 
-    const getPadding = createMemo(() => access(props.padding) ?? DEFAULT_SCROLLER_PADDING);
+    const getPadding = createMemo(() => access(props.padding) ?? SCROLLER_DEFAULTS.padding);
 
-    const getButtonPlacement = createMemo(() => access(props.buttonPlacement) ?? DEFAULT_SCROLLER_BUTTON_PLACEMENT);
+    const getButtonPlacement = createMemo(() => access(props.buttonPlacement) ?? SCROLLER_DEFAULTS.buttonPlacement);
 
     const stepper: ScrollerStepper = {
         getIsAtStart: () => getMetrics().start <= SCROLL_EPSILON,

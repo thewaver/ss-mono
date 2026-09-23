@@ -5,13 +5,10 @@ import { MathUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerUtils } from "../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { access } from "../../../Utils/propUtils";
+import { LIGHT_CATCHER_DEFAULTS } from "./LightCatcher.const";
 import type { LightCatcherProps } from "./LightCatcher.types";
 
 import * as styles from "./LightCatcher.css";
-
-const DEFAULT_LIGHT_CATCHER_LIGHT_RANGE_PX = 420;
-const DEFAULT_LIGHT_CATCHER_MAX_BRIGHTNESS = 1.6;
-const DEFAULT_LIGHT_CATCHER_RESTING_BRIGHTNESS = 1;
 
 const FULL_STRENGTH = 1;
 const NO_STRENGTH = 0;
@@ -34,7 +31,7 @@ export const LightCatcher = (props: ParentProps<LightCatcherProps>) => {
     const getStrength = createMemo(() => {
         if (getIsResting()) return NO_STRENGTH;
 
-        const rangePx = access(props.lightRangePx) ?? DEFAULT_LIGHT_CATCHER_LIGHT_RANGE_PX;
+        const rangePx = access(props.lightRangePx) ?? LIGHT_CATCHER_DEFAULTS.lightRangePx;
         const { distance, edgeDistance } = getReading();
 
         if (distance <= edgeDistance) return FULL_STRENGTH;
@@ -45,8 +42,8 @@ export const LightCatcher = (props: ParentProps<LightCatcherProps>) => {
 
     const getBrightness = createMemo(() =>
         MathUtils.lerp(
-            access(props.restingBrightness) ?? DEFAULT_LIGHT_CATCHER_RESTING_BRIGHTNESS,
-            access(props.maxBrightness) ?? DEFAULT_LIGHT_CATCHER_MAX_BRIGHTNESS,
+            access(props.restingBrightness) ?? LIGHT_CATCHER_DEFAULTS.restingBrightness,
+            access(props.maxBrightness) ?? LIGHT_CATCHER_DEFAULTS.maxBrightness,
             getStrength(),
         ),
     );

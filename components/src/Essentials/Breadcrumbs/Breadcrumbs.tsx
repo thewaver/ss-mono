@@ -3,11 +3,10 @@ import { Dynamic } from "solid-js/web";
 
 import { InteractionWrapper } from "../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access } from "../../Utils/propUtils";
+import { BREADCRUMBS_DEFAULTS } from "./Breadcrumbs.const";
 import type { BreadcrumbsItemProps, BreadcrumbsProps } from "./Breadcrumbs.types";
 
 import * as styles from "./Breadcrumbs.css";
-
-const DEFAULT_BREADCRUMBS_GAP = 0;
 
 const BreadcrumbsItem = <T,>(props: BreadcrumbsItemProps<T>) => {
     const getIsDisabled = () => access(props.flags).isDisabled ?? false;
@@ -77,7 +76,7 @@ export const Breadcrumbs = <T,>(props: BreadcrumbsProps<T>) => {
 
     return (
         <nav class={styles.breadcrumbsRoot} aria-label={access(props.ariaLabel)}>
-            <ol class={styles.breadcrumbsList} style={{ gap: `${access(props.gap) ?? DEFAULT_BREADCRUMBS_GAP}px` }}>
+            <ol class={styles.breadcrumbsList} style={{ gap: `${access(props.gap) ?? BREADCRUMBS_DEFAULTS.gap}px` }}>
                 <Index each={access(props.crumbs)}>
                     {(getCrumb, index) => (
                         <li class={styles.breadcrumbsEntry}>

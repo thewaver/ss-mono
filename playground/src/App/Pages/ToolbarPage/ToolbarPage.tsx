@@ -1,7 +1,7 @@
 import { createEffect, createMemo, createSignal } from "solid-js";
 import type { ParentProps } from "solid-js";
 
-import { ElementObserverUtils } from "@thewaver/ss-components";
+import { ElementObserverUtils, TOOLBAR_DEFAULTS } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -21,7 +21,6 @@ const STARTING_BAR_WIDTH = 520;
 const MIN_BAR_WIDTH = 80;
 const MAX_BAR_WIDTH = 760;
 const BAR_WIDTH_STEP = 10;
-const STARTING_GAP = 5;
 const MIN_GAP = 0;
 const MAX_GAP = 30;
 const GAP_STEP = 1;
@@ -53,7 +52,7 @@ const ResizableBar = (props: ResizableBarProps) => {
 
 export const ToolbarPage = () => {
     const [getBarWidth, setBarWidth] = createSignal(STARTING_BAR_WIDTH);
-    const [getGap, setGap] = createSignal(STARTING_GAP);
+    const [getGap, setGap] = createSignal(TOOLBAR_DEFAULTS.gap);
     const [getLastRun, setLastRun] = createSignal(NOTHING_RUN);
 
     const getExamples = createMemo(() => {

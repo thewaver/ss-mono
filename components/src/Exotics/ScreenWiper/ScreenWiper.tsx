@@ -5,13 +5,11 @@ import { MathUtils } from "@thewaver/ss-utils";
 
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
-import type { ScreenWiperDirection, ScreenWiperProps, ScreenWiperShape } from "./ScreenWiper.types";
+import { SCREEN_WIPER_DEFAULTS } from "./ScreenWiper.const";
+import type { ScreenWiperDirection, ScreenWiperProps } from "./ScreenWiper.types";
 
 import * as styles from "./ScreenWiper.css";
 
-const DEFAULT_SCREENWIPER_SHAPE: ScreenWiperShape = "lozenge";
-const DEFAULT_SCREENWIPER_TRANSITION_DURATION_MS = 200;
-const DEFAULT_SCREENWIPER_CELL_SIZE: number = 120;
 const TRANSITION_STAGGER_FACTOR = 0.05;
 
 const getTargetFromDirection = (direction: ScreenWiperDirection) => (direction === "in" ? 1 : 0);
@@ -22,10 +20,10 @@ export const ScreenWiper = (props: ScreenWiperProps) => {
     const [getTarget, setTarget] = createSignal(getTargetFromDirection(access(props.initialWipeDirection)));
     const [getHasFinished, setHasFinished] = createSignal(true);
 
-    const getCellSize = createMemo(() => access(props.cellSize) ?? DEFAULT_SCREENWIPER_CELL_SIZE);
+    const getCellSize = createMemo(() => access(props.cellSize) ?? SCREEN_WIPER_DEFAULTS.cellSize);
 
     const getTransitionDurationMs = createMemo(
-        () => access(props.transitionDurationMs) ?? DEFAULT_SCREENWIPER_TRANSITION_DURATION_MS,
+        () => access(props.transitionDurationMs) ?? SCREEN_WIPER_DEFAULTS.transitionDurationMs,
     );
 
     const getCols = createMemo(() => {
@@ -49,7 +47,7 @@ export const ScreenWiper = (props: ScreenWiperProps) => {
         clearTimeout(targetDeferralTimeout);
     });
 
-    const getShape = createMemo(() => access(props.shape) ?? DEFAULT_SCREENWIPER_SHAPE);
+    const getShape = createMemo(() => access(props.shape) ?? SCREEN_WIPER_DEFAULTS.shape);
 
     createEffect(() => {
         const direction = access(props.wipeDirection);

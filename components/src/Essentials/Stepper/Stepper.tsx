@@ -5,12 +5,11 @@ import type { InteractionSizing } from "../../Primitives/InteractionWrapper/Inte
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
-import type { Step, StepperDir, StepperItemProps, StepperProps } from "./Stepper.types";
+import { STEPPER_DEFAULTS } from "./Stepper.const";
+import type { Step, StepperItemProps, StepperProps } from "./Stepper.types";
 
 import * as styles from "./Stepper.css";
 
-const DEFAULT_STEPPER_DIR: StepperDir = "row";
-const DEFAULT_STEPPER_GAP = 0;
 const ROW_SIZING: InteractionSizing = "fit-content";
 const PLACED_SIZING: InteractionSizing = "fill";
 
@@ -46,7 +45,7 @@ export const Stepper = <TValue, TState>(props: StepperProps<TValue, TState>) => 
         );
     }
 
-    const getDir = createMemo(() => access(props.dir) ?? DEFAULT_STEPPER_DIR);
+    const getDir = createMemo(() => access(props.dir) ?? STEPPER_DEFAULTS.dir);
 
     const getLastIndex = createMemo(() => access(props.steps).length - 1);
 
@@ -150,7 +149,7 @@ export const Stepper = <TValue, TState>(props: StepperProps<TValue, TState>) => 
             style={{
                 "flex-direction": getLayout() === undefined ? getDir() : undefined,
                 "flex-wrap": getLayout() === undefined && getDir() === "row" ? "wrap" : undefined,
-                "gap": getLayout() === undefined ? `${access(props.gap) ?? DEFAULT_STEPPER_GAP}px` : undefined,
+                "gap": getLayout() === undefined ? `${access(props.gap) ?? STEPPER_DEFAULTS.gap}px` : undefined,
             }}
             aria-label={access(props.ariaLabel)}
         >

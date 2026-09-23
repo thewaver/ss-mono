@@ -5,13 +5,10 @@ import { MathUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerUtils } from "../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { access } from "../../../Utils/propUtils";
+import { TILTER_DEFAULTS } from "./Tilter.const";
 import type { TilterProps, TilterState } from "./Tilter.types";
 
 import * as styles from "./Tilter.css";
-
-const DEFAULT_TILTER_MAX_TILT_DEGREES = 14;
-const DEFAULT_TILTER_PERSPECTIVE_PX = 900;
-const DEFAULT_TILTER_TILT_RANGE_PX = 420;
 
 const CENTER = 0.5;
 const FULL_SWING = 2;
@@ -35,7 +32,7 @@ export const Tilter = (props: ParentProps<TilterProps>) => {
 
     const getIsResting = createMemo(() => getIsDisabled() || !getIsPointerPresent() || !getIsInRange());
 
-    const getMaxTiltDegrees = createMemo(() => access(props.maxTiltDegrees) ?? DEFAULT_TILTER_MAX_TILT_DEGREES);
+    const getMaxTiltDegrees = createMemo(() => access(props.maxTiltDegrees) ?? TILTER_DEFAULTS.maxTiltDegrees);
 
     const getBoxRatio = createMemo(() => ({
         x: MathUtils.clamp01(getReading().boxRatio.x),
@@ -45,7 +42,7 @@ export const Tilter = (props: ParentProps<TilterProps>) => {
     const getStrength = createMemo(() => {
         if (getIsResting()) return NO_LEAN;
 
-        const rangePx = access(props.tiltRangePx) ?? DEFAULT_TILTER_TILT_RANGE_PX;
+        const rangePx = access(props.tiltRangePx) ?? TILTER_DEFAULTS.tiltRangePx;
         const { distance, edgeDistance } = getReading();
 
         if (distance <= edgeDistance) return FULL_LEAN;
@@ -76,21 +73,19 @@ export const Tilter = (props: ParentProps<TilterProps>) => {
         return MathUtils.clamp01(CENTER - (offset.x + offset.y) * CENTER * SHEEN_OVERTRAVEL) * PERCENT;
     });
 
-    const getState = createMemo(
-        (): TilterState => ({
-            tilt: getTilt(),
-            boxRatio: getBoxRatio(),
-            sheenPosition: getSheenPosition(),
-            strength: getStrength(),
-            isResting: getIsResting(),
-        }),
-    );
+    const getState = createMemo((): TilterState => ({
+        tilt: getTilt(),
+        boxRatio: getBoxRatio(),
+        sheenPosition: getSheenPosition(),
+        strength: getStrength(),
+        isResting: getIsResting(),
+    }));
 
     return (
         <div
             ref={setRef}
             class={styles.tilterRoot}
-            style={{ perspective: `${access(props.perspectivePx) ?? DEFAULT_TILTER_PERSPECTIVE_PX}px` }}
+            style={{ perspective: `${access(props.perspectivePx) ?? TILTER_DEFAULTS.perspectivePx}px` }}
         >
             <div
                 class={styles.tilterSurface}

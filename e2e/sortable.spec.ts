@@ -40,24 +40,6 @@ const carriedCount = (page: Page, key: string) =>
         demo(key),
     );
 
-/**
- * The carried copy is portalled away from the list, so it is the aria-hidden element outside every list
- * that the component has written a transform onto — the transform being how it is positioned at all.
- * Its position is part of the answer here, since what is being tested is that it moves.
- */
-const carriedPreview = (page: Page) =>
-    page.evaluate(() => {
-        const found = [...document.querySelectorAll('[aria-hidden="true"][style*="translate"]')].find(
-            (element) => !element.closest('[role="list"]'),
-        );
-
-        if (!found) return "none";
-
-        const rect = found.getBoundingClientRect();
-
-        return `${(found.textContent ?? "").trim()}@${Math.round(rect.x)},${Math.round(rect.y)}`;
-    });
-
 const markerTop = (page: Page, key: string) =>
     page.evaluate((selector) => {
         const list = document.querySelector(`${selector} [role="list"]`) as HTMLElement;

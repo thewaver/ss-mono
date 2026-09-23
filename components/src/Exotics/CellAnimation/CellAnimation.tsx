@@ -5,16 +5,12 @@ import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access } from "../../Utils/propUtils";
-import type { CellAnimationEvaluationDefs, CellAnimationFinalFrame, CellAnimationProps } from "./CellAnimation.types";
+import { CELL_ANIMATION_DEFAULTS } from "./CellAnimation.const";
+import type { CellAnimationEvaluationDefs, CellAnimationProps } from "./CellAnimation.types";
 import { CellAnimationUtils } from "./CellAnimation.utils";
 
 import * as styles from "./CellAnimation.css";
 
-const DEFAULT_CELL_ANIMATION_DURATION_MS = 2000;
-const DEFAULT_CELL_ANIMATION_ITERATION_COUNT = Infinity;
-const DEFAULT_CELL_ANIMATION_ITERATION_DELAY_MS = 0;
-const DEFAULT_CELL_ANIMATION_SIZE_ANCHOR = "width";
-const DEFAULT_CELL_ANIMATION_FINAL_FRAME: CellAnimationFinalFrame = "cells";
 const DEFAULT_CELL_ANIMATION_WEIGHT = 0;
 const CELL_ANIMATION_PERSPECTIVE_RATIO = 1.5;
 const CELL_ANIMATION_BLEED_PX = 1;
@@ -22,18 +18,18 @@ const CELL_ANIMATION_DEPTH_STEPS = 100;
 
 export const CellAnimation = (props: CellAnimationProps) => {
     const getAnimationDurationMs = createMemo(
-        () => access(props.animationDurationMs) ?? DEFAULT_CELL_ANIMATION_DURATION_MS,
+        () => access(props.animationDurationMs) ?? CELL_ANIMATION_DEFAULTS.animationDurationMs,
     );
 
     const getAnimationIterationCount = createMemo(
-        () => access(props.animationIterationCount) ?? DEFAULT_CELL_ANIMATION_ITERATION_COUNT,
+        () => access(props.animationIterationCount) ?? CELL_ANIMATION_DEFAULTS.animationIterationCount,
     );
 
     const getAnimationIterationDelayMs = createMemo(
-        () => access(props.animationIterationDelayMs) ?? DEFAULT_CELL_ANIMATION_ITERATION_DELAY_MS,
+        () => access(props.animationIterationDelayMs) ?? CELL_ANIMATION_DEFAULTS.animationIterationDelayMs,
     );
 
-    const getSizeAnchor = createMemo(() => access(props.sizeAnchor) ?? DEFAULT_CELL_ANIMATION_SIZE_ANCHOR);
+    const getSizeAnchor = createMemo(() => access(props.sizeAnchor) ?? CELL_ANIMATION_DEFAULTS.sizeAnchor);
 
     const getAriaLabel = createMemo(() => access(props.ariaLabel));
 
@@ -104,7 +100,7 @@ export const CellAnimation = (props: CellAnimationProps) => {
 
     const getSource = createMemo(() => access(props.src));
 
-    const getFinalFrame = createMemo(() => access(props.finalFrame) ?? DEFAULT_CELL_ANIMATION_FINAL_FRAME);
+    const getFinalFrame = createMemo(() => access(props.finalFrame) ?? CELL_ANIMATION_DEFAULTS.finalFrame);
 
     const getHasEnded = createMemo(() => getCurrentIteration() >= getAnimationIterationCount());
 

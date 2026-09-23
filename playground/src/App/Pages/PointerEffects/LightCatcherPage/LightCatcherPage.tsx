@@ -1,5 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { LIGHT_CATCHER_DEFAULTS } from "@thewaver/ss-components";
+
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
@@ -19,13 +21,10 @@ const STARTING_ACTIVE_RANGE_PX = 1200;
 const MIN_LIGHT_RANGE_PX = 40;
 const MAX_LIGHT_RANGE_PX = 1200;
 const LIGHT_RANGE_STEP_PX = 20;
-const STARTING_LIGHT_RANGE_PX = 400;
 
 const MIN_BRIGHTNESS = 0;
 const MAX_BRIGHTNESS = 5;
 const BRIGHTNESS_STEP = 0.05;
-const STARTING_MAX_BRIGHTNESS = 2;
-const STARTING_RESTING_BRIGHTNESS = 1;
 
 const FIELD_WIDTH = 110;
 const BOX_HEIGHT = 200;
@@ -34,9 +33,9 @@ const ROW_SPAN = 2;
 export const LightCatcherPage = () => {
     const [getIsDisabled, setIsDisabled] = createSignal(false);
     const [getActiveRangePx, setActiveRangePx] = createSignal(STARTING_ACTIVE_RANGE_PX);
-    const [getLightRangePx, setLightRangePx] = createSignal(STARTING_LIGHT_RANGE_PX);
-    const [getMaxBrightness, setMaxBrightness] = createSignal(STARTING_MAX_BRIGHTNESS);
-    const [getRestingBrightness, setRestingBrightness] = createSignal(STARTING_RESTING_BRIGHTNESS);
+    const [getLightRangePx, setLightRangePx] = createSignal(LIGHT_CATCHER_DEFAULTS.lightRangePx);
+    const [getMaxBrightness, setMaxBrightness] = createSignal(LIGHT_CATCHER_DEFAULTS.maxBrightness);
+    const [getRestingBrightness, setRestingBrightness] = createSignal(LIGHT_CATCHER_DEFAULTS.restingBrightness);
 
     const getExamples = createMemo(() => {
         const commonProps: LightCatcherExampleProps = {

@@ -69,24 +69,6 @@ const transformOf = (page: import("@playwright/test").Page, scope: string) =>
         .evaluate((element) => (element as HTMLElement).style.transform);
 
 /**
- * Which wedges the wheel has picked out, by index. The Playground paints a picked wedge by changing the fill
- * on its shape and nothing else, so there is no attribute to read — but the comparison is still exact rather
- * than a color match, because whatever fill the majority of the wedges share is the unpicked one by
- * definition, and anything else is a pick. That holds in either theme and survives a palette change.
- */
-const pickedWedges = (page: import("@playwright/test").Page, scope: string) =>
-    page.evaluate((selector) => {
-        const fills = [...document.querySelectorAll(`${selector} path`)].map((path) => getComputedStyle(path).fill);
-        const tally = new Map<string, number>();
-
-        fills.forEach((fill) => tally.set(fill, (tally.get(fill) ?? 0) + 1));
-
-        const commonest = [...tally.entries()].sort((first, second) => second[1] - first[1])[0][0];
-
-        return fills.flatMap((fill, index) => (fill === commonest ? [] : [index]));
-    }, wedge(scope));
-
-/**
  * How far round the wheel has been, in degrees, read off the first wedge. Every variant writes the angle as
  * the first number in the wedge's transform — an overhead wedge is `rotate(a)` and a drum face is `rotateY(-a)`
  * before its own offset — and the first wedge has no offset, so the sign is the only difference and the
@@ -299,33 +281,37 @@ test("an idling wheel has picked nothing, and goes back to having picked nothing
  * machine, so reading the region afterwards was asking "did the wheel announce its prize" and "was the run
  * quick enough to still be inside the sweep window" in one breath, and answering both in the same red.
  */
-test("and the pick moves with the wheel while it spins, rather than appearing at the end", async ({ page }) => {
-    await page.locator(spin("sideways")).click();
-    await page.mouse.move(0, 0);
+test(
+    "and the pick moves with the wheel while it spins, rather than appearing at the end",
+    { tag: "@solo" },
+    async ({ page }) => {
+        await page.locator(spin("sideways")).click();
+        await page.mouse.move(0, 0);
 
-    const seen = new Set<number>();
-    const announced = new Set<string>();
+        const seen = new Set<number>();
+        const announced = new Set<string>();
 
-    for (let sample = 0; sample < PICK_SAMPLE_COUNT; sample++) {
-        (await pickedCards(page, SIDEWAYS)).forEach((index) => seen.add(index));
+        for (let sample = 0; sample < PICK_SAMPLE_COUNT; sample++) {
+            (await pickedCards(page, SIDEWAYS)).forEach((index) => seen.add(index));
 
-        const said = ((await page.locator(ANNOUNCER).textContent()) ?? "").trim();
+            const said = ((await page.locator(ANNOUNCER).textContent()) ?? "").trim();
 
-        if (said) announced.add(said);
+            if (said) announced.add(said);
 
-        await page.waitForTimeout(PICK_SAMPLE_GAP_MS);
-    }
+            await page.waitForTimeout(PICK_SAMPLE_GAP_MS);
+        }
 
-    expect(seen.size, "several wedges pass the marker and each is picked out in turn").toBeGreaterThan(1);
+        expect(seen.size, "several wedges pass the marker and each is picked out in turn").toBeGreaterThan(1);
 
-    const settled = await pickedCards(page, SIDEWAYS);
+        const settled = await pickedCards(page, SIDEWAYS);
 
-    expect(settled, "and the last one is the prize").toHaveLength(1);
-    expect(
-        [...announced].some((said) => said.includes(`, ${settled[0] + 1} of 8`)),
-        `the wheel said which wedge it came to rest on, and it said ${[...announced].join(" / ")}`,
-    ).toBe(true);
-});
+        expect(settled, "and the last one is the prize").toHaveLength(1);
+        expect(
+            [...announced].some((said) => said.includes(`, ${settled[0] + 1} of 8`)),
+            `the wheel said which wedge it came to rest on, and it said ${[...announced].join(" / ")}`,
+        ).toBe(true);
+    },
+);
 
 /**
  * The spin duration says how long a spin takes and the turn count says how far it goes in that time, so the
@@ -491,20 +477,25 @@ const DRUMS = [
     { name: "the reel", scope: REEL },
 ];
 
-test("a drum paints inside the room it reserves, at every count it can be given", async ({ page }) => {
-    await page.locator(checkField("isIdlingAllowed")).uncheck();
+test(
+    "a drum paints inside the room it reserves, at every count it can be given",
+    { tag: "@solo" },
+    async ({ page }) => {
+        await page.locator(checkField("isIdlingAllowed")).uncheck();
 
-    for (const count of ["2", "3", "6", "9", "12"]) {
-        await setField(page, "wedgeCount", count);
-        await page.waitForTimeout(FRAME_SETTLE_MS);
+        for (const count of ["2", "3", "6", "9", "12"]) {
+            await setField(page, "wedgeCount", count);
+            await page.waitForTimeout(FRAME_SETTLE_MS);
 
-        for (const drum of DRUMS) {
-            expect(await worstOverflow(page, wheel(drum.scope)), `${drum.name} at ${count} wedges`).toBeLessThanOrEqual(
-                OVERFLOW_TOLERANCE_PX,
-            );
+            for (const drum of DRUMS) {
+                expect(
+                    await worstOverflow(page, wheel(drum.scope)),
+                    `${drum.name} at ${count} wedges`,
+                ).toBeLessThanOrEqual(OVERFLOW_TOLERANCE_PX);
+            }
         }
-    }
-});
+    },
+);
 
 test("and keeps inside it all the way round, not only where it comes to rest", async ({ page }) => {
     await page.waitForTimeout(IDLE_DELAY_MS);

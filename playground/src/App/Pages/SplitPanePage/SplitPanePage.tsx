@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { Button } from "@thewaver/ss-components";
+import { Button, SPLIT_PANE_DEFAULTS } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -18,7 +18,6 @@ import type { SplitPaneExampleProps } from "./SplitPanePage.types";
 const MIN_GUTTER = 2;
 const MAX_GUTTER = 24;
 const GUTTER_STEP = 1;
-const STARTING_GUTTER = 8;
 const GUTTER_FIELD_WIDTH = 90;
 const PERCENT = 100;
 const EXAMPLES_ROOT = "/src/App/Pages/SplitPanePage/Examples";
@@ -33,7 +32,7 @@ const STARTING_COMPARE = [0.5, 0.5];
 const percent = (ratios: number[]) => ratios.map((ratio) => `${Math.round(ratio * PERCENT)}%`).join(" / ");
 
 export const SplitPanePage = () => {
-    const [getGutterSize, setGutterSize] = createSignal(STARTING_GUTTER);
+    const [getGutterSize, setGutterSize] = createSignal(SPLIT_PANE_DEFAULTS.gutterSize);
     const [getIsDisabled, setIsDisabled] = createSignal(false);
 
     const pairSignal = createSignal(STARTING_PAIR);

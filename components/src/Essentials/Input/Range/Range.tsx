@@ -8,18 +8,14 @@ import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/Inter
 import { access } from "../../../Utils/propUtils";
 import { FormFieldUtils } from "../FormField/FormField.utils";
 import { LabelUtils } from "../Label/Label.utils";
-import type { RangeElementProps, RangeOrientation, RangeProps, RangeRenderProps, RangeSpan } from "./Range.types";
+import { RANGE_DEFAULTS } from "./Range.const";
+import type { RangeElementProps, RangeProps, RangeRenderProps, RangeSpan } from "./Range.types";
 
 import * as styles from "./Range.css";
 
 const readFocusVisibleThumb = (element: HTMLElement, index: number) =>
     InteractionTrackerUtils.computeIsFocusVisible(element) ? index : undefined;
 
-const DEFAULT_RANGE_ORIENTATION: RangeOrientation = "horizontal";
-const DEFAULT_RANGE_MIN = 0;
-const DEFAULT_RANGE_MAX = 100;
-const DEFAULT_RANGE_STEP = 1;
-const DEFAULT_RANGE_THUMB_SIZE = 16;
 const MIN_TRACK_TRAVEL_PX = 1;
 
 const RangeElement = (props: RangeElementProps) => {
@@ -157,15 +153,15 @@ export const Range = (props: RangeProps) => {
 
     const [getFocusVisibleThumb, setFocusVisibleThumb] = createSignal<number>();
 
-    const getOrientation = createMemo(() => access(props.orientation) ?? DEFAULT_RANGE_ORIENTATION);
+    const getOrientation = createMemo(() => access(props.orientation) ?? RANGE_DEFAULTS.orientation);
 
-    const getMin = createMemo(() => access(props.min) ?? DEFAULT_RANGE_MIN);
+    const getMin = createMemo(() => access(props.min) ?? RANGE_DEFAULTS.min);
 
-    const getMax = createMemo(() => access(props.max) ?? DEFAULT_RANGE_MAX);
+    const getMax = createMemo(() => access(props.max) ?? RANGE_DEFAULTS.max);
 
-    const getStep = createMemo(() => access(props.step) ?? DEFAULT_RANGE_STEP);
+    const getStep = createMemo(() => access(props.step) ?? RANGE_DEFAULTS.step);
 
-    const getThumbSize = createMemo(() => access(props.thumbSize) ?? DEFAULT_RANGE_THUMB_SIZE);
+    const getThumbSize = createMemo(() => access(props.thumbSize) ?? RANGE_DEFAULTS.thumbSize);
 
     const getValues = createMemo(() => {
         const range = props.rangeSignal?.[0]();

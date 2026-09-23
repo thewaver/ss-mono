@@ -34,4 +34,3 @@ export const deckCard = style({
     transitionProperty: "transform, opacity",
     transitionTimingFunction: "ease-out",
 });
-

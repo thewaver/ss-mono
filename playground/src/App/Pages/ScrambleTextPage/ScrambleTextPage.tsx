@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { MediaQueryMonitorUtils } from "@thewaver/ss-components";
+import { MediaQueryMonitorUtils, SCRAMBLE_TEXT_DEFAULTS } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -10,7 +10,6 @@ import { HeadlineExample } from "./Examples/Headline";
 import { SequentialExample } from "./Examples/Sequential";
 import { SwapExample } from "./Examples/Swap";
 import type { ScrambleTextExampleProps } from "./ScrambleTextPage.types";
-
 
 const EXAMPLES_ROOT = "/src/App/Pages/ScrambleTextPage/Examples";
 
@@ -47,19 +46,17 @@ const SETTLE_ORDER_MAP: Record<(typeof SETTLE_ORDERS)[number], ((count: number) 
         Array.from({ length: count }, (_unused, index) => (index * GOLDEN_RATIO_CONJUGATE) % FULL_WEIGHT),
 };
 
-const STARTING_SETTLE_DURATION_MS = 1000;
 const MIN_SETTLE_DURATION_MS = 0;
 const MAX_SETTLE_DURATION_MS = 4000;
 const SETTLE_DURATION_STEP_MS = 100;
-const STARTING_SCRAMBLE_INTERVAL_MS = 50;
 const MIN_SCRAMBLE_INTERVAL_MS = 10;
 const MAX_SCRAMBLE_INTERVAL_MS = 200;
 const SCRAMBLE_INTERVAL_STEP_MS = 5;
 const NO_MOTION_DURATION_MS = 0;
 
 export const ScrambleTextPage = () => {
-    const [getSettleDurationMs, setSettleDurationMs] = createSignal(STARTING_SETTLE_DURATION_MS);
-    const [getScrambleIntervalMs, setScrambleIntervalMs] = createSignal(STARTING_SCRAMBLE_INTERVAL_MS);
+    const [getSettleDurationMs, setSettleDurationMs] = createSignal(SCRAMBLE_TEXT_DEFAULTS.settleDurationMs);
+    const [getScrambleIntervalMs, setScrambleIntervalMs] = createSignal(SCRAMBLE_TEXT_DEFAULTS.scrambleIntervalMs);
     const [getGlyphSet, setGlyphSet] = createSignal<(typeof GLYPH_SETS)[number]>(GLYPH_SETS[0]);
     const [getSettleOrder, setSettleOrder] = createSignal<(typeof SETTLE_ORDERS)[number]>(SETTLE_ORDERS[0]);
 
@@ -78,9 +75,7 @@ export const ScrambleTextPage = () => {
                 key: "headline",
                 name: "Headline",
                 readout: () => "the controller refuses a restart while a run is still going",
-                component: () => (
-                    <HeadlineExample {...commonProps} />
-                ),
+                component: () => <HeadlineExample {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Headline.tsx`,
             },
             {
@@ -88,18 +83,14 @@ export const ScrambleTextPage = () => {
                 name: "Sequential",
                 readout: () =>
                     "one character at a time, each churning inside its own window and landing before the next starts — which needs a run several times longer than a whole-line churn, or there is no time to see anything happen",
-                component: () => (
-                    <SequentialExample {...commonProps} />
-                ),
+                component: () => <SequentialExample {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Sequential.tsx`,
             },
             {
                 key: "swap",
                 name: "Swap",
                 readout: () => "nothing asks for a restart here — changing the text is what starts the run",
-                component: () => (
-                    <SwapExample {...commonProps} />
-                ),
+                component: () => <SwapExample {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Swap.tsx`,
             },
         ];

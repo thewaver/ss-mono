@@ -9,12 +9,11 @@ import { ElementFaderUtils } from "../../Abstracts/ElementFader/ElementFader.uti
 import { FocusManagerUtils } from "../../Abstracts/FocusManager/FocusManager.utils";
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
+import { TOOLTIP_DEFAULTS } from "./Tooltip.const";
 import type { TooltipProps } from "./Tooltip.types";
 
 import * as styles from "./Tooltip.css";
 
-const DEFAULT_TOOLTIP_TRANSITION_DURATION_MS = 200;
-const DEFAULT_TOOLTIP_SHOW_ON_FOCUS_DELAY_MS = 500;
 const ARIA_DESCRIBED_BY_ATTRIBUTE = "aria-describedby";
 const NO_GAP = 0;
 
@@ -34,12 +33,10 @@ export const Tooltip = (props: TooltipProps) => {
     const [getShouldShow, setShouldShow] = createSignal(false);
 
     const getTransitionDurationMs = createMemo(
-        () => access(props.transitionDurationMs) ?? DEFAULT_TOOLTIP_TRANSITION_DURATION_MS,
+        () => access(props.transitionDurationMs) ?? TOOLTIP_DEFAULTS.transitionDurationMs,
     );
 
-    const getFocusShowDelayMs = createMemo(
-        () => access(props.focusShowDelayMs) ?? DEFAULT_TOOLTIP_SHOW_ON_FOCUS_DELAY_MS,
-    );
+    const getFocusShowDelayMs = createMemo(() => access(props.focusShowDelayMs) ?? TOOLTIP_DEFAULTS.focusShowDelayMs);
 
     const [getContentRef, setLocalContentRef] = createSignal<HTMLElement>();
 

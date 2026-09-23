@@ -2,13 +2,12 @@ import { Index, createEffect, createMemo, createSignal, on, untrack } from "soli
 
 import { Barrel } from "../../Primitives/Barrel/Barrel";
 import { access } from "../../Utils/propUtils";
+import { ODOMETER_DEFAULTS } from "./Odometer.const";
 import type { OdometerProps } from "./Odometer.types";
 import { OdometerUtils } from "./Odometer.utils";
 
 import * as styles from "./Odometer.css";
 
-const DEFAULT_TURN_DURATION_MS = 600;
-const DEFAULT_CASCADE_DELAY_MS = 90;
 const RESTING_ANGLE = 0;
 const NO_DELAY = 0;
 
@@ -24,7 +23,7 @@ export const Odometer = (props: OdometerProps) => {
 
     const getDigitSize = createMemo(() => access(props.digitSize));
 
-    const getCascadeDelayMs = createMemo(() => access(props.cascadeDelayMs) ?? DEFAULT_CASCADE_DELAY_MS);
+    const getCascadeDelayMs = createMemo(() => access(props.cascadeDelayMs) ?? ODOMETER_DEFAULTS.cascadeDelayMs);
 
     createEffect(
         on(
@@ -107,7 +106,9 @@ export const Odometer = (props: OdometerProps) => {
                                 hasBacks={false}
                                 faceSize={getDigitSize}
                                 angle={() => getAngle(getSlot().digitIndex)}
-                                transitionDurationMs={() => access(props.turnDurationMs) ?? DEFAULT_TURN_DURATION_MS}
+                                transitionDurationMs={() =>
+                                    access(props.turnDurationMs) ?? ODOMETER_DEFAULTS.turnDurationMs
+                                }
                                 transitionDelayMs={() => getDelay(getSlot().digitIndex)}
                                 faceRoleDescription={""}
                                 computeFaceDefs={() => ({ ariaLabel: "", isHidden: true })}

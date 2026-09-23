@@ -6,10 +6,10 @@ import { Mosaic } from "../../../Primitives/Mosaic/Mosaic";
 import type { ImageMosaicProps } from "../../../Primitives/Mosaic/Mosaic.types";
 import { MosaicUtils } from "../../../Primitives/Mosaic/Mosaic.utils";
 import { access } from "../../../Utils/propUtils";
+import { IMAGE_MOSAIC_DEFAULTS } from "./ImageMosaic.const";
 
 import * as styles from "./ImageMosaic.css";
 
-const DEFAULT_TARGET_ASPECT_RATIO: Size2d = { width: 1, height: 1 };
 const UNREADABLE_IMAGE_SIZE: Size2d = { width: 1, height: 1 };
 const EMPTY_SIZE: Size2d = { width: 0, height: 0 };
 
@@ -83,7 +83,7 @@ export const ImageMosaic = (props: ImageMosaicProps) => {
     const getSizes = createMemo(() => access(props.sources).map((source) => getSizeBySrc()[source.src] ?? EMPTY_SIZE));
 
     const getTargetAspectRatio = createMemo(() => {
-        const targetAspectRatio = access(props.targetAspectRatio) ?? DEFAULT_TARGET_ASPECT_RATIO;
+        const targetAspectRatio = access(props.targetAspectRatio) ?? IMAGE_MOSAIC_DEFAULTS.targetAspectRatio;
 
         return access(props.sizeAnchor) === "height" ? MosaicUtils.transposeSize(targetAspectRatio) : targetAspectRatio;
     });

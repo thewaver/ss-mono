@@ -10,13 +10,10 @@ import { FocusManagerUtils } from "../../Abstracts/FocusManager/FocusManager.uti
 import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
-import type { ModalAlignment, ModalProps, ModalRole } from "./Modal.types";
+import { MODAL_DEFAULTS } from "./Modal.const";
+import type { ModalAlignment, ModalProps } from "./Modal.types";
 
 import * as styles from "./Modal.css";
-
-const DEFAULT_MODAL_TRANSITION_DURATION_MS = 200;
-const DEFAULT_MODAL_ROLE: ModalRole = "dialog";
-const DEFAULT_MODAL_ALIGNMENT: ModalAlignment = "center";
 
 const MODAL_SWIPE_COMMIT_RATIO = 0.35;
 const MODAL_SWIPE_FALLBACK_AXIS: SwipeAxis = "horizontal";
@@ -35,10 +32,10 @@ export const Modal = (props: ModalProps) => {
     const [getContainerRef, setContainerRef] = createSignal<HTMLElement>();
 
     const getTransitionDurationMs = createMemo(
-        () => access(props.transitionDurationMs) ?? DEFAULT_MODAL_TRANSITION_DURATION_MS,
+        () => access(props.transitionDurationMs) ?? MODAL_DEFAULTS.transitionDurationMs,
     );
 
-    const getAlignment = createMemo(() => access(props.alignment) ?? DEFAULT_MODAL_ALIGNMENT);
+    const getAlignment = createMemo(() => access(props.alignment) ?? MODAL_DEFAULTS.alignment);
 
     const getSwipeDirection = createMemo(() => MODAL_SWIPE_DIRECTIONS[getAlignment()]);
 
@@ -156,7 +153,7 @@ export const Modal = (props: ModalProps) => {
                             "transition-duration": `${getIsSwiping() ? 0 : getTransitionDurationMs()}ms`,
                         }}
                         tabIndex={-1}
-                        role={access(props.role) ?? DEFAULT_MODAL_ROLE}
+                        role={access(props.role) ?? MODAL_DEFAULTS.role}
                         aria-modal="true"
                         aria-label={access(props.ariaLabel)}
                         aria-labelledby={access(props.ariaLabelledBy)}

@@ -2,12 +2,11 @@ import { Index, createMemo } from "solid-js";
 
 import { BarrelUtils } from "../../Primitives/Barrel/Barrel.utils";
 import { access, accessSignal } from "../../Utils/propUtils";
+import { CUBOID_DEFAULTS } from "./Cuboid.const";
 import type { CuboidFace, CuboidFaceState, CuboidProps } from "./Cuboid.types";
 import { CuboidUtils } from "./Cuboid.utils";
 
 import * as styles from "./Cuboid.css";
-
-const DEFAULT_CUBOID_TRANSITION_DURATION_MS = 400;
 
 const HALF = 0.5;
 
@@ -65,7 +64,7 @@ export const Cuboid = (props: CuboidProps) => {
                     class={styles.cuboidBody}
                     style={{
                         "transform": CuboidUtils.getTurnTransform(getYaw(), getPitch(), getSize()),
-                        "transition-duration": `${access(props.transitionDurationMs) ?? DEFAULT_CUBOID_TRANSITION_DURATION_MS}ms`,
+                        "transition-duration": `${access(props.transitionDurationMs) ?? CUBOID_DEFAULTS.transitionDurationMs}ms`,
                     }}
                 >
                     <Index each={FACES}>

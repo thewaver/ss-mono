@@ -13,6 +13,18 @@ const BASE_URL = `http://127.0.0.1:${PORT}`;
  */
 const WINDOW_SIZE = { width: 1600, height: 1200 };
 
+/**
+ * A handful of tests measure something the machine's load can move — a scroll that has to settle, a drum
+ * whose painted box is read mid-turn — and they fail perhaps one run in three under a full parallel sweep
+ * while passing every time on their own. That is the load, not the code, and a red from it costs more than
+ * it is worth: it trains everybody to re-run rather than to look.
+ *
+ * So they carry this tag, the main project leaves them out, and a second project runs them afterwards one
+ * at a time with nothing else in flight. **Tag a test only after watching it pass alone and fail in a
+ * sweep** — a test that fails both ways is broken and belongs in neither project.
+ */
+const SOLO_TAG = /@solo/;
+
 export default defineConfig({
     testDir: "./e2e",
     fullyParallel: true,
@@ -26,6 +38,15 @@ export default defineConfig({
     projects: [
         {
             name: "chromium",
+            grepInvert: SOLO_TAG,
+            use: { ...devices["Desktop Chrome"], viewport: WINDOW_SIZE },
+        },
+        {
+            name: "solo",
+            grep: SOLO_TAG,
+            workers: 1,
+            fullyParallel: false,
+            dependencies: ["chromium"],
             use: { ...devices["Desktop Chrome"], viewport: WINDOW_SIZE },
         },
     ],

@@ -40,7 +40,7 @@ const recordMediaCalls = `
 const FAST_CROSSFADE_MS = "250";
 const SETTLE_MS = 600;
 
-const mediaCalls = (page: Page) => page.evaluate(() => window.__mediaCalls as string[]);
+const mediaCalls = (page: Page) => page.evaluate(() => (window as unknown as { __mediaCalls: string[] }).__mediaCalls);
 
 const playCalls = async (page: Page) => (await mediaCalls(page)).filter((call) => call.startsWith("play:"));
 

@@ -1,7 +1,7 @@
 import type { Accessor } from "solid-js";
 import { Index, Show, createMemo, createSignal, onMount } from "solid-js";
 
-import { AngleUtils, CSSUtils, type Point2d, type Size2d } from "@thewaver/ss-utils";
+import { AngleUtils, CSSUtils, type Point2d } from "@thewaver/ss-utils";
 
 import { MediaQueryMonitorUtils } from "../../Abstracts/MediaQueryMonitor/MediaQueryMonitor.utils";
 import type { PlacementRect } from "../../Abstracts/Placement/Placement.types";
@@ -11,19 +11,17 @@ import { ProximityUtils } from "../../Abstracts/Proximity/Proximity.utils";
 import { RotatorUtils } from "../../Abstracts/Rotator/Rotator.utils";
 import { access } from "../../Utils/propUtils";
 import { Barrel } from "../Barrel/Barrel";
-import type { WheelAxis, WheelController, WheelFace, WheelProps, WheelWedgeState } from "./Wheel.types";
+import { WHEEL_DEFAULTS } from "./Wheel.const";
+import type { WheelController, WheelFace, WheelProps, WheelWedgeState } from "./Wheel.types";
 
 import * as styles from "./Wheel.css";
-
-const DEFAULT_WHEEL_AXIS: WheelAxis = "row";
-const DEFAULT_WHEEL_WEDGE_SIZE: Size2d = { width: 0, height: 0 };
 
 const WHEEL_ROLE_DESCRIPTION = "wheel";
 const WEDGE_ROLE_DESCRIPTION = "wedge";
 const ROOT_PATH: number[] = [];
 const NO_PARENT_EXTENT = 0;
 const FIRST_WEDGE = 0;
-const DEFAULT_MARKER_DEGREES = -90;
+
 const NO_CORRECTION = 0;
 const HALF = 0.5;
 const SQUARE_HEIGHT_RATIO = 1;
@@ -46,9 +44,9 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
-    const getAxis = createMemo(() => access(props.axis) ?? DEFAULT_WHEEL_AXIS);
+    const getAxis = createMemo(() => access(props.axis) ?? WHEEL_DEFAULTS.axis);
 
-    const getWedgeSize = createMemo(() => access(props.wedgeSize) ?? DEFAULT_WHEEL_WEDGE_SIZE);
+    const getWedgeSize = createMemo(() => access(props.wedgeSize) ?? WHEEL_DEFAULTS.wedgeSize);
 
     const rotation = RotatorUtils.createRotator(getIsDisabled, {
         stepCount: getWedgeCount,
@@ -81,7 +79,9 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
 
         if (!sector) return NO_CORRECTION;
 
-        return (access(props.markerDegrees) ?? DEFAULT_MARKER_DEGREES) - (sector.fromAngle + sector.toAngle) * HALF;
+        return (
+            (access(props.markerDegrees) ?? WHEEL_DEFAULTS.markerDegrees) - (sector.fromAngle + sector.toAngle) * HALF
+        );
     });
 
     const getWedgeAngle = (index: number) =>

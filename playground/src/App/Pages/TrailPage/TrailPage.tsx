@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { MediaQueryMonitorUtils } from "@thewaver/ss-components";
+import { MediaQueryMonitorUtils, TRAIL_DEFAULTS } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -10,18 +10,16 @@ import { CircuitExample } from "./Examples/Circuit";
 import { TimelineExample } from "./Examples/Timeline";
 import type { TrailExampleProps } from "./TrailPage.types";
 
-
 const EXAMPLES_ROOT = "/src/App/Pages/TrailPage/Examples";
 
 const MIN_DURATION_MS = 500;
 const MAX_DURATION_MS = 20000;
 const DURATION_STEP_MS = 500;
-const STARTING_DURATION_MS = 6000;
 const PERCENT = 100;
 const HALF_WAY = 0.5;
 
 export const TrailPage = () => {
-    const [getDurationMs, setDurationMs] = createSignal(STARTING_DURATION_MS);
+    const [getDurationMs, setDurationMs] = createSignal(TRAIL_DEFAULTS.durationMs);
     const [getIsLooping, setIsLooping] = createSignal(true);
     const [getIsTurning, setIsTurning] = createSignal(true);
 

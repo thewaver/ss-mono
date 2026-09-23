@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components";
+import { TOOLTIP_DEFAULTS } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -28,16 +29,13 @@ const STARTING_H_PLACEMENT: AnchorHPlacement = "center";
 const STARTING_V_PLACEMENT: AnchorVPlacement = "top-out";
 const STARTING_OFFSET_Y = 10;
 const STARTING_OFFSET_X = 0;
-const STARTING_TRANSITION_DURATION_MS = 200;
-const STARTING_FOCUS_SHOW_DELAY_MS = 500;
-
 export const TooltipPage = () => {
     const [getHPlacement, setHPlacement] = createSignal<AnchorHPlacement>(STARTING_H_PLACEMENT);
     const [getVPlacement, setVPlacement] = createSignal<AnchorVPlacement>(STARTING_V_PLACEMENT);
     const [getOffsetX, setOffsetX] = createSignal(STARTING_OFFSET_X);
     const [getOffsetY, setOffsetY] = createSignal(STARTING_OFFSET_Y);
-    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(STARTING_TRANSITION_DURATION_MS);
-    const [getFocusShowDelayMs, setFocusShowDelayMs] = createSignal(STARTING_FOCUS_SHOW_DELAY_MS);
+    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(TOOLTIP_DEFAULTS.transitionDurationMs);
+    const [getFocusShowDelayMs, setFocusShowDelayMs] = createSignal(TOOLTIP_DEFAULTS.focusShowDelayMs);
 
     const getPlacement = createMemo(() => ({ x: getHPlacement(), y: getVPlacement() }));
 

@@ -4,13 +4,10 @@ import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { Collapsible } from "../Collapsible/Collapsible";
-import type { AccordionProps, AccordionSectionProps, AccordionSizing } from "./Accordion.types";
+import { ACCORDION_DEFAULTS } from "./Accordion.const";
+import type { AccordionProps, AccordionSectionProps } from "./Accordion.types";
 
 import * as styles from "./Accordion.css";
-
-const DEFAULT_ACCORDION_HEADING_LEVEL = 3;
-const DEFAULT_ACCORDION_GAP = 0;
-const DEFAULT_ACCORDION_SIZING: AccordionSizing = "fill";
 
 const AccordionSection = <T,>(props: AccordionSectionProps<T>) => {
     const headerId = createUniqueId();
@@ -45,9 +42,9 @@ export const Accordion = <T,>(props: AccordionProps<T>) => {
 
     const [getHeaderRefs, setHeaderRefs] = createSignal<(HTMLElement | undefined)[]>([]);
 
-    const getHeadingLevel = createMemo(() => access(props.headingLevel) ?? DEFAULT_ACCORDION_HEADING_LEVEL);
+    const getHeadingLevel = createMemo(() => access(props.headingLevel) ?? ACCORDION_DEFAULTS.headingLevel);
 
-    const getSizing = createMemo(() => access(props.sizing) ?? DEFAULT_ACCORDION_SIZING);
+    const getSizing = createMemo(() => access(props.sizing) ?? ACCORDION_DEFAULTS.sizing);
 
     const setHeaderRef = (index: number, element: HTMLElement) => {
         setHeaderRefs((prev) => {
@@ -98,7 +95,7 @@ export const Accordion = <T,>(props: AccordionProps<T>) => {
     return (
         <div
             class={[styles.accordionRoot, styles.accordionSizingVariants[getSizing()]].join(" ")}
-            style={{ gap: `${access(props.gap) ?? DEFAULT_ACCORDION_GAP}px` }}
+            style={{ gap: `${access(props.gap) ?? ACCORDION_DEFAULTS.gap}px` }}
             onKeyDown={handleKeyDown}
         >
             <Index each={access(props.items)}>

@@ -4,13 +4,11 @@ import type { Rect } from "@thewaver/ss-utils";
 
 import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObserver.utils";
 import { access } from "../../Utils/propUtils";
-import type { MosaicPlacement, MosaicProps, MosaicSizeAnchor } from "./Mosaic.types";
+import { MOSAIC_DEFAULTS } from "./Mosaic.const";
+import type { MosaicPlacement, MosaicProps } from "./Mosaic.types";
 import { MosaicUtils } from "./Mosaic.utils";
 
 import * as styles from "./Mosaic.css";
-
-const DEFAULT_MOSAIC_SIZE_ANCHOR: MosaicSizeAnchor = "width";
-const DEFAULT_MOSAIC_GAP = 0;
 
 const EMPTY_RECT: Rect = { x: 0, y: 0, width: 0, height: 0 };
 const EMPTY_LAYOUT = { placements: [] as MosaicPlacement[], freeExtent: 0 };
@@ -19,9 +17,9 @@ const isSameOrder = (prev: number[], next: number[]) =>
     prev.length === next.length && prev.every((index, at) => index === next[at]);
 
 export const Mosaic = (props: MosaicProps) => {
-    const getSizeAnchor = createMemo(() => access(props.sizeAnchor) ?? DEFAULT_MOSAIC_SIZE_ANCHOR);
+    const getSizeAnchor = createMemo(() => access(props.sizeAnchor) ?? MOSAIC_DEFAULTS.sizeAnchor);
 
-    const getGap = createMemo(() => access(props.gap) ?? DEFAULT_MOSAIC_GAP);
+    const getGap = createMemo(() => access(props.gap) ?? MOSAIC_DEFAULTS.gap);
 
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
 

@@ -17,16 +17,12 @@ import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/I
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { PointerTrackerUtils } from "../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { access } from "../../../Utils/propUtils";
+import { SCRATCH_CARD_DEFAULTS } from "./ScratchCard.const";
 import type { ScratchCardBrushGeometry, ScratchCardProps } from "./ScratchCard.types";
 import { ScratchCardUtils } from "./ScratchCard.utils";
 
 import * as styles from "./ScratchCard.css";
 
-const DEFAULT_BRUSH_RADIUS = 26;
-const DEFAULT_SOFTNESS = 0.45;
-const DEFAULT_PRECISION = 32;
-const DEFAULT_CLEAR_THRESHOLD = 1;
-const DEFAULT_CLEAR_DURATION_MS = 450;
 const NOTHING_RUBBED = 0;
 const INSIDE_EDGE_RATIO = 1;
 const NO_PATH = "";
@@ -47,15 +43,15 @@ export const ScratchCard = (props: ScratchCardProps) => {
 
     const getSize = ElementObserverUtils.createBorderBoxSizeObserver(getCoverRef, getIsDisabled);
 
-    const getBrushRadius = createMemo(() => access(props.brushRadius) ?? DEFAULT_BRUSH_RADIUS);
+    const getBrushRadius = createMemo(() => access(props.brushRadius) ?? SCRATCH_CARD_DEFAULTS.brushRadius);
 
-    const getSoftness = createMemo(() => access(props.softness) ?? DEFAULT_SOFTNESS);
+    const getSoftness = createMemo(() => access(props.softness) ?? SCRATCH_CARD_DEFAULTS.softness);
 
-    const getPrecision = createMemo(() => access(props.precision) ?? DEFAULT_PRECISION);
+    const getPrecision = createMemo(() => access(props.precision) ?? SCRATCH_CARD_DEFAULTS.precision);
 
-    const getClearThreshold = createMemo(() => access(props.clearThreshold) ?? DEFAULT_CLEAR_THRESHOLD);
+    const getClearThreshold = createMemo(() => access(props.clearThreshold) ?? SCRATCH_CARD_DEFAULTS.clearThreshold);
 
-    const getClearDurationMs = createMemo(() => access(props.clearDurationMs) ?? DEFAULT_CLEAR_DURATION_MS);
+    const getClearDurationMs = createMemo(() => access(props.clearDurationMs) ?? SCRATCH_CARD_DEFAULTS.clearDurationMs);
 
     const getBrushShape = createMemo(() => ({
         radius: getBrushRadius(),

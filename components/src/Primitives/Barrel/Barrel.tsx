@@ -1,21 +1,17 @@
 import type { Accessor } from "solid-js";
 import { Index, Show, createMemo } from "solid-js";
 
-import type { Size2d } from "@thewaver/ss-utils";
-
 import { access } from "../../Utils/propUtils";
-import type { BarrelAxis, BarrelFace, BarrelProps } from "./Barrel.types";
+import { BARREL_DEFAULTS } from "./Barrel.const";
+import type { BarrelFace, BarrelProps } from "./Barrel.types";
 import { BarrelUtils } from "./Barrel.utils";
 
 import * as styles from "./Barrel.css";
 
-const DEFAULT_BARREL_AXIS: BarrelAxis = "row";
-const DEFAULT_BARREL_FACE_SIZE: Size2d = { width: 0, height: 0 };
-
 export const Barrel = <T,>(props: BarrelProps<T>) => {
-    const getAxis = createMemo(() => access(props.axis) ?? DEFAULT_BARREL_AXIS);
+    const getAxis = createMemo(() => access(props.axis) ?? BARREL_DEFAULTS.axis);
 
-    const getFaceSize = createMemo(() => access(props.faceSize) ?? DEFAULT_BARREL_FACE_SIZE);
+    const getFaceSize = createMemo(() => access(props.faceSize) ?? BARREL_DEFAULTS.faceSize);
 
     const getFaceCount = createMemo(() => access(props.faces).length);
 

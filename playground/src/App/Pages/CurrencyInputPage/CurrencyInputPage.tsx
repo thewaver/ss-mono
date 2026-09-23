@@ -1,5 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { CURRENCY_INPUT_DEFAULTS } from "@thewaver/ss-components";
+
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -21,8 +23,6 @@ const STARTING_PRICE = 1234.56;
 const STARTING_BUDGET = 4999.99;
 const STARTING_BIG = 9876543210.12;
 const STARTING_ADJUSTMENT = -250.5;
-const STARTING_DECIMALS = 2;
-
 const describe = (value: number | undefined) => (value === undefined ? "none" : `${value}`);
 
 const describeGrouping = (sizes: number[] | undefined) =>
@@ -30,7 +30,7 @@ const describeGrouping = (sizes: number[] | undefined) =>
 
 export const CurrencyInputPage = () => {
     const [getLocale, setLocale] = createSignal("en-GB");
-    const [getDecimals, setDecimals] = createSignal(STARTING_DECIMALS);
+    const [getDecimals, setDecimals] = createSignal(CURRENCY_INPUT_DEFAULTS.decimals);
     const [getGrouping, setGrouping] = createSignal<number[] | undefined>();
     const [getHasSign, setHasSign] = createSignal(false);
 

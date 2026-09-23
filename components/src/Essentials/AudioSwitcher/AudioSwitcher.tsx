@@ -4,11 +4,10 @@ import { AudioUtils, MathUtils } from "@thewaver/ss-utils";
 
 import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access } from "../../Utils/propUtils";
+import { AUDIO_SWITCHER_DEFAULTS } from "./AudioSwitcher.const";
 import type { AudioSwitcherProps } from "./AudioSwitcher.types";
 
-const DEFAULT_AUDIO_SWITCHER_CROSSFADE_MS = 500;
 const DEFAULT_AUDIO_SWITCHER_CROSSFADE_STEPS = 25;
-const DEFAULT_AUDIO_SWITCHER_VOLUME = 0.5;
 
 type FadeDirection = "in" | "out";
 
@@ -29,12 +28,12 @@ export const AudioSwitcher = (props: AudioSwitcherProps) => {
     const [getVersion, setVersion] = createSignal(0);
 
     const isEven = createMemo(() => MathUtils.isEven(getVersion()));
-    const getVolume = createMemo(() => access(props.volume) ?? DEFAULT_AUDIO_SWITCHER_VOLUME);
+    const getVolume = createMemo(() => access(props.volume) ?? AUDIO_SWITCHER_DEFAULTS.volume);
     const getStep = createMemo(() => getVolume() / DEFAULT_AUDIO_SWITCHER_CROSSFADE_STEPS);
 
     const getIntervalMs = createMemo(
         () =>
-            (access(props.crossfadeMs) ?? DEFAULT_AUDIO_SWITCHER_CROSSFADE_MS) / DEFAULT_AUDIO_SWITCHER_CROSSFADE_STEPS,
+            (access(props.crossfadeMs) ?? AUDIO_SWITCHER_DEFAULTS.crossfadeMs) / DEFAULT_AUDIO_SWITCHER_CROSSFADE_STEPS,
     );
 
     const getActiveElement = createMemo(() => (isEven() ? audioA : audioB));

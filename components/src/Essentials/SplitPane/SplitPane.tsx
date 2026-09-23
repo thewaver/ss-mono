@@ -3,13 +3,11 @@ import { Index, Show, createMemo, createSignal, createUniqueId } from "solid-js"
 import { MathUtils } from "@thewaver/ss-utils";
 
 import { access, accessSignal } from "../../Utils/propUtils";
-import type { SplitPaneDir, SplitPaneProps } from "./SplitPane.types";
+import { SPLIT_PANE_DEFAULTS } from "./SplitPane.const";
+import type { SplitPaneProps } from "./SplitPane.types";
 
 import * as styles from "./SplitPane.css";
 
-const DEFAULT_SPLIT_PANE_DIR: SplitPaneDir = "row";
-const DEFAULT_SPLIT_PANE_GUTTER_SIZE = 8;
-const DEFAULT_SPLIT_PANE_KEY_STEP = 0.02;
 const NO_GUTTER_DRAGGING = -1;
 const PERCENT = 100;
 const SMALLEST_BOUNDARY = 0;
@@ -26,9 +24,9 @@ export const SplitPane = (props: SplitPaneProps) => {
 
     const getPaneId = (index: number) => access(props.panes)[index]?.id ?? `${paneIdPrefix}-pane-${index}`;
 
-    const getDir = createMemo(() => access(props.dir) ?? DEFAULT_SPLIT_PANE_DIR);
+    const getDir = createMemo(() => access(props.dir) ?? SPLIT_PANE_DEFAULTS.dir);
 
-    const getGutterSize = createMemo(() => access(props.gutterSize) ?? DEFAULT_SPLIT_PANE_GUTTER_SIZE);
+    const getGutterSize = createMemo(() => access(props.gutterSize) ?? SPLIT_PANE_DEFAULTS.gutterSize);
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
@@ -158,7 +156,7 @@ export const SplitPane = (props: SplitPaneProps) => {
         const isRow = getDir() === "row";
         const offset = isRow ? e.clientX - rect.left : e.clientY - rect.top;
         const extent = isRow ? rect.width : rect.height;
-        const step = access(props.keyStep) ?? DEFAULT_SPLIT_PANE_KEY_STEP;
+        const step = access(props.keyStep) ?? SPLIT_PANE_DEFAULTS.keyStep;
 
         moveBoundary(index, getBoundary(index) + (offset < extent * 0.5 ? -step : step));
     };
@@ -203,7 +201,7 @@ export const SplitPane = (props: SplitPaneProps) => {
 
         e.preventDefault();
 
-        const step = access(props.keyStep) ?? DEFAULT_SPLIT_PANE_KEY_STEP;
+        const step = access(props.keyStep) ?? SPLIT_PANE_DEFAULTS.keyStep;
 
         moveBoundary(index, getBoundary(index) + (e.key === decreaseKey ? -step : step));
     };

@@ -1,14 +1,12 @@
 import { Index, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
 
 import { access } from "../../Utils/propUtils";
+import { SCRAMBLE_TEXT_DEFAULTS } from "./ScrambleText.const";
 import type { ScrambleTextProps } from "./ScrambleText.types";
 import { ScrambleTextUtils } from "./ScrambleText.utils";
 
 import * as styles from "./ScrambleText.css";
 
-const DEFAULT_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&@*+=<>/\\";
-const DEFAULT_SETTLE_DURATION_MS = 900;
-const DEFAULT_SCRAMBLE_INTERVAL_MS = 45;
 const NO_DELAY = 0;
 const NO_ELAPSED = 0;
 
@@ -28,15 +26,19 @@ export const ScrambleText = (props: ScrambleTextProps) => {
 
     const getSegments = createMemo(() => ScrambleTextUtils.getSegments(getCharacters()));
 
-    const getGlyphs = createMemo(() => Array.from(access(props.glyphs) ?? DEFAULT_GLYPHS));
+    const getGlyphs = createMemo(() => Array.from(access(props.glyphs) ?? SCRAMBLE_TEXT_DEFAULTS.glyphs));
 
-    const getSettleDurationMs = createMemo(() => access(props.settleDurationMs) ?? DEFAULT_SETTLE_DURATION_MS);
+    const getSettleDurationMs = createMemo(
+        () => access(props.settleDurationMs) ?? SCRAMBLE_TEXT_DEFAULTS.settleDurationMs,
+    );
 
     const getInitialDelayMs = createMemo(() => access(props.initialDelayMs) ?? NO_DELAY);
 
     const getChurnDurationMs = createMemo(() => access(props.churnDurationMs));
 
-    const getScrambleIntervalMs = createMemo(() => access(props.scrambleIntervalMs) ?? DEFAULT_SCRAMBLE_INTERVAL_MS);
+    const getScrambleIntervalMs = createMemo(
+        () => access(props.scrambleIntervalMs) ?? SCRAMBLE_TEXT_DEFAULTS.scrambleIntervalMs,
+    );
 
     const getSettleTimes = createMemo(() => {
         const characters = getCharacters();

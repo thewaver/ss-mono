@@ -1,22 +1,16 @@
 import { Index, createEffect, createMemo, createSignal, createUniqueId, onMount } from "solid-js";
 
-import type {
-    DateValue,
-    DateValueWeekStart,
-    DateValueWeekdayWidth,
-} from "../../../Abstracts/DateValue/DateValue.types";
+import type { DateValue } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
 import { LiveAnnouncerUtils } from "../../../Abstracts/LiveAnnouncer/LiveAnnouncer.utils";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
+import { CALENDAR_DEFAULTS } from "./Calendar.const";
 import type { CalendarCompositeProps, CalendarDayProps, CalendarProps, CalendarRenderProps } from "./Calendar.types";
 
 import * as styles from "./Calendar.css";
 
-const DEFAULT_CALENDAR_WEEK_STARTS_ON: DateValueWeekStart = 1;
-const DEFAULT_CALENDAR_WEEKDAY_WIDTH: DateValueWeekdayWidth = "short";
-const DEFAULT_CALENDAR_GAP = 0;
 const GRID_WEEKS = 6;
 const MONTH_STEP = 1;
 const YEAR_STEP = 1;
@@ -61,7 +55,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
     const [getDayRefs, setDayRefs] = createSignal<(HTMLElement | undefined)[]>([]);
     const [getHighlighted, setHighlighted] = createSignal<DateValue | undefined>();
 
-    const getWeekStartsOn = createMemo(() => access(props.weekStartsOn) ?? DEFAULT_CALENDAR_WEEK_STARTS_ON);
+    const getWeekStartsOn = createMemo(() => access(props.weekStartsOn) ?? CALENDAR_DEFAULTS.weekStartsOn);
 
     const getMonth = createMemo(() => monthSignal[0]());
 
@@ -98,7 +92,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
     const getWeekdayNames = createMemo(() =>
         DateValueUtils.getWeekdayNames(
             getWeekStartsOn(),
-            access(props.weekdayWidth) ?? DEFAULT_CALENDAR_WEEKDAY_WIDTH,
+            access(props.weekdayWidth) ?? CALENDAR_DEFAULTS.weekdayWidth,
             access(props.locale),
         ),
     );
@@ -236,7 +230,7 @@ export const CalendarComposite = (props: CalendarCompositeProps) => {
             ref={setRootRef}
             id={gridId}
             class={styles.calendarRoot}
-            style={{ gap: `${access(props.gap) ?? DEFAULT_CALENDAR_GAP}px` }}
+            style={{ gap: `${access(props.gap) ?? CALENDAR_DEFAULTS.gap}px` }}
             role="grid"
             aria-label={access(props.ariaLabel)}
             aria-disabled={access(props.isDisabled) || undefined}

@@ -6,15 +6,12 @@ import { ElementObserverUtils } from "../../Abstracts/ElementObserver/ElementObs
 import { MediaQueryMonitorUtils } from "../../Abstracts/MediaQueryMonitor/MediaQueryMonitor.utils";
 import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access } from "../../Utils/propUtils";
-import type { ParticleSpawnIterationPattern, ParticleSpawnerProps } from "./ParticleSpawner.types";
+import { PARTICLE_SPAWNER_DEFAULTS } from "./ParticleSpawner.const";
+import type { ParticleSpawnerProps } from "./ParticleSpawner.types";
 import { ParticleSpawnerUtils } from "./ParticleSpawner.utils";
 
 import * as styles from "./ParticleSpawner.css";
 
-const DEFAULT_TRAVEL_DURATION_MS = 1000;
-const DEFAULT_RETENTION_MS = 0;
-const DEFAULT_SPAWN_DELAY_MS = 100;
-const DEFAULT_SPAWN_ITERATION_PATTERNS: ParticleSpawnIterationPattern[] = [{ count: 1 }];
 const NO_DELAY_MS = 0;
 
 let nextId = 0;
@@ -28,12 +25,14 @@ type LiveParticle = {
 };
 
 export const ParticleSpawner = (props: ParticleSpawnerProps) => {
-    const getTravelDurationMs = createMemo(() => access(props.travelDurationMs) ?? DEFAULT_TRAVEL_DURATION_MS);
-    const getRetentionMs = createMemo(() => access(props.retentionMs) ?? DEFAULT_RETENTION_MS);
-    const getSpawnDelayMs = createMemo(() => access(props.spawnDelayMs) ?? DEFAULT_SPAWN_DELAY_MS);
+    const getTravelDurationMs = createMemo(
+        () => access(props.travelDurationMs) ?? PARTICLE_SPAWNER_DEFAULTS.travelDurationMs,
+    );
+    const getRetentionMs = createMemo(() => access(props.retentionMs) ?? PARTICLE_SPAWNER_DEFAULTS.retentionMs);
+    const getSpawnDelayMs = createMemo(() => access(props.spawnDelayMs) ?? PARTICLE_SPAWNER_DEFAULTS.spawnDelayMs);
 
     const getSpawnIterationPatterns = createMemo(
-        () => access(props.spawnIterationPatterns) ?? DEFAULT_SPAWN_ITERATION_PATTERNS,
+        () => access(props.spawnIterationPatterns) ?? PARTICLE_SPAWNER_DEFAULTS.spawnIterationPatterns,
     );
 
     const getParticleCount = createMemo(() => Math.max(0, Math.round(access(props.particleCount))));

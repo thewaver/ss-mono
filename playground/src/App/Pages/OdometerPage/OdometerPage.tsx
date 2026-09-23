@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { Button } from "@thewaver/ss-components";
+import { Button, ODOMETER_DEFAULTS } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
@@ -22,11 +22,9 @@ const SMALL_STEP = 1;
 const BIG_STEP = 137;
 const MIN_VALUE = -999999;
 const MAX_VALUE = 999999;
-const STARTING_TURN_MS = 600;
 const MIN_TURN_MS = 50;
 const MAX_TURN_MS = 3000;
 const TURN_STEP_MS = 50;
-const STARTING_CASCADE_MS = 90;
 const MIN_CASCADE_MS = 0;
 const MAX_CASCADE_MS = 500;
 const CASCADE_STEP_MS = 10;
@@ -46,8 +44,8 @@ const group = (value: number) => {
 
 export const OdometerPage = () => {
     const [getValue, setValue] = createSignal(STARTING_VALUE);
-    const [getTurnMs, setTurnMs] = createSignal(STARTING_TURN_MS);
-    const [getCascadeMs, setCascadeMs] = createSignal(STARTING_CASCADE_MS);
+    const [getTurnMs, setTurnMs] = createSignal(ODOMETER_DEFAULTS.turnDurationMs);
+    const [getCascadeMs, setCascadeMs] = createSignal(ODOMETER_DEFAULTS.cascadeDelayMs);
 
     const step = (delta: number) => setValue((value) => Math.min(Math.max(value + delta, MIN_VALUE), MAX_VALUE));
 

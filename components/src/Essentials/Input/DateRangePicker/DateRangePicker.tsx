@@ -1,7 +1,6 @@
 import type { Signal } from "solid-js";
 import { createEffect, createMemo, createSignal, createUniqueId, untrack } from "solid-js";
 
-import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import type { DateValue, DateValueRange } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
 import { SignalMirrorUtils } from "../../../Abstracts/SignalMirror/SignalMirror.utils";
@@ -12,15 +11,10 @@ import type { PopupTriggerFlags } from "../../../Primitives/PopupTrigger/PopupTr
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { DateInput } from "../DateInput/DateInput";
 import { RangeCalendar } from "../RangeCalendar/RangeCalendar";
+import { DATE_RANGE_PICKER_DEFAULTS } from "./DateRangePicker.const";
 import type { DateRangePickerProps } from "./DateRangePicker.types";
 
 import * as styles from "./DateRangePicker.css";
-
-const DEFAULT_DATE_RANGE_PICKER_PLACEMENT: AnchorPlacement = { x: "left-in", y: "bottom-out" };
-const DEFAULT_DATE_RANGE_PICKER_TRIGGER_LABEL = "Open the calendar";
-const DEFAULT_DATE_RANGE_PICKER_CALENDAR_LABEL = "Choose a date range";
-const DEFAULT_DATE_RANGE_PICKER_START_LABEL = "Start date";
-const DEFAULT_DATE_RANGE_PICKER_END_LABEL = "End date";
 
 const toMonth = (value: DateValue): DateValue => DateValueUtils.getStartOfMonth(value);
 
@@ -89,7 +83,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
             isDisabled={props.isDisabled}
             locale={props.locale}
             weekStartsOn={props.weekStartsOn}
-            ariaLabel={() => access(props.calendarLabel) ?? DEFAULT_DATE_RANGE_PICKER_CALENDAR_LABEL}
+            ariaLabel={() => access(props.calendarLabel) ?? DATE_RANGE_PICKER_DEFAULTS.calendarLabel}
             computeIsDayDisabled={props.computeIsDayDisabled}
             renderDay={props.renderDay}
             renderWeekday={props.renderWeekday}
@@ -103,7 +97,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                 valueSignal={startSignal}
                 id={access(props.id) && `${access(props.id)}-start`}
                 name={access(props.name) && `${access(props.name)}-start`}
-                ariaLabel={() => access(props.startLabel) ?? DEFAULT_DATE_RANGE_PICKER_START_LABEL}
+                ariaLabel={() => access(props.startLabel) ?? DATE_RANGE_PICKER_DEFAULTS.startLabel}
             />
 
             {props.renderSeparator?.()}
@@ -113,7 +107,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                 valueSignal={endSignal}
                 id={getEndFieldId}
                 name={access(props.name) && `${access(props.name)}-end`}
-                ariaLabel={() => access(props.endLabel) ?? DEFAULT_DATE_RANGE_PICKER_END_LABEL}
+                ariaLabel={() => access(props.endLabel) ?? DATE_RANGE_PICKER_DEFAULTS.endLabel}
                 renderTrailing={() => (
                     <InteractionWrapper<PopupTriggerFlags>
                         isDisabled={getIsDisabled}
@@ -125,7 +119,7 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                                 popupId={() => popupId}
                                 isOpen={getIsOpen}
                                 ariaLabel={() =>
-                                    access(props.triggerAriaLabel) ?? DEFAULT_DATE_RANGE_PICKER_TRIGGER_LABEL
+                                    access(props.triggerAriaLabel) ?? DATE_RANGE_PICKER_DEFAULTS.triggerAriaLabel
                                 }
                                 flags={getRenderProps}
                                 renderContent={props.renderTrigger}
@@ -140,11 +134,11 @@ export const DateRangePicker = (props: DateRangePickerProps) => {
                 id={() => popupId}
                 role={"dialog"}
                 ariaAttributes={() => ({
-                    "aria-label": access(props.calendarLabel) ?? DEFAULT_DATE_RANGE_PICKER_CALENDAR_LABEL,
+                    "aria-label": access(props.calendarLabel) ?? DATE_RANGE_PICKER_DEFAULTS.calendarLabel,
                 })}
                 isOpen={getIsOpen}
                 anchorRef={getRootRef}
-                placement={() => access(props.placement) ?? DEFAULT_DATE_RANGE_PICKER_PLACEMENT}
+                placement={() => access(props.placement) ?? DATE_RANGE_PICKER_DEFAULTS.placement}
                 offset={props.offset}
                 transitionDurationMs={props.popupTransitionDurationMs}
                 hasAutoFocus={true}

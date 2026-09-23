@@ -7,12 +7,11 @@ import { CutoutUtils } from "../../../Abstracts/Cutout/Cutout.utils";
 import { ElementObserverUtils } from "../../../Abstracts/ElementObserver/ElementObserver.utils";
 import { PointerTrackerUtils } from "../../../Abstracts/PointerTracker/PointerTracker.utils";
 import { access } from "../../../Utils/propUtils";
+import { REVEAL_DEFAULTS } from "./Reveal.const";
 import type { RevealProps } from "./Reveal.types";
 
 import * as styles from "./Reveal.css";
 
-const DEFAULT_REVEAL_RADIUS = 90;
-const DEFAULT_REVEAL_SOFTNESS = 0.45;
 const NO_EDGE_THICKNESSES = [0];
 const INSIDE_EDGE_RATIO = 1;
 const NO_HOLE_RADIUS = 0;
@@ -50,7 +49,7 @@ export const Reveal = (props: RevealProps) => {
 
     const getSize = ElementObserverUtils.createBorderBoxSizeObserver(getRootRef, getIsDisabled);
 
-    const getRadius = createMemo(() => access(props.radius) ?? DEFAULT_REVEAL_RADIUS);
+    const getRadius = createMemo(() => access(props.radius) ?? REVEAL_DEFAULTS.radius);
 
     const getIsRevealing = createMemo(
         () => !getIsDisabled() && getIsPointerPresent() && getReading().edgeRatio <= INSIDE_EDGE_RATIO,
@@ -61,7 +60,7 @@ export const Reveal = (props: RevealProps) => {
     const getHoleImage = createMemo(() =>
         buildHoleImage(
             getRadius(),
-            MathUtils.clamp01(access(props.softness) ?? DEFAULT_REVEAL_SOFTNESS),
+            MathUtils.clamp01(access(props.softness) ?? REVEAL_DEFAULTS.softness),
             props.computePoints,
             access(props.joinRadii),
             access(props.lameExponents),

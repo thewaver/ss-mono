@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { BracketConnectors } from "@thewaver/ss-components";
+import { BRACKET_DEFAULTS, BracketConnectors } from "@thewaver/ss-components";
 import type { BracketOrientation, BracketRootSide } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -23,19 +23,17 @@ const CONNECTOR_RADIUS = 14;
 const CONNECTOR_WIDTH = 2;
 const ORIENTATIONS: BracketOrientation[] = ["horizontal", "vertical"];
 const ROOT_SIDES: BracketRootSide[] = ["end", "start"];
-const STARTING_LAYER_GAP = 40;
 const MIN_LAYER_GAP = 10;
 const MAX_LAYER_GAP = 120;
 const LAYER_GAP_STEP = 2;
-const STARTING_CROSS_GAP = 12;
 const MIN_CROSS_GAP = 0;
 const MAX_CROSS_GAP = 60;
 const CROSS_GAP_STEP = 2;
 const WIDE_SPAN = 2;
 
 export const BracketPage = () => {
-    const [getLayerGap, setLayerGap] = createSignal(STARTING_LAYER_GAP);
-    const [getCrossGap, setCrossGap] = createSignal(STARTING_CROSS_GAP);
+    const [getLayerGap, setLayerGap] = createSignal(BRACKET_DEFAULTS.layerGap);
+    const [getCrossGap, setCrossGap] = createSignal(BRACKET_DEFAULTS.crossGap);
     const [getOrientation, setOrientation] = createSignal<BracketOrientation>(ORIENTATIONS[0]);
     const [getRootSide, setRootSide] = createSignal<BracketRootSide>(ROOT_SIDES[0]);
     const [getConnector, setConnector] = createSignal<BracketConnectors.SampleKey>(BracketConnectors.SAMPLE_KEYS[0]);

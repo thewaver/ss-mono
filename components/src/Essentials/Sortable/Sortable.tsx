@@ -30,12 +30,11 @@ import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access, accessSignal } from "../../Utils/propUtils";
 import { LabelUtils } from "../Input/Label/Label.utils";
+import { SORTABLE_DEFAULTS } from "./Sortable.const";
 import type { SortableDir, SortableItem, SortableItemSlotProps, SortableProps } from "./Sortable.types";
 
 import * as styles from "./Sortable.css";
 
-const DEFAULT_SORTABLE_DIR: SortableDir = "column";
-const DEFAULT_SORTABLE_GAP = 0;
 const NO_SIZE = 0;
 
 const FORWARD_KEYS: Record<SortableDir | "both", string[]> = {
@@ -102,7 +101,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
 
     const getIsLocked = createMemo(() => access(props.isLocked) ?? false);
 
-    const getDir = createMemo(() => access(props.dir) ?? DEFAULT_SORTABLE_DIR);
+    const getDir = createMemo(() => access(props.dir) ?? SORTABLE_DEFAULTS.dir);
 
     const getItems = createMemo(() => itemsSignal[0]());
 
@@ -266,7 +265,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
         return CarrierUtils.computeMarkerIndex(asIndex(place), getSourceIndex() ?? 0, getIsSource());
     });
 
-    const getEndRoom = createMemo(() => (access(props.gap) ?? DEFAULT_SORTABLE_GAP) * 0.5);
+    const getEndRoom = createMemo(() => (access(props.gap) ?? SORTABLE_DEFAULTS.gap) * 0.5);
 
     const getMarkerPlacement = createMemo(() => {
         const layout = getLayout();
@@ -608,7 +607,7 @@ export const Sortable = <T,>(props: SortableProps<T>) => {
                     }}
                     class={getDir() === "row" ? styles.sortableRow : styles.sortableColumn}
                     style={{
-                        gap: `${access(props.gap) ?? DEFAULT_SORTABLE_GAP}px`,
+                        gap: `${access(props.gap) ?? SORTABLE_DEFAULTS.gap}px`,
                         padding: `${getEndRoom()}px`,
                     }}
                     role="list"

@@ -30,8 +30,7 @@ const FREE_SWIPE_TOUCH_ACTION = "none";
 const NO_SWIPE_PROGRESS: InteractionDragRatio = { x: 0, y: 0 };
 
 /** Picks one axis out of a pair of travels, so the two swipe trackers agree on which field is which axis. */
-const getAxisTravel = (travel: InteractionDragRatio, axis: SwipeAxis) =>
-    axis === "horizontal" ? travel.x : travel.y;
+const getAxisTravel = (travel: InteractionDragRatio, axis: SwipeAxis) => (axis === "horizontal" ? travel.x : travel.y);
 
 /** Whether focus left an element's subtree entirely, rather than moving within it. */
 const getHasLeft = (event: FocusEvent) => {

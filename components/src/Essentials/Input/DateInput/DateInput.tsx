@@ -1,15 +1,13 @@
 import { createEffect, createMemo, createSignal, untrack } from "solid-js";
 
-import type { DateValue, DateValueCalendarId } from "../../../Abstracts/DateValue/DateValue.types";
+import type { DateValue } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
 import { MaskedFieldUtils } from "../../../Abstracts/MaskedField/MaskedField.utils";
 import { TextSyncUtils } from "../../../Abstracts/TextSync/TextSync.utils";
 import { TextField } from "../../../Primitives/TextField/TextField";
 import { access, accessSignal } from "../../../Utils/propUtils";
+import { DATE_INPUT_DEFAULTS } from "./DateInput.const";
 import type { DateInputEra, DateInputFormat, DateInputProps } from "./DateInput.types";
-
-const DEFAULT_DATE_INPUT_FORMAT: DateInputFormat = "iso";
-const DEFAULT_DATE_INPUT_CALENDAR: DateValueCalendarId = "gregory";
 
 const YEAR_LENGTH = 4;
 const MONTH_LENGTH = 2;
@@ -89,9 +87,9 @@ const toDigits = (value: DateValue, format: DateInputFormat) =>
 export const DateInput = (props: DateInputProps) => {
     const valueSignal = accessSignal(() => props.valueSignal);
 
-    const getFormat = createMemo(() => access(props.format) ?? DEFAULT_DATE_INPUT_FORMAT);
+    const getFormat = createMemo(() => access(props.format) ?? DATE_INPUT_DEFAULTS.format);
 
-    const getCalendar = createMemo(() => access(props.calendar) ?? DEFAULT_DATE_INPUT_CALENDAR);
+    const getCalendar = createMemo(() => access(props.calendar) ?? DATE_INPUT_DEFAULTS.calendar);
 
     const getMask = createMemo(() => computeMask(getFormat()));
 

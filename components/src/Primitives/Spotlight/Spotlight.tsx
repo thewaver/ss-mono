@@ -4,7 +4,6 @@ import { Portal } from "solid-js/web";
 
 import { Rect } from "@thewaver/ss-utils";
 
-import type { AnchorPlacement } from "../../Abstracts/Anchor/Anchor.types";
 import { AnchorUtils } from "../../Abstracts/Anchor/Anchor.utils";
 import { CutoutUtils } from "../../Abstracts/Cutout/Cutout.utils";
 import { ElementFaderUtils } from "../../Abstracts/ElementFader/ElementFader.utils";
@@ -14,15 +13,11 @@ import { FocusManagerUtils } from "../../Abstracts/FocusManager/FocusManager.uti
 import { LiveAnnouncerUtils } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer.utils";
 import { useViewportContext } from "../../Abstracts/Viewport/Viewport.context";
 import { access } from "../../Utils/propUtils";
+import { SPOTLIGHT_DEFAULTS } from "./Spotlight.const";
 import type { SpotlightProps } from "./Spotlight.types";
 import { SpotlightUtils } from "./Spotlight.utils";
 
 import * as styles from "./Spotlight.css";
-
-const DEFAULT_SPOTLIGHT_TRANSITION_DURATION_MS = 200;
-const DEFAULT_SPOTLIGHT_PADDING = 0;
-const DEFAULT_SPOTLIGHT_POPUP_PLACEMENT: AnchorPlacement = { x: "center", y: "bottom-out" };
-const DEFAULT_SPOTLIGHT_POPUP_OFFSET = { x: 0, y: 8 };
 
 const MODIFIER_KEYS = new Set(["Shift", "Control", "Alt", "Meta", "CapsLock", "NumLock", "ScrollLock", "AltGraph"]);
 
@@ -36,10 +31,10 @@ export const Spotlight = (props: SpotlightProps) => {
     const [getPopupRef, setPopupRef] = createSignal<HTMLElement>();
 
     const getTransitionDurationMs = createMemo(
-        () => access(props.transitionDurationMs) ?? DEFAULT_SPOTLIGHT_TRANSITION_DURATION_MS,
+        () => access(props.transitionDurationMs) ?? SPOTLIGHT_DEFAULTS.transitionDurationMs,
     );
 
-    const getPadding = createMemo(() => access(props.padding) ?? DEFAULT_SPOTLIGHT_PADDING);
+    const getPadding = createMemo(() => access(props.padding) ?? SPOTLIGHT_DEFAULTS.padding);
 
     const { getIsVisible, getTransitionTarget } = ElementFaderUtils.createFader(() => props.visibilitySignal[0](), {
         getTransitionDurationMs,
@@ -73,8 +68,8 @@ export const Spotlight = (props: SpotlightProps) => {
         () => access(props.elementRef),
         () => getIsVisible() && getHasPopup(),
         {
-            getPlacement: () => access(props.popupPlacement) ?? DEFAULT_SPOTLIGHT_POPUP_PLACEMENT,
-            getOffset: () => access(props.popupOffset) ?? DEFAULT_SPOTLIGHT_POPUP_OFFSET,
+            getPlacement: () => access(props.popupPlacement) ?? SPOTLIGHT_DEFAULTS.popupPlacement,
+            getOffset: () => access(props.popupOffset) ?? SPOTLIGHT_DEFAULTS.popupOffset,
             getAnchorRect: getElementRect,
         },
     );

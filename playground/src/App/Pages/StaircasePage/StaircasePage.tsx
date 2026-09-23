@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { StaircaseIndents } from "@thewaver/ss-components";
+import { STAIRCASE_DEFAULTS, StaircaseIndents } from "@thewaver/ss-components";
 import type { StaircaseDir } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -26,10 +26,7 @@ const EXAMPLES_ROOT = "/src/App/Pages/StaircasePage/Examples";
 
 const STARTING_STEP_COUNT = 6;
 const STARTING_INDENT = 12;
-const STARTING_GAP = 6;
 const STARTING_INDENT_KEY: StaircaseIndents.SampleKey = "linear";
-const STARTING_DIR: StaircaseDir = "down";
-
 const DIRS: StaircaseDir[] = ["down", "up"];
 
 const STAGES = [
@@ -56,9 +53,9 @@ const DefaultExampleWrapper = (props: StaircaseExampleProps) => {
 export const StaircasePage = () => {
     const [getStepCount, setStepCount] = createSignal(STARTING_STEP_COUNT);
     const [getIndent, setIndent] = createSignal(STARTING_INDENT);
-    const [getGap, setGap] = createSignal(STARTING_GAP);
+    const [getGap, setGap] = createSignal(STAIRCASE_DEFAULTS.gap);
     const [getIndentKey, setIndentKey] = createSignal<StaircaseIndents.SampleKey>(STARTING_INDENT_KEY);
-    const [getDir, setDir] = createSignal<StaircaseDir>(STARTING_DIR);
+    const [getDir, setDir] = createSignal<StaircaseDir>(STAIRCASE_DEFAULTS.dir);
 
     const getSteps = createMemo(() => STAGES.slice(0, getStepCount()));
 

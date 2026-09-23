@@ -18,6 +18,7 @@ import { Popover } from "../../../Primitives/Popover/Popover";
 import { access, accessSignal } from "../../../Utils/propUtils";
 import { FormFieldUtils } from "../FormField/FormField.utils";
 import { LabelUtils } from "../Label/Label.utils";
+import { SELECT_DEFAULTS } from "./Select.const";
 import type {
     SelectCompositeProps,
     SelectFieldProps,
@@ -32,7 +33,6 @@ import { SelectUtils } from "./Select.utils";
 
 import * as styles from "./Select.css";
 
-const DEFAULT_SELECT_PADDING = 0;
 const EMPTY_QUERY = "";
 const EMPTY_SELECTION: never[] = [];
 
@@ -185,7 +185,7 @@ export const SelectComposite = <T,>(props: SelectCompositeProps<T>) => {
     const getIsFiltering = createMemo(() => getQuery() !== EMPTY_QUERY);
 
     const getSpreadPadding = createMemo(() => {
-        const padding = access(props.padding) ?? DEFAULT_SELECT_PADDING;
+        const padding = access(props.padding) ?? SELECT_DEFAULTS.padding;
 
         return typeof padding === "number" ? CSSUtils.spreadPadding(padding) : padding;
     });

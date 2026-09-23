@@ -1,5 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { TILTER_DEFAULTS } from "@thewaver/ss-components";
+
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
@@ -14,12 +16,10 @@ const EXAMPLES_ROOT = "/src/App/Pages/PointerEffects/TilterPage/Examples";
 const MIN_TILT_DEGREES = 0;
 const MAX_TILT_DEGREES = 45;
 const TILT_STEP_DEGREES = 1;
-const STARTING_TILT_DEGREES = 14;
 
 const MIN_PERSPECTIVE_PX = 200;
 const MAX_PERSPECTIVE_PX = 3000;
 const PERSPECTIVE_STEP_PX = 50;
-const STARTING_PERSPECTIVE_PX = 900;
 
 const MIN_SHEEN_OPACITY = 0;
 const MAX_SHEEN_OPACITY = 1;
@@ -29,7 +29,7 @@ const STARTING_SHEEN_OPACITY = 0.8;
 const MIN_SHEEN_SPREAD = 1;
 const MAX_SHEEN_SPREAD = 50;
 const SHEEN_SPREAD_STEP = 1;
-const STARTING_SHEEN_SPREAD = 14;
+const STARTING_SHEEN_SPREAD = 15;
 
 const MIN_ACTIVE_RANGE_PX = 40;
 const MAX_ACTIVE_RANGE_PX = 1200;
@@ -39,7 +39,6 @@ const STARTING_ACTIVE_RANGE_PX = 400;
 const MIN_TILT_RANGE_PX = 40;
 const MAX_TILT_RANGE_PX = 1200;
 const TILT_RANGE_STEP_PX = 20;
-const STARTING_TILT_RANGE_PX = 400;
 
 const FIELD_WIDTH = 110;
 const BOX_HEIGHT = 240;
@@ -47,9 +46,9 @@ const BOX_HEIGHT = 240;
 export const TilterPage = () => {
     const [getIsDisabled, setIsDisabled] = createSignal(false);
     const [getActiveRangePx, setActiveRangePx] = createSignal(STARTING_ACTIVE_RANGE_PX);
-    const [getTiltRangePx, setTiltRangePx] = createSignal(STARTING_TILT_RANGE_PX);
-    const [getMaxTiltDegrees, setMaxTiltDegrees] = createSignal(STARTING_TILT_DEGREES);
-    const [getPerspectivePx, setPerspectivePx] = createSignal(STARTING_PERSPECTIVE_PX);
+    const [getTiltRangePx, setTiltRangePx] = createSignal(TILTER_DEFAULTS.tiltRangePx);
+    const [getMaxTiltDegrees, setMaxTiltDegrees] = createSignal(TILTER_DEFAULTS.maxTiltDegrees);
+    const [getPerspectivePx, setPerspectivePx] = createSignal(TILTER_DEFAULTS.perspectivePx);
     const [getSheenOpacity, setSheenOpacity] = createSignal(STARTING_SHEEN_OPACITY);
     const [getSheenSpreadPercent, setSheenSpreadPercent] = createSignal(STARTING_SHEEN_SPREAD);
 

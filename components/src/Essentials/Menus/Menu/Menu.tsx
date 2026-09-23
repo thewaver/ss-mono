@@ -3,7 +3,6 @@ import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueI
 
 import { Point2d, Rect } from "@thewaver/ss-utils";
 
-import type { AnchorPlacement } from "../../../Abstracts/Anchor/Anchor.types";
 import { InteractionTrackerUtils } from "../../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import type { NavigatorOrientation } from "../../../Abstracts/Navigator/Navigator.types";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
@@ -18,6 +17,7 @@ import { PlacementItem } from "../../../Primitives/PlacementItem/PlacementItem";
 import { Popover } from "../../../Primitives/Popover/Popover";
 import { access } from "../../../Utils/propUtils";
 import { LabelUtils } from "../../Input/Label/Label.utils";
+import { MENU_DEFAULTS } from "./Menu.const";
 import type {
     ContextMenuProps,
     MenuHighlightPosition,
@@ -26,8 +26,6 @@ import type {
     MenuItemViewProps,
     MenuLevelProps,
     MenuProps,
-    MenuSubmenuMode,
-    MenuSubmenuTrigger,
     MenuTriggerProps,
 } from "./Menu.types";
 import { MenuUtils } from "./Menu.utils";
@@ -36,15 +34,13 @@ import * as styles from "./Menu.css";
 
 const EMPTY_CHECKED: never[] = [];
 
-const DEFAULT_SUBMENU_PLACEMENT: AnchorPlacement = { x: "right-out", y: "top-in" };
 const ROOT_LEVEL = 0;
 const ROOT_PATH: number[] = [];
 const NO_PARENT_EXTENT = 0;
 const BOX_CENTER = 0.5;
 const FULL_PERCENT = 100;
 const SAME_POINT_PX = 1;
-const DEFAULT_SUBMENU_MODE: MenuSubmenuMode = "cascade";
-const DEFAULT_SUBMENU_TRIGGER: MenuSubmenuTrigger = "hover";
+
 const BACK_INDEX = 0;
 const SUBMENU_OPEN_KEY = "ArrowRight";
 const SUBMENU_CLOSE_KEY = "ArrowLeft";
@@ -765,10 +761,10 @@ export const Menu = <T,>(props: MenuProps<T>) => {
                         triggerRef={getTriggerRef}
                         placement={props.placement}
                         offset={props.offset}
-                        submenuPlacement={() => access(props.submenuPlacement) ?? DEFAULT_SUBMENU_PLACEMENT}
+                        submenuPlacement={() => access(props.submenuPlacement) ?? MENU_DEFAULTS.submenuPlacement}
                         submenuOffset={props.submenuOffset}
-                        submenuMode={() => access(props.submenuMode) ?? DEFAULT_SUBMENU_MODE}
-                        submenuOpensOn={() => access(props.submenuOpensOn) ?? DEFAULT_SUBMENU_TRIGGER}
+                        submenuMode={() => access(props.submenuMode) ?? MENU_DEFAULTS.submenuMode}
+                        submenuOpensOn={() => access(props.submenuOpensOn) ?? MENU_DEFAULTS.submenuOpensOn}
                         reservedScreenSize={props.reservedScreenSize}
                         transitionDurationMs={props.transitionDurationMs}
                         openerFlags={getFlags}
@@ -907,10 +903,10 @@ export const ContextMenu = <T,>(props: ContextMenuProps<T>) => {
                 triggerRef={getRegionRef}
                 placement={props.placement}
                 offset={props.offset}
-                submenuPlacement={() => access(props.submenuPlacement) ?? DEFAULT_SUBMENU_PLACEMENT}
+                submenuPlacement={() => access(props.submenuPlacement) ?? MENU_DEFAULTS.submenuPlacement}
                 submenuOffset={props.submenuOffset}
-                submenuMode={() => access(props.submenuMode) ?? DEFAULT_SUBMENU_MODE}
-                submenuOpensOn={() => access(props.submenuOpensOn) ?? DEFAULT_SUBMENU_TRIGGER}
+                submenuMode={() => access(props.submenuMode) ?? MENU_DEFAULTS.submenuMode}
+                submenuOpensOn={() => access(props.submenuOpensOn) ?? MENU_DEFAULTS.submenuOpensOn}
                 reservedScreenSize={props.reservedScreenSize}
                 transitionDurationMs={props.transitionDurationMs}
                 openerFlags={() => ({ isOpen: getIsOpen() })}

@@ -8,15 +8,14 @@ import { access } from "../../../Utils/propUtils";
 import type { SignalSource } from "../../../Utils/typeUtils";
 import { Menu } from "../Menu/Menu";
 import type { MenuItem, MenuRenderItem } from "../Menu/Menu.types";
+import { WHEEL_MENU_DEFAULTS } from "./WheelMenu.const";
 import type { WheelMenuItem, WheelMenuProps } from "./WheelMenu.types";
 
 const FULL_TURN_DEGREES = 360;
 const HALF = 0.5;
 const ROOT_DEPTH = 0;
 const SINGLE_ITEM = 1;
-const DEFAULT_LEVEL_GAP = 8;
-const DEFAULT_HOLE_RADIUS = 25;
-const DEFAULT_BAND_WIDTH = 25;
+
 const PAIR = 2;
 const CLOSER = Symbol("wheelMenuCloser");
 
@@ -42,12 +41,12 @@ export const WheelMenu = <T,>(props: WheelMenuProps<T>) => {
     const computeLayout = (layoutDefs: PlacementLayoutDefs): PlacementLayout => {
         const given = props.layoutDefs ?? {};
         const base = PlacementLayoutKnobs.BAND_DEFAULTS;
-        const bandWidth = access(props.bandWidth) ?? DEFAULT_BAND_WIDTH;
+        const bandWidth = access(props.bandWidth) ?? WHEEL_MENU_DEFAULTS.bandWidth;
         const itemRadiusRatio = given.itemRadiusRatio ?? base.itemRadiusRatio;
         const itemMaxWidthRatio = given.itemMaxWidthRatio ?? base.itemMaxWidthRatio;
-        const rootHoleRadius = access(props.holeRadius) ?? DEFAULT_HOLE_RADIUS;
+        const rootHoleRadius = access(props.holeRadius) ?? WHEEL_MENU_DEFAULTS.holeRadius;
         const rootGapDegrees = given.wedgeGapDegrees ?? base.wedgeGapDegrees;
-        const levelGap = access(props.levelGap) ?? DEFAULT_LEVEL_GAP;
+        const levelGap = access(props.levelGap) ?? WHEEL_MENU_DEFAULTS.levelGap;
         const path = layoutDefs.path ?? [];
         const depth = path.length;
         const holeRadius = rootHoleRadius + depth * (bandWidth + levelGap);

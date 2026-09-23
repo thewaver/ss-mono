@@ -6,15 +6,10 @@ import type { InteractionDragRatio } from "../../Abstracts/InteractionTracker/In
 import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access } from "../../Utils/propUtils";
+import { CARD_STACK_DEFAULTS } from "./CardStack.const";
 import type { CardStackCardState, CardStackControls, CardStackProps } from "./CardStack.types";
 
 import * as styles from "./CardStack.css";
-
-const DEFAULT_CARD_STACK_COMMIT_RATIO = 0.25;
-const DEFAULT_CARD_STACK_TRANSITION_DURATION_MS = 250;
-const DEFAULT_CARD_STACK_MOUNTED_COUNT = 3;
-const DEFAULT_CARD_STACK_CARD_GAP = 12;
-const DEFAULT_CARD_STACK_FUNNEL_RATIO = 0.08;
 
 const MIN_MOUNTED_COUNT = 1;
 const FIRST_INDEX = 0;
@@ -61,19 +56,19 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
 
     const getCards = createMemo(() => access(props.cards));
 
-    const getCommitRatio = createMemo(() => access(props.commitRatio) ?? DEFAULT_CARD_STACK_COMMIT_RATIO);
+    const getCommitRatio = createMemo(() => access(props.commitRatio) ?? CARD_STACK_DEFAULTS.commitRatio);
 
     const getTransitionDurationMs = createMemo(
-        () => access(props.transitionDurationMs) ?? DEFAULT_CARD_STACK_TRANSITION_DURATION_MS,
+        () => access(props.transitionDurationMs) ?? CARD_STACK_DEFAULTS.transitionDurationMs,
     );
 
     const getMountedCount = createMemo(() =>
-        Math.max(access(props.mountedCount) ?? DEFAULT_CARD_STACK_MOUNTED_COUNT, MIN_MOUNTED_COUNT),
+        Math.max(access(props.mountedCount) ?? CARD_STACK_DEFAULTS.mountedCount, MIN_MOUNTED_COUNT),
     );
 
-    const getCardGap = createMemo(() => access(props.cardGap) ?? DEFAULT_CARD_STACK_CARD_GAP);
+    const getCardGap = createMemo(() => access(props.cardGap) ?? CARD_STACK_DEFAULTS.cardGap);
 
-    const getFunnelRatio = createMemo(() => access(props.funnelRatio) ?? DEFAULT_CARD_STACK_FUNNEL_RATIO);
+    const getFunnelRatio = createMemo(() => access(props.funnelRatio) ?? CARD_STACK_DEFAULTS.funnelRatio);
 
     const getPileExtentPx = createMemo(() => (getMountedCount() - BOTTOM_STEP) * getCardGap());
 
@@ -131,26 +126,21 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
 
     const controls: CardStackControls = { getTopIndex, getIsEmpty, send, deal };
 
-    const { getIsSwiping } = InteractionTrackerUtils.trackFreeSwipe(
-        getPileRef,
-        () => getIsDisabled() || getIsEmpty(),
-        {
-            getCommitRatio,
-            onSwipe: setTravel,
-            onSwipeEnd: (direction) => {
-                setTravel(NO_TRAVEL);
+    const { getIsSwiping } = InteractionTrackerUtils.trackFreeSwipe(getPileRef, () => getIsDisabled() || getIsEmpty(), {
+        getCommitRatio,
+        onSwipe: setTravel,
+        onSwipeEnd: (direction) => {
+            setTravel(NO_TRAVEL);
 
-                if (direction === undefined) return;
+            if (direction === undefined) return;
 
-                send(direction);
-            },
+            send(direction);
         },
-    );
+    });
 
     const getCardHeight = () => `calc(${PERCENT}% - ${getPileExtentPx()}px)`;
 
-    const getCardWidth = (depth: number) =>
-        `${Math.max(FULL_WIDTH - depth * getFunnelRatio(), NO_WIDTH) * PERCENT}%`;
+    const getCardWidth = (depth: number) => `${Math.max(FULL_WIDTH - depth * getFunnelRatio(), NO_WIDTH) * PERCENT}%`;
 
     const getStackOffsetPx = (depth: number) =>
         getPileExtentPx() - (getMounted().length - BOTTOM_STEP - depth) * getCardGap();
@@ -196,16 +186,14 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
                 {(entry, getDepth) => {
                     const getIsTop = createMemo(() => getDepth() === TOP_DEPTH);
 
-                    const getState = createMemo(
-                        (): CardStackCardState<T> => ({
-                            card: entry.card,
-                            index: entry.index,
-                            depth: getDepth(),
-                            isTop: getIsTop(),
-                            travel: getIsTop() ? getTravel() : NO_TRAVEL,
-                            leavingTo: getIsTop() ? getLeavingTo() : undefined,
-                        }),
-                    );
+                    const getState = createMemo((): CardStackCardState<T> => ({
+                        card: entry.card,
+                        index: entry.index,
+                        depth: getDepth(),
+                        isTop: getIsTop(),
+                        travel: getIsTop() ? getTravel() : NO_TRAVEL,
+                        leavingTo: getIsTop() ? getLeavingTo() : undefined,
+                    }));
 
                     return (
                         <div

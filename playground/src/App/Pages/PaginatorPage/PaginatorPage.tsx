@@ -1,5 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { PAGINATOR_DEFAULTS } from "@thewaver/ss-components";
+
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -17,16 +19,14 @@ const MIN_COUNT = 0;
 const MAX_COUNT = 5;
 const COUNT_STEP = 1;
 const STARTING_PAGE_COUNT = 20;
-const STARTING_SIBLING_COUNT = 1;
-const STARTING_BOUNDARY_COUNT = 1;
 const STARTING_PAGE = 1;
 const COUNT_FIELD_WIDTH = 90;
 const EXAMPLES_ROOT = "/src/App/Pages/PaginatorPage/Examples";
 
 export const PaginatorPage = () => {
     const [getPageCount, setPageCount] = createSignal(STARTING_PAGE_COUNT);
-    const [getSiblingCount, setSiblingCount] = createSignal(STARTING_SIBLING_COUNT);
-    const [getBoundaryCount, setBoundaryCount] = createSignal(STARTING_BOUNDARY_COUNT);
+    const [getSiblingCount, setSiblingCount] = createSignal(PAGINATOR_DEFAULTS.siblingCount);
+    const [getBoundaryCount, setBoundaryCount] = createSignal(PAGINATOR_DEFAULTS.boundaryCount);
     const [getIsDisabled, setIsDisabled] = createSignal(false);
 
     const [getStepPage, setStepPage] = createSignal(STARTING_PAGE);

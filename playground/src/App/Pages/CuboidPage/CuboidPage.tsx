@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { CuboidUtils } from "@thewaver/ss-components";
+import { CUBOID_DEFAULTS, CuboidUtils } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -20,8 +20,6 @@ const STARTING_DEPTH = 120;
 const MIN_DURATION_MS = 0;
 const MAX_DURATION_MS = 3000;
 const DURATION_STEP_MS = 100;
-const STARTING_DURATION_MS = 600;
-
 const MIN_TURN_INTERVAL_MS = 200;
 const MAX_TURN_INTERVAL_MS = 5000;
 const TURN_INTERVAL_STEP_MS = 100;
@@ -74,7 +72,7 @@ export const CuboidPage = () => {
     const [getWidth, setWidth] = createSignal(STARTING_WIDTH);
     const [getHeight, setHeight] = createSignal(STARTING_HEIGHT);
     const [getDepth, setDepth] = createSignal(STARTING_DEPTH);
-    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(STARTING_DURATION_MS);
+    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(CUBOID_DEFAULTS.transitionDurationMs);
 
     const yawSignal = createSignal(0);
     const pitchSignal = createSignal(0);

@@ -4,17 +4,15 @@ import type { InteractionFlags } from "../../Abstracts/InteractionTracker/Intera
 import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import { Tooltip } from "../../Essentials/Tooltip/Tooltip";
 import { access } from "../../Utils/propUtils";
-import type { InteractionSizing, InteractionWrapperProps } from "./InteractionWrapper.types";
+import { INTERACTION_WRAPPER_DEFAULTS } from "./InteractionWrapper.const";
+import type { InteractionWrapperProps } from "./InteractionWrapper.types";
 
 import * as styles from "./InteractionWrapper.css";
-
-const DEFAULT_INTERACTION_SIZING: InteractionSizing = "fit-content";
-const DEFAULT_INTERACTION_ROLE = "presentation";
 
 export const InteractionWrapper = <TExtra extends object = {}>(props: InteractionWrapperProps<TExtra>) => {
     const [getElementRef, setElementRef] = createSignal<HTMLElement>();
 
-    const getSizing = createMemo(() => access(props.sizing) ?? DEFAULT_INTERACTION_SIZING);
+    const getSizing = createMemo(() => access(props.sizing) ?? INTERACTION_WRAPPER_DEFAULTS.sizing);
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
@@ -57,7 +55,7 @@ export const InteractionWrapper = <TExtra extends object = {}>(props: Interactio
     return (
         <div
             class={[styles.interactionRoot, styles.interactionSizingVariants[getSizing()]].join(" ")}
-            role={access(props.role) ?? DEFAULT_INTERACTION_ROLE}
+            role={access(props.role) ?? INTERACTION_WRAPPER_DEFAULTS.role}
             style={{
                 "min-width": access(props.minWidth) ? `${access(props.minWidth)}px` : undefined,
                 "min-height": access(props.minHeight) ? `${access(props.minHeight)}px` : undefined,

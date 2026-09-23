@@ -1,5 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { CARD_STACK_DEFAULTS } from "@thewaver/ss-components";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -13,37 +14,32 @@ const EXAMPLES_ROOT = "/src/App/Pages/CardStackPage/Examples";
 const MIN_COMMIT_RATIO = 0.05;
 const MAX_COMMIT_RATIO = 0.9;
 const COMMIT_RATIO_STEP = 0.05;
-const STARTING_COMMIT_RATIO = 0.25;
 
 const MIN_DURATION_MS = 0;
 const MAX_DURATION_MS = 2000;
 const DURATION_STEP_MS = 50;
-const STARTING_DURATION_MS = 250;
 
 const MIN_MOUNTED_COUNT = 1;
 const MAX_MOUNTED_COUNT = 13;
 const MOUNTED_COUNT_STEP = 1;
-const STARTING_MOUNTED_COUNT = 5;
 
 const MIN_CARD_GAP = 0;
 const MAX_CARD_GAP = 12;
 const CARD_GAP_STEP = 2;
-const STARTING_CARD_GAP = 4;
 
 const MIN_FUNNEL_RATIO = 0;
 const MAX_FUNNEL_RATIO = 0.25;
 const FUNNEL_RATIO_STEP = 0.01;
-const STARTING_FUNNEL_RATIO = 0.05;
 
 const FIELD_WIDTH = 110;
 
 export const CardStackPage = () => {
     const [getIsDisabled, setIsDisabled] = createSignal(false);
-    const [getCommitRatio, setCommitRatio] = createSignal(STARTING_COMMIT_RATIO);
-    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(STARTING_DURATION_MS);
-    const [getMountedCount, setMountedCount] = createSignal(STARTING_MOUNTED_COUNT);
-    const [getCardGap, setCardGap] = createSignal(STARTING_CARD_GAP);
-    const [getFunnelRatio, setFunnelRatio] = createSignal(STARTING_FUNNEL_RATIO);
+    const [getCommitRatio, setCommitRatio] = createSignal(CARD_STACK_DEFAULTS.commitRatio);
+    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(CARD_STACK_DEFAULTS.transitionDurationMs);
+    const [getMountedCount, setMountedCount] = createSignal(CARD_STACK_DEFAULTS.mountedCount);
+    const [getCardGap, setCardGap] = createSignal(CARD_STACK_DEFAULTS.cardGap);
+    const [getFunnelRatio, setFunnelRatio] = createSignal(CARD_STACK_DEFAULTS.funnelRatio);
 
     const [getLastSend, setLastSend] = createSignal<{ direction: SwipeDirection; card: string }>();
     const [getIsEmpty, setIsEmpty] = createSignal(false);

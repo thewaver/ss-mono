@@ -7,12 +7,12 @@ import type { TimeValue } from "@thewaver/ss-utils";
 import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
 import { InteractionWrapper } from "../../../Primitives/InteractionWrapper/InteractionWrapper";
 import { access, accessSignal } from "../../../Utils/propUtils";
+import { CLOCK_DEFAULTS } from "./Clock.const";
 import type { ClockOption, ClockOptionProps, ClockProps, ClockRenderProps, ClockSteps, ClockUnit } from "./Clock.types";
 import { ClockUtils } from "./Clock.utils";
 
 import * as styles from "./Clock.css";
 
-const DEFAULT_CLOCK_GAP = 0;
 const DEFAULT_CLOCK_STEP = 1;
 const NO_CLOCK_STEPS: ClockSteps = {};
 const LABEL_DIGITS = 2;
@@ -67,7 +67,7 @@ export const Clock = (props: ClockProps) => {
 
     const getHasSeconds = createMemo(() => access(props.hasSeconds) ?? false);
 
-    const getGap = () => `${access(props.gap) ?? DEFAULT_CLOCK_GAP}px`;
+    const getGap = () => `${access(props.gap) ?? CLOCK_DEFAULTS.gap}px`;
 
     const getNow = createMemo(() => access(props.now) ?? fromDate(new Date()));
 

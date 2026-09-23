@@ -1,5 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { REVEAL_DEFAULTS } from "@thewaver/ss-components";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
@@ -28,20 +29,18 @@ const LAME_EXPONENT_STEP = 0.5;
 const MIN_SOFTNESS = 0;
 const MAX_SOFTNESS = 1;
 const SOFTNESS_STEP = 0.05;
-const STARTING_RADIUS = 90;
 const STARTING_SHAPE: RevealShape = CIRCLE;
 const STARTING_JOIN_RADIUS = 0;
 const STARTING_LAME_EXPONENT = 1;
-const STARTING_SOFTNESS = 0.45;
 const FIELD_WIDTH = 110;
 const SHAPE_FIELD_WIDTH = 170;
 
 export const RevealPage = () => {
-    const [getRadius, setRadius] = createSignal(STARTING_RADIUS);
+    const [getRadius, setRadius] = createSignal(REVEAL_DEFAULTS.radius);
     const [getShape, setShape] = createSignal<RevealShape>(STARTING_SHAPE);
     const [getJoinRadius, setJoinRadius] = createSignal(STARTING_JOIN_RADIUS);
     const [getLameExponent, setLameExponent] = createSignal(STARTING_LAME_EXPONENT);
-    const [getSoftness, setSoftness] = createSignal(STARTING_SOFTNESS);
+    const [getSoftness, setSoftness] = createSignal(REVEAL_DEFAULTS.softness);
     const [getIsDisabled, setIsDisabled] = createSignal(false);
 
     const getIsCircle = createMemo(() => getShape() === CIRCLE);

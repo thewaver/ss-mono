@@ -1,19 +1,17 @@
 import { Index, createMemo } from "solid-js";
 
 import { access } from "../../Utils/propUtils";
-import type { StaircaseDir, StaircaseProps, StaircaseStepDefs } from "./Staircase.types";
+import { STAIRCASE_DEFAULTS } from "./Staircase.const";
+import type { StaircaseProps, StaircaseStepDefs } from "./Staircase.types";
 
 import * as styles from "./Staircase.css";
-
-const DEFAULT_STAIRCASE_DIR: StaircaseDir = "down";
-const DEFAULT_STAIRCASE_GAP = 0;
 
 const computeDefaultStepIndent = (defs: StaircaseStepDefs) => defs.index * defs.indent;
 
 export const Staircase = <T,>(props: StaircaseProps<T>) => {
-    const getDir = createMemo(() => access(props.dir) ?? DEFAULT_STAIRCASE_DIR);
+    const getDir = createMemo(() => access(props.dir) ?? STAIRCASE_DEFAULTS.dir);
 
-    const getGap = createMemo(() => access(props.gap) ?? DEFAULT_STAIRCASE_GAP);
+    const getGap = createMemo(() => access(props.gap) ?? STAIRCASE_DEFAULTS.gap);
 
     const getStepCount = createMemo(() => access(props.steps).length);
 

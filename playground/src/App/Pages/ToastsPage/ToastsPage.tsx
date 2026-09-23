@@ -1,6 +1,6 @@
 import { createRoot, createSignal, createUniqueId } from "solid-js";
 
-import { Button, Toasts } from "@thewaver/ss-components";
+import { Button, TOASTS_DEFAULTS, Toasts } from "@thewaver/ss-components";
 import type { Toast, ToastsAlignment, ToastsDir, ToastsOverflow } from "@thewaver/ss-components";
 
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -37,13 +37,9 @@ const DURATIONS_MS = [0, 2000, 4000, 8000];
 const NO_LIMIT = 0;
 const STICKY = 0;
 
-const STARTING_ALIGNMENT: ToastsAlignment = "bottom-right";
 const STARTING_LIMIT = 3;
 const STARTING_DURATION_MS = 4000;
-const STARTING_GAP = 10;
 const STARTING_MARGIN = 20;
-const STARTING_TRANSITION_DURATION_MS = 300;
-
 const MIN_GAP = 0;
 const MAX_GAP = 40;
 const MIN_MARGIN = 0;
@@ -78,16 +74,16 @@ const raiseToast = (kind: ToastKind, durationMs: number) => {
 };
 
 export const ToastsPage = () => {
-    const [getAlignment, setAlignment] = createSignal<ToastsAlignment>(STARTING_ALIGNMENT);
+    const [getAlignment, setAlignment] = createSignal<ToastsAlignment>(TOASTS_DEFAULTS.alignment);
     const [getDir, setDir] = createSignal<ToastsDir>("column");
     const [getOverflow, setOverflow] = createSignal<ToastsOverflow>("dismiss-oldest");
     const [getAnimation, setAnimation] = createSignal<ToastAnimation>("zoom");
     const [getStacking, setStacking] = createSignal<ToastStacking>("flow");
     const [getLimit, setLimit] = createSignal(STARTING_LIMIT);
     const [getDurationMs, setDurationMs] = createSignal(STARTING_DURATION_MS);
-    const [getGap, setGap] = createSignal(STARTING_GAP);
+    const [getGap, setGap] = createSignal(TOASTS_DEFAULTS.gap);
     const [getMargin, setMargin] = createSignal(STARTING_MARGIN);
-    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(STARTING_TRANSITION_DURATION_MS);
+    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(TOASTS_DEFAULTS.transitionDurationMs);
 
     const [getToasts, setToasts] = toastQueue;
     const [getBoundaries] = toastBoundaries;

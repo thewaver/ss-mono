@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { SCRATCH_CARD_DEFAULTS } from "@thewaver/ss-components";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
@@ -11,22 +12,17 @@ import { FrostedExample } from "./Examples/Frosted";
 import { TicketExample } from "./Examples/Ticket";
 import type { ExampleKey, ExampleProgress, ScratchCardExampleProps } from "./ScratchCardPage.types";
 
-
 const EXAMPLES_ROOT = "/src/App/Pages/Reveals/ScratchCardPage/Examples";
 
-const STARTING_PRECISION = 32;
 const MIN_PRECISION = 8;
 const MAX_PRECISION = 64;
 const PRECISION_STEP = 4;
-const STARTING_BRUSH_RADIUS = 20;
 const MIN_BRUSH_RADIUS = 2;
 const MAX_BRUSH_RADIUS = 90;
 const BRUSH_STEP = 2;
-const STARTING_SOFTNESS = 0.8;
 const MIN_SOFTNESS = 0;
 const MAX_SOFTNESS = 1;
 const SOFTNESS_STEP = 0.05;
-const STARTING_THRESHOLD = 0.6;
 const MIN_THRESHOLD = 0.05;
 const MAX_THRESHOLD = 1;
 const THRESHOLD_STEP = 0.05;
@@ -36,9 +32,9 @@ const BRUSH_SHAPES = [CIRCLE, ...ShapeConst.DEFAULT_SHAPES] as const;
 const NOTHING_SCRATCHED = 0;
 
 export const ScratchCardPage = () => {
-    const [getPrecision, setPrecision] = createSignal(STARTING_PRECISION);
-    const [getBrushRadius, setBrushRadius] = createSignal(STARTING_BRUSH_RADIUS);
-    const [getSoftness, setSoftness] = createSignal(STARTING_SOFTNESS);
+    const [getPrecision, setPrecision] = createSignal(SCRATCH_CARD_DEFAULTS.precision);
+    const [getBrushRadius, setBrushRadius] = createSignal(SCRATCH_CARD_DEFAULTS.brushRadius);
+    const [getSoftness, setSoftness] = createSignal(SCRATCH_CARD_DEFAULTS.softness);
     const [getBrushShape, setBrushShape] = createSignal<(typeof BRUSH_SHAPES)[number]>(CIRCLE);
 
     const getComputePoints = createMemo(() => {
@@ -48,7 +44,7 @@ export const ScratchCardPage = () => {
 
         return (size: Size2d) => ShapeConst.getDefaultShapePoints(shape, size);
     });
-    const [getThreshold, setThreshold] = createSignal(STARTING_THRESHOLD);
+    const [getThreshold, setThreshold] = createSignal(SCRATCH_CARD_DEFAULTS.clearThreshold);
     const [getProgress, setProgress] = createStore<Record<ExampleKey, ExampleProgress>>({
         ticket: { ratio: NOTHING_SCRATCHED, hasCleared: false },
         frosted: { ratio: NOTHING_SCRATCHED, hasCleared: false },
@@ -79,18 +75,14 @@ export const ScratchCardPage = () => {
                 key: "ticket",
                 name: "Ticket",
                 readout: () => describe("ticket", "keep going"),
-                component: () => (
-                    <TicketExample {...exampleProps("ticket")} />
-                ),
+                component: () => <TicketExample {...exampleProps("ticket")} />,
                 path: `${EXAMPLES_ROOT}/Ticket.tsx`,
             },
             {
                 key: "frosted",
                 name: "Frosted",
                 readout: () => describe("frosted", "what is under it sharpens as the frost goes"),
-                component: () => (
-                    <FrostedExample {...exampleProps("frosted")} />
-                ),
+                component: () => <FrostedExample {...exampleProps("frosted")} />,
                 path: `${EXAMPLES_ROOT}/Frosted.tsx`,
             },
         ];

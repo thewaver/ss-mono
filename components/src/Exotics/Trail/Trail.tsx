@@ -5,12 +5,12 @@ import { MathUtils, type Point2d } from "@thewaver/ss-utils";
 import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import { SignalMirrorUtils } from "../../Abstracts/SignalMirror/SignalMirror.utils";
 import { access } from "../../Utils/propUtils";
+import { TRAIL_DEFAULTS } from "./Trail.const";
 import type { TrailController, TrailPlace, TrailProps } from "./Trail.types";
 import { TrailUtils } from "./Trail.utils";
 
 import * as styles from "./Trail.css";
 
-const DEFAULT_TRAIL_DURATION_MS = 4000;
 const NO_LENGTH = 0;
 const NO_PROGRESS = 0;
 const NO_ANGLE = 0;
@@ -30,7 +30,7 @@ export const Trail = (props: TrailProps) => {
 
     const getSize = createMemo(() => access(props.size));
 
-    const getDurationMs = createMemo(() => access(props.durationMs) ?? DEFAULT_TRAIL_DURATION_MS);
+    const getDurationMs = createMemo(() => access(props.durationMs) ?? TRAIL_DEFAULTS.durationMs);
 
     const getIsLooping = createMemo(() => access(props.isLooping) ?? false);
 

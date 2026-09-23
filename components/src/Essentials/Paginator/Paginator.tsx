@@ -7,6 +7,7 @@ import type { InteractionSizing } from "../../Primitives/InteractionWrapper/Inte
 import { PlacementBox } from "../../Primitives/PlacementBox/PlacementBox";
 import { PlacementItem } from "../../Primitives/PlacementItem/PlacementItem";
 import { access } from "../../Utils/propUtils";
+import { PAGINATOR_DEFAULTS } from "./Paginator.const";
 import type {
     PaginatorGapEntry,
     PaginatorItemProps,
@@ -19,12 +20,6 @@ import type {
 import { PaginatorUtils } from "./Paginator.utils";
 
 import * as styles from "./Paginator.css";
-
-const DEFAULT_PAGINATOR_STEPS: PaginatorStep[] = ["previous", "next"];
-const DEFAULT_PAGINATOR_SIBLING_COUNT = 1;
-const DEFAULT_PAGINATOR_BOUNDARY_COUNT = 1;
-const DEFAULT_PAGINATOR_GAP = 0;
-const DEFAULT_PAGINATOR_LABEL = "Pagination";
 
 const ROW_SIZING: InteractionSizing = "fit-content";
 const PLACED_SIZING: InteractionSizing = "fill";
@@ -94,13 +89,13 @@ export const Paginator = (props: PaginatorProps) => {
 
     const getIsDisabled = createMemo(() => access(props.isDisabled) ?? false);
 
-    const getSteps = createMemo(() => access(props.steps) ?? DEFAULT_PAGINATOR_STEPS);
+    const getSteps = createMemo(() => access(props.steps) ?? PAGINATOR_DEFAULTS.steps);
 
     const getEntries = createMemo(() =>
         PaginatorUtils.getEntries(access(props.page), {
             pageCount: getPageCount(),
-            siblingCount: access(props.siblingCount) ?? DEFAULT_PAGINATOR_SIBLING_COUNT,
-            boundaryCount: access(props.boundaryCount) ?? DEFAULT_PAGINATOR_BOUNDARY_COUNT,
+            siblingCount: access(props.siblingCount) ?? PAGINATOR_DEFAULTS.siblingCount,
+            boundaryCount: access(props.boundaryCount) ?? PAGINATOR_DEFAULTS.boundaryCount,
         }),
     );
 
@@ -237,8 +232,8 @@ export const Paginator = (props: PaginatorProps) => {
     return (
         <nav
             class={styles.paginatorRoot}
-            style={{ gap: `${access(props.gap) ?? DEFAULT_PAGINATOR_GAP}px` }}
-            aria-label={access(props.ariaLabel) ?? DEFAULT_PAGINATOR_LABEL}
+            style={{ gap: `${access(props.gap) ?? PAGINATOR_DEFAULTS.gap}px` }}
+            aria-label={access(props.ariaLabel) ?? PAGINATOR_DEFAULTS.ariaLabel}
         >
             <Show when={getLayout()} fallback={renderRow()}>
                 {(getResolved) => (

@@ -1,5 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { FORM_FIELD_DEFAULTS } from "@thewaver/ss-components";
+
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -19,13 +21,11 @@ const GAP_STEP = 5;
 const FIELD_WIDTH = 110;
 const MESSAGE_WIDTH = 240;
 
-const STARTING_DIRECTION = "column" as const;
-const STARTING_GAP = 5;
 const STARTING_MESSAGE = "Shown to everyone who can see your posts.";
 
 export const FormFieldPage = () => {
-    const [getDirection, setDirection] = createSignal<"column" | "row">(STARTING_DIRECTION);
-    const [getGap, setGap] = createSignal(STARTING_GAP);
+    const [getDirection, setDirection] = createSignal<"column" | "row">(FORM_FIELD_DEFAULTS.dir);
+    const [getGap, setGap] = createSignal(FORM_FIELD_DEFAULTS.gap);
     const [getMessage, setMessage] = createSignal(STARTING_MESSAGE);
     const [getHasError, setHasError] = createSignal(false);
 

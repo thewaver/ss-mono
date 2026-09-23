@@ -1,6 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { ImageSwitcherProps } from "@thewaver/ss-components";
+import { IMAGE_SWITCHER_DEFAULTS } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
@@ -33,7 +34,6 @@ const SOURCE_ALTS: Record<SourceType, string | undefined> = {
     none: undefined,
 };
 
-const STARTING_DURATION_MS = 1000;
 const MIN_DURATION_MS = 0;
 const MAX_DURATION_MS = 5000;
 const DURATION_STEP_MS = 50;
@@ -50,7 +50,9 @@ const DefaultExampleWrapper = (props: ImageSwitcherProps) => {
 
 export const ImageSwitcherPage = () => {
     const [getSourceType, setSourceType] = createSignal<SourceType>("profile");
-    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(STARTING_DURATION_MS);
+    const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(
+        IMAGE_SWITCHER_DEFAULTS.transitionDurationMs,
+    );
     const [getLoadCount, setLoadCount] = createSignal(0);
     const [getLoadedName, setLoadedName] = createSignal("none");
 
