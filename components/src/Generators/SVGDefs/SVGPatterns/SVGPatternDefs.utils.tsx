@@ -18,6 +18,7 @@ export namespace SVGPatternDefsUtils {
      * @param renderCell Draws one cell. Receives an id of its own, so a cell may carry gradients or
      * filters without colliding with its neighbors, along with its position in the grid and the grid's
      * size.
+     * @returns The `pattern` element, which a fill points at with `url(#…)`.
      */
     export const computePattern = (
         id: string,

@@ -62,7 +62,11 @@ export namespace ProximityEffectUtils {
      * and the two directions travel round and collide at the far side. The clamp is half the slack,
      * since the two ends spread in opposite directions and each takes a share. That makes a closed run
      * the case where the clamp comes out at nothing rather than a case of its own, and it is why
-     * `pushRatio` can be asked for freely: an arrangement that cannot honor it says so.
+     * `pushRatio` can be asked for freely: an arrangement that cannot honor it says so. Under reduced motion
+     * nothing grows or moves, and the nearest items brighten by the growth instead.
+     *
+     * @param defs How far the effect reaches, how much the nearest item grows, and how far the rest are pushed.
+     * @returns The effect function, ready to hand to a control's `computeEffect`.
      */
     export const createZoomIn = (defs?: ZoomInDefs): ProximityEffectFn => {
         const base = ProximityEffectDefaults.ZOOM_IN_DEFAULTS;
@@ -102,6 +106,9 @@ export namespace ProximityEffectUtils {
      * The one sample that is not motion under success criterion 2.3.3 — its own definition excludes a
      * change of color that does not change perceived size, shape or position — so it is also the one
      * that answers the reduced-motion preference by not changing.
+     *
+     * @param defs How far the effect reaches, and how much the nearest item brightens and saturates.
+     * @returns The effect function, ready to hand to a control's `computeEffect`.
      */
     export const createGlow = (defs?: GlowDefs): ProximityEffectFn => {
         const base = ProximityEffectDefaults.GLOW_DEFAULTS;
@@ -131,6 +138,9 @@ export namespace ProximityEffectUtils {
      * layout cannot state — everything else is a share of something the arrangement already knows.
      * Under reduced motion the dimming stays and the blur goes, the erratum to success criterion 2.3.3
      * having brought blurring inside it.
+     *
+     * @param defs How far the effect reaches, how much the farthest items dim, and how far they blur, in pixels.
+     * @returns The effect function, ready to hand to a control's `computeEffect`.
      */
     export const createFade = (defs?: FadeDefs): ProximityEffectFn => {
         const base = ProximityEffectDefaults.FADE_DEFAULTS;

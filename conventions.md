@@ -512,7 +512,8 @@ namespace is the published surface, so a consumer should be able to read what a 
 answers and what it guarantees without opening the body. A one-line summary first, then a blank line and the
 part that cannot be read off the signature — why the helper exists, what the caller is spared, what happens at
 the edges — then `@param` and `@returns` where they add something the prose has not. `{@link}` a neighbor
-rather than restating it.
+rather than restating it. **A `.factory.tsx` is held to the same rule**, since it is a utility published as a
+class rather than a namespace: the class, its constructor and every public method carry a block.
 
 **A `/** */` block says what a consumer needs, never why the code is shaped that way.** The user's rule,
 stated in those terms. A block is read by somebody deciding whether to call the thing and what to hand it, so

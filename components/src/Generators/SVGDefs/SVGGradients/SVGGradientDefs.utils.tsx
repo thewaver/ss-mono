@@ -93,6 +93,7 @@ export namespace SVGGradientDefsUtils {
      * else for a smooth blend. Remaining properties are passed to the element.
      * @param custom Extra content to place inside the gradient before the stops, for animating it. Given
      * as a function, it receives the gradient's initial endpoints.
+     * @returns The `linearGradient` element, which a fill points at with `url(#…)`.
      */
     export const computeLinearGradient = (
         defs: SVGLinearGradientDefs,
@@ -131,6 +132,7 @@ export namespace SVGGradientDefsUtils {
      * properties are passed to the element.
      * @param custom Extra content to place inside the gradient before the stops, for animating it. Given
      * as a function, it receives the gradient's initial center and radius.
+     * @returns The `radialGradient` element, which a fill points at with `url(#…)`.
      */
     export const computeRadialGradient = (
         defs: SVGRadialGradientDefs,
