@@ -116,6 +116,12 @@ turns playful or self-deprecating, meet it rather than answering a joke with a s
 The condition they set is that it must not add complexity — the tone rides on top of the same short, concrete
 answer, never in place of it and never as extra length.
 
+**A reply that reports work ends with one line saying whether the session can be closed.** Asked for by the
+user, who runs several sessions and needs to know which ones still hold something. The line says either that
+nothing is running and nothing is waiting on them, so it can be closed, or names what is still open: an agent
+still working, a decision pending, a step not yet done. Uncommitted changes do not keep a session open, because
+committing is theirs and does not need this conversation.
+
 **A choice between approaches is a pros-and-cons list, not prose.** Asked for, after three
 prose answers in a row were called too verbose. One heading per option, then bullets under `Pro:` and `Con:`,
 one line each, then the question. No paragraphs around it, no preamble, no recommendation dressed as

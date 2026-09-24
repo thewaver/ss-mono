@@ -1,8 +1,9 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { CornerKey } from "@thewaver/ss-components";
-import { CORNERS_DEFAULTS } from "@thewaver/ss-components";
+import { CORNERS_DEFAULTS, CORNERS_KEYS } from "@thewaver/ss-components";
 
+import { CornerKnobs } from "../../Knobs/Corners.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -16,7 +17,6 @@ import { OverlayExample } from "./Examples/Overlay";
 
 const EXAMPLES_ROOT = "/src/App/Pages/CornersPage/Examples";
 
-const CORNER_KEYS: CornerKey[] = ["topLeft", "topRight", "bottomLeft", "bottomRight"];
 const CORNER_LABELS: Record<CornerKey, string> = {
     topLeft: "Top left",
     topRight: "Top right",
@@ -24,30 +24,23 @@ const CORNER_LABELS: Record<CornerKey, string> = {
     bottomRight: "Bottom right",
 };
 
-const MIN_LENGTH = 4;
-const MAX_LENGTH = 80;
-const LENGTH_STEP = 4;
-const MIN_THICKNESS = 1;
-const MAX_THICKNESS = 16;
-const THICKNESS_STEP = 1;
-const MIN_DURATION = 0;
-const MAX_DURATION = 1000;
-const DURATION_STEP = 50;
 const FIELD_WIDTH = 110;
 
-const STARTING_COLOR = "#ffd400";
-const STARTING_LENGTH = 24;
 export const CornersPage = () => {
-    const [getColor, setColor] = createSignal(STARTING_COLOR);
-    const [getLengthAcross, setLengthAcross] = createSignal(STARTING_LENGTH);
-    const [getLengthDown, setLengthDown] = createSignal(STARTING_LENGTH);
+    const [getColor, setColor] = createSignal(CornerKnobs.STARTING_COLOR);
+    const [getLengthAcross, setLengthAcross] = createSignal(CornerKnobs.STARTING_LENGTH);
+    const [getLengthDown, setLengthDown] = createSignal(CornerKnobs.STARTING_LENGTH);
     const [getStrokeThickness, setStrokeThickness] = createSignal(CORNERS_DEFAULTS.strokeThickness);
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(CORNERS_DEFAULTS.transitionDurationMs);
-    const [getHiddenCorners, setHiddenCorners] = createSignal<CornerKey[]>([]);
+    const [getHiddenCorners, setHiddenCorners] = createSignal<CornerKey[]>(
+        CORNERS_KEYS.filter((key) => !CORNERS_DEFAULTS.visibleCorners.has(key)),
+    );
 
     const getCornerLength = createMemo(() => ({ width: getLengthAcross(), height: getLengthDown() }));
 
-    const getVisibleCorners = createMemo(() => new Set(CORNER_KEYS.filter((key) => !getHiddenCorners().includes(key))));
+    const getVisibleCorners = createMemo(
+        () => new Set(CORNERS_KEYS.filter((key) => !getHiddenCorners().includes(key))),
+    );
 
     const toggleCorner = (key: CornerKey, isVisible: boolean) =>
         setHiddenCorners((previous) => (isVisible ? previous.filter((entry) => entry !== key) : [...previous, key]));
@@ -119,9 +112,9 @@ export const CornersPage = () => {
                 >
                     <PageNumberField
                         value={getLengthAcross}
-                        min={() => MIN_LENGTH}
-                        max={() => MAX_LENGTH}
-                        step={() => LENGTH_STEP}
+                        min={() => CornerKnobs.MIN_LENGTH}
+                        max={() => CornerKnobs.MAX_LENGTH}
+                        step={() => CornerKnobs.LENGTH_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Arm across"}
                         onInput={setLengthAcross}
@@ -135,9 +128,9 @@ export const CornersPage = () => {
                 >
                     <PageNumberField
                         value={getLengthDown}
-                        min={() => MIN_LENGTH}
-                        max={() => MAX_LENGTH}
-                        step={() => LENGTH_STEP}
+                        min={() => CornerKnobs.MIN_LENGTH}
+                        max={() => CornerKnobs.MAX_LENGTH}
+                        step={() => CornerKnobs.LENGTH_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Arm down"}
                         onInput={setLengthDown}
@@ -151,9 +144,9 @@ export const CornersPage = () => {
                 >
                     <PageNumberField
                         value={getStrokeThickness}
-                        min={() => MIN_THICKNESS}
-                        max={() => MAX_THICKNESS}
-                        step={() => THICKNESS_STEP}
+                        min={() => CornerKnobs.MIN_THICKNESS}
+                        max={() => CornerKnobs.MAX_THICKNESS}
+                        step={() => CornerKnobs.THICKNESS_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Thickness"}
                         onInput={setStrokeThickness}
@@ -169,16 +162,16 @@ export const CornersPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => MIN_DURATION}
-                        max={() => MAX_DURATION}
-                        step={() => DURATION_STEP}
+                        min={() => CornerKnobs.MIN_DURATION}
+                        max={() => CornerKnobs.MAX_DURATION}
+                        step={() => CornerKnobs.DURATION_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Fade in milliseconds"}
                         onInput={setTransitionDurationMs}
                     />
                 </PageProp>
 
-                {CORNER_KEYS.map((key) => (
+                {CORNERS_KEYS.map((key) => (
                     <PageProp
                         key={key}
                         label={CORNER_LABELS[key]}

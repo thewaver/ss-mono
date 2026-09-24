@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { Button } from "@thewaver/ss-components";
 
+import { TagInputKnobs } from "../../Knobs/TagInputs.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -32,8 +33,8 @@ const CROWDED_TAGS = [
 ];
 
 export const TagInputPage = () => {
-    const [getIsDisabled, setIsDisabled] = createSignal(false);
-    const [getHasError, setHasError] = createSignal(false);
+    const [getIsDisabled, setIsDisabled] = createSignal(TagInputKnobs.STARTING_IS_DISABLED);
+    const [getHasError, setHasError] = createSignal(TagInputKnobs.STARTING_HAS_ERROR);
 
     const defaultSignal = createSignal(STARTING_TAGS);
     const uniqueSignal = createSignal(STARTING_TAGS);

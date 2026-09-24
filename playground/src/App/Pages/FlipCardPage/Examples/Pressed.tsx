@@ -1,6 +1,6 @@
 import { For, createSignal } from "solid-js";
 
-import { Button, FlipCard, Range, access } from "@thewaver/ss-components";
+import { Button, FLIP_CARD_TURN_DIRECTIONS, FlipCard, Range, access } from "@thewaver/ss-components";
 import type { FlipCardAxis, FlipCardTurnDirection } from "@thewaver/ss-components";
 
 import { computeFlipCardFaceLabel } from "../../../PageComponents/Announcements/Announcements.const";
@@ -17,7 +17,6 @@ import * as styles from "../FlipCardPage.css";
 
 const CARD_SIZE = { width: 220, height: 300 };
 
-const TURN_DIRECTIONS: FlipCardTurnDirection[] = ["backward", "forward"];
 const EDGE_LABELS: Record<FlipCardAxis, Record<FlipCardTurnDirection, string>> = {
     row: { backward: "Press the left edge", forward: "Press the right edge" },
     column: { backward: "Press the bottom edge", forward: "Press the top edge" },
@@ -60,7 +59,7 @@ export const PressedExample = (props: Props) => {
             />
 
             <div class={styles.controls}>
-                <For each={TURN_DIRECTIONS}>
+                <For each={FLIP_CARD_TURN_DIRECTIONS}>
                     {(direction) => (
                         <Button
                             id={`press-${direction}`}

@@ -2,6 +2,8 @@ import type { JSX } from "solid-js";
 
 import type { AccessorProps } from "../../../Utils/typeUtils";
 
+export type FormFieldOrientation = "horizontal" | "vertical";
+
 export type FormFieldState = {
     hasError: boolean;
     hasMessage: boolean;
@@ -10,7 +12,7 @@ export type FormFieldState = {
 
 export type FormFieldProps = AccessorProps<{
     /** Whether the label sits above the control or beside it. */
-    orientation?: "horizontal" | "vertical";
+    orientation?: FormFieldOrientation;
     /** The space between the label, the control and the message. */
     gap?: number;
     /** Puts the field into its error look and reads the message as the error rather than as help. */

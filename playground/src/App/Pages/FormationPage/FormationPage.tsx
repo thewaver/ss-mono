@@ -11,6 +11,7 @@ import {
 import type { PlacementLayoutEntry, ProximityEffectEntry } from "@thewaver/ss-components";
 import { ShapeConst } from "@thewaver/ss-utils";
 
+import { FormationKnobs } from "../../Knobs/Formations.const";
 import { PlacementLayoutKnobs } from "../../Knobs/PlacementLayouts.const";
 import { ProximityEffectKnobs } from "../../Knobs/ProximityEffects.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -19,33 +20,15 @@ import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { NO_SAMPLE_KEY } from "../../PageComponents/SampleGroups/SampleGroups.const";
+import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.types";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import type { FormationExampleProps } from "./FormationPage.types";
 
-const MIN_ITEM_COUNT = 1;
-const MAX_ITEM_COUNT = 12;
-const ITEM_COUNT_STEP = 1;
-const MIN_SKIPPED_COUNT = 0;
-const MIN_DURATION_MS = 0;
-const MAX_DURATION_MS = 3000;
-const DURATION_STEP_MS = 100;
-const MIN_STAGGER_MS = 0;
-const MAX_STAGGER_MS = 500;
-const STAGGER_STEP_MS = 10;
 const FIELD_WIDTH = 130;
 const FORMATION_WIDTH = 380;
 const EXAMPLES_ROOT = "/src/App/Pages/FormationPage/Examples";
-
-const STARTING_ITEM_COUNT = 6;
-const STARTING_LAYOUT_KEY: PlacementLayouts.SampleKey = "cliff";
-const NO_EFFECT_KEY = "none";
-const STARTING_EFFECT_KEY: EffectKey = "zoomIn";
-const STARTING_SHAPE_KIND: ShapeConst.DefaultShape = "lozenge";
-
-type EffectKey = ProximityEffects.SampleKey | typeof NO_EFFECT_KEY;
-
-const EFFECT_KEYS: EffectKey[] = [NO_EFFECT_KEY, ...ProximityEffects.SAMPLE_KEYS];
 
 const NAMES = [
     "Aurora",
@@ -71,12 +54,14 @@ const DefaultExampleWrapper = (props: FormationExampleProps) => {
 };
 
 export const FormationPage = () => {
-    const [getItemCount, setItemCount] = createSignal(STARTING_ITEM_COUNT);
-    const [getSkippedCount, setSkippedCount] = createSignal(MIN_SKIPPED_COUNT);
-    const [getLayoutKey, setLayoutKey] = createSignal<PlacementLayouts.SampleKey>(STARTING_LAYOUT_KEY);
-    const [getEffectKey, setEffectKey] = createSignal<EffectKey>(STARTING_EFFECT_KEY);
-    const [getShapeKind, setShapeKind] = createSignal<ShapeConst.DefaultShape>(STARTING_SHAPE_KIND);
-    const [getIsStackedInReverse, setIsStackedInReverse] = createSignal(false);
+    const [getItemCount, setItemCount] = createSignal(FormationKnobs.STARTING_ITEM_COUNT);
+    const [getSkippedCount, setSkippedCount] = createSignal(FormationKnobs.MIN_SKIPPED_COUNT);
+    const [getLayoutKey, setLayoutKey] = createSignal<PlacementLayouts.SampleKey>(FormationKnobs.STARTING_LAYOUT_KEY);
+    const [getEffectKey, setEffectKey] = createSignal<WithNoSample<ProximityEffects.SampleKey>>(
+        FormationKnobs.STARTING_EFFECT_KEY,
+    );
+    const [getShapeKind, setShapeKind] = createSignal<ShapeConst.DefaultShape>(FormationKnobs.STARTING_SHAPE_KIND);
+    const [getIsStackedInReverse, setIsStackedInReverse] = createSignal(FormationKnobs.STARTING_IS_STACKED_IN_REVERSE);
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(FORMATION_DEFAULTS.transitionDurationMs);
     const [getStaggerMs, setStaggerMs] = createSignal(FORMATION_DEFAULTS.staggerMs);
     const [layoutDefs, setLayoutDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
@@ -94,7 +79,7 @@ export const FormationPage = () => {
     const getEffectFamily = () => {
         const key = getEffectKey();
 
-        return key === NO_EFFECT_KEY ? undefined : ProximityEffects.SAMPLE_EFFECTS[key].family;
+        return key === NO_SAMPLE_KEY ? undefined : ProximityEffects.SAMPLE_EFFECTS[key].family;
     };
 
     const getEffectKnobs = () => {
@@ -186,7 +171,7 @@ export const FormationPage = () => {
                     >
                         <PageSelectField
                             value={getEffectKey}
-                            values={() => EFFECT_KEYS}
+                            values={() => FormationKnobs.EFFECT_KEYS}
                             width={() => FIELD_WIDTH}
                             ariaLabel={"Pointer effect"}
                             onChange={(key) => setEffectKey(() => key)}
@@ -210,9 +195,9 @@ export const FormationPage = () => {
                     <PageProp key={"itemCount"} label={"Items"} hint={"How many items the arrangement holds."}>
                         <PageNumberField
                             value={getItemCount}
-                            min={() => MIN_ITEM_COUNT}
-                            max={() => MAX_ITEM_COUNT}
-                            step={() => ITEM_COUNT_STEP}
+                            min={() => FormationKnobs.MIN_ITEM_COUNT}
+                            max={() => FormationKnobs.MAX_ITEM_COUNT}
+                            step={() => FormationKnobs.ITEM_COUNT_STEP}
                             width={() => FIELD_WIDTH}
                             ariaLabel={"Items"}
                             onInput={setItemCount}
@@ -228,9 +213,9 @@ export const FormationPage = () => {
                     >
                         <PageNumberField
                             value={getSkippedCount}
-                            min={() => MIN_SKIPPED_COUNT}
-                            max={() => NAMES.length - MIN_ITEM_COUNT}
-                            step={() => ITEM_COUNT_STEP}
+                            min={() => FormationKnobs.MIN_SKIPPED_COUNT}
+                            max={() => NAMES.length - FormationKnobs.MIN_ITEM_COUNT}
+                            step={() => FormationKnobs.ITEM_COUNT_STEP}
                             width={() => FIELD_WIDTH}
                             ariaLabel={"Skip from the start"}
                             onInput={setSkippedCount}
@@ -270,9 +255,9 @@ export const FormationPage = () => {
                     >
                         <PageNumberField
                             value={getTransitionDurationMs}
-                            min={() => MIN_DURATION_MS}
-                            max={() => MAX_DURATION_MS}
-                            step={() => DURATION_STEP_MS}
+                            min={() => FormationKnobs.MIN_DURATION_MS}
+                            max={() => FormationKnobs.MAX_DURATION_MS}
+                            step={() => FormationKnobs.DURATION_STEP_MS}
                             width={() => FIELD_WIDTH}
                             ariaLabel={"Glide duration in milliseconds"}
                             onInput={setTransitionDurationMs}
@@ -286,9 +271,9 @@ export const FormationPage = () => {
                     >
                         <PageNumberField
                             value={getStaggerMs}
-                            min={() => MIN_STAGGER_MS}
-                            max={() => MAX_STAGGER_MS}
-                            step={() => STAGGER_STEP_MS}
+                            min={() => FormationKnobs.MIN_STAGGER_MS}
+                            max={() => FormationKnobs.MAX_STAGGER_MS}
+                            step={() => FormationKnobs.STAGGER_STEP_MS}
                             width={() => FIELD_WIDTH}
                             ariaLabel={"Stagger in milliseconds"}
                             onInput={setStaggerMs}

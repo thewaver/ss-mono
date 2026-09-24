@@ -2,6 +2,7 @@ import { createSignal } from "solid-js";
 
 import { SVGFilterDefsFactory, access } from "@thewaver/ss-components";
 
+import { SVGFilterKnobs } from "../../../Knobs/SVGFilters.const";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField } from "../../../StyledComponents/Field/Field";
@@ -9,15 +10,11 @@ import { PageFilterStage } from "../../../StyledComponents/SVGFiltersContent/SVG
 import type { SVGFiltersExampleProps } from "../SVGFiltersPage.types";
 
 const FILTER_ID = "svgFiltersBlur";
-const MIN_DEVIATION = 0;
-const MAX_DEVIATION = 12;
-const DEVIATION_STEP = 0.5;
-const STARTING_DEVIATION = 3;
 
 type Props = SVGFiltersExampleProps;
 
 export const BlurExample = (props: Props) => {
-    const [getStdDeviation, setStdDeviation] = createSignal(STARTING_DEVIATION);
+    const [getStdDeviation, setStdDeviation] = createSignal(SVGFilterKnobs.Blur.STARTING_DEVIATION);
 
     return (
         <>
@@ -42,9 +39,9 @@ export const BlurExample = (props: Props) => {
                 >
                     <PageNumberField
                         value={getStdDeviation}
-                        min={() => MIN_DEVIATION}
-                        max={() => MAX_DEVIATION}
-                        step={() => DEVIATION_STEP}
+                        min={() => SVGFilterKnobs.Blur.MIN_DEVIATION}
+                        max={() => SVGFilterKnobs.Blur.MAX_DEVIATION}
+                        step={() => SVGFilterKnobs.Blur.DEVIATION_STEP}
                         ariaLabel={"Standard deviation"}
                         onInput={setStdDeviation}
                     />

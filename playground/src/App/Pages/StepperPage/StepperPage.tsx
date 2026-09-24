@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import { Button } from "@thewaver/ss-components";
 import type { Step } from "@thewaver/ss-components";
 
+import { StepperKnobs } from "../../Knobs/Steppers.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -25,7 +26,7 @@ const STARTING_DETAILED: StepValue = "payment";
 const EXAMPLES_ROOT = "/src/App/Pages/StepperPage/Examples";
 
 export const StepperPage = () => {
-    const [getIsFreeNavigation, setIsFreeNavigation] = createSignal(false);
+    const [getIsFreeNavigation, setIsFreeNavigation] = createSignal(StepperKnobs.STARTING_IS_FREE_NAVIGATION);
 
     const [getLinearCurrent, setLinearCurrent] = createSignal<StepValue>(STARTING_LINEAR);
     const [getFailedCurrent, setFailedCurrent] = createSignal<StepValue>(STARTING_FAILED);

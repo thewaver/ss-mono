@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { CURRENCY_INPUT_DEFAULTS } from "@thewaver/ss-components";
 
+import { CurrencyInputKnobs } from "../../Knobs/CurrencyInputs.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -13,10 +14,7 @@ import { DefaultExample } from "./Examples/Default";
 import { SymbolExample } from "./Examples/Symbol";
 
 const LOCALE_FIELD_WIDTH = 120;
-const LOCALES = ["en-GB", "en-US", "de-DE", "fr-FR", "ja-JP", "en-IN"];
-const DECIMALS = [0, 2, 3];
 const LOCALE_GROUPING = "locale";
-const GROUPINGS: (number[] | undefined)[] = [undefined, [3], [4], [3, 2]];
 const EXAMPLES_ROOT = "/src/App/Pages/CurrencyInputPage/Examples";
 
 const STARTING_PRICE = 1234.56;
@@ -29,10 +27,10 @@ const describeGrouping = (sizes: number[] | undefined) =>
     sizes === undefined ? LOCALE_GROUPING : sizes.join(" then ");
 
 export const CurrencyInputPage = () => {
-    const [getLocale, setLocale] = createSignal("en-GB");
+    const [getLocale, setLocale] = createSignal(CurrencyInputKnobs.STARTING_LOCALE);
     const [getDecimals, setDecimals] = createSignal(CURRENCY_INPUT_DEFAULTS.decimals);
     const [getGrouping, setGrouping] = createSignal<number[] | undefined>();
-    const [getHasSign, setHasSign] = createSignal(false);
+    const [getHasSign, setHasSign] = createSignal(CurrencyInputKnobs.STARTING_HAS_SIGN);
 
     const priceSignal = createSignal<number | undefined>(STARTING_PRICE);
     const emptySignal = createSignal<number | undefined>();
@@ -118,7 +116,7 @@ export const CurrencyInputPage = () => {
                 >
                     <PageSelectField
                         value={getLocale}
-                        values={() => LOCALES}
+                        values={() => CurrencyInputKnobs.LOCALES}
                         width={() => LOCALE_FIELD_WIDTH}
                         ariaLabel={"Locale"}
                         onChange={(locale) => setLocale(() => locale)}
@@ -132,7 +130,7 @@ export const CurrencyInputPage = () => {
                 >
                     <PageSelectField
                         value={getDecimals}
-                        values={() => DECIMALS}
+                        values={() => CurrencyInputKnobs.DECIMALS}
                         ariaLabel={"Decimals"}
                         onChange={setDecimals}
                     />
@@ -155,7 +153,7 @@ export const CurrencyInputPage = () => {
                 >
                     <PageSelectField
                         value={getGrouping}
-                        values={() => GROUPINGS}
+                        values={() => CurrencyInputKnobs.GROUPINGS}
                         computeLabel={describeGrouping}
                         ariaLabel={"Grouping"}
                         onChange={(sizes) => setGrouping(() => sizes)}

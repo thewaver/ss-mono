@@ -4,6 +4,7 @@ import type { PatchBoardLink } from "@thewaver/ss-components";
 import { PATCH_BOARD_DEFAULTS } from "@thewaver/ss-components";
 import { MathUtils } from "@thewaver/ss-utils";
 
+import { PatchBoardKnobs } from "../../Knobs/PatchBoards.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -34,9 +35,6 @@ import { MEASURE_BOX_PADDING } from "../../PageComponents/MeasureBox/MeasureBox.
 
 const EXAMPLES_ROOT = "/src/App/Pages/PatchBoardPage/Examples";
 
-const MIN_SOCKET_SIZE = 0.02;
-const MAX_SOCKET_SIZE = 0.06;
-const SOCKET_SIZE_STEP = 0.005;
 const WIDE_SPAN = 2;
 const PERCENT = 100;
 const MEASURED_BOARD_WIDTH = BOARD_WIDTH + MEASURE_BOX_PADDING * 2;
@@ -44,8 +42,8 @@ const NOTHING_DONE = "nothing yet";
 
 export const PatchBoardPage = () => {
     const [getSocketSize, setSocketSize] = createSignal(PATCH_BOARD_DEFAULTS.socketSize);
-    const [getIsLocked, setIsLocked] = createSignal(false);
-    const [getIsDisabled, setIsDisabled] = createSignal(false);
+    const [getIsLocked, setIsLocked] = createSignal(PatchBoardKnobs.STARTING_IS_LOCKED);
+    const [getIsDisabled, setIsDisabled] = createSignal(PatchBoardKnobs.STARTING_IS_DISABLED);
     const [getChainAction, setChainAction] = createSignal(NOTHING_DONE);
     const [getMixerAction, setMixerAction] = createSignal(NOTHING_DONE);
     const [getRackAction, setRackAction] = createSignal(NOTHING_DONE);
@@ -195,9 +193,9 @@ export const PatchBoardPage = () => {
                 >
                     <PageNumberField
                         value={getSocketSize}
-                        min={() => MIN_SOCKET_SIZE}
-                        max={() => MAX_SOCKET_SIZE}
-                        step={() => SOCKET_SIZE_STEP}
+                        min={() => PatchBoardKnobs.MIN_SOCKET_SIZE}
+                        max={() => PatchBoardKnobs.MAX_SOCKET_SIZE}
+                        step={() => PatchBoardKnobs.SOCKET_SIZE_STEP}
                         ariaLabel={"Socket size as a fraction of the board's width"}
                         onInput={setSocketSize}
                     />

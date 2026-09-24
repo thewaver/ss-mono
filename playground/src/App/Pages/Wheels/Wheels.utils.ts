@@ -2,31 +2,21 @@ import { createMemo, createSignal } from "solid-js";
 
 import { MediaQueryMonitorUtils } from "@thewaver/ss-components";
 
-import {
-    INDEFINITE_REST_DURATION_MS,
-    PRIZES,
-    SPIN_STYLES,
-    STARTING_IDLE_DELAY_MS,
-    STARTING_REST_DURATION_MS,
-    STARTING_SETTLE_DURATION_MS,
-    STARTING_SPIN_DURATION_MS,
-    STARTING_SPIN_STYLE_KEY,
-    STARTING_TURNS,
-    STARTING_WEDGE_COUNT,
-} from "./Wheels.const";
+import { WheelKnobs } from "../../Knobs/Wheels.const";
+import { INDEFINITE_REST_DURATION_MS, PRIZES, SPIN_STYLES } from "./Wheels.const";
 import type { WheelSpinStyleKey, WheelsControls } from "./Wheels.types";
 
 export const createWheelsControls = (): WheelsControls => {
-    const wedgeCountSignal = createSignal(STARTING_WEDGE_COUNT);
-    const spinDurationSignal = createSignal(STARTING_SPIN_DURATION_MS);
-    const turnsSignal = createSignal(STARTING_TURNS);
-    const settleDurationSignal = createSignal(STARTING_SETTLE_DURATION_MS);
-    const doesResumeSignal = createSignal(true);
-    const restDurationSignal = createSignal(STARTING_REST_DURATION_MS);
-    const isIdlingAllowedSignal = createSignal(true);
-    const idleDelaySignal = createSignal(STARTING_IDLE_DELAY_MS);
-    const spinStyleSignal = createSignal<WheelSpinStyleKey>(STARTING_SPIN_STYLE_KEY);
-    const isDisabledSignal = createSignal(false);
+    const wedgeCountSignal = createSignal(WheelKnobs.STARTING_WEDGE_COUNT);
+    const spinDurationSignal = createSignal(WheelKnobs.STARTING_SPIN_DURATION_MS);
+    const turnsSignal = createSignal(WheelKnobs.STARTING_TURNS);
+    const settleDurationSignal = createSignal(WheelKnobs.STARTING_SETTLE_DURATION_MS);
+    const doesResumeSignal = createSignal(WheelKnobs.STARTING_DOES_RESUME);
+    const restDurationSignal = createSignal(WheelKnobs.STARTING_REST_DURATION_MS);
+    const isIdlingAllowedSignal = createSignal(WheelKnobs.STARTING_IS_IDLING_ALLOWED);
+    const idleDelaySignal = createSignal(WheelKnobs.STARTING_IDLE_DELAY_MS);
+    const spinStyleSignal = createSignal<WheelSpinStyleKey>(WheelKnobs.STARTING_SPIN_STYLE_KEY);
+    const isDisabledSignal = createSignal(WheelKnobs.STARTING_IS_DISABLED);
 
     const getPrefersReducedMotion = MediaQueryMonitorUtils.createReducedMotion();
 

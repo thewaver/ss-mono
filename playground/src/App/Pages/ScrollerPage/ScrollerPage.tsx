@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import type { Tab } from "@thewaver/ss-components";
 import { CURRENT_INDEX_OBSERVER_DEFAULTS } from "@thewaver/ss-components";
 
+import { ScrollerKnobs } from "../../Knobs/Scrollers.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -15,12 +16,6 @@ import { TOC_SECTIONS } from "./ScrollerPage.const";
 
 import * as styles from "./ScrollerPage.css";
 
-const MIN_ITEM_COUNT = 1;
-const MAX_ITEM_COUNT = 40;
-const ITEM_COUNT_STEP = 1;
-const STARTING_ITEM_COUNT = 12;
-const MIN_POSITION = 0;
-const POSITION_STEP = 10;
 const EXAMPLES_ROOT = "/src/App/Pages/ScrollerPage/Examples";
 const PERCENT = 100;
 
@@ -40,7 +35,7 @@ const MONTHS = [
 ];
 
 export const ScrollerPage = () => {
-    const [getItemCount, setItemCount] = createSignal(STARTING_ITEM_COUNT);
+    const [getItemCount, setItemCount] = createSignal(ScrollerKnobs.STARTING_ITEM_COUNT);
     const [getSelectedMonth, setSelectedMonth] = createSignal(MONTHS[0]);
     const progressSignal = createSignal(0);
     const [getCurrentSection, setCurrentSection] = createSignal<number | undefined>();
@@ -117,9 +112,9 @@ export const ScrollerPage = () => {
                 <PageProp key={"itemCount"} label={"Item count"} hint={"How many items sit in the scrolling strip."}>
                     <PageNumberField
                         value={getItemCount}
-                        min={() => MIN_ITEM_COUNT}
-                        max={() => MAX_ITEM_COUNT}
-                        step={() => ITEM_COUNT_STEP}
+                        min={() => ScrollerKnobs.MIN_ITEM_COUNT}
+                        max={() => ScrollerKnobs.MAX_ITEM_COUNT}
+                        step={() => ScrollerKnobs.ITEM_COUNT_STEP}
                         ariaLabel={"Item count"}
                         onInput={setItemCount}
                     />
@@ -132,9 +127,9 @@ export const ScrollerPage = () => {
                 >
                     <PageNumberField
                         value={() => Math.round(progressSignal[0]() * PERCENT)}
-                        min={() => MIN_POSITION}
+                        min={() => ScrollerKnobs.MIN_POSITION}
                         max={() => PERCENT}
-                        step={() => POSITION_STEP}
+                        step={() => ScrollerKnobs.POSITION_STEP}
                         ariaLabel={"First strip position"}
                         onInput={(value) => progressSignal[1](value / PERCENT)}
                     />

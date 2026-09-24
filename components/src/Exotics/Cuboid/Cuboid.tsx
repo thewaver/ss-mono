@@ -6,7 +6,7 @@ import { MathUtils } from "@thewaver/ss-utils";
 import { InteractionTrackerUtils } from "../../Abstracts/InteractionTracker/InteractionTracker.utils";
 import { BarrelUtils } from "../../Primitives/Barrel/Barrel.utils";
 import { access, accessSignal } from "../../Utils/propUtils";
-import { CUBOID_DEFAULTS } from "./Cuboid.const";
+import { CUBOID_DEFAULTS, CUBOID_FACES } from "./Cuboid.const";
 import type { CuboidController, CuboidFace, CuboidFaceState, CuboidProps, CuboidTurns } from "./Cuboid.types";
 import { CuboidUtils } from "./Cuboid.utils";
 
@@ -22,8 +22,6 @@ const DRAG_COMMIT_RATIO = 0.5;
 const SETTLE_EASING = "ease";
 
 const NO_TURNS: CuboidTurns = { yaw: 0, pitch: 0 };
-
-const FACES: CuboidFace[] = ["front", "right", "back", "left", "top", "bottom"];
 
 const roundTurn = (turn: number) => Math.sign(turn) * Math.round(Math.abs(turn)) + 0;
 
@@ -206,7 +204,7 @@ export const Cuboid = (props: CuboidProps) => {
                         "transition-duration": `${getBodyTransitionDurationMs()}ms`,
                     }}
                 >
-                    <Index each={FACES}>
+                    <Index each={CUBOID_FACES}>
                         {(getFace) => {
                             const getIsShowing = () => getFace() === getFacing();
 

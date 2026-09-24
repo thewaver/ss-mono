@@ -5,3 +5,5 @@ export const MOSAIC_DEFAULTS = {
     gap: 0,
     transitionDurationMs: 0,
 };
+
+export const MOSAIC_SIZE_ANCHORS: readonly MosaicSizeAnchor[] = ["width", "height"];

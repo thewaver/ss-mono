@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import { TILE_BOARD_DEFAULTS, TileBoardUtils } from "@thewaver/ss-components";
 import { Index2d, type Index2dString, ShapeConst } from "@thewaver/ss-utils";
 
+import { TileBoardKnobs } from "../../Knobs/TileBoards.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -13,29 +14,8 @@ import { PaintExample } from "./Examples/Paint";
 
 const EXAMPLES_ROOT = "/src/App/Pages/TileBoardPage/Examples";
 
-const MIN_ROWS = 1;
-const MAX_ROWS = 9;
-const MIN_COLS = 1;
-const MAX_COLS = 9;
-const MIN_TILE_SIZE = 24;
-const MAX_TILE_SIZE = 120;
-const MIN_REACH = 1;
-const MAX_REACH = 4;
-const MIN_GAP = 0;
-const MAX_GAP = 16;
-const MIN_TAPER = 0.2;
-const MAX_TAPER = 1;
-const TAPER_STEP = 0.05;
-const SIZE_STEP = 2;
-const COUNT_STEP = 1;
 const FIELD_WIDTH = 130;
 
-const STARTING_ROWS = 5;
-const STARTING_COLS = 5;
-const STARTING_TILE_WIDTH = 72;
-const STARTING_TILE_HEIGHT = 72;
-const STARTING_REACH = 1;
-const STARTING_SHAPE: ShapeConst.DefaultShape = "hexagon-pointy-top";
 const STARTING_PIECE: Index2d = { row: 2, col: 2 };
 const ROUTE_START: Index2d = { row: 0, col: 0 };
 const ROCKS: Index2d[] = [
@@ -53,15 +33,15 @@ const describeTile = (tile: Index2d) => `row ${tile.row + 1}, tile ${tile.col + 
 const computeIsRock = (tile: Index2d) => ROCKS.some((rock) => Index2d.isSame(rock, tile));
 
 export const TileBoardPage = () => {
-    const [getRows, setRows] = createSignal(STARTING_ROWS);
-    const [getCols, setCols] = createSignal(STARTING_COLS);
-    const [getTileWidth, setTileWidth] = createSignal(STARTING_TILE_WIDTH);
-    const [getTileHeight, setTileHeight] = createSignal(STARTING_TILE_HEIGHT);
+    const [getRows, setRows] = createSignal(TileBoardKnobs.STARTING_ROWS);
+    const [getCols, setCols] = createSignal(TileBoardKnobs.STARTING_COLS);
+    const [getTileWidth, setTileWidth] = createSignal(TileBoardKnobs.STARTING_TILE_WIDTH);
+    const [getTileHeight, setTileHeight] = createSignal(TileBoardKnobs.STARTING_TILE_HEIGHT);
     const [getGap, setGap] = createSignal(TILE_BOARD_DEFAULTS.gap);
-    const [getShape, setShape] = createSignal<ShapeConst.DefaultShape>(STARTING_SHAPE);
-    const [getHasShortFirstRow, setHasShortFirstRow] = createSignal(false);
+    const [getShape, setShape] = createSignal<ShapeConst.DefaultShape>(TILE_BOARD_DEFAULTS.tileShape);
+    const [getHasShortFirstRow, setHasShortFirstRow] = createSignal(TileBoardKnobs.STARTING_HAS_SHORT_FIRST_ROW);
     const [getTaper, setTaper] = createSignal(TILE_BOARD_DEFAULTS.taper);
-    const [getReach, setReach] = createSignal(STARTING_REACH);
+    const [getReach, setReach] = createSignal(TileBoardKnobs.STARTING_REACH);
 
     const [getMarked, setMarked] = createSignal<Index2dString[]>(NO_MARKS);
     const [getPiece, setPiece] = createSignal<Index2d>(STARTING_PIECE);
@@ -175,9 +155,9 @@ export const TileBoardPage = () => {
                             >
                                 <PageNumberField
                                     value={getReach}
-                                    min={() => MIN_REACH}
-                                    max={() => MAX_REACH}
-                                    step={() => COUNT_STEP}
+                                    min={() => TileBoardKnobs.MIN_REACH}
+                                    max={() => TileBoardKnobs.MAX_REACH}
+                                    step={() => TileBoardKnobs.COUNT_STEP}
                                     width={() => FIELD_WIDTH}
                                     ariaLabel={"Reach"}
                                     onInput={setReach}
@@ -246,9 +226,9 @@ export const TileBoardPage = () => {
                 <PageProp key={"rows"} label={"Rows"} hint={"How many rows of tiles the board has."}>
                     <PageNumberField
                         value={getRows}
-                        min={() => MIN_ROWS}
-                        max={() => MAX_ROWS}
-                        step={() => COUNT_STEP}
+                        min={() => TileBoardKnobs.MIN_ROWS}
+                        max={() => TileBoardKnobs.MAX_ROWS}
+                        step={() => TileBoardKnobs.COUNT_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Rows"}
                         onInput={setRows}
@@ -258,9 +238,9 @@ export const TileBoardPage = () => {
                 <PageProp key={"cols"} label={"Columns"} hint={"How many tiles sit in a row."}>
                     <PageNumberField
                         value={getCols}
-                        min={() => MIN_COLS}
-                        max={() => MAX_COLS}
-                        step={() => COUNT_STEP}
+                        min={() => TileBoardKnobs.MIN_COLS}
+                        max={() => TileBoardKnobs.MAX_COLS}
+                        step={() => TileBoardKnobs.COUNT_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Columns"}
                         onInput={setCols}
@@ -270,9 +250,9 @@ export const TileBoardPage = () => {
                 <PageProp key={"tileWidth"} label={"Tile width"} hint={"How wide one tile is."}>
                     <PageNumberField
                         value={getTileWidth}
-                        min={() => MIN_TILE_SIZE}
-                        max={() => MAX_TILE_SIZE}
-                        step={() => SIZE_STEP}
+                        min={() => TileBoardKnobs.MIN_TILE_SIZE}
+                        max={() => TileBoardKnobs.MAX_TILE_SIZE}
+                        step={() => TileBoardKnobs.SIZE_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Tile width"}
                         onInput={setTileWidth}
@@ -282,9 +262,9 @@ export const TileBoardPage = () => {
                 <PageProp key={"tileHeight"} label={"Tile height"} hint={"How tall one tile is."}>
                     <PageNumberField
                         value={getTileHeight}
-                        min={() => MIN_TILE_SIZE}
-                        max={() => MAX_TILE_SIZE}
-                        step={() => SIZE_STEP}
+                        min={() => TileBoardKnobs.MIN_TILE_SIZE}
+                        max={() => TileBoardKnobs.MAX_TILE_SIZE}
+                        step={() => TileBoardKnobs.SIZE_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Tile height"}
                         onInput={setTileHeight}
@@ -294,9 +274,9 @@ export const TileBoardPage = () => {
                 <PageProp key={"gap"} label={"Gap"} hint={"The space left between tiles."}>
                     <PageNumberField
                         value={getGap}
-                        min={() => MIN_GAP}
-                        max={() => MAX_GAP}
-                        step={() => COUNT_STEP}
+                        min={() => TileBoardKnobs.MIN_GAP}
+                        max={() => TileBoardKnobs.MAX_GAP}
+                        step={() => TileBoardKnobs.COUNT_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Gap"}
                         onInput={setGap}
@@ -338,9 +318,9 @@ export const TileBoardPage = () => {
                 >
                     <PageNumberField
                         value={getTaper}
-                        min={() => MIN_TAPER}
-                        max={() => MAX_TAPER}
-                        step={() => TAPER_STEP}
+                        min={() => TileBoardKnobs.MIN_TAPER}
+                        max={() => TileBoardKnobs.MAX_TAPER}
+                        step={() => TileBoardKnobs.TAPER_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Taper"}
                         onInput={setTaper}

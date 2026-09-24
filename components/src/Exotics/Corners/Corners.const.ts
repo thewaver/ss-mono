@@ -6,3 +6,5 @@ export const CORNERS_DEFAULTS = {
     strokeThickness: 4,
     visibleCorners: new Set(["bottomLeft", "bottomRight", "topLeft", "topRight"]) as Set<CornerKey>,
 };
+
+export const CORNERS_KEYS: readonly CornerKey[] = ["topLeft", "topRight", "bottomLeft", "bottomRight"];

@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { Button, SPLIT_PANE_DEFAULTS } from "@thewaver/ss-components";
 
+import { SplitPaneKnobs } from "../../Knobs/SplitPanes.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -16,9 +17,6 @@ import { StackedExample } from "./Examples/Stacked";
 import { TripleExample } from "./Examples/Triple";
 import type { SplitPaneExampleProps } from "./SplitPanePage.types";
 
-const MIN_GUTTER = 2;
-const MAX_GUTTER = 24;
-const GUTTER_STEP = 1;
 const GUTTER_FIELD_WIDTH = 90;
 const PERCENT = 100;
 const EXAMPLES_ROOT = "/src/App/Pages/SplitPanePage/Examples";
@@ -35,7 +33,7 @@ const percent = (ratios: number[]) => ratios.map((ratio) => `${Math.round(ratio 
 
 export const SplitPanePage = () => {
     const [getGutterSize, setGutterSize] = createSignal(SPLIT_PANE_DEFAULTS.gutterSize);
-    const [getIsDisabled, setIsDisabled] = createSignal(false);
+    const [getIsDisabled, setIsDisabled] = createSignal(SplitPaneKnobs.STARTING_IS_DISABLED);
 
     const pairSignal = createSignal(STARTING_PAIR);
     const rightToLeftSignal = createSignal(STARTING_RIGHT_TO_LEFT);
@@ -129,9 +127,9 @@ export const SplitPanePage = () => {
                 >
                     <PageNumberField
                         value={getGutterSize}
-                        min={() => MIN_GUTTER}
-                        max={() => MAX_GUTTER}
-                        step={() => GUTTER_STEP}
+                        min={() => SplitPaneKnobs.MIN_GUTTER}
+                        max={() => SplitPaneKnobs.MAX_GUTTER}
+                        step={() => SplitPaneKnobs.GUTTER_STEP}
                         width={() => GUTTER_FIELD_WIDTH}
                         ariaLabel={"Gutter size in pixels"}
                         onInput={setGutterSize}

@@ -3,6 +3,7 @@ import { createStore } from "solid-js/store";
 
 import { SVGDefsSamples, TimedGradientDefaults } from "@thewaver/ss-components";
 
+import { SVGGradientKnobs } from "../../../Knobs/SVGGradients.const";
 import { TimedGradientKnobs } from "../../../Knobs/TimedGradients.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../../PageComponents/Knobs/Knobs";
@@ -12,19 +13,17 @@ import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../../Page
 import { NO_SAMPLE_KEY, toGroupEntriesWithNoSample } from "../../../PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "../../../PageComponents/SampleGroups/SampleGroups.types";
 import { PageGroupedSelectField, PageNumberField, PageSelectField } from "../../../StyledComponents/Field/Field";
-import { DURATION_STEP_MS, GROUPPED_TIMED_GRADIENTS, MAX_DURATION_MS, MIN_DURATION_MS } from "../SVGGradients.const";
+import { GROUPPED_TIMED_GRADIENTS } from "../SVGGradients.const";
 import type { SVGGradientsPaintKind, TimedGradientExampleProps } from "../SVGGradients.types";
 import { PageSVGGradientsProps } from "../SVGGradientsProps";
 import { DefaultExample } from "./Examples/Default";
 
 const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/SVGGradients/TimedGradientsPage/Examples/Default.tsx";
 
-const STARTING_DURATION_MS = 2000;
-const STARTING_BLUR_WIDTH = 0;
-
 export const TimedGradientsPage = () => {
-    const [getConfigKey, setConfigKey] =
-        createSignal<WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>>("sweep_diag_1v1");
+    const [getConfigKey, setConfigKey] = createSignal<WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>>(
+        SVGGradientKnobs.STARTING_TIMED_GRADIENT_KEY,
+    );
     const [configDefs, setConfigDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
 
     const getKnobs = () => {
@@ -38,10 +37,12 @@ export const TimedGradientsPage = () => {
         return key === NO_SAMPLE_KEY ? {} : (TimedGradientDefaults.DEFAULTS_BY_FAMILY[key] as Record<string, unknown>);
     };
     const getConfigDefs = () => configDefs[getConfigKey()] ?? {};
-    const [getIterationConfigKey, setIterationConfigKey] = createSignal<SVGDefsSamples.Iteration.SampleKey>("constant");
-    const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(STARTING_DURATION_MS);
-    const paintKindSignal = createSignal<SVGGradientsPaintKind>("fill");
-    const blurWidthSignal = createSignal(STARTING_BLUR_WIDTH);
+    const [getIterationConfigKey, setIterationConfigKey] = createSignal<SVGDefsSamples.Iteration.SampleKey>(
+        SVGGradientKnobs.STARTING_ITERATION_KEY,
+    );
+    const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(SVGGradientKnobs.STARTING_DURATION_MS);
+    const paintKindSignal = createSignal<SVGGradientsPaintKind>(SVGGradientKnobs.STARTING_PAINT_KIND);
+    const blurWidthSignal = createSignal(SVGGradientKnobs.STARTING_BLUR_WIDTH);
     const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS });
 
     const getExamples = createMemo(() => {
@@ -111,9 +112,9 @@ export const TimedGradientsPage = () => {
                     >
                         <PageNumberField
                             value={getAnimationDurationMs}
-                            min={() => MIN_DURATION_MS}
-                            max={() => MAX_DURATION_MS}
-                            step={() => DURATION_STEP_MS}
+                            min={() => SVGGradientKnobs.MIN_DURATION_MS}
+                            max={() => SVGGradientKnobs.MAX_DURATION_MS}
+                            step={() => SVGGradientKnobs.DURATION_STEP_MS}
                             ariaLabel={"Animation duration"}
                             onInput={setAnimationDurationMs}
                         />

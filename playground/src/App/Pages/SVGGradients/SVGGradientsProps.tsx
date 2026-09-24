@@ -2,9 +2,9 @@ import { For } from "solid-js";
 
 import type { SVGDefsColors } from "@thewaver/ss-components";
 
+import { SVGGradientKnobs } from "../../Knobs/SVGGradients.const";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PageColorField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
-import { BLUR_WIDTH_STEP, MAX_BLUR_WIDTH, MIN_BLUR_WIDTH, PAINT_KINDS } from "./SVGGradients.const";
 import type { SVGGradientsControls } from "./SVGGradients.types";
 
 import * as styles from "./SVGGradients.css";
@@ -25,7 +25,7 @@ export const PageSVGGradientsProps = (props: Props) => {
             >
                 <PageSelectField
                     value={controls.paintKindSignal[0]}
-                    values={() => PAINT_KINDS}
+                    values={() => SVGGradientKnobs.PAINT_KINDS}
                     ariaLabel={"Painted as"}
                     onChange={(kind) => controls.paintKindSignal[1](() => kind)}
                 />
@@ -56,9 +56,9 @@ export const PageSVGGradientsProps = (props: Props) => {
             >
                 <PageNumberField
                     value={controls.blurWidthSignal[0]}
-                    min={() => MIN_BLUR_WIDTH}
-                    max={() => MAX_BLUR_WIDTH}
-                    step={() => BLUR_WIDTH_STEP}
+                    min={() => SVGGradientKnobs.MIN_BLUR_WIDTH}
+                    max={() => SVGGradientKnobs.MAX_BLUR_WIDTH}
+                    step={() => SVGGradientKnobs.BLUR_WIDTH_STEP}
                     ariaLabel={"Blur width"}
                     onInput={controls.blurWidthSignal[1]}
                 />

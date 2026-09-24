@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
+import { ImageMosaicKnobs } from "../../../Knobs/ImageMosaics.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
@@ -16,11 +17,9 @@ import { MosaicImages } from "./MosaicImages.const";
 
 const EXAMPLES_ROOT = "/src/App/Pages/Mosaics/ImageMosaicPage/Examples";
 
-const STARTING_SHAPE_KEY: MosaicImages.SampleShapeKey = "square";
-
 const ImagesExampleWrapper = (props: MosaicSharedProps) => {
-    const [getShapeKey, setShapeKey] = createSignal<MosaicImages.SampleShapeKey>(STARTING_SHAPE_KEY);
-    const [getIsDecorated, setIsDecorated] = createSignal(false);
+    const [getShapeKey, setShapeKey] = createSignal<MosaicImages.SampleShapeKey>(ImageMosaicKnobs.STARTING_SHAPE_KEY);
+    const [getIsDecorated, setIsDecorated] = createSignal(ImageMosaicKnobs.STARTING_IS_DECORATED);
 
     const getSources = createMemo(() => MosaicImages.SAMPLE_SOURCES.slice(0, access(props.itemCount)));
 

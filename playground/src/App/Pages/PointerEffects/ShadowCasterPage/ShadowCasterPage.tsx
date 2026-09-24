@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { SHADOW_CASTER_DEFAULTS } from "@thewaver/ss-components";
 
+import { ShadowCasterKnobs } from "../../../Knobs/ShadowCasters.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
@@ -12,37 +13,12 @@ import type { ShadowCasterExampleProps } from "./ShadowCasterPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/PointerEffects/ShadowCasterPage/Examples";
 
-const MIN_LIGHT_RANGE_PX = 80;
-const MAX_LIGHT_RANGE_PX = 1200;
-const LIGHT_RANGE_STEP_PX = 20;
-
-const MIN_THROW_PX = 0;
-const MAX_THROW_PX = 120;
-const THROW_STEP_PX = 2;
-
-const MIN_BLUR_PX = 0;
-const MAX_BLUR_PX = 60;
-const BLUR_STEP_PX = 1;
-
-const MIN_OPACITY = 0;
-const MAX_OPACITY = 1;
-const OPACITY_STEP = 0.05;
-
-const MIN_ACTIVE_RANGE_PX = 40;
-const MAX_ACTIVE_RANGE_PX = 1200;
-const ACTIVE_RANGE_STEP_PX = 20;
-const STARTING_ACTIVE_RANGE_PX = 1200;
-
-const MIN_SMOOTHING_MS = 0;
-const MAX_SMOOTHING_MS = 1000;
-const SMOOTHING_STEP_MS = 10;
-
 const FIELD_WIDTH = 110;
 
 export const ShadowCasterPage = () => {
-    const [getIsDisabled, setIsDisabled] = createSignal(false);
+    const [getIsDisabled, setIsDisabled] = createSignal(ShadowCasterKnobs.STARTING_IS_DISABLED);
     const [getSmoothingMs, setSmoothingMs] = createSignal(SHADOW_CASTER_DEFAULTS.smoothingMs);
-    const [getActiveRangePx, setActiveRangePx] = createSignal(STARTING_ACTIVE_RANGE_PX);
+    const [getActiveRangePx, setActiveRangePx] = createSignal(ShadowCasterKnobs.STARTING_ACTIVE_RANGE_PX);
     const [getLightRangePx, setLightRangePx] = createSignal(SHADOW_CASTER_DEFAULTS.lightRangePx);
     const [getMaxThrowPx, setMaxThrowPx] = createSignal(SHADOW_CASTER_DEFAULTS.maxThrowPx);
     const [getMinBlurPx, setMinBlurPx] = createSignal(SHADOW_CASTER_DEFAULTS.minBlurPx);
@@ -109,9 +85,9 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getSmoothingMs}
-                        min={() => MIN_SMOOTHING_MS}
-                        max={() => MAX_SMOOTHING_MS}
-                        step={() => SMOOTHING_STEP_MS}
+                        min={() => ShadowCasterKnobs.MIN_SMOOTHING_MS}
+                        max={() => ShadowCasterKnobs.MAX_SMOOTHING_MS}
+                        step={() => ShadowCasterKnobs.SMOOTHING_STEP_MS}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Smoothing in milliseconds"}
                         onInput={setSmoothingMs}
@@ -127,9 +103,9 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getActiveRangePx}
-                        min={() => MIN_ACTIVE_RANGE_PX}
-                        max={() => MAX_ACTIVE_RANGE_PX}
-                        step={() => ACTIVE_RANGE_STEP_PX}
+                        min={() => ShadowCasterKnobs.MIN_ACTIVE_RANGE_PX}
+                        max={() => ShadowCasterKnobs.MAX_ACTIVE_RANGE_PX}
+                        step={() => ShadowCasterKnobs.ACTIVE_RANGE_STEP_PX}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Active range in pixels"}
                         onInput={setActiveRangePx}
@@ -143,9 +119,9 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getLightRangePx}
-                        min={() => MIN_LIGHT_RANGE_PX}
-                        max={() => MAX_LIGHT_RANGE_PX}
-                        step={() => LIGHT_RANGE_STEP_PX}
+                        min={() => ShadowCasterKnobs.MIN_LIGHT_RANGE_PX}
+                        max={() => ShadowCasterKnobs.MAX_LIGHT_RANGE_PX}
+                        step={() => ShadowCasterKnobs.LIGHT_RANGE_STEP_PX}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Light range in pixels"}
                         onInput={setLightRangePx}
@@ -159,9 +135,9 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getMaxThrowPx}
-                        min={() => MIN_THROW_PX}
-                        max={() => MAX_THROW_PX}
-                        step={() => THROW_STEP_PX}
+                        min={() => ShadowCasterKnobs.MIN_THROW_PX}
+                        max={() => ShadowCasterKnobs.MAX_THROW_PX}
+                        step={() => ShadowCasterKnobs.THROW_STEP_PX}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Maximum throw in pixels"}
                         onInput={setMaxThrowPx}
@@ -175,9 +151,9 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getMinBlurPx}
-                        min={() => MIN_BLUR_PX}
-                        max={() => MAX_BLUR_PX}
-                        step={() => BLUR_STEP_PX}
+                        min={() => ShadowCasterKnobs.MIN_BLUR_PX}
+                        max={() => ShadowCasterKnobs.MAX_BLUR_PX}
+                        step={() => ShadowCasterKnobs.BLUR_STEP_PX}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Near blur in pixels"}
                         onInput={setMinBlurPx}
@@ -191,9 +167,9 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getMaxBlurPx}
-                        min={() => MIN_BLUR_PX}
-                        max={() => MAX_BLUR_PX}
-                        step={() => BLUR_STEP_PX}
+                        min={() => ShadowCasterKnobs.MIN_BLUR_PX}
+                        max={() => ShadowCasterKnobs.MAX_BLUR_PX}
+                        step={() => ShadowCasterKnobs.BLUR_STEP_PX}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Far blur in pixels"}
                         onInput={setMaxBlurPx}
@@ -207,9 +183,9 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getMaxOpacity}
-                        min={() => MIN_OPACITY}
-                        max={() => MAX_OPACITY}
-                        step={() => OPACITY_STEP}
+                        min={() => ShadowCasterKnobs.MIN_OPACITY}
+                        max={() => ShadowCasterKnobs.MAX_OPACITY}
+                        step={() => ShadowCasterKnobs.OPACITY_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Near opacity"}
                         onInput={setMaxOpacity}
@@ -225,9 +201,9 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getMinOpacity}
-                        min={() => MIN_OPACITY}
-                        max={() => MAX_OPACITY}
-                        step={() => OPACITY_STEP}
+                        min={() => ShadowCasterKnobs.MIN_OPACITY}
+                        max={() => ShadowCasterKnobs.MAX_OPACITY}
+                        step={() => ShadowCasterKnobs.OPACITY_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Far opacity"}
                         onInput={setMinOpacity}
@@ -241,9 +217,9 @@ export const ShadowCasterPage = () => {
                 >
                     <PageNumberField
                         value={getRestingOpacity}
-                        min={() => MIN_OPACITY}
-                        max={() => MAX_OPACITY}
-                        step={() => OPACITY_STEP}
+                        min={() => ShadowCasterKnobs.MIN_OPACITY}
+                        max={() => ShadowCasterKnobs.MAX_OPACITY}
+                        step={() => ShadowCasterKnobs.OPACITY_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Resting opacity"}
                         onInput={setRestingOpacity}

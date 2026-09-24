@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { MediaQueryMonitorUtils, TRAIL_DEFAULTS } from "@thewaver/ss-components";
 
+import { TrailKnobs } from "../../Knobs/Trails.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -14,16 +15,13 @@ import type { TrailExampleProps } from "./TrailPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/TrailPage/Examples";
 
-const MIN_DURATION_MS = 500;
-const MAX_DURATION_MS = 20000;
-const DURATION_STEP_MS = 500;
 const PERCENT = 100;
 const HALF_WAY = 0.5;
 
 export const TrailPage = () => {
     const [getDurationMs, setDurationMs] = createSignal(TRAIL_DEFAULTS.durationMs);
-    const [getIsLooping, setIsLooping] = createSignal(true);
-    const [getIsTurning, setIsTurning] = createSignal(true);
+    const [getIsLooping, setIsLooping] = createSignal(TrailKnobs.STARTING_IS_LOOPING);
+    const [getIsTurning, setIsTurning] = createSignal(TrailKnobs.STARTING_IS_TURNING);
 
     const getPrefersReducedMotion = MediaQueryMonitorUtils.createReducedMotion();
 
@@ -116,9 +114,9 @@ export const TrailPage = () => {
                 >
                     <PageNumberField
                         value={getDurationMs}
-                        min={() => MIN_DURATION_MS}
-                        max={() => MAX_DURATION_MS}
-                        step={() => DURATION_STEP_MS}
+                        min={() => TrailKnobs.MIN_DURATION_MS}
+                        max={() => TrailKnobs.MAX_DURATION_MS}
+                        step={() => TrailKnobs.DURATION_STEP_MS}
                         ariaLabel={"Lap duration in milliseconds"}
                         onInput={setDurationMs}
                     />

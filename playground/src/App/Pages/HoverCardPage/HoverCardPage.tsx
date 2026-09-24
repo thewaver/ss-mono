@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { HOVER_CARD_DEFAULTS } from "@thewaver/ss-components";
 
+import { HoverCardKnobs } from "../../Knobs/HoverCards.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -12,18 +13,10 @@ import type { HoverCardExampleProps, NavigationMenuExampleProps } from "./HoverC
 
 const EXAMPLES_ROOT = "/src/App/Pages/HoverCardPage/Examples";
 
-const MIN_OFFSET = 0;
-const MAX_OFFSET = 40;
-const OFFSET_STEP = 2;
-const MIN_DURATION = 0;
-const MAX_DURATION = 1000;
-const DURATION_STEP = 50;
 const FIELD_WIDTH = 110;
 
-const STARTING_OFFSET_Y = 8;
-
 export const HoverCardPage = () => {
-    const [getOffsetY, setOffsetY] = createSignal(STARTING_OFFSET_Y);
+    const [getOffsetY, setOffsetY] = createSignal(HoverCardKnobs.STARTING_OFFSET_Y);
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(HOVER_CARD_DEFAULTS.transitionDurationMs);
     const [getFocusShowDelayMs, setFocusShowDelayMs] = createSignal(HOVER_CARD_DEFAULTS.focusShowDelayMs);
     const [getHoverShowDelayMs, setHoverShowDelayMs] = createSignal(HOVER_CARD_DEFAULTS.hoverShowDelayMs);
@@ -84,9 +77,9 @@ export const HoverCardPage = () => {
                 >
                     <PageNumberField
                         value={getOffsetY}
-                        min={() => MIN_OFFSET}
-                        max={() => MAX_OFFSET}
-                        step={() => OFFSET_STEP}
+                        min={() => HoverCardKnobs.MIN_OFFSET}
+                        max={() => HoverCardKnobs.MAX_OFFSET}
+                        step={() => HoverCardKnobs.OFFSET_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Offset down"}
                         onInput={setOffsetY}
@@ -100,9 +93,9 @@ export const HoverCardPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => MIN_DURATION}
-                        max={() => MAX_DURATION}
-                        step={() => DURATION_STEP}
+                        min={() => HoverCardKnobs.MIN_DURATION}
+                        max={() => HoverCardKnobs.MAX_DURATION}
+                        step={() => HoverCardKnobs.DURATION_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Fade in milliseconds"}
                         onInput={setTransitionDurationMs}
@@ -116,9 +109,9 @@ export const HoverCardPage = () => {
                 >
                     <PageNumberField
                         value={getFocusShowDelayMs}
-                        min={() => MIN_DURATION}
-                        max={() => MAX_DURATION}
-                        step={() => DURATION_STEP}
+                        min={() => HoverCardKnobs.MIN_DURATION}
+                        max={() => HoverCardKnobs.MAX_DURATION}
+                        step={() => HoverCardKnobs.DURATION_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Focus delay in milliseconds"}
                         onInput={setFocusShowDelayMs}
@@ -134,9 +127,9 @@ export const HoverCardPage = () => {
                 >
                     <PageNumberField
                         value={getHoverShowDelayMs}
-                        min={() => MIN_DURATION}
-                        max={() => MAX_DURATION}
-                        step={() => DURATION_STEP}
+                        min={() => HoverCardKnobs.MIN_DURATION}
+                        max={() => HoverCardKnobs.MAX_DURATION}
+                        step={() => HoverCardKnobs.DURATION_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Hover delay in milliseconds"}
                         onInput={setHoverShowDelayMs}
@@ -152,9 +145,9 @@ export const HoverCardPage = () => {
                 >
                     <PageNumberField
                         value={getSkipDelayWindowMs}
-                        min={() => MIN_DURATION}
-                        max={() => MAX_DURATION}
-                        step={() => DURATION_STEP}
+                        min={() => HoverCardKnobs.MIN_DURATION}
+                        max={() => HoverCardKnobs.MAX_DURATION}
+                        step={() => HoverCardKnobs.DURATION_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Skip window in milliseconds"}
                         onInput={setSkipDelayWindowMs}

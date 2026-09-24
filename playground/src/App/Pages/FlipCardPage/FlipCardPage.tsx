@@ -1,8 +1,9 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { FlipCardAxis, FlipCardTurnDirection } from "@thewaver/ss-components";
-import { FLIP_CARD_DEFAULTS } from "@thewaver/ss-components";
+import { FLIP_CARD_AXES, FLIP_CARD_DEFAULTS } from "@thewaver/ss-components";
 
+import { FlipCardKnobs } from "../../Knobs/FlipCards.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -10,21 +11,17 @@ import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/F
 import { DefaultExample } from "./Examples/Default";
 import { PressedExample } from "./Examples/Pressed";
 
-const AXES: FlipCardAxis[] = ["row", "column"];
 const AXIS_LABELS: Record<FlipCardAxis, string> = {
     row: "About the upright axis",
     column: "About the horizontal axis",
 };
 
-const MIN_DURATION_MS = 0;
-const MAX_DURATION_MS = 3000;
-const DURATION_STEP_MS = 100;
 const FIELD_WIDTH = 110;
 const SELECT_WIDTH = 220;
 const EXAMPLES_ROOT = "/src/App/Pages/FlipCardPage/Examples";
 
 export const FlipCardPage = () => {
-    const [getAxis, setAxis] = createSignal<FlipCardAxis>("row");
+    const [getAxis, setAxis] = createSignal<FlipCardAxis>(FLIP_CARD_DEFAULTS.axis);
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(FLIP_CARD_DEFAULTS.transitionDurationMs);
 
     const flippedSignal = createSignal(false);
@@ -77,7 +74,7 @@ export const FlipCardPage = () => {
                 <PageProp key={"axis"} label={"Axis"} hint={"Which way the card turns over to show its other side."}>
                     <PageSelectField
                         value={getAxis}
-                        values={AXES}
+                        values={FLIP_CARD_AXES}
                         computeLabel={(axis) => AXIS_LABELS[axis]}
                         width={() => SELECT_WIDTH}
                         ariaLabel={"Axis"}
@@ -92,9 +89,9 @@ export const FlipCardPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => MIN_DURATION_MS}
-                        max={() => MAX_DURATION_MS}
-                        step={() => DURATION_STEP_MS}
+                        min={() => FlipCardKnobs.MIN_DURATION_MS}
+                        max={() => FlipCardKnobs.MAX_DURATION_MS}
+                        step={() => FlipCardKnobs.DURATION_STEP_MS}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Turn duration in milliseconds"}
                         onInput={setTransitionDurationMs}

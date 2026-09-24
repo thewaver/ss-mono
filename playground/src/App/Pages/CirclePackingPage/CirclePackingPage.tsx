@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import { CIRCLE_PACKING_DEFAULTS, MediaQueryMonitorUtils, TreemapUtils } from "@thewaver/ss-components";
 import type { CirclePackingNode } from "@thewaver/ss-components";
 
+import { CirclePackingKnobs } from "../../Knobs/CirclePackings.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -12,12 +13,6 @@ import { LibraryExample } from "./Examples/Library";
 
 const EXAMPLES_ROOT = "/src/App/Pages/CirclePackingPage/Examples";
 
-const MIN_PADDING = 0;
-const MAX_PADDING = 12;
-const PADDING_STEP = 1;
-const MIN_ZOOM_DURATION_MS = 0;
-const MAX_ZOOM_DURATION_MS = 3000;
-const ZOOM_DURATION_STEP_MS = 50;
 const NO_MOTION_DURATION_MS = 0;
 const WIDE_SPAN = 2;
 
@@ -60,9 +55,9 @@ export const CirclePackingPage = () => {
                 >
                     <PageNumberField
                         value={getPadding}
-                        min={() => MIN_PADDING}
-                        max={() => MAX_PADDING}
-                        step={() => PADDING_STEP}
+                        min={() => CirclePackingKnobs.MIN_PADDING}
+                        max={() => CirclePackingKnobs.MAX_PADDING}
+                        step={() => CirclePackingKnobs.PADDING_STEP}
                         ariaLabel={"Padding in pixels"}
                         onInput={setPadding}
                     />
@@ -77,9 +72,9 @@ export const CirclePackingPage = () => {
                 >
                     <PageNumberField
                         value={getZoomDurationMs}
-                        min={() => MIN_ZOOM_DURATION_MS}
-                        max={() => MAX_ZOOM_DURATION_MS}
-                        step={() => ZOOM_DURATION_STEP_MS}
+                        min={() => CirclePackingKnobs.MIN_ZOOM_DURATION_MS}
+                        max={() => CirclePackingKnobs.MAX_ZOOM_DURATION_MS}
+                        step={() => CirclePackingKnobs.ZOOM_DURATION_STEP_MS}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Zoom duration in milliseconds"}
                         onInput={setZoomDurationMs}

@@ -1,6 +1,9 @@
 import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
+import { PARTICLE_SPAWNER_DEFAULTS } from "@thewaver/ss-components";
+
+import { ParticleSpawnerKnobs } from "../../Knobs/ParticleSpawners.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
@@ -22,33 +25,8 @@ import { VerticalExample } from "./Examples/Vertical";
 import {
     ITERATION_PATTERNS,
     ITERATION_PATTERN_KEYS,
-    MAX_OVERSHOOT_PERCENT,
-    MAX_PARTICLE_COUNT,
-    MAX_RETENTION_MS,
-    MAX_SPAWN_DELAY_MS,
-    MAX_TRAVEL_DURATION_MS,
-    MIN_OVERSHOOT_PERCENT,
-    MIN_PARTICLE_COUNT,
-    MIN_RETENTION_MS,
-    MIN_SPAWN_DELAY_MS,
-    MIN_TRAVEL_DURATION_MS,
-    OVERSHOOT_PERCENT_STEP,
-    PARTICLE_COUNT_STEP,
-    RETENTION_STEP_MS,
-    SPAWN_DELAY_STEP_MS,
-    STARTING_ITERATION_PATTERN_KEY,
-    STARTING_OVERSHOOT_PERCENT,
-    STARTING_PARTICLE_COUNT,
-    STARTING_RETENTION_MS,
-    STARTING_SPAWN_DELAY_MS,
-    STARTING_TRAVEL_DURATION_MS,
-    STARTING_TRAVEL_EASING_KEY,
-    STARTING_TRAVEL_PATTERN_KEY,
-    TRAVEL_DEFAULTS_BY_PATTERN,
-    TRAVEL_DURATION_STEP_MS,
     TRAVEL_EASING_FNS,
     TRAVEL_EASING_KEYS,
-    TRAVEL_KNOBS_BY_PATTERN,
     TRAVEL_PATTERN_FACTORIES,
     TRAVEL_PATTERN_KEYS,
     applyOvershoot,
@@ -99,25 +77,30 @@ const StressTestWrapper = (props: ParticleSpawnerExampleProps) => {
 };
 
 export const ParticleSpawnerPage = () => {
-    const [getParticleCount, setParticleCount] = createSignal(STARTING_PARTICLE_COUNT);
-    const [getTravelDurationMs, setTravelDurationMs] = createSignal(STARTING_TRAVEL_DURATION_MS);
-    const [getRetentionMs, setRetentionMs] = createSignal(STARTING_RETENTION_MS);
-    const [getSpawnDelayMs, setSpawnDelayMs] = createSignal(STARTING_SPAWN_DELAY_MS);
-    const [getOvershootPercent, setOvershootPercent] = createSignal(STARTING_OVERSHOOT_PERCENT);
-    const [getTravelEasingKey, setTravelEasingKey] = createSignal<TravelEasingKey>(STARTING_TRAVEL_EASING_KEY);
+    const [getParticleCount, setParticleCount] = createSignal(ParticleSpawnerKnobs.STARTING_PARTICLE_COUNT);
+    const [getTravelDurationMs, setTravelDurationMs] = createSignal(PARTICLE_SPAWNER_DEFAULTS.travelDurationMs);
+    const [getRetentionMs, setRetentionMs] = createSignal(PARTICLE_SPAWNER_DEFAULTS.retentionMs);
+    const [getSpawnDelayMs, setSpawnDelayMs] = createSignal(ParticleSpawnerKnobs.STARTING_SPAWN_DELAY_MS);
+    const [getOvershootPercent, setOvershootPercent] = createSignal(ParticleSpawnerKnobs.STARTING_OVERSHOOT_PERCENT);
+    const [getTravelEasingKey, setTravelEasingKey] = createSignal<TravelEasingKey>(
+        ParticleSpawnerKnobs.STARTING_TRAVEL_EASING_KEY,
+    );
 
-    const [getTravelPatternKey, setTravelPatternKey] = createSignal<ParticleTravelPattern>(STARTING_TRAVEL_PATTERN_KEY);
+    const [getTravelPatternKey, setTravelPatternKey] = createSignal<ParticleTravelPattern>(
+        ParticleSpawnerKnobs.STARTING_TRAVEL_PATTERN_KEY,
+    );
 
-    const [getIterationPatternKey, setIterationPatternKey] =
-        createSignal<IterationPattern>(STARTING_ITERATION_PATTERN_KEY);
+    const [getIterationPatternKey, setIterationPatternKey] = createSignal<IterationPattern>(
+        ParticleSpawnerKnobs.STARTING_ITERATION_PATTERN_KEY,
+    );
 
-    const [getAreTargetsHidden, setAreTargetsHidden] = createSignal(false);
+    const [getAreTargetsHidden, setAreTargetsHidden] = createSignal(ParticleSpawnerKnobs.STARTING_ARE_TARGETS_HIDDEN);
 
     const [travelDefs, setTravelDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
     const playback = createSignal(true);
 
-    const getTravelKnobs = () => TRAVEL_KNOBS_BY_PATTERN[getTravelPatternKey()];
-    const getTravelDefaults = () => TRAVEL_DEFAULTS_BY_PATTERN[getTravelPatternKey()];
+    const getTravelKnobs = () => ParticleSpawnerKnobs.TRAVEL_KNOBS_BY_PATTERN[getTravelPatternKey()];
+    const getTravelDefaults = () => ParticleSpawnerKnobs.TRAVEL_DEFAULTS_BY_PATTERN[getTravelPatternKey()];
     const getPickedTravelDefs = () => travelDefs[getTravelPatternKey()] ?? {};
 
     const getComputeParticlePos = createMemo(() => {
@@ -294,9 +277,9 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageNumberField
                             value={getParticleCount}
-                            min={() => MIN_PARTICLE_COUNT}
-                            max={() => MAX_PARTICLE_COUNT}
-                            step={() => PARTICLE_COUNT_STEP}
+                            min={() => ParticleSpawnerKnobs.MIN_PARTICLE_COUNT}
+                            max={() => ParticleSpawnerKnobs.MAX_PARTICLE_COUNT}
+                            step={() => ParticleSpawnerKnobs.PARTICLE_COUNT_STEP}
                             width={() => FIELD_WIDTH}
                             ariaLabel={"Particle count"}
                             onInput={setParticleCount}
@@ -310,9 +293,9 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageNumberField
                             value={getTravelDurationMs}
-                            min={() => MIN_TRAVEL_DURATION_MS}
-                            max={() => MAX_TRAVEL_DURATION_MS}
-                            step={() => TRAVEL_DURATION_STEP_MS}
+                            min={() => ParticleSpawnerKnobs.MIN_TRAVEL_DURATION_MS}
+                            max={() => ParticleSpawnerKnobs.MAX_TRAVEL_DURATION_MS}
+                            step={() => ParticleSpawnerKnobs.TRAVEL_DURATION_STEP_MS}
                             width={() => FIELD_WIDTH}
                             ariaLabel={"Travel duration in milliseconds"}
                             onInput={setTravelDurationMs}
@@ -326,9 +309,9 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageNumberField
                             value={getRetentionMs}
-                            min={() => MIN_RETENTION_MS}
-                            max={() => MAX_RETENTION_MS}
-                            step={() => RETENTION_STEP_MS}
+                            min={() => ParticleSpawnerKnobs.MIN_RETENTION_MS}
+                            max={() => ParticleSpawnerKnobs.MAX_RETENTION_MS}
+                            step={() => ParticleSpawnerKnobs.RETENTION_STEP_MS}
                             width={() => FIELD_WIDTH}
                             ariaLabel={"Retention in milliseconds"}
                             onInput={setRetentionMs}
@@ -344,9 +327,9 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageNumberField
                             value={getSpawnDelayMs}
-                            min={() => MIN_SPAWN_DELAY_MS}
-                            max={() => MAX_SPAWN_DELAY_MS}
-                            step={() => SPAWN_DELAY_STEP_MS}
+                            min={() => ParticleSpawnerKnobs.MIN_SPAWN_DELAY_MS}
+                            max={() => ParticleSpawnerKnobs.MAX_SPAWN_DELAY_MS}
+                            step={() => ParticleSpawnerKnobs.SPAWN_DELAY_STEP_MS}
                             width={() => FIELD_WIDTH}
                             ariaLabel={"Spawn delay in milliseconds"}
                             onInput={setSpawnDelayMs}
@@ -378,9 +361,9 @@ export const ParticleSpawnerPage = () => {
                     >
                         <PageNumberField
                             value={getOvershootPercent}
-                            min={() => MIN_OVERSHOOT_PERCENT}
-                            max={() => MAX_OVERSHOOT_PERCENT}
-                            step={() => OVERSHOOT_PERCENT_STEP}
+                            min={() => ParticleSpawnerKnobs.MIN_OVERSHOOT_PERCENT}
+                            max={() => ParticleSpawnerKnobs.MAX_OVERSHOOT_PERCENT}
+                            step={() => ParticleSpawnerKnobs.OVERSHOOT_PERCENT_STEP}
                             width={() => FIELD_WIDTH}
                             ariaLabel={"Overshoot percent"}
                             onInput={setOvershootPercent}

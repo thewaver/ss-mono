@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import type { ImageSwitcherProps } from "@thewaver/ss-components";
 import { IMAGE_SWITCHER_DEFAULTS } from "@thewaver/ss-components";
 
+import { ImageSwitcherKnobs } from "../../Knobs/ImageSwitchers.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -11,14 +12,12 @@ import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/F
 import knight_date from "../../knight_date.webp";
 import knight_profile from "../../knight_profile.webp";
 import { DefaultExample } from "./Examples/Default";
+import type { SourceType } from "./ImageSwitcherPage.types";
 
 import * as styles from "./ImageSwitcherPage.css";
 
 const IMAGE_CONTAINER_SIZE = 480;
 const MISSING_SRC = "missing_image.webp";
-const SOURCE_TYPES = ["profile", "date", "missingFile", "none"] as const;
-
-type SourceType = (typeof SOURCE_TYPES)[number];
 
 const SOURCE_URLS: Record<SourceType, string | undefined> = {
     profile: knight_profile,
@@ -34,10 +33,6 @@ const SOURCE_ALTS: Record<SourceType, string | undefined> = {
     none: undefined,
 };
 
-const MIN_DURATION_MS = 0;
-const MAX_DURATION_MS = 5000;
-const DURATION_STEP_MS = 50;
-
 const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/ImageSwitcherPage/Examples/Default.tsx";
 
 const DefaultExampleWrapper = (props: ImageSwitcherProps) => {
@@ -49,7 +44,7 @@ const DefaultExampleWrapper = (props: ImageSwitcherProps) => {
 };
 
 export const ImageSwitcherPage = () => {
-    const [getSourceType, setSourceType] = createSignal<SourceType>("profile");
+    const [getSourceType, setSourceType] = createSignal<SourceType>(ImageSwitcherKnobs.STARTING_SOURCE_TYPE);
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(
         IMAGE_SWITCHER_DEFAULTS.transitionDurationMs,
     );
@@ -96,7 +91,7 @@ export const ImageSwitcherPage = () => {
                 >
                     <PageSelectField
                         value={getSourceType}
-                        values={() => SOURCE_TYPES}
+                        values={() => ImageSwitcherKnobs.SOURCE_TYPES}
                         ariaLabel={"Source"}
                         onChange={(sourceType) => setSourceType(() => sourceType)}
                     />
@@ -109,9 +104,9 @@ export const ImageSwitcherPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => MIN_DURATION_MS}
-                        max={() => MAX_DURATION_MS}
-                        step={() => DURATION_STEP_MS}
+                        min={() => ImageSwitcherKnobs.MIN_DURATION_MS}
+                        max={() => ImageSwitcherKnobs.MAX_DURATION_MS}
+                        step={() => ImageSwitcherKnobs.DURATION_STEP_MS}
                         ariaLabel={"Transition duration"}
                         onInput={setTransitionDurationMs}
                     />

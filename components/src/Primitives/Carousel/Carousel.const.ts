@@ -10,3 +10,5 @@ export const CAROUSEL_DEFAULTS = {
     roleDescription: "carousel",
     slideRoleDescription: "slide",
 };
+
+export const CAROUSEL_ORIENTATIONS: readonly CarouselOrientation[] = ["horizontal", "vertical"];

@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { PAGINATOR_DEFAULTS } from "@thewaver/ss-components";
 
+import { PaginatorKnobs } from "../../Knobs/Paginators.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -13,21 +14,15 @@ import { LinksExample } from "./Examples/Links";
 import { StepsExample } from "./Examples/Steps";
 import type { PaginatorExampleProps } from "./PaginatorPage.types";
 
-const MIN_PAGE_COUNT = 0;
-const MAX_PAGE_COUNT = 200;
-const MIN_COUNT = 0;
-const MAX_COUNT = 5;
-const COUNT_STEP = 1;
-const STARTING_PAGE_COUNT = 20;
 const STARTING_PAGE = 1;
 const COUNT_FIELD_WIDTH = 90;
 const EXAMPLES_ROOT = "/src/App/Pages/PaginatorPage/Examples";
 
 export const PaginatorPage = () => {
-    const [getPageCount, setPageCount] = createSignal(STARTING_PAGE_COUNT);
+    const [getPageCount, setPageCount] = createSignal(PaginatorKnobs.STARTING_PAGE_COUNT);
     const [getSiblingCount, setSiblingCount] = createSignal(PAGINATOR_DEFAULTS.siblingCount);
     const [getBoundaryCount, setBoundaryCount] = createSignal(PAGINATOR_DEFAULTS.boundaryCount);
-    const [getIsDisabled, setIsDisabled] = createSignal(false);
+    const [getIsDisabled, setIsDisabled] = createSignal(PaginatorKnobs.STARTING_IS_DISABLED);
 
     const [getStepPage, setStepPage] = createSignal(STARTING_PAGE);
     const [getEndPage, setEndPage] = createSignal(STARTING_PAGE);
@@ -95,9 +90,9 @@ export const PaginatorPage = () => {
                 <PageProp key={"pageCount"} label={"Page count"} hint={"How many pages there are to page through."}>
                     <PageNumberField
                         value={getPageCount}
-                        min={() => MIN_PAGE_COUNT}
-                        max={() => MAX_PAGE_COUNT}
-                        step={() => COUNT_STEP}
+                        min={() => PaginatorKnobs.MIN_PAGE_COUNT}
+                        max={() => PaginatorKnobs.MAX_PAGE_COUNT}
+                        step={() => PaginatorKnobs.COUNT_STEP}
                         width={() => COUNT_FIELD_WIDTH}
                         ariaLabel={"Page count"}
                         onInput={setPageCount}
@@ -113,9 +108,9 @@ export const PaginatorPage = () => {
                 >
                     <PageNumberField
                         value={getSiblingCount}
-                        min={() => MIN_COUNT}
-                        max={() => MAX_COUNT}
-                        step={() => COUNT_STEP}
+                        min={() => PaginatorKnobs.MIN_COUNT}
+                        max={() => PaginatorKnobs.MAX_COUNT}
+                        step={() => PaginatorKnobs.COUNT_STEP}
                         width={() => COUNT_FIELD_WIDTH}
                         ariaLabel={"Sibling count"}
                         onInput={setSiblingCount}
@@ -129,9 +124,9 @@ export const PaginatorPage = () => {
                 >
                     <PageNumberField
                         value={getBoundaryCount}
-                        min={() => MIN_COUNT}
-                        max={() => MAX_COUNT}
-                        step={() => COUNT_STEP}
+                        min={() => PaginatorKnobs.MIN_COUNT}
+                        max={() => PaginatorKnobs.MAX_COUNT}
+                        step={() => PaginatorKnobs.COUNT_STEP}
                         width={() => COUNT_FIELD_WIDTH}
                         ariaLabel={"Boundary count"}
                         onInput={setBoundaryCount}

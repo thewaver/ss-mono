@@ -2,8 +2,9 @@ import type { Signal } from "solid-js";
 import { createMemo, createSignal } from "solid-js";
 
 import type { DateValue, DateValueCalendarId, DateValueRange, DateValueWeekStart } from "@thewaver/ss-components";
-import { DateValueUtils } from "@thewaver/ss-components";
+import { CALENDAR_DEFAULTS, DateValueUtils } from "@thewaver/ss-components";
 
+import { RangeCalendarKnobs } from "../../Knobs/RangeCalendars.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -12,7 +13,6 @@ import { MAX_DATE, MIN_DATE, TODAY, WEEK_START_LABELS } from "../CalendarPage/Ca
 import { BoundedExample } from "./Examples/Bounded";
 import { DefaultExample } from "./Examples/Default";
 
-const WEEK_STARTS = [0, 1] as const;
 const CALENDAR_FIELD_WIDTH = 180;
 const EXAMPLES_ROOT = "/src/App/Pages/RangeCalendarPage/Examples";
 
@@ -20,8 +20,8 @@ const describe = (value: DateValueRange | undefined) =>
     value ? `${DateValueUtils.toIso(value.start)} to ${DateValueUtils.toIso(value.end)}` : "none";
 
 export const RangeCalendarPage = () => {
-    const [getCalendarId, setCalendarId] = createSignal<DateValueCalendarId>("gregory");
-    const [getWeekStartsOn, setWeekStartsOn] = createSignal<DateValueWeekStart>(1);
+    const [getCalendarId, setCalendarId] = createSignal<DateValueCalendarId>(RangeCalendarKnobs.STARTING_CALENDAR);
+    const [getWeekStartsOn, setWeekStartsOn] = createSignal<DateValueWeekStart>(CALENDAR_DEFAULTS.weekStartsOn);
 
     const defaultValue = createSignal<DateValueRange | undefined>();
     const boundedValue = createSignal<DateValueRange | undefined>();
@@ -81,7 +81,7 @@ export const RangeCalendarPage = () => {
                 >
                     <PageSelectField
                         value={getWeekStartsOn}
-                        values={() => [...WEEK_STARTS]}
+                        values={() => [...RangeCalendarKnobs.WEEK_STARTS]}
                         ariaLabel={"Week starts on"}
                         computeLabel={(day) => WEEK_START_LABELS[day]}
                         onChange={(day) => setWeekStartsOn(() => day)}

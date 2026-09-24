@@ -1,8 +1,9 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { STAIRCASE_DEFAULTS, StaircaseIndents } from "@thewaver/ss-components";
+import { STAIRCASE_DEFAULTS, STAIRCASE_DIRS, StaircaseIndents } from "@thewaver/ss-components";
 import type { StaircaseDir } from "@thewaver/ss-components";
 
+import { StaircaseKnobs } from "../../Knobs/Staircases.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -11,23 +12,9 @@ import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/F
 import { DefaultExample } from "./Examples/Default";
 import type { StaircaseExampleProps } from "./StaircasePage.types";
 
-const MIN_STEP_COUNT = 1;
-const MAX_STEP_COUNT = 10;
-const STEP_COUNT_STEP = 1;
-const MIN_INDENT = 0;
-const MAX_INDENT = 60;
-const INDENT_STEP = 2;
-const MIN_GAP = 0;
-const MAX_GAP = 40;
-const GAP_STEP = 2;
 const FIELD_WIDTH = 110;
 const STAIRCASE_WIDTH = 340;
 const EXAMPLES_ROOT = "/src/App/Pages/StaircasePage/Examples";
-
-const STARTING_STEP_COUNT = 6;
-const STARTING_INDENT = 12;
-const STARTING_INDENT_KEY: StaircaseIndents.SampleKey = "linear";
-const DIRS: StaircaseDir[] = ["down", "up"];
 
 const STAGES = [
     "Visitors",
@@ -51,10 +38,10 @@ const DefaultExampleWrapper = (props: StaircaseExampleProps) => {
 };
 
 export const StaircasePage = () => {
-    const [getStepCount, setStepCount] = createSignal(STARTING_STEP_COUNT);
-    const [getIndent, setIndent] = createSignal(STARTING_INDENT);
+    const [getStepCount, setStepCount] = createSignal(StaircaseKnobs.STARTING_STEP_COUNT);
+    const [getIndent, setIndent] = createSignal(StaircaseKnobs.STARTING_INDENT);
     const [getGap, setGap] = createSignal(STAIRCASE_DEFAULTS.gap);
-    const [getIndentKey, setIndentKey] = createSignal<StaircaseIndents.SampleKey>(STARTING_INDENT_KEY);
+    const [getIndentKey, setIndentKey] = createSignal<StaircaseIndents.SampleKey>(StaircaseKnobs.STARTING_INDENT_KEY);
     const [getDir, setDir] = createSignal<StaircaseDir>(STAIRCASE_DEFAULTS.dir);
 
     const getSteps = createMemo(() => STAGES.slice(0, getStepCount()));
@@ -84,9 +71,9 @@ export const StaircasePage = () => {
                 <PageProp key={"stepCount"} label={"Steps"} hint={"How many steps the staircase holds."}>
                     <PageNumberField
                         value={getStepCount}
-                        min={() => MIN_STEP_COUNT}
-                        max={() => MAX_STEP_COUNT}
-                        step={() => STEP_COUNT_STEP}
+                        min={() => StaircaseKnobs.MIN_STEP_COUNT}
+                        max={() => StaircaseKnobs.MAX_STEP_COUNT}
+                        step={() => StaircaseKnobs.STEP_COUNT_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Steps"}
                         onInput={setStepCount}
@@ -100,9 +87,9 @@ export const StaircasePage = () => {
                 >
                     <PageNumberField
                         value={getIndent}
-                        min={() => MIN_INDENT}
-                        max={() => MAX_INDENT}
-                        step={() => INDENT_STEP}
+                        min={() => StaircaseKnobs.MIN_INDENT}
+                        max={() => StaircaseKnobs.MAX_INDENT}
+                        step={() => StaircaseKnobs.INDENT_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Indent"}
                         onInput={setIndent}
@@ -112,9 +99,9 @@ export const StaircasePage = () => {
                 <PageProp key={"gap"} label={"Gap (px)"} hint={"The space between one step and the next."}>
                     <PageNumberField
                         value={getGap}
-                        min={() => MIN_GAP}
-                        max={() => MAX_GAP}
-                        step={() => GAP_STEP}
+                        min={() => StaircaseKnobs.MIN_GAP}
+                        max={() => StaircaseKnobs.MAX_GAP}
+                        step={() => StaircaseKnobs.GAP_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Gap"}
                         onInput={setGap}
@@ -124,7 +111,7 @@ export const StaircasePage = () => {
                 <PageProp key={"dir"} label={"Direction"} hint={"Which way the staircase runs."}>
                     <PageSelectField
                         value={getDir}
-                        values={() => DIRS}
+                        values={() => STAIRCASE_DIRS}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Direction"}
                         onChange={(dir) => setDir(() => dir)}

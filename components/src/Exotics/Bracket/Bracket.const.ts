@@ -7,3 +7,7 @@ export const BRACKET_DEFAULTS = {
     rootSide: "end" as BracketRootSide,
     layerHeaderSize: 24,
 };
+
+export const BRACKET_ORIENTATIONS: readonly BracketOrientation[] = ["horizontal", "vertical"];
+
+export const BRACKET_ROOT_SIDES: readonly BracketRootSide[] = ["end", "start"];

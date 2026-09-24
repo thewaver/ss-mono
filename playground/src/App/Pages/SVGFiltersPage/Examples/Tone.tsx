@@ -2,6 +2,7 @@ import { createSignal } from "solid-js";
 
 import { SVGFilterDefsFactory, access } from "@thewaver/ss-components";
 
+import { SVGFilterKnobs } from "../../../Knobs/SVGFilters.const";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField } from "../../../StyledComponents/Field/Field";
@@ -9,23 +10,13 @@ import { PageFilterStage } from "../../../StyledComponents/SVGFiltersContent/SVG
 import type { SVGFiltersExampleProps } from "../SVGFiltersPage.types";
 
 const FILTER_ID = "svgFiltersTone";
-const MIN_AMOUNT = 0;
-const MAX_AMOUNT = 3;
-const AMOUNT_STEP = 0.05;
-const MIN_INVERSION = 0;
-const MAX_INVERSION = 1;
-const INVERSION_STEP = 0.05;
-
-const STARTING_BRIGHTNESS = 1.2;
-const STARTING_CONTRAST = 1.4;
-const STARTING_INVERSION = 0;
 
 type Props = SVGFiltersExampleProps;
 
 export const ToneExample = (props: Props) => {
-    const [getBrightness, setBrightness] = createSignal(STARTING_BRIGHTNESS);
-    const [getContrast, setContrast] = createSignal(STARTING_CONTRAST);
-    const [getInversion, setInversion] = createSignal(STARTING_INVERSION);
+    const [getBrightness, setBrightness] = createSignal(SVGFilterKnobs.Tone.STARTING_BRIGHTNESS);
+    const [getContrast, setContrast] = createSignal(SVGFilterKnobs.Tone.STARTING_CONTRAST);
+    const [getInversion, setInversion] = createSignal(SVGFilterKnobs.Tone.STARTING_INVERSION);
 
     return (
         <>
@@ -52,9 +43,9 @@ export const ToneExample = (props: Props) => {
                 >
                     <PageNumberField
                         value={getBrightness}
-                        min={() => MIN_AMOUNT}
-                        max={() => MAX_AMOUNT}
-                        step={() => AMOUNT_STEP}
+                        min={() => SVGFilterKnobs.Tone.MIN_AMOUNT}
+                        max={() => SVGFilterKnobs.Tone.MAX_AMOUNT}
+                        step={() => SVGFilterKnobs.Tone.AMOUNT_STEP}
                         ariaLabel={"Brightness"}
                         onInput={setBrightness}
                     />
@@ -67,9 +58,9 @@ export const ToneExample = (props: Props) => {
                 >
                     <PageNumberField
                         value={getContrast}
-                        min={() => MIN_AMOUNT}
-                        max={() => MAX_AMOUNT}
-                        step={() => AMOUNT_STEP}
+                        min={() => SVGFilterKnobs.Tone.MIN_AMOUNT}
+                        max={() => SVGFilterKnobs.Tone.MAX_AMOUNT}
+                        step={() => SVGFilterKnobs.Tone.AMOUNT_STEP}
                         ariaLabel={"Contrast"}
                         onInput={setContrast}
                     />
@@ -82,9 +73,9 @@ export const ToneExample = (props: Props) => {
                 >
                     <PageNumberField
                         value={getInversion}
-                        min={() => MIN_INVERSION}
-                        max={() => MAX_INVERSION}
-                        step={() => INVERSION_STEP}
+                        min={() => SVGFilterKnobs.Tone.MIN_INVERSION}
+                        max={() => SVGFilterKnobs.Tone.MAX_INVERSION}
+                        step={() => SVGFilterKnobs.Tone.INVERSION_STEP}
                         ariaLabel={"Inversion"}
                         onInput={setInversion}
                     />

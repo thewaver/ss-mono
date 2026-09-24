@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { LIGHT_CATCHER_DEFAULTS } from "@thewaver/ss-components";
 
+import { LightCatcherKnobs } from "../../../Knobs/LightCatchers.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
@@ -13,35 +14,14 @@ import type { LightCatcherExampleProps } from "./LightCatcherPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/PointerEffects/LightCatcherPage/Examples";
 
-const MIN_ACTIVE_RANGE_PX = 40;
-const MAX_ACTIVE_RANGE_PX = 1200;
-const ACTIVE_RANGE_STEP_PX = 20;
-const STARTING_ACTIVE_RANGE_PX = 1200;
-
-const MIN_LIGHT_RANGE_PX = 40;
-const MAX_LIGHT_RANGE_PX = 1200;
-const LIGHT_RANGE_STEP_PX = 20;
-
-const MIN_BRIGHTNESS = 0;
-const MAX_BRIGHTNESS = 5;
-const BRIGHTNESS_STEP = 0.05;
-
-const MIN_LIGHTNESS = 0;
-const MAX_LIGHTNESS = 1;
-const LIGHTNESS_STEP = 0.05;
-
-const MIN_SMOOTHING_MS = 0;
-const MAX_SMOOTHING_MS = 1000;
-const SMOOTHING_STEP_MS = 10;
-
 const FIELD_WIDTH = 110;
 const BOX_HEIGHT = 200;
 const ROW_SPAN = 2;
 
 export const LightCatcherPage = () => {
-    const [getIsDisabled, setIsDisabled] = createSignal(false);
+    const [getIsDisabled, setIsDisabled] = createSignal(LightCatcherKnobs.STARTING_IS_DISABLED);
     const [getSmoothingMs, setSmoothingMs] = createSignal(LIGHT_CATCHER_DEFAULTS.smoothingMs);
-    const [getActiveRangePx, setActiveRangePx] = createSignal(STARTING_ACTIVE_RANGE_PX);
+    const [getActiveRangePx, setActiveRangePx] = createSignal(LightCatcherKnobs.STARTING_ACTIVE_RANGE_PX);
     const [getLightRangePx, setLightRangePx] = createSignal(LIGHT_CATCHER_DEFAULTS.lightRangePx);
     const [getMaxBrightness, setMaxBrightness] = createSignal(LIGHT_CATCHER_DEFAULTS.maxBrightness);
     const [getRestingBrightness, setRestingBrightness] = createSignal(LIGHT_CATCHER_DEFAULTS.restingBrightness);
@@ -110,9 +90,9 @@ export const LightCatcherPage = () => {
                 >
                     <PageNumberField
                         value={getSmoothingMs}
-                        min={() => MIN_SMOOTHING_MS}
-                        max={() => MAX_SMOOTHING_MS}
-                        step={() => SMOOTHING_STEP_MS}
+                        min={() => LightCatcherKnobs.MIN_SMOOTHING_MS}
+                        max={() => LightCatcherKnobs.MAX_SMOOTHING_MS}
+                        step={() => LightCatcherKnobs.SMOOTHING_STEP_MS}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Smoothing in milliseconds"}
                         onInput={setSmoothingMs}
@@ -128,9 +108,9 @@ export const LightCatcherPage = () => {
                 >
                     <PageNumberField
                         value={getActiveRangePx}
-                        min={() => MIN_ACTIVE_RANGE_PX}
-                        max={() => MAX_ACTIVE_RANGE_PX}
-                        step={() => ACTIVE_RANGE_STEP_PX}
+                        min={() => LightCatcherKnobs.MIN_ACTIVE_RANGE_PX}
+                        max={() => LightCatcherKnobs.MAX_ACTIVE_RANGE_PX}
+                        step={() => LightCatcherKnobs.ACTIVE_RANGE_STEP_PX}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Active range in pixels"}
                         onInput={setActiveRangePx}
@@ -144,9 +124,9 @@ export const LightCatcherPage = () => {
                 >
                     <PageNumberField
                         value={getLightRangePx}
-                        min={() => MIN_LIGHT_RANGE_PX}
-                        max={() => MAX_LIGHT_RANGE_PX}
-                        step={() => LIGHT_RANGE_STEP_PX}
+                        min={() => LightCatcherKnobs.MIN_LIGHT_RANGE_PX}
+                        max={() => LightCatcherKnobs.MAX_LIGHT_RANGE_PX}
+                        step={() => LightCatcherKnobs.LIGHT_RANGE_STEP_PX}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Light range in pixels"}
                         onInput={setLightRangePx}
@@ -160,9 +140,9 @@ export const LightCatcherPage = () => {
                 >
                     <PageNumberField
                         value={getMaxBrightness}
-                        min={() => MIN_BRIGHTNESS}
-                        max={() => MAX_BRIGHTNESS}
-                        step={() => BRIGHTNESS_STEP}
+                        min={() => LightCatcherKnobs.MIN_BRIGHTNESS}
+                        max={() => LightCatcherKnobs.MAX_BRIGHTNESS}
+                        step={() => LightCatcherKnobs.BRIGHTNESS_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Maximum brightness"}
                         onInput={setMaxBrightness}
@@ -178,9 +158,9 @@ export const LightCatcherPage = () => {
                 >
                     <PageNumberField
                         value={getRestingBrightness}
-                        min={() => MIN_BRIGHTNESS}
-                        max={() => MAX_BRIGHTNESS}
-                        step={() => BRIGHTNESS_STEP}
+                        min={() => LightCatcherKnobs.MIN_BRIGHTNESS}
+                        max={() => LightCatcherKnobs.MAX_BRIGHTNESS}
+                        step={() => LightCatcherKnobs.BRIGHTNESS_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Resting brightness"}
                         onInput={setRestingBrightness}
@@ -196,9 +176,9 @@ export const LightCatcherPage = () => {
                 >
                     <PageNumberField
                         value={getMaxLightness}
-                        min={() => MIN_LIGHTNESS}
-                        max={() => MAX_LIGHTNESS}
-                        step={() => LIGHTNESS_STEP}
+                        min={() => LightCatcherKnobs.MIN_LIGHTNESS}
+                        max={() => LightCatcherKnobs.MAX_LIGHTNESS}
+                        step={() => LightCatcherKnobs.LIGHTNESS_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Maximum lightness"}
                         onInput={setMaxLightness}
@@ -212,9 +192,9 @@ export const LightCatcherPage = () => {
                 >
                     <PageNumberField
                         value={getRestingLightness}
-                        min={() => MIN_LIGHTNESS}
-                        max={() => MAX_LIGHTNESS}
-                        step={() => LIGHTNESS_STEP}
+                        min={() => LightCatcherKnobs.MIN_LIGHTNESS}
+                        max={() => LightCatcherKnobs.MAX_LIGHTNESS}
+                        step={() => LightCatcherKnobs.LIGHTNESS_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Resting lightness"}
                         onInput={setRestingLightness}

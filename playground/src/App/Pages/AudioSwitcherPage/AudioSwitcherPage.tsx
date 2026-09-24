@@ -1,30 +1,20 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { AUDIO_SWITCHER_DEFAULTS } from "@thewaver/ss-components";
+
+import { AudioSwitcherKnobs } from "../../Knobs/AudioSwitchers.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
-import {
-    CROSSFADE_STEP_MS,
-    FIELD_WIDTH,
-    MAX_CROSSFADE_MS,
-    MAX_VOLUME_PERCENT,
-    MIN_CROSSFADE_MS,
-    MIN_VOLUME_PERCENT,
-    PERCENT,
-    STARTING_CROSSFADE_MS,
-    STARTING_VOLUME_PERCENT,
-    TRACKS,
-    TRACK_NAMES,
-    VOLUME_STEP_PERCENT,
-} from "./AudioSwitcherPage.const";
+import { FIELD_WIDTH, PERCENT, TRACKS, TRACK_NAMES } from "./AudioSwitcherPage.const";
 import { DefaultExample } from "./Examples/Default";
 
 const EXAMPLES_ROOT = "/src/App/Pages/AudioSwitcherPage/Examples";
 
 export const AudioSwitcherPage = () => {
-    const [getCrossfadeMs, setCrossfadeMs] = createSignal(STARTING_CROSSFADE_MS);
-    const [getVolumePercent, setVolumePercent] = createSignal(STARTING_VOLUME_PERCENT);
+    const [getCrossfadeMs, setCrossfadeMs] = createSignal(AudioSwitcherKnobs.STARTING_CROSSFADE_MS);
+    const [getVolumePercent, setVolumePercent] = createSignal(AUDIO_SWITCHER_DEFAULTS.volume * PERCENT);
     const [getTrackName, setTrackName] = createSignal(TRACKS[0].name);
 
     const playbackSignal = createSignal(false);
@@ -73,9 +63,9 @@ export const AudioSwitcherPage = () => {
                 >
                     <PageNumberField
                         value={getCrossfadeMs}
-                        min={() => MIN_CROSSFADE_MS}
-                        max={() => MAX_CROSSFADE_MS}
-                        step={() => CROSSFADE_STEP_MS}
+                        min={() => AudioSwitcherKnobs.MIN_CROSSFADE_MS}
+                        max={() => AudioSwitcherKnobs.MAX_CROSSFADE_MS}
+                        step={() => AudioSwitcherKnobs.CROSSFADE_STEP_MS}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Crossfade in milliseconds"}
                         onInput={setCrossfadeMs}
@@ -85,9 +75,9 @@ export const AudioSwitcherPage = () => {
                 <PageProp key={"volume"} label={"Volume (%)"} hint={"How loud the playback is."}>
                     <PageNumberField
                         value={getVolumePercent}
-                        min={() => MIN_VOLUME_PERCENT}
-                        max={() => MAX_VOLUME_PERCENT}
-                        step={() => VOLUME_STEP_PERCENT}
+                        min={() => AudioSwitcherKnobs.MIN_VOLUME_PERCENT}
+                        max={() => AudioSwitcherKnobs.MAX_VOLUME_PERCENT}
+                        step={() => AudioSwitcherKnobs.VOLUME_STEP_PERCENT}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Volume as a percentage"}
                         onInput={setVolumePercent}

@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import { REVEAL_DEFAULTS } from "@thewaver/ss-components";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
+import { RevealKnobs } from "../../../Knobs/Reveals.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
@@ -10,49 +11,27 @@ import { PageCheckField, PageNumberField, PageSelectField } from "../../../Style
 import { FrostedExample } from "./Examples/Frosted";
 import { PromptExample } from "./Examples/Prompt";
 import { TorchExample } from "./Examples/Torch";
+import type { RevealShape } from "./RevealPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/Reveals/RevealPage/Examples";
-const CIRCLE = "circle";
-const SHAPES = [CIRCLE, ...ShapeConst.DEFAULT_SHAPES] as const;
-
-type RevealShape = (typeof SHAPES)[number];
-
-const MIN_RADIUS = 20;
-const MAX_RADIUS = 220;
-const RADIUS_STEP = 10;
-const MIN_JOIN_RADIUS = 0;
-const MAX_JOIN_RADIUS = 120;
-const JOIN_RADIUS_STEP = 5;
-const MIN_LAME_EXPONENT = -5;
-const MAX_LAME_EXPONENT = 5;
-const LAME_EXPONENT_STEP = 0.5;
-const MIN_SOFTNESS = 0;
-const MAX_SOFTNESS = 1;
-const SOFTNESS_STEP = 0.05;
-const STARTING_SHAPE: RevealShape = CIRCLE;
-const STARTING_JOIN_RADIUS = 0;
-const STARTING_LAME_EXPONENT = 1;
-const MIN_STEP_SIZE = 5;
-const MAX_STEP_SIZE = 80;
-const STEP_SIZE_STEP = 5;
 const FIELD_WIDTH = 110;
 const SHAPE_FIELD_WIDTH = 170;
 
 export const RevealPage = () => {
     const [getRadius, setRadius] = createSignal(REVEAL_DEFAULTS.radius);
-    const [getShape, setShape] = createSignal<RevealShape>(STARTING_SHAPE);
-    const [getJoinRadius, setJoinRadius] = createSignal(STARTING_JOIN_RADIUS);
-    const [getLameExponent, setLameExponent] = createSignal(STARTING_LAME_EXPONENT);
+    const [getShape, setShape] = createSignal<RevealShape>(RevealKnobs.STARTING_SHAPE);
+    const [getJoinRadius, setJoinRadius] = createSignal(RevealKnobs.STARTING_JOIN_RADIUS);
+    const [getLameExponent, setLameExponent] = createSignal(RevealKnobs.STARTING_LAME_EXPONENT);
     const [getSoftness, setSoftness] = createSignal(REVEAL_DEFAULTS.softness);
     const [getStepSize, setStepSize] = createSignal(REVEAL_DEFAULTS.stepSize);
-    const [getIsDisabled, setIsDisabled] = createSignal(false);
+    const [getIsDisabled, setIsDisabled] = createSignal(RevealKnobs.STARTING_IS_DISABLED);
 
-    const getIsCircle = createMemo(() => getShape() === CIRCLE);
+    const getIsCircle = createMemo(() => getShape() === RevealKnobs.CIRCLE);
 
     const getComputePoints = createMemo(() => {
         const shape = getShape();
 
-        if (shape === CIRCLE) return undefined;
+        if (shape === RevealKnobs.CIRCLE) return undefined;
 
         return (size: Size2d) => ShapeConst.getDefaultShapePoints(shape, size);
     });
@@ -103,9 +82,9 @@ export const RevealPage = () => {
                 >
                     <PageNumberField
                         value={getRadius}
-                        min={() => MIN_RADIUS}
-                        max={() => MAX_RADIUS}
-                        step={() => RADIUS_STEP}
+                        min={() => RevealKnobs.MIN_RADIUS}
+                        max={() => RevealKnobs.MAX_RADIUS}
+                        step={() => RevealKnobs.RADIUS_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Radius"}
                         onInput={setRadius}
@@ -119,7 +98,7 @@ export const RevealPage = () => {
                 >
                     <PageSelectField
                         value={getShape}
-                        values={() => SHAPES}
+                        values={() => RevealKnobs.SHAPES}
                         width={() => SHAPE_FIELD_WIDTH}
                         ariaLabel={"Shape"}
                         onChange={(shape) => setShape(() => shape)}
@@ -135,9 +114,9 @@ export const RevealPage = () => {
                 >
                     <PageNumberField
                         value={getJoinRadius}
-                        min={() => MIN_JOIN_RADIUS}
-                        max={() => MAX_JOIN_RADIUS}
-                        step={() => JOIN_RADIUS_STEP}
+                        min={() => RevealKnobs.MIN_JOIN_RADIUS}
+                        max={() => RevealKnobs.MAX_JOIN_RADIUS}
+                        step={() => RevealKnobs.JOIN_RADIUS_STEP}
                         width={() => FIELD_WIDTH}
                         isDisabled={getIsCircle}
                         ariaLabel={"Corner radius"}
@@ -154,9 +133,9 @@ export const RevealPage = () => {
                 >
                     <PageNumberField
                         value={getLameExponent}
-                        min={() => MIN_LAME_EXPONENT}
-                        max={() => MAX_LAME_EXPONENT}
-                        step={() => LAME_EXPONENT_STEP}
+                        min={() => RevealKnobs.MIN_LAME_EXPONENT}
+                        max={() => RevealKnobs.MAX_LAME_EXPONENT}
+                        step={() => RevealKnobs.LAME_EXPONENT_STEP}
                         width={() => FIELD_WIDTH}
                         isDisabled={getIsCircle}
                         ariaLabel={"Corner style"}
@@ -171,9 +150,9 @@ export const RevealPage = () => {
                 >
                     <PageNumberField
                         value={getSoftness}
-                        min={() => MIN_SOFTNESS}
-                        max={() => MAX_SOFTNESS}
-                        step={() => SOFTNESS_STEP}
+                        min={() => RevealKnobs.MIN_SOFTNESS}
+                        max={() => RevealKnobs.MAX_SOFTNESS}
+                        step={() => RevealKnobs.SOFTNESS_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Clear fraction"}
                         onInput={setSoftness}
@@ -189,9 +168,9 @@ export const RevealPage = () => {
                 >
                     <PageNumberField
                         value={getStepSize}
-                        min={() => MIN_STEP_SIZE}
-                        max={() => MAX_STEP_SIZE}
-                        step={() => STEP_SIZE_STEP}
+                        min={() => RevealKnobs.MIN_STEP_SIZE}
+                        max={() => RevealKnobs.MAX_STEP_SIZE}
+                        step={() => RevealKnobs.STEP_SIZE_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Step size in pixels"}
                         onInput={setStepSize}

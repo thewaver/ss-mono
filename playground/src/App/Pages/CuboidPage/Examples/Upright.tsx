@@ -1,7 +1,6 @@
 import { For } from "solid-js";
 
-import type { CuboidFace } from "@thewaver/ss-components";
-import { Button, Cuboid } from "@thewaver/ss-components";
+import { Button, CUBOID_FACES, Cuboid } from "@thewaver/ss-components";
 
 import { computeCuboidFaceLabel } from "../../../PageComponents/Announcements/Announcements.const";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
@@ -14,8 +13,6 @@ import {
 import type { CuboidUprightExampleProps } from "../CuboidPage.types";
 
 const QUARTER_TURN = 1;
-
-const FACES: CuboidFace[] = ["front", "right", "back", "left", "top", "bottom"];
 
 type Props = CuboidUprightExampleProps;
 
@@ -71,7 +68,7 @@ export const UprightExample = (props: Props) => {
             </PageCuboidPad>
 
             <PageCuboidRow>
-                <For each={FACES}>
+                <For each={CUBOID_FACES}>
                     {(face) => (
                         <Button
                             id={`turnTo${computeCuboidFaceLabel(face)}`}

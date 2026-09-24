@@ -1,5 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { MenubarKnobs } from "../../Knobs/Menubars.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -11,13 +12,8 @@ import * as styles from "./MenubarPage.css";
 
 const EXAMPLES_ROOT = "/src/App/Pages/MenubarPage/Examples";
 
-const STARTING_BAR_WIDTH = 420;
-const MIN_BAR_WIDTH = 80;
-const MAX_BAR_WIDTH = 760;
-const BAR_WIDTH_STEP = 10;
-
 export const MenubarPage = () => {
-    const [getBarWidth, setBarWidth] = createSignal(STARTING_BAR_WIDTH);
+    const [getBarWidth, setBarWidth] = createSignal(MenubarKnobs.STARTING_BAR_WIDTH);
     const [getLastPicked, setLastPicked] = createSignal(NOTHING_PICKED);
     const checkedSignal = createSignal(VIEW_DEFAULTS);
 
@@ -46,9 +42,9 @@ export const MenubarPage = () => {
                 >
                     <PageNumberField
                         value={getBarWidth}
-                        min={() => MIN_BAR_WIDTH}
-                        max={() => MAX_BAR_WIDTH}
-                        step={() => BAR_WIDTH_STEP}
+                        min={() => MenubarKnobs.MIN_BAR_WIDTH}
+                        max={() => MenubarKnobs.MAX_BAR_WIDTH}
+                        step={() => MenubarKnobs.BAR_WIDTH_STEP}
                         ariaLabel={"Bar width in pixels"}
                         onInput={setBarWidth}
                     />

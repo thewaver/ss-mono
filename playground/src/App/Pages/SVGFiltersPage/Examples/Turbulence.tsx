@@ -1,8 +1,9 @@
 import { createSignal } from "solid-js";
 
-import { SVGFilterDefsFactory, access } from "@thewaver/ss-components";
-import type { SVGDisplacementChannel, SVGTurbulenceFilterDefs } from "@thewaver/ss-components";
+import { SVGFilterDefs, SVGFilterDefsFactory, access } from "@thewaver/ss-components";
+import type { SVGDisplacementChannel } from "@thewaver/ss-components";
 
+import { SVGFilterKnobs } from "../../../Knobs/SVGFilters.const";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField, PageSelectField } from "../../../StyledComponents/Field/Field";
@@ -11,36 +12,21 @@ import type { SVGFiltersExampleProps } from "../SVGFiltersPage.types";
 
 const FILTER_ID = "svgFiltersTurbulence";
 
-const TYPES: NonNullable<SVGTurbulenceFilterDefs["type"]>[] = ["fractalNoise", "turbulence"];
-const CHANNELS: SVGDisplacementChannel[] = ["R", "G", "B", "A"];
-
-const MIN_FREQUENCY = 0.001;
-const MAX_FREQUENCY = 0.2;
-const FREQUENCY_STEP = 0.001;
-const MIN_SCALE = 0;
-const MAX_SCALE = 200;
-const MIN_OCTAVES = 1;
-const MAX_OCTAVES = 6;
-const MIN_SEED = 0;
-const MAX_SEED = 60;
-
-const STARTING_FREQUENCY_X = 0.015;
-const STARTING_FREQUENCY_Y = 0.015;
-const STARTING_SCALE = 30;
-const STARTING_OCTAVES = 2;
-const STARTING_SEED = 5;
-
 type Props = SVGFiltersExampleProps;
 
 export const TurbulenceExample = (props: Props) => {
-    const [getFrequencyX, setFrequencyX] = createSignal(STARTING_FREQUENCY_X);
-    const [getFrequencyY, setFrequencyY] = createSignal(STARTING_FREQUENCY_Y);
-    const [getScale, setScale] = createSignal(STARTING_SCALE);
-    const [getType, setType] = createSignal(TYPES[0]);
-    const [getOctaves, setOctaves] = createSignal(STARTING_OCTAVES);
-    const [getSeed, setSeed] = createSignal(STARTING_SEED);
-    const [getXChannel, setXChannel] = createSignal<SVGDisplacementChannel>("R");
-    const [getYChannel, setYChannel] = createSignal<SVGDisplacementChannel>("G");
+    const [getFrequencyX, setFrequencyX] = createSignal(SVGFilterKnobs.Turbulence.STARTING_FREQUENCY_X);
+    const [getFrequencyY, setFrequencyY] = createSignal(SVGFilterKnobs.Turbulence.STARTING_FREQUENCY_Y);
+    const [getScale, setScale] = createSignal(SVGFilterKnobs.Turbulence.STARTING_SCALE);
+    const [getType, setType] = createSignal(SVGFilterKnobs.Turbulence.STARTING_TYPE);
+    const [getOctaves, setOctaves] = createSignal(SVGFilterKnobs.Turbulence.STARTING_OCTAVES);
+    const [getSeed, setSeed] = createSignal(SVGFilterKnobs.Turbulence.STARTING_SEED);
+    const [getXChannel, setXChannel] = createSignal<SVGDisplacementChannel>(
+        SVGFilterKnobs.Turbulence.STARTING_X_CHANNEL,
+    );
+    const [getYChannel, setYChannel] = createSignal<SVGDisplacementChannel>(
+        SVGFilterKnobs.Turbulence.STARTING_Y_CHANNEL,
+    );
 
     return (
         <>
@@ -75,7 +61,7 @@ export const TurbulenceExample = (props: Props) => {
                 >
                     <PageSelectField
                         value={getType}
-                        values={() => TYPES}
+                        values={() => SVGFilterDefs.TURBULENCE_TYPES}
                         ariaLabel={"Type"}
                         onChange={(type) => setType(() => type)}
                     />
@@ -88,9 +74,9 @@ export const TurbulenceExample = (props: Props) => {
                 >
                     <PageNumberField
                         value={getFrequencyX}
-                        min={() => MIN_FREQUENCY}
-                        max={() => MAX_FREQUENCY}
-                        step={() => FREQUENCY_STEP}
+                        min={() => SVGFilterKnobs.Turbulence.MIN_FREQUENCY}
+                        max={() => SVGFilterKnobs.Turbulence.MAX_FREQUENCY}
+                        step={() => SVGFilterKnobs.Turbulence.FREQUENCY_STEP}
                         ariaLabel={"Base frequency x"}
                         onInput={setFrequencyX}
                     />
@@ -103,9 +89,9 @@ export const TurbulenceExample = (props: Props) => {
                 >
                     <PageNumberField
                         value={getFrequencyY}
-                        min={() => MIN_FREQUENCY}
-                        max={() => MAX_FREQUENCY}
-                        step={() => FREQUENCY_STEP}
+                        min={() => SVGFilterKnobs.Turbulence.MIN_FREQUENCY}
+                        max={() => SVGFilterKnobs.Turbulence.MAX_FREQUENCY}
+                        step={() => SVGFilterKnobs.Turbulence.FREQUENCY_STEP}
                         ariaLabel={"Base frequency y"}
                         onInput={setFrequencyY}
                     />
@@ -118,8 +104,8 @@ export const TurbulenceExample = (props: Props) => {
                 >
                     <PageNumberField
                         value={getScale}
-                        min={() => MIN_SCALE}
-                        max={() => MAX_SCALE}
+                        min={() => SVGFilterKnobs.Turbulence.MIN_SCALE}
+                        max={() => SVGFilterKnobs.Turbulence.MAX_SCALE}
                         ariaLabel={"Scale"}
                         onInput={setScale}
                     />
@@ -132,8 +118,8 @@ export const TurbulenceExample = (props: Props) => {
                 >
                     <PageNumberField
                         value={getOctaves}
-                        min={() => MIN_OCTAVES}
-                        max={() => MAX_OCTAVES}
+                        min={() => SVGFilterKnobs.Turbulence.MIN_OCTAVES}
+                        max={() => SVGFilterKnobs.Turbulence.MAX_OCTAVES}
                         ariaLabel={"Octaves"}
                         onInput={setOctaves}
                     />
@@ -148,8 +134,8 @@ export const TurbulenceExample = (props: Props) => {
                 >
                     <PageNumberField
                         value={getSeed}
-                        min={() => MIN_SEED}
-                        max={() => MAX_SEED}
+                        min={() => SVGFilterKnobs.Turbulence.MIN_SEED}
+                        max={() => SVGFilterKnobs.Turbulence.MAX_SEED}
                         ariaLabel={"Seed"}
                         onInput={setSeed}
                     />
@@ -162,7 +148,7 @@ export const TurbulenceExample = (props: Props) => {
                 >
                     <PageSelectField
                         value={getXChannel}
-                        values={() => CHANNELS}
+                        values={() => SVGFilterDefs.DISPLACEMENT_CHANNELS}
                         ariaLabel={"X channel"}
                         onChange={(channel) => setXChannel(() => channel)}
                     />
@@ -175,7 +161,7 @@ export const TurbulenceExample = (props: Props) => {
                 >
                     <PageSelectField
                         value={getYChannel}
-                        values={() => CHANNELS}
+                        values={() => SVGFilterDefs.DISPLACEMENT_CHANNELS}
                         ariaLabel={"Y channel"}
                         onChange={(channel) => setYChannel(() => channel)}
                     />

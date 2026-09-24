@@ -1,19 +1,10 @@
+import { MOSAIC_SIZE_ANCHORS } from "@thewaver/ss-components";
+
+import { MosaicKnobs } from "../../Knobs/Mosaics.const";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
-import {
-    DURATION_STEP_MS,
-    FIELD_WIDTH,
-    GAP_STEP,
-    ITEM_COUNT_STEP,
-    MAX_DURATION_MS,
-    MAX_GAP,
-    MAX_ITEM_COUNT,
-    MIN_DURATION_MS,
-    MIN_GAP,
-    MIN_ITEM_COUNT,
-    SIZE_ANCHORS,
-} from "./Mosaics.const";
+import { FIELD_WIDTH } from "./Mosaics.const";
 import type { MosaicsControls } from "./Mosaics.types";
 
 type Props = {
@@ -34,9 +25,9 @@ export const PageMosaicsPanel = (props: Props) => {
             >
                 <PageNumberField
                     value={controls.itemCountSignal[0]}
-                    min={() => MIN_ITEM_COUNT}
-                    max={() => MAX_ITEM_COUNT}
-                    step={() => ITEM_COUNT_STEP}
+                    min={() => MosaicKnobs.MIN_ITEM_COUNT}
+                    max={() => MosaicKnobs.MAX_ITEM_COUNT}
+                    step={() => MosaicKnobs.ITEM_COUNT_STEP}
                     width={() => FIELD_WIDTH}
                     ariaLabel={"Items"}
                     onInput={controls.itemCountSignal[1]}
@@ -46,9 +37,9 @@ export const PageMosaicsPanel = (props: Props) => {
             <PageProp key={"gap"} label={"Gap (px)"} hint={"The space left between tiles."}>
                 <PageNumberField
                     value={controls.gapSignal[0]}
-                    min={() => MIN_GAP}
-                    max={() => MAX_GAP}
-                    step={() => GAP_STEP}
+                    min={() => MosaicKnobs.MIN_GAP}
+                    max={() => MosaicKnobs.MAX_GAP}
+                    step={() => MosaicKnobs.GAP_STEP}
                     width={() => FIELD_WIDTH}
                     ariaLabel={"Gap in pixels"}
                     onInput={controls.gapSignal[1]}
@@ -62,7 +53,7 @@ export const PageMosaicsPanel = (props: Props) => {
             >
                 <PageSelectField
                     value={controls.sizeAnchorSignal[0]}
-                    values={() => SIZE_ANCHORS}
+                    values={() => MOSAIC_SIZE_ANCHORS}
                     width={() => FIELD_WIDTH}
                     ariaLabel={"Fixed side"}
                     onChange={(anchor) => controls.sizeAnchorSignal[1](() => anchor)}
@@ -78,9 +69,9 @@ export const PageMosaicsPanel = (props: Props) => {
             >
                 <PageNumberField
                     value={controls.transitionDurationMsSignal[0]}
-                    min={() => MIN_DURATION_MS}
-                    max={() => MAX_DURATION_MS}
-                    step={() => DURATION_STEP_MS}
+                    min={() => MosaicKnobs.MIN_DURATION_MS}
+                    max={() => MosaicKnobs.MAX_DURATION_MS}
+                    step={() => MosaicKnobs.DURATION_STEP_MS}
                     width={() => FIELD_WIDTH}
                     ariaLabel={"Glide duration in milliseconds"}
                     onInput={controls.transitionDurationMsSignal[1]}

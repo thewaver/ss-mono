@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { DateValue, DateValueCalendarId } from "@thewaver/ss-components";
-import { DateValueUtils } from "@thewaver/ss-components";
+import { DATE_INPUT_DEFAULTS, DateValueUtils } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -20,7 +20,7 @@ const describe = (value: DateValue | undefined) => (value ? DateValueUtils.toIso
 const getIsWeekend = (day: DateValue) => DateValueUtils.getWeekdayOffset(day, WEEK_STARTS_ON_MONDAY) >= WEEKEND_OFFSET;
 
 export const DatePickerPage = () => {
-    const [getCalendarId, setCalendarId] = createSignal<DateValueCalendarId>("gregory");
+    const [getCalendarId, setCalendarId] = createSignal<DateValueCalendarId>(DATE_INPUT_DEFAULTS.calendar);
 
     const pickedSignal = createSignal<DateValue | undefined>();
     const boundedSignal = createSignal<DateValue | undefined>();

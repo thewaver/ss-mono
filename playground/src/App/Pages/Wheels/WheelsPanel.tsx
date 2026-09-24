@@ -1,22 +1,8 @@
+import { WheelKnobs } from "../../Knobs/Wheels.const";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
-import {
-    DURATION_STEP_MS,
-    FIELD_WIDTH,
-    IDLE_DELAY_STEP_MS,
-    MAX_DURATION_MS,
-    MAX_IDLE_DELAY_MS,
-    MAX_TURNS,
-    MAX_WEDGE_COUNT,
-    MIN_DURATION_MS,
-    MIN_IDLE_DELAY_MS,
-    MIN_TURNS,
-    MIN_WEDGE_COUNT,
-    SPIN_STYLE_KEYS,
-    TURNS_STEP,
-    WEDGE_COUNT_STEP,
-} from "./Wheels.const";
+import { FIELD_WIDTH, SPIN_STYLE_KEYS } from "./Wheels.const";
 import type { WheelsControls } from "./Wheels.types";
 
 type Props = {
@@ -31,9 +17,9 @@ export const PageWheelsPanel = (props: Props) => {
             <PageProp key={"wedgeCount"} label={"Wedges"} hint={"How many wedges the wheel is divided into."}>
                 <PageNumberField
                     value={controls.wedgeCountSignal[0]}
-                    min={() => MIN_WEDGE_COUNT}
-                    max={() => MAX_WEDGE_COUNT}
-                    step={() => WEDGE_COUNT_STEP}
+                    min={() => WheelKnobs.MIN_WEDGE_COUNT}
+                    max={() => WheelKnobs.MAX_WEDGE_COUNT}
+                    step={() => WheelKnobs.WEDGE_COUNT_STEP}
                     width={() => FIELD_WIDTH}
                     ariaLabel={"Wedges"}
                     onInput={controls.wedgeCountSignal[1]}
@@ -47,9 +33,9 @@ export const PageWheelsPanel = (props: Props) => {
             >
                 <PageNumberField
                     value={controls.spinDurationSignal[0]}
-                    min={() => MIN_DURATION_MS}
-                    max={() => MAX_DURATION_MS}
-                    step={() => DURATION_STEP_MS}
+                    min={() => WheelKnobs.MIN_DURATION_MS}
+                    max={() => WheelKnobs.MAX_DURATION_MS}
+                    step={() => WheelKnobs.DURATION_STEP_MS}
                     width={() => FIELD_WIDTH}
                     ariaLabel={"Spin duration"}
                     onInput={controls.spinDurationSignal[1]}
@@ -63,9 +49,9 @@ export const PageWheelsPanel = (props: Props) => {
             >
                 <PageNumberField
                     value={controls.turnsSignal[0]}
-                    min={() => MIN_TURNS}
-                    max={() => MAX_TURNS}
-                    step={() => TURNS_STEP}
+                    min={() => WheelKnobs.MIN_TURNS}
+                    max={() => WheelKnobs.MAX_TURNS}
+                    step={() => WheelKnobs.TURNS_STEP}
                     width={() => FIELD_WIDTH}
                     ariaLabel={"Turns per spin"}
                     onInput={controls.turnsSignal[1]}
@@ -79,9 +65,9 @@ export const PageWheelsPanel = (props: Props) => {
             >
                 <PageNumberField
                     value={controls.settleDurationSignal[0]}
-                    min={() => MIN_DURATION_MS}
-                    max={() => MAX_DURATION_MS}
-                    step={() => DURATION_STEP_MS}
+                    min={() => WheelKnobs.MIN_DURATION_MS}
+                    max={() => WheelKnobs.MAX_DURATION_MS}
+                    step={() => WheelKnobs.DURATION_STEP_MS}
                     width={() => FIELD_WIDTH}
                     ariaLabel={"Settle duration"}
                     onInput={controls.settleDurationSignal[1]}
@@ -109,9 +95,9 @@ export const PageWheelsPanel = (props: Props) => {
             >
                 <PageNumberField
                     value={controls.restDurationSignal[0]}
-                    min={() => MIN_DURATION_MS}
-                    max={() => MAX_DURATION_MS}
-                    step={() => DURATION_STEP_MS}
+                    min={() => WheelKnobs.MIN_DURATION_MS}
+                    max={() => WheelKnobs.MAX_DURATION_MS}
+                    step={() => WheelKnobs.DURATION_STEP_MS}
                     width={() => FIELD_WIDTH}
                     isDisabled={() => !controls.doesResumeSignal[0]()}
                     ariaLabel={"Rest after a spin"}
@@ -138,9 +124,9 @@ export const PageWheelsPanel = (props: Props) => {
             >
                 <PageNumberField
                     value={controls.idleDelaySignal[0]}
-                    min={() => MIN_IDLE_DELAY_MS}
-                    max={() => MAX_IDLE_DELAY_MS}
-                    step={() => IDLE_DELAY_STEP_MS}
+                    min={() => WheelKnobs.MIN_IDLE_DELAY_MS}
+                    max={() => WheelKnobs.MAX_IDLE_DELAY_MS}
+                    step={() => WheelKnobs.IDLE_DELAY_STEP_MS}
                     width={() => FIELD_WIDTH}
                     isDisabled={() => !controls.isIdlingAllowedSignal[0]()}
                     ariaLabel={"Idle step delay"}

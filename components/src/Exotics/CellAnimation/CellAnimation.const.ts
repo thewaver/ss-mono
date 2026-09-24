@@ -7,3 +7,5 @@ export const CELL_ANIMATION_DEFAULTS = {
     sizeAnchor: "width",
     finalFrame: "cells" as CellAnimationFinalFrame,
 };
+
+export const CELL_ANIMATION_FINAL_FRAMES: readonly CellAnimationFinalFrame[] = ["source", "cells", "nothing"];

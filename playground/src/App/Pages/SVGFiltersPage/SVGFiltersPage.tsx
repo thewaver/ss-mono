@@ -1,7 +1,9 @@
 import { createMemo, createSignal } from "solid-js";
 
+import { SVGFilterDefs } from "@thewaver/ss-components";
 import type { SVGFilterMethod, SortableItem } from "@thewaver/ss-components";
 
+import { SVGFilterKnobs } from "../../Knobs/SVGFilters.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -19,13 +21,11 @@ import { SUBJECT_SIZE } from "../../StyledComponents/SVGFiltersContent/SVGFilter
 
 const EXAMPLES_ROOT = "/src/App/Pages/SVGFiltersPage/Examples";
 
-const METHODS: SVGFilterMethod[] = ["chain", "isolate"];
-
 const names = (items: SortableItem<SVGFiltersStep>[]) => items.map((item) => item.value.name).join(" → ") || "nothing";
 
 export const SVGFiltersPage = () => {
-    const [getMethod, setMethod] = createSignal<SVGFilterMethod>("chain");
-    const [getIsSizedFromElement, setIsSizedFromElement] = createSignal(true);
+    const [getMethod, setMethod] = createSignal<SVGFilterMethod>(SVGFilterKnobs.STARTING_METHOD);
+    const [getIsSizedFromElement, setIsSizedFromElement] = createSignal(SVGFilterKnobs.STARTING_IS_SIZED_FROM_ELEMENT);
 
     const appliedSignal = createSignal(APPLIED_STEPS);
     const unusedSignal = createSignal<SortableItem<SVGFiltersStep>[]>([]);
@@ -96,7 +96,7 @@ export const SVGFiltersPage = () => {
                 >
                     <PageSelectField
                         value={getMethod}
-                        values={() => METHODS}
+                        values={() => SVGFilterDefs.METHODS}
                         ariaLabel={"Method"}
                         onChange={(method) => setMethod(() => method)}
                     />

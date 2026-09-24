@@ -3,6 +3,7 @@ import type { ParentProps } from "solid-js";
 
 import { ElementObserverUtils, TOOLBAR_DEFAULTS } from "@thewaver/ss-components";
 
+import { ToolbarKnobs } from "../../Knobs/Toolbars.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -18,13 +19,6 @@ import * as styles from "./ToolbarPage.css";
 
 const EXAMPLES_ROOT = "/src/App/Pages/ToolbarPage/Examples";
 
-const STARTING_BAR_WIDTH = 520;
-const MIN_BAR_WIDTH = 80;
-const MAX_BAR_WIDTH = 760;
-const BAR_WIDTH_STEP = 10;
-const MIN_GAP = 0;
-const MAX_GAP = 30;
-const GAP_STEP = 1;
 const NO_WIDTH = 0;
 const WIDE_SPAN = 2;
 
@@ -52,7 +46,7 @@ const ResizableBar = (props: ResizableBarProps) => {
 };
 
 export const ToolbarPage = () => {
-    const [getBarWidth, setBarWidth] = createSignal(STARTING_BAR_WIDTH);
+    const [getBarWidth, setBarWidth] = createSignal(ToolbarKnobs.STARTING_BAR_WIDTH);
     const [getGap, setGap] = createSignal(TOOLBAR_DEFAULTS.gap);
     const [getLastRun, setLastRun] = createSignal(NOTHING_RUN);
     const pressedValues = createSignal<string[]>([]);
@@ -123,9 +117,9 @@ export const ToolbarPage = () => {
                 >
                     <PageNumberField
                         value={getBarWidth}
-                        min={() => MIN_BAR_WIDTH}
-                        max={() => MAX_BAR_WIDTH}
-                        step={() => BAR_WIDTH_STEP}
+                        min={() => ToolbarKnobs.MIN_BAR_WIDTH}
+                        max={() => ToolbarKnobs.MAX_BAR_WIDTH}
+                        step={() => ToolbarKnobs.BAR_WIDTH_STEP}
                         ariaLabel={"Bar width in pixels"}
                         onInput={setBarWidth}
                     />
@@ -134,9 +128,9 @@ export const ToolbarPage = () => {
                 <PageProp key={"gap"} label={"Gap (px)"} hint={"The space left between items on the bar."}>
                     <PageNumberField
                         value={getGap}
-                        min={() => MIN_GAP}
-                        max={() => MAX_GAP}
-                        step={() => GAP_STEP}
+                        min={() => ToolbarKnobs.MIN_GAP}
+                        max={() => ToolbarKnobs.MAX_GAP}
+                        step={() => ToolbarKnobs.GAP_STEP}
                         ariaLabel={"Gap in pixels"}
                         onInput={setGap}
                     />

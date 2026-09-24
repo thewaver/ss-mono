@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import type { Breadcrumb } from "@thewaver/ss-components";
 import { Button } from "@thewaver/ss-components";
 
+import { BreadcrumbKnobs } from "../../Knobs/Breadcrumbs.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -15,16 +16,12 @@ import { LinkComponentExample } from "./Examples/LinkComponent";
 import { LinkedExample } from "./Examples/Linked";
 import { TrailExample } from "./Examples/Trail";
 
-const MIN_DEPTH = 1;
-const MAX_DEPTH = 5;
-const DEPTH_STEP = 1;
-const STARTING_DEPTH = 4;
 const DEPTH_FIELD_WIDTH = 90;
 const EXAMPLES_ROOT = "/src/App/Pages/BreadcrumbsPage/Examples";
 
 export const BreadcrumbsPage = () => {
-    const [getDepth, setDepth] = createSignal(STARTING_DEPTH);
-    const [getIsDisabled, setIsDisabled] = createSignal(false);
+    const [getDepth, setDepth] = createSignal(BreadcrumbKnobs.STARTING_DEPTH);
+    const [getIsDisabled, setIsDisabled] = createSignal(BreadcrumbKnobs.STARTING_IS_DISABLED);
 
     const [getPressed, setPressed] = createSignal<CrumbValue | undefined>(undefined);
     const [getLinkPressed, setLinkPressed] = createSignal<CrumbValue | undefined>(undefined);
@@ -46,7 +43,7 @@ export const BreadcrumbsPage = () => {
     };
 
     const reset = () => {
-        setDepth(STARTING_DEPTH);
+        setDepth(BreadcrumbKnobs.STARTING_DEPTH);
         setPressed(undefined);
         setLinkPressed(undefined);
     };
@@ -113,9 +110,9 @@ export const BreadcrumbsPage = () => {
                 >
                     <PageNumberField
                         value={getDepth}
-                        min={() => MIN_DEPTH}
-                        max={() => MAX_DEPTH}
-                        step={() => DEPTH_STEP}
+                        min={() => BreadcrumbKnobs.MIN_DEPTH}
+                        max={() => BreadcrumbKnobs.MAX_DEPTH}
+                        step={() => BreadcrumbKnobs.DEPTH_STEP}
                         width={() => DEPTH_FIELD_WIDTH}
                         ariaLabel={"Depth"}
                         onInput={setDepth}

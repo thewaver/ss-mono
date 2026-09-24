@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import { MediaQueryMonitorUtils, SUNBURST_DEFAULTS, TreemapUtils } from "@thewaver/ss-components";
 import type { SunburstNode } from "@thewaver/ss-components";
 
+import { SunburstKnobs } from "../../Knobs/Sunbursts.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -12,12 +13,6 @@ import { LibraryExample } from "./Examples/Library";
 
 const EXAMPLES_ROOT = "/src/App/Pages/SunburstPage/Examples";
 
-const MIN_RING_COUNT = 1;
-const MAX_RING_COUNT = 4;
-const RING_COUNT_STEP = 1;
-const MIN_ZOOM_DURATION_MS = 0;
-const MAX_ZOOM_DURATION_MS = 3000;
-const ZOOM_DURATION_STEP_MS = 50;
 const NO_MOTION_DURATION_MS = 0;
 const WIDE_SPAN = 2;
 
@@ -60,9 +55,9 @@ export const SunburstPage = () => {
                 >
                     <PageNumberField
                         value={getRingCount}
-                        min={() => MIN_RING_COUNT}
-                        max={() => MAX_RING_COUNT}
-                        step={() => RING_COUNT_STEP}
+                        min={() => SunburstKnobs.MIN_RING_COUNT}
+                        max={() => SunburstKnobs.MAX_RING_COUNT}
+                        step={() => SunburstKnobs.RING_COUNT_STEP}
                         ariaLabel={"Rings"}
                         onInput={setRingCount}
                     />
@@ -77,9 +72,9 @@ export const SunburstPage = () => {
                 >
                     <PageNumberField
                         value={getZoomDurationMs}
-                        min={() => MIN_ZOOM_DURATION_MS}
-                        max={() => MAX_ZOOM_DURATION_MS}
-                        step={() => ZOOM_DURATION_STEP_MS}
+                        min={() => SunburstKnobs.MIN_ZOOM_DURATION_MS}
+                        max={() => SunburstKnobs.MAX_ZOOM_DURATION_MS}
+                        step={() => SunburstKnobs.ZOOM_DURATION_STEP_MS}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Zoom duration in milliseconds"}
                         onInput={setZoomDurationMs}

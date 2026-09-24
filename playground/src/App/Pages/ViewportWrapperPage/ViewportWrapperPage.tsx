@@ -4,6 +4,7 @@ import { createMemo, createSignal, createUniqueId } from "solid-js";
 import type { AnchorPlacement, SelectOption, Toast } from "@thewaver/ss-components";
 import { Button, Range, Select, Toasts, ViewportWrapper, useViewportContext } from "@thewaver/ss-components";
 
+import { ViewportWrapperKnobs } from "../../Knobs/ViewportWrappers.const";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { PagePopoverSurface } from "../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageRangeContent } from "../../StyledComponents/RangeContent/RangeContent";
@@ -31,18 +32,12 @@ const COUNTRIES: SelectOption<string>[] = [
     { value: "Sweden" },
 ];
 
-const SCALE_MIN = 50;
-const SCALE_MAX = 200;
-const SCALE_STEP = 10;
 const PERCENT = 100;
 
 const SCROLL_SIZE = { width: styles.HOST_SIZE, height: styles.HOST_SIZE };
 const INNER_TOAST_GAP = 10;
 const INNER_TOAST_MARGIN = 10;
 const INNER_TOAST_MESSAGE = "Raised inside the square.";
-
-const STARTING_ROAMER_X = 50;
-const STARTING_ROAMER_Y = 50;
 
 const renderTooltip = (text: string) => ({
     placement: () => ({ x: "center", y: "top-out" }) as const,
@@ -80,8 +75,8 @@ const ViewportReadout = () => {
 };
 
 export const ViewportWrapperPage = () => {
-    const [getRoamerX, setRoamerX] = createSignal(STARTING_ROAMER_X);
-    const [getRoamerY, setRoamerY] = createSignal(STARTING_ROAMER_Y);
+    const [getRoamerX, setRoamerX] = createSignal(ViewportWrapperKnobs.STARTING_ROAMER_X);
+    const [getRoamerY, setRoamerY] = createSignal(ViewportWrapperKnobs.STARTING_ROAMER_Y);
     const [getScalePercent, setScalePercent] = createSignal(PERCENT);
     const [getRoamingValue, setRoamingValue] = createSignal<string | undefined>();
     const innerToasts = createSignal<Toast<ToastDefs>[]>([]);
@@ -130,9 +125,9 @@ export const ViewportWrapperPage = () => {
                         valueSignal={[getScalePercent, setScalePercent]}
                         id={"viewportScale"}
                         ariaLabel={"Viewport scale"}
-                        min={() => SCALE_MIN}
-                        max={() => SCALE_MAX}
-                        step={() => SCALE_STEP}
+                        min={() => ViewportWrapperKnobs.SCALE_MIN}
+                        max={() => ViewportWrapperKnobs.SCALE_MAX}
+                        step={() => ViewportWrapperKnobs.SCALE_STEP}
                         thumbSize={() => RANGE_THUMB_SIZE}
                         renderContent={(getRenderProps) => <PageRangeContent renderProps={getRenderProps} />}
                     />

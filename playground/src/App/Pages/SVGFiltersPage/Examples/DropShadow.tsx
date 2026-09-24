@@ -2,6 +2,7 @@ import { createSignal } from "solid-js";
 
 import { SVGFilterDefsFactory, access } from "@thewaver/ss-components";
 
+import { SVGFilterKnobs } from "../../../Knobs/SVGFilters.const";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { PageColorField, PageNumberField } from "../../../StyledComponents/Field/Field";
@@ -9,28 +10,15 @@ import { PageFilterStage } from "../../../StyledComponents/SVGFiltersContent/SVG
 import type { SVGFiltersExampleProps } from "../SVGFiltersPage.types";
 
 const FILTER_ID = "svgFiltersDropShadow";
-const MIN_OFFSET = -30;
-const MAX_OFFSET = 30;
-const MIN_DEVIATION = 0;
-const MAX_DEVIATION = 12;
-const DEVIATION_STEP = 0.5;
-const MIN_OPACITY = 0;
-const MAX_OPACITY = 1;
-const OPACITY_STEP = 0.05;
-const STARTING_DX = 8;
-const STARTING_DY = 8;
-const STARTING_DEVIATION = 4;
-const STARTING_OPACITY = 0.6;
-const STARTING_COLOR = "#000000";
 
 type Props = SVGFiltersExampleProps;
 
 export const DropShadowExample = (props: Props) => {
-    const [getDx, setDx] = createSignal(STARTING_DX);
-    const [getDy, setDy] = createSignal(STARTING_DY);
-    const [getStdDeviation, setStdDeviation] = createSignal(STARTING_DEVIATION);
-    const [getFloodColor, setFloodColor] = createSignal(STARTING_COLOR);
-    const [getFloodOpacity, setFloodOpacity] = createSignal(STARTING_OPACITY);
+    const [getDx, setDx] = createSignal(SVGFilterKnobs.DropShadow.STARTING_DX);
+    const [getDy, setDy] = createSignal(SVGFilterKnobs.DropShadow.STARTING_DY);
+    const [getStdDeviation, setStdDeviation] = createSignal(SVGFilterKnobs.DropShadow.STARTING_DEVIATION);
+    const [getFloodColor, setFloodColor] = createSignal(SVGFilterKnobs.DropShadow.STARTING_COLOR);
+    const [getFloodOpacity, setFloodOpacity] = createSignal(SVGFilterKnobs.DropShadow.STARTING_OPACITY);
 
     return (
         <>
@@ -61,8 +49,8 @@ export const DropShadowExample = (props: Props) => {
                 >
                     <PageNumberField
                         value={getDx}
-                        min={() => MIN_OFFSET}
-                        max={() => MAX_OFFSET}
+                        min={() => SVGFilterKnobs.DropShadow.MIN_OFFSET}
+                        max={() => SVGFilterKnobs.DropShadow.MAX_OFFSET}
                         ariaLabel={"Offset x"}
                         onInput={setDx}
                     />
@@ -75,8 +63,8 @@ export const DropShadowExample = (props: Props) => {
                 >
                     <PageNumberField
                         value={getDy}
-                        min={() => MIN_OFFSET}
-                        max={() => MAX_OFFSET}
+                        min={() => SVGFilterKnobs.DropShadow.MIN_OFFSET}
+                        max={() => SVGFilterKnobs.DropShadow.MAX_OFFSET}
                         ariaLabel={"Offset y"}
                         onInput={setDy}
                     />
@@ -89,9 +77,9 @@ export const DropShadowExample = (props: Props) => {
                 >
                     <PageNumberField
                         value={getStdDeviation}
-                        min={() => MIN_DEVIATION}
-                        max={() => MAX_DEVIATION}
-                        step={() => DEVIATION_STEP}
+                        min={() => SVGFilterKnobs.DropShadow.MIN_DEVIATION}
+                        max={() => SVGFilterKnobs.DropShadow.MAX_DEVIATION}
+                        step={() => SVGFilterKnobs.DropShadow.DEVIATION_STEP}
                         ariaLabel={"Shadow standard deviation"}
                         onInput={setStdDeviation}
                     />
@@ -108,9 +96,9 @@ export const DropShadowExample = (props: Props) => {
                 >
                     <PageNumberField
                         value={getFloodOpacity}
-                        min={() => MIN_OPACITY}
-                        max={() => MAX_OPACITY}
-                        step={() => OPACITY_STEP}
+                        min={() => SVGFilterKnobs.DropShadow.MIN_OPACITY}
+                        max={() => SVGFilterKnobs.DropShadow.MAX_OPACITY}
+                        step={() => SVGFilterKnobs.DropShadow.OPACITY_STEP}
                         ariaLabel={"Flood opacity"}
                         onInput={setFloodOpacity}
                     />

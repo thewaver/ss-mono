@@ -2,8 +2,9 @@ import type { Signal } from "solid-js";
 import { createMemo, createSignal } from "solid-js";
 
 import type { DateValue, DateValueCalendarId, DateValueWeekStart } from "@thewaver/ss-components";
-import { DateValueUtils } from "@thewaver/ss-components";
+import { CALENDAR_DEFAULTS, DateValueUtils } from "@thewaver/ss-components";
 
+import { CalendarKnobs } from "../../Knobs/Calendars.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -16,15 +17,14 @@ import { RightToLeftExample } from "./Examples/RightToLeft";
 import { WeekdaysExample } from "./Examples/Weekdays";
 import { YearPickerExample } from "./Examples/YearPicker";
 
-const WEEK_STARTS = [0, 1] as const;
 const CALENDAR_FIELD_WIDTH = 180;
 const EXAMPLES_ROOT = "/src/App/Pages/CalendarPage/Examples";
 
 const describe = (value: DateValue | undefined) => (value ? DateValueUtils.toIso(value) : "none");
 
 export const CalendarPage = () => {
-    const [getCalendarId, setCalendarId] = createSignal<DateValueCalendarId>("gregory");
-    const [getWeekStartsOn, setWeekStartsOn] = createSignal<DateValueWeekStart>(1);
+    const [getCalendarId, setCalendarId] = createSignal<DateValueCalendarId>(CalendarKnobs.STARTING_CALENDAR);
+    const [getWeekStartsOn, setWeekStartsOn] = createSignal<DateValueWeekStart>(CALENDAR_DEFAULTS.weekStartsOn);
 
     const defaultValue = createSignal<DateValue | undefined>(TODAY);
     const rangedValue = createSignal<DateValue | undefined>();
@@ -137,7 +137,7 @@ export const CalendarPage = () => {
                 >
                     <PageSelectField
                         value={getWeekStartsOn}
-                        values={() => [...WEEK_STARTS]}
+                        values={() => [...CalendarKnobs.WEEK_STARTS]}
                         ariaLabel={"Week starts on"}
                         computeLabel={(day) => WEEK_START_LABELS[day]}
                         onChange={(day) => setWeekStartsOn(() => day)}

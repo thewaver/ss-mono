@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import { ICICLE_DEFAULTS, MediaQueryMonitorUtils, TreemapUtils } from "@thewaver/ss-components";
 import type { IcicleNode } from "@thewaver/ss-components";
 
+import { IcicleKnobs } from "../../Knobs/Icicles.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -12,12 +13,6 @@ import { LibraryExample } from "./Examples/Library";
 
 const EXAMPLES_ROOT = "/src/App/Pages/IciclePage/Examples";
 
-const MIN_COLUMN_COUNT = 1;
-const MAX_COLUMN_COUNT = 5;
-const COLUMN_COUNT_STEP = 1;
-const MIN_ZOOM_DURATION_MS = 0;
-const MAX_ZOOM_DURATION_MS = 3000;
-const ZOOM_DURATION_STEP_MS = 50;
 const NO_MOTION_DURATION_MS = 0;
 const WIDE_SPAN = 2;
 
@@ -60,9 +55,9 @@ export const IciclePage = () => {
                 >
                     <PageNumberField
                         value={getColumnCount}
-                        min={() => MIN_COLUMN_COUNT}
-                        max={() => MAX_COLUMN_COUNT}
-                        step={() => COLUMN_COUNT_STEP}
+                        min={() => IcicleKnobs.MIN_COLUMN_COUNT}
+                        max={() => IcicleKnobs.MAX_COLUMN_COUNT}
+                        step={() => IcicleKnobs.COLUMN_COUNT_STEP}
                         ariaLabel={"Columns"}
                         onInput={setColumnCount}
                     />
@@ -77,9 +72,9 @@ export const IciclePage = () => {
                 >
                     <PageNumberField
                         value={getZoomDurationMs}
-                        min={() => MIN_ZOOM_DURATION_MS}
-                        max={() => MAX_ZOOM_DURATION_MS}
-                        step={() => ZOOM_DURATION_STEP_MS}
+                        min={() => IcicleKnobs.MIN_ZOOM_DURATION_MS}
+                        max={() => IcicleKnobs.MAX_ZOOM_DURATION_MS}
+                        step={() => IcicleKnobs.ZOOM_DURATION_STEP_MS}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Zoom duration in milliseconds"}
                         onInput={setZoomDurationMs}

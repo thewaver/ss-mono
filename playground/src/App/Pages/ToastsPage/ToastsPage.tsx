@@ -1,8 +1,16 @@
 import { createRoot, createSignal, createUniqueId } from "solid-js";
 
-import { Button, TOASTS_DEFAULTS, Toasts } from "@thewaver/ss-components";
+import {
+    Button,
+    TOASTS_ALIGNMENTS,
+    TOASTS_DEFAULTS,
+    TOASTS_DIRS,
+    TOASTS_OVERFLOWS,
+    Toasts,
+} from "@thewaver/ss-components";
 import type { Toast, ToastsAlignment, ToastsDir, ToastsOverflow } from "@thewaver/ss-components";
 
+import { ToastKnobs } from "../../Knobs/Toasts.const";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
@@ -17,36 +25,8 @@ import type {
 
 import * as styles from "./ToastsPage.css";
 
-const ALIGNMENTS: ToastsAlignment[] = [
-    "top-left",
-    "top-center",
-    "top-right",
-    "middle-left",
-    "middle-center",
-    "middle-right",
-    "bottom-left",
-    "bottom-center",
-    "bottom-right",
-];
-const DIRS: ToastsDir[] = ["column", "column-reverse", "row", "row-reverse"];
-const OVERFLOWS: ToastsOverflow[] = ["dismiss-oldest", "hold-newest"];
-const ANIMATIONS: ToastAnimation[] = ["zoom", "slide", "fade"];
-const STACKINGS: ToastStacking[] = ["flow", "pile"];
-const LIMITS = [0, 1, 2, 3, 5];
-const DURATIONS_MS = [0, 2000, 4000, 8000];
 const NO_LIMIT = 0;
 const STICKY = 0;
-
-const STARTING_LIMIT = 3;
-const STARTING_DURATION_MS = 4000;
-const STARTING_MARGIN = 20;
-const MIN_GAP = 0;
-const MAX_GAP = 40;
-const MIN_MARGIN = 0;
-const MAX_MARGIN = 80;
-const MIN_TRANSITION_DURATION_MS = 0;
-const MAX_TRANSITION_DURATION_MS = 2000;
-const TRANSITION_DURATION_STEP_MS = 50;
 
 const BURST_SIZE = 5;
 
@@ -75,14 +55,14 @@ const raiseToast = (kind: ToastKind, durationMs: number) => {
 
 export const ToastsPage = () => {
     const [getAlignment, setAlignment] = createSignal<ToastsAlignment>(TOASTS_DEFAULTS.alignment);
-    const [getDir, setDir] = createSignal<ToastsDir>("column");
-    const [getOverflow, setOverflow] = createSignal<ToastsOverflow>("dismiss-oldest");
-    const [getAnimation, setAnimation] = createSignal<ToastAnimation>("zoom");
-    const [getStacking, setStacking] = createSignal<ToastStacking>("flow");
-    const [getLimit, setLimit] = createSignal(STARTING_LIMIT);
-    const [getDurationMs, setDurationMs] = createSignal(STARTING_DURATION_MS);
+    const [getDir, setDir] = createSignal<ToastsDir>(TOASTS_DEFAULTS.dir);
+    const [getOverflow, setOverflow] = createSignal<ToastsOverflow>(TOASTS_DEFAULTS.overflow);
+    const [getAnimation, setAnimation] = createSignal<ToastAnimation>(ToastKnobs.STARTING_ANIMATION);
+    const [getStacking, setStacking] = createSignal<ToastStacking>(ToastKnobs.STARTING_STACKING);
+    const [getLimit, setLimit] = createSignal(ToastKnobs.STARTING_LIMIT);
+    const [getDurationMs, setDurationMs] = createSignal(ToastKnobs.STARTING_DURATION_MS);
     const [getGap, setGap] = createSignal(TOASTS_DEFAULTS.gap);
-    const [getMargin, setMargin] = createSignal(STARTING_MARGIN);
+    const [getMargin, setMargin] = createSignal(ToastKnobs.STARTING_MARGIN);
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(TOASTS_DEFAULTS.transitionDurationMs);
 
     const [getToasts, setToasts] = toastQueue;
@@ -98,7 +78,7 @@ export const ToastsPage = () => {
                 >
                     <PageSelectField
                         value={getAlignment}
-                        values={() => ALIGNMENTS}
+                        values={() => TOASTS_ALIGNMENTS}
                         ariaLabel={"Alignment"}
                         onChange={(alignment) => setAlignment(() => alignment)}
                     />
@@ -113,7 +93,7 @@ export const ToastsPage = () => {
                 >
                     <PageSelectField
                         value={getDir}
-                        values={() => DIRS}
+                        values={() => TOASTS_DIRS}
                         ariaLabel={"Dir"}
                         onChange={(dir) => setDir(() => dir)}
                     />
@@ -126,7 +106,7 @@ export const ToastsPage = () => {
                 >
                     <PageSelectField
                         value={getLimit}
-                        values={() => LIMITS}
+                        values={() => ToastKnobs.LIMITS}
                         ariaLabel={"Limit"}
                         computeLabel={(limit) => (limit === NO_LIMIT ? "none" : `${limit}`)}
                         onChange={setLimit}
@@ -142,7 +122,7 @@ export const ToastsPage = () => {
                 >
                     <PageSelectField
                         value={getOverflow}
-                        values={() => OVERFLOWS}
+                        values={() => TOASTS_OVERFLOWS}
                         ariaLabel={"Overflow"}
                         onChange={(overflow) => setOverflow(() => overflow)}
                     />
@@ -155,7 +135,7 @@ export const ToastsPage = () => {
                 >
                     <PageSelectField
                         value={getDurationMs}
-                        values={() => DURATIONS_MS}
+                        values={() => ToastKnobs.DURATIONS_MS}
                         ariaLabel={"Duration"}
                         computeLabel={(durationMs) => (durationMs === STICKY ? "sticky" : `${durationMs}ms`)}
                         onChange={setDurationMs}
@@ -165,7 +145,7 @@ export const ToastsPage = () => {
                 <PageProp key={"animation"} label={"Animation"} hint={"How a toast arrives and leaves."}>
                     <PageSelectField
                         value={getAnimation}
-                        values={() => ANIMATIONS}
+                        values={() => ToastKnobs.ANIMATIONS}
                         ariaLabel={"Animation"}
                         onChange={(animation) => setAnimation(() => animation)}
                     />
@@ -180,7 +160,7 @@ export const ToastsPage = () => {
                 >
                     <PageSelectField
                         value={getStacking}
-                        values={() => STACKINGS}
+                        values={() => ToastKnobs.STACKINGS}
                         ariaLabel={"Stacking"}
                         onChange={(stacking) => setStacking(() => stacking)}
                     />
@@ -189,8 +169,8 @@ export const ToastsPage = () => {
                 <PageProp key={"gap"} label={"Gap (px)"} hint={"The space between one toast and the next."}>
                     <PageNumberField
                         value={getGap}
-                        min={() => MIN_GAP}
-                        max={() => MAX_GAP}
+                        min={() => ToastKnobs.MIN_GAP}
+                        max={() => ToastKnobs.MAX_GAP}
                         ariaLabel={"Gap in pixels"}
                         onInput={setGap}
                     />
@@ -203,8 +183,8 @@ export const ToastsPage = () => {
                 >
                     <PageNumberField
                         value={getMargin}
-                        min={() => MIN_MARGIN}
-                        max={() => MAX_MARGIN}
+                        min={() => ToastKnobs.MIN_MARGIN}
+                        max={() => ToastKnobs.MAX_MARGIN}
                         ariaLabel={"Margin in pixels"}
                         onInput={setMargin}
                     />
@@ -217,9 +197,9 @@ export const ToastsPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => MIN_TRANSITION_DURATION_MS}
-                        max={() => MAX_TRANSITION_DURATION_MS}
-                        step={() => TRANSITION_DURATION_STEP_MS}
+                        min={() => ToastKnobs.MIN_TRANSITION_DURATION_MS}
+                        max={() => ToastKnobs.MAX_TRANSITION_DURATION_MS}
+                        step={() => ToastKnobs.TRANSITION_DURATION_STEP_MS}
                         ariaLabel={"Transition duration"}
                         onInput={setTransitionDurationMs}
                     />

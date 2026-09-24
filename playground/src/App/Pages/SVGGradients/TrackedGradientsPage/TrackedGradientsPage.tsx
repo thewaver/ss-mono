@@ -3,6 +3,7 @@ import { createStore } from "solid-js/store";
 
 import { SVGDefsSamples, TrackedGradientDefaults } from "@thewaver/ss-components";
 
+import { SVGGradientKnobs } from "../../../Knobs/SVGGradients.const";
 import { TrackedGradientKnobs } from "../../../Knobs/TrackedGradients.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../../PageComponents/Knobs/Knobs";
@@ -20,11 +21,10 @@ import { DefaultExample } from "./Examples/Default";
 
 const EXAMPLES_ROOT = "/src/App/Pages/SVGGradients/TrackedGradientsPage/Examples";
 
-const STARTING_BLUR_WIDTH = 0;
-
 export const TrackedGradientsPage = () => {
-    const [getConfigKey, setConfigKey] =
-        createSignal<WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>>("spot_1");
+    const [getConfigKey, setConfigKey] = createSignal<WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>>(
+        SVGGradientKnobs.STARTING_TRACKED_GRADIENT_KEY,
+    );
     const [configDefs, setConfigDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
 
     const getKnobs = () => {
@@ -40,8 +40,8 @@ export const TrackedGradientsPage = () => {
             : (TrackedGradientDefaults.DEFAULTS_BY_FAMILY[key] as Record<string, unknown>);
     };
     const getConfigDefs = () => configDefs[getConfigKey()] ?? {};
-    const paintKindSignal = createSignal<SVGGradientsPaintKind>("fill");
-    const blurWidthSignal = createSignal(STARTING_BLUR_WIDTH);
+    const paintKindSignal = createSignal<SVGGradientsPaintKind>(SVGGradientKnobs.STARTING_PAINT_KIND);
+    const blurWidthSignal = createSignal(SVGGradientKnobs.STARTING_BLUR_WIDTH);
     const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS });
 
     const getExamples = createMemo(() => {

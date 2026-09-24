@@ -4,6 +4,7 @@ import { createEffect, createMemo, createSignal, on } from "solid-js";
 import { FrameRateMonitorUtils } from "@thewaver/ss-components";
 import type { SelectOption } from "@thewaver/ss-components";
 
+import { SelectKnobs } from "../../Knobs/Selects.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { AirportsExample } from "./Examples/Airports";
 import { AutocompleteExample } from "./Examples/Autocomplete";
@@ -27,7 +28,6 @@ import {
 } from "./SelectPage.const";
 import type { Airport, Delivery } from "./SelectPage.types";
 
-const STARTING_STRESS_COUNT = 10000;
 const PAGE_SIZE = 40;
 const PAGED_TOTAL = 500;
 const PAGE_DELAY_MS = 600;
@@ -56,7 +56,7 @@ const searchRoutes = (query: string, offset: number) =>
     });
 
 export const SelectPage = () => {
-    const [getStressCount, setStressCount] = createSignal(STARTING_STRESS_COUNT);
+    const [getStressCount, setStressCount] = createSignal(SelectKnobs.STARTING_STRESS_COUNT);
     const [getOpenMs, setOpenMs] = createSignal<number>();
 
     const filterQuerySignal = createSignal("");

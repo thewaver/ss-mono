@@ -1,20 +1,12 @@
 import { Show } from "solid-js";
 
+import { CAROUSEL_ORIENTATIONS } from "@thewaver/ss-components";
+
+import { CarouselKnobs } from "../../Knobs/Carousels.const";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
-import {
-    DELAY_STEP_MS,
-    FIELD_WIDTH,
-    MAX_DELAY_MS,
-    MAX_SLIDE_COUNT,
-    MIN_DELAY_MS,
-    MIN_SLIDE_COUNT,
-    ORIENTATIONS,
-    ORIENTATION_FIELD_WIDTH,
-    ORIENTATION_LABELS,
-    SLIDE_COUNT_STEP,
-} from "./Carousels.const";
+import { FIELD_WIDTH, ORIENTATION_FIELD_WIDTH, ORIENTATION_LABELS } from "./Carousels.const";
 import type { CarouselsControls } from "./Carousels.types";
 
 type Props = {
@@ -31,9 +23,9 @@ export const PageCarouselsPanel = (props: Props) => {
             <PageProp key={"slideCount"} label={"Slide count"} hint={"How many slides the carousel holds."}>
                 <PageNumberField
                     value={controls.slideCountSignal[0]}
-                    min={() => MIN_SLIDE_COUNT}
-                    max={() => MAX_SLIDE_COUNT}
-                    step={() => SLIDE_COUNT_STEP}
+                    min={() => CarouselKnobs.MIN_SLIDE_COUNT}
+                    max={() => CarouselKnobs.MAX_SLIDE_COUNT}
+                    step={() => CarouselKnobs.SLIDE_COUNT_STEP}
                     width={() => FIELD_WIDTH}
                     ariaLabel={"Slide count"}
                     onInput={controls.slideCountSignal[1]}
@@ -48,9 +40,9 @@ export const PageCarouselsPanel = (props: Props) => {
                 >
                     <PageNumberField
                         value={controls.delaySignal[0]}
-                        min={() => MIN_DELAY_MS}
-                        max={() => MAX_DELAY_MS}
-                        step={() => DELAY_STEP_MS}
+                        min={() => CarouselKnobs.MIN_DELAY_MS}
+                        max={() => CarouselKnobs.MAX_DELAY_MS}
+                        step={() => CarouselKnobs.DELAY_STEP_MS}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"RotatorUtils delay in milliseconds"}
                         onInput={controls.delaySignal[1]}
@@ -65,7 +57,7 @@ export const PageCarouselsPanel = (props: Props) => {
             >
                 <PageSelectField
                     value={controls.orientationSignal[0]}
-                    values={() => ORIENTATIONS}
+                    values={() => CAROUSEL_ORIENTATIONS}
                     computeLabel={(orientation) => ORIENTATION_LABELS[orientation]}
                     width={() => ORIENTATION_FIELD_WIDTH}
                     ariaLabel={"Orientation"}

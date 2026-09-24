@@ -2000,12 +2000,31 @@ constants because two subjects both have a `BAND_DEFAULTS`, and because the plai
 `ProximityEffects` already belong to the sample registries. The descriptions went to
 `playground/src/App/Knobs/<Subject>.const.ts` under the old `<Subject>Knobs` names, one file per library
 subject, on the user's call over keeping them in whichever page first used them: the timed gradients are read
-by two pages and the tracked gradients by two others, and a file named for the subject is owned by no page. A
-page's knobs for options of its own, such as `ParticleSpawnerPage`'s, stay in that page's `.const.ts`. The
+by two pages and the tracked gradients by two others, and a file named for the subject is owned by no page.
+**Every knob value lives in `Knobs/`, not only the shared ones.** The user's call, taken afterwards over the
+first build's rule that a page's knobs for options of its own stayed in the page. It covers the knob records
+and their defaults tables — `ParticleSpawnerPage`'s travel knobs are the case that prompted it — and also the
+loose minimum, maximum, step and starting value of every hand-built slider, number field and dropdown that
+tunes a demo, each page's under a `<Subject>Knobs` namespace in `Knobs/<Subject>.const.ts` keeping the
+constants' old names. **Nothing about a knob stays in the page**, on the user's further call: a starting value
+that was written inline where the signal is made gets a name there too, and a dropdown's list of choices is its
+range and moves with it. **A knob that starts at the library's default is the one exception**: it reads
+`<COMPONENT>_DEFAULTS` where the signal is made, as most pages already did, because there is no number of the
+Playground's own to state and a `Knobs` constant would only restate the library's. What stays in the page is
+what the example itself is made of: a range handed to the component being shown, as `NumberInputPage`'s
+quantity field has, is the example's content rather than a control tuning it, and so are an example's own
+state, layout sizes, labels and content lists. Patch Board's zoom range is the example's for that reason — its
+buttons are part of what the example shows, and the example's source is on the page. The
 knob types went with them into `PageComponents/Knobs/Knobs.types.ts` as `Knob`, `NumberKnob`, `CheckKnob`,
 `KnobFor` and `Knobs`, and `Samples/Samples.types.ts`, which held nothing else, is gone. `TimedGradientDefsOf`
 and `TrackedGradientDefsOf` stayed in the library beside the entries they read, because the defaults need them
 as much as the knobs do.
+
+**`FormFieldOrientation` was named so its lookup could move.** `FormField`'s orientation was written inline in
+its props type, so the Playground's list of the two values had nothing to be typed against in the library.
+Naming the union is an addition rather than a change, and `FORM_FIELD_ORIENTATIONS` sits beside
+`FORM_FIELD_DEFAULTS` under the lookup rule in `conventions.md`. Its order is vertical first, the default,
+because that is the order the Playground's dropdown showed.
 
 **Generators are a group of their own in Uses and Used by**, between abstracts and primitives, and a generator
 folder is a unit as a whole in the dependency map, the way an abstract folder is. `Surface`, `GlassSurface`

@@ -7,6 +7,7 @@ import {
     ScrambleTextWeights,
 } from "@thewaver/ss-components";
 
+import { ScrambleTextKnobs } from "../../Knobs/ScrambleTexts.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -19,23 +20,17 @@ import type { ScrambleTextExampleProps } from "./ScrambleTextPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/ScrambleTextPage/Examples";
 
-const GLYPH_SETS = ["library", ...ScrambleTextGlyphs.SAMPLE_KEYS] as const;
-
-const SETTLE_ORDERS = ["leftToRight", ...ScrambleTextWeights.SAMPLE_KEYS] as const;
-
-const MIN_SETTLE_DURATION_MS = 0;
-const MAX_SETTLE_DURATION_MS = 4000;
-const SETTLE_DURATION_STEP_MS = 100;
-const MIN_SCRAMBLE_INTERVAL_MS = 10;
-const MAX_SCRAMBLE_INTERVAL_MS = 200;
-const SCRAMBLE_INTERVAL_STEP_MS = 5;
 const NO_MOTION_DURATION_MS = 0;
 
 export const ScrambleTextPage = () => {
     const [getSettleDurationMs, setSettleDurationMs] = createSignal(SCRAMBLE_TEXT_DEFAULTS.settleDurationMs);
     const [getScrambleIntervalMs, setScrambleIntervalMs] = createSignal(SCRAMBLE_TEXT_DEFAULTS.scrambleIntervalMs);
-    const [getGlyphSet, setGlyphSet] = createSignal<(typeof GLYPH_SETS)[number]>(GLYPH_SETS[0]);
-    const [getSettleOrder, setSettleOrder] = createSignal<(typeof SETTLE_ORDERS)[number]>(SETTLE_ORDERS[0]);
+    const [getGlyphSet, setGlyphSet] = createSignal<(typeof ScrambleTextKnobs.GLYPH_SETS)[number]>(
+        ScrambleTextKnobs.STARTING_GLYPH_SET,
+    );
+    const [getSettleOrder, setSettleOrder] = createSignal<(typeof ScrambleTextKnobs.SETTLE_ORDERS)[number]>(
+        ScrambleTextKnobs.STARTING_SETTLE_ORDER,
+    );
 
     const getPrefersReducedMotion = MediaQueryMonitorUtils.createReducedMotion();
 
@@ -104,9 +99,9 @@ export const ScrambleTextPage = () => {
                 >
                     <PageNumberField
                         value={getSettleDurationMs}
-                        min={() => MIN_SETTLE_DURATION_MS}
-                        max={() => MAX_SETTLE_DURATION_MS}
-                        step={() => SETTLE_DURATION_STEP_MS}
+                        min={() => ScrambleTextKnobs.MIN_SETTLE_DURATION_MS}
+                        max={() => ScrambleTextKnobs.MAX_SETTLE_DURATION_MS}
+                        step={() => ScrambleTextKnobs.SETTLE_DURATION_STEP_MS}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Settle duration in milliseconds"}
                         onInput={setSettleDurationMs}
@@ -122,9 +117,9 @@ export const ScrambleTextPage = () => {
                 >
                     <PageNumberField
                         value={getScrambleIntervalMs}
-                        min={() => MIN_SCRAMBLE_INTERVAL_MS}
-                        max={() => MAX_SCRAMBLE_INTERVAL_MS}
-                        step={() => SCRAMBLE_INTERVAL_STEP_MS}
+                        min={() => ScrambleTextKnobs.MIN_SCRAMBLE_INTERVAL_MS}
+                        max={() => ScrambleTextKnobs.MAX_SCRAMBLE_INTERVAL_MS}
+                        step={() => ScrambleTextKnobs.SCRAMBLE_INTERVAL_STEP_MS}
                         ariaLabel={"Scramble interval in milliseconds"}
                         onInput={setScrambleIntervalMs}
                     />
@@ -139,7 +134,7 @@ export const ScrambleTextPage = () => {
                 >
                     <PageSelectField
                         value={getGlyphSet}
-                        values={() => GLYPH_SETS}
+                        values={() => ScrambleTextKnobs.GLYPH_SETS}
                         ariaLabel={"Glyphs"}
                         onChange={(glyphSet) => setGlyphSet(() => glyphSet)}
                     />
@@ -154,7 +149,7 @@ export const ScrambleTextPage = () => {
                 >
                     <PageSelectField
                         value={getSettleOrder}
-                        values={() => SETTLE_ORDERS}
+                        values={() => ScrambleTextKnobs.SETTLE_ORDERS}
                         ariaLabel={"Settle order"}
                         onChange={(settleOrder) => setSettleOrder(() => settleOrder)}
                     />

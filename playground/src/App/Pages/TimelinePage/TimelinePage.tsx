@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { Button } from "@thewaver/ss-components";
 
+import { TimelineKnobs } from "../../Knobs/Timelines.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -16,9 +17,9 @@ import type { Clip, TimelineExampleProps } from "./TimelinePage.types";
 const EXAMPLES_ROOT = "/src/App/Pages/TimelinePage/Examples";
 
 export const TimelinePage = () => {
-    const [getIsPannable, setIsPannable] = createSignal(true);
-    const [getIsZoomable, setIsZoomable] = createSignal(true);
-    const [getIsDisabled, setIsDisabled] = createSignal(false);
+    const [getIsPannable, setIsPannable] = createSignal(TimelineKnobs.STARTING_IS_PANNABLE);
+    const [getIsZoomable, setIsZoomable] = createSignal(TimelineKnobs.STARTING_IS_ZOOMABLE);
+    const [getIsDisabled, setIsDisabled] = createSignal(TimelineKnobs.STARTING_IS_DISABLED);
     const [getPicked, setPicked] = createSignal("nothing yet");
 
     const daySignal = createSignal(DAY);

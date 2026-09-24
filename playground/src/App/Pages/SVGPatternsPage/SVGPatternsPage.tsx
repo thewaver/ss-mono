@@ -3,6 +3,7 @@ import { createStore } from "solid-js/store";
 
 import { SVGDefsSamples } from "@thewaver/ss-components";
 
+import { SVGPatternKnobs } from "../../Knobs/SVGPatterns.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -26,26 +27,16 @@ const GROUPPED_PATTERNS = splitEntriesIntoGroups(SVGDefsSamples.Pattern.SAMPLE_C
 
 const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/SVGPatternsPage/Examples/Default.tsx";
 
-const MIN_CELL_SIZE = 10;
-const MAX_CELL_SIZE = 160;
-const CELL_SIZE_STEP = 10;
-const MIN_BLUR_WIDTH = 0;
-const MAX_BLUR_WIDTH = 40;
-const BLUR_WIDTH_STEP = 1;
-const MIN_DURATION_MS = 1000;
-const MAX_DURATION_MS = 5000;
-
-const STARTING_DURATION_MS = 2000;
-const STARTING_CELL_SIZE = 60;
-const STARTING_BLUR_WIDTH = 0;
-const DURATION_STEP_MS = 100;
-
 export const SVGPatternsPage = () => {
-    const [getConfigKey, setConfigKey] = createSignal<WithNoSample<SVGDefsSamples.Pattern.SampleKey>>("hexagon_pt_2");
-    const [getIterationConfigKey, setIterationConfigKey] = createSignal<SVGDefsSamples.Iteration.SampleKey>("constant");
-    const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(STARTING_DURATION_MS);
-    const [getCellSize, setCellSize] = createSignal(STARTING_CELL_SIZE);
-    const [getBlurWidth, setBlurWidth] = createSignal(STARTING_BLUR_WIDTH);
+    const [getConfigKey, setConfigKey] = createSignal<WithNoSample<SVGDefsSamples.Pattern.SampleKey>>(
+        SVGPatternKnobs.STARTING_PATTERN_KEY,
+    );
+    const [getIterationConfigKey, setIterationConfigKey] = createSignal<SVGDefsSamples.Iteration.SampleKey>(
+        SVGPatternKnobs.STARTING_ITERATION_KEY,
+    );
+    const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(SVGPatternKnobs.STARTING_DURATION_MS);
+    const [getCellSize, setCellSize] = createSignal(SVGPatternKnobs.STARTING_CELL_SIZE);
+    const [getBlurWidth, setBlurWidth] = createSignal(SVGPatternKnobs.STARTING_BLUR_WIDTH);
     const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS });
 
     const getExamples = createMemo(() => {
@@ -87,9 +78,9 @@ export const SVGPatternsPage = () => {
                 >
                     <PageNumberField
                         value={getCellSize}
-                        min={() => MIN_CELL_SIZE}
-                        max={() => MAX_CELL_SIZE}
-                        step={() => CELL_SIZE_STEP}
+                        min={() => SVGPatternKnobs.MIN_CELL_SIZE}
+                        max={() => SVGPatternKnobs.MAX_CELL_SIZE}
+                        step={() => SVGPatternKnobs.CELL_SIZE_STEP}
                         ariaLabel={"Cell size"}
                         onInput={setCellSize}
                     />
@@ -120,9 +111,9 @@ export const SVGPatternsPage = () => {
                 >
                     <PageNumberField
                         value={getBlurWidth}
-                        min={() => MIN_BLUR_WIDTH}
-                        max={() => MAX_BLUR_WIDTH}
-                        step={() => BLUR_WIDTH_STEP}
+                        min={() => SVGPatternKnobs.MIN_BLUR_WIDTH}
+                        max={() => SVGPatternKnobs.MAX_BLUR_WIDTH}
+                        step={() => SVGPatternKnobs.BLUR_WIDTH_STEP}
                         ariaLabel={"Blur width"}
                         onInput={setBlurWidth}
                     />
@@ -135,9 +126,9 @@ export const SVGPatternsPage = () => {
                 >
                     <PageNumberField
                         value={getAnimationDurationMs}
-                        min={() => MIN_DURATION_MS}
-                        max={() => MAX_DURATION_MS}
-                        step={() => DURATION_STEP_MS}
+                        min={() => SVGPatternKnobs.MIN_DURATION_MS}
+                        max={() => SVGPatternKnobs.MAX_DURATION_MS}
+                        step={() => SVGPatternKnobs.DURATION_STEP_MS}
                         ariaLabel={"Animation duration"}
                         onInput={setAnimationDurationMs}
                     />

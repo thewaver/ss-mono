@@ -4,6 +4,7 @@ import { createStore } from "solid-js/store";
 
 import {
     CELL_ANIMATION_DEFAULTS,
+    CELL_ANIMATION_FINAL_FRAMES,
     CellAnimationBreakpoints,
     CellAnimationKeyframes,
     CellAnimationOrigins,
@@ -21,6 +22,7 @@ import type {
 } from "@thewaver/ss-components";
 import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
+import { CellAnimationKnobs } from "../../Knobs/CellAnimations.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -44,7 +46,6 @@ import { WipeExample } from "./Examples/Wipe";
 import * as styles from "./CellAnimationPage.css";
 
 const IMAGE_CONTAINER_SIZE = 480;
-const DEFAULT_SOURCE_RATIO: SVGDefsSources.SourceRatio = "1:1";
 const STRESS_CELL_COUNT: Index2d = { row: 11, col: 11 };
 const STRESS_ITEM_SIZE = 120;
 const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
@@ -79,23 +80,6 @@ const SCRUB_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Scrub.tsx"
 const WIPE_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Wipe.tsx";
 const DRAWN_SOURCE_PATH = "/src/App/PageComponents/SVGDefsSources/SVGDefsSources.const.ts";
 
-const MIN_CELL_COUNT = 1;
-const MAX_CELL_COUNT = 40;
-const CELL_COUNT_STEP = 1;
-const MIN_SMOOTHNESS = 0.05;
-const MAX_SMOOTHNESS = 1;
-const SMOOTHNESS_STEP = 0.05;
-const MIN_DURATION_MS = 100;
-const MAX_DURATION_MS = 10000;
-const DURATION_STEP_MS = 100;
-const MIN_ITERATION_DELAY_MS = 0;
-const MAX_ITERATION_DELAY_MS = 5000;
-const MIN_ITERATION_COUNT = -1;
-const MAX_ITERATION_COUNT = 10;
-const ENDLESS_ITERATION_COUNT = -1;
-const FINAL_FRAMES: CellAnimationFinalFrame[] = ["source", "cells", "nothing"];
-const MIN_HOLD_MS = 0;
-const MAX_HOLD_MS = 5000;
 const PERCENT = 100;
 
 const computeContainerWidth = (size: Size2d) => (IMAGE_CONTAINER_SIZE * size.width) / Math.max(size.width, size.height);
@@ -149,8 +133,10 @@ const ImageExampleWrapper = (props: CellAnimationExampleProps) => {
 };
 
 const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
-    const [getKey, setKey] = createSignal<SVGDefsSamples.Gradient.Timed.SampleKey>("orbit_async_2v1");
-    const [getRatio, setRatio] = createSignal<SVGDefsSources.SourceRatio>(DEFAULT_SOURCE_RATIO);
+    const [getKey, setKey] = createSignal<SVGDefsSamples.Gradient.Timed.SampleKey>(
+        CellAnimationKnobs.STARTING_GRADIENT_KEY,
+    );
+    const [getRatio, setRatio] = createSignal<SVGDefsSources.SourceRatio>(CellAnimationKnobs.DEFAULT_SOURCE_RATIO);
 
     const getSize = createMemo(() => SVGDefsSources.computeSourceSize(getRatio()));
 
@@ -209,8 +195,8 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
 };
 
 const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
-    const [getKey, setKey] = createSignal<SVGDefsSamples.Pattern.SampleKey>("hexagon_pt_2");
-    const [getRatio, setRatio] = createSignal<SVGDefsSources.SourceRatio>(DEFAULT_SOURCE_RATIO);
+    const [getKey, setKey] = createSignal<SVGDefsSamples.Pattern.SampleKey>(CellAnimationKnobs.STARTING_PATTERN_KEY);
+    const [getRatio, setRatio] = createSignal<SVGDefsSources.SourceRatio>(CellAnimationKnobs.DEFAULT_SOURCE_RATIO);
 
     const getSize = createMemo(() => SVGDefsSources.computeSourceSize(getRatio()));
 
@@ -327,28 +313,30 @@ export const CellAnimationPage = () => {
     const scrubPlayback = createSignal(false);
     const scrubProgress = createSignal(0);
 
-    const [getOriginType, setOriginType] = createSignal<CellAnimationOrigins.OriginType>("center");
-    const [getWeightType, setWeightType] = createSignal<CellAnimationWeights.WeightType>("diamondDefault");
-    const [getAnimationType, setAnimationType] = createSignal<CellAnimationKeyframes.AnimationType>("zoomIn");
+    const [getOriginType, setOriginType] = createSignal<CellAnimationOrigins.OriginType>(
+        CellAnimationKnobs.STARTING_ORIGIN_KEY,
+    );
+    const [getWeightType, setWeightType] = createSignal<CellAnimationWeights.WeightType>(
+        CellAnimationKnobs.STARTING_WEIGHT_KEY,
+    );
+    const [getAnimationType, setAnimationType] = createSignal<CellAnimationKeyframes.AnimationType>(
+        CellAnimationKnobs.STARTING_ANIMATION_KEY,
+    );
     const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(CELL_ANIMATION_DEFAULTS.animationDurationMs);
     const [getAnimationIterationDelayMs, setAnimationIterationDelayMs] = createSignal(
         CELL_ANIMATION_DEFAULTS.animationIterationDelayMs,
     );
-    const [getAnimationIterationCount, setAnimationIterationCount] = createSignal(ENDLESS_ITERATION_COUNT);
-    const [getFinalFrame, setFinalFrame] = createSignal<CellAnimationFinalFrame>("cells");
-    const [cellCount, setCellCount] = createStore<Index2d>({ ...STRESS_CELL_COUNT });
-    const [weightOpts, setWeightOpts] = createStore<WeightOpts>({
-        shouldMakeUnique: false,
-        shouldNormalize: false,
-    });
+    const [getAnimationIterationCount, setAnimationIterationCount] = createSignal(
+        CellAnimationKnobs.ENDLESS_ITERATION_COUNT,
+    );
+    const [getFinalFrame, setFinalFrame] = createSignal<CellAnimationFinalFrame>(CELL_ANIMATION_DEFAULTS.finalFrame);
+    const [cellCount, setCellCount] = createStore<Index2d>({ ...CellAnimationKnobs.STARTING_CELL_COUNT });
+    const [weightOpts, setWeightOpts] = createStore<WeightOpts>({ ...CellAnimationKnobs.STARTING_WEIGHT_OPTS });
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
-        dir: "asc",
-        smoothness: 0.25,
-        easing: "linear",
+        ...CellAnimationKnobs.STARTING_BREAKPOINT_OPTS,
     });
     const [playbackOpts, setPlaybackOpts] = createStore<CellAnimationPlaybackOpts>({
-        dir: "alternate",
-        holdMs: 1000,
+        ...CellAnimationKnobs.STARTING_PLAYBACK_OPTS,
     });
 
     const getExamples = createMemo(() => {
@@ -363,7 +351,9 @@ export const CellAnimationPage = () => {
             animationType: getAnimationType,
             animationDurationMs: getAnimationDurationMs,
             animationIterationCount: () =>
-                getAnimationIterationCount() === ENDLESS_ITERATION_COUNT ? Infinity : getAnimationIterationCount(),
+                getAnimationIterationCount() === CellAnimationKnobs.ENDLESS_ITERATION_COUNT
+                    ? Infinity
+                    : getAnimationIterationCount(),
             animationIterationDelayMs: getAnimationIterationDelayMs,
             finalFrame: getFinalFrame,
         };
@@ -434,17 +424,17 @@ export const CellAnimationPage = () => {
                     <div class={styles.valueList}>
                         <PageNumberField
                             value={() => cellCount.col}
-                            min={() => MIN_CELL_COUNT}
-                            max={() => MAX_CELL_COUNT}
-                            step={() => CELL_COUNT_STEP}
+                            min={() => CellAnimationKnobs.MIN_CELL_COUNT}
+                            max={() => CellAnimationKnobs.MAX_CELL_COUNT}
+                            step={() => CellAnimationKnobs.CELL_COUNT_STEP}
                             ariaLabel={"Columns"}
                             onInput={(value) => setCellCount("col", value)}
                         />
                         <PageNumberField
                             value={() => cellCount.row}
-                            min={() => MIN_CELL_COUNT}
-                            max={() => MAX_CELL_COUNT}
-                            step={() => CELL_COUNT_STEP}
+                            min={() => CellAnimationKnobs.MIN_CELL_COUNT}
+                            max={() => CellAnimationKnobs.MAX_CELL_COUNT}
+                            step={() => CellAnimationKnobs.CELL_COUNT_STEP}
                             ariaLabel={"Rows"}
                             onInput={(value) => setCellCount("row", value)}
                         />
@@ -558,9 +548,9 @@ export const CellAnimationPage = () => {
                 >
                     <PageNumberField
                         value={() => breakpointOpts.smoothness!}
-                        min={() => MIN_SMOOTHNESS}
-                        max={() => MAX_SMOOTHNESS}
-                        step={() => SMOOTHNESS_STEP}
+                        min={() => CellAnimationKnobs.MIN_SMOOTHNESS}
+                        max={() => CellAnimationKnobs.MAX_SMOOTHNESS}
+                        step={() => CellAnimationKnobs.SMOOTHNESS_STEP}
                         ariaLabel={"Smoothness"}
                         onInput={(value) => setBreakpointOpts("smoothness", value)}
                     />
@@ -573,9 +563,9 @@ export const CellAnimationPage = () => {
                 >
                     <PageNumberField
                         value={getAnimationDurationMs}
-                        min={() => MIN_DURATION_MS}
-                        max={() => MAX_DURATION_MS}
-                        step={() => DURATION_STEP_MS}
+                        min={() => CellAnimationKnobs.MIN_DURATION_MS}
+                        max={() => CellAnimationKnobs.MAX_DURATION_MS}
+                        step={() => CellAnimationKnobs.DURATION_STEP_MS}
                         ariaLabel={"Animation duration"}
                         onInput={setAnimationDurationMs}
                     />
@@ -588,9 +578,9 @@ export const CellAnimationPage = () => {
                 >
                     <PageNumberField
                         value={getAnimationIterationDelayMs}
-                        min={() => MIN_ITERATION_DELAY_MS}
-                        max={() => MAX_ITERATION_DELAY_MS}
-                        step={() => DURATION_STEP_MS}
+                        min={() => CellAnimationKnobs.MIN_ITERATION_DELAY_MS}
+                        max={() => CellAnimationKnobs.MAX_ITERATION_DELAY_MS}
+                        step={() => CellAnimationKnobs.DURATION_STEP_MS}
                         ariaLabel={"Iteration delay"}
                         onInput={setAnimationIterationDelayMs}
                     />
@@ -603,9 +593,9 @@ export const CellAnimationPage = () => {
                 >
                     <PageNumberField
                         value={getAnimationIterationCount}
-                        min={() => MIN_ITERATION_COUNT}
-                        max={() => MAX_ITERATION_COUNT}
-                        step={() => CELL_COUNT_STEP}
+                        min={() => CellAnimationKnobs.MIN_ITERATION_COUNT}
+                        max={() => CellAnimationKnobs.MAX_ITERATION_COUNT}
+                        step={() => CellAnimationKnobs.CELL_COUNT_STEP}
                         ariaLabel={"Iteration count"}
                         onInput={setAnimationIterationCount}
                     />
@@ -620,8 +610,8 @@ export const CellAnimationPage = () => {
                 >
                     <PageSelectField
                         value={getFinalFrame}
-                        values={() => FINAL_FRAMES}
-                        isDisabled={() => getAnimationIterationCount() === ENDLESS_ITERATION_COUNT}
+                        values={() => CELL_ANIMATION_FINAL_FRAMES}
+                        isDisabled={() => getAnimationIterationCount() === CellAnimationKnobs.ENDLESS_ITERATION_COUNT}
                         ariaLabel={"Final frame"}
                         onChange={(frame) => setFinalFrame(() => frame)}
                     />
@@ -649,9 +639,9 @@ export const CellAnimationPage = () => {
                 >
                     <PageNumberField
                         value={() => playbackOpts.holdMs!}
-                        min={() => MIN_HOLD_MS}
-                        max={() => MAX_HOLD_MS}
-                        step={() => DURATION_STEP_MS}
+                        min={() => CellAnimationKnobs.MIN_HOLD_MS}
+                        max={() => CellAnimationKnobs.MAX_HOLD_MS}
+                        step={() => CellAnimationKnobs.DURATION_STEP_MS}
                         isDisabled={() => !playbackOpts.dir?.startsWith("alternate")}
                         ariaLabel={"Hold at far end"}
                         onInput={(value) => setPlaybackOpts("holdMs", value)}

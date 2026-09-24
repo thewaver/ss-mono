@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { DateValue, DateValueCalendarId } from "@thewaver/ss-components";
-import { DateValueUtils } from "@thewaver/ss-components";
+import { DATE_INPUT_DEFAULTS, DateValueUtils } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -16,7 +16,7 @@ const EXAMPLES_ROOT = "/src/App/Pages/DateInputPage/Examples";
 const describe = (value: DateValue | undefined) => (value ? DateValueUtils.toIso(value) : "none");
 
 export const DateInputPage = () => {
-    const [getCalendarId, setCalendarId] = createSignal<DateValueCalendarId>("gregory");
+    const [getCalendarId, setCalendarId] = createSignal<DateValueCalendarId>(DATE_INPUT_DEFAULTS.calendar);
 
     const typedSignal = createSignal<DateValue | undefined>(TODAY);
     const localeSignal = createSignal<DateValue | undefined>(TODAY);

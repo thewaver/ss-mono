@@ -1,7 +1,9 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { FORM_FIELD_DEFAULTS } from "@thewaver/ss-components";
+import type { FormFieldOrientation } from "@thewaver/ss-components";
+import { FORM_FIELD_DEFAULTS, FORM_FIELD_ORIENTATIONS } from "@thewaver/ss-components";
 
+import { FormFieldKnobs } from "../../Knobs/FormFields.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -13,21 +15,14 @@ import type { FormFieldExampleProps } from "./FormFieldPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/FormFieldPage/Examples";
 
-const ORIENTATIONS: ("horizontal" | "vertical")[] = ["vertical", "horizontal"];
-
-const MIN_GAP = 0;
-const MAX_GAP = 40;
-const GAP_STEP = 5;
 const FIELD_WIDTH = 110;
 const MESSAGE_WIDTH = 240;
 
-const STARTING_MESSAGE = "Shown to everyone who can see your posts.";
-
 export const FormFieldPage = () => {
-    const [getOrientation, setOrientation] = createSignal<"horizontal" | "vertical">(FORM_FIELD_DEFAULTS.orientation);
+    const [getOrientation, setOrientation] = createSignal<FormFieldOrientation>(FORM_FIELD_DEFAULTS.orientation);
     const [getGap, setGap] = createSignal(FORM_FIELD_DEFAULTS.gap);
-    const [getMessage, setMessage] = createSignal(STARTING_MESSAGE);
-    const [getHasError, setHasError] = createSignal(false);
+    const [getMessage, setMessage] = createSignal(FormFieldKnobs.STARTING_MESSAGE);
+    const [getHasError, setHasError] = createSignal(FormFieldKnobs.STARTING_HAS_ERROR);
 
     const defaultSignal = createSignal("");
     const foreignSignal = createSignal("");
@@ -81,7 +76,7 @@ export const FormFieldPage = () => {
                 >
                     <PageSelectField
                         value={getOrientation}
-                        values={() => ORIENTATIONS}
+                        values={() => FORM_FIELD_ORIENTATIONS}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Orientation"}
                         onChange={(orientation) => setOrientation(() => orientation)}
@@ -95,9 +90,9 @@ export const FormFieldPage = () => {
                 >
                     <PageNumberField
                         value={getGap}
-                        min={() => MIN_GAP}
-                        max={() => MAX_GAP}
-                        step={() => GAP_STEP}
+                        min={() => FormFieldKnobs.MIN_GAP}
+                        max={() => FormFieldKnobs.MAX_GAP}
+                        step={() => FormFieldKnobs.GAP_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Gap in pixels"}
                         onInput={setGap}

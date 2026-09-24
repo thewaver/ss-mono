@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { MediaQueryMonitorUtils, TREEMAP_DEFAULTS, TreemapUtils } from "@thewaver/ss-components";
 
+import { TreemapKnobs } from "../../Knobs/Treemaps.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -11,9 +12,6 @@ import { LIBRARY } from "./TreemapPage.const";
 
 const EXAMPLES_ROOT = "/src/App/Pages/TreemapPage/Examples";
 
-const MIN_ZOOM_DURATION_MS = 0;
-const MAX_ZOOM_DURATION_MS = 3000;
-const ZOOM_DURATION_STEP_MS = 50;
 const NO_MOTION_DURATION_MS = 0;
 const WIDE_SPAN = 2;
 
@@ -56,9 +54,9 @@ export const TreemapPage = () => {
                 >
                     <PageNumberField
                         value={getZoomDurationMs}
-                        min={() => MIN_ZOOM_DURATION_MS}
-                        max={() => MAX_ZOOM_DURATION_MS}
-                        step={() => ZOOM_DURATION_STEP_MS}
+                        min={() => TreemapKnobs.MIN_ZOOM_DURATION_MS}
+                        max={() => TreemapKnobs.MAX_ZOOM_DURATION_MS}
+                        step={() => TreemapKnobs.ZOOM_DURATION_STEP_MS}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Zoom duration in milliseconds"}
                         onInput={setZoomDurationMs}

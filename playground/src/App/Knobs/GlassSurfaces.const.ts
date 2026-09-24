@@ -1,0 +1,42 @@
+export namespace GlassSurfaceKnobs {
+    export const MIN_BORDER_RADIUS = 0;
+    export const MAX_BORDER_RADIUS = 160;
+    export const BORDER_RADIUS_STEP = 10;
+    export const MIN_BORDER_WIDTH = 0;
+    export const MAX_BORDER_WIDTH = 12;
+    export const BORDER_WIDTH_STEP = 1;
+    export const MIN_BLUR_RADIUS = 0;
+    export const MAX_BLUR_RADIUS = 20;
+    export const BLUR_RADIUS_STEP = 1;
+    export const MIN_RIPPLE_SCALE = 0;
+    export const MAX_RIPPLE_SCALE = 80;
+    export const RIPPLE_SCALE_STEP = 1;
+    export const MIN_LIGHT_HEIGHT = 0;
+    export const MAX_LIGHT_HEIGHT = 2000;
+    export const LIGHT_HEIGHT_STEP = 20;
+    export const MIN_SURFACE_SCALE = 0;
+    export const MAX_SURFACE_SCALE = 8;
+    export const SURFACE_SCALE_STEP = 0.05;
+    export const MIN_SPECULAR_CONSTANT = 0;
+    export const MAX_SPECULAR_CONSTANT = 4;
+    export const SPECULAR_CONSTANT_STEP = 0.05;
+    export const MIN_SPECULAR_EXPONENT = 1;
+    export const MAX_SPECULAR_EXPONENT = 300;
+    export const SPECULAR_EXPONENT_STEP = 1;
+    export const MIN_GRAIN_FREQUENCY = 0.005;
+    export const MAX_GRAIN_FREQUENCY = 0.3;
+    export const GRAIN_FREQUENCY_STEP = 0.005;
+    export const MIN_GRAIN_OCTAVES = 1;
+    export const MAX_GRAIN_OCTAVES = 5;
+    export const GRAIN_OCTAVES_STEP = 1;
+    export const MIN_TINT_OPACITY = 0;
+    export const MAX_TINT_OPACITY = 1;
+    export const TINT_OPACITY_STEP = 0.05;
+    export const MIN_BLUR_WIDTH = 0;
+    export const MAX_BLUR_WIDTH = 40;
+    export const BLUR_WIDTH_STEP = 1;
+
+    export const STARTING_BORDER_WIDTH = 2;
+    export const STARTING_STROKE_CONFIG_KEY = "spot_1";
+    export const STARTING_BLUR_WIDTH = 0;
+}

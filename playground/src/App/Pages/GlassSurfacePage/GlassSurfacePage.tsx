@@ -3,6 +3,7 @@ import { createStore } from "solid-js/store";
 
 import { DEFAULT_GLASS_DEFS, SVGDefsSamples, TrackedGradientDefaults } from "@thewaver/ss-components";
 
+import { GlassSurfaceKnobs } from "../../Knobs/GlassSurfaces.const";
 import { TrackedGradientKnobs } from "../../Knobs/TrackedGradients.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
@@ -26,52 +27,12 @@ const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Tracke
 
 const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/GlassSurfacePage/Examples/Default.tsx";
 
-const MIN_BORDER_RADIUS = 0;
-const MAX_BORDER_RADIUS = 160;
-const BORDER_RADIUS_STEP = 10;
-const MIN_BORDER_WIDTH = 0;
-const MAX_BORDER_WIDTH = 12;
-const BORDER_WIDTH_STEP = 1;
-const MIN_BLUR_RADIUS = 0;
-const MAX_BLUR_RADIUS = 20;
-const BLUR_RADIUS_STEP = 1;
-const MIN_RIPPLE_SCALE = 0;
-const MAX_RIPPLE_SCALE = 80;
-const RIPPLE_SCALE_STEP = 1;
-const MIN_LIGHT_HEIGHT = 0;
-const MAX_LIGHT_HEIGHT = 2000;
-const LIGHT_HEIGHT_STEP = 20;
-const MIN_SURFACE_SCALE = 0;
-const MAX_SURFACE_SCALE = 8;
-const SURFACE_SCALE_STEP = 0.05;
-const MIN_SPECULAR_CONSTANT = 0;
-const MAX_SPECULAR_CONSTANT = 4;
-const SPECULAR_CONSTANT_STEP = 0.05;
-const MIN_SPECULAR_EXPONENT = 1;
-const MAX_SPECULAR_EXPONENT = 300;
-const SPECULAR_EXPONENT_STEP = 1;
-const MIN_GRAIN_FREQUENCY = 0.005;
-const MAX_GRAIN_FREQUENCY = 0.3;
-const GRAIN_FREQUENCY_STEP = 0.005;
-const MIN_GRAIN_OCTAVES = 1;
-const MAX_GRAIN_OCTAVES = 5;
-const GRAIN_OCTAVES_STEP = 1;
-const MIN_TINT_OPACITY = 0;
-const MAX_TINT_OPACITY = 1;
-const TINT_OPACITY_STEP = 0.05;
-const MIN_BLUR_WIDTH = 0;
-const MAX_BLUR_WIDTH = 40;
-const BLUR_WIDTH_STEP = 1;
-
-const STARTING_BORDER_WIDTH = 2;
-const STARTING_STROKE_CONFIG_KEY = "spot_1";
-const STARTING_BLUR_WIDTH = 0;
-
 export const GlassSurfacePage = () => {
     const [getBorderRadius, setBorderRadius] = createSignal(BORDER_RADIUS_FULL);
-    const [getBorderWidth, setBorderWidth] = createSignal(STARTING_BORDER_WIDTH);
-    const [getStrokeConfigKey, setStrokeConfigKey] =
-        createSignal<WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>>(STARTING_STROKE_CONFIG_KEY);
+    const [getBorderWidth, setBorderWidth] = createSignal(GlassSurfaceKnobs.STARTING_BORDER_WIDTH);
+    const [getStrokeConfigKey, setStrokeConfigKey] = createSignal<
+        WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>
+    >(GlassSurfaceKnobs.STARTING_STROKE_CONFIG_KEY);
     const [strokeConfigDefs, setStrokeConfigDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
 
     const getStrokeKnobs = () => {
@@ -87,7 +48,7 @@ export const GlassSurfacePage = () => {
             : (TrackedGradientDefaults.DEFAULTS_BY_FAMILY[key] as Record<string, unknown>);
     };
     const getStrokeConfigDefs = () => strokeConfigDefs[getStrokeConfigKey()] ?? {};
-    const [getBlurWidth, setBlurWidth] = createSignal(STARTING_BLUR_WIDTH);
+    const [getBlurWidth, setBlurWidth] = createSignal(GlassSurfaceKnobs.STARTING_BLUR_WIDTH);
     const [getBlurRadius, setBlurRadius] = createSignal(DEFAULT_GLASS_DEFS.backdrop.blurRadius);
     const [getRippleScale, setRippleScale] = createSignal(DEFAULT_GLASS_DEFS.ripple.scale);
     const [getNoiseFrequency, setNoiseFrequency] = createSignal(DEFAULT_GLASS_DEFS.noise.frequency);
@@ -169,9 +130,9 @@ export const GlassSurfacePage = () => {
                     >
                         <PageNumberField
                             value={getBorderRadius}
-                            min={() => MIN_BORDER_RADIUS}
-                            max={() => MAX_BORDER_RADIUS}
-                            step={() => BORDER_RADIUS_STEP}
+                            min={() => GlassSurfaceKnobs.MIN_BORDER_RADIUS}
+                            max={() => GlassSurfaceKnobs.MAX_BORDER_RADIUS}
+                            step={() => GlassSurfaceKnobs.BORDER_RADIUS_STEP}
                             ariaLabel={"Corner radius"}
                             onInput={setBorderRadius}
                         />
@@ -184,9 +145,9 @@ export const GlassSurfacePage = () => {
                     >
                         <PageNumberField
                             value={getBorderWidth}
-                            min={() => MIN_BORDER_WIDTH}
-                            max={() => MAX_BORDER_WIDTH}
-                            step={() => BORDER_WIDTH_STEP}
+                            min={() => GlassSurfaceKnobs.MIN_BORDER_WIDTH}
+                            max={() => GlassSurfaceKnobs.MAX_BORDER_WIDTH}
+                            step={() => GlassSurfaceKnobs.BORDER_WIDTH_STEP}
                             ariaLabel={"Border width"}
                             onInput={setBorderWidth}
                         />
@@ -219,9 +180,9 @@ export const GlassSurfacePage = () => {
                     >
                         <PageNumberField
                             value={getBlurWidth}
-                            min={() => MIN_BLUR_WIDTH}
-                            max={() => MAX_BLUR_WIDTH}
-                            step={() => BLUR_WIDTH_STEP}
+                            min={() => GlassSurfaceKnobs.MIN_BLUR_WIDTH}
+                            max={() => GlassSurfaceKnobs.MAX_BLUR_WIDTH}
+                            step={() => GlassSurfaceKnobs.BLUR_WIDTH_STEP}
                             ariaLabel={"Border blur"}
                             onInput={setBlurWidth}
                         />
@@ -234,9 +195,9 @@ export const GlassSurfacePage = () => {
                     >
                         <PageNumberField
                             value={getBlurRadius}
-                            min={() => MIN_BLUR_RADIUS}
-                            max={() => MAX_BLUR_RADIUS}
-                            step={() => BLUR_RADIUS_STEP}
+                            min={() => GlassSurfaceKnobs.MIN_BLUR_RADIUS}
+                            max={() => GlassSurfaceKnobs.MAX_BLUR_RADIUS}
+                            step={() => GlassSurfaceKnobs.BLUR_RADIUS_STEP}
                             ariaLabel={"Backdrop blur"}
                             onInput={setBlurRadius}
                         />
@@ -249,9 +210,9 @@ export const GlassSurfacePage = () => {
                     >
                         <PageNumberField
                             value={getNoiseFrequency}
-                            min={() => MIN_GRAIN_FREQUENCY}
-                            max={() => MAX_GRAIN_FREQUENCY}
-                            step={() => GRAIN_FREQUENCY_STEP}
+                            min={() => GlassSurfaceKnobs.MIN_GRAIN_FREQUENCY}
+                            max={() => GlassSurfaceKnobs.MAX_GRAIN_FREQUENCY}
+                            step={() => GlassSurfaceKnobs.GRAIN_FREQUENCY_STEP}
                             ariaLabel={"Noise scale"}
                             onInput={setNoiseFrequency}
                         />
@@ -266,9 +227,9 @@ export const GlassSurfacePage = () => {
                     >
                         <PageNumberField
                             value={getNoiseOctaves}
-                            min={() => MIN_GRAIN_OCTAVES}
-                            max={() => MAX_GRAIN_OCTAVES}
-                            step={() => GRAIN_OCTAVES_STEP}
+                            min={() => GlassSurfaceKnobs.MIN_GRAIN_OCTAVES}
+                            max={() => GlassSurfaceKnobs.MAX_GRAIN_OCTAVES}
+                            step={() => GlassSurfaceKnobs.GRAIN_OCTAVES_STEP}
                             ariaLabel={"Noise octaves"}
                             onInput={setNoiseOctaves}
                         />
@@ -283,9 +244,9 @@ export const GlassSurfacePage = () => {
                     >
                         <PageNumberField
                             value={getRippleScale}
-                            min={() => MIN_RIPPLE_SCALE}
-                            max={() => MAX_RIPPLE_SCALE}
-                            step={() => RIPPLE_SCALE_STEP}
+                            min={() => GlassSurfaceKnobs.MIN_RIPPLE_SCALE}
+                            max={() => GlassSurfaceKnobs.MAX_RIPPLE_SCALE}
+                            step={() => GlassSurfaceKnobs.RIPPLE_SCALE_STEP}
                             ariaLabel={"Ripple bend"}
                             onInput={setRippleScale}
                         />
@@ -300,9 +261,9 @@ export const GlassSurfacePage = () => {
                     >
                         <PageNumberField
                             value={getLightHeight}
-                            min={() => MIN_LIGHT_HEIGHT}
-                            max={() => MAX_LIGHT_HEIGHT}
-                            step={() => LIGHT_HEIGHT_STEP}
+                            min={() => GlassSurfaceKnobs.MIN_LIGHT_HEIGHT}
+                            max={() => GlassSurfaceKnobs.MAX_LIGHT_HEIGHT}
+                            step={() => GlassSurfaceKnobs.LIGHT_HEIGHT_STEP}
                             ariaLabel={"Light height"}
                             onInput={setLightHeight}
                         />
@@ -317,9 +278,9 @@ export const GlassSurfacePage = () => {
                     >
                         <PageNumberField
                             value={getSurfaceScale}
-                            min={() => MIN_SURFACE_SCALE}
-                            max={() => MAX_SURFACE_SCALE}
-                            step={() => SURFACE_SCALE_STEP}
+                            min={() => GlassSurfaceKnobs.MIN_SURFACE_SCALE}
+                            max={() => GlassSurfaceKnobs.MAX_SURFACE_SCALE}
+                            step={() => GlassSurfaceKnobs.SURFACE_SCALE_STEP}
                             ariaLabel={"Sheen relief"}
                             onInput={setSurfaceScale}
                         />
@@ -332,9 +293,9 @@ export const GlassSurfacePage = () => {
                     >
                         <PageNumberField
                             value={getSpecularConstant}
-                            min={() => MIN_SPECULAR_CONSTANT}
-                            max={() => MAX_SPECULAR_CONSTANT}
-                            step={() => SPECULAR_CONSTANT_STEP}
+                            min={() => GlassSurfaceKnobs.MIN_SPECULAR_CONSTANT}
+                            max={() => GlassSurfaceKnobs.MAX_SPECULAR_CONSTANT}
+                            step={() => GlassSurfaceKnobs.SPECULAR_CONSTANT_STEP}
                             ariaLabel={"Sheen brightness"}
                             onInput={setSpecularConstant}
                         />
@@ -349,9 +310,9 @@ export const GlassSurfacePage = () => {
                     >
                         <PageNumberField
                             value={getSpecularExponent}
-                            min={() => MIN_SPECULAR_EXPONENT}
-                            max={() => MAX_SPECULAR_EXPONENT}
-                            step={() => SPECULAR_EXPONENT_STEP}
+                            min={() => GlassSurfaceKnobs.MIN_SPECULAR_EXPONENT}
+                            max={() => GlassSurfaceKnobs.MAX_SPECULAR_EXPONENT}
+                            step={() => GlassSurfaceKnobs.SPECULAR_EXPONENT_STEP}
                             ariaLabel={"Shininess"}
                             onInput={setSpecularExponent}
                         />
@@ -364,9 +325,9 @@ export const GlassSurfacePage = () => {
                     >
                         <PageNumberField
                             value={getTintOpacity}
-                            min={() => MIN_TINT_OPACITY}
-                            max={() => MAX_TINT_OPACITY}
-                            step={() => TINT_OPACITY_STEP}
+                            min={() => GlassSurfaceKnobs.MIN_TINT_OPACITY}
+                            max={() => GlassSurfaceKnobs.MAX_TINT_OPACITY}
+                            step={() => GlassSurfaceKnobs.TINT_OPACITY_STEP}
                             ariaLabel={"Tint opacity"}
                             onInput={setTintOpacity}
                         />

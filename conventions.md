@@ -558,6 +558,16 @@ namespace of them — and a `.utils.ts` reads them from there rather than export
 renders it. What the old rule guarded against still holds, because a knob starts at the default read from the
 library rather than at a copy of it, so the number is stated once.
 
+**A lookup over a library type is the library's, exported, even when only the demo app reads it.** The user's
+rule: a constant that enumerates or indexes something the library defines — every member of one of its unions,
+the keys of one of its registries, a map from a family to its defaults — adds no demo-app vocabulary, and any
+consumer building a picker over the same type needs exactly that list. So it lives in the subject's `.const.ts`
+and goes out through the barrel, and a demo app that finds itself writing one moves it there instead. **The
+line is vocabulary**: a label or hint keyed by the same type is the demo app's, a list that adds a demo-only
+option spreads the library's lookup rather than restating it, and a hand-picked subset of a union is the page's
+choice rather than a lookup. Apart from lookups, the library's `.const.ts` files hold what the library reads
+and the sample content a consumer calls; a value only the demo app reads goes to the demo app.
+
 **A type lives in `<Subject>.types.ts`, never in the module that uses it.** `TextSync` declared three types in
 its utils file and `LiveAnnouncer` one, so a consumer wanting only the type pulled the whole implementation
 in. The one file exempt is `Utils/typeUtils.ts`, which is a home for type transformers by design and has no

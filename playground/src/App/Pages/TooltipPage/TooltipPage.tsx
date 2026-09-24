@@ -1,8 +1,9 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components";
-import { TOOLTIP_DEFAULTS } from "@thewaver/ss-components";
+import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components";
 
+import { TooltipKnobs } from "../../Knobs/Tooltips.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -14,26 +15,13 @@ import type { TooltipExampleProps } from "./TooltipPage.types";
 
 const EXAMPLES_ROOT = "/src/App/Pages/TooltipPage/Examples";
 
-const H_PLACEMENTS: AnchorHPlacement[] = ["left-out", "left-in", "center", "right-in", "right-out"];
-const V_PLACEMENTS: AnchorVPlacement[] = ["top-out", "top-in", "center", "bottom-in", "bottom-out"];
-
-const MIN_OFFSET = -40;
-const MAX_OFFSET = 40;
-const OFFSET_STEP = 5;
-const MIN_DURATION = 0;
-const MAX_DURATION = 1000;
-const DURATION_STEP = 50;
 const FIELD_WIDTH = 110;
 
-const STARTING_H_PLACEMENT: AnchorHPlacement = "center";
-const STARTING_V_PLACEMENT: AnchorVPlacement = "top-out";
-const STARTING_OFFSET_Y = 10;
-const STARTING_OFFSET_X = 0;
 export const TooltipPage = () => {
-    const [getHPlacement, setHPlacement] = createSignal<AnchorHPlacement>(STARTING_H_PLACEMENT);
-    const [getVPlacement, setVPlacement] = createSignal<AnchorVPlacement>(STARTING_V_PLACEMENT);
-    const [getOffsetX, setOffsetX] = createSignal(STARTING_OFFSET_X);
-    const [getOffsetY, setOffsetY] = createSignal(STARTING_OFFSET_Y);
+    const [getHPlacement, setHPlacement] = createSignal<AnchorHPlacement>(TooltipKnobs.STARTING_H_PLACEMENT);
+    const [getVPlacement, setVPlacement] = createSignal<AnchorVPlacement>(TooltipKnobs.STARTING_V_PLACEMENT);
+    const [getOffsetX, setOffsetX] = createSignal(TooltipKnobs.STARTING_OFFSET_X);
+    const [getOffsetY, setOffsetY] = createSignal(TooltipKnobs.STARTING_OFFSET_Y);
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(TOOLTIP_DEFAULTS.transitionDurationMs);
     const [getFocusShowDelayMs, setFocusShowDelayMs] = createSignal(TOOLTIP_DEFAULTS.focusShowDelayMs);
     const [getHoverShowDelayMs, setHoverShowDelayMs] = createSignal(TOOLTIP_DEFAULTS.hoverShowDelayMs);
@@ -92,7 +80,7 @@ export const TooltipPage = () => {
                 >
                     <PageSelectField
                         value={getHPlacement}
-                        values={() => H_PLACEMENTS}
+                        values={() => ANCHOR_H_PLACEMENTS}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Placement across"}
                         onChange={(placement) => setHPlacement(() => placement)}
@@ -108,7 +96,7 @@ export const TooltipPage = () => {
                 >
                     <PageSelectField
                         value={getVPlacement}
-                        values={() => V_PLACEMENTS}
+                        values={() => ANCHOR_V_PLACEMENTS}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Placement down"}
                         onChange={(placement) => setVPlacement(() => placement)}
@@ -122,9 +110,9 @@ export const TooltipPage = () => {
                 >
                     <PageNumberField
                         value={getOffsetX}
-                        min={() => MIN_OFFSET}
-                        max={() => MAX_OFFSET}
-                        step={() => OFFSET_STEP}
+                        min={() => TooltipKnobs.MIN_OFFSET}
+                        max={() => TooltipKnobs.MAX_OFFSET}
+                        step={() => TooltipKnobs.OFFSET_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Offset across"}
                         onInput={setOffsetX}
@@ -138,9 +126,9 @@ export const TooltipPage = () => {
                 >
                     <PageNumberField
                         value={getOffsetY}
-                        min={() => MIN_OFFSET}
-                        max={() => MAX_OFFSET}
-                        step={() => OFFSET_STEP}
+                        min={() => TooltipKnobs.MIN_OFFSET}
+                        max={() => TooltipKnobs.MAX_OFFSET}
+                        step={() => TooltipKnobs.OFFSET_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Offset down"}
                         onInput={setOffsetY}
@@ -154,9 +142,9 @@ export const TooltipPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => MIN_DURATION}
-                        max={() => MAX_DURATION}
-                        step={() => DURATION_STEP}
+                        min={() => TooltipKnobs.MIN_DURATION}
+                        max={() => TooltipKnobs.MAX_DURATION}
+                        step={() => TooltipKnobs.DURATION_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Fade in milliseconds"}
                         onInput={setTransitionDurationMs}
@@ -170,9 +158,9 @@ export const TooltipPage = () => {
                 >
                     <PageNumberField
                         value={getFocusShowDelayMs}
-                        min={() => MIN_DURATION}
-                        max={() => MAX_DURATION}
-                        step={() => DURATION_STEP}
+                        min={() => TooltipKnobs.MIN_DURATION}
+                        max={() => TooltipKnobs.MAX_DURATION}
+                        step={() => TooltipKnobs.DURATION_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Focus delay in milliseconds"}
                         onInput={setFocusShowDelayMs}
@@ -188,9 +176,9 @@ export const TooltipPage = () => {
                 >
                     <PageNumberField
                         value={getHoverShowDelayMs}
-                        min={() => MIN_DURATION}
-                        max={() => MAX_DURATION}
-                        step={() => DURATION_STEP}
+                        min={() => TooltipKnobs.MIN_DURATION}
+                        max={() => TooltipKnobs.MAX_DURATION}
+                        step={() => TooltipKnobs.DURATION_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Hover delay in milliseconds"}
                         onInput={setHoverShowDelayMs}
@@ -206,9 +194,9 @@ export const TooltipPage = () => {
                 >
                     <PageNumberField
                         value={getSkipDelayWindowMs}
-                        min={() => MIN_DURATION}
-                        max={() => MAX_DURATION}
-                        step={() => DURATION_STEP}
+                        min={() => TooltipKnobs.MIN_DURATION}
+                        max={() => TooltipKnobs.MAX_DURATION}
+                        step={() => TooltipKnobs.DURATION_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Skip window in milliseconds"}
                         onInput={setSkipDelayWindowMs}

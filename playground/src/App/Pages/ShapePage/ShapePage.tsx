@@ -5,6 +5,7 @@ import { SVGDefsSamples, Shape, TimedGradientDefaults, access } from "@thewaver/
 import { ShapeConst } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
+import { ShapeKnobs } from "../../Knobs/Shapes.const";
 import { TimedGradientKnobs } from "../../Knobs/TimedGradients.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
@@ -38,29 +39,7 @@ const GROUPPED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Timed.
 const GROUPPED_PATTERNS = splitEntriesIntoGroups(SVGDefsSamples.Pattern.SAMPLE_CONFIGS);
 
 const CORNER_FIELD_WIDTH = 80;
-const MIN_EDGE_THICKNESS = 0;
-const MAX_EDGE_THICKNESS = 80;
-const EDGE_THICKNESS_STEP = 1;
-const MIN_JOIN_RADIUS = 0;
-const MAX_JOIN_RADIUS = 160;
-const JOIN_RADIUS_STEP = 5;
-const MIN_LAME_EXPONENT = -5;
-const MAX_LAME_EXPONENT = 5;
-const LAME_EXPONENT_STEP = 0.5;
 const MAX_CORNER_COLUMNS = 6;
-const MIN_CELL_SIZE = 10;
-const MAX_CELL_SIZE = 160;
-const CELL_SIZE_STEP = 10;
-const MIN_BLUR_WIDTH = 0;
-const MAX_BLUR_WIDTH = 40;
-const BLUR_WIDTH_STEP = 1;
-const MIN_DURATION_MS = 1000;
-const MAX_DURATION_MS = 5000;
-
-const STARTING_BLUR_WIDTH = 8;
-const STARTING_DURATION_MS = 2000;
-const STARTING_CELL_SIZE = 40;
-const DURATION_STEP_MS = 100;
 
 const spreadCornerValue = (previous: number[], index: number, value: number, hasIndividualCorners: boolean) => {
     if (!hasIndividualCorners) return previous.map(() => value);
@@ -204,17 +183,18 @@ const DefaultExampleWrapper = (props: ShapeExampleProps) => {
 };
 
 export const ShapePage = () => {
-    const [getHasIndividualCorners, setHasIndividualCorners] = createSignal(false);
-    const [getShouldClipChildren, setShouldClipChildren] = createSignal(true);
-    const [getShouldPadChildren, setShouldPadChildren] = createSignal(true);
-    const [getBlurWidth, setBlurWidth] = createSignal(STARTING_BLUR_WIDTH);
-    const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(STARTING_DURATION_MS);
-    const [getShapeKind, setShapeKind] = createSignal<ShapeConst.DefaultShape>("square");
-    const [getEdgeThicknesses, setEdgeThicknesses] = createSignal<number[]>([4, 4, 4, 4, 4, 4]);
-    const [getJoinRadii, setJoinRadii] = createSignal<number[]>([40, 40, 40, 40, 40, 40]);
-    const [getLameExponents, setLameExponents] = createSignal<number[]>([1, 1, 1, 1, 1, 1]);
-    const [getStrokeConfigKey, setStrokeConfigKey] =
-        createSignal<WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>>("sweep_diag_1v1");
+    const [getHasIndividualCorners, setHasIndividualCorners] = createSignal(ShapeKnobs.STARTING_HAS_INDIVIDUAL_CORNERS);
+    const [getShouldClipChildren, setShouldClipChildren] = createSignal(ShapeKnobs.STARTING_SHOULD_CLIP_CHILDREN);
+    const [getShouldPadChildren, setShouldPadChildren] = createSignal(ShapeKnobs.STARTING_SHOULD_PAD_CHILDREN);
+    const [getBlurWidth, setBlurWidth] = createSignal(ShapeKnobs.STARTING_BLUR_WIDTH);
+    const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(ShapeKnobs.STARTING_DURATION_MS);
+    const [getShapeKind, setShapeKind] = createSignal<ShapeConst.DefaultShape>(ShapeKnobs.STARTING_SHAPE_KIND);
+    const [getEdgeThicknesses, setEdgeThicknesses] = createSignal<number[]>(ShapeKnobs.STARTING_EDGE_THICKNESSES);
+    const [getJoinRadii, setJoinRadii] = createSignal<number[]>(ShapeKnobs.STARTING_JOIN_RADII);
+    const [getLameExponents, setLameExponents] = createSignal<number[]>(ShapeKnobs.STARTING_LAME_EXPONENTS);
+    const [getStrokeConfigKey, setStrokeConfigKey] = createSignal<
+        WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey>
+    >(ShapeKnobs.STARTING_GRADIENT_KEY);
     const [strokeConfigDefs, setStrokeConfigDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
 
     const getStrokeKnobs = () => {
@@ -231,8 +211,10 @@ export const ShapePage = () => {
 
     const [getFillConfigKey, setFillConfigKey] =
         createSignal<WithNoSample<SVGDefsSamples.Pattern.SampleKey>>(NO_SAMPLE_KEY);
-    const [getIterationConfigKey, setIterationConfigKey] = createSignal<SVGDefsSamples.Iteration.SampleKey>("constant");
-    const [getCellSize, setCellSize] = createSignal(STARTING_CELL_SIZE);
+    const [getIterationConfigKey, setIterationConfigKey] = createSignal<SVGDefsSamples.Iteration.SampleKey>(
+        ShapeKnobs.STARTING_ITERATION_KEY,
+    );
+    const [getCellSize, setCellSize] = createSignal(ShapeKnobs.STARTING_CELL_SIZE);
     const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS });
 
     const getShapePointCount = createMemo(
@@ -355,9 +337,9 @@ export const ShapePage = () => {
                     >
                         <PageNumberField
                             value={getCellSize}
-                            min={() => MIN_CELL_SIZE}
-                            max={() => MAX_CELL_SIZE}
-                            step={() => CELL_SIZE_STEP}
+                            min={() => ShapeKnobs.MIN_CELL_SIZE}
+                            max={() => ShapeKnobs.MAX_CELL_SIZE}
+                            step={() => ShapeKnobs.CELL_SIZE_STEP}
                             ariaLabel={"Fill cell size"}
                             onInput={setCellSize}
                         />
@@ -419,9 +401,9 @@ export const ShapePage = () => {
                                 {(_, getIndex) => (
                                     <PageNumberField
                                         value={() => getEdgeThicknesses()[getIndex()]}
-                                        min={() => MIN_EDGE_THICKNESS}
-                                        max={() => MAX_EDGE_THICKNESS}
-                                        step={() => EDGE_THICKNESS_STEP}
+                                        min={() => ShapeKnobs.MIN_EDGE_THICKNESS}
+                                        max={() => ShapeKnobs.MAX_EDGE_THICKNESS}
+                                        step={() => ShapeKnobs.EDGE_THICKNESS_STEP}
                                         width={() => CORNER_FIELD_WIDTH}
                                         ariaLabel={() => `Edge thickness ${getIndex() + 1}`}
                                         onInput={(value) =>
@@ -447,9 +429,9 @@ export const ShapePage = () => {
                                 {(_, getIndex) => (
                                     <PageNumberField
                                         value={() => getJoinRadii()[getIndex()]}
-                                        min={() => MIN_JOIN_RADIUS}
-                                        max={() => MAX_JOIN_RADIUS}
-                                        step={() => JOIN_RADIUS_STEP}
+                                        min={() => ShapeKnobs.MIN_JOIN_RADIUS}
+                                        max={() => ShapeKnobs.MAX_JOIN_RADIUS}
+                                        step={() => ShapeKnobs.JOIN_RADIUS_STEP}
                                         width={() => CORNER_FIELD_WIDTH}
                                         id={() => `jointRadius${getIndex() + 1}`}
                                         ariaLabel={() => `Joint radius ${getIndex() + 1}`}
@@ -476,9 +458,9 @@ export const ShapePage = () => {
                                 {(_, getIndex) => (
                                     <PageNumberField
                                         value={() => getLameExponents()[getIndex()]}
-                                        min={() => MIN_LAME_EXPONENT}
-                                        max={() => MAX_LAME_EXPONENT}
-                                        step={() => LAME_EXPONENT_STEP}
+                                        min={() => ShapeKnobs.MIN_LAME_EXPONENT}
+                                        max={() => ShapeKnobs.MAX_LAME_EXPONENT}
+                                        step={() => ShapeKnobs.LAME_EXPONENT_STEP}
                                         width={() => CORNER_FIELD_WIDTH}
                                         ariaLabel={() => `Lamé exponent ${getIndex() + 1}`}
                                         onInput={(value) =>
@@ -532,9 +514,9 @@ export const ShapePage = () => {
                     >
                         <PageNumberField
                             value={getBlurWidth}
-                            min={() => MIN_BLUR_WIDTH}
-                            max={() => MAX_BLUR_WIDTH}
-                            step={() => BLUR_WIDTH_STEP}
+                            min={() => ShapeKnobs.MIN_BLUR_WIDTH}
+                            max={() => ShapeKnobs.MAX_BLUR_WIDTH}
+                            step={() => ShapeKnobs.BLUR_WIDTH_STEP}
                             ariaLabel={"Blur width"}
                             onInput={setBlurWidth}
                         />
@@ -547,9 +529,9 @@ export const ShapePage = () => {
                     >
                         <PageNumberField
                             value={getAnimationDurationMs}
-                            min={() => MIN_DURATION_MS}
-                            max={() => MAX_DURATION_MS}
-                            step={() => DURATION_STEP_MS}
+                            min={() => ShapeKnobs.MIN_DURATION_MS}
+                            max={() => ShapeKnobs.MAX_DURATION_MS}
+                            step={() => ShapeKnobs.DURATION_STEP_MS}
                             ariaLabel={"Animation duration"}
                             onInput={setAnimationDurationMs}
                         />

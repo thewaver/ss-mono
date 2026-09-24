@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import { ScrambleTextWeights, TextArea } from "@thewaver/ss-components";
 import type { AccessorProps } from "@thewaver/ss-components";
 
+import { TypewriterKnobs } from "../../Knobs/Typewriters.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -16,14 +17,14 @@ import { PageTextFieldPlaceholder } from "../../StyledComponents/TextFieldPlaceh
 import { ComplexExample } from "./Examples/Complex";
 import { CustomInputExample } from "./Examples/CustomInput";
 import { PhrasesExample } from "./Examples/Phrases";
-import type { TypewriterExampleProps } from "./TypewriterPage.types";
+import type { TypewriterExampleProps, TypewriterTextEffect } from "./TypewriterPage.types";
 
 import { MEASURE_BOX_PADDING } from "../../PageComponents/MeasureBox/MeasureBox.css";
 import { FIELD_GAP, FIELD_PADDING } from "../../StyledComponents/TextFieldContent/TextFieldContent.css";
 import * as styles from "./TypewriterPage.css";
 
-const TEXT_EFFECTS = ["fade", "scale", "glow", "drop", "slide"] as const;
-const TEXT_EFFECT_MAP: Record<(typeof TEXT_EFFECTS)[number], string> = {
+const TEXT_EFFECTS: TypewriterTextEffect[] = ["fade", "scale", "glow", "drop", "slide"];
+const TEXT_EFFECT_MAP: Record<TypewriterTextEffect, string> = {
     fade: styles.typewriterFade,
     scale: styles.typewriterScale,
     glow: styles.typewriterGlow,
@@ -31,15 +32,9 @@ const TEXT_EFFECT_MAP: Record<(typeof TEXT_EFFECTS)[number], string> = {
     slide: styles.typewriterSlide,
 };
 
-const ARRIVAL_ORDERS = ["leftToRight", ...ScrambleTextWeights.SAMPLE_KEYS] as const;
-
 const CUSTOM_TEXT_WIDTH = 320;
 const CUSTOM_TEXT_MIN_ROWS = 6;
 const CUSTOM_TEXT_MAX_ROWS = 12;
-const STARTING_WIDTH = 240;
-const MIN_CONTAINER_WIDTH = 40;
-const MAX_CONTAINER_WIDTH = 560;
-const CONTAINER_WIDTH_STEP = 4;
 const EXAMPLES_ROOT = "/src/App/Pages/TypewriterPage/Examples";
 
 type ExampleWrapperProps = TypewriterExampleProps &
@@ -95,9 +90,11 @@ const CustomInputExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => 
 };
 
 export const TypewriterPage = () => {
-    const [getTextContainerWidth, setTextContainerWidth] = createSignal(STARTING_WIDTH);
-    const [getTextEffect, setTextEffect] = createSignal<(typeof TEXT_EFFECTS)[number]>(TEXT_EFFECTS[0]);
-    const [getArrivalOrder, setArrivalOrder] = createSignal<(typeof ARRIVAL_ORDERS)[number]>(ARRIVAL_ORDERS[0]);
+    const [getTextContainerWidth, setTextContainerWidth] = createSignal(TypewriterKnobs.STARTING_WIDTH);
+    const [getTextEffect, setTextEffect] = createSignal<TypewriterTextEffect>(TypewriterKnobs.STARTING_TEXT_EFFECT);
+    const [getArrivalOrder, setArrivalOrder] = createSignal<(typeof TypewriterKnobs.ARRIVAL_ORDERS)[number]>(
+        TypewriterKnobs.STARTING_ARRIVAL_ORDER,
+    );
 
     const getExamples = createMemo(() => {
         const commonProps: ExampleWrapperProps = {
@@ -146,9 +143,9 @@ export const TypewriterPage = () => {
                 >
                     <PageNumberField
                         value={getTextContainerWidth}
-                        min={() => MIN_CONTAINER_WIDTH}
-                        max={() => MAX_CONTAINER_WIDTH}
-                        step={() => CONTAINER_WIDTH_STEP}
+                        min={() => TypewriterKnobs.MIN_CONTAINER_WIDTH}
+                        max={() => TypewriterKnobs.MAX_CONTAINER_WIDTH}
+                        step={() => TypewriterKnobs.CONTAINER_WIDTH_STEP}
                         ariaLabel={"Container width in pixels"}
                         onInput={setTextContainerWidth}
                     />
@@ -176,7 +173,7 @@ export const TypewriterPage = () => {
                 >
                     <PageSelectField
                         value={getArrivalOrder}
-                        values={() => ARRIVAL_ORDERS}
+                        values={() => TypewriterKnobs.ARRIVAL_ORDERS}
                         ariaLabel={"Arrival order"}
                         onChange={(arrivalOrder) => setArrivalOrder(() => arrivalOrder)}
                     />

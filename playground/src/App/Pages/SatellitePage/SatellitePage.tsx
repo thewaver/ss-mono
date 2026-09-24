@@ -1,8 +1,9 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { SATELLITE_DEFAULTS } from "@thewaver/ss-components";
+import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, SATELLITE_DEFAULTS } from "@thewaver/ss-components";
 import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components";
 
+import { SatelliteKnobs } from "../../Knobs/Satellites.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -13,52 +14,22 @@ import { DefaultExample } from "./Examples/Default";
 import { SeveralExample } from "./Examples/Several";
 import type { SatelliteBadgeCorner, SatelliteExampleProps } from "./SatellitePage.types";
 
-const H_PLACEMENTS: AnchorHPlacement[] = ["left-out", "left-in", "center", "right-in", "right-out"];
-const V_PLACEMENTS: AnchorVPlacement[] = ["top-out", "top-in", "center", "bottom-in", "bottom-out"];
-const BADGE_CORNERS: SatelliteBadgeCorner[] = ["top-right", "top-left", "bottom-right", "bottom-left"];
-
-const MIN_OFFSET = -40;
-const MAX_OFFSET = 40;
-const OFFSET_STEP = 2;
-const MIN_SUBJECT_SIZE = 40;
-const MAX_SUBJECT_SIZE = 240;
-const SUBJECT_SIZE_STEP = 10;
-const MIN_BADGE_SIZE = 12;
-const MAX_BADGE_SIZE = 96;
-const BADGE_SIZE_STEP = 4;
-const MIN_COUNT = 0;
-const MAX_COUNT = 99999;
-const COUNT_STEP = 1;
-const MIN_OVERHANG = 0;
-const MAX_OVERHANG = 16;
-const OVERHANG_STEP = 1;
 const FIELD_WIDTH = 110;
 const EXAMPLES_ROOT = "/src/App/Pages/SatellitePage/Examples";
 
-const STARTING_H_PLACEMENT: AnchorHPlacement = "right-out";
-const STARTING_V_PLACEMENT: AnchorVPlacement = "top-out";
-const STARTING_SUBJECT_WIDTH = 140;
-const STARTING_SUBJECT_HEIGHT = 80;
-const STARTING_BADGE_SIZE = 28;
-const STARTING_OFFSET_X = 0;
-const STARTING_OFFSET_Y = 0;
-const STARTING_CORNER: SatelliteBadgeCorner = "top-right";
-const STARTING_COUNT = 7;
-const STARTING_OVERHANG = 8;
-
 export const SatellitePage = () => {
-    const [getHPlacement, setHPlacement] = createSignal<AnchorHPlacement>(STARTING_H_PLACEMENT);
-    const [getVPlacement, setVPlacement] = createSignal<AnchorVPlacement>(STARTING_V_PLACEMENT);
-    const [getOffsetX, setOffsetX] = createSignal(STARTING_OFFSET_X);
-    const [getOffsetY, setOffsetY] = createSignal(STARTING_OFFSET_Y);
-    const [getSubjectWidth, setSubjectWidth] = createSignal(STARTING_SUBJECT_WIDTH);
-    const [getSubjectHeight, setSubjectHeight] = createSignal(STARTING_SUBJECT_HEIGHT);
-    const [getBadgeSize, setBadgeSize] = createSignal(STARTING_BADGE_SIZE);
-    const [getHasSatellite, setHasSatellite] = createSignal(true);
+    const [getHPlacement, setHPlacement] = createSignal<AnchorHPlacement>(SatelliteKnobs.STARTING_H_PLACEMENT);
+    const [getVPlacement, setVPlacement] = createSignal<AnchorVPlacement>(SatelliteKnobs.STARTING_V_PLACEMENT);
+    const [getOffsetX, setOffsetX] = createSignal(SATELLITE_DEFAULTS.offset.x);
+    const [getOffsetY, setOffsetY] = createSignal(SATELLITE_DEFAULTS.offset.y);
+    const [getSubjectWidth, setSubjectWidth] = createSignal(SatelliteKnobs.STARTING_SUBJECT_WIDTH);
+    const [getSubjectHeight, setSubjectHeight] = createSignal(SatelliteKnobs.STARTING_SUBJECT_HEIGHT);
+    const [getBadgeSize, setBadgeSize] = createSignal(SatelliteKnobs.STARTING_BADGE_SIZE);
+    const [getHasSatellite, setHasSatellite] = createSignal(SatelliteKnobs.STARTING_HAS_SATELLITE);
     const [getIsBehindSubject, setIsBehindSubject] = createSignal(SATELLITE_DEFAULTS.isBehindSubject);
-    const [getCorner, setCorner] = createSignal<SatelliteBadgeCorner>(STARTING_CORNER);
-    const [getCount, setCount] = createSignal(STARTING_COUNT);
-    const [getOverhang, setOverhang] = createSignal(STARTING_OVERHANG);
+    const [getCorner, setCorner] = createSignal<SatelliteBadgeCorner>(SatelliteKnobs.STARTING_CORNER);
+    const [getCount, setCount] = createSignal(SatelliteKnobs.STARTING_COUNT);
+    const [getOverhang, setOverhang] = createSignal(SatelliteKnobs.STARTING_OVERHANG);
 
     const getPlacement = createMemo(() => ({ x: getHPlacement(), y: getVPlacement() }));
 
@@ -98,7 +69,7 @@ export const SatellitePage = () => {
                             >
                                 <PageSelectField
                                     value={getHPlacement}
-                                    values={() => H_PLACEMENTS}
+                                    values={() => ANCHOR_H_PLACEMENTS}
                                     width={() => FIELD_WIDTH}
                                     ariaLabel={"Placement across"}
                                     onChange={(placement) => setHPlacement(() => placement)}
@@ -114,7 +85,7 @@ export const SatellitePage = () => {
                             >
                                 <PageSelectField
                                     value={getVPlacement}
-                                    values={() => V_PLACEMENTS}
+                                    values={() => ANCHOR_V_PLACEMENTS}
                                     width={() => FIELD_WIDTH}
                                     ariaLabel={"Placement down"}
                                     onChange={(placement) => setVPlacement(() => placement)}
@@ -128,9 +99,9 @@ export const SatellitePage = () => {
                             >
                                 <PageNumberField
                                     value={getOffsetX}
-                                    min={() => MIN_OFFSET}
-                                    max={() => MAX_OFFSET}
-                                    step={() => OFFSET_STEP}
+                                    min={() => SatelliteKnobs.MIN_OFFSET}
+                                    max={() => SatelliteKnobs.MAX_OFFSET}
+                                    step={() => SatelliteKnobs.OFFSET_STEP}
                                     width={() => FIELD_WIDTH}
                                     ariaLabel={"Offset across"}
                                     onInput={setOffsetX}
@@ -144,9 +115,9 @@ export const SatellitePage = () => {
                             >
                                 <PageNumberField
                                     value={getOffsetY}
-                                    min={() => MIN_OFFSET}
-                                    max={() => MAX_OFFSET}
-                                    step={() => OFFSET_STEP}
+                                    min={() => SatelliteKnobs.MIN_OFFSET}
+                                    max={() => SatelliteKnobs.MAX_OFFSET}
+                                    step={() => SatelliteKnobs.OFFSET_STEP}
                                     width={() => FIELD_WIDTH}
                                     ariaLabel={"Offset down"}
                                     onInput={setOffsetY}
@@ -174,9 +145,9 @@ export const SatellitePage = () => {
                             >
                                 <PageNumberField
                                     value={getBadgeSize}
-                                    min={() => MIN_BADGE_SIZE}
-                                    max={() => MAX_BADGE_SIZE}
-                                    step={() => BADGE_SIZE_STEP}
+                                    min={() => SatelliteKnobs.MIN_BADGE_SIZE}
+                                    max={() => SatelliteKnobs.MAX_BADGE_SIZE}
+                                    step={() => SatelliteKnobs.BADGE_SIZE_STEP}
                                     width={() => FIELD_WIDTH}
                                     ariaLabel={"Satellite size"}
                                     onInput={setBadgeSize}
@@ -232,7 +203,7 @@ export const SatellitePage = () => {
                             >
                                 <PageSelectField
                                     value={getCorner}
-                                    values={() => BADGE_CORNERS}
+                                    values={() => SatelliteKnobs.BADGE_CORNERS}
                                     width={() => FIELD_WIDTH}
                                     ariaLabel={"Corner"}
                                     onChange={(corner) => setCorner(() => corner)}
@@ -248,9 +219,9 @@ export const SatellitePage = () => {
                             >
                                 <PageNumberField
                                     value={getCount}
-                                    min={() => MIN_COUNT}
-                                    max={() => MAX_COUNT}
-                                    step={() => COUNT_STEP}
+                                    min={() => SatelliteKnobs.MIN_COUNT}
+                                    max={() => SatelliteKnobs.MAX_COUNT}
+                                    step={() => SatelliteKnobs.COUNT_STEP}
                                     width={() => FIELD_WIDTH}
                                     ariaLabel={"Count"}
                                     onInput={setCount}
@@ -264,9 +235,9 @@ export const SatellitePage = () => {
                             >
                                 <PageNumberField
                                     value={getOverhang}
-                                    min={() => MIN_OVERHANG}
-                                    max={() => MAX_OVERHANG}
-                                    step={() => OVERHANG_STEP}
+                                    min={() => SatelliteKnobs.MIN_OVERHANG}
+                                    max={() => SatelliteKnobs.MAX_OVERHANG}
+                                    step={() => SatelliteKnobs.OVERHANG_STEP}
                                     width={() => FIELD_WIDTH}
                                     ariaLabel={"Overhang"}
                                     onInput={setOverhang}
@@ -290,9 +261,9 @@ export const SatellitePage = () => {
                 >
                     <PageNumberField
                         value={getSubjectWidth}
-                        min={() => MIN_SUBJECT_SIZE}
-                        max={() => MAX_SUBJECT_SIZE}
-                        step={() => SUBJECT_SIZE_STEP}
+                        min={() => SatelliteKnobs.MIN_SUBJECT_SIZE}
+                        max={() => SatelliteKnobs.MAX_SUBJECT_SIZE}
+                        step={() => SatelliteKnobs.SUBJECT_SIZE_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Subject width"}
                         onInput={setSubjectWidth}
@@ -306,9 +277,9 @@ export const SatellitePage = () => {
                 >
                     <PageNumberField
                         value={getSubjectHeight}
-                        min={() => MIN_SUBJECT_SIZE}
-                        max={() => MAX_SUBJECT_SIZE}
-                        step={() => SUBJECT_SIZE_STEP}
+                        min={() => SatelliteKnobs.MIN_SUBJECT_SIZE}
+                        max={() => SatelliteKnobs.MAX_SUBJECT_SIZE}
+                        step={() => SatelliteKnobs.SUBJECT_SIZE_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Subject height"}
                         onInput={setSubjectHeight}

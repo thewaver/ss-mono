@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import type { CuboidController } from "@thewaver/ss-components";
 import { CUBOID_DEFAULTS, CuboidUtils, MediaQueryMonitorUtils } from "@thewaver/ss-components";
 
+import { CuboidKnobs } from "../../Knobs/Cuboids.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -12,28 +13,14 @@ import { DefaultExample } from "./Examples/Default";
 import { UprightExample } from "./Examples/Upright";
 import { WanderingExample } from "./Examples/Wandering";
 
-const MIN_EXTENT = 40;
-const MAX_EXTENT = 400;
-const EXTENT_STEP = 10;
-const STARTING_WIDTH = 200;
-const STARTING_HEIGHT = 260;
-const STARTING_DEPTH = 120;
-
-const MIN_DURATION_MS = 0;
-const MAX_DURATION_MS = 3000;
-const DURATION_STEP_MS = 100;
-const MIN_TURN_INTERVAL_MS = 200;
-const MAX_TURN_INTERVAL_MS = 5000;
-const TURN_INTERVAL_STEP_MS = 100;
-const STARTING_TURN_INTERVAL_MS = 1000;
 const NO_MOTION_DURATION_MS = 0;
 
 const FIELD_WIDTH = 110;
 const EXAMPLES_ROOT = "/src/App/Pages/CuboidPage/Examples";
 
 const WanderingExampleWrapper = (props: CuboidExampleProps) => {
-    const [getTurnIntervalMs, setTurnIntervalMs] = createSignal(STARTING_TURN_INTERVAL_MS);
-    const [getIsTurning, setIsTurning] = createSignal(true);
+    const [getTurnIntervalMs, setTurnIntervalMs] = createSignal(CuboidKnobs.STARTING_TURN_INTERVAL_MS);
+    const [getIsTurning, setIsTurning] = createSignal(CuboidKnobs.STARTING_IS_TURNING);
 
     return (
         <>
@@ -57,9 +44,9 @@ const WanderingExampleWrapper = (props: CuboidExampleProps) => {
                 >
                     <PageNumberField
                         value={getTurnIntervalMs}
-                        min={() => MIN_TURN_INTERVAL_MS}
-                        max={() => MAX_TURN_INTERVAL_MS}
-                        step={() => TURN_INTERVAL_STEP_MS}
+                        min={() => CuboidKnobs.MIN_TURN_INTERVAL_MS}
+                        max={() => CuboidKnobs.MAX_TURN_INTERVAL_MS}
+                        step={() => CuboidKnobs.TURN_INTERVAL_STEP_MS}
                         width={() => FIELD_WIDTH}
                         isDisabled={() => !getIsTurning()}
                         ariaLabel={"Turn interval in milliseconds"}
@@ -72,8 +59,8 @@ const WanderingExampleWrapper = (props: CuboidExampleProps) => {
 };
 
 const UprightExampleWrapper = (props: Omit<CuboidUprightExampleProps, "isUpright" | "isDraggable">) => {
-    const [getIsUpright, setIsUpright] = createSignal(true);
-    const [getIsDraggable, setIsDraggable] = createSignal(true);
+    const [getIsUpright, setIsUpright] = createSignal(CuboidKnobs.STARTING_IS_UPRIGHT);
+    const [getIsDraggable, setIsDraggable] = createSignal(CuboidKnobs.STARTING_IS_DRAGGABLE);
 
     return (
         <>
@@ -105,9 +92,9 @@ const UprightExampleWrapper = (props: Omit<CuboidUprightExampleProps, "isUpright
 };
 
 export const CuboidPage = () => {
-    const [getWidth, setWidth] = createSignal(STARTING_WIDTH);
-    const [getHeight, setHeight] = createSignal(STARTING_HEIGHT);
-    const [getDepth, setDepth] = createSignal(STARTING_DEPTH);
+    const [getWidth, setWidth] = createSignal(CuboidKnobs.STARTING_WIDTH);
+    const [getHeight, setHeight] = createSignal(CuboidKnobs.STARTING_HEIGHT);
+    const [getDepth, setDepth] = createSignal(CuboidKnobs.STARTING_DEPTH);
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(CUBOID_DEFAULTS.transitionDurationMs);
 
     const yawSignal = createSignal(0);
@@ -179,9 +166,9 @@ export const CuboidPage = () => {
                 <PageProp key={"width"} label={"Width (px)"} hint={"How wide the box is."}>
                     <PageNumberField
                         value={getWidth}
-                        min={() => MIN_EXTENT}
-                        max={() => MAX_EXTENT}
-                        step={() => EXTENT_STEP}
+                        min={() => CuboidKnobs.MIN_EXTENT}
+                        max={() => CuboidKnobs.MAX_EXTENT}
+                        step={() => CuboidKnobs.EXTENT_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Width in pixels"}
                         onInput={setWidth}
@@ -191,9 +178,9 @@ export const CuboidPage = () => {
                 <PageProp key={"height"} label={"Height (px)"} hint={"How tall the box is."}>
                     <PageNumberField
                         value={getHeight}
-                        min={() => MIN_EXTENT}
-                        max={() => MAX_EXTENT}
-                        step={() => EXTENT_STEP}
+                        min={() => CuboidKnobs.MIN_EXTENT}
+                        max={() => CuboidKnobs.MAX_EXTENT}
+                        step={() => CuboidKnobs.EXTENT_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Height in pixels"}
                         onInput={setHeight}
@@ -203,9 +190,9 @@ export const CuboidPage = () => {
                 <PageProp key={"depth"} label={"Depth (px)"} hint={"How deep the box is, front face to back face."}>
                     <PageNumberField
                         value={getDepth}
-                        min={() => MIN_EXTENT}
-                        max={() => MAX_EXTENT}
-                        step={() => EXTENT_STEP}
+                        min={() => CuboidKnobs.MIN_EXTENT}
+                        max={() => CuboidKnobs.MAX_EXTENT}
+                        step={() => CuboidKnobs.EXTENT_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Depth in pixels"}
                         onInput={setDepth}
@@ -221,9 +208,9 @@ export const CuboidPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => MIN_DURATION_MS}
-                        max={() => MAX_DURATION_MS}
-                        step={() => DURATION_STEP_MS}
+                        min={() => CuboidKnobs.MIN_DURATION_MS}
+                        max={() => CuboidKnobs.MAX_DURATION_MS}
+                        step={() => CuboidKnobs.DURATION_STEP_MS}
                         width={() => FIELD_WIDTH}
                         isDisabled={getPrefersReducedMotion}
                         ariaLabel={"Turn duration in milliseconds"}

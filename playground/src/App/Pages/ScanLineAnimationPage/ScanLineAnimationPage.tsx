@@ -6,6 +6,7 @@ import {
     CellAnimationBreakpoints,
     CellAnimationWeights,
     SCANLINE_ANIMATION_DEFAULTS,
+    SCANLINE_ANIMATION_ORIENTATIONS,
     ScanlineAnimation,
     ScanlineAnimationKeyframes,
     access,
@@ -13,7 +14,6 @@ import {
 import type {
     CellAnimationBreakpointDirection,
     CellAnimationBreakpointOpts,
-    ScanlineAnimationOrientation,
     ScanlineHorizontalBrightnessOpts,
     ScanlineHorizontalGrayscaleOpts,
     ScanlineHorizontalHueOpts,
@@ -28,6 +28,7 @@ import type {
 } from "@thewaver/ss-components";
 
 import { ScanlineAnimationKeyframeKnobs } from "../../Knobs/ScanlineAnimationKeyframes.const";
+import { ScanlineAnimationKnobs } from "../../Knobs/ScanlineAnimations.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
@@ -60,30 +61,6 @@ import type { ScanlineAnimationExampleProps } from "./ScanlineAnimationPage.type
 import * as styles from "./ScanlineAnimationPage.css";
 
 const IMAGE_CONTAINER_SIZE = 360;
-const MIN_GLITCH_COUNT = 1;
-const MAX_GLITCH_COUNT = 10;
-const GLITCH_COUNT_STEP = 1;
-const MIN_SMOOTHNESS = 0.1;
-const MAX_SMOOTHNESS = 1;
-const SMOOTHNESS_STEP = 0.1;
-const MIN_SHIFT_PERCENT = 5;
-const MAX_SHIFT_PERCENT = 25;
-const SHIFT_PERCENT_STEP = 5;
-const MIN_CHUNKYNESS = 0.1;
-const MAX_CHUNKYNESS = 1;
-const CHUNKYNESS_STEP = 0.1;
-const MIN_LINE_COUNT = 8;
-const MAX_LINE_COUNT = 240;
-const LINE_COUNT_STEP = 4;
-const MIN_DURATION_MS = 100;
-const MAX_DURATION_MS = 5000;
-const DURATION_STEP_MS = 100;
-const MIN_ITERATION_DELAY_MS = 0;
-const ORIENTATIONS: ScanlineAnimationOrientation[] = ["horizontal", "vertical"];
-
-const STARTING_LINE_COUNT = 120;
-const STARTING_DURATION_MS = 2000;
-const STARTING_ITERATION_DELAY_MS = 1000;
 
 const STRESS_LINE_COUNT = 120;
 const STRESS_ITEMS: (StressTestDefs & { size: number; kind: "transform" | "filter" })[] = (
@@ -218,9 +195,9 @@ const SmoothnessInput = (props: { getter: () => number; setter: (value: number) 
         >
             <PageNumberField
                 value={props.getter}
-                min={() => MIN_SMOOTHNESS}
-                max={() => MAX_SMOOTHNESS}
-                step={() => SMOOTHNESS_STEP}
+                min={() => ScanlineAnimationKnobs.MIN_SMOOTHNESS}
+                max={() => ScanlineAnimationKnobs.MAX_SMOOTHNESS}
+                step={() => ScanlineAnimationKnobs.SMOOTHNESS_STEP}
                 ariaLabel={"Smoothness"}
                 onInput={props.setter}
             />
@@ -249,11 +226,7 @@ const DirInput = (props: {
 };
 
 const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const [keyframeOpts, setKeyframeOpts] = createStore({
-        count: 3,
-        shiftPercent: 10,
-        chunkyness: 0.8,
-    });
+    const [keyframeOpts, setKeyframeOpts] = createStore({ ...ScanlineAnimationKnobs.STARTING_GLITCH_OPTS });
 
     return (
         <>
@@ -265,9 +238,9 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <PageProp key={"count"} label={"Count"} hint={"How many glitch bursts happen over one pass."}>
                     <PageNumberField
                         value={() => keyframeOpts.count!}
-                        min={() => MIN_GLITCH_COUNT}
-                        max={() => MAX_GLITCH_COUNT}
-                        step={() => GLITCH_COUNT_STEP}
+                        min={() => ScanlineAnimationKnobs.MIN_GLITCH_COUNT}
+                        max={() => ScanlineAnimationKnobs.MAX_GLITCH_COUNT}
+                        step={() => ScanlineAnimationKnobs.GLITCH_COUNT_STEP}
                         ariaLabel={"Count"}
                         onInput={(value) => setKeyframeOpts("count", value)}
                     />
@@ -280,9 +253,9 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 >
                     <PageNumberField
                         value={() => keyframeOpts.shiftPercent!}
-                        min={() => MIN_SHIFT_PERCENT}
-                        max={() => MAX_SHIFT_PERCENT}
-                        step={() => SHIFT_PERCENT_STEP}
+                        min={() => ScanlineAnimationKnobs.MIN_SHIFT_PERCENT}
+                        max={() => ScanlineAnimationKnobs.MAX_SHIFT_PERCENT}
+                        step={() => ScanlineAnimationKnobs.SHIFT_PERCENT_STEP}
                         ariaLabel={"Shift percent"}
                         onInput={(value) => setKeyframeOpts("shiftPercent", value)}
                     />
@@ -297,9 +270,9 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 >
                     <PageNumberField
                         value={() => keyframeOpts.chunkyness}
-                        min={() => MIN_CHUNKYNESS}
-                        max={() => MAX_CHUNKYNESS}
-                        step={() => CHUNKYNESS_STEP}
+                        min={() => ScanlineAnimationKnobs.MIN_CHUNKYNESS}
+                        max={() => ScanlineAnimationKnobs.MAX_CHUNKYNESS}
+                        step={() => ScanlineAnimationKnobs.CHUNKYNESS_STEP}
                         ariaLabel={"Chunkyness"}
                         onInput={(value) => setKeyframeOpts("chunkyness", value)}
                     />
@@ -312,8 +285,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
-        dir: "asc",
-        smoothness: 0.2,
+        ...ScanlineAnimationKnobs.STARTING_SURGE_BREAKPOINT_OPTS,
     });
 
     return (
@@ -347,8 +319,7 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
-        dir: "asc",
-        smoothness: 0.2,
+        ...ScanlineAnimationKnobs.STARTING_SNAKE_BREAKPOINT_OPTS,
     });
 
     return (
@@ -382,8 +353,7 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
-        dir: "asc",
-        smoothness: 1,
+        ...ScanlineAnimationKnobs.STARTING_SPLIT_BREAKPOINT_OPTS,
     });
 
     return (
@@ -417,8 +387,7 @@ const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 const BrightnessExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts] = createStore<ScanlineHorizontalBrightnessOpts>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
-        dir: "asc",
-        smoothness: 0.5,
+        ...ScanlineAnimationKnobs.STARTING_BRIGHTNESS_BREAKPOINT_OPTS,
     });
 
     return (
@@ -441,8 +410,7 @@ const BrightnessExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 const GrayscaleExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts] = createStore<ScanlineHorizontalGrayscaleOpts>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
-        dir: "asc",
-        smoothness: 0.5,
+        ...ScanlineAnimationKnobs.STARTING_GRAYSCALE_BREAKPOINT_OPTS,
     });
 
     return (
@@ -465,8 +433,7 @@ const GrayscaleExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts] = createStore<ScanlineHorizontalHueOpts>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
-        dir: "asc",
-        smoothness: 0.5,
+        ...ScanlineAnimationKnobs.STARTING_HUE_BREAKPOINT_OPTS,
     });
 
     return (
@@ -489,8 +456,7 @@ const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
-        dir: "asc",
-        smoothness: 0.6,
+        ...ScanlineAnimationKnobs.STARTING_WAVE_BREAKPOINT_OPTS,
     });
 
     return (
@@ -524,8 +490,7 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
-        dir: "asc",
-        smoothness: 0.1,
+        ...ScanlineAnimationKnobs.STARTING_ROLL_BREAKPOINT_OPTS,
     });
 
     return (
@@ -559,8 +524,7 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
-        dir: "asc",
-        smoothness: 0.2,
+        ...ScanlineAnimationKnobs.STARTING_DROPOUT_BREAKPOINT_OPTS,
     });
 
     return (
@@ -594,8 +558,7 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
-        dir: "asc",
-        smoothness: 0.8,
+        ...ScanlineAnimationKnobs.STARTING_INTERLACE_BREAKPOINT_OPTS,
     });
 
     return (
@@ -629,8 +592,7 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
     const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
-        dir: "asc",
-        smoothness: 0.3,
+        ...ScanlineAnimationKnobs.STARTING_SKEW_BREAKPOINT_OPTS,
     });
 
     return (
@@ -665,11 +627,15 @@ export const ScanlineAnimationPage = () => {
     const playback = createSignal(true);
 
     const [getSrc, setSrc] = createSignal(knight);
-    const [getLineCount, setLineCount] = createSignal(STARTING_LINE_COUNT);
+    const [getLineCount, setLineCount] = createSignal(ScanlineAnimationKnobs.STARTING_LINE_COUNT);
     const [getOrientation, setOrientation] = createSignal(SCANLINE_ANIMATION_DEFAULTS.orientation);
-    const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(STARTING_DURATION_MS);
-    const [getAnimationIterationDelayMs, setAnimationIterationDelayMs] = createSignal(STARTING_ITERATION_DELAY_MS);
-    const [getWeightType, setWeightType] = createSignal<CellAnimationWeights.OriginFreeWeightType>("sequenceLinear");
+    const [getAnimationDurationMs, setAnimationDurationMs] = createSignal(ScanlineAnimationKnobs.STARTING_DURATION_MS);
+    const [getAnimationIterationDelayMs, setAnimationIterationDelayMs] = createSignal(
+        ScanlineAnimationKnobs.STARTING_ITERATION_DELAY_MS,
+    );
+    const [getWeightType, setWeightType] = createSignal<CellAnimationWeights.OriginFreeWeightType>(
+        ScanlineAnimationKnobs.STARTING_WEIGHT_TYPE,
+    );
 
     const handleFile = (file: File) => {
         setSrc(URL.createObjectURL(file));
@@ -802,9 +768,9 @@ export const ScanlineAnimationPage = () => {
                 >
                     <PageNumberField
                         value={getLineCount}
-                        min={() => MIN_LINE_COUNT}
-                        max={() => MAX_LINE_COUNT}
-                        step={() => LINE_COUNT_STEP}
+                        min={() => ScanlineAnimationKnobs.MIN_LINE_COUNT}
+                        max={() => ScanlineAnimationKnobs.MAX_LINE_COUNT}
+                        step={() => ScanlineAnimationKnobs.LINE_COUNT_STEP}
                         ariaLabel={"Line count"}
                         onInput={setLineCount}
                     />
@@ -819,7 +785,7 @@ export const ScanlineAnimationPage = () => {
                 >
                     <PageSelectField
                         value={getOrientation}
-                        values={() => ORIENTATIONS}
+                        values={() => SCANLINE_ANIMATION_ORIENTATIONS}
                         ariaLabel={"Orientation"}
                         onChange={(orientation) => setOrientation(() => orientation)}
                     />
@@ -832,9 +798,9 @@ export const ScanlineAnimationPage = () => {
                 >
                     <PageNumberField
                         value={getAnimationDurationMs}
-                        min={() => MIN_DURATION_MS}
-                        max={() => MAX_DURATION_MS}
-                        step={() => DURATION_STEP_MS}
+                        min={() => ScanlineAnimationKnobs.MIN_DURATION_MS}
+                        max={() => ScanlineAnimationKnobs.MAX_DURATION_MS}
+                        step={() => ScanlineAnimationKnobs.DURATION_STEP_MS}
                         ariaLabel={"Animation duration"}
                         onInput={setAnimationDurationMs}
                     />
@@ -847,9 +813,9 @@ export const ScanlineAnimationPage = () => {
                 >
                     <PageNumberField
                         value={getAnimationIterationDelayMs}
-                        min={() => MIN_ITERATION_DELAY_MS}
-                        max={() => MAX_DURATION_MS}
-                        step={() => DURATION_STEP_MS}
+                        min={() => ScanlineAnimationKnobs.MIN_ITERATION_DELAY_MS}
+                        max={() => ScanlineAnimationKnobs.MAX_DURATION_MS}
+                        step={() => ScanlineAnimationKnobs.DURATION_STEP_MS}
                         ariaLabel={"Iteration delay"}
                         onInput={setAnimationIterationDelayMs}
                     />

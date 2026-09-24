@@ -2,6 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { Button, ODOMETER_DEFAULTS, OdometerReels } from "@thewaver/ss-components";
 
+import { OdometerKnobs } from "../../Knobs/Odometers.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -17,18 +18,9 @@ import * as styles from "./OdometerPage.css";
 
 const EXAMPLES_ROOT = "/src/App/Pages/OdometerPage/Examples";
 
-const STARTING_VALUE = 199;
 const ZERO = 0;
 const SMALL_STEP = 1;
 const BIG_STEP = 137;
-const MIN_VALUE = -999999;
-const MAX_VALUE = 999999;
-const MIN_TURN_MS = 50;
-const MAX_TURN_MS = 3000;
-const TURN_STEP_MS = 50;
-const MIN_CASCADE_MS = 0;
-const MAX_CASCADE_MS = 500;
-const CASCADE_STEP_MS = 10;
 const GROUP_SIZE = 3;
 const FIRST = 0;
 const BOX_WIDTH = 380;
@@ -37,7 +29,6 @@ const REEL_DIGITS = 4;
 const REEL_PAD = "0";
 const REEL_RANGE = 10 ** REEL_DIGITS;
 const STARTING_REEL_VALUE = 7;
-const STARTING_REEL_KEY: OdometerReels.SampleKey = "leftToRight";
 const FIELD_WIDTH = 130;
 
 const group = (value: number) => {
@@ -58,13 +49,14 @@ const pull = (value: number) => {
 };
 
 export const OdometerPage = () => {
-    const [getValue, setValue] = createSignal(STARTING_VALUE);
+    const [getValue, setValue] = createSignal(OdometerKnobs.STARTING_VALUE);
     const [getTurnMs, setTurnMs] = createSignal(ODOMETER_DEFAULTS.turnDurationMs);
     const [getCascadeMs, setCascadeMs] = createSignal(ODOMETER_DEFAULTS.cascadeDelayMs);
     const [getReelValue, setReelValue] = createSignal(STARTING_REEL_VALUE);
-    const [getReelKey, setReelKey] = createSignal<OdometerReels.SampleKey>(STARTING_REEL_KEY);
+    const [getReelKey, setReelKey] = createSignal<OdometerReels.SampleKey>(OdometerKnobs.STARTING_REEL_KEY);
 
-    const step = (delta: number) => setValue((value) => Math.min(Math.max(value + delta, MIN_VALUE), MAX_VALUE));
+    const step = (delta: number) =>
+        setValue((value) => Math.min(Math.max(value + delta, OdometerKnobs.MIN_VALUE), OdometerKnobs.MAX_VALUE));
 
     const getExamples = createMemo(() => {
         const commonProps: OdometerExampleProps = {
@@ -185,8 +177,8 @@ export const OdometerPage = () => {
                 >
                     <PageNumberField
                         value={getValue}
-                        min={() => MIN_VALUE}
-                        max={() => MAX_VALUE}
+                        min={() => OdometerKnobs.MIN_VALUE}
+                        max={() => OdometerKnobs.MAX_VALUE}
                         step={() => SMALL_STEP}
                         ariaLabel={"Value"}
                         onInput={setValue}
@@ -200,9 +192,9 @@ export const OdometerPage = () => {
                 >
                     <PageNumberField
                         value={getTurnMs}
-                        min={() => MIN_TURN_MS}
-                        max={() => MAX_TURN_MS}
-                        step={() => TURN_STEP_MS}
+                        min={() => OdometerKnobs.MIN_TURN_MS}
+                        max={() => OdometerKnobs.MAX_TURN_MS}
+                        step={() => OdometerKnobs.TURN_STEP_MS}
                         ariaLabel={"Turn duration in milliseconds"}
                         onInput={setTurnMs}
                     />
@@ -217,9 +209,9 @@ export const OdometerPage = () => {
                 >
                     <PageNumberField
                         value={getCascadeMs}
-                        min={() => MIN_CASCADE_MS}
-                        max={() => MAX_CASCADE_MS}
-                        step={() => CASCADE_STEP_MS}
+                        min={() => OdometerKnobs.MIN_CASCADE_MS}
+                        max={() => OdometerKnobs.MAX_CASCADE_MS}
+                        step={() => OdometerKnobs.CASCADE_STEP_MS}
                         ariaLabel={"Cascade delay in milliseconds"}
                         onInput={setCascadeMs}
                     />

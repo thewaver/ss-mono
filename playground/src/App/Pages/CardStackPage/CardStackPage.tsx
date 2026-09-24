@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import { CARD_STACK_DEFAULTS } from "@thewaver/ss-components";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
+import { CardStackKnobs } from "../../Knobs/CardStacks.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -12,30 +13,10 @@ import { EndlessExample } from "./Examples/Endless";
 
 const EXAMPLES_ROOT = "/src/App/Pages/CardStackPage/Examples";
 
-const MIN_COMMIT_RATIO = 0.05;
-const MAX_COMMIT_RATIO = 0.9;
-const COMMIT_RATIO_STEP = 0.05;
-
-const MIN_DURATION_MS = 0;
-const MAX_DURATION_MS = 2000;
-const DURATION_STEP_MS = 50;
-
-const MIN_MOUNTED_COUNT = 1;
-const MAX_MOUNTED_COUNT = 13;
-const MOUNTED_COUNT_STEP = 1;
-
-const MIN_CARD_GAP = 0;
-const MAX_CARD_GAP = 12;
-const CARD_GAP_STEP = 2;
-
-const MIN_FUNNEL_RATIO = 0;
-const MAX_FUNNEL_RATIO = 0.25;
-const FUNNEL_RATIO_STEP = 0.01;
-
 const FIELD_WIDTH = 110;
 
 export const CardStackPage = () => {
-    const [getIsDisabled, setIsDisabled] = createSignal(false);
+    const [getIsDisabled, setIsDisabled] = createSignal(CardStackKnobs.STARTING_IS_DISABLED);
     const [getCommitRatio, setCommitRatio] = createSignal(CARD_STACK_DEFAULTS.commitRatio);
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(CARD_STACK_DEFAULTS.transitionDurationMs);
     const [getMountedCount, setMountedCount] = createSignal(CARD_STACK_DEFAULTS.mountedCount);
@@ -127,9 +108,9 @@ export const CardStackPage = () => {
                 >
                     <PageNumberField
                         value={getCommitRatio}
-                        min={() => MIN_COMMIT_RATIO}
-                        max={() => MAX_COMMIT_RATIO}
-                        step={() => COMMIT_RATIO_STEP}
+                        min={() => CardStackKnobs.MIN_COMMIT_RATIO}
+                        max={() => CardStackKnobs.MAX_COMMIT_RATIO}
+                        step={() => CardStackKnobs.COMMIT_RATIO_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Commit ratio"}
                         onInput={setCommitRatio}
@@ -143,9 +124,9 @@ export const CardStackPage = () => {
                 >
                     <PageNumberField
                         value={getTransitionDurationMs}
-                        min={() => MIN_DURATION_MS}
-                        max={() => MAX_DURATION_MS}
-                        step={() => DURATION_STEP_MS}
+                        min={() => CardStackKnobs.MIN_DURATION_MS}
+                        max={() => CardStackKnobs.MAX_DURATION_MS}
+                        step={() => CardStackKnobs.DURATION_STEP_MS}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Duration in milliseconds"}
                         onInput={setTransitionDurationMs}
@@ -159,9 +140,9 @@ export const CardStackPage = () => {
                 >
                     <PageNumberField
                         value={getMountedCount}
-                        min={() => MIN_MOUNTED_COUNT}
-                        max={() => MAX_MOUNTED_COUNT}
-                        step={() => MOUNTED_COUNT_STEP}
+                        min={() => CardStackKnobs.MIN_MOUNTED_COUNT}
+                        max={() => CardStackKnobs.MAX_MOUNTED_COUNT}
+                        step={() => CardStackKnobs.MOUNTED_COUNT_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Mounted cards"}
                         onInput={setMountedCount}
@@ -177,9 +158,9 @@ export const CardStackPage = () => {
                 >
                     <PageNumberField
                         value={getCardGap}
-                        min={() => MIN_CARD_GAP}
-                        max={() => MAX_CARD_GAP}
-                        step={() => CARD_GAP_STEP}
+                        min={() => CardStackKnobs.MIN_CARD_GAP}
+                        max={() => CardStackKnobs.MAX_CARD_GAP}
+                        step={() => CardStackKnobs.CARD_GAP_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Card gap in pixels"}
                         onInput={setCardGap}
@@ -195,9 +176,9 @@ export const CardStackPage = () => {
                 >
                     <PageNumberField
                         value={getFunnelRatio}
-                        min={() => MIN_FUNNEL_RATIO}
-                        max={() => MAX_FUNNEL_RATIO}
-                        step={() => FUNNEL_RATIO_STEP}
+                        min={() => CardStackKnobs.MIN_FUNNEL_RATIO}
+                        max={() => CardStackKnobs.MAX_FUNNEL_RATIO}
+                        step={() => CardStackKnobs.FUNNEL_RATIO_STEP}
                         width={() => FIELD_WIDTH}
                         ariaLabel={"Funnel"}
                         onInput={setFunnelRatio}
