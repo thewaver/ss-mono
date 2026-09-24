@@ -222,7 +222,8 @@ export namespace PlacementLayoutUtils {
      *
      * Each item is given the wedge of the ring it sits in as well as its box, so a control can hand its
      * painter a shape rather than a rectangle. A spread below a whole turn opens the band into an arc of
-     * wedges, and the box is snapped to what the items actually cover rather than to the whole circle.
+     * wedges, and the box stays the whole circle, so a part-ring leaves the side it does not cover empty and
+     * nested bands still share a center.
      *
      * @param defs How wide the band is, which way it faces, and how its items sit on it.
      * @returns A layout function, sized — it states the width it was drawn at.

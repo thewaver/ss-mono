@@ -2,9 +2,9 @@ import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
 
-const FIELD_WIDTH = 240;
+export const FIELD_WIDTH = 240;
 export const FIELD_HEIGHT = 40;
-const FIELD_BORDER = 2;
+export const FIELD_BORDER = 2;
 
 export const FIELD_PADDING = 10 + FIELD_BORDER;
 export const FIELD_STEPPER_PADDING = {

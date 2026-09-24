@@ -7,7 +7,6 @@ export const deck = style({
     flexDirection: "column",
     alignItems: "flex-start",
     gap: themeVars.spacing.double,
-    padding: themeVars.spacing.double,
 });
 
 export const row = style({

@@ -17,6 +17,7 @@
         "test": "npm run test --workspaces --if-present",
         "verify:dom": "playwright test",
         "verify:dom:ui": "playwright test --ui",
+        "update:library-tree": "node playground/scripts/libraryTree.ts",
         "format": "prettier --write .",
         "prepare": "husky"
     },

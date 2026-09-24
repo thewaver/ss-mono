@@ -75,7 +75,7 @@ export const PaginatorPage = () => {
             },
             {
                 key: "dial",
-                name: "The same row, round a dial",
+                name: "The same row, round half a dial",
                 readout: () =>
                     `page ${getDialPage()} of ${getPageCount()} — one layout function, and the steps, pages and gaps become wedges in the order they already had`,
                 component: () => <DialExample {...commonProps} page={getDialPage} onPageChange={setDialPage} />,

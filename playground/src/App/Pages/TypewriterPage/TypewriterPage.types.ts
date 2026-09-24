@@ -6,3 +6,8 @@ export type TypewriterExampleProps = AccessorProps<{
     animationName: string;
     computeCharacterWeights?: (count: number) => number[];
 }>;
+
+export type TypewriterPhrasesExampleProps = TypewriterExampleProps &
+    AccessorProps<{
+        width: number;
+    }>;

@@ -135,7 +135,7 @@ export const TourExample = (props: Props) => {
                             <Button
                                 renderContent={(getFlags) => (
                                     <PageButtonContent flags={getFlags}>
-                                        {getCurrent().isWaitingForUser ? "Try it" : getIsLastStep() ? "Done" : "Next"}
+                                        {getCurrent().isWaitingForUser ? "Try" : getIsLastStep() ? "Done" : "Next"}
                                     </PageButtonContent>
                                 )}
                                 onClick={() => (getCurrent().isWaitingForUser ? handOverToUser() : next())}

@@ -9,7 +9,6 @@ import { EditableExample } from "./Examples/Editable";
 import { ErroredExample } from "./Examples/Errored";
 import { LabeledExample } from "./Examples/Labeled";
 import { NumberFieldExample } from "./Examples/NumberField";
-import { OneTimeCodeExample } from "./Examples/OneTimeCode";
 import { PasswordExample } from "./Examples/Password";
 import { ReachableExample } from "./Examples/Reachable";
 import { ReadOnlyExample } from "./Examples/ReadOnly";
@@ -33,7 +32,6 @@ export const TextInputPage = () => {
     const quantitySignal = createSignal("10");
     const revealSignal = createSignal(false);
     const citySignal = createSignal("");
-    const oneTimeCodeSignal = createSignal("");
     const editableSignal = createSignal("Ada Lovelace");
     const editingSignal = createSignal(false);
 
@@ -74,14 +72,6 @@ export const TextInputPage = () => {
                 `value: "${citySignal[0]()}" — ${getCitySuggestions().length} suggested; any text is kept, and Enter only picks once the arrows have moved into the list`,
             component: () => <CitiesExample valueSignal={citySignal} suggestions={getCitySuggestions} />,
             path: `${EXAMPLES_ROOT}/Cities.tsx`,
-        },
-        {
-            key: "oneTimeCode",
-            name: "One-time code",
-            readout: () =>
-                `value: "${oneTimeCodeSignal[0]()}" — one field painted as ${PIN_LENGTH} cells, the next empty one marked while focused`,
-            component: () => <OneTimeCodeExample valueSignal={oneTimeCodeSignal} />,
-            path: `${EXAMPLES_ROOT}/OneTimeCode.tsx`,
         },
         {
             key: "editable",

@@ -50,14 +50,6 @@ const ComplexExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
     );
 };
 
-const PhrasesExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
-    return (
-        <PageMeasureBox width={width} padding={() => MEASURE_BOX_PADDING}>
-            <PhrasesExample {...props} />
-        </PageMeasureBox>
-    );
-};
-
 const CustomInputExampleWrapper = ({ width, ...props }: ExampleWrapperProps) => {
     const textSignal = createSignal("Line one\n\nline two");
 
@@ -125,7 +117,7 @@ export const TypewriterPage = () => {
                 name: "Phrases",
                 readout: () =>
                     "the example owns the loop: each run's end either holds the phrase and switches to erasing, or moves to the next phrase and types it, and the caret is moved by each character's own animation starting",
-                component: () => <PhrasesExampleWrapper {...commonProps} />,
+                component: () => <PhrasesExample {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Phrases.tsx`,
             },
         ];

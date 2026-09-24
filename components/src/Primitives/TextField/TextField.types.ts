@@ -102,6 +102,12 @@ export type TextFieldState = {
     minRows?: number;
     /** The most rows a multi-line field grows to before it starts scrolling. */
     maxRows?: number;
+    /**
+     * Whether the element draws nothing of its own: no text, no caret, no selection highlight and no focus outline.
+     * For a control whose painter draws all four from state the control reports, so the element's own paint would
+     * show a second, misplaced copy.
+     */
+    isConcealed?: boolean;
 };
 
 export type TextFieldElementProps = AccessorProps<
@@ -154,6 +160,7 @@ export type TextFieldPresetProps = Omit<
     | "isAutoSizing"
     | "minRows"
     | "maxRows"
+    | "isConcealed"
     | "onKeyDown"
     | "onBlur"
     | "ariaAttributes"

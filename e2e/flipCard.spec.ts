@@ -3,20 +3,20 @@ import { expect, test } from "@playwright/test";
 import { demo, prop, readout } from "./helpers";
 
 /**
- * The card draws no control of its own: the page owns the button and the two share a signal. That is as much
- * what these checks pin as the turn itself — a component that renders no button cannot promise one is
- * reachable or named, so the page's button is the thing that has to be real, and it is looked up by its id.
+ * The card draws no control of its own: the page owns the buttons and they share a signal with it. That is as
+ * much what these checks pin as the turn itself — a component that renders no button cannot promise one is
+ * reachable or named, so the page's buttons are the thing that has to be real, and they are looked up by id.
  *
  * Both sides are in the document at all times, back to back with no depth between them, which is why every
  * assertion here is about which of the two is *reachable* rather than about which one is painted.
  */
-const CARD = demo("default");
+const CARD = demo("pressed");
 
 const card = `${CARD} [aria-roledescription="flip card"]`;
 const faces = `${CARD} [aria-roledescription="face"]`;
 const face = (name: string) => `${faces}[aria-label="${name}"]`;
 
-const FLIP = "#flip";
+const FLIP = "#press-forward";
 const AXIS_FIELD = `${prop("axis")} [role="combobox"]`;
 const SETTLE_MS = 800;
 
@@ -30,7 +30,7 @@ test.beforeEach(async ({ page }) => {
 
 test("the card and both of its sides say what they are, beyond what their roles convey", async ({ page }) => {
     await expect(page.locator(card)).toHaveAttribute("role", "group");
-    await expect(page.locator(card)).toHaveAttribute("aria-label", "Nine of hearts");
+    await expect(page.locator(card)).toHaveAttribute("aria-label", "Queen of spades");
 
     await expect(page.locator(faces), "two sides, no more").toHaveCount(2);
     await expect(page.locator(face("Front"))).toBeAttached();
@@ -53,7 +53,7 @@ test("turning the card swaps which side is the reachable one", async ({ page }) 
     await expect(page.locator(face("Back")), "the side asked for is the one in reach").not.toHaveAttribute("inert");
     await expect(page.locator(face("Front"))).toHaveAttribute("inert", "");
 
-    expect(await readout(page, "default"), "and the page is told which side it is showing").toContain("back");
+    expect(await readout(page, "pressed"), "and the page is told which side it is showing").toContain("back");
 
     await page.locator(FLIP).click();
     await page.waitForTimeout(SETTLE_MS);
@@ -81,8 +81,8 @@ test("the axis decides which way the card turns, and nothing else about it chang
 });
 
 /**
- * The second card is turned by two edge buttons rather than one, and each press names the way it turns, so
- * the card's angle stops retracing and starts accumulating. The angle is read off the front face's own
+ * The card is turned by two edge buttons, and each press names the way it turns, so the card's angle
+ * accumulates rather than retracing. The angle is read off the front face's own
  * transform — the inline value is the target of the turn, written the moment the side changes, so nothing
  * here has to wait for the animation to finish. What is asserted is how successive angles relate to one
  * another, never what any of them is.
@@ -96,18 +96,6 @@ const angleOf = async (page: import("@playwright/test").Page, selector: string) 
     Number(/rotate[XY]\((-?[\d.]+)deg\)/.exec(await transformOf(page, selector))?.[1]);
 
 const pressedAngle = (page: import("@playwright/test").Page) => angleOf(page, pressedFace("Front"));
-
-test("unset, the card rocks back the way it came rather than going on round", async ({ page }) => {
-    const start = await angleOf(page, face("Front"));
-
-    await page.locator(FLIP).click();
-    const turned = await angleOf(page, face("Front"));
-
-    await page.locator(FLIP).click();
-
-    expect(turned, "a turn moves the card").not.toBe(start);
-    expect(await angleOf(page, face("Front")), "and the turn back undoes it").toBe(start);
-});
 
 test("pressing the same edge twice keeps the card going the same way round", async ({ page }) => {
     const start = await pressedAngle(page);

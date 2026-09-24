@@ -2274,6 +2274,15 @@ placement overlaps its anchor and gets no bridge at all. It is absolutely positi
 the measured `offsetWidth` the placement math reads nor anything painted, and a negative offset clamps to
 zero rather than eating into the tooltip.
 
+**The bridge sits beneath the content, at `z-index: -1` inside a root that is `isolation: isolate`.** It spans
+the whole root plus the gap, and an absolutely positioned box with no `z-index` paints — and so hit-tests —
+above every static child of its parent. `HoverCard`'s panel had the same bridge, and a plain `<a>` in the
+profile card could not be clicked: the pseudo-element took the press. The `Follow` button beside it worked only
+because `InteractionWrapper`'s root is positioned and comes later in the tree, and the navigation flyout only
+because its surface carries a `transform`. Isolating the root keeps the `-1` from sinking below the root's own
+background into whatever stacking context is outside. `Tooltip`, `HoverCard` and the Playground's flyout all
+take it.
+
 **Leaving is judged by where the pointer is going, not by a timer.** `mouseleave` carries `relatedTarget`,
 so the anchor ignores a leave into the tooltip and the tooltip ignores a leave into the anchor. A grace
 delay would have done the same job and was rejected: it is a tuned constant standing in for something the
@@ -3151,6 +3160,12 @@ spacing a function of how many items happen to be there; a step makes it a prope
 and fifteen sit the same distance apart and the arc simply grows. `maxSpreadDegrees` is the only thing
 holding it: past that the step is squeezed to fit, which is what stops a menu of two hundred from wrapping
 round on itself. The radius follows the effective step rather than the count, so the cards never crowd.
+
+**A replaced level stays hidden while the whole menu fades out.** Closing clears each level's open submenu, and
+"covered" was read straight off that, so picking a card two levels down uncovered every level above it at the
+moment the fade began — the person saw the arc they had left reappear and fade beside the one they picked from.
+`MenuLevel` now remembers, on close, whether it was covered and keeps that until it next opens, so only the
+level that was on screen fades.
 
 ### `WheelMenu`: the wheel becomes a component, and `Menu` forgets it ever knew
 
@@ -5349,6 +5364,108 @@ now derives the trail from the pressed crumb's index, and the panel's `Reset` is
 **Not built:** collapsing a long trail behind an overflow menu. It needs a decision about where the hidden
 crumbs go, and nothing has asked.
 
+### Controls: `TableOfContents`, where the article is the consumer's
+
+Built at the user's request, reversing the earlier call that left a table of contents as an abstract
+(`ElementObserverUtils.createViewportCurrentIndexObserver`) with the links as consumer markup. The trigger was
+that its demo had to be parked on the Scroller page, whose last example was then not a scroller. The condition
+the user set was the house's usual abstraction: like `Stepper`, the list is drawn however the consumer likes.
+
+**The component renders the link list and nothing else.** A `<nav>` holding an `<ol>`, one `<li>` per link,
+each link an `InteractionWrapper` over an unexported `TableOfContentsItem` leaf. Unlike `Stepper`'s
+`renderBody`, the sections are not drawn by the component: a table of contents usually sits in a sidebar far
+from its article, often in another column or another component, so a slot inside the `<nav>` would put the
+article inside the landmark and decide the page's layout on the consumer's behalf — the same argument as
+_"A component hands out a controller and renders no controls of its own"_.
+
+**Each link record carries its target element, rather than the component taking a separate list of elements.**
+`TableOfContentsLink<T> = { value, target, href?, depth?, id? }`, where `target: HTMLElement | undefined` is
+required and is `undefined` until the consumer's heading mounts. Two alternatives were weighed. A second prop
+holding an array of elements was the shape `createViewportCurrentIndexObserver` itself takes, and it is the
+parallel-arrays fault `Tabs` was rebuilt to remove (_"Parallel arrays became one array of records"_): two
+sources indexed against each other that nothing keeps aligned. Finding the element from `href` by id was the
+other, and it needs a document query the component cannot make reactive and a fragment the link may not have.
+The field keeps what the component needs next to the thing it belongs to, and the consumer owns the keying,
+as it does for the list observer. A consumer collects refs into a signal and maps them into the records, which
+is what the Playground example does.
+
+**The library owns three things**: the `<nav>` landmark and its name, `aria-current` on the link whose section
+is being read, and "pressing a link scrolls its target into view and moves focus to it". Current-section
+tracking is the existing observer, not a reimplementation, and its `offsetRatio` passes through as a prop whose
+default in `TABLE_OF_CONTENTS_DEFAULTS` is `CURRENT_INDEX_OBSERVER_DEFAULTS.offsetRatio`, so the user's tuned
+number still has one home.
+
+**The name is required, as a union where exactly one of `ariaLabel` and `ariaLabelledBy` is given** —
+`Modal`'s `ModalNameProps` shape, under _"A role that requires a name makes the prop that names it
+required"_. A table of contents always shares a page with the site's own navigation, so it is always the
+`navigation` with a sibling that ARIA says needs a name.
+
+**`aria-current="location"`, not `page` and not `true`.** ARIA's tokens: `page` "represents the current page
+within a set of pages" — the link to the document you are on, which is `Breadcrumbs`' and `Paginator`'s case and
+not this one, since every link here points into the same page. `location` "represents the current location
+within an environment or context", which is the reader's place within the article. `true` "represents the
+current item within a set" and is what any unrecognized token degrades to; it was what the parked demo used,
+and it is the least specific answer available where a specific one fits. The spec that moved with the demo
+expected `true` and now expects `location`.
+
+**A link with an `href` is a real anchor; without one it is a button that does the same thing** — `Tab<T>`'s
+terms, as `Tree` and `Breadcrumbs` follow them. An anchor keeps middle-click, open-in-new-tab and copy-link,
+none of which a click handler can give. The click is intercepted only when the target exists: then the default
+is cancelled, the target is scrolled to `block: "start"` (so a consumer's `scroll-margin-top` is honored) and
+focused with `preventScroll`. With no target yet the anchor follows its fragment as any link would. There is no
+`linkComponent`, which `Tabs` takes because an `<a>` reloads a routed application: a fragment link does not, and
+the click is cancelled before a router sees it.
+
+**The component makes the target focusable itself, and only where the consumer said nothing.** Moving focus is
+the half of "pressing a link" a keyboard or screen reader user depends on — without it the next Tab carries on
+through the table of contents rather than into the section — and a heading cannot take focus unless it carries
+`tabindex`. Argued from ownership: the element is the consumer's, but the promise is the component's, and a
+promise that silently fails when the consumer forgets an attribute is the fault _"A component generates the id
+a relationship attribute needs"_ closes for ids. So the same rule: `tabindex="-1"` is written only onto a target
+that has no `tabindex` of its own and is not focusable already, and removed again when the target leaves the
+list. A consumer who set a value keeps it; `-1` means focusable without joining the tab order, so nothing the
+consumer tabs through changes.
+
+**The current section is reported, not held.** `onCurrentChange(value | undefined)` fires only when the value
+changes (_"Asking for a state a thing is already in does nothing"_ counts notifying as work), and not at mount.
+It is not a `currentSignal`: the scroll position owns it, and a consumer writing a value the page is not
+scrolled to would contradict the observer on the next scroll event. A consumer wanting to move the reader
+scrolls the target element, which they already hold, and the mark follows.
+
+**The painter is `renderLink(getLink, getFlags, getPlacement)`, `Tabs`' shape.** The record comes first as its
+own accessor, then `InteractionFlags<TableOfContentsFlags>` — which holds `isCurrent` and nothing else, so it is
+`*Flags` — then the placement. The depth is read off the record. The first build put the record, index, depth and
+placement inside one `*RenderProps` object, following `SegmentedInput`'s cells; the user chose the neighbors' shape
+instead, so every list-of-records control reads the same (_"One aggregated object per painter"_ now says where
+a record goes). The painter's text is the link's accessible name, so there is no `computeLinkAriaLabel`.
+
+**A depth is paint, and the list stays flat.** It is handed to the painter so it can indent, and the markup is
+one `<ol>` whatever the depths, so a sub-section is reached by the same Tab and announced as one more item. A
+nested list would say more about the outline's structure; it waits until something asks for it.
+
+**It takes `computeLayout` and `computeEffect` like `Stepper`**, with the same placed-`li`-as-layer arrangement,
+and an `orientation` that defaults to `vertical` and drives the flex direction only. There are no arrow keys:
+every link is its own tab stop, as `Breadcrumbs` and `Paginator` record for independent destinations.
+
+**What WCAG said.** 2.4.1 Bypass Blocks: "A mechanism is available to bypass blocks of content that are repeated
+on multiple web pages" — the named `navigation` landmark is one such mechanism for the links themselves, and
+the in-page links are another for the article; the component supplies the landmark and cannot supply its name,
+hence the required prop. 2.4.3 Focus Order: "focusable components receive focus in an order that preserves
+meaning and operability" — this is what moving focus to the target is for; a scroll alone would leave the
+sequential order at the link. 2.4.7 Focus Visible: "Any keyboard operable user interface has a mode of
+operation where the keyboard focus indicator is visible" — the links are wrapped controls whose painter
+receives `isFocusVisible`, and the focused target is the consumer's element and its ring the consumer's style.
+4.1.2 Name, Role, Value: "the name and role can be programmatically determined; states … can be programmatically
+set; and notification of changes to these items is available" — real anchors or buttons give the role, the
+painter's text the name, and `aria-current` is the state, updated in place as the reader scrolls. 1.3.1 Info and
+Relationships: "Information, structure, and relationships conveyed through presentation can be programmatically
+determined" — the highlighted link is presentation, and `aria-current` is what makes it determinable; the
+indentation a depth draws is not exposed, which is the cost of the flat list above. 2.4.4 Link Purpose (In
+Context) was checked too: the purpose comes from the link's text, which is the consumer's heading text.
+
+**Not built:** updating the address bar's fragment as the reader scrolls or presses a link, a nested list for
+the outline, and a `linkComponent`.
+
 ### Controls: `CheckboxGroup`, and `Checkbox`'s `value` opt-in
 
 `CheckboxGroup` is `RadioGroup`'s context shape with the walk taken out, on the user's call. It holds one list,
@@ -5473,6 +5590,10 @@ is laid under it. Only the appearance is common. The metrics travel as the exist
 
 **Width is deliberately not matched.** A text field is 240px because its painter says so; a tag box is as
 wide as its tags, which is the documented behavior of the control.
+
+**`PageListboxSurface` wears it too**, at the user's request: a standalone `Listbox` is a field-shaped control,
+so it takes the black fill and shadow rather than sitting transparent on the card. It never receives the flag
+classes, so only the resting appearance applies.
 
 ### A Playground demo a visitor can move must be a demo they can put back
 
@@ -8370,6 +8491,116 @@ see, and belongs in the same class as changing a prop's meaning.
 this repo rather than for `ss-utils`; exporting it does not change that, and the entry above is where the
 reasoning lives.
 
+### Controls: `SegmentedInput`, one hidden field drawn as cells
+
+Decided by the user: a code field built the way `input-otp` builds one, replacing the Playground's one-time code
+demo, which faked it with a `TextInput` whose text was made transparent and a painter drawing six boxes over it.
+The fake needed three workarounds in consumer CSS — hiding the input's focus outline through a sibling selector,
+hiding its `::selection`, and guessing which box was "next" — and still could not do the one thing a person
+correcting a code needs: the hidden characters sat bunched at the left rather than under the boxes, so a press
+on the third box put the caret nowhere near the third digit, and a selection could not be seen at all. Fixing
+digit three of four meant erasing digit four first.
+
+**One real input, not one per cell.** The alternative every hand-rolled code field reaches for is an input per
+digit with focus hopping between them, and it loses on the things the field is for. An SMS code offered by the
+phone (`autocomplete="one-time-code"`) is written into one field, so with six fields it lands in the first and
+the component has to catch and redistribute it; a paste has the same problem; and a screen reader meets six
+unnamed one-character fields instead of one field holding the code. One input gets all three from the platform,
+and the cells are paint.
+
+**It is a preset over `TextField`, not a shell of its own.** Everything a single-line field already does is
+wanted unchanged: the caret-keeping sync and the IME gating in `TextSync`, the `Label` and `FormField` wiring,
+disabled-as-`readonly`, `autoComplete` and `inputMode`, and the mask transform hook. What it adds sits on top:
+the cell row as the field's `renderContent`, the listeners reading the caret, and the pointer handler.
+`TagInput` is its own shell because its value is a list; this one's value is a string like any other field's,
+so it has no such reason.
+
+**What the field hides is `TextField`'s `isConcealed`, not consumer CSS.** The one change to the base: an
+`isConcealed` state prop, `Omit`ted from `TextFieldPresetProps` so no other preset offers it, which puts a class
+on the element making its text, its caret, its `::selection` and its outline transparent or absent — all
+`!important`, for the same reason the blank-slate resets are: an app's `:focus-visible` rule and an element
+selector outrank a class. The outline in particular: this is the one control where the ring is deliberately not
+on the focusable element, because the painter draws it on the cell that has the caret, and a second ring around
+the whole row would be wrong. It is a property of the element's paint, so it belongs with the element rather than
+in a sibling selector reaching into it.
+
+**What the painter receives, per cell.** `renderCell(getCell)` is called once per cell and hands over one
+`SegmentedInputCellRenderProps`: the field's own flags (`TextFieldFlags` plus the interaction set), the
+component's `SegmentedInputCellFlags` — `hasCaret` and `isSelected` — and the payload `index` and `char`. It is a
+`*RenderProps` because of the payload, and the boolean pair keeps the `*Flags` name as the component's own
+contribution. **`hasCaret` marks the cell the next typed character lands in**, which is where the caret is or,
+with a selection, where the selection starts; on a full field with the caret at its end it is the last cell. So
+exactly one cell has it whenever the field holds focus, and that is what makes it the place for the focus
+indicator. Both are false while the field is unfocused, matching a native input, which does not paint its
+selection when it is not focused. The component wraps each painted cell in a box of its own, inside a row marked
+`aria-hidden="true"`, so the cells are never read — the field's value is.
+
+**The caret and selection are read off the input, not tracked.** `selectionchange` on the element is the event
+for it — Baseline 2024 per MDN, and it fires asynchronously even for a selection set by script — with `select`,
+`focus`, `blur`, `keyup` and a deferred read after `keydown` beside it for anything that arrives before it or in
+a browser without it. A read is idempotent, so hearing about one change several times costs nothing. An effect on
+the value re-reads too, because the mask writes the text and the caret together and then reports.
+
+**The pointer handler is the one hand-written piece of input behavior.** The input lies over the whole row at
+`inset: 0`, as `TextField` places it, so every press lands on it. On `pointerdown` the component cancels the
+browser's own caret placement — which would land somewhere in the invisible text — works out which cell the
+pointer is over from the cells' own boxes (the nearest one, so a press in a gap goes somewhere sensible and the
+arithmetic does not care which way the row runs), focuses the input and selects the character in that cell, so
+the next character typed replaces it and the ones after it are untouched. A cell past the end of the value puts
+the caret after the last character. Dragging with the button down extends the selection across the cells
+crossed, with pointer capture so it survives leaving the row. Keyboard behavior is the browser's untouched:
+arrows move the caret, `Shift` extends, typing at a collapsed caret inserts and pushes later characters along,
+and the filter cuts whatever falls off the end.
+
+**Characters are restricted by a predicate, through `TextSyncUtils.applyFilter`, not `applyMask`.**
+`computeIsAllowed(char)` defaults to the ASCII digits, published as `TextSyncUtils.getIsMaskDigit`; the
+component hands the field `applyFilter(computeIsAllowed, cellCount, next, caret)` as its mask transform. `applyMask`
+did not fit: its only slot is a digit, so a code taking letters was impossible, and the part of it that deals
+with literals — re-emitting separators, a backspace over one taking the digit before — has nothing to act on in a
+field with none. What was reused is the shape: a pure transform in `TextSync` returning the text and the caret,
+counted in accepted characters so a refused one in front of the caret does not move it, and tested in
+`TextSync.utils.test.ts`. A pasted `123-456` lands as six digits for the same reason a pasted date lands in a
+mask. `inputMode` defaults to `numeric` to match the digits default, and a consumer who widens the predicate
+says so there as well.
+
+**No string of its own.** It is a `textbox`, which ARIA does not require to be named, so `ariaLabel` stays
+optional exactly as on `TextInput` and a `Label` or `FormField` names it just as well. There is no
+`roleDescription`: nothing about it differs from a text field to somebody not looking at it. `cellCount` is a
+count by _"a tally of cells is a count"_.
+
+**What WCAG said.**
+
+- **4.1.2 Name, Role, Value** — _"For all user interface components …, the name and role can be programmatically
+  determined; states, properties, and values that can be set by the user can be programmatically set; and
+  notification of changes to these items is available to user agents, including assistive technologies."_ One
+  native input satisfies it without help: its role is `textbox`, its value is the whole code and changes are the
+  platform's to announce. It is the argument for one input rather than six, since six would each expose a single
+  character and no whole.
+- **2.1.1 Keyboard** — _"All functionality of the content is operable through a keyboard interface without
+  requiring specific timings for individual keystrokes …"_ Everything the pointer handler does — put the caret on
+  a cell, select a run of cells — the arrows and `Shift` do natively, so the pointer route adds nothing the
+  keyboard lacks.
+- **2.4.7 Focus Visible** — _"Any keyboard operable user interface has a mode of operation where the keyboard
+  focus indicator is visible."_ The field's own outline is gone by design, so the indicator is the painter's:
+  `hasCaret` is set on exactly one cell whenever the field holds focus, and the Playground's painter draws the
+  theme ring there when `isFocusVisible`. A consumer painter that ignores `hasCaret` fails this, and the
+  `renderCell` block says the ring is theirs to draw.
+- **3.3.2 Labels or Instructions** — _"Labels or instructions are provided when content requires user input."_
+  The consumer's: the name comes from `ariaLabel` or a `Label`, and an instruction such as how many characters
+  are expected is text they place and link through `FormField`. The library supplies no wording.
+- **1.3.5 Identify Input Purpose** — _"The purpose of each input field collecting information about the user can
+  be programmatically determined when: The input field serves a purpose identified in the Input Purposes for user
+  interface components section …"_ It does not reach a code field: the Understanding document scopes it to
+  _"inputs collecting information about the user"_, and `one-time-code` is not in WCAG's list of input purposes. So
+  `autocomplete="one-time-code"` is not a conformance requirement; it is what lets a phone offer the code from a
+  message, which is why the Playground passes it. The component does not default it, because a field holding a PIN
+  the person chose themselves must not invite autofill.
+
+**Known limits.** Chromium's `:autofill` look paints an opaque box over a filled field, and a concealed field has
+no text to show under it — the anti-spoofing lock `TextInput` records applies here too, and is left alone for the
+same reason. Touch was not exercised: the pointer handler is written against Pointer Events and cancels the press
+the same way for a finger, but only a mouse was driven by the suite.
+
 ### Controls: `CurrencyInput`, and why it is not `NumberInput` with grouping
 
 Settled by the user, choosing a separate control over widening `NumberInput`.
@@ -10655,6 +10886,13 @@ every route that is not a click.
 cells: a painter drawing a bare digit gives a reader "7" with no idea what of. The default names are English,
 and the compute hook is the escape from that rather than a locale the library pretends to know.
 
+**The page's dial example is the eastern half of a ring, with the results panel against its flat edge.** The
+user's layout: half a turn facing right runs clockwise from the top, so the order reads top to bottom without
+the dial going against every other round control in the Playground. A ring's box is always the whole circle
+(_"The band and the arc are two placers"_), so the half sits in a square whose left half is empty; the panel is
+pulled into that half by a negative margin of half the dial's width and stacked above it, and its minimum height
+is the dial's, so the flat edge is never taller than what it meets.
+
 ### The painter's object: `activation` left the flags, and only the mixed ones became `RenderProps`
 
 Every control hands its painter **one** object rather than a run of arguments, because positional arguments
@@ -12736,7 +12974,8 @@ the edge without the check reading the overhang as a drum painting outside its r
 
 ### `DrumWheel` page: three reels take one result through `computeSpinTarget`
 
-**One press fetches one result, and each wheel's `computeSpinTarget` returns its own part of it.** Writing `targetIndexSignal` instead would move a wheel without a spin's turns and easing. **The stop order comes from `spinDurationMs` alone**, 600ms more for each reel, because the settle that follows is the same length for all three. **"All stopped" is a countdown of `onSpinEnd` from the number of `spin()` calls that returned true**, so a wheel that declined is never waited for.
+**The example is gone; the user removed it because `Odometer`'s pull-to-spin reels already show a slot machine.**
+What it established still holds for anyone building one out of wheels. **One press fetches one result, and each wheel's `computeSpinTarget` returns its own part of it.** Writing `targetIndexSignal` instead would move a wheel without a spin's turns and easing. **The stop order comes from `spinDurationMs` alone**, 600ms more for each reel, because the settle that follows is the same length for all three. **"All stopped" is a countdown of `onSpinEnd` from the number of `spin()` calls that returned true**, so a wheel that declined is never waited for.
 
 ### `Barrel`: the drum, lifted out of the wheel so a second component can turn one
 
@@ -12789,8 +13028,9 @@ It re-reads on capture-phase `scroll` anywhere in the document and on `resize`, 
 nothing about the answer changes without one of those. It measures through
 `ViewportUtils.getAdjustedBoundingClientRect` against the viewport context's height, which is the space its name
 claims. A last section shorter than the stretch below the line can never become current; that is the consumer's
-layout, and the doc block says so. The Playground example sits on the Scroller page, because an abstract's menu
-entry carries no examples.
+layout, and the doc block says so. The abstract-only call was later reversed by the user: `TableOfContents` is
+now the component built over this helper (_"Controls: `TableOfContents`, where the article is the consumer's"_),
+and the example that used to sit on the Scroller page lives on its page.
 
 ### `ElementObserver` reports a size, and the height observer is a view of it
 
@@ -12836,7 +13076,18 @@ of it and replaces it with a peek and a scale, which lands every card of differi
 
 ### `ElementObserver`: progress through the viewport
 
-**`createViewportProgressObserver` gives 0 while an element's top is at or below the viewport's bottom edge, 1 once its bottom has passed the top, and a straight line between.** That is the whole passage across the screen, the same range a CSS view timeline calls "cover". It re-reads on any scroll and on resize, like the current-index observer, and measures in the viewport's coordinates. It is meant as the getter half of a `progressSignal` with playback off, which is how Trail's scroll example uses it and how CellAnimation's scrub can.
+**`createViewportProgressObserver` gives 0 while an element's top is at or below the viewport's bottom edge, 1 once its bottom has passed the top, and a straight line between.** That is the whole passage across the screen, the same range a CSS view timeline calls "cover". It re-reads on any scroll and on resize, like the current-index observer, and measures in the viewport's coordinates. It is meant as the getter half of a `progressSignal` with playback off, and how CellAnimation's scrub can use it.
+
+**`createScrollContainerProgressObserver` is the same passage measured against a scrolling box.** The user's call,
+after Trail's scroll example did almost nothing: the page it sat on scrolled 211 pixels at most, so the marker crossed
+a fifth of its curve and stopped, and on a taller screen the page did not scroll at all. A demo whose range depends on
+how long the rest of the page is cannot be relied on, and a consumer driving something from a panel's scroll had no
+helper either. Both observers are one private core handed a different span — the viewport's height, or the box's
+client area measured through the viewport's scale — so the arithmetic is written once and
+`computeViewportProgress` is published from it. They are siblings named for their space, per _"When a function
+grows a sibling"_. Trail's example now holds its own box: the trail pinned at the top with `position: sticky`, and
+beneath it an invisible runway with a box's height of room before and after, which is what lets the runway start
+below the box and leave above it, so a full scroll is exactly `0` to `1`.
 
 ### The hold is one function, and all three consumers call it
 
@@ -12913,6 +13164,17 @@ expressions are gone. **The components that draw text are the exception and opt 
 `RichText`, `ScrambleText` — because unpadded text is hard to read; `MEASURE_BOX_PADDING` stays exported for
 them. The user restated the scope later, in those terms: padding belongs to the text components and to nothing
 else, so a demo of anything that is not text hugs its box.
+
+**It kept coming back, so it is restated here in the user's own terms: no padding inside a measure box unless
+the content is plain text.** `PatchBoard` and `Bracket` both shipped with `MEASURE_BOX_PADDING` long after the
+default went to zero, copied from the text pages. Before reaching for the constant, ask whether the thing inside
+draws text as its content; a board, a tree or a wheel with labels on it does not.
+
+**Only the component goes inside the box; the page's own controls sit outside it.** Stated by the user alongside
+the padding rule, after `PatchBoard`'s zoom example put its zoom buttons in the same box as the board, so the
+outline measured a toolbar plus a board and the checkerboard showed behind both. An example that needs controls
+renders them beside a `PageMeasureBox` of its own that holds only the component, which is how the zoom example
+now reads.
 
 **A demo paints at the full size of its box, and a demo drawn smaller than the box is the same fault from the
 other end.** The `CardStack` sample was painted at 70% of the stack's own size, which put a ring of

@@ -45,6 +45,20 @@ export const textFieldElement = style({
     },
 });
 
+export const textFieldConcealed = style({
+    color: "transparent !important",
+    WebkitTextFillColor: "transparent",
+    caretColor: "transparent !important",
+    outline: "none !important",
+
+    selectors: {
+        "&::selection": {
+            color: "transparent",
+            backgroundColor: "transparent",
+        },
+    },
+});
+
 export const textFieldTextArea = style({
     resize: "none",
     overflowX: "hidden",

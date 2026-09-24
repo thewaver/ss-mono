@@ -184,7 +184,10 @@ const TextFieldElement = (props: TextFieldElementProps) => {
                 rows={getIsAutoSizing() ? 1 : undefined}
                 name={access(props.name)}
                 class={styles.textFieldElement}
-                classList={{ [styles.textFieldTextArea]: getIsTextArea() }}
+                classList={{
+                    [styles.textFieldTextArea]: getIsTextArea(),
+                    [styles.textFieldConcealed]: access(props.isConcealed) ?? false,
+                }}
                 style={{
                     ...access(props.textInset),
                     ...props.computeTextStyle?.(() => access(props.flags)),
@@ -336,6 +339,7 @@ export const TextField = (props: TextFieldProps) => {
                     isAutoSizing={getIsAutoSizing}
                     minRows={getMinRows}
                     maxRows={props.maxRows}
+                    isConcealed={props.isConcealed}
                     flags={getFlags}
                     value={() => props.valueSignal[0]()}
                     textInset={getTextInset}

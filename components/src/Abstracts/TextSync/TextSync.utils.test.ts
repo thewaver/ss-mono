@@ -291,3 +291,34 @@ describe("readSignedDigits", () => {
         expect(TextSyncUtils.readSignedDigits("1,234.56")).toBe("123456");
     });
 });
+
+describe("applyFilter", () => {
+    const digits = TextSyncUtils.getIsMaskDigit;
+
+    it("drops a refused character and leaves the caret after what was accepted", () => {
+        expect(TextSyncUtils.applyFilter(digits, 6, "12a", 3)).toEqual({ text: "12", caret: 2 });
+    });
+
+    it("lands a pasted code with separators as its digits alone", () => {
+        expect(TextSyncUtils.applyFilter(digits, 6, "123 456", 7)).toEqual({ text: "123456", caret: 6 });
+        expect(TextSyncUtils.applyFilter(digits, 6, "123-456", 7)).toEqual({ text: "123456", caret: 6 });
+    });
+
+    it("cuts a paste past the end and keeps the caret inside the text", () => {
+        expect(TextSyncUtils.applyFilter(digits, 6, "123456789", 9)).toEqual({ text: "123456", caret: 6 });
+    });
+
+    it("takes a digit typed over a selected one without touching the digits after it", () => {
+        expect(TextSyncUtils.applyFilter(digits, 4, "1294", 3)).toEqual({ text: "1294", caret: 3 });
+    });
+
+    it("keeps whatever the predicate allows, letters included", () => {
+        const isAlphanumeric = (char: string) => /^[A-Za-z0-9]$/.test(char);
+
+        expect(TextSyncUtils.applyFilter(isAlphanumeric, 4, "a1-B2", 5)).toEqual({ text: "a1B2", caret: 4 });
+    });
+
+    it("gives an empty text for a length of nothing", () => {
+        expect(TextSyncUtils.applyFilter(digits, 0, "12", 2)).toEqual({ text: "", caret: 0 });
+    });
+});

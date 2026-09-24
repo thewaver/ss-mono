@@ -31,13 +31,10 @@ import {
 } from "./PatchBoardPage.const";
 import type { PatchBoardExampleProps } from "./PatchBoardPage.types";
 
-import { MEASURE_BOX_PADDING } from "../../PageComponents/MeasureBox/MeasureBox.css";
-
 const EXAMPLES_ROOT = "/src/App/Pages/PatchBoardPage/Examples";
 
 const WIDE_SPAN = 2;
 const PERCENT = 100;
-const MEASURED_BOARD_WIDTH = BOARD_WIDTH + MEASURE_BOX_PADDING * 2;
 const NOTHING_DONE = "nothing yet";
 
 export const PatchBoardPage = () => {
@@ -83,7 +80,7 @@ export const PatchBoardPage = () => {
                 readout: () =>
                     `${chainLinksSignal[0]().length} cables, last: ${getChainAction()} — the gate's second input is disabled, so a cable aimed at it is refused`,
                 component: () => (
-                    <PageMeasureBox width={() => MEASURED_BOARD_WIDTH} padding={() => MEASURE_BOX_PADDING}>
+                    <PageMeasureBox width={() => BOARD_WIDTH}>
                         <ChainExample
                             {...commonProps}
                             nodesSignal={chainNodesSignal}
@@ -103,7 +100,7 @@ export const PatchBoardPage = () => {
                 readout: () =>
                     `${mixerLinksSignal[0]().length} cables, last: ${getMixerAction()} — a standing board, sockets on the top and bottom edges; only the desk may feed the amp, so a source aimed straight at it is refused`,
                 component: () => (
-                    <PageMeasureBox width={() => MEASURED_BOARD_WIDTH} padding={() => MEASURE_BOX_PADDING}>
+                    <PageMeasureBox width={() => BOARD_WIDTH}>
                         <MixerExample
                             {...commonProps}
                             nodesSignal={mixerNodesSignal}
@@ -123,7 +120,7 @@ export const PatchBoardPage = () => {
                 readout: () =>
                     `${rackLinksSignal[0]().length} cables, last: ${getRackAction()} — a node lands on the grid as it is dragged, and an arrow key takes it to the next grid point; a cable that would feed a signal back to where it came from, such as the reverb into the delay's feedback, is refused`,
                 component: () => (
-                    <PageMeasureBox padding={() => MEASURE_BOX_PADDING}>
+                    <PageMeasureBox>
                         <RackExample
                             {...commonProps}
                             nodesSignal={rackNodesSignal}
@@ -143,7 +140,7 @@ export const PatchBoardPage = () => {
                 readout: () =>
                     `${panLinksSignal[0]().length} cables, last: ${getPanAction()} — the board is wider and taller than its window, so scroll to pan; a node carried with the arrow keys brings the window with it`,
                 component: () => (
-                    <PageMeasureBox padding={() => MEASURE_BOX_PADDING}>
+                    <PageMeasureBox>
                         <PanExample
                             {...commonProps}
                             nodesSignal={panNodesSignal}
@@ -163,18 +160,16 @@ export const PatchBoardPage = () => {
                 readout: () =>
                     `${zoomLinksSignal[0]().length} cables at ${Math.round(getZoom() * PERCENT)}%, last: ${getZoomAction()} — the board is scaled with a CSS transform, and a drag still lands under the pointer`,
                 component: () => (
-                    <PageMeasureBox padding={() => MEASURE_BOX_PADDING}>
-                        <ZoomExample
-                            {...commonProps}
-                            zoom={getZoom}
-                            nodesSignal={zoomNodesSignal}
-                            linksSignal={zoomLinksSignal}
-                            onZoomChange={(zoom) => setZoom(MathUtils.clamp(zoom, MIN_ZOOM, MAX_ZOOM))}
-                            onLink={(link) => setZoomAction(`connected ${getLinkWords(link)}`)}
-                            onUnlink={(link) => setZoomAction(`unplugged ${getLinkWords(link)}`)}
-                            onMove={(nodeKey) => setZoomAction(`moved ${nodeKey}`)}
-                        />
-                    </PageMeasureBox>
+                    <ZoomExample
+                        {...commonProps}
+                        zoom={getZoom}
+                        nodesSignal={zoomNodesSignal}
+                        linksSignal={zoomLinksSignal}
+                        onZoomChange={(zoom) => setZoom(MathUtils.clamp(zoom, MIN_ZOOM, MAX_ZOOM))}
+                        onLink={(link) => setZoomAction(`connected ${getLinkWords(link)}`)}
+                        onUnlink={(link) => setZoomAction(`unplugged ${getLinkWords(link)}`)}
+                        onMove={(nodeKey) => setZoomAction(`moved ${nodeKey}`)}
+                    />
                 ),
                 path: `${EXAMPLES_ROOT}/Zoom.tsx`,
             },

@@ -1,6 +1,7 @@
 import { Button, PatchBoard, access } from "@thewaver/ss-components";
 
 import { PATCH_BOARD_ANNOUNCEMENTS } from "../../../PageComponents/Announcements/Announcements.const";
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import {
     PagePatchCable,
@@ -32,35 +33,37 @@ export const ZoomExample = (props: Props) => {
                 />
             </div>
 
-            <div class={styles.zoomWindow}>
-                <div class={styles.zoomScaler} style={{ transform: `scale(${access(props.zoom)})` }}>
-                    <PatchBoard
-                        groupId={"zoom"}
-                        ariaLabel={"Zoomed chain"}
-                        announcements={PATCH_BOARD_ANNOUNCEMENTS}
-                        heightRatio={BOARD_HEIGHT_RATIO}
-                        socketSize={props.socketSize}
-                        isLocked={props.isLocked}
-                        isDisabled={props.isDisabled}
-                        nodesSignal={props.nodesSignal}
-                        linksSignal={props.linksSignal}
-                        computeNodeKey={(device) => device.id}
-                        computeNodeLabel={(device) => device.name}
-                        renderNode={(getNode, getFlags) => (
-                            <PagePatchNode
-                                label={() => getNode().value.name}
-                                kind={() => getNode().value.kind}
-                                flags={getFlags}
-                            />
-                        )}
-                        renderSocket={(_getSocket, getFlags) => <PagePatchSocket flags={getFlags} />}
-                        renderCable={(getDefs) => <PagePatchCable defs={getDefs} />}
-                        onLink={props.onLink}
-                        onUnlink={props.onUnlink}
-                        onMove={props.onMove}
-                    />
+            <PageMeasureBox>
+                <div class={styles.zoomWindow}>
+                    <div class={styles.zoomScaler} style={{ transform: `scale(${access(props.zoom)})` }}>
+                        <PatchBoard
+                            groupId={"zoom"}
+                            ariaLabel={"Zoomed chain"}
+                            announcements={PATCH_BOARD_ANNOUNCEMENTS}
+                            heightRatio={BOARD_HEIGHT_RATIO}
+                            socketSize={props.socketSize}
+                            isLocked={props.isLocked}
+                            isDisabled={props.isDisabled}
+                            nodesSignal={props.nodesSignal}
+                            linksSignal={props.linksSignal}
+                            computeNodeKey={(device) => device.id}
+                            computeNodeLabel={(device) => device.name}
+                            renderNode={(getNode, getFlags) => (
+                                <PagePatchNode
+                                    label={() => getNode().value.name}
+                                    kind={() => getNode().value.kind}
+                                    flags={getFlags}
+                                />
+                            )}
+                            renderSocket={(_getSocket, getFlags) => <PagePatchSocket flags={getFlags} />}
+                            renderCable={(getDefs) => <PagePatchCable defs={getDefs} />}
+                            onLink={props.onLink}
+                            onUnlink={props.onUnlink}
+                            onMove={props.onMove}
+                        />
+                    </div>
                 </div>
-            </div>
+            </PageMeasureBox>
         </div>
     );
 };

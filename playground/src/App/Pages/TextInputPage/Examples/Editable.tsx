@@ -2,7 +2,7 @@ import { Show, createEffect, createSignal, on } from "solid-js";
 
 import { Button, TextInput } from "@thewaver/ss-components";
 
-import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageInlineEditContent } from "../../../StyledComponents/InlineEditContent/InlineEditContent";
 import {
     PageTextFieldContent,
     computePageTextFieldTextStyle,
@@ -53,7 +53,7 @@ export const EditableExample = (props: Props) => {
                     ariaLabel={() => `Edit name, ${props.valueSignal[0]()}`}
                     onClick={startEditing}
                     renderContent={(getFlags) => (
-                        <PageButtonContent flags={getFlags}>{props.valueSignal[0]()}</PageButtonContent>
+                        <PageInlineEditContent flags={getFlags}>{props.valueSignal[0]()}</PageInlineEditContent>
                     )}
                 />
             }

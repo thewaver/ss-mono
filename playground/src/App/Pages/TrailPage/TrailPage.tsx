@@ -91,7 +91,7 @@ export const TrailPage = () => {
                 readout: () =>
                     getPrefersReducedMotion()
                         ? "reduced motion is on, so the marker stays at the start instead of following the scroll"
-                        : `${getPercent(getScrollProgress())} of the way through the window — nothing is running, scrolling the page is what moves the marker`,
+                        : `${getPercent(getScrollProgress())} of the way through the box — nothing is running, scrolling the box is what moves the marker`,
                 component: () => (
                     <ScrollExample
                         {...commonProps}

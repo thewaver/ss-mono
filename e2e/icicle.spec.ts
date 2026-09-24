@@ -19,6 +19,22 @@ const cellNamed = (page: Page, name: string) => page.locator(BUTTON).filter({ ha
 const activeName = (page: Page) =>
     page.evaluate(() => (document.activeElement?.textContent ?? "").replace(/ [\d,]+ lines$/, "").trim());
 
+/**
+ * Which cell is drawn highest in the column to the right of the named one. The order of a column follows the data,
+ * so the spec reads it off the page rather than naming it, and a refresh of the library tree cannot break it.
+ */
+const topmostChildName = (page: Page, parentName: string) =>
+    page.locator(BUTTON).evaluateAll((buttons, name) => {
+        const nameOf = (element: Element) => (element.textContent ?? "").replace(/ [\d,]+ lines$/, "").trim();
+        const parent = buttons.find((button) => nameOf(button) === name)!.getBoundingClientRect();
+        const next = buttons
+            .map((button) => ({ name: nameOf(button), rect: button.getBoundingClientRect() }))
+            .filter(({ rect }) => rect.left >= parent.right - 1 && rect.left < parent.right + parent.width * 0.5)
+            .sort((a, b) => a.rect.top - b.rect.top);
+
+        return next[0]?.name;
+    }, parentName);
+
 test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/icicle");
@@ -62,13 +78,15 @@ test("the arrows walk a column and across it, Enter brings a cell left, Escape g
     expect(await activeName(page), "the cell in view is where the walk starts").toBe("src");
 
     await page.keyboard.press("ArrowRight");
-    expect(await activeName(page), "right goes to the topmost child").toBe("Essentials");
+    const topmost = await topmostChildName(page, "src");
+
+    expect(await activeName(page), "right goes to the topmost child").toBe(topmost);
 
     await page.keyboard.press("ArrowDown");
 
     const below = await activeName(page);
 
-    expect(below, "down goes to the next cell in the column").not.toBe("Essentials");
+    expect(below, "down goes to the next cell in the column").not.toBe(topmost);
 
     await page.keyboard.press("ArrowLeft");
     expect(await activeName(page), "left goes to the parent").toBe("src");

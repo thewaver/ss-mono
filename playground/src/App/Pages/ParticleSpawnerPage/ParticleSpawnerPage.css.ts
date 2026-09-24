@@ -78,3 +78,10 @@ export const spawnerOverlay = style({
     inset: 0,
     pointerEvents: "none",
 });
+
+export const particleReturn = style([
+    particle,
+    {
+        backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.secondary.light}, ${themeVars.color.secondary.dark})`,
+    },
+]);

@@ -8,7 +8,6 @@ import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
-import { DefaultExample } from "./Examples/Default";
 import { PressedExample } from "./Examples/Pressed";
 
 const AXIS_LABELS: Record<FlipCardAxis, string> = {
@@ -24,26 +23,11 @@ export const FlipCardPage = () => {
     const [getAxis, setAxis] = createSignal<FlipCardAxis>(FLIP_CARD_DEFAULTS.axis);
     const [getTransitionDurationMs, setTransitionDurationMs] = createSignal(FLIP_CARD_DEFAULTS.transitionDurationMs);
 
-    const flippedSignal = createSignal(false);
     const pressedFlippedSignal = createSignal(false);
 
     const [getLastTurn, setLastTurn] = createSignal<FlipCardTurnDirection>();
 
     const getExamples = createMemo(() => [
-        {
-            key: "default",
-            name: "Two sides of one card",
-            readout: () =>
-                `${flippedSignal[0]() ? "back" : "front"} — the card is told which side to show, so the button that turns it belongs to the page rather than to the library`,
-            component: () => (
-                <DefaultExample
-                    flippedSignal={flippedSignal}
-                    axis={getAxis}
-                    transitionDurationMs={getTransitionDurationMs}
-                />
-            ),
-            path: `${EXAMPLES_ROOT}/Default.tsx`,
-        },
         {
             key: "pressed",
             name: "Turned toward the edge pressed",

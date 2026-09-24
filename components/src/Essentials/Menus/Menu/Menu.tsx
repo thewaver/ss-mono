@@ -1,5 +1,5 @@
 import type { JSX } from "solid-js";
-import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
+import { For, Index, Show, createEffect, createMemo, createSignal, createUniqueId, onCleanup, untrack } from "solid-js";
 
 import { Point2d, Rect } from "@thewaver/ss-utils";
 
@@ -172,6 +172,7 @@ const MenuItemView = (props: MenuItemViewProps) => {
 const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     const [getHighlightedValue, setHighlightedValue] = createSignal<T | undefined>();
     const [getOpenValue, setOpenValue] = createSignal<T | undefined>();
+    const [getIsCoveredWhileClosing, setIsCoveredWhileClosing] = createSignal(false);
     const [getLayoutRootRef, setLayoutRootRef] = createSignal<HTMLElement>();
 
     const typeahead = TypeaheadUtils.createBuffer();
@@ -268,7 +269,8 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
         return `calc(${size} * ${extent / rootExtent})`;
     };
 
-    const getIsCovered = () => access(props.submenuMode) === "replace" && getOpenValue() !== undefined;
+    const getIsCovered = () =>
+        access(props.submenuMode) === "replace" && (getOpenValue() !== undefined || getIsCoveredWhileClosing());
 
     const getPlacementAt = (index: number) => getLayout()?.placements[index];
 
@@ -360,8 +362,13 @@ const MenuLevel = <T,>(props: MenuLevelProps<T>): JSX.Element => {
     };
 
     createEffect(() => {
-        if (access(props.isOpen)) return;
+        if (access(props.isOpen)) {
+            setIsCoveredWhileClosing(false);
 
+            return;
+        }
+
+        setIsCoveredWhileClosing(untrack(getIsCovered));
         setHighlightedValue(() => undefined);
         setOpenValue(() => undefined);
     });

@@ -3,9 +3,11 @@ import { createSignal, onCleanup } from "solid-js";
 import { Button, MediaQueryMonitorUtils, Typewriter } from "@thewaver/ss-components";
 import type { TypewriterController, TypewriterMode } from "@thewaver/ss-components";
 
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import type { TypewriterExampleProps } from "../TypewriterPage.types";
+import type { TypewriterPhrasesExampleProps } from "../TypewriterPage.types";
 
+import { MEASURE_BOX_PADDING } from "../../../PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "../TypewriterPage.css";
 
 const LEAD = "We build";
@@ -16,7 +18,7 @@ const CHARACTER_DELAY_MS = 80;
 const CHARACTER_DURATION_MS = 200;
 const NO_MOTION_MS = 0;
 
-type Props = TypewriterExampleProps;
+type Props = TypewriterPhrasesExampleProps;
 
 export const PhrasesExample = (props: Props) => {
     const [getController, setController] = createSignal<TypewriterController>();
@@ -77,32 +79,36 @@ export const PhrasesExample = (props: Props) => {
 
     return (
         <div class={styles.phraseStack}>
-            <div class={styles.phraseLine}>
-                <span>{LEAD}</span>
+            <PageMeasureBox width={props.width} padding={() => MEASURE_BOX_PADDING}>
+                <div class={styles.phraseLine}>
+                    <span>{LEAD}</span>
 
-                <div class={styles.phraseSlot}>
-                    <Typewriter
-                        mode={getMode}
-                        animationName={props.animationName}
-                        animationDelayMs={() => (getPrefersReducedMotion() ? NO_MOTION_MS : CHARACTER_DELAY_MS)}
-                        animationDurationMs={() => (getPrefersReducedMotion() ? NO_MOTION_MS : CHARACTER_DURATION_MS)}
-                        computeCharacterWeights={props.computeCharacterWeights}
-                        renderCaret={() => (
-                            <span
-                                class={styles.phraseCaret}
-                                classList={{
-                                    [styles.phraseCaretBlinking]: !getIsPaused() && !getPrefersReducedMotion(),
-                                }}
-                                aria-hidden="true"
-                            />
-                        )}
-                        onMount={setController}
-                        onAnimationEnd={handleAnimationEnd}
-                    >
-                        {PHRASES[getPhraseIndex()]}
-                    </Typewriter>
+                    <div class={styles.phraseSlot}>
+                        <Typewriter
+                            mode={getMode}
+                            animationName={props.animationName}
+                            animationDelayMs={() => (getPrefersReducedMotion() ? NO_MOTION_MS : CHARACTER_DELAY_MS)}
+                            animationDurationMs={() =>
+                                getPrefersReducedMotion() ? NO_MOTION_MS : CHARACTER_DURATION_MS
+                            }
+                            computeCharacterWeights={props.computeCharacterWeights}
+                            renderCaret={() => (
+                                <span
+                                    class={styles.phraseCaret}
+                                    classList={{
+                                        [styles.phraseCaretBlinking]: !getIsPaused() && !getPrefersReducedMotion(),
+                                    }}
+                                    aria-hidden="true"
+                                />
+                            )}
+                            onMount={setController}
+                            onAnimationEnd={handleAnimationEnd}
+                        >
+                            {PHRASES[getPhraseIndex()]}
+                        </Typewriter>
+                    </div>
                 </div>
-            </div>
+            </PageMeasureBox>
 
             <Button
                 id={"pausePhrases"}

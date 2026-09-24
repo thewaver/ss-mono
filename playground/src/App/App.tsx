@@ -82,6 +82,7 @@ import { SatellitePage } from "./Pages/SatellitePage/SatellitePage";
 import { ScanlineAnimationPage } from "./Pages/ScanLineAnimationPage/ScanLineAnimationPage";
 import { ScrambleTextPage } from "./Pages/ScrambleTextPage/ScrambleTextPage";
 import { ScrollerPage } from "./Pages/ScrollerPage/ScrollerPage";
+import { SegmentedInputPage } from "./Pages/SegmentedInputPage/SegmentedInputPage";
 import { SelectPage } from "./Pages/SelectPage/SelectPage";
 import { ShapePage } from "./Pages/ShapePage/ShapePage";
 import { SlideButtonPage } from "./Pages/SlideButtonPage/SlideButtonPage";
@@ -95,6 +96,7 @@ import { StaircasePage } from "./Pages/StaircasePage/StaircasePage";
 import { StepperPage } from "./Pages/StepperPage/StepperPage";
 import { SunburstPage } from "./Pages/SunburstPage/SunburstPage";
 import { SurfacePage } from "./Pages/SurfacePage/SurfacePage";
+import { TableOfContentsPage } from "./Pages/TableOfContentsPage/TableOfContentsPage";
 import { TablePage } from "./Pages/TablePage/TablePage";
 import { TabsPage } from "./Pages/TabsPage/TabsPage";
 import { TagInputPage } from "./Pages/TagInputPage/TagInputPage";
@@ -537,6 +539,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                         component: () => <RangeCalendarPage />,
                     },
                     {
+                        name: "SegmentedInput",
+                        description:
+                            "A code drawn as a row of cells over one real field, so autofill, paste, the keyboard and a screen reader all meet a single input holding the whole code. The field draws none of its own text, caret, selection or focus ring; it hands each cell its character and whether the caret or the selection is in it, and a press on a cell puts the caret there.",
+                        component: () => <SegmentedInputPage />,
+                    },
+                    {
                         name: "Select",
                         description:
                             "A list of options in a popup over one value or several. Filtering is the consumer's — autocomplete narrows what is shown, and the component never decides what counts as a match.",
@@ -691,6 +699,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 description:
                     "A grid rather than a table: one tab stop for the whole thing, arrows walking cell to cell, and the row and column indices published so a screen reader can still count fifty thousand rows when only thirty of them exist. Sorting, selection, column widths and the scroll window are each a signal the consumer owns, and every cell is painted by the column that declared it.",
                 component: () => <TablePage />,
+            },
+            {
+                name: "TableOfContents",
+                description:
+                    "The links to an article's sections, as a navigation landmark that follows the reader: the link whose section is being read is marked current, and pressing one scrolls its section into view and moves focus there, so the next Tab carries on inside it. The article is not the component's — it is rendered wherever the page likes, and each link is handed the element it leads to.",
+                component: () => <TableOfContentsPage />,
             },
             {
                 name: "Tabs",

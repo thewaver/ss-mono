@@ -124,6 +124,35 @@ export namespace TextSyncUtils {
         return { text, caret: clampedIndex === 0 ? 0 : offsetsAfterDigit[clampedIndex - 1] };
     };
 
+    /** Whether a character is one of the ASCII digits `0` to `9`, which is the only thing a mask's digit slot takes. */
+    export const getIsMaskDigit = getIsDigit;
+
+    /**
+     * Keeps only the characters a field accepts, cuts the text at a length, and works out where the caret goes.
+     *
+     * The counterpart to {@link TextSyncUtils.applyMask} for a field with no separators: every character is data,
+     * so nothing is re-inserted and nothing needs a pattern. A refused character is dropped wherever it appears,
+     * which is what lets a pasted `123 456` or `123-456` land as six digits. The caret is counted in accepted
+     * characters rather than in offsets, so dropping a refused one in front of it does not displace it.
+     *
+     * @param computeIsAllowed Answers whether one character may stay in the text.
+     * @param maxLength How many characters the text may hold. Anything past it is cut.
+     * @param next The text the input now holds.
+     * @param caret Where the caret is in `next`.
+     * @returns The filtered text and where to put the caret, never past the text's end.
+     */
+    export const applyFilter = (
+        computeIsAllowed: (char: string) => boolean,
+        maxLength: number,
+        next: string,
+        caret: number,
+    ): TextSyncMaskResult => {
+        const text = [...next].filter(computeIsAllowed).slice(0, Math.max(0, maxLength)).join("");
+        const kept = [...next.slice(0, caret)].filter(computeIsAllowed).length;
+
+        return { text, caret: Math.min(kept, text.length) };
+    };
+
     /** The digits in a masked field's text, with the separators dropped. */
     export const getMaskedDigits = getDigits;
 

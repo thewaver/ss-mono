@@ -16,7 +16,7 @@ const FLYOUT_OFFSET = { x: 0, y: 6 };
 const NAV_DELAY_GROUP = HoverIntentUtils.createDelayGroup();
 
 const ENTRIES: NavMenuEntry[] = [
-    { key: "keep", label: "The keep" },
+    { key: "keep", label: "Keep" },
     {
         key: "armory",
         label: "Armory",
@@ -174,7 +174,7 @@ const NavFlyout = (props: NavFlyoutProps) => {
 
 export const NavigationMenuExample = (props: NavigationMenuExampleProps) => {
     return (
-        <nav class={styles.navBar} aria-label={"Castle"}>
+        <nav aria-label={"Castle"}>
             <ul class={styles.navList}>
                 <For each={ENTRIES}>
                     {(entry) => (

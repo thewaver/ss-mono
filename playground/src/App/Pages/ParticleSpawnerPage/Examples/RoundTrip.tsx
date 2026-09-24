@@ -16,14 +16,11 @@ export const RoundTripExample = (props: ParticleSpawnerExampleProps) => {
     const [getRelay, setRelay] = createSignal<ParticleSpawnerController>();
     const relayPlayback = createSignal(false);
 
-    const renderParticle = (getT: Accessor<number>) => {
+    const renderParticle = (getT: Accessor<number>, particleClass: string) => {
         const getGlow = () => computeParticleGlow(getT());
 
         return (
-            <div
-                class={styles.particle}
-                style={{ opacity: getGlow().opacity, transform: `scale(${getGlow().scale})` }}
-            />
+            <div class={particleClass} style={{ opacity: getGlow().opacity, transform: `scale(${getGlow().scale})` }} />
         );
     };
 
@@ -35,7 +32,7 @@ export const RoundTripExample = (props: ParticleSpawnerExampleProps) => {
                 <ParticleSpawner
                     {...props}
                     targets={() => [getReturnMarker()]}
-                    renderParticle={(_index, getT) => renderParticle(getT)}
+                    renderParticle={(_index, getT) => renderParticle(getT, styles.particle)}
                     onParticleArrive={() => getRelay()?.emit(RETURN_COUNT)}
                 />
             </div>
@@ -47,7 +44,7 @@ export const RoundTripExample = (props: ParticleSpawnerExampleProps) => {
                     {...props}
                     playbackSignal={relayPlayback}
                     targets={() => [getOutboundMarker()]}
-                    renderParticle={(_index, getT) => renderParticle(getT)}
+                    renderParticle={(_index, getT) => renderParticle(getT, styles.particleReturn)}
                     onMount={setRelay}
                 />
             </div>

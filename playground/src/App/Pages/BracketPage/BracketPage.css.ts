@@ -42,7 +42,7 @@ export const layerHeader = style({
     placeItems: "center",
     width: "100%",
     height: "100%",
-    color: themeVars.color.background.contrast,
+    color: themeVars.color.surface.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",
 });

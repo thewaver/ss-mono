@@ -8,7 +8,6 @@ export const bridgeBottomVar = createVar();
 export const bridgeLeftVar = createVar();
 
 export const sentence = style({
-    padding: themeVars.spacing.double,
     lineHeight: 1.6,
 });
 
@@ -65,10 +64,6 @@ export const profileActions = style({
     gap: themeVars.spacing.full,
 });
 
-export const navBar = style({
-    padding: themeVars.spacing.double,
-});
-
 export const navList = style({
     display: "flex",
     alignItems: "center",
@@ -86,11 +81,13 @@ export const navLink = style({
 
 export const flyoutPanel = style({
     position: "relative",
+    isolation: "isolate",
 
     selectors: {
         "&::before": {
             content: '""',
             position: "absolute",
+            zIndex: -1,
             top: bridgeTopVar,
             right: bridgeRightVar,
             bottom: bridgeBottomVar,

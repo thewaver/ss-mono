@@ -5,7 +5,6 @@ import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { createWheelsControls } from "../Wheels.utils";
 import { PageWheelsPanel } from "../WheelsPanel";
 import { OverExample } from "./Examples/Over";
-import { ReelsExample } from "./Examples/Reels";
 import { SidewaysExample } from "./Examples/Sideways";
 
 const EXAMPLES_ROOT = "/src/App/Pages/Wheels/DrumWheelPage/Examples";
@@ -18,7 +17,6 @@ export const DrumWheelPage = () => {
 
     const [getSidewaysMarkedIndex, setSidewaysMarkedIndex] = createSignal(0);
     const [getReelMarkedIndex, setReelMarkedIndex] = createSignal(0);
-    const [getReelsReadout, setReelsReadout] = createSignal("not spun yet — one press spins all three");
 
     const getReadout = (getMarkedIndex: Accessor<number>, getSettledIndex: Accessor<number>) => () =>
         `under the marker: ${controls.getWedges()[getMarkedIndex()] ?? "nothing"} — settled on: ${controls.getWedges()[getSettledIndex()] ?? "nothing"}`;
@@ -49,23 +47,6 @@ export const DrumWheelPage = () => {
             ),
             readout: getReadout(getReelMarkedIndex, reelIndexSignal[0]),
             path: `${EXAMPLES_ROOT}/Over.tsx`,
-        },
-        {
-            key: "reels",
-            name: "Three reels, one result",
-            component: () => (
-                <ReelsExample
-                    {...controls.getSharedProps()}
-                    onSpinStart={() => setReelsReadout("spinning — each reel stops a little after the one before")}
-                    onAllStopped={(indices) =>
-                        setReelsReadout(
-                            `all stopped on: ${indices.map((index) => controls.getWedges()[index] ?? "nothing").join(", ")}`,
-                        )
-                    }
-                />
-            ),
-            readout: getReelsReadout,
-            path: `${EXAMPLES_ROOT}/Reels.tsx`,
         },
     ]);
 

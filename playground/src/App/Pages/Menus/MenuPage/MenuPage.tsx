@@ -53,6 +53,13 @@ export const MenuPage = () => {
 
     const getExamples = createMemo(() => [
         {
+            key: "default",
+            name: "Default",
+            readout: () => `${getLastAction()} — activating an item closes the menu`,
+            component: () => <DefaultExample onActivate={(action) => setLastAction(action.name)} />,
+            path: `${EXAMPLES_ROOT}/Default.tsx`,
+        },
+        {
             key: "driven",
             name: "Driven from outside",
             readout: () =>
@@ -72,13 +79,6 @@ export const MenuPage = () => {
                 `${getLastContextAction()} — the menu opens where the pointer was, and there is no trigger button anywhere`,
             component: () => <ContextAreaExample onActivate={(action) => setLastContextAction(action.name)} />,
             path: `${EXAMPLES_ROOT}/ContextArea.tsx`,
-        },
-        {
-            key: "default",
-            name: "Default",
-            readout: () => `${getLastAction()} — activating an item closes the menu`,
-            component: () => <DefaultExample onActivate={(action) => setLastAction(action.name)} />,
-            path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
         {
             key: "staysOpen",

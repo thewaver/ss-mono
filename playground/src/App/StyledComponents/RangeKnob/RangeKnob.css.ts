@@ -39,9 +39,20 @@ export const rangeKnobPointer = style({
     width: "42%",
     height: 4,
     marginTop: -2,
-    borderRadius: themeVars.borderRadius.half,
-    backgroundColor: themeVars.color.primary.main,
     transformOrigin: "0 50%",
+
+    selectors: {
+        "&::after": {
+            content: '""',
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: "50%",
+            right: 0,
+            borderRadius: themeVars.borderRadius.half,
+            backgroundColor: themeVars.color.primary.main,
+        },
+    },
 });
 
 export const rangeKnobReadout = style({

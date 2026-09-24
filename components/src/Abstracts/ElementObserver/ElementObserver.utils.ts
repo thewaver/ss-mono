@@ -4,6 +4,7 @@ import { createEffect, createMemo, createSignal, onCleanup, onMount } from "soli
 import { Bounds, MathUtils, type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
 import { useViewportContext } from "../Viewport/Viewport.context";
+import type { ViewportContextType } from "../Viewport/Viewport.context.types";
 import { ViewportUtils } from "../Viewport/Viewport.utils";
 import { CURRENT_INDEX_OBSERVER_DEFAULTS } from "./ElementObserver.const";
 
@@ -21,6 +22,60 @@ const isSameSizeList = (a: Size2d[], b: Size2d[]) =>
 const isSameRectList = (a: (Rect | undefined)[], b: (Rect | undefined)[]) =>
     a.length === b.length &&
     a.every((rect, index) => (rect === undefined ? b[index] === undefined : Rect.isSame(rect, b[index])));
+
+/** The share of an element's passage across a stretch of screen it has covered, `0`–`1`. */
+const toPassageProgress = (top: number, height: number, spanHeight: number) => {
+    const passage = spanHeight + height;
+
+    if (passage <= 0) return 0;
+
+    return MathUtils.clamp01((spanHeight - top) / passage);
+};
+
+/**
+ * Follows an element's progress across a stretch of screen that `getSpan` measures, re-reading on any scroll in
+ * the document and on resize. The span's top and the element's rect are both in layout space.
+ */
+const createPassageProgressObserver = (
+    getRef: Accessor<HTMLElement | undefined>,
+    getIsDisabled: Accessor<boolean> | undefined,
+    getSpan: (viewportContext: ViewportContextType) => { top: number; height: number } | undefined,
+) => {
+    const viewportContext = useViewportContext();
+    const [getProgress, setProgress] = createSignal(0);
+
+    createEffect(() => {
+        const ref = getRef();
+
+        if (!ref || getIsDisabled?.()) {
+            setProgress(0);
+
+            return;
+        }
+
+        const update = () => {
+            const span = getSpan(viewportContext);
+
+            if (!span) return;
+
+            const rect = ViewportUtils.getAdjustedBoundingClientRect(ref, viewportContext);
+
+            setProgress(toPassageProgress(rect.y - span.top, rect.height, span.height));
+        };
+
+        update();
+
+        document.addEventListener("scroll", update, { capture: true, passive: true });
+        window.addEventListener("resize", update);
+
+        onCleanup(() => {
+            document.removeEventListener("scroll", update, true);
+            window.removeEventListener("resize", update);
+        });
+    });
+
+    return getProgress;
+};
 
 /**
  * Reports an element's size and position as reactive accessors, and keeps them current.
@@ -412,13 +467,8 @@ export namespace ElementObserverUtils {
      * @param viewportHeight The viewport's height, in the same space.
      * @returns The share of the passage covered, clamped to `0`–`1`. `0` when there is no height to travel.
      */
-    export const computeViewportProgress = (top: number, height: number, viewportHeight: number) => {
-        const passage = viewportHeight + height;
-
-        if (passage <= 0) return 0;
-
-        return MathUtils.clamp01((viewportHeight - top) / passage);
-    };
+    export const computeViewportProgress = (top: number, height: number, viewportHeight: number) =>
+        toPassageProgress(top, height, viewportHeight);
 
     /**
      * Follows how far an element has traveled through the viewport as the page scrolls, in viewport coordinates.
@@ -435,36 +485,43 @@ export namespace ElementObserverUtils {
     export const createViewportProgressObserver = (
         getRef: Accessor<HTMLElement | undefined>,
         getIsDisabled?: Accessor<boolean>,
-    ) => {
-        const viewportContext = useViewportContext();
-        const [getProgress, setProgress] = createSignal(0);
+    ) =>
+        createPassageProgressObserver(getRef, getIsDisabled, (viewportContext) => ({
+            top: 0,
+            height: viewportContext.getSize().height,
+        }));
 
-        createEffect(() => {
-            const ref = getRef();
+    /**
+     * Follows how far an element has traveled through a scrolling box as the box scrolls, in the box's coordinates.
+     *
+     * {@link createViewportProgressObserver}'s answer, with the box's visible area standing in for the viewport:
+     * `0` while the element's top is at or below the box's bottom edge, `1` once its bottom has gone past the top
+     * edge. It is what drives something from the scroll of a panel, a list or a pane rather than of the page, and
+     * it still measures through the viewport's scale, so it holds inside a scaled `Viewport`.
+     *
+     * The visible area is the box's content height, inside its border and without a horizontal scrollbar. For the
+     * whole range to be reachable, the box's content has to let the element start below the box and finish above
+     * it — room of about one box height before and after it.
+     *
+     * @param getRef The element to follow. Nothing is measured until it exists.
+     * @param getContainerRef The scrolling box it travels through. Nothing is measured until it exists.
+     * @param getIsDisabled Pass `true` to stop following. Omitted means always on.
+     * @returns `0` while the element has yet to come up from below the box's visible area, `1` once it has left
+     * through the top, and the share in between while it crosses. `0` before either element exists and while
+     * disabled.
+     */
+    export const createScrollContainerProgressObserver = (
+        getRef: Accessor<HTMLElement | undefined>,
+        getContainerRef: Accessor<HTMLElement | undefined>,
+        getIsDisabled?: Accessor<boolean>,
+    ) =>
+        createPassageProgressObserver(getRef, getIsDisabled, (viewportContext) => {
+            const container = getContainerRef();
 
-            if (!ref || getIsDisabled?.()) {
-                setProgress(0);
+            if (!container) return undefined;
 
-                return;
-            }
+            const rect = ViewportUtils.getAdjustedBoundingClientRect(container, viewportContext);
 
-            const update = () => {
-                const rect = ViewportUtils.getAdjustedBoundingClientRect(ref, viewportContext);
-
-                setProgress(computeViewportProgress(rect.y, rect.height, viewportContext.getSize().height));
-            };
-
-            update();
-
-            document.addEventListener("scroll", update, { capture: true, passive: true });
-            window.addEventListener("resize", update);
-
-            onCleanup(() => {
-                document.removeEventListener("scroll", update, true);
-                window.removeEventListener("resize", update);
-            });
+            return { top: rect.y + container.clientTop, height: container.clientHeight };
         });
-
-        return getProgress;
-    };
 }

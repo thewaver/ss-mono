@@ -332,38 +332,31 @@ test("on a run that does not loop, the followers wait at the start until the lea
 });
 
 /**
- * The fourth example runs no clock at all: how far the page has been scrolled past it is its progress. The
- * Playground scrolls inside its own frame rather than the window, so the scroll is a wheel over the page,
- * which is what a person does, and the readout and the marker are read back after each one. The example is
- * the last on the page, so bringing it into view can leave the page at the bottom of its scroll; it is
- * backed off first so that there is room to scroll down.
- *
- * At the suite's own window size the whole Trail page fits and nothing scrolls, so this test narrows the
- * window's height: `Viewport` keeps the window's aspect ratio, so a short, wide window gives the page less
- * height than its content and the page frame starts to scroll.
+ * The fourth example runs no clock at all: how far a runway inside its own scrolling box has been scrolled
+ * past is its progress, measured against the box rather than the window, so it works whatever size the page
+ * is. The scroll is a wheel over the box, which is what a person does, and the readout and the marker are read
+ * back after each one. The box starts at its top, so it is scrolled down first to leave room to come back.
  */
-const SHORT_WINDOW = { width: 1600, height: 500 };
+const SCROLL_BOX = "#trailScrollBox";
 
-const scrollPage = async (page: Page, byY: number) => {
-    const box = (await page.locator(example("scroll")).boundingBox())!;
+const wheelOverBox = async (page: Page, byY: number) => {
+    const box = (await page.locator(SCROLL_BOX).boundingBox())!;
 
-    await page.mouse.move(box.x + box.width * 0.5, box.y + 4);
+    await page.mouse.move(box.x + box.width * 0.5, box.y + box.height * 0.5);
     await page.mouse.wheel(0, byY);
     await page.waitForTimeout(A_FEW_FRAMES_MS);
 };
 
-test("scrolling the page moves the scroll-driven traveler forward, and scrolling back moves it back", async ({
+test("scrolling the box moves the scroll-driven traveler forward, and scrolling back moves it back", async ({
     page,
 }) => {
-    await page.setViewportSize(SHORT_WINDOW);
-    await page.reload();
-    await page.locator(example("scroll")).scrollIntoViewIfNeeded();
-    await scrollPage(page, -150);
+    await page.locator(SCROLL_BOX).scrollIntoViewIfNeeded();
+    await wheelOverBox(page, 150);
 
     const startProgress = await progressOf(page, "scroll");
     const start = await arcPositionOf(page, SCROLL_MARKER);
 
-    await scrollPage(page, 150);
+    await wheelOverBox(page, 150);
 
     const forwardProgress = await progressOf(page, "scroll");
     const forward = await arcPositionOf(page, SCROLL_MARKER);
@@ -371,7 +364,7 @@ test("scrolling the page moves the scroll-driven traveler forward, and scrolling
     expect(forwardProgress, "scrolling down takes the readout on").toBeGreaterThan(startProgress);
     expect(forward.at, "and the traveler further along its path").toBeGreaterThan(start.at);
 
-    await scrollPage(page, -150);
+    await wheelOverBox(page, -150);
 
     const backProgress = await progressOf(page, "scroll");
     const back = await arcPositionOf(page, SCROLL_MARKER);

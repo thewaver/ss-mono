@@ -144,8 +144,6 @@ test("a composition is left alone until it is committed", async ({ page }) => {
 
 const CITY = `${demo("suggestions")} [role="combobox"]`;
 const SUGGESTION = '[role="listbox"] [role="option"]';
-const ONE_TIME_CODE = `${demo("oneTimeCode")} input`;
-const CODE_CELLS = `${demo("oneTimeCode")} [aria-hidden="true"] > div`;
 const EDITABLE = demo("editable");
 
 /**
@@ -283,72 +281,6 @@ test("Escape closes the list without touching the text, and an empty filter keep
         "aria-expanded",
         "true",
     );
-});
-
-test("a one-time code field asks for digits and a code the platform can fill", async ({ page }) => {
-    await expect(page.locator(ONE_TIME_CODE), "the platform is told this is a one-time code").toHaveAttribute(
-        "autocomplete",
-        "one-time-code",
-    );
-    await expect(page.locator(ONE_TIME_CODE), "and a phone is asked for its digit keyboard").toHaveAttribute(
-        "inputmode",
-        "numeric",
-    );
-    await expect(page.locator(ONE_TIME_CODE), "with a name of its own").toHaveAttribute("aria-label", "One-time code");
-});
-
-/**
- * The cells are paint over one real field, so a screen reader reads the field's value and never the cells:
- * the cells are hidden from it, and the digits they show have to be the field's digits in order.
- */
-test("a one-time code keeps digits only, stops at six, and the cells show what the field holds", async ({ page }) => {
-    await expect(page.locator(CODE_CELLS), "one cell per digit of the code").toHaveCount(6);
-
-    await page.locator(ONE_TIME_CODE).focus();
-    await page.keyboard.type("1a2b3");
-
-    expect(await inputValue(page.locator(ONE_TIME_CODE)), "letters are refused by the mask").toBe("123");
-    expect(await readout(page, "oneTimeCode"), "and the owner holds only the digits").toContain('value: "123"');
-    expect(
-        await page.locator(CODE_CELLS).allTextContents(),
-        "each cell shows the digit in its place, and the rest stay empty",
-    ).toEqual(["1", "2", "3", "", "", ""]);
-
-    await page.keyboard.insertText("456789");
-
-    expect(await inputValue(page.locator(ONE_TIME_CODE)), "a paste past the end is cut at six digits").toBe("123456");
-    expect(await page.locator(CODE_CELLS).allTextContents()).toEqual(["1", "2", "3", "4", "5", "6"]);
-});
-
-/**
- * Which cell is next is drawn by a class, and what that class paints is the painter's business. So the
- * check is only that one cell is set apart from the rest while the field has focus — the one the next
- * digit will land in — and that none is once focus leaves.
- */
-test("while focused, exactly the next empty cell is set apart from the others", async ({ page }) => {
-    const cellClasses = () => attributesOf(page, CODE_CELLS, "class");
-    const oddOneOut = (classes: Array<string | null>) =>
-        classes
-            .map((value, index) => ({ value, index }))
-            .filter(({ value }) => classes.filter((other) => other === value).length === 1);
-
-    const unfocused = await cellClasses();
-
-    expect(new Set(unfocused).size, "with the field unfocused every cell is drawn the same").toBe(1);
-
-    await page.locator(ONE_TIME_CODE).focus();
-    await page.keyboard.type("12");
-
-    const focused = await cellClasses();
-
-    expect(
-        oddOneOut(focused).map(({ index }) => index),
-        "focused, the one cell set apart is the one the next digit lands in",
-    ).toEqual([2]);
-
-    await page.locator(ONE_TIME_CODE).blur();
-
-    expect(new Set(await cellClasses()).size, "and none is once focus leaves").toBe(1);
 });
 
 test("edit in place swaps a button for a focused field holding the current text", async ({ page }) => {

@@ -780,6 +780,15 @@ What changes is the **name**, and the name is decided by what the object holds.
 - **`*RenderProps`** the moment it also carries a payload — an index, a value, an array, a date, a color, a
   position. The object is then not a set of flags, and calling it one misdescribes it.
 
+**A record the consumer handed over is not folded into the aggregate; it travels ahead of it, as its own
+accessor.** The user's call, taken when `TableOfContents` first shipped with its link inside one object:
+`renderStep(getStep, getFlags)`, `renderCrumb(getCrumb, getFlags)`, `renderTab(getTab, getFlags, getPlacement)`
+and the rest of the list-of-records controls all read that way, and one shape across them is worth more than
+the single-object reading of the paragraph above. Anything derivable from the record — a depth, a label — is
+read off it rather than copied into the flags. What the aggregate still takes is the component's own state
+about that record. A painter with no consumer record behind it, such as `SegmentedInput`'s cells, keeps the one
+object.
+
 A component's own contribution keeps its own name under this test, independently of what it is combined with:
 a boolean-only extras type stays `*Flags` even where the merged object the painter actually receives is a
 `*RenderProps`, because the merged type is a different type and gets named on its own merits.

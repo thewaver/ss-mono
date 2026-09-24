@@ -10,11 +10,13 @@ export const tooltipRoot = style({
     top: 0,
     left: 0,
     pointerEvents: "none",
+    isolation: "isolate",
 
     selectors: {
         "&::before": {
             content: '""',
             position: "absolute",
+            zIndex: -1,
             top: bridgeTopVar,
             right: bridgeRightVar,
             bottom: bridgeBottomVar,

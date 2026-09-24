@@ -15,7 +15,6 @@ import { KnockoutExample } from "./Examples/Knockout";
 import { OrgChartExample } from "./Examples/OrgChart";
 import { SkillTreeExample } from "./Examples/SkillTree";
 
-import { MEASURE_BOX_PADDING } from "../../PageComponents/MeasureBox/MeasureBox.css";
 import { CONNECTOR_FROM_COLOR, CONNECTOR_TO_COLOR, ROUTE_FROM_COLOR, ROUTE_TO_COLOR } from "./BracketPage.css";
 
 const EXAMPLES_ROOT = "/src/App/Pages/BracketPage/Examples";
@@ -58,7 +57,7 @@ export const BracketPage = () => {
                 readout: () =>
                     `picked: ${getPicked()} — a full draw with its rounds named, every node feeding exactly two, and one seed withdrawn so the walk steps past it; focus a seed and its road to the final lights up`,
                 component: () => (
-                    <PageMeasureBox padding={() => MEASURE_BOX_PADDING}>
+                    <PageMeasureBox>
                         <KnockoutExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -71,7 +70,7 @@ export const BracketPage = () => {
                 readout: () =>
                     "an uneven tree: three under one node, two under another, one that goes no further — a parent still lands between the outermost of the nodes it holds, whichever way round the board is turned",
                 component: () => (
-                    <PageMeasureBox padding={() => MEASURE_BOX_PADDING}>
+                    <PageMeasureBox>
                         <OrgChartExample {...commonProps} />
                     </PageMeasureBox>
                 ),
@@ -83,7 +82,7 @@ export const BracketPage = () => {
                 readout: () =>
                     "a chain of single children, which is what a bye looks like — each one level with the last, under headers that turn with the board",
                 component: () => (
-                    <PageMeasureBox padding={() => MEASURE_BOX_PADDING}>
+                    <PageMeasureBox>
                         <SkillTreeExample {...commonProps} />
                     </PageMeasureBox>
                 ),

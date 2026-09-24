@@ -4,7 +4,6 @@ import { Button, ODOMETER_DEFAULTS, OdometerReels } from "@thewaver/ss-component
 
 import { OdometerKnobs } from "../../Knobs/Odometers.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
-import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
@@ -13,7 +12,6 @@ import { CounterExample } from "./Examples/Counter";
 import { ReelsExample } from "./Examples/Reels";
 import type { OdometerExampleProps } from "./OdometerPage.types";
 
-import { MEASURE_BOX_PADDING } from "../../PageComponents/MeasureBox/MeasureBox.css";
 import * as styles from "./OdometerPage.css";
 
 const EXAMPLES_ROOT = "/src/App/Pages/OdometerPage/Examples";
@@ -23,8 +21,6 @@ const SMALL_STEP = 1;
 const BIG_STEP = 137;
 const GROUP_SIZE = 3;
 const FIRST = 0;
-const BOX_WIDTH = 380;
-const BOX_HEIGHT = 130;
 const REEL_DIGITS = 4;
 const REEL_PAD = "0";
 const REEL_RANGE = 10 ** REEL_DIGITS;
@@ -73,13 +69,7 @@ export const OdometerPage = () => {
                     "every column that has to carry waits for the one to its right, a column going nine to zero keeps turning forward rather than rewinding, and crossing zero turns the whole number back the other way, and a digit or separator arriving or going grows in or shrinks away while it fades",
                 component: () => (
                     <div class={styles.stack}>
-                        <PageMeasureBox
-                            width={() => BOX_WIDTH}
-                            height={() => BOX_HEIGHT}
-                            padding={() => MEASURE_BOX_PADDING}
-                        >
-                            <CounterExample {...commonProps} />
-                        </PageMeasureBox>
+                        <CounterExample {...commonProps} />
 
                         <div class={styles.controls}>
                             <Button
@@ -123,13 +113,7 @@ export const OdometerPage = () => {
                     "every column spins at once and stops in the order its reel gives, taking extra whole turns on the way; with less motion asked for it only turns as far as its digit needs",
                 component: () => (
                     <div class={styles.stack}>
-                        <PageMeasureBox
-                            width={() => BOX_WIDTH}
-                            height={() => BOX_HEIGHT}
-                            padding={() => MEASURE_BOX_PADDING}
-                        >
-                            <ReelsExample text={() => pad(getReelValue())} reelKey={getReelKey} />
-                        </PageMeasureBox>
+                        <ReelsExample text={() => pad(getReelValue())} reelKey={getReelKey} />
 
                         <div class={styles.controls}>
                             <Button

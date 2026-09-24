@@ -2,7 +2,6 @@ export const PIN_LENGTH = 6;
 export const QUANTITY_MIN = 0;
 export const QUANTITY_MAX = 100;
 export const QUANTITY_STEP = 5;
-export const PIN_MASK = "######";
 
 export const CITIES = [
     { name: "Aarhus", country: "Denmark" },
