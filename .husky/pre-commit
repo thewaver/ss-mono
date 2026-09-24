@@ -1,5 +1,8 @@
 files=$(git diff --cached --name-only --diff-filter=ACMR)
 [ -z "$files" ] && exit 0
 
+npm run --silent update:library-tree > /dev/null
+files=$(printf '%s\n%s\n' "$files" "playground/src/App/Pages/TreemapPage/TreemapPage.const.ts" | sort -u)
+
 printf '%s\n' "$files" | tr '\n' '\0' | xargs -0 npx prettier --write --ignore-unknown
 printf '%s\n' "$files" | tr '\n' '\0' | xargs -0 git add
