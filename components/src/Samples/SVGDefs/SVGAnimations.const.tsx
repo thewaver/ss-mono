@@ -2,8 +2,8 @@ import { For, Show } from "solid-js";
 
 import { SVGUtils } from "@thewaver/ss-utils";
 
-import type { SVGAnimationDefs } from "../../Abstracts/SVG/Defs/Animation/SVGAnimationDefs.types";
-import { SVGAnimationDefsUtils } from "../../Abstracts/SVG/Defs/Animation/SVGAnimationDefs.utils";
+import type { SVGAnimationDefs } from "../../Generators/SVGDefs/SVGAnimations/SVGAnimationDefs.types";
+import { SVGAnimationDefsUtils } from "../../Generators/SVGDefs/SVGAnimations/SVGAnimationDefs.utils";
 import { SVGAnimationTracks } from "./SVGAnimationTracks.const";
 
 const join = (values: number[]) => values.map((value) => `${value}`).join(";");

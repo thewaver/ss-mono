@@ -1,12 +1,9 @@
 import type { Signal } from "solid-js";
 
-import type {
-    AccessorProps,
-    ParticleSpawnIterationPattern,
-    ParticleTravelDefs,
-    SampleKnob,
-} from "@thewaver/ss-components";
+import type { AccessorProps, ParticleSpawnIterationPattern, ParticleTravelDefs } from "@thewaver/ss-components";
 import type { Point2d } from "@thewaver/ss-utils";
+
+import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
 
 export type ParticleTravelPattern = "line" | "arc" | "wave" | "spiral" | "orbit" | "bezier" | "zigzag" | "scatter";
 
@@ -53,7 +50,7 @@ export type ParticleTravelPatternFn = (defs: ParticleTravelDefs, t: number) => P
 
 export type ParticleTravelPatternFactory = (knobValues: Record<string, number>) => ParticleTravelPatternFn;
 
-export type ParticleTravelKnobs = Record<string, SampleKnob>;
+export type ParticleTravelKnobs = Record<string, Knob>;
 
 export type IterationPatternFn = () => ParticleSpawnIterationPattern[];
 

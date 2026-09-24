@@ -1,4 +1,4 @@
-import type { ArcDefs } from "../../../Samples/Placement/Layouts/PlacementLayouts.types";
+import type { ArcDefs } from "../../../Generators/PlacementLayouts/PlacementLayouts.types";
 import type { AccessorProps } from "../../../Utils/typeUtils";
 import type { MenuProps } from "../Menu/Menu.types";
 

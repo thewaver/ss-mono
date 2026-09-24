@@ -1,5 +1,5 @@
-import type { CellAnimationFn } from "../CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../CellAnimationKeyframes.utils";
+import type { CellAnimationFn } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
+import { CellAnimationKeyframeUtils } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
 import { swarmCcw } from "./swarmCcw";
 import { swarmCw } from "./swarmCw";
 

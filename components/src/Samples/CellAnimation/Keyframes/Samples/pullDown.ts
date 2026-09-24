@@ -1,5 +1,5 @@
-import type { CellAnimationFn } from "../CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../CellAnimationKeyframes.utils";
+import type { CellAnimationFn } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
+import { CellAnimationKeyframeUtils } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
 
 export const pullDown: CellAnimationFn = CellAnimationKeyframeUtils.fromStops([
     { at: 0, originY: 0, scaleY: 0 },

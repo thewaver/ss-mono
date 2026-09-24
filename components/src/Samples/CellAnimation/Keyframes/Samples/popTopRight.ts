@@ -1,5 +1,5 @@
-import type { CellAnimationFn } from "../CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "../CellAnimationKeyframes.utils";
+import type { CellAnimationFn } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
+import { CellAnimationKeyframeUtils } from "../../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
 
 export const popTopRight: CellAnimationFn = CellAnimationKeyframeUtils.fromStops([
     { at: 0, originX: 1, originY: 0, scaleX: 0, scaleY: 0 },

@@ -4,11 +4,10 @@ import { MathUtils, type Point2d, Point2dUtils } from "@thewaver/ss-utils";
 
 import type { PointerReading } from "../../../../Abstracts/PointerTracker/PointerTracker.types";
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
-import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
+import { SVGGradientDefsUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefs.utils";
 import type { GradientFalloffOpts, GradientSpotTrailOpts, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
-import { SVGDefsFrameUtils } from "../../SVGDefsFrames.utils";
-import { TrackedGradientKnobs } from "../TrackedGradient.knobs";
+import { TrackedGradientDefaults } from "../TrackedGradient.const";
 
 type TrailStamp = {
     origin: Point2d;
@@ -27,7 +26,7 @@ const FULL_AGE_RATIO = 1;
 const FULL_ALPHA = 1;
 const NO_FADE = 0;
 
-const DEFAULTS = TrackedGradientKnobs.SPOT_TRAIL_DEFAULTS;
+const DEFAULTS = TrackedGradientDefaults.SPOT_TRAIL_DEFAULTS;
 
 const NO_REF = () => undefined;
 
@@ -44,7 +43,7 @@ const computePoolColors = (color: string, alpha: number, opts?: GradientFalloffO
     { value: `rgb(from ${color} r g b / 0)`, stop: 100 },
 ];
 
-const clock = SVGDefsFrameUtils.createClock(TRAIL_LIFETIME_MS);
+const clock = SVGDefsUtils.createClock(TRAIL_LIFETIME_MS);
 
 const createTrailStamp = (
     index: number,

@@ -1,13 +1,11 @@
 import { For, Match, Switch } from "solid-js";
 
-import type { SampleKnob } from "@thewaver/ss-components";
-
 import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
 import { PageProp } from "../Prop/Prop";
-import type { PageKnobsProps } from "./Knobs.types";
+import type { Knob, PageKnobsProps } from "./Knobs.types";
 
-const toEntries = (knobs: Record<string, SampleKnob | undefined>) =>
-    Object.entries(knobs).filter((entry): entry is [string, SampleKnob] => entry[1] !== undefined);
+const toEntries = (knobs: Record<string, Knob | undefined>) =>
+    Object.entries(knobs).filter((entry): entry is [string, Knob] => entry[1] !== undefined);
 
 export const PageKnobs = (props: PageKnobsProps) => {
     const getValue = (key: string) => props.values()[key] ?? props.defaults()[key];

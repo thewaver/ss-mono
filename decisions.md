@@ -164,7 +164,8 @@ local file.
 are not meaningful on their own. `Composites/` combines Essentials. `Essentials/Input/` groups controls
 carrying a user-editable value (see _"Folder layout"_ in `conventions.md`). `components/src/index.ts` enumerates every export path individually — not a
 barrel. **Its blocks run in order of what is built on what** — `Abstracts`, `Primitives`, `Essentials`,
-`Exotics`, `Composites`, then `Samples` and `Utils` — with the paths inside a block still sorted. The
+`Exotics`, `Composites`, then `Samples` and `Utils` — with the paths inside a block still sorted, and a
+`Generators` block straight after `Abstracts`. The
 user's call, taking structural precedence over the alphabetical block order it used to have. It is also the
 order the stylesheet is emitted in, so a foundational sheet now lands before the things that override it.
 
@@ -205,7 +206,7 @@ level. The cost is that the one stylesheet became two, the rule reaching into an
 the item.
 
 **With those gone, `Abstracts/` renders no structural DOM again.** What it still produces is the contents of
-an SVG `<defs>` block from the `SVG` factories and `Glass`, which paint nothing and take no space until
+an SVG `<defs>` block from `Glass`, which paints nothing and take no space until
 something references them by id, and `LiveAnnouncer`'s live region, which is built in JavaScript and attached
 to the body rather than placed by a consumer. Neither is a component anybody renders.
 
@@ -227,10 +228,9 @@ Three components render DOM but mean nothing on their own: `BinarySwitch` is the
 `Radio` and `Toggle`; `TextField` is the shared body of `TextInput`, `TextArea`, `NumberInput`,
 `CurrencyInput`, `DateInput` and `TimeInput`; `InteractionWrapper` sits inside twenty-seven other units.
 Two of the three were already half-private — only `BinarySwitch.types` and `TextField.types` ship — so the
-folder records a split that `index.ts` had already made. **The layer earns its keep in the Playground**: the
-dependency scanner counts a unit only when its top folder is `Essentials`, `Composites` or `Exotics`, so
-these three stop appearing in the Uses and Used by lists, where they were names a reader could do nothing
-with. What they import is still attributed, because the walk passes through them.
+folder records a split that `index.ts` had already made. Primitives were at first left out of the Uses and
+Used by lists, as names a reader could do nothing with; they now have pages and a group of their own in both
+lists — see _"Primitives have a menu section, and a page with no examples has no Samples tab"_.
 
 **The rename was the price of the name.** `Primitives` beside `Fundamentals` says nothing about which sits
 under which — both are claims about level — so the other layer had to be named by kind instead. `Essentials`
@@ -810,8 +810,8 @@ names every site, which is how all 263 of them were found rather than by greppin
 **A knob owns its explanation, beside its range, its step, its label and its default.** `SampleKnob` gained
 a required `hint`, so `PageKnobs` reads it off the knob rather than being handed one per page — the knob
 records already travel by family, and a hint written per consuming page would be written several times and
-drift apart. This is the same argument as _"A `.knobs.ts` owns a tunable whole"_ in `conventions.md`, one
-field further.
+drift apart. The knob records now live in the Playground rather than beside the samples — see
+_"The library holds a tunable's default and nothing else"_ in `conventions.md` — and the `hint` is still required there.
 
 **The default value is reported by the field, not written at the call site.** `useFieldReset` already
 captures each field's value at mount, because that is what its reset restores; it now also reports that
@@ -1801,12 +1801,11 @@ readable by a spec without a race.
 Asked for by the user: a page for each abstract, description and dependencies only, no examples. The first
 build left the four that already had pages — `InteractionTracker`, `PointerTracker`, `SVGFilters`,
 `Virtualizer` — with theirs, and the user later closed that gap: **an abstract's entry carries no examples at
-all, and the pages under `SVG defs` are the one exception.** Those stay because what they demonstrate is the
-output of a factory a consumer calls directly, so there is nothing else in the Playground that shows it;
-everywhere else the abstract is either visible through the component that consumes it or reports numbers a
-page of its own would only print back. An abstract's entry is a line of config.
+all.** The pages under `SVGDefs` were the one exception while those factories were abstracts; they have since
+moved to `Generators`, so there is none. An abstract is either visible through the component that consumes it or
+reports numbers a page of its own would only print back, and its entry is a line of config.
 
-**`ComponentConfig.component` is optional, and an entry without one routes to `EmptyPage`.** The alternative
+**`ComponentConfig.component` is optional, and an entry without one has no Samples view.** The alternative
 was a directory per abstract each holding a file that returns `null`, plus an import each at the top of
 `App.tsx`, which is noise standing in for nothing. `AppContent` already draws the title, the description and
 the dependency chips from the config; the page component only ever supplied the examples under them. So an
@@ -1819,7 +1818,8 @@ the Playground is now a link to the thing it names.
 
 **The `SVG` folder became four entries rather than one.** `SVGFilters` was the only page over a folder that
 holds four families, so a component resting on a gradient or a tiling showed a chip reading `SVG` that led
-nowhere. `SVGAnimations`, `SVGGradients` and `SVGPatterns` now sit beside it under a `SVG defs` group, which
+nowhere. `SVGAnimations`, `SVGGradients` and `SVGPatterns` sit beside it under an `SVGDefs` group, now in
+the `Generators` section, which
 is what _"The `SVGFilters` page is the factory's, and it is filed under `Abstracts`"_ said would happen if the
 other three ever arrived. **They are plural to match the page that was already there** — the request named
 them in the singular, and the existing name is a rename the user made deliberately, so matching it was the
@@ -1842,7 +1842,7 @@ the whole header — tabs included — disappeared on any view but the first. It
 **The description moved out of the header into Docs**, which is what makes Docs a view rather than an empty
 frame. The consequence is that landing on a page no longer shows the description; reaching it is one click.
 
-**The props table is read off the published type at build time, not written by hand.** `virtual:component-props`
+**The props table is read off the published type at build time, not written by hand.** `virtual:component-api`
 is a vite plugin in the shape of the dependency one, except that it drives the TypeScript compiler rather
 than a regex: a regex cannot see through `AccessorProps<{…}> & {…}`, and the checker flattens exactly that
 into the property list a consumer actually has. Hand-writing the tables was rejected outright — a hundred
@@ -1881,6 +1881,136 @@ dropped, which leaves `href` and takes the library's own total from 3,718 to 2,3
 spread into every wrapped control, so two files took the documented count from 7 to 643. That is why
 `conventions.md` says to document the layered props first rather than working component by component.
 
+### The API view lists everything a unit exports, not only its props
+
+Asked for by the user: a props table was half the story, and for an abstract — almost all namespaces — it was
+none of it. The view now covers every export of the library entry except `.const` files and
+everything under `Samples/` and `Utils/`, grouped as Props, Components, Context, Utilities, Classes and Types,
+in that order, with an empty group left out.
+
+**An export belongs to the unit its folder names**, by the same `getUnitName` the dependency map uses, so the
+two agree on what a unit is. **A props type is the one exception: `XProps` goes to unit `X` when there is one.**
+Folder ownership alone would have taken `SpotlightGuideProps`, `DrumCarouselProps` and the rest declared in a
+shared primitive's types file away from the pages that show them; name ownership alone is what hid
+`TabPanelProps`, `CalendarCompositeProps` and every other secondary props type before, because they were keyed
+to units with no page. The fallback to the folder is what puts those on their siblings' pages.
+
+**The lookup is case-insensitive.** The `TypeWriter` page never found `TypewriterProps` and drew the empty
+message, for no reason but the capital W.
+
+**A type with an object shape gets a table of its fields; anything else is a row in one table of aliases.** A
+union, a literal set or a function type has no members to list, so its written definition is shown instead.
+An object type is listed field by field because a context type's or a props-feeding type's fields carry
+their own documentation, which a one-line definition would lose.
+
+**The `Use` column is drawn only where documentation is the rule.** Props and utility namespaces always carry
+it, with _"Not written yet."_ in an empty row, because both are required to be documented. Every other table
+draws it only when at least one of its rows has a block: component files, context files and most of a
+`.types.ts` are not documented by rule, and a column reading _"Not written yet."_ on every row would be
+announcing a gap that is not one.
+
+**Signatures are the checker's, not the source text.** A namespace member is an arrow function whose return
+type is usually inferred, so the written text has nothing to show for it; the checker prints the whole
+function type, keeping the library's own alias names.
+
+**`Generators` is included and `Samples` is not.** A generator is something a consumer calls, so its
+namespace and types are its API; a sample is an example and has none. **The `SVGGradients` generator's page sits inside its own menu group.** The group of that name holds the
+two sample pages, `TimedGradients` and `TrackedGradients`, and a group is not a page, so the generator had an
+API with nowhere to show it. The user's call: a page of the group's own name goes first inside it, which is how
+they structure such a case generally, over flattening the two sample pages up beside it.
+
+### Primitives have a menu section, and a page with no examples has no Samples tab
+
+Asked for by the user once the API view existed: a primitive had exports worth reading and nowhere to read
+them. **Each of the twelve folders under `Primitives/` is a config entry** in a `Primitives` section, with a
+description and no examples, exactly as an abstract is — the page test in _"Layering"_ says a primitive
+cannot be shown alone, so there is nothing to put under Samples. Its description says which components are
+built on it and whether it is exported whole or only by its types, since that decides what its API view holds.
+
+**A page with no `component` shows Docs and API only, and its bare address forwards to Docs.** The user
+asked for the empty Samples tab to go from abstracts; the rule is written on the config rather than on the
+layer, so it holds for any entry without examples, and an SVG defs page without examples — `SVGAnimations` —
+has two tabs as well. The forward replaces the history entry rather than adding one, so the back button does
+not return to an address that only forwards again. Every link in the nav still points at the bare address.
+
+**Primitives are a third group in Uses and Used by**, between abstracts and components. The reason they were
+kept out was that a chip would lead nowhere; with a page each, that reason is gone.
+
+### `Generators/` holds the code that computes things a component is handed, and `Samples/` keeps the examples
+
+The user's call, taken in two steps. The SVG defs had examples, so they could not stay in `Abstracts`, whose
+entries carry none; they went to `Samples` first, which broke three things at once — library components
+(`Glass`, `Surface`, `GlassSurface`, `Shape`) depended on a folder meant for examples, the pages lost their API
+and dependency lists because both leave samples out, and the accepted limit that nothing in `components/src`
+depends on sample code stopped being true. **A layer of their own fixes all three**, and the user widened it
+to everything in `Samples` of the same kind rather than the SVG defs alone.
+
+**The test is whether a consumer calls it to produce something to hand a component.** That catches the four
+SVG families, `PlacementLayoutUtils`, `ProximityEffectUtils`, and the cell animation's keyframe, weight,
+breakpoint and zone builders. A registry of sample entries, a sample itself, and the helpers only the samples
+use — `SVGDefsUtils`, `SVGDefsFrameUtils` — stay in `Samples`. Each generator took its own types and its
+defaults with it.
+
+**The name is `Generators`, not `Factories`.** `Abstracts` is already described as namespaced utilities and
+hook-like factories, and holds twenty-eight `create…` functions, so `Factories` would name a thing another
+layer already is and leave a new `createSomething` with two plausible homes. `Generators` collides only with
+JavaScript's `function*`, of which the repo has none. It passes the layer-name test under _"Layering"_: nobody
+builds a `Generator` component.
+
+**The folders are named after the pages**, so the unit name is the folder name and nothing needs a table:
+`Generators/SVGDefs/SVGFilters`, `SVGGradients`, `SVGPatterns` and `SVGAnimations`, with the shared `SVGDefs`
+output type at `Generators/SVGDefs/SVGDefs.types.ts`, and `Generators/PlacementLayouts` and
+`Generators/ProximityEffects` beside them. The SVG families sit in an `SVGDefs` family folder, as
+_"A family is a folder"_ has it. The menu's `Generators` section mirrors that, with the `SVGDefs` branch as it
+was and a page each for the layouts and the effects.
+
+**The breakpoint and zone tables became generators of their own, split by what they hold.** They arrived as
+`CellAnimationBreakpoints.const.ts` and `CellAnimationZones.const.ts`, each one namespace mixing constant
+lists, types and callable functions — so the API view skipped the functions, being `.const`, and nothing
+documented them. The user's call: the lists stay in the `.const.ts`, the types go to a `.types.ts` as
+top-level names (`CellAnimationEasing`, `CellAnimationBreakpointTriple`, `CellAnimationZoneType`), and the
+functions go to a documented `.utils.ts` as `CellAnimationBreakpointUtils` and `CellAnimationZoneUtils`. They
+got a folder each rather than joining `CellAnimationKeyframes`, which reads both, because
+_"One namespace per folder"_ in `conventions.md` would otherwise have put three namespaces of functions in one
+folder, and because `ScanlineAnimation` times its lines with the breakpoints too and should not have to reach
+into the cell-animation keyframes to do it.
+
+**`CellAnimationPlayback` joined them in the file-kind sweep that followed.** Its two functions turn elapsed
+time into a timeline position for any duration and direction the caller has, which is the reusable side of
+_"A small thing used only where it is declared stays there"_ in `conventions.md`, so it took the breakpoints'
+shape: `DIRECTIONS` in the `.const.ts`, `CellAnimationPlaybackDirection` and `CellAnimationPlaybackOpts` in the
+`.types.ts`, `CellAnimationPlaybackUtils` in a documented `.utils.ts`, and a page under `Generators`.
+
+**The rest of that sweep found everything outside `Samples` already in order, and most of `Samples` stays.** The
+registry lookups (`CellAnimationKeyframes.computeAnimation`, `CellAnimationWeights.computeCellWeights`,
+`CellAnimationOrigins.computeOrigin`, `Timed.toConfig`), every `SampleKey` and the samples that are themselves
+functions stay in their `.const.ts`, being local to the table they serve. So do `SVGAnimationTracks` and
+`BracketConnectorPaths.getSpine`, small helpers that exist for the entries beside them. Two things moved.
+The scanline effects' option types went to `ScanlineAnimationKeyframes.types.ts` as top-level names
+(`ScanlineHorizontalSnakeOpts`; the underscored draft effects keep their underscore), because pages read them.
+And `SVGDefsFrameUtils.createClock` joined `SVGDefsUtils`, which leaves `Samples/SVGDefs` one helper namespace
+besides its registries, as _"One namespace per folder"_ asks; `SVGAnimationTracks` could not join it too,
+since `SVGDefs.utils.ts` imports the filter factory and a test of the tracks would then pull JSX in.
+
+**Knob descriptions left the library entirely.** The user's rule, recorded in `conventions.md`: the library
+keeps a tunable's default and the Playground owns its range, step, label and hint. So each `<Subject>Knobs`
+namespace in a `.knobs.ts` became a `<Subject>Defaults` namespace in the subject's `.const.ts`, holding the
+`*_DEFAULTS` objects and `DEFAULTS_BY_FAMILY` under the same member names — a namespace rather than loose
+constants because two subjects both have a `BAND_DEFAULTS`, and because the plain names `PlacementLayouts` and
+`ProximityEffects` already belong to the sample registries. The descriptions went to
+`playground/src/App/Knobs/<Subject>.const.ts` under the old `<Subject>Knobs` names, one file per library
+subject, on the user's call over keeping them in whichever page first used them: the timed gradients are read
+by two pages and the tracked gradients by two others, and a file named for the subject is owned by no page. A
+page's knobs for options of its own, such as `ParticleSpawnerPage`'s, stay in that page's `.const.ts`. The
+knob types went with them into `PageComponents/Knobs/Knobs.types.ts` as `Knob`, `NumberKnob`, `CheckKnob`,
+`KnobFor` and `Knobs`, and `Samples/Samples.types.ts`, which held nothing else, is gone. `TimedGradientDefsOf`
+and `TrackedGradientDefsOf` stayed in the library beside the entries they read, because the defaults need them
+as much as the knobs do.
+
+**Generators are a group of their own in Uses and Used by**, between abstracts and primitives, and a generator
+folder is a unit as a whole in the dependency map, the way an abstract folder is. `Surface`, `GlassSurface`
+and `Shape` list no generator, because they take only the `SVGDefs` type and a type import runs nothing.
+
 ### The dependency map takes a whole abstract folder as its entry when no file carries the folder's name
 
 The `componentDependencies` plugin finds a component's entry file by looking for the one whose basename
@@ -1898,17 +2028,14 @@ had a map entry changed.
 because nothing imports a test — but a folder-wide entry set would have made `CarrierUtils.utils.test.ts` an entry
 and counted whatever it imports as a dependency of `Carrier`.
 
-**The `SVG` folder is the one place where a folder name is not the unit name**, and it is a table of four
-prefixes rather than a rule. `Abstracts/SVG/Defs/Filter` is `SVGFilters` and its three siblings likewise,
-because the folder holds four independent families and the pages are named for them rather than for it.
-Deriving those names from the file names — `SVGFilterDefs.factory.tsx` — was rejected as string surgery over
-a naming convention nothing enforces; four literal rows say the same thing and fail loudly if a folder moves.
+**`Generators` is walked the same way.** A generator folder rarely has a file of its own name —
+`SVGFilters/` holds `SVGFilterDefs.factory.tsx` — so it takes every file in the folder as its entry too.
 
 ### `usedBy` is the same map read backwards, and the layer of the consumer decides which list it lands in
 
 Asked for by the user: pages already said what they rest on, and should also say what rests on them. The
 walk is unchanged — it is the `uses` map inverted once it is complete, so `usedBy` is transitive in exactly
-the way `uses` is. A consumer is filed under `Abstracts` or `Components` by **its own** layer rather than
+the way `uses` is. A consumer is filed under `Abstracts`, `Primitives` or `Components` by **its own** layer rather than
 the layer of the thing it uses, which is why `Rotator` appears under abstracts in `InteractionTracker`'s
 list and everything else under components.
 
@@ -3794,8 +3921,8 @@ union says the same, so a knob a sample never reads cannot be handed to it.
 
 **`steps` is the one number every animated timed sample shared.** All fifty-odd calls to
 `getIntermediateValues` walked their sweep in twelve, whatever the sweep was — the endpoints are the sample's
-identity, the count is its smoothness. Fourteen samples take it now and the default lives once, in the knobs file beside the samples'
-other defaults, as `TimedGradientKnobs.STEPS_DEFAULT`.
+identity, the count is its smoothness. Fourteen samples take it now and the default lives once, beside the samples'
+other defaults, as `TimedGradientDefaults.STEPS_DEFAULT`.
 
 **`bands` replaced four literal stop-key arrays.** The flows held a seven-entry array for the blended case and
 a thirteen- or seventeen-entry one for the banded case, alternating two or three colors by hand.
@@ -3973,9 +4100,9 @@ two together and nothing complained when they disagreed, so the panel could pain
 importing the sample got another. Thirteen of them had already drifted apart.
 
 **The registry is the home and the samples import from it**, the user's, in those words. Each sample holds
-`const DEFAULTS = TrackedGradientKnobs.<FAMILY>_DEFAULTS` and every fallback reads a field off it, so the
-number cannot be stated in two places again. The direction is safe: the knobs file imports only
-`Samples.types`, the samples import the knobs file, and the sample registry imports the samples.
+`const DEFAULTS = TrackedGradientDefaults.<FAMILY>_DEFAULTS` and every fallback reads a field off it, so the
+number cannot be stated in two places again. The direction is safe: the defaults file imports only types, the
+samples import the defaults file, and the sample registry imports the samples.
 
 **The defaults compose rather than repeat.** Fourteen objects cover the nineteen samples. A family states its
 numbers once and its cycling members add the two color knobs to it — `SPOT_TRAIL_CYCLING_DEFAULTS` is
@@ -6462,7 +6589,10 @@ single number stays the common case and is written straight through.
 **`custom` goes to the `feTurbulence`, not the displacement.** It is the animation slot every other method
 carries, and the attributes worth animating on this pair — `baseFrequency` and `seed` — are the noise's.
 
-### The `SVGFilters` page is the factory's, and it is filed under `Abstracts`
+### The `SVGFilters` page is the factory's
+
+It was filed under `Abstracts` at first; the factory and its three siblings now live in
+`Generators/SVGDefs` and the page is under the `Generators` section. What follows is otherwise unchanged.
 
 Asked for as a page to test the filter defs factory. It renders no component of its own — what it shows is a
 consumer built on top of something the library only hands out, and nothing here is a `Fundamental` or an
@@ -9474,8 +9604,8 @@ either, and nothing had to branch to keep that true.
 **The folders mirror the namespaces, because the left nav mirrors the folders.** `Samples/SVGDefs/Gradient`
 holds `Timed` and `Tracked` directories, and the menu's SVGGradients entry became a branch with a
 `TimedGradients` and a `TrackedGradients` child. This is the one branch of the SVG group whose nav shape
-follows the samples tree rather than `Abstracts/SVG/Defs`, which is where its siblings come from — named here
-because it was noticed and accepted rather than overlooked. Nothing in the plumbing depended on sample folder
+followed the samples tree rather than `Abstracts/SVG/Defs`, which is where its siblings came from. The
+generators have since moved to `Generators/SVGDefs`, so the nav follows that folder throughout. Nothing in the plumbing depended on sample folder
 depth: the source view globs the Playground's own tree only, so the move was import paths and nothing else.
 
 **Two pages, because the knobs differ.** The timed page carries the animation duration and the iteration
@@ -9747,7 +9877,9 @@ handed a knob it does not read. Nothing in `components/src` outside `Samples` re
 six places that read a registry by key are all Playground pages, and each now threads a bag alongside the
 key it already threaded.
 
-**Knob descriptions are derived, and they live beside the family rather than with it.** `Samples.types.ts`
+**Knob descriptions are derived.** They have since left the library for `playground/src/App/Knobs`, and the
+vocabulary below for `PageComponents/Knobs/Knobs.types.ts`, under _"Knob descriptions left the library
+entirely"_; what follows is how they were first built. `Samples.types.ts`
 at the root of the tree holds the vocabulary — a number knob with a range and a step, a check knob, and a
 `SampleKnobs<T>` mapped type that checks each entry's name and kind against the family's own options type,
 so a renamed option breaks the build and a boolean cannot be given a slider. Each registry has a
@@ -13655,7 +13787,7 @@ it renders none. The user's call was to keep the category rather than file it wr
 the one Abstract with no component consumer would otherwise be the only thing in the library you cannot look
 at.
 
-**Every Abstract has an entry, and none of them carry examples** apart from the `SVG defs` pages; the rule and
+**Every Abstract has an entry, and none of them carry examples**; the rule and
 its reasoning are under _"Every abstract has a menu entry, and a page with no examples is a config entry rather
 than a file"_. `Anchor` was the first case argued that way and rejected before the rule was general: it is
 already everywhere — tooltips, menus, selects and the spotlight all position through it, so a page would be a
@@ -13808,8 +13940,8 @@ abstract a component merely borrows a shape from.
 **Internal components are listed alongside exported ones.** `Select` names `FormField`, whose context it
 reads without a consumer ever putting one there. The alternative — filtering to what `index.ts` exports —
 would have made the list a partial truth for the sake of tidiness, and the list is describing what runs, not
-what can be bought. **`Primitives` is the one exception**, and on different grounds: those units are not
-things a reader can go and look at, so naming them offers a name and nowhere to take it.
+what can be bought. Primitives were once left out on the grounds that a reader had nowhere to go and look at
+one; that ended when they got pages, and they are now a group of their own between abstracts and components.
 
 **The nav marker says whether there is anything to look at, and its weight follows what is there.** A branch
 keeps the heaviest mark, ▶, because it holds the most; a leaf with examples takes a •; and a leaf carrying

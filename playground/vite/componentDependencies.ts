@@ -8,18 +8,16 @@ const IMPORT_PATTERN = /^import\s+(?!type\s)[^;]*?["']([^"']+)["'];?\s*$/gm;
 const SOURCE_PATTERN = /\.tsx?$/;
 const TEST_PATTERN = /\.test\.tsx?$/;
 const ABSTRACTS_LAYER = "Abstracts";
+const GENERATORS_LAYER = "Generators";
+const PRIMITIVES_LAYER = "Primitives";
+const FOLDER_UNIT_LAYERS = new Set([ABSTRACTS_LAYER, GENERATORS_LAYER]);
 const COMPONENT_LAYERS = new Set(["Essentials", "Composites", "Exotics"]);
-const UNIT_NAME_OVERRIDES: [folder: string, name: string][] = [
-    ["Abstracts/SVG/Defs/Animation", "SVGAnimations"],
-    ["Abstracts/SVG/Defs/Filter", "SVGFilters"],
-    ["Abstracts/SVG/Defs/Gradient", "SVGGradients"],
-    ["Abstracts/SVG/Defs/Pattern", "SVGPatterns"],
-];
 
-type DependencyNames = {
-    abstracts: string[];
-    components: string[];
-};
+type DependencyKind = "abstracts" | "generators" | "primitives" | "components";
+
+const DEPENDENCY_KINDS: DependencyKind[] = ["abstracts", "generators", "primitives", "components"];
+
+type DependencyNames = Record<DependencyKind, string[]>;
 
 type Dependencies = {
     uses: DependencyNames;
@@ -50,11 +48,7 @@ const resolveSpecifier = (fromFile: string, specifier: string, known: Set<string
     return [base, `${base}.ts`, `${base}.tsx`, `${base}/index.ts`].find((candidate) => known.has(candidate));
 };
 
-const getUnitName = (relativeFile: string) => {
-    const override = UNIT_NAME_OVERRIDES.find(([folder]) => relativeFile.startsWith(`${folder}/`));
-
-    if (override) return override[1];
-
+export const getUnitName = (relativeFile: string) => {
     const segments = relativeFile.split("/");
 
     return segments[0] === ABSTRACTS_LAYER ? segments[1] : segments[segments.length - 2];
@@ -64,6 +58,8 @@ const getUnitKind = (relativeFile: string) => {
     const layer = relativeFile.split("/")[0];
 
     if (layer === ABSTRACTS_LAYER) return "abstracts" as const;
+    if (layer === GENERATORS_LAYER) return "generators" as const;
+    if (layer === PRIMITIVES_LAYER) return "primitives" as const;
 
     return COMPONENT_LAYERS.has(layer) ? ("components" as const) : undefined;
 };
@@ -99,7 +95,7 @@ const buildDependencyMap = async (root: string) => {
 
         if (owner && segments[segments.length - 1].replace(SOURCE_PATTERN, "") === owner) entries.set(owner, [file]);
 
-        if (segments[0] !== ABSTRACTS_LAYER) continue;
+        if (!FOLDER_UNIT_LAYERS.has(segments[0])) continue;
 
         const unit = getUnitName(relative);
 
@@ -116,7 +112,7 @@ const buildDependencyMap = async (root: string) => {
     }
 
     const map: Record<string, Dependencies> = {};
-    const kinds = new Map<string, "abstracts" | "components">();
+    const kinds = new Map<string, DependencyKind>();
 
     for (const [name, entry] of entries) {
         const seen = new Set(entry);
@@ -131,10 +127,10 @@ const buildDependencyMap = async (root: string) => {
             }
         }
 
-        const found: Record<"abstracts" | "components", Set<string>> = {
-            abstracts: new Set(),
-            components: new Set(),
-        };
+        const found = Object.fromEntries(DEPENDENCY_KINDS.map((kind) => [kind, new Set<string>()])) as Record<
+            DependencyKind,
+            Set<string>
+        >;
 
         for (const file of seen) {
             const relative = relativeTo(file);
@@ -151,11 +147,10 @@ const buildDependencyMap = async (root: string) => {
         if (kind) kinds.set(name, kind);
 
         map[name] = {
-            uses: {
-                abstracts: [...found.abstracts].sort(),
-                components: [...found.components].sort(),
-            },
-            usedBy: { abstracts: [], components: [] },
+            uses: Object.fromEntries(
+                DEPENDENCY_KINDS.map((kind) => [kind, [...found[kind]].sort()]),
+            ) as DependencyNames,
+            usedBy: Object.fromEntries(DEPENDENCY_KINDS.map((kind) => [kind, [] as string[]])) as DependencyNames,
         };
     }
 
@@ -164,14 +159,13 @@ const buildDependencyMap = async (root: string) => {
 
         if (!kind) continue;
 
-        for (const used of [...dependencies.uses.abstracts, ...dependencies.uses.components]) {
+        for (const used of Object.values(dependencies.uses).flat()) {
             map[used]?.usedBy[kind].push(name);
         }
     }
 
     for (const dependencies of Object.values(map)) {
-        dependencies.usedBy.abstracts.sort();
-        dependencies.usedBy.components.sort();
+        for (const names of Object.values(dependencies.usedBy)) names.sort();
     }
 
     return map;

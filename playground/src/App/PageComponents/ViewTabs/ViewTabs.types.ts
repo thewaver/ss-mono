@@ -4,4 +4,5 @@ export type PageViewKey = "docs" | "api" | "samples";
 
 export type PageViewTabsProps = AccessorProps<{
     baseRoute: string;
+    hasSamples: boolean;
 }>;

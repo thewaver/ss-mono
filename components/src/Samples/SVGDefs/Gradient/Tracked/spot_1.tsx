@@ -1,10 +1,10 @@
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
-import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
+import { SVGGradientDefsUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefs.utils";
 import type { GradientSpotOpts, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
-import { TrackedGradientKnobs } from "../TrackedGradient.knobs";
+import { TrackedGradientDefaults } from "../TrackedGradient.const";
 
-const DEFAULTS = TrackedGradientKnobs.SPOT_DEFAULTS;
+const DEFAULTS = TrackedGradientDefaults.SPOT_DEFAULTS;
 
 const NO_REF = () => undefined;
 

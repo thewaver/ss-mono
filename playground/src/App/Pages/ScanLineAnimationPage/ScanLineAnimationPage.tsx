@@ -1,19 +1,36 @@
 import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import type { SampleKnob, ScanlineAnimationOrientation } from "@thewaver/ss-components";
 import {
+    CellAnimationBreakpointUtils,
     CellAnimationBreakpoints,
     CellAnimationWeights,
     SCANLINE_ANIMATION_DEFAULTS,
     ScanlineAnimation,
-    ScanlineAnimationKeyframeKnobs,
     ScanlineAnimationKeyframes,
     access,
 } from "@thewaver/ss-components";
+import type {
+    CellAnimationBreakpointDirection,
+    CellAnimationBreakpointOpts,
+    ScanlineAnimationOrientation,
+    ScanlineHorizontalBrightnessOpts,
+    ScanlineHorizontalGrayscaleOpts,
+    ScanlineHorizontalHueOpts,
+    ScanlineHorizontalSnakeOpts,
+    ScanlineHorizontalSplitOpts,
+    ScanlineHorizontalStretchOpts,
+    _ScanlineHorizontalDropoutOpts,
+    _ScanlineHorizontalInterlaceOpts,
+    _ScanlineHorizontalRollOpts,
+    _ScanlineHorizontalSkewOpts,
+    _ScanlineHorizontalWaveOpts,
+} from "@thewaver/ss-components";
 
+import { ScanlineAnimationKeyframeKnobs } from "../../Knobs/ScanlineAnimationKeyframes.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
+import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -175,7 +192,7 @@ const StressTestWrapper = (props: ScanlineAnimationExampleProps) => {
                                 }
                                 computeScanlineAnimation={(defs, timeline) =>
                                     foo(
-                                        CellAnimationBreakpoints.computeBreakpoints(defs.weight, undefined),
+                                        CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, undefined),
                                         defs,
                                         timeline,
                                         undefined,
@@ -212,8 +229,8 @@ const SmoothnessInput = (props: { getter: () => number; setter: (value: number) 
 };
 
 const DirInput = (props: {
-    getter: () => CellAnimationBreakpoints.Direction;
-    setter: (value: CellAnimationBreakpoints.Direction) => void;
+    getter: () => CellAnimationBreakpointDirection;
+    setter: (value: CellAnimationBreakpointDirection) => void;
 }) => {
     return (
         <PageProp
@@ -294,7 +311,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
 const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         dir: "asc",
         smoothness: 0.2,
     });
@@ -304,14 +321,14 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
                 <SurgeExample
                     {...props}
-                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes.HorizontalStretchOpts}
+                    keyframeOpts={() => keyframeOpts as ScanlineHorizontalStretchOpts}
                     breakpointOpts={() => breakpointOpts}
                 />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKeyframeKnobs.STRETCH_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.STRETCH_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_STRETCH_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
@@ -329,7 +346,7 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
 const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         dir: "asc",
         smoothness: 0.2,
     });
@@ -339,14 +356,14 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
                 <SnakeExample
                     {...props}
-                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes.HorizontalSnakeOpts}
+                    keyframeOpts={() => keyframeOpts as ScanlineHorizontalSnakeOpts}
                     breakpointOpts={() => breakpointOpts}
                 />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKeyframeKnobs.SNAKE_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.SNAKE_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_SNAKE_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
@@ -364,7 +381,7 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
 const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         dir: "asc",
         smoothness: 1,
     });
@@ -374,14 +391,14 @@ const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
                 <SplitExample
                     {...props}
-                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes.HorizontalSplitOpts}
+                    keyframeOpts={() => keyframeOpts as ScanlineHorizontalSplitOpts}
                     breakpointOpts={() => breakpointOpts}
                 />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKeyframeKnobs.SPLIT_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.SPLIT_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_SPLIT_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
@@ -398,8 +415,8 @@ const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const BrightnessExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const [keyframeOpts] = createStore<ScanlineAnimationKeyframes.HorizontalBrightnessOpts>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
+    const [keyframeOpts] = createStore<ScanlineHorizontalBrightnessOpts>({});
+    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         dir: "asc",
         smoothness: 0.5,
     });
@@ -422,8 +439,8 @@ const BrightnessExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const GrayscaleExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const [keyframeOpts] = createStore<ScanlineAnimationKeyframes.HorizontalGrayscaleOpts>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
+    const [keyframeOpts] = createStore<ScanlineHorizontalGrayscaleOpts>({});
+    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         dir: "asc",
         smoothness: 0.5,
     });
@@ -446,8 +463,8 @@ const GrayscaleExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 };
 
 const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
-    const [keyframeOpts] = createStore<ScanlineAnimationKeyframes.HorizontalHueOpts>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
+    const [keyframeOpts] = createStore<ScanlineHorizontalHueOpts>({});
+    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         dir: "asc",
         smoothness: 0.5,
     });
@@ -471,7 +488,7 @@ const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
 const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         dir: "asc",
         smoothness: 0.6,
     });
@@ -481,14 +498,14 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
                 <WaveExample
                     {...props}
-                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes._HorizontalWaveOpts}
+                    keyframeOpts={() => keyframeOpts as _ScanlineHorizontalWaveOpts}
                     breakpointOpts={() => breakpointOpts}
                 />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKeyframeKnobs.WAVE_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.WAVE_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_WAVE_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
@@ -506,7 +523,7 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
 const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         dir: "asc",
         smoothness: 0.1,
     });
@@ -516,14 +533,14 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
                 <RollExample
                     {...props}
-                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes._HorizontalRollOpts}
+                    keyframeOpts={() => keyframeOpts as _ScanlineHorizontalRollOpts}
                     breakpointOpts={() => breakpointOpts}
                 />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKeyframeKnobs.ROLL_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.ROLL_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_ROLL_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
@@ -541,7 +558,7 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
 const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         dir: "asc",
         smoothness: 0.2,
     });
@@ -551,14 +568,14 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
                 <DropoutExample
                     {...props}
-                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes._HorizontalDropoutOpts}
+                    keyframeOpts={() => keyframeOpts as _ScanlineHorizontalDropoutOpts}
                     breakpointOpts={() => breakpointOpts}
                 />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKeyframeKnobs.DROPOUT_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.DROPOUT_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_DROPOUT_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
@@ -576,7 +593,7 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
 const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         dir: "asc",
         smoothness: 0.8,
     });
@@ -586,14 +603,14 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
                 <InterlaceExample
                     {...props}
-                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes._HorizontalInterlaceOpts}
+                    keyframeOpts={() => keyframeOpts as _ScanlineHorizontalInterlaceOpts}
                     breakpointOpts={() => breakpointOpts}
                 />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKeyframeKnobs.INTERLACE_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.INTERLACE_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_INTERLACE_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}
@@ -611,7 +628,7 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
 
 const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
     const [keyframeOpts, setKeyframeOpts] = createStore<Record<string, number | boolean>>({});
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         dir: "asc",
         smoothness: 0.3,
     });
@@ -621,14 +638,14 @@ const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
             <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
                 <SkewExample
                     {...props}
-                    keyframeOpts={() => keyframeOpts as ScanlineAnimationKeyframes._HorizontalSkewOpts}
+                    keyframeOpts={() => keyframeOpts as _ScanlineHorizontalSkewOpts}
                     breakpointOpts={() => breakpointOpts}
                 />
             </PageMeasureBox>
 
             <PagePropsPanel scope={"local"}>
                 <PageKnobs
-                    knobs={() => ScanlineAnimationKeyframeKnobs.SKEW_KNOBS as Record<string, SampleKnob>}
+                    knobs={() => ScanlineAnimationKeyframeKnobs.SKEW_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_SKEW_OPTS}
                     values={() => keyframeOpts}
                     onInput={(key, value) => setKeyframeOpts(key, value)}

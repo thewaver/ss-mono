@@ -1,8 +1,8 @@
 import type { Size2d } from "@thewaver/ss-utils";
 
 import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type { SVGAnimationDefs } from "../../Abstracts/SVG/Defs/Animation/SVGAnimationDefs.types";
-import type { SVGDefs } from "../../Abstracts/SVG/Defs/SVGDefs.types";
+import type { SVGAnimationDefs } from "../../Generators/SVGDefs/SVGAnimations/SVGAnimationDefs.types";
+import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
 
 export type SVGDefsColors = { [K in "primary" | "secondary" | "tertiary" | "background"]: string };
 
@@ -209,3 +209,13 @@ export type TrackedGradientEntry =
     | { family: "spot_trail_3"; defs?: GradientSpotTrailOpts };
 
 export type TrackedGradientFamily = TrackedGradientEntry["family"];
+
+export type TimedGradientDefsOf<F extends TimedGradientFamily> =
+    Extract<TimedGradientEntry, { family: F }> extends { defs?: infer TDefs } ? NonNullable<TDefs> : object;
+
+export type TimedGradientDefaultsByFamily = { [F in TimedGradientFamily]: Partial<TimedGradientDefsOf<F>> };
+
+export type TrackedGradientDefsOf<F extends TrackedGradientFamily> =
+    Extract<TrackedGradientEntry, { family: F }> extends { defs?: infer TDefs } ? NonNullable<TDefs> : object;
+
+export type TrackedGradientDefaultsByFamily = { [F in TrackedGradientFamily]: Partial<TrackedGradientDefsOf<F>> };

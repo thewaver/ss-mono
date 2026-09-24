@@ -2,10 +2,10 @@ import { createMemo } from "solid-js";
 
 import {
     CellAnimation,
-    CellAnimationBreakpoints,
+    CellAnimationBreakpointUtils,
     CellAnimationKeyframes,
     CellAnimationOrigins,
-    CellAnimationPlayback,
+    CellAnimationPlaybackUtils,
     CellAnimationWeights,
     access,
 } from "@thewaver/ss-components";
@@ -29,7 +29,7 @@ export const DefaultExample = ({
         <CellAnimation
             {...otherProps}
             animationDurationMs={() =>
-                CellAnimationPlayback.computeCycleDurationMs(
+                CellAnimationPlaybackUtils.computeCycleDurationMs(
                     access(otherProps.animationDurationMs),
                     access(playbackOpts),
                 )
@@ -40,9 +40,9 @@ export const DefaultExample = ({
             computeCellAnimation={(defs, timeline) =>
                 CellAnimationKeyframes.computeAnimation(
                     access(animationType),
-                    CellAnimationBreakpoints.computeBreakpoints(defs.weight, access(breakpointOpts)),
+                    CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, access(breakpointOpts)),
                     { ...defs, origin: getOrigin() },
-                    CellAnimationPlayback.computeGlobalTimeline(
+                    CellAnimationPlaybackUtils.computeGlobalTimeline(
                         timeline,
                         access(otherProps.animationDurationMs),
                         access(playbackOpts),

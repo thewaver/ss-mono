@@ -1,15 +1,24 @@
 /// <reference types="vite/client" />
 
 declare module "virtual:component-dependencies" {
-    export type DependencyNames = { abstracts: string[]; components: string[] };
+    export type DependencyNames = {
+        abstracts: string[];
+        generators: string[];
+        primitives: string[];
+        components: string[];
+    };
 
     const dependencies: Record<string, { uses: DependencyNames; usedBy: DependencyNames }>;
 
     export default dependencies;
 }
 
-declare module "virtual:component-props" {
-    export type PropEntry = {
+declare module "virtual:component-api" {
+    export type ApiGroupKind = "props" | "components" | "context" | "utilities" | "classes" | "types";
+
+    export type ApiTableKind = "props" | "values" | "aliases" | "fields";
+
+    export type ApiEntry = {
         name: string;
         type: string;
         description: string;
@@ -17,7 +26,21 @@ declare module "virtual:component-props" {
         isAccessor: boolean;
     };
 
-    const props: Record<string, PropEntry[]>;
+    export type ApiTable = {
+        kind: ApiTableKind;
+        name: string;
+        heading: string;
+        description: string;
+        isDocumented: boolean;
+        entries: ApiEntry[];
+    };
 
-    export default props;
+    export type ApiGroup = {
+        kind: ApiGroupKind;
+        tables: ApiTable[];
+    };
+
+    const api: Record<string, ApiGroup[]>;
+
+    export default api;
 }

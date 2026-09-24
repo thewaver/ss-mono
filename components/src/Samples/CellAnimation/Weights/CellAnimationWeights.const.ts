@@ -1,7 +1,7 @@
 import type { Index2d } from "@thewaver/ss-utils";
 
-import type { WeightFn, WeightOpts } from "./CellAnimationWeights.types";
-import { CellAnimationWeightUtils } from "./CellAnimationWeights.utils";
+import type { WeightFn, WeightOpts } from "../../../Generators/CellAnimationWeights/CellAnimationWeights.types";
+import { CellAnimationWeightUtils } from "../../../Generators/CellAnimationWeights/CellAnimationWeights.utils";
 import { checkeredConvergent } from "./Samples/checkeredConvergent";
 import { checkeredDefault } from "./Samples/checkeredDefault";
 import { diamondAlternate } from "./Samples/diamondAlternate";

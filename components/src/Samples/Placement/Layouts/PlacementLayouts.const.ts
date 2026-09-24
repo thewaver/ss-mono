@@ -1,4 +1,4 @@
-import type { PlacementLayoutEntry } from "./PlacementLayouts.types";
+import type { PlacementLayoutEntry } from "../../../Generators/PlacementLayouts/PlacementLayouts.types";
 
 export namespace PlacementLayouts {
     export const SAMPLE_LAYOUTS = {

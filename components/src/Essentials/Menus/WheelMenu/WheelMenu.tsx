@@ -2,8 +2,8 @@ import type { Accessor } from "solid-js";
 import { createMemo } from "solid-js";
 
 import type { PlacementLayout, PlacementLayoutDefs } from "../../../Abstracts/Placement/Placement.types";
-import { PlacementLayoutKnobs } from "../../../Samples/Placement/Layouts/PlacementLayouts.knobs";
-import { PlacementLayoutUtils } from "../../../Samples/Placement/Layouts/PlacementLayouts.utils";
+import { PlacementLayoutDefaults } from "../../../Generators/PlacementLayouts/PlacementLayouts.const";
+import { PlacementLayoutUtils } from "../../../Generators/PlacementLayouts/PlacementLayouts.utils";
 import { access } from "../../../Utils/propUtils";
 import type { SignalSource } from "../../../Utils/typeUtils";
 import { Menu } from "../Menu/Menu";
@@ -40,7 +40,7 @@ export const WheelMenu = <T,>(props: WheelMenuProps<T>) => {
 
     const computeLayout = (layoutDefs: PlacementLayoutDefs): PlacementLayout => {
         const given = props.layoutDefs ?? {};
-        const base = PlacementLayoutKnobs.BAND_DEFAULTS;
+        const base = PlacementLayoutDefaults.BAND_DEFAULTS;
         const bandWidth = access(props.bandWidth) ?? WHEEL_MENU_DEFAULTS.bandWidth;
         const itemRadiusRatio = given.itemRadiusRatio ?? base.itemRadiusRatio;
         const itemMaxWidthRatio = given.itemMaxWidthRatio ?? base.itemMaxWidthRatio;

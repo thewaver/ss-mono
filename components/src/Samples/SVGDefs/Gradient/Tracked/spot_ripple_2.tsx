@@ -4,11 +4,10 @@ import { Color, EasingUtils, MathUtils, type Point2d, Point2dUtils } from "@thew
 
 import type { PointerReading } from "../../../../Abstracts/PointerTracker/PointerTracker.types";
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
-import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
+import { SVGGradientDefsUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefs.utils";
 import type { GradientRippleSampleOpts, SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
-import { SVGDefsFrameUtils } from "../../SVGDefsFrames.utils";
-import { TrackedGradientKnobs } from "../TrackedGradient.knobs";
+import { TrackedGradientDefaults } from "../TrackedGradient.const";
 
 type Ripple = {
     origin: Point2d;
@@ -27,7 +26,7 @@ const NO_FADE = 0;
 const NO_TRAVEL = 0;
 const FIRST_MILESTONE = 0;
 
-const DEFAULTS = TrackedGradientKnobs.SPOT_RIPPLE_CYCLING_DEFAULTS;
+const DEFAULTS = TrackedGradientDefaults.SPOT_RIPPLE_CYCLING_DEFAULTS;
 
 const NO_REF = () => undefined;
 
@@ -43,7 +42,7 @@ const getCycleColor = (colors: SVGDefsColors, atMs: number, opts?: GradientRippl
     return Color.Hex.interpolate(from, to, phase - index);
 };
 
-const clock = SVGDefsFrameUtils.createClock(RIPPLE_LIFETIME_MS);
+const clock = SVGDefsUtils.createClock(RIPPLE_LIFETIME_MS);
 
 const createRipple = (
     index: number,

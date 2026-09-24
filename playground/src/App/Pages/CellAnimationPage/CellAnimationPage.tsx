@@ -8,11 +8,17 @@ import {
     CellAnimationKeyframes,
     CellAnimationOrigins,
     CellAnimationPlayback,
+    CellAnimationPlaybackUtils,
     CellAnimationWeights,
     SVGDefsSamples,
     access,
 } from "@thewaver/ss-components";
-import type { CellAnimationFinalFrame, WeightOpts } from "@thewaver/ss-components";
+import type {
+    CellAnimationBreakpointOpts,
+    CellAnimationFinalFrame,
+    CellAnimationPlaybackOpts,
+    WeightOpts,
+} from "@thewaver/ss-components";
 import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
@@ -158,7 +164,7 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
                             SVGDefsSources.computeGradientSource(
                                 getKey(),
                                 getSize(),
-                                CellAnimationPlayback.computeCycleDurationMs(
+                                CellAnimationPlaybackUtils.computeCycleDurationMs(
                                     access(props.animationDurationMs),
                                     access(props.playbackOpts),
                                 ),
@@ -218,7 +224,7 @@ const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
                             SVGDefsSources.computePatternSource(
                                 getKey(),
                                 getSize(),
-                                CellAnimationPlayback.computeCycleDurationMs(
+                                CellAnimationPlaybackUtils.computeCycleDurationMs(
                                     access(props.animationDurationMs),
                                     access(props.playbackOpts),
                                 ),
@@ -335,12 +341,12 @@ export const CellAnimationPage = () => {
         shouldMakeUnique: false,
         shouldNormalize: false,
     });
-    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpoints.BreakpointOpts>({
+    const [breakpointOpts, setBreakpointOpts] = createStore<CellAnimationBreakpointOpts>({
         dir: "asc",
         smoothness: 0.25,
         easing: "linear",
     });
-    const [playbackOpts, setPlaybackOpts] = createStore<CellAnimationPlayback.PlaybackOpts>({
+    const [playbackOpts, setPlaybackOpts] = createStore<CellAnimationPlaybackOpts>({
         dir: "alternate",
         holdMs: 1000,
     });

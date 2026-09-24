@@ -3,7 +3,7 @@ import { Index, Show, createEffect, createMemo, createSignal, on, onCleanup, onM
 import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
 
-import { A, Route, type RouteSectionProps, Router } from "@solidjs/router";
+import { A, Navigate, Route, type RouteSectionProps, Router } from "@solidjs/router";
 import { Checkbox, Collapsible, Label, Tree, ViewportWrapper } from "@thewaver/ss-components";
 import type { SignalPair, TreeNode } from "@thewaver/ss-components";
 import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
@@ -11,7 +11,7 @@ import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
 import { PageApiView } from "./PageComponents/ApiView/ApiView";
 import { PageDocsView } from "./PageComponents/DocsView/DocsView";
 import { PageViewTabs } from "./PageComponents/ViewTabs/ViewTabs";
-import { toBaseRoute } from "./PageComponents/ViewTabs/ViewTabs.const";
+import { toBaseRoute, toPageViewRoute } from "./PageComponents/ViewTabs/ViewTabs.const";
 import { AccordionPage } from "./Pages/Accordions/AccordionPage/AccordionPage";
 import { CollapsiblePage } from "./Pages/Accordions/CollapsiblePage/CollapsiblePage";
 import { AudioSwitcherPage } from "./Pages/AudioSwitcherPage/AudioSwitcherPage";
@@ -250,7 +250,7 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Placement",
                 description:
-                    "Where a control's items go when they are not in a row. A layout is a function from an item count, the path down to the level being drawn, the size of the level above it and the placement of the item that opened it, to a list of boxes in fractions of the arrangement's own width — so it resolves in CSS with nothing measured in JavaScript. A box may also name the wedge of a ring it occupies, which is what lets a control hand its painter a shape rather than a rectangle. The layouts themselves are sample code; what stays here is the vocabulary, the picking that answers which item a direction means, and the sector and link path builders. Every control that takes a layout shows it on its own page.",
+                    "Where a control's items go when they are not in a row. A layout is a function from an item count, the path down to the level being drawn, the size of the level above it and the placement of the item that opened it, to a list of boxes in fractions of the arrangement's own width — so it resolves in CSS with nothing measured in JavaScript. A box may also name the wedge of a ring it occupies, which is what lets a control hand its painter a shape rather than a rectangle. The layouts themselves are under `PlacementLayouts`; what stays here is the vocabulary, the picking that answers which item a direction means, and the sector and link path builders. Every control that takes a layout shows it on its own page.",
             },
             {
                 name: "PointerTracker",
@@ -260,56 +260,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             {
                 name: "Proximity",
                 description:
-                    "The other half of a layout: where `Placement` says where an arrangement's items go, this says what being near the pointer does to one of them. An effect is a function from one item's measurements to a set of CSS transform and filter values, so a dock's swell, a glow and a blur that lifts as the pointer nears are the same mechanism with a different answer. What makes it work across arrangements is that nearness is not a straight line: a row counts the horizontal gap and nothing else, a ring counts the turn between two wedges and, separately, how far off the band the pointer is — a turn never making up for the second — and each arrangement names the rule it is read by. The axis a rule throws away is read once more as a yes or a no — inside the arrangement's box or not — so ignoring an axis does not mean answering a pointer that has walked away. It never strips a response it thinks is motion — the reduced-motion preference arrives in the measurements instead, because only the consumer knows what to put in movement's place. The effects themselves are sample code; every control that takes a layout takes one of these too.",
+                    "The other half of a layout: where `Placement` says where an arrangement's items go, this says what being near the pointer does to one of them. An effect is a function from one item's measurements to a set of CSS transform and filter values, so a dock's swell, a glow and a blur that lifts as the pointer nears are the same mechanism with a different answer. What makes it work across arrangements is that nearness is not a straight line: a row counts the horizontal gap and nothing else, a ring counts the turn between two wedges and, separately, how far off the band the pointer is — a turn never making up for the second — and each arrangement names the rule it is read by. The axis a rule throws away is read once more as a yes or a no — inside the arrangement's box or not — so ignoring an axis does not mean answering a pointer that has walked away. It never strips a response it thinks is motion — the reduced-motion preference arrives in the measurements instead, because only the consumer knows what to put in movement's place. The effects themselves are under `ProximityEffects`; every control that takes a layout takes one of these too.",
             },
             {
                 name: "Rotator",
                 description:
                     "The spin both wheels share: given a number of steps and a function that answers with the one to land on, it turns, overshoots and settles back, and will turn on its own until it is spun. How many turns a spin takes and how far it is thrown off true are a function the consumer can replace; where the wedges are and what they look like are the wheel's, not this.",
-            },
-            {
-                name: "SVG",
-                children: [
-                    {
-                        name: "Defs",
-                        children: [
-                            {
-                                name: "SVGAnimations",
-                                description:
-                                    "The record behind a SMIL animation: a duration, and a list of patterns saying how many times each runs, how long it waits before starting, and which pattern comes next. A pattern naming itself as its own next step is unrolled into a pair that hand back and forth, because an animation pointing at itself has nothing to report an end to. It reports each iteration and the finish, so what happens next can be driven off the animation rather than off a timer beside it.",
-                            },
-                            {
-                                name: "SVGFilters",
-                                description:
-                                    "The builder behind every filter the library paints with: primitives are added one call at a time and the assembly decides what they see. Chained, each one is handed what the one before it produced; isolated, every one reads the original and the results are merged back over it. The region is the other half — a blur, a shadow or a displacement all reach outside the element's box, and the builder works out how far and reserves it.",
-                                component: () => <SVGFiltersPage />,
-                            },
-                            {
-                                name: "SVGGradients",
-                                children: [
-                                    {
-                                        name: "TimedGradients",
-                                        description:
-                                            "Linear and radial gradients written as a list of colors rather than as markup. A color may name the stop it sits at or leave it to be spread evenly between the ones that do, and asking for bands rather than a blend emits each stop twice so the colors meet at a hard edge. Angle, origin, scale and offset belong to the gradient rather than to the colors, so the same list can be turned or squashed without being rewritten. Every sample here is driven by a clock, so a duration and an iteration pattern are what they answer to.",
-                                        component: () => <TimedGradientsPage />,
-                                    },
-                                    {
-                                        name: "TrackedGradients",
-                                        description:
-                                            "The same gradients, driven by the pointer rather than by a clock. Each one reads the element it is painting and turns the pointer's position inside that box into an origin or an offset, so there is no duration to set and no iteration to choose — the highlight simply is wherever the pointer is, and travels off the surface when the pointer leaves. A key names the mark it draws, then the treatment applied to it, then how many of the shared colors it uses. Three marks: a band slides under the pointer, a spot is a pool centered on it, and a hand throws a wedge out towards it. The treatments are what happens next — a trail leaves the mark behind at every position it passed through and fades it where it lies, a smear stretches each of those along the way the pointer was going, a ripple expands them into rings, and a flare hangs a chain of ghosts off the mark on the axis through the center. A trailing c blends the colors continuously on a clock and freezes each mark at the color the source had when it was laid. The second example is four boxes rather than one, because each reads the pointer against its own box and only neighbors can show whether they agree.",
-                                        component: () => <TrackedGradientsPage />,
-                                    },
-                                ],
-                            },
-                            {
-                                name: "SVGPatterns",
-                                description:
-                                    "Places a number of cells inside one tile and repeats the tile, which is the whole of what turns a shape and a count into a tiling. Where a cell sits and what it draws are the consumer's two functions; the named tilings themselves — hexagons, triangles, lozenges — are sample code rather than library code, so what stays here is the placement and the repeat any tiling of one's own would be built on.",
-                                component: () => <SVGPatternsPage />,
-                            },
-                        ],
-                    },
-                ],
             },
             {
                 name: "Selection",
@@ -1003,6 +959,155 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
             },
         ],
     },
+    {
+        name: "Generators",
+        children: [
+            {
+                name: "CellAnimationBreakpoints",
+                description:
+                    "When each cell of a cell animation plays. A weight becomes a window of the shared timeline — heavy cells early, light ones late, or the other way round — and the smoothness decides how much of the timeline one window takes, from every cell being an instant to every cell moving together. The same window is where an easing curve is applied, so the curve bends each cell's own motion rather than the stagger. `ScanlineAnimation` times its lines with it too.",
+            },
+            {
+                name: "CellAnimationKeyframes",
+                description:
+                    "The per-cell animations written as keyframes rather than as code: a list of stops — at this point, these values — is turned into the function a cell animation asks for, with the interpolation done for you. A stop may also name the point a cell turns about and how far it is pushed towards the viewer, which are folded into ordinary transform values. Different parts of the grid can play different animations, by zone.",
+            },
+            {
+                name: "CellAnimationPlayback",
+                description:
+                    "Turns elapsed time into the position on a cell animation's timeline. A cell animation is handed a timeline from 0 to 1 and knows nothing about time; this runs it forwards or backwards, or out and back again with an optional hold at the turn, so a loop can rest at its end rather than snapping back to its start. It also says how long one loop takes, which is what a player needs to know when to start the next.",
+            },
+            {
+                name: "CellAnimationWeights",
+                description:
+                    "Where a cell's turn comes from. A weight is a number from 0 to 1 per cell, heavy cells going first, and these are what weights are made of: distances from the origin measured straight, in squares, in rings stretched to the grid's shape and along the diagonals; orderings by row, by column, by a scattering stride and along a Z-shaped curve; a seeded random order that holds still between renders; and three shapes built from those — a ripple, a radar sweep and a spiral. One call runs a weight function over the whole grid and can break ties or even out the spacing.",
+            },
+            {
+                name: "CellAnimationZones",
+                description:
+                    "Named parts of a cell animation's grid, for an animation that does different things in different places: a side of the origin, a quadrant, an axis, the origin itself, a parity of rows, columns, rings or checkered cells, or a half by weight. Everything is measured from the origin, so a zone moves with it. Every parity zone is the exact complement of its partner, so the two together take every cell exactly once.",
+            },
+            {
+                name: "PlacementLayouts",
+                description:
+                    "The arrangements the library ships — a ring, an arc, a row, a column, a honeycomb, a cliff, a whorl and a zigzag — as functions a consumer can tune or take as they are. Each turns an item count into one box per item, in the shares `Placement` describes, so they are examples of writing a layout rather than the only ones a control will accept. Two families are worth telling apart: a sized layout states the width it was drawn at, so a menu can grow its levels in the proportions the layout chose, and a fitted one has no size of its own and fills whatever room it is given. Every control that takes a layout shows them on its own page.",
+            },
+            {
+                name: "ProximityEffects",
+                description:
+                    "The pointer effects the library ships — a zoom that grows the nearest items and moves the rest aside, a glow and a fade — as functions a consumer can tune or take as they are. Each turns one item's measurements into CSS transform and filter values, which is the whole of what an effect is in `Proximity`. What is worth reading them for is how each answers the reduced-motion preference: the library never strips a response it thinks is motion, so the substitution belongs to whoever wrote the effect, and these are three worked answers. Every control that takes a layout takes one of these too.",
+            },
+            {
+                name: "SVGDefs",
+                children: [
+                    {
+                        name: "SVGAnimations",
+                        description:
+                            "The record behind a SMIL animation: a duration, and a list of patterns saying how many times each runs, how long it waits before starting, and which pattern comes next. A pattern naming itself as its own next step is unrolled into a pair that hand back and forth, because an animation pointing at itself has nothing to report an end to. It reports each iteration and the finish, so what happens next can be driven off the animation rather than off a timer beside it.",
+                    },
+                    {
+                        name: "SVGFilters",
+                        description:
+                            "The builder behind every filter the library paints with: primitives are added one call at a time and the assembly decides what they see. Chained, each one is handed what the one before it produced; isolated, every one reads the original and the results are merged back over it. The region is the other half — a blur, a shadow or a displacement all reach outside the element's box, and the builder works out how far and reserves it.",
+                        component: () => <SVGFiltersPage />,
+                    },
+                    {
+                        name: "SVGGradients",
+                        children: [
+                            {
+                                name: "SVGGradients",
+                                description:
+                                    "Linear and radial gradients written as a list of colors rather than as markup. A gradient can be described by an angle, the way CSS describes one, rather than by two endpoints; a color may name the stop it sits at or leave it to be spread evenly between the ones that do; and asking for bands rather than a blend emits each stop twice so the colors meet at a hard edge. Everything is read through accessors, so a gradient changes in place as its angle or its colors do. The two pages beside this one drive it, one on a clock and one from the pointer.",
+                            },
+                            {
+                                name: "TimedGradients",
+                                description:
+                                    "Linear and radial gradients written as a list of colors rather than as markup. A color may name the stop it sits at or leave it to be spread evenly between the ones that do, and asking for bands rather than a blend emits each stop twice so the colors meet at a hard edge. Angle, origin, scale and offset belong to the gradient rather than to the colors, so the same list can be turned or squashed without being rewritten. Every sample here is driven by a clock, so a duration and an iteration pattern are what they answer to.",
+                                component: () => <TimedGradientsPage />,
+                            },
+                            {
+                                name: "TrackedGradients",
+                                description:
+                                    "The same gradients, driven by the pointer rather than by a clock. Each one reads the element it is painting and turns the pointer's position inside that box into an origin or an offset, so there is no duration to set and no iteration to choose — the highlight simply is wherever the pointer is, and travels off the surface when the pointer leaves. A key names the mark it draws, then the treatment applied to it, then how many of the shared colors it uses. Three marks: a band slides under the pointer, a spot is a pool centered on it, and a hand throws a wedge out towards it. The treatments are what happens next — a trail leaves the mark behind at every position it passed through and fades it where it lies, a smear stretches each of those along the way the pointer was going, a ripple expands them into rings, and a flare hangs a chain of ghosts off the mark on the axis through the center. A trailing c blends the colors continuously on a clock and freezes each mark at the color the source had when it was laid. The second example is four boxes rather than one, because each reads the pointer against its own box and only neighbors can show whether they agree.",
+                                component: () => <TrackedGradientsPage />,
+                            },
+                        ],
+                    },
+                    {
+                        name: "SVGPatterns",
+                        description:
+                            "Places a number of cells inside one tile and repeats the tile, which is the whole of what turns a shape and a count into a tiling. Where a cell sits and what it draws are the consumer's two functions; the named tilings — hexagons, triangles, lozenges — are built on the same placement and repeat any tiling of one's own would be.",
+                        component: () => <SVGPatternsPage />,
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        name: "Primitives",
+        children: [
+            {
+                name: "Barrel",
+                description:
+                    "Faces set round a turning drum, and nothing that turns it. It is handed an angle and shows it: which faces sit where, which have turned away from the viewer and so leave the accessibility tree, and what each one is called when it is read out. A drum carousel and a drum wheel are each one of these with something moving the angle, and that something is what makes it a control — which is why a barrel has no use on its own.",
+            },
+            {
+                name: "BinarySwitch",
+                description:
+                    "The shared body of `Checkbox`, `Radio` and `Toggle`: a hidden native input under a control the consumer paints, told whether it is a checkbox or a radio and whether it announces itself as a switch. What it owns that the three must not each copy is how the input's ticked state is written — from state, in one place, and again straight after a change is reported — so a change the owner refuses never leaves the box showing ticked. It is not exported; only its types are, because the three controls' props are built from them.",
+            },
+            {
+                name: "Carousel",
+                description:
+                    "The shell both carousels are built on: stepping, wrapping, autoplay that can be stopped and held, the swipe and the keyboard, and the controls that step, pick a slide and stop the rotation. `TrackCarousel` lays the slides out in a strip and `DrumCarousel` sets them round a barrel; the geometry is the only thing that differs. It is not exported, since a consumer reaches for one of the two.",
+            },
+            {
+                name: "InteractionWrapper",
+                description:
+                    "What every pressable control in the library sits inside. It owns the events, focus, the tab order, the ARIA attributes and the tooltip, and paints nothing: the consumer draws the control and is handed its state — hovered, pressed, focused, disabled — to draw it against. A disabled control can be kept reachable by keyboard, so a reader still finds it, hears that it is disabled, and can read the tooltip saying why.",
+            },
+            {
+                name: "Mosaic",
+                description:
+                    "Tiles of different sizes packed together: one side is given and the other is worked out from what the tiles measure. Packing moves tiles out of the order they were given in, so it keeps the reading order separately, and a mosaic can be walked with the arrow keys as a single tab stop. `ElementMosaic` and `ImageMosaic` are what a consumer reaches for; this is the packing and the walk they share, and it is not exported.",
+            },
+            {
+                name: "PlacementBox",
+                description:
+                    "The box an arrangement is drawn in. It takes a layout — a function from how many items there are to a rectangle each — and holds what the items inside it need to read: where the pointer is, what nearness does to an item, and whether the reader has asked for less motion. It reports itself as nothing to assistive technology, because the shape arrives from outside and so do the items.",
+            },
+            {
+                name: "PlacementItem",
+                description:
+                    "One item inside a `PlacementBox`, placed as a share of the box rather than in pixels, so the whole arrangement scales with its container. When the layout changes it glides to its new place, and giving each item a longer wait than the one before is what staggers an arrangement.",
+            },
+            {
+                name: "Popover",
+                description:
+                    "The floating layer behind every dropdown, menu and picker panel. The consumer owns whether it is open and what it hangs off, and says which of three things it is standing in for — a listbox, a menu or a dialog — which decides what it is announced as. It keeps itself on screen against its anchor, closes when dismissed from outside and says whether that was a press elsewhere, focus leaving or Escape, and hands the fade to the consumer rather than applying it.",
+            },
+            {
+                name: "PopupTrigger",
+                description:
+                    "The button that opens a picker's popup, shared by `DatePicker`, `DateRangePicker` and `TimePicker`. It says that it opens a dialog, whether that dialog is showing and which element it is, and that last part is also what lets a press inside a popup drawn elsewhere on the page count as a press inside this control rather than outside it.",
+            },
+            {
+                name: "Spotlight",
+                description:
+                    "Lights one element and covers the rest: a hole cut in an overlay, moved rather than restarted when the element changes, with a sentence announced on each move so a reader who cannot see the hole is told what it is on. How insistent it is decides which of three it is — a hint goes away at the first key or press, a prompt keeps focus on the lit element, and a guide adds a popup beside it and keeps focus inside that. `SpotlightHint`, `SpotlightPrompt` and `SpotlightGuide` are what a consumer reaches for.",
+            },
+            {
+                name: "TextField",
+                description:
+                    "The shared body of `TextInput`, `TextArea`, `NumberInput`, `CurrencyInput`, `DateInput` and `TimeInput`, told whether it is a single-line input or a text area. It handles everything those have in common — the placeholder, whatever sits before and after the text, formatting as you type without the caret jumping, and the number a spin button announces holding. Only its types are exported.",
+            },
+            {
+                name: "Wheel",
+                description:
+                    "The shell both wheels are built on: wedges set round a turn, spun by `Rotator`, landing on one wedge and announcing it. `OverheadWheel` lays its wedges out flat and `DrumWheel` sets them round a barrel; that is the only difference. It is not exported.",
+            },
+        ],
+    },
 ];
 
 const flattenConfigs = (nodes: MenuNodeConfig[]): ComponentConfig[] =>
@@ -1062,6 +1167,8 @@ const listNames = (names: string[]) =>
 
 const listDependencyNames = (names: DependencyNames): DependencyNames => ({
     abstracts: listNames(names.abstracts),
+    generators: listNames(names.generators),
+    primitives: listNames(names.primitives),
     components: listNames(names.components),
 });
 
@@ -1079,10 +1186,12 @@ const DEPENDENCY_SECTIONS = [
 
 const DEPENDENCY_GROUPS = [
     { key: "abstracts" as const, label: "Abstracts", singular: "Abstract" },
+    { key: "generators" as const, label: "Generators", singular: "Generator" },
+    { key: "primitives" as const, label: "Primitives", singular: "Primitive" },
     { key: "components" as const, label: "Components", singular: "Component" },
 ];
 
-const EMPTY_DEPENDENCY_NAMES: DependencyNames = { abstracts: [], components: [] };
+const EMPTY_DEPENDENCY_NAMES: DependencyNames = { abstracts: [], generators: [], primitives: [], components: [] };
 
 const computeDependencySummary = (names: DependencyNames) =>
     DEPENDENCY_GROUPS.filter((group) => names[group.key].length > 0)
@@ -1118,7 +1227,7 @@ const PageDependencies = (props: { name: string }) => {
                     ];
 
                     return (
-                        <Show when={getSectionNames().abstracts.length || getSectionNames().components.length}>
+                        <Show when={DEPENDENCY_GROUPS.some((group) => getSectionNames()[group.key].length)}>
                             <span class={styles.dependencySectionLabel}>{getSection().label}</span>
 
                             <div class={styles.dependencyDisclosure}>
@@ -1322,7 +1431,10 @@ export function AppContent(props: RouteSectionProps) {
 
                                 <PageDependencies name={getConfig().name} />
 
-                                <PageViewTabs baseRoute={componentToRouteName(getConfig().name)} />
+                                <PageViewTabs
+                                    baseRoute={componentToRouteName(getConfig().name)}
+                                    hasSamples={getConfig().component !== undefined}
+                                />
                             </div>
 
                             {props.children}
@@ -1376,7 +1488,15 @@ export function App() {
                     <Route path="/" component={EmptyPage} />
                     {COMPONENT_CONFIGS.map((config) => (
                         <Route path={componentToRouteName(config.name)} component={PassThroughPage}>
-                            <Route path="/" component={config.component ?? EmptyPage} />
+                            <Route
+                                path="/"
+                                component={
+                                    config.component ??
+                                    (() => (
+                                        <Navigate href={toPageViewRoute(componentToRouteName(config.name), "docs")} />
+                                    ))
+                                }
+                            />
                             <Route path="/docs" component={() => <PageDocsView description={config.description} />} />
                             <Route path="/api" component={() => <PageApiView name={config.name} />} />
                         </Route>

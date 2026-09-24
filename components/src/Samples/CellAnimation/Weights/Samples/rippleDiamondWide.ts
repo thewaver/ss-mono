@@ -1,5 +1,5 @@
-import type { RippleDefs, WeightFn } from "../CellAnimationWeights.types";
-import { CellAnimationWeightUtils } from "../CellAnimationWeights.utils";
+import type { RippleDefs, WeightFn } from "../../../../Generators/CellAnimationWeights/CellAnimationWeights.types";
+import { CellAnimationWeightUtils } from "../../../../Generators/CellAnimationWeights/CellAnimationWeights.utils";
 
 const RIPPLE_PERIOD_CELLS = 8;
 const STANDING_RIPPLE = 0;

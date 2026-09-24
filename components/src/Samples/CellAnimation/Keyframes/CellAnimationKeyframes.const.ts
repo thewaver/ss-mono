@@ -4,9 +4,12 @@ import type {
     CellAnimationEvaluationDefs,
     CellAnimationEvaluationResult,
 } from "../../../Exotics/CellAnimation/CellAnimation.types";
-import { CellAnimationBreakpoints } from "../Breakpoints/CellAnimationBreakpoints.const";
-import type { CellAnimationFn } from "./CellAnimationKeyframes.types";
-import { CellAnimationKeyframeUtils } from "./CellAnimationKeyframes.utils";
+import type {
+    CellAnimationBreakpointTriple,
+    CellAnimationEasing,
+} from "../../../Generators/CellAnimationBreakpoints/CellAnimationBreakpoints.types";
+import type { CellAnimationFn } from "../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.types";
+import { CellAnimationKeyframeUtils } from "../../../Generators/CellAnimationKeyframes/CellAnimationKeyframes.utils";
 import { blurDefault } from "./Samples/blurDefault";
 import { bounceDefault } from "./Samples/bounceDefault";
 import { carouselBottom } from "./Samples/carouselBottom";
@@ -366,10 +369,10 @@ export namespace CellAnimationKeyframes {
 
     export const computeAnimation = (
         type: AnimationType,
-        breakpoints: CellAnimationBreakpoints.BreakpointTupleTriple,
+        breakpoints: CellAnimationBreakpointTriple,
         defs: CellAnimationEvaluationDefs & { origin: Index2d },
         timeline: number,
-        easing?: CellAnimationBreakpoints.Easing,
+        easing?: CellAnimationEasing,
     ): CellAnimationEvaluationResult =>
         CellAnimationKeyframeUtils.computeAnimation(SAMPLE_ANIMATIONS[type], breakpoints, defs, timeline, easing);
 }

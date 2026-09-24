@@ -1,10 +1,10 @@
 import { MathUtils } from "@thewaver/ss-utils";
 
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
-import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
+import { SVGGradientDefsUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefs.utils";
 import type { GradientFlareOpts, SVGDefsColors, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
-import { TrackedGradientKnobs } from "../TrackedGradient.knobs";
+import { TrackedGradientDefaults } from "../TrackedGradient.const";
 
 type FlareGhost = {
     reach: number;
@@ -29,7 +29,7 @@ const DISC_ALPHA_RATIOS = [1, 0.3];
 const RING_STOPS = [55, 82, 92];
 const RING_ALPHA_RATIOS = [0.12, 1, 0.2];
 
-const DEFAULTS = TrackedGradientKnobs.SPOT_FLARE_DEFAULTS;
+const DEFAULTS = TrackedGradientDefaults.SPOT_FLARE_DEFAULTS;
 
 const NO_REF = () => undefined;
 

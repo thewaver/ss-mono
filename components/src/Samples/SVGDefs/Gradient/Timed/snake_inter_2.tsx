@@ -2,11 +2,11 @@ import { Show } from "solid-js";
 
 import { MathUtils, ObjectUtils } from "@thewaver/ss-utils";
 
-import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
+import { SVGGradientDefsUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefs.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { GradientCycleStepsOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
-import { TimedGradientKnobs } from "../TimedGradient.knobs";
+import { TimedGradientDefaults } from "../TimedGradient.const";
 
 export const snake_inter_2 = (opts?: GradientCycleStepsOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
@@ -32,42 +32,42 @@ export const snake_inter_2 = (opts?: GradientCycleStepsOpts): TimedGradientConfi
                                     ...MathUtils.getIntermediateValues(
                                         90,
                                         90,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         90,
                                         90,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         90,
                                         180,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         180,
                                         270,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         270,
                                         360,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         360,
                                         450,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         450,
                                         450,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         450,
                                         450,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                 ],
                                 defs,
@@ -100,42 +100,42 @@ export const snake_inter_2 = (opts?: GradientCycleStepsOpts): TimedGradientConfi
                                     ...MathUtils.getIntermediateValues(
                                         90,
                                         90,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         90,
                                         90,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         90,
                                         180,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         180,
                                         270,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         270,
                                         360,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         360,
                                         450,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         450,
                                         450,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         450,
                                         450,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                 ],
                                 [180],
@@ -165,42 +165,42 @@ export const snake_inter_2 = (opts?: GradientCycleStepsOpts): TimedGradientConfi
                                     ...MathUtils.getIntermediateValues(
                                         90,
                                         180,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         180,
                                         270,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         270,
                                         270,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         270,
                                         270,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         270,
                                         270,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         270,
                                         270,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         270,
                                         360,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         360,
                                         450,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                 ],
                                 defs,
@@ -233,42 +233,42 @@ export const snake_inter_2 = (opts?: GradientCycleStepsOpts): TimedGradientConfi
                                     ...MathUtils.getIntermediateValues(
                                         90,
                                         180,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         180,
                                         270,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         270,
                                         270,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         270,
                                         270,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         270,
                                         270,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         270,
                                         270,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         270,
                                         360,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         360,
                                         450,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                 ],
                                 [180],

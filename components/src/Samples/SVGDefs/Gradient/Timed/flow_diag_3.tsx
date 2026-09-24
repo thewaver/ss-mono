@@ -2,7 +2,7 @@ import { Show } from "solid-js";
 
 import { AngleUtils } from "@thewaver/ss-utils";
 
-import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
+import { SVGGradientDefsUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefs.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { CycleColorKey, GradientBandedCycleOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";

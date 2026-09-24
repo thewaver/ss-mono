@@ -1,18 +1,21 @@
 import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import type { PlacementLayoutEntry, ProximityEffectEntry, SampleKnob } from "@thewaver/ss-components";
 import {
     FORMATION_DEFAULTS,
-    PlacementLayoutKnobs,
+    PlacementLayoutDefaults,
     PlacementLayouts,
-    ProximityEffectKnobs,
+    ProximityEffectDefaults,
     ProximityEffects,
 } from "@thewaver/ss-components";
+import type { PlacementLayoutEntry, ProximityEffectEntry } from "@thewaver/ss-components";
 import { ShapeConst } from "@thewaver/ss-utils";
 
+import { PlacementLayoutKnobs } from "../../Knobs/PlacementLayouts.const";
+import { ProximityEffectKnobs } from "../../Knobs/ProximityEffects.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
+import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -80,8 +83,8 @@ export const FormationPage = () => {
     const [effectDefs, setEffectDefs] = createStore<Record<string, Record<string, number | boolean>>>({});
 
     const getFamily = () => PlacementLayouts.SAMPLE_LAYOUTS[getLayoutKey()].family;
-    const getKnobs = () => PlacementLayoutKnobs.KNOBS_BY_FAMILY[getFamily()] as Record<string, SampleKnob>;
-    const getDefaults = () => PlacementLayoutKnobs.DEFAULTS_BY_FAMILY[getFamily()] as Record<string, unknown>;
+    const getKnobs = () => PlacementLayoutKnobs.KNOBS_BY_FAMILY[getFamily()] as Record<string, Knob>;
+    const getDefaults = () => PlacementLayoutDefaults.DEFAULTS_BY_FAMILY[getFamily()] as Record<string, unknown>;
     const getDefs = () => layoutDefs[getLayoutKey()] ?? {};
 
     const getLayoutEntry = createMemo(
@@ -97,13 +100,16 @@ export const FormationPage = () => {
     const getEffectKnobs = () => {
         const family = getEffectFamily();
 
-        return (family === undefined ? {} : ProximityEffectKnobs.KNOBS_BY_FAMILY[family]) as Record<string, SampleKnob>;
+        return (family === undefined ? {} : ProximityEffectKnobs.KNOBS_BY_FAMILY[family]) as Record<string, Knob>;
     };
 
     const getEffectDefaults = () => {
         const family = getEffectFamily();
 
-        return (family === undefined ? {} : ProximityEffectKnobs.DEFAULTS_BY_FAMILY[family]) as Record<string, unknown>;
+        return (family === undefined ? {} : ProximityEffectDefaults.DEFAULTS_BY_FAMILY[family]) as Record<
+            string,
+            unknown
+        >;
     };
 
     const getPickedEffectDefs = () => effectDefs[getEffectKey()] ?? {};

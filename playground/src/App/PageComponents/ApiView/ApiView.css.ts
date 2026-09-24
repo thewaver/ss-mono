@@ -5,8 +5,40 @@ import { themeVars } from "../../Theme.css";
 export const apiView = style({
     display: "flex",
     flexDirection: "column",
-    gap: themeVars.spacing.double,
+    gap: themeVars.spacing.quad,
     width: "100%",
+});
+
+export const apiGroup = style({
+    display: "flex",
+    flexDirection: "column",
+    gap: themeVars.spacing.double,
+});
+
+export const apiGroupTitle = style({
+    margin: 0,
+    fontSize: themeVars.fontSize.medium,
+    fontWeight: "bold",
+});
+
+export const apiSection = style({
+    display: "flex",
+    flexDirection: "column",
+    gap: themeVars.spacing.full,
+});
+
+export const apiTableTitle = style({
+    margin: 0,
+    fontFamily: "monospace",
+    fontSize: themeVars.fontSize.small,
+    fontWeight: "bold",
+});
+
+export const apiDescription = style({
+    margin: 0,
+    maxWidth: 900,
+    fontSize: themeVars.fontSize.small,
+    lineHeight: 1.6,
 });
 
 export const apiEmpty = style({

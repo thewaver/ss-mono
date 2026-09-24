@@ -1,4 +1,4 @@
-import type { ProximityEffectEntry } from "./ProximityEffects.types";
+import type { ProximityEffectEntry } from "../../../Generators/ProximityEffects/ProximityEffects.types";
 
 export namespace ProximityEffects {
     export const SAMPLE_EFFECTS = {

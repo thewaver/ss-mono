@@ -4,8 +4,8 @@ import { Dynamic } from "solid-js/web";
 import { ShapeConst, Size2d, StringUtils } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-import type { SVGDefs } from "../../Abstracts/SVG/Defs/SVGDefs.types";
 import { Shape } from "../../Exotics/Shape/Shape";
+import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
 import { access } from "../../Utils/propUtils";
 import type { SurfaceProps } from "./Surface.types";
 

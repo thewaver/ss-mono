@@ -1,11 +1,12 @@
 import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import type { SampleKnob } from "@thewaver/ss-components";
-import { SVGDefsSamples, TimedGradientKnobs } from "@thewaver/ss-components";
+import { SVGDefsSamples, TimedGradientDefaults } from "@thewaver/ss-components";
 
+import { TimedGradientKnobs } from "../../../Knobs/TimedGradients.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../../PageComponents/Knobs/Knobs";
+import type { Knob } from "../../../PageComponents/Knobs/Knobs.types";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { NO_SAMPLE_KEY, toGroupEntriesWithNoSample } from "../../../PageComponents/SampleGroups/SampleGroups.const";
@@ -29,12 +30,12 @@ export const TimedGradientsPage = () => {
     const getKnobs = () => {
         const key = getConfigKey();
 
-        return key === NO_SAMPLE_KEY ? {} : (TimedGradientKnobs.KNOBS_BY_FAMILY[key] as Record<string, SampleKnob>);
+        return key === NO_SAMPLE_KEY ? {} : (TimedGradientKnobs.KNOBS_BY_FAMILY[key] as Record<string, Knob>);
     };
     const getDefaults = () => {
         const key = getConfigKey();
 
-        return key === NO_SAMPLE_KEY ? {} : (TimedGradientKnobs.DEFAULTS_BY_FAMILY[key] as Record<string, unknown>);
+        return key === NO_SAMPLE_KEY ? {} : (TimedGradientDefaults.DEFAULTS_BY_FAMILY[key] as Record<string, unknown>);
     };
     const getConfigDefs = () => configDefs[getConfigKey()] ?? {};
     const [getIterationConfigKey, setIterationConfigKey] = createSignal<SVGDefsSamples.Iteration.SampleKey>("constant");

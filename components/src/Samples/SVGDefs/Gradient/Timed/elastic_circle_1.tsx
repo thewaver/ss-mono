@@ -1,10 +1,10 @@
 import { MathUtils, ObjectUtils } from "@thewaver/ss-utils";
 
-import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
+import { SVGGradientDefsUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefs.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { GradientCycleOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
-import { TimedGradientKnobs } from "../TimedGradient.knobs";
+import { TimedGradientDefaults } from "../TimedGradient.const";
 
 export const elastic_circle_1 = (opts?: GradientCycleOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => [
@@ -45,12 +45,28 @@ export const elastic_circle_1 = (opts?: GradientCycleOpts): TimedGradientConfig 
                             ObjectUtils.zipArray(
                                 "stretch",
                                 [
-                                    ...MathUtils.getIntermediateValues(90, 90, TimedGradientKnobs.STEPS_DEFAULT.steps),
-                                    ...MathUtils.getIntermediateValues(90, 450, TimedGradientKnobs.STEPS_DEFAULT.steps),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        90,
+                                        TimedGradientDefaults.STEPS_DEFAULT.steps,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        90,
+                                        450,
+                                        TimedGradientDefaults.STEPS_DEFAULT.steps,
+                                    ),
                                 ],
                                 [
-                                    ...MathUtils.getIntermediateValues(0, 360, TimedGradientKnobs.STEPS_DEFAULT.steps),
-                                    ...MathUtils.getIntermediateValues(360, 0, TimedGradientKnobs.STEPS_DEFAULT.steps),
+                                    ...MathUtils.getIntermediateValues(
+                                        0,
+                                        360,
+                                        TimedGradientDefaults.STEPS_DEFAULT.steps,
+                                    ),
+                                    ...MathUtils.getIntermediateValues(
+                                        360,
+                                        0,
+                                        TimedGradientDefaults.STEPS_DEFAULT.steps,
+                                    ),
                                 ],
                             ),
                             defs,

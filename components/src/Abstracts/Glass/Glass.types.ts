@@ -1,4 +1,7 @@
-import type { SVGLinearGradientDefs, SVGRadialGradientDefs } from "../SVG/Defs/Gradient/SVGGradientDefs.types";
+import type {
+    SVGLinearGradientDefs,
+    SVGRadialGradientDefs,
+} from "../../Generators/SVGDefs/SVGGradients/SVGGradientDefs.types";
 
 export type GlassNoiseDefs = {
     frequency: number;

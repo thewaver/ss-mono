@@ -1,14 +1,14 @@
 import { createEffect, createMemo, createSignal } from "solid-js";
 
-import { CellAnimationBreakpoints, CellAnimationWeights, ScanlineAnimation, access } from "@thewaver/ss-components";
-import type { AccessorProps } from "@thewaver/ss-components";
+import { CellAnimationWeights, ScanlineAnimation, access } from "@thewaver/ss-components";
+import type { AccessorProps, CellAnimationBreakpointTriple } from "@thewaver/ss-components";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
 
 const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
 const getGlitchBreakpointGroups = (count: number, start: number, end: number) => {
-    const result: CellAnimationBreakpoints.BreakpointTupleTriple[] = [];
+    const result: CellAnimationBreakpointTriple[] = [];
     const range = end - start;
     const segmentWidth = range / count;
 

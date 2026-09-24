@@ -541,18 +541,22 @@ one of those tables, so do that before documenting any of them individually.
 
 **Sample data is exempt and sample implementation is not, which is a line about the file rather than the
 folder.** The user's rule. A registry, a table of keyframes and a set of knobs are descriptions, carry no
-comments like every other non-utils file, and are read by looking at them. A factory that computes something —
-the layout families, the pointer effects — is utility that happens to live under `Samples`, and a consumer
-calls it without reading the body, so it is documented like any other. **That the two sit in one folder is
-the thing to fix rather than the rule to bend**; see `backlog.md`'s _Open discussion_.
+comments like every other non-utils file, and are read by looking at them. A factory that computes something is utility,
+and a consumer calls it without reading the body, so it is documented like any other. **That the two once sat
+in one folder was the thing to fix rather than the rule to bend**: the layout families, the pointer effects and
+the SVG defs builders now live in `Generators/`, and what computes and remains in `Samples/` is the helpers only
+the samples use, which the same rule covers.
 
-**A `.knobs.ts` owns a tunable whole — its range, its step, its label, its explanation and its default.** A
-default is part of describing a knob, and splitting the two leaves anything driving the sample reading a range
-from one file and the value it starts at from another. The `hint` is there for the same reason and is required:
-a sentence saying what the knob does belongs with the knob, not with each harness that renders it, or it gets
-written once per consumer and the copies drift. So a `.utils.ts` never exports a defaults object; it holds whatever
-local constants it needs and reads the published ones from the knobs beside it. The gradient samples were
-already this way and the placement ones were not.
+**The library holds a tunable's default and nothing else; its range, step, label and hint belong to the demo
+app.** The user's rule, reversing an earlier one that kept all five together in a `.knobs.ts` beside the thing
+they tune. A consumer of the package needs the value a tunable starts at and never a slider's minimum, so shipping
+the rest put the Playground's vocabulary into the library's surface. **Defaults go in the subject's `.const.ts`**
+— a component's as one `<COMPONENT>_DEFAULTS` object, a subject with several sets as a `<Subject>Defaults`
+namespace of them — and a `.utils.ts` reads them from there rather than exporting a defaults object of its own.
+**The knob descriptions are `.const.ts` files in the demo app too**, never a file kind of their own, and the
+`hint` is still required: a sentence saying what a knob does belongs with the knob, not with each panel that
+renders it. What the old rule guarded against still holds, because a knob starts at the default read from the
+library rather than at a copy of it, so the number is stated once.
 
 **A type lives in `<Subject>.types.ts`, never in the module that uses it.** `TextSync` declared three types in
 its utils file and `LiveAnnouncer` one, so a consumer wanting only the type pulled the whole implementation
@@ -560,6 +564,14 @@ in. The one file exempt is `Utils/typeUtils.ts`, which is a home for type transf
 implementation to separate from. Where the type is a companion to a value in a `.const.ts` — `NO_SAMPLE_KEY`
 and `WithNoSample` — the type file owns the literal and the const file annotates against it, so the
 dependency runs one way.
+
+**A small thing used only where it is declared stays there; a reusable one goes to `.utils.ts` or `.types.ts`.**
+The user's rule, given as a matter of judgement rather than a test. A lookup that only reads its own registry,
+a `SampleKey` derived from the table beside it, a helper that exists for the entries in its file — these stay
+in the `.const.ts` they serve. A function that takes its inputs as arguments and would work for a caller with
+other data is a utility, and a type describing what such a function or a sample takes is a type, so both go
+to the file kinds named for them. **Reusable is judged by what the thing is, not by who calls it today**, since
+nearly everything in a registry has some caller outside its file.
 
 **Four kinds of file are outside the rule.** A `.const.ts` holds a registry and keeps the subject's plain
 name — every `Samples` registry is one, and so are `SVGDefsSamples`, `StaircaseIndents` and

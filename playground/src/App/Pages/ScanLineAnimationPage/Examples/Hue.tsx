@@ -1,11 +1,11 @@
 import {
-    CellAnimationBreakpoints,
+    CellAnimationBreakpointUtils,
     CellAnimationWeights,
     ScanlineAnimation,
     ScanlineAnimationKeyframes,
     access,
 } from "@thewaver/ss-components";
-import type { AccessorProps } from "@thewaver/ss-components";
+import type { AccessorProps, CellAnimationBreakpointOpts, ScanlineHorizontalHueOpts } from "@thewaver/ss-components";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
 
@@ -13,8 +13,8 @@ const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
 type Props = ScanlineAnimationExampleProps &
     AccessorProps<{
-        breakpointOpts: CellAnimationBreakpoints.BreakpointOpts;
-        keyframeOpts: ScanlineAnimationKeyframes.HorizontalHueOpts;
+        breakpointOpts: CellAnimationBreakpointOpts;
+        keyframeOpts: ScanlineHorizontalHueOpts;
     }>;
 
 export const HueExample = ({ keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props) => {
@@ -26,7 +26,7 @@ export const HueExample = ({ keyframeOpts, breakpointOpts, weightType, ...otherP
             }
             computeScanlineAnimation={(defs, timeline) =>
                 ScanlineAnimationKeyframes.computeHorizontalHue(
-                    CellAnimationBreakpoints.computeBreakpoints(defs.weight, access(breakpointOpts)),
+                    CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, access(breakpointOpts)),
                     defs,
                     timeline,
                     access(keyframeOpts),

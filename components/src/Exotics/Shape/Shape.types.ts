@@ -2,7 +2,7 @@ import type { JSX } from "solid-js";
 
 import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
-import type { SVGDefs } from "../../Abstracts/SVG/Defs/SVGDefs.types";
+import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
 import type { AccessorProps } from "../../Utils/typeUtils";
 
 export type ShapeStrokeGeom = {

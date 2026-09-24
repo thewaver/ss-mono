@@ -1151,9 +1151,9 @@ is what turned up the origin-placed item it scored as pointing due east.
 closed.** The page should stop being a gallery of entries and become a single example with knobs that follow
 the effect picked — one image, a picker, and the panel changing under it.
 
-**The knob half is already built.** Each effect describes its own knobs in
-`ScanlineAnimationKeyframes.knobs.ts`, the page renders them through the generic panel, and the ranges and
-defaults live with the effect rather than in the page. What is left is the twelve example boxes.
+**The knob half is already built.** Each effect's knobs are described in the Playground's
+`Knobs/ScanlineAnimationKeyframes.const.ts`, the page renders them through the generic panel, and none of it is
+written in the page itself. What is left is the twelve example boxes.
 
 **Eleven of the twelve differ only by which compute function and which knobs**, so eleven boxes are showing
 the same example over and over with a different function passed in. `Glitch` is the exception and would stay
@@ -1397,19 +1397,6 @@ pointer leaves the window or goes out of range glide too. Smoothing a shared rea
 
 Nothing has been argued yet about the tracker's shape: what it hands out, how an effect accepts one, or how a
 source that is not the pointer plugs into it.
-
-### `Samples` holds two kinds of file, and only one of them is a sample
-
-Raised by the user while correcting a documentation sweep. A registry, a knob set and a table of keyframes
-are descriptions: a reader looks at them and that is the whole of it. The layout families and the pointer
-effects are not descriptions — they are factories that compute something, called by consumers who never read
-the body, which is to say they are utility that happens to live under `Samples`.
-
-The immediate consequence was a rule that reads as an exception: sample files carry no comments, except the
-ones that are secretly utility, which do. The deeper question the user put is whether the implementation
-should leave `Samples` entirely, so that what is left is purely structural and descriptive and the rule needs
-no clause. Nothing has been argued about where it would go, or whether the split would leave a sample's
-factory further from the sample it is for than is useful.
 
 ### A tracked sample that rewards holding still
 

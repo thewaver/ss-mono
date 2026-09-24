@@ -2,11 +2,11 @@ import type { Signal } from "solid-js";
 
 import type {
     AccessorProps,
-    CellAnimationBreakpoints,
+    CellAnimationBreakpointOpts,
     CellAnimationFinalFrame,
     CellAnimationKeyframes,
     CellAnimationOrigins,
-    CellAnimationPlayback,
+    CellAnimationPlaybackOpts,
     CellAnimationWeights,
     WeightOpts,
 } from "@thewaver/ss-components";
@@ -17,8 +17,8 @@ export type CellAnimationExampleProps = AccessorProps<{
     originType: CellAnimationOrigins.OriginType;
     weightType: CellAnimationWeights.WeightType;
     weightOpts: WeightOpts;
-    breakpointOpts: CellAnimationBreakpoints.BreakpointOpts;
-    playbackOpts: CellAnimationPlayback.PlaybackOpts;
+    breakpointOpts: CellAnimationBreakpointOpts;
+    playbackOpts: CellAnimationPlaybackOpts;
     animationType: CellAnimationKeyframes.AnimationType;
     animationDurationMs: number;
     animationIterationCount: number;

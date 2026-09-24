@@ -139,6 +139,12 @@ item competes with three others and none land. When several decisions genuinely 
 pending and present only the first. This governs the reply, not the work — still do the whole task, and
 still write the full reasoning into `conventions.md`, `decisions.md` and `backlog.md`, where length is wanted.
 
+**Settle every pending decision before doing any of the work.** Stated by the user, after an answer to the
+first of two open questions was taken as licence to start moving files while the second was still unasked:
+_"we settle work decisions, then sweep"_. So when a task carries several open decisions, ask them one at a
+time, and do not touch the code until the last one is answered — an answer to one question is not a go-ahead
+while another is still open. The sweep then happens once, with every decision in hand.
+
 **When asked what work is outstanding, answer in their recorded order, not by size.** `backlog.md` carries the
 ordering already: item 8 says in its own text not to list it, and item 5's **_Bottom of the list_** section
 holds `Table` / data grid and the command palette, placed last by the user after each was argued. Both were
@@ -342,11 +348,11 @@ where they add something the prose has not already said. `{@link}` neighboring e
 restating them.
 
 Two limits on it. **`Samples/` is excluded where it holds sample data** — a registry, a table, a set of
-knobs — and **is not excluded where it holds implementation**. The user's correction: the layout families and
-the pointer effects are utility that happens to sit under `Samples`, and a consumer calls a factory without
-reading its body. So a `.utils.ts` is documented wherever it lives, and a `.knobs.ts` or `.const.ts` carries
-no comments wherever it lives. And **it is `*.utils.ts` and `Utils/` only**: component files, `.css.ts`,
-`.types.ts`, `.const.ts` and `.knobs.ts` are still stripped, and an inline `//` note inside a utility's body
+knobs — and **is not excluded where it holds implementation**. The user's correction: a factory is utility
+wherever it sits, and a consumer calls it without reading its body. The layout families, the pointer effects
+and the SVG defs builders have since moved to `Generators/`, where the same rule applies. So a `.utils.ts` is documented wherever it lives, and a `.const.ts` carries no comments
+wherever it lives. And **it is `*.utils.ts` and `Utils/` only**: component files, `.css.ts`,
+`.types.ts` and `.const.ts` are still stripped, and an inline `//` note inside a utility's body
 is still a defect. The documentation sits above declarations, never inside them.
 
 The rule also lives in `conventions.md` now, which is where it should always have been — it was written only
@@ -363,7 +369,7 @@ the contract — one file kind further, so write these in that style: what the p
 edges, and what the caller is spared. **The scope is members of the exported `*Props` types**, and a type that
 feeds one is documented for the same reason it is shown, which is how `ExternalInteractionFlags` comes to
 carry blocks. **Nothing else in a `.types.ts` changes**, and the ban is untouched everywhere else: component
-files, `.css.ts`, `.const.ts`, `.knobs.ts` and every file in `playground/src` — its `*.utils.ts` included, which
+files, `.css.ts`, `.const.ts` and every file in `playground/src` — its `*.utils.ts` included, which
 has never carried documentation and does not start now.
 
 **`e2e/` is the only exception in this repo** — explanatory blocks are welcome there, and the existing specs

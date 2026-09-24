@@ -1,14 +1,14 @@
 import type { Size2d } from "@thewaver/ss-utils";
 
 import { PointerTrackerUtils } from "../../../../Abstracts/PointerTracker/PointerTracker.utils";
-import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
+import { SVGGradientDefsUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefs.utils";
 import type { GradientBandOpts, TrackedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
-import { TrackedGradientKnobs } from "../TrackedGradient.knobs";
+import { TrackedGradientDefaults } from "../TrackedGradient.const";
 
 const BAND_SPAN: Size2d = { width: 0.7, height: 0.7 };
 
-const DEFAULTS = TrackedGradientKnobs.BAND_BLEND_DEFAULTS;
+const DEFAULTS = TrackedGradientDefaults.BAND_BLEND_DEFAULTS;
 
 const NO_REF = () => undefined;
 

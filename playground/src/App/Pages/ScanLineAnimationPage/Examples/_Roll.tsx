@@ -1,11 +1,11 @@
 import {
-    CellAnimationBreakpoints,
+    CellAnimationBreakpointUtils,
     CellAnimationWeights,
     ScanlineAnimation,
     ScanlineAnimationKeyframes,
     access,
 } from "@thewaver/ss-components";
-import type { AccessorProps } from "@thewaver/ss-components";
+import type { AccessorProps, CellAnimationBreakpointOpts, _ScanlineHorizontalRollOpts } from "@thewaver/ss-components";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
 
@@ -13,8 +13,8 @@ const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
 type Props = ScanlineAnimationExampleProps &
     AccessorProps<{
-        breakpointOpts: CellAnimationBreakpoints.BreakpointOpts;
-        keyframeOpts: ScanlineAnimationKeyframes._HorizontalRollOpts;
+        breakpointOpts: CellAnimationBreakpointOpts;
+        keyframeOpts: _ScanlineHorizontalRollOpts;
     }>;
 
 export const RollExample = ({ keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props) => {
@@ -26,7 +26,7 @@ export const RollExample = ({ keyframeOpts, breakpointOpts, weightType, ...other
             }
             computeScanlineAnimation={(defs, timeline) =>
                 ScanlineAnimationKeyframes._computeHorizontalRoll(
-                    CellAnimationBreakpoints.computeBreakpoints(defs.weight, access(breakpointOpts)),
+                    CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, access(breakpointOpts)),
                     defs,
                     timeline,
                     access(keyframeOpts),

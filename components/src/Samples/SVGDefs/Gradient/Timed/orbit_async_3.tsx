@@ -1,10 +1,10 @@
 import { MathUtils } from "@thewaver/ss-utils";
 
-import { SVGGradientDefsUtils } from "../../../../Abstracts/SVG/Defs/Gradient/SVGGradientDefs.utils";
+import { SVGGradientDefsUtils } from "../../../../Generators/SVGDefs/SVGGradients/SVGGradientDefs.utils";
 import { SVGAnimations } from "../../SVGAnimations.const";
 import type { GradientStepsOpts, TimedGradientConfig } from "../../SVGDefs.types";
 import { SVGDefsUtils } from "../../SVGDefs.utils";
-import { TimedGradientKnobs } from "../TimedGradient.knobs";
+import { TimedGradientDefaults } from "../TimedGradient.const";
 
 export const orbit_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => ({
     computeSVGDefs: (id, __, ___, defs) => {
@@ -32,7 +32,7 @@ export const orbit_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                                 MathUtils.getIntermediateValues(
                                     0,
                                     360,
-                                    opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                    opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                 ),
                                 defs,
                             ),
@@ -59,12 +59,12 @@ export const orbit_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                                     ...MathUtils.getIntermediateValues(
                                         0,
                                         360,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         0,
                                         360,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                 ],
                                 defs,
@@ -92,17 +92,17 @@ export const orbit_async_3 = (opts?: GradientStepsOpts): TimedGradientConfig => 
                                     ...MathUtils.getIntermediateValues(
                                         0,
                                         360,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         0,
                                         360,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                     ...MathUtils.getIntermediateValues(
                                         0,
                                         360,
-                                        opts?.steps ?? TimedGradientKnobs.STEPS_DEFAULT.steps,
+                                        opts?.steps ?? TimedGradientDefaults.STEPS_DEFAULT.steps,
                                     ),
                                 ],
                                 defs,

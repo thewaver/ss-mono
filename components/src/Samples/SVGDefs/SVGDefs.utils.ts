@@ -1,9 +1,12 @@
+import { createSignal, onCleanup } from "solid-js";
+
 import { Color, MathUtils, type Point2d, RandomUtils, type Size2d } from "@thewaver/ss-utils";
 
 import type { PointerReading } from "../../Abstracts/PointerTracker/PointerTracker.types";
-import { SVGFilterDefsFactory } from "../../Abstracts/SVG/Defs/Filter/SVGFilterDefs.factory";
+import { SVGFilterDefsFactory } from "../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.factory";
 import type { CycleColorKey, SVGDefsColors } from "./SVGDefs.types";
 
+const NO_CONSUMERS = 0;
 const TRANSPARENT_ALPHA = 0;
 const FULL_STOP = 100;
 const POINTER_FADE_START_RATIO = 1;
@@ -149,5 +152,57 @@ export namespace SVGDefsUtils {
         }
 
         return values;
+    };
+
+    /**
+     * A frame clock shared by every sample that animates off the pointer rather than off a SMIL timeline.
+     *
+     * It runs only while somebody needs it: each consumer registers with `subscribe`, which undoes itself when
+     * that consumer is cleaned up, and each pointer movement calls `keepAwake`. With nobody subscribed, or once
+     * the grace period has passed since the last wake, the clock stops asking for frames — so a trail that has
+     * finished fading costs nothing, and the next movement starts it again.
+     *
+     * @param graceMs How long the clock keeps running after the last wake, long enough for whatever was left
+     * behind to finish fading.
+     * @returns The current frame time as a signal, and the `keepAwake` and `subscribe` calls.
+     */
+    export const createClock = (graceMs: number) => {
+        const [getFrameMs, setFrameMs] = createSignal(performance.now());
+
+        let frameId: ReturnType<typeof requestAnimationFrame> | undefined;
+        let lastWakeMs = 0;
+        let consumerCount = NO_CONSUMERS;
+
+        const advance = () => {
+            const nowMs = performance.now();
+
+            setFrameMs(nowMs);
+
+            if (consumerCount === NO_CONSUMERS || nowMs - lastWakeMs > graceMs) {
+                frameId = undefined;
+
+                return;
+            }
+
+            frameId = requestAnimationFrame(advance);
+        };
+
+        return {
+            getFrameMs,
+            keepAwake: () => {
+                lastWakeMs = performance.now();
+
+                if (frameId !== undefined) return;
+
+                frameId = requestAnimationFrame(advance);
+            },
+            subscribe: () => {
+                consumerCount += 1;
+
+                onCleanup(() => {
+                    consumerCount -= 1;
+                });
+            },
+        };
     };
 }

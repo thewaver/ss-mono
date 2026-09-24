@@ -1,5 +1,5 @@
-import type { SweepDefs, WeightFn } from "../CellAnimationWeights.types";
-import { CellAnimationWeightUtils } from "../CellAnimationWeights.utils";
+import type { SweepDefs, WeightFn } from "../../../../Generators/CellAnimationWeights/CellAnimationWeights.types";
+import { CellAnimationWeightUtils } from "../../../../Generators/CellAnimationWeights/CellAnimationWeights.utils";
 
 const SWEEP_DEFS: SweepDefs = {
     quadrantsPerSection: 4,

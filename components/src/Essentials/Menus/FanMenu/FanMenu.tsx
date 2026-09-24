@@ -1,6 +1,6 @@
 import { createMemo } from "solid-js";
 
-import { PlacementLayoutUtils } from "../../../Samples/Placement/Layouts/PlacementLayouts.utils";
+import { PlacementLayoutUtils } from "../../../Generators/PlacementLayouts/PlacementLayouts.utils";
 import { access } from "../../../Utils/propUtils";
 import { Menu } from "../Menu/Menu";
 import type { FanMenuProps } from "./FanMenu.types";

@@ -1,11 +1,12 @@
 import { For, createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
-import type { SampleKnob } from "@thewaver/ss-components";
-import { DEFAULT_GLASS_DEFS, SVGDefsSamples, TrackedGradientKnobs } from "@thewaver/ss-components";
+import { DEFAULT_GLASS_DEFS, SVGDefsSamples, TrackedGradientDefaults } from "@thewaver/ss-components";
 
+import { TrackedGradientKnobs } from "../../Knobs/TrackedGradients.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
+import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import {
@@ -76,12 +77,14 @@ export const GlassSurfacePage = () => {
     const getStrokeKnobs = () => {
         const key = getStrokeConfigKey();
 
-        return key === NO_SAMPLE_KEY ? {} : (TrackedGradientKnobs.KNOBS_BY_FAMILY[key] as Record<string, SampleKnob>);
+        return key === NO_SAMPLE_KEY ? {} : (TrackedGradientKnobs.KNOBS_BY_FAMILY[key] as Record<string, Knob>);
     };
     const getStrokeDefaults = () => {
         const key = getStrokeConfigKey();
 
-        return key === NO_SAMPLE_KEY ? {} : (TrackedGradientKnobs.DEFAULTS_BY_FAMILY[key] as Record<string, unknown>);
+        return key === NO_SAMPLE_KEY
+            ? {}
+            : (TrackedGradientDefaults.DEFAULTS_BY_FAMILY[key] as Record<string, unknown>);
     };
     const getStrokeConfigDefs = () => strokeConfigDefs[getStrokeConfigKey()] ?? {};
     const [getBlurWidth, setBlurWidth] = createSignal(STARTING_BLUR_WIDTH);

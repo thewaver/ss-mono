@@ -1,6 +1,6 @@
 import type { Size2d } from "@thewaver/ss-utils";
 
-import { SVGPatternDefsUtils } from "../../Abstracts/SVG/Defs/Pattern/SVGPatternDefs.utils";
+import { SVGPatternDefsUtils } from "../../Generators/SVGDefs/SVGPatterns/SVGPatternDefs.utils";
 import { SVGPatternLayouts } from "./SVGPatternLayouts.const";
 import type { SVGPatternCellCount, SVGPatternKind } from "./SVGPatternLayouts.types";
 import type { SVGPatternCellRenderer } from "./SVGPatterns.types";

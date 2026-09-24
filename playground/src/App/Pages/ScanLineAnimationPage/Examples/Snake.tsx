@@ -1,11 +1,11 @@
 import {
-    CellAnimationBreakpoints,
+    CellAnimationBreakpointUtils,
     CellAnimationWeights,
     ScanlineAnimation,
     ScanlineAnimationKeyframes,
     access,
 } from "@thewaver/ss-components";
-import type { AccessorProps } from "@thewaver/ss-components";
+import type { AccessorProps, CellAnimationBreakpointOpts, ScanlineHorizontalSnakeOpts } from "@thewaver/ss-components";
 
 import type { ScanlineAnimationExampleProps } from "../ScanlineAnimationPage.types";
 
@@ -13,8 +13,8 @@ const WEIGHT_ORIGIN = { row: 0, col: 0 };
 
 type Props = ScanlineAnimationExampleProps &
     AccessorProps<{
-        breakpointOpts: CellAnimationBreakpoints.BreakpointOpts;
-        keyframeOpts: ScanlineAnimationKeyframes.HorizontalSnakeOpts;
+        breakpointOpts: CellAnimationBreakpointOpts;
+        keyframeOpts: ScanlineHorizontalSnakeOpts;
     }>;
 
 export const SnakeExample = ({ keyframeOpts, breakpointOpts, weightType, ...otherProps }: Props) => {
@@ -26,7 +26,7 @@ export const SnakeExample = ({ keyframeOpts, breakpointOpts, weightType, ...othe
             }
             computeScanlineAnimation={(defs, timeline) =>
                 ScanlineAnimationKeyframes.computeHorizontalSnake(
-                    CellAnimationBreakpoints.computeBreakpoints(defs.weight, access(breakpointOpts)),
+                    CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, access(breakpointOpts)),
                     defs,
                     timeline,
                     access(keyframeOpts),

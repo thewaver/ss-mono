@@ -4,8 +4,21 @@ import type {
     ScanlineAnimationEvaluationDefs,
     ScanlineAnimationEvaluationResult,
 } from "../../../Exotics/ScanlineAnimation/ScanlineAnimation.types";
-import type { CellAnimationBreakpoints } from "../../CellAnimation/Breakpoints/CellAnimationBreakpoints.const";
-import { CellAnimationWeightUtils } from "../../CellAnimation/Weights/CellAnimationWeights.utils";
+import type { CellAnimationBreakpointTriple } from "../../../Generators/CellAnimationBreakpoints/CellAnimationBreakpoints.types";
+import { CellAnimationWeightUtils } from "../../../Generators/CellAnimationWeights/CellAnimationWeights.utils";
+import type {
+    ScanlineHorizontalBrightnessOpts,
+    ScanlineHorizontalGrayscaleOpts,
+    ScanlineHorizontalHueOpts,
+    ScanlineHorizontalSnakeOpts,
+    ScanlineHorizontalSplitOpts,
+    ScanlineHorizontalStretchOpts,
+    _ScanlineHorizontalDropoutOpts,
+    _ScanlineHorizontalInterlaceOpts,
+    _ScanlineHorizontalRollOpts,
+    _ScanlineHorizontalSkewOpts,
+    _ScanlineHorizontalWaveOpts,
+} from "./ScanlineAnimationKeyframes.types";
 
 const peak = (a: number, b: number, x: number) => {
     const mid = (a + b) * 0.5;
@@ -22,51 +35,47 @@ const ramp = (a: number, b: number, x: number) => {
 };
 
 export namespace ScanlineAnimationKeyframes {
-    export const DEFAULT_HORIZONTAL_SNAKE_OPTS: Required<ScanlineAnimationKeyframes.HorizontalSnakeOpts> = {
+    export const DEFAULT_HORIZONTAL_SNAKE_OPTS: Required<ScanlineHorizontalSnakeOpts> = {
         shiftPercent: 5,
     };
 
-    export const DEFAULT_HORIZONTAL_SPLIT_OPTS: Required<ScanlineAnimationKeyframes.HorizontalSplitOpts> = {
+    export const DEFAULT_HORIZONTAL_SPLIT_OPTS: Required<ScanlineHorizontalSplitOpts> = {
         shiftPercent: 10,
     };
 
-    export const DEFAULT_HORIZONTAL_STRETCH_OPTS: Required<ScanlineAnimationKeyframes.HorizontalStretchOpts> = {
+    export const DEFAULT_HORIZONTAL_STRETCH_OPTS: Required<ScanlineHorizontalStretchOpts> = {
         peakScalePercent: 150,
     };
 
-    export const DEFAULT_HORIZONTAL_WAVE_OPTS: Required<ScanlineAnimationKeyframes._HorizontalWaveOpts> = {
+    export const DEFAULT_HORIZONTAL_WAVE_OPTS: Required<_ScanlineHorizontalWaveOpts> = {
         shiftPercent: 8,
         waveCount: 3,
     };
 
-    export const DEFAULT_HORIZONTAL_ROLL_OPTS: Required<ScanlineAnimationKeyframes._HorizontalRollOpts> = {
+    export const DEFAULT_HORIZONTAL_ROLL_OPTS: Required<_ScanlineHorizontalRollOpts> = {
         shiftPercent: 100,
         seamBrightnessPercent: 40,
     };
 
-    export const DEFAULT_HORIZONTAL_DROPOUT_OPTS: Required<ScanlineAnimationKeyframes._HorizontalDropoutOpts> = {
+    export const DEFAULT_HORIZONTAL_DROPOUT_OPTS: Required<_ScanlineHorizontalDropoutOpts> = {
         dropChance: 0.3,
         shiftPercent: 15,
     };
 
-    export const DEFAULT_HORIZONTAL_INTERLACE_OPTS: Required<ScanlineAnimationKeyframes._HorizontalInterlaceOpts> = {
+    export const DEFAULT_HORIZONTAL_INTERLACE_OPTS: Required<_ScanlineHorizontalInterlaceOpts> = {
         dipPercent: 40,
         fieldCount: 8,
     };
 
-    export const DEFAULT_HORIZONTAL_SKEW_OPTS: Required<ScanlineAnimationKeyframes._HorizontalSkewOpts> = {
+    export const DEFAULT_HORIZONTAL_SKEW_OPTS: Required<_ScanlineHorizontalSkewOpts> = {
         skewDegrees: 20,
     };
 
-    export type HorizontalSnakeOpts = {
-        shiftPercent?: number;
-    };
-
     export const computeHorizontalSnake = (
-        [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
+        [b0, b1, b2]: CellAnimationBreakpointTriple,
         defs: ScanlineAnimationEvaluationDefs,
         t: number,
-        opts?: HorizontalSnakeOpts,
+        opts?: ScanlineHorizontalSnakeOpts,
     ): ScanlineAnimationEvaluationResult => {
         const mergedOpts = { ...DEFAULT_HORIZONTAL_SNAKE_OPTS, ...opts };
         const p = peak(b1, b2, t) - peak(b0, b1, t);
@@ -74,15 +83,11 @@ export namespace ScanlineAnimationKeyframes {
         return { translateX: mergedOpts.shiftPercent * p };
     };
 
-    export type HorizontalSplitOpts = {
-        shiftPercent?: number;
-    };
-
     export const computeHorizontalSplit = (
-        [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
+        [b0, b1, b2]: CellAnimationBreakpointTriple,
         defs: ScanlineAnimationEvaluationDefs,
         t: number,
-        opts?: HorizontalSplitOpts,
+        opts?: ScanlineHorizontalSplitOpts,
     ): ScanlineAnimationEvaluationResult => {
         const mergedOpts = { ...DEFAULT_HORIZONTAL_SPLIT_OPTS, ...opts };
         const dir = MathUtils.isEven(defs.pos.row) ? -1 : 1;
@@ -91,15 +96,11 @@ export namespace ScanlineAnimationKeyframes {
         return { translateX: dir * mergedOpts.shiftPercent * p };
     };
 
-    export type HorizontalStretchOpts = {
-        peakScalePercent?: number;
-    };
-
     export const computeHorizontalStretch = (
-        [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
+        [b0, b1, b2]: CellAnimationBreakpointTriple,
         defs: ScanlineAnimationEvaluationDefs,
         t: number,
-        opts?: HorizontalStretchOpts,
+        opts?: ScanlineHorizontalStretchOpts,
     ): ScanlineAnimationEvaluationResult => {
         const mergedOpts = { ...DEFAULT_HORIZONTAL_STRETCH_OPTS, ...opts };
         const p = peak(b0, b2, t);
@@ -107,55 +108,44 @@ export namespace ScanlineAnimationKeyframes {
         return { scaleX: 100 + (mergedOpts.peakScalePercent - 100) * p };
     };
 
-    export type HorizontalHueOpts = {};
-
     export const computeHorizontalHue = (
-        [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
+        [b0, b1, b2]: CellAnimationBreakpointTriple,
         defs: ScanlineAnimationEvaluationDefs,
         t: number,
-        opts?: HorizontalHueOpts,
+        opts?: ScanlineHorizontalHueOpts,
     ): ScanlineAnimationEvaluationResult => {
         const p = peak(b0, b2, t);
 
         return { "hue-rotate": 180 * p };
     };
 
-    export type HorizontalBrightnessOpts = {};
-
     export const computeHorizontalBrightness = (
-        [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
+        [b0, b1, b2]: CellAnimationBreakpointTriple,
         defs: ScanlineAnimationEvaluationDefs,
         t: number,
-        opts?: HorizontalBrightnessOpts,
+        opts?: ScanlineHorizontalBrightnessOpts,
     ): ScanlineAnimationEvaluationResult => {
         const p = peak(b0, b2, t);
 
         return { brightness: 150 * p };
     };
 
-    export type HorizontalGrayscaleOpts = {};
-
     export const computeHorizontalGrayscale = (
-        [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
+        [b0, b1, b2]: CellAnimationBreakpointTriple,
         defs: ScanlineAnimationEvaluationDefs,
         t: number,
-        opts?: HorizontalGrayscaleOpts,
+        opts?: ScanlineHorizontalGrayscaleOpts,
     ): ScanlineAnimationEvaluationResult => {
         const p = peak(b0, b2, t);
 
         return { grayscale: 100 * p };
     };
 
-    export type _HorizontalWaveOpts = {
-        shiftPercent?: number;
-        waveCount?: number;
-    };
-
     export const _computeHorizontalWave = (
-        [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
+        [b0, b1, b2]: CellAnimationBreakpointTriple,
         defs: ScanlineAnimationEvaluationDefs,
         t: number,
-        opts?: _HorizontalWaveOpts,
+        opts?: _ScanlineHorizontalWaveOpts,
     ): ScanlineAnimationEvaluationResult => {
         const mergedOpts = { ...DEFAULT_HORIZONTAL_WAVE_OPTS, ...opts };
         const envelope = peak(b0, b2, t);
@@ -164,16 +154,11 @@ export namespace ScanlineAnimationKeyframes {
         return { translateX: mergedOpts.shiftPercent * envelope * Math.sin(phase) };
     };
 
-    export type _HorizontalRollOpts = {
-        shiftPercent?: number;
-        seamBrightnessPercent?: number;
-    };
-
     export const _computeHorizontalRoll = (
-        [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
+        [b0, b1, b2]: CellAnimationBreakpointTriple,
         defs: ScanlineAnimationEvaluationDefs,
         t: number,
-        opts?: _HorizontalRollOpts,
+        opts?: _ScanlineHorizontalRollOpts,
     ): ScanlineAnimationEvaluationResult => {
         const mergedOpts = { ...DEFAULT_HORIZONTAL_ROLL_OPTS, ...opts };
 
@@ -183,16 +168,11 @@ export namespace ScanlineAnimationKeyframes {
         };
     };
 
-    export type _HorizontalDropoutOpts = {
-        dropChance?: number;
-        shiftPercent?: number;
-    };
-
     export const _computeHorizontalDropout = (
-        [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
+        [b0, b1, b2]: CellAnimationBreakpointTriple,
         defs: ScanlineAnimationEvaluationDefs,
         t: number,
-        opts?: _HorizontalDropoutOpts,
+        opts?: _ScanlineHorizontalDropoutOpts,
     ): ScanlineAnimationEvaluationResult => {
         const mergedOpts = { ...DEFAULT_HORIZONTAL_DROPOUT_OPTS, ...opts };
 
@@ -210,16 +190,11 @@ export namespace ScanlineAnimationKeyframes {
         return { opacity: 100 - 100 * p, translateX: mergedOpts.shiftPercent * p };
     };
 
-    export type _HorizontalInterlaceOpts = {
-        dipPercent?: number;
-        fieldCount?: number;
-    };
-
     export const _computeHorizontalInterlace = (
-        [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
+        [b0, b1, b2]: CellAnimationBreakpointTriple,
         defs: ScanlineAnimationEvaluationDefs,
         t: number,
-        opts?: _HorizontalInterlaceOpts,
+        opts?: _ScanlineHorizontalInterlaceOpts,
     ): ScanlineAnimationEvaluationResult => {
         const mergedOpts = { ...DEFAULT_HORIZONTAL_INTERLACE_OPTS, ...opts };
         const envelope = peak(b0, b2, t);
@@ -229,15 +204,11 @@ export namespace ScanlineAnimationKeyframes {
         return { brightness: 100 + mergedOpts.dipPercent * dir * field * envelope };
     };
 
-    export type _HorizontalSkewOpts = {
-        skewDegrees?: number;
-    };
-
     export const _computeHorizontalSkew = (
-        [b0, b1, b2]: CellAnimationBreakpoints.BreakpointTupleTriple,
+        [b0, b1, b2]: CellAnimationBreakpointTriple,
         defs: ScanlineAnimationEvaluationDefs,
         t: number,
-        opts?: _HorizontalSkewOpts,
+        opts?: _ScanlineHorizontalSkewOpts,
     ): ScanlineAnimationEvaluationResult => {
         const mergedOpts = { ...DEFAULT_HORIZONTAL_SKEW_OPTS, ...opts };
         const p = peak(b1, b2, t) - peak(b0, b1, t);

@@ -1,9 +1,9 @@
 import { ShapeConst, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
 
+import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
+import { SVGFilterDefsFactory } from "../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.factory";
+import { SVGGradientDefsUtils } from "../../Generators/SVGDefs/SVGGradients/SVGGradientDefs.utils";
 import { PointerTrackerUtils } from "../PointerTracker/PointerTracker.utils";
-import { SVGFilterDefsFactory } from "../SVG/Defs/Filter/SVGFilterDefs.factory";
-import { SVGGradientDefsUtils } from "../SVG/Defs/Gradient/SVGGradientDefs.utils";
-import type { SVGDefs } from "../SVG/Defs/SVGDefs.types";
 import { DEFAULT_GLASS_DEFS } from "./Glass.const";
 import type { GlassDefs, GlassTintDefs, PartialGlassDefs } from "./Glass.types";
 
