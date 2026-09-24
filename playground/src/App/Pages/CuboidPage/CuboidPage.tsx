@@ -4,6 +4,7 @@ import type { CuboidController } from "@thewaver/ss-components";
 import { CUBOID_DEFAULTS, CuboidUtils, MediaQueryMonitorUtils } from "@thewaver/ss-components";
 
 import { CuboidKnobs } from "../../Knobs/Cuboids.const";
+import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -26,7 +27,7 @@ const WanderingExampleWrapper = (props: CuboidExampleProps) => {
         <>
             <WanderingExample {...props} turnIntervalMs={() => (getIsTurning() ? getTurnIntervalMs() : undefined)} />
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageProp
                     key={"isTurning"}
                     label={"Turns by itself"}
@@ -53,7 +54,7 @@ const WanderingExampleWrapper = (props: CuboidExampleProps) => {
                         onInput={setTurnIntervalMs}
                     />
                 </PageProp>
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -66,7 +67,7 @@ const UprightExampleWrapper = (props: Omit<CuboidUprightExampleProps, "isUpright
         <>
             <UprightExample {...props} isUpright={getIsUpright} isDraggable={getIsDraggable} />
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageProp
                     key={"isUpright"}
                     label={"Stays upright"}
@@ -86,7 +87,7 @@ const UprightExampleWrapper = (props: Omit<CuboidUprightExampleProps, "isUpright
                 >
                     <PageCheckField value={getIsDraggable} ariaLabel={"Draggable"} onChange={setIsDraggable} />
                 </PageProp>
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };

@@ -4,8 +4,8 @@ import { SVGFilterDefs, SVGFilterDefsFactory, access } from "@thewaver/ss-compon
 import type { SVGDisplacementChannel } from "@thewaver/ss-components";
 
 import { SVGFilterKnobs } from "../../../Knobs/SVGFilters.const";
+import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
-import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField, PageSelectField } from "../../../StyledComponents/Field/Field";
 import { PageFilterStage } from "../../../StyledComponents/SVGFiltersContent/SVGFiltersContent";
 import type { SVGFiltersExampleProps } from "../SVGFiltersPage.types";
@@ -51,7 +51,7 @@ export const TurbulenceExample = (props: Props) => {
                 }
             />
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageProp
                     key={"type"}
                     label={"Type"}
@@ -166,7 +166,7 @@ export const TurbulenceExample = (props: Props) => {
                         onChange={(channel) => setYChannel(() => channel)}
                     />
                 </PageProp>
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };

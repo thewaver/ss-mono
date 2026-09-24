@@ -4,8 +4,8 @@ import { Select } from "@thewaver/ss-components";
 import type { MaybeAccessor, SelectItem } from "@thewaver/ss-components";
 
 import { SelectKnobs } from "../../../Knobs/Selects.const";
+import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
-import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField } from "../../../StyledComponents/Field/Field";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
@@ -61,7 +61,7 @@ export const VirtualizedExample = (props: Props) => {
                 }
             />
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageProp
                     key={"stressCount"}
                     label={"Option count"}
@@ -79,7 +79,7 @@ export const VirtualizedExample = (props: Props) => {
                         onInput={props.onCountChange}
                     />
                 </PageProp>
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </div>
     );
 };

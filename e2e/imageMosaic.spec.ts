@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { example, prop } from "./helpers";
+import { example, prop, revealProp } from "./helpers";
 
 /**
  * The image preset chooses the sizes rather than being given them, so what a browser has to confirm is
@@ -66,6 +66,7 @@ const rowsOf = (placed: Tile[]) => {
 };
 
 const pick = async (page: import("@playwright/test").Page, key: string, name: string) => {
+    await revealProp(page, key);
     await page.locator(selectField(key)).click();
     await page.locator(option, { hasText: name }).click();
 };
@@ -76,6 +77,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("every row ends flush with both edges, gaps counted", async ({ page }) => {
+    await revealProp(page, "gap");
     const gap = Number(await page.locator(numberField("gap")).inputValue());
     const root = await rootSize(page, MOSAIC);
 
@@ -129,6 +131,7 @@ test("anchoring the height fills columns instead of rows", async ({ page }) => {
         })
         .not.toBe(upright.width);
 
+    await revealProp(page, "gap");
     const gap = Number(await page.locator(numberField("gap")).inputValue());
     const root = await rootSize(page, MOSAIC);
     const placed = await tiles(page, MOSAIC);
@@ -145,6 +148,7 @@ test("anchoring the height fills columns instead of rows", async ({ page }) => {
 });
 
 test("whatever the consumer wraps the image in fills the cell, without being told a size", async ({ page }) => {
+    await revealProp(page, "isDecorated");
     await page.locator(`${prop("isDecorated")} input`).check();
     await expect(page.locator(`${MOSAIC} a`).first()).toBeVisible();
 

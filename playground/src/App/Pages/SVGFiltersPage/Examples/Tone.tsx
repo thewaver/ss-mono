@@ -3,8 +3,8 @@ import { createSignal } from "solid-js";
 import { SVGFilterDefsFactory, access } from "@thewaver/ss-components";
 
 import { SVGFilterKnobs } from "../../../Knobs/SVGFilters.const";
+import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
-import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { PageNumberField } from "../../../StyledComponents/Field/Field";
 import { PageFilterStage } from "../../../StyledComponents/SVGFiltersContent/SVGFiltersContent";
 import type { SVGFiltersExampleProps } from "../SVGFiltersPage.types";
@@ -35,7 +35,7 @@ export const ToneExample = (props: Props) => {
                 }
             />
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageProp
                     key={"brightness"}
                     label={"Brightness"}
@@ -80,7 +80,7 @@ export const ToneExample = (props: Props) => {
                         onInput={setInversion}
                     />
                 </PageProp>
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };

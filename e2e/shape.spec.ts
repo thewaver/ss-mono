@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { example, prop } from "./helpers";
+import { example, prop, revealProp } from "./helpers";
 
 const DEFAULT = example("default");
 const LAYERS = `${DEFAULT} svg`;
@@ -115,6 +115,7 @@ test("an animated def is rebuilt when its animation changes, which is what reset
 
     expect(await hold(), "the default fill animates").toBeGreaterThan(0);
 
+    await revealProp(page, "animationDurationMs");
     const duration = page.locator(`${prop("animationDurationMs")} input`);
 
     await duration.fill("3000");
@@ -144,6 +145,7 @@ test("an animated def is rebuilt when its animation changes, which is what reset
  */
 test("switching iteration pattern mid-run leaves the animation running", async ({ page }) => {
     const chooseIteration = async (name: string) => {
+        await revealProp(page, "iterationConfigKey");
         await page.locator(`${prop("iterationConfigKey")} [role="combobox"]`).click();
         await page.locator('[role="listbox"] [role="option"]', { hasText: name }).first().click();
     };

@@ -3,6 +3,7 @@ import { createMemo, createSignal } from "solid-js";
 import { Button, ODOMETER_DEFAULTS, OdometerReels } from "@thewaver/ss-components";
 
 import { OdometerKnobs } from "../../Knobs/Odometers.const";
+import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -112,22 +113,24 @@ export const OdometerPage = () => {
                 readout: () =>
                     "every column spins at once and stops in the order its reel gives, taking extra whole turns on the way; with less motion asked for it only turns as far as its digit needs",
                 component: () => (
-                    <div class={styles.stack}>
-                        <ReelsExample text={() => pad(getReelValue())} reelKey={getReelKey} />
+                    <>
+                        <div class={styles.stack}>
+                            <ReelsExample text={() => pad(getReelValue())} reelKey={getReelKey} />
 
-                        <div class={styles.controls}>
-                            <Button
-                                id={"pullReels"}
-                                renderContent={(getFlags) => (
-                                    <PageButtonContent flags={getFlags}>Pull</PageButtonContent>
-                                )}
-                                onClick={() => {
-                                    setReelValue(pull);
-                                }}
-                            />
+                            <div class={styles.controls}>
+                                <Button
+                                    id={"pullReels"}
+                                    renderContent={(getFlags) => (
+                                        <PageButtonContent flags={getFlags}>Pull</PageButtonContent>
+                                    )}
+                                    onClick={() => {
+                                        setReelValue(pull);
+                                    }}
+                                />
+                            </div>
                         </div>
 
-                        <PagePropsPanel scope={"local"}>
+                        <PageExampleKnobs>
                             <PageProp
                                 key={"reelKey"}
                                 label={"Reel"}
@@ -143,8 +146,8 @@ export const OdometerPage = () => {
                                     onChange={(key) => setReelKey(() => key)}
                                 />
                             </PageProp>
-                        </PagePropsPanel>
-                    </div>
+                        </PageExampleKnobs>
+                    </>
                 ),
                 path: `${EXAMPLES_ROOT}/Reels.tsx`,
             },

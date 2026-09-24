@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { accessibleText, demo, example, prop } from "./helpers";
+import { accessibleText, demo, example, prop, revealProp } from "./helpers";
 
 /**
  * Every column is a barrel turned to an angle, so the checks read the angle the component wrote rather than
@@ -249,6 +249,7 @@ const pullAndWatch = async (page: Page) => {
 };
 
 const pickReel = async (page: Page, key: string) => {
+    await revealProp(page, "reelKey");
     await page.locator(`${prop("reelKey")} [role="combobox"]`).click();
     await page.locator('[role="listbox"] [role="option"]', { hasText: key }).first().click();
     await page.waitForTimeout(SETTLE_MS);

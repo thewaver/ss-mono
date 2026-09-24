@@ -16,6 +16,7 @@ type ShapePaths = {
     innerPoints: Point2d[];
     outerPath: string;
     outerPoints: Point2d[];
+    outerOutline: Point2d[];
 };
 
 /**
@@ -502,7 +503,10 @@ export namespace ShapeUtils {
      * {@link ShapeConst.CORNER_SHAPE_LAME_EXPONENTS}.
      * @param offset Pushes the whole outline outwards. Negative pulls it in.
      * @returns Path text for the outer and inner outlines plus the points behind them.
-     * Fewer than three corners gives empty strings and empty lists.
+     * `outerPoints` and `innerPoints` hold only where each rounded corner starts and
+     * ends; `outerOutline` holds every point the outer path is drawn through, curves
+     * included, so a polygon built from it follows the painted edge. Fewer than three
+     * corners gives empty strings and empty lists.
      */
 
     export const getPaths = (
@@ -514,7 +518,8 @@ export namespace ShapeUtils {
     ): ShapePaths => {
         const vertexCount = vertices.length;
 
-        if (vertexCount < 3) return { outerPath: "", innerPath: "", outerPoints: [], innerPoints: [] };
+        if (vertexCount < 3)
+            return { outerPath: "", innerPath: "", outerPoints: [], innerPoints: [], outerOutline: [] };
 
         const cacheKey = JSON.stringify({ vertices, edgeThicknesses, joinRadii, lameExponents, offset });
         const cached = pathCache.get(cacheKey);
@@ -598,11 +603,18 @@ export namespace ShapeUtils {
                 innerPath = `M ${inner.vertices[vertexCount - 1].x.toFixed(3)} ${inner.vertices[vertexCount - 1].y.toFixed(3)} ${innerPathSegments.join(" ")} Z`;
             }
 
-            return writePathCache(cacheKey, { outerPath, innerPath, outerPoints: outer.vertices, innerPoints });
+            return writePathCache(cacheKey, {
+                outerPath,
+                innerPath,
+                outerPoints: outer.vertices,
+                innerPoints,
+                outerOutline: outer.vertices,
+            });
         }
 
         const { unitTangents, unitNormals, crossChecks } = vectors;
         const outerPathSegments: string[] = [];
+        const outerOutline: Point2d[] = [];
         const outerStartPoints: Point2d[] = [];
         const outerEndPoints: Point2d[] = [];
         const innerPathSegments: string[] = [];
@@ -654,6 +666,12 @@ export namespace ShapeUtils {
                 outerRadius,
                 kappa,
             );
+
+            for (const point of outerPts) {
+                const last = outerOutline.at(-1);
+
+                if (!last || last.x !== point.x || last.y !== point.y) outerOutline.push(point);
+            }
 
             const outerStr = outerPts.map((p) => `L ${p.x.toFixed(3)} ${p.y.toFixed(3)}`).join(" ");
             outerPathSegments.push(outerStr);
@@ -751,6 +769,7 @@ export namespace ShapeUtils {
             innerPath: `${innerPath} Z`,
             outerPoints,
             innerPoints,
+            outerOutline,
         });
     };
 

@@ -23,8 +23,34 @@ const selectField = (key: string) => `${prop(key)} [role="combobox"]`;
 
 const option = '[role="listbox"] [role="option"]';
 
+/**
+ * An example's knobs live in a panel its card opens from a settings button, so a knob can only be reached once
+ * that panel is open. Each knob is looked up through the example that owns it, and the panel is opened if it is
+ * not already — opening another card's panel closes this one, which no test here needs to survive.
+ */
+const KNOB_OWNERS: Record<string, string> = {
+    hPlacement: "default",
+    vPlacement: "default",
+    offsetX: "default",
+    offsetY: "default",
+    hasSatellite: "default",
+    badgeSize: "default",
+    isBehindSubject: "default",
+    badgeCorner: "badge",
+    badgeCount: "badge",
+    badgeOverhang: "badge",
+};
+
+const knob = async (page: import("@playwright/test").Page, key: string, toSelector: (key: string) => string) => {
+    const trigger = page.locator(`#${KNOB_OWNERS[key]}Knobs`);
+
+    if ((await trigger.getAttribute("aria-expanded")) !== "true") await trigger.click();
+
+    return page.locator(toSelector(key));
+};
+
 const pick = async (page: import("@playwright/test").Page, key: string, name: string) => {
-    await page.locator(selectField(key)).click();
+    await (await knob(page, key, selectField)).click();
     await page.locator(option, { hasText: name }).click();
 };
 
@@ -41,7 +67,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("the wrapper grows on exactly the sides the satellite hangs over", async ({ page }) => {
-    const badgeSize = await page.locator(numberField("badgeSize")).inputValue();
+    const badgeSize = await (await knob(page, "badgeSize", numberField)).inputValue();
 
     await expect
         .poll(() => paddings(page, BADGE), {
@@ -54,7 +80,7 @@ test("moving the placement moves the growth with it", async ({ page }) => {
     await pick(page, "hPlacement", "left-out");
     await pick(page, "vPlacement", "bottom-out");
 
-    const badgeSize = await page.locator(numberField("badgeSize")).inputValue();
+    const badgeSize = await (await knob(page, "badgeSize", numberField)).inputValue();
 
     await expect
         .poll(() => paddings(page, BADGE), { message: "the same overhang, now down and to the left" })
@@ -112,7 +138,7 @@ test("the satellite can be sent behind the subject without moving", async ({ pag
 
     expect(inFront.satellite, "a satellite starts out in front of its subject").toBeGreaterThan(inFront.subject);
 
-    await page.locator(checkField("isBehindSubject")).check();
+    await (await knob(page, "isBehindSubject", checkField)).check();
 
     await expect
         .poll(
@@ -138,7 +164,7 @@ test("the satellite can be sent behind the subject without moving", async ({ pag
  * on, and the measure box around the demo is padded whether or not there is a satellite.
  */
 test("a satellite that was never handed one renders the subject and nothing else", async ({ page }) => {
-    await page.locator(checkField("hasSatellite")).uncheck();
+    await (await knob(page, "hasSatellite", checkField)).uncheck();
 
     await expect
         .poll(() => page.locator(wrapper(BADGE)).count(), {
@@ -303,8 +329,8 @@ for (const corner of ["top-right", "top-left", "bottom-right", "bottom-left"]) {
         const short = await measure();
         const shortPadding = await paddings(page, COUNT_BADGE);
 
-        await page.locator(numberField("badgeCount")).fill("99999");
-        await page.locator(numberField("badgeCount")).blur();
+        await (await knob(page, "badgeCount", numberField)).fill("99999");
+        await (await knob(page, "badgeCount", numberField)).blur();
 
         await expect
             .poll(async () => (await measure()).width, { message: "more digits make the badge wider" })

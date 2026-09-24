@@ -65,5 +65,7 @@ export const wrapText = style({
 
 globalStyle(`${wrapText} > :first-child`, {
     float: "left",
+    marginRight: themeVars.spacing.double,
+    marginBottom: themeVars.spacing.double,
     shapeMargin: themeVars.spacing.double,
 });

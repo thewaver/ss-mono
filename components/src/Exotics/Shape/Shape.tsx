@@ -63,7 +63,7 @@ export const Shape = (props: ShapeProps) => {
         });
     });
 
-    const getShapeOutside = createMemo(() => toShapeOutside(getPaths()[0].outerPoints));
+    const getShapeOutside = createMemo(() => toShapeOutside(getPaths()[0].outerOutline));
 
     onMount(() => {
         let rootResizeObserver: ResizeObserver | undefined;

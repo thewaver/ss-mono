@@ -1,7 +1,7 @@
 import type { Page } from "@playwright/test";
 import { expect, test } from "@playwright/test";
 
-import { demo, prop, readout, waitUntilStill } from "./helpers";
+import { demo, prop, readout, revealProp, waitUntilStill } from "./helpers";
 
 /**
  * The box is driven by two counts of quarter turns rather than by naming a face, so every check here presses
@@ -214,6 +214,7 @@ test("the turn buttons tip the box about the screen's own axes, and every face l
 });
 
 test("with upright off, the same presses leave the far side upside down", async ({ page }) => {
+    await revealProp(page, "isUpright");
     await page.locator(`${prop("isUpright")} input`).uncheck();
     await settleUpright(page);
 
@@ -223,6 +224,7 @@ test("with upright off, the same presses leave the far side upside down", async 
     expect(await uprightFacingName(page)).toBe("Back");
     expect(await readsUpright(page), "which is what the upright check tells apart").toBe(false);
 
+    await revealProp(page, "isUpright");
     await page.locator(`${prop("isUpright")} input`).check();
     await settleUpright(page);
 

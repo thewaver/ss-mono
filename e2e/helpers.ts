@@ -24,6 +24,37 @@ export const prop = (key: string) => `[data-prop][data-testid="${key}"]`;
  */
 export const demo = (key: string) => `${example(key)} [data-demo]`;
 
+/**
+ * An example's own knobs sit in a popup its card opens from a settings button, so a props row belonging to
+ * one example is not in the document until that popup is open. This opens it when the row is not already on
+ * screen — the named example's popup when one is given, otherwise each card's in turn until the row appears.
+ * Only one popup is open at a time, so opening a second closes the first.
+ */
+const POPUP_WAIT_MS = 1000;
+
+export const revealProp = async (page: Page, key: string, exampleKey?: string) => {
+    const row = page.locator(prop(key)).first();
+
+    if (await row.isVisible()) return;
+
+    const triggers = page.locator(exampleKey ? `#${exampleKey}Knobs` : '[id$="Knobs"][aria-haspopup="dialog"]');
+
+    for (let index = 0; index < (await triggers.count()); index++) {
+        const trigger = triggers.nth(index);
+
+        if ((await trigger.getAttribute("aria-expanded")) !== "true") await trigger.click();
+
+        const isShown = await row.waitFor({ state: "visible", timeout: POPUP_WAIT_MS }).then(
+            () => true,
+            () => false,
+        );
+
+        if (isShown) return;
+    }
+
+    throw new Error(`no settings popup on this page holds the props row "${key}"`);
+};
+
 /** The reading the Playground itself displays, so a spec checks state the way the page shows it. */
 export const readout = async (page: Page, key: string) =>
     ((await page.locator(`${variant(key)} [data-readout], ${example(key)} [data-readout]`).textContent()) ?? "").trim();

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { inlineStyle, inputValue, prop } from "./helpers";
+import { inlineStyle, inputValue, prop, revealProp } from "./helpers";
 
 const CORNER_GRID = '[data-panel="global"] [style*="grid-template-columns"]';
 
@@ -15,6 +15,8 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("no native control survives in a props panel", async ({ page }) => {
+    await revealProp(page, "iterationConfigKey");
+
     await expect(page.locator("select"), "no native select survives in a props panel").toHaveCount(0);
     await expect(page.locator("input[disabled]"), "and nothing uses the native disabled attribute").toHaveCount(0);
 
@@ -66,6 +68,7 @@ test("a migrated Select still drives the page state the raw one did", async ({ p
  * assertion is here as well as in `numberInput.spec.ts` because the panel is where the fault shipped.
  */
 test("a migrated NumberInput is not brought into range while it is still being typed", async ({ page }) => {
+    await revealProp(page, "cellSize");
     const field = page.locator(`${prop("cellSize")} input`);
 
     await field.focus();

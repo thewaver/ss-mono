@@ -4,6 +4,7 @@ import { TILE_BOARD_DEFAULTS, TileBoardUtils } from "@thewaver/ss-components";
 import { Index2d, type Index2dString, ShapeConst } from "@thewaver/ss-utils";
 
 import { TileBoardKnobs } from "../../Knobs/TileBoards.const";
+import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
@@ -145,7 +146,7 @@ export const TileBoardPage = () => {
                             onTileActivate={(tile) => setPiece(() => tile)}
                         />
 
-                        <PagePropsPanel scope={"local"}>
+                        <PageExampleKnobs>
                             <PageProp
                                 key={"reach"}
                                 label={"Reach"}
@@ -163,7 +164,7 @@ export const TileBoardPage = () => {
                                     onInput={setReach}
                                 />
                             </PageProp>
-                        </PagePropsPanel>
+                        </PageExampleKnobs>
                     </>
                 ),
                 path: `${EXAMPLES_ROOT}/Meeple.tsx`,

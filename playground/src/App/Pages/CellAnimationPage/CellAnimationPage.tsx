@@ -23,6 +23,7 @@ import type {
 import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
 import { CellAnimationKnobs } from "../../Knobs/CellAnimations.const";
+import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -113,7 +114,7 @@ const ImageExampleWrapper = (props: CellAnimationExampleProps) => {
                 </PageMeasureBox>
             </div>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageProp
                     key={"image"}
                     label={"Image"}
@@ -127,7 +128,7 @@ const ImageExampleWrapper = (props: CellAnimationExampleProps) => {
                         onPick={(file) => setSrc(URL.createObjectURL(file))}
                     />
                 </PageProp>
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -161,7 +162,7 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
                 </PageMeasureBox>
             </div>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageProp
                     key={"gradient"}
                     label={"Gradient"}
@@ -189,7 +190,7 @@ const GradientExampleWrapper = (props: CellAnimationExampleProps) => {
                         onChange={(ratio) => setRatio(() => ratio)}
                     />
                 </PageProp>
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -220,7 +221,7 @@ const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
                 </PageMeasureBox>
             </div>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageProp
                     key={"pattern"}
                     label={"Pattern"}
@@ -248,7 +249,7 @@ const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
                         onChange={(ratio) => setRatio(() => ratio)}
                     />
                 </PageProp>
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -260,7 +261,7 @@ const ScrubExampleWrapper = (props: CellAnimationExampleProps & { progressSignal
                 <ScrubExample {...props} src={() => knight_profile} />
             </div>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageProp
                     key={"scrubIsPlaying"}
                     label={"Playing"}
@@ -274,7 +275,7 @@ const ScrubExampleWrapper = (props: CellAnimationExampleProps & { progressSignal
                         onChange={props.playbackSignal[1]}
                     />
                 </PageProp>
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };

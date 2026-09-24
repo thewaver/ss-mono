@@ -9,4 +9,11 @@ export const popupTrigger = style({
     font: "inherit",
     color: "inherit",
     textAlign: "inherit",
+    cursor: "pointer",
+
+    selectors: {
+        "&[aria-disabled='true']": {
+            cursor: "not-allowed",
+        },
+    },
 });

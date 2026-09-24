@@ -12216,7 +12216,45 @@ and a measure box are near-disjoint across the pages — `ImageSwitcher` is the 
 readout is narrower than its image. Worth stating because the first flowing page to grow a long readout will
 show it, and the fix is to stop the readout contributing rather than to reach back for the grid.
 
-### Controls: `Spotlight`, and three presets because a mode cannot move at runtime
+### An example's own knobs open from a button on its card, not from a panel inside it
+
+The user's call, after `Satellite` moved its knobs into its first card's local panel and the card grew to hold
+seven rows around a demo a fifth of its size, while `Shape` kept twenty knobs page-wide above two examples that
+read none of them. An example with knobs of its own wraps them in `<PageExampleKnobs>` anywhere inside its demo,
+and its card draws a ⚙ button after `</>` that opens them in a non-modal `Popover` dialog anchored to the button,
+opening out past the card's right edge so the demo stays in view while it is tuned.
+
+**It is a slot, not a field on the example record, and that is what made the sweep cheap.** The first build took
+the knobs as `ExampleDefs.renderKnobs`, which works for knobs whose state lives on the page and not for the
+common shape, a wrapper component holding its own signals and drawing its demo and its panel side by side —
+lifting those would have meant moving every wrapper's state up into its page. `PageExampleKnobs` registers its
+children with the card through a context the card provides around the demo, and renders nothing where it stands,
+so each local panel became the slot by a change of tag with the state left where it was. Outside a card it falls
+back to drawing a local panel in place. Every `scope={"local"}` panel on an example became one, twenty-nine in
+all; the one left is `StressTest`'s, whose buttons are the demo rather than settings for one.
+
+**The page-wide panel keeps only what more than one card reads.** `Shape` is the case that decided it: colors
+paint every card and the page's own background, and the shape, the corner radii, the Lamé exponent and the
+individual-corners switch are also read by Text Wrap, so those five stay page-wide; the stroke and fill patterns
+with their knobs, the cell size, clip, pad, edge thickness, blur, duration and iteration are Default's alone and
+live in its ⚙. The stress test renders whatever Default is set to. `revealProp` in `e2e/helpers.ts` opens the
+popup that holds a props row, so a spec driving a card's knob asks for it first.
+
+**`PopupTrigger` now shows a pointer**, and `not-allowed` while disabled, as `Button` already did; the ⚙ was the
+first place it showed, and every picker's trigger shares it. The ⚙ carries a "Settings" tooltip beside `</>`'s
+"View source code".
+
+**Three layouts were tried or argued first.** A panel above each group of examples, built and looked at, was
+correct and not elegant — the page read as a stack of forms. Knobs beside the demo inside one wide card is the
+user's second choice, and remains the fallback. A `HoverCard` was proposed as the popup and rejected: it opens when
+the pointer brushes past and closes when it wanders off, which is right for a preview and wrong for a panel somebody
+works in, and a dropdown inside it would open its list outside the card and count as leaving it.
+
+**The popover is pressed open, and the button is its anchor.** A press elsewhere, `Escape` or a second press of ⚙
+closes it; `Escape` puts focus back on the button. Because the anchor is inside the layer's dismiss roots, pressing
+⚙ again toggles rather than closing and re-opening, and a dropdown opened from a knob resolves as inside through
+`aria-controls`, so the panel stays open while one is picked. The button is `PopupTrigger`, so `aria-expanded` and
+`aria-controls` come with it; its id is `<exampleKey>Knobs`, which is how a spec opens it.
 
 Settled with the user, renaming `ElementHighlight` on the way. A spotlight cuts a hole in an
 overlay around one element; what differs between uses is **what the page is still allowed to do**, and that

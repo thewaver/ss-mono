@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { demo, prop } from "./helpers";
+import { demo, prop, revealProp } from "./helpers";
 
 /**
  * The three motion components have Playground pages and no specs, because what they produce is movement over
@@ -279,7 +279,8 @@ test("a new picture starts the cell timeline over", async ({ page }) => {
 
     await expect.poll(() => progressOf(demo("gradient")), { message: "the cells are mid-assembly" }).not.toBe("");
 
-    await page.locator(`${demo("gradient")} ${prop("gradient")} [role="combobox"]`).click();
+    await revealProp(page, "gradient", "gradient");
+    await page.locator(`${prop("gradient")} [role="combobox"]`).click();
     await page.locator('[role="listbox"] [role="option"]', { hasText: "orbit_async_3" }).first().click();
 
     const afterPick = await progressOf(demo("gradient"));
@@ -292,7 +293,8 @@ test("a new picture starts the cell timeline over", async ({ page }) => {
 test("picking another def rebuilds the source", async ({ page }) => {
     const before = await page.locator(`${demo("pattern")} img`).getAttribute("src");
 
-    await page.locator(`${demo("pattern")} ${prop("pattern")} [role="combobox"]`).click();
+    await revealProp(page, "pattern", "pattern");
+    await page.locator(`${prop("pattern")} [role="combobox"]`).click();
     await page.locator('[role="listbox"] [role="option"]', { hasText: "triangle_t_2" }).first().click();
 
     await expect
@@ -303,8 +305,17 @@ test("picking another def rebuilds the source", async ({ page }) => {
 });
 
 test("the file picker belongs to the example that has a file, not to the page", async ({ page }) => {
-    await expect(page.locator(`${demo("image")} input[type="file"]`), "it sits inside the first example").toHaveCount(
-        1,
-    );
-    await expect(page.locator(`${demo("gradient")} input[type="file"]`), "and nowhere else").toHaveCount(0);
+    await expect(
+        page.locator('input[type="file"]'),
+        "it is not on the page until an example's settings open",
+    ).toHaveCount(0);
+
+    await revealProp(page, "image", "image");
+    await expect(
+        page.locator('[role="dialog"] input[type="file"]'),
+        "it sits in the first example's settings",
+    ).toHaveCount(1);
+
+    await page.locator("#gradientKnobs").click();
+    await expect(page.locator('input[type="file"]'), "and in no other example's").toHaveCount(0);
 });

@@ -3,10 +3,10 @@ import { createMemo, createSignal } from "solid-js";
 import { access } from "@thewaver/ss-components";
 
 import { ImageMosaicKnobs } from "../../../Knobs/ImageMosaics.const";
+import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
-import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { PageCheckField, PageSelectField } from "../../../StyledComponents/Field/Field";
 import { FIELD_WIDTH, MOSAIC_EXTENT } from "../Mosaics.const";
 import type { MosaicSharedProps } from "../Mosaics.types";
@@ -39,7 +39,7 @@ const ImagesExampleWrapper = (props: MosaicSharedProps) => {
                 />
             </PageMeasureBox>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageProp key={"shapeKey"} label={"Target shape"} hint={"The outline the tiles are packed into."}>
                     <PageSelectField
                         value={getShapeKey}
@@ -59,7 +59,7 @@ const ImagesExampleWrapper = (props: MosaicSharedProps) => {
                 >
                     <PageCheckField value={getIsDecorated} ariaLabel={"Wrapped"} onChange={setIsDecorated} />
                 </PageProp>
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };

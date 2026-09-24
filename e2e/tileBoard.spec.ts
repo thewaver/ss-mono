@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { demo, prop, readout } from "./helpers";
+import { demo, prop, readout, revealProp } from "./helpers";
 
 /**
  * Three claims the component makes can only be answered by a browser, and they are what this spec is for.
@@ -381,7 +381,8 @@ test("the reach knob widens the ring of tiles that will take the piece", async (
             tile(MEEPLE),
         );
 
-    const field = page.locator(`${MEEPLE} ${prop("reach")} input`);
+    await revealProp(page, "reach", "meeple");
+    const field = page.locator(`${prop("reach")} input`);
 
     const near = await enabled();
 
@@ -468,7 +469,8 @@ test("on a tapered board a press on a drawn tile marks that tile, not the one th
 test("on a tapered board a piece stands on its tile and is smaller at the top than at the bottom", async ({ page }) => {
     await setTaper(page);
 
-    const reach = page.locator(`${MEEPLE} ${prop("reach")} input`);
+    await revealProp(page, "reach", "meeple");
+    const reach = page.locator(`${prop("reach")} input`);
 
     await reach.fill("4");
     await reach.blur();

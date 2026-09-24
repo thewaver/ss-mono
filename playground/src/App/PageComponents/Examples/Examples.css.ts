@@ -72,3 +72,9 @@ export const exampleTitle = style({
     gap: themeVars.spacing.double,
     width: "100%",
 });
+
+export const exampleActions = style({
+    display: "flex",
+    alignItems: "center",
+    gap: themeVars.spacing.double,
+});

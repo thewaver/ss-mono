@@ -29,6 +29,7 @@ import type {
 
 import { ScanlineAnimationKeyframeKnobs } from "../../Knobs/ScanlineAnimationKeyframes.const";
 import { ScanlineAnimationKnobs } from "../../Knobs/ScanlineAnimations.const";
+import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
@@ -234,7 +235,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <GlitchExample {...props} keyframeOpts={() => keyframeOpts} />
             </PageMeasureBox>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageProp key={"count"} label={"Count"} hint={"How many glitch bursts happen over one pass."}>
                     <PageNumberField
                         value={() => keyframeOpts.count!}
@@ -277,7 +278,7 @@ const GlitchExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                         onInput={(value) => setKeyframeOpts("chunkyness", value)}
                     />
                 </PageProp>
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -298,7 +299,7 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 />
             </PageMeasureBox>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageKnobs
                     knobs={() => ScanlineAnimationKeyframeKnobs.STRETCH_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_STRETCH_OPTS}
@@ -311,7 +312,7 @@ const SurgeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     setter={(value) => setBreakpointOpts("smoothness", value)}
                 />
                 <DirInput getter={() => breakpointOpts.dir!} setter={(value) => setBreakpointOpts("dir", value)} />
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -332,7 +333,7 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 />
             </PageMeasureBox>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageKnobs
                     knobs={() => ScanlineAnimationKeyframeKnobs.SNAKE_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_SNAKE_OPTS}
@@ -345,7 +346,7 @@ const SnakeExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     setter={(value) => setBreakpointOpts("smoothness", value)}
                 />
                 <DirInput getter={() => breakpointOpts.dir!} setter={(value) => setBreakpointOpts("dir", value)} />
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -366,7 +367,7 @@ const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 />
             </PageMeasureBox>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageKnobs
                     knobs={() => ScanlineAnimationKeyframeKnobs.SPLIT_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_SPLIT_OPTS}
@@ -379,7 +380,7 @@ const SplitExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     setter={(value) => setBreakpointOpts("smoothness", value)}
                 />
                 <DirInput getter={() => breakpointOpts.dir!} setter={(value) => setBreakpointOpts("dir", value)} />
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -396,13 +397,13 @@ const BrightnessExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <BrightnessExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
             </PageMeasureBox>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <SmoothnessInput
                     getter={() => breakpointOpts.smoothness!}
                     setter={(value) => setBreakpointOpts("smoothness", value)}
                 />
                 <DirInput getter={() => breakpointOpts.dir!} setter={(value) => setBreakpointOpts("dir", value)} />
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -419,13 +420,13 @@ const GrayscaleExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <GrayscaleExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
             </PageMeasureBox>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <SmoothnessInput
                     getter={() => breakpointOpts.smoothness!}
                     setter={(value) => setBreakpointOpts("smoothness", value)}
                 />
                 <DirInput getter={() => breakpointOpts.dir!} setter={(value) => setBreakpointOpts("dir", value)} />
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -442,13 +443,13 @@ const HueExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 <HueExample {...props} keyframeOpts={() => keyframeOpts} breakpointOpts={() => breakpointOpts} />
             </PageMeasureBox>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <SmoothnessInput
                     getter={() => breakpointOpts.smoothness!}
                     setter={(value) => setBreakpointOpts("smoothness", value)}
                 />
                 <DirInput getter={() => breakpointOpts.dir!} setter={(value) => setBreakpointOpts("dir", value)} />
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -469,7 +470,7 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 />
             </PageMeasureBox>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageKnobs
                     knobs={() => ScanlineAnimationKeyframeKnobs.WAVE_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_WAVE_OPTS}
@@ -482,7 +483,7 @@ const WaveExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     setter={(value) => setBreakpointOpts("smoothness", value)}
                 />
                 <DirInput getter={() => breakpointOpts.dir!} setter={(value) => setBreakpointOpts("dir", value)} />
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -503,7 +504,7 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 />
             </PageMeasureBox>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageKnobs
                     knobs={() => ScanlineAnimationKeyframeKnobs.ROLL_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_ROLL_OPTS}
@@ -516,7 +517,7 @@ const RollExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     setter={(value) => setBreakpointOpts("smoothness", value)}
                 />
                 <DirInput getter={() => breakpointOpts.dir!} setter={(value) => setBreakpointOpts("dir", value)} />
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -537,7 +538,7 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 />
             </PageMeasureBox>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageKnobs
                     knobs={() => ScanlineAnimationKeyframeKnobs.DROPOUT_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_DROPOUT_OPTS}
@@ -550,7 +551,7 @@ const DropoutExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     setter={(value) => setBreakpointOpts("smoothness", value)}
                 />
                 <DirInput getter={() => breakpointOpts.dir!} setter={(value) => setBreakpointOpts("dir", value)} />
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -571,7 +572,7 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 />
             </PageMeasureBox>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageKnobs
                     knobs={() => ScanlineAnimationKeyframeKnobs.INTERLACE_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_INTERLACE_OPTS}
@@ -584,7 +585,7 @@ const InterlaceExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     setter={(value) => setBreakpointOpts("smoothness", value)}
                 />
                 <DirInput getter={() => breakpointOpts.dir!} setter={(value) => setBreakpointOpts("dir", value)} />
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };
@@ -605,7 +606,7 @@ const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                 />
             </PageMeasureBox>
 
-            <PagePropsPanel scope={"local"}>
+            <PageExampleKnobs>
                 <PageKnobs
                     knobs={() => ScanlineAnimationKeyframeKnobs.SKEW_KNOBS as Record<string, Knob>}
                     defaults={() => ScanlineAnimationKeyframes.DEFAULT_HORIZONTAL_SKEW_OPTS}
@@ -618,7 +619,7 @@ const SkewExampleWrapper = (props: ScanlineAnimationExampleProps) => {
                     setter={(value) => setBreakpointOpts("smoothness", value)}
                 />
                 <DirInput getter={() => breakpointOpts.dir!} setter={(value) => setBreakpointOpts("dir", value)} />
-            </PagePropsPanel>
+            </PageExampleKnobs>
         </>
     );
 };

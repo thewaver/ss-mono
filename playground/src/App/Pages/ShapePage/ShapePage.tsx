@@ -7,11 +7,12 @@ import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { ShapeKnobs } from "../../Knobs/Shapes.const";
 import { TimedGradientKnobs } from "../../Knobs/TimedGradients.const";
+import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
 import { PageProp } from "../../PageComponents/Prop/Prop";
-import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { PagePropsDivider, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
@@ -256,7 +257,178 @@ export const ShapePage = () => {
             {
                 key: "default",
                 name: "Default",
-                component: () => <DefaultExampleWrapper {...commonProps} />,
+                component: () => (
+                    <>
+                        <DefaultExampleWrapper {...commonProps} />
+
+                        <PageExampleKnobs>
+                            <PageProp
+                                key={"strokeConfigKey"}
+                                label={"Stroke Pattern"}
+                                hint={
+                                    "Which animated gradient paints the shape's outline. Choosing one brings its own knobs with it."
+                                }
+                            >
+                                <PageGroupedSelectField
+                                    value={getStrokeConfigKey}
+                                    groups={() => toGroupEntriesWithNoSample(GROUPPED_GRADIENTS)}
+                                    ariaLabel={"Stroke pattern"}
+                                    onChange={(config) => setStrokeConfigKey(() => config)}
+                                />
+                            </PageProp>
+
+                            <PageKnobs
+                                knobs={getStrokeKnobs}
+                                defaults={() => getStrokeDefaults()}
+                                values={getStrokeConfigDefs}
+                                onInput={(key, value) =>
+                                    setStrokeConfigDefs(getStrokeConfigKey(), (previous) => ({
+                                        ...previous,
+                                        [key]: value,
+                                    }))
+                                }
+                            />
+
+                            <PagePropsDivider />
+
+                            <PageProp
+                                key={"fillConfigKey"}
+                                label={"Fill Pattern"}
+                                hint={
+                                    "Which repeating pattern fills the shape's inside. Choosing one brings its own knobs with it."
+                                }
+                            >
+                                <PageGroupedSelectField
+                                    value={getFillConfigKey}
+                                    groups={() => toGroupEntriesWithNoSample(GROUPPED_PATTERNS)}
+                                    ariaLabel={"Fill pattern"}
+                                    onChange={(config) => setFillConfigKey(() => config)}
+                                />
+                            </PageProp>
+
+                            <PageProp
+                                key={"cellSize"}
+                                label={"Fill Cell Size (px)"}
+                                hint={"How large one tile of the fill pattern is before it repeats."}
+                            >
+                                <PageNumberField
+                                    value={getCellSize}
+                                    min={() => ShapeKnobs.MIN_CELL_SIZE}
+                                    max={() => ShapeKnobs.MAX_CELL_SIZE}
+                                    step={() => ShapeKnobs.CELL_SIZE_STEP}
+                                    ariaLabel={"Fill cell size"}
+                                    onInput={setCellSize}
+                                />
+                            </PageProp>
+
+                            <PagePropsDivider />
+
+                            <PageProp
+                                key={"shouldClipChildren"}
+                                label={"Clip children"}
+                                hint={
+                                    "Cuts whatever is inside the shape to the shape's own outline, instead of letting it spill past."
+                                }
+                            >
+                                <PageCheckField
+                                    value={getShouldClipChildren}
+                                    ariaLabel={"Clip children"}
+                                    onChange={setShouldClipChildren}
+                                />
+                            </PageProp>
+
+                            <PageProp
+                                key={"shouldPadChildren"}
+                                label={"Pad children"}
+                                hint={
+                                    "Insets whatever is inside far enough to clear the rounded corners, so text does not run under them."
+                                }
+                            >
+                                <PageCheckField
+                                    value={getShouldPadChildren}
+                                    ariaLabel={"Pad children"}
+                                    onChange={setShouldPadChildren}
+                                />
+                            </PageProp>
+
+                            <PageProp
+                                key={"edgeThicknessPx"}
+                                label={"Edge Thickness (px)"}
+                                hint={
+                                    "How thick the outline is along each edge. With individual corners off, the first field drives them all."
+                                }
+                            >
+                                <div class={styles.valueList} style={{ "grid-template-columns": getTemplateColumns() }}>
+                                    <For each={getPointIterator()}>
+                                        {(_, getIndex) => (
+                                            <PageNumberField
+                                                value={() => getEdgeThicknesses()[getIndex()]}
+                                                min={() => ShapeKnobs.MIN_EDGE_THICKNESS}
+                                                max={() => ShapeKnobs.MAX_EDGE_THICKNESS}
+                                                step={() => ShapeKnobs.EDGE_THICKNESS_STEP}
+                                                width={() => CORNER_FIELD_WIDTH}
+                                                ariaLabel={() => `Edge thickness ${getIndex() + 1}`}
+                                                onInput={(value) =>
+                                                    setEdgeThicknesses((prev) =>
+                                                        spreadCornerValue(
+                                                            prev,
+                                                            getIndex(),
+                                                            value,
+                                                            getHasIndividualCorners(),
+                                                        ),
+                                                    )
+                                                }
+                                            />
+                                        )}
+                                    </For>
+                                </div>
+                            </PageProp>
+
+                            <PageProp
+                                key={"blurWidth"}
+                                label={"Blur (px)"}
+                                hint={"How far the outline is blurred outward, which is what gives it its glow."}
+                            >
+                                <PageNumberField
+                                    value={getBlurWidth}
+                                    min={() => ShapeKnobs.MIN_BLUR_WIDTH}
+                                    max={() => ShapeKnobs.MAX_BLUR_WIDTH}
+                                    step={() => ShapeKnobs.BLUR_WIDTH_STEP}
+                                    ariaLabel={"Blur width"}
+                                    onInput={setBlurWidth}
+                                />
+                            </PageProp>
+
+                            <PageProp
+                                key={"animationDurationMs"}
+                                label={"Animation duration (ms)"}
+                                hint={"How long one pass of the stroke or fill animation takes."}
+                            >
+                                <PageNumberField
+                                    value={getAnimationDurationMs}
+                                    min={() => ShapeKnobs.MIN_DURATION_MS}
+                                    max={() => ShapeKnobs.MAX_DURATION_MS}
+                                    step={() => ShapeKnobs.DURATION_STEP_MS}
+                                    ariaLabel={"Animation duration"}
+                                    onInput={setAnimationDurationMs}
+                                />
+                            </PageProp>
+
+                            <PageProp
+                                key={"iterationConfigKey"}
+                                label={"Iteration Pattern"}
+                                hint={"How the animation repeats: once, endlessly, or back and forth."}
+                            >
+                                <PageSelectField
+                                    value={getIterationConfigKey}
+                                    values={() => SVGDefsSamples.Iteration.SAMPLE_KEYS}
+                                    ariaLabel={"Iteration pattern"}
+                                    onChange={(config) => setIterationConfigKey(() => config)}
+                                />
+                            </PageProp>
+                        </PageExampleKnobs>
+                    </>
+                ),
                 path: DEFAULT_EXAMPLE_PATH,
             },
             {
@@ -285,272 +457,109 @@ export const ShapePage = () => {
 
     return (
         <div class={styles.root} style={assignInlineVars({ [styles.backgroundColor]: colors.background })}>
-            <PagePropsGroups>
-                <PagePropsPanel scope={"sample"}>
-                    <PageProp
-                        key={"strokeConfigKey"}
-                        label={"Stroke Pattern"}
-                        hint={
-                            "Which animated gradient paints the shape's outline. Choosing one brings its own knobs with it."
-                        }
-                    >
-                        <PageGroupedSelectField
-                            value={getStrokeConfigKey}
-                            groups={() => toGroupEntriesWithNoSample(GROUPPED_GRADIENTS)}
-                            ariaLabel={"Stroke pattern"}
-                            onChange={(config) => setStrokeConfigKey(() => config)}
-                        />
-                    </PageProp>
-
-                    <PageKnobs
-                        knobs={getStrokeKnobs}
-                        defaults={() => getStrokeDefaults()}
-                        values={getStrokeConfigDefs}
-                        onInput={(key, value) =>
-                            setStrokeConfigDefs(getStrokeConfigKey(), (previous) => ({ ...previous, [key]: value }))
-                        }
+            <PagePropsPanel scope={"global"}>
+                <PageProp
+                    key={"hasIndividualCorners"}
+                    label={"Individual corner settings"}
+                    hint={"Opens one field per corner instead of one field driving all of them together."}
+                >
+                    <PageCheckField
+                        value={getHasIndividualCorners}
+                        ariaLabel={"Individual corner settings"}
+                        onChange={setHasIndividualCorners}
                     />
-                </PagePropsPanel>
+                </PageProp>
 
-                <PagePropsDivider />
+                <PageProp
+                    key={"jointRadiiPx"}
+                    label={"Joint Radii (px)"}
+                    hint={
+                        "How far each corner is rounded. With individual corners off, the first field drives them all."
+                    }
+                >
+                    <div class={styles.valueList} style={{ "grid-template-columns": getTemplateColumns() }}>
+                        <For each={getPointIterator()}>
+                            {(_, getIndex) => (
+                                <PageNumberField
+                                    value={() => getJoinRadii()[getIndex()]}
+                                    min={() => ShapeKnobs.MIN_JOIN_RADIUS}
+                                    max={() => ShapeKnobs.MAX_JOIN_RADIUS}
+                                    step={() => ShapeKnobs.JOIN_RADIUS_STEP}
+                                    width={() => CORNER_FIELD_WIDTH}
+                                    id={() => `jointRadius${getIndex() + 1}`}
+                                    ariaLabel={() => `Joint radius ${getIndex() + 1}`}
+                                    onInput={(value) =>
+                                        setJoinRadii((prev) =>
+                                            spreadCornerValue(prev, getIndex(), value, getHasIndividualCorners()),
+                                        )
+                                    }
+                                />
+                            )}
+                        </For>
+                    </div>
+                </PageProp>
 
-                <PagePropsPanel scope={"sample"}>
-                    <PageProp
-                        key={"fillConfigKey"}
-                        label={"Fill Pattern"}
-                        hint={
-                            "Which repeating pattern fills the shape's inside. Choosing one brings its own knobs with it."
-                        }
-                    >
-                        <PageGroupedSelectField
-                            value={getFillConfigKey}
-                            groups={() => toGroupEntriesWithNoSample(GROUPPED_PATTERNS)}
-                            ariaLabel={"Fill pattern"}
-                            onChange={(config) => setFillConfigKey(() => config)}
-                        />
-                    </PageProp>
+                <PageProp
+                    key={"lameExponent"}
+                    label={"Lamé Exponent"}
+                    hint={
+                        "How square or how pinched each rounded corner is: 2 is a circular round, higher is squarer, lower is pinched inward."
+                    }
+                >
+                    <div class={styles.valueList} style={{ "grid-template-columns": getTemplateColumns() }}>
+                        <For each={getPointIterator()}>
+                            {(_, getIndex) => (
+                                <PageNumberField
+                                    value={() => getLameExponents()[getIndex()]}
+                                    min={() => ShapeKnobs.MIN_LAME_EXPONENT}
+                                    max={() => ShapeKnobs.MAX_LAME_EXPONENT}
+                                    step={() => ShapeKnobs.LAME_EXPONENT_STEP}
+                                    width={() => CORNER_FIELD_WIDTH}
+                                    ariaLabel={() => `Lamé exponent ${getIndex() + 1}`}
+                                    onInput={(value) =>
+                                        setLameExponents((prev) =>
+                                            spreadCornerValue(prev, getIndex(), value, getHasIndividualCorners()),
+                                        )
+                                    }
+                                />
+                            )}
+                        </For>
+                    </div>
+                </PageProp>
 
-                    <PageProp
-                        key={"cellSize"}
-                        label={"Fill Cell Size (px)"}
-                        hint={"How large one tile of the fill pattern is before it repeats."}
-                    >
-                        <PageNumberField
-                            value={getCellSize}
-                            min={() => ShapeKnobs.MIN_CELL_SIZE}
-                            max={() => ShapeKnobs.MAX_CELL_SIZE}
-                            step={() => ShapeKnobs.CELL_SIZE_STEP}
-                            ariaLabel={"Fill cell size"}
-                            onInput={setCellSize}
-                        />
-                    </PageProp>
-                </PagePropsPanel>
+                <PageProp
+                    key={"shapeKind"}
+                    label={"Shape"}
+                    hint={
+                        "The outline the shape is cut to, which also decides how many corners the corner fields offer."
+                    }
+                >
+                    <PageSelectField
+                        value={getShapeKind}
+                        values={() => ShapeConst.DEFAULT_SHAPES}
+                        ariaLabel={"Shape"}
+                        onChange={(shape) => setShapeKind(() => shape)}
+                    />
+                </PageProp>
 
-                <PagePropsDivider />
-
-                <PagePropsPanel scope={"global"}>
-                    <PageProp
-                        key={"hasIndividualCorners"}
-                        label={"Individual corner settings"}
-                        hint={"Opens one field per corner instead of one field driving all of them together."}
-                    >
-                        <PageCheckField
-                            value={getHasIndividualCorners}
-                            ariaLabel={"Individual corner settings"}
-                            onChange={setHasIndividualCorners}
-                        />
-                    </PageProp>
-
-                    <PageProp
-                        key={"shouldClipChildren"}
-                        label={"Clip children"}
-                        hint={
-                            "Cuts whatever is inside the shape to the shape's own outline, instead of letting it spill past."
-                        }
-                    >
-                        <PageCheckField
-                            value={getShouldClipChildren}
-                            ariaLabel={"Clip children"}
-                            onChange={setShouldClipChildren}
-                        />
-                    </PageProp>
-
-                    <PageProp
-                        key={"shouldPadChildren"}
-                        label={"Pad children"}
-                        hint={
-                            "Insets whatever is inside far enough to clear the rounded corners, so text does not run under them."
-                        }
-                    >
-                        <PageCheckField
-                            value={getShouldPadChildren}
-                            ariaLabel={"Pad children"}
-                            onChange={setShouldPadChildren}
-                        />
-                    </PageProp>
-
-                    <PageProp
-                        key={"edgeThicknessPx"}
-                        label={"Edge Thickness (px)"}
-                        hint={
-                            "How thick the outline is along each edge. With individual corners off, the first field drives them all."
-                        }
-                    >
-                        <div class={styles.valueList} style={{ "grid-template-columns": getTemplateColumns() }}>
-                            <For each={getPointIterator()}>
-                                {(_, getIndex) => (
-                                    <PageNumberField
-                                        value={() => getEdgeThicknesses()[getIndex()]}
-                                        min={() => ShapeKnobs.MIN_EDGE_THICKNESS}
-                                        max={() => ShapeKnobs.MAX_EDGE_THICKNESS}
-                                        step={() => ShapeKnobs.EDGE_THICKNESS_STEP}
-                                        width={() => CORNER_FIELD_WIDTH}
-                                        ariaLabel={() => `Edge thickness ${getIndex() + 1}`}
-                                        onInput={(value) =>
-                                            setEdgeThicknesses((prev) =>
-                                                spreadCornerValue(prev, getIndex(), value, getHasIndividualCorners()),
-                                            )
-                                        }
-                                    />
-                                )}
-                            </For>
-                        </div>
-                    </PageProp>
-
-                    <PageProp
-                        key={"jointRadiiPx"}
-                        label={"Joint Radii (px)"}
-                        hint={
-                            "How far each corner is rounded. With individual corners off, the first field drives them all."
-                        }
-                    >
-                        <div class={styles.valueList} style={{ "grid-template-columns": getTemplateColumns() }}>
-                            <For each={getPointIterator()}>
-                                {(_, getIndex) => (
-                                    <PageNumberField
-                                        value={() => getJoinRadii()[getIndex()]}
-                                        min={() => ShapeKnobs.MIN_JOIN_RADIUS}
-                                        max={() => ShapeKnobs.MAX_JOIN_RADIUS}
-                                        step={() => ShapeKnobs.JOIN_RADIUS_STEP}
-                                        width={() => CORNER_FIELD_WIDTH}
-                                        id={() => `jointRadius${getIndex() + 1}`}
-                                        ariaLabel={() => `Joint radius ${getIndex() + 1}`}
-                                        onInput={(value) =>
-                                            setJoinRadii((prev) =>
-                                                spreadCornerValue(prev, getIndex(), value, getHasIndividualCorners()),
-                                            )
-                                        }
-                                    />
-                                )}
-                            </For>
-                        </div>
-                    </PageProp>
-
-                    <PageProp
-                        key={"lameExponent"}
-                        label={"Lamé Exponent"}
-                        hint={
-                            "How square or how pinched each rounded corner is: 2 is a circular round, higher is squarer, lower is pinched inward."
-                        }
-                    >
-                        <div class={styles.valueList} style={{ "grid-template-columns": getTemplateColumns() }}>
-                            <For each={getPointIterator()}>
-                                {(_, getIndex) => (
-                                    <PageNumberField
-                                        value={() => getLameExponents()[getIndex()]}
-                                        min={() => ShapeKnobs.MIN_LAME_EXPONENT}
-                                        max={() => ShapeKnobs.MAX_LAME_EXPONENT}
-                                        step={() => ShapeKnobs.LAME_EXPONENT_STEP}
-                                        width={() => CORNER_FIELD_WIDTH}
-                                        ariaLabel={() => `Lamé exponent ${getIndex() + 1}`}
-                                        onInput={(value) =>
-                                            setLameExponents((prev) =>
-                                                spreadCornerValue(prev, getIndex(), value, getHasIndividualCorners()),
-                                            )
-                                        }
-                                    />
-                                )}
-                            </For>
-                        </div>
-                    </PageProp>
-
-                    <PageProp
-                        key={"shapeKind"}
-                        label={"Shape"}
-                        hint={
-                            "The outline the shape is cut to, which also decides how many corners the corner fields offer."
-                        }
-                    >
-                        <PageSelectField
-                            value={getShapeKind}
-                            values={() => ShapeConst.DEFAULT_SHAPES}
-                            ariaLabel={"Shape"}
-                            onChange={(shape) => setShapeKind(() => shape)}
-                        />
-                    </PageProp>
-
-                    <PageProp
-                        key={"colors"}
-                        label={"Colors"}
-                        hint={"The colors the outline, the fill and the page's own background are painted from."}
-                    >
-                        <div class={styles.colorList}>
-                            <For each={Object.keys(colors)}>
-                                {(key) => (
-                                    <PageColorField
-                                        value={() => colors[key as keyof typeof colors]}
-                                        ariaLabel={() => key}
-                                        onInput={(value) => setColors(key as keyof typeof colors, value)}
-                                    />
-                                )}
-                            </For>
-                        </div>
-                    </PageProp>
-
-                    <PageProp
-                        key={"blurWidth"}
-                        label={"Blur (px)"}
-                        hint={"How far the outline is blurred outward, which is what gives it its glow."}
-                    >
-                        <PageNumberField
-                            value={getBlurWidth}
-                            min={() => ShapeKnobs.MIN_BLUR_WIDTH}
-                            max={() => ShapeKnobs.MAX_BLUR_WIDTH}
-                            step={() => ShapeKnobs.BLUR_WIDTH_STEP}
-                            ariaLabel={"Blur width"}
-                            onInput={setBlurWidth}
-                        />
-                    </PageProp>
-
-                    <PageProp
-                        key={"animationDurationMs"}
-                        label={"Animation duration (ms)"}
-                        hint={"How long one pass of the stroke or fill animation takes."}
-                    >
-                        <PageNumberField
-                            value={getAnimationDurationMs}
-                            min={() => ShapeKnobs.MIN_DURATION_MS}
-                            max={() => ShapeKnobs.MAX_DURATION_MS}
-                            step={() => ShapeKnobs.DURATION_STEP_MS}
-                            ariaLabel={"Animation duration"}
-                            onInput={setAnimationDurationMs}
-                        />
-                    </PageProp>
-
-                    <PageProp
-                        key={"iterationConfigKey"}
-                        label={"Iteration Pattern"}
-                        hint={"How the animation repeats: once, endlessly, or back and forth."}
-                    >
-                        <PageSelectField
-                            value={getIterationConfigKey}
-                            values={() => SVGDefsSamples.Iteration.SAMPLE_KEYS}
-                            ariaLabel={"Iteration pattern"}
-                            onChange={(config) => setIterationConfigKey(() => config)}
-                        />
-                    </PageProp>
-                </PagePropsPanel>
-            </PagePropsGroups>
+                <PageProp
+                    key={"colors"}
+                    label={"Colors"}
+                    hint={"The colors the outline, the fill and the page's own background are painted from."}
+                >
+                    <div class={styles.colorList}>
+                        <For each={Object.keys(colors)}>
+                            {(key) => (
+                                <PageColorField
+                                    value={() => colors[key as keyof typeof colors]}
+                                    ariaLabel={() => key}
+                                    onInput={(value) => setColors(key as keyof typeof colors, value)}
+                                />
+                            )}
+                        </For>
+                    </div>
+                </PageProp>
+            </PagePropsPanel>
 
             <PageExamples items={getExamples} layout={"flow"} />
         </div>

@@ -232,6 +232,7 @@ describe("ShapeUtils.getPaths", () => {
             innerPath: "",
             outerPoints: [],
             innerPoints: [],
+            outerOutline: [],
         });
     });
 
