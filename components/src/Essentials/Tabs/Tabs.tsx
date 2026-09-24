@@ -269,18 +269,21 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
 
     const renderTabs = () => <Index each={access(props.tabs)}>{renderTabAt}</Index>;
 
-    const renderFloater = () =>
-        props.renderFloater &&
-        floaterFader.getIsVisible() &&
-        getFloaterBounds() && (
+    const getIsFloaterRendered = createMemo(
+        () => props.renderFloater !== undefined && floaterFader.getIsVisible() && getFloaterBounds() !== undefined,
+    );
+
+    const renderFloater = () => (
+        <Show when={getIsFloaterRendered()}>
             <div
                 ref={setFloaterRef}
                 class={styles.tabsFloater}
                 style={{ ...getFloaterBounds(), "transition-duration": `${getTransitionDurationMs()}ms` }}
             >
-                {props.renderFloater(floaterFader.getTransitionTarget, getTransitionDurationMs)}
+                {props.renderFloater!(floaterFader.getTransitionTarget, getTransitionDurationMs)}
             </div>
-        );
+        </Show>
+    );
 
     return (
         <div

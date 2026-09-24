@@ -47,8 +47,8 @@ const DEFAULT_THEME_VALUES = {
             contrast: "hsl(0, 100%, 100%)",
         },
         background: {
-            dark: "hsl(0, 10%, 10%)",
-            light: "hsl(30, 10%, 15%)",
+            dark: "hsl(0, 20%, 5%)",
+            light: "hsl(30, 20%, 15%)",
             contrast: "hsl(30, 100%, 95%)",
         },
         surface: {

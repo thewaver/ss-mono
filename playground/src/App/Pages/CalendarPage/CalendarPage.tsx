@@ -145,7 +145,7 @@ export const CalendarPage = () => {
                 </PageProp>
             </PagePropsPanel>
 
-            <PageExamples items={getExamples} />
+            <PageExamples items={getExamples} minColumnWidth={400} />
         </>
     );
 };

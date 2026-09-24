@@ -7,13 +7,12 @@ export const docsView = style({
     flexDirection: "column",
     gap: themeVars.spacing.quad,
     width: "100%",
+    maxWidth: 960,
 });
 
 export const docsLead = style({
     margin: 0,
-    maxWidth: 900,
     fontSize: themeVars.fontSize.medium,
-    lineHeight: 1.6,
 });
 
 export const docsGroup = style({
@@ -43,9 +42,7 @@ export const docsTableTitle = style({
 
 export const docsDescription = style({
     margin: 0,
-    maxWidth: 900,
     fontSize: themeVars.fontSize.small,
-    lineHeight: 1.6,
 });
 
 export const docsEmpty = style({
@@ -53,8 +50,11 @@ export const docsEmpty = style({
 });
 
 export const docsTableScroller = style({
-    width: "100%",
     overflowX: "auto",
+    backgroundColor: `rgba(from ${themeVars.color.control.background.main} r g b / 50%)`,
+    border: `1px solid rgb(from ${themeVars.color.background.contrast} r g b / 25%)`,
+    borderRadius: themeVars.borderRadius.full,
+    boxShadow: themeVars.shadow.small,
 });
 
 export const docsTable = style({
@@ -72,9 +72,14 @@ export const docsHeadCell = style({
 });
 
 export const docsCell = style({
-    borderBottom: `1px solid rgb(from ${themeVars.color.background.contrast} r g b / 10%)`,
     padding: themeVars.spacing.full,
     verticalAlign: "top",
+
+    selectors: {
+        [`tr:not(:last-child) > &`]: {
+            borderBottom: `1px solid rgb(from ${themeVars.color.background.contrast} r g b / 10%)`,
+        },
+    },
 });
 
 export const docsNameCell = style([docsCell, { whiteSpace: "nowrap", fontFamily: "monospace" }]);
@@ -82,14 +87,14 @@ export const docsNameCell = style([docsCell, { whiteSpace: "nowrap", fontFamily:
 export const docsTypeCell = style([docsCell, { fontFamily: "monospace" }]);
 
 export const docsOptional = style({
-    opacity: 0.6,
+    opacity: 0.75,
 });
 
 export const docsFlag = style({
     display: "inline-block",
     borderRadius: themeVars.borderRadius.half,
     padding: `2px ${themeVars.spacing.half}`,
-    backgroundColor: `rgb(from ${themeVars.color.background.contrast} r g b / 12%)`,
+    backgroundColor: `rgb(from ${themeVars.color.background.contrast} r g b / 10%)`,
     fontSize: themeVars.fontSize.xSmall,
     whiteSpace: "nowrap",
 });
