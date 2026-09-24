@@ -8,7 +8,6 @@ import { Checkbox, Collapsible, Label, Tree, ViewportWrapper } from "@thewaver/s
 import type { SignalPair, TreeNode } from "@thewaver/ss-components";
 import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
 
-import { PageApiView } from "./PageComponents/ApiView/ApiView";
 import { PageDocsView } from "./PageComponents/DocsView/DocsView";
 import { PageViewTabs } from "./PageComponents/ViewTabs/ViewTabs";
 import { toBaseRoute, toPageViewRoute } from "./PageComponents/ViewTabs/ViewTabs.const";
@@ -1497,8 +1496,10 @@ export function App() {
                                     ))
                                 }
                             />
-                            <Route path="/docs" component={() => <PageDocsView description={config.description} />} />
-                            <Route path="/api" component={() => <PageApiView name={config.name} />} />
+                            <Route
+                                path="/docs"
+                                component={() => <PageDocsView name={config.name} description={config.description} />}
+                            />
                         </Route>
                     ))}
                 </Route>

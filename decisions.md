@@ -1825,13 +1825,22 @@ other three ever arrived. **They are plural to match the page that was already t
 them in the singular, and the existing name is a rename the user made deliberately, so matching it was the
 change that moved nothing.
 
-### A component page is three routed views, and the API one is read off the published type
+### A component page is two routed views, and the Docs one is read off the published type
 
-Each component page is now Docs, API and Samples, and which one you are on is a URL rather than component
-state, so a view can be linked to and the back button walks them.
+Each component page is Docs and Samples, and which one you are on is a URL rather than component state, so a
+view can be linked to and the back button walks them.
 
-**Samples is the index rather than a segment of its own.** `/button` is the Samples view and only `/docs`
-and `/api` are added. Giving Samples a segment would have renamed every address in the Playground and every
+**Docs and API were two tabs at first, and are one now.** The first build had a Docs tab holding
+only the description and an API tab holding the export tables. Once the tables carried the documentation
+blocks of props, utilities and types, most of what a reader learns about a unit was on the API tab and the
+Docs tab was one paragraph. The user's call: one tab, named Docs at `/docs`, with the description as its
+lead paragraph and the tables under it. The name covers both halves where "API" would have put the plain
+description under a reference heading, and pages without samples already forwarded to `/docs`. The
+`data-api-*` attributes on groups, tables and rows keep their name, since they mark the export tables
+wherever those are drawn, and `virtual:component-api` keeps its name for the same reason.
+
+**Samples is the index rather than a segment of its own.** `/button` is the Samples view and only `/docs` is
+added. Giving Samples a segment would have renamed every address in the Playground and every
 locator in the suite for no gain, and the bare route is what the pages already were.
 
 **The tab bar lives in the shell, not in the pages.** `AppContent` already renders the title and the
@@ -1839,8 +1848,8 @@ dependency chips above the routed outlet, so the tabs go there too and no page f
 have to change is the config lookup: it keyed off the exact pathname, so `/button/docs` found nothing and
 the whole header — tabs included — disappeared on any view but the first. It resolves the base route now.
 
-**The description moved out of the header into Docs**, which is what makes Docs a view rather than an empty
-frame. The consequence is that landing on a page no longer shows the description; reaching it is one click.
+**The description moved out of the header into Docs.** The consequence is that landing on a page no longer
+shows the description; reaching it is one click.
 
 **The props table is read off the published type at build time, not written by hand.** `virtual:component-api`
 is a vite plugin in the shape of the dependency one, except that it drives the TypeScript compiler rather
@@ -1881,7 +1890,7 @@ dropped, which leaves `href` and takes the library's own total from 3,718 to 2,3
 spread into every wrapped control, so two files took the documented count from 7 to 643. That is why
 `conventions.md` says to document the layered props first rather than working component by component.
 
-### The API view lists everything a unit exports, not only its props
+### The Docs view lists everything a unit exports, not only its props
 
 Asked for by the user: a props table was half the story, and for an abstract — almost all namespaces — it was
 none of it. The view now covers every export of the library entry except `.const` files and
@@ -1921,16 +1930,16 @@ they structure such a case generally, over flattening the two sample pages up be
 
 ### Primitives have a menu section, and a page with no examples has no Samples tab
 
-Asked for by the user once the API view existed: a primitive had exports worth reading and nowhere to read
+Asked for by the user once the export tables existed: a primitive had exports worth reading and nowhere to read
 them. **Each of the twelve folders under `Primitives/` is a config entry** in a `Primitives` section, with a
 description and no examples, exactly as an abstract is — the page test in _"Layering"_ says a primitive
 cannot be shown alone, so there is nothing to put under Samples. Its description says which components are
-built on it and whether it is exported whole or only by its types, since that decides what its API view holds.
+built on it and whether it is exported whole or only by its types, since that decides what its Docs view lists.
 
-**A page with no `component` shows Docs and API only, and its bare address forwards to Docs.** The user
+**A page with no `component` shows Docs only, and its bare address forwards to Docs.** The user
 asked for the empty Samples tab to go from abstracts; the rule is written on the config rather than on the
 layer, so it holds for any entry without examples, and an SVG defs page without examples — `SVGAnimations` —
-has two tabs as well. The forward replaces the history entry rather than adding one, so the back button does
+has only the one tab as well. The forward replaces the history entry rather than adding one, so the back button does
 not return to an address that only forwards again. Every link in the nav still points at the bare address.
 
 **Primitives are a third group in Uses and Used by**, between abstracts and components. The reason they were
@@ -1966,7 +1975,7 @@ was and a page each for the layouts and the effects.
 
 **The breakpoint and zone tables became generators of their own, split by what they hold.** They arrived as
 `CellAnimationBreakpoints.const.ts` and `CellAnimationZones.const.ts`, each one namespace mixing constant
-lists, types and callable functions — so the API view skipped the functions, being `.const`, and nothing
+lists, types and callable functions — so the Docs view skipped the functions, being `.const`, and nothing
 documented them. The user's call: the lists stay in the `.const.ts`, the types go to a `.types.ts` as
 top-level names (`CellAnimationEasing`, `CellAnimationBreakpointTriple`, `CellAnimationZoneType`), and the
 functions go to a documented `.utils.ts` as `CellAnimationBreakpointUtils` and `CellAnimationZoneUtils`. They

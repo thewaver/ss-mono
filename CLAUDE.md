@@ -365,7 +365,7 @@ The rule also lives in `conventions.md` now, which is where it should always hav
 here, and that is why it went unfollowed in a tree nobody thought to check this file about.
 
 **A member of an exported props type in `components/src` carries a `/** */` block, and that is the second
-exception.** The user's call, taken when the Playground grew an API view: the table it draws lists a
+exception.** The user's call, taken when the Playground grew its export tables: the table it draws lists a
 component's props, and the sentence saying what each one is for has to come from somewhere. Hand-writing it
 beside the table was rejected because it drifts from the type the moment a prop is renamed; putting it on the
 property means it cannot. It also reaches a consumer's editor on hover, which the Playground never could.

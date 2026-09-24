@@ -1,16 +1,14 @@
 import type { PageViewKey } from "./ViewTabs.types";
 
-export const PAGE_VIEW_KEYS: PageViewKey[] = ["docs", "api", "samples"];
+export const PAGE_VIEW_KEYS: PageViewKey[] = ["docs", "samples"];
 
 export const PAGE_VIEW_LABELS: Record<PageViewKey, string> = {
     docs: "Docs",
-    api: "API",
     samples: "Samples",
 };
 
 export const PAGE_VIEW_SEGMENTS: Record<PageViewKey, string> = {
     docs: "/docs",
-    api: "/api",
     samples: "",
 };
 
