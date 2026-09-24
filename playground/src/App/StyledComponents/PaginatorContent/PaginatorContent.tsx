@@ -37,7 +37,7 @@ const RESULTS = [
 const toResult = (index: number) => RESULTS[index % RESULTS.length];
 
 const toViewBox = (rect: PlacementRect) =>
-    `${rect.left - rect.width * HALF} ${rect.top - rect.height * HALF} ${rect.width} ${rect.height}`;
+    `${rect.leftShare - rect.widthShare * HALF} ${rect.topShare - rect.heightShare * HALF} ${rect.widthShare} ${rect.heightShare}`;
 
 const STEP_GLYPHS: Record<PaginatorStep, string> = {
     first: "«",

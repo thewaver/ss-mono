@@ -123,10 +123,10 @@ export const Tabs = <T,>(props: TabsProps<T>) => {
     );
 
     const toPlacedBounds = (placement: PlacementRect) => ({
-        top: PlacementUtils.toContainerWidth(placement.top - placement.height * HALF),
-        left: PlacementUtils.toContainerWidth(placement.left - placement.width * HALF),
-        width: PlacementUtils.toContainerWidth(placement.width),
-        height: PlacementUtils.toContainerWidth(placement.height),
+        top: PlacementUtils.toContainerWidth(placement.topShare - placement.heightShare * HALF),
+        left: PlacementUtils.toContainerWidth(placement.leftShare - placement.widthShare * HALF),
+        width: PlacementUtils.toContainerWidth(placement.widthShare),
+        height: PlacementUtils.toContainerWidth(placement.heightShare),
         transform: `rotate(${placement.angle ?? NO_ANGLE}deg)`,
     });
 

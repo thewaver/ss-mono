@@ -262,6 +262,12 @@ formatter, a language server — anything that writes outside the repository. Na
 and what it would buy, and wait. Where the question was "which browser are you in", the answer was to ask
 them.
 
+**The one standing exception: Playwright's own browser, when the installed build is older than the one it asks
+for.** Stated by the user, who works across several machines and expects the mismatch to recur. When a spec run
+fails with Playwright's "Executable doesn't exist" message, run `npx playwright install chromium` without asking,
+say in the reply that it was done, and carry on. It covers updating the browser the suite already uses, and
+nothing else — a different browser, or any other install, still waits for them.
+
 **A probe is cheaper than a theory: make the thing an obvious color.** The user's technique, offered after
 several rounds of reasoning about why a layout looked wrong — _"quick way to test - make the dashed box
 background red"_. A garish `background`, `outline` or border on one named element answers, in one reload,

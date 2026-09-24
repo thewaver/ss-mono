@@ -66,7 +66,7 @@ describe("createArc", () => {
         layout.placements.slice(1).map((placement, index) => {
             const previous = layout.placements[index];
 
-            return Math.hypot(placement.left - previous.left, placement.top - previous.top);
+            return Math.hypot(placement.leftShare - previous.leftShare, placement.topShare - previous.topShare);
         });
 
     const spread = (values: number[]) => Math.max(...values) / Math.min(...values);
@@ -105,9 +105,9 @@ describe("createArc", () => {
 
         expect(flat.heightRatio, "a flattened arc is a shallower box").toBeLessThan(round.heightRatio);
         expect(
-            flat.placements[0].height * flat.extent,
+            flat.placements[0].heightShare * flat.extent,
             "while an item keeps the size it was given, in pixels",
-        ).toBeCloseTo(round.placements[0].height * round.extent);
+        ).toBeCloseTo(round.placements[0].heightShare * round.extent);
     });
 
     it("hands a painter the curve rather than a radius, so a run between two items can follow it", () => {
@@ -127,11 +127,11 @@ describe("createArc", () => {
             const first = layout.placements[0];
             const last = layout.placements[ITEM_COUNT - 1];
 
-            return Math.hypot(first.left - last.left, first.top - last.top);
+            return Math.hypot(first.leftShare - last.leftShare, first.topShare - last.topShare);
         };
 
-        expect(open.placements[0].left - open.origin!.x, "a run is symmetrical about the facing").toBeCloseTo(
-            -(open.placements[ITEM_COUNT - 1].left - open.origin!.x),
+        expect(open.placements[0].leftShare - open.origin!.x, "a run is symmetrical about the facing").toBeCloseTo(
+            -(open.placements[ITEM_COUNT - 1].leftShare - open.origin!.x),
         );
         expect(spread(stepsOf(whole)), "asked for a whole turn, the steps it does take are even").toBeCloseTo(1);
         expect(
@@ -139,10 +139,10 @@ describe("createArc", () => {
             "and the room left between last and first is one more step, so the ring closes without the run having to",
         ).toBeCloseTo(Math.max(...stepsOf(whole)));
         expect(
-            whole.placements[0].left,
+            whole.placements[0].leftShare,
             "asking for more than a whole turn cannot carry the run any further round",
-        ).toBeCloseTo(beyond.placements[0].left);
-        expect(whole.placements[0].top).toBeCloseTo(beyond.placements[0].top);
+        ).toBeCloseTo(beyond.placements[0].leftShare);
+        expect(whole.placements[0].topShare).toBeCloseTo(beyond.placements[0].topShare);
     });
 });
 
@@ -227,7 +227,7 @@ describe("createRing", () => {
 describe("createHoneycomb", () => {
     const HEX_HEIGHT_RATIO = 2 / Math.sqrt(3);
 
-    const rowOf = (layout: SizedLayout, index: number) => layout.placements[index].top;
+    const rowOf = (layout: SizedLayout, index: number) => layout.placements[index].topShare;
 
     it("fills a row before starting the next, and steps down by less than a whole cell", () => {
         const layout = PlacementLayoutUtils.createHoneycomb({ perRow: 3, gapRatio: 0 })({ itemCount: 6 });
@@ -237,15 +237,15 @@ describe("createHoneycomb", () => {
         expect(
             rowOf(layout, 3) - rowOf(layout, 0),
             "by three quarters of a cell, which is what makes the rows interlock rather than stack",
-        ).toBeCloseTo(layout.placements[0].height * 3 * 0.25);
+        ).toBeCloseTo(layout.placements[0].heightShare * 3 * 0.25);
     });
 
     it("staggers every other row by half a cell, so a cell sits in the notch between two", () => {
         const layout = PlacementLayoutUtils.createHoneycomb({ perRow: 2 })({ itemCount: 4 });
-        const step = layout.placements[1].left - layout.placements[0].left;
+        const step = layout.placements[1].leftShare - layout.placements[0].leftShare;
 
         expect(
-            layout.placements[2].left - layout.placements[0].left,
+            layout.placements[2].leftShare - layout.placements[0].leftShare,
             "the second row starts half a step in",
         ).toBeCloseTo(step * 0.5);
     });
@@ -256,15 +256,15 @@ describe("createHoneycomb", () => {
 
         for (const layout of [tight, loose]) {
             expect(
-                layout.placements[0].height / layout.placements[0].width,
+                layout.placements[0].heightShare / layout.placements[0].widthShare,
                 "a hexagon across the points is taller than it is across the flats, by a fixed amount",
             ).toBeCloseTo(HEX_HEIGHT_RATIO);
         }
 
         expect(
-            loose.placements[0].width,
+            loose.placements[0].widthShare,
             "and a cell is a smaller share of a box that holds more of them",
-        ).toBeLessThan(tight.placements[0].width);
+        ).toBeLessThan(tight.placements[0].widthShare);
     });
 
     it("picks by nearest rather than by bearing, there being no center to take a bearing from", () => {
@@ -276,12 +276,14 @@ describe("createWhorl", () => {
     const HALF = 0.5;
 
     const lowestEdge = (placements: PlacementRect[], from: number, count: number) =>
-        placements.slice(from, from + count).reduce((low, box) => Math.max(low, box.top + box.height * HALF), 0);
+        placements
+            .slice(from, from + count)
+            .reduce((low, box) => Math.max(low, box.topShare + box.heightShare * HALF), 0);
 
     const highestEdge = (placements: PlacementRect[], from: number, count: number) =>
         placements
             .slice(from, from + count)
-            .reduce((high, box) => Math.min(high, box.top - box.height * HALF), Infinity);
+            .reduce((high, box) => Math.min(high, box.topShare - box.heightShare * HALF), Infinity);
 
     const withinWhorl = (placements: PlacementRect[]) => highestEdge(placements, 1, 2) - lowestEdge(placements, 0, 1);
 

@@ -2992,7 +2992,7 @@ is wrong.** A bounding box looked tidier: the element would then contain the who
 could simply center in it. But the center of an annular sector's bounding box is not on the sector. For a
 wide, thin band — the second level of a wheel is 117° of a band 84px thick — that center lands **inside the
 hole**, so the label would float off the wedge and the element's own center would not be a point a pointer
-could press. So `left` and `top` stay what they mean everywhere else, the mid-radius mid-angle point where
+could press. So `leftShare` and `topShare` stay what they mean everywhere else, the mid-radius mid-angle point where
 the content goes, and the painter's SVG carries `overflow: visible` so a small box can paint a wedge much
 larger than itself.
 
@@ -11055,6 +11055,64 @@ rather than per call, so `prefers-reduced-motion` turns it off without the compo
 
 **Horizontal only.** The axis is one variable rather than a redesign, but nothing has asked for a column and
 `SlideButton`'s precedent is to build the axis that exists.
+
+### `EdgeFader`: a mask on the content, fixed or following the scroll
+
+A wrapper whose chosen sides fade to nothing. The consumer picks any mix of `top`, `right`, `bottom` and `left`,
+one `size` in pixels for how far in the fade reaches, and whether it follows the scroll.
+
+**A mask, not a gradient laid over the top.** An overlay has to be painted in the color of whatever is behind
+the box, which the component cannot know and the consumer would have to keep in step by hand; a mask fades the
+content itself to transparent, so any background shows through unasked. Each axis is one `linear-gradient`
+layer, and two axes are combined with `mask-composite: intersect` — the default adds layers together, and the
+union of a vertical strip and a horizontal one fades nothing at all.
+
+**The scrollbars are kept out of the mask.** A mask covers everything the box paints, its own scrollbars
+included, so a plain fade ate the ends of each bar — both bars at once when the box scrolls both ways. The fix
+is the documented one ([Pqina](https://pqina.nl/blog/fade-out-overflow-using-css-mask-image/)): the fade layers
+are sized to the box minus the scrollbar strips, and a solid layer is added over each strip. The strips are
+measured as `offsetWidth - clientWidth` and `offsetHeight - clientHeight`, so a box with no scrollbar gets
+zero-sized strips and nothing changes. The layer order is what makes the arithmetic right: the two fades
+intersect with each other first, and the strips are then added on top, so neither strip is cut by the other
+axis's fade.
+
+**Both modes, the user's call, and fixed is the default.** Fixed works on anything, scrolling or not. Scroll-aware
+sets each side's fade to the lesser of `size` and the distance left to scroll that way, so a fade shrinks to
+nothing as its end arrives rather than switching off, and a box whose contents fit shows no fade anywhere. That
+last case is the answer to "what does scroll-aware do when nothing scrolls", which was the open question when
+the user chose to have both.
+
+**The wrapper is the scroll box.** It is `overflow: auto` with `max-width` and `max-height` at `100%`, so it takes
+its size from a parent that has one and hugs its content otherwise. The consequence: scroll-aware watches its
+own scroll only, so wrapping something that scrolls inside itself — a `Scroller`, whose track is the scrolling
+element — finds nothing to follow and draws no fade. Fixed mode still works around such a thing.
+
+**The scroll is measured in script, the way `Scroller` measures its track**: a scroll listener, a resize
+observer on the box and its children, and a mutation observer to pick up children arriving later. CSS scroll-driven
+animations can produce the same fade with no script; that route was not taken, and its browser support was not
+looked into when this was built.
+
+**A box that scrolls with nothing focusable inside becomes a tab stop.** WCAG 2.1.1: a keyboard user has to be
+able to scroll it, and with nothing inside to land on, Tab passes straight over it in browsers that do not make
+such boxes reachable on their own. Chrome does now make them reachable, and this copies that rule rather than
+inventing one: the box takes `tabindex="0"` only while it overflows and holds nothing
+`FocusManagerUtils.getFirstFocusableChild` can find. When something inside is focusable, tabbing to it already
+scrolls the box, so a second stop would be noise. A mutation observer over the whole subtree, filtered to the
+attributes that change focusability, keeps the answer current. The user left this call to Claude's judgement.
+
+**`ariaLabel` is optional, and names the box only while it scrolls.** Given, the scrolling box is `role="region"`
+with that name; not given, it is still reachable, only unnamed. Making it required, as _"A role that requires a
+name makes the prop that names it required"_ would suggest, would have charged every non-scrolling use for a role
+it never takes; the role is applied only when the name exists, so the convention is not broken.
+
+**The fade drops while the box has keyboard focus.** The mask clips everything outside the box, which is exactly
+where an outline is drawn, and would fade an inset one at the edges anyway — WCAG 2.4.7. So `:focus-visible`
+sets `mask-image: none !important`, which outranks the inline mask. The person operating the box sees all of it
+for as long as they are.
+
+**Sides are physical**, as `Drawer`'s edges are, and for the reason recorded under _"Controls: `TextInput`"_:
+nothing else in the library is right-to-left aware, so a logical name would promise something the rest does not
+keep.
 
 ### Controls: `Carousel`, and the first component that acts without being asked
 

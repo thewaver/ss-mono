@@ -74,14 +74,14 @@ export namespace PatchBoardUtils {
 
         if (orientation === "vertical") {
             return {
-                x: placement.spot.x + placement.size.width * share,
-                y: placement.spot.y + (isFarEdge ? placement.size.height : NOTHING),
+                x: placement.spot.x + placement.sizeShare.width * share,
+                y: placement.spot.y + (isFarEdge ? placement.sizeShare.height : NOTHING),
             };
         }
 
         return {
-            x: placement.spot.x + (isFarEdge ? placement.size.width : NOTHING),
-            y: placement.spot.y + placement.size.height * share,
+            x: placement.spot.x + (isFarEdge ? placement.sizeShare.width : NOTHING),
+            y: placement.spot.y + placement.sizeShare.height * share,
         };
     };
 
@@ -212,12 +212,12 @@ export namespace PatchBoardUtils {
      * with its whole self visible.
      *
      * @param spot Where the drag wants to put it.
-     * @param size The node's size.
-     * @param bounds The board's size, in the same unit as the spot.
+     * @param sizeShare The node's size.
+     * @param boundsShare The board's size, in the same unit as the spot.
      */
-    export const getClampedSpot = (spot: Point2d, size: Size2d, bounds: Size2d): Point2d => ({
-        x: MathUtils.clamp(spot.x, NOTHING, Math.max(NOTHING, bounds.width - size.width)),
-        y: MathUtils.clamp(spot.y, NOTHING, Math.max(NOTHING, bounds.height - size.height)),
+    export const getClampedSpot = (spot: Point2d, sizeShare: Size2d, boundsShare: Size2d): Point2d => ({
+        x: MathUtils.clamp(spot.x, NOTHING, Math.max(NOTHING, boundsShare.width - sizeShare.width)),
+        y: MathUtils.clamp(spot.y, NOTHING, Math.max(NOTHING, boundsShare.height - sizeShare.height)),
     });
 
     /**
@@ -364,19 +364,19 @@ export namespace PatchBoardUtils {
      * is given the band nearest to it.
      *
      * @param spot The node's position.
-     * @param size The node's size.
-     * @param bounds The board's size, in the same unit as the spot. An empty axis puts every node in its first band.
+     * @param sizeShare The node's size.
+     * @param boundsShare The board's size, in the same unit as the spot. An empty axis puts every node in its first band.
      * @returns A vertical and a horizontal band, such as `top` and `left`, for the consumer to word.
      */
-    export const getRegion = (spot: Point2d, size: Size2d, bounds: Size2d): PatchBoardRegion => {
+    export const getRegion = (spot: Point2d, sizeShare: Size2d, boundsShare: Size2d): PatchBoardRegion => {
         const band = (value: number, extent: number) =>
             extent > NOTHING
                 ? MathUtils.clamp(Math.floor((value / extent) * THIRDS), NOTHING, THIRDS - SINGLE)
                 : NOTHING;
 
         return {
-            vertical: VERTICAL_BANDS[band(spot.y + size.height * 0.5, bounds.height)],
-            horizontal: HORIZONTAL_BANDS[band(spot.x + size.width * 0.5, bounds.width)],
+            vertical: VERTICAL_BANDS[band(spot.y + sizeShare.height * 0.5, boundsShare.height)],
+            horizontal: HORIZONTAL_BANDS[band(spot.x + sizeShare.width * 0.5, boundsShare.width)],
         };
     };
 }

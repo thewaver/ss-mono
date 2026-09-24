@@ -1260,8 +1260,6 @@ is the user's to confirm or change.
   of that counts.
 - **Whether Shape should accept a class or a style for its outer box.** The text-wrap example has to reach it with
   a child selector, because Shape takes neither.
-- **PatchBoard node sizes are called `width` and `height` while holding shares of the board's width.**
-  `conventions.md` says those two words mean pixels. `PlacementRect` already bends the same rule.
 - **A paused CellAnimation now shows its cut-up grid at the current point instead of the whole picture.** Before
   anything has run, that is the first frame. Resizing the window or switching tabs also no longer starts the
   pass over. Both follow from making the pass scrubbable.

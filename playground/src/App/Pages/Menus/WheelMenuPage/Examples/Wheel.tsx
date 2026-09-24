@@ -13,7 +13,7 @@ const SUBMENU_MARK = "›";
 const CLOSER_MARK = "✕";
 
 const toViewBox = (rect: PlacementRect) =>
-    `${rect.left - rect.width * HALF} ${rect.top - rect.height * HALF} ${rect.width} ${rect.height}`;
+    `${rect.leftShare - rect.widthShare * HALF} ${rect.topShare - rect.heightShare * HALF} ${rect.widthShare} ${rect.heightShare}`;
 
 type WedgeDefsProps = {
     gradientId: string;

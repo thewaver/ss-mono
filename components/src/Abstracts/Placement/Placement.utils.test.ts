@@ -7,19 +7,19 @@ const RING: PlacementLayout = {
     heightRatio: 1,
     pickRule: "angle",
     placements: [
-        { left: 0.5, top: 0.1, width: 0.2, height: 0.2 },
-        { left: 0.9, top: 0.5, width: 0.2, height: 0.2 },
-        { left: 0.5, top: 0.9, width: 0.2, height: 0.2 },
-        { left: 0.1, top: 0.5, width: 0.2, height: 0.2 },
+        { leftShare: 0.5, topShare: 0.1, widthShare: 0.2, heightShare: 0.2 },
+        { leftShare: 0.9, topShare: 0.5, widthShare: 0.2, heightShare: 0.2 },
+        { leftShare: 0.5, topShare: 0.9, widthShare: 0.2, heightShare: 0.2 },
+        { leftShare: 0.1, topShare: 0.5, widthShare: 0.2, heightShare: 0.2 },
     ],
 };
 
 const SCATTER: PlacementLayout = {
     heightRatio: 0.5,
     placements: [
-        { left: 0.1, top: 0.1, width: 0.1, height: 0.1 },
-        { left: 0.9, top: 0.4, width: 0.1, height: 0.1 },
-        { left: 0.5, top: 0.25, width: 0.1, height: 0.1 },
+        { leftShare: 0.1, topShare: 0.1, widthShare: 0.1, heightShare: 0.1 },
+        { leftShare: 0.9, topShare: 0.4, widthShare: 0.1, heightShare: 0.1 },
+        { leftShare: 0.5, topShare: 0.25, widthShare: 0.1, heightShare: 0.1 },
     ],
 };
 
@@ -42,10 +42,10 @@ describe("getSpacing", () => {
         const run = {
             heightRatio: 1,
             placements: [
-                { left: 0, top: 0, width: 0.1, height: 0.1 },
-                { left: 0.1, top: 0, width: 0.1, height: 0.1 },
-                { left: 0.2, top: 0, width: 0.1, height: 0.1 },
-                { left: 0.9, top: 0, width: 0.1, height: 0.1 },
+                { leftShare: 0, topShare: 0, widthShare: 0.1, heightShare: 0.1 },
+                { leftShare: 0.1, topShare: 0, widthShare: 0.1, heightShare: 0.1 },
+                { leftShare: 0.2, topShare: 0, widthShare: 0.1, heightShare: 0.1 },
+                { leftShare: 0.9, topShare: 0, widthShare: 0.1, heightShare: 0.1 },
             ],
         };
 
@@ -107,7 +107,7 @@ describe("pickIndex, by angle", () => {
     it("passes over an item sitting on the origin, because it is the one place with no direction to aim at", () => {
         const withCenter: PlacementLayout = {
             ...RING,
-            placements: [...RING.placements, { left: 0.5, top: 0.5, width: 0.4, height: 0.4 }],
+            placements: [...RING.placements, { leftShare: 0.5, topShare: 0.5, widthShare: 0.4, heightShare: 0.4 }],
         };
         const pickWithCenter = (x: number, y: number) =>
             PlacementUtils.pickIndex({ layout: withCenter, point: { x, y } });
@@ -165,34 +165,34 @@ describe("pickIndex, with nothing to pick", () => {
 });
 
 describe("getGapPlacement", () => {
-    const box = (left: number, top: number, angle?: number): PlacementRect => ({
-        left,
-        top,
-        width: 0.2,
-        height: 0.1,
+    const box = (leftShare: number, topShare: number, angle?: number): PlacementRect => ({
+        leftShare,
+        topShare,
+        widthShare: 0.2,
+        heightShare: 0.1,
         angle,
     });
 
     it("sits midway between the two borders rather than midway between the two centers", () => {
         const gap = PlacementUtils.getGapPlacement([box(0.2, 0.5), box(0.8, 0.5)], 1)!;
 
-        expect(gap.left, "the centers are level, so the gap is level with them").toBeCloseTo(0.5);
-        expect(gap.top).toBeCloseTo(0.5);
-        expect(gap.width, "and it is as wide as what is left between the two facing edges").toBeCloseTo(0.4);
+        expect(gap.leftShare, "the centers are level, so the gap is level with them").toBeCloseTo(0.5);
+        expect(gap.topShare).toBeCloseTo(0.5);
+        expect(gap.widthShare, "and it is as wide as what is left between the two facing edges").toBeCloseTo(0.4);
     });
 
     it("measures a smaller gap when the neighbors are wider, the centers being unmoved", () => {
         const narrow = PlacementUtils.getGapPlacement([box(0.2, 0.5), box(0.8, 0.5)], 1)!;
         const wide = PlacementUtils.getGapPlacement(
             [
-                { ...box(0.2, 0.5), width: 0.4 },
-                { ...box(0.8, 0.5), width: 0.4 },
+                { ...box(0.2, 0.5), widthShare: 0.4 },
+                { ...box(0.8, 0.5), widthShare: 0.4 },
             ],
             1,
         )!;
 
-        expect(wide.left, "the gap is still between the same two centers").toBeCloseTo(narrow.left);
-        expect(wide.width, "but there is less room left between them").toBeLessThan(narrow.width);
+        expect(wide.leftShare, "the gap is still between the same two centers").toBeCloseTo(narrow.leftShare);
+        expect(wide.widthShare, "but there is less room left between them").toBeLessThan(narrow.widthShare);
     });
 
     it("lies across the line joining the two, so a mark reads as a mark", () => {
@@ -208,9 +208,9 @@ describe("getGapPlacement", () => {
         const turned = PlacementUtils.getGapPlacement([box(0.2, 0.5, 90), box(0.8, 0.5)], 1)!;
 
         expect(
-            turned.width,
+            turned.widthShare,
             "turned a quarter, the box presents its short side to the join, so more room is left",
-        ).toBeGreaterThan(upright.width);
+        ).toBeGreaterThan(upright.widthShare);
     });
 
     it("puts the ends outside the outermost item, carrying a straight run straight on", () => {
@@ -218,9 +218,9 @@ describe("getGapPlacement", () => {
         const before = PlacementUtils.getGapPlacement(placements, 0)!;
         const after = PlacementUtils.getGapPlacement(placements, placements.length)!;
 
-        expect(before.left, "the gap before the first sits on its far side").toBeLessThan(placements[0].left);
-        expect(after.left, "and the one after the last on its far side").toBeGreaterThan(
-            placements[placements.length - 1].left,
+        expect(before.leftShare, "the gap before the first sits on its far side").toBeLessThan(placements[0].leftShare);
+        expect(after.leftShare, "and the one after the last on its far side").toBeGreaterThan(
+            placements[placements.length - 1].leftShare,
         );
         expect(after.angle, "a run in a line continues along it").toBeCloseTo(before.angle!);
     });
@@ -229,13 +229,13 @@ describe("getGapPlacement", () => {
         const ring = [box(0.5, 0.1), box(0.9, 0.5), box(0.5, 0.9), box(0.1, 0.5)];
         const after = PlacementUtils.getGapPlacement(ring, ring.length)!;
         const joinToFirst = PlacementUtils.getAngle(
-            { x: ring[3].left, y: ring[3].top },
-            { x: ring[0].left, y: ring[0].top },
+            { x: ring[3].leftShare, y: ring[3].topShare },
+            { x: ring[0].leftShare, y: ring[0].topShare },
         );
 
         expect(after.angle, "the last gap is aimed at where the ring comes back round to").toBeCloseTo(joinToFirst);
         expect(
-            Math.abs(after.left - 0.3) + Math.abs(after.top - 0.3),
+            Math.abs(after.leftShare - 0.3) + Math.abs(after.topShare - 0.3),
             "so it sits north-west of the box, between nine o'clock and twelve",
         ).toBeLessThan(0.1);
     });
@@ -245,8 +245,10 @@ describe("getGapPlacement", () => {
         const before = PlacementUtils.getGapPlacement(ring, 0)!;
         const after = PlacementUtils.getGapPlacement(ring, ring.length)!;
 
-        expect(before.left, "before the first and after the last are one place on a ring").toBeCloseTo(after.left);
-        expect(before.top).toBeCloseTo(after.top);
+        expect(before.leftShare, "before the first and after the last are one place on a ring").toBeCloseTo(
+            after.leftShare,
+        );
+        expect(before.topShare).toBeCloseTo(after.topShare);
         expect(before.angle).toBeCloseTo(after.angle!);
     });
 
@@ -255,8 +257,8 @@ describe("getGapPlacement", () => {
         const before = PlacementUtils.getGapPlacement(placements, 0)!;
         const after = PlacementUtils.getGapPlacement(placements, placements.length)!;
 
-        expect(before.left, "the gap before the first sits on its far side").toBeLessThan(placements[0].left);
-        expect(after.left, "and the one after the last on its far side").toBeGreaterThan(placements[1].left);
+        expect(before.leftShare, "the gap before the first sits on its far side").toBeLessThan(placements[0].leftShare);
+        expect(after.leftShare, "and the one after the last on its far side").toBeGreaterThan(placements[1].leftShare);
         expect(before.angle, "both lie across the line the two describe").toBeCloseTo(0);
         expect(after.angle).toBeCloseTo(0);
     });
@@ -337,9 +339,9 @@ describe("getNearestReach", () => {
         heightRatio: 1,
         reachRule: "vertical",
         placements: [
-            { left: 0.5, top: 0.2, width: 0.2, height: 0.1 },
-            { left: 0.5, top: 0.4, width: 0.2, height: 0.1 },
-            { left: 0.5, top: 0.6, width: 0.2, height: 0.1 },
+            { leftShare: 0.5, topShare: 0.2, widthShare: 0.2, heightShare: 0.1 },
+            { leftShare: 0.5, topShare: 0.4, widthShare: 0.2, heightShare: 0.1 },
+            { leftShare: 0.5, topShare: 0.6, widthShare: 0.2, heightShare: 0.1 },
         ],
     };
 
@@ -364,9 +366,9 @@ describe("getRunOverreach", () => {
         heightRatio: 1,
         reachRule: "vertical",
         placements: [
-            { left: 0.5, top: 0.2, width: 0.2, height: 0.1 },
-            { left: 0.5, top: 0.4, width: 0.2, height: 0.1 },
-            { left: 0.5, top: 0.6, width: 0.2, height: 0.1 },
+            { leftShare: 0.5, topShare: 0.2, widthShare: 0.2, heightShare: 0.1 },
+            { leftShare: 0.5, topShare: 0.4, widthShare: 0.2, heightShare: 0.1 },
+            { leftShare: 0.5, topShare: 0.6, widthShare: 0.2, heightShare: 0.1 },
         ],
     };
 
@@ -391,8 +393,8 @@ describe("getRunOverreach", () => {
             heightRatio: 1,
             reachRule: "horizontal",
             placements: [
-                { left: 0.2, top: 0.5, width: 0.1, height: 0.1 },
-                { left: 0.4, top: 0.5, width: 0.1, height: 0.1 },
+                { leftShare: 0.2, topShare: 0.5, widthShare: 0.1, heightShare: 0.1 },
+                { leftShare: 0.4, topShare: 0.5, widthShare: 0.1, heightShare: 0.1 },
             ],
         };
 
@@ -414,10 +416,10 @@ describe("getRunOverreach", () => {
                 const radians = (step * index * Math.PI) / 180;
 
                 return {
-                    left: 0.5 + Math.cos(radians) * radius,
-                    top: 0.5 + Math.sin(radians) * radius,
-                    width: 0.1,
-                    height: 0.1,
+                    leftShare: 0.5 + Math.cos(radians) * radius,
+                    topShare: 0.5 + Math.sin(radians) * radius,
+                    widthShare: 0.1,
+                    heightShare: 0.1,
                 };
             }),
         };
@@ -450,7 +452,7 @@ describe("getRunOverreach", () => {
     it("falls back to the nearest item where a layout names no reach rule to have an end at all", () => {
         const scatter: PlacementLayout = {
             heightRatio: 1,
-            placements: [{ left: 0.5, top: 0.5, width: 0.1, height: 0.1 }],
+            placements: [{ leftShare: 0.5, topShare: 0.5, widthShare: 0.1, heightShare: 0.1 }],
         };
 
         expect(PlacementUtils.getRunOverreach(scatter, { x: 0.5, y: 0.6 })).toBeCloseTo(
@@ -513,9 +515,9 @@ describe("getIsWithinReach, around a pivot", () => {
         reachRule: "arc" as const,
         origin: { x: 0.5, y: 0.5 },
         placements: [
-            { left: 0.5, top: 0.5 - radius, width: 0.1, height: 0.1 },
-            { left: 0.5 + radius, top: 0.5, width: 0.1, height: 0.1 },
-            { left: 0.5, top: 0.5 + radius, width: 0.1, height: 0.1 },
+            { leftShare: 0.5, topShare: 0.5 - radius, widthShare: 0.1, heightShare: 0.1 },
+            { leftShare: 0.5 + radius, topShare: 0.5, widthShare: 0.1, heightShare: 0.1 },
+            { leftShare: 0.5, topShare: 0.5 + radius, widthShare: 0.1, heightShare: 0.1 },
         ],
     });
 
@@ -535,9 +537,9 @@ describe("getRunFacing", () => {
             heightRatio: 1,
             origin: { x: 0.5, y: 0.5 },
             placements: [
-                { left: 0.1, top: 0.5, width: 0.1, height: 0.1 },
-                { left: 0.5, top: 0.1, width: 0.1, height: 0.1 },
-                { left: 0.9, top: 0.5, width: 0.1, height: 0.1 },
+                { leftShare: 0.1, topShare: 0.5, widthShare: 0.1, heightShare: 0.1 },
+                { leftShare: 0.5, topShare: 0.1, widthShare: 0.1, heightShare: 0.1 },
+                { leftShare: 0.9, topShare: 0.5, widthShare: 0.1, heightShare: 0.1 },
             ],
         };
 
@@ -549,10 +551,10 @@ describe("getRunFacing", () => {
             heightRatio: 1,
             origin: { x: 0.5, y: 0.5 },
             placements: [
-                { left: 0.5, top: 0.1, width: 0.1, height: 0.1 },
-                { left: 0.9, top: 0.5, width: 0.1, height: 0.1 },
-                { left: 0.5, top: 0.9, width: 0.1, height: 0.1 },
-                { left: 0.1, top: 0.5, width: 0.1, height: 0.1 },
+                { leftShare: 0.5, topShare: 0.1, widthShare: 0.1, heightShare: 0.1 },
+                { leftShare: 0.9, topShare: 0.5, widthShare: 0.1, heightShare: 0.1 },
+                { leftShare: 0.5, topShare: 0.9, widthShare: 0.1, heightShare: 0.1 },
+                { leftShare: 0.1, topShare: 0.5, widthShare: 0.1, heightShare: 0.1 },
             ],
         };
 
@@ -573,10 +575,10 @@ describe("getRunSlack", () => {
                 const radians = ((index * step) / 180) * Math.PI;
 
                 return {
-                    left: 0.5 + Math.cos(radians) * radius,
-                    top: 0.5 + Math.sin(radians) * radius,
-                    width: 0.1,
-                    height: 0.1,
+                    leftShare: 0.5 + Math.cos(radians) * radius,
+                    topShare: 0.5 + Math.sin(radians) * radius,
+                    widthShare: 0.1,
+                    heightShare: 0.1,
                 };
             }),
         };

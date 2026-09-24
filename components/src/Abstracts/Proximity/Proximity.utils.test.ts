@@ -4,7 +4,7 @@ import type { PlacementRect } from "../Placement/Placement.types";
 import type { ProximityArrangement } from "./Proximity.types";
 import { ProximityUtils } from "./Proximity.utils";
 
-const ITEM: PlacementRect = { left: 0.5, top: 0.25, width: 0.2, height: 0.1 };
+const ITEM: PlacementRect = { leftShare: 0.5, topShare: 0.25, widthShare: 0.2, heightShare: 0.1 };
 
 const TILTED: PlacementRect = { ...ITEM, angle: 90 };
 
@@ -12,7 +12,7 @@ describe("getFalloff", () => {
     const RUN: ProximityArrangement = { spacing: 0.3, radius: 0, slack: Infinity };
 
     const atDistance = (distance: number) =>
-        ProximityUtils.toEffectDefs(ITEM, { x: ITEM.left + distance, y: ITEM.top }, RUN, false);
+        ProximityUtils.toEffectDefs(ITEM, { x: ITEM.leftShare + distance, y: ITEM.topShare }, RUN, false);
 
     it("is everything under the pointer and nothing at the reach", () => {
         expect(ProximityUtils.getFalloff(atDistance(0), 0.5)).toBe(1);
@@ -36,7 +36,7 @@ describe("getFalloff", () => {
 });
 
 describe("getFalloff, across a turning run", () => {
-    const RING = { left: 0.5, top: 0.2, width: 0.12, height: 0.12 };
+    const RING = { leftShare: 0.5, topShare: 0.2, widthShare: 0.12, heightShare: 0.12 };
     const ORIGIN = { x: 0.5, y: 0.5 };
     const RUN: ProximityArrangement = {
         spacing: 0.2,
@@ -136,6 +136,8 @@ describe("toTranslation", () => {
     });
 
     it("answers nothing rather than dividing by an item with no extent", () => {
-        expect(ProximityUtils.toTranslation({ ...ITEM, width: 0, height: 0 }, { x: 0.1, y: 0.1 })).toEqual([0, 0]);
+        expect(ProximityUtils.toTranslation({ ...ITEM, widthShare: 0, heightShare: 0 }, { x: 0.1, y: 0.1 })).toEqual([
+            0, 0,
+        ]);
     });
 });

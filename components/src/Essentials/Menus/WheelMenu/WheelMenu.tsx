@@ -89,7 +89,7 @@ export const WheelMenu = <T,>(props: WheelMenuProps<T>) => {
             ...layout,
             placements: [
                 ...layout.placements,
-                { left: origin.x, top: origin.y, width: closerSize, height: closerSize },
+                { leftShare: origin.x, topShare: origin.y, widthShare: closerSize, heightShare: closerSize },
             ],
         };
     };

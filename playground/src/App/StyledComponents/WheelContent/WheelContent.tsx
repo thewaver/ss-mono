@@ -63,11 +63,11 @@ export const PageWheelWedge = (props: ParentProps<PageWheelWedgeProps>) => {
                     <div
                         class={styles.wheelWedgeLabel}
                         style={{
-                            "left": PlacementUtils.toContainerWidth(getRect().left),
-                            "top": PlacementUtils.toContainerWidth(getRect().top),
-                            "width": PlacementUtils.toContainerWidth(getRect().width),
-                            "height": PlacementUtils.toContainerWidth(getRect().height),
-                            "font-size": PlacementUtils.toContainerWidth(getRect().width * LABEL_TYPE_RATIO),
+                            "left": PlacementUtils.toContainerWidth(getRect().leftShare),
+                            "top": PlacementUtils.toContainerWidth(getRect().topShare),
+                            "width": PlacementUtils.toContainerWidth(getRect().widthShare),
+                            "height": PlacementUtils.toContainerWidth(getRect().heightShare),
+                            "font-size": PlacementUtils.toContainerWidth(getRect().widthShare * LABEL_TYPE_RATIO),
                             "transform": `translate(-50%, -50%) rotate(${toLabelTilt(access(props.state).angle, getRect().sector)}deg)`,
                         }}
                     >

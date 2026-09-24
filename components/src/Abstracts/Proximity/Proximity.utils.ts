@@ -301,6 +301,6 @@ export namespace ProximityUtils {
         const toPercent = (value: number, extent: number) =>
             extent < NO_DIRECTION || value === NOTHING ? NOTHING : (value / extent) * PERCENT;
 
-        return [toPercent(along, frame.width), toPercent(across, frame.height)];
+        return [toPercent(along, frame.widthShare), toPercent(across, frame.heightShare)];
     };
 }

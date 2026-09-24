@@ -67,10 +67,10 @@ const RADIAL_LAYOUT: PlacementLayoutFn = ({ itemCount, itemParents = [] }: Place
         const radius = radiusAt(span.depth);
 
         return {
-            left: CENTER + (Math.cos(radians) * radius) / width,
-            top: CENTER + (Math.sin(radians) * radius) / width,
-            width: RADIAL_DEFS.itemWidth / width,
-            height: RADIAL_DEFS.itemHeight / width,
+            leftShare: CENTER + (Math.cos(radians) * radius) / width,
+            topShare: CENTER + (Math.sin(radians) * radius) / width,
+            widthShare: RADIAL_DEFS.itemWidth / width,
+            heightShare: RADIAL_DEFS.itemHeight / width,
         };
     });
 

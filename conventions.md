@@ -811,10 +811,20 @@ This is the same rule as _"an observer's name carries its coordinate space"_ abo
 of a continuous one, and it exists for the same reason: the wrong one fails silently, returning a number that
 looks right.
 
-### `width` and `height` mean pixels; a tally of cells is a count
+### `width` and `height` mean a length, pixels unless the name says otherwise; a tally of cells is a count
 
 Stated by the user. A pair counting rows and columns is **`{ rowCount, colCount }`**, or an `Index2d` named at
-the call site for what it tallies. `width` and `height` are reserved for measurements in pixels.
+the call site for what it tallies. `width` and `height` are reserved for lengths, never counts.
+
+**A length in any unit but pixels carries its unit in the name.** Chosen by the user over two alternatives:
+leaving the name bare and relying on the doc block, which lets a pixel size and a fractional one swap without
+a reader noticing, and a separate pair type with different keys, which would have caught the swap at compile
+time but cost a second set of size helpers and a conversion wherever the two meet. So the word goes on the
+nearest name the reader sees: on the prop or variable holding a `Size2d` (`sizeShare`, `boundsShare`,
+`NODE_SIZE_SHARE`), and on the fields themselves where the type has no holder above them —
+`PlacementRect` is `{ leftShare, topShare, widthShare, heightShare }`. **`Share` means a fraction of the
+container's width, on both axes.** A name that already says it is a ratio (`aspect`, `heightRatio`) needs
+nothing added. A name only warns: a mix-up still compiles, and that was accepted.
 
 It is the tally-side half of the rule above, and it fails the same way: a `{ width, height }` holding eight
 rows by four columns reads as a size, sits in the same type as a real one, and swaps without complaint.

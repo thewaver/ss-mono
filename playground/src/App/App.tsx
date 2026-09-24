@@ -37,6 +37,7 @@ import { DateRangePickerPage } from "./Pages/DateRangePickerPage/DateRangePicker
 import { DateTimePickerPage } from "./Pages/DateTimePickerPage/DateTimePickerPage";
 import { DiePage } from "./Pages/DiePage/DiePage";
 import { DrawerPage } from "./Pages/DrawerPage/DrawerPage";
+import { EdgeFaderPage } from "./Pages/EdgeFaderPage/EdgeFaderPage";
 import { FileInputPage } from "./Pages/FileInputPage/FileInputPage";
 import { FlipCardPage } from "./Pages/FlipCardPage/FlipCardPage";
 import { FormFieldPage } from "./Pages/FormFieldPage/FormFieldPage";
@@ -381,6 +382,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 description:
                     "A modal that arrives from an edge. It is a preset rather than a mode, because a panel cannot become a centered dialog while it is open.",
                 component: () => <DrawerPage />,
+            },
+            {
+                name: "EdgeFader",
+                description:
+                    "A box whose chosen sides fade to nothing, so content running past an edge trails off rather than being cut. The fade is a mask on the content itself, so it works over any background without being told what is behind it. Fixed, the sides are always faded; scroll-aware, a side fades only while there is more to scroll to that way, and the fade shrinks as that end arrives.",
+                component: () => <EdgeFaderPage />,
             },
             {
                 name: "Form",

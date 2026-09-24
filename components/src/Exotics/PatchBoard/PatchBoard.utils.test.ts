@@ -19,7 +19,7 @@ const placement = (
 ): PatchBoardPlacement => ({
     key,
     spot: { x, y },
-    size: { width: 100, height: 60 },
+    sizeShare: { width: 100, height: 60 },
     sockets,
     isDisabled,
 });

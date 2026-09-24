@@ -132,12 +132,12 @@ export const Wheel = <T,>(props: WheelProps<T>) => {
         const origin = PlacementUtils.getOrigin(layout);
         const angle = getWedgeAngle(index);
         const center = toTurnedPoint(PlacementUtils.getCenter(resting), origin, angle);
-        const placement: PlacementRect = { ...resting, left: center.x, top: center.y, angle };
+        const placement: PlacementRect = { ...resting, leftShare: center.x, topShare: center.y, angle };
         const frame: PlacementRect = {
-            left: origin.x,
-            top: origin.y,
-            width: SQUARE_HEIGHT_RATIO,
-            height: SQUARE_HEIGHT_RATIO,
+            leftShare: origin.x,
+            topShare: origin.y,
+            widthShare: SQUARE_HEIGHT_RATIO,
+            heightShare: SQUARE_HEIGHT_RATIO,
             angle,
         };
 

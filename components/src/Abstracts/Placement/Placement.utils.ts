@@ -35,7 +35,7 @@ const toBorderDistance = (rect: PlacementRect, direction: Point2d) => {
     const toEdge = (extent: number, share: number) =>
         share < NO_DIRECTION_RADIUS ? Infinity : (extent * HALF) / share;
 
-    return Math.min(toEdge(rect.width, along), toEdge(rect.height, across));
+    return Math.min(toEdge(rect.widthShare, along), toEdge(rect.heightShare, across));
 };
 
 /** How wide a rotated rectangle's shadow is when measured along a given direction. */
@@ -45,8 +45,8 @@ const toExtentAcross = (rect: PlacementRect, direction: Point2d) => {
     const sin = Math.sin(radians);
 
     return (
-        Math.abs(direction.x * cos + direction.y * sin) * rect.width +
-        Math.abs(-direction.x * sin + direction.y * cos) * rect.height
+        Math.abs(direction.x * cos + direction.y * sin) * rect.widthShare +
+        Math.abs(-direction.x * sin + direction.y * cos) * rect.heightShare
     );
 };
 
@@ -124,7 +124,7 @@ const toContinuedCenter = (beyond: Point2d, near: Point2d, from: Point2d): Point
  *
  * Positions are fractions of the container's width rather than pixels, and vertical positions are
  * scaled by the layout's own height ratio, which is what lets one layout describe a shape that
- * keeps its proportions at any size. A rectangle's `left` and `top` are its center, not its corner.
+ * keeps its proportions at any size. A rectangle's `leftShare` and `topShare` are its center, not its corner.
  */
 export namespace PlacementUtils {
     /**
@@ -160,8 +160,8 @@ export namespace PlacementUtils {
         y: boxRatio.y * heightRatio,
     });
 
-    /** A placement's center. Its `left` and `top` already name the center rather than a corner, so this is only a change of vocabulary. */
-    export const getCenter = (placement: PlacementRect): Point2d => ({ x: placement.left, y: placement.top });
+    /** A placement's center. Its `leftShare` and `topShare` already name the center rather than a corner, so this is only a change of vocabulary. */
+    export const getCenter = (placement: PlacementRect): Point2d => ({ x: placement.leftShare, y: placement.topShare });
 
     /**
      * How far a placement's border reaches from its center in a given direction.
@@ -490,7 +490,7 @@ export namespace PlacementUtils {
     export const getSpacing = (layout: PlacementLayout) => {
         const { placements } = layout;
 
-        if (placements.length < PAIR) return placements[FIRST_INDEX]?.width ?? NOTHING;
+        if (placements.length < PAIR) return placements[FIRST_INDEX]?.widthShare ?? NOTHING;
 
         const steps: number[] = [];
 
@@ -614,7 +614,7 @@ export namespace PlacementUtils {
                 ? toContinuedCenter(getCenter(beyondPlacement), nearCenter, fromCenter)
                 : toMirroredCenter(nearCenter, fromCenter);
 
-            return { ...at(from), left: center.x, top: center.y };
+            return { ...at(from), leftShare: center.x, topShare: center.y };
         };
 
         const isBeforeFirst = index <= FIRST_INDEX;
@@ -645,10 +645,10 @@ export namespace PlacementUtils {
         };
 
         return {
-            left: center.x,
-            top: center.y,
-            width: Math.max(far - near, NOTHING),
-            height: Math.min(toExtentAcross(anchor, across), toExtentAcross(neighbor, across)),
+            leftShare: center.x,
+            topShare: center.y,
+            widthShare: Math.max(far - near, NOTHING),
+            heightShare: Math.min(toExtentAcross(anchor, across), toExtentAcross(neighbor, across)),
             angle: (Math.atan2(forward.y, forward.x) * HALF_TURN_DEGREES) / Math.PI,
         };
     };

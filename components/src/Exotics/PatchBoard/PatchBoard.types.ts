@@ -94,7 +94,7 @@ export type PatchBoardNode<T> = {
      */
     spot: Point2d;
     /** How large the node is, as fractions of the board's width on both axes, the same unit as `spot`. */
-    size: Size2d;
+    sizeShare: Size2d;
     /** The node's inputs and outputs, spread along the edges that `orientation` gives each kind. */
     sockets: PatchBoardSocket[];
     /** Turns the node off: it cannot be picked up, and none of its sockets take or give a cable. */
@@ -114,7 +114,7 @@ export type PatchBoardLink = {
 export type PatchBoardPlacement = {
     key: string;
     spot: Point2d;
-    size: Size2d;
+    sizeShare: Size2d;
     sockets: PatchBoardSocket[];
     isDisabled: boolean;
 };

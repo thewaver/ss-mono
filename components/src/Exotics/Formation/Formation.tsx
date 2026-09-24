@@ -7,7 +7,7 @@ import { access } from "../../Utils/propUtils";
 import { FORMATION_DEFAULTS } from "./Formation.const";
 import type { FormationProps } from "./Formation.types";
 
-const EMPTY_PLACEMENT: PlacementRect = { top: 0, left: 0, width: 0, height: 0 };
+const EMPTY_PLACEMENT: PlacementRect = { topShare: 0, leftShare: 0, widthShare: 0, heightShare: 0 };
 
 export const Formation = <T,>(props: FormationProps<T>) => {
     const getItemCount = createMemo(() => access(props.items).length);

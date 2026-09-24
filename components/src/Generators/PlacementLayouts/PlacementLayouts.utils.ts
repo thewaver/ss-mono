@@ -151,7 +151,7 @@ const toEvenArcAngles = (
 const toFittedLayout = (placements: PlacementRect[]) => ({
     placements,
     heightRatio: placements.reduce(
-        (lowest, placement) => Math.max(lowest, placement.top + placement.height * HALF),
+        (lowest, placement) => Math.max(lowest, placement.topShare + placement.heightShare * HALF),
         NOTHING,
     ),
 });
@@ -166,10 +166,10 @@ const toRun = (itemCount: number, size: Point2d, gap: number, isVertical: boolea
     const step = (isVertical ? size.y : size.x) + gap;
 
     return Array.from({ length: itemCount }, (_unused, index) => ({
-        left: isVertical ? FULL_SHARE * HALF : size.x * HALF + step * index,
-        top: isVertical ? size.y * HALF + step * index : size.y * HALF,
-        width: size.x,
-        height: size.y,
+        leftShare: isVertical ? FULL_SHARE * HALF : size.x * HALF + step * index,
+        topShare: isVertical ? size.y * HALF + step * index : size.y * HALF,
+        widthShare: size.x,
+        heightShare: size.y,
     }));
 };
 
@@ -181,10 +181,10 @@ const computeWhorl = (itemCount: number, itemStepRatio: number, whorlStepRatio: 
         const place = index % WHORL_SIZE;
 
         return {
-            top: QUARTER + whorlTop + (place === 0 ? NOTHING : itemDrop),
-            left: QUARTER * (place === 0 ? 2 : place === 1 ? 1 : 3),
-            width: itemSize,
-            height: itemSize,
+            topShare: QUARTER + whorlTop + (place === 0 ? NOTHING : itemDrop),
+            leftShare: QUARTER * (place === 0 ? 2 : place === 1 ? 1 : 3),
+            widthShare: itemSize,
+            heightShare: itemSize,
         };
     });
 
@@ -292,10 +292,10 @@ export namespace PlacementLayoutUtils {
             const origin = { x: -extent.left / width, y: -extent.top / width };
 
             const placements = boxes.map<PlacementRect>((box) => ({
-                left: origin.x + box.x / width,
-                top: origin.y + box.y / width,
-                width: box.width / width,
-                height: box.height / width,
+                leftShare: origin.x + box.x / width,
+                topShare: origin.y + box.y / width,
+                widthShare: box.width / width,
+                heightShare: box.height / width,
                 angle: box.tiltDegrees,
                 sector:
                     box.fromAngle === undefined || box.toAngle === undefined
@@ -364,10 +364,10 @@ export namespace PlacementLayoutUtils {
 
             return {
                 placements: boxes.map<PlacementRect>((box) => ({
-                    left: origin.x + box.x / width,
-                    top: origin.y + box.y / width,
-                    width: box.width / width,
-                    height: box.height / width,
+                    leftShare: origin.x + box.x / width,
+                    topShare: origin.y + box.y / width,
+                    widthShare: box.width / width,
+                    heightShare: box.height / width,
                     angle: box.tiltDegrees,
                 })),
                 extent: width,
@@ -465,10 +465,10 @@ export namespace PlacementLayoutUtils {
                 const stagger = row % ROW_PARITY === EVEN_ROW ? NOTHING : columnStep * HALF;
 
                 return {
-                    left: (stagger + columnStep * (index % perRow) + cellWidth * HALF) / width,
-                    top: (rowStep * row + cellHeight * HALF) / width,
-                    width: cellWidth / width,
-                    height: cellHeight / width,
+                    leftShare: (stagger + columnStep * (index % perRow) + cellWidth * HALF) / width,
+                    topShare: (rowStep * row + cellHeight * HALF) / width,
+                    widthShare: cellWidth / width,
+                    heightShare: cellHeight / width,
                     clipPath: HEX_CLIP_PATH,
                 };
             });
@@ -498,12 +498,12 @@ export namespace PlacementLayoutUtils {
                     const place = index % CLIFF_SIZE;
 
                     return {
-                        top:
+                        topShare:
                             itemSize * HALF +
                             itemSize * (Math.floor(index / CLIFF_SIZE) * cliffStepRatio + CLIFF_DROP_RATIOS[place]),
-                        left: leaderLeft + itemSize * CLIFF_SHIFT_RATIOS[place],
-                        width: itemSize,
-                        height: itemSize,
+                        leftShare: leaderLeft + itemSize * CLIFF_SHIFT_RATIOS[place],
+                        widthShare: itemSize,
+                        heightShare: itemSize,
                     };
                 }),
             );
@@ -546,10 +546,10 @@ export namespace PlacementLayoutUtils {
         return ({ itemCount }) =>
             toFittedLayout(
                 Array.from({ length: itemCount }, (_unused, index) => ({
-                    top: step * (index + 1),
-                    left: step * (peak - Math.abs((index % (peak * 2)) - peak) + 1),
-                    width: step * 2,
-                    height: step * 2,
+                    topShare: step * (index + 1),
+                    leftShare: step * (peak - Math.abs((index % (peak * 2)) - peak) + 1),
+                    widthShare: step * 2,
+                    heightShare: step * 2,
                 })),
             );
     };

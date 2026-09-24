@@ -9,10 +9,10 @@ export type PlacementSector = {
 };
 
 export type PlacementRect = {
-    left: number;
-    top: number;
-    width: number;
-    height: number;
+    leftShare: number;
+    topShare: number;
+    widthShare: number;
+    heightShare: number;
     angle?: number;
     depth?: number;
     clipPath?: string;

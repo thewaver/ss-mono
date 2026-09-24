@@ -69,7 +69,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
     const getHeightRatio = createMemo(() => access(props.heightRatio));
 
-    const getBounds = createMemo((): Size2d => ({ width: FULL_WIDTH, height: getHeightRatio() }));
+    const getBoundsShare = createMemo((): Size2d => ({ width: FULL_WIDTH, height: getHeightRatio() }));
 
     const getGroupId = createMemo(() => access(props.groupId));
 
@@ -134,26 +134,30 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
     const getSnappedSpot = (spot: Point2d) => props.computeSnapSpot?.(spot) ?? spot;
 
-    const getNudgedSpot = (spot: Point2d, nudge: CarryNudge, size: Size2d) => {
+    const getNudgedSpot = (spot: Point2d, nudge: CarryNudge, sizeShare: Size2d) => {
         const step = getStepSize();
         const x = nudge.x ?? NOTHING;
         const y = nudge.y ?? NOTHING;
-        const bounds = getBounds();
+        const boundsShare = getBoundsShare();
         const computeSnapSpot = props.computeSnapSpot;
 
         if (!computeSnapSpot) {
-            return PatchBoardUtils.getClampedSpot({ x: spot.x + x * step, y: spot.y + y * step }, size, bounds);
+            return PatchBoardUtils.getClampedSpot(
+                { x: spot.x + x * step, y: spot.y + y * step },
+                sizeShare,
+                boundsShare,
+            );
         }
 
         const stride = { x: Math.sign(x) * step, y: Math.sign(y) * step };
-        const reach = Math.max(bounds.width, bounds.height);
+        const reach = Math.max(boundsShare.width, boundsShare.height);
 
         let next = spot;
 
         for (let count = Math.max(Math.abs(x), Math.abs(y)); count > NOTHING; count--) {
             const snapped = PatchBoardUtils.getNextSnappedSpot(next, stride, reach, computeSnapSpot) ?? next;
 
-            next = PatchBoardUtils.getClampedSpot(snapped, size, bounds);
+            next = PatchBoardUtils.getClampedSpot(snapped, sizeShare, boundsShare);
         }
 
         return next;
@@ -193,8 +197,8 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                     kind: "spot",
                     ...PatchBoardUtils.getClampedSpot(
                         getSnappedSpot({ x: board.x - grabOffset.x, y: board.y - grabOffset.y }),
-                        value.node.size,
-                        getBounds(),
+                        value.node.sizeShare,
+                        getBoundsShare(),
                     ),
                 };
             }
@@ -210,7 +214,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
             if (value.kind === "node") {
                 if (current.kind !== "spot") return undefined;
 
-                return { kind: "spot", ...getNudgedSpot(current, nudge, value.node.size) };
+                return { kind: "spot", ...getNudgedSpot(current, nudge, value.node.sizeShare) };
             }
 
             const step = (nudge.x ?? NOTHING) + (nudge.y ?? NOTHING);
@@ -256,7 +260,9 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
             if (value.kind === "node") {
                 return current.kind === "spot"
-                    ? announcements.computeRegionLabel(PatchBoardUtils.getRegion(current, value.node.size, getBounds()))
+                    ? announcements.computeRegionLabel(
+                          PatchBoardUtils.getRegion(current, value.node.sizeShare, getBoundsShare()),
+                      )
                     : announcements.offBoardPlaceLabel;
             }
 
@@ -368,7 +374,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
         getNodes().map((node) => ({
             key: getNodeKey(node),
             spot: getLiveSpot(node),
-            size: node.size,
+            sizeShare: node.sizeShare,
             sockets: node.sockets,
             isDisabled: node.isDisabled ?? false,
         })),
@@ -471,7 +477,7 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
 
         grabOffset = board
             ? { x: board.x - node.spot.x, y: board.y - node.spot.y }
-            : { x: node.size.width * 0.5, y: node.size.height * 0.5 };
+            : { x: node.sizeShare.width * 0.5, y: node.sizeShare.height * 0.5 };
 
         CarrierUtils.start(
             zone,
@@ -802,8 +808,8 @@ export const PatchBoard = <T,>(props: PatchBoardProps<T>) => {
                             style={{
                                 left: PlacementUtils.toContainerWidth(getPlacement()?.spot.x ?? getNode().spot.x),
                                 top: PlacementUtils.toContainerWidth(getPlacement()?.spot.y ?? getNode().spot.y),
-                                width: PlacementUtils.toContainerWidth(getNode().size.width),
-                                height: PlacementUtils.toContainerWidth(getNode().size.height),
+                                width: PlacementUtils.toContainerWidth(getNode().sizeShare.width),
+                                height: PlacementUtils.toContainerWidth(getNode().sizeShare.height),
                             }}
                         >
                             <div class={styles.patchBoardNodeHolder}>

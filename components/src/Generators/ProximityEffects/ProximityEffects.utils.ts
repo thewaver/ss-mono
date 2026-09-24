@@ -81,7 +81,7 @@ export namespace ProximityEffectUtils {
             if (effectDefs.prefersReducedMotion) return { brightness: growth * PERCENT };
 
             const size = { scale: [growth * PERCENT, growth * PERCENT] };
-            const push = Math.min(pushRatio * effectDefs.placement.width, effectDefs.slack * SHARED_ENDS);
+            const push = Math.min(pushRatio * effectDefs.placement.widthShare, effectDefs.slack * SHARED_ENDS);
 
             if (push < NO_DIRECTION) return size;
 

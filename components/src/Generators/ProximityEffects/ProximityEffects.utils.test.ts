@@ -10,7 +10,12 @@ import { ProximityEffectUtils } from "./ProximityEffects.utils";
 const ROW_TOP = 0.1;
 const ITEM_WIDTH = 0.2;
 
-const itemAt = (left: number): PlacementRect => ({ left, top: ROW_TOP, width: ITEM_WIDTH, height: ITEM_WIDTH });
+const itemAt = (leftShare: number): PlacementRect => ({
+    leftShare,
+    topShare: ROW_TOP,
+    widthShare: ITEM_WIDTH,
+    heightShare: ITEM_WIDTH,
+});
 
 const UNDER = itemAt(0.5);
 const BESIDE = itemAt(0.2);
@@ -99,7 +104,7 @@ describe("zoomIn, with the pointer between two real neighbors", () => {
 });
 
 describe("zoomIn, around a pivot", () => {
-    const ON_RING = { left: 0.5, top: 0.2, width: 0.16, height: 0.16 };
+    const ON_RING = { leftShare: 0.5, topShare: 0.2, widthShare: 0.16, heightShare: 0.16 };
     const ORIGIN = { x: 0.5, y: 0.5 };
 
     it("gives way around the arrangement rather than across it, so a ring spreads instead of buckling", () => {
@@ -111,15 +116,15 @@ describe("zoomIn, around a pivot", () => {
         );
         const [along, across] = ProximityEffectUtils.zoomIn(defs).translate as number[];
         const moved = {
-            x: ON_RING.left + along * PERCENT_TO_SHARE * ON_RING.width,
-            y: ON_RING.top + across * PERCENT_TO_SHARE * ON_RING.height,
+            x: ON_RING.leftShare + along * PERCENT_TO_SHARE * ON_RING.widthShare,
+            y: ON_RING.topShare + across * PERCENT_TO_SHARE * ON_RING.heightShare,
         };
 
         expect(along, "the pointer is round to the right, so this item slides left along the ring").toBeLessThan(0);
         expect(
             Math.hypot(moved.x - ORIGIN.x, moved.y - ORIGIN.y),
             "and lands back on the ring rather than inside it, the travel being an arc rather than a tangent",
-        ).toBeCloseTo(Math.hypot(ON_RING.left - ORIGIN.x, ON_RING.top - ORIGIN.y));
+        ).toBeCloseTo(Math.hypot(ON_RING.leftShare - ORIGIN.x, ON_RING.topShare - ORIGIN.y));
     });
 
     it("does not push at all on a run with no room left, there being nowhere on a loop to push into", () => {
@@ -200,8 +205,8 @@ describe("zoomIn, at the far end of an open arc", () => {
         const [along, across] = ProximityEffectUtils.zoomIn(ProximityUtils.toEffectDefs(placement, pointer, RUN, false))
             .translate as number[];
         const moved = {
-            x: placement.left + along * PERCENT_TO_SHARE * placement.width,
-            y: placement.top + across * PERCENT_TO_SHARE * placement.height,
+            x: placement.leftShare + along * PERCENT_TO_SHARE * placement.widthShare,
+            y: placement.topShare + across * PERCENT_TO_SHARE * placement.heightShare,
         };
 
         return unwrap(PlacementUtils.getAngle(ORIGIN, moved));
