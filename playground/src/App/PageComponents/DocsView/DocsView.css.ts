@@ -51,8 +51,7 @@ export const docsEmpty = style({
 
 export const docsTableScroller = style({
     overflowX: "auto",
-    backgroundColor: `rgba(from ${themeVars.color.control.background.main} r g b / 50%)`,
-    border: `1px solid rgb(from ${themeVars.color.background.contrast} r g b / 25%)`,
+    backgroundColor: [themeVars.color.background.dark, `rgba(from ${themeVars.color.background.dark} r g b / 75%)`],
     borderRadius: themeVars.borderRadius.full,
     boxShadow: themeVars.shadow.small,
 });

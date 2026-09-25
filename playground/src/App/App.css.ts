@@ -15,7 +15,7 @@ export const appContent = style({
     gridTemplateRows: "minmax(0, 1fr)",
     width: "100%",
     height: "100%",
-    backgroundImage: `radial-gradient(ellipse at top, hsl(from ${themeVars.color.background.light} h s 75% / 5%), transparent 33%), radial-gradient(ellipse at top, hsl(from ${themeVars.color.background.light} h s 50% / 5%), transparent 66%), radial-gradient(ellipse at top, ${themeVars.color.background.light}, ${themeVars.color.background.dark})`,
+    backgroundImage: `radial-gradient(ellipse at top, hsl(from ${themeVars.color.background.light} h s 50% / 10%), transparent 33%), radial-gradient(ellipse at top, hsl(from ${themeVars.color.background.light} h s 50% / 10%), transparent 66%), radial-gradient(ellipse at top, ${themeVars.color.background.light}, ${themeVars.color.background.dark})`,
 });
 
 export const leftMenu = style({
