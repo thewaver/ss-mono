@@ -4,13 +4,22 @@ import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
 
 import { A, Navigate, Route, type RouteSectionProps, Router } from "@solidjs/router";
-import { Checkbox, Collapsible, Label, Tree, ViewportWrapper } from "@thewaver/ss-components";
-import type { SignalPair, TreeNode } from "@thewaver/ss-components";
+import { Collapsible, Sidebar, Tree, ViewportWrapper } from "@thewaver/ss-components";
+import type { SidebarPhase, SignalPair, TreeNode } from "@thewaver/ss-components";
 import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
 
 import { PageDocsView } from "./PageComponents/DocsView/DocsView";
+import { PageNavSettings } from "./PageComponents/NavSettings/NavSettings";
+import { DEFAULT_VIEWPORT_ANCHOR } from "./PageComponents/NavSettings/NavSettings.const";
+import type { ViewportAnchor } from "./PageComponents/NavSettings/NavSettings.types";
 import { PageViewTabs } from "./PageComponents/ViewTabs/ViewTabs";
-import { toBaseRoute, toPageViewRoute } from "./PageComponents/ViewTabs/ViewTabs.const";
+import {
+    DEFAULT_PAGE_VIEW,
+    PAGE_VIEW_KEYS,
+    toBaseRoute,
+    toPageViewRoute,
+} from "./PageComponents/ViewTabs/ViewTabs.const";
+import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
 import { AccordionPage } from "./Pages/Accordions/AccordionPage/AccordionPage";
 import { CollapsiblePage } from "./Pages/Accordions/CollapsiblePage/CollapsiblePage";
 import { AudioSwitcherPage } from "./Pages/AudioSwitcherPage/AudioSwitcherPage";
@@ -85,6 +94,7 @@ import { ScrollerPage } from "./Pages/ScrollerPage/ScrollerPage";
 import { SegmentedInputPage } from "./Pages/SegmentedInputPage/SegmentedInputPage";
 import { SelectPage } from "./Pages/SelectPage/SelectPage";
 import { ShapePage } from "./Pages/ShapePage/ShapePage";
+import { SidebarPage } from "./Pages/SidebarPage/SidebarPage";
 import { SlideButtonPage } from "./Pages/SlideButtonPage/SlideButtonPage";
 import { SortableGridPage } from "./Pages/SortableGridPage/SortableGridPage";
 import { SortablePage } from "./Pages/SortablePage/SortablePage";
@@ -117,9 +127,8 @@ import { TypewriterPage } from "./Pages/TypewriterPage/TypewriterPage";
 import { ViewportWrapperPage } from "./Pages/ViewportWrapperPage/ViewportWrapperPage";
 import { DrumWheelPage } from "./Pages/Wheels/DrumWheelPage/DrumWheelPage";
 import { OverheadWheelPage } from "./Pages/Wheels/OverheadWheelPage/OverheadWheelPage";
-import { PageCheckboxContent } from "./StyledComponents/CheckboxContent/CheckboxContent";
 import { PageTextField } from "./StyledComponents/Field/Field";
-import { PageLabelCaption } from "./StyledComponents/LabelCaption/LabelCaption";
+import { PageSidebarToggle } from "./StyledComponents/SidebarToggle/SidebarToggle";
 import { PageTreeNodeContent } from "./StyledComponents/TreeNodeContent/TreeNodeContent";
 
 import * as styles from "./App.css";
@@ -148,7 +157,13 @@ const componentToRouteName = (name: string) => `/${StringUtils.camelToKebabCase(
 
 const SHOW_COMPOSITES = false;
 const LIST_PAGELESS_COMPONENTS = false;
-const SEARCH_FIELD_WIDTH = 320;
+const SEARCH_FIELD_WIDTH = 280;
+const MENU_ID = "library-menu";
+const MENU_EDGE = "left";
+const MENU_COLLAPSED_WIDTH = 68;
+const MENU_EXPANDED_WIDTH = 320;
+
+const getIsMenuFaded = (phase: SidebarPhase) => phase === "collapsing" || phase === "collapsed";
 
 const MENU_CONFIGS: MenuBranchConfig[] = [
     {
@@ -648,6 +663,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 component: () => <ScrollerPage />,
             },
             {
+                name: "Sidebar",
+                description:
+                    "A panel docked to one side that grows and shrinks between two widths the consumer gives it, either pushing the content beside it aside or growing over it. It is not a modal: nothing is sealed off, focus is not held and the page stays usable, which is what separates it from Drawer. It draws no control of its own — anything holding its expanded signal opens and closes it — and it hands its contents one of four phases, so a collapsed layout and an expanded one can be swapped at the moment that suits them. It can also expand while the pointer rests on it, without touching the owner's state.",
+                component: () => <SidebarPage />,
+            },
+            {
                 name: "SlideButton",
                 description:
                     "A confirmation you drag rather than press. Holding it is the single-pointer route the standard asks for, so the gesture is never the only way through.",
@@ -1133,10 +1154,15 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
 const flattenConfigs = (nodes: MenuNodeConfig[]): ComponentConfig[] =>
     nodes.flatMap((node) => (getIsBranchConfig(node) ? flattenConfigs(node.children) : [node]));
 
-const toTreeNode = (node: MenuNodeConfig): TreeNode<MenuNodeConfig> =>
-    getIsBranchConfig(node)
-        ? { value: node, children: node.children.map(toTreeNode) }
-        : { value: node, href: componentToRouteName(node.name) };
+const toPageHref = (config: ComponentConfig, view: PageViewKey) =>
+    toPageViewRoute(componentToRouteName(config.name), config.component === undefined ? "docs" : view);
+
+const toTreeNode =
+    (view: PageViewKey) =>
+    (node: MenuNodeConfig): TreeNode<MenuNodeConfig> =>
+        getIsBranchConfig(node)
+            ? { value: node, children: node.children.map(toTreeNode(view)) }
+            : { value: node, href: toPageHref(node, view) };
 
 const collectAncestors = (
     nodes: MenuNodeConfig[],
@@ -1168,7 +1194,9 @@ const collectBranchValues = (nodes: TreeNode<MenuNodeConfig>[]): MenuNodeConfig[
 
 const VISIBLE_MENU_CONFIGS = MENU_CONFIGS.filter((category) => !category.hidden);
 
-const MENU_NODES = VISIBLE_MENU_CONFIGS.map(toTreeNode);
+const MENU_NODES_BY_VIEW = Object.fromEntries(
+    PAGE_VIEW_KEYS.map((view) => [view, VISIBLE_MENU_CONFIGS.map(toTreeNode(view))]),
+) as Record<PageViewKey, TreeNode<MenuNodeConfig>[]>;
 
 const COMPONENT_CONFIGS = flattenConfigs(MENU_CONFIGS);
 
@@ -1180,10 +1208,10 @@ const COMPONENT_CONFIGS_BY_ROUTE = Object.fromEntries(
     COMPONENT_CONFIGS.map((config) => [componentToRouteName(config.name), config]),
 );
 
-const ROUTES_BY_KEY = new Map(COMPONENT_CONFIGS.map((config) => [config.name.toLowerCase(), config.name]));
+const CONFIGS_BY_KEY = new Map(COMPONENT_CONFIGS.map((config) => [config.name.toLowerCase(), config]));
 
 const listNames = (names: string[]) =>
-    LIST_PAGELESS_COMPONENTS ? names : names.filter((name) => ROUTES_BY_KEY.has(name.toLowerCase()));
+    LIST_PAGELESS_COMPONENTS ? names : names.filter((name) => CONFIGS_BY_KEY.has(name.toLowerCase()));
 
 const listDependencyNames = (names: DependencyNames): DependencyNames => ({
     abstracts: listNames(names.abstracts),
@@ -1218,7 +1246,7 @@ const computeDependencySummary = (names: DependencyNames) =>
         .map((group) => `${names[group.key].length} ${names[group.key].length === 1 ? group.singular : group.label}`)
         .join(" and ");
 
-const PageDependencies = (props: { name: string }) => {
+const PageDependencies = (props: { name: string; view: PageViewKey }) => {
     const [getExpandedSections, setExpandedSections] = createSignal<string[]>([]);
 
     const getDependencies = () => DEPENDENCIES_BY_KEY.get(props.name.toLowerCase());
@@ -1288,12 +1316,12 @@ const PageDependencies = (props: { name: string }) => {
 
                                                             <Index each={getSectionNames()[getGroup().key]}>
                                                                 {(getName) => {
-                                                                    const getPageName = () =>
-                                                                        ROUTES_BY_KEY.get(getName().toLowerCase());
+                                                                    const getPageConfig = () =>
+                                                                        CONFIGS_BY_KEY.get(getName().toLowerCase());
 
                                                                     return (
                                                                         <Show
-                                                                            when={getPageName()}
+                                                                            when={getPageConfig()}
                                                                             fallback={
                                                                                 <span class={styles.dependencyName}>
                                                                                     {getName()}
@@ -1303,8 +1331,9 @@ const PageDependencies = (props: { name: string }) => {
                                                                             {(getFound) => (
                                                                                 <A
                                                                                     class={styles.dependencyLink}
-                                                                                    href={componentToRouteName(
+                                                                                    href={toPageHref(
                                                                                         getFound(),
+                                                                                        props.view,
                                                                                     )}
                                                                                 >
                                                                                     {getName()}
@@ -1330,10 +1359,12 @@ const PageDependencies = (props: { name: string }) => {
     );
 };
 
-export function AppContent(props: RouteSectionProps) {
+export function AppContent(props: RouteSectionProps & { viewportAnchorSignal: SignalPair<ViewportAnchor> }) {
     const [getSelectedConfig, setSelectedConfig] = createSignal<ComponentConfig>();
     const [getSearchTerm, setSearchTerm] = createSignal("");
     const showsDescriptionOnlySignal = createSignal(false);
+    const pageViewSignal = createSignal<PageViewKey>(DEFAULT_PAGE_VIEW);
+    const isAutoHiddenSignal = createSignal(false);
     const [getBrowseExpanded, setBrowseExpanded] = createSignal<MenuNodeConfig[]>(VISIBLE_MENU_CONFIGS);
     const [getSearchExpanded, setSearchExpanded] = createSignal<MenuNodeConfig[]>([]);
 
@@ -1342,8 +1373,9 @@ export function AppContent(props: RouteSectionProps) {
     const getVisibleNodes = createMemo(() => {
         const isSearching = getIsSearching();
         const showsDescriptionOnly = showsDescriptionOnlySignal[0]();
+        const menuNodes = MENU_NODES_BY_VIEW[pageViewSignal[0]()];
 
-        if (!isSearching && showsDescriptionOnly) return MENU_NODES;
+        if (!isSearching && showsDescriptionOnly) return menuNodes;
 
         const searchTerm = getSearchTerm().trim().toLocaleLowerCase();
         const selectedConfig = getSelectedConfig();
@@ -1356,9 +1388,9 @@ export function AppContent(props: RouteSectionProps) {
             return showsDescriptionOnly || config.component !== undefined;
         };
 
-        return MENU_NODES.map((node) => filterTreeNode(node, getIsKept)).filter(
-            (node): node is TreeNode<MenuNodeConfig> => node !== undefined,
-        );
+        return menuNodes
+            .map((node) => filterTreeNode(node, getIsKept))
+            .filter((node): node is TreeNode<MenuNodeConfig> => node !== undefined);
     });
 
     createEffect(() => {
@@ -1389,58 +1421,98 @@ export function AppContent(props: RouteSectionProps) {
 
     const selectedSignal: SignalPair<MenuNodeConfig | undefined> = [getSelectedConfig, () => undefined];
 
+    const menuExpandedSignal: SignalPair<boolean> = [
+        () => !isAutoHiddenSignal[0](),
+        (isExpanded) => isAutoHiddenSignal[1](!isExpanded),
+    ];
+
     return (
         <div class={styles.appContent}>
-            <nav class={styles.leftMenu} aria-label={"Library"}>
-                <div class={styles.searchContainer}>
-                    <PageTextField
-                        value={getSearchTerm}
-                        width={() => SEARCH_FIELD_WIDTH}
-                        placeholder={"Search"}
-                        ariaLabel={"Search components"}
-                        onInput={setSearchTerm}
-                    />
-                </div>
+            <Sidebar
+                id={() => MENU_ID}
+                edge={() => MENU_EDGE}
+                collapsedWidth={() => MENU_COLLAPSED_WIDTH}
+                expandedWidth={() => MENU_EXPANDED_WIDTH}
+                isExpandedOnHover={isAutoHiddenSignal[0]}
+                expandedSignal={menuExpandedSignal}
+                renderContent={(getPhase, getTransitionDurationMs) => (
+                    <nav class={styles.leftMenu} aria-label={"Library"}>
+                        <div class={styles.leftMenuContent}>
+                            <div class={styles.searchContainer}>
+                                <PageSidebarToggle
+                                    sidebarId={() => MENU_ID}
+                                    edge={() => MENU_EDGE}
+                                    isExpanded={menuExpandedSignal[0]}
+                                    ariaLabel={() =>
+                                        menuExpandedSignal[0]() ? "Auto-hide the menu" : "Keep the menu open"
+                                    }
+                                    onToggle={() => menuExpandedSignal[1](!menuExpandedSignal[0]())}
+                                />
 
-                <div class={styles.filterContainer}>
-                    <Label>
-                        <Checkbox
-                            checkedSignal={showsDescriptionOnlySignal}
-                            renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
-                        />
+                                <div
+                                    class={styles.searchFields}
+                                    classList={{
+                                        [styles.isFaded]: getIsMenuFaded(getPhase()),
+                                        [styles.isHidden]: getPhase() === "collapsed",
+                                    }}
+                                    style={{ "transition-duration": `${getTransitionDurationMs()}ms` }}
+                                >
+                                    <PageTextField
+                                        value={getSearchTerm}
+                                        width={() => SEARCH_FIELD_WIDTH}
+                                        placeholder={"Search"}
+                                        ariaLabel={"Search components"}
+                                        onInput={setSearchTerm}
+                                    />
 
-                        <PageLabelCaption>Show pages without examples</PageLabelCaption>
-                    </Label>
-                </div>
+                                    <PageNavSettings
+                                        showsDescriptionOnlySignal={showsDescriptionOnlySignal}
+                                        pageViewSignal={pageViewSignal}
+                                        viewportAnchorSignal={props.viewportAnchorSignal}
+                                    />
+                                </div>
+                            </div>
 
-                <div class={styles.menuTree}>
-                    <Tree
-                        nodes={getVisibleNodes}
-                        valueSignal={selectedSignal}
-                        expandedSignal={expandedSignal}
-                        ariaLabel={"Library"}
-                        linkComponent={A}
-                        computeCustomText={(node) => node.value.name}
-                        renderNode={(getNode, getRenderProps) => (
-                            <PageTreeNodeContent
-                                renderProps={getRenderProps}
-                                hasExamples={() => {
-                                    const node = getNode().value;
-
-                                    return getIsBranchConfig(node) || node.component !== undefined;
+                            <div
+                                class={styles.menuTree}
+                                classList={{
+                                    [styles.isFaded]: getIsMenuFaded(getPhase()),
+                                    [styles.isHidden]: getPhase() === "collapsed",
                                 }}
-                                detail={() => {
-                                    const node = getNode().value;
-
-                                    return getIsBranchConfig(node) ? `${flattenConfigs(node.children).length}` : "";
-                                }}
+                                style={{ "transition-duration": `${getTransitionDurationMs()}ms` }}
                             >
-                                {getNode().value.name}
-                            </PageTreeNodeContent>
-                        )}
-                    />
-                </div>
-            </nav>
+                                <Tree
+                                    nodes={getVisibleNodes}
+                                    valueSignal={selectedSignal}
+                                    expandedSignal={expandedSignal}
+                                    ariaLabel={"Library"}
+                                    linkComponent={A}
+                                    computeCustomText={(node) => node.value.name}
+                                    renderNode={(getNode, getRenderProps) => (
+                                        <PageTreeNodeContent
+                                            renderProps={getRenderProps}
+                                            hasExamples={() => {
+                                                const node = getNode().value;
+
+                                                return getIsBranchConfig(node) || node.component !== undefined;
+                                            }}
+                                            detail={() => {
+                                                const node = getNode().value;
+
+                                                return getIsBranchConfig(node)
+                                                    ? `${flattenConfigs(node.children).length}`
+                                                    : "";
+                                            }}
+                                        >
+                                            {getNode().value.name}
+                                        </PageTreeNodeContent>
+                                    )}
+                                />
+                            </div>
+                        </div>
+                    </nav>
+                )}
+            />
 
             <main class={styles.pageColumn}>
                 <Show when={getSelectedConfig()} fallback={props.children}>
@@ -1449,11 +1521,11 @@ export function AppContent(props: RouteSectionProps) {
                             <div class={styles.pageHeader}>
                                 <h1 class={styles.pageTitle}>{getConfig().name}</h1>
 
-                                <PageDependencies name={getConfig().name} />
+                                <PageDependencies name={getConfig().name} view={pageViewSignal[0]()} />
 
                                 <PageViewTabs
                                     baseRoute={componentToRouteName(getConfig().name)}
-                                    hasSamples={getConfig().component !== undefined}
+                                    hasExamples={getConfig().component !== undefined}
                                 />
                             </div>
 
@@ -1466,20 +1538,33 @@ export function AppContent(props: RouteSectionProps) {
     );
 }
 
-const SIZE_ANCHOR = window.screen.height;
+const SCREEN_HEIGHT = window.screen.height;
+const FIXED_ANCHOR_RATIO = { width: 16, height: 9 };
 
 const getWindowInnerSize = () => ({ width: window.innerWidth, height: window.innerHeight });
 
 export function App() {
     const [getWindowSize, setWindowSize] = createSignal<Size2d>(getWindowInnerSize());
+    const viewportAnchorSignal = createSignal<ViewportAnchor>(DEFAULT_VIEWPORT_ANCHOR);
 
     const getViewportSize = createMemo(() => {
         const windowSize = getWindowSize();
+        const anchor = viewportAnchorSignal[0]();
+
+        if (anchor === "none") return windowSize;
+
+        if (anchor !== "auto") {
+            return {
+                width: Math.round((anchor * FIXED_ANCHOR_RATIO.width) / FIXED_ANCHOR_RATIO.height),
+                height: anchor,
+            };
+        }
+
         const ratio = windowSize.width / windowSize.height;
         const next =
             ratio >= 1
-                ? { width: Math.round(SIZE_ANCHOR * ratio), height: SIZE_ANCHOR }
-                : { width: SIZE_ANCHOR, height: Math.round(SIZE_ANCHOR / ratio) };
+                ? { width: Math.round(SCREEN_HEIGHT * ratio), height: SCREEN_HEIGHT }
+                : { width: SCREEN_HEIGHT, height: Math.round(SCREEN_HEIGHT / ratio) };
 
         return next;
     });
@@ -1501,7 +1586,7 @@ export function App() {
                     path="/"
                     component={(props: RouteSectionProps) => (
                         <ViewportWrapper size={getViewportSize}>
-                            <AppContent {...props} />
+                            <AppContent {...props} viewportAnchorSignal={viewportAnchorSignal} />
                         </ViewportWrapper>
                     )}
                 >

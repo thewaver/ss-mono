@@ -12,7 +12,7 @@ import * as styles from "./ViewTabs.css";
 
 const TAB_GAP = 20;
 const TAB_ORIENTATION = "horizontal";
-const SAMPLES_VIEW: PageViewKey = "samples";
+const EXAMPLES_VIEW: PageViewKey = "examples";
 
 const PageViewTabLink = (props: TabLinkProps) => <A {...props} data-view-tab={props.href} />;
 
@@ -25,7 +25,7 @@ export const PageViewTabs = (props: PageViewTabsProps) => {
     const getSelected = createMemo<PageViewKey>(() => toPageViewKey(location.pathname, getBaseRoute()));
 
     const getTabs = createMemo(() =>
-        PAGE_VIEW_KEYS.filter((key) => access(props.hasSamples) || key !== SAMPLES_VIEW).map((key) => ({
+        PAGE_VIEW_KEYS.filter((key) => access(props.hasExamples) || key !== EXAMPLES_VIEW).map((key) => ({
             value: key,
             href: toPageViewRoute(getBaseRoute(), key),
         })),

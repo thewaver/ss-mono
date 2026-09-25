@@ -19,37 +19,69 @@ export const appContent = style({
 });
 
 export const leftMenu = style({
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "stretch",
-    gap: themeVars.spacing.double,
     color: themeVars.color.surface.contrast,
     backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
     backdropFilter: "blur(10px)",
     boxShadow: themeVars.shadow.large,
+    width: "100%",
+    height: "100%",
+    overflow: "hidden",
+});
+
+export const leftMenuContent = style({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    gap: themeVars.spacing.double,
+    boxSizing: "border-box",
     width: 320,
-    padding: themeVars.spacing.double,
-    overflowY: "auto",
+    height: "100%",
+    paddingTop: themeVars.spacing.double,
+    overflow: "hidden",
+});
+
+export const isFaded = style({
+    opacity: 0,
+});
+
+export const isHidden = style({
+    visibility: "hidden",
+});
+
+export const searchFields = style({
+    transitionProperty: "opacity",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flex: 1,
+    minWidth: 0,
+    gap: themeVars.spacing.full,
 });
 
 export const isExpanded = style({});
 export const isHovered = style({});
 
-export const filterContainer = style({
-    display: "flex",
-    alignItems: "center",
-    fontSize: themeVars.fontSize.small,
-    opacity: 0.75,
+export const menuTree = style({
+    transitionProperty: "opacity",
+    flex: 1,
+    minHeight: 0,
+    padding: `0 ${themeVars.spacing.double} ${themeVars.spacing.double}`,
+    overflowY: "auto",
 });
-
-export const menuTree = style({});
 
 globalStyle(`${menuTree} a, ${menuTree} a:visited`, {
     color: "inherit",
 });
 
 export const searchContainer = style({
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    flexShrink: 0,
+    gap: themeVars.spacing.full,
+    boxSizing: "border-box",
     width: "100%",
+    padding: `0 ${themeVars.spacing.double}`,
 });
 
 export const pageColumn = style({

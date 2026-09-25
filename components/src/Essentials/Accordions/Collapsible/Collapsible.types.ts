@@ -9,6 +9,8 @@ import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
 
 export type CollapsibleSizing = "fit-content" | "fill";
 
+export type CollapsibleSide = "top" | "right" | "bottom" | "left";
+
 export type CollapsibleFlags = {
     isExpanded: boolean;
 };
@@ -43,6 +45,11 @@ export type CollapsibleProps = Omit<
         id?: string;
         /** Whether the collapsible takes only the room its content needs, or fills the width it is given. */
         sizing?: CollapsibleSizing;
+        /**
+         * Which side of the trigger the panel opens on. Top and bottom grow the panel's height, left and right its
+         * width; a sideways panel keeps its contents at their own width and uncovers them, so give them one.
+         */
+        side?: CollapsibleSide;
         /** How long the panel takes to open and close. */
         transitionDurationMs?: number;
         /**

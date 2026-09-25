@@ -7,7 +7,7 @@ const TABS_PROPS = '[data-api-table="TabsProps"]';
 /**
  * Every component page is two views over one component — what it is and what it takes, then what it looks
  * like working — and which one you are on is in the URL rather than in component state, so a view can be
- * linked to and the back button walks them. Samples is the index rather than a segment of its own: it is
+ * linked to and the back button walks them. Examples is the index rather than a segment of its own: it is
  * what the pages already were, every link and every spec in this suite already points at it, and a tab
  * that changed those URLs would have been a rename of the whole Playground for no gain.
  */
@@ -16,10 +16,10 @@ test.beforeEach(async ({ page }) => {
     await expect(page.locator(VIEW_TABS)).toBeVisible();
 });
 
-test("the bare component route is the Samples view, and the tab agrees", async ({ page }) => {
+test("the bare component route is the Examples view, and the tab agrees", async ({ page }) => {
     await expect(page.locator("[data-example]").first(), "the examples are what a bare route shows").toBeVisible();
     await expect(
-        page.locator(VIEW_TABS).getByRole("tab", { name: "Samples" }),
+        page.locator(VIEW_TABS).getByRole("tab", { name: "Examples" }),
         "and the tab reads its selection off the URL rather than tracking clicks",
     ).toHaveAttribute("aria-selected", "true");
 });
@@ -30,7 +30,7 @@ test("each tab carries its view into the URL, and a deep link lands on it", asyn
     await expect(page.locator(DOCS), "Docs holds the page's own description").toBeVisible();
     await expect(page.locator(TABS_PROPS), "and the props table under it").toBeVisible();
 
-    await page.locator(VIEW_TABS).getByRole("tab", { name: "Samples" }).click();
+    await page.locator(VIEW_TABS).getByRole("tab", { name: "Examples" }).click();
     await expect(page).toHaveURL(/\/tabs$/);
 
     await page.goto("/tabs/docs");

@@ -230,7 +230,7 @@ Three components render DOM but mean nothing on their own: `BinarySwitch` is the
 Two of the three were already half-private — only `BinarySwitch.types` and `TextField.types` ship — so the
 folder records a split that `index.ts` had already made. Primitives were at first left out of the Uses and
 Used by lists, as names a reader could do nothing with; they now have pages and a group of their own in both
-lists — see _"Primitives have a menu section, and a page with no examples has no Samples tab"_.
+lists — see _"Primitives have a menu section, and a page with no examples has no Examples tab"_.
 
 **The rename was the price of the name.** `Primitives` beside `Fundamentals` says nothing about which sits
 under which — both are claims about level — so the other layer had to be named by kind instead. `Essentials`
@@ -1760,6 +1760,49 @@ the selected row was distinguishable only by being bold. A `globalStyle` scoped 
 anchor color back to `inherit`, which is a Playground fix rather than a theme change — nothing outside the
 `<nav>` is touched.
 
+**The menu's options sit behind a cog beside the search field**, the same `PageExampleKnobsButton` an
+example uses, holding three rows: pages without examples, which tab a page opens on, and the viewport anchor.
+The user asked for the two segmented rows. **The tab setting rewrites the links rather than redirecting after
+arrival**: the tree is built once per view (`MENU_NODES_BY_VIEW`) and the setting picks which set is shown,
+so the values stay the same objects and expansion and selection survive the switch. The dependency links in
+the page header follow the same setting, since they open pages too, and a page with no examples links straight
+to its docs whatever the setting says. **The anchor is owned by `App`**, because the `ViewportWrapper` it
+sizes wraps the menu; `AppContent` is handed the signal. `none` passes the window's size through unscaled,
+`auto` is the screen's height as before, and the numbers are a fixed 16:9 page (1920 by 1080, 2560 by 1440) that the wrapper fits inside the window with empty bars, at the user's request, rather than a height whose width follows the window. None of it is remembered across a
+reload, which is how the checkbox behaved before it moved.
+
+**The menu is always a `Sidebar`, and the arrow in its search row is the whole auto-hide setting.** Off, the
+sidebar is held expanded, which is the menu as it always was. On, it shrinks to a strip holding only the arrow
+and expands while the pointer rests on it. The sidebar's expanded state is simply auto-hide being off. **One
+control, not two**: the first build had a checkbox in the cog for auto-hide and an arrow that pinned the menu
+open on top of it, two sources of truth that could disagree. The arrow was made to flip the setting itself, and
+since it is always shown — it is also the way back in — the user had the checkbox removed. **It pushes the page
+in both, at the user's call** — an overlay was tried first and reverted. The arrow sits first in the search row
+rather than inside the part that hides, so it is the same element in both states and keeps focus when pressed
+from the keyboard. It is a Playground button of its own (`PageSidebarToggle`) because the library's `Button`
+cannot carry `aria-expanded`.
+
+**The tree's scrolling box runs to the menu's edges.** The padding sits on the search row and inside the
+scrolling box rather than around both, so the scrollbar is flush with the menu's right edge as it was when the
+whole menu scrolled.
+
+**Collapsed, the menu's contents are hidden rather than removed.** The first build unmounted the search, the
+cog and the tree on every collapse, so each hover rebuilt a couple of hundred rows mid-animation and the tree
+lost its scroll position. They are now `visibility: hidden` while collapsed, which also takes them out of the
+tab order and the accessibility tree, the same as removing them did. **They fade rather than pop**, which is
+what the phase is handed over for: opacity drops as collapsing begins and returns as expanding begins, over the
+sidebar's own duration, and `visibility` only goes once the phase reaches collapsed, so the fade out is seen. **Only the tree scrolls**, not the whole
+menu: with the search row inside the scrolling box, a menu collapsed while scrolled down would have scrolled
+the arrow out of the strip.
+
+**The menu clips itself; the sidebar does not.** The outer `<nav>` fills the sidebar's width, carries the
+gradient and the shadow, and hides what overflows; the box inside it is laid out at the full 320px. That split
+is what keeps the shadow — see _"Nothing drawn in a `Sidebar` is clipped"_.
+
+**`auto` reads the screen's height once, when the page loads.** Reading it on every resize looks equivalent
+and is not: a test browser reports a screen the size of its window, so the anchor shrank with the window and
+`viewport.spec.ts`'s nested-scale check stopped seeing the outer scale change.
+
 ### The floater appears and disappears through `ElementFader`, like every other library element that comes and goes
 
 Settled, at the user's request, back when the left menu was several tab lists and a floater could be
@@ -1805,7 +1848,7 @@ all.** The pages under `SVGDefs` were the one exception while those factories we
 moved to `Generators`, so there is none. An abstract is either visible through the component that consumes it or
 reports numbers a page of its own would only print back, and its entry is a line of config.
 
-**`ComponentConfig.component` is optional, and an entry without one has no Samples view.** The alternative
+**`ComponentConfig.component` is optional, and an entry without one has no Examples view.** The alternative
 was a directory per abstract each holding a file that returns `null`, plus an import each at the top of
 `App.tsx`, which is noise standing in for nothing. `AppContent` already draws the title, the description and
 the dependency chips from the config; the page component only ever supplied the examples under them. So an
@@ -1827,7 +1870,7 @@ change that moved nothing.
 
 ### A component page is two routed views, and the Docs one is read off the published type
 
-Each component page is Docs and Samples, and which one you are on is a URL rather than component state, so a
+Each component page is Docs and Examples, and which one you are on is a URL rather than component state, so a
 view can be linked to and the back button walks them.
 
 **Docs and API were two tabs at first, and are one now.** The first build had a Docs tab holding
@@ -1835,12 +1878,12 @@ only the description and an API tab holding the export tables. Once the tables c
 blocks of props, utilities and types, most of what a reader learns about a unit was on the API tab and the
 Docs tab was one paragraph. The user's call: one tab, named Docs at `/docs`, with the description as its
 lead paragraph and the tables under it. The name covers both halves where "API" would have put the plain
-description under a reference heading, and pages without samples already forwarded to `/docs`. The
+description under a reference heading, and pages without examples already forwarded to `/docs`. The
 `data-api-*` attributes on groups, tables and rows keep their name, since they mark the export tables
 wherever those are drawn, and `virtual:component-api` keeps its name for the same reason.
 
-**Samples is the index rather than a segment of its own.** `/button` is the Samples view and only `/docs` is
-added. Giving Samples a segment would have renamed every address in the Playground and every
+**Examples is the index rather than a segment of its own.** `/button` is the Examples view and only `/docs` is
+added. Giving Examples a segment would have renamed every address in the Playground and every
 locator in the suite for no gain, and the bare route is what the pages already were.
 
 **The tab bar lives in the shell, not in the pages.** `AppContent` already renders the title and the
@@ -1928,16 +1971,16 @@ two sample pages, `TimedGradients` and `TrackedGradients`, and a group is not a 
 API with nowhere to show it. The user's call: a page of the group's own name goes first inside it, which is how
 they structure such a case generally, over flattening the two sample pages up beside it.
 
-### Primitives have a menu section, and a page with no examples has no Samples tab
+### Primitives have a menu section, and a page with no examples has no Examples tab
 
 Asked for by the user once the export tables existed: a primitive had exports worth reading and nowhere to read
 them. **Each of the twelve folders under `Primitives/` is a config entry** in a `Primitives` section, with a
 description and no examples, exactly as an abstract is — the page test in _"Layering"_ says a primitive
-cannot be shown alone, so there is nothing to put under Samples. Its description says which components are
+cannot be shown alone, so there is nothing to put under Examples. Its description says which components are
 built on it and whether it is exported whole or only by its types, since that decides what its Docs view lists.
 
 **A page with no `component` shows Docs only, and its bare address forwards to Docs.** The user
-asked for the empty Samples tab to go from abstracts; the rule is written on the config rather than on the
+asked for the empty Examples tab to go from abstracts; the rule is written on the config rather than on the
 layer, so it holds for any entry without examples, and an SVG defs page without examples — `SVGAnimations` —
 has only the one tab as well. The forward replaces the history entry rather than adding one, so the back button does
 not return to an address that only forwards again. Every link in the nav still points at the bare address.
@@ -5018,6 +5061,81 @@ be swiped away either, and the flag's doc block says so. The user's call, made w
 an accident; the other direction, a tap-only drawer with the swipe off, breaks nothing under 2.5.7 and waits for
 somebody to need it.
 
+### `Sidebar`: a panel that grows between two widths and never blocks the page
+
+**It is its own component, not a mode of `Drawer`.** `Drawer` is `Modal` all the way down: it seals the page,
+locks scrolling, traps focus and says `aria-modal`. A sidebar that pushes the page aside so the page can keep
+being used cannot keep any of that, and one prop switching all of it on and off would leave most of `Drawer`'s
+contract hanging on it. The user's call. The name is theirs too, over `NavigationRail`, which says the
+contents are navigation, and `SidePanel`, whose "panel" already means `Collapsible`'s opening part.
+
+**It is not built on `Collapsible` either.** A collapsed `Collapsible` is `inert` and the only thing on show is
+its trigger; a collapsed sidebar is a strip whose contents stay usable. What the two share is a box changing
+size, which is `ElementFader` and a CSS transition, and `Sidebar` uses those directly.
+
+**Push or overlay is a prop, and both are legitimate.** Pushed, the sidebar's own box grows and the content
+beside it gives the room up. Overlaid, the box the layout sees stays at the collapsed width and the panel inside
+grows over the neighbor from the docked edge, raised one step above whatever stacking it sits in. The edge only
+matters to overlay; pushed, the consumer's layout already decides which side it is on.
+
+**Nothing drawn in a `Sidebar` is clipped.** The first build put `overflow: hidden` on the panel, which also
+cut off anything painted outside it, so the Playground menu lost its shadow. `overflow-clip-margin` would let a
+clip leave room for one, but MDN lists it as limited availability rather than Baseline. So the panel clips
+nothing and is always exactly the sidebar's width, and contents laid out at the expanded width clip themselves
+inside an outer box that fills the panel — the outer box keeps its shadow because nothing above it clips.
+
+**Both widths are the consumer's.** Measuring the expanded width from the contents is circular, since the
+contents change layout with the width they are given.
+
+**The contents are handed a phase — collapsed, expanding, expanded, collapsing — rather than a visibility
+target.** The user asked for it so a collapsed layout and an expanded one can be swapped smoothly: expanding
+is when to show the wide layout so the growth uncovers it, collapsed is when to put the narrow one back. It is
+read from the intended state and `ElementFader`'s `getHasTransitionFinished`, not from the transition target,
+because the fader commits its target a frame late and the target would briefly say the opposite.
+
+**It draws no control; `expandedSignal` is the whole interface.** Expanded is state, so it is a signal, and
+anyone holding it can open or close the sidebar from anywhere (_"Playback is a signal; a rewind is a
+command"_ in `conventions.md`). The accessibility of the button travels with it: the consumer's button carries
+`aria-expanded` and points `aria-controls` at the sidebar's `id`, which is why `id` is a prop.
+
+**Hover is a look, not a decision.** `isExpandedOnHover` goes through `HoverIntentUtils` into a private
+signal that is OR-ed with the owner's, so resting the pointer expands it without writing `expandedSignal`: a
+sidebar the owner expanded stays expanded when the pointer leaves, and the owner's button keeps reporting
+collapsed while it is only being looked at. The hover-expanded state is a dismiss layer, so Escape and a press
+elsewhere put it back — WCAG 1.4.13 asks for content that appears on hover to be dismissable without moving the
+pointer. The owner collapsing it clears the hover state too, so pressing the button while hovering collapses
+at once.
+
+**Something opened from inside holds it open.** A popup is portaled out of the sidebar, so reaching it is the
+pointer leaving — the first build collapsed the Playground's menu the moment the pointer moved onto its own
+settings pane. So while any control inside says `aria-expanded="true"` and points `aria-controls` at an
+element outside the sidebar, a leave collapses nothing. The test is read off the attributes the library's
+triggers already write, which is what lets it cover a popup the sidebar knows nothing about. Holding cannot
+end with a leave, since the pointer has already left, so while hover-expanded the sidebar also listens for
+pointer movement on the document and lets go on the first move that lands outside it and everything it owns
+once nothing is held.
+
+**The owner collapsing it waits on the same thing.** Switching the Playground's auto-hide on from a checkbox in
+its own settings pane collapsed the menu under the open pane, which was left pointing at a cog nobody could
+see. That checkbox has since gone, so the Playground no longer reaches this case and no spec covers it; the
+behavior stays because any consumer collapsing from inside a popup would hit it. So a
+collapse that arrives while something opened from inside is still open keeps the sidebar expanded, and lets go
+the way a hover does. **The wait is its own state, not a hover.** The first attempt reused the hover state,
+which is a dismiss layer, and a layer registered after the pane sits above it — so Escape collapsed the menu
+and left the pane standing. The wait registers no layer; Escape closes the pane, and the next move away
+collapses the menu.
+
+**A sidebar that starts expanded appears expanded.** `ElementFader` always starts from hidden and grows into
+the first state it is given, so every page load slid the Playground's menu open. The first transition runs at
+zero duration when the starting state is expanded, and the real duration applies from the first change on. The default rest before it expands is 300ms, shorter than a tooltip's 700 because the strip is a
+deliberate target rather than something passed over on the way elsewhere; it is a guess, not a measurement.
+
+**It does not register itself with `ElevationUtils`.** The first build did, reading its own `z-index` from
+`ElevationUtils.getBase` while registering it — and registering bumps the revision `getBase` reads, so the
+registration re-ran itself and the panel never settled on its expanded width. Popups inside it find the raised
+panel through `AnchorUtils.getStackingBase`, which reads ancestors' `z-index` from the document, so the
+registration bought nothing.
+
 ### Controls: `FileInput` and `ColorInput`, where the UA owns the activation
 
 Both are the `TextInput` arrangement (overlay geometry, wrapper, flags, private
@@ -6439,6 +6557,19 @@ consumer, and the first inside the library.
 
 **`AccordionFlags` is gone rather than aliased to `CollapsibleFlags`**, following the `TextField` extraction:
 old names went with it and the Playground's painter was renamed. One shape, one name.
+
+**The panel opens on any side of its trigger, through one `side` prop.** Top, right, bottom or left, bottom
+by default, which is what it always did. The user's call over an orientation prop plus a before-or-after prop:
+four physical sides say the same thing in one value, and `Drawer`'s `edge` already uses that vocabulary. It
+gives up flipping by itself in a right-to-left page, which `Drawer` does not do either. Sideways, the panel
+animates its width instead of its height, the trigger stops filling the row, and the contents are laid out at
+`max-content` so the growing panel uncovers them rather than squeezing them — which is why a sideways panel
+wants contents with a width of their own.
+
+**A minimum collapsed size was considered and dropped.** A closed panel is `inert`, so whatever a minimum
+left showing would be visible and unusable; keeping it usable means lifting `inert`, which lets Tab walk into
+the clipped part. The user dropped it rather than change what closing means. `Sidebar` is where a panel that
+stays partly visible lives.
 
 ### `Accordion`, `Collapsible`, `Preview`, `Tree`: two-way state is optional
 

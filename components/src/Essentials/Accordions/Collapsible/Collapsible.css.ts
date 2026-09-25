@@ -11,7 +11,26 @@ export const collapsibleSizingVariants = styleVariants({
 
 export const collapsibleRoot = style({
     display: "flex",
-    flexDirection: "column",
+});
+
+export const collapsibleSideVariants = styleVariants({
+    top: {
+        flexDirection: "column-reverse",
+    },
+    right: {
+        flexDirection: "row",
+    },
+    bottom: {
+        flexDirection: "column",
+    },
+    left: {
+        flexDirection: "row-reverse",
+    },
+});
+
+export const collapsibleSidewaysContent = style({
+    width: "max-content",
+    height: "100%",
 });
 
 export const collapsibleTrigger = style({

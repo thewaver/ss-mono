@@ -62,10 +62,15 @@ export const Collapsible = (props: CollapsibleProps) => {
         false,
     );
 
-    const getContentHeight = ElementObserverUtils.createBorderBoxHeightObserver(
-        getContentRef,
-        () => !getHasPanelContent(),
-    );
+    const getSide = createMemo(() => access(props.side) ?? COLLAPSIBLE_DEFAULTS.side);
+
+    const getIsSideways = () => getSide() === "left" || getSide() === "right";
+
+    const getContentSize = ElementObserverUtils.createBorderBoxSizeObserver(getContentRef, () => !getHasPanelContent());
+
+    const getContentExtent = () => (getIsSideways() ? getContentSize().width : getContentSize().height);
+
+    const getPanelAxis = () => (getIsSideways() ? "width" : "height");
 
     const { getTransitionTarget, getHasTransitionFinished } = ElementFaderUtils.createFader(getIsExpanded, {
         getTransitionDurationMs,
@@ -107,7 +112,7 @@ export const Collapsible = (props: CollapsibleProps) => {
     const renderWrapper = () => (
         <InteractionWrapper
             {...props}
-            sizing={"fill"}
+            sizing={getIsSideways() ? "fit-content" : "fill"}
             extraFlags={(): CollapsibleFlags => ({ isExpanded: getIsExpanded() })}
             renderControl={(setElementRef, getFlags) => (
                 <CollapsibleTrigger
@@ -127,7 +132,14 @@ export const Collapsible = (props: CollapsibleProps) => {
     );
 
     return (
-        <div ref={setRootRef} class={[styles.collapsibleRoot, styles.collapsibleSizingVariants[getSizing()]].join(" ")}>
+        <div
+            ref={setRootRef}
+            class={[
+                styles.collapsibleRoot,
+                styles.collapsibleSizingVariants[getSizing()],
+                styles.collapsibleSideVariants[getSide()],
+            ].join(" ")}
+        >
             <Show when={getHeadingTag()} fallback={renderWrapper()}>
                 {(getTag) => (
                     <Dynamic component={getTag()} class={styles.collapsibleHeading}>
@@ -140,15 +152,15 @@ export const Collapsible = (props: CollapsibleProps) => {
                 id={panelId}
                 class={styles.collapsiblePanel}
                 style={{
-                    "height": `${getTransitionTarget() === 1 ? getContentHeight() : 0}px`,
-                    "transition-property": "height",
+                    [getPanelAxis()]: `${getTransitionTarget() === 1 ? getContentExtent() : 0}px`,
+                    "transition-property": getPanelAxis(),
                     "transition-duration": `${getTransitionDurationMs()}ms`,
                 }}
                 role={access(props.panelRole)}
                 {...(access(props.panelAriaAttributes) ?? {})}
                 inert={!getIsExpanded()}
             >
-                <div ref={setContentRef}>
+                <div ref={setContentRef} class={getIsSideways() ? styles.collapsibleSidewaysContent : undefined}>
                     <Show when={getHasPanelContent()}>
                         {props.renderPanel(getTransitionTarget, getTransitionDurationMs)}
                     </Show>

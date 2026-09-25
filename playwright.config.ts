@@ -5,7 +5,8 @@ const BASE_URL = `http://127.0.0.1:${PORT}`;
 
 /**
  * `Viewport` scales its content to the window, and the scale is almost never 1: it is 1 only when the
- * window's **height** equals the Playground's own `SIZE_ANCHOR`, since the derived viewport always
+ * window's **height** equals the Playground's viewport anchor (the screen's height, unless the library
+ * settings say otherwise), since the derived viewport always
  * matches the window's aspect ratio and `RectUtils.fit` scales up as readily as down. So a client rect
  * measured here — `boundingBox`, `getBoundingClientRect` — is the layout value times that factor, which
  * reads as a component measuring itself wrong. **Assert geometry in layout space** (`offsetWidth`,

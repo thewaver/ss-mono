@@ -1,18 +1,18 @@
 import type { PageViewKey } from "./ViewTabs.types";
 
-export const PAGE_VIEW_KEYS: PageViewKey[] = ["docs", "samples"];
+export const PAGE_VIEW_KEYS: PageViewKey[] = ["docs", "examples"];
 
 export const PAGE_VIEW_LABELS: Record<PageViewKey, string> = {
     docs: "Docs",
-    samples: "Samples",
+    examples: "Examples",
 };
 
 export const PAGE_VIEW_SEGMENTS: Record<PageViewKey, string> = {
     docs: "/docs",
-    samples: "",
+    examples: "",
 };
 
-export const DEFAULT_PAGE_VIEW: PageViewKey = "samples";
+export const DEFAULT_PAGE_VIEW: PageViewKey = "examples";
 
 export const toPageViewRoute = (baseRoute: string, key: PageViewKey) => `${baseRoute}${PAGE_VIEW_SEGMENTS[key]}`;
 
