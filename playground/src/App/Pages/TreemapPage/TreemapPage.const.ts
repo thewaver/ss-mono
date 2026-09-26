@@ -126,6 +126,7 @@ export const LIBRARY: TreemapNode<string> = branch(
         leaf("Icicle", 597),
         branch("Mosaics", leaf("ElementMosaic", 67), leaf("ImageMosaic", 131)),
         leaf("Odometer", 628),
+        leaf("ParticleField", 520),
         leaf("ParticleSpawner", 463),
         leaf("PatchBoard", 1685),
         branch("PointerEffects", leaf("LightCatcher", 167), leaf("ShadowCaster", 194), leaf("Tilter", 230)),
@@ -204,5 +205,5 @@ export const LIBRARY: TreemapNode<string> = branch(
         branch("Staircase", leaf("Indents", 49)),
     ),
     leaf("Utils", 84),
-    leaf("src files", 742),
+    leaf("src files", 746),
 );

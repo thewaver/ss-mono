@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { inlineStyle, inputValue, prop, revealProp } from "./helpers";
 
-const CORNER_GRID = '[data-panel="global"] [style*="grid-template-columns"]';
+const CORNER_GRID = '[data-panel="local"] [style*="grid-template-columns"]';
 
 /**
  * The Playground's props panels are the only consumer of these controls that was not written to
@@ -15,7 +15,7 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("no native control survives in a props panel", async ({ page }) => {
-    await revealProp(page, "iterationConfigKey");
+    await revealProp(page, "shouldClipChildren", "default");
 
     await expect(page.locator("select"), "no native select survives in a props panel").toHaveCount(0);
     await expect(page.locator("input[disabled]"), "and nothing uses the native disabled attribute").toHaveCount(0);
@@ -34,6 +34,8 @@ test("no native control survives in a props panel", async ({ page }) => {
 });
 
 test("a migrated Checkbox still drives the page state the raw one did", async ({ page }) => {
+    await revealProp(page, "hasIndividualCorners", "default");
+
     expect(
         await inlineStyle(page.locator(CORNER_GRID).first(), "grid-template-columns"),
         "the corner grid starts collapsed to one column",

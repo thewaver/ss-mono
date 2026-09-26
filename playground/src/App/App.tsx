@@ -70,6 +70,7 @@ import { MultiSelectPage } from "./Pages/MultiSelectPage/MultiSelectPage";
 import { NumberInputPage } from "./Pages/NumberInputPage/NumberInputPage";
 import { OdometerPage } from "./Pages/OdometerPage/OdometerPage";
 import { PaginatorPage } from "./Pages/PaginatorPage/PaginatorPage";
+import { ParticleFieldPage } from "./Pages/ParticleFieldPage/ParticleFieldPage";
 import { ParticleSpawnerPage } from "./Pages/ParticleSpawnerPage/ParticleSpawnerPage";
 import { PatchBoardPage } from "./Pages/PatchBoardPage/PatchBoardPage";
 import { LightCatcherPage } from "./Pages/PointerEffects/LightCatcherPage/LightCatcherPage";
@@ -850,6 +851,12 @@ const MENU_CONFIGS: MenuBranchConfig[] = [
                 description:
                     "A number where each digit is a column that turns to its new value, so a change reads as travel rather than a swap. The columns turn the way the number is going, so nine to zero keeps going forward instead of rewinding, and a column waits for every column to its right that is also carrying. It takes the text rather than the number, so a separator is a slot that never turns and the component owns no locale.",
                 component: () => <OdometerPage />,
+            },
+            {
+                name: "ParticleField",
+                description:
+                    "A grid of cells where particles appear and disappear in place rather than traveling. The field runs in passes, and each cell spawns at the moment its weight gives it, as CellAnimation staggers its cells. A spawn chance below 1 lets each cell into a pass only by a roll, decided once per pass so scrubbing back shows the same particles. How a particle appears is the same transform-and-filter result CellAnimation takes, and the area can be limited to a shape, a cell spawning only when its center is inside.",
+                component: () => <ParticleFieldPage />,
             },
             {
                 name: "ParticleSpawner",

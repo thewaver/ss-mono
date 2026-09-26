@@ -26,6 +26,7 @@ import { CellAnimationKnobs } from "../../Knobs/CellAnimations.const";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
+import { PagePlaybackScrubber } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { SVGDefsSources } from "../../PageComponents/SVGDefsSources/SVGDefsSources.const";
@@ -41,7 +42,6 @@ import {
 import knight_profile from "../../knight_profile.webp";
 import type { CellAnimationExampleProps, CellAnimationSourcedExampleProps } from "./CellAnimationPage.types";
 import { DefaultExample } from "./Examples/Default";
-import { ScrubExample } from "./Examples/Scrub";
 import { WipeExample } from "./Examples/Wipe";
 
 import * as styles from "./CellAnimationPage.css";
@@ -77,7 +77,6 @@ const STRESS_ITEMS: (StressTestDefs & { size: number })[] = [
 ];
 
 const DEFAULT_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Default.tsx";
-const SCRUB_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Scrub.tsx";
 const WIPE_EXAMPLE_PATH = "/src/App/Pages/CellAnimationPage/Examples/Wipe.tsx";
 const DRAWN_SOURCE_PATH = "/src/App/PageComponents/SVGDefsSources/SVGDefsSources.const.ts";
 
@@ -103,15 +102,22 @@ const groupOptions = <T extends string>(keys: readonly T[]) => {
 const GROUPPED_WEIGHTS = groupOptions(CellAnimationWeights.WEIGHT_TYPES);
 const GROUPPED_ANIMATIONS = groupOptions(CellAnimationKeyframes.ANIMATION_TYPES);
 
-const ImageExampleWrapper = (props: CellAnimationExampleProps) => {
+const ImageExampleWrapper = (props: CellAnimationExampleProps & { progressSignal: Signal<number> }) => {
     const [getSrc, setSrc] = createSignal(knight_profile);
 
     return (
         <>
-            <div class={styles.exampleRoot}>
+            <div class={styles.stack}>
                 <PageMeasureBox width={() => IMAGE_CONTAINER_SIZE}>
                     <DefaultExample {...props} src={getSrc} />
                 </PageMeasureBox>
+
+                <PagePlaybackScrubber
+                    id={"cellAnimation"}
+                    ariaLabel={"Position in the pass"}
+                    playbackSignal={props.playbackSignal}
+                    progressSignal={props.progressSignal}
+                />
             </div>
 
             <PageExampleKnobs>
@@ -254,32 +260,6 @@ const PatternExampleWrapper = (props: CellAnimationExampleProps) => {
     );
 };
 
-const ScrubExampleWrapper = (props: CellAnimationExampleProps & { progressSignal: Signal<number> }) => {
-    return (
-        <>
-            <div class={styles.exampleRoot}>
-                <ScrubExample {...props} src={() => knight_profile} />
-            </div>
-
-            <PageExampleKnobs>
-                <PageProp
-                    key={"scrubIsPlaying"}
-                    label={"Playing"}
-                    hint={
-                        "Runs the pass on its own, and the slider follows it. Stopped, the slider is the only thing that moves the grid."
-                    }
-                >
-                    <PageCheckField
-                        value={props.playbackSignal[0]}
-                        ariaLabel={"Playing"}
-                        onChange={props.playbackSignal[1]}
-                    />
-                </PageProp>
-            </PageExampleKnobs>
-        </>
-    );
-};
-
 const StressTestWrapper = (props: CellAnimationSourcedExampleProps) => {
     const modalPlayback = createSignal(true);
 
@@ -311,8 +291,8 @@ const StressTestWrapper = (props: CellAnimationSourcedExampleProps) => {
 
 export const CellAnimationPage = () => {
     const playback = createSignal(true);
-    const scrubPlayback = createSignal(false);
-    const scrubProgress = createSignal(0);
+    const imagePlayback = createSignal(true);
+    const imageProgress = createSignal(0);
 
     const [getOriginType, setOriginType] = createSignal<CellAnimationOrigins.OriginType>(
         CellAnimationKnobs.STARTING_ORIGIN_KEY,
@@ -363,7 +343,15 @@ export const CellAnimationPage = () => {
             {
                 key: "image",
                 name: "A photograph, sliced",
-                component: () => <ImageExampleWrapper {...commonProps} />,
+                readout: () =>
+                    `${Math.round(imageProgress[0]() * PERCENT)}% through the pass, ${imagePlayback[0]() ? "running" : "stopped"} — the progress signal is written by the component while it plays, and writing it moves the pass there`,
+                component: () => (
+                    <ImageExampleWrapper
+                        {...commonProps}
+                        playbackSignal={imagePlayback}
+                        progressSignal={imageProgress}
+                    />
+                ),
                 path: DEFAULT_EXAMPLE_PATH,
             },
             {
@@ -381,20 +369,6 @@ export const CellAnimationPage = () => {
                     "the same for the patterns, which flow on without a pause — a repeating fill has no beat to be out of step with",
                 component: () => <PatternExampleWrapper {...commonProps} />,
                 path: DRAWN_SOURCE_PATH,
-            },
-            {
-                key: "scrub",
-                name: "Scrubbed by a slider",
-                readout: () =>
-                    `${Math.round(scrubProgress[0]() * PERCENT)}% through the pass, ${scrubPlayback[0]() ? "running" : "stopped"} — the progress signal is written by the component while it plays, and writing it moves the pass there`,
-                component: () => (
-                    <ScrubExampleWrapper
-                        {...commonProps}
-                        playbackSignal={scrubPlayback}
-                        progressSignal={scrubProgress}
-                    />
-                ),
-                path: SCRUB_EXAMPLE_PATH,
             },
             {
                 key: "wipe",

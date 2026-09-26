@@ -3989,9 +3989,18 @@ The arc's version of this is one entry along; both placers now anchor the same w
 ### The grouped panel is every page with a sample picker, not just `Formation`
 
 The sample group, the divider and the global group below it went to the four other pages that drive a sample
-from a picker: both gradient pages, `GlassSurface`'s border pattern, and `ShapePage` — which has two sample
-groups rather than one, its stroke pattern and its fill pattern being independent samples with their own
-knobs. `ScanlineAnimation` was left alone at the user's word.
+from a picker: both gradient pages, `GlassSurface`'s border pattern, and `ShapePage`. `ScanlineAnimation` was
+left alone at the user's word.
+
+**A group exists only where props depend on each other to be shown.** The user's rule, in their words: if prop
+Y only shows when prop X is set to a particular value, X and Y belong in a separate group with X first. Props
+that are related but not dependent in that way get no group, however closely they belong together. So a picker
+whose choice brings its own knobs with it — a gradient family, a layout, an effect — heads a group with its knobs
+under it, and a picker that shows or hides nothing goes with the rest: `ShapePage`'s fill pattern and fill cell size are in the global panel, because the
+pattern brings no knobs. **The same holds inside an example's own popup**, which is one flat list with no
+dividers, since nothing there shows or hides anything. `ShapePage`'s geometry — shape, corners, radii, exponents
+— sits in the popups of the two examples that use it, and clip and pad in the first one's only; the stroke,
+fill and timing are page-wide because all three examples draw them.
 
 ### The gradient samples' tuning is props, composed rather than declared per sample
 
@@ -15429,6 +15438,28 @@ surprising of the two.
 ### `Trail`: followers are offsets on one clock
 
 **A convoy is one progress and one track, and each traveler is that progress minus its offset.** `followerOffsets` lists every traveler, the lead being `0`. On a loop, a follower wraps round behind the lead from the start. On a path that stops, it waits at the start until the lead is its offset ahead, and the run lasts one path length plus the largest offset. `durationMs` is scaled by the same amount so every traveler moves at a lone traveler's speed, and `1` still means the run is over — everybody at the end, `onLap` fired, playback written false.
+
+### `ParticleField`: particles that appear in place, on a grid, timed by weights
+
+**A separate component, not a mode of `ParticleSpawner`.** The user's framing: particles with no path of travel, appearing inside a grid on a system of weights like `CellAnimation`'s. Nothing of the spawner's survives that — no source element, no targets, no travel — so what the two share is the word "particle" and a `renderParticle` slot.
+
+**One engine, passes, and a spawn chance — no modes.** The field runs `CellAnimation`'s timing: one pass over the grid lasting `animationDurationMs`, iterations, a pause between them, a `progressSignal` that scrubs, and the pass props named as `CellAnimation` names them. **A weight is a cell's turn in the pass and means nothing else.** `spawnChance` is the only other say in which cells spawn: at `1`, the default, every cell spawns every pass; below it, each cell spawns in a pass only if it wins a roll.
+
+The first build had two modes under a `spawnMode` union. `batch` was the above; `stream` never stopped, and there a weight was a cell's chance of spawning within one duration, with a per-cell wait after each spawn. The user then proposed keeping passes in both and letting the second mode differ only by chance. Once that was true, the second mode was the first with a number below 1, so the union was dropped for one prop — the user's go-ahead, on the argument that a weight meaning "when" in one mode and "how eager" in the other was the hardest part of the component to explain. It also gave the chance-driven field the scrub, the iterations and the pass callbacks for free, and deleted a second clock and the per-cell waits.
+
+**A roll is decided once per cell per pass and kept.** `ParticleFieldUtils.computeRoll` hashes a seed, the pass number and the cell into `0`–`1`, so redrawing a pass — which scrubbing does on every drag — never rolls again, and dragging back over a point shows the particles it showed before. The seed is drawn once per mounted field, so two fields side by side do not light the same cells. **The chance is one number for the whole field**, the simpler reading taken to try the idea; a per-cell chance, which would bring back busier and quieter areas without mixing that into timing, was raised and not taken up. **A cell that does spawn always spawns at the same moment of its pass**, since its weight is fixed; with a low chance that beat is mostly hidden, and a consumer who sees it rebuilds random weights in `onIterationEnd`.
+
+**`animationDurationMs` is the shortest time between two spawns from the same cell**, the user's rule, and it holds by construction: a cell spawns at most once per pass. **A cell holds one particle at a time** for the same reason.
+
+**The heaviest cell spawns first, as in `CellAnimation`**, and the lightest late enough that its particle is removed exactly as the pass ends (`computeBatchSpawnMs`). A particle whose lifetime is longer than the pass is cut to the pass; otherwise it would still be showing at the end, and during the pause between iterations it would sit frozen. **A cell with no weight counts as `0`**, as in `CellAnimation`.
+
+**A particle's life is its own `0`–`1`, and `particleLifetimeMs` is its length.** `CellAnimation` hands a cell the shared timeline and lets breakpoints place its window. The field places the window itself, from the weight and the lifetime, and hands the evaluator the particle's own progress, so a lifetime can be set without touching the weights. `computeParticleAnimation` returns the same transform-and-filter values `CellAnimation` does, written by `CellAnimationUtils.assignAnimationProps` on an inner element, so the position on the outer one is never overwritten. The Playground plays a keyframe sample forwards to appear and backwards to disappear, with a hold share between; that envelope is page code, not the library's.
+
+**Where a particle sits is `computeParticlePos`, asked once per spawn, defaulting to the cell's center.** Scattering it inside the cell is a random answer to that callback, which the Playground offers, and is what makes the grid stop showing. The component owns no randomness except the spawn roll.
+
+**The area is `computeShapePoints`, the same input `Shape` takes, plus `shapeJoinRadii` and `shapeLameExponents`.** The user's intent, confirmed after an early "SVG path" turned out to mean this: the area is `Shape`'s own input, so the built-in shapes (`ShapeConst.getDefaultShapePoints`, corner lists that stretch to fill a box) work unchanged, and a path string with its own coordinates would have been a second vocabulary beside them. Rounded corners go through `ShapeUtils.getPaths`, whose `outerOutline` is the painted edge as a polygon, and each cell's center is tested against that by ray casting (`ParticleFieldUtils.isPointInPolygon`). No canvas, no DOM, so it is unit-tested. A shape stretches with the box, as `Shape`'s do: a consumer who wants proportions kept computes the points that way.
+
+**Pausing freezes every particle.** Everything is drawn from the pass's progress, which only advances while the field runs, so a hidden tab or a pause does not age the particles.
 
 ### `ParticleSpawner`: `emit` sends a round alongside playback, and that is what makes a relay
 

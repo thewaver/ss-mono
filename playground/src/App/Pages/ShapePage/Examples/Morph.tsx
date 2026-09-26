@@ -1,11 +1,11 @@
-import { createMemo, createSignal, onCleanup } from "solid-js";
+import { createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
 import { Button, MediaQueryMonitorUtils, Shape, access } from "@thewaver/ss-components";
 import { EasingUtils, MathUtils, Point2dUtils } from "@thewaver/ss-utils";
 import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
-import { computeNoSampleDefs } from "../../../PageComponents/SampleGroups/SampleGroups.const";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";
 import type { ShapeExampleProps } from "../ShapePage.types";
 
 import * as styles from "../ShapePage.css";
@@ -16,7 +16,6 @@ const MORPH_STEPS = 64;
 const POINT_COUNT = 8;
 const STAR_INNER_RATIO = 0.38;
 const START_ANGLE = -Math.PI * 0.5;
-const STROKE_GEOM = [{ thicknesses: [4] }];
 
 const CIRCLE_JOIN_RADII = Array.from({ length: POINT_COUNT }, () => 60);
 const STAR_JOIN_RADII = Array.from({ length: POINT_COUNT }, (_, index) => (index % 2 ? 16 : 6));
@@ -45,6 +44,8 @@ const blendList = (from: number[], to: number[], ratio: number) =>
 type Props = ShapeExampleProps;
 
 export const MorphExample = (props: Props) => {
+    const id = createUniqueId();
+
     const getPrefersReducedMotion = MediaQueryMonitorUtils.createReducedMotion();
 
     const [getMorph, setMorph] = createSignal(0);
@@ -95,7 +96,7 @@ export const MorphExample = (props: Props) => {
             <Shape
                 joinRadii={getJoinRadii}
                 lameExponents={getLameExponents}
-                strokeGeom={STROKE_GEOM}
+                strokeGeom={() => [{ thicknesses: access(props.edgeThicknesses) }]}
                 computePoints={(size) => {
                     const circle = computeCirclePoints(size);
                     const star = computeStarPoints(size);
@@ -103,8 +104,8 @@ export const MorphExample = (props: Props) => {
 
                     return circle.map((point, index) => Point2dUtils.lerp(point, star[index], morph));
                 }}
-                computeFillDefs={() => computeNoSampleDefs(access(props.colors), "fill")}
-                computeStrokeDefs={() => computeNoSampleDefs(access(props.colors), "stroke")}
+                computeFillDefs={(getSize, getRef) => computeShapeFillDefs(id, props, getSize, getRef)}
+                computeStrokeDefs={(getSize, getRef) => computeShapeStrokeDefs(id, props, getSize, getRef)}
                 renderChildren={() => <div style={{ width: `${MORPH_SIZE}px`, height: `${MORPH_SIZE}px` }} />}
             />
 

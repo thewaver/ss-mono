@@ -66,6 +66,7 @@ test("it draws a closed path", async ({ page }) => {
 test("changing the shape kind redraws the path", async ({ page }) => {
     const before = await page.locator(FILL_PATH).first().getAttribute("d");
 
+    await revealProp(page, "shapeKind", "default");
     await page.locator(SHAPE_FIELD).click();
     await expect(page.locator(SHAPE_FIELD)).toHaveAttribute("aria-activedescendant", /.+/);
     await page.keyboard.press("ArrowDown");
@@ -81,6 +82,7 @@ test("changing the shape kind redraws the path", async ({ page }) => {
 test("changing a joint radius redraws the path", async ({ page }) => {
     const before = await page.locator(FILL_PATH).first().getAttribute("d");
 
+    await revealProp(page, "jointRadiiPx", "default");
     await page.locator(JOINT_RADIUS).fill("60");
     await page.locator(JOINT_RADIUS).blur();
 
