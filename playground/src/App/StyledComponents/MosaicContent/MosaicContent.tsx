@@ -2,14 +2,17 @@ import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { PageMosaicLinkProps, PageMosaicTileProps } from "./MosaicContent.types";
 
 import * as styles from "./MosaicContent.css";
 
 export const PageMosaicTile = (props: ParentProps<PageMosaicTileProps>) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
-            class={styles.mosaicTile}
+            class={[styles.mosaicTile, getLayerClass()].join(" ")}
             style={{ width: `${access(props.width)}px`, height: `${access(props.height)}px` }}
         >
             <div class={styles.mosaicTileName}>{props.children}</div>
@@ -22,8 +25,10 @@ export const PageMosaicTile = (props: ParentProps<PageMosaicTileProps>) => {
 };
 
 export const PageMosaicLink = (props: ParentProps<PageMosaicLinkProps>) => {
+    const getLayerClass = useLayerClass();
+
     return (
-        <a class={styles.mosaicLink} href={access(props.href)}>
+        <a class={[styles.mosaicLink, getLayerClass()].join(" ")} href={access(props.href)}>
             {props.children}
 
             <span class={styles.mosaicCaption}>{access(props.caption)}</span>

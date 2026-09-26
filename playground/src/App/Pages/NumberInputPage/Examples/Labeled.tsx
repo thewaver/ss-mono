@@ -1,7 +1,7 @@
 import { Label, NumberInput } from "@thewaver/ss-components";
 
+import { PageNumberInputStepper } from "../../../PageComponents/NumberInputStepper/NumberInputStepper";
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
-import { PageNumberInputStepper } from "../../../StyledComponents/NumberInputStepper/NumberInputStepper";
 import {
     PageTextFieldContent,
     computePageTextFieldTextStyle,

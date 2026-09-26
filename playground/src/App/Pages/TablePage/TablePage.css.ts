@@ -1,11 +1,12 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const tableFrame = style({
     width: "100%",
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: themeVars.color.surface.dark,
+    backgroundColor: layerVars.main,
     overflow: "auto",
 });
 

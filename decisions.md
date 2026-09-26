@@ -23,18 +23,90 @@ _"One repo, three packages"_ for why and for what that changes.
   in `CLAUDE.md`.
 - **`components/src`** — the published library, and the only tree with a support contract (see
   _"Compatibility arguments"_).
-- **`playground/src`** — the demo app. Every consumer-side painter lives in `App/StyledComponents`,
-  named `<LibComponent>Content` after the shell whose slot it fills, with the playground-wide `Page`
-  prefix: `PageButtonContent`, `PageCheckboxContent`, `PageTooltipContent`. `App/PageComponents`
-  holds the playground's own furniture: `PageVariants`, `PageExamples`, `PageCodeBox`.
+- **`playground/src`** — the demo app. `App/StyledComponents` holds paint and nothing else, mostly
+  consumer-side painters named `<LibComponent>Content` after the shell whose slot it fills, with the
+  playground-wide `Page` prefix: `PageButtonContent`, `PageCheckboxContent`, `PageTooltipContent`.
+  `App/PageComponents` holds everything that behaves: the playground's own furniture (`PageVariants`,
+  `PageExamples`, `PageCodeBox`) and every composition that wires a library control up (`PageNumberField`,
+  `PageCalendarCaption`, `PageSidebarToggle`).
 
-**The line between the two folders is the library, not the shape of the thing.** Anything that
-dresses a library component belongs in `StyledComponents`, even when it is not a `renderContent`
-painter and even when it composes several controls — `Field`, `ColorChannels`, `CalendarCaption`
-and `LabelCaption` sat in `PageComponents` until on the grounds that they were
-compositions rather than paint, which was the wrong test. `PageComponents` is what the Playground
-would still need if the library did not exist. The `<LibComponent>Content` naming is for slot
-painters only; these keep the name of the thing they are.
+**The line between the two folders is paint versus behavior.** Stated by the user, replacing an earlier
+rule that drew the line at the library — "anything that dresses a library component belongs in
+`StyledComponents`" — under which `Field`, `ColorChannels` and `CalendarCaption` had been moved in. The reason
+for the new line is what `StyledComponents` is for: it is meant to grow theme subfolders that can be swapped
+wholesale to change how the whole Playground looks, so it may hold only what a different look would replace —
+markup, classes, the mapping from props to classes, and the layer read (_"Layers"_ below). Anything that changes
+what a control does lives in `PageComponents` and composes the paint: value wiring, resets, event handlers,
+focus management, wrapping a library control. Where a moved component had paint of its own, the paint stayed
+behind as a component of its own — `PageEraCycleContent`, `PageMeridiemToggleContent`,
+`PageScrollerButtonContent`, `PageNumberInputStepperContent`, `PageSidebarToggleButton`, `PageTabPanelContent`,
+`PageCalendarCaptionFields` — and the behavior half renders it. `pageColorPickerSlots` moved to
+`PageComponents/ColorPicker` because it renders `PageColorChannels`.
+
+**A borderline file is split by purpose, not by mechanism.** The user's call, with the individual cases left
+to judgment: code whose only job is producing a look stays in `StyledComponents` even when it uses signals,
+memos or timers, because a different brand replaces it along with the styling. So `Ripple` keeps its timers,
+`ToastContent` its pile transforms, `SortableGridContent` and `SVGFiltersContent` their memos, and the sidebar
+toggle's paint picks its own arrow. `ToastContent` also keeps its close `Button`: it forwards the `onDismiss` it
+is handed and decides nothing. `NumberInputStepper` did not qualify, because it decides when each button is
+disabled and binds the stepping handlers.
+
+**`StyledComponents` imports from `PageComponents` in exactly one place**, `Layer/Layer.context.ts`, which
+reads the layer context. Everything else runs the other way. The `<LibComponent>Content` naming is for slot
+painters only; the rest keep the name of the thing they are.
+
+### Layers
+
+**A control paints from the layer it sits on, and never guesses.** The user's design. Before it, every
+styled component picked its own fill and text color — `"black"`, `surface.dark`, `currentColor` at some
+alpha — on the assumption of what would be behind it, and the assumption was wrong as soon as the control
+appeared somewhere else (a calendar inside a popup, a field inside a modal). The theme now carries one pair
+per layer, `color.control.level0` to `level2`, each a `main` (the control's own fill) and a `contrast` (its
+text, icons and, at 25%, its outline).
+
+**Three fixed levels, not a running count.** Level 0 is on the page background. Level 1 is inside an
+example box, a variants box, the left menu, a modal, a drawer or a sidebar. Level 2 is inside a popover —
+menus, menubar and toolbar popups, the hover-card navigation flyout, the fan and wheel menus, hover cards,
+tooltips, toasts, spotlight popups and the knobs popover — **except a popover that opens from an input**
+(select, multi-select and autocomplete lists, the date, time and date-range pickers, the color picker),
+which carries its input's level. Nothing adds to its parent's level: an example box inside a modal is
+still level 1. The user's call, with nested layering explicitly deferred: this is the Playground's theme,
+and a consumer may build something else entirely.
+
+**The Playground sets the level, not the library.** `PageLayer` in `PageComponents/Layer` provides it, and
+the level-setting surfaces place it themselves: `PageExamples`, `PageVariants` and the left menu in
+`App.tsx`; `PageModalPanel`, `PageDrawerPanel` and `PageSidebarSurface` at 1; `PageTooltipContent`,
+`PageHoverCardContent`, `PageToastContent` and `PageSpotlightPopup` at 2; and each non-input popup at the
+call site that renders it. `PagePopoverSurface` sets nothing, because it serves both kinds of popup and
+takes its level from wherever it is mounted.
+
+**Every styled component reads the level itself.** Also the user's call, over the alternative of letting
+the containers switch the colors and keeping components unaware: reading the context is one of the few
+pieces of logic a theme is expected to own, because a different theme may not use layers at all. So each
+painter calls `useLayerClass()` and puts the returned class on its root; the class assigns `layerVars.main`
+and `layerVars.contrast` from the matching `color.control.levelN`, and the painter's styles use
+`layerVars` only.
+
+**`PageLayer` also paints the level onto the page, through `PageLayerScope`**, a `display: contents` element
+carrying the same class, and `:root` carries level 0. That is what reaches paint no component owns: a page's
+own stylesheet, text typed into a library input (styled through `computeTextStyle`, which is a plain
+function), and anything a library control renders between a provider and a painter. It takes no part in
+layout, and the library measures its own wrappers rather than what a slot returns, so nothing positioned
+sees it.
+
+**Where a surface sits decides its paint, not what it is.** The user's rule. Anything page-level — on the
+page background or in a top-level portal of its own: the example box, the left menu, modals, drawers, toasts,
+hover cards, spotlight popups, tooltips — takes the `surface` gradient. Anything contained in an example box
+takes a solid fill of its level: a sample's frames and panels paint `layerVars.main`. The one exception is
+`PageSidebarSurface`, which paints exactly the left menu's gradient, since it is a sample of that same
+furniture; a solid fill was tried and reverted by the user. `color.background.*` is off-limits to all of it. Where a solid fill takes away the difference between neighboring tiles or cells, their
+separators become the 25% outline, since a separator painted in the fill itself disappears.
+
+**A control's own outline is `contrast` at 25%.** The user's rule; 50% was tried first and read too strong.
+A state that strengthens the outline — a sortable item or grid cell picked up or blocked — goes to 50%. A
+line that divides parts of something — table rows, a tab row's gutter, a docs table, a form section's rule,
+a grid's cell lines — is not an outline and keeps its own alpha. Alphas stay on 25, 50 and 75, with 10, 35
+and 65 where a step is needed.
 
 - **`e2e/`** — Playwright interaction suite. Imports from neither tree; drives the built Playground in
   a real browser. See _"Verifying interaction"_ in `conventions.md`.
@@ -734,13 +806,18 @@ anybody remembering `npm run format`. The root `prepare` script is `husky`, and 
 install, so a fresh clone has the hook working after `npm install` with no setup step — `prepare` is what
 points git's `core.hooksPath` at `.husky/_`. The package is current and maintained; nothing has superseded it.
 
-**The hook formats the staged list, not the tree.** `prettier --write .` on every commit would rewrite files
-the commit has nothing to do with and pull them into it. So the hook reads
-`git diff --cached --name-only --diff-filter=ACMR`, hands that list to `prettier --write --ignore-unknown`, and
-`git add`s the same list back. The filter drops deletions, which have no file left to format.
-`--ignore-unknown` is what lets a staged lockfile, image or `.gitignore` pass through untouched rather than
-failing the run, and Prettier reading `.gitignore` on its own account keeps `external/` and `.scratch/` out of
-it without a second list. The list is passed as NUL-separated arguments, so a path with a space in it survives.
+**The hook formats the whole tree and stages only what was staged.** It runs
+`prettier --write --ignore-unknown .`, then `git add`s the list from `git diff --cached --name-only --diff-filter=ACMR`
+back — so every file ends up formatted, and only the commit's own files are pulled into it. The first version
+formatted the staged list alone, to keep a commit from touching unrelated working-copy files; it broke on Windows,
+where `npx` goes through `cmd.exe` and its 8191-character command line, once a commit carried a few hundred paths.
+The user's call was the whole tree: it is fast enough, and the case it risks — reformatting someone's unstaged
+work in progress — does not arise, because the user never commits while another worker is active. The filter
+drops deletions, which have no file left to `git add`. `--ignore-unknown` lets a lockfile, image or `.gitignore`
+pass untouched, and Prettier reading `.gitignore` on its own account keeps `node_modules`, build output,
+`external/` and `.scratch/` out of it without a second list. The `git add` list is passed NUL-separated and in
+batches under that command-line limit (`xargs -s 7000`), so a path with a space survives and a large commit does
+not fail.
 
 **A file staged in part is the cost.** Where a file has some changes staged and others not, the closing
 `git add` stages the whole file and the unstaged half rides into the commit. Avoiding that needs a second
@@ -795,6 +872,16 @@ is the corrected version, and a break the author wrote pushes unconditionally wh
 collapse. `ss-utils` sharing this repo means a fix that belongs to it is now made in place rather than
 parked. The rule above stands for the next foreign file that needs somewhere to wait.
 
+### Breaking the API is free until 0.1.0
+
+Stated by the user, for both published packages: while `@thewaver/ss-components` or `@thewaver/ss-utils`
+is on a `0.0.x` version, a change that breaks its consumers — a removed prop, a renamed export, a slot
+replaced by a builtin — needs no migration path, no deprecation period and no argument about compatibility.
+Take the better API and move on. The rule ends for each package when it reaches `0.1.0`, and the user has
+said that is getting close, so a breaking change that
+is already known to be wanted is cheaper now than it will be later. (The support contract below is about
+which browsers the library runs in, not about its API.)
+
 ### Compatibility arguments cite `components/src` and nothing else
 
 When arguing a modern CSS or JS feature is safe here, **only `components/src` counts** — it is the published
@@ -834,9 +921,8 @@ defaults by hand was rejected: half of them are expressions rather than literals
 goes stale silently the first time a starting value is tuned. Reporting it means the tooltip cannot disagree
 with what Reset does, because both read the same capture.
 
-The context lives in `StyledComponents/Field/Field.context.ts` rather than beside `PageProp`, which keeps
-the existing direction — `PageComponents` imports from `StyledComponents` and not the other way round — and
-puts the registry next to the code that already computes the value it carries.
+The context lives in `PageComponents/Field/Field.context.ts` rather than beside `PageProp`, which puts the
+registry next to the code that already computes the value it carries.
 
 **A row holding more than one field shows no default at all.** `Colors` is four swatches, `Cell count` is
 two numbers, and the corner rows are one field per corner; with several reporters there is no single value
@@ -1710,8 +1796,8 @@ nothing else to land on, and testing for focusable descendants would mean measur
 every render.
 
 **It carries no class**, so a consumer's flex or grid child would become this element rather than their own
-box. Copy the Playground: `PageTabPanel` holds the `TabPanel` and paints inside it, so the library element
-is absorbed by the styled component and layout stays outside both.
+box. Copy the Playground: `PageTabPanel` holds the `TabPanel` and puts `PageTabPanelContent` inside it, so the
+library element is absorbed by the page component and layout stays outside both.
 
 **Driven by `tabs.spec.ts` against `TabsPage`, not the Playground's left menu.** The menu is app
 furniture — adding a page or renaming a category used to break the keyboard spec and read as a `Tabs`
@@ -4357,9 +4443,8 @@ that value back through the setter it already has. `PagePropsPanel` provides the
 callbacks, and renders one `Reset` row once anything has registered. A page that has no panel gets nothing,
 which is correct — there is nothing to reset.
 
-**The direction of the import is why the registry lives with the fields.** `PageComponents` already import
-`StyledComponents` — `Knobs` renders `PageNumberField` — so the panel importing a field module keeps that
-direction. A registry under `PageComponents` would have had the fields importing upward instead.
+**The registry lives with the fields**, in `PageComponents/Field`, so the fields and the panel that provides
+it sit in the same tree and neither imports across the paint boundary to reach it.
 
 **A sample panel leaves its selector alone, and hides the reset when the selector is all there is.** The
 user's, in two passes: resetting the picked sample defeats the point, and a `Reset` beside a lone picker
@@ -7331,7 +7416,7 @@ its popup opens without the component having an opinion.
 **That header being the consumer's is what made an interactive caption free.** Added: the
 Playground's caption is a month title that turns into a `Select` for the month and a `NumberInput` for the
 year when clicked, with the paging arrows either side throughout. `Calendar` was not touched — the caption
-writes `monthSignal` exactly as the arrows did. It lives in `StyledComponents/CalendarCaption` and both
+writes `monthSignal` exactly as the arrows did. It lives in `PageComponents/CalendarCaption` and both
 `CalendarPage` and `DatePickerPage` use it, since the two had written the same header twice.
 
 **The fields are a mode, not the resting state**, so a calendar reads as a calendar until someone asks to
@@ -14533,9 +14618,9 @@ after a second pass wrapped everything in `PageMeasureBox`, which was as wrong a
   Anything whose whole point is a reading taken against a box qualifies, and so does a swipe, which travels a
   fraction of its own width. **A hover state does not** — nothing moves, nothing is measured, and a box around
   it is decoration pretending to be information.
-- **`color.control.background.main`** is for anything that should read as a control's own surface. The
-  virtualizer's lists take it, because a scrolling list of rows is what a select's popup is, and the two
-  looking alike is the useful signal.
+- **The layer's `main`** is for anything that should read as a control's own surface. The virtualizer's lists
+  take it, because a scrolling list of rows is what a select's popup is, and the two looking alike is the
+  useful signal. Which `color.control.levelN` that is gets decided by where the control sits; see _"Layers"_.
 - **A surface-family card** for everything else.
 
 **Text on a background is that family's `contrast`, and a highlight color has to be checked against the
@@ -16244,7 +16329,7 @@ those already belong.
 24 CSS pixel circle centred on each undersized target to clear the others. The resizer is 8px wide and sat
 inside a clickable header, so **2.5.8 failed before this**. Taking the header out of the target set is what
 makes the resizer defensible. The three targets now sharing a cell are a spacing constraint the consumer owns,
-documented on the slots.
+documented on the builtins.
 
 **The keyboard stays on the cell.** Both new controls are `tabindex="-1"` and `aria-hidden`, so they are
 pointer affordances and nothing else — one tab stop per cell, which is what the grid pattern wants, and all
@@ -16254,6 +16339,28 @@ pointer affordances and nothing else — one tab stop per cell, which is what th
 the cell's own click never runs, and without the explicit focus a press left the grid with focus nowhere and
 the next key press went nowhere.
 
-**The box-and-paint split is copied from the resizer deliberately**: the library renders the target, the
-consumer paints inside it, so an unpainted slot is invisible but still hit-testable and sorting cannot die
-silently for a consumer who never draws an arrow.
+**The two controls are builtins the consumer places, not slots the library places.** The user's design. The
+first build rendered both as library `<button>`s after the header content, each with a `renderSortControl` or
+`renderReorderGrip` painter, which left their placement to a consumer who had no way to reach it: the buttons
+stacked under the title and doubled the header's height in every Playground example. Pinning them from the
+library fixed the look and took the placement away instead. So they became `TableHeaderSort` and
+`TableHeaderReorder`, components the consumer puts inside `renderHeader` wherever they belong, each taking a
+`renderContent` painter. The builtin owns every rule the old buttons carried — keeping its press from starting
+the header's drag, focusing its cell first, `tabindex="-1"` and `aria-hidden` — so placing one is all the
+consumer does. It finds its column through a context the header cell provides, and renders nothing in a column
+that is not sortable or reorderable, so one header renderer serves every column. The resizer stays the library's:
+it is a drag surface measured against the column, and where it sits is not a matter of taste.
+
+**No raw `sort()` or `pickUp()` is exported.** `sortSignal` and `orderSignal` are already the programmatic route,
+so a custom trigger — a menu item that sorts — writes the signal, and nothing that skips the rules is left
+around to be used by mistake.
+
+**A missing builtin is warned about**, per _"An accessibility mistake the library can detect is warned about"_ in
+`conventions.md`. Each builtin registers with its cell as it is created, and the cell checks on mount: a sortable
+column with no `TableHeaderSort` can only be sorted with Enter, and a reorderable column with no
+`TableHeaderReorder` can only be reordered by dragging, which fails 2.5.7. Both warnings name the column. A
+builtin rendered outside a header cell warns and renders nothing, as an orphan `Radio` does.
+
+**The guarantee this gave up**: under the slots, a consumer who painted nothing still had a working, invisible
+target, so sorting could not die silently. With builtins, a consumer who renders none gets no pointer route, and
+the warning is what stands in for the guarantee.

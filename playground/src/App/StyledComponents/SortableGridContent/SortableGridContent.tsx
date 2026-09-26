@@ -4,6 +4,7 @@ import { access } from "@thewaver/ss-components";
 import type { SortableGridGeometry } from "@thewaver/ss-components";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type {
     SortableGridCellProps,
     SortableGridItemContentProps,
@@ -30,6 +31,8 @@ const getViewBox = (geometry: SortableGridGeometry) => {
 };
 
 export const PageSortableGridItemContent = (props: SortableGridItemContentProps) => {
+    const getLayerClass = useLayerClass();
+
     const getGeometry = createMemo(() => access(props.geometry));
 
     const getGlyphRect = createMemo(() => getGeometry().block);
@@ -40,6 +43,7 @@ export const PageSortableGridItemContent = (props: SortableGridItemContentProps)
         <div
             class={styles.sortableGridItemContent}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isCarried]: access(props.flags).isCarried,
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isDisabled]: access(props.flags).isDisabled,
@@ -90,38 +94,52 @@ export const PageSortableGridItemContent = (props: SortableGridItemContentProps)
     );
 };
 
-export const PageSortableGridCell = (props: SortableGridCellProps) => (
-    <div
-        class={styles.sortableGridCell}
-        classList={{
-            [styles.isOdd]: (access(props.spot).col + access(props.spot).row) % 2 === 1,
-            [styles.isBlocked]: access(props.isBlocked) ?? false,
-        }}
-    />
-);
+export const PageSortableGridCell = (props: SortableGridCellProps) => {
+    const getLayerClass = useLayerClass();
 
-export const PageSortableGridLanding = (props: SortableGridLandingProps) => (
-    <svg
-        class={styles.sortableGridLanding}
-        classList={{ [styles.isAllowed]: access(props.isAllowed) }}
-        viewBox={getViewBox(access(props.geometry))}
-        aria-hidden="true"
-    >
-        <polygon class={styles.sortableGridLandingOutline} points={getPoints(access(props.geometry))} />
-    </svg>
-);
+    return (
+        <div
+            class={styles.sortableGridCell}
+            classList={{
+                [getLayerClass()]: true,
+                [styles.isOdd]: (access(props.spot).col + access(props.spot).row) % 2 === 1,
+                [styles.isBlocked]: access(props.isBlocked) ?? false,
+            }}
+        />
+    );
+};
 
-export const PageSortableGridSurface = (props: SortableGridSurfaceProps) => (
-    <div
-        class={styles.sortableGridSurface}
-        classList={{
-            [styles.isReceiving]: access(props.flags).isReceiving,
-            [styles.isCarrying]: access(props.flags).isCarrying,
-            [styles.isDisabled]: access(props.flags).isDisabled,
-        }}
-    >
-        <Show when={access(props.flags).isEmpty}>
-            <div class={styles.sortableGridEmpty}>{access(props.emptyText)}</div>
-        </Show>
-    </div>
-);
+export const PageSortableGridLanding = (props: SortableGridLandingProps) => {
+    const getLayerClass = useLayerClass();
+
+    return (
+        <svg
+            class={styles.sortableGridLanding}
+            classList={{ [getLayerClass()]: true, [styles.isAllowed]: access(props.isAllowed) }}
+            viewBox={getViewBox(access(props.geometry))}
+            aria-hidden="true"
+        >
+            <polygon class={styles.sortableGridLandingOutline} points={getPoints(access(props.geometry))} />
+        </svg>
+    );
+};
+
+export const PageSortableGridSurface = (props: SortableGridSurfaceProps) => {
+    const getLayerClass = useLayerClass();
+
+    return (
+        <div
+            class={styles.sortableGridSurface}
+            classList={{
+                [getLayerClass()]: true,
+                [styles.isReceiving]: access(props.flags).isReceiving,
+                [styles.isCarrying]: access(props.flags).isCarrying,
+                [styles.isDisabled]: access(props.flags).isDisabled,
+            }}
+        >
+            <Show when={access(props.flags).isEmpty}>
+                <div class={styles.sortableGridEmpty}>{access(props.emptyText)}</div>
+            </Show>
+        </div>
+    );
+};

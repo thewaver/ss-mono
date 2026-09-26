@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../../Theme.css";
 
 export const contextRegion = style({
@@ -8,7 +9,7 @@ export const contextRegion = style({
     alignItems: "center",
     height: 120,
     padding: themeVars.spacing.double,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     border: `1px dashed currentColor`,
     borderRadius: themeVars.borderRadius.full,
     fontSize: themeVars.fontSize.small,

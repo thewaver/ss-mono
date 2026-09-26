@@ -7,18 +7,18 @@ import { type Index2d, ShapeConst } from "@thewaver/ss-utils";
 import { ParticleFieldKnobs } from "../../Knobs/ParticleFields.const";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import {
+    PageCheckField,
+    PageGroupedSelectField,
+    PageNumberField,
+    PageSelectField,
+} from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PagePlaybackScrubber } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
-import {
-    PageCheckField,
-    PageGroupedSelectField,
-    PageNumberField,
-    PageSelectField,
-} from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import { ShapedExample } from "./Examples/Shaped";
 import type { ParticleFieldExampleProps } from "./ParticleFieldPage.types";

@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 const SURFACE_PADDING = 5;
 const SURFACE_BORDER = 2;
@@ -12,7 +13,7 @@ export const isFlipped = style({});
 
 export const popoverSurfaceEmpty = style({
     padding: themeVars.spacing.full,
-    color: `rgb(from currentColor r g b / 50%)`,
+    color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
     fontSize: themeVars.fontSize.medium,
     lineHeight: 1.25,
     whiteSpace: "nowrap",
@@ -24,11 +25,11 @@ export const popoverSurface = style({
     maxHeight: 220,
     overflowY: "auto",
     padding: SURFACE_PADDING,
-    color: "inherit",
+    color: layerVars.contrast,
     boxShadow: themeVars.shadow.medium,
-    border: `${SURFACE_BORDER}px solid rgb(from currentColor r g b / 25%)`,
+    border: `${SURFACE_BORDER}px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: "black",
+    backgroundColor: layerVars.main,
     opacity: 0,
     transform: "translateY(-4px)",
 

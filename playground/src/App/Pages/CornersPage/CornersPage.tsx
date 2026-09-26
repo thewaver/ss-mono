@@ -5,9 +5,9 @@ import { CORNERS_DEFAULTS, CORNERS_KEYS } from "@thewaver/ss-components";
 
 import { CornerKnobs } from "../../Knobs/Corners.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField, PageColorField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageColorField, PageNumberField } from "../../StyledComponents/Field/Field";
 import type { CornersExampleProps } from "./CornersPage.types";
 import { ControlExample } from "./Examples/Control";
 import { DefaultExample } from "./Examples/Default";

@@ -3,6 +3,7 @@ import { For } from "solid-js";
 import { Button, SpotlightGuide, access } from "@thewaver/ss-components";
 
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
+import { useLayerClass } from "../../../../StyledComponents/Layer/Layer.context";
 import {
     PageSpotlightPopup,
     PageSpotlightPopupActions,
@@ -16,12 +17,14 @@ import * as styles from "../../Spotlights.css";
 type Props = SpotlightGuideExampleProps;
 
 export const GuideExample = (props: Props) => {
+    const getLayerClass = useLayerClass();
+
     const stepRefs: HTMLElement[] = [];
 
     const getIsLastStep = () => access(props.step) >= TOUR_STEPS.length - 1;
 
     return (
-        <div class={styles.root}>
+        <div class={[styles.root, getLayerClass()].join(" ")}>
             <div class={styles.tourStrip} data-scroll-box>
                 <For each={TOUR_STEPS}>
                     {(step, getIndex) => (

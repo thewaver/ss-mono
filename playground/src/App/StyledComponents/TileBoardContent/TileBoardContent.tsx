@@ -1,5 +1,6 @@
 import { Shape, access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { PageTileBoardMeepleProps, PageTileBoardTileProps } from "./TileBoardContent.types";
 
 import { FOCUS_RING_WIDTH, themeVars } from "../../Theme.css";
@@ -10,13 +11,18 @@ const FOCUS_THICKNESSES = [FOCUS_RING_WIDTH];
 const MEEPLE_WIDTH_RATIO = 0.56;
 
 export const PageTileBoardTile = (props: PageTileBoardTileProps) => {
+    const getLayerClass = useLayerClass();
+
     const getRenderProps = () => access(props.renderProps);
 
     const getStrokeColor = () =>
         getRenderProps().isFocusVisible ? themeVars.color.outline.main : themeVars.color.primary.main;
 
     return (
-        <div class={styles.tileBoardTile} classList={{ [styles.isMarked]: access(props.isMarked) }}>
+        <div
+            class={styles.tileBoardTile}
+            classList={{ [getLayerClass()]: true, [styles.isMarked]: access(props.isMarked) }}
+        >
             <Shape
                 computePoints={() => getRenderProps().points}
                 computeStrokeDefs={() => [{ color: getStrokeColor() }]}
@@ -43,9 +49,11 @@ export const PageTileBoardTile = (props: PageTileBoardTileProps) => {
 };
 
 export const PageTileBoardMeeple = (props: PageTileBoardMeepleProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
-            class={styles.tileBoardMeeple}
+            class={[styles.tileBoardMeeple, getLayerClass()].join(" ")}
             style={{
                 left: `${access(props.center).x}px`,
                 top: `${access(props.center).y}px`,

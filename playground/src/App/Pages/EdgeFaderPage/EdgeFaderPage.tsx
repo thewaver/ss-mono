@@ -4,9 +4,9 @@ import { EDGE_FADER_DEFAULTS } from "@thewaver/ss-components";
 
 import { EdgeFaderKnobs } from "../../Knobs/EdgeFaders.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
 import { CardExample } from "./Examples/Card";
 import { ColumnExample } from "./Examples/Column";
 import { GridExample } from "./Examples/Grid";

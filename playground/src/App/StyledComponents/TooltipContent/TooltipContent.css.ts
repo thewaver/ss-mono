@@ -16,7 +16,7 @@ export const tooltipVisibility = style({
 });
 
 export const tooltipBody = style({
-    color: themeVars.color.tooltip.contrast,
+    color: themeVars.color.surface.contrast,
     padding: themeVars.spacing.full,
 
     maxWidth: 240,

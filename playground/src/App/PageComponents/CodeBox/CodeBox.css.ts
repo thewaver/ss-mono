@@ -1,10 +1,11 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const codeBoxRoot = style({
     position: "relative",
-    backgroundColor: "black",
+    backgroundColor: layerVars.main,
     boxShadow: themeVars.shadow.small,
     borderRadius: themeVars.borderRadius.half,
     padding: themeVars.spacing.half,

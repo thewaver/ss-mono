@@ -1,10 +1,9 @@
-import type { JSX, ParentProps, Signal } from "solid-js";
+import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
-import { Color } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
-import { PageColorChannels } from "../ColorChannels/ColorChannels";
+import { useLayerClass } from "../Layer/Layer.context";
 import type {
     ColorAreaContentProps,
     ColorFieldTriggerProps,
@@ -17,10 +16,13 @@ import * as styles from "./ColorAreaContent.css";
 const PERCENT = 100;
 
 export const PageColorAreaContent = (props: ColorAreaContentProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.colorAreaSquare}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isDragging]: access(props.renderProps).isDragging,
                 [styles.isFocused]: access(props.renderProps).focusVisibleAxis !== undefined,
                 [styles.isDisabled]: access(props.renderProps).isDisabled,
@@ -40,12 +42,13 @@ export const PageColorAreaContent = (props: ColorAreaContentProps) => {
 };
 
 const HUE_THUMB_SIZE = 18;
-const AREA_SIZE = 160;
 const HUE_MAX = 360;
 
 export const PageHueSlider = (props: HueSliderProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
-        <div class={styles.hueSlider}>
+        <div class={[styles.hueSlider, getLayerClass()].join(" ")}>
             <div class={styles.hueTrack} />
 
             <div
@@ -63,34 +66,55 @@ export const PageHueSlider = (props: HueSliderProps) => {
 };
 
 export const PageColorSwatch = (props: ColorSwatchProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
-        <div class={styles.colorSwatchChecker}>
+        <div class={[styles.colorSwatchChecker, getLayerClass()].join(" ")}>
             <div class={styles.colorSwatch} style={assignInlineVars({ [styles.swatchVar]: access(props.value) })} />
         </div>
     );
 };
 
-export const PageColorChannelGrid = (props: ParentProps) => <div class={styles.colorChannels}>{props.children}</div>;
+export const PageColorChannelGrid = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
 
-export const PageColorChannel = (props: ParentProps<{ label: string }>) => (
-    <div class={styles.colorChannel}>
-        <div class={styles.colorChannelLabel} aria-hidden="true">
-            {props.label}
+    return <div class={[styles.colorChannels, getLayerClass()].join(" ")}>{props.children}</div>;
+};
+
+export const PageColorChannel = (props: ParentProps<{ label: string }>) => {
+    const getLayerClass = useLayerClass();
+
+    return (
+        <div class={[styles.colorChannel, getLayerClass()].join(" ")}>
+            <div class={styles.colorChannelLabel} aria-hidden="true">
+                {props.label}
+            </div>
+
+            {props.children}
         </div>
+    );
+};
 
-        {props.children}
-    </div>
-);
+export const PageColorPickerPopup = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
 
-export const PageColorPickerPopup = (props: ParentProps) => <div class={styles.colorPickerPopup}>{props.children}</div>;
+    return <div class={[styles.colorPickerPopup, getLayerClass()].join(" ")}>{props.children}</div>;
+};
 
-export const PageColorPickerRow = (props: ParentProps) => <div class={styles.colorPickerRow}>{props.children}</div>;
+export const PageColorPickerRow = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
+
+    return <div class={[styles.colorPickerRow, getLayerClass()].join(" ")}>{props.children}</div>;
+};
 
 export const PageColorFieldTrigger = (props: ParentProps<ColorFieldTriggerProps>) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.colorFieldTrigger}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isDisabled]: access(props.flags).isDisabled,
             }}
@@ -101,27 +125,11 @@ export const PageColorFieldTrigger = (props: ParentProps<ColorFieldTriggerProps>
 };
 
 export const PageColorPreview = (props: ColorSwatchProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
-        <div class={styles.colorPreviewChecker}>
+        <div class={[styles.colorPreviewChecker, getLayerClass()].join(" ")}>
             <div class={styles.colorPreview} style={assignInlineVars({ [styles.swatchVar]: access(props.value) })} />
         </div>
     );
-};
-
-export const pageColorPickerSlots = {
-    renderArea: (getRenderProps: Parameters<typeof PageColorAreaContent>[0]["renderProps"]) => (
-        <PageColorAreaContent renderProps={getRenderProps} size={() => AREA_SIZE} />
-    ),
-    renderHue: (getRenderProps: Parameters<typeof PageHueSlider>[0]["renderProps"]) => (
-        <PageHueSlider renderProps={getRenderProps} />
-    ),
-    renderPopup: (renderSurface: () => JSX.Element, hsvSignal: Signal<Color.HSVA>) => (
-        <PageColorPickerPopup>
-            <PageColorPreview value={() => Color.RGBA.toCss(Color.HSVA.toRgba(hsvSignal[0]()))} />
-
-            {renderSurface()}
-
-            <PageColorChannels hsvSignal={hsvSignal} />
-        </PageColorPickerPopup>
-    ),
 };

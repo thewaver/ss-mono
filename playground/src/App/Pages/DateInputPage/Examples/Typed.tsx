@@ -8,7 +8,7 @@ import type {
 import { DateInput } from "@thewaver/ss-components";
 
 import { DATE_PART_HINTS } from "../../../PageComponents/Announcements/Announcements.const";
-import { PageEraCycle } from "../../../StyledComponents/EraCycle/EraCycle";
+import { PageEraCycle } from "../../../PageComponents/EraCycle/EraCycle";
 import {
     PageTextFieldContent,
     computePageTextFieldTextStyle,

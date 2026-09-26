@@ -3,6 +3,7 @@ import { createEffect, createSignal, onCleanup, untrack } from "solid-js";
 import { Button, Popover, Range, access } from "@thewaver/ss-components";
 import { Color } from "@thewaver/ss-utils";
 
+import { PageColorChannels } from "../../../PageComponents/ColorChannels/ColorChannels";
 import {
     PageColorFieldTrigger,
     PageColorPickerPopup,
@@ -11,7 +12,6 @@ import {
     PageColorSwatch,
     PageHueSlider,
 } from "../../../StyledComponents/ColorAreaContent/ColorAreaContent";
-import { PageColorChannels } from "../../../StyledComponents/ColorChannels/ColorChannels";
 import type { ColorAreaDropdownExampleProps } from "../ColorAreaPage.types";
 import { SurfaceExample } from "./Surface";
 

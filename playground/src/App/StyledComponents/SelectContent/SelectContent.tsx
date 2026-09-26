@@ -4,24 +4,29 @@ import { Show } from "solid-js";
 import type { InteractionFlags, SelectFlags, TextFieldTextStyle } from "@thewaver/ss-components";
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { SelectContentProps } from "./SelectContent.types";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 import * as styles from "./SelectContent.css";
 
 export const computePageSelectTextStyle = (getFlags: () => InteractionFlags<SelectFlags>): TextFieldTextStyle => ({
-    "color": getFlags().isDisabled ? `rgb(from currentColor r g b / 50%)` : "currentColor",
+    "color": getFlags().isDisabled ? `rgb(from ${layerVars.contrast} r g b / 50%)` : layerVars.contrast,
     "caret-color": themeVars.color.primary.main,
     "font-size": styles.FIELD_FONT_SIZE,
     "line-height": styles.FIELD_LINE_HEIGHT,
 });
 
 export const PageSelectContent = (props: ParentProps<SelectContentProps>) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.selectContent}
             style={{ width: props.width ? `${access(props.width)}px` : undefined }}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isEmpty]: access(props.flags).isEmpty,
                 [styles.isFiltering]: access(props.flags).isFiltering,
                 [styles.isHovered]: access(props.flags).isHovered,

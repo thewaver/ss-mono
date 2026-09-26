@@ -1,6 +1,6 @@
 import { Calendar, DateValueUtils } from "@thewaver/ss-components";
 
-import { PageCalendarPagedCaption } from "../../../StyledComponents/CalendarCaption/CalendarPagedCaption";
+import { PageCalendarPagedCaption } from "../../../PageComponents/CalendarCaption/CalendarPagedCaption";
 import { PageCalendarCell, PageCalendarFrame } from "../../../StyledComponents/CalendarContent/CalendarContent";
 import { LOCALE, TODAY } from "../CalendarPage.const";
 import type { CalendarPrecisionExampleProps } from "../CalendarPage.types";

@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const resizer = style({
@@ -19,7 +20,7 @@ export const bar = style({
     height: "100%",
     padding: themeVars.spacing.half,
     borderRadius: themeVars.borderRadius.full,
-    backgroundColor: themeVars.color.control.background.main,
+    backgroundColor: layerVars.main,
 });
 
 const PRESSED_MARK_PX = 3;

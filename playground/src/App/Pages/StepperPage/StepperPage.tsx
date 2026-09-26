@@ -5,10 +5,10 @@ import type { Step } from "@thewaver/ss-components";
 
 import { StepperKnobs } from "../../Knobs/Steppers.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
-import { PageCheckField } from "../../StyledComponents/Field/Field";
 import type { PageStepState } from "../../StyledComponents/StepContent/StepContent.types";
 import { ArcExample } from "./Examples/Arc";
 import { BareExample } from "./Examples/Bare";

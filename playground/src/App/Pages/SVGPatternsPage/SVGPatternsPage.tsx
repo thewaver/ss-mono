@@ -5,6 +5,12 @@ import { SVGDefsSamples } from "@thewaver/ss-components";
 
 import { SVGPatternKnobs } from "../../Knobs/SVGPatterns.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import {
+    PageColorField,
+    PageGroupedSelectField,
+    PageNumberField,
+    PageSelectField,
+} from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import {
@@ -12,12 +18,6 @@ import {
     toGroupEntriesWithNoSample,
 } from "../../PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.types";
-import {
-    PageColorField,
-    PageGroupedSelectField,
-    PageNumberField,
-    PageSelectField,
-} from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import type { SVGPatternsExampleProps } from "./SVGPatternsPage.types";
 

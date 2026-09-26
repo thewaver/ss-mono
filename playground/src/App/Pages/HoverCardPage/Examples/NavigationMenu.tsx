@@ -4,6 +4,7 @@ import type { AnchorPlacement, DismisserReason, PopupTriggerFlags } from "@thewa
 import { HoverIntentUtils, InteractionWrapper, Popover, PopupTrigger, access } from "@thewaver/ss-components";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
+import { PageLayer } from "../../../PageComponents/Layer/Layer";
 import { PageNavMenuTrigger } from "../../../StyledComponents/NavMenuContent/NavMenuContent";
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
 import type { NavFlyoutProps, NavMenuEntry, NavigationMenuExampleProps } from "../HoverCardPage.types";
@@ -141,29 +142,31 @@ const NavFlyout = (props: NavFlyoutProps) => {
                                 [styles.bridgeLeftVar]: `${-getBridge().left}px`,
                             })}
                         >
-                            <PagePopoverSurface
-                                visibilityTarget={getVisibilityTarget}
-                                transitionDurationMs={getTransitionDurationMs}
-                                placement={getPlacement}
-                            >
-                                <ul class={styles.flyoutList}>
-                                    <For each={access(props.links)}>
-                                        {(link) => (
-                                            <li>
-                                                <a
-                                                    href={`#${link.key}`}
-                                                    class={styles.flyoutLink}
-                                                    onClick={() => {
-                                                        setIsOpen(false);
-                                                    }}
-                                                >
-                                                    {link.label}
-                                                </a>
-                                            </li>
-                                        )}
-                                    </For>
-                                </ul>
-                            </PagePopoverSurface>
+                            <PageLayer level={2}>
+                                <PagePopoverSurface
+                                    visibilityTarget={getVisibilityTarget}
+                                    transitionDurationMs={getTransitionDurationMs}
+                                    placement={getPlacement}
+                                >
+                                    <ul class={styles.flyoutList}>
+                                        <For each={access(props.links)}>
+                                            {(link) => (
+                                                <li>
+                                                    <a
+                                                        href={`#${link.key}`}
+                                                        class={styles.flyoutLink}
+                                                        onClick={() => {
+                                                            setIsOpen(false);
+                                                        }}
+                                                    >
+                                                        {link.label}
+                                                    </a>
+                                                </li>
+                                            )}
+                                        </For>
+                                    </ul>
+                                </PagePopoverSurface>
+                            </PageLayer>
                         </div>
                     );
                 }}

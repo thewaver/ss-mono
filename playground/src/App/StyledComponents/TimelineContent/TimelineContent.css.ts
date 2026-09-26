@@ -1,6 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
 import { FOCUS_RING_WIDTH, themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const AXIS_HEIGHT = 22;
 const FRAME_WIDTH = 520;
@@ -23,9 +24,9 @@ export const timelineFrame = style({
     width: "100%",
     maxWidth: FRAME_WIDTH,
     padding: themeVars.spacing.full,
-    border: `1px solid rgb(from currentColor r g b / 25%)`,
+    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.full,
-    backgroundColor: themeVars.color.background.dark,
+    backgroundColor: layerVars.main,
     touchAction: "none",
     userSelect: "none",
 });
@@ -50,7 +51,7 @@ export const timelineLaneName = style({
     justifyContent: "flex-end",
     boxSizing: "border-box",
     paddingRight: themeVars.spacing.half,
-    color: themeVars.color.background.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     opacity: 0.5,
     whiteSpace: "nowrap",
@@ -67,11 +68,11 @@ export const timelineRule = style({
     top: AXIS_HEIGHT,
     bottom: 0,
     width: 1,
-    backgroundColor: `rgb(from currentColor r g b / 12%)`,
+    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
 
     selectors: {
         [`&.${isMajor}`]: {
-            backgroundColor: `rgb(from currentColor r g b / 30%)`,
+            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
         },
     },
 });
@@ -81,7 +82,7 @@ export const timelineTickLabel = style({
     top: 0,
     left: 0,
     paddingLeft: 4,
-    color: themeVars.color.background.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     fontVariantNumeric: "tabular-nums",
     lineHeight: `${AXIS_HEIGHT}px`,

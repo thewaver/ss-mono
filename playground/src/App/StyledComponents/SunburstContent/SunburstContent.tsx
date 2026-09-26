@@ -2,6 +2,7 @@ import { createUniqueId } from "solid-js";
 
 import { SunburstUtils, access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { PageSunburstArcProps, PageSunburstHubProps } from "./SunburstContent.types";
 
 import * as styles from "./SunburstContent.css";
@@ -13,6 +14,8 @@ const LABEL_SHOWN = 1;
 const LABEL_HIDDEN = 0;
 
 export const PageSunburstArc = (props: PageSunburstArcProps) => {
+    const getLayerClass = useLayerClass();
+
     const gradientId = createUniqueId();
 
     const getIsLabelShown = () => access(props.state).endAngle - access(props.state).startAngle > MIN_LABEL_ANGLE;
@@ -28,7 +31,7 @@ export const PageSunburstArc = (props: PageSunburstArcProps) => {
 
             <path
                 class={styles.sunburstArc}
-                classList={{ [styles.sunburstArcBranch]: access(props.state).isBranch }}
+                classList={{ [getLayerClass()]: true, [styles.sunburstArcBranch]: access(props.state).isBranch }}
                 style={{ fill: `url(#${gradientId})` }}
                 d={SunburstUtils.computeArcPath(access(props.state), { padLength: PAD_LENGTH, ringGap: RING_GAP })}
             >
@@ -49,10 +52,13 @@ export const PageSunburstArc = (props: PageSunburstArcProps) => {
 };
 
 export const PageSunburstHub = (props: PageSunburstHubProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.sunburstHub}
             classList={{
+                [getLayerClass()]: true,
                 [styles.sunburstHubHovered]: access(props.flags).isHovered,
                 [styles.sunburstHubAtRoot]: access(props.flags).isDisabled,
             }}

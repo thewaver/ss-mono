@@ -3,6 +3,7 @@ import { For, type ParentProps, Show, createUniqueId } from "solid-js";
 import type { PaginatorStep, PlacementRect } from "@thewaver/ss-components";
 import { PlacementUtils, access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type {
     PaginatorDialGapContentProps,
     PaginatorGapContentProps,
@@ -47,10 +48,13 @@ const STEP_GLYPHS: Record<PaginatorStep, string> = {
 };
 
 export const PagePaginatorPage = (props: PaginatorPageContentProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.paginatorPage}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isCurrent]: access(props.renderProps).isCurrent,
                 [styles.isHovered]: access(props.renderProps).isHovered,
                 [styles.isActive]: access(props.renderProps).isActive,
@@ -64,10 +68,13 @@ export const PagePaginatorPage = (props: PaginatorPageContentProps) => {
 };
 
 export const PagePaginatorStep = (props: PaginatorStepContentProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.paginatorStep}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isHovered]: access(props.renderProps).isHovered,
                 [styles.isActive]: access(props.renderProps).isActive,
                 [styles.isDisabled]: access(props.renderProps).isDisabled,
@@ -80,14 +87,21 @@ export const PagePaginatorStep = (props: PaginatorStepContentProps) => {
 };
 
 export const PagePaginatorGap = (props: PaginatorGapContentProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
-        <div class={styles.paginatorGap} title={`Pages ${access(props.entry).from} to ${access(props.entry).to}`}>
+        <div
+            class={[styles.paginatorGap, getLayerClass()].join(" ")}
+            title={`Pages ${access(props.entry).from} to ${access(props.entry).to}`}
+        >
             …
         </div>
     );
 };
 
 export const PagePaginatorWedge = (props: PaginatorWedgeProps) => {
+    const getLayerClass = useLayerClass();
+
     const gradientId = createUniqueId();
 
     const getSectorPath = () => PlacementUtils.getSectorPath(access(props.placement).sector!);
@@ -96,6 +110,7 @@ export const PagePaginatorWedge = (props: PaginatorWedgeProps) => {
         <div
             class={styles.paginatorWedge}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isCurrent]: access(props.isCurrent),
                 [styles.isHovered]: access(props.isHovered),
                 [styles.isActive]: access(props.isActive),
@@ -170,6 +185,8 @@ export const PagePaginatorDialGap = (props: PaginatorDialGapContentProps) => {
 };
 
 export const PagePaginatorPanel = (props: PaginatorPanelProps) => {
+    const getLayerClass = useLayerClass();
+
     const getFirstIndex = () => (Math.max(access(props.page), FIRST_PAGE) - FIRST_PAGE) * PAGE_SIZE;
 
     const getTotal = () => Math.max(access(props.pageCount), 0) * PAGE_SIZE;
@@ -180,7 +197,7 @@ export const PagePaginatorPanel = (props: PaginatorPanelProps) => {
         );
 
     return (
-        <div class={styles.paginatorPanel}>
+        <div class={[styles.paginatorPanel, getLayerClass()].join(" ")}>
             <div class={styles.paginatorPanelSummary} role="status">
                 {getIndexes().length === 0
                     ? "nothing to show"
@@ -200,4 +217,8 @@ export const PagePaginatorPanel = (props: PaginatorPanelProps) => {
     );
 };
 
-export const PagePaginatorDemo = (props: ParentProps) => <div class={styles.paginatorDemo}>{props.children}</div>;
+export const PagePaginatorDemo = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
+
+    return <div class={[styles.paginatorDemo, getLayerClass()].join(" ")}>{props.children}</div>;
+};

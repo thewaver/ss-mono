@@ -2,6 +2,7 @@ import { For, createUniqueId } from "solid-js";
 
 import { Sidebar } from "@thewaver/ss-components";
 
+import { PageSidebarToggle } from "../../../PageComponents/SidebarToggle/SidebarToggle";
 import {
     PageSidebarFade,
     PageSidebarFrame,
@@ -9,7 +10,6 @@ import {
     PageSidebarPhase,
     PageSidebarSurface,
 } from "../../../StyledComponents/SidebarContent/SidebarContent";
-import { PageSidebarToggle } from "../../../StyledComponents/SidebarToggle/SidebarToggle";
 import type { SidebarExampleProps } from "../SidebarPage.types";
 
 type Props = SidebarExampleProps;

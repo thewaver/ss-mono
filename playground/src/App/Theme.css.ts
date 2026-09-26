@@ -56,13 +56,16 @@ const DEFAULT_THEME_VALUES = {
             light: "hsl(210, 10%, 15%)",
             contrast: "hsl(210, 100%, 95%)",
         },
-        tooltip: {
-            dark: "rgba(0, 0, 0, 0.5)",
-            light: "rgba(16, 16, 16, 0.5)",
-            contrast: "rgb(255, 255, 255)",
-        },
         control: {
-            background: {
+            level0: {
+                main: "hsl(0, 10%, 5%)",
+                contrast: "hsl(30, 100%, 95%)",
+            },
+            level1: {
+                main: "hsl(240, 10%, 5%)",
+                contrast: "hsl(210, 100%, 95%)",
+            },
+            level2: {
                 main: "rgb(0, 0, 0)",
                 contrast: "rgb(255, 255, 255)",
             },

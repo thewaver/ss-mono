@@ -1,37 +1,20 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const HOST_SIZE = 400;
 
 const CARD_PADDING = 20;
-const MIN_COLUMN_WIDTH = HOST_SIZE + CARD_PADDING * 2;
+export const MIN_COLUMN_WIDTH = HOST_SIZE + CARD_PADDING * 2;
 
-export const root = style({
-    display: "grid",
-    gridTemplateColumns: `repeat(auto-fill, minmax(min(100%, ${MIN_COLUMN_WIDTH}px), 1fr))`,
-    alignItems: "stretch",
-    gap: themeVars.spacing.double,
-    width: "100%",
-    minWidth: 0,
-});
-
-export const section = style({
+export const sectionBody = style({
     display: "flex",
     flexDirection: "column",
     gap: themeVars.spacing.full,
-    color: themeVars.color.surface.contrast,
-    backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
-    boxShadow: themeVars.shadow.medium,
-    borderRadius: themeVars.borderRadius.full,
-    padding: themeVars.spacing.double,
+    alignSelf: "flex-start",
+    width: "100%",
     minWidth: 0,
-});
-
-export const sectionTitle = style({
-    fontSize: themeVars.fontSize.xSmall,
-    fontWeight: "bold",
-    textTransform: "uppercase",
 });
 
 export const readout = style({
@@ -54,11 +37,8 @@ export const host = style({
     width: HOST_SIZE,
     height: HOST_SIZE,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: [themeVars.color.background.dark, `rgb(from ${themeVars.color.background.dark} r g b / 50%)`],
-    outline: [
-        `1px dashed ${themeVars.color.surface.contrast}`,
-        `1px dashed rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
-    ],
+    backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
+    outline: [`1px dashed ${layerVars.contrast}`, `1px dashed rgb(from ${layerVars.contrast} r g b / 25%)`],
     outlineOffset: -1,
 });
 

@@ -3,8 +3,8 @@ import { For } from "solid-js";
 import type { SVGDefsColors } from "@thewaver/ss-components";
 
 import { SVGGradientKnobs } from "../../Knobs/SVGGradients.const";
+import { PageColorField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
-import { PageColorField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import type { SVGGradientsControls } from "./SVGGradients.types";
 
 import * as styles from "./SVGGradients.css";

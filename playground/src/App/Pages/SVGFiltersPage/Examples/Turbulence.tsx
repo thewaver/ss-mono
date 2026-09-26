@@ -5,8 +5,8 @@ import type { SVGDisplacementChannel } from "@thewaver/ss-components";
 
 import { SVGFilterKnobs } from "../../../Knobs/SVGFilters.const";
 import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
+import { PageNumberField, PageSelectField } from "../../../PageComponents/Field/Field";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
-import { PageNumberField, PageSelectField } from "../../../StyledComponents/Field/Field";
 import { PageFilterStage } from "../../../StyledComponents/SVGFiltersContent/SVGFiltersContent";
 import type { SVGFiltersExampleProps } from "../SVGFiltersPage.types";
 

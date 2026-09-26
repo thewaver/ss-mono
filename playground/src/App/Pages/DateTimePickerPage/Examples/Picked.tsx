@@ -9,7 +9,8 @@ import {
     DATE_PART_HINTS,
     TIME_SEGMENT_HINTS,
 } from "../../../PageComponents/Announcements/Announcements.const";
-import { PageCalendarCaption } from "../../../StyledComponents/CalendarCaption/CalendarCaption";
+import { PageCalendarCaption } from "../../../PageComponents/CalendarCaption/CalendarCaption";
+import { PageMeridiemToggle } from "../../../PageComponents/MeridiemToggle/MeridiemToggle";
 import {
     PageCalendarDay,
     PageCalendarFrame,
@@ -22,7 +23,6 @@ import {
     PageClockUnit,
 } from "../../../StyledComponents/ClockContent/ClockContent";
 import { PageDatePickerTrigger } from "../../../StyledComponents/DatePickerTrigger/DatePickerTrigger";
-import { PageMeridiemToggle } from "../../../StyledComponents/MeridiemToggle/MeridiemToggle";
 import {
     PageTextFieldContent,
     computePageTextFieldTextStyle,

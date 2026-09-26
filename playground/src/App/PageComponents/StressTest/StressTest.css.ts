@@ -1,5 +1,6 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const itemGrid = style({
@@ -13,7 +14,7 @@ export const fpsCounter = style({
     right: 0,
     zIndex: 10,
 
-    backgroundColor: "black",
+    backgroundColor: layerVars.main,
     padding: themeVars.spacing.full,
     whiteSpace: "pre",
 });

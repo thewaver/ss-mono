@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isChecked = style({});
 export const isMixed = style({});
@@ -10,7 +11,7 @@ export const selectGroupContent = style({
     alignItems: "center",
     gap: themeVars.spacing.half,
     padding: `${themeVars.spacing.full} ${themeVars.spacing.full} ${themeVars.spacing.half}`,
-    color: `rgb(from currentColor r g b / 50%)`,
+    color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
     fontSize: themeVars.fontSize.xSmall,
     lineHeight: 1.25,
     letterSpacing: "0.05em",
@@ -24,7 +25,7 @@ export const selectGroupMark = style({
     alignItems: "center",
     width: 14,
     height: 14,
-    border: `2px solid rgb(from currentColor r g b / 50%)`,
+    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.half,
     color: themeVars.color.primary.main,
     fontSize: themeVars.fontSize.small,

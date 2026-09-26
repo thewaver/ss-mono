@@ -1,6 +1,6 @@
 import { NumberInput } from "@thewaver/ss-components";
 
-import { PageNumberInputStepper } from "../../../StyledComponents/NumberInputStepper/NumberInputStepper";
+import { PageNumberInputStepper } from "../../../PageComponents/NumberInputStepper/NumberInputStepper";
 import {
     PageTextFieldContent,
     computePageTextFieldTextStyle,

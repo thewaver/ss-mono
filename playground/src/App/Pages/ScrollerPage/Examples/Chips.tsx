@@ -3,7 +3,7 @@ import type { Signal } from "solid-js";
 import { Scroller, access } from "@thewaver/ss-components";
 import type { MaybeAccessor, ScrollerButtonPlacement } from "@thewaver/ss-components";
 
-import { PageScrollerButton } from "../../../StyledComponents/ScrollerButton/ScrollerButton";
+import { PageScrollerButton } from "../../../PageComponents/ScrollerButton/ScrollerButton";
 import type { ScrollerExampleProps } from "../ScrollerPage.types";
 
 import { FOCUS_RING_WIDTH } from "../../../Theme.css";

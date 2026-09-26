@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isHovered = style({});
 export const isHighlighted = style({});
@@ -21,10 +22,10 @@ export const selectOptionContent = style({
 
     selectors: {
         [`&.${isHighlighted}`]: {
-            backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
+            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
         },
         [`&.${isHovered}`]: {
-            backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
+            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
         },
         [`&.${isSelected}`]: {
             color: themeVars.color.primary.main,

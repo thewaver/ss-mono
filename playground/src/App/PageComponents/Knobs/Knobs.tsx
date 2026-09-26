@@ -1,6 +1,6 @@
 import { For, Match, Switch } from "solid-js";
 
-import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
+import { PageCheckField, PageNumberField } from "../Field/Field";
 import { PageProp } from "../Prop/Prop";
 import type { Knob, PageKnobsProps } from "./Knobs.types";
 

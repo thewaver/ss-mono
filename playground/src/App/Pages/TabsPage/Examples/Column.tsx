@@ -1,6 +1,7 @@
 import { Tabs, access } from "@thewaver/ss-components";
 
-import { PageTabContent, PageTabFloater, PageTabPanel } from "../../../StyledComponents/TabContent/TabContent";
+import { PageTabPanel } from "../../../PageComponents/TabPanel/TabPanel";
+import { PageTabContent, PageTabFloater } from "../../../StyledComponents/TabContent/TabContent";
 import { COLUMN_TABS, PANEL_BODIES, getPanelId, getTabId } from "../TabsPage.const";
 import type { TabsExampleProps } from "../TabsPage.types";
 

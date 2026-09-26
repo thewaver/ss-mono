@@ -1,5 +1,6 @@
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { FileInputContentProps } from "./FileInputContent.types";
 
 import * as styles from "./FileInputContent.css";
@@ -8,10 +9,13 @@ const NO_FILES = "none picked";
 const PICK_FILE_MARK = "⬆️";
 
 export const PageFileInputContent = (props: FileInputContentProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.fileInputContent}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isHovered]: access(props.renderProps).isHovered,
                 [styles.isDisabled]: access(props.renderProps).isDisabled,
                 [styles.hasError]: access(props.renderProps).hasError,

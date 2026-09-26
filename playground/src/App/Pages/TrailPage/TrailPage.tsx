@@ -4,9 +4,9 @@ import { MediaQueryMonitorUtils, TRAIL_DEFAULTS } from "@thewaver/ss-components"
 
 import { TrailKnobs } from "../../Knobs/Trails.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
 import { CircuitExample } from "./Examples/Circuit";
 import { ConvoyExample } from "./Examples/Convoy";
 import { ScrollExample } from "./Examples/Scroll";

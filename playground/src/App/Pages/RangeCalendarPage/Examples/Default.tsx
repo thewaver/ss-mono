@@ -1,6 +1,6 @@
 import { RangeCalendar } from "@thewaver/ss-components";
 
-import { PageCalendarCaption } from "../../../StyledComponents/CalendarCaption/CalendarCaption";
+import { PageCalendarCaption } from "../../../PageComponents/CalendarCaption/CalendarCaption";
 import {
     PageCalendarDay,
     PageCalendarFrame,

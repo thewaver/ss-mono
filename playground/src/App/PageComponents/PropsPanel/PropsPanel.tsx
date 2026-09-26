@@ -4,7 +4,7 @@ import { Show, createSignal } from "solid-js";
 import { Button, access } from "@thewaver/ss-components";
 
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
-import { FieldResetProvider } from "../../StyledComponents/Field/Field.context";
+import { FieldResetProvider } from "../Field/Field.context";
 import { PageProp } from "../Prop/Prop";
 import { PropsPanelContextProvider } from "./PropsPanel.context";
 import type { PagePropsPanelProps } from "./PropsPanel.types";

@@ -6,10 +6,10 @@ import { MathUtils } from "@thewaver/ss-utils";
 
 import { PatchBoardKnobs } from "../../Knobs/PatchBoards.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
 import { ChainExample } from "./Examples/Chain";
 import { MixerExample } from "./Examples/Mixer";
 import { PanExample } from "./Examples/Pan";

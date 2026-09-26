@@ -14,10 +14,14 @@ import type { VirtualizerRow } from "../../Abstracts/Virtualizer/Virtualizer.typ
 import { VirtualizerUtils } from "../../Abstracts/Virtualizer/Virtualizer.utils";
 import { access } from "../../Utils/propUtils";
 import { TABLE_DEFAULTS } from "./Table.const";
+import { TableHeaderContextProvider, useTableHeaderContext } from "./Table.context";
+import type { TableHeaderContextType } from "./Table.context.types";
 import type {
     TableCellRenderProps,
     TableColumn,
     TableColumnRenderProps,
+    TableHeaderReorderProps,
+    TableHeaderSortProps,
     TableProps,
     TableSelectionMode,
 } from "./Table.types";
@@ -533,48 +537,6 @@ export const Table = <T,>(props: TableProps<T>) => {
         CarrierUtils.end("drop");
     };
 
-    const renderSortControl = (getColumn: Accessor<TableColumn<T>>, columnIndex: number) => (
-        <button
-            type="button"
-            class={styles.tableSortControl}
-            tabindex={-1}
-            aria-hidden="true"
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
-                e.stopPropagation();
-
-                focusCell({ row: HEADER_ROW_INDEX, col: columnIndex });
-
-                if (getIsDisabled()) return;
-
-                toggleSort(getColumn());
-            }}
-        >
-            {props.renderSortControl?.(() => getColumnRenderProps(columnIndex))}
-        </button>
-    );
-
-    const renderReorderGrip = (columnIndex: number) => (
-        <button
-            type="button"
-            class={styles.tableReorderGrip}
-            tabindex={-1}
-            aria-hidden="true"
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={(e) => {
-                e.stopPropagation();
-
-                focusCell({ row: HEADER_ROW_INDEX, col: columnIndex });
-
-                if (getIsDisabled()) return;
-
-                handleGripClick(columnIndex);
-            }}
-        >
-            {props.renderReorderGrip?.(() => getColumnRenderProps(columnIndex))}
-        </button>
-    );
-
     const renderMarker = (columnIndex: number) => (
         <Show when={getLandingCol() === columnIndex}>
             <div class={columnIndex < getColumns().length ? styles.tableMarkerBefore : styles.tableMarkerAfter}>
@@ -586,6 +548,49 @@ export const Table = <T,>(props: TableProps<T>) => {
     const renderHeaderCell = (getColumn: Accessor<TableColumn<T>>, columnIndex: number) => {
         const cell = { row: HEADER_ROW_INDEX, col: columnIndex };
         const getRenderProps = () => getColumnRenderProps(columnIndex);
+
+        let hasSortControl = false;
+        let hasReorderGrip = false;
+
+        const headerContext: TableHeaderContextType = {
+            getRenderProps,
+            sort: () => {
+                focusCell(cell);
+
+                if (getIsDisabled()) return;
+
+                toggleSort(getColumn());
+            },
+            pickUp: () => {
+                focusCell(cell);
+
+                if (getIsDisabled()) return;
+
+                handleGripClick(columnIndex);
+            },
+            registerSort: () => {
+                hasSortControl = true;
+            },
+            registerReorder: () => {
+                hasReorderGrip = true;
+            },
+        };
+
+        onMount(() => {
+            const column = getColumn();
+
+            if (column.isSortable === true && !hasSortControl) {
+                console.warn(
+                    `Table: column "${column.id}" is sortable but its header renders no TableHeaderSort, so a pointer cannot sort it — only Enter on the header cell can.`,
+                );
+            }
+
+            if (getIsReorderable(column) && !hasReorderGrip) {
+                console.warn(
+                    `Table: column "${column.id}" is reorderable but its header renders no TableHeaderReorder, so the only pointer route is dragging, which fails WCAG 2.5.7 Dragging Movements.`,
+                );
+            }
+        });
 
         return (
             <div
@@ -610,11 +615,9 @@ export const Table = <T,>(props: TableProps<T>) => {
                 onPointerEnter={() => setHoveredColumn(columnIndex)}
                 onPointerLeave={() => setHoveredColumn(undefined)}
             >
-                {getColumn().renderHeader(getRenderProps)}
-
-                <Show when={getColumn().isSortable === true}>{renderSortControl(getColumn, columnIndex)}</Show>
-
-                <Show when={getRenderProps().isReorderable}>{renderReorderGrip(columnIndex)}</Show>
+                <TableHeaderContextProvider value={headerContext}>
+                    {getColumn().renderHeader(getRenderProps)}
+                </TableHeaderContextProvider>
 
                 <Show when={getRenderProps().isResizable}>{renderResizer(getColumn, columnIndex)}</Show>
 
@@ -714,5 +717,55 @@ export const Table = <T,>(props: TableProps<T>) => {
                 </Show>
             </div>
         </div>
+    );
+};
+
+export const TableHeaderSort = (props: TableHeaderSortProps) => {
+    const context = useTableHeaderContext("TableHeaderSort");
+
+    context?.registerSort();
+
+    return (
+        <Show when={context?.getRenderProps().isSortable}>
+            <button
+                type="button"
+                class={styles.tableSortControl}
+                tabindex={-1}
+                aria-hidden="true"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                    e.stopPropagation();
+
+                    context!.sort();
+                }}
+            >
+                {props.renderContent(context!.getRenderProps)}
+            </button>
+        </Show>
+    );
+};
+
+export const TableHeaderReorder = (props: TableHeaderReorderProps) => {
+    const context = useTableHeaderContext("TableHeaderReorder");
+
+    context?.registerReorder();
+
+    return (
+        <Show when={context?.getRenderProps().isReorderable}>
+            <button
+                type="button"
+                class={styles.tableReorderGrip}
+                tabindex={-1}
+                aria-hidden="true"
+                onPointerDown={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                    e.stopPropagation();
+
+                    context!.pickUp();
+                }}
+            >
+                {props.renderContent(context!.getRenderProps)}
+            </button>
+        </Show>
     );
 };

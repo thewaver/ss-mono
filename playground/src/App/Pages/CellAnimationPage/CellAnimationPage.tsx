@@ -25,6 +25,13 @@ import type { Index2d, Size2d } from "@thewaver/ss-utils";
 import { CellAnimationKnobs } from "../../Knobs/CellAnimations.const";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import {
+    PageCheckField,
+    PageFileField,
+    PageGroupedSelectField,
+    PageNumberField,
+    PageSelectField,
+} from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PagePlaybackScrubber } from "../../PageComponents/PlaybackScrubber/PlaybackScrubber";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -32,13 +39,6 @@ import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { SVGDefsSources } from "../../PageComponents/SVGDefsSources/SVGDefsSources.const";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
-import {
-    PageCheckField,
-    PageFileField,
-    PageGroupedSelectField,
-    PageNumberField,
-    PageSelectField,
-} from "../../StyledComponents/Field/Field";
 import knight_profile from "../../knight_profile.webp";
 import type { CellAnimationExampleProps, CellAnimationSourcedExampleProps } from "./CellAnimationPage.types";
 import { DefaultExample } from "./Examples/Default";

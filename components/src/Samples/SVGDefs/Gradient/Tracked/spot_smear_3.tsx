@@ -172,7 +172,7 @@ export const spot_smear_3 = (opts?: GradientSmearSampleOpts): TrackedGradientCon
                     renderDefsElement: () => {
                         return SVGGradientDefsUtils.computeRadialGradient({
                             id: `gradient1-${id}`,
-                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
                             origin: () => getReading().boxRatio,
                             scale: opts?.glowScale ?? DEFAULTS.glowScale,
                             colors: opts?.cycles
@@ -202,7 +202,7 @@ export const spot_smear_3 = (opts?: GradientSmearSampleOpts): TrackedGradientCon
 
                         return SVGGradientDefsUtils.computeRadialGradient({
                             id: `gradient${index + 2}-${id}`,
-                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
                             origin: stamp.getOrigin,
                             scale: opts?.glowScale ?? DEFAULTS.glowScale,
                             aspect: stamp.getAspect,

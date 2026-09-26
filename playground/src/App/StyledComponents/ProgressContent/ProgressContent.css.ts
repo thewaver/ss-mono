@@ -1,6 +1,7 @@
 import { keyframes, style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isIndeterminate = style({});
 export const hasError = style({});
@@ -16,9 +17,9 @@ export const progressTrack = style({
     width: "100%",
     height: 8,
     boxShadow: themeVars.shadow.small,
-    border: `2px solid rgb(from currentColor r g b / 25%)`,
+    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: "black",
+    backgroundColor: layerVars.main,
     transition: `border-color ${themeVars.animation.duration}`,
 
     selectors: {

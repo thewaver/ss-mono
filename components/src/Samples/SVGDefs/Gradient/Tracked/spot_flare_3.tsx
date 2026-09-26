@@ -76,7 +76,7 @@ export const spot_flare_3 = (opts?: GradientFlareOpts): TrackedGradientConfig =>
 
                         return SVGGradientDefsUtils.computeRadialGradient({
                             id: `gradient1-${id}`,
-                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
                             origin: () => getReading().boxRatio,
                             scale: opts?.glowScale ?? DEFAULTS.glowScale,
                             colors: [
@@ -115,7 +115,7 @@ export const spot_flare_3 = (opts?: GradientFlareOpts): TrackedGradientConfig =>
 
                         return SVGGradientDefsUtils.computeRadialGradient({
                             id: `gradient${index + 2}-${id}`,
-                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
                             origin: () => ({
                                 x: getReading().boxRatio.x + (0.5 - getReading().boxRatio.x) * ghost.reach,
                                 y: getReading().boxRatio.y + (0.5 - getReading().boxRatio.y) * ghost.reach,

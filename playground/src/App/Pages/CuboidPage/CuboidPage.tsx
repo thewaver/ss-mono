@@ -6,9 +6,9 @@ import { CUBOID_DEFAULTS, CuboidUtils, MediaQueryMonitorUtils } from "@thewaver/
 import { CuboidKnobs } from "../../Knobs/Cuboids.const";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
 import type { CuboidExampleProps, CuboidUprightExampleProps } from "./CuboidPage.types";
 import { DefaultExample } from "./Examples/Default";
 import { UprightExample } from "./Examples/Upright";

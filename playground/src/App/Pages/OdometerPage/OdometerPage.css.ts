@@ -1,8 +1,7 @@
 import { createVar, keyframes, style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
-
-const panel = (from: string, to: string) => `linear-gradient(180deg, ${from}, ${to})`;
 
 export const fadeDurationVar = createVar();
 
@@ -43,14 +42,14 @@ export const digit = style({
     placeItems: "center",
     width: "100%",
     height: "100%",
-    backgroundImage: panel(themeVars.color.surface.dark, themeVars.color.surface.light),
+    backgroundColor: layerVars.main,
     color: themeVars.color.primary.main,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xLarge,
 });
 
 export const fixed = style({
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xLarge,
 });

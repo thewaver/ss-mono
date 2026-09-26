@@ -1,6 +1,7 @@
 import type { TableColumn } from "@thewaver/ss-components";
 
-import { PageTableCellContent, PageTableHeaderContent } from "../../StyledComponents/TableContent/TableContent";
+import { PageTableHeader } from "../../PageComponents/TableHeader/TableHeader";
+import { PageTableCellContent } from "../../StyledComponents/TableContent/TableContent";
 import type { Part, PartColumnDefs } from "./TablePage.types";
 
 export const STRESS_PART_COUNT = 50000;
@@ -47,9 +48,7 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
         isResizable: defs.isResizable,
         isReorderable: defs.isReorderable,
         compare: (a, b) => a.sku.localeCompare(b.sku),
-        renderHeader: (getRenderProps) => (
-            <PageTableHeaderContent renderProps={getRenderProps}>{"SKU"}</PageTableHeaderContent>
-        ),
+        renderHeader: (getRenderProps) => <PageTableHeader renderProps={getRenderProps}>{"SKU"}</PageTableHeader>,
         renderCell: (getPart, getRenderProps) => (
             <PageTableCellContent renderProps={getRenderProps}>{getPart().sku}</PageTableCellContent>
         ),
@@ -62,9 +61,7 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
         isResizable: defs.isResizable,
         isReorderable: defs.isReorderable,
         compare: (a, b) => a.name.localeCompare(b.name),
-        renderHeader: (getRenderProps) => (
-            <PageTableHeaderContent renderProps={getRenderProps}>{"Name"}</PageTableHeaderContent>
-        ),
+        renderHeader: (getRenderProps) => <PageTableHeader renderProps={getRenderProps}>{"Name"}</PageTableHeader>,
         renderCell: (getPart, getRenderProps) => (
             <PageTableCellContent renderProps={getRenderProps}>{getPart().name}</PageTableCellContent>
         ),
@@ -79,9 +76,7 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
         isResizable: defs.isResizable,
         isReorderable: defs.isReorderable,
         compare: (a, b) => a.category.localeCompare(b.category),
-        renderHeader: (getRenderProps) => (
-            <PageTableHeaderContent renderProps={getRenderProps}>{"Category"}</PageTableHeaderContent>
-        ),
+        renderHeader: (getRenderProps) => <PageTableHeader renderProps={getRenderProps}>{"Category"}</PageTableHeader>,
         renderCell: (getPart, getRenderProps) => (
             <PageTableCellContent renderProps={getRenderProps}>{getPart().category}</PageTableCellContent>
         ),
@@ -97,9 +92,9 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
         isReorderable: defs.isReorderable,
         compare: (a, b) => a.stock - b.stock,
         renderHeader: (getRenderProps) => (
-            <PageTableHeaderContent renderProps={getRenderProps} align={"end"}>
+            <PageTableHeader renderProps={getRenderProps} align={"end"}>
                 {"In stock"}
-            </PageTableHeaderContent>
+            </PageTableHeader>
         ),
         renderCell: (getPart, getRenderProps) => (
             <PageTableCellContent renderProps={getRenderProps} align={"end"}>
@@ -118,9 +113,9 @@ export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => 
         isReorderable: defs.isReorderable,
         compare: (a, b) => a.pricePence - b.pricePence,
         renderHeader: (getRenderProps) => (
-            <PageTableHeaderContent renderProps={getRenderProps} align={"end"}>
+            <PageTableHeader renderProps={getRenderProps} align={"end"}>
                 {"Price"}
-            </PageTableHeaderContent>
+            </PageTableHeader>
         ),
         renderCell: (getPart, getRenderProps) => (
             <PageTableCellContent renderProps={getRenderProps} align={"end"}>

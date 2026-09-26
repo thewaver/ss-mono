@@ -1,5 +1,6 @@
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { ProgressRingProps } from "./ProgressRing.types";
 
 import * as styles from "./ProgressRing.css";
@@ -11,6 +12,8 @@ const RADIUS = (styles.RING_SIZE - styles.RING_STROKE) * HALF;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 export const PageProgressRing = (props: ProgressRingProps) => {
+    const getLayerClass = useLayerClass();
+
     const getRatio = () => access(props.state).ratio;
 
     const getShownRatio = () => getRatio() ?? INDETERMINATE_ARC;
@@ -19,6 +22,7 @@ export const PageProgressRing = (props: ProgressRingProps) => {
         <div
             class={styles.progressRing}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isIndeterminate]: getRatio() === undefined,
                 [styles.hasError]: access(props.state).hasError,
             }}

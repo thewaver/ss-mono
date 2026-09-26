@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const docsView = style({
@@ -64,7 +65,7 @@ export const docsTable = style({
 });
 
 export const docsHeadCell = style({
-    borderBottom: `1px solid rgb(from ${themeVars.color.background.contrast} r g b / 25%)`,
+    borderBottom: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     padding: themeVars.spacing.full,
     whiteSpace: "nowrap",
     fontWeight: "bold",
@@ -76,7 +77,7 @@ export const docsCell = style({
 
     selectors: {
         [`tr:not(:last-child) > &`]: {
-            borderBottom: `1px solid rgb(from ${themeVars.color.background.contrast} r g b / 10%)`,
+            borderBottom: `1px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
         },
     },
 });
@@ -93,7 +94,7 @@ export const docsFlag = style({
     display: "inline-block",
     borderRadius: themeVars.borderRadius.half,
     padding: `2px ${themeVars.spacing.half}`,
-    backgroundColor: `rgb(from ${themeVars.color.background.contrast} r g b / 10%)`,
+    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
     fontSize: themeVars.fontSize.xSmall,
     whiteSpace: "nowrap",
 });

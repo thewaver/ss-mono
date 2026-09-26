@@ -1,6 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 const cuboidFaceBase = style({
     display: "flex",
@@ -15,8 +16,8 @@ const cuboidFaceBase = style({
 });
 
 export const cuboidFace = styleVariants({
-    front: [cuboidFaceBase, { backgroundColor: themeVars.color.tooltip.dark, color: themeVars.color.tooltip.contrast }],
-    back: [cuboidFaceBase, { backgroundColor: themeVars.color.tooltip.light, color: themeVars.color.tooltip.contrast }],
+    front: [cuboidFaceBase, { backgroundColor: `rgb(from ${layerVars.main} r g b / 50%)`, color: layerVars.contrast }],
+    back: [cuboidFaceBase, { backgroundColor: `rgb(from ${layerVars.main} r g b / 75%)`, color: layerVars.contrast }],
     left: [cuboidFaceBase, { backgroundColor: themeVars.color.primary.dark, color: themeVars.color.primary.contrast }],
     right: [
         cuboidFaceBase,

@@ -1,7 +1,8 @@
 import { PlacementLayoutUtils, Tabs, access } from "@thewaver/ss-components";
 import type { HoneycombDefs } from "@thewaver/ss-components";
 
-import { PageTabCell, PageTabHexFloater, PageTabPanel } from "../../../StyledComponents/TabContent/TabContent";
+import { PageTabPanel } from "../../../PageComponents/TabPanel/TabPanel";
+import { PageTabCell, PageTabHexFloater } from "../../../StyledComponents/TabContent/TabContent";
 import { HONEYCOMB_TABS, PANEL_BODIES, getPanelId, getTabId } from "../TabsPage.const";
 import type { TabsExampleProps } from "../TabsPage.types";
 

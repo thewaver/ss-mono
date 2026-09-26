@@ -6,6 +6,7 @@ import { DEFAULT_GLASS_DEFS, SVGDefsSamples, TrackedGradientDefaults } from "@th
 import { GlassSurfaceKnobs } from "../../Knobs/GlassSurfaces.const";
 import { TrackedGradientKnobs } from "../../Knobs/TrackedGradients.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageColorField, PageGroupedSelectField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -16,7 +17,6 @@ import {
     toGroupEntriesWithNoSample,
 } from "../../PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.types";
-import { PageColorField, PageGroupedSelectField, PageNumberField } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import type { GlassSurfaceExampleProps } from "./GlassSurfacePage.types";
 

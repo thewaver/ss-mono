@@ -1,6 +1,7 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 const GLOW_NEAR = "6px";
 const GLOW_FAR = "14px";
@@ -30,8 +31,8 @@ export const tileBoardTileContent = style({
     paddingBottom: themeVars.spacing.half,
     width: "100%",
     height: "100%",
-    backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
-    color: themeVars.color.surface.contrast,
+    backgroundColor: layerVars.main,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     fontVariantNumeric: "tabular-nums",
     textAlign: "center",

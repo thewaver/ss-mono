@@ -2,6 +2,7 @@ import type { Accessor, JSX } from "solid-js";
 
 import type { AnchorPlacement, InteractionFlags, MenuItem, MenuItemFlags } from "@thewaver/ss-components";
 
+import { PageLayer } from "../../PageComponents/Layer/Layer";
 import { PageMenuItemContent } from "../../StyledComponents/MenuItemContent/MenuItemContent";
 import { PagePopoverSurface } from "../../StyledComponents/PopoverSurface/PopoverSurface";
 
@@ -13,13 +14,15 @@ export const renderToolbarPopup = (
     getTransitionDurationMs: () => number,
     getPlacement: () => AnchorPlacement,
 ) => (
-    <PagePopoverSurface
-        visibilityTarget={getVisibilityTarget}
-        transitionDurationMs={getTransitionDurationMs}
-        placement={getPlacement}
-    >
-        {renderItems()}
-    </PagePopoverSurface>
+    <PageLayer level={2}>
+        <PagePopoverSurface
+            visibilityTarget={getVisibilityTarget}
+            transitionDurationMs={getTransitionDurationMs}
+            placement={getPlacement}
+        >
+            {renderItems()}
+        </PagePopoverSurface>
+    </PageLayer>
 );
 
 export const renderToolbarOverflowItem = (

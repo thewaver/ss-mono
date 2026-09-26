@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isCurrent = style({});
 export const isHovered = style({});
@@ -19,7 +20,7 @@ export const breadcrumbContent = style({
 
     selectors: {
         [`&.${isCurrent}`]: {
-            color: "inherit",
+            color: layerVars.contrast,
             fontWeight: "bold",
         },
         [`&.${isHovered}`]: {
@@ -35,6 +36,6 @@ export const breadcrumbContent = style({
 
 export const breadcrumbSeparator = style({
     paddingInline: themeVars.spacing.half,
-    color: `rgb(from currentColor r g b / 50%)`,
+    color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
     fontSize: themeVars.fontSize.small,
 });

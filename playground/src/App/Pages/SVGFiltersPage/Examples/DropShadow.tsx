@@ -4,8 +4,8 @@ import { SVGFilterDefsFactory, access } from "@thewaver/ss-components";
 
 import { SVGFilterKnobs } from "../../../Knobs/SVGFilters.const";
 import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
+import { PageColorField, PageNumberField } from "../../../PageComponents/Field/Field";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
-import { PageColorField, PageNumberField } from "../../../StyledComponents/Field/Field";
 import { PageFilterStage } from "../../../StyledComponents/SVGFiltersContent/SVGFiltersContent";
 import type { SVGFiltersExampleProps } from "../SVGFiltersPage.types";
 

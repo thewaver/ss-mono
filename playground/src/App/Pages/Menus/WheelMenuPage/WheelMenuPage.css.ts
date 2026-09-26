@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../../Theme.css";
 
 export const stage = style({
@@ -18,8 +19,8 @@ export const canvas = style({
 });
 
 export const wedge = style({
-    fill: themeVars.color.surface.light,
-    stroke: themeVars.color.surface.contrast,
+    fill: layerVars.main,
+    stroke: layerVars.contrast,
     strokeWidth: 1,
     strokeOpacity: 0.25,
     vectorEffect: "non-scaling-stroke",
@@ -44,7 +45,7 @@ export const wedgeGradientTo = style({
 });
 
 export const wedgeDisabled = style({
-    fill: themeVars.color.surface.dark,
+    fill: layerVars.main,
     opacity: 0.4,
     cursor: "not-allowed",
 });
@@ -57,7 +58,7 @@ export const label = style({
     justifyContent: "center",
     alignItems: "center",
     gap: themeVars.spacing.half,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",
     pointerEvents: "none",
@@ -71,7 +72,7 @@ export const shortcut = style({
     flex: "none",
     padding: `0 ${themeVars.spacing.half}`,
     borderRadius: themeVars.borderRadius.half,
-    border: "1px solid currentColor",
+    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xSmall,
     opacity: 0.75,
@@ -83,9 +84,9 @@ export const closer = style({
     width: "100%",
     height: "100%",
     borderRadius: "50%",
-    backgroundColor: themeVars.color.surface.dark,
+    backgroundColor: layerVars.main,
     boxShadow: themeVars.shadow.small,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.medium,
     transition: "background-color 120ms ease-out, color 120ms ease-out",
 });

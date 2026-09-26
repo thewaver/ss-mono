@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 const PILL_HEIGHT = 22;
 
@@ -10,8 +11,8 @@ export const satelliteSubject = style({
     alignItems: "center",
     padding: themeVars.spacing.full,
     borderRadius: themeVars.borderRadius.half,
-    backgroundImage: `linear-gradient(135deg, ${themeVars.color.tooltip.dark}, ${themeVars.color.tooltip.light})`,
-    color: themeVars.color.tooltip.contrast,
+    backgroundImage: `linear-gradient(135deg, rgb(from ${layerVars.main} r g b / 50%), rgb(from ${layerVars.main} r g b / 75%))`,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     textAlign: "center",
 });

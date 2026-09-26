@@ -9,6 +9,13 @@ import { ShapeKnobs } from "../../Knobs/Shapes.const";
 import { TimedGradientKnobs } from "../../Knobs/TimedGradients.const";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import {
+    PageCheckField,
+    PageColorField,
+    PageGroupedSelectField,
+    PageNumberField,
+    PageSelectField,
+} from "../../PageComponents/Field/Field";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
 import { PageProp } from "../../PageComponents/Prop/Prop";
@@ -22,13 +29,6 @@ import {
 import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.types";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
-import {
-    PageCheckField,
-    PageColorField,
-    PageGroupedSelectField,
-    PageNumberField,
-    PageSelectField,
-} from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import { MorphExample } from "./Examples/Morph";
 import { TextWrapExample } from "./Examples/TextWrap";

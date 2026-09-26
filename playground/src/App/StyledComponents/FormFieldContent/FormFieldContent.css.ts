@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const hasError = style({});
 
@@ -45,5 +46,5 @@ export const formSectionBody = style({
     alignItems: "start",
     gap: themeVars.spacing.full,
     paddingLeft: themeVars.spacing.full,
-    borderLeft: `1px solid rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
+    borderLeft: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
 });

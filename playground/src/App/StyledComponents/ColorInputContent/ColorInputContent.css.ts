@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 const FIELD_BORDER = 2;
 const SWATCH_SIZE = 24;
@@ -15,9 +16,9 @@ export const colorInputContent = style({
     gap: themeVars.spacing.full,
     padding: themeVars.spacing.full,
     boxShadow: themeVars.shadow.small,
-    border: `${FIELD_BORDER}px solid rgb(from currentColor r g b / 25%)`,
+    border: `${FIELD_BORDER}px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: "black",
+    backgroundColor: layerVars.main,
     transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
 
     selectors: {
@@ -38,7 +39,7 @@ export const colorInputSwatch = style({
     width: SWATCH_SIZE,
     height: SWATCH_SIZE,
     borderRadius: themeVars.borderRadius.half,
-    boxShadow: `inset 0 0 0 1px rgb(from currentColor r g b / 35%)`,
+    boxShadow: `inset 0 0 0 1px rgb(from ${layerVars.contrast} r g b / 25%)`,
 });
 
 export const colorInputValue = style({

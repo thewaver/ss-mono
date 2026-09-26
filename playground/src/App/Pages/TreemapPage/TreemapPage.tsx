@@ -4,9 +4,9 @@ import { MediaQueryMonitorUtils, TREEMAP_DEFAULTS, TreemapUtils } from "@thewave
 
 import { TreemapKnobs } from "../../Knobs/Treemaps.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField } from "../../StyledComponents/Field/Field";
 import { LibraryExample } from "./Examples/Library";
 import { LIBRARY } from "./TreemapPage.const";
 

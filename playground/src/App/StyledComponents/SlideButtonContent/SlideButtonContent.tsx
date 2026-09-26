@@ -2,6 +2,7 @@ import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { SlideButtonContentProps } from "./SlideButtonContent.types";
 
 import * as styles from "./SlideButtonContent.css";
@@ -14,6 +15,8 @@ const covered = (ratio: number) =>
     `calc(${ratio} * (100% - ${styles.SLIDE_BUTTON_THUMB_SIZE}px) + ${styles.SLIDE_BUTTON_THUMB_SIZE / 2}px)`;
 
 export const PageSlideButtonContent = (props: ParentProps<SlideButtonContentProps>) => {
+    const getLayerClass = useLayerClass();
+
     const getWidth = () => access(props.width) ?? DEFAULT_SLIDE_BUTTON_CONTENT_WIDTH;
 
     const getRatio = () => (access(props.renderProps).isPressed ? 1 : access(props.renderProps).progressRatio);
@@ -25,6 +28,7 @@ export const PageSlideButtonContent = (props: ParentProps<SlideButtonContentProp
             class={styles.slideButtonContent}
             style={{ width: `${getWidth()}px` }}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isDisabled]: access(props.renderProps).isDisabled,
                 [styles.hasError]: access(props.renderProps).hasError,
             }}

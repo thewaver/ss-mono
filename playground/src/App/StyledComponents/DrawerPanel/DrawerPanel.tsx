@@ -2,6 +2,7 @@ import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
+import { PageLayer } from "../../PageComponents/Layer/Layer";
 import type { DrawerPanelProps } from "./DrawerPanel.types";
 
 import * as styles from "./DrawerPanel.css";
@@ -18,7 +19,7 @@ export const PageDrawerPanel = (props: ParentProps<DrawerPanelProps>) => {
             ].join(" ")}
             style={{ transition: `transform ${access(props.transitionDurationMs)}ms` }}
         >
-            {props.children}
+            <PageLayer level={1}>{props.children}</PageLayer>
         </div>
     );
 };

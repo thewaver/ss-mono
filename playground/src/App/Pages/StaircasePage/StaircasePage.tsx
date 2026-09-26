@@ -5,10 +5,10 @@ import type { StaircaseDir } from "@thewaver/ss-components";
 
 import { StaircaseKnobs } from "../../Knobs/Staircases.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import type { StaircaseExampleProps } from "./StaircasePage.types";
 

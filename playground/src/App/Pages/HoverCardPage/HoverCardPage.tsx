@@ -4,9 +4,9 @@ import { HOVER_CARD_DEFAULTS } from "@thewaver/ss-components";
 
 import { HoverCardKnobs } from "../../Knobs/HoverCards.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField } from "../../StyledComponents/Field/Field";
 import { NavigationMenuExample } from "./Examples/NavigationMenu";
 import { ProfileExample } from "./Examples/Profile";
 import type { HoverCardExampleProps, NavigationMenuExampleProps } from "./HoverCardPage.types";

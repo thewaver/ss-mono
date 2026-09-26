@@ -4,9 +4,9 @@ import { CURRENCY_INPUT_DEFAULTS } from "@thewaver/ss-components";
 
 import { CurrencyInputKnobs } from "../../Knobs/CurrencyInputs.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { BUDGET_MAX } from "./CurrencyInputPage.const";
 import type { CurrencyInputExampleProps } from "./CurrencyInputPage.types";
 import { BoundedExample } from "./Examples/Bounded";

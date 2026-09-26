@@ -5,9 +5,9 @@ import type { SVGFilterMethod, SortableItem } from "@thewaver/ss-components";
 
 import { SVGFilterKnobs } from "../../Knobs/SVGFilters.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { BlurExample } from "./Examples/Blur";
 import { DropShadowExample } from "./Examples/DropShadow";
 import { HueExample } from "./Examples/Hue";

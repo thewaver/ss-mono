@@ -2,6 +2,7 @@ import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
+import { PageLayer } from "../../PageComponents/Layer/Layer";
 import type { SpotlightPopupProps } from "./SpotlightPopup.types";
 
 import * as styles from "./SpotlightPopup.css";
@@ -16,7 +17,7 @@ export const PageSpotlightPopup = (props: ParentProps<SpotlightPopupProps>) => {
             }}
         >
             <div class={styles.spotlightPopupTitle}>{access(props.title)}</div>
-            {props.children}
+            <PageLayer level={2}>{props.children}</PageLayer>
         </div>
     );
 };

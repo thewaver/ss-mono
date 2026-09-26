@@ -200,6 +200,25 @@ from memory.
 existing route conforms" is worth a line, since otherwise nobody can tell a criterion that was
 considered from one never opened.
 
+### An accessibility mistake the library can detect is warned about, never blocked or filled in
+
+**The library always ships the accessible way to do it.** Stated by the user, and it comes first: for every
+affordance a criterion needs, there is a builtin that gets it right with nothing more from the consumer than
+where to put it and what it looks like. What follows is about the consumer who does not use it — the library
+offers the solution, it does not force it.
+
+Also stated by the user. When a consumer's choice leaves a control failing a success criterion — a required
+affordance never rendered, a route left with no pointer or keyboard way in — and the library can tell, it says
+so loudly in development, naming what is missing. It does not refuse to render, and it does not draw a
+fallback of its own. The consumer owns the final product and may decide looks outweigh a criterion, as they
+can by hiding a focus ring in CSS; the library's part is making sure that decision is never made by accident.
+**There is no option to silence the warning.** A consumer who removes the affordance deliberately lives with
+the message.
+
+A fallback is refused for a second reason: it needs a place to put the thing, and choosing that place is the
+layout opinion that the slot or builtin existed to hand to the consumer. Settled while designing `Table`'s
+header builtins, where the case to detect is a sortable or reorderable column with no builtin in its header.
+
 ## API naming
 
 ### When a function grows a sibling, both names get the distinguishing word

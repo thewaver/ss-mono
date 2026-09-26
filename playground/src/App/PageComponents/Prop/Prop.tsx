@@ -3,9 +3,9 @@ import { Show, createSignal } from "solid-js";
 
 import { Button, access } from "@thewaver/ss-components";
 
-import { FieldDefaultProvider } from "../../StyledComponents/Field/Field.context";
 import { PagePropHintBadge } from "../../StyledComponents/PropHintBadge/PropHintBadge";
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
+import { FieldDefaultProvider } from "../Field/Field.context";
 import { usePropsPanelContext } from "../PropsPanel/PropsPanel.context";
 import type { PagePropProps } from "./Prop.types";
 

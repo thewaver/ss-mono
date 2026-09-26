@@ -5,8 +5,8 @@ import type { MaybeAccessor, SelectItem } from "@thewaver/ss-components";
 
 import { SelectKnobs } from "../../../Knobs/Selects.const";
 import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
+import { PageNumberField } from "../../../PageComponents/Field/Field";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
-import { PageNumberField } from "../../../StyledComponents/Field/Field";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";
 import { PageSelectGroupContent } from "../../../StyledComponents/SelectGroupContent/SelectGroupContent";
 import { PageSelectOptionContent } from "../../../StyledComponents/SelectOptionContent/SelectOptionContent";

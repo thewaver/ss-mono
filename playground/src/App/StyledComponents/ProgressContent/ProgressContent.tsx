@@ -1,5 +1,6 @@
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { ProgressContentProps } from "./ProgressContent.types";
 
 import * as styles from "./ProgressContent.css";
@@ -7,8 +8,10 @@ import * as styles from "./ProgressContent.css";
 const PERCENT = 100;
 
 export const PageProgressContent = (props: ProgressContentProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
-        <div class={styles.progressRow}>
+        <div class={[styles.progressRow, getLayerClass()].join(" ")}>
             <div
                 class={styles.progressTrack}
                 classList={{

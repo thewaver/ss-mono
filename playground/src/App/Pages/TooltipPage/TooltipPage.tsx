@@ -5,9 +5,9 @@ import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@the
 
 import { TooltipKnobs } from "../../Knobs/Tooltips.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import { RichExample } from "./Examples/Rich";
 import { WordExample } from "./Examples/Word";

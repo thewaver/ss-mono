@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 const panel = (from: string, to: string) => `linear-gradient(135deg, ${from}, ${to})`;
@@ -19,10 +20,10 @@ export const node = style({
     width: "100%",
     height: "100%",
     padding: `0 ${themeVars.spacing.half}`,
-    border: `1px solid ${themeVars.color.surface.dark}`,
+    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundImage: panel(themeVars.color.surface.dark, themeVars.color.surface.light),
-    color: themeVars.color.surface.contrast,
+    backgroundColor: layerVars.main,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",
     cursor: "pointer",
@@ -42,7 +43,7 @@ export const layerHeader = style({
     placeItems: "center",
     width: "100%",
     height: "100%",
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",
 });

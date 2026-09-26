@@ -292,7 +292,7 @@ already red before the work started. This holds whether or not a second machine 
 next session, not about parallelism.
 
 **Never run Prettier by hand.** The user's call, and it is now absolute rather than a preference: a
-`pre-commit` hook formats every staged file on the way into a commit, so the house format arrives on its own
+`pre-commit` hook formats the whole tree on the way into a commit, so the house format arrives on its own
 (`decisions.md`, _"Formatting is applied on commit, by a hook"_). A `prettier --check` after an edit spends a
 process to answer a question that is about to be answered automatically, and a `--write` between edits churns
 lines nobody asked to move and then shows up in the diff as work the user did not request. Write code in the

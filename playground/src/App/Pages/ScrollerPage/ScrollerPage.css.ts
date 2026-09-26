@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const root = style({
@@ -25,8 +26,8 @@ export const chip = style({
     flexShrink: 0,
     height: 32,
     paddingInline: themeVars.spacing.double,
-    color: themeVars.color.surface.contrast,
-    backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
+    color: layerVars.contrast,
+    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
     borderRadius: themeVars.borderRadius.half,
     fontSize: themeVars.fontSize.small,
     whiteSpace: "nowrap",

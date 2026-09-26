@@ -5,6 +5,7 @@ import type { AnchorPlacement, DismisserReason, PopupTriggerFlags } from "@thewa
 import { InteractionWrapper, Popover, PopupTrigger, access } from "@thewaver/ss-components";
 
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
+import { PageLayer } from "../Layer/Layer";
 import { PagePropsPanel } from "../PropsPanel/PropsPanel";
 import { useExampleKnobsContext } from "./ExampleKnobs.context";
 import type { PageExampleKnobsButtonProps } from "./ExampleKnobs.types";
@@ -78,7 +79,9 @@ export const PageExampleKnobsButton = (props: PageExampleKnobsButtonProps) => {
                         classList={{ [styles.isVisible]: getVisibilityTarget() === 1 }}
                         style={{ transition: `opacity ${getTransitionDurationMs()}ms` }}
                     >
-                        <PagePropsPanel scope={"local"}>{props.renderKnobs()}</PagePropsPanel>
+                        <PageLayer level={2}>
+                            <PagePropsPanel scope={"local"}>{props.renderKnobs()}</PagePropsPanel>
+                        </PageLayer>
                     </div>
                 )}
             />

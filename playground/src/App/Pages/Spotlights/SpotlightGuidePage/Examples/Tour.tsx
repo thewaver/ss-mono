@@ -4,6 +4,7 @@ import { Button, SpotlightGuide, SpotlightPrompt, access } from "@thewaver/ss-co
 
 import { PageControlRow } from "../../../../PageComponents/ControlRow/ControlRow";
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";
+import { useLayerClass } from "../../../../StyledComponents/Layer/Layer.context";
 import {
     PageSpotlightPopup,
     PageSpotlightPopupActions,
@@ -18,6 +19,8 @@ import * as styles from "../../Spotlights.css";
 type Props = SpotlightTourExampleProps;
 
 export const TourExample = (props: Props) => {
+    const getLayerClass = useLayerClass();
+
     const [getShelfRef, setShelfRef] = createSignal<HTMLElement>();
     const [getAddRef, setAddRef] = createSignal<HTMLElement>();
     const [getBasketRef, setBasketRef] = createSignal<HTMLElement>();
@@ -49,7 +52,7 @@ export const TourExample = (props: Props) => {
     };
 
     return (
-        <div class={styles.root}>
+        <div class={[styles.root, getLayerClass()].join(" ")}>
             <PageControlRow>
                 <div ref={setShelfRef} class={styles.tourTarget}>
                     Potatoes

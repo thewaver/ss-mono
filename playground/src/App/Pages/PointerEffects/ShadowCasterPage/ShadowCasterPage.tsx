@@ -4,9 +4,9 @@ import { SHADOW_CASTER_DEFAULTS } from "@thewaver/ss-components";
 
 import { ShadowCasterKnobs } from "../../../Knobs/ShadowCasters.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
+import { PageCheckField, PageColorField, PageNumberField } from "../../../PageComponents/Field/Field";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageColorField, PageNumberField } from "../../../StyledComponents/Field/Field";
 import { BadgeExample } from "./Examples/Badge";
 import { CardExample } from "./Examples/Card";
 import type { ShadowCasterExampleProps } from "./ShadowCasterPage.types";

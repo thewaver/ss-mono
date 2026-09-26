@@ -2,6 +2,7 @@ import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
+import { PageLayer } from "../../PageComponents/Layer/Layer";
 import type { ModalHintProps, ModalPanelProps } from "./ModalPanel.types";
 
 import * as styles from "./ModalPanel.css";
@@ -12,7 +13,7 @@ export const PageModalPanel = (props: ParentProps<ModalPanelProps>) => {
             class={access(props.visibilityTarget) === 1 ? styles.modalPanelOn : styles.modalPanelOff}
             style={{ transition: `transform ${access(props.transitionDurationMs)}ms`, padding: access(props.padding) }}
         >
-            {props.children}
+            <PageLayer level={1}>{props.children}</PageLayer>
         </div>
     );
 };

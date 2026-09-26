@@ -2,6 +2,7 @@ import { Show } from "solid-js";
 
 import { FanMenu, access } from "@thewaver/ss-components";
 
+import { PageLayer } from "../../../../PageComponents/Layer/Layer";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
 import type { FanMenuExampleProps } from "../FanMenuPage.types";
 
@@ -56,7 +57,7 @@ export const FanExample = (props: FanMenuExampleProps) => {
                             transition: `opacity ${getTransitionDurationMs()}ms, transform ${getTransitionDurationMs()}ms`,
                         }}
                     >
-                        {renderItems()}
+                        <PageLayer level={2}>{renderItems()}</PageLayer>
                     </div>
                 )}
                 onActivate={props.onActivate}

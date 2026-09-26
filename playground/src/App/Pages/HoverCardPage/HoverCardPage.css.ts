@@ -1,5 +1,6 @@
 import { createVar, style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const bridgeTopVar = createVar();
@@ -110,4 +111,11 @@ export const flyoutLink = style({
     padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
     borderRadius: themeVars.borderRadius.half,
     whiteSpace: "nowrap",
+    transition: `background-color ${themeVars.animation.duration}`,
+
+    selectors: {
+        "&:hover, &:focus-visible": {
+            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+        },
+    },
 });

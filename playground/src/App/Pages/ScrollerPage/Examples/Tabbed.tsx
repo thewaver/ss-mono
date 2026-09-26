@@ -1,6 +1,6 @@
 import { Scroller, Tabs, access } from "@thewaver/ss-components";
 
-import { PageScrollerButton } from "../../../StyledComponents/ScrollerButton/ScrollerButton";
+import { PageScrollerButton } from "../../../PageComponents/ScrollerButton/ScrollerButton";
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../../StyledComponents/TabContent/TabContent";
 import type { ScrollerTabbedExampleProps } from "../ScrollerPage.types";
 

@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const KNOB_SIZE = 96;
 
@@ -15,8 +16,8 @@ export const rangeKnob = style({
     width: KNOB_SIZE,
     height: KNOB_SIZE,
     borderRadius: "50%",
-    boxShadow: `${themeVars.shadow.small}, inset 0 0 0 2px rgb(from currentColor r g b / 25%)`,
-    backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
+    boxShadow: `${themeVars.shadow.small}, inset 0 0 0 2px rgb(from ${layerVars.contrast} r g b / 25%)`,
+    backgroundColor: layerVars.main,
     transition: `box-shadow ${themeVars.animation.duration}`,
 
     selectors: {

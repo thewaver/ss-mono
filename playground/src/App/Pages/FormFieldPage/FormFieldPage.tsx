@@ -5,9 +5,9 @@ import { FORM_FIELD_DEFAULTS, FORM_FIELD_ORIENTATIONS } from "@thewaver/ss-compo
 
 import { FormFieldKnobs } from "../../Knobs/FormFields.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField, PageNumberField, PageSelectField, PageTextField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageNumberField, PageSelectField, PageTextField } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import { ForeignExample } from "./Examples/Foreign";
 import { InFormExample } from "./Examples/InForm";

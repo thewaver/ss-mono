@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 import { SELECT_CLEAR_SIZE } from "../SelectClear/SelectClear.css";
 
 const FIELD_WIDTH = 240;
@@ -31,9 +32,9 @@ export const selectContent = style({
     height: FIELD_HEIGHT,
     padding: FIELD_BOX_PADDING,
     boxShadow: themeVars.shadow.small,
-    border: `${FIELD_BORDER}px solid rgb(from currentColor r g b / 25%)`,
+    border: `${FIELD_BORDER}px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: "black",
+    backgroundColor: layerVars.main,
     fontSize: FIELD_FONT_SIZE,
     lineHeight: FIELD_LINE_HEIGHT,
     textAlign: "left",
@@ -65,7 +66,7 @@ export const selectValue = style({
 
     selectors: {
         [`${selectContent}.${isEmpty} &`]: {
-            color: `rgb(from currentColor r g b / 50%)`,
+            color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
         },
         [`${selectContent}.${isFiltering} &`]: {
             opacity: 0,

@@ -130,7 +130,7 @@ export const spot_ripple_1 = (opts?: GradientRippleSampleOpts): TrackedGradientC
                     renderDefsElement: () => {
                         return SVGGradientDefsUtils.computeRadialGradient({
                             id: `gradient1-${id}`,
-                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
                             origin: () => getReading().boxRatio,
                             scale: opts?.sourceScale ?? DEFAULTS.sourceScale,
                             colors: [
@@ -154,7 +154,7 @@ export const spot_ripple_1 = (opts?: GradientRippleSampleOpts): TrackedGradientC
 
                         return SVGGradientDefsUtils.computeRadialGradient({
                             id: `gradient${index + 2}-${id}`,
-                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
                             origin: ripple.getOrigin,
                             scale: ripple.getScale,
                             colors: () => ripple.getColors(defs.colors.primary),

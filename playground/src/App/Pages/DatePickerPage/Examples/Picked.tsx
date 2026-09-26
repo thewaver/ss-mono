@@ -11,8 +11,9 @@ import type {
 import { DatePicker, DateValueUtils, access } from "@thewaver/ss-components";
 
 import { CALENDAR_TRIGGER_LABEL, DATE_PART_HINTS } from "../../../PageComponents/Announcements/Announcements.const";
-import { PageCalendarCaption } from "../../../StyledComponents/CalendarCaption/CalendarCaption";
-import { PageCalendarPagedCaption } from "../../../StyledComponents/CalendarCaption/CalendarPagedCaption";
+import { PageCalendarCaption } from "../../../PageComponents/CalendarCaption/CalendarCaption";
+import { PageCalendarPagedCaption } from "../../../PageComponents/CalendarCaption/CalendarPagedCaption";
+import { PageEraCycle } from "../../../PageComponents/EraCycle/EraCycle";
 import {
     PageCalendarCell,
     PageCalendarDay,
@@ -20,7 +21,6 @@ import {
     PageCalendarWeekday,
 } from "../../../StyledComponents/CalendarContent/CalendarContent";
 import { PageDatePickerTrigger } from "../../../StyledComponents/DatePickerTrigger/DatePickerTrigger";
-import { PageEraCycle } from "../../../StyledComponents/EraCycle/EraCycle";
 import {
     PageTextFieldContent,
     computePageTextFieldTextStyle,

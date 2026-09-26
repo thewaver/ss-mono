@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isChecked = style({});
 export const isHovered = style({});
@@ -35,9 +36,9 @@ export const radioMarker = style({
     width: 20,
     height: 20,
     boxShadow: themeVars.shadow.small,
-    border: `2px solid rgb(from currentColor r g b / 25%)`,
+    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: "50%",
-    backgroundColor: "black",
+    backgroundColor: layerVars.main,
     transition: `border-color ${themeVars.animation.duration}`,
 
     selectors: {

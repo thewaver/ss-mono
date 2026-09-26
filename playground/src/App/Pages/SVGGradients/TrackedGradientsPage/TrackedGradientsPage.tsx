@@ -6,18 +6,19 @@ import { SVGDefsSamples, TrackedGradientDefaults } from "@thewaver/ss-components
 import { SVGGradientKnobs } from "../../../Knobs/SVGGradients.const";
 import { TrackedGradientKnobs } from "../../../Knobs/TrackedGradients.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
+import { PageCheckField, PageGroupedSelectField } from "../../../PageComponents/Field/Field";
 import { PageKnobs } from "../../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../../PageComponents/Knobs/Knobs.types";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
 import { NO_SAMPLE_KEY, toGroupEntriesWithNoSample } from "../../../PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "../../../PageComponents/SampleGroups/SampleGroups.types";
-import { PageGroupedSelectField } from "../../../StyledComponents/Field/Field";
 import { GROUPPED_TRACKED_GRADIENTS } from "../SVGGradients.const";
 import type { SVGGradientsPaintKind, TrackedGradientExampleProps } from "../SVGGradients.types";
 import { PageSVGGradientsProps } from "../SVGGradientsProps";
 import { ContinuityExample } from "./Examples/Continuity";
 import { DefaultExample } from "./Examples/Default";
+import { TrackedGradientOverlay } from "./TrackedGradientOverlay";
 
 const EXAMPLES_ROOT = "/src/App/Pages/SVGGradients/TrackedGradientsPage/Examples";
 
@@ -40,6 +41,7 @@ export const TrackedGradientsPage = () => {
             : (TrackedGradientDefaults.DEFAULTS_BY_FAMILY[key] as Record<string, unknown>);
     };
     const getConfigDefs = () => configDefs[getConfigKey()] ?? {};
+    const [getIsOverlayShown, setIsOverlayShown] = createSignal(TrackedGradientKnobs.STARTING_IS_OVERLAY_SHOWN);
     const paintKindSignal = createSignal<SVGGradientsPaintKind>(SVGGradientKnobs.STARTING_PAINT_KIND);
     const blurWidthSignal = createSignal(SVGGradientKnobs.STARTING_BLUR_WIDTH);
     const [colors, setColors] = createStore({ ...SVGDefsSamples.SAMPLE_COLORS });
@@ -109,10 +111,33 @@ export const TrackedGradientsPage = () => {
                             setColor: (key, value) => setColors(key, value),
                         }}
                     />
+
+                    <PageProp
+                        key={"isOverlayShown"}
+                        label={"Screen overlay"}
+                        hint={
+                            "Draws the gradient on a layer over the whole window, so it follows the pointer everywhere. Clicks pass through it, and a button in the top-right corner turns it off. Its sizes are a quarter of what the knobs say, since the box it fills is the whole window."
+                        }
+                    >
+                        <PageCheckField
+                            value={getIsOverlayShown}
+                            ariaLabel={"Screen overlay"}
+                            onChange={setIsOverlayShown}
+                        />
+                    </PageProp>
                 </PagePropsPanel>
             </PagePropsGroups>
 
             <PageExamples items={getExamples} layout={"flow"} />
+
+            <TrackedGradientOverlay
+                isShown={getIsOverlayShown}
+                configDefs={getConfigDefs}
+                configKey={getConfigKey}
+                colors={() => colors}
+                blurWidth={blurWidthSignal[0]}
+                onClose={() => setIsOverlayShown(false)}
+            />
         </>
     );
 };

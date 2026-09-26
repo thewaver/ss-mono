@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../Layer/Layer.css";
 import { fieldSurface } from "../TextFieldContent/TextFieldContent.css";
 
 const SURFACE_PADDING = 5;
@@ -12,7 +13,7 @@ export const listboxSurface = style([
         maxHeight: 220,
         overflowY: "auto",
         padding: SURFACE_PADDING,
-        color: "inherit",
+        color: layerVars.contrast,
     },
 ]);
 

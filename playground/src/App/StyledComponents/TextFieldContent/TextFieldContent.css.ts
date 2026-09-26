@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const FIELD_WIDTH = 240;
 export const FIELD_HEIGHT = 40;
@@ -27,14 +28,15 @@ export const hasError = style({});
 
 export const fieldSurface = style({
     boxShadow: themeVars.shadow.small,
-    border: `${FIELD_BORDER}px solid rgb(from currentColor r g b / 25%)`,
+    border: `${FIELD_BORDER}px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: "black",
+    color: layerVars.contrast,
+    backgroundColor: layerVars.main,
     transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
 
     selectors: {
         [`&.${isReadOnly}`]: {
-            backgroundColor: `rgb(from currentColor r g b / 10%)`,
+            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
         },
         [`&.${hasError}`]: {
             borderColor: themeVars.color.error.main,
@@ -67,7 +69,7 @@ export const textFieldPlaceholder = style({
     display: "flex",
     alignItems: "center",
     height: "100%",
-    color: `rgb(from currentColor r g b / 50%)`,
+    color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
     fontSize: FIELD_FONT_SIZE,
     lineHeight: FIELD_LINE_HEIGHT,
     opacity: 0,

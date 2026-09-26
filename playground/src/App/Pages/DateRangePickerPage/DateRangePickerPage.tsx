@@ -4,9 +4,9 @@ import type { DateValueCalendarId, DateValueRange } from "@thewaver/ss-component
 import { DATE_INPUT_DEFAULTS, DateValueUtils } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageSelectField } from "../../StyledComponents/Field/Field";
 import { MAX_DATE, MIN_DATE } from "../CalendarPage/CalendarPage.const";
 import { PickedExample } from "./Examples/Picked";
 

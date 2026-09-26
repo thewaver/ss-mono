@@ -2,7 +2,7 @@ import type { DateValue, MaybeAccessor } from "@thewaver/ss-components";
 import { DateRangePicker, access } from "@thewaver/ss-components";
 
 import { CALENDAR_TRIGGER_LABEL, DATE_PART_HINTS } from "../../../PageComponents/Announcements/Announcements.const";
-import { PageCalendarCaption } from "../../../StyledComponents/CalendarCaption/CalendarCaption";
+import { PageCalendarCaption } from "../../../PageComponents/CalendarCaption/CalendarCaption";
 import {
     PageCalendarDay,
     PageCalendarFrame,

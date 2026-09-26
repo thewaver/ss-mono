@@ -5,9 +5,10 @@ import { ElementObserverUtils, TOOLBAR_DEFAULTS } from "@thewaver/ss-components"
 
 import { ToolbarKnobs } from "../../Knobs/Toolbars.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField } from "../../StyledComponents/Field/Field";
+import { useLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import { DefaultExample } from "./Examples/Default";
 import { PaletteExample } from "./Examples/Palette";
 import { PressedExample } from "./Examples/Pressed";
@@ -30,6 +31,8 @@ type ResizableBarProps = ParentProps<{
 const ResizableBar = (props: ResizableBarProps) => {
     const [getRef, setRef] = createSignal<HTMLElement>();
 
+    const getLayerClass = useLayerClass();
+
     const getSize = ElementObserverUtils.createBorderBoxSizeObserver(getRef);
 
     createEffect(() => {
@@ -40,7 +43,7 @@ const ResizableBar = (props: ResizableBarProps) => {
 
     return (
         <div ref={setRef} class={styles.resizer} style={{ width: `${props.width()}px` }}>
-            <div class={styles.bar}>{props.children}</div>
+            <div class={[styles.bar, getLayerClass()].join(" ")}>{props.children}</div>
         </div>
     );
 };

@@ -2,15 +2,19 @@ import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { AccordionHeaderProps, AccordionPanelProps } from "./AccordionContent.types";
 
 import * as styles from "./AccordionContent.css";
 
 export const PageAccordionHeader = (props: ParentProps<AccordionHeaderProps>) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.accordionHeader}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isExpanded]: access(props.flags).isExpanded,
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isDisabled]: access(props.flags).isDisabled,
@@ -26,9 +30,11 @@ export const PageAccordionHeader = (props: ParentProps<AccordionHeaderProps>) =>
 };
 
 export const PageAccordionPanel = (props: ParentProps<AccordionPanelProps>) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
-            class={styles.accordionPanel}
+            class={[styles.accordionPanel, getLayerClass()].join(" ")}
             style={{
                 opacity: access(props.visibilityTarget),
                 transition: `opacity ${access(props.transitionDurationMs)}ms`,

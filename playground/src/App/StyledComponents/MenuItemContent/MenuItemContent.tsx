@@ -3,6 +3,7 @@ import { Show } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { MenuItemContentProps } from "./MenuItemContent.types";
 
 import * as styles from "./MenuItemContent.css";
@@ -12,10 +13,13 @@ const CHECKED_MARK = "✓";
 const PICKED_MARK = "●";
 
 export const PageMenuItemContent = (props: ParentProps<MenuItemContentProps>) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.menuItemContent}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isActive]: access(props.flags).isActive,
                 [styles.isHighlighted]: access(props.flags).isHighlighted,

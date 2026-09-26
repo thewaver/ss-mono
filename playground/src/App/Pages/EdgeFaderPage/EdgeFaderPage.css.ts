@@ -1,8 +1,9 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
-const tileBackground = `rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`;
+const tileBackground = `rgb(from ${layerVars.contrast} r g b / 10%)`;
 
 export const frame = style({
     width: 320,
@@ -23,7 +24,7 @@ export const column = style({
 
 export const row = style({
     padding: themeVars.spacing.full,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     backgroundColor: tileBackground,
     borderRadius: themeVars.borderRadius.half,
 });
@@ -40,7 +41,7 @@ export const chip = style({
     flexShrink: 0,
     height: 32,
     paddingInline: themeVars.spacing.double,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     backgroundColor: tileBackground,
     borderRadius: themeVars.borderRadius.half,
     fontSize: themeVars.fontSize.small,
@@ -58,7 +59,7 @@ export const tile = style({
     justifyContent: "center",
     alignItems: "center",
     height: 80,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     backgroundColor: tileBackground,
     borderRadius: themeVars.borderRadius.half,
 });

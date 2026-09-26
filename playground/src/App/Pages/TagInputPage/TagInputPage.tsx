@@ -4,10 +4,10 @@ import { Button } from "@thewaver/ss-components";
 
 import { TagInputKnobs } from "../../Knobs/TagInputs.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
-import { PageCheckField } from "../../StyledComponents/Field/Field";
 import { CrowdedExample } from "./Examples/Crowded";
 import { DefaultExample } from "./Examples/Default";
 import { UniqueExample } from "./Examples/Unique";

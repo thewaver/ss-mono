@@ -6,9 +6,9 @@ import { CALENDAR_DEFAULTS, DateValueUtils } from "@thewaver/ss-components";
 
 import { RangeCalendarKnobs } from "../../Knobs/RangeCalendars.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageSelectField } from "../../StyledComponents/Field/Field";
 import { MAX_DATE, MIN_DATE, TODAY, WEEK_START_LABELS } from "../CalendarPage/CalendarPage.const";
 import { BoundedExample } from "./Examples/Bounded";
 import { DefaultExample } from "./Examples/Default";

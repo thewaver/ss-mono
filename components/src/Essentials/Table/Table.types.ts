@@ -97,6 +97,11 @@ export type TableColumn<T> = {
     isResizable?: boolean;
     isReorderable?: boolean;
     compare?: (a: T, b: T) => number;
+    /**
+     * Draws the column's header. A sortable column puts a `TableHeaderSort` in it and a reorderable one a
+     * `TableHeaderReorder`, wherever they belong; without them the column can only be sorted from the keyboard, or
+     * reordered by dragging, and the table warns about it.
+     */
     renderHeader: (getRenderProps: () => TableColumnRenderProps) => JSX.Element;
     renderCell: (getRow: Accessor<T>, getRenderProps: () => TableCellRenderProps) => JSX.Element;
 };
@@ -148,27 +153,6 @@ export type TableProps<T> = TableOrderProps &
         computeEstimatedRowHeight?: (index: number) => number;
         /** Draws the grab handle between two columns. */
         renderResizer?: (getRenderProps: () => TableColumnRenderProps) => JSX.Element;
-        /**
-         * Draws what sits inside the control that sorts a column.
-         *
-         * A header cell is no longer a target of its own: sorting and reordering each have their own control, so
-         * a tap can only ever mean one of them. The component renders both boxes and the consumer paints inside,
-         * exactly as {@link TableProps.renderResizer} already works — so an unpainted control is invisible but
-         * still hit-testable, and sorting does not quietly stop working for a consumer who never drew an arrow.
-         *
-         * **Three targets now share a header cell**, and 2.5.8 Target Size wants a 24 CSS pixel circle centered on
-         * each undersized one to clear the others — so their centers need roughly that much space between them,
-         * which is the consumer's to arrange.
-         */
-        renderSortControl?: (getRenderProps: () => TableColumnRenderProps) => JSX.Element;
-        /**
-         * Draws what sits inside the control that picks a column up to move it.
-         *
-         * Tapping it picks the column up; tapping another header drops it there. That is the single-pointer route
-         * 2.5.7 asks for, and it is why reordering needed a control of its own — a tap on the header could not
-         * mean both "sort" and "pick up". Dragging from anywhere on the header still works and is unchanged.
-         */
-        renderReorderGrip?: (getRenderProps: () => TableColumnRenderProps) => JSX.Element;
         /** Draws the line showing where a dragged column would land. */
         renderMarker?: () => JSX.Element;
         /** Runs when the reader sorts by a different column, or reverses the one it is sorted by. */
@@ -189,3 +173,30 @@ export type TableProps<T> = TableOrderProps &
         /** Runs when the selection changes. */
         onSelectionChange?: (rows: T[]) => void;
     };
+
+export type TableHeaderControlProps = {
+    /** Draws what sits inside the control, from the state of the column whose header it is in. */
+    renderContent: (getRenderProps: () => TableColumnRenderProps) => JSX.Element;
+};
+
+/**
+ * The control that sorts a column, placed by the consumer anywhere inside the column's header.
+ *
+ * A header cell is not a target of its own: sorting and reordering each have their own control, so a tap can only
+ * ever mean one of them. The control keeps a press from reaching the header, so it never starts a column drag,
+ * focuses its own cell before acting, and stays out of the tab order and hidden from screen readers — the cell is
+ * the one tab stop, and Enter on it sorts. Three targets can share a header cell, and 2.5.8 Target Size wants a 24
+ * CSS pixel circle centered on each undersized one to clear the others, so painting each control at 24 pixels is
+ * the simple way to meet it. It renders nothing in a column that is not sortable.
+ */
+export type TableHeaderSortProps = TableHeaderControlProps;
+
+/**
+ * The control that picks a column up to move it, placed by the consumer anywhere inside the column's header.
+ *
+ * Tapping it picks the column up; tapping another header drops it there. That is the single-pointer route 2.5.7
+ * asks for, and it is why reordering needs a control of its own — a tap on the header could not mean both "sort"
+ * and "pick up". Dragging from anywhere on the header still works. It follows the same rules as the sort control,
+ * and renders nothing in a column that is not reorderable.
+ */
+export type TableHeaderReorderProps = TableHeaderControlProps;

@@ -1,6 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const RANGE_THUMB_SIZE = 18;
 export const RANGE_TRACK_THICKNESS = 6;
@@ -34,7 +35,7 @@ export const rangeContentVariants = styleVariants({
 export const rangeTrack = style({
     position: "absolute",
     borderRadius: RANGE_TRACK_THICKNESS,
-    backgroundColor: `rgb(from currentColor r g b / 25%)`,
+    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
     boxShadow: themeVars.shadow.small,
 });
 
@@ -84,7 +85,7 @@ export const rangeThumb = style({
     height: RANGE_THUMB_SIZE,
     borderRadius: "50%",
     border: `2px solid ${themeVars.color.primary.main}`,
-    backgroundColor: "black",
+    backgroundColor: layerVars.main,
     boxShadow: themeVars.shadow.small,
     transition: `border-color ${themeVars.animation.duration}, transform ${themeVars.animation.duration}`,
 

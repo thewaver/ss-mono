@@ -1,6 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const PAGE_SUNBURST_FAMILIES = ["primary", "secondary", "info", "success", "alert", "error"] as const;
 
@@ -42,14 +43,14 @@ export const sunburstHub = style({
     width: "100%",
     height: "100%",
     borderRadius: "50%",
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",
     cursor: "pointer",
 });
 
 export const sunburstHubHovered = style({
-    backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
+    backgroundColor: layerVars.main,
 });
 
 export const sunburstHubAtRoot = style({

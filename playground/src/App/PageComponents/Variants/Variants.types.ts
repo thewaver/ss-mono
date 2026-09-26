@@ -11,4 +11,5 @@ export type VariantDefs = {
 
 export type VariantsProps = AccessorProps<{
     items: VariantDefs[];
+    minColumnWidth?: number;
 }>;

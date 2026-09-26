@@ -1,12 +1,8 @@
 import { Tabs, access } from "@thewaver/ss-components";
 import type { MaybeAccessor, Tab } from "@thewaver/ss-components";
 
-import {
-    PageTabContent,
-    PageTabFloater,
-    PageTabGutter,
-    PageTabPanel,
-} from "../../../StyledComponents/TabContent/TabContent";
+import { PageTabPanel } from "../../../PageComponents/TabPanel/TabPanel";
+import { PageTabContent, PageTabFloater, PageTabGutter } from "../../../StyledComponents/TabContent/TabContent";
 import { PANEL_BODIES, ROW_TABS, ROW_TAB_GAP, getPanelId, getTabId } from "../TabsPage.const";
 import type { TabsExampleProps } from "../TabsPage.types";
 

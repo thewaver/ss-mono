@@ -3,6 +3,7 @@ import { Show } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { TreeNodeContentProps, TreeNodePendingProps } from "./TreeNodeContent.types";
 
 import { themeVars } from "../../Theme.css";
@@ -16,6 +17,8 @@ const ROOT_RANK_DEPTH = 0;
 const INNER_RANK_DEPTH = 1;
 
 export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.treeNodeContent}
@@ -23,6 +26,7 @@ export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) =>
                 "padding-left": `calc(${themeVars.spacing.half} + ${access(props.renderProps).depth * INDENT_PER_DEPTH}px)`,
             }}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isBranch]: access(props.renderProps).isBranch,
                 [styles.isExpanded]: access(props.renderProps).isExpanded,
                 [styles.isHovered]: access(props.renderProps).isHovered,
@@ -48,26 +52,33 @@ export const PageTreeNodeContent = (props: ParentProps<TreeNodeContentProps>) =>
     );
 };
 
-export const PageTreeNodePending = (props: ParentProps<TreeNodePendingProps>) => (
-    <div
-        class={styles.treeNodePending}
-        style={{
-            "padding-left": `calc(${themeVars.spacing.half} + ${access(props.depth) * INDENT_PER_DEPTH}px)`,
-        }}
-    >
-        <div class={styles.treeNodeMarker} aria-hidden="true">
-            {LEAF_MARKER}
-        </div>
+export const PageTreeNodePending = (props: ParentProps<TreeNodePendingProps>) => {
+    const getLayerClass = useLayerClass();
 
-        <div>{props.children}</div>
-    </div>
-);
+    return (
+        <div
+            class={[styles.treeNodePending, getLayerClass()].join(" ")}
+            style={{
+                "padding-left": `calc(${themeVars.spacing.half} + ${access(props.depth) * INDENT_PER_DEPTH}px)`,
+            }}
+        >
+            <div class={styles.treeNodeMarker} aria-hidden="true">
+                {LEAF_MARKER}
+            </div>
+
+            <div>{props.children}</div>
+        </div>
+    );
+};
 
 export const PageTreeRadialNode = (props: ParentProps<TreeNodeContentProps>) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.treeRadialNode}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isRootRank]: access(props.renderProps).depth === ROOT_RANK_DEPTH,
                 [styles.isOuterRank]: access(props.renderProps).depth > INNER_RANK_DEPTH,
                 [styles.isHovered]: access(props.renderProps).isHovered,

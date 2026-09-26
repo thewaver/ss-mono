@@ -5,9 +5,9 @@ import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import { CardStackKnobs } from "../../Knobs/CardStacks.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
 import { DeckExample } from "./Examples/Deck";
 import { EndlessExample } from "./Examples/Endless";
 

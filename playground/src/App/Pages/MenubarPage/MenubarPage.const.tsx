@@ -8,6 +8,7 @@ import type {
     MenubarAction,
 } from "@thewaver/ss-components";
 
+import { PageLayer } from "../../PageComponents/Layer/Layer";
 import { PageMenuItemContent } from "../../StyledComponents/MenuItemContent/MenuItemContent";
 import { PagePopoverSurface } from "../../StyledComponents/PopoverSurface/PopoverSurface";
 import type { MenubarEntry } from "./MenubarPage.types";
@@ -63,13 +64,15 @@ export const renderMenubarPopup = (
     getTransitionDurationMs: () => number,
     getPlacement: () => AnchorPlacement,
 ) => (
-    <PagePopoverSurface
-        visibilityTarget={getVisibilityTarget}
-        transitionDurationMs={getTransitionDurationMs}
-        placement={getPlacement}
-    >
-        {renderItems()}
-    </PagePopoverSurface>
+    <PageLayer level={2}>
+        <PagePopoverSurface
+            visibilityTarget={getVisibilityTarget}
+            transitionDurationMs={getTransitionDurationMs}
+            placement={getPlacement}
+        >
+            {renderItems()}
+        </PagePopoverSurface>
+    </PageLayer>
 );
 
 export const renderMenubarItem = (

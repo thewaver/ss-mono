@@ -1,6 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 const FRAME_MAX_WIDTH = 520;
 const FRAME_HEIGHT = 240;
@@ -21,7 +22,7 @@ export const sidebarFrame = style({
     height: FRAME_HEIGHT,
     border: `1px solid rgb(from currentColor r g b / 25%)`,
     borderRadius: themeVars.borderRadius.full,
-    backgroundColor: themeVars.color.background.dark,
+    backgroundColor: layerVars.main,
     overflow: "hidden",
 });
 
@@ -30,7 +31,7 @@ export const sidebarSurface = style({
     height: "100%",
     overflow: "hidden",
     color: themeVars.color.surface.contrast,
-    backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
+    backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
     boxShadow: themeVars.shadow.medium,
 });
 

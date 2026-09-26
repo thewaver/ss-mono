@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isHovered = style({});
 export const isOpen = style({});
@@ -17,7 +18,7 @@ export const navMenuTrigger = style({
 
     selectors: {
         [`&.${isHovered}, &.${isOpen}`]: {
-            backgroundColor: `rgb(from currentColor r g b / 10%)`,
+            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
         },
     },
 });

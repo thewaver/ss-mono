@@ -1,5 +1,6 @@
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { PageIcicleCellProps } from "./IcicleContent.types";
 
 import * as styles from "./IcicleContent.css";
@@ -9,11 +10,16 @@ const LABEL_SHOWN = 1;
 const LABEL_HIDDEN = 0;
 
 export const PageIcicleCell = (props: PageIcicleCellProps) => {
+    const getLayerClass = useLayerClass();
+
     const getFamily = () => access(props.family);
 
     return (
         <div
-            class={`${styles.icicleCell} ${getFamily() ? styles.icicleCellFamily[getFamily()!] : styles.icicleCellRoot}`}
+            class={[
+                `${styles.icicleCell} ${getFamily() ? styles.icicleCellFamily[getFamily()!] : styles.icicleCellRoot}`,
+                getLayerClass(),
+            ].join(" ")}
             title={access(props.title)}
         >
             <span

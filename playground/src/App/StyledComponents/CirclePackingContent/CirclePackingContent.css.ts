@@ -1,9 +1,12 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const circlePackingFrame = style({
-    backgroundImage: `radial-gradient(circle at 70% 30%, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
+    width: "100%",
+    height: "100%",
+    backgroundColor: layerVars.main,
     borderRadius: themeVars.borderRadius.full,
     cursor: "pointer",
 });
@@ -41,8 +44,8 @@ export const circlePackingBranch = style({
 });
 
 export const circlePackingLabel = style({
-    fill: themeVars.color.surface.contrast,
-    stroke: themeVars.color.background.dark,
+    fill: layerVars.contrast,
+    stroke: layerVars.main,
     strokeWidth: 3,
     paintOrder: "stroke",
     fontSize: themeVars.fontSize.xSmall,

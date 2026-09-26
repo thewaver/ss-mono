@@ -21,7 +21,7 @@ export const spot_1 = (opts?: GradientSpotOpts): TrackedGradientConfig => ({
 
                     return SVGGradientDefsUtils.computeRadialGradient({
                         id: `gradient1-${id}`,
-                        elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                        elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
                         origin: () => getReading().boxRatio,
                         scale: opts?.glowScale ?? DEFAULTS.glowScale,
                         colors: [

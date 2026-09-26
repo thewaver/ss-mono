@@ -144,7 +144,7 @@ export const spot_trail_3 = (opts?: GradientSpotTrailOpts): TrackedGradientConfi
                     renderDefsElement: () => {
                         return SVGGradientDefsUtils.computeRadialGradient({
                             id: `gradient1-${id}`,
-                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
                             origin: () => getReading().boxRatio,
                             scale: opts?.glowScale ?? DEFAULTS.glowScale,
                             colors: opts?.cycles
@@ -173,7 +173,7 @@ export const spot_trail_3 = (opts?: GradientSpotTrailOpts): TrackedGradientConfi
 
                         return SVGGradientDefsUtils.computeRadialGradient({
                             id: `gradient${index + 2}-${id}`,
-                            elementSize: opts?.circular ? () => defs.getSize() : undefined,
+                            elementSize: (opts?.circular ?? DEFAULTS.circular) ? () => defs.getSize() : undefined,
                             origin: stamp.getOrigin,
                             scale: opts?.glowScale ?? DEFAULTS.glowScale,
                             colors: () => stamp.getColors(defs.colors),

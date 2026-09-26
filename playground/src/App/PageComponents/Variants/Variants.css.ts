@@ -2,11 +2,10 @@ import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
 
-const MIN_COLUMN_WIDTH = 320;
+export const DEFAULT_MIN_COLUMN_WIDTH = 320;
 
 export const variantsRoot = style({
     display: "grid",
-    gridTemplateColumns: `repeat(auto-fill, minmax(min(100%, ${MIN_COLUMN_WIDTH}px), 1fr))`,
     alignItems: "stretch",
     gap: themeVars.spacing.double,
 });

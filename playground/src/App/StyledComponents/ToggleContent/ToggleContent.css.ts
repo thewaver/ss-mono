@@ -1,9 +1,14 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
-const TOGGLE_WIDTH = 44;
-const TOGGLE_HEIGHT = 24;
+const TOGGLE_WIDTH = 56;
+const TOGGLE_HEIGHT = 32;
+const TOGGLE_BORDER = 2;
+const HANDLE_GAP = 4;
+const HANDLE_SIZE = TOGGLE_HEIGHT - 2 * (TOGGLE_BORDER + HANDLE_GAP);
+const HANDLE_TRAVEL = TOGGLE_WIDTH - 2 * (TOGGLE_BORDER + HANDLE_GAP) - HANDLE_SIZE;
 
 export const isChecked = style({});
 export const isMixed = style({});
@@ -18,9 +23,9 @@ export const toggleContent = style({
     width: TOGGLE_WIDTH,
     height: TOGGLE_HEIGHT,
     boxShadow: themeVars.shadow.small,
-    border: `2px solid rgb(from currentColor r g b / 25%)`,
+    border: `${TOGGLE_BORDER}px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: TOGGLE_HEIGHT * 0.5,
-    backgroundColor: "black",
+    backgroundColor: layerVars.main,
     transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
 
     selectors: {
@@ -39,20 +44,22 @@ export const toggleContent = style({
 
 export const toggleHandle = style({
     position: "absolute",
-    left: 2,
-    width: 16,
-    height: 16,
+    left: HANDLE_GAP,
+    width: HANDLE_SIZE,
+    height: HANDLE_SIZE,
     borderRadius: "50%",
-    backgroundImage: `linear-gradient(45deg, ${themeVars.color.primary.dark}, ${themeVars.color.primary.light})`,
+    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 75%)`,
     transform: "translateX(0)",
-    transition: `transform ${themeVars.animation.duration}`,
+    transition: `transform ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
 
     selectors: {
         [`${toggleContent}.${isMixed} &`]: {
-            transform: "translateX(10px)",
+            backgroundColor: themeVars.color.primary.main,
+            transform: `translateX(${HANDLE_TRAVEL / 2}px)`,
         },
         [`${toggleContent}.${isChecked} &`]: {
-            transform: "translateX(20px)",
+            backgroundColor: themeVars.color.primary.main,
+            transform: `translateX(${HANDLE_TRAVEL}px)`,
         },
     },
 });

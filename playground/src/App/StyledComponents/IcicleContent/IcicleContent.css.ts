@@ -1,6 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const PAGE_ICICLE_FAMILIES = ["primary", "secondary", "info", "success", "alert", "error"] as const;
 
@@ -22,8 +23,8 @@ export const icicleCell = style({
     width: "100%",
     height: "100%",
     padding: `2px ${themeVars.spacing.half}`,
-    borderRight: `1px solid ${themeVars.color.background.dark}`,
-    borderBottom: `1px solid ${themeVars.color.background.dark}`,
+    borderRight: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
+    borderBottom: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     fontSize: themeVars.fontSize.xSmall,
     lineHeight: 1.3,
     whiteSpace: "nowrap",
@@ -32,8 +33,8 @@ export const icicleCell = style({
 });
 
 export const icicleCellRoot = style({
-    backgroundImage: panel(themeVars.color.surface.light, themeVars.color.surface.dark),
-    color: themeVars.color.surface.contrast,
+    backgroundColor: layerVars.main,
+    color: layerVars.contrast,
 });
 
 export const icicleLabel = style({

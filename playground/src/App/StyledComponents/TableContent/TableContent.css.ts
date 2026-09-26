@@ -1,8 +1,13 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
+
+const CONTROL_SIZE = 24;
+const RESIZER_WIDTH = 8;
 
 export const isSortable = style({});
+export const isResizable = style({});
 export const isSorted = style({});
 export const isHovered = style({});
 export const isSelected = style({});
@@ -20,9 +25,9 @@ export const tableHeaderContent = style({
     gap: themeVars.spacing.half,
     height: "100%",
     padding: themeVars.spacing.half,
-    borderBottom: `2px solid rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
-    backgroundColor: themeVars.color.surface.dark,
-    color: themeVars.color.surface.contrast,
+    borderBottom: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
+    backgroundColor: layerVars.main,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     fontWeight: 700,
     lineHeight: 1.25,
@@ -35,8 +40,11 @@ export const tableHeaderContent = style({
         [`&.${isSortable}`]: {
             cursor: "pointer",
         },
+        [`&.${isResizable}`]: {
+            paddingInlineEnd: RESIZER_WIDTH,
+        },
         [`&.${isSortable}.${isHovered}`]: {
-            backgroundColor: themeVars.color.surface.light,
+            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
         },
         [`&.${isSorted}`]: {
             color: themeVars.color.primary.main,
@@ -55,7 +63,23 @@ export const tableText = style({
     textOverflow: "ellipsis",
 });
 
+const headerControl = {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: CONTROL_SIZE,
+    height: CONTROL_SIZE,
+} as const;
+
+export const tableHeaderText = style([
+    tableText,
+    {
+        flex: 1,
+    },
+]);
+
 export const tableSortMarker = style({
+    ...headerControl,
     fontSize: themeVars.fontSize.xSmall,
     opacity: 0.5,
 
@@ -71,7 +95,7 @@ export const tableCellContent = style({
     alignItems: "center",
     height: "100%",
     padding: themeVars.spacing.half,
-    borderBottom: `1px solid rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
+    borderBottom: `1px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
     fontSize: themeVars.fontSize.small,
     lineHeight: 1.25,
     whiteSpace: "nowrap",
@@ -81,7 +105,7 @@ export const tableCellContent = style({
 
     selectors: {
         [`&.${isHovered}`]: {
-            backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
+            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
         },
         [`&.${isSelected}`]: {
             backgroundColor: `rgb(from ${themeVars.color.primary.main} r g b / 25%)`,
@@ -100,7 +124,7 @@ export const tableCellContent = style({
 export const tableResizerHandle = style({
     width: "100%",
     height: "100%",
-    borderRight: `2px solid rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
+    borderRight: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     transition: `border-color ${themeVars.animation.duration}`,
 
     selectors: {
@@ -117,6 +141,7 @@ export const tableMarker = style({
 });
 
 export const tableReorderGrip = style({
+    ...headerControl,
     opacity: 0.4,
     cursor: "grab",
     selectors: {

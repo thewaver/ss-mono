@@ -2,6 +2,7 @@ import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
+import { PageLayer } from "../../PageComponents/Layer/Layer";
 import type { SidebarFadeProps, SidebarFrameProps, SidebarSurfaceProps } from "./SidebarContent.types";
 
 import * as styles from "./SidebarContent.css";
@@ -13,7 +14,7 @@ export const PageSidebarFrame = (props: ParentProps<SidebarFrameProps>) => (
 export const PageSidebarSurface = (props: ParentProps<SidebarSurfaceProps>) => (
     <div class={styles.sidebarSurface}>
         <div class={styles.sidebarSurfaceContent} style={{ width: `${access(props.width)}px` }}>
-            {props.children}
+            <PageLayer level={1}>{props.children}</PageLayer>
         </div>
     </div>
 );

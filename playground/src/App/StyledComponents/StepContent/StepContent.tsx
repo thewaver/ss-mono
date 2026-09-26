@@ -2,6 +2,7 @@ import { type ParentProps, Show } from "solid-js";
 
 import { PlacementUtils, access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { StepArcConnectorProps, StepConnectorProps, StepContentProps } from "./StepContent.types";
 
 import * as styles from "./StepContent.css";
@@ -15,10 +16,13 @@ const MARKER_GLYPHS = {
 } as const;
 
 export const PageStepContent = (props: ParentProps<StepContentProps>) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={access(props.orientation) === "horizontal" ? styles.rowStep : styles.columnStep}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isCurrent]: access(props.flags).isCurrent,
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isDisabled]: access(props.flags).isDisabled,
@@ -34,14 +38,29 @@ export const PageStepContent = (props: ParentProps<StepContentProps>) => {
 };
 
 export const PageStepConnector = (props: StepConnectorProps) => {
+    const getLayerClass = useLayerClass();
+
     const getColumnClass = () => (access(props.isRail) === true ? styles.columnRailConnector : styles.columnConnector);
 
-    return <span class={access(props.orientation) === "horizontal" ? styles.rowConnector : getColumnClass()} />;
+    return (
+        <span
+            class={[
+                access(props.orientation) === "horizontal" ? styles.rowConnector : getColumnClass(),
+                getLayerClass(),
+            ].join(" ")}
+        />
+    );
 };
 
-export const PageStepArcCell = (props: ParentProps) => <div class={styles.arcCell}>{props.children}</div>;
+export const PageStepArcCell = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
+
+    return <div class={[styles.arcCell, getLayerClass()].join(" ")}>{props.children}</div>;
+};
 
 export const PageStepArcConnector = (props: StepArcConnectorProps) => {
+    const getLayerClass = useLayerClass();
+
     const getRun = () => {
         const defs = access(props.defs);
 
@@ -53,7 +72,7 @@ export const PageStepArcConnector = (props: StepArcConnectorProps) => {
     return (
         <Show when={getRun()}>
             {(getPath) => (
-                <svg class={styles.arcConnector} viewBox={"0 0 1 1"} aria-hidden={"true"}>
+                <svg class={[styles.arcConnector, getLayerClass()].join(" ")} viewBox={"0 0 1 1"} aria-hidden={"true"}>
                     <path class={styles.arcConnectorPath} d={getPath()} />
                 </svg>
             )}
@@ -61,4 +80,8 @@ export const PageStepArcConnector = (props: StepArcConnectorProps) => {
     );
 };
 
-export const PageStepBody = (props: ParentProps) => <div class={styles.stepBody}>{props.children}</div>;
+export const PageStepBody = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
+
+    return <div class={[styles.stepBody, getLayerClass()].join(" ")}>{props.children}</div>;
+};

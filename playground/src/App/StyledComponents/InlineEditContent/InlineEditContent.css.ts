@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 import {
     FIELD_BORDER,
     FIELD_FONT_SIZE,
@@ -33,7 +34,7 @@ export const inlineEditContent = style({
 
     selectors: {
         [`&.${isHinted}`]: {
-            borderColor: `rgb(from currentColor r g b / 25%)`,
+            borderColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
         },
         [`&.${isDisabled}`]: {
             cursor: "not-allowed",

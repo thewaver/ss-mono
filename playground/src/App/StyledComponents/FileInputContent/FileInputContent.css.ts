@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 const FIELD_WIDTH = 200;
 const FIELD_HEIGHT = 40;
@@ -22,9 +23,9 @@ export const fileInputContent = style({
     height: FIELD_HEIGHT,
     padding: themeVars.spacing.full,
     boxShadow: themeVars.shadow.small,
-    border: `${FIELD_BORDER}px solid rgb(from currentColor r g b / 25%)`,
+    border: `${FIELD_BORDER}px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: "black",
+    backgroundColor: layerVars.main,
     fontSize: FIELD_FONT_SIZE,
     lineHeight: FIELD_LINE_HEIGHT,
     transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
@@ -56,7 +57,7 @@ export const fileInputNames = style({
 
     selectors: {
         [`&.${isEmpty}`]: {
-            color: `rgb(from currentColor r g b / 50%)`,
+            color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
             fontStyle: "italic",
         },
     },

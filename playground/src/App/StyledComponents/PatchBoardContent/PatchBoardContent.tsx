@@ -1,5 +1,6 @@
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { PagePatchCableProps, PagePatchNodeProps, PagePatchSocketProps } from "./PatchBoardContent.types";
 
 import * as styles from "./PatchBoardContent.css";
@@ -8,12 +9,15 @@ const MIN_BOW = 0.09;
 const BOW_RATIO = 0.55;
 
 export const PagePatchNode = (props: PagePatchNodeProps) => {
+    const getLayerClass = useLayerClass();
+
     const getFlags = () => access(props.flags);
 
     return (
         <div
             class={styles.patchNode}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isCarried]: getFlags().isCarried,
                 [styles.isHovered]: getFlags().isHovered,
                 [styles.isFocusVisible]: getFlags().isFocusVisible,
@@ -27,6 +31,8 @@ export const PagePatchNode = (props: PagePatchNodeProps) => {
 };
 
 export const PagePatchSocket = (props: PagePatchSocketProps) => {
+    const getLayerClass = useLayerClass();
+
     const getFlags = () => access(props.flags);
 
     const getIsRefused = () => getFlags().isAimed && !getFlags().isAllowed;
@@ -35,6 +41,7 @@ export const PagePatchSocket = (props: PagePatchSocketProps) => {
         <div
             class={styles.patchSocket}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isIn]: getFlags().kind === "in",
                 [styles.isTaken]: getFlags().isTaken,
                 [styles.isSource]: getFlags().isSource,
@@ -49,6 +56,8 @@ export const PagePatchSocket = (props: PagePatchSocketProps) => {
 };
 
 export const PagePatchCable = (props: PagePatchCableProps) => {
+    const getLayerClass = useLayerClass();
+
     const getDefs = () => access(props.defs);
 
     const getPath = () => {
@@ -67,6 +76,7 @@ export const PagePatchCable = (props: PagePatchCableProps) => {
         <path
             class={styles.patchCable}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isPending]: getDefs().isPending,
                 [styles.isRefused]: !getDefs().isAllowed,
             }}

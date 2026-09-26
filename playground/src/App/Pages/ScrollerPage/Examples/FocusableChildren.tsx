@@ -1,7 +1,7 @@
 import { Button, Scroller, access } from "@thewaver/ss-components";
 
+import { PageScrollerButton } from "../../../PageComponents/ScrollerButton/ScrollerButton";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
-import { PageScrollerButton } from "../../../StyledComponents/ScrollerButton/ScrollerButton";
 import type { ScrollerExampleProps } from "../ScrollerPage.types";
 
 import { FOCUS_RING_WIDTH } from "../../../Theme.css";

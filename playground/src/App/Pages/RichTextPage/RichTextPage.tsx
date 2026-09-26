@@ -3,10 +3,10 @@ import { createMemo, createSignal } from "solid-js";
 import { RICH_TEXT_DEFAULTS, TextArea } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField } from "../../StyledComponents/Field/Field";
 import {
     PageTextFieldContent,
     computePageTextFieldTextStyle,

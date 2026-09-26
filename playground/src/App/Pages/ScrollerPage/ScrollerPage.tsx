@@ -4,9 +4,9 @@ import type { Tab } from "@thewaver/ss-components";
 
 import { ScrollerKnobs } from "../../Knobs/Scrollers.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField } from "../../StyledComponents/Field/Field";
 import { ChipsExample } from "./Examples/Chips";
 import { FocusableChildrenExample } from "./Examples/FocusableChildren";
 import { TabbedExample } from "./Examples/Tabbed";

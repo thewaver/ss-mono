@@ -13,7 +13,9 @@ const layers: DismisserLayerDefs[] = [];
  * something points at with `aria-controls` continues the walk from that controller, which is what
  * keeps a menu open while the user is in the popup it opened. A trigger button counts as inside
  * the layer it controls for the same reason — clicking it should toggle the layer, not have it
- * closed from underneath and reopened.
+ * closed from underneath and reopened. A controller that sits inside the element it controls — a
+ * sidebar's own collapse button — would send the walk round in a circle, so a step to an element
+ * already visited is skipped and the walk carries on up from where it was.
  *
  * Published as {@link DismisserUtils.getIsWithinOwnedLayer}; it lives here because the module's own
  * listeners need it before the namespace object exists.
@@ -24,16 +26,20 @@ const layers: DismisserLayerDefs[] = [];
  * @returns `true` when the node is inside one of those roots or inside something they own.
  */
 const computeIsWithinOwnedLayer = (target: Node | null, roots: (HTMLElement | null | undefined)[]) => {
+    const visited = new Set<Element>();
+
     let node = target instanceof Element ? target : (target?.parentElement ?? null);
 
-    while (node) {
+    while (node && !visited.has(node)) {
         const current = node;
+
+        visited.add(current);
 
         if (roots.some((root) => root?.contains(current))) return true;
 
         const owner = current.id ? document.querySelector(`[aria-controls="${CSS.escape(current.id)}"]`) : null;
 
-        node = owner ?? current.parentElement;
+        node = owner && !visited.has(owner) ? owner : current.parentElement;
     }
 
     return false;
@@ -106,7 +112,8 @@ export namespace DismisserUtils {
      * something points at with `aria-controls` continues the walk from that controller, which is what
      * keeps a menu open while the user is in the popup it opened. A trigger button counts as inside
      * the layer it controls for the same reason — clicking it should toggle the layer, not have it
-     * closed from underneath and reopened.
+     * closed from underneath and reopened. A controller inside the element it controls is stepped
+     * past rather than followed, so the walk always ends.
      *
      * @param target The node the event landed on.
      * @param roots The layer's own elements. Missing entries are ignored, so a caller may pass refs

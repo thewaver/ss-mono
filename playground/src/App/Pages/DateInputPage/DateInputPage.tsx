@@ -4,9 +4,9 @@ import type { DateValue, DateValueCalendarId } from "@thewaver/ss-components";
 import { DATE_INPUT_DEFAULTS, DateValueUtils } from "@thewaver/ss-components";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageSelectField } from "../../StyledComponents/Field/Field";
 import { CAESAR, TODAY } from "../DatePickerPage/DatePickerPage.const";
 import { TypedExample } from "./Examples/Typed";
 

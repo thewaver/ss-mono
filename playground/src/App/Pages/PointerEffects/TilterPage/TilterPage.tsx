@@ -4,10 +4,10 @@ import { TILTER_DEFAULTS } from "@thewaver/ss-components";
 
 import { TilterKnobs } from "../../../Knobs/Tilters.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
+import { PageCheckField, PageNumberField } from "../../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageNumberField } from "../../../StyledComponents/Field/Field";
 import { CardExample } from "./Examples/Card";
 import { PhotoExample } from "./Examples/Photo";
 import type { TilterExampleProps } from "./TilterPage.types";

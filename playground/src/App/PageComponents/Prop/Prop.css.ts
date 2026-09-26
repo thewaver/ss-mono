@@ -1,5 +1,6 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const propScopeBase = style({
@@ -17,7 +18,7 @@ export const propScopeVariants = styleVariants({
     global: [
         propScopeBase,
         {
-            color: themeVars.color.background.contrast,
+            color: layerVars.contrast,
             backgroundColor: [
                 themeVars.color.background.dark,
                 `rgb(from ${themeVars.color.background.dark} r g b / 75%)`,
@@ -27,7 +28,7 @@ export const propScopeVariants = styleVariants({
     sample: [
         propScopeBase,
         {
-            color: themeVars.color.background.contrast,
+            color: layerVars.contrast,
             backgroundColor: [
                 themeVars.color.background.light,
                 `rgb(from ${themeVars.color.background.light} r g b / 75%)`,
@@ -37,7 +38,7 @@ export const propScopeVariants = styleVariants({
     local: [
         propScopeBase,
         {
-            color: themeVars.color.surface.contrast,
+            color: layerVars.contrast,
             backgroundColor: [themeVars.color.surface.dark, `rgb(from ${themeVars.color.surface.dark} r g b / 75%)`],
         },
     ],

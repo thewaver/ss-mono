@@ -1,13 +1,13 @@
 import { For } from "solid-js";
 
-import { Checkbox, Radio, RadioGroup } from "@thewaver/ss-components";
+import { Radio, RadioGroup, Toggle } from "@thewaver/ss-components";
 
-import { PageCheckboxContent } from "../../StyledComponents/CheckboxContent/CheckboxContent";
 import {
     PageRadioSegmentContent,
     PageRadioSegmentFloater,
     PageRadioSegmentGroup,
 } from "../../StyledComponents/RadioSegmentContent/RadioSegmentContent";
+import { PageToggleContent } from "../../StyledComponents/ToggleContent/ToggleContent";
 import { PageExampleKnobsButton } from "../ExampleKnobs/ExampleKnobs";
 import { PageProp } from "../Prop/Prop";
 import { PAGE_VIEW_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
@@ -54,10 +54,10 @@ export const PageNavSettings = (props: PageNavSettingsProps) => (
                     hint={"Lists the pages that have docs but no examples yet, which are hidden otherwise."}
                     defaultValue={false}
                 >
-                    <Checkbox
+                    <Toggle
                         checkedSignal={props.showsDescriptionOnlySignal}
                         ariaLabel={"Show pages without examples"}
-                        renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
+                        renderContent={(getFlags) => <PageToggleContent flags={getFlags} />}
                     />
                 </PageProp>
 

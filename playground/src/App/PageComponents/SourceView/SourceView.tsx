@@ -4,14 +4,10 @@ import { Accordion, Scroller, Tabs, access, useViewportContext } from "@thewaver
 import type { AccordionItem, Tab } from "@thewaver/ss-components";
 
 import { PageAccordionHeader, PageAccordionPanel } from "../../StyledComponents/AccordionContent/AccordionContent";
-import { PageScrollerButton } from "../../StyledComponents/ScrollerButton/ScrollerButton";
-import {
-    PageTabContent,
-    PageTabFloater,
-    PageTabGutter,
-    PageTabPanel,
-} from "../../StyledComponents/TabContent/TabContent";
+import { PageTabContent, PageTabFloater, PageTabGutter } from "../../StyledComponents/TabContent/TabContent";
 import { PageCodeBox } from "../CodeBox/CodeBox";
+import { PageScrollerButton } from "../ScrollerButton/ScrollerButton";
+import { PageTabPanel } from "../TabPanel/TabPanel";
 import type { SourceGroup, SourceViewProps } from "./SourceView.types";
 import { SourceViewUtils } from "./SourceView.utils";
 

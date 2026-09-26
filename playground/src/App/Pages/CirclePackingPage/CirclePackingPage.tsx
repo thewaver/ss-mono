@@ -5,9 +5,9 @@ import type { CirclePackingNode } from "@thewaver/ss-components";
 
 import { CirclePackingKnobs } from "../../Knobs/CirclePackings.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField } from "../../StyledComponents/Field/Field";
 import { LIBRARY } from "../TreemapPage/TreemapPage.const";
 import { LibraryExample } from "./Examples/Library";
 

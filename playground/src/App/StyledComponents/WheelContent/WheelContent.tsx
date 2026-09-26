@@ -3,6 +3,7 @@ import { type ParentProps, Show, createUniqueId } from "solid-js";
 import { PlacementUtils, access } from "@thewaver/ss-components";
 import type { PlacementSector } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type {
     PageWheelCardProps,
     PageWheelPipProps,
@@ -39,12 +40,17 @@ const toLabelTilt = (wedgeAngle: number, sector: PlacementSector | undefined) =>
 };
 
 export const PageWheelWedge = (props: ParentProps<PageWheelWedgeProps>) => {
+    const getLayerClass = useLayerClass();
+
     const gradientId = createUniqueId();
 
     return (
         <Show when={access(props.state).placement}>
             {(getRect) => (
-                <div class={styles.wheelWedge} classList={{ [styles.isSelected]: access(props.state).isSelected }}>
+                <div
+                    class={styles.wheelWedge}
+                    classList={{ [getLayerClass()]: true, [styles.isSelected]: access(props.state).isSelected }}
+                >
                     <svg class={styles.wheelWedgeSVG} viewBox={"0 0 1 1"}>
                         <defs>
                             <linearGradient id={gradientId} x1="0" y1="0" x2="1" y2="1">
@@ -80,10 +86,13 @@ export const PageWheelWedge = (props: ParentProps<PageWheelWedgeProps>) => {
 };
 
 export const PageWheelCard = (props: ParentProps<PageWheelCardProps>) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.wheelCard}
             classList={{
+                [getLayerClass()]: true,
                 [styles.wheelCardBack]: access(props.state).face === "back",
                 [styles.isSelected]: access(props.state).isSelected,
             }}
@@ -99,13 +108,23 @@ export const PageWheelCard = (props: ParentProps<PageWheelCardProps>) => {
     );
 };
 
-export const PageWheelStack = (props: ParentProps) => <div class={styles.wheelStack}>{props.children}</div>;
+export const PageWheelStack = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
 
-export const PageWheelMount = (props: ParentProps) => <div class={styles.wheelMount}>{props.children}</div>;
+    return <div class={[styles.wheelStack, getLayerClass()].join(" ")}>{props.children}</div>;
+};
+
+export const PageWheelMount = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
+
+    return <div class={[styles.wheelMount, getLayerClass()].join(" ")}>{props.children}</div>;
+};
 
 export const PageWheelPip = (props: PageWheelPipProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
-        <div class={PIP_SIDE_STYLES[access(props.side)]} aria-hidden="true">
+        <div class={[PIP_SIDE_STYLES[access(props.side)], getLayerClass()].join(" ")} aria-hidden="true">
             <svg class={styles.wheelPipShape} viewBox="0 0 20 20">
                 <path d={PIP_PATH} />
             </svg>
@@ -113,15 +132,26 @@ export const PageWheelPip = (props: PageWheelPipProps) => {
     );
 };
 
-export const PageWheelCenter = (props: ParentProps) => <div class={styles.wheelCenter}>{props.children}</div>;
+export const PageWheelCenter = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
 
-export const PageWheelBar = (props: ParentProps) => <div class={styles.wheelBar}>{props.children}</div>;
+    return <div class={[styles.wheelCenter, getLayerClass()].join(" ")}>{props.children}</div>;
+};
+
+export const PageWheelBar = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
+
+    return <div class={[styles.wheelBar, getLayerClass()].join(" ")}>{props.children}</div>;
+};
 
 export const PageWheelSpin = (props: PageWheelSpinProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.wheelSpin}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isActive]: access(props.flags).isActive,
                 [styles.isDisabled]: access(props.flags).isDisabled,

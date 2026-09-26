@@ -15,6 +15,7 @@ import { FormationKnobs } from "../../Knobs/Formations.const";
 import { PlacementLayoutKnobs } from "../../Knobs/PlacementLayouts.const";
 import { ProximityEffectKnobs } from "../../Knobs/ProximityEffects.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
@@ -22,7 +23,6 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsDivider, PagePropsGroups, PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { NO_SAMPLE_KEY } from "../../PageComponents/SampleGroups/SampleGroups.const";
 import type { WithNoSample } from "../../PageComponents/SampleGroups/SampleGroups.types";
-import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { DefaultExample } from "./Examples/Default";
 import type { FormationExampleProps } from "./FormationPage.types";
 

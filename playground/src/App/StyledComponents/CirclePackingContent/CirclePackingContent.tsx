@@ -1,7 +1,9 @@
+import type { ParentProps } from "solid-js";
 import { createUniqueId } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { PageCirclePackingCircleProps, PageCirclePackingLabelProps } from "./CirclePackingContent.types";
 
 import * as styles from "./CirclePackingContent.css";
@@ -10,6 +12,8 @@ const LABEL_SHOWN = 1;
 const LABEL_HIDDEN = 0;
 
 export const PageCirclePackingCircle = (props: PageCirclePackingCircleProps) => {
+    const getLayerClass = useLayerClass();
+
     const gradientId = createUniqueId();
 
     return (
@@ -37,7 +41,7 @@ export const PageCirclePackingCircle = (props: PageCirclePackingCircleProps) => 
 
             <circle
                 class={styles.circlePackingCircle}
-                classList={{ [styles.circlePackingBranch]: access(props.state).isBranch }}
+                classList={{ [getLayerClass()]: true, [styles.circlePackingBranch]: access(props.state).isBranch }}
                 style={{ fill: `url(#${gradientId})` }}
                 cx={access(props.state).x}
                 cy={access(props.state).y}
@@ -50,9 +54,11 @@ export const PageCirclePackingCircle = (props: PageCirclePackingCircleProps) => 
 };
 
 export const PageCirclePackingLabel = (props: PageCirclePackingLabelProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <text
-            class={styles.circlePackingLabel}
+            class={[styles.circlePackingLabel, getLayerClass()].join(" ")}
             style={{
                 "fill-opacity": access(props.state).isInView ? LABEL_SHOWN : LABEL_HIDDEN,
                 "stroke-opacity": access(props.state).isInView ? LABEL_SHOWN : LABEL_HIDDEN,
@@ -65,4 +71,10 @@ export const PageCirclePackingLabel = (props: PageCirclePackingLabelProps) => {
             {access(props.name)}
         </text>
     );
+};
+
+export const PageCirclePackingFrame = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
+
+    return <div class={[styles.circlePackingFrame, getLayerClass()].join(" ")}>{props.children}</div>;
 };

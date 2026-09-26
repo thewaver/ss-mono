@@ -5,10 +5,10 @@ import type { BracketOrientation, BracketRootSide } from "@thewaver/ss-component
 
 import { BracketKnobs } from "../../Knobs/Brackets.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { NOTHING_PICKED } from "./BracketPage.const";
 import type { BracketExampleProps } from "./BracketPage.types";
 import { KnockoutExample } from "./Examples/Knockout";

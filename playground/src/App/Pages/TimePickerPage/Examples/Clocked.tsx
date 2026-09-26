@@ -5,13 +5,13 @@ import { TimePicker, access } from "@thewaver/ss-components";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import { CLOCK_TRIGGER_LABEL, TIME_SEGMENT_HINTS } from "../../../PageComponents/Announcements/Announcements.const";
+import { PageMeridiemToggle } from "../../../PageComponents/MeridiemToggle/MeridiemToggle";
 import {
     PageClockColumn,
     PageClockFrame,
     PageClockOption,
     PageClockUnit,
 } from "../../../StyledComponents/ClockContent/ClockContent";
-import { PageMeridiemToggle } from "../../../StyledComponents/MeridiemToggle/MeridiemToggle";
 import {
     PageTextFieldContent,
     computePageTextFieldTextStyle,

@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const paragraphs = style({
@@ -11,12 +12,12 @@ export const paragraphs = style({
 export const panel = style({
     borderRadius: themeVars.borderRadius.full,
     padding: themeVars.spacing.full,
-    backgroundColor: themeVars.color.background.dark,
+    backgroundColor: layerVars.main,
 });
 
 export const fade = style({
     height: 60,
-    backgroundImage: `linear-gradient(to bottom, transparent, ${themeVars.color.background.dark} 75%)`,
+    backgroundImage: `linear-gradient(to bottom, transparent, ${layerVars.main} 75%)`,
 });
 
 export const scrollBox = style({

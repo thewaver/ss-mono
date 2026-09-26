@@ -303,6 +303,8 @@ export * from "./Essentials/Stepper/Stepper.const";
 export type * from "./Essentials/Stepper/Stepper.types";
 export * from "./Essentials/Table/Table";
 export * from "./Essentials/Table/Table.const";
+export * from "./Essentials/Table/Table.context";
+export type * from "./Essentials/Table/Table.context.types";
 export type * from "./Essentials/Table/Table.types";
 export * from "./Essentials/Table/Table.utils";
 export * from "./Essentials/TableOfContents/TableOfContents";

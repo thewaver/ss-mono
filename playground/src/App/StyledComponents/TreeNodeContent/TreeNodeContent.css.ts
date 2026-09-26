@@ -1,6 +1,7 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isBranch = style({});
 export const isExpanded = style({});
@@ -24,10 +25,10 @@ export const treeNodeContent = style({
         [`&.${isCategory}`]: {
             textTransform: "uppercase",
             fontWeight: "bold",
-            color: `hsl(from ${themeVars.color.surface.contrast} h 50% 75%)`,
+            color: `hsl(from ${layerVars.contrast} h 50% 75%)`,
         },
         [`&.${isHovered}`]: {
-            backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
+            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
         },
         [`&.${isSelected}`]: {
             color: themeVars.color.primary.main,
@@ -81,9 +82,9 @@ export const treeRadialNode = style({
     width: "100%",
     height: "100%",
     borderRadius: "50%",
-    backgroundColor: themeVars.color.surface.dark,
+    backgroundColor: layerVars.main,
     boxShadow: themeVars.shadow.small,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     whiteSpace: "nowrap",
     transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,

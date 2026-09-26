@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isCurrent = style({});
 export const isHovered = style({});
@@ -14,7 +15,7 @@ const cellBase = style({
     minWidth: 32,
     height: 32,
     paddingInline: themeVars.spacing.half,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     borderRadius: themeVars.borderRadius.half,
     fontSize: themeVars.fontSize.small,
     transition: `color ${themeVars.animation.duration}, filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
@@ -36,7 +37,7 @@ const cellBase = style({
 export const paginatorPage = style([
     cellBase,
     {
-        backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
+        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
 
         selectors: {
             [`&.${isCurrent}`]: {
@@ -50,7 +51,7 @@ export const paginatorPage = style([
 export const paginatorStep = style([
     cellBase,
     {
-        backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
+        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
     },
 ]);
 
@@ -85,8 +86,8 @@ export const paginatorWedgeCanvas = style({
 });
 
 export const paginatorWedgeShape = style({
-    fill: `rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
-    stroke: themeVars.color.surface.contrast,
+    fill: `rgb(from ${layerVars.contrast} r g b / 10%)`,
+    stroke: layerVars.contrast,
     strokeWidth: 1,
     strokeOpacity: 0.25,
     vectorEffect: "non-scaling-stroke",
@@ -139,7 +140,7 @@ export const paginatorWedgeLabel = style({
     inset: 0,
     justifyContent: "center",
     alignItems: "center",
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     textAlign: "center",
     pointerEvents: "none",
@@ -169,12 +170,12 @@ export const paginatorPanel = style({
     gap: themeVars.spacing.half,
     borderRadius: themeVars.borderRadius.half,
     padding: themeVars.spacing.full,
-    backgroundColor: themeVars.color.surface.dark,
+    backgroundColor: layerVars.main,
     fontSize: themeVars.fontSize.small,
 });
 
 export const paginatorPanelSummary = style({
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xSmall,
     opacity: 0.75,
@@ -184,9 +185,9 @@ export const paginatorPanelRow = style({
     display: "flex",
     justifyContent: "space-between",
     gap: themeVars.spacing.full,
-    borderBlockEnd: `1px solid rgb(from ${themeVars.color.surface.contrast} r g b / 15%)`,
+    borderBlockEnd: `1px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
     paddingBlock: themeVars.spacing.half,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
 
     selectors: {
         "&:last-child": {

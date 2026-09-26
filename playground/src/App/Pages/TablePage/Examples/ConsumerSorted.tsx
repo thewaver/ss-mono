@@ -3,12 +3,8 @@ import { createMemo, createSignal } from "solid-js";
 import type { TableColumn, TableSort } from "@thewaver/ss-components";
 import { Table } from "@thewaver/ss-components";
 
-import {
-    PageTableCellContent,
-    PageTableHeaderContent,
-    PageTableReorderGrip,
-    PageTableSortControl,
-} from "../../../StyledComponents/TableContent/TableContent";
+import { PageTableHeader } from "../../../PageComponents/TableHeader/TableHeader";
+import { PageTableCellContent } from "../../../StyledComponents/TableContent/TableContent";
 import { PARTS } from "../TablePage.const";
 import type { Part, TableExampleProps } from "../TablePage.types";
 
@@ -25,9 +21,7 @@ const COLUMNS: TableColumn<Part>[] = [
         header: "SKU",
         widthPx: 110,
         isSortable: true,
-        renderHeader: (getRenderProps) => (
-            <PageTableHeaderContent renderProps={getRenderProps}>{"SKU"}</PageTableHeaderContent>
-        ),
+        renderHeader: (getRenderProps) => <PageTableHeader renderProps={getRenderProps}>{"SKU"}</PageTableHeader>,
         renderCell: (getPart, getRenderProps) => (
             <PageTableCellContent renderProps={getRenderProps}>{getPart().sku}</PageTableCellContent>
         ),
@@ -37,9 +31,7 @@ const COLUMNS: TableColumn<Part>[] = [
         header: "Name",
         minWidthPx: 140,
         isSortable: true,
-        renderHeader: (getRenderProps) => (
-            <PageTableHeaderContent renderProps={getRenderProps}>{"Name"}</PageTableHeaderContent>
-        ),
+        renderHeader: (getRenderProps) => <PageTableHeader renderProps={getRenderProps}>{"Name"}</PageTableHeader>,
         renderCell: (getPart, getRenderProps) => (
             <PageTableCellContent renderProps={getRenderProps}>{getPart().name}</PageTableCellContent>
         ),
@@ -48,9 +40,7 @@ const COLUMNS: TableColumn<Part>[] = [
         id: "category",
         header: "Category",
         widthPx: 140,
-        renderHeader: (getRenderProps) => (
-            <PageTableHeaderContent renderProps={getRenderProps}>{"Category"}</PageTableHeaderContent>
-        ),
+        renderHeader: (getRenderProps) => <PageTableHeader renderProps={getRenderProps}>{"Category"}</PageTableHeader>,
         renderCell: (getPart, getRenderProps) => (
             <PageTableCellContent renderProps={getRenderProps}>{getPart().category}</PageTableCellContent>
         ),
@@ -78,8 +68,6 @@ export const ConsumerSortedExample = (props: TableExampleProps) => {
         <div class={styles.tableFrameShort}>
             <Table
                 columns={getColumns}
-                renderSortControl={(getRenderProps) => <PageTableSortControl renderProps={getRenderProps} />}
-                renderReorderGrip={() => <PageTableReorderGrip />}
                 rows={getRows}
                 sortSignal={props.sortSignal}
                 selectionSignal={props.selectionSignal}

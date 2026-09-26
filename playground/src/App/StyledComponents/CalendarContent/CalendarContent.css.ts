@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 import { FIELD_HEIGHT } from "../TextFieldContent/TextFieldContent.css";
 
 const CELL_SIZE = 46;
@@ -23,7 +24,7 @@ export const calendarDay = style({
     width: CELL_SIZE,
     height: CELL_SIZE,
     borderRadius: themeVars.borderRadius.half,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     fontVariantNumeric: "tabular-nums",
     transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,
@@ -69,7 +70,7 @@ export const calendarWeekday = style({
     justifyContent: "center",
     width: CELL_SIZE,
     height: CELL_SIZE,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textTransform: "uppercase",
     opacity: 0.75,
@@ -82,7 +83,7 @@ export const calendarTitle = style({
     height: FIELD_HEIGHT,
     paddingInline: themeVars.spacing.full,
     borderRadius: themeVars.borderRadius.half,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     fontWeight: "bold",
     whiteSpace: "nowrap",
@@ -102,7 +103,7 @@ export const calendarHeader = style({
     gap: themeVars.spacing.half,
     width: "100%",
     paddingBottom: themeVars.spacing.half,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
 });
 
@@ -113,6 +114,12 @@ export const calendarFrame = style({
     width: "fit-content",
     borderRadius: themeVars.borderRadius.full,
     padding: themeVars.spacing.full,
-    backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
+    backgroundColor: layerVars.main,
     boxShadow: themeVars.shadow.medium,
+});
+
+export const calendarCaptionFields = style({
+    display: "flex",
+    alignItems: "center",
+    gap: themeVars.spacing.half,
 });

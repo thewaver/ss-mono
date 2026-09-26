@@ -5,9 +5,9 @@ import { FLIP_CARD_AXES, FLIP_CARD_DEFAULTS } from "@thewaver/ss-components";
 
 import { FlipCardKnobs } from "../../Knobs/FlipCards.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { PressedExample } from "./Examples/Pressed";
 
 const AXIS_LABELS: Record<FlipCardAxis, string> = {

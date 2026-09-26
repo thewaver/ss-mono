@@ -2,9 +2,10 @@ import { createMemo, createSignal } from "solid-js";
 
 import { MenubarKnobs } from "../../Knobs/Menubars.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField } from "../../StyledComponents/Field/Field";
+import { useLayerClass } from "../../StyledComponents/Layer/Layer.context";
 import { DefaultExample } from "./Examples/Default";
 import { NOTHING_PICKED, VIEW_DEFAULTS } from "./MenubarPage.const";
 
@@ -23,11 +24,18 @@ export const MenubarPage = () => {
             name: "File, Edit and View",
             readout: () =>
                 `last picked: ${getLastPicked()} — with a menu open, the left and right arrows close it and open the next one; narrow the bar and a word becomes a submenu of the overflow menu`,
-            component: () => (
-                <div class={styles.bar} style={{ width: `${getBarWidth()}px` }}>
-                    <DefaultExample checkedSignal={checkedSignal} onActivate={(entry) => setLastPicked(entry.name)} />
-                </div>
-            ),
+            component: () => {
+                const getLayerClass = useLayerClass();
+
+                return (
+                    <div class={[styles.bar, getLayerClass()].join(" ")} style={{ width: `${getBarWidth()}px` }}>
+                        <DefaultExample
+                            checkedSignal={checkedSignal}
+                            onActivate={(entry) => setLastPicked(entry.name)}
+                        />
+                    </div>
+                );
+            },
             path: `${EXAMPLES_ROOT}/Default.tsx`,
         },
     ]);

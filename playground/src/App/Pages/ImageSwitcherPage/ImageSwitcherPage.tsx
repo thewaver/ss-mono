@@ -5,10 +5,10 @@ import { IMAGE_SWITCHER_DEFAULTS } from "@thewaver/ss-components";
 
 import { ImageSwitcherKnobs } from "../../Knobs/ImageSwitchers.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import knight_date from "../../knight_date.webp";
 import knight_profile from "../../knight_profile.webp";
 import { DefaultExample } from "./Examples/Default";

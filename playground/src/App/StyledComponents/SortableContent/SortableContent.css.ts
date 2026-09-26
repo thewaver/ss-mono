@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isCarried = style({});
 export const isHovered = style({});
@@ -13,9 +14,9 @@ export const sortableItemContent = style({
     alignItems: "center",
     gap: themeVars.spacing.full,
     padding: themeVars.spacing.full,
-    border: `1px solid rgb(from currentColor r g b / 25%)`,
+    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: themeVars.color.surface.dark,
+    backgroundColor: layerVars.main,
     fontSize: themeVars.fontSize.medium,
     lineHeight: 1.25,
     whiteSpace: "nowrap",
@@ -24,13 +25,13 @@ export const sortableItemContent = style({
 
     selectors: {
         [`&.${isHovered}`]: {
-            borderColor: `rgb(from currentColor r g b / 50%)`,
+            borderColor: `rgb(from ${layerVars.contrast} r g b / 50%)`,
         },
         [`&.${isCarried}`]: {
             borderStyle: "dashed",
             borderColor: themeVars.color.primary.main,
             backgroundColor: "transparent",
-            color: `rgb(from currentColor r g b / 50%)`,
+            color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
             boxShadow: "none",
             cursor: "grabbing",
         },
@@ -61,14 +62,14 @@ export const sortableSurface = style({
     position: "absolute",
     inset: `calc(-1 * ${themeVars.spacing.full})`,
     zIndex: -1,
-    border: `1px dashed rgb(from currentColor r g b / 25%)`,
+    border: `1px dashed rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.full,
     pointerEvents: "none",
     transition: `border-color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
 
     selectors: {
         [`&.${isCarrying}`]: {
-            borderColor: `rgb(from currentColor r g b / 50%)`,
+            borderColor: `rgb(from ${layerVars.contrast} r g b / 50%)`,
         },
         [`&.${isReceiving}`]: {
             borderColor: themeVars.color.primary.main,

@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isCurrent = style({});
 export const isHovered = style({});
@@ -16,8 +17,8 @@ export const carouselSlide = style({
     height: 140,
     minHeight: "100%",
     borderRadius: themeVars.borderRadius.half,
-    backgroundImage: `linear-gradient(135deg, ${themeVars.color.tooltip.dark}, ${themeVars.color.tooltip.light})`,
-    color: themeVars.color.tooltip.contrast,
+    backgroundImage: `linear-gradient(135deg, rgb(from ${layerVars.main} r g b / 50%), rgb(from ${layerVars.main} r g b / 75%))`,
+    color: layerVars.contrast,
 });
 
 export const carouselSlideTitle = style({
@@ -33,7 +34,7 @@ export const carouselSlideBack = style({
     height: "100%",
     minHeight: "100%",
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
+    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
 });
 
 export const carouselBox = style({
@@ -54,8 +55,8 @@ const controlBase = style({
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    color: themeVars.color.surface.contrast,
-    backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
+    color: layerVars.contrast,
+    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
     borderRadius: themeVars.borderRadius.half,
     transition: `color ${themeVars.animation.duration}, filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
 

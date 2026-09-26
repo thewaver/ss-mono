@@ -3,6 +3,7 @@ import type { ParentProps } from "solid-js";
 import { GlassSurface, access } from "@thewaver/ss-components";
 import { CSSUtils } from "@thewaver/ss-utils";
 
+import { PageLayer } from "../../PageComponents/Layer/Layer";
 import type { TooltipContentProps } from "./TooltipContent.types";
 
 import { BORDER_RADIUS_FULL, themeVars } from "../../Theme.css";
@@ -25,13 +26,15 @@ export const PageTooltipContent = (props: ParentProps<TooltipContentProps>) => {
                         gradient: {
                             kind: "linear",
                             angle: TINT_GRADIENT_ANGLE,
-                            colors: [{ value: themeVars.color.tooltip.dark }, { value: themeVars.color.tooltip.light }],
+                            colors: [{ value: themeVars.color.surface.dark }, { value: themeVars.color.surface.light }],
                         },
                     },
                     sheen: { specularConstant: 0 },
                 })}
             >
-                <div class={styles.tooltipBody}>{props.children}</div>
+                <div class={styles.tooltipBody}>
+                    <PageLayer level={2}>{props.children}</PageLayer>
+                </div>
             </GlassSurface>
         </div>
     );

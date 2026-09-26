@@ -2,15 +2,19 @@ import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { RadioStarContentProps } from "./RadioStarContent.types";
 
 import * as styles from "./RadioStarContent.css";
 
 export const PageRadioStarContent = (props: RadioStarContentProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.starContent}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isFilled]: access(props.isFilled),
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isDisabled]: access(props.flags).isDisabled,
@@ -22,4 +26,8 @@ export const PageRadioStarContent = (props: RadioStarContentProps) => {
     );
 };
 
-export const PageRadioStarCell = (props: ParentProps) => <div class={styles.starCell}>{props.children}</div>;
+export const PageRadioStarCell = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
+
+    return <div class={[styles.starCell, getLayerClass()].join(" ")}>{props.children}</div>;
+};

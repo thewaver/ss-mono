@@ -1,4 +1,4 @@
-import { style } from "@vanilla-extract/css";
+import { globalStyle, style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
 
@@ -35,4 +35,26 @@ export const trackedCell = style({
     overflow: "auto",
     width: trackedCellSize,
     height: trackedCellSize,
+});
+
+export const screenOverlay = style({
+    position: "fixed",
+    inset: 0,
+    pointerEvents: "none",
+    mixBlendMode: "screen",
+});
+
+globalStyle(`${screenOverlay} *`, {
+    pointerEvents: "none",
+});
+
+export const screenOverlayBox = style({
+    width: "100vw",
+    height: "100vh",
+});
+
+export const screenOverlayClose = style({
+    position: "fixed",
+    top: themeVars.spacing.double,
+    right: themeVars.spacing.double,
 });

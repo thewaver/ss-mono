@@ -5,10 +5,10 @@ import { Button, ODOMETER_DEFAULTS, OdometerReels } from "@thewaver/ss-component
 import { OdometerKnobs } from "../../Knobs/Odometers.const";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
-import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { CounterExample } from "./Examples/Counter";
 import { ReelsExample } from "./Examples/Reels";
 import type { OdometerExampleProps } from "./OdometerPage.types";

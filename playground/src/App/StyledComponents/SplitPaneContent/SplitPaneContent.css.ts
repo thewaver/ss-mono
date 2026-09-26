@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 const FRAME_MAX_WIDTH = 380;
 const PICTURE_ASPECT = 1;
@@ -13,7 +14,6 @@ const gutterBase = {
     justifyContent: "center",
     alignItems: "center",
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `rgb(from currentColor r g b / 10%)`,
     transition: `background-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
 
     selectors: {
@@ -32,8 +32,7 @@ export const columnGutter = style({ ...gutterBase, width: "100%", height: "100%"
 
 export const gutterGrip = style({
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: themeVars.color.background.contrast,
-    opacity: 0.5,
+    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 50%)`,
 });
 
 export const rowGrip = style([gutterGrip, { width: 2, height: 24 }]);
@@ -45,7 +44,8 @@ export const splitPaneBox = style({
     height: "100%",
     padding: themeVars.spacing.full,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: themeVars.color.surface.dark,
+    color: layerVars.contrast,
+    backgroundColor: layerVars.main,
     fontSize: themeVars.fontSize.small,
     overflow: "auto",
 });
@@ -55,9 +55,9 @@ export const splitPaneFrame = style({
     maxWidth: FRAME_MAX_WIDTH,
     height: 220,
     padding: themeVars.spacing.half,
-    border: `1px solid rgb(from currentColor r g b / 25%)`,
+    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.full,
-    backgroundColor: themeVars.color.background.dark,
+    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
 });
 
 export const compareFrame = style([

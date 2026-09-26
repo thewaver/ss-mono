@@ -3,6 +3,7 @@ import { Show, createUniqueId } from "solid-js";
 import { PlacementUtils, WheelMenu, access } from "@thewaver/ss-components";
 import type { PlacementRect } from "@thewaver/ss-components";
 
+import { PageLayer } from "../../../../PageComponents/Layer/Layer";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
 import type { WheelMenuExampleProps } from "../WheelMenuPage.types";
 
@@ -106,7 +107,7 @@ export const WheelExample = (props: WheelMenuExampleProps) => {
                             transition: `opacity ${getTransitionDurationMs()}ms, transform ${getTransitionDurationMs()}ms`,
                         }}
                     >
-                        {renderItems()}
+                        <PageLayer level={2}>{renderItems()}</PageLayer>
                     </div>
                 )}
                 onActivate={props.onActivate}

@@ -31,6 +31,12 @@ import { ScanlineAnimationKeyframeKnobs } from "../../Knobs/ScanlineAnimationKey
 import { ScanlineAnimationKnobs } from "../../Knobs/ScanlineAnimations.const";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import {
+    PageFileField,
+    PageGroupedSelectField,
+    PageNumberField,
+    PageSelectField,
+} from "../../PageComponents/Field/Field";
 import { PageKnobs } from "../../PageComponents/Knobs/Knobs";
 import type { Knob } from "../../PageComponents/Knobs/Knobs.types";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
@@ -38,12 +44,6 @@ import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { StressTest } from "../../PageComponents/StressTest/StressTest";
 import type { StressTestDefs } from "../../PageComponents/StressTest/StressText.types";
-import {
-    PageFileField,
-    PageGroupedSelectField,
-    PageNumberField,
-    PageSelectField,
-} from "../../StyledComponents/Field/Field";
 import knight from "../../knight.webp";
 import { BrightnessExample } from "./Examples/Brightness";
 import { GlitchExample } from "./Examples/Glitch";

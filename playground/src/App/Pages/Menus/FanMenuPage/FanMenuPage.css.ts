@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../../Theme.css";
 
 export const itemHighlighted = style({});
@@ -15,9 +16,9 @@ export const item = style({
     height: "100%",
     padding: `0 ${themeVars.spacing.full}`,
     borderRadius: themeVars.borderRadius.full,
-    backgroundColor: themeVars.color.surface.dark,
+    backgroundColor: layerVars.main,
     boxShadow: themeVars.shadow.small,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     textAlign: "center",
     transition: "background-color 120ms ease-out, color 120ms ease-out, transform 120ms ease-out",
@@ -59,7 +60,7 @@ export const shortcut = style({
     flex: "none",
     padding: `0 ${themeVars.spacing.half}`,
     borderRadius: themeVars.borderRadius.half,
-    border: "1px solid currentColor",
+    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xSmall,
     opacity: 0.75,

@@ -1,17 +1,20 @@
 import type { ParentProps } from "solid-js";
 
-import { TabPanel, access } from "@thewaver/ss-components";
-import type { TabPanelProps } from "@thewaver/ss-components";
+import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { TabCellProps, TabContentProps, TabDecorationProps, TabFloaterProps } from "./TabContent.types";
 
 import * as styles from "./TabContent.css";
 
 export const PageTabContent = (props: ParentProps<TabContentProps>) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={access(props.orientation) === "horizontal" ? styles.rowTab : styles.columnTab}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isSelected]: access(props.isSelected),
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isDisabled]: access(props.flags).isDisabled,
@@ -23,10 +26,13 @@ export const PageTabContent = (props: ParentProps<TabContentProps>) => {
 };
 
 export const PageTabCell = (props: ParentProps<TabCellProps>) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.hexTab}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isSelected]: access(props.isSelected),
                 [styles.isHovered]: access(props.flags).isHovered,
                 [styles.isDisabled]: access(props.flags).isDisabled,
@@ -38,14 +44,25 @@ export const PageTabCell = (props: ParentProps<TabCellProps>) => {
 };
 
 export const PageTabGutter = (props: TabDecorationProps) => {
-    return <div class={access(props.orientation) === "horizontal" ? styles.rowTabGutter : undefined} data-gutter />;
+    const getLayerClass = useLayerClass();
+
+    return (
+        <div
+            class={[access(props.orientation) === "horizontal" ? styles.rowTabGutter : undefined, getLayerClass()].join(
+                " ",
+            )}
+            data-gutter
+        />
+    );
 };
 
 export const PageTabHexFloater = (props: TabFloaterProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.hexTabFloater}
-            classList={{ [styles.isVisible]: access(props.visibilityTarget) === 1 }}
+            classList={{ [getLayerClass()]: true, [styles.isVisible]: access(props.visibilityTarget) === 1 }}
             style={{ "transition-duration": `${access(props.transitionDurationMs)}ms` }}
             data-floater
         />
@@ -53,20 +70,20 @@ export const PageTabHexFloater = (props: TabFloaterProps) => {
 };
 
 export const PageTabFloater = (props: TabFloaterProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={access(props.orientation) === "horizontal" ? styles.rowTabFloater : styles.columnTabFloater}
-            classList={{ [styles.isVisible]: access(props.visibilityTarget) === 1 }}
+            classList={{ [getLayerClass()]: true, [styles.isVisible]: access(props.visibilityTarget) === 1 }}
             style={{ "transition-duration": `${access(props.transitionDurationMs)}ms` }}
             data-floater
         />
     );
 };
 
-export const PageTabPanel = (props: TabPanelProps) => {
-    return (
-        <TabPanel id={props.id} tabId={props.tabId}>
-            <div class={styles.tabPanel}>{props.children}</div>
-        </TabPanel>
-    );
+export const PageTabPanelContent = (props: ParentProps) => {
+    const getLayerClass = useLayerClass();
+
+    return <div class={[styles.tabPanel, getLayerClass()].join(" ")}>{props.children}</div>;
 };

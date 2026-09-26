@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const root = style({
@@ -18,7 +19,7 @@ export const raiseRow = style({
 
 export const note = style({
     maxWidth: 640,
-    color: themeVars.color.background.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     opacity: 0.75,
 });

@@ -7,14 +7,7 @@ export const fieldBox = style({
 });
 
 export const foreignInput = style({
-    width: 240,
-    color: themeVars.color.control.background.contrast,
-    backgroundColor: themeVars.color.control.background.main,
-    border: `1px solid ${themeVars.color.background.contrast}`,
-    borderRadius: themeVars.borderRadius.half,
-    padding: themeVars.spacing.half,
-    fontFamily: "inherit",
-    fontSize: themeVars.fontSize.small,
+    all: "revert",
 });
 
 export const formStack = style({

@@ -1,5 +1,6 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../../StyledComponents/Layer/Layer.css";
 import { FOCUS_RING_WIDTH, themeVars } from "../../../Theme.css";
 
 const panel = (from: string, to: string) => `linear-gradient(135deg, ${from}, ${to})`;
@@ -24,8 +25,8 @@ export const content = style({
     gap: themeVars.spacing.half,
     height: 200,
     padding: themeVars.spacing.double,
-    backgroundImage: panel(themeVars.color.surface.dark, themeVars.color.surface.light),
-    color: themeVars.color.surface.contrast,
+    backgroundColor: layerVars.main,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
 });
 
@@ -48,7 +49,7 @@ export const frostedCover = style({
     width: "100%",
     height: "100%",
     backdropFilter: "blur(8px) saturate(0.4)",
-    backgroundColor: [themeVars.color.surface.dark, `rgb(from ${themeVars.color.surface.dark} r g b / 50%)`],
+    backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
 });
 
 export const promptCover = style({

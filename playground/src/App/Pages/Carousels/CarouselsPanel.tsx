@@ -3,9 +3,9 @@ import { Show } from "solid-js";
 import { CAROUSEL_ORIENTATIONS } from "@thewaver/ss-components";
 
 import { CarouselKnobs } from "../../Knobs/Carousels.const";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { FIELD_WIDTH, ORIENTATION_FIELD_WIDTH, ORIENTATION_LABELS } from "./Carousels.const";
 import type { CarouselsControls } from "./Carousels.types";
 

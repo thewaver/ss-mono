@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 const OPTION_WIDTH = 52;
 const OPTION_HEIGHT = 34;
@@ -18,7 +19,7 @@ export const clockOption = style({
     width: OPTION_WIDTH,
     height: OPTION_HEIGHT,
     borderRadius: themeVars.borderRadius.half,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     fontVariantNumeric: "tabular-nums",
     transition: `background-color ${themeVars.animation.duration}, color ${themeVars.animation.duration}`,
@@ -46,7 +47,7 @@ export const clockUnit = style({
     justifyContent: "center",
     width: OPTION_WIDTH,
     height: OPTION_HEIGHT,
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textTransform: "uppercase",
     opacity: 0.5,
@@ -67,6 +68,6 @@ export const clockFrame = style({
     width: "fit-content",
     borderRadius: themeVars.borderRadius.full,
     padding: themeVars.spacing.full,
-    backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
+    backgroundColor: layerVars.main,
     boxShadow: themeVars.shadow.medium,
 });

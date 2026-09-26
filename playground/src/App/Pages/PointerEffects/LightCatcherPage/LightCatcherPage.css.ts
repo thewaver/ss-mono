@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../../Theme.css";
 
 const panel = (from: string, to: string) => `linear-gradient(135deg, ${from}, ${to})`;
@@ -18,8 +19,8 @@ export const panelCard = style({
     height: 150,
     padding: themeVars.spacing.full,
     borderRadius: themeVars.borderRadius.full,
-    backgroundImage: panel(themeVars.color.surface.dark, themeVars.color.surface.light),
-    color: themeVars.color.surface.contrast,
+    backgroundColor: layerVars.main,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     textAlign: "center",
     userSelect: "none",

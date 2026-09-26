@@ -1,9 +1,9 @@
 import { MOSAIC_SIZE_ANCHORS } from "@thewaver/ss-components";
 
 import { MosaicKnobs } from "../../Knobs/Mosaics.const";
+import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { FIELD_WIDTH } from "./Mosaics.const";
 import type { MosaicsControls } from "./Mosaics.types";
 

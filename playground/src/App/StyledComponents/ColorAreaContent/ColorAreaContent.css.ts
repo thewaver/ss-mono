@@ -1,6 +1,7 @@
 import { createVar, style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 import { FIELD_HEIGHT, FIELD_PADDING } from "../TextFieldContent/TextFieldContent.css";
 
 export const hueVar = createVar();
@@ -22,7 +23,7 @@ export const colorAreaSquare = style({
         "linear-gradient(to top, #000, transparent)",
         `linear-gradient(to right, #fff, hsl(${hueVar} 100% 50%))`,
     ].join(","),
-    boxShadow: `inset 0 0 0 1px rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
+    boxShadow: `inset 0 0 0 1px rgb(from ${layerVars.contrast} r g b / 25%)`,
     cursor: "crosshair",
 
     selectors: {
@@ -76,7 +77,7 @@ export const hueTrack = style({
     backgroundImage: `linear-gradient(to right, ${[0, 60, 120, 180, 240, 300, 360]
         .map((hue) => `hsl(${hue} 100% 50%)`)
         .join(",")})`,
-    boxShadow: `inset 0 0 0 1px rgb(from ${themeVars.color.surface.contrast} r g b / 25%)`,
+    boxShadow: `inset 0 0 0 1px rgb(from ${layerVars.contrast} r g b / 25%)`,
 });
 
 export const hueThumb = style({
@@ -105,7 +106,7 @@ export const colorSwatch = style({
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: swatchVar,
     backgroundClip: "padding-box",
-    boxShadow: `inset 0 0 0 1px rgb(from ${themeVars.color.surface.contrast} r g b / 35%)`,
+    boxShadow: `inset 0 0 0 1px rgb(from ${layerVars.contrast} r g b / 25%)`,
 });
 
 export const colorPickerPopup = style({
@@ -115,8 +116,8 @@ export const colorPickerPopup = style({
     width: 360,
     borderRadius: themeVars.borderRadius.full,
     padding: themeVars.spacing.double,
-    color: themeVars.color.surface.contrast,
-    backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
+    color: layerVars.contrast,
+    backgroundColor: layerVars.main,
     backdropFilter: "brightness(75%) blur(10px)",
     boxShadow: themeVars.shadow.large,
 });
@@ -137,7 +138,7 @@ const checkerboard = {
 export const colorSwatchChecker = style({
     ...checkerboard,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: "black",
+    backgroundColor: layerVars.main,
 });
 
 export const colorChannels = style({
@@ -154,7 +155,7 @@ export const colorChannel = style({
 });
 
 export const colorChannelLabel = style({
-    color: themeVars.color.surface.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textTransform: "uppercase",
     opacity: 0.5,
@@ -175,11 +176,11 @@ export const colorFieldTrigger = style({
     width: 180,
     height: FIELD_HEIGHT,
     boxShadow: themeVars.shadow.small,
-    border: `2px solid rgb(from currentColor r g b / 25%)`,
+    border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.half,
     paddingInline: FIELD_PADDING,
-    backgroundColor: "black",
-    color: themeVars.color.surface.contrast,
+    backgroundColor: layerVars.main,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.medium,
     fontVariantNumeric: "tabular-nums",
     transition: `filter ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}`,
@@ -200,7 +201,7 @@ export const colorPreviewChecker = style({
     width: "100%",
     height: 28,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: "black",
+    backgroundColor: layerVars.main,
 });
 
 export const colorPreview = style({
@@ -208,5 +209,5 @@ export const colorPreview = style({
     height: "100%",
     borderRadius: themeVars.borderRadius.half,
     backgroundColor: swatchVar,
-    boxShadow: `inset 0 0 0 1px rgb(from ${themeVars.color.surface.contrast} r g b / 35%)`,
+    boxShadow: `inset 0 0 0 1px rgb(from ${layerVars.contrast} r g b / 25%)`,
 });

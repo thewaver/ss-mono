@@ -1,7 +1,7 @@
 import { WheelKnobs } from "../../Knobs/Wheels.const";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { FIELD_WIDTH, SPIN_STYLE_KEYS } from "./Wheels.const";
 import type { WheelsControls } from "./Wheels.types";
 

@@ -1,5 +1,6 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../../Theme.css";
 
 const panel = (from: string, to: string) => `linear-gradient(135deg, ${from}, ${to})`;
@@ -29,7 +30,7 @@ export const prize = style({
     display: "grid",
     placeItems: "center",
     padding: themeVars.spacing.double,
-    backgroundImage: panel(themeVars.color.surface.dark, themeVars.color.surface.light),
+    backgroundColor: layerVars.main,
     color: themeVars.color.primary.main,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xLarge,
@@ -49,8 +50,8 @@ export const pane = style({
     justifyContent: "center",
     gap: themeVars.spacing.half,
     padding: themeVars.spacing.double,
-    backgroundImage: panel(themeVars.color.surface.dark, themeVars.color.surface.light),
-    color: themeVars.color.surface.contrast,
+    backgroundColor: layerVars.main,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
 });
 
@@ -63,7 +64,7 @@ export const frost = style({
     width: "100%",
     height: "100%",
     backdropFilter: "blur(8px) saturate(0.4)",
-    backgroundColor: [themeVars.color.surface.dark, `rgb(from ${themeVars.color.surface.dark} r g b / 50%)`],
+    backgroundColor: [layerVars.main, `rgb(from ${layerVars.main} r g b / 50%)`],
 });
 
 export const coin = style({
@@ -92,7 +93,7 @@ export const windowPrize = style({
     display: "grid",
     placeItems: "center",
     padding: themeVars.spacing.double,
-    backgroundImage: panel(themeVars.color.surface.dark, themeVars.color.surface.light),
+    backgroundColor: layerVars.main,
     color: themeVars.color.primary.main,
     fontFamily: "monospace",
     fontSize: themeVars.fontSize.xLarge,

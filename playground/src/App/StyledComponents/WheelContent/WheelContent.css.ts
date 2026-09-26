@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 const SPIN_SIZE = 84;
 const PIP_SIZE = 20;
@@ -26,7 +27,7 @@ export const wheelWedgeSVG = style({
 });
 
 export const wheelWedgeShape = style({
-    fill: themeVars.color.control.background.main,
+    fill: layerVars.main,
     stroke: themeVars.color.primary.main,
     strokeWidth: 1,
     strokeLinejoin: "round",
@@ -48,7 +49,7 @@ export const wheelWedgeLabel = style({
     justifyContent: "center",
     alignItems: "center",
     gap: "0.5em",
-    color: themeVars.color.control.background.contrast,
+    color: layerVars.contrast,
     lineHeight: 1.2,
     textAlign: "center",
     textWrap: "balance",
@@ -100,7 +101,7 @@ export const wheelPipShape = style({
     display: "block",
     width: "100%",
     height: "100%",
-    fill: themeVars.color.control.background.main,
+    fill: layerVars.main,
     stroke: themeVars.color.secondary.main,
     strokeWidth: 2,
     strokeLinejoin: "round",
@@ -167,9 +168,9 @@ export const wheelCard = style({
     width: "100%",
     height: "100%",
     borderRadius: themeVars.borderRadius.half,
-    backgroundImage: `linear-gradient(160deg, ${themeVars.color.control.background.main}, ${themeVars.color.control.background.main})`,
+    backgroundImage: `linear-gradient(160deg, ${layerVars.main}, ${layerVars.main})`,
     border: `2px solid ${themeVars.color.primary.main}`,
-    color: themeVars.color.control.background.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.small,
     textAlign: "center",
 
@@ -183,7 +184,7 @@ export const wheelCard = style({
 });
 
 export const wheelCardBack = style({
-    backgroundImage: `repeating-linear-gradient(45deg, ${themeVars.color.primary.main} 0 6px, ${themeVars.color.control.background.main} 6px 12px)`,
+    backgroundImage: `repeating-linear-gradient(45deg, ${themeVars.color.primary.main} 0 6px, ${layerVars.main} 6px 12px)`,
 });
 
 export const wheelCardRank = style({

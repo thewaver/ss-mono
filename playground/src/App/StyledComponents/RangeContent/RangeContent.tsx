@@ -2,6 +2,7 @@ import { For } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { RangeContentProps } from "./RangeContent.types";
 
 import * as styles from "./RangeContent.css";
@@ -14,6 +15,8 @@ const center = (ratio: number) =>
     `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE / 2}px)`;
 
 export const PageRangeContent = (props: RangeContentProps) => {
+    const getLayerClass = useLayerClass();
+
     const getOrientation = () => access(props.renderProps).orientation;
 
     const getLength = () => access(props.length) ?? DEFAULT_RANGE_CONTENT_LENGTH;
@@ -28,7 +31,7 @@ export const PageRangeContent = (props: RangeContentProps) => {
         <div
             class={[styles.rangeContent, styles.rangeContentVariants[getOrientation()]].join(" ")}
             style={getOrientation() === "vertical" ? { height: `${getLength()}px` } : { width: `${getLength()}px` }}
-            classList={{ [styles.isDisabled]: access(props.renderProps).isDisabled }}
+            classList={{ [getLayerClass()]: true, [styles.isDisabled]: access(props.renderProps).isDisabled }}
         >
             <div class={[styles.rangeTrack, styles.rangeTrackVariants[getOrientation()]].join(" ")} />
 

@@ -6,10 +6,10 @@ import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components
 import { SatelliteKnobs } from "../../Knobs/Satellites.const";
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageMeasureBox } from "../../PageComponents/MeasureBox/MeasureBox";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageCheckField, PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { BadgeExample } from "./Examples/Badge";
 import { DefaultExample } from "./Examples/Default";
 import { SeveralExample } from "./Examples/Several";

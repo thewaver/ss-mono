@@ -1,11 +1,12 @@
 import { style } from "@vanilla-extract/css";
 
+import { layerVars } from "../../StyledComponents/Layer/Layer.css";
 import { themeVars } from "../../Theme.css";
 
 export const frame = style({
     height: 160,
     borderRadius: themeVars.borderRadius.full,
-    backgroundColor: themeVars.color.background.dark,
+    backgroundColor: layerVars.main,
 });
 
 export const frameBody = style({
@@ -27,7 +28,7 @@ export const controlRow = style({
 export const panel = style({
     height: 180,
     borderRadius: themeVars.borderRadius.full,
-    backgroundColor: themeVars.color.background.dark,
+    backgroundColor: layerVars.main,
 });
 
 export const panelBody = style({

@@ -2,15 +2,19 @@ import { Show } from "solid-js";
 
 import { access } from "@thewaver/ss-components";
 
+import { useLayerClass } from "../Layer/Layer.context";
 import type { ColorInputContentProps } from "./ColorInputContent.types";
 
 import * as styles from "./ColorInputContent.css";
 
 export const PageColorInputContent = (props: ColorInputContentProps) => {
+    const getLayerClass = useLayerClass();
+
     return (
         <div
             class={styles.colorInputContent}
             classList={{
+                [getLayerClass()]: true,
                 [styles.isHovered]: access(props.renderProps).isHovered,
                 [styles.isDisabled]: access(props.renderProps).isDisabled,
                 [styles.hasError]: access(props.renderProps).hasError,

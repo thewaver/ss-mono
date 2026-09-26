@@ -3,7 +3,7 @@ import type { MaybeAccessor } from "@thewaver/ss-components";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import { TIME_SEGMENT_HINTS } from "../../../PageComponents/Announcements/Announcements.const";
-import { PageMeridiemToggle } from "../../../StyledComponents/MeridiemToggle/MeridiemToggle";
+import { PageMeridiemToggle } from "../../../PageComponents/MeridiemToggle/MeridiemToggle";
 import {
     PageTextFieldContent,
     computePageTextFieldTextStyle,

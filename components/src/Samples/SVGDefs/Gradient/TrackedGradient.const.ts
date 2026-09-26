@@ -4,9 +4,9 @@ const RIPPLE_SOURCE_SCALE = 0.25;
 
 export namespace TrackedGradientDefaults {
     export const BAND_DEFAULTS = {
-        coreStop: 50,
-        coreAlpha: 0.75,
-        falloffSpread: 25,
+        coreStop: 48,
+        coreAlpha: 0.5,
+        falloffSpread: 24,
         falloffAlpha: 0.25,
         bandTravel: 1,
     };
@@ -21,7 +21,14 @@ export namespace TrackedGradientDefaults {
 
     export const HAND_TRAIL_CYCLING_DEFAULTS = { ...HAND_TRAIL_DEFAULTS, ageColorSpan: 0.5, cycleMs: 1000 };
 
-    export const SPOT_DEFAULTS = { glowScale: 1.5, coreStop: 5, coreAlpha: 0.75, falloffStop: 40, falloffAlpha: 0.25 };
+    export const SPOT_DEFAULTS = {
+        circular: true,
+        glowScale: 0.8,
+        coreStop: 4,
+        coreAlpha: 0.5,
+        falloffStop: 32,
+        falloffAlpha: 0.25,
+    };
 
     export const SPOT_FLARE_DEFAULTS = {
         ...SPOT_DEFAULTS,
@@ -32,8 +39,9 @@ export namespace TrackedGradientDefaults {
     };
 
     export const SPOT_RIPPLE_DEFAULTS = {
+        circular: true,
         sourceScale: RIPPLE_SOURCE_SCALE,
-        sourceStop: 25,
+        sourceStop: 8,
         sourceAlpha: 0.5,
         rippleCount: 8,
         rippleSpacingRatio: 0.15,
@@ -48,15 +56,7 @@ export namespace TrackedGradientDefaults {
 
     export const SPOT_RIPPLE_CYCLING_DEFAULTS = { ...SPOT_RIPPLE_DEFAULTS, cycleMs: 1000 };
 
-    export const SPOT_TRAIL_DEFAULTS = {
-        glowScale: 0.8,
-        trailAlpha: 0.25,
-        trailDecay: 2.2,
-        coreStop: 5,
-        coreAlpha: 0.75,
-        falloffStop: 30,
-        falloffAlpha: 0.25,
-    };
+    export const SPOT_TRAIL_DEFAULTS = { ...SPOT_DEFAULTS, trailAlpha: 0.25, trailDecay: 2.2 };
 
     export const SPOT_TRAIL_CYCLING_DEFAULTS = { ...SPOT_TRAIL_DEFAULTS, ageColorSpan: 0.5, cycleMs: 1000 };
 

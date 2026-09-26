@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const mosaicTile = style({
     display: "flex",
@@ -47,7 +48,7 @@ export const mosaicCaption = style({
     left: 0,
     padding: themeVars.spacing.half,
     background: "rgba(0, 0, 0, 0.55)",
-    color: themeVars.color.background.contrast,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     textAlign: "center",
 });

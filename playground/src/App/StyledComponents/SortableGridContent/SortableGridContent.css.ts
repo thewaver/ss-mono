@@ -1,6 +1,7 @@
 import { createVar, globalStyle, style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isCarried = style({});
 export const isHovered = style({});
@@ -15,18 +16,18 @@ export const tileHue = createVar();
 
 export const sortableGridCell = style({
     flex: "1 1 auto",
-    border: `1px solid rgb(from currentColor r g b / 15%)`,
+    border: `1px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: `rgb(from currentColor r g b / 5%)`,
+    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
 
     selectors: {
         [`&.${isOdd}`]: {
-            backgroundColor: `rgb(from currentColor r g b / 10%)`,
+            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
         },
         [`&.${isBlocked}`]: {
-            borderColor: `rgb(from currentColor r g b / 45%)`,
-            backgroundColor: `rgb(from currentColor r g b / 30%)`,
-            backgroundImage: `repeating-linear-gradient(45deg, rgb(from currentColor r g b / 35%) 0 3px, transparent 3px 7px)`,
+            borderColor: `rgb(from ${layerVars.contrast} r g b / 50%)`,
+            backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
+            backgroundImage: `repeating-linear-gradient(45deg, rgb(from ${layerVars.contrast} r g b / 35%) 0 3px, transparent 3px 7px)`,
         },
     },
 });
@@ -56,7 +57,7 @@ export const sortableGridItemShape = style({
 });
 
 export const sortableGridItemOutline = style({
-    fill: themeVars.color.surface.light,
+    fill: layerVars.main,
     stroke: `rgb(from ${themeVars.color.secondary.main} r g b / 50%)`,
     strokeWidth: 2,
     transition: `fill ${themeVars.animation.duration}, stroke ${themeVars.animation.duration}`,
@@ -145,14 +146,14 @@ export const sortableGridSurface = style({
     position: "absolute",
     inset: `calc(-1 * ${themeVars.spacing.half})`,
     zIndex: -1,
-    border: `1px dashed rgb(from currentColor r g b / 25%)`,
+    border: `1px dashed rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.full,
     pointerEvents: "none",
     transition: `border-color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
 
     selectors: {
         [`&.${isCarrying}`]: {
-            borderColor: `rgb(from currentColor r g b / 50%)`,
+            borderColor: `rgb(from ${layerVars.contrast} r g b / 50%)`,
         },
         [`&.${isReceiving}`]: {
             borderColor: themeVars.color.primary.main,

@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 const ZONE_WIDTH = 320;
 const ZONE_HEIGHT = 120;
@@ -22,9 +23,9 @@ export const fileDropZoneContent = style({
     width: ZONE_WIDTH,
     height: ZONE_HEIGHT,
     padding: themeVars.spacing.full,
-    border: `${ZONE_BORDER}px dashed rgb(from currentColor r g b / 25%)`,
+    border: `${ZONE_BORDER}px dashed rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.full,
-    backgroundColor: themeVars.color.control.background.main,
+    backgroundColor: layerVars.main,
     fontSize: themeVars.fontSize.medium,
     textAlign: "center",
     transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}`,
@@ -61,7 +62,7 @@ export const fileDropZoneNames = style({
 
     selectors: {
         [`&.${isEmpty}`]: {
-            color: `rgb(from currentColor r g b / 50%)`,
+            color: `rgb(from ${layerVars.contrast} r g b / 50%)`,
             fontStyle: "italic",
         },
     },

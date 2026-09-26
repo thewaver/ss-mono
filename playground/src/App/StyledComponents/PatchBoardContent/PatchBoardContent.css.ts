@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { FOCUS_RING_WIDTH, themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isCarried = style({});
 export const isHovered = style({});
@@ -23,8 +24,8 @@ export const patchNode = style({
     padding: themeVars.spacing.full,
     border: `1px solid rgb(from ${themeVars.color.primary.main} r g b / 50%)`,
     borderRadius: themeVars.borderRadius.half,
-    background: `linear-gradient(215deg, ${themeVars.color.surface.light}, ${themeVars.color.surface.dark})`,
-    color: themeVars.color.surface.contrast,
+    backgroundColor: layerVars.main,
+    color: layerVars.contrast,
     boxShadow: themeVars.shadow.small,
     cursor: "grab",
     transition: `border-color ${themeVars.animation.duration}, box-shadow ${themeVars.animation.duration}`,
@@ -71,7 +72,7 @@ export const patchSocket = style({
     boxSizing: "border-box",
     borderRadius: "50%",
     border: `2px solid ${themeVars.color.primary.main}`,
-    background: themeVars.color.control.background.main,
+    background: layerVars.main,
     cursor: "crosshair",
     transition: `background ${themeVars.animation.duration}, border-color ${themeVars.animation.duration}, transform ${themeVars.animation.duration}`,
 

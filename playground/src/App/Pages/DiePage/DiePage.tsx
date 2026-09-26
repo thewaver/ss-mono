@@ -4,9 +4,9 @@ import { DIE_DEFAULTS, DieShapes, MediaQueryMonitorUtils } from "@thewaver/ss-co
 
 import { DieKnobs } from "../../Knobs/Dice.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { TabletopExample } from "./Examples/Tabletop";
 
 const EXAMPLES_ROOT = "/src/App/Pages/DiePage/Examples";

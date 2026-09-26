@@ -5,10 +5,10 @@ import { Button } from "@thewaver/ss-components";
 
 import { BreadcrumbKnobs } from "../../Knobs/Breadcrumbs.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
-import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
 import { TRAIL } from "./BreadcrumbsPage.const";
 import type { BreadcrumbsExampleProps, CrumbValue } from "./BreadcrumbsPage.types";
 import { BareExample } from "./Examples/Bare";

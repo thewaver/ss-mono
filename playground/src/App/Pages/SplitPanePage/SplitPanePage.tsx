@@ -4,10 +4,10 @@ import { Button, SPLIT_PANE_DEFAULTS } from "@thewaver/ss-components";
 
 import { SplitPaneKnobs } from "../../Knobs/SplitPanes.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
-import { PageCheckField, PageNumberField } from "../../StyledComponents/Field/Field";
 import { BoundedExample } from "./Examples/Bounded";
 import { CompareExample } from "./Examples/Compare";
 import { CrampedExample } from "./Examples/Cramped";

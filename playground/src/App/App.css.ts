@@ -1,5 +1,6 @@
 import { globalStyle, style } from "@vanilla-extract/css";
 
+import { layerVars } from "./StyledComponents/Layer/Layer.css";
 import { themeVars } from "./Theme.css";
 
 export const appRoot = style({
@@ -154,8 +155,8 @@ export const dependencySummary = style({
     gap: themeVars.spacing.half,
     padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundImage: `linear-gradient(45deg, ${themeVars.color.tooltip.dark}, ${themeVars.color.tooltip.light})`,
-    color: themeVars.color.tooltip.contrast,
+    backgroundImage: `linear-gradient(45deg, rgb(from ${layerVars.main} r g b / 50%), rgb(from ${layerVars.main} r g b / 75%))`,
+    color: layerVars.contrast,
     fontFamily: "monospace",
     whiteSpace: "nowrap",
     transition: `filter ${themeVars.animation.duration}`,
@@ -194,11 +195,11 @@ export const dependencyLabel = style({
 const dependencyChip = style({
     padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
     borderRadius: themeVars.borderRadius.half,
-    backgroundImage: `linear-gradient(45deg, ${themeVars.color.tooltip.dark}, ${themeVars.color.tooltip.light})`,
+    backgroundImage: `linear-gradient(45deg, rgb(from ${layerVars.main} r g b / 50%), rgb(from ${layerVars.main} r g b / 75%))`,
     fontFamily: "monospace",
 });
 
-export const dependencyName = style([dependencyChip, { color: themeVars.color.tooltip.contrast }]);
+export const dependencyName = style([dependencyChip, { color: layerVars.contrast }]);
 
 export const dependencyLink = style([
     dependencyChip,

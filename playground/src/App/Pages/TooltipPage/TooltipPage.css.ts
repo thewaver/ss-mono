@@ -11,24 +11,7 @@ export const anchorRow = style({
 });
 
 export const anchorButton = style({
-    color: themeVars.color.primary.contrast,
-    backgroundColor: themeVars.color.primary.main,
-    border: "none",
-    borderRadius: themeVars.borderRadius.full,
-    padding: `${themeVars.spacing.half} ${themeVars.spacing.full}`,
-    fontFamily: "inherit",
-    fontSize: themeVars.fontSize.small,
-    cursor: "pointer",
-
-    selectors: {
-        "&:hover": {
-            filter: themeVars.hover.filter,
-        },
-        "&:focus-visible": {
-            outline: `2px solid ${themeVars.color.outline.main}`,
-            outlineOffset: 2,
-        },
-    },
+    all: "revert",
 });
 
 export const sentence = style({

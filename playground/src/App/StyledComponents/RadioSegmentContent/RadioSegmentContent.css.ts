@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isChecked = style({});
 export const isHovered = style({});
@@ -11,9 +12,9 @@ export const isVisible = style({});
 export const segmentGroup = style({
     width: "fit-content",
     padding: themeVars.spacing.half,
-    border: `1px solid rgb(from currentColor r g b / 25%)`,
+    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
     borderRadius: themeVars.borderRadius.full,
-    backgroundColor: themeVars.color.background.dark,
+    backgroundColor: layerVars.main,
 });
 
 export const segmentContent = style({

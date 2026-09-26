@@ -4,9 +4,9 @@ import { AUDIO_SWITCHER_DEFAULTS } from "@thewaver/ss-components";
 
 import { AudioSwitcherKnobs } from "../../Knobs/AudioSwitchers.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField, PageSelectField } from "../../StyledComponents/Field/Field";
 import { FIELD_WIDTH, PERCENT, TRACKS, TRACK_NAMES } from "./AudioSwitcherPage.const";
 import { DefaultExample } from "./Examples/Default";
 

@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 const panel = (from: string, to: string) => `linear-gradient(215deg, ${from}, ${to})`;
 
@@ -10,9 +11,9 @@ export const treemapTile = style({
     width: "100%",
     height: "100%",
     padding: themeVars.spacing.half,
-    border: `1px solid ${themeVars.color.background.dark}`,
-    backgroundImage: panel(themeVars.color.surface.dark, themeVars.color.surface.light),
-    color: themeVars.color.surface.contrast,
+    border: `1px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
+    backgroundColor: layerVars.main,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     lineHeight: 1.2,
     overflow: "hidden",
@@ -36,8 +37,8 @@ export const treemapBar = style({
     width: "100%",
     height: 30,
     paddingInline: themeVars.spacing.half,
-    backgroundImage: panel(themeVars.color.surface.dark, themeVars.color.surface.light),
-    color: themeVars.color.surface.contrast,
+    backgroundColor: layerVars.main,
+    color: layerVars.contrast,
     fontSize: themeVars.fontSize.xSmall,
     lineHeight: "30px",
     cursor: "pointer",

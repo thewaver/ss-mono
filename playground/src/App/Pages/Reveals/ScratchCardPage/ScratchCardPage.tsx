@@ -6,9 +6,9 @@ import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { ScratchCardKnobs } from "../../../Knobs/ScratchCards.const";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
+import { PageNumberField, PageSelectField } from "../../../PageComponents/Field/Field";
 import { PageProp } from "../../../PageComponents/Prop/Prop";
 import { PagePropsPanel } from "../../../PageComponents/PropsPanel/PropsPanel";
-import { PageNumberField, PageSelectField } from "../../../StyledComponents/Field/Field";
 import { FrostedExample } from "./Examples/Frosted";
 import { TicketExample } from "./Examples/Ticket";
 import { WindowsExample } from "./Examples/Windows";

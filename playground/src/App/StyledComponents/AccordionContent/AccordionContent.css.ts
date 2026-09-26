@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isExpanded = style({});
 export const isHovered = style({});
@@ -14,7 +15,7 @@ export const accordionHeader = style({
     width: "100%",
     borderRadius: themeVars.borderRadius.half,
     padding: themeVars.spacing.full,
-    backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.dark})`,
+    backgroundColor: layerVars.main,
     fontSize: themeVars.fontSize.medium,
     transition: `filter ${themeVars.animation.duration}`,
 
@@ -46,5 +47,5 @@ export const accordionPanel = style({
     gap: themeVars.spacing.full,
     padding: themeVars.spacing.full,
     fontSize: themeVars.fontSize.small,
-    backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.dark})`,
+    backgroundColor: layerVars.main,
 });

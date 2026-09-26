@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const SLIDE_BUTTON_THUMB_SIZE = 44;
 export const SLIDE_BUTTON_WIDTH = 300;
@@ -16,7 +17,7 @@ export const slideButtonContent = style({
     alignItems: "center",
     height: SLIDE_BUTTON_THUMB_SIZE,
     borderRadius: SLIDE_BUTTON_THUMB_SIZE * 0.5,
-    backgroundColor: `rgb(from currentColor r g b / 10%)`,
+    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
     boxShadow: themeVars.shadow.small,
     overflow: "hidden",
     transition: `filter ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,
@@ -64,7 +65,7 @@ export const slideButtonThumb = style({
     height: SLIDE_BUTTON_THUMB_SIZE,
     borderRadius: "50%",
     border: `2px solid ${themeVars.color.primary.main}`,
-    backgroundColor: themeVars.color.background.dark,
+    backgroundColor: layerVars.main,
     boxShadow: themeVars.shadow.small,
     cursor: "grab",
     transition: `left ${themeVars.animation.duration}, transform ${themeVars.animation.duration}`,

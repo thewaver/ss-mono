@@ -1,6 +1,7 @@
 import { style } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isSelected = style({});
 export const isHovered = style({});
@@ -47,7 +48,7 @@ export const columnTab = style([
 ]);
 
 export const rowTabGutter = style({
-    borderBlockEnd: `2px solid rgb(from currentColor r g b / 10%)`,
+    borderBlockEnd: `2px solid rgb(from ${layerVars.contrast} r g b / 10%)`,
 });
 
 export const rowTabFloater = style({
@@ -63,7 +64,7 @@ export const rowTabFloater = style({
 });
 
 export const columnTabFloater = style({
-    backgroundImage: `linear-gradient(to right, ${themeVars.color.primary.main} 3px, rgb(from ${themeVars.color.surface.contrast} r g b / 10%) 3px, transparent)`,
+    backgroundImage: `linear-gradient(to right, ${themeVars.color.primary.main} 3px, rgb(from ${layerVars.contrast} r g b / 10%) 3px, transparent)`,
     width: "100%",
     height: "100%",
     opacity: 0,
@@ -79,7 +80,7 @@ export const columnTabFloater = style({
 export const tabPanel = style({
     borderRadius: themeVars.borderRadius.half,
     padding: themeVars.spacing.full,
-    backgroundImage: `linear-gradient(215deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.dark})`,
+    backgroundColor: layerVars.main,
     fontSize: themeVars.fontSize.small,
 });
 
@@ -92,7 +93,7 @@ export const hexTab = style([
         placeItems: "center",
         width: "100%",
         height: "100%",
-        backgroundColor: `rgb(from ${themeVars.color.surface.contrast} r g b / 10%)`,
+        backgroundColor: `rgb(from ${layerVars.contrast} r g b / 10%)`,
         fontSize: themeVars.fontSize.xSmall,
         fontWeight: "bold",
         transition: `color ${themeVars.animation.duration}, background-color ${themeVars.animation.duration}, opacity ${themeVars.animation.duration}`,

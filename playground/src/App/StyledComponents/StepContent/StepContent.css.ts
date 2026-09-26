@@ -1,6 +1,7 @@
 import { style, styleVariants } from "@vanilla-extract/css";
 
 import { themeVars } from "../../Theme.css";
+import { layerVars } from "../Layer/Layer.css";
 
 export const isCurrent = style({});
 export const isHovered = style({});
@@ -79,7 +80,7 @@ export const marker = styleVariants({
         {
             ...markerBase,
             backgroundColor: "transparent",
-            border: `2px solid rgb(from currentColor r g b / 25%)`,
+            border: `2px solid rgb(from ${layerVars.contrast} r g b / 25%)`,
         },
     ],
 });
@@ -87,14 +88,14 @@ export const marker = styleVariants({
 export const rowConnector = style({
     width: 32,
     height: 2,
-    backgroundColor: `rgb(from currentColor r g b / 25%)`,
+    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
 });
 
 export const columnConnector = style({
     width: 2,
     height: 20,
     marginInlineStart: `calc(${themeVars.spacing.double} - 1px)`,
-    backgroundColor: `rgb(from currentColor r g b / 25%)`,
+    backgroundColor: `rgb(from ${layerVars.contrast} r g b / 25%)`,
 });
 
 export const columnRailConnector = style([columnConnector, { height: "auto", alignSelf: "stretch" }]);
@@ -115,7 +116,7 @@ export const arcCell = style({
     width: "100%",
     height: "100%",
     borderRadius: themeVars.borderRadius.half,
-    backgroundColor: themeVars.color.surface.dark,
+    backgroundColor: layerVars.main,
     boxShadow: themeVars.shadow.small,
 });
 
@@ -131,7 +132,7 @@ export const arcConnector = style({
 
 export const arcConnectorPath = style({
     fill: "none",
-    stroke: themeVars.color.surface.contrast,
+    stroke: layerVars.contrast,
     strokeWidth: 2,
     strokeOpacity: 0.35,
     strokeLinecap: "round",

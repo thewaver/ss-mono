@@ -1,7 +1,7 @@
 import { ColorInput, Label } from "@thewaver/ss-components";
 
 import { COLOR_INPUT_LABELS } from "../../../PageComponents/Announcements/Announcements.const";
-import { pageColorPickerSlots } from "../../../StyledComponents/ColorAreaContent/ColorAreaContent";
+import { pageColorPickerSlots } from "../../../PageComponents/ColorPicker/ColorPicker";
 import { PageColorInputContent } from "../../../StyledComponents/ColorInputContent/ColorInputContent";
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
 import type { ColorInputExampleProps } from "../ColorInputPage.types";
