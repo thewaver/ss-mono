@@ -600,6 +600,20 @@ its place.
 would otherwise produce `NaN` and take the whole path with it, and a path of `NaN` renders as nothing at all.
 With the fallback only that one corner is wrong and the rest of the shape still draws.
 
+**`ShapeUtils` rounds a reflex corner from outside the shape.** A corner that turns outward — a star's notch —
+has its arc center on the far side of the outline, so the arc is centered at `offset + r` rather than
+`offset - r` and its end points sit at `-r` along the normals; the inner path shares that center at radius
+`r + thickness`. Centering it inside, as every corner once was, puts both end points past the vertex on the
+edges' extensions, and the outline draws a small loop that crosses itself at every notch.
+
+**`setupPaths` shrinks radii by the length each arc takes from its edge, not by the radius itself.** An arc of
+radius `r` at a corner that turns by `φ` starts `r · tan(φ / 2)` from the vertex, which equals `r` only at a
+right angle. The factor is applied only where the turn is sharper than a right angle and is `1` everywhere
+else, so a square, a hexagon or any wider corner shrinks exactly as before; only corners whose arcs used to
+overrun their edge and overlap the neighbor's — a triangle's, a star's tips and notches — are held back
+further. Using the exact factor on wide corners too would let them round further than they do today, which
+would change how existing shapes look, so that was left alone.
+
 **`PolygonUtils.getLineIntersection` passes an epsilon of `1e-6`, looser than `Point2dUtils.intersectLines`'
 own `1e-8`.** Polygon edges that are nearly parallel are better treated as parallel than sent off to a distant
 corner. The number is measured and is the user's; flag a concern rather than changing it.

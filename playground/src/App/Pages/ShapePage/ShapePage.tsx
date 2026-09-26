@@ -179,9 +179,9 @@ const StressTestWrapper = ({
     );
 };
 
-const createShapeGeometry = () => {
+const createShapeGeometry = (startingShapeKind: ShapeConst.DefaultShape = ShapeKnobs.STARTING_SHAPE_KIND) => {
     const [getHasIndividualCorners, setHasIndividualCorners] = createSignal(ShapeKnobs.STARTING_HAS_INDIVIDUAL_CORNERS);
-    const [getShapeKind, setShapeKind] = createSignal<ShapeConst.DefaultShape>(ShapeKnobs.STARTING_SHAPE_KIND);
+    const [getShapeKind, setShapeKind] = createSignal<ShapeConst.DefaultShape>(startingShapeKind);
     const [getJoinRadii, setJoinRadii] = createSignal<number[]>(ShapeKnobs.STARTING_JOIN_RADII);
     const [getLameExponents, setLameExponents] = createSignal<number[]>(ShapeKnobs.STARTING_LAME_EXPONENTS);
 
@@ -342,8 +342,37 @@ const DefaultExampleWrapper = (props: ShapeExampleProps) => {
     );
 };
 
+const MorphExampleWrapper = (props: ShapeExampleProps) => {
+    const [getStarPoints, setStarPoints] = createSignal(ShapeKnobs.STARTING_STAR_POINTS);
+
+    return (
+        <>
+            <MorphExample {...props} starPoints={getStarPoints} />
+
+            <PageExampleKnobs>
+                <PageProp
+                    key={"starPoints"}
+                    label={"Star points"}
+                    hint={
+                        "How many tips the star has. The outline carries twice as many points: one per tip, one per notch between tips."
+                    }
+                >
+                    <PageNumberField
+                        value={getStarPoints}
+                        min={() => ShapeKnobs.MIN_STAR_POINTS}
+                        max={() => ShapeKnobs.MAX_STAR_POINTS}
+                        step={() => ShapeKnobs.STAR_POINTS_STEP}
+                        ariaLabel={"Star points"}
+                        onInput={setStarPoints}
+                    />
+                </PageProp>
+            </PageExampleKnobs>
+        </>
+    );
+};
+
 const TextWrapExampleWrapper = (props: ShapeExampleProps) => {
-    const { geometryProps, renderKnobs } = createShapeGeometry();
+    const { geometryProps, renderKnobs } = createShapeGeometry(ShapeKnobs.STARTING_TEXT_WRAP_SHAPE_KIND);
 
     return (
         <>
@@ -412,8 +441,8 @@ export const ShapePage = () => {
                 key: "morph",
                 name: "Morph",
                 readout: () =>
-                    "one number from 0 to 1 is read inside computePoints and blends two outlines of eight points each, their corner radii and their exponents with them; under reduced motion the press jumps straight to the other shape",
-                component: () => <MorphExample {...commonProps} />,
+                    "one number from 0 to 1 is read inside computePoints and blends two outlines of twice the star-point count each, their corner radii and their exponents with them; under reduced motion the press jumps straight to the other shape",
+                component: () => <MorphExampleWrapper {...commonProps} />,
                 path: `${EXAMPLES_ROOT}/Morph.tsx`,
             },
             {

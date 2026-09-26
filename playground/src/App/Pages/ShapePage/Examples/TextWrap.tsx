@@ -8,7 +8,7 @@ import type { ShapeExampleProps } from "../ShapePage.types";
 
 import * as styles from "../ShapePage.css";
 
-const FLOAT_SIZE = 200;
+const FLOAT_SIZE = 256;
 
 const WRAPPED_TEXT = [
     "A floated Shape carries its own outline as its float area, so the lines of this paragraph run up to the",

@@ -9,6 +9,8 @@ const INNER_RECT_SAMPLES = 50;
 const CIRCLE_KAPPA = 1;
 const HALF_PI = Math.PI * 0.5;
 const DODECAGON_SIDES = 12;
+const MIN_TANGENT_COS_GAP = 1e-9;
+const MAX_TANGENT_LENGTH_FACTOR = 1e6;
 
 /** The outer and inner outlines of a shape, as both SVG path text and raw points. */
 type ShapePaths = {
@@ -370,6 +372,21 @@ export namespace ShapeUtils {
             outer.joinRadii = rawJoinRadii;
         } else {
             const edgeScaleFactors = new Array(vertexCount).fill(1);
+            const tangentLengthFactors = vertices.map((vertex, i) => {
+                const prev = vertices[ObjectUtils.getPrevArrayIndex(i, vertexCount)];
+                const next = vertices[ObjectUtils.getNextArrayIndex(i, vertexCount)];
+                const inLength = Math.hypot(vertex.x - prev.x, vertex.y - prev.y) || 1;
+                const outLength = Math.hypot(next.x - vertex.x, next.y - vertex.y) || 1;
+                const cosTurn =
+                    ((vertex.x - prev.x) * (next.x - vertex.x) + (vertex.y - prev.y) * (next.y - vertex.y)) /
+                    (inLength * outLength);
+
+                if (cosTurn >= 0) return 1;
+
+                return 1 + cosTurn <= MIN_TANGENT_COS_GAP
+                    ? MAX_TANGENT_LENGTH_FACTOR
+                    : Math.min(MAX_TANGENT_LENGTH_FACTOR, Math.sqrt((1 - cosTurn) / (1 + cosTurn)));
+            });
 
             for (let i = 0; i < vertexCount; i++) {
                 const nextIndex = ObjectUtils.getNextArrayIndex(i, vertexCount);
@@ -378,8 +395,8 @@ export namespace ShapeUtils {
                     vertices[nextIndex].y - vertices[i].y,
                 );
                 const thickness = common.edgeThicknesses[i];
-                const rCurrent = rawJoinRadii[i];
-                const rNext = rawJoinRadii[nextIndex];
+                const rCurrent = rawJoinRadii[i] * tangentLengthFactors[i];
+                const rNext = rawJoinRadii[nextIndex] * tangentLengthFactors[nextIndex];
                 const kCurrent = common.lameExponents[i];
                 const kNext = common.lameExponents[nextIndex];
                 const thicknessOverhead = (kCurrent < 0 ? thickness : 0) + (kNext < 0 ? thickness : 0);
@@ -631,14 +648,16 @@ export namespace ShapeUtils {
             const currNormal = unitNormals[i];
             const crossCheck = crossChecks[i];
             const outerRadius = outer.joinRadii[i];
+            const isReflex = currTangent.x * prevNormal.x + currTangent.y * prevNormal.y > 0;
+            const side = isReflex ? -1 : 1;
 
             const prevArcRefPt = {
-                x: vertex.x + (offset - outerRadius) * prevNormal.x,
-                y: vertex.y + (offset - outerRadius) * prevNormal.y,
+                x: vertex.x + (offset - side * outerRadius) * prevNormal.x,
+                y: vertex.y + (offset - side * outerRadius) * prevNormal.y,
             };
             const currArcRefPt = {
-                x: vertex.x + (offset - outerRadius) * currNormal.x,
-                y: vertex.y + (offset - outerRadius) * currNormal.y,
+                x: vertex.x + (offset - side * outerRadius) * currNormal.x,
+                y: vertex.y + (offset - side * outerRadius) * currNormal.y,
             };
             const outerIntersectionScale =
                 ((currArcRefPt.x - prevArcRefPt.x) * currTangent.y -
@@ -649,12 +668,12 @@ export namespace ShapeUtils {
                 y: prevArcRefPt.y + outerIntersectionScale * prevTangent.y,
             };
             const outerArcStart = {
-                x: cornerArcCenter.x + outerRadius * prevNormal.x,
-                y: cornerArcCenter.y + outerRadius * prevNormal.y,
+                x: cornerArcCenter.x + side * outerRadius * prevNormal.x,
+                y: cornerArcCenter.y + side * outerRadius * prevNormal.y,
             };
             const outerArcEnd = {
-                x: cornerArcCenter.x + outerRadius * currNormal.x,
-                y: cornerArcCenter.y + outerRadius * currNormal.y,
+                x: cornerArcCenter.x + side * outerRadius * currNormal.x,
+                y: cornerArcCenter.y + side * outerRadius * currNormal.y,
             };
 
             const outerPts = generatePolylineCorner(
@@ -690,11 +709,11 @@ export namespace ShapeUtils {
             const currThickness = common.edgeThicknesses[i];
             const maxThickness = Math.max(prevThickness, currThickness);
             const isConcave = kappa < 0;
-            const innerRadius = outerRadius - maxThickness;
+            const innerRadius = outerRadius - side * maxThickness;
             const fallbackInnerRadius = inner.joinRadii[i];
             const sharpInnerIntersection = inner.vertices[i];
 
-            if (!isConcave && (innerRadius <= 0 || fallbackInnerRadius <= 0)) {
+            if (!isConcave && !isReflex && (innerRadius <= 0 || fallbackInnerRadius <= 0)) {
                 innerPathSegments.push(
                     `L ${sharpInnerIntersection.x.toFixed(3)} ${sharpInnerIntersection.y.toFixed(3)}`,
                 );
@@ -703,12 +722,12 @@ export namespace ShapeUtils {
             } else {
                 const layoutRadius = isConcave ? outerRadius : innerRadius;
                 const prevInnerArcRefPt = {
-                    x: vertex.x + (offset - prevThickness - layoutRadius) * prevNormal.x,
-                    y: vertex.y + (offset - prevThickness - layoutRadius) * prevNormal.y,
+                    x: vertex.x + (offset - prevThickness - side * layoutRadius) * prevNormal.x,
+                    y: vertex.y + (offset - prevThickness - side * layoutRadius) * prevNormal.y,
                 };
                 const currInnerArcRefPt = {
-                    x: vertex.x + (offset - currThickness - layoutRadius) * currNormal.x,
-                    y: vertex.y + (offset - currThickness - layoutRadius) * currNormal.y,
+                    x: vertex.x + (offset - currThickness - side * layoutRadius) * currNormal.x,
+                    y: vertex.y + (offset - currThickness - side * layoutRadius) * currNormal.y,
                 };
                 const innerIntersectionScale =
                     ((currInnerArcRefPt.x - prevInnerArcRefPt.x) * currTangent.y -
@@ -719,12 +738,12 @@ export namespace ShapeUtils {
                     y: prevInnerArcRefPt.y + innerIntersectionScale * prevTangent.y,
                 };
                 const innerArcStart = {
-                    x: innerCornerArcCenter.x + layoutRadius * prevNormal.x,
-                    y: innerCornerArcCenter.y + layoutRadius * prevNormal.y,
+                    x: innerCornerArcCenter.x + side * layoutRadius * prevNormal.x,
+                    y: innerCornerArcCenter.y + side * layoutRadius * prevNormal.y,
                 };
                 const innerArcEnd = {
-                    x: innerCornerArcCenter.x + layoutRadius * currNormal.x,
-                    y: innerCornerArcCenter.y + layoutRadius * currNormal.y,
+                    x: innerCornerArcCenter.x + side * layoutRadius * currNormal.x,
+                    y: innerCornerArcCenter.y + side * layoutRadius * currNormal.y,
                 };
 
                 const innerPts = generatePolylineCorner(

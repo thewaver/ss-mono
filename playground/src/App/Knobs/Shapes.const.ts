@@ -21,6 +21,9 @@ export namespace ShapeKnobs {
     export const BLUR_WIDTH_STEP = 1;
     export const MIN_DURATION_MS = 1000;
     export const MAX_DURATION_MS = 5000;
+    export const MIN_STAR_POINTS = 3;
+    export const MAX_STAR_POINTS = 16;
+    export const STAR_POINTS_STEP = 1;
 
     export const STARTING_BLUR_WIDTH = 8;
     export const STARTING_DURATION_MS = 2000;
@@ -29,7 +32,9 @@ export namespace ShapeKnobs {
     export const STARTING_SHOULD_CLIP_CHILDREN = true;
     export const STARTING_SHOULD_PAD_CHILDREN = true;
     export const STARTING_SHAPE_KIND: ShapeConst.DefaultShape = "square";
+    export const STARTING_TEXT_WRAP_SHAPE_KIND: ShapeConst.DefaultShape = "lozenge";
     export const STARTING_EDGE_THICKNESS = 4;
+    export const STARTING_STAR_POINTS = 4;
     export const STARTING_JOIN_RADII: number[] = [40, 40, 40, 40, 40, 40];
     export const STARTING_LAME_EXPONENTS: number[] = [1, 1, 1, 1, 1, 1];
     export const STARTING_GRADIENT_KEY: WithNoSample<SVGDefsSamples.Gradient.Timed.SampleKey> = "sweep_diag_1v1";
