@@ -1,24 +1,12 @@
-import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
+import { type Store, StoreUtils } from "@thewaver/ss-utils";
 
-/** One registered stacking context: the element that makes it, and the z-index it was given. */
-type ElevationEntry = {
-    element: HTMLElement;
-    zIndex: number;
-};
+import type { ElevationLayer } from "./Elevation.types";
 
 /** The floor a popup is raised from when nothing above it has claimed a z-index. */
 const NO_ELEVATION = 0;
 
 /** Every registered stacking context, in registration order. Shared, because nesting is a page-wide fact. */
-const entries: ElevationEntry[] = [];
-
-/** Bumped whenever the list changes, so the readers below re-run without the list itself being reactive. */
-const [getRevision, setRevision] = createSignal(0);
-
-/** Tells every reader the list has changed. */
-const bumpRevision = () => {
-    setRevision((previous) => previous + 1);
-};
+const layers = StoreUtils.create<readonly ElevationLayer[]>([]);
 
 /**
  * Tracks the stacking contexts an element is nested inside, so a popup can be raised above them.
@@ -30,63 +18,49 @@ const bumpRevision = () => {
  */
 export namespace ElevationUtils {
     /**
-     * Registers an element as a stacking layer for as long as the owning component lives.
+     * Every stacking layer registered on the page, as a store.
+     *
+     * The list is replaced rather than edited on each change, so a reader following it hears about every layer
+     * added or removed. Read {@link getBase} for the question most callers are asking.
+     */
+    export const registeredLayers: Store<readonly ElevationLayer[]> = { get: layers.get, subscribe: layers.subscribe };
+
+    /**
+     * Registers an element as a stacking layer until the returned function is called.
      *
      * Call this from a component that raises itself — a modal, a drawer, a popover — so that anything
-     * opening inside it can find out how high it must go. The registration follows the accessors: it
-     * is added when the layer becomes active, moved when its element or index changes, and removed on
-     * cleanup.
+     * opening inside it can find out how high it must go. Removing the same layer twice is harmless.
      *
-     * @param getElement The element whose subtree the layer covers. Nothing is registered until it
-     * exists.
-     * @param getIsActive Whether the layer currently applies; a closed popup should report `false`.
-     * @param getZIndex The `z-index` actually being applied to that element.
+     * @param element The element whose subtree the layer covers.
+     * @param zIndex The `z-index` actually being applied to that element.
+     * @returns The function that removes the layer again.
      */
-    export const createElevation = (
-        getElement: Accessor<HTMLElement | undefined>,
-        getIsActive: Accessor<boolean>,
-        getZIndex: Accessor<number>,
-    ) => {
-        createEffect(() => {
-            const element = getElement();
-            const zIndex = getZIndex();
+    export const addElevation = (element: HTMLElement, zIndex: number) => {
+        const layer: ElevationLayer = { element, zIndex };
 
-            if (!getIsActive() || !element) return;
+        layers.update((current) => [...current, layer]);
 
-            const entry: ElevationEntry = { element, zIndex };
-
-            entries.push(entry);
-            bumpRevision();
-
-            onCleanup(() => {
-                const index = entries.indexOf(entry);
-
-                if (index >= 0) entries.splice(index, 1);
-
-                bumpRevision();
-            });
-        });
+        return () => {
+            layers.update((current) =>
+                current.includes(layer) ? current.filter((entry) => entry !== layer) : current,
+            );
+        };
     };
 
     /**
      * Reports the `z-index` an element has to clear to sit above everything containing it.
-     *
-     * Reading this inside a reactive context re-runs whenever a layer is added or removed, so a popup
-     * that opens while a modal is already up gets the modal's index rather than a stale zero.
      *
      * @param element The element about to be raised.
      * @returns The highest registered index among the layers containing it, or `0` when it is inside
      * none of them. Add the caller's own step to it rather than using it directly.
      */
     export const getBase = (element: HTMLElement | undefined) => {
-        getRevision();
-
         if (!element) return NO_ELEVATION;
 
         let base = NO_ELEVATION;
 
-        for (const entry of entries) {
-            if (entry.element.contains(element)) base = Math.max(base, entry.zIndex);
+        for (const layer of layers.get()) {
+            if (layer.element.contains(element)) base = Math.max(base, layer.zIndex);
         }
 
         return base;

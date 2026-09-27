@@ -1,3 +1,4 @@
+import { TreemapUtils } from "../Treemap/Treemap.utils";
 import type { CirclePackingCircle, CirclePackingNode, CirclePackingView } from "./CirclePacking.types";
 
 type Placed = { x: number; y: number; r: number };
@@ -501,4 +502,76 @@ export namespace CirclePackingUtils {
             radius: circle.radius * scale,
         };
     };
+
+    /**
+     * The view that shows exactly one circle.
+     *
+     * @param circle The circle, as {@link computeLayout} placed it.
+     * @returns Its center and its diameter, which is what has to fit across the drawing for it to fill it.
+     */
+    export const toView = (circle: CirclePackingCircle): CirclePackingView => ({
+        x: circle.x,
+        y: circle.y,
+        diameter: circle.radius * DOUBLE,
+    });
+
+    /**
+     * Every node that gets a circle, in drawing order.
+     *
+     * @param root The whole tree.
+     * @param layout What {@link computeLayout} answered for it.
+     * @returns Every node the layout placed but the root, level by level from the outside in, so a circle is always
+     * drawn after the one around it and on top of it.
+     */
+    export const listNodes = <T>(
+        root: CirclePackingNode<T>,
+        layout: Map<CirclePackingNode<T>, CirclePackingCircle>,
+    ) => {
+        const nodes: CirclePackingNode<T>[] = [];
+        const queue = [root];
+
+        while (queue.length) {
+            const node = queue.shift()!;
+
+            if (node !== root) nodes.push(node);
+
+            queue.push(...(node.children ?? []).filter((child) => layout.has(child)));
+        }
+
+        return nodes;
+    };
+
+    /**
+     * How deep every node in a tree is.
+     *
+     * @param root The whole tree.
+     * @returns The root at `0`, its children at `1`, and so on down.
+     */
+    export const computeDepths = <T>(root: CirclePackingNode<T>) => {
+        const depths = new Map<CirclePackingNode<T>, number>();
+
+        const walk = (node: CirclePackingNode<T>, depth: number) => {
+            depths.set(node, depth);
+            node.children?.forEach((child) => walk(child, depth + SINGLE));
+        };
+
+        walk(root, NOTHING);
+
+        return depths;
+    };
+
+    /**
+     * What is in view at one moment of a zoom.
+     *
+     * @param path What {@link interpolateZoom} answered for the zoom, or `undefined` before any zoom has run.
+     * @param target The view the zoom is headed for.
+     * @param progress How far through the zoom's time, `0` to `1`, as `TreemapUtils.createZoomClock` reads it.
+     * @returns `target` once the zoom is over or when there is no path, and the point along the path eased by
+     * `TreemapUtils.easeZoom` while it runs. A new zoom started mid-way begins from this, so it never jumps.
+     */
+    export const computeShownView = (
+        path: ((progress: number) => CirclePackingView) | undefined,
+        target: CirclePackingView,
+        progress: number,
+    ) => (progress < SINGLE && path ? path(TreemapUtils.easeZoom(progress)) : target);
 }

@@ -1,11 +1,15 @@
 import { RotationUtils } from "@thewaver/ss-utils";
 
 import type {
+    OdometerDigitSlot,
     OdometerDirection,
+    OdometerFixedSlot,
+    OdometerReel,
     OdometerShownSlot,
     OdometerSlot,
     OdometerSlotFlags,
     OdometerSlotPhase,
+    OdometerTurn,
 } from "./Odometer.types";
 
 /** Digits on a wheel. */
@@ -20,6 +24,10 @@ const NO_DIGIT = -1;
 const FULL_TURN_DEG = 360;
 /** No angle at all, for a wheel that makes no extra turns. */
 const NO_ANGLE = 0;
+/** No wait, for a wheel that starts at once. */
+const NO_DELAY = 0;
+/** A slot shrunk to nothing. */
+const ZERO_WIDTH = "0px";
 
 /** The digits in the order they appear around a wheel. */
 const DIGIT_FACES = Array.from({ length: DIGIT_COUNT }, (_unused, index) => String(index));
@@ -234,4 +242,123 @@ export namespace OdometerUtils {
         isEntering: phase === "entering",
         isLeaving: phase === "leaving",
     });
+
+    /**
+     * The slots that never turn, each with where it sits among all of them.
+     *
+     * @param slots What {@link getSlots} gives.
+     */
+    export const getFixedSlots = (slots: OdometerSlot[]) =>
+        slots.flatMap((slot, order): OdometerFixedSlot[] =>
+            slot.kind === "fixed" ? [{ character: slot.character, order }] : [],
+        );
+
+    /**
+     * The slots that turn, each with where it sits among all of them and which digit it is.
+     *
+     * @param slots What {@link getSlots} gives.
+     */
+    export const getDigitSlots = (slots: OdometerSlot[]) =>
+        slots.flatMap((slot, order): OdometerDigitSlot[] =>
+            slot.kind === "digit" ? [{ order, digitIndex: slot.digitIndex }] : [],
+        );
+
+    /**
+     * How every column turns when the number changes.
+     *
+     * Which way the display goes is decided from the number as a whole ({@link compareDigits}). Each column that
+     * was showing a digit turns from its current angle by what it takes to reach its new digit, plus whatever
+     * extra turns its reel asks for; a column that has just arrived starts at rest on its digit. Columns the new
+     * number no longer has keep their angle and their digit, so they can shrink away still showing it — except
+     * with `isInstant`, when they are simply gone and no reel adds turns. The cascade runs only without reels
+     * and only when something changed.
+     *
+     * @param opts.shownDigits The digits the number showed before this change.
+     * @param opts.columnDigits The digit each column shows now, leaving columns included.
+     * @param opts.angles The angle each column is drawn at now.
+     * @param opts.digits The digits to show.
+     * @param opts.isInstant Whether the visitor has asked for less motion.
+     * @param opts.reels What each column's reel says, or `undefined` for every column without reels.
+     * @param opts.cascadeDelayMs How long one column waits behind the next.
+     * @returns The new angles, delays, durations and column digits.
+     */
+    export const computeTurn = (opts: {
+        shownDigits: number[];
+        columnDigits: number[];
+        angles: number[];
+        digits: number[];
+        isInstant: boolean;
+        reels: (OdometerReel | undefined)[] | undefined;
+        cascadeDelayMs: number;
+    }): OdometerTurn => {
+        const { shownDigits, columnDigits, angles, digits, isInstant, reels, cascadeDelayMs } = opts;
+        const direction = compareDigits(shownDigits, digits);
+
+        return {
+            delays:
+                direction === "same" || reels !== undefined
+                    ? digits.map(() => NO_DELAY)
+                    : computeCascadeDelays(shownDigits, digits, cascadeDelayMs),
+            durations: digits.map((_digit, index) => reels?.[index]?.durationMs),
+            angles: [
+                ...digits.map((digit, index) => {
+                    const wasShowing = columnDigits[index];
+
+                    if (wasShowing === undefined) return getRestingAngle(digit);
+
+                    const extraTurns = isInstant ? NOTHING : (reels?.[index]?.extraTurns ?? NOTHING);
+
+                    return (
+                        (angles[index] ?? NO_ANGLE) +
+                        computeAngleDelta(wasShowing, digit, direction) +
+                        computeReelAngle(extraTurns, direction)
+                    );
+                }),
+                ...(isInstant ? [] : angles.slice(digits.length)),
+            ],
+            columnDigits: isInstant ? digits : [...digits, ...columnDigits.slice(digits.length)],
+        };
+    };
+
+    /**
+     * Animates a slot's width as it grows in or shrinks away.
+     *
+     * The width runs from nothing to one digit's width while entering and back while leaving, over the turn's
+     * duration. A leaving slot holds at nothing once it gets there, so it does not flash back to full width before
+     * it is removed. An animation already running is stopped, and the new one starts from the width the slot is
+     * drawn at, so a slot that turns round halfway does not jump.
+     *
+     * @param element The slot.
+     * @param phase Whether the slot is entering or leaving. A shown slot is left alone.
+     * @param current The animation running on the slot, if any.
+     * @param widthPx One digit's width.
+     * @param durationMs How long the change takes.
+     * @param onFinish Runs once the width has arrived.
+     * @returns The animation now running, or `current` untouched for a shown slot.
+     */
+    export const animateSlotWidth = (
+        element: HTMLElement,
+        phase: OdometerSlotPhase,
+        current: Animation | undefined,
+        widthPx: number,
+        durationMs: number,
+        onFinish: () => void,
+    ) => {
+        if (phase === "shown") return current;
+
+        const fullWidth = `${widthPx}px`;
+        const startWidth =
+            current === undefined ? (phase === "entering" ? ZERO_WIDTH : fullWidth) : getComputedStyle(element).width;
+
+        current?.cancel();
+
+        const animation = element.animate(
+            [{ width: startWidth }, { width: phase === "entering" ? fullWidth : ZERO_WIDTH }],
+            { duration: durationMs, fill: phase === "leaving" ? "forwards" : "none" },
+        );
+
+        animation.onfinish = onFinish;
+
+        return animation;
+    };
 }

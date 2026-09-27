@@ -343,6 +343,15 @@ that needs recording goes in `decisions.md` — _"method X does Y rather than Z,
 that file is for — or in the reply. If a change seems to need an inline comment to be understood, that is a
 signal the code should be clearer instead.
 
+**`components-solid/src` and `components-react/src` are under every rule this section gives `components/src`.** The
+Solid views were in `components/src` when these rules were written and moved out with the package split, so the ban
+and both of its exceptions went with them; the React tree was written to the same rules from the start. Read
+`components/src` in what follows as all three.
+
+**The same goes for the Playground, which is now three folders.** `playground/` became `playground-core/` (the
+framework-free half both apps share), `playground-solid/` and `playground-react/`, and every rule here that names
+`playground/src` applies to all three `src` folders.
+
 **`utils/` is the opposite, and confusing the two is the mistake to avoid.** That is `@thewaver/ss-utils`,
 which now shares this repo rather than sitting in a clone next door — but sharing a repo did not merge the
 two sets of rules. There, every exported function is documented so that a consumer can read what it takes,

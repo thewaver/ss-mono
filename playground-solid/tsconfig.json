@@ -1,0 +1,13 @@
+{
+    "extends": "../tsconfig.base.json",
+    "compilerOptions": {
+        "allowImportingTsExtensions": true,
+        "paths": {
+            "@thewaver/ss-components": ["../components/src/index.ts"],
+            "@thewaver/ss-components-solid": ["../components-solid/src/index.ts"],
+            "@thewaver/ss-utils": ["../utils/src/index.ts"],
+            "@thewaver/ss-playground-core/*": ["../playground-core/src/*"]
+        }
+    },
+    "include": ["src", "../playground-core/src/global.d.ts", "vite.config.ts"]
+}

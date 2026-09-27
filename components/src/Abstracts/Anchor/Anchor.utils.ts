@@ -1,11 +1,5 @@
-import type { Accessor } from "solid-js";
-import { createEffect, createMemo, createSignal, onCleanup } from "solid-js";
+import type { Point2d, Rect, Size2d } from "@thewaver/ss-utils";
 
-import { type Point2d, Rect, Size2d } from "@thewaver/ss-utils";
-
-import { ElementObserverUtils } from "../ElementObserver/ElementObserver.utils";
-import { ElevationUtils } from "../Elevation/Elevation.utils";
-import { useViewportContext } from "../Viewport/Viewport.context";
 import type { AnchorBand, AnchorBandKind, AnchorHPlacement, AnchorPlacement, AnchorVPlacement } from "./Anchor.types";
 
 /** For each horizontal placement, the placements to try if it does not fit, best first. */
@@ -308,7 +302,7 @@ export namespace AnchorUtils {
      *
      * Content portaled out of the anchor's subtree leaves that stacking behind, so it has to be given
      * an index of its own to land above whatever the anchor was sitting under. This reads what the
-     * document already says, as opposed to {@link ElevationUtils.getBase}, which reads what other
+     * document already says, as opposed to `ElevationUtils.getBase`, which reads what other
      * components have registered; a popup needs to clear both.
      *
      * @param element The anchor. Missing gives `0`.
@@ -330,174 +324,136 @@ export namespace AnchorUtils {
     };
 
     /**
-     * Runs the whole positioning cycle for portaled content, as reactive accessors.
+     * The placement portaled content should take: the one asked for, or its mirror where that fits better.
      *
-     * This is the piece a popover-shaped component actually uses. It measures the anchor and the
-     * content, chooses a placement that fits, clamps the result into the free space, and reports a
-     * `z-index` that clears both the document's own stacking and any registered layer. Everything
-     * re-runs as the anchor moves, the content resizes or the viewport changes, and observers are torn
-     * down while the content is hidden so a closed popup costs nothing.
-     *
-     * @param getAnchorRef The element to position against.
-     * @param getIsVisible Whether the content is currently shown. Measuring stops when it is not.
-     * @param opts.getPlacement The placement to aim for.
-     * @param opts.getOffset The gap to hold between anchor and content.
-     * @param opts.getReservedScreenSize A margin to keep clear at the screen edges.
-     * @param opts.getAnchorRect Supplies the anchor rectangle directly, for content anchored to
-     * something that is not an element — a caret position, a pointer, a cell in a canvas. Given this,
-     * no element is observed.
-     * @param opts.getIsPinned Keeps the placement the caller asked for and skips clamping, for content
-     * that should be allowed to run off screen rather than move.
-     * @returns `getAnchorRect` and `getIsAnchorOnScreen` for deciding whether to draw at all,
-     * `getPlacement` for styling that depends on which way the content opened, `getPosition` for where
-     * to put it, `getZIndex`, and `setContentRef`, which must be attached to the content's own element
-     * for any of the rest to have a size to work with. `getPosition` is `undefined` until both anchor
-     * and content have been measured.
+     * @param placement The placement to aim for.
+     * @param anchorRect The anchor, in viewport coordinates. Missing leaves the placement as asked.
+     * @param contentSize The content's measured size. Missing leaves the placement as asked.
+     * @param screenSize The viewport's size.
+     * @param opts.offset The gap to hold between anchor and content.
+     * @param opts.reservedScreenSize A margin to keep clear at the screen edges.
+     * @param opts.isPinned Keeps the placement asked for, for content that should run off screen rather than move.
+     * @returns The placement to use.
      */
-    export const createPortalPosition = (
-        getAnchorRef: Accessor<HTMLElement | undefined>,
-        getIsVisible: Accessor<boolean>,
-        opts: {
-            getPlacement: Accessor<AnchorPlacement>;
-            getOffset?: () => Point2d;
-            getReservedScreenSize?: () => Size2d;
-            getAnchorRect?: () => Rect | undefined;
-            getIsPinned?: () => boolean;
-        },
-    ) => {
-        const viewportContext = useViewportContext();
+    export const computePortalPlacement = (
+        placement: AnchorPlacement,
+        anchorRect: Rect | undefined,
+        contentSize: Size2d | undefined,
+        screenSize: Size2d,
+        opts?: { offset?: Point2d; reservedScreenSize?: Size2d; isPinned?: boolean },
+    ): AnchorPlacement => {
+        if (!contentSize || !anchorRect || opts?.isPinned) return placement;
 
-        const [getContentRef, setContentRef] = createSignal<HTMLElement>();
-        const [getContentSize, setContentSize] = createSignal<Size2d | undefined>(undefined, {
-            equals: Size2d.isSame,
-        });
-        const [getObservedRect, setAnchorRect] = createSignal<Rect | undefined>(undefined, {
-            equals: Rect.isSame,
-        });
+        return {
+            x: getSafeHPlacement(
+                placement.x,
+                anchorRect,
+                contentSize,
+                screenSize,
+                opts?.offset,
+                opts?.reservedScreenSize,
+            ),
+            y: getSafeVPlacement(
+                placement.y,
+                anchorRect,
+                contentSize,
+                screenSize,
+                opts?.offset,
+                opts?.reservedScreenSize,
+            ),
+        };
+    };
 
-        const getAnchorRect = createMemo(() => opts.getAnchorRect?.() ?? getObservedRect());
+    /**
+     * Where portaled content goes for a placement, held inside the space that is actually free.
+     *
+     * @param placement The placement to use, as {@link computePortalPlacement} gives it.
+     * @param anchorRect The anchor, in viewport coordinates.
+     * @param contentSize The content's measured size.
+     * @param screenSize The viewport's size.
+     * @param opts.offset The gap to hold between anchor and content.
+     * @param opts.reservedScreenSize A margin to keep clear at the screen edges.
+     * @param opts.isPinned Skips the clamping, for content that should run off screen rather than move.
+     * @returns The content's top-left corner in viewport coordinates, or `undefined` until both the anchor and the
+     * content have been measured.
+     */
+    export const computePortalPosition = (
+        placement: AnchorPlacement,
+        anchorRect: Rect | undefined,
+        contentSize: Size2d | undefined,
+        screenSize: Size2d,
+        opts?: { offset?: Point2d; reservedScreenSize?: Size2d; isPinned?: boolean },
+    ): Point2d | undefined => {
+        if (!anchorRect || !contentSize) return;
 
-        const getPlacement = createMemo((): AnchorPlacement => {
-            const contentSize = getContentSize();
-            const anchorRect = getAnchorRect();
-            const screenSize: Size2d = {
-                width: viewportContext.getSize().width,
-                height: viewportContext.getSize().height,
-            };
-            const offset = opts.getOffset?.();
-            const placement = opts.getPlacement();
-            const reservedScreenSize = opts.getReservedScreenSize?.();
+        const x =
+            getHPlacementShift(placement.x, anchorRect, contentSize) +
+            getHPlacementOffset(placement.x, opts?.offset?.x ?? 0);
+        const y =
+            getVPlacementShift(placement.y, anchorRect, contentSize) +
+            getVPlacementOffset(placement.y, opts?.offset?.y ?? 0);
 
-            if (!contentSize || !anchorRect || opts.getIsPinned?.()) return placement;
+        if (opts?.isPinned) return { x, y };
 
-            return {
-                x: getSafeHPlacement(placement.x, anchorRect, contentSize, screenSize, offset, reservedScreenSize),
-                y: getSafeVPlacement(placement.y, anchorRect, contentSize, screenSize, offset, reservedScreenSize),
-            };
-        });
+        const kinds = { x: getHBandKind(placement.x), y: getVBandKind(placement.y) };
+        const reserved = opts?.reservedScreenSize;
+        const bandX = getBand(
+            kinds.x,
+            anchorRect.x,
+            anchorRect.width,
+            opts?.offset?.x ?? 0,
+            screenSize.width,
+            reserved?.width ?? 0,
+        );
+        const bandY = getBand(
+            kinds.y,
+            anchorRect.y,
+            anchorRect.height,
+            opts?.offset?.y ?? 0,
+            screenSize.height,
+            reserved?.height ?? 0,
+        );
 
-        const getBands = createMemo(() => {
-            const anchorRect = getAnchorRect();
-            const placement = getPlacement();
-            const screenSize = viewportContext.getSize();
-            const reservedScreenSize = opts.getReservedScreenSize?.();
-            const offset = opts.getOffset?.();
+        return {
+            x: clampToBand(x, contentSize.width, bandX, kinds.x),
+            y: clampToBand(y, contentSize.height, bandY, kinds.y),
+        };
+    };
 
-            const kinds = {
-                x: anchorRect ? getHBandKind(placement.x) : ("over" as const),
-                y: anchorRect ? getVBandKind(placement.y) : ("over" as const),
-            };
+    /**
+     * Whether any part of an anchor is inside the viewport.
+     *
+     * @param anchorRect The anchor, in viewport coordinates. Missing counts as on screen.
+     * @param screenSize The viewport's size.
+     */
+    export const getIsAnchorOnScreen = (anchorRect: Rect | undefined, screenSize: Size2d) => {
+        if (!anchorRect) return true;
 
-            return {
-                kinds,
-                x: getBand(
-                    kinds.x,
-                    anchorRect?.x ?? 0,
-                    anchorRect?.width ?? 0,
-                    offset?.x ?? 0,
-                    screenSize.width,
-                    reservedScreenSize?.width ?? 0,
-                ),
-                y: getBand(
-                    kinds.y,
-                    anchorRect?.y ?? 0,
-                    anchorRect?.height ?? 0,
-                    offset?.y ?? 0,
-                    screenSize.height,
-                    reservedScreenSize?.height ?? 0,
-                ),
-            };
-        });
+        return (
+            anchorRect.x + anchorRect.width > 0 &&
+            anchorRect.y + anchorRect.height > 0 &&
+            anchorRect.x < screenSize.width &&
+            anchorRect.y < screenSize.height
+        );
+    };
 
-        const getPosition = createMemo(() => {
-            const anchorRect = getAnchorRect();
-            const contentSize = getContentSize();
-            const placement = getPlacement();
-            const bands = getBands();
-
-            if (!anchorRect || !contentSize) return;
-
-            const x =
-                getHPlacementShift(placement.x, anchorRect, contentSize) +
-                getHPlacementOffset(placement.x, opts.getOffset?.().x ?? 0);
-            const y =
-                getVPlacementShift(placement.y, anchorRect, contentSize) +
-                getVPlacementOffset(placement.y, opts.getOffset?.().y ?? 0);
-
-            if (opts.getIsPinned?.()) return { x, y };
-
-            return {
-                x: clampToBand(x, contentSize.width, bands.x, bands.kinds.x),
-                y: clampToBand(y, contentSize.height, bands.y, bands.kinds.y),
-            };
-        });
-
-        const getIsAnchorOnScreen = createMemo(() => {
-            const anchorRect = getAnchorRect();
-
-            if (!anchorRect) return true;
-
-            const screenSize = viewportContext.getSize();
-
-            return (
-                anchorRect.x + anchorRect.width > 0 &&
-                anchorRect.y + anchorRect.height > 0 &&
-                anchorRect.x < screenSize.width &&
-                anchorRect.y < screenSize.height
-            );
-        });
-
-        const getZIndex = createMemo(() => {
-            if (!getIsVisible()) return 1;
-
-            const anchorRef = getAnchorRef();
-
-            return Math.max(getStackingBase(anchorRef), ElevationUtils.getBase(anchorRef)) + 1;
+    /**
+     * Watches portaled content's size as it lays out, until the returned function is called.
+     *
+     * Read as the element's offset size each time the browser reports a resize, the first report arriving once it
+     * has been laid out.
+     *
+     * @param element The content's own element.
+     * @param onSize Called with each size.
+     * @returns The function that stops watching.
+     */
+    export const observeContentSize = (element: HTMLElement, onSize: (size: Size2d) => void) => {
+        const observer = new ResizeObserver(() => {
+            onSize({ width: element.offsetWidth, height: element.offsetHeight });
         });
 
-        ElementObserverUtils.createViewportRectObserver(getAnchorRef, () => getIsVisible() && !opts.getAnchorRect, {
-            setElementRect: setAnchorRect,
-        });
+        observer.observe(element);
 
-        createEffect(() => {
-            let contentResizeObserver: ResizeObserver | undefined;
-
-            onCleanup(() => {
-                contentResizeObserver?.disconnect();
-                setContentSize(undefined);
-            });
-
-            const contentRef = getContentRef();
-            const isVisible = getIsVisible();
-
-            if (!contentRef || !isVisible) return;
-
-            contentResizeObserver = new ResizeObserver(() => {
-                setContentSize({ width: contentRef.offsetWidth, height: contentRef.offsetHeight });
-            });
-            contentResizeObserver.observe(contentRef);
-        });
-
-        return { getAnchorRect, getIsAnchorOnScreen, getPlacement, getPosition, getZIndex, setContentRef };
+        return () => observer.disconnect();
     };
 }

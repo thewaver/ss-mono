@@ -1,4 +1,4 @@
-import type { Matrix3d, Point3d, Size2d } from "@thewaver/ss-utils";
+import type { Matrix3d, Point3d, Size2d, SwipeDirection } from "@thewaver/ss-utils";
 import { AngleUtils, MathUtils, Matrix3dUtils } from "@thewaver/ss-utils";
 
 import { BarrelUtils } from "../../Primitives/Barrel/Barrel.utils";
@@ -22,6 +22,18 @@ const UP_PITCH = 1;
 const DOWN_PITCH = 3;
 /** The half turn that leaves the cuboid upside down. */
 const INVERTED_PITCH = 2;
+
+/** A drag across left as it is. */
+const UNFLIPPED = 1;
+/** A drag across turned round, for a pose whose far side shows upside down. */
+const FLIPPED = -1;
+/** No time at all, for a settle that is skipped. */
+const NO_DURATION = 0;
+/** The curve a settle follows. */
+const SETTLE_EASING = "ease";
+
+/** A turn rounded to the nearest whole one, halves away from nothing, and never negative zero. */
+const roundTurn = (turn: number) => Math.sign(turn) * Math.round(Math.abs(turn)) + 0;
 
 /** No turn on either axis. */
 const NO_TURNS: CuboidTurns = { yaw: 0, pitch: 0 };
@@ -493,5 +505,179 @@ export namespace CuboidUtils {
         const extent = BarrelUtils.getProjectedExtent(circumradius, size.depth * HALF);
 
         return { width: extent, height: extent };
+    };
+
+    /**
+     * Which face is towards the viewer.
+     *
+     * @param isUpright Whether the cuboid keeps its own orientation rather than reading the counts as a pose.
+     * @param orientation The orientation it keeps, read only while upright.
+     * @param yaw Quarter turns across, read only while not upright.
+     * @param pitch Quarter turns up, read only while not upright.
+     * @returns The face showing.
+     */
+    export const getFacing = (isUpright: boolean, orientation: Matrix3d, yaw: number, pitch: number) =>
+        isUpright ? getFacingFromOrientation(orientation) : getFacingFromTurns(yaw, pitch);
+
+    /**
+     * Which way a drag across turns the cuboid, so dragging the front rightwards always brings the left face round.
+     *
+     * Read as a pose and tipped over the top, the cuboid shows its far side upside down, and a turn across then
+     * runs backwards on screen; the drag is flipped to make up for it. Upright, turns are about the screen's own
+     * axes, so nothing is flipped.
+     *
+     * @param isUpright Whether the cuboid keeps its own orientation.
+     * @param pitch Quarter turns up.
+     * @returns `-1` when the drag across is flipped, `1` otherwise.
+     */
+    export const getAcrossSign = (isUpright: boolean, pitch: number) =>
+        !isUpright && MathUtils.wrapIndex(pitch, QUARTER_TURN_COUNT) === INVERTED_PITCH ? FLIPPED : UNFLIPPED;
+
+    /**
+     * The turns a drag in progress stands for, one box width or height being one quarter turn.
+     *
+     * @param travel How far the pointer has travelled, as signed fractions of the box's width and height.
+     * @param acrossSign What {@link getAcrossSign} gives.
+     * @returns The turns, fractional while the drag is held.
+     */
+    export const getDragTurns = (travel: { x: number; y: number }, acrossSign: number): CuboidTurns => ({
+        yaw: -travel.x * acrossSign,
+        pitch: travel.y,
+    });
+
+    /**
+     * The whole turns a drag is recorded as when it is let go.
+     *
+     * Each axis rounds to the nearest quarter turn, halves away from nothing, and a drag that did not commit
+     * records nothing at all, so it springs back to the face it started on.
+     *
+     * @param direction The direction the swipe committed to, or `undefined` when it fell short.
+     * @param dragged The turns the drag stood for when it was let go.
+     * @returns The turns to add to the two counts.
+     */
+    export const getReleaseTurns = (direction: SwipeDirection | undefined, dragged: CuboidTurns): CuboidTurns =>
+        direction === undefined ? NO_TURNS : { yaw: roundTurn(dragged.yaw), pitch: roundTurn(dragged.pitch) };
+
+    /**
+     * The transform the cuboid's body is drawn with.
+     *
+     * Upright, it is the kept orientation with the drag in progress on top; otherwise it is the two counts as a
+     * pose, the drag added to each.
+     *
+     * @param isUpright Whether the cuboid keeps its own orientation.
+     * @param orientation The orientation it keeps.
+     * @param yaw Quarter turns across.
+     * @param pitch Quarter turns up.
+     * @param dragTurns The drag in progress, nothing when none is.
+     * @param size The cuboid's width, height and depth.
+     * @returns The CSS `transform`.
+     */
+    export const getBodyTransform = (
+        isUpright: boolean,
+        orientation: Matrix3d,
+        yaw: number,
+        pitch: number,
+        dragTurns: CuboidTurns,
+        size: CuboidSize,
+    ) =>
+        isUpright
+            ? getOrientationTransform(orientation, size, dragTurns)
+            : getTurnTransform(yaw + dragTurns.yaw, pitch + dragTurns.pitch, size);
+
+    /**
+     * The turns that bring a face to the front from where the cuboid is, for turning to a face by name.
+     *
+     * {@link getTurnsTo}, asking the question the mode needs: the counts as a pose, or presses from the kept
+     * orientation.
+     *
+     * @param face The face wanted.
+     * @param isUpright Whether the cuboid keeps its own orientation.
+     * @param orientation The orientation it keeps.
+     * @param yaw Quarter turns across.
+     * @param pitch Quarter turns up.
+     * @returns The turns to add to the two counts, or `undefined` when the face already shows or no route finds
+     * it.
+     */
+    export const findTurnsTo = (
+        face: CuboidFace,
+        isUpright: boolean,
+        orientation: Matrix3d,
+        yaw: number,
+        pitch: number,
+    ) => {
+        const turns = getTurnsTo(face, (candidate) =>
+            isUpright
+                ? getFacingFromOrientation(turnUpright(orientation, candidate))
+                : getFacingFromTurns(yaw + candidate.yaw, pitch + candidate.pitch),
+        );
+
+        return !turns || (turns.yaw === 0 && turns.pitch === 0) ? undefined : turns;
+    };
+
+    /**
+     * Where one face's box sits inside the cuboid's front-facing box, before it is pushed out to its surface.
+     *
+     * @param face The face.
+     * @param size The cuboid's width, height and depth.
+     * @returns The face's width and height, and its offset from the top left, so it is centered.
+     */
+    export const getFaceBox = (face: CuboidFace, size: CuboidSize) => {
+        const faceSize = getFaceSize(face, size);
+
+        return {
+            ...faceSize,
+            left: (size.width - faceSize.width) * HALF,
+            top: (size.height - faceSize.height) * HALF,
+        };
+    };
+
+    /**
+     * Where the cuboid's body is drawn right now, part-way through a turn or a drag included.
+     *
+     * @param body The element carrying the body's transform.
+     * @returns The orientation, or `undefined` when there is no body or its transform cannot be read.
+     */
+    export const readDrawnOrientation = (body: HTMLElement | undefined) =>
+        body && readOrientation(getComputedStyle(body).transform);
+
+    /**
+     * Stops a settle under way, leaving the body drawn at whatever its transform now says.
+     *
+     * @param body The element carrying the body's transform.
+     */
+    export const stopSettling = (body: HTMLElement | undefined) => {
+        for (const animation of body?.getAnimations() ?? []) animation.cancel();
+    };
+
+    /**
+     * Animates the body from where it was drawn to where it should rest, the way {@link getSettleKeyframes}
+     * lays out.
+     *
+     * The upright mode draws each orientation at once and lets this carry the eye there, because a transition
+     * between two matrices may go the long way round. A settle already under way is stopped first, so a second
+     * press starts from wherever the first had got to.
+     *
+     * @param body The element carrying the body's transform.
+     * @param from Where it was drawn, from {@link readDrawnOrientation}. Without it nothing animates.
+     * @param to Where it should rest.
+     * @param size The cuboid's width, height and depth.
+     * @param turns The presses that asked for the move, for deciding a half turn.
+     * @param durationMs How long the settle takes. Nothing animates at `0`.
+     */
+    export const settle = (
+        body: HTMLElement | undefined,
+        from: Matrix3d | undefined,
+        to: Matrix3d,
+        size: CuboidSize,
+        turns: CuboidTurns,
+        durationMs: number,
+    ) => {
+        stopSettling(body);
+
+        if (!from || durationMs <= NO_DURATION) return;
+
+        const keyframes = getSettleKeyframes(from, to, size, turns);
+
+        if (keyframes.length > 0) body?.animate(keyframes, { duration: durationMs, easing: SETTLE_EASING });
     };
 }

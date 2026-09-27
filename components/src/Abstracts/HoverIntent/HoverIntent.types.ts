@@ -16,9 +16,8 @@ export type HoverIntentShowDelayDefs = {
     msSinceLastClose: number;
 };
 
-export type HoverIntentDefs = {
+export type HoverIntentControllerDefs = {
     delayGroup: HoverIntentDelayGroup;
-    getPanelRef: () => HTMLElement | undefined;
     getHoverShowDelayMs: () => number;
     getSkipDelayWindowMs: () => number;
     getFocusShowDelayMs?: () => number;
@@ -27,7 +26,18 @@ export type HoverIntentDefs = {
     isTouchIgnored?: boolean;
 };
 
+export type HoverIntentDefs = HoverIntentControllerDefs & {
+    getPanelRef: () => HTMLElement | undefined;
+};
+
 export type HoverIntentHandle = {
     getIsPointerInside: () => boolean;
     cancel: () => void;
+};
+
+export type HoverIntentController = HoverIntentHandle & {
+    observeAnchor: (element: HTMLElement) => () => void;
+    observePanel: (element: HTMLElement) => () => void;
+    reportShown: (isShown: boolean) => void;
+    stop: () => void;
 };

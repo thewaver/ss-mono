@@ -1,8 +1,4 @@
-import type { Accessor, JSX } from "solid-js";
-
 import type { Point3d, Size2d } from "@thewaver/ss-utils";
-
-import type { AccessorProps, SignalSource } from "../../Utils/typeUtils";
 
 export type DieShape = {
     vertices: Point3d[];
@@ -36,45 +32,45 @@ export type DieFaceState = {
     size: Size2d;
 };
 
-export type DieController = {
-    /** Whether a roll is under way. */
-    getIsRolling: Accessor<boolean>;
-    /** Starts a roll and reports whether it did. It declines while one is already under way. */
-    roll: () => boolean;
+export type DieRollerState = {
+    /** How the die is turned right now, part-way through a roll included. */
+    orientation: DieQuaternion;
+    /** Whether a roll is under way, from the moment it is asked for until it lands. */
+    isRolling: boolean;
+    /** The face the die has come to rest on, or `undefined` while it turns. */
+    restingFace: number | undefined;
 };
 
-export type DieProps = AccessorProps<{
-    /**
-     * The solid: its corners, and its faces as lists of corners. Each face must be flat, the solid must be convex, and a
-     * face's first corner is the one its top points at when it is turned towards the viewer.
-     */
-    shape: DieShape;
-    /** How far across the die is at its widest, corner to corner, in pixels. */
-    size: number;
-    /** How long a roll takes from the moment it starts to the moment it lands. */
-    rollDurationMs?: number;
+export type DieRollerOpts = {
+    /** The face geometry the die is drawn with, at its current size. */
+    getGeometry: () => DieFaceGeometry[];
+    /** The face the owner says is showing, already clamped to the faces there are. */
+    getShownFace: () => number;
+    /** How long a roll takes. */
+    getRollDurationMs: () => number;
     /** How many whole tumbles a roll makes on the way to its face. */
-    tumbleCount?: number;
-    /** Names the die for assistive technology. */
-    ariaLabel: string;
-    /** Names one face, which is what a reader is told is showing and what is announced when a roll lands. */
-    computeFaceLabel: (index: number) => string;
-    /** What the die is called when it is announced, so a reader hears die rather than group. Defaults to "die". */
-    roleDescription?: string;
-    /** What one face is called when it is announced, so a reader hears face rather than group. Defaults to "face". */
-    faceRoleDescription?: string;
-    /**
-     * The face turned towards the viewer. Both sides write it: the die as soon as a roll's result is known, before the
-     * roll lands, and the consumer to turn it to a face directly, which it does without tumbling. Leave it out and the
-     * die keeps it itself, starting on the first face.
-     */
-    faceSignal?: SignalSource<number>;
-    /** Chooses which face a roll lands on. It may answer later, so the result can come from a server. */
+    getTumbleCount: () => number;
+    /** Chooses which face a roll lands on. It may answer later. */
     computeRollTarget: () => number | Promise<number>;
-    /** Runs once a roll has landed, with the face it landed on. */
+    /** Names one face, which is what is announced when a roll lands. */
+    computeFaceLabel: (index: number) => string;
+    /** Writes the face showing back to its owner, as soon as a roll's result is known. */
+    writeFace: (index: number) => void;
+    /** Runs once a roll has landed. */
     onRollEnd?: (index: number) => void;
-    /** Draws one face. The face's box is clipped to its outline, so the painter can simply fill it. */
-    renderFace: (getIndex: Accessor<number>, getState: Accessor<DieFaceState>) => JSX.Element;
-    /** Hands the consumer a controller once the die is up, for rolling it from outside. */
-    onMount?: (controller: DieController) => void;
-}>;
+};
+
+export type DieRoller = {
+    /** The die's state. */
+    get: () => DieRollerState;
+    /** Calls `listener` whenever the state changes, until the returned function is called. */
+    subscribe: (listener: () => void) => () => void;
+    /** Puts the die straight onto a face, stopping any turn under way. */
+    rest: (index: number) => void;
+    /** Turns the die to a face the owner asked for, without tumbling. The echo of a roll's own write is ignored. */
+    turnTo: (index: number) => void;
+    /** Starts a roll and reports whether it did. It declines while one is already under way. */
+    roll: () => boolean;
+    /** Stops any turn under way, leaving the die where it is drawn. */
+    stop: () => void;
+};

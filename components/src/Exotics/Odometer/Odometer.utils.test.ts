@@ -221,3 +221,61 @@ describe("getSlotFlags", () => {
         expect(OdometerUtils.getSlotFlags("leaving")).toEqual({ isEntering: false, isLeaving: true });
     });
 });
+
+describe("getFixedSlots and getDigitSlots", () => {
+    it("split the slots into the two kinds, each keeping where it sat among all of them", () => {
+        const slots = OdometerUtils.getSlots("1,20");
+
+        expect(OdometerUtils.getFixedSlots(slots)).toEqual([{ character: ",", order: 1 }]);
+        expect(OdometerUtils.getDigitSlots(slots)).toEqual([
+            { order: 0, digitIndex: 0 },
+            { order: 2, digitIndex: 1 },
+            { order: 3, digitIndex: 2 },
+        ]);
+    });
+});
+
+describe("computeTurn", () => {
+    const base = { isInstant: false, reels: undefined, cascadeDelayMs: 100 };
+
+    it("turns a carrying column on from where it was and cascades from the right", () => {
+        const angles = [1, 9, 9].map(OdometerUtils.getRestingAngle);
+        const turn = OdometerUtils.computeTurn({
+            ...base,
+            shownDigits: [1, 9, 9],
+            columnDigits: [1, 9, 9],
+            angles,
+            digits: [2, 0, 0],
+        });
+
+        expect(turn.delays).toEqual([200, 100, 0]);
+        expect(turn.angles[2]).toBe(angles[2]! - 36);
+        expect(turn.columnDigits).toEqual([2, 0, 0]);
+    });
+
+    it("keeps a leaving column's angle and digit, unless motion is reduced", () => {
+        const args = { ...base, shownDigits: [1, 0], columnDigits: [1, 0], angles: [-36, 0], digits: [9] };
+
+        expect(OdometerUtils.computeTurn(args).angles).toHaveLength(2);
+        expect(OdometerUtils.computeTurn(args).columnDigits).toEqual([9, 0]);
+        expect(OdometerUtils.computeTurn({ ...args, isInstant: true }).angles).toHaveLength(1);
+    });
+
+    it("hands each column its reel's duration and runs no cascade under reels", () => {
+        const turn = OdometerUtils.computeTurn({
+            ...base,
+            shownDigits: [0, 0],
+            columnDigits: [0, 0],
+            angles: [0, 0],
+            digits: [0, 1],
+            reels: [
+                { extraTurns: 1, durationMs: 500 },
+                { extraTurns: 2, durationMs: 900 },
+            ],
+        });
+
+        expect(turn.delays).toEqual([0, 0]);
+        expect(turn.durations).toEqual([500, 900]);
+        expect(turn.angles[0]).toBe(-360);
+    });
+});

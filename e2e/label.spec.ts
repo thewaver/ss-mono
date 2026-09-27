@@ -24,7 +24,7 @@ test("a Label wraps caption and control, and the caption activates it", async ({
  * The warning fires while the component mounts, so the listener has to be attached before the
  * navigation rather than in `beforeEach` after it.
  */
-test("an aria-label inside a Label warns and is dropped", async ({ page }) => {
+test("an aria-label inside a Label warns and is dropped @solid", async ({ page }) => {
     const messages: ConsoleMessage[] = [];
 
     page.on("console", (message) => messages.push(message));
@@ -33,6 +33,27 @@ test("an aria-label inside a Label warns and is dropped", async ({ page }) => {
     await expect(page.locator("[data-example]").first()).toBeVisible();
 
     const warning = messages.find((message) => message.text().startsWith("Label: getAriaLabel"));
+
+    expect(warning, "an aria-label inside a Label warns, rather than silently renaming the control").toBeTruthy();
+    expect(warning?.type(), "and it warns rather than logs").toBe("warning");
+    await expect(
+        page.locator(`${SUPPRESSED} input`),
+        "the aria-label is dropped, so the visible caption stays the accessible name",
+    ).not.toHaveAttribute("aria-label");
+});
+
+/**
+ * The same warning in the React Playground, where the prop, and so the warning, is named `ariaLabel`.
+ */
+test("an aria-label inside a Label warns and is dropped @react", async ({ page }) => {
+    const messages: ConsoleMessage[] = [];
+
+    page.on("console", (message) => messages.push(message));
+
+    await page.goto("/label");
+    await expect(page.locator("[data-example]").first()).toBeVisible();
+
+    const warning = messages.find((message) => message.text().startsWith("Label: ariaLabel"));
 
     expect(warning, "an aria-label inside a Label warns, rather than silently renaming the control").toBeTruthy();
     expect(warning?.type(), "and it warns rather than logs").toBe("warning");

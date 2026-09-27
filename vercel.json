@@ -1,10 +1,31 @@
 {
-    "buildCommand": "npm run build:playground",
-    "outputDirectory": "playground/dist",
+    "buildCommand": "npm run build:site",
+    "outputDirectory": "dist",
+    "redirects": [
+        {
+            "source": "/solid",
+            "destination": "/solid/",
+            "permanent": true
+        },
+        {
+            "source": "/react",
+            "destination": "/react/",
+            "permanent": true
+        },
+        {
+            "source": "/:path((?!solid(?:/|$)|react(?:/|$)|index\\.html$).+)",
+            "destination": "/solid/:path",
+            "permanent": true
+        }
+    ],
     "rewrites": [
         {
-            "source": "/(.*)",
-            "destination": "/index.html"
+            "source": "/solid/(.*)",
+            "destination": "/solid/index.html"
+        },
+        {
+            "source": "/react/(.*)",
+            "destination": "/react/index.html"
         }
     ]
 }

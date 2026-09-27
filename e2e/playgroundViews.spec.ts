@@ -44,7 +44,7 @@ test("each tab carries its view into the URL, and a deep link lands on it", asyn
  * marked required or not to match. Nothing here pins how many rows there are: props get added, and a count
  * would go red for that without anything being wrong.
  */
-test("the props table is the published type, not a transcription of it", async ({ page }) => {
+test("the props table is the published type, not a transcription of it @solid", async ({ page }) => {
     await page.goto("/tabs/docs");
     await expect(page.locator(TABS_PROPS)).toBeVisible();
 
@@ -62,6 +62,28 @@ test("the props table is the published type, not a transcription of it", async (
         optional,
         "with the accessor wrapper stated once, beside the type rather than inside it",
     ).toContainText("value or accessor");
+});
+
+/**
+ * The same table in the React Playground, read off the React package's type. A render callback there returns
+ * `ReactNode`, and a prop carries its value as it is — there is no accessor to state beside the type, so the
+ * table states none.
+ */
+test("the props table is the published type, not a transcription of it @react", async ({ page }) => {
+    await page.goto("/tabs/docs");
+    await expect(page.locator(TABS_PROPS)).toBeVisible();
+
+    const required = page.locator(TABS_PROPS).locator('[data-api-row="renderTab"]');
+    await expect(required, "a prop the type declares has a row").toHaveCount(1);
+    await expect(required, "carrying what it returns").toContainText("ReactNode");
+    await expect(required, "and marked required, since the type does not make it optional").toContainText("required");
+
+    const optional = page.locator(TABS_PROPS).locator('[data-api-row="tabGap"]');
+    await expect(optional, "an optional prop is marked by its name rather than in the type column").toContainText(
+        "tabGap?",
+    );
+    await expect(optional, "and its type is the value it carries").toContainText("number");
+    await expect(optional, "with no accessor wrapper, since a React prop is its value").not.toContainText("accessor");
 });
 
 /**

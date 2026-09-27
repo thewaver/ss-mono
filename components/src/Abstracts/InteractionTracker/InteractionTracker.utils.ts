@@ -1,14 +1,20 @@
-import { createEffect, createMemo, createSignal, on, onCleanup } from "solid-js";
-import { createStore } from "solid-js/store";
-
-import { GestureUtils, MathUtils } from "@thewaver/ss-utils";
+import { GestureUtils, MathUtils, StoreUtils } from "@thewaver/ss-utils";
 import type { SwipeAxis, SwipeDirection } from "@thewaver/ss-utils";
 
 import { NavigatorUtils } from "../Navigator/Navigator.utils";
 import type {
     InteractionActivation,
+    InteractionActivationTracker,
     InteractionDragEndReason,
     InteractionDragRatio,
+    InteractionDragTracker,
+    InteractionElementOpts,
+    InteractionElementState,
+    InteractionElementTracker,
+    InteractionHoldState,
+    InteractionHoldTracker,
+    InteractionPageHiddenWatcher,
+    InteractionSwipeTracker,
     InternalInteractionFlags,
 } from "./InteractionTracker.types";
 
@@ -83,6 +89,17 @@ const clampRatio = (ratio: InteractionDragRatio): InteractionDragRatio => ({
     y: MathUtils.clamp01(ratio.y),
 });
 
+/** Nothing hovered, focused or pressed, and no flag written yet. */
+const IDLE_ELEMENT_STATE: InteractionElementState = { isActiveByMouse: false, isActiveByKey: false };
+
+/** Neither hovered nor holding focus. */
+const IDLE_HOLD_STATE: InteractionHoldState = { isHovered: false, hasFocusWithin: false };
+
+/** Stops a press from focusing a control that must not take focus. */
+const preventFocusOnPress = (e: MouseEvent) => {
+    e.preventDefault();
+};
+
 /**
  * The shared pointer-drag machinery behind dragging and swiping.
  *
@@ -91,63 +108,36 @@ const clampRatio = (ratio: InteractionDragRatio): InteractionDragRatio => ({
  * really a swipe. And once engaged, the pointer is captured, so the gesture survives the pointer
  * leaving the element or the window.
  *
- * @param getRef The element the gesture happens on.
- * @param getIsDisabled Whether to ignore gestures.
+ * Stopping only removes the listeners, so a gesture under way survives them being attached again; `reset` is
+ * what forgets it and reports it disengaged, without calling `onEnd`.
+ *
  * @param opts.isMeasuredFromStart Measures ratios against the element's rectangle as it was when the
  * gesture began rather than as it is now, for a gesture that moves the element it is being tracked
  * on.
  * @param opts.onDown Called on press, with a chance to engage immediately.
  * @param opts.onMove Called on every move, engaged or not, with a chance to engage.
  * @param opts.onEnd Called only if the gesture was engaged.
- * @returns `getIsEngaged`, true while the gesture is owned.
+ * @returns A store of whether the gesture is owned, `observe` to track an element until stopped, and `reset`.
  */
-const trackPointer = (
-    getRef: () => HTMLElement | undefined,
-    getIsDisabled: () => boolean,
-    opts: {
-        isMeasuredFromStart?: boolean;
-        onDown: (ratio: InteractionDragRatio, engage: () => void) => void;
-        onMove: (ratio: InteractionDragRatio, engage: () => void) => void;
-        onEnd: (reason: InteractionDragEndReason) => void;
-    },
-) => {
-    const [getIsEngaged, setIsEngaged] = createSignal(false);
+const createPointerGesture = (opts: {
+    isMeasuredFromStart?: boolean;
+    onDown: (ratio: InteractionDragRatio, engage: () => void) => void;
+    onMove: (ratio: InteractionDragRatio, engage: () => void) => void;
+    onEnd: (reason: InteractionDragEndReason) => void;
+}) => {
+    const engaged = StoreUtils.create(false);
 
     let pointerId: number | undefined;
     let startRect: DOMRect | undefined;
 
-    createEffect(
-        on(
-            getRef,
-            () => {
-                pointerId = undefined;
-                startRect = undefined;
-
-                setIsEngaged(false);
-            },
-            { defer: true },
-        ),
-    );
-
-    createEffect(() => {
-        const ref = getRef();
-
-        if (!ref || getIsDisabled()) {
-            pointerId = undefined;
-            startRect = undefined;
-
-            setIsEngaged(false);
-
-            return;
-        }
-
-        const measure = () => (opts.isMeasuredFromStart && startRect ? startRect : ref.getBoundingClientRect());
+    const observe = (element: HTMLElement) => {
+        const measure = () => (opts.isMeasuredFromStart && startRect ? startRect : element.getBoundingClientRect());
 
         const engage = () => {
             if (pointerId === undefined) return;
 
-            ref.setPointerCapture(pointerId);
-            setIsEngaged(true);
+            element.setPointerCapture(pointerId);
+            engaged.set(true);
         };
 
         const onPointerDown = (e: PointerEvent) => {
@@ -155,11 +145,11 @@ const trackPointer = (
             if (pointerId !== undefined) return;
 
             pointerId = e.pointerId;
-            startRect = ref.getBoundingClientRect();
+            startRect = element.getBoundingClientRect();
 
             opts.onDown(computeRatio(startRect, e.clientX, e.clientY), engage);
 
-            if (getIsEngaged()) e.preventDefault();
+            if (engaged.get()) e.preventDefault();
         };
 
         const onPointerMove = (e: PointerEvent) => {
@@ -167,38 +157,45 @@ const trackPointer = (
 
             opts.onMove(computeRatio(measure(), e.clientX, e.clientY), engage);
 
-            if (getIsEngaged()) e.preventDefault();
+            if (engaged.get()) e.preventDefault();
         };
 
         const onPointerEnd = (e: PointerEvent) => {
             if (e.pointerId !== pointerId) return;
 
-            const wasEngaged = getIsEngaged();
+            const wasEngaged = engaged.get();
 
-            if (ref.hasPointerCapture(e.pointerId)) ref.releasePointerCapture(e.pointerId);
+            if (element.hasPointerCapture(e.pointerId)) element.releasePointerCapture(e.pointerId);
 
             pointerId = undefined;
             startRect = undefined;
 
-            setIsEngaged(false);
+            engaged.set(false);
 
             if (wasEngaged) opts.onEnd(e.type === "pointercancel" ? "cancel" : "release");
         };
 
-        ref.addEventListener("pointerdown", onPointerDown);
-        ref.addEventListener("pointermove", onPointerMove);
+        element.addEventListener("pointerdown", onPointerDown);
+        element.addEventListener("pointermove", onPointerMove);
         document.addEventListener("pointerup", onPointerEnd);
         document.addEventListener("pointercancel", onPointerEnd);
 
-        onCleanup(() => {
-            ref.removeEventListener("pointerdown", onPointerDown);
-            ref.removeEventListener("pointermove", onPointerMove);
+        return () => {
+            element.removeEventListener("pointerdown", onPointerDown);
+            element.removeEventListener("pointermove", onPointerMove);
             document.removeEventListener("pointerup", onPointerEnd);
             document.removeEventListener("pointercancel", onPointerEnd);
-        });
-    });
+        };
+    };
 
-    return { getIsEngaged };
+    const reset = () => {
+        pointerId = undefined;
+        startRect = undefined;
+
+        engaged.set(false);
+    };
+
+    return { engaged, observe, reset };
 };
 
 /**
@@ -213,24 +210,18 @@ const trackPointer = (
  * An `undefined` axis means free: both axes are measured, and the one traveled furthest is the one that
  * commits.
  *
- * @param getRef The element to track.
- * @param getIsDisabled Whether to ignore swipes.
  * @param opts.getAxis Which axis is live, or `undefined` for both.
  * @param opts.getCommitRatio How far the swipe must travel to count, as a fraction of the element.
  * @param opts.onSwipe Called on every move once the gesture is owned, with signed travel on both axes.
  * @param opts.onSwipeEnd Called when the swipe finishes, with the committed direction or `undefined`.
- * @returns `getIsEngaged`.
+ * @returns The tracker.
  */
-const trackSwipeGesture = (
-    getRef: () => HTMLElement | undefined,
-    getIsDisabled: () => boolean,
-    opts: {
-        getAxis: () => SwipeAxis | undefined;
-        getCommitRatio: () => number;
-        onSwipe: (progress: InteractionDragRatio) => void;
-        onSwipeEnd: (direction: SwipeDirection | undefined) => void;
-    },
-) => {
+const createSwipeGesture = (opts: {
+    getAxis: () => SwipeAxis | undefined;
+    getCommitRatio: () => number;
+    onSwipe: (progress: InteractionDragRatio) => void;
+    onSwipeEnd: (direction: SwipeDirection | undefined) => void;
+}): InteractionSwipeTracker => {
     let origin: InteractionDragRatio | undefined;
     let progress = NO_SWIPE_PROGRESS;
     let hasPendingClick = false;
@@ -256,7 +247,7 @@ const trackSwipeGesture = (
         return GestureUtils.computeSwipeDirection(getAxisTravel(value, axis), axis, opts.getCommitRatio());
     };
 
-    const { getIsEngaged } = trackPointer(getRef, getIsDisabled, {
+    const pointer = createPointerGesture({
         isMeasuredFromStart: true,
         onDown: (ratio) => {
             origin = ratio;
@@ -268,7 +259,7 @@ const trackSwipeGesture = (
 
             progress = computeProgress(origin, ratio);
 
-            if (!getIsEngaged()) {
+            if (!pointer.engaged.get()) {
                 if (getLiveTravel(progress) < SWIPE_SLOP_RATIO) return;
 
                 engage();
@@ -287,27 +278,7 @@ const trackSwipeGesture = (
         },
     });
 
-    createEffect(() => {
-        const ref = getRef();
-
-        if (!ref) return;
-
-        if (getIsDisabled()) {
-            ref.style.touchAction = "";
-
-            return;
-        }
-
-        const axis = opts.getAxis();
-
-        ref.style.touchAction = axis === undefined ? FREE_SWIPE_TOUCH_ACTION : SWIPE_TOUCH_ACTIONS[axis];
-    });
-
-    createEffect(() => {
-        const ref = getRef();
-
-        if (!ref || getIsDisabled()) return;
-
+    const observeTouches = (element: HTMLElement) => {
         let startTouch: { clientX: number; clientY: number } | undefined;
         let isOwned: boolean | undefined;
 
@@ -330,7 +301,7 @@ const trackSwipeGesture = (
 
                 if (delta === 0) return;
 
-                isOwned = !getHasScrollChainRoom(e.target, ref, axis, delta);
+                isOwned = !getHasScrollChainRoom(e.target, element, axis, delta);
             }
 
             if (isOwned && e.cancelable) e.preventDefault();
@@ -341,41 +312,58 @@ const trackSwipeGesture = (
             isOwned = undefined;
         };
 
-        ref.addEventListener("touchstart", onTouchStart, { passive: true });
-        ref.addEventListener("touchmove", onTouchMove, { passive: false });
-        ref.addEventListener("touchend", onTouchEnd, { passive: true });
-        ref.addEventListener("touchcancel", onTouchEnd, { passive: true });
+        element.addEventListener("touchstart", onTouchStart, { passive: true });
+        element.addEventListener("touchmove", onTouchMove, { passive: false });
+        element.addEventListener("touchend", onTouchEnd, { passive: true });
+        element.addEventListener("touchcancel", onTouchEnd, { passive: true });
 
-        onCleanup(() => {
-            ref.removeEventListener("touchstart", onTouchStart);
-            ref.removeEventListener("touchmove", onTouchMove);
-            ref.removeEventListener("touchend", onTouchEnd);
-            ref.removeEventListener("touchcancel", onTouchEnd);
-        });
-    });
-
-    createEffect(() => {
-        const ref = getRef();
-
-        if (!ref) return;
-
-        const onClick = (e: MouseEvent) => {
-            if (!hasPendingClick) return;
-
-            hasPendingClick = false;
-
-            e.preventDefault();
-            e.stopPropagation();
+        return () => {
+            element.removeEventListener("touchstart", onTouchStart);
+            element.removeEventListener("touchmove", onTouchMove);
+            element.removeEventListener("touchend", onTouchEnd);
+            element.removeEventListener("touchcancel", onTouchEnd);
         };
+    };
 
-        ref.addEventListener("click", onClick, true);
+    return {
+        get: pointer.engaged.get,
+        subscribe: pointer.engaged.subscribe,
+        observe: (element) => {
+            const stopPointer = pointer.observe(element);
+            const stopTouches = observeTouches(element);
 
-        onCleanup(() => {
-            ref.removeEventListener("click", onClick, true);
-        });
-    });
+            return () => {
+                stopPointer();
+                stopTouches();
+            };
+        },
+        reset: pointer.reset,
+        observeClicks: (element) => {
+            const onClick = (e: MouseEvent) => {
+                if (!hasPendingClick) return;
 
-    return { getIsEngaged };
+                hasPendingClick = false;
+
+                e.preventDefault();
+                e.stopPropagation();
+            };
+
+            element.addEventListener("click", onClick, true);
+
+            return () => element.removeEventListener("click", onClick, true);
+        },
+        applyTouchAction: (element, isDisabled) => {
+            if (isDisabled) {
+                element.style.touchAction = "";
+
+                return;
+            }
+
+            const axis = opts.getAxis();
+
+            element.style.touchAction = axis === undefined ? FREE_SWIPE_TOUCH_ACTION : SWIPE_TOUCH_ACTIONS[axis];
+        },
+    };
 };
 
 /**
@@ -387,6 +375,9 @@ const trackSwipeGesture = (
  * appear for the keyboard and not for the mouse, as the browser itself decides; a swipe yields to a
  * scroller that has not reached its end; and a gesture that has been taken over does not also fire
  * a click at the end.
+ *
+ * Each tracker here watches an element between `observe` and the function it returns, and can be started
+ * again afterwards; what changes over time is held in a store.
  */
 export namespace InteractionTrackerUtils {
     /**
@@ -419,121 +410,100 @@ export namespace InteractionTrackerUtils {
     ) => isDisabled && (isReachableWhenDisabled || isFocusableWhenDisabled);
 
     /**
-     * Manages the tab order of an element's secondary controls.
+     * Sets the tab order of one of an element's secondary controls, and stops a disabled one taking focus.
      *
      * For the extra buttons a composite control carries — a clear button in a field, a step button on a
      * number input — which follow the parent's disabled state but are not the thing being tracked.
      * Pressing a disabled one does not steal focus, which is the one behavior a native `disabled`
      * would have given for free.
      *
-     * @param getRefs The controls. Missing entries are skipped, so refs that have not attached yet are
-     * fine.
-     * @param getIsDisabled Whether the parent is disabled.
-     * @param opts.getIsTabbable Pass `false` to take the controls out of the tab order while still
-     * enabled, for a control reached through its parent rather than directly.
+     * @param element The control.
+     * @param opts.isDisabled Whether the parent is disabled.
+     * @param opts.isTabbable Pass `false` to take the control out of the tab order while still enabled, for a
+     * control reached through its parent rather than directly.
+     * @returns The function that stops refusing focus. The tab order is left as it was set.
      */
-    export const wrapExtraControls = (
-        getRefs: () => Array<HTMLElement | undefined>,
-        getIsDisabled: () => boolean,
-        opts?: { getIsTabbable?: () => boolean },
-    ) => {
-        const onDisabledMouseDown = (e: MouseEvent) => {
-            e.preventDefault();
-        };
+    export const wrapExtraControl = (element: HTMLElement, opts: { isDisabled: boolean; isTabbable: boolean }) => {
+        element.tabIndex = !opts.isDisabled && opts.isTabbable ? 0 : -1;
 
-        createEffect(() => {
-            const isDisabled = getIsDisabled();
-            const isTabbable = opts?.getIsTabbable?.() ?? true;
+        if (!opts.isDisabled) return () => {};
 
-            for (const ref of getRefs()) {
-                if (!ref) continue;
+        element.addEventListener("mousedown", preventFocusOnPress);
 
-                ref.tabIndex = !isDisabled && isTabbable ? 0 : -1;
-
-                if (!isDisabled) continue;
-
-                ref.addEventListener("mousedown", onDisabledMouseDown);
-
-                onCleanup(() => {
-                    ref.removeEventListener("mousedown", onDisabledMouseDown);
-                });
-            }
-        });
+        return () => element.removeEventListener("mousedown", preventFocusOnPress);
     };
 
     /**
-     * Tracks hover, focus and press on an element, and reports them as flags.
+     * The flags a painter reads, from what an element tracker holds and whether the element is disabled.
      *
-     * The flags are cleared rather than frozen when the element becomes disabled, so a control disabled
-     * while the pointer is over it does not stay stuck looking hovered. Press is tracked separately for
-     * mouse and keyboard because they end differently — the mouse on release anywhere, the keyboard on
-     * key up or on losing focus.
+     * Hover and press are cleared rather than frozen when the element is disabled, so a control disabled
+     * while the pointer is over it does not stay stuck looking hovered. Focus is left alone, so a disabled
+     * control that is still reachable keeps its ring.
      *
-     * @param getRef The element to track.
-     * @param getIsDisabled Whether the element is disabled.
-     * @param opts.applyButtonSemantics Gives the element a button role, `aria-disabled` and a cursor.
-     * Uses `aria-disabled` rather than the `disabled` attribute so the element stays focusable and can
-     * still explain itself.
-     * @param opts.getIsReachable Whether a disabled element should still be focusable — the answer from
-     * {@link InteractionTrackerUtils.computeIsReachable}.
-     * @param opts.getIsTabbable Pass `false` to take the element out of the tab order while still
-     * enabled.
-     * @returns `getFlags`, giving `isHovered`, `isFocused`, `isFocusVisible` and `isActive`.
+     * @param state What {@link createElementTracker} holds.
+     * @param isDisabled Whether the element is disabled.
+     * @returns `isHovered`, `isFocused`, `isFocusVisible` and `isActive`. The two focus flags are absent until the
+     * element has first been focused or blurred.
      */
-    export const wrapElement = (
-        getRef: () => HTMLElement | undefined,
-        getIsDisabled: () => boolean,
-        opts?: {
-            applyButtonSemantics?: boolean;
-            getIsReachable?: () => boolean;
-            getIsTabbable?: () => boolean;
-        },
-    ) => {
-        const [internalFlags, setInternalFlags] = createStore<InternalInteractionFlags>({});
-        const [getActiveByMouse, setActiveByMouse] = createSignal(false);
-        const [getActiveByKey, setActiveByKey] = createSignal(false);
+    export const computeFlags = (state: InteractionElementState, isDisabled: boolean): InternalInteractionFlags => {
+        const { isActiveByMouse, isActiveByKey, ...flags } = state;
 
-        const getFlags = createMemo(() => {
-            const isDisabled = getIsDisabled();
+        return {
+            ...flags,
+            isHovered: !isDisabled && (flags.isHovered ?? false),
+            isActive: !isDisabled && (isActiveByMouse || isActiveByKey),
+        };
+    };
 
-            const flags: InternalInteractionFlags = {
-                ...internalFlags,
-                isHovered: !isDisabled && (internalFlags.isHovered ?? false),
-                isActive: !isDisabled && (getActiveByMouse() || getActiveByKey()),
-            };
+    /**
+     * Tracks hover, focus and press on an element.
+     *
+     * The tracker is a store of the raw state; {@link computeFlags} turns it into what a painter reads. Press is
+     * tracked separately for mouse and keyboard because they end differently — the mouse on release anywhere, the
+     * keyboard on key up or on losing focus. A write that changes nothing is skipped, so a key press that leaves
+     * the focus ring as it was notifies nobody.
+     *
+     * `observe` also writes the element's tab order, and with `applyButtonSemantics` its role, `aria-disabled`
+     * and cursor. Observing a disabled element that is not reachable clears every flag, listens for nothing and
+     * refuses the press that would focus it.
+     *
+     * @returns The tracker. `observe(element, opts)` takes `isDisabled`, `isReachable` — the answer from
+     * {@link computeIsReachable} — `isTabbable`, `false` to take the element out of the tab order while still
+     * enabled, and `applyButtonSemantics`, which uses `aria-disabled` rather than the `disabled` attribute so the
+     * element stays focusable and can still explain itself.
+     */
+    export const createElementTracker = (): InteractionElementTracker => {
+        const store = StoreUtils.create(IDLE_ELEMENT_STATE, { isEqual: StoreUtils.getIsShallowEqual });
 
-            return flags;
-        });
+        const write = (next: Partial<InteractionElementState>) => store.update((current) => ({ ...current, ...next }));
 
         const readFocusVisible = (element: HTMLElement) => {
-            setInternalFlags("isFocusVisible", computeIsFocusVisible(element));
+            write({ isFocusVisible: computeIsFocusVisible(element) });
         };
 
         const onFocus = (e: FocusEvent) => {
-            setInternalFlags("isFocused", true);
+            write({ isFocused: true });
             readFocusVisible(e.currentTarget as HTMLElement);
         };
 
         const onBlur = () => {
-            setInternalFlags({ isFocused: false, isFocusVisible: false });
-            setActiveByKey(false);
+            write({ isFocused: false, isFocusVisible: false, isActiveByKey: false });
         };
 
         const onMouseEnter = () => {
-            setInternalFlags("isHovered", true);
+            write({ isHovered: true });
         };
 
         const onMouseLeave = () => {
-            setInternalFlags("isHovered", false);
-            setActiveByMouse(false);
+            write({ isHovered: false, isActiveByMouse: false });
         };
 
         const onMouseDown = () => {
-            setActiveByMouse(true);
+            write({ isActiveByMouse: true });
         };
 
         const onMouseUp = () => {
-            setActiveByMouse(false);
+            write({ isActiveByMouse: false });
         };
 
         const onKeyDown = (e: KeyboardEvent) => {
@@ -541,140 +511,125 @@ export namespace InteractionTrackerUtils {
 
             if (!NavigatorUtils.getIsActivationKey(e.key)) return;
 
-            setActiveByKey(true);
+            write({ isActiveByKey: true });
         };
 
         const onKeyUp = () => {
-            setActiveByKey(false);
+            write({ isActiveByKey: false });
         };
 
-        const onDisabledMouseDown = (e: MouseEvent) => {
-            e.preventDefault();
-        };
+        const observe = (element: HTMLElement, opts: InteractionElementOpts) => {
+            element.tabIndex = (!opts.isDisabled || opts.isReachable) && opts.isTabbable ? 0 : -1;
 
-        createEffect(() => {
-            const ref = getRef();
-            const isDisabled = getIsDisabled();
-            const isReachable = opts?.getIsReachable?.() ?? false;
-            const isTabbable = opts?.getIsTabbable?.() ?? true;
-
-            if (!ref) return;
-
-            ref.tabIndex = (!isDisabled || isReachable) && isTabbable ? 0 : -1;
-
-            if (opts?.applyButtonSemantics) {
-                ref.role = "button";
-                ref.ariaDisabled = String(isDisabled);
-                ref.style.cursor = !isDisabled ? "pointer" : "not-allowed";
+            if (opts.applyButtonSemantics) {
+                element.role = "button";
+                element.ariaDisabled = String(opts.isDisabled);
+                element.style.cursor = !opts.isDisabled ? "pointer" : "not-allowed";
             }
 
-            if (isDisabled && !isReachable) {
-                setInternalFlags({ isHovered: false, isFocused: false, isFocusVisible: false });
-                setActiveByKey(false);
-                setActiveByMouse(false);
-
-                ref.addEventListener("mousedown", onDisabledMouseDown);
-
-                onCleanup(() => {
-                    ref.removeEventListener("mousedown", onDisabledMouseDown);
+            if (opts.isDisabled && !opts.isReachable) {
+                write({
+                    isHovered: false,
+                    isFocused: false,
+                    isFocusVisible: false,
+                    isActiveByKey: false,
+                    isActiveByMouse: false,
                 });
 
-                return;
+                element.addEventListener("mousedown", preventFocusOnPress);
+
+                return () => element.removeEventListener("mousedown", preventFocusOnPress);
             }
 
-            ref.addEventListener("focus", onFocus);
-            ref.addEventListener("blur", onBlur);
-            ref.addEventListener("mouseenter", onMouseEnter);
-            ref.addEventListener("mouseleave", onMouseLeave);
-            ref.addEventListener("mousedown", onMouseDown);
-            ref.addEventListener("mouseup", onMouseUp);
-            ref.addEventListener("keydown", onKeyDown);
-            ref.addEventListener("keyup", onKeyUp);
+            element.addEventListener("focus", onFocus);
+            element.addEventListener("blur", onBlur);
+            element.addEventListener("mouseenter", onMouseEnter);
+            element.addEventListener("mouseleave", onMouseLeave);
+            element.addEventListener("mousedown", onMouseDown);
+            element.addEventListener("mouseup", onMouseUp);
+            element.addEventListener("keydown", onKeyDown);
+            element.addEventListener("keyup", onKeyUp);
 
-            onCleanup(() => {
-                ref.removeEventListener("focus", onFocus);
-                ref.removeEventListener("blur", onBlur);
-                ref.removeEventListener("mouseenter", onMouseEnter);
-                ref.removeEventListener("mouseleave", onMouseLeave);
-                ref.removeEventListener("mousedown", onMouseDown);
-                ref.removeEventListener("mouseup", onMouseUp);
-                ref.removeEventListener("keydown", onKeyDown);
-                ref.removeEventListener("keyup", onKeyUp);
-            });
-        });
+            return () => {
+                element.removeEventListener("focus", onFocus);
+                element.removeEventListener("blur", onBlur);
+                element.removeEventListener("mouseenter", onMouseEnter);
+                element.removeEventListener("mouseleave", onMouseLeave);
+                element.removeEventListener("mousedown", onMouseDown);
+                element.removeEventListener("mouseup", onMouseUp);
+                element.removeEventListener("keydown", onKeyDown);
+                element.removeEventListener("keyup", onKeyUp);
+            };
+        };
 
-        return { getFlags };
+        return { get: store.get, subscribe: store.subscribe, observe };
     };
 
     /**
-     * Whether the tab is currently in the background.
+     * Watches whether the tab is in the background.
      *
      * Anything on a timer wants this: a carousel should not advance, and a tooltip should not time out,
      * while nobody is watching.
      *
-     * @returns Whether the page is hidden.
+     * @returns A store of whether the page is hidden, read from the document when the watcher is made and kept
+     * current between `observe` and the function it returns.
      */
-    export const trackPageHidden = () => {
-        const [getIsPageHidden, setIsPageHidden] = createSignal(document.hidden);
+    export const createPageHiddenWatcher = (): InteractionPageHiddenWatcher => {
+        const store = StoreUtils.create(document.hidden);
 
-        const onVisibilityChange = () => setIsPageHidden(document.hidden);
+        const onVisibilityChange = () => store.set(document.hidden);
 
-        createEffect(() => {
-            document.addEventListener("visibilitychange", onVisibilityChange);
+        return {
+            get: store.get,
+            subscribe: store.subscribe,
+            observe: () => {
+                document.addEventListener("visibilitychange", onVisibilityChange);
 
-            onCleanup(() => {
-                document.removeEventListener("visibilitychange", onVisibilityChange);
-            });
-        });
-
-        return getIsPageHidden;
+                return () => document.removeEventListener("visibilitychange", onVisibilityChange);
+            },
+        };
     };
 
     /**
-     * Whether something should be held open rather than allowed to close on its own.
+     * Watches whether the pointer is over an element or focus is inside it.
      *
-     * Three reasons to hold, and they are all the same reason from the user's point of view — they are
-     * still using it. The pointer is over it, focus is inside it, or the tab is in the background so
-     * they are not there to see it at all. An auto-dismissing toast or a carousel checks this before
-     * moving on.
+     * Two of the three reasons to hold something open rather than letting it close on its own — the user is still
+     * using it. The third, the tab being in the background, is {@link createPageHiddenWatcher}'s.
      *
-     * @param getRef The element to watch.
-     * @returns Whether to hold.
+     * @returns A store of the two, kept current between `observe` and the function it returns. Stopping leaves
+     * them as they were last heard.
      */
-    export const trackHold = (getRef: () => HTMLElement | undefined) => {
-        const [getIsHovered, setIsHovered] = createSignal(false);
-        const [getHasFocusWithin, setHasFocusWithin] = createSignal(false);
+    export const createHoldTracker = (): InteractionHoldTracker => {
+        const store = StoreUtils.create(IDLE_HOLD_STATE, { isEqual: StoreUtils.getIsShallowEqual });
 
-        const getIsPageHidden = trackPageHidden();
+        const write = (next: Partial<InteractionHoldState>) => store.update((current) => ({ ...current, ...next }));
 
-        const onMouseEnter = () => setIsHovered(true);
-        const onMouseLeave = () => setIsHovered(false);
-        const onFocusIn = () => setHasFocusWithin(true);
+        const onMouseEnter = () => write({ isHovered: true });
+        const onMouseLeave = () => write({ isHovered: false });
+        const onFocusIn = () => write({ hasFocusWithin: true });
         const onFocusOut = (event: FocusEvent) => {
             if (!getHasLeft(event)) return;
 
-            setHasFocusWithin(false);
+            write({ hasFocusWithin: false });
         };
 
-        createEffect(() => {
-            const ref = getRef();
+        return {
+            get: store.get,
+            subscribe: store.subscribe,
+            observe: (element) => {
+                element.addEventListener("mouseenter", onMouseEnter);
+                element.addEventListener("mouseleave", onMouseLeave);
+                element.addEventListener("focusin", onFocusIn);
+                element.addEventListener("focusout", onFocusOut);
 
-            if (!ref) return;
-
-            ref.addEventListener("mouseenter", onMouseEnter);
-            ref.addEventListener("mouseleave", onMouseLeave);
-            ref.addEventListener("focusin", onFocusIn);
-            ref.addEventListener("focusout", onFocusOut);
-
-            onCleanup(() => {
-                ref.removeEventListener("mouseenter", onMouseEnter);
-                ref.removeEventListener("mouseleave", onMouseLeave);
-                ref.removeEventListener("focusin", onFocusIn);
-                ref.removeEventListener("focusout", onFocusOut);
-            });
-        });
-
-        return createMemo(() => getIsHovered() || getHasFocusWithin() || getIsPageHidden());
+                return () => {
+                    element.removeEventListener("mouseenter", onMouseEnter);
+                    element.removeEventListener("mouseleave", onMouseLeave);
+                    element.removeEventListener("focusin", onFocusIn);
+                    element.removeEventListener("focusout", onFocusOut);
+                };
+            },
+        };
     };
 
     /**
@@ -683,51 +638,46 @@ export namespace InteractionTrackerUtils {
      * Where a plain click handler would do, this adds the two things a visual response needs: where the
      * press landed, for an effect that starts under the pointer, and how many presses there have been,
      * which lets a repeated press restart an animation that is already running. Held keys are ignored,
-     * so leaning on Enter does not fire repeatedly.
+     * so leaning on Enter does not fire repeatedly. The count carries on across `observe` calls.
      *
-     * @param getRef The element to track.
-     * @param getIsDisabled Whether to ignore presses.
      * @param onActivate Called on each press, with the press position as a `0` to `1` ratio across the
      * element — the center for a keyboard press — and a count that increases each time.
+     * @returns The tracker.
      */
-    export const trackActivation = (
-        getRef: () => HTMLElement | undefined,
-        getIsDisabled: () => boolean,
+    export const createActivationTracker = (
         onActivate: (activation: InteractionActivation) => void,
-    ) => {
+    ): InteractionActivationTracker => {
         let count = 0;
 
-        createEffect(() => {
-            const ref = getRef();
+        return {
+            observe: (element) => {
+                const activate = (ratio: InteractionDragRatio) => {
+                    count += 1;
 
-            if (!ref || getIsDisabled()) return;
+                    onActivate({ ratio, count });
+                };
 
-            const activate = (ratio: InteractionDragRatio) => {
-                count += 1;
+                const onPointerDown = (e: PointerEvent) => {
+                    if (e.button !== 0) return;
 
-                onActivate({ ratio, count });
-            };
+                    activate(clampRatio(computeRatio(element.getBoundingClientRect(), e.clientX, e.clientY)));
+                };
 
-            const onPointerDown = (e: PointerEvent) => {
-                if (e.button !== 0) return;
+                const onKeyDown = (e: KeyboardEvent) => {
+                    if (e.repeat || !NavigatorUtils.getIsActivationKey(e.key)) return;
 
-                activate(clampRatio(computeRatio(ref.getBoundingClientRect(), e.clientX, e.clientY)));
-            };
+                    activate(CENTER_RATIO);
+                };
 
-            const onKeyDown = (e: KeyboardEvent) => {
-                if (e.repeat || !NavigatorUtils.getIsActivationKey(e.key)) return;
+                element.addEventListener("pointerdown", onPointerDown);
+                element.addEventListener("keydown", onKeyDown);
 
-                activate(CENTER_RATIO);
-            };
-
-            ref.addEventListener("pointerdown", onPointerDown);
-            ref.addEventListener("keydown", onKeyDown);
-
-            onCleanup(() => {
-                ref.removeEventListener("pointerdown", onPointerDown);
-                ref.removeEventListener("keydown", onKeyDown);
-            });
-        });
+                return () => {
+                    element.removeEventListener("pointerdown", onPointerDown);
+                    element.removeEventListener("keydown", onKeyDown);
+                };
+            },
+        };
     };
 
     /**
@@ -737,23 +687,19 @@ export namespace InteractionTrackerUtils {
      * whole of which is the target — a slider track, a color area — where a press with no movement
      * should still move the handle.
      *
-     * @param getRef The element to track.
-     * @param getIsDisabled Whether to ignore drags.
      * @param opts.onDrag Called on press and on every move, with the position as a `0` to `1` ratio
      * across the element, held inside it however far the pointer strays.
      * @param opts.onDragEnd Called when the drag finishes, saying whether the pointer was released or
      * the gesture was canceled by the system.
-     * @returns `getIsDragging`.
+     * @returns A store of whether a drag is under way, `observe` to track an element until stopped, and `reset`.
+     * Stopping only removes the listeners, so a drag under way survives them being attached again; `reset`
+     * forgets it without calling `onDragEnd`, for when the element changes or the control is disabled.
      */
-    export const trackDrag = (
-        getRef: () => HTMLElement | undefined,
-        getIsDisabled: () => boolean,
-        opts: {
-            onDrag: (ratio: InteractionDragRatio) => void;
-            onDragEnd?: (reason: InteractionDragEndReason) => void;
-        },
-    ) => {
-        const { getIsEngaged } = trackPointer(getRef, getIsDisabled, {
+    export const createDragTracker = (opts: {
+        onDrag: (ratio: InteractionDragRatio) => void;
+        onDragEnd?: (reason: InteractionDragEndReason) => void;
+    }): InteractionDragTracker => {
+        const pointer = createPointerGesture({
             onDown: (ratio, engage) => {
                 engage();
                 opts.onDrag(clampRatio(ratio));
@@ -766,21 +712,30 @@ export namespace InteractionTrackerUtils {
             },
         });
 
-        return { getIsDragging: getIsEngaged };
+        return {
+            get: pointer.engaged.get,
+            subscribe: pointer.engaged.subscribe,
+            observe: pointer.observe,
+            reset: pointer.reset,
+        };
     };
 
     /**
      * Tracks a swipe along one axis across an element, and reports which way it committed.
      *
-     * The hard part is not the gesture but everything it competes with, and {@link trackSwipeGesture}
-     * handles that. What belongs to this entry point is the axis: the other one is left to the browser
-     * to scroll, so a horizontal swipe does not stop the page going up and down, and travel across it
-     * takes no part in either the threshold or the verdict.
+     * The hard part is not the gesture but everything it competes with: the swipe is not owned until it has
+     * traveled far enough to be one, an ancestor scroller with room left keeps the gesture, and a swipe that was
+     * taken over does not also fire a click at the end. What belongs to this entry point is the axis: the other
+     * one is left to the browser to scroll, so a horizontal swipe does not stop the page going up and down, and
+     * travel across it takes no part in either the threshold or the verdict.
      *
-     * Use {@link trackFreeSwipe} where all four directions are wanted.
+     * The tracker's `observe` follows the pointer and the touches while the element is enabled; `observeClicks`
+     * swallows the click that ends a swipe, and should run whether or not it is; `applyTouchAction` writes the
+     * `touch-action` the axis calls for, or clears it while disabled. Stopping `observe` leaves a swipe under way
+     * alive; `reset` forgets it, for when the element changes or the control is disabled.
      *
-     * @param getRef The element to track.
-     * @param getIsDisabled Whether to ignore swipes.
+     * Use {@link createFreeSwipeTracker} where all four directions are wanted.
+     *
      * @param opts.getAxis Which way the swipe runs.
      * @param opts.getCommitRatio How far across the element the swipe must travel to count, as a
      * fraction. Short of it, the swipe ends without a direction and the caller should spring back.
@@ -788,27 +743,20 @@ export namespace InteractionTrackerUtils {
      * fraction of the element — negative back along the axis, positive forward.
      * @param opts.onSwipeEnd Called when the swipe finishes, with the committed direction, or
      * `undefined` when it fell short or the system canceled it.
-     * @returns `getIsSwiping`.
+     * @returns The tracker, a store of whether a swipe is under way.
      */
-    export const trackAxialSwipe = (
-        getRef: () => HTMLElement | undefined,
-        getIsDisabled: () => boolean,
-        opts: {
-            getAxis: () => SwipeAxis;
-            getCommitRatio: () => number;
-            onSwipe: (progressRatio: number) => void;
-            onSwipeEnd: (direction: SwipeDirection | undefined) => void;
-        },
-    ) => {
-        const { getIsEngaged } = trackSwipeGesture(getRef, getIsDisabled, {
+    export const createAxialSwipeTracker = (opts: {
+        getAxis: () => SwipeAxis;
+        getCommitRatio: () => number;
+        onSwipe: (progressRatio: number) => void;
+        onSwipeEnd: (direction: SwipeDirection | undefined) => void;
+    }) =>
+        createSwipeGesture({
             getAxis: opts.getAxis,
             getCommitRatio: opts.getCommitRatio,
             onSwipe: (progress) => opts.onSwipe(getAxisTravel(progress, opts.getAxis())),
             onSwipeEnd: opts.onSwipeEnd,
         });
-
-        return { getIsSwiping: getIsEngaged };
-    };
 
     /**
      * Tracks a swipe free to go any of the four ways, and reports which one it committed to.
@@ -819,34 +767,26 @@ export namespace InteractionTrackerUtils {
      *
      * Claiming both axes means the browser is left none to scroll, so an element tracked this way cannot
      * also be flicked to scroll its page on a touch screen. That is the price of the extra two directions,
-     * and it is why {@link trackAxialSwipe} is the one to reach for wherever a single axis will do.
+     * and it is why {@link createAxialSwipeTracker} is the one to reach for wherever a single axis will do. The
+     * tracker is used as that one's is.
      *
-     * @param getRef The element to track.
-     * @param getIsDisabled Whether to ignore swipes.
      * @param opts.getCommitRatio How far across the element the swipe must travel to count, as a
      * fraction. Short of it, the swipe ends without a direction and the caller should spring back.
      * @param opts.onSwipe Called on every move once the gesture is owned, with signed travel on each
      * axis as a fraction of the element's own width and height.
      * @param opts.onSwipeEnd Called when the swipe finishes, with the committed direction, or
      * `undefined` when it fell short or the system canceled it.
-     * @returns `getIsSwiping`.
+     * @returns The tracker, a store of whether a swipe is under way.
      */
-    export const trackFreeSwipe = (
-        getRef: () => HTMLElement | undefined,
-        getIsDisabled: () => boolean,
-        opts: {
-            getCommitRatio: () => number;
-            onSwipe: (progress: InteractionDragRatio) => void;
-            onSwipeEnd: (direction: SwipeDirection | undefined) => void;
-        },
-    ) => {
-        const { getIsEngaged } = trackSwipeGesture(getRef, getIsDisabled, {
+    export const createFreeSwipeTracker = (opts: {
+        getCommitRatio: () => number;
+        onSwipe: (progress: InteractionDragRatio) => void;
+        onSwipeEnd: (direction: SwipeDirection | undefined) => void;
+    }) =>
+        createSwipeGesture({
             getAxis: () => undefined,
             getCommitRatio: opts.getCommitRatio,
             onSwipe: opts.onSwipe,
             onSwipeEnd: opts.onSwipeEnd,
         });
-
-        return { getIsSwiping: getIsEngaged };
-    };
 }

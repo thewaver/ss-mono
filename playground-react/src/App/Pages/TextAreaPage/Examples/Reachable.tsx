@@ -1,0 +1,37 @@
+import { TextArea } from "@thewaver/ss-components-react";
+import { FIELD_WIDTH, FIXED_HEIGHT } from "@thewaver/ss-playground-core/App/Pages/TextAreaPage/TextAreaPage.const";
+import {
+    FIELD_GAP,
+    FIELD_PADDING,
+} from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+
+import {
+    PageTextFieldContent,
+    computePageTextFieldTextStyle,
+} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
+import type { TextAreaExampleProps } from "../TextAreaPage.types";
+
+type Props = TextAreaExampleProps;
+
+export const ReachableExample = (props: Props) => (
+    <TextArea
+        valueState={props.valueState}
+        isDisabled={true}
+        isReachableWhenDisabled={true}
+        padding={FIELD_PADDING}
+        gap={FIELD_GAP}
+        ariaLabel={"Disabled but reachable notes"}
+        computeTextStyle={computePageTextFieldTextStyle}
+        renderContent={(flags) => <PageTextFieldContent flags={flags} width={FIELD_WIDTH} height={FIXED_HEIGHT} />}
+        tooltipDefs={{
+            placement: { x: "center", y: "top-out" },
+            offset: { x: 0, y: 10 },
+            renderContent: (visibilityTarget, transitionDurationMs) => (
+                <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
+                    Focusable so this tooltip can be read, but typing must leave the value alone.
+                </PageTooltipContent>
+            ),
+        }}
+    />
+);

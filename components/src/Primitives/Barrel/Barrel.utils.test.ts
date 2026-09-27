@@ -40,3 +40,10 @@ describe("getHasBacks", () => {
         expect(BarrelUtils.getHasBacks(2)).toBe(false);
     });
 });
+
+describe("getRootSize", () => {
+    it("reserves the girth along the way the barrel turns, and one face across it", () => {
+        expect(BarrelUtils.getRootSize({ width: 100, height: 40 }, "row", 180)).toEqual({ width: 180, height: 40 });
+        expect(BarrelUtils.getRootSize({ width: 100, height: 40 }, "column", 180)).toEqual({ width: 100, height: 180 });
+    });
+});

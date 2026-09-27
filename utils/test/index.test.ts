@@ -38,6 +38,7 @@ const EXPECTED_EXPORTS = [
     "ShapeUtils",
     "Size2d",
     "Size2dString",
+    "StoreUtils",
     "StringUtils",
     "TimeUtils",
     "Vec2d",

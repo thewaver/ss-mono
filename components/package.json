@@ -2,7 +2,7 @@
     "name": "@thewaver/ss-components",
     "type": "module",
     "version": "0.0.3",
-    "description": "SolidJS components for building shaped UI.",
+    "description": "The framework-free core of the ss-components libraries: behavior, styles and types shared by @thewaver/ss-components-solid and @thewaver/ss-components-react.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "exports": {
@@ -17,8 +17,7 @@
         "**/*.css"
     ],
     "files": [
-        "dist",
-        "llms.txt"
+        "dist"
     ],
     "license": "MIT",
     "author": "Luís Santos",
@@ -32,9 +31,6 @@
     },
     "homepage": "https://github.com/thewaver/ss-mono#readme",
     "keywords": [
-        "solid",
-        "solidjs",
-        "solid-js",
         "components",
         "ui",
         "ui-components",
@@ -126,21 +122,16 @@
     },
     "dependencies": {
         "@internationalized/date": "^3.12.4",
-        "@tanstack/solid-virtual": "^3.13.40",
         "colorthief": "^3.5.0"
     },
     "peerDependencies": {
-        "@thewaver/ss-utils": "^0.0.24",
-        "solid-js": "^1.9.15"
+        "@thewaver/ss-utils": "^0.0.24"
     },
     "devDependencies": {
         "@thewaver/ss-utils": "^0.0.24",
         "@vanilla-extract/css": "^1.21.2",
-        "@vanilla-extract/dynamic": "^2.1.5",
         "@vanilla-extract/vite-plugin": "^5.2.6",
-        "solid-js": "^1.9.15",
         "tsup": "^8.5.1",
-        "vite": "^8.3.0",
-        "vite-plugin-solid": "^2.11.14"
+        "vite": "^8.3.0"
     }
 }

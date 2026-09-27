@@ -1,9 +1,10 @@
 import { getLocalTimeZone } from "@internationalized/date";
 
-import type { DateValue, DateValueWeekStart } from "../../../Abstracts/DateValue/DateValue.types";
+import type { DateValue, DateValueRange, DateValueWeekStart } from "../../../Abstracts/DateValue/DateValue.types";
 import { DateValueUtils } from "../../../Abstracts/DateValue/DateValue.utils";
-import type { NavigatorGrid } from "../../../Abstracts/Navigator/Navigator.types";
-import type { CalendarPrecision } from "./Calendar.types";
+import type { NavigatorDirection, NavigatorGrid } from "../../../Abstracts/Navigator/Navigator.types";
+import { NavigatorUtils } from "../../../Abstracts/Navigator/Navigator.utils";
+import type { CalendarKeyAction, CalendarPrecision, CalendarRenderProps } from "./Calendar.types";
 
 /** Days in a week, which is the width of the day grid. */
 const DAYS_PER_WEEK = 7;
@@ -17,6 +18,27 @@ const YEARS_PER_PAGE = 12;
 const PAGES_PER_LEAP = 12;
 /** Pushes a date to noon before handing it to `Intl`, so a time-zone shift cannot move it onto another day. */
 const MIDDAY_MS = 12 * 60 * 60 * 1000;
+
+/** How many pages the page keys move. */
+const PAGE_STEP = 1;
+/** How many long steps Shift with the page keys moves. */
+const LEAP_STEP = 1;
+
+/** How a cell names itself for assistive technology, at each precision. */
+const CELL_LABEL_OPTIONS: Record<CalendarPrecision, Intl.DateTimeFormatOptions> = {
+    day: { day: "numeric", month: "long", year: "numeric" },
+    month: { month: "long", year: "numeric" },
+    year: { year: "numeric" },
+};
+/** How a page is named when paging announces it, at each precision. */
+const PAGE_ANNOUNCE_OPTIONS: Record<CalendarPrecision, Intl.DateTimeFormatOptions> = {
+    day: { month: "long", year: "numeric" },
+    month: { year: "numeric" },
+    year: { year: "numeric" },
+};
+
+/** The same options with the era written out, for a date that is not in the current era. */
+const withEra = (options: Intl.DateTimeFormatOptions): Intl.DateTimeFormatOptions => ({ ...options, era: "short" });
 
 /** The first day of a date's year. */
 const getStartOfYear = (value: DateValue) => DateValueUtils.getStartOfMonth(value).set({ month: 1 }) as DateValue;
@@ -218,4 +240,287 @@ export namespace CalendarUtils {
             calendar: DateValueUtils.getCalendarId(start),
             timeZone: getLocalTimeZone(),
         }).formatRange(toIntlDate(start), toIntlDate(end));
+
+    /**
+     * The page's cells cut into rows.
+     *
+     * @param cells Every cell on the page, as {@link CalendarUtils.getCells} answers them.
+     * @param colCount How many cells a row holds.
+     * @returns The rows in order. A last row with fewer cells than the others is kept short rather than padded.
+     */
+    export const getRows = (cells: DateValue[], colCount: number) =>
+        Array.from({ length: Math.ceil(cells.length / colCount) }, (_, row) =>
+            cells.slice(row * colCount, (row + 1) * colCount),
+        );
+
+    /**
+     * Where on the page the cell holding a date sits.
+     *
+     * @param cells Every cell on the page.
+     * @param value The date to look for.
+     * @returns Its index in reading order, or `undefined` when the date is not on this page or is missing.
+     */
+    export const findCellIndex = (cells: DateValue[], value: DateValue | undefined, precision: CalendarPrecision) => {
+        const index = cells.findIndex((cell) => getIsSameCell(cell, value, precision));
+
+        return index < 0 ? undefined : index;
+    };
+
+    /**
+     * Tests whether a cell can be picked.
+     *
+     * @param day The cell's first day.
+     * @param opts.isDisabled Whether the whole calendar is off.
+     * @param opts.minValue The earliest day that can be picked, if there is one.
+     * @param opts.maxValue The latest day that can be picked, if there is one.
+     * @param opts.computeIsDayDisabled The consumer's own rule, handed the cell's first day.
+     * @returns `true` when the calendar is off, when no day of the cell is inside the bounds, or when the
+     * consumer's rule refuses it.
+     */
+    export const getIsCellDisabled = (
+        day: DateValue,
+        precision: CalendarPrecision,
+        opts: {
+            isDisabled?: boolean;
+            minValue?: DateValue;
+            maxValue?: DateValue;
+            computeIsDayDisabled?: (day: DateValue) => boolean;
+        },
+    ) =>
+        (opts.isDisabled ?? false) ||
+        !getIsCellInBounds(day, precision, opts.minValue, opts.maxValue) ||
+        (opts.computeIsDayDisabled?.(day) ?? false);
+
+    /**
+     * The day counted as today, in the calendar the page is drawn in.
+     *
+     * @param today The consumer's own today, if they hold one still.
+     * @param page Any date on the page, whose calendar the answer is expressed in.
+     * @returns That day, or the machine's current date when none is given.
+     */
+    export const resolveToday = (today: DateValue | undefined, page: DateValue) =>
+        DateValueUtils.withCalendar(today ?? DateValueUtils.fromDate(new Date()), DateValueUtils.getCalendarId(page));
+
+    /**
+     * The day the grid's one tab stop sits on.
+     *
+     * The first of the candidates that is on the page wins, so a walk the keyboard has made is kept while it is
+     * visible, and paging with the header lands on the picked day, then today, then the page's first day.
+     *
+     * @param cells Every cell on the page.
+     * @param candidates.highlighted Where the keyboard last left it.
+     * @param candidates.anchor The picked day, or the end a range is being measured from.
+     * @param candidates.today Today, from {@link CalendarUtils.resolveToday}.
+     * @param candidates.pageStart The page's first day, which is always the last resort.
+     */
+    export const computeRovingDay = (
+        cells: DateValue[],
+        precision: CalendarPrecision,
+        candidates: {
+            highlighted?: DateValue;
+            anchor?: DateValue;
+            today: DateValue;
+            pageStart: DateValue;
+        },
+    ) => {
+        const isOnPage = (day: DateValue | undefined): day is DateValue =>
+            day !== undefined && findCellIndex(cells, day, precision) !== undefined;
+
+        if (isOnPage(candidates.highlighted)) return candidates.highlighted;
+        if (isOnPage(candidates.anchor)) return candidates.anchor;
+        if (isOnPage(candidates.today)) return candidates.today;
+
+        return candidates.pageStart;
+    };
+
+    /**
+     * Where a move of the keyboard's highlight lands, and whether it takes the page with it.
+     *
+     * @param day Where the move was aimed.
+     * @param pageStart The first day of the page now shown.
+     * @param minValue The earliest day allowed, if there is one.
+     * @param maxValue The latest day allowed, if there is one.
+     * @returns `day`, the aim pulled inside the bounds; and `month`, the first of the month to show when that day
+     * is on another page, or `undefined` when the page stays.
+     */
+    export const computeMove = (
+        day: DateValue,
+        precision: CalendarPrecision,
+        pageStart: DateValue,
+        minValue?: DateValue,
+        maxValue?: DateValue,
+    ) => {
+        const clamped = DateValueUtils.clamp(day, minValue, maxValue);
+        const isSamePage = DateValueUtils.isSame(getPageStart(clamped, precision), pageStart);
+
+        return { day: clamped, month: isSamePage ? undefined : DateValueUtils.getStartOfMonth(clamped) };
+    };
+
+    /**
+     * The date a pick of a cell sets.
+     *
+     * @returns The cell's first day, pulled inside the bounds, so a month straddling the minimum picks the minimum.
+     */
+    export const computePick = (
+        day: DateValue,
+        precision: CalendarPrecision,
+        minValue?: DateValue,
+        maxValue?: DateValue,
+    ) => DateValueUtils.clamp(getCellStart(day, precision), minValue, maxValue);
+
+    /**
+     * What a key pressed on the grid does.
+     *
+     * Enter and Space pick the roving day. The page keys move it a page, and a long step with Shift held. The
+     * arrows, Home and End walk the grid through `NavigatorUtils.computeNextCell`, carrying off either end of the
+     * page into the next one; Home and End on a short last row stop at its last cell.
+     *
+     * @param key The `key` of the keyboard event.
+     * @param isShiftHeld Whether Shift was held.
+     * @param opts.roving The day the tab stop is on.
+     * @param opts.cells Every cell on the page.
+     * @param opts.shape The page's shape, from {@link CalendarUtils.getGridShape}.
+     * @param opts.direction Which way the grid's text runs. Under `rtl` the horizontal arrows trade places.
+     * @returns What to do, or `undefined` when the key is not the grid's.
+     */
+    export const computeKeyAction = (
+        key: string,
+        isShiftHeld: boolean,
+        opts: {
+            roving: DateValue;
+            precision: CalendarPrecision;
+            cells: DateValue[];
+            shape: NavigatorGrid;
+            direction: NavigatorDirection;
+        },
+    ): CalendarKeyAction | undefined => {
+        const { roving, precision, cells, shape } = opts;
+
+        if (NavigatorUtils.getIsActivationKey(key)) return { kind: "pick", day: roving };
+
+        if (key === "PageUp" || key === "PageDown") {
+            const direction = key === "PageUp" ? -1 : 1;
+
+            return {
+                kind: "move",
+                day: isShiftHeld
+                    ? stepLeap(roving, precision, direction * LEAP_STEP)
+                    : stepPage(roving, precision, direction * PAGE_STEP),
+            };
+        }
+
+        const index = findCellIndex(cells, roving, precision);
+
+        if (index === undefined) return undefined;
+
+        const from = { row: Math.floor(index / shape.colCount), col: index % shape.colCount };
+        const next = NavigatorUtils.computeNextCell(key, from, shape, {
+            direction: opts.direction,
+            hasPageKeys: false,
+        });
+
+        if (!next) return undefined;
+
+        const flat = next.row * shape.colCount + next.col;
+        const lastIndex = cells.length - 1;
+
+        return {
+            kind: "move",
+            day: getCellAt(cells[0], next.row === from.row ? Math.min(flat, lastIndex) : flat, precision),
+        };
+    };
+
+    /**
+     * The state a cell is painted from.
+     *
+     * @param day The cell's first day.
+     * @param opts.month Any date on the page, whose month decides which days are outside it.
+     * @param opts.roving The day the tab stop is on.
+     * @param opts.today Today.
+     * @param opts.isSelected Whether the cell counts as picked.
+     * @param opts.range The range to band, if there is one.
+     */
+    export const computeCellFlags = (
+        day: DateValue,
+        opts: {
+            precision: CalendarPrecision;
+            month: DateValue;
+            roving: DateValue;
+            today: DateValue;
+            isSelected: boolean;
+            range: DateValueRange | undefined;
+        },
+    ): CalendarRenderProps => ({
+        day,
+        isSelected: opts.isSelected,
+        isToday: getIsSameCell(day, opts.today, opts.precision),
+        isOutsideMonth: opts.precision === "day" && day.month !== opts.month.month,
+        isHighlighted: getIsSameCell(day, opts.roving, opts.precision),
+        isInRange: DateValueUtils.getIsWithin(day, opts.range),
+        isRangeStart: DateValueUtils.isSame(day, opts.range?.start),
+        isRangeEnd: DateValueUtils.isSame(day, opts.range?.end),
+    });
+
+    /**
+     * The id of the era a page's calendar is in now, against which a cell or page decides whether to name its era.
+     *
+     * @param page Any date on the page.
+     * @param locale The locale the era names are read in.
+     * @returns The latest era the calendar reports.
+     */
+    export const getCurrentEraId = (page: DateValue, locale?: string) => {
+        const eras = DateValueUtils.getEras(page, locale);
+
+        return eras[eras.length - 1].id;
+    };
+
+    /**
+     * A function naming a cell for assistive technology, since the painter often draws only a number.
+     *
+     * The formatters are built once, so a page of forty-two days pays for two rather than forty-two. A cell in a
+     * past era is named with its era, so a year before the common era is not read as one after it.
+     *
+     * @param firstCell The page's first cell, whose calendar the names are written in.
+     * @param currentEraId What {@link CalendarUtils.getCurrentEraId} answered.
+     * @param locale The locale to write in.
+     * @returns A function answering a cell's name: the whole date for `day`, month and year for `month`, the year
+     * for `year`.
+     */
+    export const createCellLabeler = (
+        firstCell: DateValue,
+        precision: CalendarPrecision,
+        currentEraId: string,
+        locale?: string,
+    ) => {
+        const options = CELL_LABEL_OPTIONS[precision];
+        const currentEra = DateValueUtils.createFormatter(firstCell, options, locale);
+        const pastEra = DateValueUtils.createFormatter(firstCell, withEra(options), locale);
+
+        return (cell: DateValue) => (cell.era === currentEraId ? currentEra : pastEra)(cell);
+    };
+
+    /**
+     * What paging announces about the page it landed on.
+     *
+     * @param pageStart The page's first day.
+     * @param cells Every cell on the page, whose ends name a page of years.
+     * @param currentEraId What {@link CalendarUtils.getCurrentEraId} answered.
+     * @param locale The locale to write in.
+     * @returns The month and year for `day`, the year for `month`, and the span of years for `year` — with the era
+     * written out when the page is in a past era.
+     */
+    export const formatPage = (
+        pageStart: DateValue,
+        cells: DateValue[],
+        precision: CalendarPrecision,
+        currentEraId: string,
+        locale?: string,
+    ) => {
+        const baseOptions = PAGE_ANNOUNCE_OPTIONS[precision];
+        const options = pageStart.era === currentEraId ? baseOptions : withEra(baseOptions);
+
+        if (precision !== "year") return DateValueUtils.format(pageStart, options, locale);
+
+        return formatSpan(cells[0], cells[cells.length - 1], options, locale);
+    };
 }

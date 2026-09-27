@@ -1,6 +1,7 @@
 import { Index2d, type Index2dString, MathUtils, type Point2d, ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-import type { TileBoardLayout, TileBoardTiling } from "./TileBoard.types";
+import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
+import type { TileBoardKeyAction, TileBoardLayout, TileBoardSweepDefs, TileBoardTiling } from "./TileBoard.types";
 
 /** The size of a board with no tiles. */
 const EMPTY_SIZE: Size2d = { width: 0, height: 0 };
@@ -20,6 +21,17 @@ const POINTS_RIGHT = "triangle-right";
 const NO_TAPER = 1;
 /** The narrowest top row a taper may ask for, since a top row of no width would put the bottom one at infinity. */
 const MIN_TAPER = 0.01;
+
+/** The fewest corners an outline needs to enclose anything. */
+const MIN_CLIP_POINTS = 3;
+/** The clip a tile wears when it has no outline to wear. */
+const NO_CLIP = "none";
+/** The keys that, held with Ctrl or Cmd, jump to the first and last tile of the board. */
+const EDGE_KEYS = ["Home", "End"];
+/** No mouse button held. */
+const NO_BUTTONS = 0;
+/** The primary mouse button. */
+const PRIMARY_BUTTON = 0;
 
 const DODECAGON_ROW_PITCH = Math.sqrt(3) * HALF;
 
@@ -672,5 +684,181 @@ export namespace TileBoardUtils {
 
         if (key === "Home") return clampTile({ row: from.row, col: FIRST_INDEX }, layout);
         if (key === "End") return clampTile({ row: from.row, col: getRowLength(from.row, layout) - 1 }, layout);
+    };
+
+    /**
+     * The CSS clip that cuts a tile's hit layer to its outline.
+     *
+     * @param points The tile's corners, in pixels from its top left.
+     * @returns A `polygon()`, or `"none"` for fewer than three corners, which enclose nothing.
+     */
+    export const getClipPath = (points: Point2d[]) => {
+        if (points.length < MIN_CLIP_POINTS) return NO_CLIP;
+
+        return `polygon(${points.map((point) => `${point.x}px ${point.y}px`).join(", ")})`;
+    };
+
+    /**
+     * How large one tile is drawn, once the gap is taken off the room it is given.
+     *
+     * @param pitchSize The room one tile is given, which is the `tileSize` a consumer passes.
+     * @param gap The space left between tiles.
+     * @returns The tile's own size, never below zero.
+     */
+    export const getTileBoxSize = (pitchSize: Size2d, gap: number): Size2d => ({
+        width: Math.max(pitchSize.width - gap, NO_TILES),
+        height: Math.max(pitchSize.height - gap, NO_TILES),
+    });
+
+    /**
+     * Where a row's first tile box is drawn, on the flat board.
+     *
+     * {@link getRowOffset} across and {@link getRowTop} down, each moved in by half the gap, which is what
+     * centers a tile shrunk by the gap in the room it was given.
+     *
+     * @param row The row.
+     * @param layout The board's layout.
+     * @param gap The space left between tiles.
+     */
+    export const getRowOrigin = (row: number, layout: TileBoardLayout, gap: number): Point2d => ({
+        x: getRowOffset(row, layout) + gap * HALF,
+        y: getRowTop(row, layout) + gap * HALF,
+    });
+
+    /**
+     * What a key pressed on the board does.
+     *
+     * Enter and Space activate the tile holding the tab stop. Ctrl or Cmd with Home or End jumps to the first or
+     * last tile of the board; everything else is {@link computeNextTile}.
+     *
+     * @param key The `key` of the keyboard event.
+     * @param isModified Whether Ctrl or Cmd was held.
+     * @param from The tile holding the tab stop.
+     * @param layout The board's layout.
+     * @returns What to do, or `undefined` when the key means nothing here. Every action has its default prevented.
+     */
+    export const computeKeyAction = (
+        key: string,
+        isModified: boolean,
+        from: Index2d,
+        layout: TileBoardLayout,
+    ): TileBoardKeyAction | undefined => {
+        if (NavigatorUtils.getIsActivationKey(key)) return { kind: "activate" };
+
+        if (isModified && EDGE_KEYS.includes(key)) {
+            return { kind: "move", tile: key === "Home" ? getFirstTile() : getLastTile(layout) };
+        }
+
+        const next = computeNextTile(key, from, layout);
+
+        return next === undefined ? undefined : { kind: "move", tile: next };
+    };
+
+    /**
+     * Sweeping a press across a board's tiles.
+     *
+     * A sweep starts only when a press moves onto a second tile: the tile it began on is reported then, and every
+     * tile entered after it, each once per press. A press that never leaves its tile is left to be a click, and the
+     * click the browser fires at the end of a sweep is swallowed. The tile under the pointer is found by
+     * `elementFromPoint` among the hit layers registered here rather than by listening on the tiles, because a touch
+     * is captured by the layer it began on and the others never hear it arrive; that also works through a taper's
+     * transform. Only the pointer that started the press is followed, and a move with no buttons held ends the
+     * sweep, which covers a mouse released outside the window. Refused tiles are passed over.
+     *
+     * @param defs Whether sweeping is on, whether a tile is refused, and what to do with each tile swept, all read
+     * at the moment a sweep needs them.
+     * @returns `addHitLayer` to register a tile's hit layer, returning its removal; `press` for the root's
+     * `pointerdown`; `swallowClick` for a `click` listener the root takes in the capture phase; and `stop`, which
+     * abandons any sweep in flight and takes its document listeners away.
+     */
+    export const createSweeper = (defs: TileBoardSweepDefs) => {
+        const hitTiles = new Map<Element, Index2d>();
+
+        let sweep: { pointerId: number; from: Index2d; entered: Set<string>; hasLeft: boolean } | undefined;
+        let isClickSwallowed = false;
+
+        const sweepInto = (tile: Index2d) => {
+            if (defs.getIsTileDisabled(tile)) return;
+
+            defs.onSweep(tile);
+        };
+
+        const handleMove = (e: PointerEvent) => {
+            if (!sweep || e.pointerId !== sweep.pointerId) return;
+
+            if (e.buttons === NO_BUTTONS) {
+                stop();
+
+                return;
+            }
+
+            const element = document.elementFromPoint(e.clientX, e.clientY);
+            const tile = element ? hitTiles.get(element) : undefined;
+
+            if (!tile) return;
+
+            const key = Index2d.toString(tile);
+
+            if (sweep.entered.has(key)) return;
+
+            sweep.entered.add(key);
+
+            if (!sweep.hasLeft) {
+                sweep.hasLeft = true;
+                sweepInto(sweep.from);
+            }
+
+            sweepInto(tile);
+        };
+
+        const handleEnd = (e: PointerEvent) => {
+            if (!sweep || e.pointerId !== sweep.pointerId) return;
+
+            isClickSwallowed = sweep.hasLeft;
+
+            stop();
+        };
+
+        const stop = () => {
+            sweep = undefined;
+
+            document.removeEventListener("pointermove", handleMove);
+            document.removeEventListener("pointerup", handleEnd);
+            document.removeEventListener("pointercancel", handleEnd);
+        };
+
+        return {
+            addHitLayer: (element: Element, tile: Index2d) => {
+                hitTiles.set(element, tile);
+
+                return () => {
+                    if (hitTiles.get(element) === tile) hitTiles.delete(element);
+                };
+            },
+            press: (e: PointerEvent) => {
+                isClickSwallowed = false;
+
+                if (sweep || e.button !== PRIMARY_BUTTON || !defs.getIsSweepable()) return;
+
+                const from = hitTiles.get(e.target as Element);
+
+                if (!from) return;
+
+                sweep = { pointerId: e.pointerId, from, entered: new Set([Index2d.toString(from)]), hasLeft: false };
+
+                document.addEventListener("pointermove", handleMove);
+                document.addEventListener("pointerup", handleEnd);
+                document.addEventListener("pointercancel", handleEnd);
+            },
+            swallowClick: (e: MouseEvent) => {
+                if (!isClickSwallowed) return;
+
+                isClickSwallowed = false;
+
+                e.preventDefault();
+                e.stopPropagation();
+            },
+            stop,
+        };
     };
 }

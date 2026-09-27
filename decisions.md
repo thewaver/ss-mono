@@ -21,9 +21,12 @@ _"One repo, three packages"_ for why and for what that changes.
 - **`utils/src`** — `@thewaver/ss-utils`, published separately and depended on by the other two. Its
   own conventions travel with it, including the documented exports; see _"`ss-utils` is the opposite"_
   in `CLAUDE.md`.
-- **`components/src`** — the published library, and the only tree with a support contract (see
-  _"Compatibility arguments"_).
-- **`playground/src`** — the demo app. `App/StyledComponents` holds paint and nothing else, mostly
+- **`components/src`** — the published library's framework-free core, `@thewaver/ss-components`, with
+  `components-solid/src` and `components-react/src` beside it holding each framework's views
+  (_"Porting: the three packages"_). These are the trees with a support contract (see _"Compatibility arguments"_).
+- **`playground-solid/src` and `playground-react/src`**, over the shared **`playground-core/src`** — the demo app,
+  once per framework (_"Porting: the Playground in two frameworks"_). What follows was written of the one Solid
+  Playground and holds for each. `App/StyledComponents` holds paint and nothing else, mostly
   consumer-side painters named `<LibComponent>Content` after the shell whose slot it fills, with the
   playground-wide `Page` prefix: `PageButtonContent`, `PageCheckboxContent`, `PageTooltipContent`.
   `App/PageComponents` holds everything that behaves: the playground's own furniture (`PageVariants`,
@@ -164,7 +167,7 @@ that package's source, which raised twelve `TS1484` errors — imports of types 
 `type`. They were marked, `utils/dist` was rebuilt, and the output is byte-identical to the build before
 the change, so nothing about the published package moved.
 
-**Vite's root is pinned in `playground/vite.config.ts`.** `vite preview` is started from the repo root by
+**Vite's root is pinned in each Playground's `vite.config.ts`** (`playground-solid/`, `playground-react/`). `vite preview` is started from the repo root by
 the Playwright config, and without an explicit root Vite takes the working directory rather than the config
 file's folder, which sends it looking for `dist` at the repo root rather than the Playground's. `root` is set from
 `import.meta.url` so the config means the same thing wherever it is invoked from.
@@ -172,6 +175,788 @@ file's folder, which sends it looking for `dist` at the repo root rather than th
 **`conventions.md`, `backlog.md` and `brief.md` moved to the repo root**, beside `CLAUDE.md`. They were in
 `src/Lib` when that was the only tree with anything to say; they now describe three packages and a test
 suite, so sitting inside one of them would be wrong.
+
+### Porting beyond Solid: the shared logic is this library's own, not Zag's
+
+The user's call, with Solid and React as the first two targets. The library is to work in more than one
+framework, and the part that decides how a component behaves — keys, focus, open and closed, selection — is
+written once in plain TypeScript with no framework in it, with a thin Solid view and a thin React view each
+drawing markup from it. Zag.js was the starting proposal and was weighed in both of its layers.
+
+**Zag's components were rejected on what they would overwrite.** Zag covers roughly twenty-five of the
+Essentials and Primitives here and none of Exotics, Generators or Placement, which is the half that makes
+the library distinct. Where it does cover a control, its behavior replaces the one argued out in this file:
+`aria-disabled` on every disabled control, a one-second typeahead reset, `Tree` stopping rather than
+wrapping, the `F8` toast hotkey, `hasAutoActivation` on `Tabs`. It also leaves one view per framework to
+write regardless, since it hands back attributes and handlers rather than markup — so it removes none of
+the per-framework work, only the behavior, which is the part worth keeping.
+
+**Zag's engine alone (`@zag-js/core` with its per-framework bindings) is the fallback, not the plan.** It
+would supply the Solid and React bindings ready-made, which is the largest cost of doing this without it.
+Against it: Zag documents consuming its machines, not authoring new ones, so it would mean building on an
+undocumented surface that has already changed shape once, at 1.0. If the binding layer turns out to be
+the expensive part once a first component is ported end to end, this is the option to reopen.
+
+**The shared logic follows Zag's shape even without Zag**: state and behavior in, attributes and handlers
+out, with each framework's view spreading them onto its own elements. That keeps a single Zag machine
+adoptable later for one control where it wins, without the rest of the library changing shape to fit.
+
+**What already crosses frameworks unchanged is the styling**: vanilla-extract compiles to plain class names
+and a stylesheet. What does not is `Abstracts/`, several of which create Solid signals at module scope
+(`Navigator.utils.ts`'s direction version, for one) — pulling those out of Solid is the first work.
+
+**Three packages, and `@thewaver/ss-components` becomes the core rather than being retired.** The user's
+call: repurpose the name rather than abandon it. `ss-components` holds the framework-free logic and the
+stylesheet; `ss-components-solid` and `ss-components-react` hold the views and depend on it, so a consumer
+installs only their framework's package and never the core by hand. Effector publishes the same way
+(`effector`, `effector-react`, `effector-solid`). The package boundary is the point of the split: the core
+has no `solid-js` or `react` to import, so it cannot drift into either, which one package with framework
+subpaths could only enforce by discipline. Weighed and accepted: a consumer upgrading from the Solid-only
+0.0.x finds no components under the old name, which is a sharper break than a rename but free before 0.1.0
+(_"Breaking the API is free until 0.1.0"_); the core's README and npm description point at the framework
+packages. The existing `components/` folder stays the core, and the Solid views move out of it.
+
+**The tree as it stood before the port is published as the last Solid-only release** of both
+`@thewaver/ss-components` and `@thewaver/ss-utils`, stable, from the user's other machine. That is what
+softens the break above: a consumer pinned to it keeps a working Solid library indefinitely, and moves to
+`ss-components-solid` when they choose to rather than when an upgrade forces it. No port work lands in the
+package manifests until that publish is pushed and pulled here, so the version bump and the restructure
+never touch the same lines on two machines.
+
+**A component's core holds its own state and announces changes to whoever subscribes.** Taken on Claude's
+recommendation — the user said plainly they had no view of their own, so this is the one of the porting
+calls most open to being reopened on evidence. Each core object keeps its state, runs its own timers,
+observers and document listeners, cleans them up, and calls its subscribers when anything changes; React
+reads it through `useSyncExternalStore`, Solid through a signal fed by the same subscription. TanStack
+Virtual's `virtual-core` is built this way. The pure arithmetic inside — `computeNextPosition` and its
+kind — stays as plain exported functions, so their tests carry over untouched.
+
+Two alternatives were weighed. Pure functions with each framework holding the state was rejected because
+everything that runs over time — a toast's timer, `HoverIntent`'s delay, the `dir` observer — would be
+written once per framework and its cleanup could drift between them. A standalone signals library in the
+core was rejected as a dependency every consumer carries, and as a second reactive system running beside
+Solid's inside every Solid app. **The known cost of the chosen shape is Solid's granularity**: a snapshot
+that changes as a whole reruns everything reading it, so a Solid view reads narrow slices of the state
+rather than the whole of it.
+
+**React is checked by automated tests until a React Playground exists, and that Playground is one app with a
+framework switch.** The user's call on both halves. The target is the existing Playground with a Solid/React
+switch, every example in both, and the e2e specs run once per setting, so a divergence between the two
+frameworks surfaces as a red spec; a second, separate React app was rejected because nobody browses it and it
+falls behind. That work is postponed as a large task of its own (`backlog.md` #31), so in the meantime the React
+views are covered by automated tests alone — which means the user's usual check, running the Playground and
+looking, does not reach them.
+
+**Those tests are Playwright component tests against a bare React page, not `jsdom`.** `jsdom` was proposed
+first and is ruled out by _"Unit tests: `vitest`, colocated, and only for functions"_ in `conventions.md`: if it
+renders, it is a spec, because a DOM with no layout engine answers every geometry question wrongly — and Tabs'
+floater alone is geometry. Playwright, already the suite's runner, mounts components through its own `mount`
+fixture onto a gallery page the project serves itself, with story files naming each scenario; it needs no
+package beyond `@playwright/test`, only the page and a Vite server able to compile React. Vitest's browser mode
+would do the same through a second runner and more packages, for nothing Playwright does not already give. The
+gallery is a test fixture rather than a demo: nobody is meant to browse it, which is what keeps it from being the
+separate React app the paragraph above rejected.
+
+**The port starts from `Abstracts/`, bottom up, rather than from a component.** The user's call, over a first
+port of `Tabs` — which turned out to reach twenty-three folders and about 6,400 lines, because it sits on
+`InteractionWrapper` and that sits on `Tooltip`, `Popover`'s positioning and `Viewport`. Starting at the bottom
+means nothing ported has to be undone, and every Solid component keeps working on top of each converted abstract,
+so the Playground and `e2e/` check each step. What it gives up is a second framework shaping the core from the
+start, which is why `Navigator` and `ElementFader` were converted first **with** their React side and tested on the
+gallery, before the rest follow the same shape.
+
+### Porting: where each half of an abstract sits
+
+Derived when `Navigator` and `ElementFader` were converted, and meant to be copied by the rest.
+
+- **`<Subject>.utils.ts` exporting `<Subject>Utils` is the framework-free half**, and it keeps the name it always
+  had, so `NavigatorUtils.computeNextPosition` did not move. Pure functions stay as they were; stateful parts
+  become factories returning a store plus commands — `NavigatorUtils.createDirectionWatcher`,
+  `ElementFaderUtils.createFader`.
+- **`<Subject>Solid.utils.ts` exporting `<Subject>SolidUtils` is the Solid half**, in `components-solid/src` under
+  the same folder path. It keeps the old Solid-facing signature, so each call site changed one identifier and one
+  import. Each package's folder holds one namespace, as _"One namespace per folder"_ in `conventions.md` asks.
+- **`<Subject>React.utils.ts` exporting `<Subject>ReactUtils` is the React half**, in `components-react/src`
+  under the same folder path. Its hooks are `use*` and hand back plain values rather than getters, because that
+  is what a React component reads. Names are distinct across all three so that a framework package re-exporting
+  the core can never hit `TS2308`.
+- **`Store` and `StoreUtils` are in `ss-utils`**, because a value with a subscribe needs nothing but the language
+  (_"What goes to `ss-utils` and what stays here"_). Each framework reads one through a single helper of its
+  own: `accessStore` in `components-solid/src/Utils/storeUtils.ts`, beside `access` and `accessSignal`, and `useStore`
+  in `components-react/src/Utils/storeUtils.ts` over `useSyncExternalStore`. Both take a `select` so a component
+  follows one field, which is the answer to Solid's granularity cost recorded above.
+- **`components/src/index.ts` is the framework-free barrel.** Both framework packages' TypeScript paths and Vite
+  aliases point `@thewaver/ss-components` at it. **The gallery's Vite server still refuses any `solid-js` import
+  outright**, which the package boundary now makes redundant for the core but keeps catching a slip inside
+  `components-react` itself.
+- **`components-react/src` and `components-solid/src` follow `components/src`'s comment rules**: `*.utils.ts` and `Utils/` documented,
+  everything else bare. `components-react/gallery` is a test fixture and reads like `e2e/`.
+
+**What a core takes, and what it leaves to the binding.** A function the core calls when it needs an answer —
+`getTransitionDurationMs`, `getRef` — stays a function, since both frameworks can supply one (React through a
+ref it keeps current). A value whose _change_ is the event — the fader's `isVisible`, the element to watch — is
+not taken by the core at all: the binding reacts to it in its own way and calls the command (`show`, `hide`,
+`observe`).
+
+**Two things the React side found, both now true of every core.**
+
+- **A core object has to survive being stopped and started again.** React's `StrictMode` runs every effect,
+  tears it down and runs it again on mount, and the gallery renders under it for that reason. So nothing is
+  disposed for good: `observe` returns a stop and can be called again, and `ElementFader`'s `cancel` rolls a
+  pending fade back to the target already committed and leaves the fader usable. A one-way `dispose` left the
+  remounted fade stuck, half-open, with its request already spent.
+- **A core that reads the DOM straight after changing its own state reads it too early under React.** React
+  applies a store change in a microtask, not inside the write, so `ElementFader` looking for running animations in
+  the same breath found none under React and fell back to the stated duration — the timer-only mode its own
+  documentation calls a guess. It now looks one microtask later, which under Solid, whose writes apply at once,
+  changes nothing but the moment. The rule for the rest: **anything a core measures after its own write waits a
+  microtask for the binding to apply it.**
+
+### Porting: the three packages
+
+The layout the user chose — the core repurposed, one package per framework on top — as it was carried out.
+
+- **`components/` is `@thewaver/ss-components`, the framework-free core**: every `<Subject>Utils`, every `.css.ts`,
+  `.const.ts` and framework-free `.types.ts`, the generators' arithmetic and the sample data that builds no markup.
+  It has no `.tsx`, no dependency on `solid-js` and no Vite Solid plugin. Its `index.ts` lists every file of it that
+  the old barrel listed, the sample data included, with each `.css.ts` as a `<Stem>Styles` namespace.
+- **`components-solid/` is `@thewaver/ss-components-solid`**: the views, `*Solid.utils.ts`, `*Solid.types.ts`,
+  contexts, `Utils/`, and the samples that build Solid markup (`Samples/SVGDefs`'s timed and tracked gradients and
+  named tilings, `Samples/Bracket`'s connectors), each of which has a React twin in `components-react/src/Samples`. Its `index.ts` begins with `export * from "@thewaver/ss-components"`, so a Solid consumer imports
+  everything from one name, as before the split. `llms.txt` moved here, because it documents the Solid components.
+- **A Solid file imports the core by package name, never by a relative path across the trees**, in one
+  `import { ... } from "@thewaver/ss-components"` per file, a style namespace arriving as `XStyles as styles`. So each
+  view still reads `styles.tabsRoot` and nothing inside it changed.
+- **A `.types.ts` was split by what its declarations reach.** Any declaration naming something from `solid-js`, from
+  a Solid file, or from a declaration already moved — followed to a fixed point — went to `<Stem>Solid.types.ts`
+  beside it, and the rest stayed. Where a framework-free core needed a record whose Solid form carried Solid-typed
+  tooltip definitions, the core owns a `*Record` with the tooltip type as a parameter (`SelectOptionRecord`,
+  `TreeNodeRecord`, `MenuItemRecord`, `SortableGridItemRecord`), and the Solid type is that record with Solid's
+  tooltip type filled in. With that done the React typecheck loads no file from `solid-js`.
+- **The Playground imports `@thewaver/ss-components-solid` only.** Its docs plugins read both trees: the dependency
+  graph resolves a name imported from the core package to the core file that exports it, and the export tables take
+  a component from the Solid tree and follow its props into the core.
+- **The samples' shared helpers split the same way as an abstract.** `SVGDefsUtils` in the core holds everything
+  about the samples that is arithmetic or color — the stops, the fades, the random split values — and the frame
+  clock as a store with `retain` and `keepAwake`. `SVGDefsSolidUtils` holds the two things that are not: the blur
+  filter, which is markup, and the clock read as a signal. The React side is `SVGDefsReactUtils`.
+- **The React samples keep Solid's names and arguments, with plain values for getters.** `computeSVGDefs(id,
+interactionFlags, element, defs)` runs during the host's render, so it calls no hooks; where a sample needs one,
+  `renderDefsElement` returns a small component of the sample's own that holds it. `SVGAnimations` does the same
+  for every function, because React's animation schedule is a hook. A pointer-following sample with a trail draws
+  its head and every stamp from one component, so it has one pointer tracker, one clock consumer and one render
+  per frame; the stamp defs keep their ids and draw nothing, as `SVGDefsUtils.getSharedFilter` does. A tiling
+  rolls each cell's random values once, through `SVGDefsReactUtils.useSplitValues`, because a React sample is
+  drawn again on every render of its host and a fresh roll would restart every cell; a change of colors or cell
+  size therefore keeps the rolls, where Solid, rebuilding its defs, rolls again.
+- **Every package builds on its own and imports the others by name.** Each package's Vite build lists the other
+  `@thewaver/*` packages, its framework and TanStack's `virtual-core` as external, and bundles
+  `@vanilla-extract/dynamic` into `_external/` as the core always did. The React package's library build is
+  `vite.lib.config.ts`, because its `vite.config.ts` is the gallery's dev server. React is a peer at `^19`, the
+  version everything was written and tested against. Versions, the order of publishing and lifting `private` on
+  the React package are the user's.
+- **Each framework barrel starts with `export * from "@thewaver/ss-components"`.** Where the React package
+  declares its own type under a name the core also exports — fourteen of them, mostly callbacks typed with React's
+  events, and `DateInputEra` and `TimeInputMeridiem`, which carry values where the core's carry getters — the
+  React barrel names its own explicitly, which TypeScript lets win over both star exports. A React type identical
+  to the core's is not redeclared: the React file imports the core's and re-exports it.
+- **The Solid package's own tests are the ones that run Solid** — `vitest` in each of the two packages, the core's
+  run with no Solid on hand.
+
+### Porting: the Playground in two frameworks
+
+The user's calls, taken one at a time before any of it was built: two separate Playground apps rather than React
+examples mounted inside the Solid one; the Playground split in three the way the library is; one site, whose root
+is a landing page where a visitor picks a framework, with the Solid app under `/solid/` and the React app under
+`/react/`; a switch on every page that opens the same page in the other framework; and the React test gallery kept,
+each of its specs retired once the Playground spec for the same component covers what it checks.
+
+- **`playground-core/` is `@thewaver/ss-playground-core`, private, and has no barrel.** It holds every file of the
+  old Playground that reaches nothing Solid — the stylesheets, the page data and knob settings, framework-free
+  types, the assets, `shiki.ts`, the virtual-module declarations in `global.d.ts` — at the same path it had, plus the
+  Vite plugins both apps load (`vite/`: the docs plugins and the `?source` loader) and the library-tree script.
+  Its `exports` map is `"./*": "./src/*"`, so an app imports one file by its path,
+  `@thewaver/ss-playground-core/App/Pages/TabsPage/TabsPage.css`. A barrel would have had to invent names: the
+  Playground's files export `styles`-shaped modules and page constants whose names were only ever unique per folder.
+- **Which files are shared was decided by what they reach**, as for the library: a `.tsx`, a context, or anything
+  importing `solid-js`, the Solid router, a Solid-only library name, or another Solid file, followed to a fixed
+  point, stayed Solid. So a page's `.types.ts` built on `AccessorProps` is Solid, and the React app writes its own.
+- **`playground-solid/` and `playground-react/` mirror each other path for path**, so the switch between them only
+  swaps the prefix, and a spec written against one finds the same page, example and `data-*` keys in the other.
+  The React app's Vite server refuses `solid-js`, the Solid router and `@thewaver/ss-components-solid`.
+- **The source view follows both folders.** It globs the app's own `src` and the shared one, keys both by the path
+  the file had before the split, and resolves an import of the shared package as it resolves a relative one, so the
+  code panel shows the same files it showed before. The code it shows now spells shared files by package path.
+- **The React Playground routes with `react-router`**, the user's call for consistency with the Solid one on
+  `@solidjs/router`. It is a dependency of `playground-react` alone; no library package takes a router.
+- **Each app reads its own prefix from the build and is told the other's.** The router's base comes from
+  `import.meta.env.BASE_URL`, and `VITE_OTHER_PLAYGROUND_URL` names the other app — `/react/` and `/solid/` in the
+  site build, the other preview's port in the test builds, the other dev server's port by default. The switch is a
+  "Framework" dropdown in the settings popover beside the sidebar's search, where the user asked for it, showing the
+  app's own framework; picking the other opens that address plus the current route. The viewport anchor beside it is
+  a dropdown too, also at the user's request. A root-relative link a page draws itself, such as the rich-text
+  sample's, goes through `toOwnAppHref` so it stays inside its own app.
+- **The site is assembled by `npm run build:site`**: the Solid app built with base `/solid/` into `dist/solid`, the
+  React app with `/react/` into `dist/react`, and `playground-core/landing/index.html` — plain HTML, two links, as
+  bare as the user asked — at the root. `vercel.json` serves each app's `index.html` for its own routes and sends
+  every older address, from before the apps moved under a prefix, to the same page under `/solid/`.
+- **The two routers report the address differently, and the shared helpers absorb it.** React's `useLocation`
+  gives the route with the `basename` already taken off; Solid's gives it with the `base` still on. So every Solid
+  read of the address goes through `toRoutePath` before it is matched against a route, and the React side reads it
+  as it comes.
+- **The React frame's links are a small adapter, `PageRouterLink`, rather than `react-router`'s `Link`.** The
+  library hands a `linkComponent` an `href`, where `Link` takes `to`, so something has to translate either way; the
+  adapter renders a plain `<a>` and takes `useHref` and `useLinkClickHandler` for the in-app navigation.
+- **The tree page's radial example writes its own layout on purpose.** A radial tree is the one arrangement the
+  shared layouts cannot supply, because it needs more than an item count: every node has to know its parent before
+  it can be given a slice of the turn. So it stands as a worked example of a layout of one's own — a function from a
+  set of defs to boxes in fractions of the arrangement's width — giving each node the slice of its parent's turn its
+  siblings leave it, depth by depth.
+- **`npm start` runs the site the way it is deployed**, asked for by the user: `playground-core/scripts/startSite.mjs`
+  starts the Solid app on 8082 under `/solid/`, the React app on 8083 under `/react/`, and a Vite server for the
+  landing page on 8080 that passes `/solid` and `/react` through to them, live-reload connections included, and
+  opens the browser there. So in development the addresses, the switch and the landing page are the deployed ones.
+  `start:solid` and `start:react` still run one app alone at its root. The script is plain JavaScript because the
+  Node in use does not run TypeScript files directly.
+- **The library-tree script counts `components/src` and `components-solid/src` merged by path**, which is what
+  `components/src` held before the split, so the Treemap, Icicle, Sunburst and Circle Packing demos keep drawing the
+  same library. Counting the core alone moved the arcs far enough that `sunburst.spec.ts`'s click on "Exotics" landed
+  on the middle button. It is plain JavaScript, `libraryTree.mjs`, because the Node in use does not run TypeScript
+  files, and the commit hook runs it.
+- **A Playground case that only one framework can pass exists once per framework, tagged `@solid` or `@react`**,
+  the user's call over teaching a spec to branch on the framework. Each Playground's projects leave out the other's
+  tag. The three so far: the docs table's type text (`JSX.Element` and "value or accessor" against `ReactNode` and a
+  plain value), `Label`'s warning (`getAriaLabel` against `ariaLabel`), and the no-frames placement, where a Solid
+  layer opens a frame behind its anchor and a React one, placed in a layout effect, opens on it.
+- **The builds the tests run are served at the root**, so the specs keep navigating to `/tabs`; only the deployed
+  builds carry the `/solid/` and `/react/` prefixes, and each app reads its own from the build.
+
+### Porting: the shapes the rest of `Abstracts/` took
+
+Every abstract is now split along the lines above; these are the recurring shapes, so the components and
+`Generators/` can copy them rather than re-derive them.
+
+- **A watcher or tracker is a store plus `observe(element)` returning a stop**, restartable, as `Navigator`'s
+  direction watcher set out: `MediaQueryMonitor`, `PointerTracker`, `FrameRateMonitor`, every tracker in
+  `InteractionTracker`. Where the state is only the latest reading and nothing else holds time, the core is just
+  `observe*(element, callback)` returning a stop, and the Solid side keeps the reading in a signal —
+  `ElementObserver`, `Anchor`'s content size. **A core observer reports only when its reading changes**, which is
+  what the old signals' `equals` did, with one exception kept for parity: the per-frame viewport rect is reported
+  every frame, because the old observer wrote it every frame and consumers' own signals decide what a repeat means.
+- **A tracker whose state a painter reads skips writes that change nothing.** `InteractionTracker`'s element
+  tracker compares field by field before notifying, as the Solid store it replaced did; without that, every key
+  press re-reading the focus ring would hand every painter a fresh flags object.
+- **Module-level shared state is a store in the core and one Solid signal mirroring it**, subscribed once at
+  module load rather than through `accessStore`, which needs an owner: `Elevation`'s registered layers,
+  `PointerTracker`'s presence, `Carrier`'s carry in flight. A Solid getter that must re-run when that state changes
+  but computes through the core reads the mirror first and then calls the core function —
+  `ElevationSolidUtils.getBase`, `CarrierSolidUtils.getIsTargetAllowed`.
+- **A framework's batching is passed in, never assumed.** `Carrier` commits a move between zones as two writes the
+  consumer must see as one; the core's `end` and `dragFromPointer` take `opts.batch`, and the Solid side hands
+  over Solid's `batch`. React batches on its own and needs nothing.
+- **A consumer-owned value the core writes is a getter-and-setter pair in its defs**, never a store the core owns:
+  `Selection`'s selection, `HoverIntent`'s open state, `Rotator`'s target index. Where the core has to know that
+  such a value changed from outside, the binding reports it — `HoverIntent`'s `reportShown`, `Rotator`'s
+  `turnToTarget` — because the core cannot watch a value it does not own.
+- **A reactive chain of pure calculations becomes the pure calculations, and the chain stays each framework's.**
+  `Anchor`'s positioning is `computePortalPlacement`, `computePortalPosition` and `getIsAnchorOnScreen`, and the
+  Solid side keeps the same memo per step, so what re-runs when is unchanged.
+- **Stopping a gesture tracker's listeners is not forgetting the gesture.** `InteractionTracker`'s drag and swipe
+  trackers take `reset` separately from `observe`'s stop, and the Solid side calls it only when the element changes
+  or the control is disabled — the two cases the old code reset in. A first version reset on every stop, and
+  `ColorArea`, whose listeners are attached again mid-drag, then took the press and dropped every move after it;
+  `e2e/colorArea.spec.ts` caught it.
+- **A Solid cleanup that writes to a core store is registered before the signals reading it**, so it runs after
+  they have unsubscribed — Solid runs an owner's cleanups last-registered first. `Rotator`'s `stop` is the case.
+- **Types that name Solid go in `<Subject>Solid.types.ts`**: `MaskedFieldHandle`, `RotatorDefs` and the
+  `Virtualizer` row window's. A core `.types.ts` imports nothing from `Utils/typeUtils`, because the React
+  typecheck would then load Solid's types — which is how the check is run: `tsc --listFiles` in
+  `components-react` lists no `solid-js` file.
+
+**Five places kept most of their Solid half, each for a stated reason.**
+
+- **`SignalMirror`** exists to shape Solid signals, and most of it goes to the Solid package as it is. The one
+  rule in it that is not about Solid — telling an outside clear of a composite value from the echo of the
+  component's own, which is what lets a time be picked before a date — was extracted as
+  `SignalMirrorUtils.createSplitter` once React needed the same split, and the Solid half became
+  `SignalMirrorSolidUtils`.
+- **The `Viewport` and `ColorExtractor` contexts** are each framework's by nature. `Viewport`'s context type was
+  loosened to plain function types so `ViewportUtils` and every core that takes a viewport stay framework-free;
+  `ColorExtractor`'s loading moved into `ColorExtractorUtils.createExtractor`, and the context calls it.
+- **`MaskedField`'s wiring.** Its three effects depend on exactly which reads are tracked and which are not — a
+  value change must not re-commit the digits, a format change must not rewrite the text — and those choices are
+  the behavior. So the rules moved out as pure functions (`computeHasIssue`, `computeTypedValue`,
+  `computeText`), and the wiring stayed in `MaskedFieldSolidUtils.createField`, calling them.
+- **`Virtualizer`'s row window** was first a layer over `@tanstack/solid-virtual`, and only the scroller search moved
+  (`VirtualizerUtils.findScrollParent`). It is now built on TanStack's framework-free `virtual-core`, the same package
+  the React side uses, by folding in exactly what `solid-virtual`'s own wrapper did: options recomputed inside a
+  `createComputed`, `_didMount` and `_willUpdate` on mount, and the visible rows kept in a store reconciled by row
+  index so a row that stays on screen keeps its element. The ref-timing and scroll-margin fixes recorded under
+  `Virtualizer` sit outside that wrapper and were not touched; `measureRow` still defers to `onMount`. One TanStack
+  package serves both frameworks, and `solid-virtual` 3.13.40 was itself on `virtual-core` 3.17.11, so the version
+  under the Solid lists did not change.
+- **`Glass`'s filter builders** return markup through `Generators/SVGDefs`, which is JSX; they moved to
+  `GlassSolidUtils`, and the geometry and ids stayed. `Glass` was at first left out of `core.ts`, because its
+  description type borrowed Solid-flavored gradient types from `Generators/SVGDefs`; it rejoined once the generators
+  were split (_"Porting: the SVG generators, `Shape`, `Surface`, `GlassSurface`, `Corners` and `Glass`"_), and
+  `GlassReactUtils` is the React side of the builders.
+
+**Every abstract has its React side, written ahead of the components that will use it.** The user's call,
+reversing Claude's first one, which was to write each when a React component first needed it. They are in
+`components-react/src/Abstracts`, each tested through a story on the gallery page and a spec under `e2e/react`.
+`Glass`'s filter builders are the one gap, since they return markup through `Generators/`, which has no React
+side yet.
+
+### Porting: how the React side reads
+
+Derived from the `Navigator` and `ElementFader` pilot and applied to every abstract; the components should keep to
+it.
+
+- **Hooks take plain values and `RefObject`s, and return plain values.** `useX` inside `<Subject>ReactUtils`, the
+  React counterpart of Solid's `create*` inside `<Subject>SolidUtils`. A hook that follows an element reads it
+  through `useElement(ref)` in `components-react/src/Utils/refUtils.ts`, which turns the ref into state after every
+  commit so an effect can depend on it — the counterpart of an accessor ref in Solid.
+- **A framework-free object is made once, in `useState`'s initializer, and reads this render's props through
+  `useLatest`.** Its callbacks are functions over that ref rather than captured values, so a new callback or
+  duration takes effect without the object being made again. Where a core reads an optional function's presence
+  at event time — `HoverIntent`'s focus delay, `TextSync`'s mask — the object passed in uses a getter, so the
+  presence follows the prop too.
+- **Two-way state is a `[value, setValue]` pair named `*State`**, the React spelling of Solid's `*Signal`:
+  `selectionState`, `shownState`, `targetIndexState`, `valueState`. Where the consumer may leave it out, the hook
+  keeps its own, as `SignalMirrorReactUtils.useOptionalState` does.
+- **Lists of elements are compared entry by entry** through `useStableList`, so a list built inline each render
+  does not re-run the effect that watches it.
+- **A reading that has not changed leaves the state alone**, through an updater that hands back the previous value,
+  so a measurement repeated every frame re-renders nothing. The per-frame rect's report-every-frame parity with Solid
+  does not carry over: in React a repeat would be a render, and nothing depends on one.
+- **`useEffect` for listeners and timers, `useLayoutEffect` for anything written into the DOM or measured from it**
+  before paint: tab order, `touch-action`, sizes, the text sync.
+- **A controlled input's text is committed from its setter, not from an effect watching it.** `MaskedField`'s React
+  side commits the typed value inside the setter the input calls, so a keystroke and the value it makes arrive in
+  one render; the value-from-outside direction stays an effect, as in Solid.
+- **The `Viewport` context has a React twin** in `components-react/src/Abstracts/Viewport/Viewport.context.ts`, falling
+  back to the window when no provider is above, which is what every viewport-space measurement reads. Since the
+  fallback's size is read during rendering, `usePortalPosition` re-renders on window resize.
+- **`Virtualizer`'s React row window is built on TanStack's `virtual-core` directly**, the way `@tanstack/react-virtual`
+  builds itself — options set during render, `_didMount` and `_willUpdate` in layout effects — declared as a
+  dependency of `components-react`. It was already on disk as a dependency of `@tanstack/solid-virtual`, so nothing
+  new was fetched; the Solid side has since moved onto it too. **A change `virtual-core` marks as needing to land
+  at once is flushed at once**, as `@tanstack/react-virtual` does, so a jump to the far end of a long list lands in
+  one step instead of showing an in-between layout for a frame or two — found by `select.spec.ts`'s End case, which
+  reads the rows the moment the highlight lands and saw one row over another. The flush is skipped when the change
+  arrives from inside React's own work (a row measured as React attaches it, the mount and update effects), where
+  React refuses to flush and says so; there the change waits for the next render as before. Row measuring needs none of the Solid side's deferral, because React attaches a ref only after
+  the element is in the document.
+- **A component that records its items' elements as state takes a detach and reattach of the same element as no
+  change.** `Tabs` hands each tab's element through the consumer's `linkComponent`, and a router's link typically
+  gives its element a new ref function on every render, so React detaches and reattaches it each time. Recording
+  that as two writes left a new array with the same entries, which counted as a change, rendered again and looped.
+  `Tabs` now keeps the latest elements aside and only replaces its state when the list, once every ref of the commit
+  has run, differs. `Toolbar`, `Range` and `Satellite` record elements the same old way, but only from refs of
+  their own that never change, so they cannot loop; they were left as they are.
+- **`CarrierUtils.end` needs no batch under React**, which batches the two writes of a move between zones on its
+  own.
+
+### Porting: how a component is carried across
+
+Settled when `InteractionWrapper`, `Button`, `Tooltip` and `Label` were ported by hand as the pattern for the rest.
+Taken on Claude's judgment, since the user asked for the components to be ported without supervision.
+
+- **A React component keeps the Solid component's name and its props' names**, adapted the way the abstracts' hooks
+  are: plain values instead of accessors, `*State` pairs instead of `*Signal`, `render*` callbacks handed plain values
+  and returning `ReactNode` (`renderContent(flags)` rather than `renderContent(getFlags)`), React's own event types,
+  `className` for `class`. A prop that means the same thing is spelled the same in both, which is what the eventual
+  Playground switch needs. `Tooltip`'s `anchorRef` is the case that shows the limit of it: it is an element value in
+  both frameworks, not a React `RefObject`, because that is what the name means in the Solid component.
+- **Logic that is not about the framework moves into the component's own `.utils.ts` and both views call it**, as the
+  abstracts' logic did. `TooltipUtils.describe` — adding a tooltip's id to its anchor's `aria-describedby` and taking
+  it back out without disturbing anyone else's — is the first; `LabelUtils.resolveAriaLabel` and `warnIfShadowed`
+  the second, which split `Label.utils.ts` into a framework-free `LabelUtils` and a Solid `LabelSolidUtils` exactly as
+  the abstracts were split.
+- **Styles, defaults and types reach both framework packages through the core's `index.ts`.** Every `.css.ts` is exported as a namespace
+  named after its file stem plus `Styles` — `TooltipStyles.tooltipRoot` — because the class names are the contract
+  both frameworks share and a flat export would collide (`Tooltip` and `HoverCard` both declare `bridgeTopVar`). Every
+  `.const.ts` and every `.types.ts` is exported whole, and holds nothing Solid since the split
+  (_"The three packages"_). React never imports a Solid props type: each React component declares its own in its own
+  `.types.ts`.
+- **The React gallery loads each story file only when a test mounts it, and pushes no live reloads.** Both were
+  needed once several ports were running at once: one broken story file must not stop every other story from loading,
+  and a reload pushed when any file changes destroyed the page under a test that happened to be running.
+
+### Porting: `PlacementBox`, `PlacementItem` and `Barrel`
+
+- **The shared parts are `PlacementBoxUtils` and `PlacementItemUtils`**, new, holding what the Solid box's memos and
+  the item's style computed: the pointer point, the arrangement, the overreach, the transition duration, the effect
+  style, and `createGlideWatcher`, which replaced the Solid item's glide counter and its wait for the animations to
+  finish. `PlacementBoxUtils.UNTRACKED_CONTEXT` is the inert context an item gets outside any box, shared by both
+  frameworks' contexts.
+- **`PlacementItemUtils.computeStyleValues` returns camelCase fields**: React spreads them as its style directly, and
+  the Solid item renames the two that need it (`zIndex`, `clipPath`), since Solid's `style` takes kebab-case keys.
+- **The React context keeps Solid's getter-shaped `PlacementBoxContextType`**, as the React `Label` did, with its
+  value rebuilt through `useMemo` over what it hands down, so items re-render only when one of those changes.
+- **A React `PlacementItem` glides when its placement object changes identity**, as Solid's `on(placement)` does. The
+  change is caught during render, so the new position and its transition reach the DOM in one commit. The props
+  documentation asks for the same object while an item has not moved; one built inline costs only a glide that
+  finds nothing to animate and ends at once.
+- **The React `Barrel`'s `renderFace` is `(item, index, face) => ReactNode`**, keyed by index as Solid's `<Index>`
+  keys it, and `BarrelUtils.getRootSize` replaced the size-by-axis choice written out in the Solid root's style.
+
+### Porting: `Popover`, `Modal`, `Drawer` and `PopupTrigger`
+
+- **The shared parts are `PopoverUtils` and `ModalUtils`.** `PopoverUtils.computeAnchorPresence` is the rule for
+  when a pinned popup gives up on an anchor that has scrolled away, and `getIsFocusKeptOnPress` the `dialog` check a
+  press reads; `ModalUtils` holds the swipe-to-dismiss rules (`getSwipeDirection`, `getSwipeAxis`,
+  `getIsSwipeDismissal`, `computeSwipeTransform`), the size cap and which dismissal reasons a modal honors.
+- **Events cross a portal the same way in both frameworks**, so a React handler standing in for a delegated Solid one
+  needs no check on where in the document the event started: Solid's delegated events follow the component tree
+  through a `Portal`, and React's synthetic events do too. **Blur is the exception.** Solid's `onBlur` is a native
+  listener on the element alone, React's fires for anything inside losing focus, so the React `Popover` answers
+  `onBlur` only when `e.target === e.currentTarget`.
+- **The React `Modal` declares its sealing effect before its auto-focus.** React runs effect cleanups in declaration
+  order, so the page behind is unsealed before focus is put back — restoring first would reach for a trigger that is
+  still inert.
+- **`initialFocusRef` is an element value, as `anchorRef` is**, and `visibilitySignal` is `visibilityState`.
+- **A story that portals needs a full-window layer**, because a dialog portaled straight into `document.body` is only
+  as tall as the body's content; the Playground's viewport supplies one for Solid, and
+  `components-react/gallery/Essentials/ModalFixtures.tsx` supplies one for the gallery.
+
+### Porting: the form family — `Form`, `FormField`, `FormSection`, `TextField`, `BinarySwitch` and the presets over them
+
+- **The shared parts are `FormUtils`, `FormFieldUtils`, `BinarySwitchUtils`, `CheckboxGroupUtils` and
+  `TextFieldUtils`**: validity and which field an error sends focus to; `aria-describedby` resolution (with
+  `FormField.utils.ts` split into framework-free `FormFieldUtils` and Solid `FormFieldSolidUtils`, as `Label` was);
+  the switch role dropped while mixed and the write of `checked` and `indeterminate` onto the input; a group's
+  checked-state fold and list arithmetic; a text field's padding, inset, input type, auto-sizing, spin value and
+  content measurement. The Solid adornment-width observer now goes through `ElementObserverUtils.observeBorderBoxSize`.
+- **A React form's contexts carry one member Solid's do not, `reportChange`** (`FormReactContextType`). A React field's
+  entry getters read refs, so the field or section reports from a layout effect when its error changes, and the form
+  re-renders and reads them again; a section passes the report on to the form above it.
+- **A React form moves focus after the submit's render is applied, not inside the handler**, since errors that appear
+  because the form now counts as submitted arrive in that render. Under Solid they are visible at once, so both land
+  in the same place.
+- **The React `CheckboxGroup` hands its controller over again, as a new object, whenever its checked state changes**,
+  because a select-all box drawn outside the group renders before it and would otherwise stay a change behind. Its
+  `register` returns its own cleanup (`CheckboxGroupReactContextType`).
+- **The React `BinarySwitch` keeps its input uncontrolled, as the Solid one does**, writing `checked` and
+  `indeterminate` through `BinarySwitchUtils.syncElement`, so a refused write leaves the input showing what its owner
+  holds.
+- **The React `TextSync` hook shows the core the text just typed until the next render.** The core writes the owner's
+  value back straight after `onInput`, and under React that value is still the previous render's, so an unmasked field
+  typed "Ada" came out "daA". The hook now holds the typed text for the core, forces one render, and brings the input
+  in step with whatever the owner decided. One difference from Solid remains: a masked write the owner refuses is put
+  back to the owner's value, where Solid leaves the masked text showing.
+- **`LabelUtils.warnIfShadowed` takes the prop's name** so each framework's warning names what its caller wrote; the
+  Solid one still says `getAriaLabel`, which is what `e2e/label.spec.ts` reads.
+
+### Porting: the carousels and the wheels
+
+- **The shared parts are `CarouselUtils` and `WheelUtils`**: the swipe rules, when a step is disabled, when rotation
+  runs and stops at the end, what is announced, the drum's turn angle and the track's transform; and the wheel's
+  layout, marker correction, wedge angle and transform, what counts as selected while idling, and the whole per-wedge
+  pointer effect.
+- **A React controller handed over through `onMount` keeps the Solid getter names and adds `subscribe`.** In React a
+  getter called while rendering never re-renders its caller, so a Spin button could not follow `getIsSpinnable`; the
+  getters answer with what the wheel last drew, backed by a store that ignores writes that change nothing, and one
+  getter plus `subscribe` is what `useSyncExternalStore` takes. `WheelController` is the model for every other
+  controller ported after it.
+- **`CarouselControls` holds plain values in React** (`index`, `count`, `isPlaying`, `isHeld`), since it is handed to
+  `renderControls`, and the elements from `renderStep`, `renderPick` and `renderRotationControl` carry their own
+  `key`, so a consumer can put a row of pickers in an array without adding keys.
+- **The drum carousel's resting angle is held in React state together with the index and count it was worked out
+  for**, and worked out again during render when those change, so the accumulating angle is never painted one frame
+  stale.
+- **A core type is reused in React where its documentation reads true for both**; `CarouselState` is redeclared on
+  the React side only because its documentation names `playbackSignal`.
+
+### Porting: the SVG generators, `Shape`, `Surface`, `GlassSurface`, `Corners` and `Glass`
+
+- **One SVG defs record, generic in the core**: `SVGDefsOf<TElement>` in `SVGDefs.types.ts`, with Solid's `SVGDefs` as
+  `SVGDefsOf<JSX.Element>` in `SVGDefsSolid.types.ts` and React's as `SVGDefsOf<ReactNode>` under the same name in the
+  React package. **The plain-value description types keep the canonical names** (`SVGLinearGradientDefs`,
+  `SVGSpecularLightingFilterDefs`…) in the core; Solid's accessor forms are `…SolidDefs`. That is what let
+  `Glass.types.ts` stop borrowing Solid types, and `Glass` rejoined `core.ts`.
+- **A filter's bookkeeping is the core's**: `SVGFilterDefsUtils.createRegistry` decides which effects are kept, what each
+  is named and reads, and how far the region reaches; each framework's `SVGFilterDefsFactory`, the same class name in
+  both packages, only writes the elements. The gradients' stops (`computeStops`, one flat list), the patterns' cells and
+  the animation scheduler (`SVGAnimationDefsUtils.createScheduler`) moved the same way.
+- **The framework owns the SMIL pattern index**, handed to the scheduler as a getter-and-setter pair whose setter must
+  have written `repeatCount` before it returns, because the elements are begun again straight afterwards; React's
+  `useAnimateDefs` therefore sets its state inside `flushSync`, matching Solid's synchronous signal.
+- **In React a restart is owned by a key that describes the animation.** React keeps elements across renders, so
+  `useAnimateDefs` returns `key = computeIdentity(defs)`, built from the duration and patterns by value: a changed
+  animation rebuilds its `animate` elements and a render describing the same one leaves them running. Solid keeps its
+  rule that a new defs record rebuilds.
+- **A defs element that needs hooks is a component** — the React Glass sheen is a private `GlassSheenFilter`, so
+  following the pointer re-renders only the filter.
+- **`ShapeLayerUtils`, not `ShapeUtils`**, is Shape's framework-free half, since `ShapeUtils` is the `ss-utils`
+  namespace Shape itself imports. React's `Shape` takes plain values: `computeFillDefs(size, element)` and
+  `renderChildren(size, clipPath, clipPoints)`. `SurfaceUtils` holds the named-to-clockwise conversions `Surface` and
+  `GlassSurface` both used to copy.
+- **The samples stay Solid-only for now**; React stories build their own paint.
+
+### Porting: the overlays — `HoverCard`, `Toasts`, `Sidebar`, `Preview`, the spotlights, `Accordion` and `Collapsible`
+
+- **The shared parts are new `CollapsibleUtils`, `AccordionUtils`, `PreviewUtils`, `SidebarUtils` and `HoverCardUtils`,
+  and extended `ToastUtils` and `SpotlightUtils`**: headings, axes and extents; single- and required-expand rules and the
+  arrow walk; overflow and overlay targets; the sidebar's phase and its pointer-away watch; the hover card's hold,
+  dismissal, focus return and anchor listeners; the toasts' admission, overflow trim, countdown with its pause
+  arithmetic, and the F8 hotkey route; the spotlight's dismiss keys and focus hold. `Preview` now reuses
+  `CollapsibleUtils.scrollIntoView` rather than a copy of it.
+- **The React `HoverCard` keeps its panel element in state, not a ref**, because the panel is drawn inside `Popover`,
+  which mounts it on its own fade state without re-rendering `HoverCard` — a ref was never re-read, and the bridged gap
+  lost the card.
+- **React views that act when a fade finishes act on a real change of `hasTransitionFinished`**, not on its rendered
+  value: in the render where the flag that starts the fade flips, the fader still reports finished from before.
+- **React Spotlight converts `CutoutUtils.getMaskStyle`'s hyphenated keys to camelCase** before handing them to
+  `renderOverlay`.
+- **Under React's development double mount, a fade's `onShow` fires twice** — show, cancel, show — since `cancel` does
+  not take back an `onShow` already fired. Production mounts once. The React toasts spec asserts the arrival was
+  reported rather than reported exactly once.
+
+### Porting: the navigation controls — `Tabs`, `Breadcrumbs`, `Paginator`, `Stepper`, `TableOfContents`, `Tree` and `Sortable`
+
+- **Keyboard decisions come back as action descriptors** — `TabsKeyStep`, `TreeKeyAction`, `SortableKeyAction` — and
+  each view carries them out. Any action claims the key; `undefined` lets it through. Tree hands typeahead in as a
+  `pushQuery` callback, so `*` is claimed before the buffer ever sees it. The roving index, the navigable set, the
+  floater's bounds (`TabsUtils.observeSelectedBounds`), expand and collapse, the focus rescue when a branch closes
+  from outside, the table of contents' target bookkeeping and the sortable marker's geometry all moved into the
+  components' `.utils.ts` the same way.
+- **A record that carries a tooltip is generic over the tooltip's type** — `TreeNodeRecord<T, TTooltipDefs>`,
+  `SortableItemRecord<T, TTooltipDefs>` — so one set of core rules serves both frameworks, and each framework's props
+  fix the tooltip to its own `InteractionTooltipDefs`.
+- **`SortableUtils.createZone` builds the whole `CarrierZone` from getters**; Solid registers it directly and React
+  hands it to `CarrierReactUtils.useZone`. The carry state reaches the pure helpers as explicit values, so Solid's memos
+  still track the mirror signals.
+- **React Tree focuses a row outside the virtualized window after it is drawn**, from a layout effect, since React does
+  not draw the pinned row synchronously the way Solid does.
+- **React Tabs and Tree reset the roving `focusedValue` by adjusting state during render**, and React
+  `TableOfContents` remembers the value it last reported in a ref, so the development double mount never reports the
+  initial one.
+- **Link props include the ref**: `TabLinkProps`, `PaginatorLinkProps` and `TreeLinkProps` are the anchor's attributes
+  plus `href` and an optional `ref`, and Breadcrumbs reuses `TabLinkProps` as it does in Solid.
+
+### Porting: the text inputs — `NumberInput`, `CurrencyInput`, `SegmentedInput`, `TagInput` and `FileInput`
+
+- **The shared parts**: `NumberInputUtils` gained the key moves, the settle-on-leave clamp and `createStepRepeater`, the
+  hold-to-repeat timers; `CurrencyInputUtils.createFieldRules` holds every masked-field rule but the value's own getter
+  and setter; `SegmentedInputUtils.observeSelection` holds the drag and every selection listener; `TagInputUtils` holds
+  the add, remove and key decisions; and `FileInput.utils.ts` split, as `Label`'s did, into `FileInputUtils` —
+  `createDropTracker`, a store plus a restartable `observe` — and `FileInputSolidUtils.trackDrop`.
+- **`CurrencyInputUtils.createFieldRules` takes one getter per input, not one record.** Solid runs its updates in the
+  order they subscribed; reading the digits through the whole grouping turned the old digits into an amount before the
+  text was rewritten in the new decimal count, which `e2e/currencyInput.spec.ts` caught. Narrow getters restore
+  Solid's order.
+- **The React masked field does not watch the format.** The Solid `createField`'s third effect rewrites the text when
+  the format changes; the React `useMaskedField` has no counterpart, so a caller whose spelling can change hands the new
+  spelling to the text setter or calls `refresh`. The React `CurrencyInput` does the former when its grouping changes.
+- **The React `NumberInput` reads its text through a ref beside the state**, because a held stepper repeats on a timer
+  started in an earlier render.
+- **The React `FileInput` brings the native input back in step after every change event**, counting changes as
+  `TextSyncReactUtils.useValueSync` does, so a refused pick still reverts the input.
+- **The React `TagInput`'s text field is a small inner component with a stable ref callback**, so the consumer's `ref`
+  is not handed `null` and then the element on every render.
+
+### Porting: the menus — `Menu`, `FanMenu`, `WheelMenu`, `Toolbar` and `Menubar`
+
+- **The shared rules take a framework-free `MenuItemRecord<T>`**, which each framework's `MenuItem` satisfies
+  structurally; the functions that hand items back are generic over the item type. A menu level's keys come back as a
+  `MenuLevelKeyStep` (dismiss, claim, activate, open, close, highlight) and a toolbar's as a `ToolbarKeyStep`, as the
+  navigation controls' do. The document listeners — the pointer reader, the flick, the context-menu requests — are
+  `observe*` functions in `MenuUtils`; the wheel menu's band arithmetic and the fan's layout constants moved into
+  `WheelMenuUtils` and `FanMenuUtils`.
+- **The React menubar switches menus over two commits.** React applies a switch's close, focus and open in one commit,
+  after which the old menu's focus-restore cleanup pulled focus back to the old word; so the key handler closes the menu
+  and records the target, and an effect on the next pass focuses that word and opens its menu, with every cleanup run
+  first. `e2e/react/menubar.spec.ts`' Escape-after-handover case pins it.
+- **A React menu level resets its highlight, open submenu and covered flag during render when `isOpen` flips**, which
+  is Solid's effect without a frame of stale highlight; a laid-out menu keeps its Escape from the dismisser with
+  `stopPropagation` on the React event.
+- **The toolbar's tab stop follows focus however it arrives.** Both frameworks now answer a focus inside the row with
+  `ToolbarUtils.computeStopAt`, so a clicked or tabbed-to action is where the arrows walk on from, as the published
+  toolbar pattern has it. Before, only the arrows moved the stop, and ArrowRight after clicking the fourth action went
+  on from the first. Found while porting and fixed in both.
+
+### Porting: the list controls — `Listbox`, `MultiListbox`, `Select`, `MultiSelect` and `TextInput`
+
+- **`Listbox.utils.ts` split, as `Label`'s did**: `ListboxUtils.createCursor` is a store of the highlighted value and
+  focus with its commands, `ListboxSolidUtils.createCursor` keeps the old Solid shape, and the pure pieces — navigable
+  indexes, option ids and text, the combobox ARIA both `Select` and `TextInput` wrote (`computeComboboxAttributes`),
+  the windowed runs and pinned rows, and `createReachEndGuard` — live in `ListboxUtils`. Two effects stay per
+  framework because they follow state rather than a key: clearing the highlight when the list closes, and moving
+  focus to the highlighted option in a roving list.
+- **Select's records carry their tooltip type as a parameter** (`SelectOption<T, TTooltipDefs>` and its neighbors),
+  defaulting to Solid's, as `Tree`'s and `Sortable`'s do.
+- **The React `Select` waits for the closing fade before emptying its query**, since the React `Popover` reports the
+  fade's start one commit late; the render where the list closes marks the popup unsettled itself.
+- **The React end marker is keyed by a counter bumped whenever the options array is replaced**, matching the Solid
+  keyed `Show` that observes each new array afresh; and a React option answers `onFocus` only for focus on itself, as
+  the `Popover`'s blur does.
+
+### Porting: `Radio`, `RadioGroup`, `Range`, `ColorArea`, `ColorInput` and `SlideButton`
+
+- **The shared parts**: new `RadioGroupUtils` (entry order, the roving and selected entries, the key target, the floater
+  bounds), `ColorAreaUtils` (the axes' percent, value text and dragged color, `syncAxis`) and `ColorInputUtils` (the two
+  directions that keep a value and a color in step); `RangeUtils` gained the values, ratios, fill and thumb bounds, and
+  `createThumbs`, which holds all of the old element's change-start and change-end bookkeeping, the nearest-thumb raise
+  and the write-back onto each input; `SlideButtonUtils.createGesture` is a store of holding and grabbed with the drag,
+  key and hold commands, replacing the Solid element's hold loop.
+- **`RadioGroupUtils`' floater functions are copies of `TabsUtils`', not shared with them**, keeping the recorded rule
+  that the floater was copied deliberately and a third consumer is when to extract it.
+- **A React radio registers again whenever its value, disabled state or reachability changes**, and the group's
+  `register` returns its own cleanup (`RadioGroupReactContextType`), since the group reads those through the entry's
+  getters and would not otherwise re-render to see them.
+- **The React `Range` listens for the native `change` event**, because React's `onChange` fires on every `input`;
+  `onChangeEnd` rides on it. Its `onInput` is handed the values the write produced, where Solid's reads the owner's
+  back — they differ only when the owner refuses the write.
+- **Ref callbacks on raw inputs are made once and memoized per index or axis** in the React `Range` and `ColorArea`, since
+  an inline one is detached and attached on every render, and doing that while writing element state loops.
+- **The React `SlideButton` keeps its progress in a ref beside the owner's value**, because its release check can run while
+  the owner's state is still a pointer move behind; the React `ColorArea` decides whether focus after a press shows a
+  ring from a pressed ref for the same reason.
+- **React specs find an element by a `useId` id through `[id="…"]`**, since React's generated ids hold characters a `#`
+  selector cannot take.
+
+### Porting: the date and time family — `Calendar`, `RangeCalendar`, `Clock`, `DateInput`, `TimeInput` and the pickers
+
+- **The shared parts**: `CalendarUtils` and `ClockUtils` gained each key's action (`computeKeyAction`), the move and
+  pick rules, the roving day or unit, the per-cell flags and the label and announcement formatting; new
+  `DateInputUtils` and `TimeInputUtils` hold what were module helpers inside the Solid files, with `parseDigits`, the
+  era and meridiem rules and the time stepping; `RangeCalendarUtils` holds the half-entered range; the date-range
+  split and the date-time picker's time bounds moved into their own `.utils.ts`.
+- **The era and meridiem records a painter is handed are plain values in React** — `{ value, options, set }` and
+  `{ value, set, toggle }` — since the painter runs again on every render and a getter would only return what the value
+  holds.
+- **The React `CalendarComposite` takes `anchorDay` as a value** rather than Solid's callback, since it is an effect's
+  dependency for moving the highlight.
+- **Calendar cells and clock options are keyed by index, as Solid's `<Index>` keys them.** Keyed by date, paging from
+  the keyboard would remount every cell and drop focus before the effect moving it could run.
+- **A React picker closed by Escape returns focus to its field in an effect, after the close has been applied**,
+  since focusing inside the handler was undone by the popup's own focus restore as it unmounted.
+- **The React `DateInput` memoizes its value in the chosen calendar and keeps its anchor date in state**, replacing it
+  only when the calendar, era or year actually changes, which is what Solid's memo equality did — otherwise a new
+  date object each render re-ran the masked field's value effect and overwrote a half-typed entry.
+- **The React `TimeInput` steps by setting the value and the selection, and lets the masked field rewrite the text**;
+  committing the text itself re-read it with the old meridiem, so 11:30 pm stepped to noon rather than midnight.
+
+### Porting: `Table`, the mosaics, `Scroller`, `SplitPane`, the switchers, `EdgeFader`, `Progress` and `ViewportWrapper`
+
+- **The shared parts**: `TableUtils.computeKeyCommand` is the table's whole key decision tree, returning a
+  `TableKeyCommand` each view carries out, beside the resize, carry, sort and render-props arithmetic, with the column's
+  non-rendering fields as `TableColumnDefs<T>`; `MosaicUtils` holds the layout, the order, `createSlotKeeper` and the
+  glide; new `Progress`, `EdgeFader`, `ViewportWrapper`, `Scroller`, `SplitPane`, `ImageSwitcher` and `ImageMosaic`
+  utils hold what the Solid memos and effects did; and `AudioSwitcherUtils.createSwitcher` owns the pair of `Audio`
+  elements and their fades, with the binding reporting playback changes through `followPlayback`, since playback stays
+  the consumer's getter-and-setter pair.
+- **The React `AudioSwitcher`'s controller is `reset` plus `subscribe`**, backed by a store of the playback it last
+  reported; on stop the core forgets the current source, so the development double mount can load it again.
+- **The React `ViewportWrapper` provides the React viewport context** the way the Solid one provides the Solid one.
+- **SplitPane's gutter is named by the pane before it**, the one it resizes and the one `aria-controls` names. Both
+  frameworks had read the pane after it, so the name never reached the gutter; found while porting and fixed in both.
+- **The React `SplitPane` forgets remembered collapses during render when its ratios change identity**, since an effect
+  ran too late for an Enter pressed straight after an outside write.
+- **The React `Mosaic` keeps Solid's model, one component per tile**, keyed by `createSlotKeeper` slots in reading order,
+  each running its own glide in a layout effect, with focus restored in a layout effect when the slot order changes.
+- **React table header cells are positional, as Solid's `<Index>` keys them**, so the cell at the moved-to position keeps
+  focus after a Shift-arrow move; `TableHeaderSort` and `TableHeaderReorder` register during render and the cell checks
+  them in its mount effect, which runs after its children's.
+- **`EdgeFader` and `Scroller` skip unchanged readings in React**, so a scroll that moves nothing renders nothing.
+
+### Porting: `Timeline` and `TileBoard`
+
+- **The shared parts**: `TimelineUtils.computeKeyAction` holds the held-edge and resting key maps,
+  `createGestureTracker` the pan, pinch and wheel with the slop before capture, and `createEdgeZone` the carrier zone
+  that was written out in the view; `TileBoardUtils.computeKeyAction` holds the activation, Ctrl-Home and Ctrl-End and the
+  arrow walk, and `createSweeper` the sweep state machine, the hit layers, the document listeners and the swallowed
+  click.
+- **The React `Timeline` keeps its view in a ref every write updates at once**, synced to what was rendered after each
+  commit, since several wheel or pinch events can arrive before React renders and each would otherwise zoom from a stale
+  view; the held edge is mirrored into a ref for the same reason, as `CarrierUtils.start` asks the zone for it in the
+  same moment it is set.
+- **The React `Timeline` attaches its wheel listener natively with `passive: false`**, since React's `onWheel` is passive
+  and its `preventDefault` would let the page scroll under the zoom.
+- **The React `TileBoard` registers each hit layer through a ref callback returning `addHitLayer`'s removal**, React 19's
+  ref cleanup standing in for Solid's `onCleanup` inside the ref setter.
+
+### Porting: the hierarchy charts, `Bracket`, `Formation`, `Satellite` and `Staircase`
+
+- **One zoom clock serves `Icicle`, `Sunburst` and `CirclePacking`**: `TreemapUtils.createZoomClock`, a store of progress
+  from 0 to 1 advanced once a frame, with a timer that settles it if no frames come — replacing the frame loop and backup
+  timer each of the three had copied. `TreemapUtils` also holds the branch and stop resolution, the parent lookup for
+  Escape, the key action and the zoom projections; `BracketUtils.computeGeometry` replaced about a dozen size memos; the
+  new `StaircaseUtils` holds the step indents.
+- **A React hierarchy view catches a zoom during render**, recording the level being left, the starting views and a zoom
+  counter in state, and starts the clock and moves focus in a layout effect keyed on that counter — the counterpart of
+  Solid's `createComputed(on(...))`, as the React `PlacementItem` catches a changed placement.
+- **The React `Treemap` keys its current and leaving levels on the zoom counter**, so each zoom mounts a fresh layer as
+  Solid's keyed `Show` does, and its animations cancel on cleanup, so the development double mount does not leave two
+  running.
+- **The React `Formation` keys items by identity**, telling repeats apart by how often each has appeared, and asks its
+  layout again only when the count or the function changes; the React `Satellite` keeps one ref callback per satellite
+  across renders; the React `Bracket` answers focus and blur only for the node itself.
+
+### Porting: the animations, particles, trail, pointer effects and reveals
+
+- **`LightCatcher`, `ShadowCaster` and `Tilter` share one `PointerEffectsUtils`** in the parent `PointerEffects` folder,
+  which held no namespace of its own, since they share the resting rule and the edge falloff; its functions apply each
+  component's defaults, so either view passes its props straight through. **`CellAnimationUtils.runPasses` is the one
+  pass clock** that `CellAnimation` and `ParticleField` each used to carry a copy of; `TrailUtils.run`,
+  `ScratchCardUtils.createMeasureScheduler`, `ParticleFieldUtils.createRoster`, `ParticleSpawnerUtils.createEngine` and
+  the new `RevealUtils` took over what the Solid views' effects did.
+- **A controller with no getters gains no `subscribe`** (`ScratchCardController`, `ParticleSpawnerController`); the React
+  `TrailController` has plain-function getters and `subscribe`, on the `WheelController` model.
+- **A React frame loop that reads its own progress writes it through a ref at the same moment as the state setter**
+  (Trail, CellAnimation, ParticleField), so the next frame does not read the previous render's value; the ref is reset
+  to the rendered value on each commit, so a consumer who refuses a write still wins.
+- **The React `ParticleSpawner` draws a particle from its element's ref callback**, since React mounts the element after
+  the store changes rather than inside the tick, and it would otherwise paint at the corner for a frame.
+- **`spawnIterationPatterns` are compared by content in React**, so an inline array does not restart the stage on every
+  render; a stage is set as a fresh object, which is how one looping back to itself plays again, as Solid's
+  `equals: false` gives it.
+- **The particle roster clears itself when handed a different cell count**, since a cell's key then names a different
+  cell.
+
+### Porting: `Cuboid`, `Die`, `FlipCard`, `Odometer`, `RichText`, `ScrambleText` and `Typewriter`
+
+- **`Die`, `ScrambleText` and `Typewriter` each got a store-backed core** — `DieUtils.createRoller`,
+  `ScrambleTextUtils.createScrambler`, `TypewriterUtils.createPlayer` — since each runs a timer or frames over time;
+  `FlipCardUtils`, `CuboidUtils`, `OdometerUtils` and `RichTextUtils.getTagTreatment` took over the rest of the views'
+  arithmetic, with the rich-text default class map moved to `RICH_TEXT_DEFAULT_CLASSES`.
+- **`DieUtils.createRoller` recognizes the owner's echo of a roll's result by value**, remembering the face it wrote and
+  ignoring one `turnTo` of it, since React delivers the echo a render later and a flag set only during the write would
+  have let it cut the tumble short.
+- **The React `Cuboid`, `FlipCard` and `Odometer` work their turn state out during render when the input changes**, as
+  the drum carousel does; the React `Cuboid` reads the drawn orientation before the new transform commits.
+- **The React `Typewriter`'s `update(cause)` measures after the next commit**, since a consumer changes the children and
+  calls it in one handler; it returns `true` when a measurement is scheduled, and cannot report an unchanged width in
+  advance.
+- **Only `Cuboid` and `Die` hand React controllers with `subscribe`** — the face showing, and `isRolling` — since the
+  scrambler's and typewriter's controllers have no getters.
+- **A React `Cuboid` drag settles back only when it rounded to no turn**, since it cannot read at once whether the owner
+  accepted the new count, which the Solid one checks on release.
+
+### Porting: `PatchBoard`, `SortableGrid` and `CardStack`
+
+- **`PatchBoardUtils.createBoard` is one board object**: the carrier zone together with every handler, the swallowed
+  click and the tap aim, since the component is two carries over one zone, so both views only attach it and draw. The
+  view hands it the zone as registered, because React's `useZone` wraps the object and a carry started from the
+  unwrapped one would not be recognized as its own. **`SortableGridUtils.createZone`** is the grid's zone, with the
+  module-level grab record now shared by every grid on the page whichever framework draws it, and both grids reuse
+  `SortableUtils`' roving, click and carry helpers instead of copies. **`CardStackUtils.createPile`** is a store of the top
+  card's push and flight with its commands, holding the leave timer and the two-frame return.
+- **A React command sees its own writes before the re-render**: a React grid or stack hands the value it just gave the
+  owner's setter back to its own core, since `compact()` called from `onTransfer` otherwise read the items from before
+  the drop and undid the move. PatchBoard's `nodesState`, `linksState` and CardStack's `topIndexState` do not yet, and
+  nothing reads the new value in between today.
+- **A PatchBoard socket's wrapper is `sizing="fill"`**, in both frameworks. Its width used to come from
+  `patchBoardSocketHolder > *` beating the wrapper's fit-content width only by stylesheet order, and through `core.ts`
+  that order flips — so the React socket was 4px wide and every cable ended off center. **A style that wins by
+  stylesheet order is a hazard across the two builds**, which load the same `.css.ts` files in different orders.
+- **A React `CardStack` keys its cards by their index in `cards`**, so a card coming up the pile keeps its element and
+  eases into place; the Solid `For` builds every card afresh as the pile moves, since it is handed new entry objects, so
+  there the cards jump. A small visible difference between the two, left as it is.
+- **The React `CardStack` runs both swipe hooks and hands the pile element to only one**, since hooks cannot be called
+  conditionally; the other gets an empty ref and attaches nothing. `createPile`'s `stop` puts a card in flight back at
+  rest, so the pile survives the development double mount.
 
 ### Samples live in the library
 
@@ -559,7 +1344,7 @@ component-driven. Not outstanding work — the argument, so it is not re-derived
 `TreeUtils`, `ToastUtils`); anything bound to a framework (`InteractionTracker`, `FocusManager`, `FrameRateMonitor`,
 `ElementFader`, the SVG defs modules that return JSX — the arithmetic that used to be tangled into them has
 since moved to the Playground samples instead, so what is left here is markup and nothing else); anything adapting a
-third-party package (`DateValue`, `Virtualizer` over `@tanstack/solid-virtual`); and three near misses
+third-party package (`DateValue`, `Virtualizer` over TanStack's `virtual-core`); and three near misses
 blocked only by a pure type sharing a file with Solid props — `NumberInputUtils`,
 `RichTextUtils.parseContent`, `compileStops` / `sampleTrack`.
 
@@ -8989,7 +9774,8 @@ nobody can see — every row on screen is measured for real — so what it buys 
 anything has been scrolled. TanStack's advice is to estimate the **largest** plausible row so the guess errs
 one way and the list only ever settles upward.
 
-**`@tanstack/solid-virtual` is a runtime dependency, marked external rather than bundled.** The first attempt
+**TanStack's virtualizer is a runtime dependency, marked external rather than bundled** — `@tanstack/virtual-core`
+now, in both framework packages, where it was `@tanstack/solid-virtual` when this was argued. The first attempt
 took a package out again; this one keeps it, on the user's call that a dependency is acceptable
 for exactly this kind of functionality — the call `colorthief` already carries. External rather than bundled
 follows `colorthief` too: a package both inlined into `dist` and declared in `dependencies` makes a consumer

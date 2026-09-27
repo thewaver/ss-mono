@@ -1,6 +1,6 @@
-import type { Size2d } from "@thewaver/ss-utils";
+import type { Rect, Size2d } from "@thewaver/ss-utils";
 
-import type { MosaicPackDefs, MosaicPlacement, MosaicStep } from "./Mosaic.types";
+import type { MosaicLayout, MosaicPackDefs, MosaicPlacement, MosaicSizeAnchor, MosaicStep } from "./Mosaic.types";
 
 /** One flat stretch of the packing frontier: where it starts, how wide it runs, and how high it stands. */
 type MosaicSkylineSegment = {
@@ -13,6 +13,41 @@ type MosaicSkylineSegment = {
 type MosaicSpot = {
     x: number;
     y: number;
+};
+
+/** Which step each arrow and edge key takes in a walked mosaic. */
+const STEP_BY_KEY: Record<string, MosaicStep> = {
+    ArrowLeft: "previous",
+    ArrowRight: "next",
+    ArrowUp: "up",
+    ArrowDown: "down",
+    Home: "first",
+    End: "last",
+};
+
+/** The computed `transform` of an element with none. */
+const IDENTITY_TRANSFORM = "none";
+
+/** The easing a re-pack glide runs on. */
+const GLIDE_EASING = "ease";
+
+/** One keyframe of a glide: an offset from the final position, and the size to draw at where the tile is sized. */
+const toGlideFrame = (offsetX: number, offsetY: number, size: Rect | undefined) => ({
+    transform: `translate(${offsetX}px, ${offsetY}px)`,
+    ...(size ? { width: `${size.width}px`, height: `${size.height}px` } : {}),
+});
+
+/** Where a tile is on screen mid-glide, read off its computed transform and size, relative to the box it left. */
+const readShownRect = (element: HTMLElement, from: Rect): Rect => {
+    const style = getComputedStyle(element);
+    const offset = style.transform === IDENTITY_TRANSFORM ? undefined : new DOMMatrixReadOnly(style.transform);
+
+    return {
+        x: from.x + (offset?.e ?? 0),
+        y: from.y + (offset?.f ?? 0),
+        width: parseFloat(style.width),
+        height: parseFloat(style.height),
+    };
 };
 
 /** Slack when deciding whether two items really do overlap. Placements arrive from division, so edges meant to line up can be fractions of a pixel apart. */
@@ -494,4 +529,194 @@ export namespace MosaicUtils {
 
         return findVerticalStep(placements[at], placements, step === "down")?.index;
     };
+
+    /** The layout of a mosaic with nothing to pack, or no room yet to pack it in. */
+    export const EMPTY_LAYOUT: MosaicLayout = { placements: [], freeExtent: 0, anchoredExtent: 0 };
+
+    /**
+     * Packs a mosaic along whichever side is anchored, and puts the result in reading order.
+     *
+     * Anchoring the height packs the transposed sizes and transposes the placements back, so one packer serves
+     * both sides. The free extent is measured before the transpose back, so it is always the side that was
+     * worked out rather than given.
+     *
+     * @param params The items' sizes, the room across the anchored side, which side that is, the gap, and the
+     * preset's packing function.
+     * @returns The placements in reading order, how far they reached along the free side, and the anchored extent
+     * they were packed against — or {@link MosaicUtils.EMPTY_LAYOUT} when there is no room or nothing to pack.
+     */
+    export const computeLayout = (params: {
+        sizes: Size2d[];
+        anchoredExtent: number;
+        sizeAnchor: MosaicSizeAnchor;
+        gap: number;
+        computePlacements: (defs: MosaicPackDefs) => MosaicPlacement[];
+    }): MosaicLayout => {
+        const { sizes, anchoredExtent, sizeAnchor, gap } = params;
+
+        if (anchoredExtent <= 0 || !sizes.length) return EMPTY_LAYOUT;
+
+        const isTransposed = sizeAnchor === "height";
+
+        const packed = sortIntoReadingOrder(
+            params.computePlacements({
+                sizes: isTransposed ? sizes.map(transposeSize) : sizes,
+                anchoredExtent,
+                gap,
+            }),
+        );
+
+        return {
+            placements: isTransposed ? packed.map(transposePlacement) : packed,
+            freeExtent: getFreeExtent(packed),
+            anchoredExtent,
+        };
+    };
+
+    /**
+     * The order a mosaic's tiles go into the document: every placed item in reading order, then every item that
+     * has not been placed yet, in the order given.
+     *
+     * An unplaced item is still rendered, hidden, so that it can be measured and earn a place on the next pass.
+     *
+     * @param placements The placements, in reading order.
+     * @param itemCount How many items there are.
+     * @returns Item indices, in the order they were given, arranged in document order.
+     */
+    export const computeOrder = (placements: MosaicPlacement[], itemCount: number) => {
+        const placed = placements.map((placement) => placement.index);
+        const isPlaced = new Set(placed);
+
+        const unplaced = Array.from({ length: itemCount }, (_, index) => index).filter((index) => !isPlaced.has(index));
+
+        return [...placed, ...unplaced];
+    };
+
+    /**
+     * Whether two lists hold the same entries in the same order, by identity.
+     *
+     * @param prev One list.
+     * @param next The other.
+     * @returns `true` when every entry matches.
+     */
+    export const getIsSameList = (prev: unknown[], next: unknown[]) =>
+        prev.length === next.length && prev.every((value, at) => value === next[at]);
+
+    /**
+     * Makes the keeper that gives each tile a stable identity from one pass to the next.
+     *
+     * Each key keeps the slot object it had last time, matched by key and by which occurrence of that key it is,
+     * so two equal keys still get two slots and a removal hands no tile its neighbor's slot. A framework keys its
+     * tile elements by these slots, so a reorder moves elements rather than rebuilding them.
+     *
+     * @returns A function taking this pass's keys, in the order the items were given, and answering one slot per
+     * key.
+     */
+    export const createSlotKeeper = () => {
+        let slotsByKey = new Map<unknown, object[]>();
+
+        return (keys: unknown[]) => {
+            const previous = slotsByKey;
+            const next = new Map<unknown, object[]>();
+
+            const slots = keys.map((key) => {
+                const taken = next.get(key) ?? [];
+                const slot = previous.get(key)?.[taken.length] ?? {};
+
+                next.set(key, [...taken, slot]);
+
+                return slot;
+            });
+
+            slotsByKey = next;
+
+            return slots;
+        };
+    };
+
+    /**
+     * The step a key takes in a walked mosaic.
+     *
+     * @param key The `key` of the keyboard event.
+     * @returns The step, or `undefined` for a key the walk leaves alone.
+     */
+    export const getStepForKey = (key: string): MosaicStep | undefined => STEP_BY_KEY[key];
+
+    /**
+     * Glides a tile from the box it was in to the box it is now in, through the Web Animations API.
+     *
+     * The tile is already written at its new box, so the glide runs an offset from the old one down to nothing, plus
+     * the size where the preset sizes tiles. An interrupted glide restarts from where the tile is on screen rather
+     * than snapping back to its last target. Only a re-pack glides — a pass that kept the anchored extent — and a
+     * zero duration, which is what reduced motion asks for, jumps.
+     *
+     * @param params The tile's element, the glide running on it if any, the box it was in and the box it is in now,
+     * whether the preset sizes tiles, how long to take, and whether this pass is a re-pack.
+     * @returns The glide now running, or `undefined` when the tile jumped or had nowhere to go. Any glide passed in
+     * is cancelled either way.
+     */
+    export const glideTile = (params: {
+        element: HTMLElement;
+        glide: Animation | undefined;
+        from: Rect;
+        to: Rect;
+        isSized: boolean;
+        durationMs: number;
+        isRepack: boolean;
+    }): Animation | undefined => {
+        const { element, glide, from, to, isSized, durationMs } = params;
+        const shown = glide?.playState === "running" ? readShownRect(element, from) : from;
+
+        glide?.cancel();
+
+        if (durationMs <= 0 || !params.isRepack) return undefined;
+
+        const isStill =
+            shown.x === to.x &&
+            shown.y === to.y &&
+            (!isSized || (shown.width === to.width && shown.height === to.height));
+
+        if (isStill) return undefined;
+
+        return element.animate(
+            [
+                toGlideFrame(shown.x - to.x, shown.y - to.y, isSized ? shown : undefined),
+                toGlideFrame(0, 0, isSized ? to : undefined),
+            ],
+            { duration: durationMs, easing: GLIDE_EASING },
+        );
+    };
+
+    /**
+     * The size a mosaic's root is drawn at: the anchored side fills its parent, the free side is what the packing
+     * reached.
+     *
+     * @param sizeAnchor Which side is given.
+     * @param freeExtent How far the packing reached along the other.
+     * @returns The root's CSS width and height.
+     */
+    export const computeRootSize = (sizeAnchor: MosaicSizeAnchor, freeExtent: number) => ({
+        width: sizeAnchor === "width" ? "100%" : `${freeExtent}px`,
+        height: sizeAnchor === "height" ? "100%" : `${freeExtent}px`,
+    });
+
+    /**
+     * Where a tile is drawn, and whether it is shown.
+     *
+     * A tile is positioned at its box; its size is written only where the preset sizes tiles, since otherwise the
+     * tile's own size is what was measured. An unplaced tile is hidden rather than left out, so it can still be
+     * measured.
+     *
+     * @param rect The tile's box.
+     * @param isPlaced Whether the tile has earned a box yet.
+     * @param isSized Whether the preset sizes tiles.
+     * @returns The tile's CSS `left`, `top`, `width`, `height` and `visibility`, with the unset ones `undefined`.
+     */
+    export const computeTileStyle = (rect: Rect, isPlaced: boolean, isSized: boolean) => ({
+        left: `${rect.x}px`,
+        top: `${rect.y}px`,
+        width: isSized ? `${rect.width}px` : undefined,
+        height: isSized ? `${rect.height}px` : undefined,
+        visibility: isPlaced ? undefined : ("hidden" as const),
+    });
 }

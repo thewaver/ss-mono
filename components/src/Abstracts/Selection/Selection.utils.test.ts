@@ -1,4 +1,3 @@
-import { createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import type { SelectionMode } from "./Selection.types";
@@ -25,9 +24,16 @@ const findNode = (node: Node, id: string): Node => {
     return (node.children ?? []).map((child) => findNode(child, id)).find((found) => found !== undefined)!;
 };
 
+/** A value with a getter and a setter, standing in for whatever holds it in a real control. */
+const holder = <T>(initial: T) => {
+    let value = initial;
+
+    return [() => value, (next: T) => (value = next)] as const;
+};
+
 const buildHandle = (mode: SelectionMode, opts?: { isDisabled?: boolean; items?: Row[] }) => {
-    const [getItems, setItems] = createSignal(opts?.items ?? ROWS);
-    const [getSelection, setSelection] = createSignal<Row[]>([]);
+    const [getItems, setItems] = holder(opts?.items ?? ROWS);
+    const [getSelection, setSelection] = holder<Row[]>([]);
 
     let writes = 0;
 

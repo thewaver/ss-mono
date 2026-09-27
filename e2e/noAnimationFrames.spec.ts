@@ -68,7 +68,7 @@ test("a transition still commits when no frame ever arrives", async ({ page }) =
  * and further from its anchor — but it does open a frame behind, and with frames starved it stays there
  * until any event arrives. Both halves are asserted, because it is the pair that answers the question.
  */
-test("an anchored layer opens a frame behind, then tracks its anchor on the event alone", async ({ page }) => {
+test("an anchored layer opens a frame behind, then tracks its anchor on the event alone @solid", async ({ page }) => {
     await page.goto("/viewport-wrapper");
     await expect(page.locator("[data-variant]").first()).toBeVisible();
 
@@ -83,6 +83,42 @@ test("an anchored layer opens a frame behind, then tracks its anchor on the even
         Math.abs(gapToAnchor(anchorBefore, before)),
         "the opening placement is provisional, and the frame that would have finished it never came",
     ).toBeGreaterThan(DRIFT_TOLERANCE);
+
+    await page.locator(`${SCROLLED} [data-scroll-box]`).evaluate((element, by) => {
+        element.scrollTop += by;
+    }, SCROLL_BY);
+    await page.waitForTimeout(SETTLE_MS);
+
+    const anchorAfter = (await page.locator("#scrolledCountry").boundingBox())!;
+    const after = (await page.locator(LISTBOX).boundingBox())!;
+
+    expect(anchorAfter.y, "the scroll really did move the anchor").not.toBe(anchorBefore.y);
+    expect(
+        Math.abs(gapToAnchor(anchorAfter, after)),
+        "and one event is enough to land it exactly, so the poll is not what keeps it there",
+    ).toBeLessThanOrEqual(DRIFT_TOLERANCE);
+});
+
+/**
+ * The React side of the same question. React places a layer in a layout effect, which runs after the layer has its
+ * final size and before the browser paints, so there is no provisional first placement for a frame to finish: it
+ * opens on its anchor with frames starved, and the scroll listener carries it from there as it does in Solid.
+ */
+test("an anchored layer opens in place, then tracks its anchor on the event alone @react", async ({ page }) => {
+    await page.goto("/viewport-wrapper");
+    await expect(page.locator("[data-variant]").first()).toBeVisible();
+
+    await page.locator("#scrolledCountry").click();
+    await expect(page.locator(LISTBOX)).toBeVisible();
+    await page.waitForTimeout(SETTLE_MS);
+
+    const anchorBefore = (await page.locator("#scrolledCountry").boundingBox())!;
+    const before = (await page.locator(LISTBOX).boundingBox())!;
+
+    expect(
+        Math.abs(gapToAnchor(anchorBefore, before)),
+        "React measures the layer after it is laid out and before it is painted, so it opens on its anchor",
+    ).toBeLessThanOrEqual(DRIFT_TOLERANCE);
 
     await page.locator(`${SCROLLED} [data-scroll-box]`).evaluate((element, by) => {
         element.scrollTop += by;

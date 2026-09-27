@@ -5,19 +5,26 @@
     "workspaces": [
         "utils",
         "components",
-        "playground"
+        "components-react",
+        "components-solid",
+        "playground-core",
+        "playground-solid",
+        "playground-react"
     ],
     "scripts": {
-        "start": "npm run start -w playground",
+        "start": "node playground-core/scripts/startSite.mjs",
+        "start:solid": "npm run start -w playground-solid",
+        "start:react": "npm run start -w playground-react",
         "dev": "npm run dev -w components",
-        "build": "npm run build -w utils && npm run build -w components",
-        "build:playground": "npm run build -w playground",
+        "build": "npm run build -w utils && npm run build -w components && npm run build -w components-solid && npm run build -w components-react",
+        "build:playground": "npm run build -w playground-solid",
         "build:all": "npm run build && npm run build:playground",
-        "preview": "npm run preview -w playground",
+        "build:site": "rm -rf dist && VITE_OTHER_PLAYGROUND_URL=/react/ npm run build -w playground-solid -- --base /solid/ --outDir ../dist/solid && VITE_OTHER_PLAYGROUND_URL=/solid/ npm run build -w playground-react -- --base /react/ --outDir ../dist/react && cp playground-core/landing/index.html dist/index.html",
+        "preview": "npm run preview -w playground-solid",
         "test": "npm run test --workspaces --if-present",
         "verify:dom": "playwright test",
         "verify:dom:ui": "playwright test --ui",
-        "update:library-tree": "node playground/scripts/libraryTree.ts",
+        "update:library-tree": "node playground-core/scripts/libraryTree.mjs",
         "format": "prettier --write .",
         "prepare": "husky"
     },

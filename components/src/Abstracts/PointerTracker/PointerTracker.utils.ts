@@ -1,8 +1,6 @@
-import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
+import { MathUtils, Point2d, Point2dUtils, RectUtils, type Store, StoreUtils } from "@thewaver/ss-utils";
 
-import { MathUtils, Point2d, Point2dUtils, RectUtils } from "@thewaver/ss-utils";
-
-import { useViewportContext } from "../Viewport/Viewport.context";
+import type { ViewportContextType } from "../Viewport/Viewport.context.types";
 import { ViewportUtils } from "../Viewport/Viewport.utils";
 import type { PointerReading } from "./PointerTracker.types";
 
@@ -17,7 +15,8 @@ const RESTING_READING: PointerReading = {
     boxRatio: { x: 0.5, y: 0.5 },
 };
 
-const [getIsPointerPresent, setIsPointerPresent] = createSignal(false);
+/** Whether the pointer is over the window, shared by every tracker. */
+const pointerPresence = StoreUtils.create(false);
 
 /** One update function per tracked element. */
 const subscribers = new Set<() => void>();
@@ -43,7 +42,7 @@ const invalidate = () => {
 const handlePointerMove = (e: PointerEvent) => {
     clientPoint = { x: e.clientX, y: e.clientY };
 
-    setIsPointerPresent(true);
+    pointerPresence.set(true);
     invalidate();
 };
 
@@ -51,12 +50,12 @@ const handlePointerMove = (e: PointerEvent) => {
 const handlePointerOut = (e: PointerEvent) => {
     if (e.relatedTarget) return;
 
-    setIsPointerPresent(false);
+    pointerPresence.set(false);
 };
 
 /** Losing the window means the pointer's position can no longer be trusted. */
 const handleWindowBlur = () => {
-    setIsPointerPresent(false);
+    pointerPresence.set(false);
 };
 
 /** A scroll or a resize moves elements under a stationary pointer, so the readings need redoing. */
@@ -128,57 +127,73 @@ const computeReading = (rect: DOMRect, point: Point2d): PointerReading => {
  * pointer that has not itself moved.
  */
 export namespace PointerTrackerUtils {
+    /** What is reported before the pointer has been seen: centered, and infinitely far away, so a distance test reads as "not near". */
+    export const RESTING = RESTING_READING;
+
     /**
-     * Tracks one element.
+     * Whether the pointer is over the window, as a store shared by every tracker.
      *
-     * @param getRef The element to track. Nothing is measured until it exists.
-     * @param getIsDisabled Pass `true` to stop tracking; the element stops contributing to the shared
-     * listeners entirely.
-     * @returns `getReading` and `getIsPointerPresent`. The reading gives `offset` and `distance` from
-     * the element's center in pixels, `angle` as a bearing, `edgeOffset` and `edgeDistance` describing
-     * how far the element's border reaches in that same direction, `edgeRatio` — below `1` inside the
-     * element, `1` on its border, `2` a further element-radius away — and `boxRatio`, the pointer's
-     * position across the element from `0` to `1`, which reads outside that range when the pointer is
-     * outside. Readings are taken in the enclosing viewport's coordinates, so they are correct inside a
-     * zoomed `Viewport`. `getIsPointerPresent` is shared by every tracker and is `false` before the
-     * pointer is first seen, after it leaves the window, and when the window loses focus — which is
-     * what an effect should fall back to a resting state on.
+     * `false` before the pointer is first seen, after it leaves the window, and when the window loses focus —
+     * which is what an effect should fall back to a resting state on. It is kept current only while at least
+     * one element is being observed.
      */
-    export const create = (getRef: Accessor<HTMLElement | undefined>, getIsDisabled?: Accessor<boolean>) => {
-        const viewportContext = useViewportContext();
-        const [getReading, setReading] = createSignal(RESTING_READING, { equals: getIsSameReading });
+    export const presence: Store<boolean> = { get: pointerPresence.get, subscribe: pointerPresence.subscribe };
+
+    /**
+     * Whether two readings are close enough to be treated as unchanged.
+     *
+     * Comparing the two offsets is enough, since everything else is derived from them.
+     */
+    export const getIsSame = getIsSameReading;
+
+    /**
+     * Tracks one element until the returned function is called.
+     *
+     * Readings are reported once per animation frame at most, and only when they change. The first arrives on
+     * the next frame once the pointer has been seen.
+     *
+     * @param element The element to track.
+     * @param viewportContext The viewport it is drawn in, whose coordinates the reading is taken in, so it is
+     * correct inside a zoomed `Viewport`.
+     * @param onReading Called with each new reading: `offset` and `distance` from the element's center in pixels,
+     * `angle` as a bearing, `edgeOffset` and `edgeDistance` describing how far the element's border reaches in
+     * that same direction, `edgeRatio` — below `1` inside the element, `1` on its border, `2` a further
+     * element-radius away — and `boxRatio`, the pointer's position across the element from `0` to `1`, which
+     * reads outside that range when the pointer is outside.
+     * @returns The function that stops tracking; the element then stops contributing to the shared listeners
+     * entirely.
+     */
+    export const observe = (
+        element: HTMLElement,
+        viewportContext: ViewportContextType,
+        onReading: (reading: PointerReading) => void,
+    ) => {
+        let last: PointerReading | undefined;
 
         const update = () => {
-            const ref = getRef();
+            if (!clientPoint) return;
 
-            if (!ref || !clientPoint) return;
-
-            setReading(
-                computeReading(
-                    ViewportUtils.getAdjustedBoundingClientRect(ref, viewportContext),
-                    ViewportUtils.getAdjustedClientPoint(clientPoint, viewportContext),
-                ),
+            const reading = computeReading(
+                ViewportUtils.getAdjustedBoundingClientRect(element, viewportContext),
+                ViewportUtils.getAdjustedClientPoint(clientPoint, viewportContext),
             );
+
+            if (last && getIsSameReading(last, reading)) return;
+
+            last = reading;
+            onReading(reading);
         };
 
-        createEffect(() => {
-            const ref = getRef();
+        subscribers.add(update);
 
-            if (!ref || getIsDisabled?.()) return;
+        if (subscribers.size === 1) attach();
 
-            subscribers.add(update);
+        invalidate();
 
-            if (subscribers.size === 1) attach();
+        return () => {
+            if (!subscribers.delete(update)) return;
 
-            invalidate();
-
-            onCleanup(() => {
-                subscribers.delete(update);
-
-                if (subscribers.size === 0) detach();
-            });
-        });
-
-        return { getReading, getIsPointerPresent };
+            if (subscribers.size === 0) detach();
+        };
     };
 }

@@ -1,0 +1,38 @@
+import { RangeCalendar } from "@thewaver/ss-components-solid";
+import {
+    LOCALE,
+    MAX_DATE,
+    MIN_DATE,
+    TODAY,
+} from "@thewaver/ss-playground-core/App/Pages/CalendarPage/CalendarPage.const";
+
+import { PageCalendarCaption } from "../../../PageComponents/CalendarCaption/CalendarCaption";
+import {
+    PageCalendarDay,
+    PageCalendarFrame,
+    PageCalendarWeekday,
+} from "../../../StyledComponents/CalendarContent/CalendarContent";
+import type { RangeCalendarExampleProps } from "../RangeCalendarPage.types";
+
+type Props = RangeCalendarExampleProps;
+
+export const BoundedExample = (props: Props) => {
+    return (
+        <PageCalendarFrame>
+            <PageCalendarCaption monthSignal={props.monthSignal} key={"bounded"} locale={() => LOCALE} />
+
+            <RangeCalendar
+                valueSignal={props.valueSignal}
+                monthSignal={props.monthSignal}
+                today={() => TODAY}
+                locale={() => LOCALE}
+                minValue={() => MIN_DATE}
+                maxValue={() => MAX_DATE}
+                weekStartsOn={props.weekStartsOn}
+                ariaLabel={"Choose a date range within the bounds"}
+                renderDay={(_unused, getRenderProps) => <PageCalendarDay renderProps={getRenderProps} />}
+                renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
+            />
+        </PageCalendarFrame>
+    );
+};

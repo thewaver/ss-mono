@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { FlattenerUtils } from "../../../Abstracts/Flattener/Flattener.utils";
-import type { SelectItem } from "./Select.types";
+import type { SelectItemRecord as SelectItem } from "./Select.types";
 import { SelectUtils } from "./Select.utils";
 
 const OPTION_A = { value: "a", label: "A" };
@@ -75,5 +75,46 @@ describe("getGroupRowIndex", () => {
         const rows = FlattenerUtils.getFlatRows(SelectUtils.getItemRows(ITEMS));
 
         expect(rows.map(SelectUtils.getGroupRowIndex)).toEqual([undefined, 1, 1, 1]);
+    });
+});
+
+describe("computeListAriaAttributes", () => {
+    it("writes the consumer's name and points nowhere else", () => {
+        expect(
+            SelectUtils.computeListAriaAttributes({
+                listAriaLabel: "Countries",
+                labelId: "label",
+                fieldId: "field",
+                isMultiple: false,
+            }),
+        ).toEqual({ "aria-label": "Countries", "aria-labelledby": undefined, "aria-multiselectable": undefined });
+    });
+
+    it("falls back to the Label around the field, and then to the field", () => {
+        expect(
+            SelectUtils.computeListAriaAttributes({
+                listAriaLabel: undefined,
+                labelId: "label",
+                fieldId: "field",
+                isMultiple: true,
+            }),
+        ).toEqual({ "aria-label": undefined, "aria-labelledby": "label", "aria-multiselectable": true });
+        expect(
+            SelectUtils.computeListAriaAttributes({
+                listAriaLabel: undefined,
+                labelId: undefined,
+                fieldId: "field",
+                isMultiple: false,
+            })["aria-labelledby"],
+        ).toBe("field");
+    });
+});
+
+describe("getIsQueryClearDue", () => {
+    it("clears only once a closed popup has settled, and never an empty query", () => {
+        expect(SelectUtils.getIsQueryClearDue(false, true, "lis")).toBe(true);
+        expect(SelectUtils.getIsQueryClearDue(false, false, "lis")).toBe(false);
+        expect(SelectUtils.getIsQueryClearDue(true, true, "lis")).toBe(false);
+        expect(SelectUtils.getIsQueryClearDue(false, true, "")).toBe(false);
     });
 });

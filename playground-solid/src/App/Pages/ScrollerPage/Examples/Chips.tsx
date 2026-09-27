@@ -1,0 +1,34 @@
+import type { Signal } from "solid-js";
+
+import { Scroller, access } from "@thewaver/ss-components-solid";
+import type { MaybeAccessor, ScrollerButtonPlacement } from "@thewaver/ss-components-solid";
+import * as styles from "@thewaver/ss-playground-core/App/Pages/ScrollerPage/ScrollerPage.css";
+import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground-core/App/Theme.css";
+
+import { PageScrollerButton } from "../../../PageComponents/ScrollerButton/ScrollerButton";
+import type { ScrollerExampleProps } from "../ScrollerPage.types";
+
+const SCROLLER_GAP = 10;
+
+type Props = ScrollerExampleProps & {
+    buttonPlacement?: MaybeAccessor<ScrollerButtonPlacement>;
+    progressSignal?: Signal<number>;
+};
+
+export const ChipsExample = (props: Props) => {
+    return (
+        <div class={styles.demo}>
+            <Scroller
+                gap={() => SCROLLER_GAP}
+                padding={() => FOCUS_RING_WIDTH}
+                buttonPlacement={props.buttonPlacement}
+                progressSignal={props.progressSignal}
+                renderButton={(getStep, stepper) => <PageScrollerButton step={getStep} stepper={stepper} />}
+            >
+                {access(props.labels).map((label) => (
+                    <div class={styles.chip}>{label}</div>
+                ))}
+            </Scroller>
+        </div>
+    );
+};

@@ -1,0 +1,37 @@
+import * as styles from "@thewaver/ss-playground-core/App/Pages/SurfacePage/SurfacePage.css";
+
+import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { AvatarExample } from "./Examples/Avatar/Avatar";
+import { BannerExample } from "./Examples/Banner/Banner";
+import { CardExample } from "./Examples/Card/Card";
+
+const EXAMPLES_ROOT = "/src/App/Pages/SurfacePage/Examples";
+
+const EXAMPLES = [
+    {
+        key: "avatar",
+        name: "Avatar",
+        component: () => <AvatarExample />,
+        path: `${EXAMPLES_ROOT}/Avatar/Avatar.tsx`,
+    },
+    {
+        key: "banner",
+        name: "Banner",
+        component: () => <BannerExample />,
+        path: `${EXAMPLES_ROOT}/Banner/Banner.tsx`,
+    },
+    {
+        key: "card",
+        name: "Card",
+        component: () => <CardExample />,
+        path: `${EXAMPLES_ROOT}/Card/Card.tsx`,
+    },
+];
+
+export const SurfacePage = () => {
+    return (
+        <div className={styles.root}>
+            <PageExamples items={EXAMPLES} />
+        </div>
+    );
+};

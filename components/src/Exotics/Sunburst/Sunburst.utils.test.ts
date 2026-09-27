@@ -122,3 +122,38 @@ describe("computeLabelTransform", () => {
         expect(SunburstUtils.computeLabelTransform(arcAround(0.75))).toMatch(/rotate\(180\)$/);
     });
 });
+
+describe("listNodes", () => {
+    it("walks every node but the root, depth first and heaviest first", () => {
+        expect(SunburstUtils.listNodes(ROOT, TreemapUtils.computeWeights(ROOT)).map((node) => node.value)).toEqual([
+            "side",
+            "inner",
+            "large",
+            "small",
+        ]);
+    });
+});
+
+describe("computeShownSpan", () => {
+    const center = spans.get(INNER)!;
+    const span = spans.get(SMALL)!;
+
+    it("rests at the view once the zoom is over, and starts where the arc was", () => {
+        const from = { start: 0, end: 0.2, inner: 2, outer: 3 };
+
+        expect(SunburstUtils.computeShownSpan(span, center, from, 1)).toEqual(SunburstUtils.computeView(span, center));
+        expect(SunburstUtils.computeShownSpan(span, center, from, 0)).toEqual(from);
+        expect(SunburstUtils.computeShownSpan(span, center, undefined, 0.5)).toEqual(
+            SunburstUtils.computeView(span, center),
+        );
+    });
+});
+
+describe("computeOpacity", () => {
+    it("fades an arc in or out while the zoom runs and settles on shown or hidden", () => {
+        expect(SunburstUtils.computeOpacity(false, true, 1)).toBe(1);
+        expect(SunburstUtils.computeOpacity(true, false, 1)).toBe(0);
+        expect(SunburstUtils.computeOpacity(false, true, 0)).toBe(0);
+        expect(SunburstUtils.computeOpacity(true, false, 0.5)).toBe(0.5);
+    });
+});

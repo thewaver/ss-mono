@@ -1,5 +1,3 @@
-import { createEffect, onCleanup, untrack } from "solid-js";
-
 /** Everything the platform makes focusable by default, plus anything given a tab stop of its own. */
 const FOCUSABLE_SELECTOR = [
     "a[href]",
@@ -142,20 +140,6 @@ export namespace FocusManagerUtils {
     };
 
     /**
-     * Moves focus into an element when it appears, and back where it came from when it goes.
-     *
-     * Focusing is done with scrolling suppressed, so opening a layer does not jerk the page underneath
-     * it. On the way out, focus is only restored if the element that had it is still in the document —
-     * a trigger that has itself been removed cannot be returned to — and the restore is marked so that
-     * other layers' focus handlers do not read it as the user leaving.
-     *
-     * @param getRef The element to focus into.
-     * @param getIsVisible Whether it is currently shown.
-     * @param opts.getInitialRef What to focus instead of the first focusable child — a text field
-     * rather than a close button, say. Read once, when focus moves in, so a later change does not steal
-     * focus from the user.
-     */
-    /**
      * Makes everything beside a layer inert, so neither focus nor a screen reader can reach the page behind it.
      *
      * Walks from the layer up to `<body>` and marks every sibling along the way, which is what `aria-modal`
@@ -222,28 +206,30 @@ export namespace FocusManagerUtils {
         };
     };
 
-    export const autoFocus = (
-        getRef: () => HTMLElement | undefined,
-        getIsVisible: () => boolean,
-        opts?: { getInitialRef?: () => HTMLElement | undefined },
-    ) =>
-        createEffect(() => {
-            const ref = getRef();
-            const isVisible = getIsVisible();
+    /**
+     * Moves focus into an element, and hands back the function that puts it where it came from.
+     *
+     * Focusing is done with scrolling suppressed, so opening a layer does not jerk the page underneath
+     * it. On the way out, focus is only restored if the element that had it is still in the document —
+     * a trigger that has itself been removed cannot be returned to — and the restore is marked so that
+     * other layers' focus handlers do not read it as the user leaving.
+     *
+     * @param ref The element to focus into.
+     * @param opts.initialRef What to focus instead of the first focusable child — a text field rather than a
+     * close button, say.
+     * @returns The function that restores focus, for when the element goes.
+     */
+    export const focusInto = (ref: HTMLElement, opts?: { initialRef?: HTMLElement }) => {
+        const previouslyFocused = (document.activeElement as HTMLElement | null) ?? undefined;
 
-            if (!ref || !isVisible) return;
+        (opts?.initialRef ?? getFirstFocusableChild(ref) ?? ref).focus({ preventScroll: true });
 
-            const previouslyFocused = (document.activeElement as HTMLElement | null) ?? undefined;
-            const initialRef = untrack(() => opts?.getInitialRef?.());
+        return () => {
+            if (!previouslyFocused?.isConnected) return;
 
-            (initialRef ?? getFirstFocusableChild(ref) ?? ref).focus({ preventScroll: true });
-
-            onCleanup(() => {
-                if (!previouslyFocused?.isConnected) return;
-
-                runFocusRestore(() => {
-                    previouslyFocused.focus({ preventScroll: true });
-                });
+            runFocusRestore(() => {
+                previouslyFocused.focus({ preventScroll: true });
             });
-        });
+        };
+    };
 }

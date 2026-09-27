@@ -1,0 +1,61 @@
+import { For } from "solid-js";
+
+import { access } from "@thewaver/ss-components-solid";
+import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/RangeContent/RangeContent.css";
+
+import { useLayerClass } from "../Layer/Layer.context";
+import type { RangeContentProps } from "./RangeContent.types";
+
+const DEFAULT_RANGE_CONTENT_LENGTH = styles.RANGE_LENGTH;
+
+const travel = (ratio: number) => `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px))`;
+
+const center = (ratio: number) =>
+    `calc(${ratio} * (100% - ${styles.RANGE_THUMB_SIZE}px) + ${styles.RANGE_THUMB_SIZE / 2}px)`;
+
+export const PageRangeContent = (props: RangeContentProps) => {
+    const getLayerClass = useLayerClass();
+
+    const getOrientation = () => access(props.renderProps).orientation;
+
+    const getLength = () => access(props.length) ?? DEFAULT_RANGE_CONTENT_LENGTH;
+
+    const getFillSpan = () => {
+        const fill = access(props.renderProps).fill;
+
+        return travel(fill.end - fill.start);
+    };
+
+    return (
+        <div
+            class={[styles.rangeContent, styles.rangeContentVariants[getOrientation()]].join(" ")}
+            style={getOrientation() === "vertical" ? { height: `${getLength()}px` } : { width: `${getLength()}px` }}
+            classList={{ [getLayerClass()]: true, [styles.isDisabled]: access(props.renderProps).isDisabled }}
+        >
+            <div class={[styles.rangeTrack, styles.rangeTrackVariants[getOrientation()]].join(" ")} />
+
+            <div
+                class={[styles.rangeFill, styles.rangeFillVariants[getOrientation()]].join(" ")}
+                classList={{ [styles.hasError]: access(props.renderProps).hasError }}
+                style={
+                    getOrientation() === "vertical"
+                        ? { bottom: center(access(props.renderProps).fill.start), height: getFillSpan() }
+                        : { left: center(access(props.renderProps).fill.start), width: getFillSpan() }
+                }
+            />
+
+            <For each={access(props.renderProps).ratios}>
+                {(ratio, getIndex) => (
+                    <div
+                        class={[styles.rangeThumb, styles.rangeThumbVariants[getOrientation()]].join(" ")}
+                        classList={{
+                            [styles.isFocused]: access(props.renderProps).focusVisibleThumb === getIndex(),
+                            [styles.hasError]: access(props.renderProps).hasError,
+                        }}
+                        style={getOrientation() === "vertical" ? { bottom: travel(ratio) } : { left: travel(ratio) }}
+                    />
+                )}
+            </For>
+        </div>
+    );
+};

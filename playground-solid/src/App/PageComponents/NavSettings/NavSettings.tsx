@@ -1,0 +1,135 @@
+import { For } from "solid-js";
+
+import { useLocation } from "@solidjs/router";
+import { Radio, RadioGroup, Toggle } from "@thewaver/ss-components-solid";
+import {
+    PLAYGROUND_FRAMEWORKS,
+    PLAYGROUND_FRAMEWORK_LABELS,
+    toOtherFrameworkHref,
+    toRoutePath,
+} from "@thewaver/ss-playground-core/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
+import type { PlaygroundFramework } from "@thewaver/ss-playground-core/App/PageComponents/FrameworkSwitch/PlaygroundFramework.types";
+
+import {
+    PageRadioSegmentContent,
+    PageRadioSegmentFloater,
+    PageRadioSegmentGroup,
+} from "../../StyledComponents/RadioSegmentContent/RadioSegmentContent";
+import { PageToggleContent } from "../../StyledComponents/ToggleContent/ToggleContent";
+import { PageExampleKnobsButton } from "../ExampleKnobs/ExampleKnobs";
+import { PageSelectField } from "../Field/Field";
+import { PageProp } from "../Prop/Prop";
+import { PAGE_VIEW_OPTIONS, VIEWPORT_ANCHOR_OPTIONS } from "./NavSettings.const";
+import type { PageNavSettingsChoiceProps, PageNavSettingsProps, ViewportAnchor } from "./NavSettings.types";
+
+const OWN_FRAMEWORK: PlaygroundFramework = "solid";
+
+const computeViewportAnchorLabel = (anchor: ViewportAnchor) =>
+    VIEWPORT_ANCHOR_OPTIONS.find((option) => option.value === anchor)?.label ?? String(anchor);
+
+const PageNavSettingsChoice = <T,>(props: PageNavSettingsChoiceProps<T>) => (
+    <PageRadioSegmentGroup>
+        <RadioGroup
+            valueSignal={props.valueSignal}
+            ariaLabel={props.ariaLabel}
+            orientation={"horizontal"}
+            gap={0}
+            renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
+                <PageRadioSegmentFloater
+                    visibilityTarget={getVisibilityTarget}
+                    transitionDurationMs={getTransitionDurationMs}
+                />
+            )}
+        >
+            <For each={props.options}>
+                {(option) => (
+                    <Radio
+                        value={() => option.value}
+                        ariaLabel={() => option.label}
+                        renderContent={(getFlags) => (
+                            <PageRadioSegmentContent flags={getFlags}>{option.label}</PageRadioSegmentContent>
+                        )}
+                    />
+                )}
+            </For>
+        </RadioGroup>
+    </PageRadioSegmentGroup>
+);
+
+export const PageNavSettings = (props: PageNavSettingsProps) => {
+    const location = useLocation();
+
+    return (
+        <PageExampleKnobsButton
+            exampleKey={"library"}
+            exampleName={"Library"}
+            renderKnobs={() => (
+                <>
+                    <PageProp
+                        key={"showsDescriptionOnly"}
+                        label={"Show pages without examples"}
+                        hint={"Lists the pages that have docs but no examples yet, which are hidden otherwise."}
+                        defaultValue={false}
+                    >
+                        <Toggle
+                            checkedSignal={props.showsDescriptionOnlySignal}
+                            ariaLabel={"Show pages without examples"}
+                            renderContent={(getFlags) => <PageToggleContent flags={getFlags} />}
+                        />
+                    </PageProp>
+
+                    <PageProp
+                        key={"pageView"}
+                        label={"Open pages on"}
+                        hint={
+                            "Which tab a page opens on when it is picked from the list. A page with no examples always opens on its docs."
+                        }
+                        defaultValue={"Examples"}
+                    >
+                        <PageNavSettingsChoice
+                            ariaLabel={"Open pages on"}
+                            options={PAGE_VIEW_OPTIONS}
+                            valueSignal={props.pageViewSignal}
+                        />
+                    </PageProp>
+
+                    <PageProp
+                        key={"viewportAnchor"}
+                        label={"Viewport anchor"}
+                        hint={
+                            "The height the whole playground is laid out at before it is scaled to fit the window. None lays it out at the window's own size and Auto at the screen's height, both at the window's shape; 1080p and 1440p lay out a fixed 16:9 page of that height, with empty bars around it."
+                        }
+                        defaultValue={"Auto"}
+                    >
+                        <PageSelectField
+                            value={props.viewportAnchorSignal[0]}
+                            values={VIEWPORT_ANCHOR_OPTIONS.map((option) => option.value)}
+                            computeLabel={computeViewportAnchorLabel}
+                            ariaLabel={"Viewport anchor"}
+                            onChange={props.viewportAnchorSignal[1]}
+                        />
+                    </PageProp>
+
+                    <PageProp
+                        key={"framework"}
+                        label={"Framework"}
+                        hint={"Which framework the playground runs in. Picking the other opens this same page there."}
+                        defaultValue={PLAYGROUND_FRAMEWORK_LABELS[OWN_FRAMEWORK]}
+                    >
+                        <PageSelectField
+                            value={OWN_FRAMEWORK}
+                            values={PLAYGROUND_FRAMEWORKS}
+                            computeLabel={(framework) => PLAYGROUND_FRAMEWORK_LABELS[framework]}
+                            ariaLabel={"Framework"}
+                            onChange={(framework) => {
+                                if (framework === OWN_FRAMEWORK) return;
+
+                                window.location.assign(toOtherFrameworkHref(toRoutePath(location.pathname)));
+                            }}
+                        />
+                    </PageProp>
+                </>
+            )}
+        />
+    );
+};

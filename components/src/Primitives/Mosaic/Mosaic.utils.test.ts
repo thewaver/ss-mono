@@ -329,3 +329,54 @@ describe("computeStepIndex", () => {
         expect(MosaicUtils.computeStepIndex("next", 9, wall)).toBeUndefined();
     });
 });
+
+describe("MosaicUtils.computeOrder", () => {
+    it("puts placed items in reading order, then the unplaced ones in the order given", () => {
+        const placements = [
+            { index: 2, x: 0, y: 0, width: 1, height: 1 },
+            { index: 0, x: 1, y: 0, width: 1, height: 1 },
+        ];
+
+        expect(MosaicUtils.computeOrder(placements, 4)).toEqual([2, 0, 1, 3]);
+    });
+});
+
+describe("MosaicUtils.createSlotKeeper", () => {
+    it("keeps each key's slot across passes, and gives equal keys a slot each", () => {
+        const assign = MosaicUtils.createSlotKeeper();
+        const first = assign(["a", "b", "a"]);
+        const second = assign(["b", "a", "a"]);
+
+        expect(second[0]).toBe(first[1]);
+        expect(second[1]).toBe(first[0]);
+        expect(second[2]).toBe(first[2]);
+        expect(first[0]).not.toBe(first[2]);
+    });
+});
+
+describe("MosaicUtils.computeLayout", () => {
+    it("is empty without room or items", () => {
+        const args = { sizeAnchor: "width" as const, gap: 0, computePlacements: MosaicUtils.packFixed };
+
+        expect(MosaicUtils.computeLayout({ ...args, sizes: [{ width: 1, height: 1 }], anchoredExtent: 0 })).toBe(
+            MosaicUtils.EMPTY_LAYOUT,
+        );
+        expect(MosaicUtils.computeLayout({ ...args, sizes: [], anchoredExtent: 100 })).toBe(MosaicUtils.EMPTY_LAYOUT);
+    });
+
+    it("packs the transposed sizes when the height is anchored, and hands the placements back upright", () => {
+        const layout = MosaicUtils.computeLayout({
+            sizes: [
+                { width: 10, height: 40 },
+                { width: 10, height: 40 },
+            ],
+            anchoredExtent: 100,
+            sizeAnchor: "height",
+            gap: 0,
+            computePlacements: MosaicUtils.packFixed,
+        });
+
+        expect(layout.freeExtent, "two 10-wide items side by side in a 100-tall column").toBe(10);
+        expect(layout.placements.every((placement) => placement.width === 10 && placement.height === 40)).toBe(true);
+    });
+});

@@ -1,0 +1,283 @@
+import type { JSX } from "solid-js";
+import { createMemo, createSignal, createUniqueId } from "solid-js";
+
+import type { AnchorPlacement, SelectOption, Toast } from "@thewaver/ss-components-solid";
+import { Button, Range, Select, Toasts, ViewportWrapper, useViewportContext } from "@thewaver/ss-components-solid";
+import { ViewportWrapperKnobs } from "@thewaver/ss-playground-core/App/Knobs/ViewportWrappers.const";
+import * as styles from "@thewaver/ss-playground-core/App/Pages/ViewportWrapperPage/ViewportWrapperPage.css";
+import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground-core/App/StyledComponents/RangeContent/RangeContent.css";
+
+import { PageVariants } from "../../PageComponents/Variants/Variants";
+import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
+import { PagePopoverSurface } from "../../StyledComponents/PopoverSurface/PopoverSurface";
+import { PageRangeContent } from "../../StyledComponents/RangeContent/RangeContent";
+import { PageSelectContent } from "../../StyledComponents/SelectContent/SelectContent";
+import { PageSelectOptionContent } from "../../StyledComponents/SelectOptionContent/SelectOptionContent";
+import { PageToastContent } from "../../StyledComponents/ToastContent/ToastContent";
+import type { ToastDefs } from "../../StyledComponents/ToastContent/ToastContent.types";
+import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
+
+const COUNTRIES: SelectOption<string>[] = [
+    { value: "Belgium" },
+    { value: "Denmark" },
+    { value: "Estonia" },
+    { value: "Finland" },
+    { value: "Germany" },
+    { value: "Iceland" },
+    { value: "Ireland" },
+    { value: "Latvia" },
+    { value: "Norway" },
+    { value: "Poland" },
+    { value: "Portugal" },
+    { value: "Sweden" },
+];
+
+const PERCENT = 100;
+
+const SCROLL_SIZE = { width: styles.HOST_SIZE, height: styles.HOST_SIZE };
+const INNER_TOAST_GAP = 10;
+const INNER_TOAST_MARGIN = 10;
+const INNER_TOAST_MESSAGE = "Raised inside the square.";
+
+const renderTooltip = (text: string) => ({
+    placement: () => ({ x: "center", y: "top-out" }) as const,
+    offset: () => ({ x: 0, y: 10 }),
+    renderContent: (getVisibilityTarget: () => 0 | 1, getTransitionDurationMs: () => number) => (
+        <PageTooltipContent visibilityTarget={getVisibilityTarget} transitionDurationMs={getTransitionDurationMs}>
+            {text}
+        </PageTooltipContent>
+    ),
+});
+
+const renderCountryPopup = (
+    renderOptions: () => JSX.Element,
+    getVisibilityTarget: () => 0 | 1,
+    getTransitionDurationMs: () => number,
+    getPlacement: () => AnchorPlacement,
+) => (
+    <PagePopoverSurface
+        visibilityTarget={getVisibilityTarget}
+        transitionDurationMs={getTransitionDurationMs}
+        placement={getPlacement}
+    >
+        {renderOptions()}
+    </PagePopoverSurface>
+);
+
+const ViewportReadout = () => {
+    const context = useViewportContext();
+
+    return (
+        <div class={[styles.readout, styles.cornerReadout].join(" ")} data-inner-readout>
+            {`${context.getScale().toFixed(2)}× of ${Math.round(context.getSize().width)}×${Math.round(context.getSize().height)}`}
+        </div>
+    );
+};
+
+export const ViewportWrapperPage = () => {
+    const [getRoamerX, setRoamerX] = createSignal(ViewportWrapperKnobs.STARTING_ROAMER_X);
+    const [getRoamerY, setRoamerY] = createSignal(ViewportWrapperKnobs.STARTING_ROAMER_Y);
+    const [getScalePercent, setScalePercent] = createSignal(PERCENT);
+    const [getRoamingValue, setRoamingValue] = createSignal<string | undefined>();
+    const innerToasts = createSignal<Toast<ToastDefs>[]>([]);
+    const [getScrolledValue, setScrolledValue] = createSignal<string | undefined>();
+
+    const getStageSize = createMemo(() => {
+        const side = Math.round((styles.HOST_SIZE * PERCENT) / getScalePercent());
+
+        return { width: side, height: side };
+    });
+
+    return (
+        <PageVariants
+            minColumnWidth={styles.MIN_COLUMN_WIDTH}
+            items={[
+                {
+                    key: "roaming",
+                    name: "A control roaming the viewport",
+                    component: () => (
+                        <div class={styles.sectionBody}>
+                            <div>
+                                The dashed square is a viewport of its own, so it is the boundary that counts. Park the
+                                control against any edge of it: its tooltip and its list turn around rather than cross
+                                that edge, keep the side of the control they are on, and are cut by the square when
+                                there is not enough room. The scale slider changes the resolution the square is designed
+                                for, so everything inside it grows or shrinks while the boundary stays where it is.
+                            </div>
+
+                            <div class={styles.controls}>
+                                <div>Across</div>
+                                <Range
+                                    valueSignal={[getRoamerX, setRoamerX]}
+                                    id={"roamerX"}
+                                    ariaLabel={"Horizontal position"}
+                                    thumbSize={() => RANGE_THUMB_SIZE}
+                                    renderContent={(getRenderProps) => (
+                                        <PageRangeContent renderProps={getRenderProps} />
+                                    )}
+                                />
+
+                                <div>Down</div>
+                                <Range
+                                    valueSignal={[getRoamerY, setRoamerY]}
+                                    id={"roamerY"}
+                                    ariaLabel={"Vertical position"}
+                                    thumbSize={() => RANGE_THUMB_SIZE}
+                                    renderContent={(getRenderProps) => (
+                                        <PageRangeContent renderProps={getRenderProps} />
+                                    )}
+                                />
+
+                                <div>Scale</div>
+                                <Range
+                                    valueSignal={[getScalePercent, setScalePercent]}
+                                    id={"viewportScale"}
+                                    ariaLabel={"Viewport scale"}
+                                    min={() => ViewportWrapperKnobs.SCALE_MIN}
+                                    max={() => ViewportWrapperKnobs.SCALE_MAX}
+                                    step={() => ViewportWrapperKnobs.SCALE_STEP}
+                                    thumbSize={() => RANGE_THUMB_SIZE}
+                                    renderContent={(getRenderProps) => (
+                                        <PageRangeContent renderProps={getRenderProps} />
+                                    )}
+                                />
+                            </div>
+
+                            <div class={styles.readout} data-readout>
+                                {`x: ${getRoamerX()}% | y: ${getRoamerY()}% | scale: ${getScalePercent()}% of ${styles.HOST_SIZE}px`}
+                            </div>
+
+                            <div class={styles.host} data-stage>
+                                <ViewportWrapper size={getStageSize}>
+                                    <div
+                                        class={styles.roamer}
+                                        style={{
+                                            left: `${getRoamerX()}%`,
+                                            top: `${getRoamerY()}%`,
+                                            transform: `translate(-${getRoamerX()}%, -${getRoamerY()}%)`,
+                                        }}
+                                    >
+                                        <Select
+                                            valueSignal={[getRoamingValue, setRoamingValue]}
+                                            options={() => COUNTRIES}
+                                            id={"roamingCountry"}
+                                            ariaLabel={"Roaming country"}
+                                            tooltipDefs={() => renderTooltip("My tooltip has the same boundary I do.")}
+                                            renderContent={(getSelectedOption, getFlags) => (
+                                                <PageSelectContent flags={getFlags}>
+                                                    {getSelectedOption()?.value ?? "Pick one"}
+                                                </PageSelectContent>
+                                            )}
+                                            renderOption={(getOption, getFlags) => (
+                                                <PageSelectOptionContent flags={getFlags}>
+                                                    {getOption().value}
+                                                </PageSelectOptionContent>
+                                            )}
+                                            renderPopup={renderCountryPopup}
+                                        />
+                                    </div>
+
+                                    <div class={styles.toastRaiser}>
+                                        <Button
+                                            id={"raiseInnerToast"}
+                                            ariaLabel={"Raise a notification inside the viewport"}
+                                            renderContent={(getFlags) => (
+                                                <PageButtonContent flags={getFlags}>Notify</PageButtonContent>
+                                            )}
+                                            onClick={() => {
+                                                innerToasts[1]((prev) => [
+                                                    ...prev,
+                                                    {
+                                                        id: createUniqueId(),
+                                                        value: { kind: "info", message: INNER_TOAST_MESSAGE },
+                                                    },
+                                                ]);
+                                            }}
+                                        />
+                                    </div>
+
+                                    <Toasts
+                                        toastsSignal={innerToasts}
+                                        ariaLabel={"Viewport notifications"}
+                                        alignment={"bottom-center"}
+                                        margins={() => ({
+                                            marginTop: INNER_TOAST_MARGIN,
+                                            marginRight: INNER_TOAST_MARGIN,
+                                            marginBottom: INNER_TOAST_MARGIN,
+                                            marginLeft: INNER_TOAST_MARGIN,
+                                        })}
+                                        renderToast={(
+                                            getToast,
+                                            getVisibilityTarget,
+                                            getTransitionDurationMs,
+                                            getState,
+                                        ) => (
+                                            <PageToastContent
+                                                toast={getToast}
+                                                state={getState}
+                                                animation={"fade"}
+                                                stacking={"flow"}
+                                                dir={"column"}
+                                                gap={INNER_TOAST_GAP}
+                                                visibilityTarget={getVisibilityTarget}
+                                                transitionDurationMs={getTransitionDurationMs}
+                                                onDismiss={() => {
+                                                    innerToasts[1]((prev) =>
+                                                        prev.filter((toast) => toast.id !== getToast().id),
+                                                    );
+                                                }}
+                                            />
+                                        )}
+                                    />
+
+                                    <ViewportReadout />
+                                </ViewportWrapper>
+                            </div>
+                        </div>
+                    ),
+                },
+                {
+                    key: "scrolled",
+                    name: "An anchor inside a scrolled box",
+                    component: () => (
+                        <div class={styles.sectionBody}>
+                            <div>
+                                A viewport of the same size with a scrolling area inside it. Scrolling moves the anchor
+                                without moving the page, so an open list has to follow it, stay off it, and stop at the
+                                square.
+                            </div>
+
+                            <div class={styles.host}>
+                                <ViewportWrapper size={() => SCROLL_SIZE}>
+                                    <div class={styles.scrollBox} data-scroll-box>
+                                        <div class={styles.scrollFiller} />
+
+                                        <Select
+                                            valueSignal={[getScrolledValue, setScrolledValue]}
+                                            options={() => COUNTRIES}
+                                            id={"scrolledCountry"}
+                                            ariaLabel={"Scrolled country"}
+                                            renderContent={(getSelectedOption, getFlags) => (
+                                                <PageSelectContent flags={getFlags}>
+                                                    {getSelectedOption()?.value ?? "Pick one"}
+                                                </PageSelectContent>
+                                            )}
+                                            renderOption={(getOption, getFlags) => (
+                                                <PageSelectOptionContent flags={getFlags}>
+                                                    {getOption().value}
+                                                </PageSelectOptionContent>
+                                            )}
+                                            renderPopup={renderCountryPopup}
+                                        />
+
+                                        <div class={styles.scrollFiller} />
+                                    </div>
+                                </ViewportWrapper>
+                            </div>
+                        </div>
+                    ),
+                },
+            ]}
+        />
+    );
+};

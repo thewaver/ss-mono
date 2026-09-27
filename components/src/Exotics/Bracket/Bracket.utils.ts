@@ -1,4 +1,17 @@
-import type { BracketLayout, BracketNode, BracketPlacement, BracketRootSide, BracketStep } from "./Bracket.types";
+import type { Point2d } from "@thewaver/ss-utils";
+
+import type {
+    BracketBox,
+    BracketConnectorDefs,
+    BracketGeometry,
+    BracketGeometryOpts,
+    BracketLayout,
+    BracketNode,
+    BracketOrientation,
+    BracketPlacement,
+    BracketRootSide,
+    BracketStep,
+} from "./Bracket.types";
 
 /** The final's own id. Every other id is built by appending a child's position to its parent's. */
 const ROOT_ID = "0";
@@ -10,6 +23,8 @@ const NOTHING = 0;
 const SINGLE = 1;
 /** Halfway, for centering a match between its two feeders. */
 const HALF = 0.5;
+/** What separates a child's position from its parent's id. */
+const ID_SEPARATOR = ".";
 
 /**
  * Places the matches of a knockout bracket, and moves a cursor around it.
@@ -155,4 +170,203 @@ export namespace BracketUtils {
 
         return layer[next]?.id;
     };
+
+    /**
+     * The node a placement id points at.
+     *
+     * @param root The final, as {@link computeLayout} was given it.
+     * @param id An id from that layout: the root's own, then each child's position appended after a separator.
+     * @returns The node. An id the layout did not produce is not guarded against.
+     */
+    export const findNode = <T>(root: BracketNode<T>, id: string): BracketNode<T> =>
+        id
+            .split(ID_SEPARATOR)
+            .slice(SINGLE)
+            .map(Number)
+            .reduce<BracketNode<T>>((node, index) => node.children![index], root);
+
+    /**
+     * Turns a layout's layers and places into lengths on the board.
+     *
+     * @param layout What {@link computeLayout} answered.
+     * @param opts The node size, the two gaps, which way the board runs, which end holds the final, and how thick the
+     * strip of layer headers is — `0` when there are none.
+     * @returns Everything {@link computeInset}, {@link computeHeaderBox} and {@link computeConnectors} need, and the
+     * board's own size: as long as the layers with their gaps between, and as wide as the first round's matches with
+     * theirs, plus the header strip.
+     */
+    export const computeGeometry = (layout: BracketLayout, opts: BracketGeometryOpts): BracketGeometry => {
+        const isHorizontal = opts.orientation === "horizontal";
+        const layerExtent = isHorizontal ? opts.nodeSize.width : opts.nodeSize.height;
+        const crossExtent = isHorizontal ? opts.nodeSize.height : opts.nodeSize.width;
+        const layerPitch = layerExtent + opts.layerGap;
+        const crossPitch = crossExtent + opts.crossGap;
+        const layerSpan = layout.layerCount * layerPitch - opts.layerGap;
+        const crossSpan = opts.headerExtent + layout.leafCount * crossPitch - opts.crossGap;
+
+        return {
+            ...opts,
+            isHorizontal,
+            layerExtent,
+            crossExtent,
+            layerPitch,
+            crossPitch,
+            layerSpan,
+            boardSize: isHorizontal ? { width: layerSpan, height: crossSpan } : { width: crossSpan, height: layerSpan },
+        };
+    };
+
+    /**
+     * Where a layer begins along the board.
+     *
+     * @param geometry What {@link computeGeometry} answered.
+     * @param layer The layer, counting from the final.
+     * @returns The distance from the board's leading edge, counted from the end the final is not at when it sits at
+     * the end.
+     */
+    export const getLayerStart = (geometry: BracketGeometry, layer: number) => {
+        const fromStart = layer * geometry.layerPitch;
+
+        return geometry.rootSide === "start" ? fromStart : geometry.layerSpan - fromStart - geometry.layerExtent;
+    };
+
+    /**
+     * Where a match's box begins across the board, past the header strip.
+     *
+     * @param geometry What {@link computeGeometry} answered.
+     * @param placement The match.
+     */
+    export const getCrossStart = (geometry: BracketGeometry, placement: BracketPlacement) =>
+        geometry.headerExtent + placement.cross * geometry.crossPitch;
+
+    /**
+     * Where a match's box sits on the board.
+     *
+     * @param geometry What {@link computeGeometry} answered.
+     * @param placement The match.
+     * @returns Its top left corner, in pixels from the board's.
+     */
+    export const computeInset = (geometry: BracketGeometry, placement: BracketPlacement) => {
+        const along = getLayerStart(geometry, placement.layer);
+        const across = getCrossStart(geometry, placement);
+
+        return geometry.isHorizontal ? { left: along, top: across } : { left: across, top: along };
+    };
+
+    /**
+     * Where a layer's header sits on the board.
+     *
+     * @param geometry What {@link computeGeometry} answered.
+     * @param layer The layer, counting from the final.
+     * @returns A box in the header strip, as long as one node along the board and as thick as the strip, in line with
+     * the layer's matches.
+     */
+    export const computeHeaderBox = (geometry: BracketGeometry, layer: number): BracketBox => {
+        const along = getLayerStart(geometry, layer);
+
+        return geometry.isHorizontal
+            ? { left: along, top: NOTHING, width: geometry.layerExtent, height: geometry.headerExtent }
+            : { left: NOTHING, top: along, width: geometry.headerExtent, height: geometry.layerExtent };
+    };
+
+    /**
+     * Every line between a match and the one it feeds.
+     *
+     * @param layout What {@link computeLayout} answered.
+     * @param geometry What {@link computeGeometry} answered for it.
+     * @param boardId Unique to this board in the document, so the connector ids it prefixes are too.
+     * @param focusedId The match that holds focus, or `undefined` for none.
+     * @returns One connector per match that feeds another, running from the middle of the parent's edge facing its
+     * children to the middle of the child's edge facing the root, so no line passes under a box. Each says whether
+     * its child is on the route from the focused match to the final.
+     */
+    export const computeConnectors = (
+        layout: BracketLayout,
+        geometry: BracketGeometry,
+        boardId: string,
+        focusedId: string | undefined,
+    ): BracketConnectorDefs[] => {
+        const toPoint = (along: number, across: number): Point2d =>
+            geometry.isHorizontal ? { x: along, y: across } : { x: across, y: along };
+
+        const getAnchor = (placement: BracketPlacement, isTowardRoot: boolean) =>
+            toPoint(
+                getFacingEdge(
+                    getLayerStart(geometry, placement.layer),
+                    geometry.layerExtent,
+                    geometry.rootSide,
+                    isTowardRoot,
+                ),
+                getCrossStart(geometry, placement) + geometry.crossExtent * HALF,
+            );
+
+        return layout.placements
+            .filter((placement) => placement.childIds.length > NOTHING)
+            .flatMap((placement) => {
+                const from = getAnchor(placement, false);
+
+                return placement.childIds.flatMap((childId) => {
+                    const child = findPlacement(layout.placements, childId);
+
+                    if (!child) return [];
+
+                    return [
+                        {
+                            id: `${boardId}-${placement.id}-${childId}`,
+                            parentId: placement.id,
+                            childId,
+                            orientation: geometry.orientation,
+                            from,
+                            to: getAnchor(child, true),
+                            isOnFocusedRoute: getIsOnRoute(childId, focusedId),
+                        },
+                    ];
+                });
+            });
+    };
+
+    /**
+     * Which step a key takes on a board.
+     *
+     * @param key The key pressed, as `KeyboardEvent.key` names it.
+     * @param orientation Which way the board runs.
+     * @param rootSide Which end holds the final.
+     * @returns For {@link computeStepId}: the arrow along the board pointing at the final goes towards it and the other
+     * away, the two across the board move within a layer, and Home and End go to the layer's ends. `undefined` for
+     * any other key.
+     */
+    export const getKeyStep = (
+        key: string,
+        orientation: BracketOrientation,
+        rootSide: BracketRootSide,
+    ): BracketStep | undefined => {
+        const isHorizontal = orientation === "horizontal";
+        const alongLayers = isHorizontal ? ["ArrowLeft", "ArrowRight"] : ["ArrowUp", "ArrowDown"];
+        const towardRoot = rootSide === "start" ? alongLayers[NOTHING] : alongLayers[SINGLE];
+
+        if (key === towardRoot) return "toRoot";
+        if (alongLayers.includes(key)) return "toLeaves";
+        if (key === "Home") return "first";
+        if (key === "End") return "last";
+
+        const acrossLayer = isHorizontal ? ["ArrowUp", "ArrowDown"] : ["ArrowLeft", "ArrowRight"];
+
+        if (key === acrossLayer[NOTHING]) return "previous";
+        if (key === acrossLayer[SINGLE]) return "next";
+
+        return undefined;
+    };
+
+    /**
+     * Which match holds the board's one tab stop.
+     *
+     * @param stops The matches that can be picked, in keyboard order.
+     * @param lastFocusedId The match that last held focus, or `undefined` for none yet.
+     * @returns That match while it can still be picked, and the first one that can otherwise. `undefined` when none
+     * can.
+     */
+    export const resolveRovingId = (stops: BracketPlacement[], lastFocusedId: string | undefined) =>
+        lastFocusedId !== undefined && stops.some((placement) => placement.id === lastFocusedId)
+            ? lastFocusedId
+            : stops[NOTHING]?.id;
 }

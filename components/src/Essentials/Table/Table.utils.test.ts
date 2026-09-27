@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { TableColumn } from "./Table.types";
+import type { TableColumnDefs as TableColumn } from "./Table.types";
 import { TableUtils } from "./Table.utils";
 
 type Person = { name: string; age: number };
@@ -15,15 +15,11 @@ const NAME: TableColumn<Person> = {
     id: "name",
     header: "Name",
     compare: (a, b) => a.name.localeCompare(b.name),
-    renderHeader: () => null,
-    renderCell: () => null,
 };
 
 const UNCOMPARED: TableColumn<Person> = {
     id: "notes",
     header: "Notes",
-    renderHeader: () => null,
-    renderCell: () => null,
 };
 
 const SIZED: TableColumn<Person> = {
@@ -32,8 +28,6 @@ const SIZED: TableColumn<Person> = {
     widthPx: 120,
     minWidthPx: 80,
     maxWidthPx: 200,
-    renderHeader: () => null,
-    renderCell: () => null,
 };
 
 const namesOf = (rows: Person[]) => rows.map((row) => row.name).join(" ");
@@ -164,5 +158,75 @@ describe("getResizedWidth", () => {
     it("treats a column with no bounds as free above zero", () => {
         expect(TableUtils.getResizedWidth(NAME, -20)).toBe(0);
         expect(TableUtils.getResizedWidth(NAME, 900)).toBe(900);
+    });
+});
+
+describe("TableUtils.computeKeyCommand", () => {
+    const GRID = { rowCount: 4, colCount: 3 };
+    const OPTS = { direction: "ltr" as const, pageRows: 10 };
+    const press = (key: string, mods: Partial<{ ctrlKey: boolean; metaKey: boolean; shiftKey: boolean }> = {}) => ({
+        key,
+        ctrlKey: false,
+        metaKey: false,
+        shiftKey: false,
+        ...mods,
+    });
+
+    it("sorts, resizes and moves from the header row", () => {
+        const header = { row: 0, col: 1 };
+
+        expect(TableUtils.computeKeyCommand(press("Enter"), header, GRID, OPTS)).toEqual({ kind: "sort" });
+        expect(TableUtils.computeKeyCommand(press("ArrowLeft", { ctrlKey: true }), header, GRID, OPTS)).toEqual({
+            kind: "resize",
+            step: -1,
+        });
+        expect(TableUtils.computeKeyCommand(press("ArrowRight", { shiftKey: true }), header, GRID, OPTS)).toEqual({
+            kind: "moveColumn",
+            to: 2,
+        });
+    });
+
+    it("reads left and right in reading order", () => {
+        expect(
+            TableUtils.computeKeyCommand(press("ArrowRight", { shiftKey: true }), { row: 0, col: 1 }, GRID, {
+                ...OPTS,
+                direction: "rtl",
+            }),
+        ).toEqual({ kind: "moveColumn", to: 0 });
+    });
+
+    it("activates and picks from a body row", () => {
+        const body = { row: 2, col: 0 };
+
+        expect(TableUtils.computeKeyCommand(press("Enter"), body, GRID, OPTS)).toEqual({
+            kind: "activateRow",
+            rowIndex: 1,
+        });
+        expect(TableUtils.computeKeyCommand(press(" ", { shiftKey: true }), body, GRID, OPTS)).toEqual({
+            kind: "pickRow",
+            rowIndex: 1,
+            gesture: { isToggling: false, isExtending: true },
+        });
+    });
+
+    it("walks inside the grid, extending the selection with Shift into the body", () => {
+        const walked = TableUtils.computeKeyCommand(
+            press("ArrowDown", { shiftKey: true }),
+            { row: 3, col: 0 },
+            GRID,
+            OPTS,
+        );
+
+        expect(walked).toEqual({ kind: "focus", cell: { row: 3, col: 0 }, isExtending: true });
+        expect(TableUtils.computeKeyCommand(press("a", { metaKey: true }), { row: 1, col: 0 }, GRID, OPTS)).toEqual({
+            kind: "selectAll",
+        });
+        expect(TableUtils.computeKeyCommand(press("x"), { row: 1, col: 0 }, GRID, OPTS)).toBeUndefined();
+    });
+});
+
+describe("TableUtils.clampCell", () => {
+    it("holds a cell inside the grid", () => {
+        expect(TableUtils.clampCell({ row: 9, col: -2 }, { rowCount: 4, colCount: 3 })).toEqual({ row: 3, col: 0 });
     });
 });

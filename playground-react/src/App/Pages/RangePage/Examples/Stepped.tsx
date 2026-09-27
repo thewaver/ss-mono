@@ -1,0 +1,23 @@
+import { Range } from "@thewaver/ss-components-react";
+import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground-core/App/StyledComponents/RangeContent/RangeContent.css";
+
+import { PageRangeContent } from "../../../StyledComponents/RangeContent/RangeContent";
+import type { RangeExampleProps } from "../RangePage.types";
+
+const MIN = 1;
+const MAX = 5;
+const STEP = 1;
+
+type Props = RangeExampleProps;
+
+export const SteppedExample = (props: Props) => (
+    <Range
+        valueState={props.valueState}
+        ariaLabel={"Difficulty"}
+        min={MIN}
+        max={MAX}
+        step={STEP}
+        thumbSize={RANGE_THUMB_SIZE}
+        renderContent={(renderProps) => <PageRangeContent renderProps={renderProps} />}
+    />
+);

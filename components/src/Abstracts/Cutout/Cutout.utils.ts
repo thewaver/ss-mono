@@ -1,6 +1,4 @@
-import type { JSX } from "solid-js";
-
-import type { CutoutHole } from "./Cutout.types";
+import type { CutoutHole, CutoutMaskStyle } from "./Cutout.types";
 
 /** An opaque layer covering the whole element. It is what the holes are then subtracted from. */
 const FULL_COVERAGE_LAYER = "linear-gradient(black, black)";
@@ -25,10 +23,11 @@ export namespace CutoutUtils {
      * @param holes Where to cut, in pixels relative to the element's own top-left corner. A hole
      * may carry an `image` to soften its shape — a radial gradient gives a faded edge; without one
      * it is cut as a hard rectangle.
-     * @returns Style properties to spread onto the element. An empty list gives a mask that covers
-     * everything, so the element paints as it normally would.
+     * @returns Style properties to spread onto the element, keyed by their CSS names — hyphenated, as a
+     * stylesheet spells them. An empty list gives a mask that covers everything, so the element paints as it
+     * normally would.
      */
-    export const getMaskStyle = (holes: CutoutHole[]): JSX.CSSProperties => {
+    export const getMaskStyle = (holes: CutoutHole[]): CutoutMaskStyle => {
         const images = [FULL_COVERAGE_LAYER, ...holes.map((hole) => hole.image ?? FULL_COVERAGE_LAYER)].join(", ");
         const positions = ["0 0", ...holes.map((hole) => `${hole.x}px ${hole.y}px`)].join(", ");
         const sizes = ["auto", ...holes.map((hole) => `${hole.width}px ${hole.height}px`)].join(", ");

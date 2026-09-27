@@ -1,5 +1,13 @@
+import type { CarrierZone, Carry, CarryPlace } from "../../Abstracts/Carrier/Carrier.types";
+import { CarrierUtils } from "../../Abstracts/Carrier/Carrier.utils";
+import { NavigatorUtils } from "../../Abstracts/Navigator/Navigator.utils";
 import type {
     TimelineEdge,
+    TimelineEdgeCarry,
+    TimelineEdgeZoneDefs,
+    TimelineGestureDefs,
+    TimelineItemBox,
+    TimelineKeyAction,
     TimelineMarker,
     TimelinePlacement,
     TimelineSpan,
@@ -27,6 +35,43 @@ const EPSILON = 1e-9;
 const MAX_SNAP_PROBES = 256;
 /** How many times the gap before the next snapped value is halved, which is past the precision of a double. */
 const MAX_HALVINGS = 64;
+
+/** Where a zoom or a pointer reading centers when there is nothing better to go on: the middle. */
+const MIDDLE_RATIO = 0.5;
+/** How much one pixel of wheel travel zooms by, as an exponent, so equal wheel travel is equal zoom either way. */
+const ZOOM_RATE = 0.0015;
+/** How many pointers make a pinch. */
+const PINCH_POINTERS = 2;
+/** How far a press travels before it counts as a pan rather than a press, the same slop `Carrier` uses. */
+const DRAG_SLOP = 4;
+/** The primary mouse button. */
+const PRIMARY_BUTTON = 0;
+/** The key that takes hold of an item's end, while edges are on. */
+const HOLD_KEY = "Enter";
+/** One percent in a ratio. */
+const PERCENT = 100;
+
+/** The keys that choose which edge is held. */
+const EDGE_BY_KEY: Record<string, TimelineEdge> = {
+    Home: "start",
+    End: "end",
+};
+
+/** The keys that move a held edge, and which way. */
+const NUDGE_BY_KEY: Record<string, number> = {
+    ArrowRight: SINGLE,
+    ArrowLeft: -SINGLE,
+};
+
+/** The keys that walk the items, and where each one goes. */
+const STEP_BY_KEY: Record<string, TimelineStep> = {
+    ArrowRight: "next",
+    ArrowLeft: "previous",
+    ArrowDown: "laneAfter",
+    ArrowUp: "laneBefore",
+    Home: "first",
+    End: "last",
+};
 
 /** Whether a value falls on a step, allowing for floating-point drift. */
 const isMultipleOf = (value: number, step: number) => Math.abs(value / step - Math.round(value / step)) < EPSILON;
@@ -460,5 +505,353 @@ export namespace TimelineUtils {
         }
 
         return ticks;
+    };
+
+    /**
+     * Whether a press should be answered at all: any touch or pen, and the primary button of a mouse.
+     *
+     * @param e The press, or anything carrying its `button` and `pointerType`.
+     */
+    export const getIsPrimaryPress = (e: { button: number; pointerType: string }) =>
+        e.button === PRIMARY_BUTTON || e.pointerType !== "mouse";
+
+    /**
+     * Where a pointer sits across the timeline, as a fraction of its width.
+     *
+     * @param clientX The pointer's horizontal position in the window.
+     * @param rect The timeline's box in the window. Missing, or of no width, reads as the middle.
+     * @returns `0` at the left edge and `1` at the right, reaching outside that for a pointer outside the box.
+     */
+    export const computePointerRatio = (clientX: number, rect: { left: number; width: number } | undefined) => {
+        if (rect === undefined || rect.width === NOTHING) return MIDDLE_RATIO;
+
+        return (clientX - rect.left) / rect.width;
+    };
+
+    /**
+     * How many lanes the items reach, when nobody has said how many there are.
+     *
+     * @param lanes One lane number per item.
+     * @returns One more than the highest lane, and never fewer than one, so an empty timeline still has a row.
+     */
+    export const computeLaneCount = (lanes: number[]) =>
+        lanes.reduce((most, lane) => Math.max(most, lane + SINGLE), SINGLE);
+
+    /**
+     * How tall the whole timeline is drawn: the ruler's band on top of every lane and the gaps between them.
+     *
+     * @param axisSize How much room the ruler takes.
+     * @param laneCount How many lanes there are.
+     * @param laneSize How thick one lane is.
+     * @param laneGap The space between one lane and the next, which is not left after the last.
+     */
+    export const computeHeight = (axisSize: number, laneCount: number, laneSize: number, laneGap: number) =>
+        axisSize + laneCount * (laneSize + laneGap) - laneGap;
+
+    /**
+     * Where one item's box is drawn.
+     *
+     * Across the axis it is a share of the view, written as percentages so a resize needs no work at all; down it
+     * is its lane, below the ruler's band, in pixels.
+     *
+     * @param placement Where the item was placed, from {@link TimelineUtils.computePlacements}.
+     * @param axisSize How much room the ruler takes.
+     * @param laneSize How thick one lane is.
+     * @param laneGap The space between one lane and the next.
+     * @returns `left` and `width` in percent of the timeline's width, `top` and `height` in pixels.
+     */
+    export const computeItemBox = (
+        placement: TimelinePlacement,
+        axisSize: number,
+        laneSize: number,
+        laneGap: number,
+    ): TimelineItemBox => ({
+        left: placement.startRatio * PERCENT,
+        width: (placement.endRatio - placement.startRatio) * PERCENT,
+        top: axisSize + placement.lane * (laneSize + laneGap),
+        height: laneSize,
+    });
+
+    /**
+     * The placement of an item nobody has placed, which is where an index missing from the placements reads.
+     *
+     * @param index The item's index.
+     * @returns A placement at the very start of the first lane, of no width, and out of view.
+     */
+    export const getBlankPlacement = (index: number): TimelinePlacement => ({
+        index,
+        order: NOTHING,
+        lane: NOTHING,
+        startRatio: NOTHING,
+        endRatio: NOTHING,
+        isInView: false,
+    });
+
+    /**
+     * Which item holds the timeline's one tab stop.
+     *
+     * @param stops The stops from {@link TimelineUtils.computeStops}.
+     * @param focusedIndex The item last focused, if any.
+     * @returns That item while it is still a stop, the first stop otherwise, or `undefined` when there are none.
+     */
+    export const computeRovingIndex = (stops: TimelineStop[], focusedIndex: number | undefined) => {
+        if (focusedIndex !== undefined && stops.some((stop) => stop.index === focusedIndex)) return focusedIndex;
+
+        return stops[NOTHING]?.index;
+    };
+
+    /**
+     * Which items to build.
+     *
+     * Only what the view can show, plus whichever item holds the tab stop, so a walk never focuses something that
+     * is not there.
+     *
+     * @param placements The placements from {@link TimelineUtils.computePlacements}.
+     * @param rovingIndex The item holding the tab stop.
+     * @returns Item indices, in keyboard order.
+     */
+    export const computeRenderedIndices = (placements: TimelinePlacement[], rovingIndex: number | undefined) =>
+        placements
+            .filter((placement) => placement.isInView || placement.index === rovingIndex)
+            .map((placement) => placement.index);
+
+    /**
+     * The spans as they should be drawn while an edge is held, which puts the held item at its proposed span.
+     *
+     * @param spans Every item's own span.
+     * @param heldIndex The item whose edge is held, if any.
+     * @param heldSpan The span that item would have if dropped now, if any.
+     * @returns `spans` itself when nothing is held, so an unchanged list keeps its identity.
+     */
+    export const computeShownSpans = (
+        spans: TimelineSpan[],
+        heldIndex: number | undefined,
+        heldSpan: TimelineSpan | undefined,
+    ) => {
+        if (heldIndex === undefined || heldSpan === undefined) return spans;
+
+        return spans.map((span, at) => (at === heldIndex ? heldSpan : span));
+    };
+
+    /**
+     * What a carry is told about an item whose edge is picked up.
+     *
+     * @param groupId The timeline's own group, so no other zone can take it.
+     * @param index The item.
+     * @param label The item's name, as it is announced.
+     */
+    export const computeEdgeCarry = (groupId: string, index: number, label: string): Carry => ({
+        groupId,
+        key: `${index}`,
+        label,
+        value: { index } satisfies TimelineEdgeCarry,
+    });
+
+    /**
+     * Which item a carry from {@link TimelineUtils.computeEdgeCarry} holds an edge of.
+     *
+     * @param carry The carry, or `undefined` when nothing is carried.
+     * @returns The item's index, or `undefined`.
+     */
+    export const getCarriedIndex = (carry: Carry | undefined) =>
+        carry === undefined ? undefined : (carry.value as TimelineEdgeCarry).index;
+
+    /**
+     * What a key pressed on the timeline does.
+     *
+     * While an edge is held by key or by tap, `Escape` puts it back, `Enter` and `Space` drop it, `Home` and `End`
+     * choose which edge is held and the left and right arrows move it; the up and down arrows are taken and do
+     * nothing, so a hold never walks away from its item. Otherwise `Enter` takes hold of the item's end when edges
+     * are on, `Enter` and `Space` activate, and the arrows, `Home` and `End` walk. `Tab` is never taken.
+     *
+     * @param key The `key` of the keyboard event.
+     * @param opts.isHolding Whether an edge of this timeline is held by key or by tap. A drag is left to the
+     * pointer.
+     * @param opts.isEditable Whether edges are on.
+     * @returns What to do, or `undefined` when the key is not the timeline's and should be left alone. Every
+     * action but `"ignore"` and `"step"` has its default prevented; a step prevents it only when it goes somewhere.
+     */
+    export const computeKeyAction = (
+        key: string,
+        opts: { isHolding: boolean; isEditable: boolean },
+    ): TimelineKeyAction | undefined => {
+        if (opts.isHolding) {
+            const edge = EDGE_BY_KEY[key];
+            const nudge = NUDGE_BY_KEY[key];
+
+            if (key === "Escape") return { kind: "cancel" };
+            if (NavigatorUtils.getIsActivationKey(key)) return { kind: "drop" };
+            if (edge !== undefined || nudge !== undefined) return { kind: "aim", edge, nudge };
+            if (STEP_BY_KEY[key] !== undefined) return { kind: "ignore" };
+        }
+
+        if (key === HOLD_KEY && opts.isEditable) return { kind: "hold" };
+        if (NavigatorUtils.getIsActivationKey(key)) return { kind: "activate" };
+
+        const step = STEP_BY_KEY[key];
+
+        return step === undefined ? undefined : { kind: "step", step };
+    };
+
+    /**
+     * How much one wheel event zooms by.
+     *
+     * @param deltaY The event's vertical travel. Down zooms out and up zooms in.
+     * @returns The factor to scale the visible extent by.
+     */
+    export const computeWheelFactor = (deltaY: number) => Math.exp(deltaY * ZOOM_RATE);
+
+    /**
+     * Drag to pan, pinch to zoom, and the wheel, for one timeline.
+     *
+     * A press that stays within four pixels of where it went down is left alone, so its click still reaches the
+     * item under it; past that, the pointer is captured and every move pans. Capturing only then is the whole trick:
+     * capture taken on the press would redirect the click as well, and no item could ever be pressed. Two pointers
+     * down make a pinch, which zooms by the change in their gap and pans by the change in their midpoint.
+     *
+     * @param defs Whether each gesture is on, the timeline's width, where a pointer sits across it, and the zoom and
+     * pan commands, all read at the moment a gesture needs them.
+     * @returns Handlers for the timeline root's pointer and wheel events. The move and release handlers take the
+     * root, which is what holds the capture.
+     */
+    export const createGestureTracker = (defs: TimelineGestureDefs) => {
+        const pointerXs = new Map<number, number>();
+
+        let isGrabbing = false;
+        let panFrom: number | undefined;
+        let pinchGap: number | undefined;
+        let pinchCenter: number | undefined;
+
+        const pinch = () => {
+            const [first, second] = [...pointerXs.values()];
+            const gap = Math.abs(second - first);
+            const center = (first + second) * MIDDLE_RATIO;
+
+            if (pinchGap !== undefined && gap > NOTHING && pinchCenter !== undefined) {
+                const ratio = defs.computePointerRatio(center);
+                const width = defs.getWidth();
+
+                if (defs.getIsZoomable()) defs.zoomBy(pinchGap / gap, ratio);
+                if (defs.getIsPannable() && width > NOTHING) defs.panBy((pinchCenter - center) / width);
+            }
+
+            pinchGap = gap;
+            pinchCenter = center;
+        };
+
+        return {
+            press: (e: PointerEvent) => {
+                if (!getIsPrimaryPress(e)) return;
+                if (!defs.getIsPannable() && !defs.getIsZoomable()) return;
+
+                pointerXs.set(e.pointerId, e.clientX);
+                panFrom = pointerXs.size === SINGLE ? e.clientX : undefined;
+                pinchGap = undefined;
+            },
+            move: (e: PointerEvent, element: HTMLElement) => {
+                if (!pointerXs.has(e.pointerId)) return;
+
+                pointerXs.set(e.pointerId, e.clientX);
+
+                if (pointerXs.size >= PINCH_POINTERS) {
+                    pinch();
+
+                    return;
+                }
+
+                if (panFrom === undefined || !defs.getIsPannable()) return;
+
+                const traveled = e.clientX - panFrom;
+
+                if (!isGrabbing && Math.abs(traveled) < DRAG_SLOP) return;
+
+                if (!isGrabbing) {
+                    isGrabbing = true;
+                    element.setPointerCapture(e.pointerId);
+                }
+
+                const width = defs.getWidth();
+
+                if (width > NOTHING) defs.panBy(-traveled / width);
+
+                panFrom = e.clientX;
+            },
+            release: (e: PointerEvent, element: HTMLElement) => {
+                pointerXs.delete(e.pointerId);
+                pinchGap = undefined;
+
+                if (pointerXs.size < PINCH_POINTERS) panFrom = pointerXs.values().next().value;
+
+                if (isGrabbing && pointerXs.size === NOTHING) {
+                    isGrabbing = false;
+                    element.releasePointerCapture(e.pointerId);
+                }
+            },
+            wheel: (e: WheelEvent) => {
+                if (!defs.getIsZoomable()) return;
+
+                e.preventDefault();
+                defs.zoomBy(computeWheelFactor(e.deltaY), defs.computePointerRatio(e.clientX));
+            },
+        };
+    };
+
+    /**
+     * The zone a timeline offers its own edge carries.
+     *
+     * The carried item is an index and the place is the whole proposed span, so the item can be drawn at its new
+     * size while held and the consumer is told only on the drop. Which edge is held is the timeline's own state,
+     * read through `getHeldEdge`, rather than part of the place — so switching ends and dropping without moving is
+     * "left in place" rather than a change. A point lands on the value under it, less the offset the pointer was
+     * grabbed at and snapped when a snap is given; a nudge is one notch through
+     * {@link TimelineUtils.computeSteppedEdgeValue}.
+     *
+     * @param defs The timeline's state and answers, read at the moment a carry needs them. `computeSnapValue` is
+     * read then too, so an object whose member is a getter follows the consumer's prop.
+     * @returns The zone, to register with the carrier.
+     */
+    export const createEdgeZone = (defs: TimelineEdgeZoneDefs): CarrierZone => {
+        const asSpan = (place: CarryPlace) => place as TimelineSpan;
+
+        return {
+            getGroupId: defs.getGroupId,
+            getLabel: defs.getLabel,
+            getRootRef: defs.getRootRef,
+            getIsDisabled: () => !defs.getIsEditable(),
+            getKeyHint: () => defs.getAnnouncements().heldKeyHint,
+            getAnnouncements: defs.getAnnouncements,
+            computeCanAccept: () => defs.getIsEditable(),
+            computePlaceAtPoint: (point) => {
+                const place = CarrierUtils.getTargetPlace();
+
+                if (place === undefined) return undefined;
+
+                const value = toValue(defs.computePointerRatio(point.x), defs.getView()) - defs.getGrabOffset();
+                const snapped = defs.computeSnapValue?.(value) ?? value;
+
+                return moveEdge(asSpan(place), defs.getHeldEdge(), snapped, defs.getRange());
+            },
+            computeNudgedPlace: (place, nudge) => {
+                const span = asSpan(place);
+                const edge = defs.getHeldEdge();
+                const value = computeSteppedEdgeValue(
+                    span[edge],
+                    nudge.x ?? NOTHING,
+                    defs.getStep(),
+                    defs.getRange(),
+                    defs.computeSnapValue,
+                );
+
+                return moveEdge(span, edge, value, defs.getRange());
+            },
+            computeEntryPlace: (carry) => defs.getSpans()[getCarriedIndex(carry)!],
+            computeIsSamePlace: (first, second) =>
+                asSpan(first).start === asSpan(second).start && asSpan(first).end === asSpan(second).end,
+            computeIsPlaceAllowed: () => true,
+            computePlaceLabel: (place) => defs.getAnnouncements().computePlaceLabel(defs.getHeldEdge(), asSpan(place)),
+            takeAt: () => undefined,
+            putAt: () => undefined,
+            moveAt: (_unusedFrom, toPlace, carry) => defs.onSpanChange(getCarriedIndex(carry)!, asSpan(toPlace)),
+        };
     };
 }

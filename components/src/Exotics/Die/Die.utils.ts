@@ -1,7 +1,17 @@
 import type { Matrix3d, Point3d, Size2d } from "@thewaver/ss-utils";
+import { StoreUtils } from "@thewaver/ss-utils";
 
+import { LiveAnnouncerUtils } from "../../Abstracts/LiveAnnouncer/LiveAnnouncer.utils";
 import { BarrelUtils } from "../../Primitives/Barrel/Barrel.utils";
-import type { DieFaceGeometry, DieQuaternion, DieShape } from "./Die.types";
+import type {
+    DieFaceGeometry,
+    DieFaceState,
+    DieQuaternion,
+    DieRoller,
+    DieRollerOpts,
+    DieRollerState,
+    DieShape,
+} from "./Die.types";
 
 /** Zero, as a length or an index. */
 const NOTHING = 0;
@@ -21,6 +31,25 @@ const SLERP_EPSILON = 1e-6;
 const TURN = Math.PI * 2;
 /** How far apart two corners may be, as a share of the die's radius, and still count as the same place. */
 const SYMMETRY_EPSILON = 1e-6;
+
+/** The first face, which a die starts on. */
+const FIRST_FACE = 0;
+/** No rotation at all. */
+const IDENTITY: DieQuaternion = { w: 1, x: 0, y: 0, z: 0 };
+/** The way a face points before it is known, straight at the viewer. */
+const FACING_NORMAL: Point3d = { x: 0, y: 0, z: 1 };
+/** The size of a face that does not exist. */
+const NO_SIZE: Size2d = { width: 0, height: 0 };
+/** How steeply a roll eases out as it lands. */
+const EASE_POWER = 3;
+/** How long past a roll's end the backstop timer waits before landing it anyway, for a tab that has stopped drawing. */
+const FRAME_STARVATION_SLACK_MS = 100;
+
+/** Eases a roll's progress so it slows as it lands. */
+const easeOut = (progress: number) => SINGLE - (SINGLE - progress) ** EASE_POWER;
+
+/** A random axis to tumble about, leaning towards the viewer so the tumble reads as a throw. */
+const pickTumbleAxis = () => ({ x: Math.random() - HALF, y: Math.random() - HALF, z: Math.random() * HALF });
 
 const dot = (a: Point3d, b: Point3d) => a.x * b.x + a.y * b.y + a.z * b.z;
 
@@ -383,5 +412,189 @@ export namespace DieUtils {
         const extent = BarrelUtils.getProjectedExtent(radius, radius);
 
         return { width: extent, height: extent };
+    };
+
+    /**
+     * The face a die shows for the face its owner holds, which may be out of range or not a whole number.
+     *
+     * @param face The owner's face.
+     * @param faceCount How many faces the die has.
+     * @returns The face, truncated and clamped to the faces there are.
+     */
+    export const clampFace = (face: number, faceCount: number) =>
+        Math.min(Math.max(FIRST_FACE, Math.trunc(face)), faceCount - SINGLE);
+
+    /**
+     * The rotation that turns one face towards the viewer, the right way up.
+     *
+     * @param geometry The die's faces.
+     * @param index Which face.
+     * @returns The rotation, or no rotation at all for a face that does not exist.
+     */
+    export const getFacingQuaternion = (geometry: DieFaceGeometry[], index: number) => {
+        const face = geometry[index];
+
+        return face ? toQuaternion(computeFacingRotation(face)) : IDENTITY;
+    };
+
+    /**
+     * The transform the die's body is drawn with: pushed back its own radius, then turned.
+     *
+     * @param orientation How the die is turned.
+     * @param size How far across the die is at its widest.
+     * @returns The CSS `transform`.
+     */
+    export const getBodyTransform = (orientation: DieQuaternion, size: number) =>
+        `translateZ(${-size * HALF}px) ${toTransform(toRotation(orientation))}`;
+
+    /**
+     * Where one face's box sits inside the die's box, and the outline it is clipped to.
+     *
+     * @param face The face.
+     * @param size How far across the die is at its widest.
+     * @returns The box's offset from the top left, so it is centered, and the CSS `clip-path` polygon of its outline.
+     */
+    export const getFaceBox = (face: DieFaceGeometry, size: number) => ({
+        left: (size - face.size.width) * HALF,
+        top: (size - face.size.height) * HALF,
+        clipPath: `polygon(${face.outline
+            .map((point) => `${point.x + face.size.width * HALF}px ${point.y + face.size.height * HALF}px`)
+            .join(",")})`,
+    });
+
+    /**
+     * What one face's painter is told.
+     *
+     * @param geometry The die's faces.
+     * @param index Which face.
+     * @param restingFace The face the die rests on, or `undefined` while it turns.
+     * @returns The face's state.
+     */
+    export const getFaceState = (
+        geometry: DieFaceGeometry[],
+        index: number,
+        restingFace: number | undefined,
+    ): DieFaceState => ({
+        index,
+        isShowing: index === restingFace,
+        normal: geometry[index]?.normal ?? FACING_NORMAL,
+        size: geometry[index]?.size ?? NO_SIZE,
+    });
+
+    /**
+     * Rolls a die and turns it between faces, holding how it is turned while it goes.
+     *
+     * A roll is asked for, waits for its result, writes the result to the owner at once — before it lands, so a
+     * reader of the face learns it early — and then tumbles there over the roll's duration, easing out, landing on
+     * the face's own rotation, announcing the face and reporting the end. A turn the owner asks for goes the same
+     * way without tumbling. The owner's echo of a roll's own write is told apart from a turn it asked for, so the
+     * roll is never cut short by hearing back what it wrote, whether the echo arrives at once or a render later.
+     *
+     * Frames can stop arriving in a background tab, so a timer lands the die anyway a little after the roll should
+     * have ended. The functions in `opts` are read when they are needed, so they may answer differently over time.
+     *
+     * @param opts What the roller reads and writes.
+     * @returns The roller.
+     */
+    export const createRoller = (opts: DieRollerOpts): DieRoller => {
+        let frameId: number | undefined;
+        let starvationHandle: ReturnType<typeof setTimeout> | undefined;
+        let writtenFace: number | undefined;
+
+        const store = StoreUtils.create<DieRollerState>(
+            { orientation: IDENTITY, isRolling: false, restingFace: undefined },
+            { isEqual: StoreUtils.getIsShallowEqual },
+        );
+
+        const write = (next: Partial<DieRollerState>) => store.update((current) => ({ ...current, ...next }));
+
+        const getFacing = (index: number) => getFacingQuaternion(opts.getGeometry(), index);
+
+        const stop = () => {
+            if (frameId !== undefined) cancelAnimationFrame(frameId);
+            if (starvationHandle !== undefined) clearTimeout(starvationHandle);
+
+            frameId = undefined;
+            starvationHandle = undefined;
+        };
+
+        const rest = (index: number) => {
+            stop();
+            write({ orientation: getFacing(index), restingFace: index });
+        };
+
+        const land = (index: number, isRoll: boolean) => {
+            stop();
+            writtenFace = undefined;
+            write({ orientation: getFacing(index), restingFace: index, isRolling: false });
+            LiveAnnouncerUtils.announce(opts.computeFaceLabel(index));
+
+            if (isRoll) opts.onRollEnd?.(index);
+        };
+
+        const startTurn = (index: number, tumbleCount: number, isRoll: boolean) => {
+            stop();
+            write({ restingFace: undefined });
+
+            const durationMs = opts.getRollDurationMs();
+            const from = store.get().orientation;
+            const to = getFacing(index);
+            const axis = pickTumbleAxis();
+
+            if (durationMs <= NOTHING) {
+                land(index, isRoll);
+
+                return;
+            }
+
+            const startedAt = performance.now();
+
+            const advance = (now: number) => {
+                const progress = easeOut(Math.min(SINGLE, (now - startedAt) / durationMs));
+
+                if (progress >= SINGLE) {
+                    land(index, isRoll);
+
+                    return;
+                }
+
+                const tumble = fromAxisAngle(axis, TURN * tumbleCount * progress);
+
+                write({ orientation: multiply(tumble, slerp(from, to, progress)) });
+                frameId = requestAnimationFrame(advance);
+            };
+
+            starvationHandle = setTimeout(() => land(index, isRoll), durationMs + FRAME_STARVATION_SLACK_MS);
+            frameId = requestAnimationFrame(advance);
+        };
+
+        const turnTo = (index: number) => {
+            if (index === writtenFace) {
+                writtenFace = undefined;
+
+                return;
+            }
+
+            startTurn(index, NOTHING, false);
+        };
+
+        const roll = () => {
+            if (store.get().isRolling) return false;
+
+            write({ isRolling: true });
+
+            void Promise.resolve(opts.computeRollTarget()).then((target) => {
+                const index = clampFace(target, opts.getGeometry().length);
+
+                writtenFace = index === opts.getShownFace() ? undefined : index;
+                opts.writeFace(index);
+
+                startTurn(index, opts.getTumbleCount(), true);
+            });
+
+            return true;
+        };
+
+        return { get: store.get, subscribe: store.subscribe, rest, turnTo, roll, stop };
     };
 }

@@ -1,6 +1,11 @@
-import { MathUtils } from "@thewaver/ss-utils";
+import { MathUtils, StoreUtils } from "@thewaver/ss-utils";
 
-import type { ScrambleTextSegment } from "./ScrambleText.types";
+import type {
+    ScrambleTextScrambler,
+    ScrambleTextScramblerOpts,
+    ScrambleTextSegment,
+    ScrambleTextState,
+} from "./ScrambleText.types";
 
 /** One character. */
 const SINGLE_CHARACTER = 1;
@@ -8,6 +13,11 @@ const SINGLE_CHARACTER = 1;
 const NO_TIME = 0;
 /** The length of a match against an empty tail. */
 const NO_MATCH = 0;
+/** The part of a run's state that says where it is, which is all the settle and pending checks read. */
+type ScrambleTextTiming = Pick<ScrambleTextState, "isScrambling" | "kept" | "elapsedMs">;
+
+/** No position kept from the text before, which is how a first run and a restart begin. */
+const NOTHING_KEPT: boolean[] = [];
 
 /**
  * Schedules the character-by-character reveal of scrambled text.
@@ -150,5 +160,112 @@ export namespace ScrambleTextUtils {
         }
 
         return carried;
+    };
+
+    /**
+     * Whether a position shows its own character rather than noise.
+     *
+     * @param state Where the run is: whether it is under way, what it keeps and how long it has gone.
+     * @param settleTime When the position settles.
+     * @param index The position.
+     * @returns `true` outside a run, for a position kept from the text before, and once its settle time has passed.
+     */
+    export const getIsSettled = (state: ScrambleTextTiming, settleTime: number | undefined, index: number) =>
+        !state.isScrambling || !!state.kept[index] || (settleTime !== undefined && state.elapsedMs >= settleTime);
+
+    /**
+     * Whether a position is still waiting for its churn to start, and so shows nothing but its reserved space.
+     *
+     * @param state Where the run is: whether it is under way and how long it has gone.
+     * @param startTime When the position starts churning.
+     * @returns `true` during a run, before the position's start time.
+     */
+    export const getIsPending = (state: ScrambleTextTiming, startTime: number | undefined) =>
+        state.isScrambling && state.elapsedMs < (startTime ?? NO_TIME);
+
+    /**
+     * Runs the scramble: a timer that swaps each unsettled position's glyph and ends the run once every position
+     * has settled.
+     *
+     * The schedule is read afresh on every tick, so a change to the durations takes effect on a run already
+     * under way. A settled or pending position keeps the glyph it had; a churning one gets a new glyph each tick,
+     * never the character it is going to settle on. Whitespace never churns.
+     *
+     * Which positions a text change carries over is decided against the run as it stood when the change came:
+     * only a position that had settled by then counts, so a change made mid-run cannot let a churning character
+     * jump to its answer. The functions in `opts` are read when they are needed, so they may answer differently
+     * over time.
+     *
+     * @param opts What the scrambler reads.
+     * @returns The scrambler.
+     */
+    export const createScrambler = (opts: ScrambleTextScramblerOpts): ScrambleTextScrambler => {
+        let interval: ReturnType<typeof setInterval> | undefined;
+        let startedAtMs = NO_TIME;
+        let runSettleTimes: number[] = [];
+
+        const store = StoreUtils.create<ScrambleTextState>(
+            { elapsedMs: NO_TIME, noise: [], isScrambling: false, kept: [] },
+            { isEqual: StoreUtils.getIsShallowEqual },
+        );
+
+        const rollNoise = (state: ScrambleTextState) => {
+            const glyphSets = opts.getGlyphSets();
+            const settleTimes = opts.getSettleTimes();
+            const startTimes = opts.getStartTimes();
+
+            return opts.getCharacters().map((character, index) => {
+                if (getIsWhitespace(character)) return character;
+
+                const isQuiet =
+                    getIsSettled(state, settleTimes[index], index) || getIsPending(state, startTimes[index]);
+
+                return isQuiet
+                    ? (state.noise[index] ?? pickGlyph(glyphSets[index] ?? [], character, Math.random()))
+                    : pickGlyph(glyphSets[index] ?? [], character, Math.random());
+            });
+        };
+
+        const stop = () => {
+            clearInterval(interval);
+            store.update((state) => ({ ...state, isScrambling: false }));
+        };
+
+        const start = (kept: boolean[] = NOTHING_KEPT) => {
+            stop();
+
+            startedAtMs = Date.now();
+            runSettleTimes = opts.getSettleTimes();
+
+            const resting = { ...store.get(), kept, elapsedMs: NO_TIME };
+
+            store.set({ ...resting, noise: rollNoise(resting), isScrambling: true });
+
+            interval = setInterval(() => {
+                const elapsedMs = Date.now() - startedAtMs;
+                const ticked = { ...store.get(), elapsedMs };
+
+                store.set({ ...ticked, noise: rollNoise(ticked) });
+
+                if (elapsedMs < opts.getInitialDelayMs() + opts.getSettleDurationMs()) return;
+
+                stop();
+                opts.onAnimationEnd?.();
+            }, opts.getScrambleIntervalMs());
+
+            return true;
+        };
+
+        const getKeptAfterChange = (previous: string[], next: string[]) => {
+            const elapsedMs = Date.now() - startedAtMs;
+            const state = store.get();
+            const wasSettled = runSettleTimes.map(
+                (settleTime, index) => !state.isScrambling || !!state.kept[index] || elapsedMs >= settleTime,
+            );
+
+            return getCarriedIndices(previous, next).map((from) => from !== undefined && !!wasSettled[from]);
+        };
+
+        return { get: store.get, subscribe: store.subscribe, start, stop, getKeptAfterChange };
     };
 }

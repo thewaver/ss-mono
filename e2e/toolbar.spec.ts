@@ -127,6 +127,21 @@ test("the row is one tab stop, and the arrows walk it", async ({ page }) => {
     expect(await focusedText(page), "and the walk wraps rather than stopping").toBe(row[0]);
 });
 
+/**
+ * The published toolbar pattern moves the tab stop to whichever action last took focus, however it got there, so a
+ * click is where the arrows carry on from — not the first action, and not wherever the arrows last left it.
+ */
+test("a clicked action is where the arrows walk on from", async ({ page }) => {
+    await setBarWidth(page, WIDE_PX);
+
+    const row = await readRow(page, DEFAULT);
+
+    await page.locator(`${DEFAULT} [role="toolbar"] button`, { hasText: row[2] }).click();
+    await page.keyboard.press("ArrowRight");
+
+    expect(await focusedText(page), "the walk moves on from the clicked action").toBe(row[3]);
+});
+
 test("an action that has left the row has left the walk with it", async ({ page }) => {
     await setBarWidth(page, NARROW_PX);
 

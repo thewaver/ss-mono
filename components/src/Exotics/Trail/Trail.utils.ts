@@ -1,11 +1,15 @@
 import { AngleUtils, MathUtils, type Point2d } from "@thewaver/ss-utils";
 
-import type { TrailStep } from "./Trail.types";
+import type { TrailPlace, TrailStep } from "./Trail.types";
 
 /** Zero, as a time or a position. */
 const NOTHING = 0;
 /** One complete pass along the path. */
 const FULL_LAP = 1;
+/** Where a traveler sits before there is a path to put it on. */
+const ORIGIN: Point2d = { x: 0, y: 0 };
+/** How far either side of a traveler the path is sampled for its heading. */
+const SAMPLE_STEP_PX = 1;
 
 /** Advances something traveling along a path, and works out which way it is pointing. */
 export namespace TrailUtils {
@@ -103,4 +107,102 @@ export namespace TrailUtils {
      */
     export const getAngle = (from: Point2d, to: Point2d) =>
         AngleUtils.fromRadians(Math.atan2(to.y - from.y, to.x - from.x));
+
+    /**
+     * Where a traveler is on the drawn path, and which way it faces.
+     *
+     * @param path The path element, as drawn — its geometry is what is asked.
+     * @param length The path's total length, measured once per path rather than on every frame.
+     * @param progress The traveler's own progress, from {@link getTravelerProgress}.
+     * @returns The progress, the point on the path in its own coordinates and the heading from {@link getAngle}.
+     * Before there is a path, or while it has no length, the point is the origin and the heading is none.
+     */
+    export const computePlace = (path: SVGPathElement | undefined, length: number, progress: number): TrailPlace => {
+        if (!path || length <= NOTHING) return { progress, point: ORIGIN, angle: NOTHING };
+
+        const at = length * progress;
+        const span = getSampleSpan(length, at, SAMPLE_STEP_PX);
+        const point = path.getPointAtLength(at);
+
+        return {
+            progress,
+            point: { x: point.x, y: point.y },
+            angle: getAngle(path.getPointAtLength(span.from), path.getPointAtLength(span.to)),
+        };
+    };
+
+    /**
+     * The transform that puts a traveler's center on its place.
+     *
+     * The turn comes after the centering, so the element spins about its own middle rather than swinging off the
+     * path on a bend.
+     *
+     * @param place Where the traveler is, from {@link computePlace}.
+     * @param isTurning Whether it faces the way it is going, rather than staying upright.
+     * @returns A `transform` value.
+     */
+    export const getTravelerTransform = (place: TrailPlace, isTurning: boolean) => {
+        const turn = isTurning ? ` rotate(${place.angle}deg)` : "";
+
+        return `translate(${place.point.x}px, ${place.point.y}px) translate(-50%, -50%)${turn}`;
+    };
+
+    /**
+     * Walks the run forward on every animation frame until stopped, or until a run that does not loop arrives.
+     *
+     * Each frame reads the progress afresh, so a seek from outside between frames is carried on from rather than
+     * overwritten, and steps it by {@link getSteppedProgress}.
+     *
+     * @param defs.getProgress The run's progress now.
+     * @param defs.setProgress Writes the stepped progress.
+     * @param defs.getRunDurationMs How long the whole run takes: one pass's duration times {@link getRunExtent}.
+     * @param defs.getIsLooping Whether the run starts again from the beginning.
+     * @param defs.onLap Runs each time the end is reached.
+     * @param defs.onEnd Runs when a run that does not loop reaches the end, after `onLap`; the walking has stopped
+     * by then.
+     * @returns Stops the walking. It can be started again with another call.
+     */
+    export const run = (defs: {
+        getProgress: () => number;
+        setProgress: (progress: number) => void;
+        getRunDurationMs: () => number;
+        getIsLooping: () => boolean;
+        onLap?: () => void;
+        onEnd: () => void;
+    }) => {
+        let frameId: number | undefined;
+        let lastMs = performance.now();
+
+        const advance = () => {
+            const nowMs = performance.now();
+            const step = getSteppedProgress(
+                defs.getProgress(),
+                nowMs - lastMs,
+                defs.getRunDurationMs(),
+                defs.getIsLooping(),
+            );
+
+            lastMs = nowMs;
+            frameId = undefined;
+            defs.setProgress(step.progress);
+
+            if (step.hasLapped) {
+                defs.onLap?.();
+
+                if (!defs.getIsLooping()) {
+                    defs.onEnd();
+
+                    return;
+                }
+            }
+
+            frameId = requestAnimationFrame(advance);
+        };
+
+        frameId = requestAnimationFrame(advance);
+
+        return () => {
+            if (frameId !== undefined) cancelAnimationFrame(frameId);
+        };
+    };
 }

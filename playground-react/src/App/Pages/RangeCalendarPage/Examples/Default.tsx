@@ -1,0 +1,31 @@
+import { RangeCalendar } from "@thewaver/ss-components-react";
+import { LOCALE, TODAY } from "@thewaver/ss-playground-core/App/Pages/CalendarPage/CalendarPage.const";
+
+import { PageCalendarCaption } from "../../../PageComponents/CalendarCaption/CalendarCaption";
+import {
+    PageCalendarDay,
+    PageCalendarFrame,
+    PageCalendarWeekday,
+} from "../../../StyledComponents/CalendarContent/CalendarContent";
+import type { RangeCalendarExampleProps } from "../RangeCalendarPage.types";
+
+type Props = RangeCalendarExampleProps;
+
+export const DefaultExample = (props: Props) => {
+    return (
+        <PageCalendarFrame>
+            <PageCalendarCaption monthState={props.monthState} itemKey={"default"} locale={LOCALE} />
+
+            <RangeCalendar
+                valueState={props.valueState}
+                monthState={props.monthState}
+                today={TODAY}
+                locale={LOCALE}
+                weekStartsOn={props.weekStartsOn}
+                ariaLabel={"Choose a date range"}
+                renderDay={(_unused, renderProps) => <PageCalendarDay renderProps={renderProps} />}
+                renderWeekday={(name) => <PageCalendarWeekday>{name}</PageCalendarWeekday>}
+            />
+        </PageCalendarFrame>
+    );
+};

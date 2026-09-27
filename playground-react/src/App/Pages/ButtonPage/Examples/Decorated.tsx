@@ -1,0 +1,39 @@
+import { useState } from "react";
+
+import { Button, Corners, type InteractionActivation } from "@thewaver/ss-components-react";
+
+import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageRipple } from "../../../StyledComponents/Ripple/Ripple";
+import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
+import type { ButtonPressedExampleProps } from "../ButtonPage.types";
+
+type Props = ButtonPressedExampleProps;
+
+export const DecoratedExample = (props: Props) => {
+    const [activation, setActivation] = useState<InteractionActivation>();
+
+    return (
+        <Button
+            isPressed={props.isPressed}
+            renderContent={(flags) => <PageButtonContent flags={flags}>Toggle Me</PageButtonContent>}
+            onActivation={setActivation}
+            renderDecoration={(flags) => (
+                <>
+                    <Corners color={flags.isPressed ? "yellow" : "transparent"} />
+                    <PageRipple activation={activation} color={"yellow"} />
+                </>
+            )}
+            tooltipDefs={{
+                placement: { x: "center", y: "top-out" },
+                offset: { x: 0, y: 10 },
+                hoverShowDelayMs: 0,
+                renderContent: (visibilityTarget, transitionDurationMs) => (
+                    <PageTooltipContent visibilityTarget={visibilityTarget} transitionDurationMs={transitionDurationMs}>
+                        Click me to toggle me.
+                    </PageTooltipContent>
+                ),
+            }}
+            onClick={props.onClick}
+        />
+    );
+};

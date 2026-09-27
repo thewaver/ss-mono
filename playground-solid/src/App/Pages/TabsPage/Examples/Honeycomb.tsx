@@ -1,0 +1,58 @@
+import { PlacementLayoutUtils, Tabs, access } from "@thewaver/ss-components-solid";
+import type { HoneycombDefs } from "@thewaver/ss-components-solid";
+import {
+    HONEYCOMB_TABS,
+    PANEL_BODIES,
+    getPanelId,
+    getTabId,
+} from "@thewaver/ss-playground-core/App/Pages/TabsPage/TabsPage.const";
+import * as styles from "@thewaver/ss-playground-core/App/Pages/TabsPage/TabsPage.css";
+
+import { PageTabPanel } from "../../../PageComponents/TabPanel/TabPanel";
+import { PageTabCell, PageTabHexFloater } from "../../../StyledComponents/TabContent/TabContent";
+import type { TabsExampleProps } from "../TabsPage.types";
+
+const HONEYCOMB_DEFS: HoneycombDefs = { perRow: 3, gapRatio: 0 };
+
+const HONEYCOMB_LAYOUT = PlacementLayoutUtils.createHoneycomb(HONEYCOMB_DEFS);
+
+const HONEYCOMB_WIDTH = "294px";
+
+const ID_PREFIX = "honeycomb";
+
+type Props = TabsExampleProps;
+
+export const HoneycombExample = (props: Props) => {
+    return (
+        <div class={styles.rowDemo}>
+            <div style={{ width: HONEYCOMB_WIDTH }}>
+                <Tabs
+                    ariaLabel={"Honeycomb views"}
+                    tabs={() => HONEYCOMB_TABS}
+                    selectedValue={props.selectedValue}
+                    computeLayout={HONEYCOMB_LAYOUT}
+                    onSelectionChange={props.onSelectionChange}
+                    renderFloater={(getVisibilityTarget, getTransitionDurationMs) => (
+                        <PageTabHexFloater
+                            orientation={"horizontal"}
+                            visibilityTarget={getVisibilityTarget}
+                            transitionDurationMs={getTransitionDurationMs}
+                        />
+                    )}
+                    renderTab={(getTab, getFlags) => (
+                        <PageTabCell flags={getFlags} isSelected={() => getTab().value === access(props.selectedValue)}>
+                            {getTab().value}
+                        </PageTabCell>
+                    )}
+                />
+            </div>
+
+            <PageTabPanel
+                id={() => getPanelId(ID_PREFIX, access(props.selectedValue) ?? "")}
+                tabId={() => getTabId(ID_PREFIX, access(props.selectedValue) ?? "")}
+            >
+                {PANEL_BODIES[access(props.selectedValue) ?? ""]}
+            </PageTabPanel>
+        </div>
+    );
+};

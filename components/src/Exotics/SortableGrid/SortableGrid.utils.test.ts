@@ -1,7 +1,14 @@
 import { describe, expect, it } from "vitest";
 
-import type { SortableGridBox, SortableGridFootprint, SortableGridItem, SortableGridSpot } from "./SortableGrid.types";
+import type {
+    SortableGridBox,
+    SortableGridFootprint,
+    SortableGridItemRecord,
+    SortableGridSpot,
+} from "./SortableGrid.types";
 import { SortableGridUtils } from "./SortableGrid.utils";
+
+type SortableGridItem<T> = SortableGridItemRecord<T, unknown>;
 
 const box = (col: number, row: number, colCount: number, rowCount: number): SortableGridBox => ({
     spot: { col, row },
@@ -15,7 +22,7 @@ const ELL = [at(0, 0), at(0, 1), at(0, 2), at(1, 2)];
 const item = (value: string, col: number, row: number, footprint: SortableGridFootprint, turns = 0) =>
     ({ value, spot: at(col, row), footprint, turns }) satisfies SortableGridItem<string>;
 
-const spotsOf = (items: SortableGridItem<string>[]) =>
+const spotsOf = (items: SortableGridItemRecord<string, unknown>[]) =>
     items.map((entry) => `${entry.value}@${entry.spot.col},${entry.spot.row}`);
 
 const keys = (cells: SortableGridSpot[]) => cells.map((cell) => `${cell.col},${cell.row}`).sort();
@@ -246,5 +253,92 @@ describe("getBlock", () => {
             spot: at(1, 0),
             size: { colCount: 1, rowCount: 2 },
         });
+    });
+});
+
+describe("getSpan, getOffset and getExtent", () => {
+    it("count the gaps between cells, and the outer ones only for the whole grid", () => {
+        expect(SortableGridUtils.getSpan(3, 40, 4)).toBe(128);
+        expect(SortableGridUtils.getOffset(2, 40, 4)).toBe(92);
+        expect(SortableGridUtils.getExtent(3, 40, 4)).toBe(136);
+    });
+});
+
+describe("getSpots", () => {
+    it("lists the cells row by row", () => {
+        expect(SortableGridUtils.getSpots(2, 2)).toEqual([at(0, 0), at(1, 0), at(0, 1), at(1, 1)]);
+    });
+});
+
+describe("computeItemLabel", () => {
+    it("appends the turned footprint and the spot, counting from one", () => {
+        expect(
+            SortableGridUtils.computeItemLabel("Scroll", item("scroll", 4, 0, { colCount: 2, rowCount: 1 }, 1)),
+        ).toBe("Scroll, 1 by 2, column 5, row 1");
+    });
+});
+
+describe("getCarriedShape and getAimedTurns", () => {
+    const carry = (value: unknown) => ({ groupId: "g", key: "k", label: "l", value });
+
+    it("gives an item with no footprint a single cell", () => {
+        expect(SortableGridUtils.getCarriedShape(carry({ value: "key" }), 0).size).toEqual({
+            colCount: 1,
+            rowCount: 1,
+        });
+    });
+
+    it("reads the turn off the aim when it is a grid's place, and off the item otherwise", () => {
+        const scroll = carry(item("scroll", 0, 0, { colCount: 2, rowCount: 1 }, 1));
+
+        expect(SortableGridUtils.getAimedTurns(scroll, { col: 0, row: 0, turns: 3 })).toBe(3);
+        expect(SortableGridUtils.getAimedTurns(scroll, 2)).toBe(1);
+    });
+});
+
+describe("getGeometry", () => {
+    it("places the block in pixels and hands over one rectangle per cell", () => {
+        const geometry = SortableGridUtils.getGeometry(
+            SortableGridUtils.getShape({ colCount: 2, rowCount: 1 }, 0),
+            40,
+            4,
+        );
+
+        expect(geometry.cells).toHaveLength(2);
+        expect(geometry.block).toMatchObject({ left: 0, top: 0, width: 84, height: 40 });
+    });
+});
+
+describe("computeKeyAction", () => {
+    const boxes = [
+        { spot: at(0, 0), size: { colCount: 1, rowCount: 1 } },
+        { spot: at(3, 0), size: { colCount: 1, rowCount: 1 } },
+        { spot: at(0, 2), size: { colCount: 1, rowCount: 1 } },
+    ];
+    const opts = { index: 0, isShifted: false, isCarrying: false, navigable: [0, 1, 2], boxes };
+
+    it("picks up and drops on the activation keys, and cancels only a carry", () => {
+        expect(SortableGridUtils.computeKeyAction("Enter", opts)).toEqual({ kind: "pickUp" });
+        expect(SortableGridUtils.computeKeyAction("Enter", { ...opts, isCarrying: true })).toEqual({ kind: "drop" });
+        expect(SortableGridUtils.computeKeyAction("Escape", opts)).toBe(undefined);
+        expect(SortableGridUtils.computeKeyAction("Escape", { ...opts, isCarrying: true })).toEqual({ kind: "cancel" });
+    });
+
+    it("nudges and changes grid while carrying", () => {
+        expect(SortableGridUtils.computeKeyAction("ArrowDown", { ...opts, isCarrying: true })).toEqual({
+            kind: "nudge",
+            nudge: { y: 1 },
+        });
+        expect(SortableGridUtils.computeKeyAction("Tab", { ...opts, isCarrying: true, isShifted: true })).toEqual({
+            kind: "aimAtNextZone",
+            step: -1,
+        });
+    });
+
+    it("walks to the nearest item that way while resting, and to the ends in reading order", () => {
+        expect(SortableGridUtils.computeKeyAction("ArrowRight", opts)).toEqual({ kind: "focus", index: 1 });
+        expect(SortableGridUtils.computeKeyAction("ArrowDown", opts)).toEqual({ kind: "focus", index: 2 });
+        expect(SortableGridUtils.computeKeyAction("End", opts)).toEqual({ kind: "focus", index: 2 });
+        expect(SortableGridUtils.computeKeyAction("Tab", opts)).toBe(undefined);
     });
 });

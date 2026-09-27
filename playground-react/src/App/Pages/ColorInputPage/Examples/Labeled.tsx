@@ -1,0 +1,24 @@
+import { ColorInput, Label } from "@thewaver/ss-components-react";
+import { COLOR_INPUT_LABELS } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
+
+import { pageColorPickerSlots } from "../../../PageComponents/ColorPicker/ColorPicker";
+import { PageColorInputContent } from "../../../StyledComponents/ColorInputContent/ColorInputContent";
+import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
+import type { ColorInputExampleProps } from "../ColorInputPage.types";
+
+const LABEL_GAP = 5;
+
+type Props = ColorInputExampleProps;
+
+export const LabeledExample = (props: Props) => (
+    <Label orientation={"vertical"} gap={LABEL_GAP}>
+        <PageLabelCaption>Accent</PageLabelCaption>
+
+        <ColorInput
+            {...pageColorPickerSlots}
+            valueState={props.valueState}
+            {...COLOR_INPUT_LABELS}
+            renderContent={(renderProps) => <PageColorInputContent renderProps={renderProps} />}
+        />
+    </Label>
+);

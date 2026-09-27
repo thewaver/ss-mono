@@ -1,9 +1,8 @@
-import type { Accessor } from "solid-js";
-import { createSignal } from "solid-js";
+import { StoreUtils } from "@thewaver/ss-utils";
 
 import type { CheckedState } from "../CheckedState/CheckedState.types";
 import { CheckedStateUtils } from "../CheckedState/CheckedState.utils";
-import type { SelectionBranchDefs, SelectionDefs, SelectionHandle } from "./Selection.types";
+import type { SelectionBranchDefs, SelectionController, SelectionDefs } from "./Selection.types";
 
 /** Stands in for a branch whose children accessor answered nothing, so the walk has something to iterate. */
 const EMPTY_CHILDREN: never[] = [];
@@ -143,15 +142,17 @@ export namespace SelectionUtils {
      * A write that would leave the selection holding the same items in the same order is skipped, so
      * extending a run back over ground it already covers notifies nobody.
      *
+     * Every function it is handed is read at the moment of the gesture, never ahead of it.
+     *
      * @param getIsDisabled Whether the control is off, in which case no gesture does anything.
      * @param defs.getMode Whether nothing can be picked, one thing can, or many can.
      * @param defs.getItems The list, in the order it is drawn. An item that is not in it is ignored.
      * @param defs.selectionSignal What is selected now, and how to change it.
-     * @returns `pick` for a gesture on one item, `selectAll` and `clear` for the two wholesale moves,
-     * and `getAnchor` for where a run would currently start.
+     * @returns The controller: a store of the anchor, which is where a run would currently start, with `pick`
+     * for a gesture on one item and `selectAll` and `clear` for the two wholesale moves.
      */
-    export const create = <T>(getIsDisabled: Accessor<boolean>, defs: SelectionDefs<T>): SelectionHandle<T> => {
-        const [getAnchor, setAnchor] = createSignal<T>();
+    export const create = <T>(getIsDisabled: () => boolean, defs: SelectionDefs<T>): SelectionController<T> => {
+        const anchor = StoreUtils.create<T | undefined>(undefined);
 
         const setSelection = (next: T[]) => {
             if (getIsUnchanged(defs.selectionSignal[0](), next)) return;
@@ -160,7 +161,8 @@ export namespace SelectionUtils {
         };
 
         return {
-            getAnchor,
+            get: anchor.get,
+            subscribe: anchor.subscribe,
             pick: (item, gesture) => {
                 const mode = defs.getMode();
 
@@ -173,21 +175,19 @@ export namespace SelectionUtils {
                 const selection = defs.selectionSignal[0]();
 
                 if (mode === "single") {
-                    setAnchor(() => item);
+                    anchor.set(item);
                     setSelection(gesture?.isToggling === true && selection.includes(item) ? EMPTY_SELECTION : [item]);
 
                     return;
                 }
 
                 if (gesture?.isExtending === true) {
-                    const anchor = getAnchor();
-
-                    setSelection(getMerged(selection, getRange(items, anchor ?? item, item)));
+                    setSelection(getMerged(selection, getRange(items, anchor.get() ?? item, item)));
 
                     return;
                 }
 
-                setAnchor(() => item);
+                anchor.set(item);
                 setSelection(gesture?.isToggling === true ? getToggled(selection, item) : [item]);
             },
             selectAll: () => {

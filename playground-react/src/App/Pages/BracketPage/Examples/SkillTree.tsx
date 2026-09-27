@@ -1,0 +1,41 @@
+import { Bracket } from "@thewaver/ss-components-react";
+import type { BracketNode } from "@thewaver/ss-components-react";
+import * as styles from "@thewaver/ss-playground-core/App/Pages/BracketPage/BracketPage.css";
+
+import { branch, computeBracketLayerHeader, renderBracketNode, seed } from "../BracketPage.const";
+import type { BracketExampleProps } from "../BracketPage.types";
+
+const NODE_SIZE = { width: 80, height: 36 };
+const TIER_NAMES = ["Tier 4", "Tier 3", "Tier 2", "Tier 1"];
+const ACROSS_HEADER_SIZE = 24;
+const DOWN_HEADER_SIZE = 56;
+const LAYER_HEADER = computeBracketLayerHeader(TIER_NAMES);
+
+const SKILLS: BracketNode<string> = branch(
+    "Adept",
+    branch("Fire", branch("Ember", seed("Spark"))),
+    branch("Frost", seed("Chill"), { value: "Blizzard", isDisabled: true }),
+);
+
+type Props = BracketExampleProps;
+
+export const SkillTreeExample = (props: Props) => {
+    return (
+        <div className={styles.board}>
+            <Bracket
+                root={SKILLS}
+                nodeSize={NODE_SIZE}
+                layerGap={props.layerGap}
+                crossGap={props.crossGap}
+                orientation={props.orientation}
+                rootSide={props.rootSide}
+                layerHeaderSize={props.orientation === "horizontal" ? ACROSS_HEADER_SIZE : DOWN_HEADER_SIZE}
+                ariaLabel={"Skills and what they unlock"}
+                onActivate={props.onActivate}
+                renderConnector={props.renderConnector}
+                renderNode={renderBracketNode}
+                renderLayerHeader={LAYER_HEADER}
+            />
+        </div>
+    );
+};

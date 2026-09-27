@@ -1,0 +1,47 @@
+import { createMemo } from "solid-js";
+
+import { TileBoard, TileBoardUtils, access } from "@thewaver/ss-components-solid";
+import * as styles from "@thewaver/ss-playground-core/App/Pages/TileBoardPage/TileBoardPage.css";
+import { Index2d } from "@thewaver/ss-utils";
+
+import { PageTileBoardMeeple, PageTileBoardTile } from "../../../StyledComponents/TileBoardContent/TileBoardContent";
+import type { TileBoardMeepleExampleProps } from "../TileBoardPage.types";
+
+type Props = TileBoardMeepleExampleProps;
+
+export const MeepleExample = ({ shape, piece, marked, ...otherProps }: Props) => {
+    const getLayout = createMemo(() =>
+        TileBoardUtils.getLayout(
+            access(shape),
+            access(otherProps.tileCount),
+            access(otherProps.tileSize),
+            access(otherProps.hasShortFirstRow),
+            access(otherProps.taper),
+        ),
+    );
+
+    return (
+        <div class={styles.meepleHost}>
+            <TileBoard
+                {...otherProps}
+                tileShape={shape}
+                computeTileAriaLabel={(tile) => `Row ${tile.row + 1}, tile ${tile.col + 1}`}
+                renderTile={(getTile, getRenderProps) => (
+                    <PageTileBoardTile
+                        renderProps={getRenderProps}
+                        isMarked={() =>
+                            Index2d.isSame(getTile(), access(piece)) ||
+                            (access(marked) ?? []).includes(Index2d.toString(getTile()))
+                        }
+                    />
+                )}
+            />
+
+            <PageTileBoardMeeple
+                center={() => TileBoardUtils.getTileCenter(access(piece), getLayout())}
+                scale={() => TileBoardUtils.getTileScale(access(piece), getLayout())}
+                tileSize={otherProps.tileSize}
+            />
+        </div>
+    );
+};

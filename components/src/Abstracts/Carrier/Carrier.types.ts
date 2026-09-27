@@ -108,3 +108,12 @@ export type CarrierZone = {
     putAt: (place: CarryPlace, carry: Carry, origin: CarryOrigin) => void;
     moveAt: (fromPlace: CarryPlace, toPlace: CarryPlace, carry: Carry) => void;
 };
+
+export type CarrierCarryState = {
+    carry: Carry;
+    from: CarrierZone;
+    fromPlace: CarryPlace;
+    to: CarrierZone;
+    toPlace: CarryPlace;
+    mode: CarryMode;
+};
