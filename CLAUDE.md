@@ -128,6 +128,13 @@ one line each, then the question. No paragraphs around it, no preamble, no recom
 narrative — the trade-offs stand side by side so they can be compared by eye. If an option is a non-starter
 it still gets listed with the reason as its con, rather than argued away in a sentence above the list.
 
+**The list says which option Claude leans towards.** Stated by the user, who missed it once the rule above had
+pushed replies into neutral lists: "you used to be more opinionated … and I liked that". The ban above is on
+narrative around the list, not on having a view. So after the options, one line names the preferred letter and
+the reason in a clause — e.g. _"Leaning A: the option name explains the scheme."_ — then the question. **Only
+when there genuinely is a lean**, the user's correction: if the options weigh the same, say nothing rather than
+inventing a preference to fill the line.
+
 **An option with no real con is not a question.** Stated by the user, after being asked to pick between passing a node's placement as a second argument — whose only con read "none worth naming" — and two weaker alternatives. If one option wins outright, it is the decision: take it, say so in a line, and move on. A pros-and-cons list is for trade-offs that exist.
 
 **Every option carries a letter in its heading** — `A`, `B`, `C`, never `1`, `2`, `3`. Asked for by the user.
@@ -301,6 +308,12 @@ across the whole tree is theirs to run, and is only ever run here when they ask 
 
 This says nothing about `tsc --noEmit` and the test runs, which answer whether the code works and are still
 worth running as the work goes.
+
+**Say when a task could be split across agents or handed to a cheaper model.** Asked for by the user. When a
+task breaks into parts that could run side by side in separate agents, or is simple enough that a smaller,
+cheaper model would do it as well, suggest it in a line before starting — what would be delegated and what it
+saves — and wait for them to take it up. It is a suggestion, not a licence: agents are still spawned only once
+they say so.
 
 **Never kill the user's processes.** No `pkill`, no killing a dev server, no stopping anything you did not
 start. They keep `npm start` running while working, and losing it interrupts them. `npm run verify:dom`
