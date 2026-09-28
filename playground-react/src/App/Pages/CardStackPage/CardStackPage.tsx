@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { CARD_STACK_DEFAULTS } from "@thewaver/ss-components-react";
-import { CardStackKnobs } from "@thewaver/ss-playground-core/App/Knobs/CardStacks.const";
+import { CardStackKnobs } from "@thewaver/ss-playground/App/Knobs/CardStacks.const";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";

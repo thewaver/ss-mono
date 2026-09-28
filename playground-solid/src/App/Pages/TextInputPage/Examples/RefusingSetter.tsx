@@ -1,9 +1,9 @@
 import { TextInput } from "@thewaver/ss-components-solid";
-import { PIN_LENGTH } from "@thewaver/ss-playground-core/App/Pages/TextInputPage/TextInputPage.const";
+import { PIN_LENGTH } from "@thewaver/ss-playground/App/Pages/TextInputPage/TextInputPage.const";
 import {
     FIELD_GAP,
     FIELD_PADDING,
-} from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import {
     PageTextFieldContent,

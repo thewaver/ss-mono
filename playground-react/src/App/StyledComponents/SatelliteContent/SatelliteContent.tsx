@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SatelliteContent/SatelliteContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SatelliteContent/SatelliteContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { PageSatelliteBadgeProps, PageSatelliteSubjectProps } from "./SatelliteContent.types";

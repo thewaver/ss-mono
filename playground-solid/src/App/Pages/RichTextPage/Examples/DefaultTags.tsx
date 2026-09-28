@@ -1,8 +1,8 @@
 import { Index } from "solid-js";
 
 import { RichText } from "@thewaver/ss-components-solid";
-import { TAG_DEFS } from "@thewaver/ss-playground-core/App/Pages/RichTextPage/RichTextPage.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/RichTextPage/RichTextPage.css";
+import { TAG_DEFS } from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.css";
 
 export const DefaultTagsExample = () => (
     <div class={styles.legendRoot}>

@@ -2,7 +2,7 @@ import type { ParentProps } from "solid-js";
 import { Show } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SelectOptionContent/SelectOptionContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectOptionContent/SelectOptionContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SelectOptionContentProps } from "./SelectOptionContent.types";

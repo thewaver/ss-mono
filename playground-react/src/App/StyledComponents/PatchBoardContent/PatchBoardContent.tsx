@@ -1,4 +1,4 @@
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/PatchBoardContent/PatchBoardContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/PatchBoardContent/PatchBoardContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { PagePatchCableProps, PagePatchNodeProps, PagePatchSocketProps } from "./PatchBoardContent.types";

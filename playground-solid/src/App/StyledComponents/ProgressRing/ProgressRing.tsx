@@ -1,5 +1,5 @@
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/ProgressRing/ProgressRing.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/ProgressRing/ProgressRing.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { ProgressRingProps } from "./ProgressRing.types";

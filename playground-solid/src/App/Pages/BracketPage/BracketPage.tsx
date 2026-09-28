@@ -7,13 +7,13 @@ import {
     BracketConnectors,
 } from "@thewaver/ss-components-solid";
 import type { BracketOrientation, BracketRootSide } from "@thewaver/ss-components-solid";
-import { BracketKnobs } from "@thewaver/ss-playground-core/App/Knobs/Brackets.const";
+import { BracketKnobs } from "@thewaver/ss-playground/App/Knobs/Brackets.const";
 import {
     CONNECTOR_FROM_COLOR,
     CONNECTOR_TO_COLOR,
     ROUTE_FROM_COLOR,
     ROUTE_TO_COLOR,
-} from "@thewaver/ss-playground-core/App/Pages/BracketPage/BracketPage.css";
+} from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";

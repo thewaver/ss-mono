@@ -46,7 +46,6 @@ export const Preview = (props: PreviewProps) => {
     const [getRootRef, setRootRef] = createSignal<HTMLElement>();
     const [getTriggerRef, setTriggerRef] = createSignal<HTMLElement>();
     const [getContentRef, setContentRef] = createSignal<HTMLElement>();
-    const [getIsAwaitingScroll, setIsAwaitingScroll] = createSignal(false);
 
     const getIsExpanded = () => expandedSignal[0]();
 
@@ -67,20 +66,24 @@ export const Preview = (props: PreviewProps) => {
         getRef: getRootRef,
     });
 
-    createEffect(on(getIsExpanded, (isExpanded) => setIsAwaitingScroll(!isExpanded), { defer: true }));
+    let isAwaitingScroll = false;
 
-    createEffect(() => {
-        if (!getIsAwaitingScroll() || !getHasTransitionFinished()) return;
+    createEffect(on(getIsExpanded, (isExpanded) => (isAwaitingScroll = !isExpanded), { defer: true }));
 
-        setIsAwaitingScroll(false);
+    createEffect(
+        on([getIsExpanded, getHasTransitionFinished], ([, hasTransitionFinished]) => {
+            if (!isAwaitingScroll || !hasTransitionFinished) return;
 
-        const root = getRootRef();
-        const trigger = getTriggerRef();
+            isAwaitingScroll = false;
 
-        if (access(props.isScrolledIntoViewOnCollapse) !== true || !root || !trigger) return;
+            const root = getRootRef();
+            const trigger = getTriggerRef();
 
-        onCleanup(CollapsibleUtils.scrollIntoView(root, trigger));
-    });
+            if (access(props.isScrolledIntoViewOnCollapse) !== true || !root || !trigger) return;
+
+            onCleanup(CollapsibleUtils.scrollIntoView(root, trigger));
+        }),
+    );
 
     const getHeight = createMemo(() =>
         PreviewUtils.computeHeight(getContentHeight(), access(props.collapsedHeight), getTransitionTarget()),

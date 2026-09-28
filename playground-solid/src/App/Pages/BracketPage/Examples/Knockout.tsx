@@ -1,6 +1,6 @@
 import { Bracket, access } from "@thewaver/ss-components-solid";
 import type { BracketNode } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/BracketPage/BracketPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
 import { branch, computeBracketLayerHeader, renderBracketNode, seed } from "../BracketPage.const";
 import type { BracketExampleProps } from "../BracketPage.types";

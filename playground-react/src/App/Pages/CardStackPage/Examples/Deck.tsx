@@ -2,7 +2,8 @@ import { useState, useSyncExternalStore } from "react";
 
 import { Button, CardStack } from "@thewaver/ss-components-react";
 import type { CardStackControls } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/CardStackPage/CardStackPage.css";
+import { computeCardTilt } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.css";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
@@ -20,7 +21,6 @@ const DIRECTION_LABELS: Record<SwipeDirection, string> = {
 
 const BOX_HEIGHT = 240;
 
-const MAX_TILT_DEGREES = 20;
 const SHOWN = 1;
 const FIRST_INDEX = 0;
 const GONE = 0;
@@ -53,7 +53,7 @@ export const DeckExample = (props: Props) => {
                         <div
                             className={styles.deckCard}
                             style={{
-                                transform: `rotate(${state.travel.x * MAX_TILT_DEGREES}deg)`,
+                                transform: `rotate(${computeCardTilt(state)}deg)`,
                                 opacity:
                                     state.leavingTo === undefined && state.returningFrom === undefined ? SHOWN : GONE,
                                 transitionDuration: `${props.transitionDurationMs}ms`,

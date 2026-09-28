@@ -1,8 +1,8 @@
 import { useState } from "react";
 
 import { Button, SpotlightHint } from "@thewaver/ss-components-react";
-import { PADDING } from "@thewaver/ss-playground-core/App/Pages/Spotlights/SpotlightTourSteps.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/Spotlights/Spotlights.css";
+import { PADDING } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightTourSteps.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/Spotlights/Spotlights.css";
 
 import { PageMeasureBox } from "../../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";

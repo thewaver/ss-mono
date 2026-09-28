@@ -1,7 +1,7 @@
 import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SplitPaneContent/SplitPaneContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SplitPaneContent/SplitPaneContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SplitPaneCompareProps, SplitPaneGutterProps } from "./SplitPaneContent.types";

@@ -2,8 +2,8 @@ import { createEffect, createMemo, createSignal } from "solid-js";
 import type { ParentProps } from "solid-js";
 
 import { ElementObserverSolidUtils, TOOLBAR_DEFAULTS } from "@thewaver/ss-components-solid";
-import { ToolbarKnobs } from "@thewaver/ss-playground-core/App/Knobs/Toolbars.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ToolbarPage/ToolbarPage.css";
+import { ToolbarKnobs } from "@thewaver/ss-playground/App/Knobs/Toolbars.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";

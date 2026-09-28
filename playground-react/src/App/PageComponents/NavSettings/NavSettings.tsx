@@ -5,8 +5,8 @@ import {
     PLAYGROUND_FRAMEWORKS,
     PLAYGROUND_FRAMEWORK_LABELS,
     toOtherFrameworkHref,
-} from "@thewaver/ss-playground-core/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
-import type { PlaygroundFramework } from "@thewaver/ss-playground-core/App/PageComponents/FrameworkSwitch/PlaygroundFramework.types";
+} from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
+import type { PlaygroundFramework } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/PlaygroundFramework.types";
 
 import {
     PageRadioSegmentContent,

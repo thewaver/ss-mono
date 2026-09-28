@@ -2,8 +2,8 @@ import { Show, createUniqueId } from "solid-js";
 import { Portal } from "solid-js/web";
 
 import { Button, SVGDefsSamples, Shape, TrackedGradientDefaults, access } from "@thewaver/ss-components-solid";
-import { NO_SAMPLE_KEY } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SVGGradients/SVGGradients.css";
+import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { TrackedGradientKnobs } from "../../../Knobs/TrackedGradients.const";

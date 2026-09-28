@@ -1,6 +1,6 @@
 import { For } from "solid-js";
 
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SVGGradients/SVGGradients.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
 
 import { TRACKED_CELLS } from "../../SVGGradients.const";
 import type { TrackedGradientExampleProps } from "../../SVGGradients.types";

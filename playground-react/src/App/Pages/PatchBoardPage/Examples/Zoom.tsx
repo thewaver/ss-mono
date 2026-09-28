@@ -1,12 +1,12 @@
 import { Button, PatchBoard } from "@thewaver/ss-components-react";
-import { PATCH_BOARD_ANNOUNCEMENTS } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
+import { PATCH_BOARD_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import {
     BOARD_HEIGHT_RATIO,
     MAX_ZOOM,
     MIN_ZOOM,
     ZOOM_STEP,
-} from "@thewaver/ss-playground-core/App/Pages/PatchBoardPage/PatchBoardPage.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/PatchBoardPage/PatchBoardPage.css";
+} from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.css";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";

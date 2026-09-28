@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import type { PatchBoardLink } from "@thewaver/ss-components-react";
 import { PATCH_BOARD_DEFAULTS } from "@thewaver/ss-components-react";
-import { PatchBoardKnobs } from "@thewaver/ss-playground-core/App/Knobs/PatchBoards.const";
+import { PatchBoardKnobs } from "@thewaver/ss-playground/App/Knobs/PatchBoards.const";
 import {
     BOARD_WIDTH,
     CHAIN_LINKS,
@@ -16,7 +16,7 @@ import {
     RACK_LINKS,
     RACK_NODES,
     STARTING_ZOOM,
-} from "@thewaver/ss-playground-core/App/Pages/PatchBoardPage/PatchBoardPage.const";
+} from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
 import { MathUtils } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { EDGE_FADER_DEFAULTS } from "@thewaver/ss-components-react";
-import { EdgeFaderKnobs } from "@thewaver/ss-playground-core/App/Knobs/EdgeFaders.const";
+import { EdgeFaderKnobs } from "@thewaver/ss-playground/App/Knobs/EdgeFaders.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";

@@ -3,7 +3,7 @@ import { Show } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
 import type { SelectGroupFlags } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SelectGroupContent/SelectGroupContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectGroupContent/SelectGroupContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SelectGroupContentProps } from "./SelectGroupContent.types";

@@ -1,12 +1,12 @@
 import { useState } from "react";
 
 import { ScrambleTextWeights, TextArea } from "@thewaver/ss-components-react";
-import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground-core/App/PageComponents/MeasureBox/MeasureBox.css";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TypewriterPage/TypewriterPage.css";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 import {
     FIELD_GAP,
     FIELD_PADDING,
-} from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { TypewriterKnobs } from "../../Knobs/Typewriters.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";

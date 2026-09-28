@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/AccordionContent/AccordionContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/AccordionContent/AccordionContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { AccordionHeaderProps, AccordionPanelProps } from "./AccordionContent.types";

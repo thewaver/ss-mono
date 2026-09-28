@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { ElementObserverSolidUtils } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
 import { ShapeConst, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
 
 import type { ParticleFieldExampleProps } from "../ParticleFieldPage.types";

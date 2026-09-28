@@ -12,7 +12,7 @@
     "dependencies": {
         "@thewaver/ss-components": "*",
         "@thewaver/ss-components-react": "*",
-        "@thewaver/ss-playground-core": "*",
+        "@thewaver/ss-playground": "*",
         "@thewaver/ss-utils": "*",
         "react": "^19.3.0",
         "react-dom": "^19.3.0",

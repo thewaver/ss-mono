@@ -4,8 +4,8 @@ import { SVGDefsSamples, TrackedGradientDefaults } from "@thewaver/ss-components
 import {
     NO_SAMPLE_KEY,
     toGroupEntriesWithNoSample,
-} from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.const";
-import type { WithNoSample } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.types";
+} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 
 import { SVGGradientKnobs } from "../../../Knobs/SVGGradients.const";
 import { TrackedGradientKnobs } from "../../../Knobs/TrackedGradients.const";

@@ -2,7 +2,7 @@ import { Show, createUniqueId } from "solid-js";
 
 import { PlacementUtils, WheelMenu, access } from "@thewaver/ss-components-solid";
 import type { PlacementRect } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/Menus/WheelMenuPage/WheelMenuPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/Menus/WheelMenuPage/WheelMenuPage.css";
 
 import { PageLayer } from "../../../../PageComponents/Layer/Layer";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";

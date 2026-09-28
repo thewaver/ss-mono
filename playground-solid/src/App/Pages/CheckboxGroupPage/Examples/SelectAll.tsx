@@ -5,8 +5,8 @@ import { Checkbox, CheckboxGroup, Label } from "@thewaver/ss-components-solid";
 import {
     GROUP_GAP,
     TOPPINGS_WITH_SOLD_OUT,
-} from "@thewaver/ss-playground-core/App/Pages/CheckboxGroupPage/CheckboxGroupPage.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/CheckboxGroupPage/CheckboxGroupPage.css";
+} from "@thewaver/ss-playground/App/Pages/CheckboxGroupPage/CheckboxGroupPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/CheckboxGroupPage/CheckboxGroupPage.css";
 
 import { PageCheckboxContent } from "../../../StyledComponents/CheckboxContent/CheckboxContent";
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";

@@ -1,5 +1,5 @@
 import type { SVGDefsColors, SVGDefsSamples } from "@thewaver/ss-components-react";
-import type { WithNoSample } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.types";
+import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 
 export type SVGGradientsPaintKind = "fill" | "stroke";
 

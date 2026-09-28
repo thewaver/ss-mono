@@ -1,5 +1,5 @@
 import { FileInput } from "@thewaver/ss-components-react";
-import { MAX_ATTACHMENT_BYTES } from "@thewaver/ss-playground-core/App/Pages/FileInputPage/FileInputPage.const";
+import { MAX_ATTACHMENT_BYTES } from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
 import { PageFileInputContent } from "../../../StyledComponents/FileInputContent/FileInputContent";
 import type { FileInputRejectingExampleProps } from "../FileInputPage.types";

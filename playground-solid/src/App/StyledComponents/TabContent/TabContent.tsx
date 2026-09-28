@@ -1,7 +1,7 @@
 import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TabContent/TabContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TabContent/TabContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { TabCellProps, TabContentProps, TabDecorationProps, TabFloaterProps } from "./TabContent.types";

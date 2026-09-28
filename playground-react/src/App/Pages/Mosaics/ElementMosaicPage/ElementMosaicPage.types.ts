@@ -1,5 +1,5 @@
 import type { MosaicSizeAnchor } from "@thewaver/ss-components-react";
-import type { PageMosaicTileDefs } from "@thewaver/ss-playground-core/App/Pages/Mosaics/MosaicTile.types";
+import type { PageMosaicTileDefs } from "@thewaver/ss-playground/App/Pages/Mosaics/MosaicTile.types";
 
 import type { MosaicSharedProps } from "../Mosaics.types";
 

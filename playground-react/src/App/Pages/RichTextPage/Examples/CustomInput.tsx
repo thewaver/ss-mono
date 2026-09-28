@@ -1,5 +1,5 @@
 import { RichText } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/RichTextPage/RichTextPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.css";
 
 type Props = {
     content: string;

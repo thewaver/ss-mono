@@ -1,5 +1,5 @@
 import { Range } from "@thewaver/ss-components-react";
-import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground-core/App/StyledComponents/RangeContent/RangeContent.css";
+import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
 
 import { PageRangeContent } from "../../../StyledComponents/RangeContent/RangeContent";
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";

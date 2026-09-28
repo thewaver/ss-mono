@@ -2,8 +2,8 @@ import type { Signal } from "solid-js";
 
 import { Scroller, access } from "@thewaver/ss-components-solid";
 import type { MaybeAccessor, ScrollerButtonPlacement } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ScrollerPage/ScrollerPage.css";
-import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground-core/App/Theme.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.css";
+import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
 import { PageScrollerButton } from "../../../PageComponents/ScrollerButton/ScrollerButton";
 import type { ScrollerExampleProps } from "../ScrollerPage.types";

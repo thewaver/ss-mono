@@ -1,5 +1,5 @@
 import type { AccessorProps, IcicleCellState } from "@thewaver/ss-components-solid";
-import type { PAGE_ICICLE_FAMILIES } from "@thewaver/ss-playground-core/App/StyledComponents/IcicleContent/IcicleContent.css";
+import type { PAGE_ICICLE_FAMILIES } from "@thewaver/ss-playground/App/StyledComponents/IcicleContent/IcicleContent.css";
 
 export type PageIcicleFamily = (typeof PAGE_ICICLE_FAMILIES)[number];
 

@@ -1,7 +1,7 @@
 import { Show } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/ColorInputContent/ColorInputContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/ColorInputContent/ColorInputContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { ColorInputContentProps } from "./ColorInputContent.types";

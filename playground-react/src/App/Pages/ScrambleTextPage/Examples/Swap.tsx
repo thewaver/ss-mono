@@ -1,8 +1,8 @@
 import { useState } from "react";
 
 import { Button, ScrambleText } from "@thewaver/ss-components-react";
-import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground-core/App/PageComponents/MeasureBox/MeasureBox.css";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ScrambleTextPage/ScrambleTextPage.css";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/ScrambleTextPage/ScrambleTextPage.css";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";

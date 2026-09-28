@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/StaircaseContent/StaircaseContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/StaircaseContent/StaircaseContent.css";
 
 import type { PageStaircaseStepProps } from "./StaircaseContent.types";
 

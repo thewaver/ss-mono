@@ -1,6 +1,6 @@
 import { MOSAIC_SIZE_ANCHORS } from "@thewaver/ss-components-react";
-import { MosaicKnobs } from "@thewaver/ss-playground-core/App/Knobs/Mosaics.const";
-import { FIELD_WIDTH } from "@thewaver/ss-playground-core/App/Pages/Mosaics/Mosaics.const";
+import { MosaicKnobs } from "@thewaver/ss-playground/App/Knobs/Mosaics.const";
+import { FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/Mosaics/Mosaics.const";
 
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";

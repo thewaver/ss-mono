@@ -1,5 +1,5 @@
 import { Breadcrumbs } from "@thewaver/ss-components-react";
-import { BREADCRUMBS_GAP, labelOf } from "@thewaver/ss-playground-core/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
+import { BREADCRUMBS_GAP, labelOf } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
 
 import {
     PageBreadcrumbContent,

@@ -8,7 +8,7 @@ import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/Pop
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
 import type { Action, Destination } from "./MenuPage.types";
 
-export * from "@thewaver/ss-playground-core/App/Pages/Menus/MenuPage/MenuActions.const";
+export * from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuActions.const";
 
 export const ACTIONS_WITH_REACHABLE: MenuItem<Action>[] = [
     { value: { name: "Cut", shortcut: "Ctrl+X" } },

@@ -1,6 +1,6 @@
 import { LightCatcher } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.css";
-import type { LightCatcherExampleProps } from "@thewaver/ss-playground-core/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.types";
+import * as styles from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.css";
+import type { LightCatcherExampleProps } from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.types";
 
 type Props = LightCatcherExampleProps;
 

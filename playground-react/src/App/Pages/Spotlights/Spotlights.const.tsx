@@ -1,6 +1,6 @@
 import { Corners } from "@thewaver/ss-components-react";
 import type { SpotlightOverlayRenderer } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/Spotlights/Spotlights.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/Spotlights/Spotlights.css";
 
 export const renderOverlay: SpotlightOverlayRenderer = (visibilityTarget, transitionDurationMs, maskStyle) => (
     <div

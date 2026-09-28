@@ -1,7 +1,7 @@
 import { For, createMemo } from "solid-js";
 
 import { TileBoard, TileBoardUtils, access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TileBoardPage/TileBoardPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/TileBoardPage/TileBoardPage.css";
 import { Index2d, Index2dString } from "@thewaver/ss-utils";
 
 import { PageTileBoardMeeple, PageTileBoardTile } from "../../../StyledComponents/TileBoardContent/TileBoardContent";

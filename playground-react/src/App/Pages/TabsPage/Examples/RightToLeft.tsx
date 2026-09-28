@@ -1,4 +1,4 @@
-import { RIGHT_TO_LEFT_TABS } from "@thewaver/ss-playground-core/App/Pages/TabsPage/TabsPage.const";
+import { RIGHT_TO_LEFT_TABS } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
 import type { TabsExampleProps } from "../TabsPage.types";
 import { RowExample } from "./Row";

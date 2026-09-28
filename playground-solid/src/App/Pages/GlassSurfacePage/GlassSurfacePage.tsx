@@ -2,15 +2,15 @@ import { For, createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { DEFAULT_GLASS_DEFS, SVGDefsSamples, TrackedGradientDefaults } from "@thewaver/ss-components-solid";
-import { GlassSurfaceKnobs } from "@thewaver/ss-playground-core/App/Knobs/GlassSurfaces.const";
+import { GlassSurfaceKnobs } from "@thewaver/ss-playground/App/Knobs/GlassSurfaces.const";
 import {
     NO_SAMPLE_KEY,
     splitEntriesIntoGroups,
     toGroupEntriesWithNoSample,
-} from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.const";
-import type { WithNoSample } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.types";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/GlassSurfacePage/GlassSurfacePage.css";
-import { BORDER_RADIUS_FULL } from "@thewaver/ss-playground-core/App/Theme.css";
+} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import * as styles from "@thewaver/ss-playground/App/Pages/GlassSurfacePage/GlassSurfacePage.css";
+import { BORDER_RADIUS_FULL } from "@thewaver/ss-playground/App/Theme.const";
 
 import { TrackedGradientKnobs } from "../../Knobs/TrackedGradients.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";

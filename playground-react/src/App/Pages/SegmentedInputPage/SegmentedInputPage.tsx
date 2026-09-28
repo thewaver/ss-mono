@@ -3,7 +3,7 @@ import { useState } from "react";
 import {
     ONE_TIME_CODE_LENGTH,
     RECOVERY_CODE_LENGTH,
-} from "@thewaver/ss-playground-core/App/Pages/SegmentedInputPage/SegmentedInputPage.const";
+} from "@thewaver/ss-playground/App/Pages/SegmentedInputPage/SegmentedInputPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { OneTimeCodeExample } from "./Examples/OneTimeCode";

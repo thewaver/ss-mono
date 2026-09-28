@@ -55,7 +55,7 @@ export const Die = (props: DieProps) => {
     }, [shownFace]);
 
     useLayoutEffect(() => {
-        if (!roller.get().isRolling) roller.rest(latest.current.shownFace);
+        roller.reshape(latest.current.shownFace);
     }, [geometry]);
 
     const [rollingStore] = useState(() => StoreUtils.create(roller.get().isRolling));

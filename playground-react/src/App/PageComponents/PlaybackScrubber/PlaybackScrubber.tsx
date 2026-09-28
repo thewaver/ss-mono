@@ -1,7 +1,7 @@
 import { useRef } from "react";
 
 import { Button, ElementObserverReactUtils, Range } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/PlaybackScrubber/PlaybackScrubber.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/PlaybackScrubber/PlaybackScrubber.css";
 
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { PageRangeContent } from "../../StyledComponents/RangeContent/RangeContent";

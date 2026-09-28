@@ -1,5 +1,5 @@
 import { SplitPane } from "@thewaver/ss-components-react";
-import { TRIPLE } from "@thewaver/ss-playground-core/App/Pages/SplitPanePage/SplitPanePage.const";
+import { TRIPLE } from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.const";
 
 import {
     PageSplitPaneBox,

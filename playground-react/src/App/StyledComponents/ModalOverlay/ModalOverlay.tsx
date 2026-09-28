@@ -1,4 +1,4 @@
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/ModalOverlay/ModalOverlay.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/ModalOverlay/ModalOverlay.css";
 
 import type { ModalOverlayProps } from "./ModalOverlay.types";
 

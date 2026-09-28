@@ -1,7 +1,7 @@
 import type { SelectItem, SelectOption } from "@thewaver/ss-components-react";
-import type { Airport, Delivery } from "@thewaver/ss-playground-core/App/Pages/SelectPage/SelectRecords.types";
+import type { Airport, Delivery } from "@thewaver/ss-playground/App/Pages/SelectPage/SelectRecords.types";
 
-export type { Airport, Delivery } from "@thewaver/ss-playground-core/App/Pages/SelectPage/SelectRecords.types";
+export type { Airport, Delivery } from "@thewaver/ss-playground/App/Pages/SelectPage/SelectRecords.types";
 
 export type SelectExampleProps = {
     valueState: readonly [string | undefined, (value: string | undefined) => void];

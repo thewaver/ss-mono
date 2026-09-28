@@ -1,16 +1,16 @@
-import { getDefaultHighlighterConfig, highlighter } from "@thewaver/ss-playground-core/shiki";
+import { getDefaultHighlighterConfig, highlighter } from "@thewaver/ss-playground/shiki";
 
 import type { SourceFile, SourceGroup } from "./SourceView.types";
 
-const CORE_PACKAGE = "@thewaver/ss-playground-core/";
-const CORE_GLOB_ROOT = "../../../../../playground-core/src/";
+const CORE_PACKAGE = "@thewaver/ss-playground/";
+const CORE_GLOB_ROOT = "../../../../../playground/src/";
 
 const APP_MODULES = import.meta.glob<string>("/src/**/*.{ts,tsx}", {
     query: "?source",
     import: "default",
 });
 
-const CORE_MODULES = import.meta.glob<string>("../../../../../playground-core/src/**/*.{ts,tsx}", {
+const CORE_MODULES = import.meta.glob<string>("../../../../../playground/src/**/*.{ts,tsx}", {
     query: "?source",
     import: "default",
 });
@@ -25,9 +25,10 @@ const SOURCE_MODULES: Record<string, () => Promise<string>> = {
 const APP_ROOT = "/src/App";
 const PAGES_ROOT = `${APP_ROOT}/Pages/`;
 const STYLED_COMPONENTS_ROOT = `${APP_ROOT}/StyledComponents/`;
-const THEME_MODULE = `${APP_ROOT}/Theme.css.ts`;
+const THEME_STEM = `${APP_ROOT}/Theme`;
 const SOURCE_EXTENSIONS = [".tsx", ".ts"];
 const SIBLING_SUFFIXES = [".types.ts", ".css.ts"];
+const FILE_KIND_ORDER = [".tsx", ".ts", ".const.ts", ".utils.ts", ".types.ts", ".css.ts"];
 const IMPORT_PATTERN = /^import\b[^;]*?["']([^"']+)["']\s*;?\s*$/gm;
 
 const SHOW_PAGE_SCAFFOLDING = true;
@@ -35,6 +36,9 @@ const SHOW_PAGE_SCAFFOLDING = true;
 const getFileName = (path: string) => path.slice(path.lastIndexOf("/") + 1);
 
 const getStem = (path: string) => path.replace(/\.tsx?$/, "").replace(/\.(const|css|types|utils)$/, "");
+
+const byFileKind = (stem: string) => (first: string, second: string) =>
+    FILE_KIND_ORDER.indexOf(first.slice(stem.length)) - FILE_KIND_ORDER.indexOf(second.slice(stem.length));
 
 const isTraversable = (path: string) => path.startsWith(STYLED_COMPONENTS_ROOT);
 
@@ -82,7 +86,7 @@ const collectImportedPaths = async (entryPath: string) => {
         for (const specifier of parseImports(await loadSource(path))) {
             const resolved = resolveSpecifier(path, specifier);
 
-            if (resolved && resolved !== THEME_MODULE) add(resolved);
+            if (resolved && getStem(resolved) !== THEME_STEM) add(resolved);
         }
     };
 
@@ -125,7 +129,7 @@ export namespace SourceViewUtils {
 
             groups.push({
                 name: getFileName(stem),
-                files: await Promise.all([...paths, ...siblings].map(toFile)),
+                files: await Promise.all([...paths, ...siblings].sort(byFileKind(stem)).map(toFile)),
                 expandedNames: paths.map(getFileName),
             });
         }

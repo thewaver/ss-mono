@@ -1,7 +1,7 @@
 import { Show } from "solid-js";
 
 import { FanMenu, access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/Menus/FanMenuPage/FanMenuPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/Menus/FanMenuPage/FanMenuPage.css";
 
 import { PageLayer } from "../../../../PageComponents/Layer/Layer";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";

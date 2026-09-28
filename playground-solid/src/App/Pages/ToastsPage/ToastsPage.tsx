@@ -9,7 +9,7 @@ import {
     Toasts,
 } from "@thewaver/ss-components-solid";
 import type { Toast, ToastsAlignment, ToastsDir, ToastsOverflow } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ToastsPage/ToastsPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.css";
 
 import { ToastKnobs } from "../../Knobs/Toasts.const";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";

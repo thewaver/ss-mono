@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { MediaQueryMonitorSolidUtils, TRAIL_DEFAULTS } from "@thewaver/ss-components-solid";
-import { TrailKnobs } from "@thewaver/ss-playground-core/App/Knobs/Trails.const";
+import { TrailKnobs } from "@thewaver/ss-playground/App/Knobs/Trails.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";

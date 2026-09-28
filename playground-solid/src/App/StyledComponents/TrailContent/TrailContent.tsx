@@ -1,5 +1,5 @@
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TrailContent/TrailContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TrailContent/TrailContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { PageTrailMarkerProps, PageTrailTrackProps, PageTrailVehicleProps } from "./TrailContent.types";

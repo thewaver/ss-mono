@@ -1,7 +1,7 @@
 import { For, createMemo, createSignal } from "solid-js";
 
 import { Button, FrameRateMonitorSolidUtils, Modal, access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/StressTest/StressTest.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/StressTest/StressTest.css";
 import { CSSUtils } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";

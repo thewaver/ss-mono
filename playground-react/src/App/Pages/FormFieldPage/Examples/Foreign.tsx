@@ -1,5 +1,5 @@
 import { FormField, FormFieldReactUtils } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/FormFieldPage/FormFieldPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.css";
 
 import {
     PageFormFieldCaption,

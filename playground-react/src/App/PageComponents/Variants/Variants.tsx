@@ -1,4 +1,4 @@
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/Variants/Variants.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/Variants/Variants.css";
 
 import { PageLayer } from "../Layer/Layer";
 import type { VariantsProps } from "./Variants.types";

@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TableOfContentsContent/TableOfContentsContent.css";
-import { themeVars } from "@thewaver/ss-playground-core/App/Theme.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TableOfContentsContent/TableOfContentsContent.css";
+import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import type { TableOfContentsContentProps } from "./TableOfContentsContent.types";
 

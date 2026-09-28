@@ -1,5 +1,5 @@
 import { EdgeFader } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/EdgeFaderPage/EdgeFaderPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/EdgeFaderPage/EdgeFaderPage.css";
 
 import type { EdgeFaderExampleProps } from "../EdgeFaderPage.types";
 

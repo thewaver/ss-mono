@@ -2,8 +2,8 @@ import { useState } from "react";
 
 import { CIRCLE_PACKING_DEFAULTS, MediaQueryMonitorReactUtils, TreemapUtils } from "@thewaver/ss-components-react";
 import type { CirclePackingNode } from "@thewaver/ss-components-react";
-import { CirclePackingKnobs } from "@thewaver/ss-playground-core/App/Knobs/CirclePackings.const";
-import { LIBRARY } from "@thewaver/ss-playground-core/App/Pages/TreemapPage/TreemapPage.const";
+import { CirclePackingKnobs } from "@thewaver/ss-playground/App/Knobs/CirclePackings.const";
+import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";

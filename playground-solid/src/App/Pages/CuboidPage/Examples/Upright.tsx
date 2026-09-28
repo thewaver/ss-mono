@@ -1,7 +1,7 @@
 import { For } from "solid-js";
 
 import { Button, CUBOID_FACES, Cuboid } from "@thewaver/ss-components-solid";
-import { computeCuboidFaceLabel } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
+import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import {

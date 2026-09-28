@@ -5,7 +5,7 @@ import {
     MAX_ROWS,
     MIN_ROWS,
     REVIEW_LIMIT,
-} from "@thewaver/ss-playground-core/App/Pages/TextAreaPage/TextAreaPage.const";
+} from "@thewaver/ss-playground/App/Pages/TextAreaPage/TextAreaPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { AutoSizingExample } from "./Examples/AutoSizing";

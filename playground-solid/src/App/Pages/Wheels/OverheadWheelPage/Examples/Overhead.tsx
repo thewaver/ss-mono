@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 
 import { Button, OverheadWheel, ProximityEffectUtils, access } from "@thewaver/ss-components-solid";
 import type { WheelController } from "@thewaver/ss-components-solid";
-import { PRIZE_WHEEL_RING, pickPrizeIndex } from "@thewaver/ss-playground-core/App/Pages/Wheels/Wheels.const";
+import { PRIZE_WHEEL_RING, pickPrizeIndex } from "@thewaver/ss-playground/App/Pages/Wheels/Wheels.const";
 
 import {
     PageWheelCenter,

@@ -1,7 +1,7 @@
 import { createEffect, createSignal } from "solid-js";
 
 import { ElementObserverSolidUtils, Trail, access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TrailPage/TrailPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.css";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageTrailMarker, PageTrailTrack } from "../../../StyledComponents/TrailContent/TrailContent";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { SVGFilterDefsFactory } from "@thewaver/ss-components-react";
-import { SVGFilterKnobs } from "@thewaver/ss-playground-core/App/Knobs/SVGFilters.const";
+import { SVGFilterKnobs } from "@thewaver/ss-playground/App/Knobs/SVGFilters.const";
 
 import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageColorField, PageNumberField } from "../../../PageComponents/Field/Field";

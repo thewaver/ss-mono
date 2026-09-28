@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { LIGHT_CATCHER_DEFAULTS } from "@thewaver/ss-components-react";
-import { LightCatcherKnobs } from "@thewaver/ss-playground-core/App/Knobs/LightCatchers.const";
+import { LightCatcherKnobs } from "@thewaver/ss-playground/App/Knobs/LightCatchers.const";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../../PageComponents/Field/Field";

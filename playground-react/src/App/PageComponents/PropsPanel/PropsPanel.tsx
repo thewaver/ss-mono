@@ -2,7 +2,7 @@ import type { PropsWithChildren } from "react";
 import { useMemo, useState } from "react";
 
 import { Button } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/PropsPanel/PropsPanel.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.css";
 
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import type { FieldResetRegistry } from "../Field/Field.context";

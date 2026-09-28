@@ -1,7 +1,7 @@
 import type { PlacementLayouts } from "@thewaver/ss-components-react";
 import { ProximityEffects } from "@thewaver/ss-components-react";
-import { NO_SAMPLE_KEY } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.const";
-import type { WithNoSample } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.types";
+import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 import type { ShapeConst } from "@thewaver/ss-utils";
 
 export namespace FormationKnobs {

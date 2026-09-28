@@ -1,6 +1,6 @@
 import { Select } from "@thewaver/ss-components-react";
 import type { SelectOption } from "@thewaver/ss-components-react";
-import * as popupStyles from "@thewaver/ss-playground-core/App/StyledComponents/PopoverSurface/PopoverSurface.css";
+import * as popupStyles from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageSelectContent, computePageSelectTextStyle } from "../../../StyledComponents/SelectContent/SelectContent";

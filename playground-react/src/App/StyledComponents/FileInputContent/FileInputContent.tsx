@@ -1,4 +1,4 @@
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/FileInputContent/FileInputContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/FileInputContent/FileInputContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { FileInputContentProps } from "./FileInputContent.types";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { Button } from "@thewaver/ss-components-react";
-import { TagInputKnobs } from "@thewaver/ss-playground-core/App/Knobs/TagInputs.const";
+import { TagInputKnobs } from "@thewaver/ss-playground/App/Knobs/TagInputs.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField } from "../../PageComponents/Field/Field";

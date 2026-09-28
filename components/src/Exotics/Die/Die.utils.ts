@@ -489,6 +489,8 @@ export namespace DieUtils {
      * the face's own rotation, announcing the face and reporting the end. A turn the owner asks for goes the same
      * way without tumbling. The owner's echo of a roll's own write is told apart from a turn it asked for, so the
      * roll is never cut short by hearing back what it wrote, whether the echo arrives at once or a render later.
+     * A change of shape part-way through such a turn starts it again from where the die is drawn, so it arrives
+     * upright on the new shape rather than snapping there or finishing on the old shape's angle.
      *
      * Frames can stop arriving in a background tab, so a timer lands the die anyway a little after the roll should
      * have ended. The functions in `opts` are read when they are needed, so they may answer differently over time.
@@ -500,6 +502,7 @@ export namespace DieUtils {
         let frameId: number | undefined;
         let starvationHandle: ReturnType<typeof setTimeout> | undefined;
         let writtenFace: number | undefined;
+        let isTurning = false;
 
         const store = StoreUtils.create<DieRollerState>(
             { orientation: IDENTITY, isRolling: false, restingFace: undefined },
@@ -516,6 +519,7 @@ export namespace DieUtils {
 
             frameId = undefined;
             starvationHandle = undefined;
+            isTurning = false;
         };
 
         const rest = (index: number) => {
@@ -566,6 +570,7 @@ export namespace DieUtils {
 
             starvationHandle = setTimeout(() => land(index, isRoll), durationMs + FRAME_STARVATION_SLACK_MS);
             frameId = requestAnimationFrame(advance);
+            isTurning = !isRoll;
         };
 
         const turnTo = (index: number) => {
@@ -576,6 +581,16 @@ export namespace DieUtils {
             }
 
             startTurn(index, NOTHING, false);
+        };
+
+        const reshape = (index: number) => {
+            if (store.get().isRolling) return;
+
+            if (isTurning) {
+                startTurn(index, NOTHING, false);
+            } else {
+                rest(index);
+            }
         };
 
         const roll = () => {
@@ -595,6 +610,6 @@ export namespace DieUtils {
             return true;
         };
 
-        return { get: store.get, subscribe: store.subscribe, rest, turnTo, roll, stop };
+        return { get: store.get, subscribe: store.subscribe, rest, turnTo, reshape, roll, stop };
     };
 }

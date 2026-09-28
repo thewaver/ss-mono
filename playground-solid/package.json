@@ -13,7 +13,7 @@
         "@solidjs/router": "^1.0.0",
         "@thewaver/ss-components": "*",
         "@thewaver/ss-components-solid": "*",
-        "@thewaver/ss-playground-core": "*",
+        "@thewaver/ss-playground": "*",
         "@thewaver/ss-utils": "*",
         "shiki": "^4.4.3",
         "solid-js": "^1.9.15"

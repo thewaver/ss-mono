@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 
 import { SCRATCH_CARD_DEFAULTS } from "@thewaver/ss-components-react";
-import { ScratchCardKnobs } from "@thewaver/ss-playground-core/App/Knobs/ScratchCards.const";
+import { ScratchCardKnobs } from "@thewaver/ss-playground/App/Knobs/ScratchCards.const";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";

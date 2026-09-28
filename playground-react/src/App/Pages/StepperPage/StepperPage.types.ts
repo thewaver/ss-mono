@@ -1,5 +1,5 @@
 import type { Step } from "@thewaver/ss-components-react";
-import type { StepValue } from "@thewaver/ss-playground-core/App/Pages/StepperPage/StepperSteps.types";
+import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.types";
 
 import type { PageStepState } from "../../StyledComponents/StepContent/StepContent.types";
 

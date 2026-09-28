@@ -8,7 +8,7 @@ import {
     Popover,
     PopupTrigger,
 } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/HoverCardPage/HoverCardPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/HoverCardPage/HoverCardPage.css";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { PageLayer } from "../../../PageComponents/Layer/Layer";

@@ -1,7 +1,7 @@
 import { useId } from "react";
 
 import { SunburstUtils } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SunburstContent/SunburstContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SunburstContent/SunburstContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { PageSunburstArcProps, PageSunburstHubProps } from "./SunburstContent.types";

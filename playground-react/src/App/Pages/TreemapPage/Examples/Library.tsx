@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 
 import { Button, Treemap, TreemapUtils } from "@thewaver/ss-components-react";
-import { LIBRARY, formatLines } from "@thewaver/ss-playground-core/App/Pages/TreemapPage/TreemapPage.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TreemapPage/TreemapPage.css";
+import { LIBRARY, formatLines } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.css";
 
 import { PageTreemapBar, PageTreemapTile } from "../../../StyledComponents/TreemapContent/TreemapContent";
 import type { TreemapExampleProps } from "../TreemapPage.types";

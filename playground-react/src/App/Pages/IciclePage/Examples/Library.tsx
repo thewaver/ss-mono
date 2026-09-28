@@ -1,8 +1,8 @@
 import { Icicle, TreemapUtils } from "@thewaver/ss-components-react";
 import type { IcicleNode } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/IciclePage/IciclePage.css";
-import { LIBRARY, formatLines } from "@thewaver/ss-playground-core/App/Pages/TreemapPage/TreemapPage.const";
-import { PAGE_ICICLE_FAMILIES } from "@thewaver/ss-playground-core/App/StyledComponents/IcicleContent/IcicleContent.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/IciclePage/IciclePage.css";
+import { LIBRARY, formatLines } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
+import { PAGE_ICICLE_FAMILIES } from "@thewaver/ss-playground/App/StyledComponents/IcicleContent/IcicleContent.css";
 
 import { PageIcicleCell } from "../../../StyledComponents/IcicleContent/IcicleContent";
 import type { IcicleExampleProps } from "../IciclePage.types";

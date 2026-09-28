@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Button, ScratchCard } from "@thewaver/ss-components-react";
 import type { ScratchCardController } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.css";
 
 import { PageMeasureBox } from "../../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";

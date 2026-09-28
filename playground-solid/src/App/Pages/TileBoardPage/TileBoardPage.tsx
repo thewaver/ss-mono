@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { TILE_BOARD_DEFAULTS, TileBoardUtils } from "@thewaver/ss-components-solid";
-import { TileBoardKnobs } from "@thewaver/ss-playground-core/App/Knobs/TileBoards.const";
+import { TileBoardKnobs } from "@thewaver/ss-playground/App/Knobs/TileBoards.const";
 import { Index2d, type Index2dString, ShapeConst } from "@thewaver/ss-utils";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";

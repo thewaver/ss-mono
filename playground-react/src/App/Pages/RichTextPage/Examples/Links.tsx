@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 
 import { RichText } from "@thewaver/ss-components-react";
-import { toOwnAppHref } from "@thewaver/ss-playground-core/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
-import { LINKS_CONTENT } from "@thewaver/ss-playground-core/App/Pages/RichTextPage/RichTextPage.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/RichTextPage/RichTextPage.css";
+import { toOwnAppHref } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
+import { LINKS_CONTENT } from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.css";
 
 const LINK_ATTRIBUTES = { a: ["href"] };
 

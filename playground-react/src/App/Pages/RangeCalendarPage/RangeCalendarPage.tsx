@@ -2,13 +2,13 @@ import { useMemo, useState } from "react";
 
 import type { DateValue, DateValueCalendarId, DateValueRange, DateValueWeekStart } from "@thewaver/ss-components-react";
 import { CALENDAR_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-react";
-import { RangeCalendarKnobs } from "@thewaver/ss-playground-core/App/Knobs/RangeCalendars.const";
+import { RangeCalendarKnobs } from "@thewaver/ss-playground/App/Knobs/RangeCalendars.const";
 import {
     MAX_DATE,
     MIN_DATE,
     TODAY,
     WEEK_START_LABELS,
-} from "@thewaver/ss-playground-core/App/Pages/CalendarPage/CalendarPage.const";
+} from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageSelectField } from "../../PageComponents/Field/Field";

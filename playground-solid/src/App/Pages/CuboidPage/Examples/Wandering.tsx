@@ -2,7 +2,7 @@ import { createEffect, onCleanup } from "solid-js";
 
 import type { CuboidFace } from "@thewaver/ss-components-solid";
 import { Cuboid, CuboidUtils, access } from "@thewaver/ss-components-solid";
-import { computeCuboidFaceLabel } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
+import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import { ObjectUtils } from "@thewaver/ss-utils";
 
 import { PageCuboidFace, PageCuboidStack } from "../../../StyledComponents/CuboidContent/CuboidContent";

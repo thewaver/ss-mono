@@ -2,8 +2,8 @@ import { useState } from "react";
 
 import { ICICLE_DEFAULTS, MediaQueryMonitorReactUtils, TreemapUtils } from "@thewaver/ss-components-react";
 import type { IcicleNode } from "@thewaver/ss-components-react";
-import { IcicleKnobs } from "@thewaver/ss-playground-core/App/Knobs/Icicles.const";
-import { LIBRARY } from "@thewaver/ss-playground-core/App/Pages/TreemapPage/TreemapPage.const";
+import { IcicleKnobs } from "@thewaver/ss-playground/App/Knobs/Icicles.const";
+import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";

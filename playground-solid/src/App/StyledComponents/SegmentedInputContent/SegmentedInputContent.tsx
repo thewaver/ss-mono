@@ -1,6 +1,6 @@
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SegmentedInputContent/SegmentedInputContent.css";
-import * as fieldStyles from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SegmentedInputContent/SegmentedInputContent.css";
+import * as fieldStyles from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SegmentedInputCellProps } from "./SegmentedInputContent.types";

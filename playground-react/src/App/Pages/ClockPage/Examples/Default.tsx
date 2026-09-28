@@ -1,6 +1,6 @@
 import { Clock } from "@thewaver/ss-components-react";
 import type { ClockSteps } from "@thewaver/ss-components-react";
-import { LOCALE } from "@thewaver/ss-playground-core/App/Pages/DatePickerPage/DatePickerPage.const";
+import { LOCALE } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import {

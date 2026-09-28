@@ -1,7 +1,7 @@
 import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/LabelCaption/LabelCaption.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/LabelCaption/LabelCaption.css";
 
 import type { PageLabelCaptionProps } from "./LabelCaption.types";
 

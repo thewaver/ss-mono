@@ -2,8 +2,8 @@ import { For, createSignal } from "solid-js";
 
 import { Button, FLIP_CARD_TURN_DIRECTIONS, FlipCard, Range, access } from "@thewaver/ss-components-solid";
 import type { FlipCardAxis, FlipCardTurnDirection } from "@thewaver/ss-components-solid";
-import { computeFlipCardFaceLabel } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/FlipCardPage/FlipCardPage.css";
+import { computeFlipCardFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/FlipCardPage/FlipCardPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import {

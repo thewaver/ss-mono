@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/Ripple/Ripple.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/Ripple/Ripple.css";
 
 import type { RippleMark, RippleProps } from "./Ripple.types";
 

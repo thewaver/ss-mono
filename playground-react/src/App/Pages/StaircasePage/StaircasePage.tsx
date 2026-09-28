@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import { STAIRCASE_DEFAULTS, STAIRCASE_DIRS, StaircaseIndents } from "@thewaver/ss-components-react";
 import type { StaircaseDir } from "@thewaver/ss-components-react";
-import { StaircaseKnobs } from "@thewaver/ss-playground-core/App/Knobs/Staircases.const";
+import { StaircaseKnobs } from "@thewaver/ss-playground/App/Knobs/Staircases.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";

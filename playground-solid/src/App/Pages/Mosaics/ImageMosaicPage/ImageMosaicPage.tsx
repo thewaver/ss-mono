@@ -1,9 +1,9 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import { ImageMosaicKnobs } from "@thewaver/ss-playground-core/App/Knobs/ImageMosaics.const";
-import { MosaicImages } from "@thewaver/ss-playground-core/App/Pages/Mosaics/ImageMosaicPage/MosaicImages.const";
-import { FIELD_WIDTH, MOSAIC_EXTENT } from "@thewaver/ss-playground-core/App/Pages/Mosaics/Mosaics.const";
+import { ImageMosaicKnobs } from "@thewaver/ss-playground/App/Knobs/ImageMosaics.const";
+import { MosaicImages } from "@thewaver/ss-playground/App/Pages/Mosaics/ImageMosaicPage/MosaicImages.const";
+import { FIELD_WIDTH, MOSAIC_EXTENT } from "@thewaver/ss-playground/App/Pages/Mosaics/Mosaics.const";
 
 import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../../PageComponents/Examples/Examples";

@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { Button, Modal } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ModalPage/ModalPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/ModalPage/ModalPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageModalOverlay } from "../../../StyledComponents/ModalOverlay/ModalOverlay";

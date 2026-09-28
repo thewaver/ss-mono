@@ -1,5 +1,5 @@
 import { ImageMosaic } from "@thewaver/ss-components-react";
-import { MosaicImages } from "@thewaver/ss-playground-core/App/Pages/Mosaics/ImageMosaicPage/MosaicImages.const";
+import { MosaicImages } from "@thewaver/ss-playground/App/Pages/Mosaics/ImageMosaicPage/MosaicImages.const";
 
 import { PageMosaicLink } from "../../../../StyledComponents/MosaicContent/MosaicContent";
 import type { ImagesExampleProps } from "../ImageMosaicPage.types";

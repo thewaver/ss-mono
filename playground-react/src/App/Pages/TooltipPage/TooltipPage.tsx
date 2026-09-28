@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import type { AnchorHPlacement, AnchorVPlacement } from "@thewaver/ss-components-react";
 import { ANCHOR_H_PLACEMENTS, ANCHOR_V_PLACEMENTS, TOOLTIP_DEFAULTS } from "@thewaver/ss-components-react";
-import { TooltipKnobs } from "@thewaver/ss-playground-core/App/Knobs/Tooltips.const";
+import { TooltipKnobs } from "@thewaver/ss-playground/App/Knobs/Tooltips.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";

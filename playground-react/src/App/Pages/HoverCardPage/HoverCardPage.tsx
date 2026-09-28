@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 
 import { HOVER_CARD_DEFAULTS } from "@thewaver/ss-components-react";
-import { HoverCardKnobs } from "@thewaver/ss-playground-core/App/Knobs/HoverCards.const";
+import { HoverCardKnobs } from "@thewaver/ss-playground/App/Knobs/HoverCards.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";

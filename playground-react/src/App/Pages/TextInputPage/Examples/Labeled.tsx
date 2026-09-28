@@ -2,7 +2,7 @@ import { Label, TextInput } from "@thewaver/ss-components-react";
 import {
     FIELD_GAP,
     FIELD_PADDING,
-} from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";
 import {

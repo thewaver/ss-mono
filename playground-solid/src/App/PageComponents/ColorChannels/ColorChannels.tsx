@@ -4,7 +4,7 @@ import { Radio, RadioGroup, TextInput } from "@thewaver/ss-components-solid";
 import {
     FIELD_GAP,
     FIELD_PADDING,
-} from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 import { Color } from "@thewaver/ss-utils";
 
 import {

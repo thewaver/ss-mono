@@ -1,8 +1,9 @@
 import type { ParentProps } from "solid-js";
 
 import { GlassSurface, access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TooltipContent/TooltipContent.css";
-import { BORDER_RADIUS_FULL, themeVars } from "@thewaver/ss-playground-core/App/Theme.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.css";
+import { BORDER_RADIUS_FULL } from "@thewaver/ss-playground/App/Theme.const";
+import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 import { CSSUtils } from "@thewaver/ss-utils";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";

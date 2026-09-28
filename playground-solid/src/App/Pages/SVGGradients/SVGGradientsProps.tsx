@@ -1,7 +1,7 @@
 import { For } from "solid-js";
 
 import type { SVGDefsColors } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SVGGradients/SVGGradients.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
 
 import { SVGGradientKnobs } from "../../Knobs/SVGGradients.const";
 import { PageColorField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";

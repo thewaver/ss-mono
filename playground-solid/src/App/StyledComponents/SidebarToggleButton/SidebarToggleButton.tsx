@@ -1,7 +1,7 @@
 import { splitProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SidebarToggleButton/SidebarToggleButton.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SidebarToggleButton/SidebarToggleButton.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SidebarToggleButtonProps } from "./SidebarToggleButton.types";

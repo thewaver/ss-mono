@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { HOVER_CARD_DEFAULTS } from "@thewaver/ss-components-solid";
-import { HoverCardKnobs } from "@thewaver/ss-playground-core/App/Knobs/HoverCards.const";
+import { HoverCardKnobs } from "@thewaver/ss-playground/App/Knobs/HoverCards.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";

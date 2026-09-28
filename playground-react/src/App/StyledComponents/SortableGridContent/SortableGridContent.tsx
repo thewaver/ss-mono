@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 
 import type { SortableGridGeometry } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SortableGridContent/SortableGridContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SortableGridContent/SortableGridContent.css";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { useLayerClass } from "../Layer/Layer.context";

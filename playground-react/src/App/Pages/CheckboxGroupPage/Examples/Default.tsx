@@ -1,5 +1,5 @@
 import { Checkbox, CheckboxGroup, Label } from "@thewaver/ss-components-react";
-import { GROUP_GAP, TOPPINGS } from "@thewaver/ss-playground-core/App/Pages/CheckboxGroupPage/CheckboxGroupPage.const";
+import { GROUP_GAP, TOPPINGS } from "@thewaver/ss-playground/App/Pages/CheckboxGroupPage/CheckboxGroupPage.const";
 
 import { PageCheckboxContent } from "../../../StyledComponents/CheckboxContent/CheckboxContent";
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";

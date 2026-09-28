@@ -2,7 +2,7 @@ import { useId } from "react";
 
 import { PlacementUtils, WheelMenu } from "@thewaver/ss-components-react";
 import type { PlacementRect } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/Menus/WheelMenuPage/WheelMenuPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/Menus/WheelMenuPage/WheelMenuPage.css";
 
 import { PageLayer } from "../../../../PageComponents/Layer/Layer";
 import { PageMenuTriggerContent } from "../../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";

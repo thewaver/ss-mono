@@ -7,9 +7,9 @@ import {
     computeNoSampleDefs,
     splitEntriesIntoGroups,
     toGroupEntriesWithNoSample,
-} from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.const";
-import type { WithNoSample } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.types";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ShapePage/ShapePage.css";
+} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 

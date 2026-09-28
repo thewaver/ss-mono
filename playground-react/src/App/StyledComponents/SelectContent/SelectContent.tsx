@@ -1,9 +1,9 @@
 import type { PropsWithChildren } from "react";
 
 import type { InteractionFlags, SelectFlags, TextFieldTextStyle } from "@thewaver/ss-components-react";
-import { layerVars } from "@thewaver/ss-playground-core/App/StyledComponents/Layer/Layer.css";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SelectContent/SelectContent.css";
-import { themeVars } from "@thewaver/ss-playground-core/App/Theme.css";
+import { layerVars } from "@thewaver/ss-playground/App/StyledComponents/Layer/Layer.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SelectContent/SelectContent.css";
+import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SelectContentProps } from "./SelectContent.types";

@@ -24,7 +24,7 @@ _"One repo, three packages"_ for why and for what that changes.
 - **`components/src`** — the published library's framework-free core, `@thewaver/ss-components`, with
   `components-solid/src` and `components-react/src` beside it holding each framework's views
   (_"Porting: the three packages"_). These are the trees with a support contract (see _"Compatibility arguments"_).
-- **`playground-solid/src` and `playground-react/src`**, over the shared **`playground-core/src`** — the demo app,
+- **`playground-solid/src` and `playground-react/src`**, over the shared **`playground/src`** — the demo app,
   once per framework (_"Porting: the Playground in two frameworks"_). What follows was written of the one Solid
   Playground and holds for each. `App/StyledComponents` holds paint and nothing else, mostly
   consumer-side painters named `<LibComponent>Content` after the shell whose slot it fills, with the
@@ -257,6 +257,14 @@ would do the same through a second runner and more packages, for nothing Playwri
 gallery is a test fixture rather than a demo: nobody is meant to browse it, which is what keeps it from being the
 separate React app the paragraph above rejected.
 
+**The gallery is gone, retired whole.** Once both Playgrounds existed the plan was to delete its specs one at a
+time as the Playground specs, now run against both apps, came to cover each; the user threw the lot out at once
+instead — `components-react/gallery`, `e2e/react`, the `react` Playwright project and the dev server it ran on. The
+React views are tested through the React Playground from here on. **One thing went with it:** the gallery ran on a
+development server under `StrictMode`, so every React effect was set up, torn down and set up again under test. The
+React Playground renders under `StrictMode` too, but the specs run against its production build, where React does
+not do that.
+
 **The port starts from `Abstracts/`, bottom up, rather than from a component.** The user's call, over a first
 port of `Tabs` — which turned out to reach twenty-three folders and about 6,400 lines, because it sits on
 `InteractionWrapper` and that sits on `Tooltip`, `Popover`'s positioning and `Viewport`. Starting at the bottom
@@ -286,11 +294,11 @@ Derived when `Navigator` and `ElementFader` were converted, and meant to be copi
   in `components-react/src/Utils/storeUtils.ts` over `useSyncExternalStore`. Both take a `select` so a component
   follows one field, which is the answer to Solid's granularity cost recorded above.
 - **`components/src/index.ts` is the framework-free barrel.** Both framework packages' TypeScript paths and Vite
-  aliases point `@thewaver/ss-components` at it. **The gallery's Vite server still refuses any `solid-js` import
-  outright**, which the package boundary now makes redundant for the core but keeps catching a slip inside
-  `components-react` itself.
+  aliases point `@thewaver/ss-components` at it. **The React Playground's Vite build refuses any `solid-js`,
+  `@solidjs/*` or `ss-components-solid` import outright**, which the package boundary makes redundant for the core
+  but keeps catching a slip inside `components-react` itself.
 - **`components-react/src` and `components-solid/src` follow `components/src`'s comment rules**: `*.utils.ts` and `Utils/` documented,
-  everything else bare. `components-react/gallery` is a test fixture and reads like `e2e/`.
+  everything else bare.
 
 **What a core takes, and what it leaves to the binding.** A function the core calls when it needs an answer —
 `getTransitionDurationMs`, `getRef` — stays a function, since both frameworks can supply one (React through a
@@ -301,7 +309,7 @@ not taken by the core at all: the binding reacts to it in its own way and calls 
 **Two things the React side found, both now true of every core.**
 
 - **A core object has to survive being stopped and started again.** React's `StrictMode` runs every effect,
-  tears it down and runs it again on mount, and the gallery renders under it for that reason. So nothing is
+  tears it down and runs it again on mount, and the React Playground renders under it for that reason. So nothing is
   disposed for good: `observe` returns a stop and can be called again, and `ElementFader`'s `cancel` rolls a
   pending fade back to the target already committed and leaves the fader usable. A one-way `dispose` left the
   remounted fade stuck, half-open, with its request already spent.
@@ -352,9 +360,10 @@ interactionFlags, element, defs)` runs during the host's render, so it calls no 
 - **Every package builds on its own and imports the others by name.** Each package's Vite build lists the other
   `@thewaver/*` packages, its framework and TanStack's `virtual-core` as external, and bundles
   `@vanilla-extract/dynamic` into `_external/` as the core always did. The React package's library build is
-  `vite.lib.config.ts`, because its `vite.config.ts` is the gallery's dev server. React is a peer at `^19`, the
-  version everything was written and tested against. Versions, the order of publishing and lifting `private` on
-  the React package are the user's.
+  `vite.lib.config.ts`, a name kept from when a `vite.config.ts` beside it served the test gallery. React is a peer at `^19`, the
+  version everything was written and tested against. Versions and lifting `private` on the React package are
+  the user's. The order is forced: the core reads `StoreUtils` from `ss-utils`, so `ss-utils` goes out first, then
+  the core, then the two framework packages.
 - **Each framework barrel starts with `export * from "@thewaver/ss-components"`.** Where the React package
   declares its own type under a name the core also exports — fourteen of them, mostly callbacks typed with React's
   events, and `DateInputEra` and `TimeInputMeridiem`, which carry values where the core's carry getters — the
@@ -368,15 +377,15 @@ interactionFlags, element, defs)` runs during the host's render, so it calls no 
 The user's calls, taken one at a time before any of it was built: two separate Playground apps rather than React
 examples mounted inside the Solid one; the Playground split in three the way the library is; one site, whose root
 is a landing page where a visitor picks a framework, with the Solid app under `/solid/` and the React app under
-`/react/`; a switch on every page that opens the same page in the other framework; and the React test gallery kept,
-each of its specs retired once the Playground spec for the same component covers what it checks.
+`/react/`; a switch on every page that opens the same page in the other framework; and the React test gallery kept for a
+while, then retired whole (_"The gallery is gone"_, above).
 
-- **`playground-core/` is `@thewaver/ss-playground-core`, private, and has no barrel.** It holds every file of the
+- **`playground/` is `@thewaver/ss-playground`, private, and has no barrel.** It holds every file of the
   old Playground that reaches nothing Solid — the stylesheets, the page data and knob settings, framework-free
   types, the assets, `shiki.ts`, the virtual-module declarations in `global.d.ts` — at the same path it had, plus the
   Vite plugins both apps load (`vite/`: the docs plugins and the `?source` loader) and the library-tree script.
   Its `exports` map is `"./*": "./src/*"`, so an app imports one file by its path,
-  `@thewaver/ss-playground-core/App/Pages/TabsPage/TabsPage.css`. A barrel would have had to invent names: the
+  `@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.css`. A barrel would have had to invent names: the
   Playground's files export `styles`-shaped modules and page constants whose names were only ever unique per folder.
 - **Which files are shared was decided by what they reach**, as for the library: a `.tsx`, a context, or anything
   importing `solid-js`, the Solid router, a Solid-only library name, or another Solid file, followed to a fixed
@@ -397,7 +406,7 @@ each of its specs retired once the Playground spec for the same component covers
   a dropdown too, also at the user's request. A root-relative link a page draws itself, such as the rich-text
   sample's, goes through `toOwnAppHref` so it stays inside its own app.
 - **The site is assembled by `npm run build:site`**: the Solid app built with base `/solid/` into `dist/solid`, the
-  React app with `/react/` into `dist/react`, and `playground-core/landing/index.html` — plain HTML, two links, as
+  React app with `/react/` into `dist/react`, and `playground/landing/index.html` — plain HTML, two links, as
   bare as the user asked — at the root. `vercel.json` serves each app's `index.html` for its own routes and sends
   every older address, from before the apps moved under a prefix, to the same page under `/solid/`.
 - **The two routers report the address differently, and the shared helpers absorb it.** React's `useLocation`
@@ -412,7 +421,7 @@ each of its specs retired once the Playground spec for the same component covers
   it can be given a slice of the turn. So it stands as a worked example of a layout of one's own — a function from a
   set of defs to boxes in fractions of the arrangement's width — giving each node the slice of its parent's turn its
   siblings leave it, depth by depth.
-- **`npm start` runs the site the way it is deployed**, asked for by the user: `playground-core/scripts/startSite.mjs`
+- **`npm start` runs the site the way it is deployed**, asked for by the user: `playground/scripts/startSite.mjs`
   starts the Solid app on 8082 under `/solid/`, the React app on 8083 under `/react/`, and a Vite server for the
   landing page on 8080 that passes `/solid` and `/react` through to them, live-reload connections included, and
   opens the browser there. So in development the addresses, the switch and the landing page are the deployed ones.
@@ -503,7 +512,7 @@ Every abstract is now split along the lines above; these are the recurring shape
 
 **Every abstract has its React side, written ahead of the components that will use it.** The user's call,
 reversing Claude's first one, which was to write each when a React component first needed it. They are in
-`components-react/src/Abstracts`, each tested through a story on the gallery page and a spec under `e2e/react`.
+`components-react/src/Abstracts`, and are tested through the React Playground's components that use them.
 `Glass`'s filter builders are the one gap, since they return markup through `Generators/`, which has no React
 side yet.
 
@@ -579,9 +588,6 @@ Taken on Claude's judgment, since the user asked for the components to be ported
   `.const.ts` and every `.types.ts` is exported whole, and holds nothing Solid since the split
   (_"The three packages"_). React never imports a Solid props type: each React component declares its own in its own
   `.types.ts`.
-- **The React gallery loads each story file only when a test mounts it, and pushes no live reloads.** Both were
-  needed once several ports were running at once: one broken story file must not stop every other story from loading,
-  and a reload pushed when any file changes destroyed the page under a test that happened to be running.
 
 ### Porting: `PlacementBox`, `PlacementItem` and `Barrel`
 
@@ -617,8 +623,7 @@ Taken on Claude's judgment, since the user asked for the components to be ported
   still inert.
 - **`initialFocusRef` is an element value, as `anchorRef` is**, and `visibilitySignal` is `visibilityState`.
 - **A story that portals needs a full-window layer**, because a dialog portaled straight into `document.body` is only
-  as tall as the body's content; the Playground's viewport supplies one for Solid, and
-  `components-react/gallery/Essentials/ModalFixtures.tsx` supplies one for the gallery.
+  as tall as the body's content; each Playground's viewport supplies one.
 
 ### Porting: the form family — `Form`, `FormField`, `FormSection`, `TextField`, `BinarySwitch` and the presets over them
 
@@ -767,7 +772,7 @@ Taken on Claude's judgment, since the user asked for the components to be ported
 - **The React menubar switches menus over two commits.** React applies a switch's close, focus and open in one commit,
   after which the old menu's focus-restore cleanup pulled focus back to the old word; so the key handler closes the menu
   and records the target, and an effect on the next pass focuses that word and opens its menu, with every cleanup run
-  first. `e2e/react/menubar.spec.ts`' Escape-after-handover case pins it.
+  first. `e2e/menubar.spec.ts`' Escape-after-handover case pins it, run against both Playgrounds.
 - **A React menu level resets its highlight, open submenu and covered flag during render when `isOpen` flips**, which
   is Solid's effect without a frame of stale highlight; a laid-out menu keeps its Escape from the dismisser with
   `stopPropagation` on the React event.
@@ -12935,14 +12940,25 @@ for one folder. The stem is therefore the file name with `.const`, `.utils`, `.t
 rule allows**: a file appears either because it was imported or because it is the stem's `.types.ts` or
 `.css.ts`. A `.utils.ts` nobody imported does not appear.
 
+**Inside a tab, files are listed by kind, not by import order.** The component first, then a plain `.ts`, the
+`.const`, the `.utils`, the `.types` and the `.css`, in both Playgrounds. The first build listed them in the
+order they were found, which is the order the example imports them — and that order belongs to the import
+sorter, not to anybody's intent: when the React port moved the page stylesheets into the shared `playground/`
+package, their imports changed from relative to package-named, sorted ahead of the types, and every listing
+flipped without a line of the source view changing. Chosen by the user over loosening the spec to accept any
+order, so that a listing reads the same whatever the imports do.
+
 **A sibling is displayed but never traversed.** A stylesheet reached only through another stylesheet is not
 followed, which is the mechanism `Theme.css` was already meant to be kept out by.
 
 **`Theme.css` is excluded by name as well, and it is the only file that is.** Settled with the user on
 , after the mechanism gave `Card` a `Theme` tab honestly — the example does import the theme by
 name. The user's reason generalizes: **the theme holds no logic that helps build the component**, it is a
-palette, and a tab of color tokens teaches a reader nothing. The exclusion is a single path constant rather
-than a pattern, so it stays a named exception rather than the start of a filter list.
+palette, and a tab of color tokens teaches a reader nothing. The exclusion is a single constant rather than a
+pattern, so it stays a named exception rather than the start of a filter list. It names the stem, `Theme`, not
+one file: the values moved into `Theme.const.ts` so the landing page's build could read them without
+vanilla-extract, and `TooltipContent` imports the radius from there, which a file-exact exclusion would have
+turned into a `Theme` tab on every page with a tooltip.
 
 **Forced: `?raw` cannot read a `.css.ts`, so the Playground's Vite config carries a nine-line plugin.** The
 vanilla-extract plugin claims every `*.css.ts` by file name and discards the query, so a stylesheet requested
@@ -16812,6 +16828,16 @@ the unsqueezed middle, and the die turned about a point off its own center and w
 pixels on a 280-pixel sphere. Found by the user on the sphere test, where a round silhouette makes any drift obvious;
 every die had it. `flex-shrink: 0` keeps the box whole and lets it overflow the frame evenly, which is harmless because the
 overflow is the box's empty corners. `e2e/die.spec.ts` checks that every face is laid out around the box's middle.
+
+**A change of shape part-way through a turn turns on to the same face of the new shape.** The roller's `reshape` is
+what both views call when the geometry changes: at rest it puts the die straight onto the face, and during a turn the
+page asked for it starts the turn again from wherever the die is drawn, towards that face's rotation on the new shape.
+The common way in is switching to a die with fewer faces than the number showing, which pulls the number back and
+changes the shape at once. Two alternatives were set aside by the user. Snapping onto the new shape, which the port
+had shipped, jumps mid-motion. Finishing the turn on the old shape's angle, which the Solid view did before the port,
+can leave the die resting crooked. Turning to whichever face of the new shape is nearest to the viewer was also
+rejected: it can land off the face the page asked for, and then the die would have to overwrite the page's own face.
+A roll is left alone — it lands where it lands, on its own schedule.
 
 ### `JSXTextParserUtils`: an inherited style is weighed against where the text lands, not against its own parent
 

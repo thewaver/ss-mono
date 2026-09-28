@@ -1,6 +1,6 @@
 import type { ToastState, ToastsDir } from "@thewaver/ss-components-react";
 import { Button } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/ToastContent/ToastContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/ToastContent/ToastContent.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
 import { PageButtonContent } from "../ButtonContent/ButtonContent";

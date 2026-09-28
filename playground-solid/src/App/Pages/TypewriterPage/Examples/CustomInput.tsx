@@ -1,4 +1,4 @@
-import { createEffect, createSignal, on } from "solid-js";
+import { createEffect, createSignal, on, onCleanup } from "solid-js";
 
 import { Typewriter, access } from "@thewaver/ss-components-solid";
 import type { AccessorProps, TypewriterController } from "@thewaver/ss-components-solid";
@@ -26,7 +26,14 @@ export const CustomInputExample = (props: Props) => {
 
     const updateContentDebounced = FunctionUtils.debounce(updateContent, 500);
 
-    createEffect(on(() => access(props.text), hasMounted ? updateContentDebounced : updateContent));
+    onCleanup(updateContentDebounced.cancel);
+
+    createEffect(
+        on(
+            () => access(props.text),
+            () => (hasMounted ? updateContentDebounced() : updateContent()),
+        ),
+    );
 
     return (
         <Typewriter

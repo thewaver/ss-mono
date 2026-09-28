@@ -2,7 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import type { CuboidController } from "@thewaver/ss-components-solid";
 import { CUBOID_DEFAULTS, CuboidUtils, MediaQueryMonitorSolidUtils } from "@thewaver/ss-components-solid";
-import { CuboidKnobs } from "@thewaver/ss-playground-core/App/Knobs/Cuboids.const";
+import { CuboidKnobs } from "@thewaver/ss-playground/App/Knobs/Cuboids.const";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";

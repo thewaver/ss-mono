@@ -2,7 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import type { CornerKey } from "@thewaver/ss-components-solid";
 import { CORNERS_DEFAULTS, CORNERS_KEYS } from "@thewaver/ss-components-solid";
-import { CornerKnobs } from "@thewaver/ss-playground-core/App/Knobs/Corners.const";
+import { CornerKnobs } from "@thewaver/ss-playground/App/Knobs/Corners.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageColorField, PageNumberField } from "../../PageComponents/Field/Field";

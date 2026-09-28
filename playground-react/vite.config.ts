@@ -6,9 +6,9 @@ import checker from "vite-plugin-checker";
 import { vanillaExtractPlugin } from "@vanilla-extract/vite-plugin";
 import react from "@vitejs/plugin-react";
 
-import { componentApi } from "../playground-core/vite/componentApi.ts";
-import { componentDependencies } from "../playground-core/vite/componentDependencies.ts";
-import { playgroundSource } from "../playground-core/vite/playgroundSource.ts";
+import { componentApi } from "../playground/vite/componentApi.ts";
+import { componentDependencies } from "../playground/vite/componentDependencies.ts";
+import { playgroundSource } from "../playground/vite/playgroundSource.ts";
 
 const fromRepo = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
@@ -48,7 +48,7 @@ export default defineConfig({
             "@thewaver/ss-components": fromRepo("../components/src/index.ts"),
             "@thewaver/ss-components-react": fromRepo("../components-react/src/index.ts"),
             "@thewaver/ss-utils": fromRepo("../utils/src/index.ts"),
-            "@thewaver/ss-playground-core": fromRepo("../playground-core/src"),
+            "@thewaver/ss-playground": fromRepo("../playground/src"),
         },
     },
     define: {

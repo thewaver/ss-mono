@@ -2,7 +2,7 @@ import { useState, useSyncExternalStore } from "react";
 
 import { Button, OverheadWheel, ProximityEffectUtils } from "@thewaver/ss-components-react";
 import type { WheelController } from "@thewaver/ss-components-react";
-import { PRIZE_WHEEL_RING, pickPrizeIndex } from "@thewaver/ss-playground-core/App/Pages/Wheels/Wheels.const";
+import { PRIZE_WHEEL_RING, pickPrizeIndex } from "@thewaver/ss-playground/App/Pages/Wheels/Wheels.const";
 
 import {
     PageWheelCenter,

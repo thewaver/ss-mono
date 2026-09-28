@@ -1,5 +1,5 @@
 import { SplitPane } from "@thewaver/ss-components-react";
-import { CRAMPED } from "@thewaver/ss-playground-core/App/Pages/SplitPanePage/SplitPanePage.const";
+import { CRAMPED } from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.const";
 
 import {
     PageSplitPaneBox,

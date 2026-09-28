@@ -1,6 +1,6 @@
 import { For } from "solid-js";
 
-import * as styles from "@thewaver/ss-playground-core/App/Pages/PreviewPage/PreviewPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/PreviewPage/PreviewPage.css";
 
 import type { PreviewExampleProps } from "../PreviewPage.types";
 import { TextExample } from "./Text";

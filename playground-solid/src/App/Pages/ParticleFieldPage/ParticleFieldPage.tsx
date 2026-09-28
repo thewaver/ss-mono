@@ -2,8 +2,8 @@ import { type Signal, createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { CellAnimationKeyframes, CellAnimationOrigins, CellAnimationWeights } from "@thewaver/ss-components-solid";
-import { ParticleFieldKnobs } from "@thewaver/ss-playground-core/App/Knobs/ParticleFields.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
+import { ParticleFieldKnobs } from "@thewaver/ss-playground/App/Knobs/ParticleFields.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
 import { type Index2d, ShapeConst } from "@thewaver/ss-utils";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";

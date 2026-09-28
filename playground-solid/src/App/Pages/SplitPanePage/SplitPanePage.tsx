@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { Button, SPLIT_PANE_DEFAULTS } from "@thewaver/ss-components-solid";
-import { SplitPaneKnobs } from "@thewaver/ss-playground-core/App/Knobs/SplitPanes.const";
+import { SplitPaneKnobs } from "@thewaver/ss-playground/App/Knobs/SplitPanes.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";

@@ -1,6 +1,6 @@
 import { Shape } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TileBoardContent/TileBoardContent.css";
-import { FOCUS_RING_WIDTH, themeVars } from "@thewaver/ss-playground-core/App/Theme.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TileBoardContent/TileBoardContent.css";
+import { FOCUS_RING_WIDTH, themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { PageTileBoardMeepleProps, PageTileBoardTileProps } from "./TileBoardContent.types";

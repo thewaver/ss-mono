@@ -1,6 +1,6 @@
 import { Tilter } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/PointerEffects/TilterPage/TilterPage.css";
-import knight from "@thewaver/ss-playground-core/App/knight_profile.webp";
+import * as styles from "@thewaver/ss-playground/App/Pages/PointerEffects/TilterPage/TilterPage.css";
+import knight from "@thewaver/ss-playground/App/knight_profile.webp";
 
 import type { TilterExampleProps } from "../TilterPageReact.types";
 

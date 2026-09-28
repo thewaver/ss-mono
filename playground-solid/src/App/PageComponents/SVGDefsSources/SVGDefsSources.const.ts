@@ -2,7 +2,7 @@ import { render } from "solid-js/web";
 
 import type { SVGDefs } from "@thewaver/ss-components-solid";
 import { SVGDefsSamples } from "@thewaver/ss-components-solid";
-import { SVGDefsUri } from "@thewaver/ss-playground-core/App/PageComponents/SVGDefsSources/SVGDefsUri.const";
+import { SVGDefsUri } from "@thewaver/ss-playground/App/PageComponents/SVGDefsSources/SVGDefsUri.const";
 import type { Size2d } from "@thewaver/ss-utils";
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg";

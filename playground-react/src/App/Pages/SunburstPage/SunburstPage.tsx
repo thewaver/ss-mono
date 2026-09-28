@@ -2,8 +2,8 @@ import { useState } from "react";
 
 import { MediaQueryMonitorReactUtils, SUNBURST_DEFAULTS, TreemapUtils } from "@thewaver/ss-components-react";
 import type { SunburstNode } from "@thewaver/ss-components-react";
-import { SunburstKnobs } from "@thewaver/ss-playground-core/App/Knobs/Sunbursts.const";
-import { LIBRARY } from "@thewaver/ss-playground-core/App/Pages/TreemapPage/TreemapPage.const";
+import { SunburstKnobs } from "@thewaver/ss-playground/App/Knobs/Sunbursts.const";
+import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";

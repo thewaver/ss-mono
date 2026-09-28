@@ -1,5 +1,5 @@
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/CodeBox/CodeBox.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/CodeBox/CodeBox.css";
 
 import type { PageCodeBoxProps } from "./CodeBox.types";
 

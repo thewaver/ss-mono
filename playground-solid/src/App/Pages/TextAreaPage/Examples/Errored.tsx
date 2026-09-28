@@ -4,11 +4,11 @@ import {
     MAX_ROWS,
     MIN_ROWS,
     REVIEW_LIMIT,
-} from "@thewaver/ss-playground-core/App/Pages/TextAreaPage/TextAreaPage.const";
+} from "@thewaver/ss-playground/App/Pages/TextAreaPage/TextAreaPage.const";
 import {
     FIELD_GAP,
     FIELD_PADDING,
-} from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import {
     PageTextFieldContent,

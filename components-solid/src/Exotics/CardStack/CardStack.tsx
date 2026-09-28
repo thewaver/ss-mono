@@ -53,6 +53,8 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
 
     const getMounted = createMemo(() => CardStackUtils.getMounted(getCards(), getTopIndex(), getMountedCount()));
 
+    const getMountedIndices = createMemo(() => getMounted().map((entry) => entry.index));
+
     const pile = CardStackUtils.createPile<T>({
         getCards,
         getTopIndex,
@@ -136,13 +138,13 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
             tabindex={0}
             onKeyDown={onKeyDown}
         >
-            <For each={getMounted()}>
-                {(entry, getDepth) => {
+            <For each={getMountedIndices()}>
+                {(index, getDepth) => {
                     const getIsTop = createMemo(() => getDepth() === TOP_DEPTH);
 
                     const getState = createMemo((): CardStackCardState<T> => ({
-                        card: entry.card,
-                        index: entry.index,
+                        card: getCards()[index],
+                        index,
                         depth: getDepth(),
                         isTop: getIsTop(),
                         ...CardStackUtils.getCardMotion(getIsTop(), getMotion()),
@@ -162,7 +164,7 @@ export const CardStack = <T,>(props: CardStackProps<T>) => {
                             aria-roledescription={
                                 access(props.cardRoleDescription) ?? CARD_STACK_DEFAULTS.cardRoleDescription
                             }
-                            aria-label={props.computeCardLabel(entry.card, entry.index)}
+                            aria-label={props.computeCardLabel(getCards()[index], index)}
                             aria-hidden={getIsTop() ? undefined : "true"}
                             inert={!getIsTop()}
                         >

@@ -1,11 +1,11 @@
 import type { TableColumn } from "@thewaver/ss-components-solid";
-import { formatPrice } from "@thewaver/ss-playground-core/App/Pages/TablePage/TableParts.const";
+import { formatPrice } from "@thewaver/ss-playground/App/Pages/TablePage/TableParts.const";
 
 import { PageTableHeader } from "../../PageComponents/TableHeader/TableHeader";
 import { PageTableCellContent } from "../../StyledComponents/TableContent/TableContent";
 import type { Part, PartColumnDefs } from "./TablePage.types";
 
-export * from "@thewaver/ss-playground-core/App/Pages/TablePage/TableParts.const";
+export * from "@thewaver/ss-playground/App/Pages/TablePage/TableParts.const";
 
 export const createPartColumns = (defs: PartColumnDefs): TableColumn<Part>[] => [
     {

@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { SVGFilterDefs, SVGFilterDefsFactory } from "@thewaver/ss-components-react";
 import type { SVGDisplacementChannel } from "@thewaver/ss-components-react";
-import { SVGFilterKnobs } from "@thewaver/ss-playground-core/App/Knobs/SVGFilters.const";
+import { SVGFilterKnobs } from "@thewaver/ss-playground/App/Knobs/SVGFilters.const";
 
 import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageNumberField, PageSelectField } from "../../../PageComponents/Field/Field";

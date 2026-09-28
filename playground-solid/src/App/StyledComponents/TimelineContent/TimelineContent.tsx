@@ -1,7 +1,7 @@
 import { For, Show } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TimelineContent/TimelineContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type {

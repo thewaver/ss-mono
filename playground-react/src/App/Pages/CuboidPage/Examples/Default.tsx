@@ -1,5 +1,5 @@
 import { Button, Cuboid } from "@thewaver/ss-components-react";
-import { computeCuboidFaceLabel } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
+import { computeCuboidFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageCuboidFace, PageCuboidPad, PageCuboidStack } from "../../../StyledComponents/CuboidContent/CuboidContent";

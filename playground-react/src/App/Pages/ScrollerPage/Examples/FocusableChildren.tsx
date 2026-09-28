@@ -1,6 +1,6 @@
 import { Button, Scroller } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ScrollerPage/ScrollerPage.css";
-import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground-core/App/Theme.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.css";
+import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
 import { PageScrollerButton } from "../../../PageComponents/ScrollerButton/ScrollerButton";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";

@@ -2,7 +2,7 @@ import type { TreeNode } from "@thewaver/ss-components-react";
 
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
 
-export * from "@thewaver/ss-playground-core/App/Pages/TreePage/TreeNodes.const";
+export * from "@thewaver/ss-playground/App/Pages/TreePage/TreeNodes.const";
 
 export const FILES_WITH_REACHABLE: TreeNode<string>[] = [
     {

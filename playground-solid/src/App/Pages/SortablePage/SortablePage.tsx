@@ -1,8 +1,8 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { SortableItem } from "@thewaver/ss-components-solid";
-import { BOARD, CHEAP_ONLY, HAND, QUEUE } from "@thewaver/ss-playground-core/App/Pages/SortablePage/SortablePage.const";
-import type { Card } from "@thewaver/ss-playground-core/App/Pages/SortablePage/SortablePage.types";
+import { BOARD, CHEAP_ONLY, HAND, QUEUE } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.const";
+import type { Card } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.types";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageSortableRoom } from "../../StyledComponents/SortableContent/SortableContent";

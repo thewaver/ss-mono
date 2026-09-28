@@ -1,12 +1,12 @@
 import { Show } from "solid-js";
 
 import { CAROUSEL_ORIENTATIONS } from "@thewaver/ss-components-solid";
-import { CarouselKnobs } from "@thewaver/ss-playground-core/App/Knobs/Carousels.const";
+import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
 import {
     FIELD_WIDTH,
     ORIENTATION_FIELD_WIDTH,
     ORIENTATION_LABELS,
-} from "@thewaver/ss-playground-core/App/Pages/Carousels/Carousels.const";
+} from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
 
 import { PageCheckField, PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";
 import { PageProp } from "../../PageComponents/Prop/Prop";

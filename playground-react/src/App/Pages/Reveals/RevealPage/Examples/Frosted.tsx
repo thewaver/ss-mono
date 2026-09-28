@@ -1,5 +1,5 @@
 import { Reveal } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/Reveals/RevealPage/RevealPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.css";
 
 import type { RevealExampleProps } from "../RevealExample.types";
 

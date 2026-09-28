@@ -8,8 +8,8 @@
             "@thewaver/ss-components": ["../components/src/index.ts"],
             "@thewaver/ss-components-react": ["../components-react/src/index.ts"],
             "@thewaver/ss-utils": ["../utils/src/index.ts"],
-            "@thewaver/ss-playground-core/*": ["../playground-core/src/*"]
+            "@thewaver/ss-playground/*": ["../playground/src/*"]
         }
     },
-    "include": ["src", "../playground-core/src/global.d.ts", "vite.config.ts"]
+    "include": ["src", "../playground/src/global.d.ts", "vite.config.ts"]
 }

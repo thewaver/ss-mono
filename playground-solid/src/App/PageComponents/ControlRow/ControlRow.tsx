@@ -1,6 +1,6 @@
 import type { ParentProps } from "solid-js";
 
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/ControlRow/ControlRow.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/ControlRow/ControlRow.css";
 
 export const PageControlRow = (props: ParentProps) => <div class={styles.controlRow}>{props.children}</div>;
 

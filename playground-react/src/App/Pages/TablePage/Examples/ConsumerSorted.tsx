@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import type { TableColumn, TableSort } from "@thewaver/ss-components-react";
 import { Table } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TablePage/TablePage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import { PageTableHeader } from "../../../PageComponents/TableHeader/TableHeader";
 import { PageTableCellContent } from "../../../StyledComponents/TableContent/TableContent";

@@ -54,13 +54,7 @@ export const Die = (props: DieProps) => {
         }),
     );
 
-    createComputed(
-        on(getGeometry, () => {
-            if (untrack(getIsRolling)) return;
-
-            roller.rest(untrack(getShownFace));
-        }),
-    );
+    createComputed(on(getGeometry, () => roller.reshape(untrack(getShownFace))));
 
     onMount(() => {
         LiveAnnouncerUtils.reserve("polite");

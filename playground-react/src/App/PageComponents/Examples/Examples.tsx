@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 
 import { Button, Modal } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/Examples/Examples.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/Examples/Examples.css";
 import { CSSUtils } from "@thewaver/ss-utils";
 
 import { PageModalOverlay } from "../../StyledComponents/ModalOverlay/ModalOverlay";

@@ -2,8 +2,9 @@ import { For, Show, createSignal } from "solid-js";
 
 import { Button, CardStack } from "@thewaver/ss-components-solid";
 import type { CardStackControls } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/CardStackPage/CardStackPage.css";
-import type { CardStackDeckExampleProps } from "@thewaver/ss-playground-core/App/Pages/CardStackPage/CardStackPage.types";
+import { computeCardTilt } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.css";
+import type { CardStackDeckExampleProps } from "@thewaver/ss-playground/App/Pages/CardStackPage/CardStackPage.types";
 import type { SwipeDirection } from "@thewaver/ss-utils";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
@@ -20,7 +21,6 @@ const DIRECTION_LABELS: Record<SwipeDirection, string> = {
 
 const BOX_HEIGHT = 240;
 
-const MAX_TILT_DEGREES = 20;
 const SHOWN = 1;
 const FIRST_INDEX = 0;
 const GONE = 0;
@@ -47,7 +47,7 @@ export const DeckExample = (props: Props) => {
                         <div
                             class={styles.deckCard}
                             style={{
-                                "transform": `rotate(${getState().travel.x * MAX_TILT_DEGREES}deg)`,
+                                "transform": `rotate(${computeCardTilt(getState())}deg)`,
                                 "opacity":
                                     getState().leavingTo === undefined && getState().returningFrom === undefined
                                         ? SHOWN

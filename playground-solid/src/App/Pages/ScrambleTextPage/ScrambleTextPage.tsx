@@ -6,7 +6,7 @@ import {
     ScrambleTextGlyphs,
     ScrambleTextWeights,
 } from "@thewaver/ss-components-solid";
-import { ScrambleTextKnobs } from "@thewaver/ss-playground-core/App/Knobs/ScrambleTexts.const";
+import { ScrambleTextKnobs } from "@thewaver/ss-playground/App/Knobs/ScrambleTexts.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";

@@ -1,7 +1,7 @@
 import { Show } from "solid-js";
 
 import { Select, access } from "@thewaver/ss-components-solid";
-import * as popupStyles from "@thewaver/ss-playground-core/App/StyledComponents/PopoverSurface/PopoverSurface.css";
+import * as popupStyles from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageSelectContent } from "../../../StyledComponents/SelectContent/SelectContent";

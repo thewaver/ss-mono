@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 
-import { MOSAIC_EXTENT, TILES } from "@thewaver/ss-playground-core/App/Pages/Mosaics/Mosaics.const";
+import { MOSAIC_EXTENT, TILES } from "@thewaver/ss-playground/App/Pages/Mosaics/Mosaics.const";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";

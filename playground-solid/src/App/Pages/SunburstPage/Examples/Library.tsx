@@ -2,9 +2,9 @@ import { createMemo } from "solid-js";
 
 import { Button, Sunburst, TreemapUtils, access } from "@thewaver/ss-components-solid";
 import type { SunburstNode } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SunburstPage/SunburstPage.css";
-import { LIBRARY, formatLines } from "@thewaver/ss-playground-core/App/Pages/TreemapPage/TreemapPage.const";
-import { PAGE_SUNBURST_FAMILIES } from "@thewaver/ss-playground-core/App/StyledComponents/SunburstContent/SunburstContent.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/SunburstPage/SunburstPage.css";
+import { LIBRARY, formatLines } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
+import { PAGE_SUNBURST_FAMILIES } from "@thewaver/ss-playground/App/StyledComponents/SunburstContent/SunburstContent.css";
 
 import { PageSunburstArc, PageSunburstHub } from "../../../StyledComponents/SunburstContent/SunburstContent";
 import type { SunburstExampleProps } from "../SunburstPage.types";

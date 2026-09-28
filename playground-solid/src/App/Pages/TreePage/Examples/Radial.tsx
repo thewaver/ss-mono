@@ -2,7 +2,7 @@ import { For, createMemo } from "solid-js";
 
 import { Tree, access } from "@thewaver/ss-components-solid";
 import type { PlacementLayoutDefs, PlacementLayoutFn, PlacementRect, TreeNode } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TreePage/TreePage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.css";
 import { AngleUtils } from "@thewaver/ss-utils";
 
 import { PageTreeRadialNode } from "../../../StyledComponents/TreeNodeContent/TreeNodeContent";

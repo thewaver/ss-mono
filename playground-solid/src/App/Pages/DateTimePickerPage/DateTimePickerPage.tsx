@@ -2,7 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import type { DateTimeValue } from "@thewaver/ss-components-solid";
 import { DateTimeValueUtils, DateValueUtils } from "@thewaver/ss-components-solid";
-import { TODAY } from "@thewaver/ss-playground-core/App/Pages/DatePickerPage/DatePickerPage.const";
+import { TODAY } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
 import { TimeUtils } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";

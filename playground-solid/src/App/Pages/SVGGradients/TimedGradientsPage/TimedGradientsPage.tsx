@@ -5,8 +5,8 @@ import { SVGDefsSamples, TimedGradientDefaults } from "@thewaver/ss-components-s
 import {
     NO_SAMPLE_KEY,
     toGroupEntriesWithNoSample,
-} from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.const";
-import type { WithNoSample } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.types";
+} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 
 import { SVGGradientKnobs } from "../../../Knobs/SVGGradients.const";
 import { TimedGradientKnobs } from "../../../Knobs/TimedGradients.const";

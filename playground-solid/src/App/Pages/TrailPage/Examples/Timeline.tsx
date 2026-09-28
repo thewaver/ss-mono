@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 
 import { Range, Trail, accessSignal } from "@thewaver/ss-components-solid";
 import type { TrailController } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TrailPage/TrailPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.css";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageRangeContent } from "../../../StyledComponents/RangeContent/RangeContent";

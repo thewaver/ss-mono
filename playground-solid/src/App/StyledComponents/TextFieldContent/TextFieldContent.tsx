@@ -1,8 +1,8 @@
 import type { InteractionFlags, TextFieldTextStyle } from "@thewaver/ss-components-solid";
 import { access } from "@thewaver/ss-components-solid";
-import { layerVars } from "@thewaver/ss-playground-core/App/StyledComponents/Layer/Layer.css";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
-import { themeVars } from "@thewaver/ss-playground-core/App/Theme.css";
+import { layerVars } from "@thewaver/ss-playground/App/StyledComponents/Layer/Layer.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { TextFieldContentProps } from "./TextFieldContent.types";

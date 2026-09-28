@@ -2,8 +2,8 @@ import { useMemo } from "react";
 import type { ApiGroupKind, ApiTableKind } from "virtual:component-api";
 import COMPONENT_API from "virtual:component-api";
 
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/DocsView/DocsView.css";
-import { toHighlightedType } from "@thewaver/ss-playground-core/App/PageComponents/DocsView/DocsView.utils";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
+import { toHighlightedType } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
 import type { PageDocsTableProps, PageDocsViewProps } from "./DocsView.types";
 

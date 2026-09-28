@@ -35,18 +35,12 @@ const SOLID_TAG = /@solid\b/;
 const REACT_TAG = /@react\b/;
 
 /**
- * The React package's components are mounted onto a bare gallery page served by its own Vite server, through
- * Playwright's `mount` fixture. Those specs live under `e2e/react` and belong to the `react` project only.
- *
  * The Playground specs run twice, once against each Playground: `chromium` and `solo` against the Solid one,
  * `react-playground` and `react-playground-solo` against the React one, which mirrors it page for page and key for
  * key. Each build is told where the other is, so the switch on every page can be followed from one to the other.
  */
-const GALLERY_PORT = 4174;
 const REACT_PORT = 4175;
 const REACT_URL = `http://127.0.0.1:${REACT_PORT}`;
-const GALLERY_URL = `http://127.0.0.1:${GALLERY_PORT}/index.html`;
-const REACT_SPECS = "react/**";
 
 export default defineConfig({
     testDir: "./e2e",
@@ -61,13 +55,11 @@ export default defineConfig({
     projects: [
         {
             name: "chromium",
-            testIgnore: REACT_SPECS,
             grepInvert: [SOLO_TAG, REACT_TAG],
             use: { ...devices["Desktop Chrome"], viewport: WINDOW_SIZE },
         },
         {
             name: "solo",
-            testIgnore: REACT_SPECS,
             grep: SOLO_TAG,
             grepInvert: REACT_TAG,
             workers: 1,
@@ -77,29 +69,17 @@ export default defineConfig({
         },
         {
             name: "react-playground",
-            testIgnore: REACT_SPECS,
             grepInvert: [SOLO_TAG, SOLID_TAG],
             use: { ...devices["Desktop Chrome"], viewport: WINDOW_SIZE, baseURL: REACT_URL },
         },
         {
             name: "react-playground-solo",
-            testIgnore: REACT_SPECS,
             grep: SOLO_TAG,
             grepInvert: SOLID_TAG,
             workers: 1,
             fullyParallel: false,
             dependencies: ["react-playground"],
             use: { ...devices["Desktop Chrome"], viewport: WINDOW_SIZE, baseURL: REACT_URL },
-        },
-        {
-            name: "react",
-            testDir: "./e2e/react",
-            use: {
-                ...devices["Desktop Chrome"],
-                viewport: WINDOW_SIZE,
-                baseURL: GALLERY_URL,
-                serviceWorkers: "block",
-            },
         },
     ],
     /**
@@ -110,21 +90,18 @@ export default defineConfig({
      */
     webServer: [
         {
-            command: `VITE_OTHER_PLAYGROUND_URL=${REACT_URL}/ npm run build -w playground-solid && npx vite preview --config ./playground-solid/vite.config.ts --port ${PORT} --strictPort --host 127.0.0.1`,
+            command: `npm run build -w playground-solid && npx vite preview --config ./playground-solid/vite.config.ts --port ${PORT} --strictPort --host 127.0.0.1`,
+            env: { VITE_OTHER_PLAYGROUND_URL: `${REACT_URL}/` },
             url: BASE_URL,
             reuseExistingServer: !process.env.CI,
             timeout: 180_000,
         },
         {
-            command: `VITE_OTHER_PLAYGROUND_URL=${BASE_URL}/ npm run build -w playground-react && npx vite preview --config ./playground-react/vite.config.ts --port ${REACT_PORT} --strictPort --host 127.0.0.1`,
+            command: `npm run build -w playground-react && npx vite preview --config ./playground-react/vite.config.ts --port ${REACT_PORT} --strictPort --host 127.0.0.1`,
+            env: { VITE_OTHER_PLAYGROUND_URL: `${BASE_URL}/` },
             url: REACT_URL,
             reuseExistingServer: !process.env.CI,
             timeout: 180_000,
-        },
-        {
-            command: `npm run gallery -w components-react -- --port ${GALLERY_PORT} --strictPort --host 127.0.0.1`,
-            url: GALLERY_URL,
-            reuseExistingServer: !process.env.CI,
         },
     ],
 });

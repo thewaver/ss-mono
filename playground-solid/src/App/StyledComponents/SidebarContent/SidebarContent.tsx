@@ -1,7 +1,7 @@
 import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SidebarContent/SidebarContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SidebarContent/SidebarContent.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
 import type { SidebarFadeProps, SidebarFrameProps, SidebarSurfaceProps } from "./SidebarContent.types";

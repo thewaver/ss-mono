@@ -1,5 +1,5 @@
 import { Menubar } from "@thewaver/ss-components-solid";
-import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground-core/App/StyledComponents/PopoverSurface/PopoverSurface.css";
+import { POPOVER_SURFACE_INSET } from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
 import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";
 import { WORDS, renderMenubarItem, renderMenubarPopup } from "../MenubarPage.const";

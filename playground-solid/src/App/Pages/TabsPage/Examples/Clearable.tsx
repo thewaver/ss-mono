@@ -1,5 +1,5 @@
 import { Button, Tabs, access } from "@thewaver/ss-components-solid";
-import { CLEARABLE_TABS, ROW_TAB_GAP } from "@thewaver/ss-playground-core/App/Pages/TabsPage/TabsPage.const";
+import { CLEARABLE_TABS, ROW_TAB_GAP } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
 import { PageControlColumn } from "../../../PageComponents/ControlRow/ControlRow";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";

@@ -3,8 +3,8 @@ import type { JSX, ParentProps } from "solid-js";
 
 import { RichText, Tooltip, access } from "@thewaver/ss-components-solid";
 import type { AccessorProps } from "@thewaver/ss-components-solid";
-import { GLOSSARY_CONTENT } from "@thewaver/ss-playground-core/App/Pages/RichTextPage/RichTextPage.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/RichTextPage/RichTextPage.css";
+import { GLOSSARY_CONTENT } from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.css";
 
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
 

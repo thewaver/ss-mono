@@ -2,7 +2,7 @@ import { useState, useSyncExternalStore } from "react";
 
 import { Button, DrumWheel } from "@thewaver/ss-components-react";
 import type { WheelController } from "@thewaver/ss-components-react";
-import { pickPrizeIndex } from "@thewaver/ss-playground-core/App/Pages/Wheels/Wheels.const";
+import { pickPrizeIndex } from "@thewaver/ss-playground/App/Pages/Wheels/Wheels.const";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import { PageMeasureBox } from "../../../../PageComponents/MeasureBox/MeasureBox";

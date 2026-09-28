@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { FrameRateMonitorReactUtils } from "@thewaver/ss-components-react";
 import type { SelectOption } from "@thewaver/ss-components-react";
-import { SelectKnobs } from "@thewaver/ss-playground-core/App/Knobs/Selects.const";
+import { SelectKnobs } from "@thewaver/ss-playground/App/Knobs/Selects.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { AirportsExample } from "./Examples/Airports";

@@ -5,8 +5,8 @@ import type { TableOfContentsLink } from "@thewaver/ss-components-react";
 import {
     HEADING_LEVEL,
     TOC_GAP,
-} from "@thewaver/ss-playground-core/App/Pages/TableOfContentsPage/TableOfContentsPage.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TableOfContentsPage/TableOfContentsPage.css";
+} from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsPage.css";
 
 import { PageTableOfContentsContent } from "../../../StyledComponents/TableOfContentsContent/TableOfContentsContent";
 import type { TableOfContentsExampleProps } from "../TableOfContentsPage.types";

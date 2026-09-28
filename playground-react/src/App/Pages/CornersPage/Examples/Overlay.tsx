@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { Button, Corners } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/CornersPage/CornersPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import type { CornersExampleProps } from "../CornersPage.types";

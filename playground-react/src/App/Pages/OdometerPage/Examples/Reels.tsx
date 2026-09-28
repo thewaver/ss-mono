@@ -1,5 +1,5 @@
 import { Odometer, OdometerReels } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/OdometerPage/OdometerPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/OdometerPage/OdometerPage.css";
 
 import type { OdometerReelsExampleProps } from "../OdometerPage.types";
 

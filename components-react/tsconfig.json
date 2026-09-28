@@ -9,5 +9,5 @@
             "@thewaver/ss-utils": ["../utils/src/index.ts"]
         }
     },
-    "include": ["src", "gallery", "vite.config.ts", "vite.lib.config.ts"]
+    "include": ["src", "vite.lib.config.ts"]
 }

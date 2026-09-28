@@ -1,9 +1,9 @@
 import { Label, NumberInput } from "@thewaver/ss-components-solid";
-import { FIELD_WIDTH } from "@thewaver/ss-playground-core/App/Pages/NumberInputPage/NumberInputPage.const";
+import { FIELD_WIDTH } from "@thewaver/ss-playground/App/Pages/NumberInputPage/NumberInputPage.const";
 import {
     FIELD_GAP,
     FIELD_STEPPER_PADDING,
-} from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageNumberInputStepper } from "../../../PageComponents/NumberInputStepper/NumberInputStepper";
 import { PageLabelCaption } from "../../../StyledComponents/LabelCaption/LabelCaption";

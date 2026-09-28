@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 
 import { Button, Corners, access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/CornersPage/CornersPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import type { CornersExampleProps } from "../CornersPage.types";

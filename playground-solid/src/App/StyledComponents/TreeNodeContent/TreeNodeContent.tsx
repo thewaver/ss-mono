@@ -2,8 +2,8 @@ import type { ParentProps } from "solid-js";
 import { Show } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TreeNodeContent/TreeNodeContent.css";
-import { themeVars } from "@thewaver/ss-playground-core/App/Theme.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TreeNodeContent/TreeNodeContent.css";
+import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { TreeNodeContentProps, TreeNodePendingProps } from "./TreeNodeContent.types";

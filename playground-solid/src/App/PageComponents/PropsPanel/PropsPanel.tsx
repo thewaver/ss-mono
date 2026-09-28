@@ -2,7 +2,7 @@ import type { ParentProps } from "solid-js";
 import { Show, createSignal } from "solid-js";
 
 import { Button, access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/PropsPanel/PropsPanel.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/PropsPanel/PropsPanel.css";
 
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
 import { FieldResetProvider } from "../Field/Field.context";

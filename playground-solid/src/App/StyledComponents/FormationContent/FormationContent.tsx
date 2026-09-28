@@ -1,9 +1,9 @@
 import type { ParentProps } from "solid-js";
 
 import { Shape, access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/FormationContent/FormationContent.css";
-import { layerVars } from "@thewaver/ss-playground-core/App/StyledComponents/Layer/Layer.css";
-import { themeVars } from "@thewaver/ss-playground-core/App/Theme.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/FormationContent/FormationContent.css";
+import { layerVars } from "@thewaver/ss-playground/App/StyledComponents/Layer/Layer.css";
+import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 
 import { useLayerClass } from "../Layer/Layer.context";

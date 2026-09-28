@@ -1,9 +1,9 @@
 import { createSignal } from "solid-js";
 
 import { Button, SpotlightGuide, SpotlightPrompt, access } from "@thewaver/ss-components-solid";
-import { RICH_TOUR_STEPS } from "@thewaver/ss-playground-core/App/Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage.const";
-import { PADDING } from "@thewaver/ss-playground-core/App/Pages/Spotlights/SpotlightTourSteps.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/Spotlights/Spotlights.css";
+import { RICH_TOUR_STEPS } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage.const";
+import { PADDING } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightTourSteps.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/Spotlights/Spotlights.css";
 
 import { PageControlRow } from "../../../../PageComponents/ControlRow/ControlRow";
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";

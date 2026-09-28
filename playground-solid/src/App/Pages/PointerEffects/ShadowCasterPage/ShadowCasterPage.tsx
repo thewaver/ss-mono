@@ -1,8 +1,8 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { SHADOW_CASTER_DEFAULTS } from "@thewaver/ss-components-solid";
-import { ShadowCasterKnobs } from "@thewaver/ss-playground-core/App/Knobs/ShadowCasters.const";
-import type { ShadowCasterExampleProps } from "@thewaver/ss-playground-core/App/Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.types";
+import { ShadowCasterKnobs } from "@thewaver/ss-playground/App/Knobs/ShadowCasters.const";
+import type { ShadowCasterExampleProps } from "@thewaver/ss-playground/App/Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.types";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCheckField, PageColorField, PageNumberField } from "../../../PageComponents/Field/Field";

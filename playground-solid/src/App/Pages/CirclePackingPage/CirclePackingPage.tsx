@@ -2,8 +2,8 @@ import { createMemo, createSignal } from "solid-js";
 
 import { CIRCLE_PACKING_DEFAULTS, MediaQueryMonitorSolidUtils, TreemapUtils } from "@thewaver/ss-components-solid";
 import type { CirclePackingNode } from "@thewaver/ss-components-solid";
-import { CirclePackingKnobs } from "@thewaver/ss-playground-core/App/Knobs/CirclePackings.const";
-import { LIBRARY } from "@thewaver/ss-playground-core/App/Pages/TreemapPage/TreemapPage.const";
+import { CirclePackingKnobs } from "@thewaver/ss-playground/App/Knobs/CirclePackings.const";
+import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";

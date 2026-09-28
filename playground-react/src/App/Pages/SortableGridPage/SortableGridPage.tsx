@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { SortableGridUtils } from "@thewaver/ss-components-react";
 import type { SortableGridItem } from "@thewaver/ss-components-react";
-import type { Gear } from "@thewaver/ss-playground-core/App/Pages/SortableGridPage/SortableGridPage.types";
+import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { InventoryExample } from "./Examples/Inventory";

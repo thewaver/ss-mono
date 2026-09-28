@@ -114,7 +114,6 @@
     ],
     "scripts": {
         "build": "vite build --config vite.lib.config.ts && tsup src/index.ts --format esm --dts-only",
-        "gallery": "vite",
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
@@ -132,7 +131,6 @@
         "@types/react-dom": "^19.3.0",
         "@vanilla-extract/css": "^1.21.2",
         "@vanilla-extract/dynamic": "^2.1.5",
-        "@vanilla-extract/vite-plugin": "^5.2.6",
         "@vitejs/plugin-react": "^6.1.1",
         "react": "^19.3.0",
         "react-dom": "^19.3.0",

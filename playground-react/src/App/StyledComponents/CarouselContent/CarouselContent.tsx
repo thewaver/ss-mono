@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 
 import type { CarouselStep } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/CarouselContent/CarouselContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type {

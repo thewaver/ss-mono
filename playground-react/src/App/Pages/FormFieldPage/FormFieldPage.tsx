@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import type { FormFieldOrientation } from "@thewaver/ss-components-react";
 import { FORM_FIELD_DEFAULTS, FORM_FIELD_ORIENTATIONS } from "@thewaver/ss-components-react";
-import { FormFieldKnobs } from "@thewaver/ss-playground-core/App/Knobs/FormFields.const";
+import { FormFieldKnobs } from "@thewaver/ss-playground/App/Knobs/FormFields.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField, PageSelectField, PageTextField } from "../../PageComponents/Field/Field";

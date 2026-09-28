@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { Button, Corners, MediaQueryMonitorReactUtils } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/CornersPage/CornersPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPage.css";
 import { EasingUtils, MathUtils } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";

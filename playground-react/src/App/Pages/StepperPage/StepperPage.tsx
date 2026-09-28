@@ -2,9 +2,9 @@ import { useState } from "react";
 
 import { Button } from "@thewaver/ss-components-react";
 import type { Step } from "@thewaver/ss-components-react";
-import { StepperKnobs } from "@thewaver/ss-playground-core/App/Knobs/Steppers.const";
-import { LABELS, ORDER } from "@thewaver/ss-playground-core/App/Pages/StepperPage/StepperSteps.const";
-import type { StepValue } from "@thewaver/ss-playground-core/App/Pages/StepperPage/StepperSteps.types";
+import { StepperKnobs } from "@thewaver/ss-playground/App/Knobs/Steppers.const";
+import { LABELS, ORDER } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.const";
+import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.types";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField } from "../../PageComponents/Field/Field";

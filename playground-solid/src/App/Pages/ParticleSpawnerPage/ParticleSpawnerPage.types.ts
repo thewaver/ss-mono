@@ -1,7 +1,7 @@
 import type { Signal } from "solid-js";
 
 import type { AccessorProps, ParticleSpawnIterationPattern } from "@thewaver/ss-components-solid";
-import type { ParticleTravelPatternFn } from "@thewaver/ss-playground-core/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
+import type { ParticleTravelPatternFn } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
 
 export type {
     IterationPattern,
@@ -11,7 +11,7 @@ export type {
     ParticleTravelPatternFactory,
     ParticleTravelPatternFn,
     TravelEasingKey,
-} from "@thewaver/ss-playground-core/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
+} from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
 
 export type ParticleSpawnerExampleProps = AccessorProps<{
     particleCount: number;

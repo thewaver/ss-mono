@@ -1,4 +1,4 @@
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/RangeContent/RangeContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { RangeContentProps } from "./RangeContent.types";

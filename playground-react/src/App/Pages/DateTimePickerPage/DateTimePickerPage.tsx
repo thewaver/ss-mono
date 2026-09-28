@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import type { DateTimeValue } from "@thewaver/ss-components-react";
 import { DateTimeValueUtils, DateValueUtils } from "@thewaver/ss-components-react";
-import { TODAY } from "@thewaver/ss-playground-core/App/Pages/DatePickerPage/DatePickerPage.const";
+import { TODAY } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
 import { TimeUtils } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";

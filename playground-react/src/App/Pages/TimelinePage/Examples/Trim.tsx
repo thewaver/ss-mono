@@ -1,14 +1,14 @@
 import { Timeline } from "@thewaver/ss-components-react";
 import type { TimelineEdgeAnnouncements } from "@thewaver/ss-components-react";
-import type { Clip } from "@thewaver/ss-playground-core/App/Pages/TimelinePage/TimelineItems.types";
+import type { Clip } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelineItems.types";
 import {
     LANE_SIZE,
     REEL,
     SECOND_STEPS,
     TRIM_TRACKS,
     formatStopwatch,
-} from "@thewaver/ss-playground-core/App/Pages/TimelinePage/TimelinePage.const";
-import { AXIS_HEIGHT } from "@thewaver/ss-playground-core/App/StyledComponents/TimelineContent/TimelineContent.css";
+} from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
+import { AXIS_HEIGHT } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
 import {
     PageTimelineBlock,

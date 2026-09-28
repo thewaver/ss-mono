@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { PAGINATOR_DEFAULTS } from "@thewaver/ss-components-solid";
-import { PaginatorKnobs } from "@thewaver/ss-playground-core/App/Knobs/Paginators.const";
+import { PaginatorKnobs } from "@thewaver/ss-playground/App/Knobs/Paginators.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";

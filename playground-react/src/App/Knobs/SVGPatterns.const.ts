@@ -1,5 +1,5 @@
 import type { SVGDefsSamples } from "@thewaver/ss-components-react";
-import type { WithNoSample } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.types";
+import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 
 export namespace SVGPatternKnobs {
     export const MIN_CELL_SIZE = 10;

@@ -3,11 +3,11 @@ import {
     AMOUNT_STEP,
     FIELD_WIDTH,
     GERMAN_LOCALE,
-} from "@thewaver/ss-playground-core/App/Pages/NumberInputPage/NumberInputPage.const";
+} from "@thewaver/ss-playground/App/Pages/NumberInputPage/NumberInputPage.const";
 import {
     FIELD_GAP,
     FIELD_STEPPER_PADDING,
-} from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageNumberInputStepper } from "../../../PageComponents/NumberInputStepper/NumberInputStepper";
 import {

@@ -2,7 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 import { createStore } from "solid-js/store";
 
 import { SCRATCH_CARD_DEFAULTS } from "@thewaver/ss-components-solid";
-import { ScratchCardKnobs } from "@thewaver/ss-playground-core/App/Knobs/ScratchCards.const";
+import { ScratchCardKnobs } from "@thewaver/ss-playground/App/Knobs/ScratchCards.const";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";

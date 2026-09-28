@@ -1,5 +1,5 @@
 import { Preview } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/PreviewPage/PreviewPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/PreviewPage/PreviewPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import type { PreviewExampleProps } from "../PreviewPage.types";

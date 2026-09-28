@@ -11,12 +11,12 @@ import {
     TextInput,
     Toggle,
 } from "@thewaver/ss-components-react";
-import { COLOR_INPUT_LABELS } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
+import { COLOR_INPUT_LABELS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import {
     FIELD_GAP,
     FIELD_PADDING,
     FIELD_STEPPER_PADDING,
-} from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageColorInputContent } from "../../StyledComponents/ColorInputContent/ColorInputContent";
 import { PageFileInputContent } from "../../StyledComponents/FileInputContent/FileInputContent";

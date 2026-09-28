@@ -4,8 +4,8 @@ import { TABLE_OF_CONTENTS_DEFAULTS } from "@thewaver/ss-components-solid";
 import {
     OUTLINE_SECTIONS,
     SECTIONS,
-} from "@thewaver/ss-playground-core/App/Pages/TableOfContentsPage/TableOfContentsPage.const";
-import type { TableOfContentsSection } from "@thewaver/ss-playground-core/App/Pages/TableOfContentsPage/TableOfContentsSection.types";
+} from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsPage.const";
+import type { TableOfContentsSection } from "@thewaver/ss-playground/App/Pages/TableOfContentsPage/TableOfContentsSection.types";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { TableOfContentsExample } from "./Examples/TableOfContents";

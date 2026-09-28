@@ -3,7 +3,7 @@ import { Show, createSignal, createUniqueId, onCleanup } from "solid-js";
 
 import type { AnchorPlacement, DismisserReason, PopupTriggerFlags } from "@thewaver/ss-components-solid";
 import { InteractionWrapper, Popover, PopupTrigger, access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/ExampleKnobs/ExampleKnobs.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/ExampleKnobs/ExampleKnobs.css";
 
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
 import { PageLayer } from "../Layer/Layer";

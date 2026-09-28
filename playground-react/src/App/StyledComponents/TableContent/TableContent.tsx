@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 
 import type { TableSortDirection } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TableContent/TableContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type {

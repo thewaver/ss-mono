@@ -3,13 +3,13 @@ import { createMemo, createSignal } from "solid-js";
 
 import type { DateValue, DateValueCalendarId, DateValueRange, DateValueWeekStart } from "@thewaver/ss-components-solid";
 import { CALENDAR_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-solid";
-import { RangeCalendarKnobs } from "@thewaver/ss-playground-core/App/Knobs/RangeCalendars.const";
+import { RangeCalendarKnobs } from "@thewaver/ss-playground/App/Knobs/RangeCalendars.const";
 import {
     MAX_DATE,
     MIN_DATE,
     TODAY,
     WEEK_START_LABELS,
-} from "@thewaver/ss-playground-core/App/Pages/CalendarPage/CalendarPage.const";
+} from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageSelectField } from "../../PageComponents/Field/Field";

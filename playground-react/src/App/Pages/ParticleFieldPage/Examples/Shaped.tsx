@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useRef } from "react";
 
 import { ElementObserverReactUtils } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
 import { ShapeConst, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
 
 import type { ParticleFieldExampleProps } from "../ParticleFieldPage.types";

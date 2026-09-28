@@ -2,7 +2,7 @@ import { For, Show, createMemo } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
 import type { SortableGridGeometry } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SortableGridContent/SortableGridContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SortableGridContent/SortableGridContent.css";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import { useLayerClass } from "../Layer/Layer.context";

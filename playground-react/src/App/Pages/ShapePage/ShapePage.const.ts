@@ -3,7 +3,7 @@ import type { SVGDefs } from "@thewaver/ss-components-react";
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
-} from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.const";
+} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import type { ShapeExampleProps } from "./ShapePage.types";

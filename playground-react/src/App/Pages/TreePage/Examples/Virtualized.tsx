@@ -1,6 +1,6 @@
 import { Tree } from "@thewaver/ss-components-react";
 import type { TreeNode } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TreePage/TreePage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/TreePage/TreePage.css";
 
 import { PageTreeNodeContent } from "../../../StyledComponents/TreeNodeContent/TreeNodeContent";
 import type { TreeExampleProps } from "../TreePage.types";

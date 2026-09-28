@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/CalendarContent/CalendarContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/CalendarContent/CalendarContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { CalendarCaptionFieldsProps, CalendarDayProps, CalendarTitleProps } from "./CalendarContent.types";

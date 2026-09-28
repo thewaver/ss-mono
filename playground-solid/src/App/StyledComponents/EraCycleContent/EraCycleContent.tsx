@@ -1,7 +1,7 @@
 import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/EraCycleContent/EraCycleContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/EraCycleContent/EraCycleContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { EraCycleContentProps } from "./EraCycleContent.types";

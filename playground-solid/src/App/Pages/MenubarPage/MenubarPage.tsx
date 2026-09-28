@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { MenubarKnobs } from "@thewaver/ss-playground-core/App/Knobs/Menubars.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/MenubarPage/MenubarPage.css";
+import { MenubarKnobs } from "@thewaver/ss-playground/App/Knobs/Menubars.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarPage.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";

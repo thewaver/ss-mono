@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Range, Trail } from "@thewaver/ss-components-react";
 import type { TrailController } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TrailPage/TrailPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.css";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageRangeContent } from "../../../StyledComponents/RangeContent/RangeContent";

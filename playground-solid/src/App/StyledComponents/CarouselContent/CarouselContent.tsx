@@ -2,7 +2,7 @@ import type { ParentProps } from "solid-js";
 
 import type { CarouselStep } from "@thewaver/ss-components-solid";
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/CarouselContent/CarouselContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/CarouselContent/CarouselContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type {

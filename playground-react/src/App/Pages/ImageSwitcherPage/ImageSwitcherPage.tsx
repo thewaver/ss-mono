@@ -2,11 +2,11 @@ import { useState } from "react";
 
 import type { ImageSwitcherProps } from "@thewaver/ss-components-react";
 import { IMAGE_SWITCHER_DEFAULTS } from "@thewaver/ss-components-react";
-import { ImageSwitcherKnobs } from "@thewaver/ss-playground-core/App/Knobs/ImageSwitchers.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ImageSwitcherPage/ImageSwitcherPage.css";
-import type { SourceType } from "@thewaver/ss-playground-core/App/Pages/ImageSwitcherPage/ImageSwitcherPage.types";
-import knight_date from "@thewaver/ss-playground-core/App/knight_date.webp";
-import knight_profile from "@thewaver/ss-playground-core/App/knight_profile.webp";
+import { ImageSwitcherKnobs } from "@thewaver/ss-playground/App/Knobs/ImageSwitchers.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ImageSwitcherPage/ImageSwitcherPage.css";
+import type { SourceType } from "@thewaver/ss-playground/App/Pages/ImageSwitcherPage/ImageSwitcherPage.types";
+import knight_date from "@thewaver/ss-playground/App/knight_date.webp";
+import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";

@@ -51,6 +51,8 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
 
     const getCaretIndex = accessStore(player, (state) => state.caretIndex);
 
+    const getWidth = accessStore(player, (state) => state.width);
+
     const getIsErased = () => !getIsAnimating() && getIsErasing();
 
     const getStartTimesMs = createMemo(() => {
@@ -110,7 +112,7 @@ export const Typewriter = (props: ParentProps<TypewriterProps>) => {
             </div>
 
             {!!getIndexedSegments().length && (
-                <div class={styles.typewriterTextWrap} style={{ width: `${getContainerRef()?.clientWidth ?? 0}px` }}>
+                <div class={styles.typewriterTextWrap} style={{ width: `${getWidth() ?? 0}px` }}>
                     <Show when={getCaretIndex() === BEFORE_FIRST}>{props.renderCaret?.()}</Show>
 
                     <For each={getIndexedSegments()}>

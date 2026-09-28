@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 
 import { Table } from "@thewaver/ss-components-react";
-import { TABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TablePage/TablePage.css";
+import { TABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import { PageTableMarker } from "../../../StyledComponents/TableContent/TableContent";
 import { PARTS, createPartColumns } from "../TablePage.const";

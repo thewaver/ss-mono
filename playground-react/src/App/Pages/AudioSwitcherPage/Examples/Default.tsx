@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { AudioSwitcher, Button } from "@thewaver/ss-components-react";
 import type { AudioSwitcherController } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/AudioSwitcherPage/AudioSwitcherPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/AudioSwitcherPage/AudioSwitcherPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import type { AudioSwitcherExampleProps } from "../AudioSwitcherPage.types";

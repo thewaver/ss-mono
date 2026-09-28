@@ -2,13 +2,13 @@ import type { Accessor, Signal } from "solid-js";
 
 import { Sortable, access } from "@thewaver/ss-components-solid";
 import type { InteractionFlags, MaybeAccessor, SortableItem, SortableItemFlags } from "@thewaver/ss-components-solid";
-import { SORTABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
+import { SORTABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import {
     LIST_GAP,
     computeCardKey,
     computeCardLabel,
-} from "@thewaver/ss-playground-core/App/Pages/SortablePage/SortablePage.const";
-import type { Card } from "@thewaver/ss-playground-core/App/Pages/SortablePage/SortablePage.types";
+} from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.const";
+import type { Card } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.types";
 
 import {
     PageSortableItemContent,

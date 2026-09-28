@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 
 import { REVEAL_DEFAULTS } from "@thewaver/ss-components-react";
-import { RevealKnobs } from "@thewaver/ss-playground-core/App/Knobs/Reveals.const";
-import type { RevealShape } from "@thewaver/ss-playground-core/App/Pages/Reveals/RevealPage/RevealPage.types";
+import { RevealKnobs } from "@thewaver/ss-playground/App/Knobs/Reveals.const";
+import type { RevealShape } from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.types";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";

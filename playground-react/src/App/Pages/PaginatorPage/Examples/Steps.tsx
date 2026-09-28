@@ -2,7 +2,7 @@ import { Paginator } from "@thewaver/ss-components-react";
 import {
     computePaginatorPageLabel,
     computePaginatorStepLabel,
-} from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
+} from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 
 import {
     PagePaginatorDemo,

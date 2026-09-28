@@ -9,8 +9,8 @@ import {
 import {
     computeParticlePos,
     computeParticleTimeline,
-} from "@thewaver/ss-playground-core/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
+} from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ParticleFieldPage/ParticleFieldPage.css";
 
 import type { ParticleFieldExampleProps } from "../ParticleFieldPage.types";
 

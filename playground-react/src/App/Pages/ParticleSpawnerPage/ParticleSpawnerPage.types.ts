@@ -1,5 +1,5 @@
 import type { ParticleSpawnIterationPattern } from "@thewaver/ss-components-react";
-import type { ParticleTravelPatternFn } from "@thewaver/ss-playground-core/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
+import type { ParticleTravelPatternFn } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
 
 export type {
     IterationPattern,
@@ -9,7 +9,7 @@ export type {
     ParticleTravelPatternFactory,
     ParticleTravelPatternFn,
     TravelEasingKey,
-} from "@thewaver/ss-playground-core/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
+} from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPatterns.types";
 
 export type ParticleSpawnerExampleProps = {
     particleCount: number;

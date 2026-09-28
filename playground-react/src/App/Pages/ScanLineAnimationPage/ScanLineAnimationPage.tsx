@@ -25,9 +25,9 @@ import type {
     _ScanlineHorizontalSkewOpts,
     _ScanlineHorizontalWaveOpts,
 } from "@thewaver/ss-components-react";
-import { ScanlineAnimationKnobs } from "@thewaver/ss-playground-core/App/Knobs/ScanlineAnimations.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ScanLineAnimationPage/ScanlineAnimationPage.css";
-import knight from "@thewaver/ss-playground-core/App/knight.webp";
+import { ScanlineAnimationKnobs } from "@thewaver/ss-playground/App/Knobs/ScanlineAnimations.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ScanLineAnimationPage/ScanlineAnimationPage.css";
+import knight from "@thewaver/ss-playground/App/knight.webp";
 import type { Index2d } from "@thewaver/ss-utils";
 
 import { ScanlineAnimationKeyframeKnobs } from "../../Knobs/ScanlineAnimationKeyframes.const";

@@ -1,4 +1,4 @@
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SVGFiltersContent/SVGFiltersContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SVGFiltersContent/SVGFiltersContent.css";
 
 import type { PageFilterStageProps } from "./SVGFiltersContent.types";
 

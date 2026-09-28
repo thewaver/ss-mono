@@ -3,8 +3,8 @@ import type { BandDefs, PaginatorStep } from "@thewaver/ss-components-solid";
 import {
     computePaginatorPageLabel,
     computePaginatorStepLabel,
-} from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/PaginatorPage/PaginatorPage.css";
+} from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/PaginatorPage/PaginatorPage.css";
 
 import {
     PagePaginatorDemo,

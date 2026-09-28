@@ -1,8 +1,8 @@
 import type { Signal } from "solid-js";
 
 import type { SortableItem } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SortablePage/SortablePage.css";
-import type { Card } from "@thewaver/ss-playground-core/App/Pages/SortablePage/SortablePage.types";
+import * as styles from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.css";
+import type { Card } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.types";
 
 import { CardsExample } from "./Cards";
 

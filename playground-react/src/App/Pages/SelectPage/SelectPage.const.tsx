@@ -5,7 +5,7 @@ import type { AnchorPlacement, SelectOption } from "@thewaver/ss-components-reac
 import { PagePopoverSurface } from "../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";
 
-export * from "@thewaver/ss-playground-core/App/Pages/SelectPage/SelectOptions.const";
+export * from "@thewaver/ss-playground/App/Pages/SelectPage/SelectOptions.const";
 
 export const COUNTRIES_WITH_REACHABLE: SelectOption<string>[] = [
     { value: "Belgium" },

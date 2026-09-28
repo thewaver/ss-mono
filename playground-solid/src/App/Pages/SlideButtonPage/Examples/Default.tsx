@@ -1,7 +1,7 @@
 import type { Signal } from "solid-js";
 
 import { SlideButton } from "@thewaver/ss-components-solid";
-import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground-core/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
+import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
 
 import { PageSlideButtonContent } from "../../../StyledComponents/SlideButtonContent/SlideButtonContent";
 import type { SlideButtonExampleProps } from "../SlideButtonPage.types";

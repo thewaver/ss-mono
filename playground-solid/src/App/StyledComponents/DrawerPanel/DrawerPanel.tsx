@@ -1,7 +1,7 @@
 import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/DrawerPanel/DrawerPanel.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/DrawerPanel/DrawerPanel.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
 import type { DrawerPanelProps } from "./DrawerPanel.types";

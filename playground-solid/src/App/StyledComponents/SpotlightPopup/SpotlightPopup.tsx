@@ -1,7 +1,7 @@
 import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SpotlightPopup/SpotlightPopup.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SpotlightPopup/SpotlightPopup.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
 import type { SpotlightPopupProps } from "./SpotlightPopup.types";

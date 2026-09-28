@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 
 import { CAROUSEL_DEFAULTS } from "@thewaver/ss-components-react";
 import type { CarouselOrientation } from "@thewaver/ss-components-react";
-import { CarouselKnobs } from "@thewaver/ss-playground-core/App/Knobs/Carousels.const";
-import { TITLES } from "@thewaver/ss-playground-core/App/Pages/Carousels/Carousels.const";
+import { CarouselKnobs } from "@thewaver/ss-playground/App/Knobs/Carousels.const";
+import { TITLES } from "@thewaver/ss-playground/App/Pages/Carousels/Carousels.const";
 
 import type { CarouselsControls } from "./Carousels.types";
 

@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SortableContent/SortableContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SortableContent/SortableContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SortableItemContentProps, SortableMarkerProps, SortableSurfaceProps } from "./SortableContent.types";

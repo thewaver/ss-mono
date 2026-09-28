@@ -1,8 +1,8 @@
 import { Fragment } from "react";
 
 import { RichText } from "@thewaver/ss-components-react";
-import { TAG_DEFS } from "@thewaver/ss-playground-core/App/Pages/RichTextPage/RichTextPage.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/RichTextPage/RichTextPage.css";
+import { TAG_DEFS } from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.css";
 
 export const DefaultTagsExample = () => (
     <div className={styles.legendRoot}>

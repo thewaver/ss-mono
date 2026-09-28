@@ -10,7 +10,7 @@ import {
     TRAVEL_PATTERN_FACTORIES,
     TRAVEL_PATTERN_KEYS,
     applyOvershoot,
-} from "@thewaver/ss-playground-core/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+} from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
 
 import { ParticleSpawnerKnobs } from "../../Knobs/ParticleSpawners.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";

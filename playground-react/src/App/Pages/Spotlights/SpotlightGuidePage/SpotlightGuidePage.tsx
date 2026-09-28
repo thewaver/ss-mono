@@ -3,8 +3,8 @@ import { useState } from "react";
 import {
     RICH_TOUR_STEPS,
     TOUR_STORAGE_KEY,
-} from "@thewaver/ss-playground-core/App/Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage.const";
-import { TOUR_STEPS } from "@thewaver/ss-playground-core/App/Pages/Spotlights/SpotlightTourSteps.const";
+} from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightGuidePage/SpotlightGuidePage.const";
+import { TOUR_STEPS } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightTourSteps.const";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { GuideExample } from "./Examples/Guide";

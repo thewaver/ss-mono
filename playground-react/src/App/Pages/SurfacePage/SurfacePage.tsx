@@ -1,4 +1,4 @@
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SurfacePage/SurfacePage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/SurfacePage/SurfacePage.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { AvatarExample } from "./Examples/Avatar/Avatar";

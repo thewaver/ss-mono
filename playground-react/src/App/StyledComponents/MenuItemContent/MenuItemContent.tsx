@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/MenuItemContent/MenuItemContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/MenuItemContent/MenuItemContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { MenuItemContentProps } from "./MenuItemContent.types";

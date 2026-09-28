@@ -1,9 +1,9 @@
 import { CurrencyInput } from "@thewaver/ss-components-react";
-import { BUDGET_MAX } from "@thewaver/ss-playground-core/App/Pages/CurrencyInputPage/CurrencyInputPage.const";
+import { BUDGET_MAX } from "@thewaver/ss-playground/App/Pages/CurrencyInputPage/CurrencyInputPage.const";
 import {
     FIELD_GAP,
     FIELD_STEPPER_PADDING,
-} from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import {
     PageTextFieldContent,

@@ -3,14 +3,14 @@ import { createMemo } from "solid-js";
 import { A, useLocation, useNavigate } from "@solidjs/router";
 import { Tabs, access } from "@thewaver/ss-components-solid";
 import type { TabLinkProps } from "@thewaver/ss-components-solid";
-import { toRoutePath } from "@thewaver/ss-playground-core/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
+import { toRoutePath } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
 import {
     PAGE_VIEW_KEYS,
     PAGE_VIEW_LABELS,
     toPageViewKey,
     toPageViewRoute,
-} from "@thewaver/ss-playground-core/App/PageComponents/ViewTabs/ViewTabs.const";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/ViewTabs/ViewTabs.css";
+} from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.css";
 
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../StyledComponents/TabContent/TabContent";
 import type { PageViewKey, PageViewTabsProps } from "./ViewTabs.types";

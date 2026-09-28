@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 
 import { Button, Die, access } from "@thewaver/ss-components-solid";
 import type { DieController } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/DiePage/DiePage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageDieFace } from "../../../StyledComponents/DieContent/DieContent";

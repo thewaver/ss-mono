@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/MeasureBox/MeasureBox.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 
 import type { PageMeasureBoxProps } from "./MeasureBox.types";
 

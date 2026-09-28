@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/ClockContent/ClockContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/ClockContent/ClockContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { ClockOptionProps } from "./ClockContent.types";

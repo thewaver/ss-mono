@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/MosaicContent/MosaicContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/MosaicContent/MosaicContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { PageMosaicLinkProps, PageMosaicTileProps } from "./MosaicContent.types";

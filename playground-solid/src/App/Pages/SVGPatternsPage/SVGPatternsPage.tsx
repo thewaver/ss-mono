@@ -5,9 +5,9 @@ import { SVGDefsSamples } from "@thewaver/ss-components-solid";
 import {
     splitEntriesIntoGroups,
     toGroupEntriesWithNoSample,
-} from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.const";
-import type { WithNoSample } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.types";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SVGPatternsPage/SVGPatternsPage.css";
+} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
+import * as styles from "@thewaver/ss-playground/App/Pages/SVGPatternsPage/SVGPatternsPage.css";
 
 import { SVGPatternKnobs } from "../../Knobs/SVGPatterns.const";
 import { PageExamples } from "../../PageComponents/Examples/Examples";

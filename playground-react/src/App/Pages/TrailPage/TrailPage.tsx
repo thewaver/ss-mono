@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { MediaQueryMonitorReactUtils, TRAIL_DEFAULTS } from "@thewaver/ss-components-react";
-import { TrailKnobs } from "@thewaver/ss-playground-core/App/Knobs/Trails.const";
+import { TrailKnobs } from "@thewaver/ss-playground/App/Knobs/Trails.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";

@@ -1,6 +1,6 @@
 import { PlacementLayoutUtils, Stepper } from "@thewaver/ss-components-react";
 import type { ArcDefs } from "@thewaver/ss-components-react";
-import { LABELS, ORDER } from "@thewaver/ss-playground-core/App/Pages/StepperPage/StepperSteps.const";
+import { LABELS, ORDER } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.const";
 
 import {
     PageStepArcCell,

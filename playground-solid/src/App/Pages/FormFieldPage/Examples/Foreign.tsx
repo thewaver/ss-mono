@@ -1,7 +1,7 @@
 import type { Signal } from "solid-js";
 
 import { FormField, FormFieldSolidUtils, access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/FormFieldPage/FormFieldPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/FormFieldPage/FormFieldPage.css";
 
 import {
     PageFormFieldCaption,

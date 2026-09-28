@@ -1,7 +1,7 @@
 import { For, createEffect, createSignal, onCleanup } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/Ripple/Ripple.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/Ripple/Ripple.css";
 
 import type { RippleMark, RippleProps } from "./Ripple.types";
 

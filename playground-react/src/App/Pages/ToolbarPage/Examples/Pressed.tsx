@@ -1,6 +1,6 @@
 import { Toolbar } from "@thewaver/ss-components-react";
 import type { ToolbarAction } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ToolbarPage/ToolbarPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/ToolbarPage/ToolbarPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageMenuTriggerContent } from "../../../StyledComponents/MenuTriggerContent/MenuTriggerContent";

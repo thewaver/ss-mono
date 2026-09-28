@@ -2,8 +2,8 @@ import { useId } from "react";
 
 import { SVGDefsSamples, Surface } from "@thewaver/ss-components-react";
 import type { SurfaceProps } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SurfacePage/Examples/Banner/Banner.css";
-import knight from "@thewaver/ss-playground-core/App/knight.webp";
+import * as styles from "@thewaver/ss-playground/App/Pages/SurfacePage/Examples/Banner/Banner.css";
+import knight from "@thewaver/ss-playground/App/knight.webp";
 import { CSSUtils, type Size2d } from "@thewaver/ss-utils";
 
 const computeDefs = (size: Size2d, element: HTMLElement | undefined, id: string) =>

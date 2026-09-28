@@ -1,6 +1,6 @@
 import { Tilter } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/PointerEffects/TilterPage/TilterPage.css";
-import type { TilterExampleProps } from "@thewaver/ss-playground-core/App/Pages/PointerEffects/TilterPage/TilterPage.types";
+import * as styles from "@thewaver/ss-playground/App/Pages/PointerEffects/TilterPage/TilterPage.css";
+import type { TilterExampleProps } from "@thewaver/ss-playground/App/Pages/PointerEffects/TilterPage/TilterPage.types";
 
 const SHEEN_ANGLE_DEGREES = 115;
 

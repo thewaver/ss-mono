@@ -3,7 +3,7 @@ import { useId } from "react";
 
 import type { PaginatorStep, PlacementRect } from "@thewaver/ss-components-react";
 import { PlacementUtils } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/PaginatorContent/PaginatorContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/PaginatorContent/PaginatorContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type {

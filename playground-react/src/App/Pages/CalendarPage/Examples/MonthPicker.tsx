@@ -1,5 +1,5 @@
 import { Calendar, DateValueUtils } from "@thewaver/ss-components-react";
-import { LOCALE, TODAY } from "@thewaver/ss-playground-core/App/Pages/CalendarPage/CalendarPage.const";
+import { LOCALE, TODAY } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
 import { PageCalendarPagedCaption } from "../../../PageComponents/CalendarCaption/CalendarPagedCaption";
 import { PageCalendarCell, PageCalendarFrame } from "../../../StyledComponents/CalendarContent/CalendarContent";

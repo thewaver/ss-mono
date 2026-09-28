@@ -1,7 +1,7 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { DIE_DEFAULTS, DieShapes, MediaQueryMonitorSolidUtils } from "@thewaver/ss-components-solid";
-import { DieKnobs } from "@thewaver/ss-playground-core/App/Knobs/Dice.const";
+import { DieKnobs } from "@thewaver/ss-playground/App/Knobs/Dice.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";

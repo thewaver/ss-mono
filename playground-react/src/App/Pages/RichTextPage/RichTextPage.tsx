@@ -1,19 +1,19 @@
 import { useState } from "react";
 
 import { RICH_TEXT_DEFAULTS, TextArea } from "@thewaver/ss-components-react";
-import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground-core/App/PageComponents/MeasureBox/MeasureBox.css";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 import {
     FIELD_WIDTH,
     MAX_ROWS,
     MIN_ROWS,
     PREVIEW_WIDTH,
     STARTING_CONTENT,
-} from "@thewaver/ss-playground-core/App/Pages/RichTextPage/RichTextPage.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/RichTextPage/RichTextPage.css";
+} from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.css";
 import {
     FIELD_GAP,
     FIELD_PADDING,
-} from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField } from "../../PageComponents/Field/Field";

@@ -2,7 +2,7 @@ import { useCallback, useState, useSyncExternalStore } from "react";
 
 import { Button, Die } from "@thewaver/ss-components-react";
 import type { DieController } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/DiePage/DiePage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/DiePage/DiePage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageDieFace } from "../../../StyledComponents/DieContent/DieContent";

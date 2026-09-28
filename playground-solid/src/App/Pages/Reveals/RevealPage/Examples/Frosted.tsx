@@ -1,6 +1,6 @@
 import { Reveal } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/Reveals/RevealPage/RevealPage.css";
-import type { RevealExampleProps } from "@thewaver/ss-playground-core/App/Pages/Reveals/RevealPage/RevealPage.types";
+import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.css";
+import type { RevealExampleProps } from "@thewaver/ss-playground/App/Pages/Reveals/RevealPage/RevealPage.types";
 
 type Props = RevealExampleProps;
 

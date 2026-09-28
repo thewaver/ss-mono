@@ -4,7 +4,7 @@ import type { FileInputRejection } from "@thewaver/ss-components-react";
 import {
     DROP_ZONE_REASON_TEXT,
     MAX_ATTACHMENT_BYTES,
-} from "@thewaver/ss-playground-core/App/Pages/FileInputPage/FileInputPage.const";
+} from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DefaultExample } from "./Examples/Default";

@@ -2,8 +2,8 @@ import { useState } from "react";
 
 import { Button, FLIP_CARD_TURN_DIRECTIONS, FlipCard, Range } from "@thewaver/ss-components-react";
 import type { FlipCardAxis, FlipCardTurnDirection } from "@thewaver/ss-components-react";
-import { computeFlipCardFaceLabel } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/FlipCardPage/FlipCardPage.css";
+import { computeFlipCardFaceLabel } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/FlipCardPage/FlipCardPage.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import {

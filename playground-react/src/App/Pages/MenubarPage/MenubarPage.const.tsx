@@ -7,7 +7,7 @@ import { PageMenuItemContent } from "../../StyledComponents/MenuItemContent/Menu
 import { PagePopoverSurface } from "../../StyledComponents/PopoverSurface/PopoverSurface";
 import type { MenubarEntry } from "./MenubarPage.types";
 
-export * from "@thewaver/ss-playground-core/App/Pages/MenubarPage/MenubarWords.const";
+export * from "@thewaver/ss-playground/App/Pages/MenubarPage/MenubarWords.const";
 
 export const renderMenubarPopup = (
     renderItems: () => ReactNode,

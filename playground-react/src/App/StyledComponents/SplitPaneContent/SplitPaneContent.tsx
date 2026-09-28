@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SplitPaneContent/SplitPaneContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SplitPaneContent/SplitPaneContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { SplitPaneCompareProps, SplitPaneGutterProps } from "./SplitPaneContent.types";

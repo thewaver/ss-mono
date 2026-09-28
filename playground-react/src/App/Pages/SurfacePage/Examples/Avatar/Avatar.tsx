@@ -2,8 +2,8 @@ import { useId } from "react";
 
 import { SVGDefsSamples, Surface } from "@thewaver/ss-components-react";
 import type { SurfaceProps } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SurfacePage/Examples/Avatar/Avatar.css";
-import knight_profile from "@thewaver/ss-playground-core/App/knight_profile.webp";
+import * as styles from "@thewaver/ss-playground/App/Pages/SurfacePage/Examples/Avatar/Avatar.css";
+import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
 import { CSSUtils } from "@thewaver/ss-utils";
 
 const getConfig = (strokeId: string): SurfaceProps => ({

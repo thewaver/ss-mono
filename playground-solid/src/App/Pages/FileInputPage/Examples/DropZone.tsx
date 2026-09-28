@@ -3,7 +3,7 @@ import {
     DROP_ZONE_ACCEPT,
     DROP_ZONE_MAX_FILES,
     DROP_ZONE_MAX_SIZE_BYTES,
-} from "@thewaver/ss-playground-core/App/Pages/FileInputPage/FileInputPage.const";
+} from "@thewaver/ss-playground/App/Pages/FileInputPage/FileInputPage.const";
 
 import { PageFileDropZoneContent } from "../../../StyledComponents/FileDropZoneContent/FileDropZoneContent";
 import type { FileInputDropZoneExampleProps } from "../FileInputPage.types";

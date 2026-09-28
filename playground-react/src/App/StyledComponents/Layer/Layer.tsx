@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/Layer/Layer.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/Layer/Layer.css";
 
 import { useLayerClass } from "./Layer.context";
 

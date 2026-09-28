@@ -2,7 +2,7 @@ import type { ParentProps } from "solid-js";
 
 import type { TableSortDirection } from "@thewaver/ss-components-solid";
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TableContent/TableContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TableContent/TableContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type {

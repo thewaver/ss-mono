@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import type { FlipCardAxis, FlipCardTurnDirection } from "@thewaver/ss-components-react";
 import { FLIP_CARD_AXES, FLIP_CARD_DEFAULTS } from "@thewaver/ss-components-react";
-import { FlipCardKnobs } from "@thewaver/ss-playground-core/App/Knobs/FlipCards.const";
+import { FlipCardKnobs } from "@thewaver/ss-playground/App/Knobs/FlipCards.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";

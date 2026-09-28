@@ -1,8 +1,8 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { Button, ODOMETER_DEFAULTS, OdometerReels } from "@thewaver/ss-components-solid";
-import { OdometerKnobs } from "@thewaver/ss-playground-core/App/Knobs/Odometers.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/OdometerPage/OdometerPage.css";
+import { OdometerKnobs } from "@thewaver/ss-playground/App/Knobs/Odometers.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/OdometerPage/OdometerPage.css";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";

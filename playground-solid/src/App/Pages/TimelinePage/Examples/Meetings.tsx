@@ -1,15 +1,15 @@
 import { createSignal, onCleanup } from "solid-js";
 
 import { Timeline } from "@thewaver/ss-components-solid";
-import type { Meeting } from "@thewaver/ss-playground-core/App/Pages/TimelinePage/TimelineItems.types";
+import type { Meeting } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelineItems.types";
 import {
     DAY,
     LANE_SIZE,
     MEETINGS,
     MINUTE_STEPS,
     formatClock,
-} from "@thewaver/ss-playground-core/App/Pages/TimelinePage/TimelinePage.const";
-import { AXIS_HEIGHT } from "@thewaver/ss-playground-core/App/StyledComponents/TimelineContent/TimelineContent.css";
+} from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
+import { AXIS_HEIGHT } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
 import {
     PageTimelineBlock,

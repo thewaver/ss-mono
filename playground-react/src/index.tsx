@@ -1,11 +1,11 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 
-import { defaultTheme } from "@thewaver/ss-playground-core/App/Theme.css";
+import { reactTheme } from "@thewaver/ss-playground/App/Theme.css";
 
 import { App } from "./App/App";
 
-document.documentElement.classList.add(defaultTheme);
+document.documentElement.classList.add(reactTheme);
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>

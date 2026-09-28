@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TagInputContent/TagInputContent.css";
-import * as fieldStyles from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TagInputContent/TagInputContent.css";
+import * as fieldStyles from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { TagContentProps, TagInputContentProps } from "./TagInputContent.types";

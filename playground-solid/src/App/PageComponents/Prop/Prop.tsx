@@ -2,7 +2,7 @@ import type { ParentProps } from "solid-js";
 import { Show, createSignal } from "solid-js";
 
 import { Button, access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/Prop/Prop.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.css";
 
 import { PagePropHintBadge } from "../../StyledComponents/PropHintBadge/PropHintBadge";
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";

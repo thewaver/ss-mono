@@ -1,5 +1,5 @@
 import type { AccessorProps, SVGDefsColors, SVGDefsSamples } from "@thewaver/ss-components-solid";
-import type { WithNoSample } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.types";
+import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 import type { Size2d } from "@thewaver/ss-utils";
 
 export type SVGPatternsExampleProps = AccessorProps<{

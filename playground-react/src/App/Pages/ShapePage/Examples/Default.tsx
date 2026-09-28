@@ -5,8 +5,8 @@ import { InteractionTrackerReactUtils, SVGDefsSamples, Shape } from "@thewaver/s
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
-} from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ShapePage/ShapePage.css";
+} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { ShapeConst, ShapeUtils, StringUtils } from "@thewaver/ss-utils";
 
 import type { ShapeExampleProps } from "../ShapePage.types";

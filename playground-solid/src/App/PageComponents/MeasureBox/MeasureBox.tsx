@@ -1,7 +1,7 @@
 import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/MeasureBox/MeasureBox.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
 
 import type { PageMeasureBoxProps } from "./MeasureBox.types";
 

@@ -2,8 +2,8 @@ import { createUniqueId } from "solid-js";
 
 import { SVGDefsSamples, Surface } from "@thewaver/ss-components-solid";
 import type { SurfaceProps } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SurfacePage/Examples/Avatar/Avatar.css";
-import knight_profile from "@thewaver/ss-playground-core/App/knight_profile.webp";
+import * as styles from "@thewaver/ss-playground/App/Pages/SurfacePage/Examples/Avatar/Avatar.css";
+import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
 import { CSSUtils } from "@thewaver/ss-utils";
 
 const getConfig = (strokeId: string): SurfaceProps => ({

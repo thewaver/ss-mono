@@ -1,8 +1,8 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { LIGHT_CATCHER_DEFAULTS } from "@thewaver/ss-components-solid";
-import { LightCatcherKnobs } from "@thewaver/ss-playground-core/App/Knobs/LightCatchers.const";
-import type { LightCatcherExampleProps } from "@thewaver/ss-playground-core/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.types";
+import { LightCatcherKnobs } from "@thewaver/ss-playground/App/Knobs/LightCatchers.const";
+import type { LightCatcherExampleProps } from "@thewaver/ss-playground/App/Pages/PointerEffects/LightCatcherPage/LightCatcherPage.types";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../../PageComponents/Field/Field";

@@ -1,7 +1,7 @@
 import { For } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TreemapContent/TreemapContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TreemapContent/TreemapContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { PageTreemapBarProps, PageTreemapTileProps } from "./TreemapContent.types";

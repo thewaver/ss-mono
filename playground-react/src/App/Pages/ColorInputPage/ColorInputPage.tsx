@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { PALETTE } from "@thewaver/ss-playground-core/App/Pages/ColorInputPage/ColorInputPage.const";
+import { PALETTE } from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { CompactExample } from "./Examples/Compact";

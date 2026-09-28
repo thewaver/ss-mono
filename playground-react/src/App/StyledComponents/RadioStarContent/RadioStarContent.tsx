@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/RadioStarContent/RadioStarContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/RadioStarContent/RadioStarContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { RadioStarContentProps } from "./RadioStarContent.types";

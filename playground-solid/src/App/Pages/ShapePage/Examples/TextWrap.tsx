@@ -1,7 +1,7 @@
 import { createUniqueId } from "solid-js";
 
 import { Shape, access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ShapePage/ShapePage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 
 import { computeShapeFillDefs, computeShapeStrokeDefs } from "../ShapePage.const";

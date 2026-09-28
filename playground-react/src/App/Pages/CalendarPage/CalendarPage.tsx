@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import type { DateValue, DateValueCalendarId, DateValueWeekStart } from "@thewaver/ss-components-react";
 import { CALENDAR_DEFAULTS, DateValueUtils } from "@thewaver/ss-components-react";
-import { CalendarKnobs } from "@thewaver/ss-playground-core/App/Knobs/Calendars.const";
+import { CalendarKnobs } from "@thewaver/ss-playground/App/Knobs/Calendars.const";
 import {
     MAX_DATE,
     MAX_YEAR,
@@ -10,7 +10,7 @@ import {
     MIN_YEAR,
     TODAY,
     WEEK_START_LABELS,
-} from "@thewaver/ss-playground-core/App/Pages/CalendarPage/CalendarPage.const";
+} from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageSelectField } from "../../PageComponents/Field/Field";

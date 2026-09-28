@@ -1,6 +1,6 @@
 import { Breadcrumbs } from "@thewaver/ss-components-solid";
 import type { TabLinkProps } from "@thewaver/ss-components-solid";
-import { BREADCRUMBS_GAP, labelOf } from "@thewaver/ss-playground-core/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
+import { BREADCRUMBS_GAP, labelOf } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
 
 import {
     PageBreadcrumbContent,

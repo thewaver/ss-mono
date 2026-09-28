@@ -1,11 +1,6 @@
 import { SVGFilterDefsFactory } from "@thewaver/ss-components-solid";
-import {
-    BEND,
-    BLUR,
-    SATURATION,
-    SHADOW,
-} from "@thewaver/ss-playground-core/App/Pages/SVGFiltersPage/SVGFilterSteps.const";
-import type { SVGFiltersStepId } from "@thewaver/ss-playground-core/App/Pages/SVGFiltersPage/SVGFilterSteps.types";
+import { BEND, BLUR, SATURATION, SHADOW } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFilterSteps.const";
+import type { SVGFiltersStepId } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFilterSteps.types";
 
 export const applyStep = (factory: SVGFilterDefsFactory, id: SVGFiltersStepId) => {
     switch (id) {

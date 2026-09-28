@@ -1,7 +1,7 @@
 import { Fragment, useMemo, useState } from "react";
 
 import { Button, FrameRateMonitorReactUtils, Modal } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/StressTest/StressTest.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/StressTest/StressTest.css";
 import { CSSUtils } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";

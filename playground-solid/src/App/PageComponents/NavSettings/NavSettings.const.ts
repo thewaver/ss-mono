@@ -1,7 +1,4 @@
-import {
-    PAGE_VIEW_KEYS,
-    PAGE_VIEW_LABELS,
-} from "@thewaver/ss-playground-core/App/PageComponents/ViewTabs/ViewTabs.const";
+import { PAGE_VIEW_KEYS, PAGE_VIEW_LABELS } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 
 import type { PageViewKey } from "../ViewTabs/ViewTabs.types";
 import type { NavSettingsOption, ViewportAnchor } from "./NavSettings.types";

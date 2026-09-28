@@ -2,7 +2,7 @@ import { For } from "solid-js";
 
 import { Button, ScratchCard } from "@thewaver/ss-components-solid";
 import type { ScratchCardController } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/Reveals/ScratchCardPage/ScratchCardPage.css";
 
 import { PageMeasureBox } from "../../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";

@@ -1,5 +1,5 @@
 import { Calendar, DateValueUtils } from "@thewaver/ss-components-solid";
-import { LOCALE, TODAY, WEEKEND_DAYS } from "@thewaver/ss-playground-core/App/Pages/CalendarPage/CalendarPage.const";
+import { LOCALE, TODAY, WEEKEND_DAYS } from "@thewaver/ss-playground/App/Pages/CalendarPage/CalendarPage.const";
 
 import { PageCalendarCaption } from "../../../PageComponents/CalendarCaption/CalendarCaption";
 import {

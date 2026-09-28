@@ -2,7 +2,7 @@ import { createMemo, createSignal } from "solid-js";
 
 import { SortableGridUtils } from "@thewaver/ss-components-solid";
 import type { SortableGridItem } from "@thewaver/ss-components-solid";
-import type { Gear } from "@thewaver/ss-playground-core/App/Pages/SortableGridPage/SortableGridPage.types";
+import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { InventoryExample } from "./Examples/Inventory";

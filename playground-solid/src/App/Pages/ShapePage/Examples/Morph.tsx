@@ -2,7 +2,7 @@ import { createMemo, createSignal, createUniqueId, onCleanup } from "solid-js";
 
 import { Button, MediaQueryMonitorSolidUtils, Shape, access } from "@thewaver/ss-components-solid";
 import type { AccessorProps } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ShapePage/ShapePage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/ShapePage/ShapePage.css";
 import { EasingUtils, MathUtils, Point2dUtils } from "@thewaver/ss-utils";
 import type { Point2d, Size2d } from "@thewaver/ss-utils";
 

@@ -2,7 +2,7 @@ import type { Signal } from "solid-js";
 
 import { Clock } from "@thewaver/ss-components-solid";
 import type { ClockSteps, MaybeAccessor } from "@thewaver/ss-components-solid";
-import { LOCALE } from "@thewaver/ss-playground-core/App/Pages/DatePickerPage/DatePickerPage.const";
+import { LOCALE } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import {

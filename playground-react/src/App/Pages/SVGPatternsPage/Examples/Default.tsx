@@ -4,8 +4,8 @@ import { SVGDefsSamples, Shape } from "@thewaver/ss-components-react";
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
-} from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SVGPatternsPage/SVGPatternsPage.css";
+} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/SVGPatternsPage/SVGPatternsPage.css";
 import { ShapeConst } from "@thewaver/ss-utils";
 
 import type { SVGPatternsExampleProps } from "../SVGPatternsPage.types";

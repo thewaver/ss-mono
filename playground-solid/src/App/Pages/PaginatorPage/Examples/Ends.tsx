@@ -3,7 +3,7 @@ import type { PaginatorStep } from "@thewaver/ss-components-solid";
 import {
     computePaginatorPageLabel,
     computePaginatorStepLabel,
-} from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
+} from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 
 import {
     PagePaginatorDemo,

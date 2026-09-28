@@ -1,10 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import {
-    CITIES,
-    PIN_LENGTH,
-    QUANTITY_STEP,
-} from "@thewaver/ss-playground-core/App/Pages/TextInputPage/TextInputPage.const";
+import { CITIES, PIN_LENGTH, QUANTITY_STEP } from "@thewaver/ss-playground/App/Pages/TextInputPage/TextInputPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { BothAdornmentsExample } from "./Examples/BothAdornments";

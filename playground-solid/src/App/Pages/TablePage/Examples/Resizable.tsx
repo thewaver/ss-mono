@@ -2,7 +2,7 @@ import type { Signal } from "solid-js";
 import { createMemo } from "solid-js";
 
 import { Table } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TablePage/TablePage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import { PageTableResizer } from "../../../StyledComponents/TableContent/TableContent";
 import { PARTS, createPartColumns } from "../TablePage.const";

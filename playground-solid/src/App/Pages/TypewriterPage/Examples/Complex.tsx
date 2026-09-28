@@ -1,6 +1,6 @@
 import { Typewriter } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TypewriterPage/TypewriterPage.css";
-import knight from "@thewaver/ss-playground-core/App/knight.webp";
+import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
+import knight from "@thewaver/ss-playground/App/knight.webp";
 
 import type { TypewriterExampleProps } from "../TypewriterPage.types";
 

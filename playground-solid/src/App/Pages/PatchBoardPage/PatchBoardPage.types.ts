@@ -1,5 +1,5 @@
 import type { AccessorProps, PatchBoardLink, PatchBoardNode, SignalSource } from "@thewaver/ss-components-solid";
-import type { PatchDevice } from "@thewaver/ss-playground-core/App/Pages/PatchBoardPage/PatchDevice.types";
+import type { PatchDevice } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchDevice.types";
 
 export type PatchBoardExampleProps = AccessorProps<{
     socketSize: number;

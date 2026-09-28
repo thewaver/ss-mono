@@ -1,5 +1,5 @@
 import { SVGDefsSamples } from "@thewaver/ss-components-react";
-import { splitEntriesIntoGroups } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.const";
+import { splitEntriesIntoGroups } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
 
 export const GROUPPED_TIMED_GRADIENTS = splitEntriesIntoGroups(SVGDefsSamples.Gradient.Timed.SAMPLE_ENTRIES);
 

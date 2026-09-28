@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/LabelCaption/LabelCaption.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/LabelCaption/LabelCaption.css";
 
 import type { PageLabelCaptionProps } from "./LabelCaption.types";
 

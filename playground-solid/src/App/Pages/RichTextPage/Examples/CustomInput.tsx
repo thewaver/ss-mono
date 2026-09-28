@@ -1,6 +1,6 @@
 import { RichText } from "@thewaver/ss-components-solid";
 import type { AccessorProps } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/RichTextPage/RichTextPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.css";
 
 type Props = AccessorProps<{
     content: string;

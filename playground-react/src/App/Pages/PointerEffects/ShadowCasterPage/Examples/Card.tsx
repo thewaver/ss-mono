@@ -1,5 +1,5 @@
 import { ShadowCaster } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/PointerEffects/ShadowCasterPage/ShadowCasterPage.css";
 
 import type { ShadowCasterExampleProps } from "../ShadowCasterPageReact.types";
 

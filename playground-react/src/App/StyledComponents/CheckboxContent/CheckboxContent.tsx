@@ -1,4 +1,4 @@
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/CheckboxContent/CheckboxContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/CheckboxContent/CheckboxContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { CheckboxContentProps } from "./CheckboxContent.types";

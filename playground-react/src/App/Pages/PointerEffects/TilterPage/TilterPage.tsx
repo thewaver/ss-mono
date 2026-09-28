@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { TILTER_DEFAULTS } from "@thewaver/ss-components-react";
-import { TilterKnobs } from "@thewaver/ss-playground-core/App/Knobs/Tilters.const";
+import { TilterKnobs } from "@thewaver/ss-playground/App/Knobs/Tilters.const";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../../PageComponents/Field/Field";

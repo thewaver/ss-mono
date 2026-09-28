@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 
 import { SVGFilterDefs, SVGFilterDefsFactory, access } from "@thewaver/ss-components-solid";
 import type { SVGDisplacementChannel } from "@thewaver/ss-components-solid";
-import { SVGFilterKnobs } from "@thewaver/ss-playground-core/App/Knobs/SVGFilters.const";
+import { SVGFilterKnobs } from "@thewaver/ss-playground/App/Knobs/SVGFilters.const";
 
 import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageNumberField, PageSelectField } from "../../../PageComponents/Field/Field";

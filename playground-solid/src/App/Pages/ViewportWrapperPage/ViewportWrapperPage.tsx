@@ -3,9 +3,9 @@ import { createMemo, createSignal, createUniqueId } from "solid-js";
 
 import type { AnchorPlacement, SelectOption, Toast } from "@thewaver/ss-components-solid";
 import { Button, Range, Select, Toasts, ViewportWrapper, useViewportContext } from "@thewaver/ss-components-solid";
-import { ViewportWrapperKnobs } from "@thewaver/ss-playground-core/App/Knobs/ViewportWrappers.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ViewportWrapperPage/ViewportWrapperPage.css";
-import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground-core/App/StyledComponents/RangeContent/RangeContent.css";
+import { ViewportWrapperKnobs } from "@thewaver/ss-playground/App/Knobs/ViewportWrappers.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ViewportWrapperPage/ViewportWrapperPage.css";
+import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
 
 import { PageVariants } from "../../PageComponents/Variants/Variants";
 import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";

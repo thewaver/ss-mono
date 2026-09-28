@@ -1,5 +1,5 @@
 import type { SVGDefsSamples } from "@thewaver/ss-components-solid";
-import type { WithNoSample } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.types";
+import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 
 import type { SVGGradientsPaintKind } from "../Pages/SVGGradients/SVGGradients.types";
 

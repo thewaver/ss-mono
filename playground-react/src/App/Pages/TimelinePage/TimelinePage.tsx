@@ -1,15 +1,15 @@
 import { useState } from "react";
 
 import { Button } from "@thewaver/ss-components-react";
-import { TimelineKnobs } from "@thewaver/ss-playground-core/App/Knobs/Timelines.const";
-import type { Clip } from "@thewaver/ss-playground-core/App/Pages/TimelinePage/TimelineItems.types";
+import { TimelineKnobs } from "@thewaver/ss-playground/App/Knobs/Timelines.const";
+import type { Clip } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelineItems.types";
 import {
     DAY,
     REEL,
     TRIM_CLIPS,
     formatClock,
     formatStopwatch,
-} from "@thewaver/ss-playground-core/App/Pages/TimelinePage/TimelinePage.const";
+} from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField } from "../../PageComponents/Field/Field";

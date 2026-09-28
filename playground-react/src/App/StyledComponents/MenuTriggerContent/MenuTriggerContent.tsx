@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/MenuTriggerContent/MenuTriggerContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/MenuTriggerContent/MenuTriggerContent.css";
 
 import type { MenuTriggerContentProps } from "./MenuTriggerContent.types";
 

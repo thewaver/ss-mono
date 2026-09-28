@@ -3,7 +3,7 @@ import { useId } from "react";
 
 import type { PlacementSector } from "@thewaver/ss-components-react";
 import { PlacementUtils } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/WheelContent/WheelContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/WheelContent/WheelContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type {

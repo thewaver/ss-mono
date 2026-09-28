@@ -1,7 +1,7 @@
 import { SplitPane } from "@thewaver/ss-components-solid";
-import { COMPARE } from "@thewaver/ss-playground-core/App/Pages/SplitPanePage/SplitPanePage.const";
-import knight_date from "@thewaver/ss-playground-core/App/knight_date.webp";
-import knight_profile from "@thewaver/ss-playground-core/App/knight_profile.webp";
+import { COMPARE } from "@thewaver/ss-playground/App/Pages/SplitPanePage/SplitPanePage.const";
+import knight_date from "@thewaver/ss-playground/App/knight_date.webp";
+import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
 
 import {
     PageSplitPaneCompareBox,

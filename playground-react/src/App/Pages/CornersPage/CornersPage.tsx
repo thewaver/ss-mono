@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 
 import type { CornerKey } from "@thewaver/ss-components-react";
 import { CORNERS_DEFAULTS, CORNERS_KEYS } from "@thewaver/ss-components-react";
-import { CornerKnobs } from "@thewaver/ss-playground-core/App/Knobs/Corners.const";
+import { CornerKnobs } from "@thewaver/ss-playground/App/Knobs/Corners.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageColorField, PageNumberField } from "../../PageComponents/Field/Field";

@@ -2,8 +2,8 @@ import { Show, createEffect, createMemo, createSignal } from "solid-js";
 
 import { Accordion, Scroller, Tabs, access, useViewportContext } from "@thewaver/ss-components-solid";
 import type { AccordionItem, Tab } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/SourceView/SourceView.css";
-import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground-core/App/Theme.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/SourceView/SourceView.css";
+import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
 import { PageAccordionHeader, PageAccordionPanel } from "../../StyledComponents/AccordionContent/AccordionContent";
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../StyledComponents/TabContent/TabContent";

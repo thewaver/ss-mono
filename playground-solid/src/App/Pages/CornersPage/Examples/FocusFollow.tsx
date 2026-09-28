@@ -7,7 +7,7 @@ import {
     MediaQueryMonitorSolidUtils,
     access,
 } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/CornersPage/CornersPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/CornersPage/CornersPage.css";
 import type { Rect } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";

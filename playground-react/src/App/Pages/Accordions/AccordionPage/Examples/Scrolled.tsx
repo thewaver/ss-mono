@@ -1,6 +1,6 @@
 import { Accordion } from "@thewaver/ss-components-react";
 import type { AccordionItem } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/Accordions/Accordions.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/Accordions/Accordions.css";
 
 import {
     PageAccordionHeader,

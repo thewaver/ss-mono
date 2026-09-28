@@ -4,8 +4,8 @@ import { SVGDefsSamples, Shape, access } from "@thewaver/ss-components-solid";
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
-} from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SVGGradients/SVGGradients.css";
+} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { STROKE_THICKNESS } from "../../SVGGradients.const";

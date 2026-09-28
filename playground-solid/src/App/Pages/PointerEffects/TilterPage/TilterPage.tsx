@@ -1,8 +1,8 @@
 import { createMemo, createSignal } from "solid-js";
 
 import { TILTER_DEFAULTS } from "@thewaver/ss-components-solid";
-import { TilterKnobs } from "@thewaver/ss-playground-core/App/Knobs/Tilters.const";
-import type { TilterExampleProps } from "@thewaver/ss-playground-core/App/Pages/PointerEffects/TilterPage/TilterPage.types";
+import { TilterKnobs } from "@thewaver/ss-playground/App/Knobs/Tilters.const";
+import type { TilterExampleProps } from "@thewaver/ss-playground/App/Pages/PointerEffects/TilterPage/TilterPage.types";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../../PageComponents/Field/Field";

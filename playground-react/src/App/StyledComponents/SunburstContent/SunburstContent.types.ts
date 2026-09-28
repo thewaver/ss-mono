@@ -1,5 +1,5 @@
 import type { InteractionFlags, SunburstArcState } from "@thewaver/ss-components-react";
-import type { PAGE_SUNBURST_FAMILIES } from "@thewaver/ss-playground-core/App/StyledComponents/SunburstContent/SunburstContent.css";
+import type { PAGE_SUNBURST_FAMILIES } from "@thewaver/ss-playground/App/StyledComponents/SunburstContent/SunburstContent.css";
 
 export type PageSunburstFamily = (typeof PAGE_SUNBURST_FAMILIES)[number];
 

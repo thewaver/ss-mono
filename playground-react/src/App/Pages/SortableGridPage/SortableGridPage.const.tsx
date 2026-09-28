@@ -4,7 +4,7 @@ import type {
     SortableGridSpot,
     SortableItem,
 } from "@thewaver/ss-components-react";
-import type { Gear } from "@thewaver/ss-playground-core/App/Pages/SortableGridPage/SortableGridPage.types";
+import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
 
 const HUE_COUNT = 360;
 const HUE_STEP = 47;

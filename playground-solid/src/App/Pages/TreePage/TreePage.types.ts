@@ -1,8 +1,8 @@
 import type { Signal } from "solid-js";
 
-import type { Asset } from "@thewaver/ss-playground-core/App/Pages/TreePage/TreeRecords.types";
+import type { Asset } from "@thewaver/ss-playground/App/Pages/TreePage/TreeRecords.types";
 
-export type { Asset } from "@thewaver/ss-playground-core/App/Pages/TreePage/TreeRecords.types";
+export type { Asset } from "@thewaver/ss-playground/App/Pages/TreePage/TreeRecords.types";
 
 export type TreeExampleProps = {
     valueSignal: Signal<string | undefined>;

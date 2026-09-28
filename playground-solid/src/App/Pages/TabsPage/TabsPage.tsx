@@ -1,6 +1,6 @@
 import { createMemo, createSignal } from "solid-js";
 
-import { AUTOMATIC_TABS, REACHABLE_TABS } from "@thewaver/ss-playground-core/App/Pages/TabsPage/TabsPage.const";
+import { AUTOMATIC_TABS, REACHABLE_TABS } from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { AllDisabledExample } from "./Examples/AllDisabled";

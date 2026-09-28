@@ -1,8 +1,8 @@
 import type { Dispatch, SetStateAction } from "react";
 
-import type { Asset } from "@thewaver/ss-playground-core/App/Pages/TreePage/TreeRecords.types";
+import type { Asset } from "@thewaver/ss-playground/App/Pages/TreePage/TreeRecords.types";
 
-export type { Asset } from "@thewaver/ss-playground-core/App/Pages/TreePage/TreeRecords.types";
+export type { Asset } from "@thewaver/ss-playground/App/Pages/TreePage/TreeRecords.types";
 
 export type TreeExampleProps = {
     valueState: readonly [string | undefined, (value: string | undefined) => void];

@@ -1,12 +1,12 @@
 import { PlacementLayoutUtils, Sortable } from "@thewaver/ss-components-react";
 import type { ArcDefs, InteractionFlags, SortableItem, SortableItemFlags } from "@thewaver/ss-components-react";
-import { SORTABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
+import { SORTABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import {
     LIST_GAP,
     computeCardKey,
     computeCardLabel,
-} from "@thewaver/ss-playground-core/App/Pages/SortablePage/SortablePage.const";
-import type { Card } from "@thewaver/ss-playground-core/App/Pages/SortablePage/SortablePage.types";
+} from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.const";
+import type { Card } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.types";
 
 import {
     PageSortableItemContent,

@@ -1,9 +1,9 @@
 import type { Signal } from "solid-js";
 
 import type { AccessorProps, SelectItem, SelectOption } from "@thewaver/ss-components-solid";
-import type { Airport, Delivery } from "@thewaver/ss-playground-core/App/Pages/SelectPage/SelectRecords.types";
+import type { Airport, Delivery } from "@thewaver/ss-playground/App/Pages/SelectPage/SelectRecords.types";
 
-export type { Airport, Delivery } from "@thewaver/ss-playground-core/App/Pages/SelectPage/SelectRecords.types";
+export type { Airport, Delivery } from "@thewaver/ss-playground/App/Pages/SelectPage/SelectRecords.types";
 
 export type SelectExampleProps = AccessorProps<{
     valueSignal: Signal<string | undefined>;

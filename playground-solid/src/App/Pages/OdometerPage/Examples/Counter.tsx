@@ -2,7 +2,7 @@ import type { Accessor, ParentProps } from "solid-js";
 
 import { Odometer, access } from "@thewaver/ss-components-solid";
 import type { OdometerSlotFlags } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/OdometerPage/OdometerPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/OdometerPage/OdometerPage.css";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import type { OdometerExampleProps } from "../OdometerPage.types";

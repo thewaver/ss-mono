@@ -1,5 +1,5 @@
 import type { SortableItem } from "@thewaver/ss-components-react";
-import type { Card } from "@thewaver/ss-playground-core/App/Pages/SortablePage/SortablePage.types";
+import type { Card } from "@thewaver/ss-playground/App/Pages/SortablePage/SortablePage.types";
 
 import { PageSortableRoom } from "../../../StyledComponents/SortableContent/SortableContent";
 import { CardsExample } from "./Cards";

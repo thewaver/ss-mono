@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from "react";
 
 import { PlacementUtils } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/StepContent/StepContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/StepContent/StepContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { StepArcConnectorProps, StepConnectorProps, StepContentProps } from "./StepContent.types";

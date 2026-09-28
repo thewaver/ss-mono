@@ -1,5 +1,5 @@
 import { SlideButton } from "@thewaver/ss-components-react";
-import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground-core/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
+import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
 
 import { PageSlideButtonContent } from "../../../StyledComponents/SlideButtonContent/SlideButtonContent";
 import type { SlideButtonErroredExampleProps } from "../SlideButtonPage.types";

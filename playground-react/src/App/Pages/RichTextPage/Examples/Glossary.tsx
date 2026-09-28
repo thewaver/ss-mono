@@ -2,8 +2,8 @@ import { useState } from "react";
 import type { PropsWithChildren, ReactNode } from "react";
 
 import { RichText, Tooltip } from "@thewaver/ss-components-react";
-import { GLOSSARY_CONTENT } from "@thewaver/ss-playground-core/App/Pages/RichTextPage/RichTextPage.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/RichTextPage/RichTextPage.css";
+import { GLOSSARY_CONTENT } from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/RichTextPage/RichTextPage.css";
 
 import { PageTooltipContent } from "../../../StyledComponents/TooltipContent/TooltipContent";
 

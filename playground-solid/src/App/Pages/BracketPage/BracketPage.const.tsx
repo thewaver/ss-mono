@@ -1,11 +1,11 @@
 import type { Accessor } from "solid-js";
 
 import type { BracketNode, BracketNodeState } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/BracketPage/BracketPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/BracketPage/BracketPage.css";
 
 const ROOT_LAYER = 0;
 
-export * from "@thewaver/ss-playground-core/App/Pages/BracketPage/BracketNodes.const";
+export * from "@thewaver/ss-playground/App/Pages/BracketPage/BracketNodes.const";
 
 export const renderBracketNode = (getNode: Accessor<BracketNode<string>>, getState: Accessor<BracketNodeState>) => (
     <div

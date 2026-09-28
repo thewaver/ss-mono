@@ -1,5 +1,5 @@
 import { Button, SlideButton, access } from "@thewaver/ss-components-solid";
-import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground-core/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
+import { SLIDE_BUTTON_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SlideButtonContent/SlideButtonContent.css";
 
 import { PageControlColumn } from "../../../PageComponents/ControlRow/ControlRow";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";

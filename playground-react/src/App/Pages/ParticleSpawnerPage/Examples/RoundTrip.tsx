@@ -2,8 +2,8 @@ import { useState } from "react";
 
 import { ParticleSpawner } from "@thewaver/ss-components-react";
 import type { ParticleSpawnerController } from "@thewaver/ss-components-react";
-import { computeParticleGlow } from "@thewaver/ss-playground-core/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
+import { computeParticleGlow } from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ParticleSpawnerPage/ParticleSpawnerPage.css";
 
 import type { ParticleSpawnerExampleProps } from "../ParticleSpawnerPage.types";
 

@@ -1,7 +1,7 @@
 import type { ParentProps } from "solid-js";
 
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldAdornment/TextFieldAdornment.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TextFieldAdornment/TextFieldAdornment.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { TextFieldAdornmentProps } from "./TextFieldAdornment.types";

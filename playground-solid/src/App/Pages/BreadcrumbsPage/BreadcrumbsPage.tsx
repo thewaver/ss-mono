@@ -2,9 +2,9 @@ import { createMemo, createSignal } from "solid-js";
 
 import type { Breadcrumb } from "@thewaver/ss-components-solid";
 import { Button } from "@thewaver/ss-components-solid";
-import { BreadcrumbKnobs } from "@thewaver/ss-playground-core/App/Knobs/Breadcrumbs.const";
-import type { CrumbValue } from "@thewaver/ss-playground-core/App/Pages/BreadcrumbsPage/BreadcrumbTrail.types";
-import { TRAIL } from "@thewaver/ss-playground-core/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
+import { BreadcrumbKnobs } from "@thewaver/ss-playground/App/Knobs/Breadcrumbs.const";
+import type { CrumbValue } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbTrail.types";
+import { TRAIL } from "@thewaver/ss-playground/App/Pages/BreadcrumbsPage/BreadcrumbsPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageNumberField } from "../../PageComponents/Field/Field";

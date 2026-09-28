@@ -2,8 +2,9 @@ import type { PropsWithChildren } from "react";
 
 import type { PartialGlassDefs } from "@thewaver/ss-components-react";
 import { GlassSurface } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TooltipContent/TooltipContent.css";
-import { BORDER_RADIUS_FULL, themeVars } from "@thewaver/ss-playground-core/App/Theme.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TooltipContent/TooltipContent.css";
+import { BORDER_RADIUS_FULL } from "@thewaver/ss-playground/App/Theme.const";
+import { themeVars } from "@thewaver/ss-playground/App/Theme.css";
 import { CSSUtils } from "@thewaver/ss-utils";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";

@@ -1,8 +1,8 @@
 import { useState } from "react";
 
 import { CURRENCY_INPUT_DEFAULTS } from "@thewaver/ss-components-react";
-import { CurrencyInputKnobs } from "@thewaver/ss-playground-core/App/Knobs/CurrencyInputs.const";
-import { BUDGET_MAX } from "@thewaver/ss-playground-core/App/Pages/CurrencyInputPage/CurrencyInputPage.const";
+import { CurrencyInputKnobs } from "@thewaver/ss-playground/App/Knobs/CurrencyInputs.const";
+import { BUDGET_MAX } from "@thewaver/ss-playground/App/Pages/CurrencyInputPage/CurrencyInputPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageSelectField } from "../../PageComponents/Field/Field";

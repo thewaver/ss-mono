@@ -4,7 +4,7 @@ import {
     BOOKING_STEPS,
     CLOSING_TIME,
     OPENING_TIME,
-} from "@thewaver/ss-playground-core/App/Pages/DatePickerPage/DatePickerPage.const";
+} from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
 import { TimeUtils } from "@thewaver/ss-utils";
 import type { TimeValue } from "@thewaver/ss-utils";
 

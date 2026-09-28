@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
 
 import type { CuboidController } from "@thewaver/ss-components-react";
 import { CUBOID_DEFAULTS, CuboidUtils, MediaQueryMonitorReactUtils } from "@thewaver/ss-components-react";
-import { CuboidKnobs } from "@thewaver/ss-playground-core/App/Knobs/Cuboids.const";
+import { CuboidKnobs } from "@thewaver/ss-playground/App/Knobs/Cuboids.const";
 
 import { PageExampleKnobs } from "../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageExamples } from "../../PageComponents/Examples/Examples";

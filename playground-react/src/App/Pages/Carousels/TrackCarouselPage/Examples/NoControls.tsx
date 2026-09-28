@@ -3,7 +3,7 @@ import {
     computeCarouselRotationLabel,
     computeCarouselStepLabel,
     computePositionLabel,
-} from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
+} from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 
 import { PageCarouselSlide } from "../../../../StyledComponents/CarouselContent/CarouselContent";
 import type { CarouselExampleProps } from "../../Carousels.types";

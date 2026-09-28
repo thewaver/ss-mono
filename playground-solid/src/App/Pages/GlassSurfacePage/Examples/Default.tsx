@@ -4,9 +4,9 @@ import { GlassSurface, InteractionTrackerSolidUtils, SVGDefsSamples, access } fr
 import {
     NO_SAMPLE_KEY,
     computeNoSampleDefs,
-} from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/GlassSurfacePage/GlassSurfacePage.css";
-import knight from "@thewaver/ss-playground-core/App/knight.webp";
+} from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/GlassSurfacePage/GlassSurfacePage.css";
+import knight from "@thewaver/ss-playground/App/knight.webp";
 import { CSSUtils, type Point2d } from "@thewaver/ss-utils";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 

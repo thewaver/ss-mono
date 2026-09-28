@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { Accordion, Scroller, Tabs, useViewportContext } from "@thewaver/ss-components-react";
 import type { AccordionItem, Tab } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/SourceView/SourceView.css";
-import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground-core/App/Theme.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/SourceView/SourceView.css";
+import { FOCUS_RING_WIDTH } from "@thewaver/ss-playground/App/Theme.css";
 
 import { PageAccordionHeader, PageAccordionPanel } from "../../StyledComponents/AccordionContent/AccordionContent";
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../StyledComponents/TabContent/TabContent";

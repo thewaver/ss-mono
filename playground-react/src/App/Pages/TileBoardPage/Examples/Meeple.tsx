@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { TileBoard, TileBoardUtils } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TileBoardPage/TileBoardPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/TileBoardPage/TileBoardPage.css";
 import { Index2d } from "@thewaver/ss-utils";
 
 import { PageTileBoardMeeple, PageTileBoardTile } from "../../../StyledComponents/TileBoardContent/TileBoardContent";

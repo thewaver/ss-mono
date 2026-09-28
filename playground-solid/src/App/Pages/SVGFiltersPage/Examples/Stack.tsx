@@ -2,15 +2,15 @@ import type { Accessor, Signal } from "solid-js";
 
 import { SVGFilterDefsFactory, Sortable, access } from "@thewaver/ss-components-solid";
 import type { InteractionFlags, SortableItem, SortableItemFlags } from "@thewaver/ss-components-solid";
-import { SORTABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
+import { SORTABLE_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 import {
     STEP_LIST_GAP,
     STEP_LIST_MIN_HEIGHT,
     computeStepKey,
     computeStepLabel,
-} from "@thewaver/ss-playground-core/App/Pages/SVGFiltersPage/SVGFilterSteps.const";
-import type { SVGFiltersStep } from "@thewaver/ss-playground-core/App/Pages/SVGFiltersPage/SVGFilterSteps.types";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SVGFiltersPage/SVGFiltersPage.css";
+} from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFilterSteps.const";
+import type { SVGFiltersStep } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFilterSteps.types";
+import * as styles from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFiltersPage.css";
 
 import { PageFilterStage } from "../../../StyledComponents/SVGFiltersContent/SVGFiltersContent";
 import {

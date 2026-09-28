@@ -348,9 +348,11 @@ Solid views were in `components/src` when these rules were written and moved out
 and both of its exceptions went with them; the React tree was written to the same rules from the start. Read
 `components/src` in what follows as all three.
 
-**The same goes for the Playground, which is now three folders.** `playground/` became `playground-core/` (the
-framework-free half both apps share), `playground-solid/` and `playground-react/`, and every rule here that names
-`playground/src` applies to all three `src` folders.
+**The same goes for the Playground, which is now three folders, named to mirror `components/`.** `playground/`
+(the framework-free half both apps share, `@thewaver/ss-playground`), `playground-solid/` and `playground-react/`,
+and every rule here that names `playground/src` applies to all three `src` folders. An earlier session named the
+shared half `playground-core/`; the user corrected it — the three must read the same way the three component
+packages do.
 
 **`utils/` is the opposite, and confusing the two is the mistake to avoid.** That is `@thewaver/ss-utils`,
 which now shares this repo rather than sitting in a clone next door — but sharing a repo did not merge the
@@ -455,6 +457,11 @@ audience"_ above for what that changes.
 means editing both in the same change; a brief that disagrees with the full list is worse than no brief,
 because it is the one that gets read. `backlog.md` is the source of truth, so where the two differ the brief
 is what gets corrected.
+
+**Routine release steps are never backlog items.** Stated by the user, who had an item's last remaining line
+dropped for being "publish the packages": publishing, committing, merging, bumping a version are obvious steps, not
+tasks, and do not earn a place in `backlog.md` or `brief.md`. A fact such a step depends on — an order packages must
+be released in — goes in `decisions.md` instead.
 
 **When an item in `backlog.md` is done or dropped, delete it outright** and renumber the rest. Nothing is
 marked "resolved" in place. If closing it settled a decision that drives future work, that decision moves to

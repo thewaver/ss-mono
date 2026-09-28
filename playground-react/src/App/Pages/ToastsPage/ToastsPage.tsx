@@ -10,7 +10,7 @@ import {
     useStore,
 } from "@thewaver/ss-components-react";
 import type { Toast, ToastsAlignment, ToastsDir, ToastsOverflow } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ToastsPage/ToastsPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/ToastsPage/ToastsPage.css";
 import { StoreUtils } from "@thewaver/ss-utils";
 
 import { ToastKnobs } from "../../Knobs/Toasts.const";

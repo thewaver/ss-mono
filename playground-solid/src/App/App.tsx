@@ -5,17 +5,17 @@ import type { DependencyNames } from "virtual:component-dependencies";
 import { A, Navigate, Route, type RouteSectionProps, Router } from "@solidjs/router";
 import { Collapsible, Sidebar, Tree, ViewportWrapper } from "@thewaver/ss-components-solid";
 import type { SidebarPhase, SignalPair, TreeNode } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/App.css";
+import * as styles from "@thewaver/ss-playground/App/App.css";
 import {
     toRoutePath,
     toRouterBase,
-} from "@thewaver/ss-playground-core/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
+} from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
 import {
     DEFAULT_PAGE_VIEW,
     PAGE_VIEW_KEYS,
     toBaseRoute,
     toPageViewRoute,
-} from "@thewaver/ss-playground-core/App/PageComponents/ViewTabs/ViewTabs.const";
+} from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
 import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
 
 import {

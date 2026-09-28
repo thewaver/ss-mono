@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import { SHADOW_CASTER_DEFAULTS } from "@thewaver/ss-components-react";
-import { ShadowCasterKnobs } from "@thewaver/ss-playground-core/App/Knobs/ShadowCasters.const";
+import { ShadowCasterKnobs } from "@thewaver/ss-playground/App/Knobs/ShadowCasters.const";
 
 import { PageExamples } from "../../../PageComponents/Examples/Examples";
 import { PageCheckField, PageColorField, PageNumberField } from "../../../PageComponents/Field/Field";

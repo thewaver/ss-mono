@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import { Table } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TablePage/TablePage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/TablePage/TablePage.css";
 
 import { createPartColumns } from "../TablePage.const";
 import type { Part, TableExampleProps } from "../TablePage.types";

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { Button, Timeline } from "@thewaver/ss-components-react";
 import type { TimelineController } from "@thewaver/ss-components-react";
-import type { Clip } from "@thewaver/ss-playground-core/App/Pages/TimelinePage/TimelineItems.types";
+import type { Clip } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelineItems.types";
 import {
     CLIPS,
     LANE_SIZE,
@@ -10,8 +10,8 @@ import {
     SECOND_STEPS,
     TRACKS,
     formatStopwatch,
-} from "@thewaver/ss-playground-core/App/Pages/TimelinePage/TimelinePage.const";
-import { AXIS_HEIGHT } from "@thewaver/ss-playground-core/App/StyledComponents/TimelineContent/TimelineContent.css";
+} from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelinePage.const";
+import { AXIS_HEIGHT } from "@thewaver/ss-playground/App/StyledComponents/TimelineContent/TimelineContent.css";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import {

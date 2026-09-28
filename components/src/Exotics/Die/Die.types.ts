@@ -69,6 +69,11 @@ export type DieRoller = {
     rest: (index: number) => void;
     /** Turns the die to a face the owner asked for, without tumbling. The echo of a roll's own write is ignored. */
     turnTo: (index: number) => void;
+    /**
+     * Answers a change of shape. A die at rest is put straight onto the face; a die part-way through a turn the owner
+     * asked for turns on from where it is drawn to that face of the new shape; a roll is left to land where it lands.
+     */
+    reshape: (index: number) => void;
     /** Starts a roll and reports whether it did. It declines while one is already under way. */
     roll: () => boolean;
     /** Stops any turn under way, leaving the die where it is drawn. */

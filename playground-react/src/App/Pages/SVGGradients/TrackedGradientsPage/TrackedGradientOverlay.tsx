@@ -2,8 +2,8 @@ import { useId } from "react";
 import { createPortal } from "react-dom";
 
 import { Button, SVGDefsSamples, Shape, TrackedGradientDefaults } from "@thewaver/ss-components-react";
-import { NO_SAMPLE_KEY } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SVGGradients/SVGGradients.css";
+import { NO_SAMPLE_KEY } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
 import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
 import { TrackedGradientKnobs } from "../../../Knobs/TrackedGradients.const";

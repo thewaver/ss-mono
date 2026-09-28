@@ -1,8 +1,8 @@
 import { useState } from "react";
 
 import { MediaQueryMonitorReactUtils, TREEMAP_DEFAULTS, TreemapUtils } from "@thewaver/ss-components-react";
-import { TreemapKnobs } from "@thewaver/ss-playground-core/App/Knobs/Treemaps.const";
-import { LIBRARY } from "@thewaver/ss-playground-core/App/Pages/TreemapPage/TreemapPage.const";
+import { TreemapKnobs } from "@thewaver/ss-playground/App/Knobs/Treemaps.const";
+import { LIBRARY } from "@thewaver/ss-playground/App/Pages/TreemapPage/TreemapPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";

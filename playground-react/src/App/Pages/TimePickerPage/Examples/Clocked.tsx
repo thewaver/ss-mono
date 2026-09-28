@@ -3,12 +3,12 @@ import { TimePicker } from "@thewaver/ss-components-react";
 import {
     CLOCK_TRIGGER_LABEL,
     TIME_SEGMENT_HINTS,
-} from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
-import { FIELD_WIDTH, LOCALE } from "@thewaver/ss-playground-core/App/Pages/DatePickerPage/DatePickerPage.const";
+} from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { FIELD_WIDTH, LOCALE } from "@thewaver/ss-playground/App/Pages/DatePickerPage/DatePickerPage.const";
 import {
     FIELD_GAP,
     FIELD_STEPPER_PADDING,
-} from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
 import type { TimeValue } from "@thewaver/ss-utils";
 
 import { PageMeridiemToggle } from "../../../PageComponents/MeridiemToggle/MeridiemToggle";

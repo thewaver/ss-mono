@@ -1,5 +1,5 @@
 import type { SVGDefsSamples } from "@thewaver/ss-components-react";
-import type { WithNoSample } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.types";
+import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 import type { ShapeConst } from "@thewaver/ss-utils";
 
 export namespace ShapeKnobs {

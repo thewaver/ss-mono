@@ -9,9 +9,9 @@ import type {
     SortableGridItemFlags,
     SortableGridSpot,
 } from "@thewaver/ss-components-react";
-import { SORTABLE_GRID_ANNOUNCEMENTS } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SortableGridPage/SortableGridPage.css";
-import type { Gear } from "@thewaver/ss-playground-core/App/Pages/SortableGridPage/SortableGridPage.types";
+import { SORTABLE_GRID_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.css";
+import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import {

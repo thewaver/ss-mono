@@ -2,7 +2,7 @@ import type { Signal } from "solid-js";
 
 import { MultiSelect, access } from "@thewaver/ss-components-solid";
 import type { MaybeAccessor, SelectItem } from "@thewaver/ss-components-solid";
-import * as popupStyles from "@thewaver/ss-playground-core/App/StyledComponents/PopoverSurface/PopoverSurface.css";
+import * as popupStyles from "@thewaver/ss-playground/App/StyledComponents/PopoverSurface/PopoverSurface.css";
 
 import { PagePopoverSurface } from "../../../StyledComponents/PopoverSurface/PopoverSurface";
 import { PageSelectContent, computePageSelectTextStyle } from "../../../StyledComponents/SelectContent/SelectContent";

@@ -1,5 +1,5 @@
 import { ColorArea } from "@thewaver/ss-components-react";
-import { COLOR_AREA_AXIS_LABELS } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
+import { COLOR_AREA_AXIS_LABELS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
 
 import { PageColorAreaContent } from "../../../StyledComponents/ColorAreaContent/ColorAreaContent";
 import type { ColorAreaExampleProps } from "../ColorAreaPage.types";

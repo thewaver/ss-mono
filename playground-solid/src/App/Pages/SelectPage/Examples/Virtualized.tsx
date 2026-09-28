@@ -2,8 +2,8 @@ import type { JSX, Signal } from "solid-js";
 
 import { Select } from "@thewaver/ss-components-solid";
 import type { MaybeAccessor, SelectItem } from "@thewaver/ss-components-solid";
-import { SelectKnobs } from "@thewaver/ss-playground-core/App/Knobs/Selects.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SelectPage/SelectPage.css";
+import { SelectKnobs } from "@thewaver/ss-playground/App/Knobs/Selects.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/SelectPage/SelectPage.css";
 
 import { PageExampleKnobs } from "../../../PageComponents/ExampleKnobs/ExampleKnobs";
 import { PageNumberField } from "../../../PageComponents/Field/Field";

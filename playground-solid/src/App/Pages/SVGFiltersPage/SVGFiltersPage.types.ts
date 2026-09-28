@@ -1,7 +1,7 @@
 import type { Signal } from "solid-js";
 
 import type { AccessorProps, SVGFilterMethod, SortableItem } from "@thewaver/ss-components-solid";
-import type { SVGFiltersStep } from "@thewaver/ss-playground-core/App/Pages/SVGFiltersPage/SVGFilterSteps.types";
+import type { SVGFiltersStep } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFilterSteps.types";
 import type { Size2d } from "@thewaver/ss-utils";
 
 export type SVGFiltersExampleProps = AccessorProps<{

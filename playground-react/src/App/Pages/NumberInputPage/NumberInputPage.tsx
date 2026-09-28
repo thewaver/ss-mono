@@ -6,7 +6,7 @@ import {
     QUANTITY_MIN,
     QUANTITY_STEP,
     RATING_STEP,
-} from "@thewaver/ss-playground-core/App/Pages/NumberInputPage/NumberInputPage.const";
+} from "@thewaver/ss-playground/App/Pages/NumberInputPage/NumberInputPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { DefaultExample } from "./Examples/Default";

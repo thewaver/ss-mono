@@ -1,5 +1,5 @@
 import type { SVGDefsColors, SVGDefsSamples, ShapeProps } from "@thewaver/ss-components-react";
-import type { WithNoSample } from "@thewaver/ss-playground-core/App/PageComponents/SampleGroups/SampleGroups.types";
+import type { WithNoSample } from "@thewaver/ss-playground/App/PageComponents/SampleGroups/SampleGroups.types";
 import type { ShapeConst, Size2d } from "@thewaver/ss-utils";
 
 export type ShapeExampleProps = Pick<ShapeProps, "lameExponents" | "joinRadii"> & {

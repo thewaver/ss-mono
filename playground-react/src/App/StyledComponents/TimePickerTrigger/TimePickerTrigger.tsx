@@ -1,4 +1,4 @@
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TimePickerTrigger/TimePickerTrigger.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TimePickerTrigger/TimePickerTrigger.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { TimePickerTriggerProps } from "./TimePickerTrigger.types";

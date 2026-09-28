@@ -1,8 +1,8 @@
 import { For } from "solid-js";
 
 import { Button, SpotlightHint, access } from "@thewaver/ss-components-solid";
-import { PADDING } from "@thewaver/ss-playground-core/App/Pages/Spotlights/SpotlightTourSteps.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/Spotlights/Spotlights.css";
+import { PADDING } from "@thewaver/ss-playground/App/Pages/Spotlights/SpotlightTourSteps.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/Spotlights/Spotlights.css";
 
 import { PageMeasureBox } from "../../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../../StyledComponents/ButtonContent/ButtonContent";

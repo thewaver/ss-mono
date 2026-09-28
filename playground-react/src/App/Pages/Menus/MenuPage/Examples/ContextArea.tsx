@@ -1,5 +1,5 @@
 import { ContextMenu } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/Menus/MenuPage/MenuPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/Menus/MenuPage/MenuPage.css";
 
 import { ACTIONS, renderMenuItem, renderMenuPopup } from "../MenuPage.const";
 import type { MenuExampleProps } from "../MenuPage.types";

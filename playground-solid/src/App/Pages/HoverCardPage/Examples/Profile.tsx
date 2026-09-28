@@ -1,8 +1,8 @@
 import { createSignal, createUniqueId } from "solid-js";
 
 import { Button, HoverCard } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/HoverCardPage/HoverCardPage.css";
-import knightProfile from "@thewaver/ss-playground-core/App/knight_profile.webp";
+import * as styles from "@thewaver/ss-playground/App/Pages/HoverCardPage/HoverCardPage.css";
+import knightProfile from "@thewaver/ss-playground/App/knight_profile.webp";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
 import { PageHoverCardContent } from "../../../StyledComponents/HoverCardContent/HoverCardContent";

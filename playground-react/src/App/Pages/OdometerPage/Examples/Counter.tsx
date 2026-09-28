@@ -2,7 +2,7 @@ import type { PropsWithChildren } from "react";
 
 import { Odometer } from "@thewaver/ss-components-react";
 import type { OdometerSlotFlags } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/OdometerPage/OdometerPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/OdometerPage/OdometerPage.css";
 import { assignInlineVars } from "@vanilla-extract/dynamic";
 
 import type { OdometerExampleProps } from "../OdometerPage.types";

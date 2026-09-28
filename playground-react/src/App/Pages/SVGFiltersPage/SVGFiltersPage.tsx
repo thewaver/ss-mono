@@ -2,10 +2,10 @@ import { useState } from "react";
 
 import { SVGFilterDefs } from "@thewaver/ss-components-react";
 import type { SVGFilterMethod, SortableItem } from "@thewaver/ss-components-react";
-import { SVGFilterKnobs } from "@thewaver/ss-playground-core/App/Knobs/SVGFilters.const";
-import { APPLIED_STEPS } from "@thewaver/ss-playground-core/App/Pages/SVGFiltersPage/SVGFilterSteps.const";
-import type { SVGFiltersStep } from "@thewaver/ss-playground-core/App/Pages/SVGFiltersPage/SVGFilterSteps.types";
-import { SUBJECT_SIZE } from "@thewaver/ss-playground-core/App/StyledComponents/SVGFiltersContent/SVGFiltersContent.css";
+import { SVGFilterKnobs } from "@thewaver/ss-playground/App/Knobs/SVGFilters.const";
+import { APPLIED_STEPS } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFilterSteps.const";
+import type { SVGFiltersStep } from "@thewaver/ss-playground/App/Pages/SVGFiltersPage/SVGFilterSteps.types";
+import { SUBJECT_SIZE } from "@thewaver/ss-playground/App/StyledComponents/SVGFiltersContent/SVGFiltersContent.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageCheckField, PageSelectField } from "../../PageComponents/Field/Field";

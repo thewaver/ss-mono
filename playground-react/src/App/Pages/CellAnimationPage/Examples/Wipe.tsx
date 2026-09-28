@@ -13,7 +13,7 @@ import {
     useViewportContext,
 } from "@thewaver/ss-components-react";
 import type { CellAnimationPlaybackOpts } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/CellAnimationPage/CellAnimationPage.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
 import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";

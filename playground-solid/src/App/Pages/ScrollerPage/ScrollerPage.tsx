@@ -1,8 +1,8 @@
 import { createMemo, createSignal } from "solid-js";
 
 import type { Tab } from "@thewaver/ss-components-solid";
-import { ScrollerKnobs } from "@thewaver/ss-playground-core/App/Knobs/Scrollers.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/ScrollerPage/ScrollerPage.css";
+import { ScrollerKnobs } from "@thewaver/ss-playground/App/Knobs/Scrollers.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/ScrollerPage/ScrollerPage.css";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField } from "../../PageComponents/Field/Field";

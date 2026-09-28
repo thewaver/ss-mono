@@ -1,6 +1,6 @@
 import type { SortableGridItem } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/SortableGridPage/SortableGridPage.css";
-import type { Gear } from "@thewaver/ss-playground-core/App/Pages/SortableGridPage/SortableGridPage.types";
+import * as styles from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.css";
+import type { Gear } from "@thewaver/ss-playground/App/Pages/SortableGridPage/SortableGridPage.types";
 
 import { QUIVER_COLUMNS, QUIVER_ROWS, STASH_COLUMNS, STASH_ROWS } from "../SortableGridPage.const";
 import { InventoryExample } from "./Inventory";

@@ -1,7 +1,7 @@
 import { createUniqueId } from "solid-js";
 
 import { SunburstUtils, access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/SunburstContent/SunburstContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/SunburstContent/SunburstContent.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { PageSunburstArcProps, PageSunburstHubProps } from "./SunburstContent.types";

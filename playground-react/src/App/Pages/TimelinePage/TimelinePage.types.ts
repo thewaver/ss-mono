@@ -1,7 +1,7 @@
 import type { Dispatch, SetStateAction } from "react";
 
 import type { TimelineSpan } from "@thewaver/ss-components-react";
-import type { Clip } from "@thewaver/ss-playground-core/App/Pages/TimelinePage/TimelineItems.types";
+import type { Clip } from "@thewaver/ss-playground/App/Pages/TimelinePage/TimelineItems.types";
 
 export type TimelineExampleProps = {
     isPannable: boolean;

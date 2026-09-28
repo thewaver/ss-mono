@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from "react";
 
 import { Button, MediaQueryMonitorReactUtils, Typewriter } from "@thewaver/ss-components-react";
 import type { TypewriterController, TypewriterMode } from "@thewaver/ss-components-react";
-import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground-core/App/PageComponents/MeasureBox/MeasureBox.css";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TypewriterPage/TypewriterPage.css";
+import { MEASURE_BOX_PADDING } from "@thewaver/ss-playground/App/PageComponents/MeasureBox/MeasureBox.css";
+import * as styles from "@thewaver/ss-playground/App/Pages/TypewriterPage/TypewriterPage.css";
 
 import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
 import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";

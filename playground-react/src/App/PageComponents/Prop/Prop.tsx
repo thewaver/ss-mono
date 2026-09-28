@@ -2,7 +2,7 @@ import type { PropsWithChildren } from "react";
 import { useState } from "react";
 
 import { Button } from "@thewaver/ss-components-react";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/Prop/Prop.css";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/Prop/Prop.css";
 
 import { PagePropHintBadge } from "../../StyledComponents/PropHintBadge/PropHintBadge";
 import { PageTooltipContent } from "../../StyledComponents/TooltipContent/TooltipContent";

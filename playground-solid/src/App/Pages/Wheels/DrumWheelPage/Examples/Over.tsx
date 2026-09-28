@@ -2,7 +2,7 @@ import { createSignal } from "solid-js";
 
 import { Button, DrumWheel, access } from "@thewaver/ss-components-solid";
 import type { WheelController } from "@thewaver/ss-components-solid";
-import { pickPrizeIndex } from "@thewaver/ss-playground-core/App/Pages/Wheels/Wheels.const";
+import { pickPrizeIndex } from "@thewaver/ss-playground/App/Pages/Wheels/Wheels.const";
 import type { Size2d } from "@thewaver/ss-utils";
 
 import { PageMeasureBox } from "../../../../PageComponents/MeasureBox/MeasureBox";

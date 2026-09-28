@@ -5,8 +5,8 @@ import {
     PANEL_BODIES,
     getPanelId,
     getTabId,
-} from "@thewaver/ss-playground-core/App/Pages/TabsPage/TabsPage.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/TabsPage/TabsPage.css";
+} from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/TabsPage/TabsPage.css";
 
 import { PageTabPanel } from "../../../PageComponents/TabPanel/TabPanel";
 import { PageTabCell, PageTabHexFloater } from "../../../StyledComponents/TabContent/TabContent";

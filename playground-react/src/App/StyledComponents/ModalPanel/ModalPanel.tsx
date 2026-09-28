@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/ModalPanel/ModalPanel.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/ModalPanel/ModalPanel.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
 import type { ModalHintProps, ModalPanelProps } from "./ModalPanel.types";

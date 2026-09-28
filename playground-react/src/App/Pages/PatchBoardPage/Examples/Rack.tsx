@@ -1,10 +1,7 @@
 import { PatchBoard, PatchBoardSnaps, PatchBoardUtils } from "@thewaver/ss-components-react";
-import { PATCH_BOARD_ANNOUNCEMENTS } from "@thewaver/ss-playground-core/App/PageComponents/Announcements/Announcements.const";
-import {
-    BOARD_HEIGHT_RATIO,
-    BOARD_WIDTH,
-} from "@thewaver/ss-playground-core/App/Pages/PatchBoardPage/PatchBoardPage.const";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/PatchBoardPage/PatchBoardPage.css";
+import { PATCH_BOARD_ANNOUNCEMENTS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { BOARD_HEIGHT_RATIO, BOARD_WIDTH } from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.const";
+import * as styles from "@thewaver/ss-playground/App/Pages/PatchBoardPage/PatchBoardPage.css";
 
 import {
     PagePatchCable,

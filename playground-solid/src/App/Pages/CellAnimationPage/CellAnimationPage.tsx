@@ -20,8 +20,8 @@ import type {
     CellAnimationPlaybackOpts,
     WeightOpts,
 } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/Pages/CellAnimationPage/CellAnimationPage.css";
-import knight_profile from "@thewaver/ss-playground-core/App/knight_profile.webp";
+import * as styles from "@thewaver/ss-playground/App/Pages/CellAnimationPage/CellAnimationPage.css";
+import knight_profile from "@thewaver/ss-playground/App/knight_profile.webp";
 import type { Index2d, Size2d } from "@thewaver/ss-utils";
 
 import { CellAnimationKnobs } from "../../Knobs/CellAnimations.const";

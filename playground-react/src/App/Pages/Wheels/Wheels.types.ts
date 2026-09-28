@@ -1,10 +1,10 @@
 import type { RotatorSpinDefs } from "@thewaver/ss-components-react";
-import type { WheelSpinStyleKey } from "@thewaver/ss-playground-core/App/Pages/Wheels/WheelSpinStyle.types";
+import type { WheelSpinStyleKey } from "@thewaver/ss-playground/App/Pages/Wheels/WheelSpinStyle.types";
 
 export type {
     WheelSpinStyleFn,
     WheelSpinStyleKey,
-} from "@thewaver/ss-playground-core/App/Pages/Wheels/WheelSpinStyle.types";
+} from "@thewaver/ss-playground/App/Pages/Wheels/WheelSpinStyle.types";
 
 export type WheelExampleProps = {
     wedges: string[];

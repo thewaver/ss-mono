@@ -1,5 +1,5 @@
 import { Range } from "@thewaver/ss-components-solid";
-import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground-core/App/StyledComponents/RangeContent/RangeContent.css";
+import { RANGE_THUMB_SIZE } from "@thewaver/ss-playground/App/StyledComponents/RangeContent/RangeContent.css";
 
 import { PageControlRow, PageControlRowLabel } from "../../../PageComponents/ControlRow/ControlRow";
 import { PageRangeContent } from "../../../StyledComponents/RangeContent/RangeContent";

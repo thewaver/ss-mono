@@ -1,5 +1,5 @@
 import { access } from "@thewaver/ss-components-solid";
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/DieContent/DieContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/DieContent/DieContent.css";
 
 import type { PageDieFaceProps } from "./DieContent.types";
 

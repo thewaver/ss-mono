@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/TextFieldAdornment/TextFieldAdornment.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/TextFieldAdornment/TextFieldAdornment.css";
 
 import { useLayerClass } from "../Layer/Layer.context";
 import type { TextFieldAdornmentProps } from "./TextFieldAdornment.types";

@@ -1,13 +1,13 @@
 import { useState } from "react";
 
 import { AUDIO_SWITCHER_DEFAULTS } from "@thewaver/ss-components-react";
-import { AudioSwitcherKnobs } from "@thewaver/ss-playground-core/App/Knobs/AudioSwitchers.const";
+import { AudioSwitcherKnobs } from "@thewaver/ss-playground/App/Knobs/AudioSwitchers.const";
 import {
     FIELD_WIDTH,
     PERCENT,
     TRACKS,
     TRACK_NAMES,
-} from "@thewaver/ss-playground-core/App/Pages/AudioSwitcherPage/AudioSwitcherPage.const";
+} from "@thewaver/ss-playground/App/Pages/AudioSwitcherPage/AudioSwitcherPage.const";
 
 import { PageExamples } from "../../PageComponents/Examples/Examples";
 import { PageNumberField, PageSelectField } from "../../PageComponents/Field/Field";

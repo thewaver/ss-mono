@@ -8,8 +8,8 @@ import {
     PAGE_VIEW_LABELS,
     toPageViewKey,
     toPageViewRoute,
-} from "@thewaver/ss-playground-core/App/PageComponents/ViewTabs/ViewTabs.const";
-import * as styles from "@thewaver/ss-playground-core/App/PageComponents/ViewTabs/ViewTabs.css";
+} from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
+import * as styles from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.css";
 
 import { PageTabContent, PageTabFloater, PageTabGutter } from "../../StyledComponents/TabContent/TabContent";
 import { PageRouterLink } from "../RouterLink/RouterLink";

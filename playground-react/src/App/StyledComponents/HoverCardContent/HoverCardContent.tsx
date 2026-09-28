@@ -1,6 +1,6 @@
 import type { PropsWithChildren } from "react";
 
-import * as styles from "@thewaver/ss-playground-core/App/StyledComponents/HoverCardContent/HoverCardContent.css";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/HoverCardContent/HoverCardContent.css";
 
 import { PageLayer } from "../../PageComponents/Layer/Layer";
 import type { HoverCardContentProps } from "./HoverCardContent.types";

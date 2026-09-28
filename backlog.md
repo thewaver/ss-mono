@@ -62,10 +62,6 @@ reading.
 28. The submit story — what a native submit carries, and what `Form` hands `onSubmit` — _pending decision_
 29. Work that has never been watched running — _open_
 30. Choices the add-ons round made on the user's behalf — _pending decision_
-31. Planned: the library in React as well as Solid — _planned_
-32. Where the two frameworks now behave differently — _pending decision_
-33. Suspected Solid faults, not yet confirmed — _open_
-34. Spec cases that do not test what they say — _open_
 
 ### Build order
 
@@ -1270,71 +1266,6 @@ is the user's to confirm or change.
 - **Odometer reels under reduced motion drop only their extra turns.** Each reel keeps its own duration, so a
   slow reel still turns its one step slowly. Falling back to `turnDurationMs` there is the alternative.
 
-## 31. Planned: the library in React as well as Solid
-
-Every component is to work in React as well as Solid, and later in other frameworks. The shape is settled, and
-the reasoning is in `decisions.md` under _"Porting beyond Solid: the shared logic is this library's own, not
-Zag's"_: the behavior is written once in plain TypeScript, `@thewaver/ss-components` becomes that shared core,
-and `ss-components-solid` and `ss-components-react` hold the views on top of it. The Playground is two apps on one
-site, `/solid/` and `/react/`, over a shared `playground-core` (`decisions.md`, _"Porting: the Playground in two
-frameworks"_).
-
-What is left:
-
-- **Publishing the new shape, which is the user's.** All three packages build, and each declares the others as
-  dependencies rather than pointing at their source. What remains is choosing versions, lifting `private` on
-  `components-react`, and the order: the core reads `StoreUtils` from `ss-utils`, so `ss-utils` goes out first,
-  then the core, then the two framework packages.
-- **Retiring the React test gallery, one spec at a time.** The user's call, once both Playgrounds existed: the
-  gallery under `components-react/gallery` and its specs under `e2e/react` stay, and each spec there is deleted once
-  the Playground spec for the same component, now run against both Playgrounds, checks everything it checks. What
-  the Playground cannot reach — React's strict mode, settings only a story sets — is folded into the Playground spec
-  first, or the gallery spec stays. The gallery goes when its last spec does.
-
-## 32. Where the two frameworks now behave differently
-
-Found while porting to React. Each is a difference a person can see or count, and each is the user's to settle.
-
-- **Solid `Die`, a shape change during a set turn.** When the page asks the die to turn to a particular face and
-  its shape changes before it arrives, the turn now stops and the die snaps to rest on the new shape. Before the
-  port it kept turning toward the angle worked out for the old shape, and could come to rest crooked. No spec
-  covers either. The ways out argued so far: keep the snap, restore the old turn, or turn smoothly to the nearest
-  face of the new shape.
-- **`CardStack`, a card coming up the pile.** The React stack keeps each card's element when the pile moves, so a
-  card eases into its new place. The Solid stack is handed new entries each time and makes every card afresh, so
-  there the cards jump.
-- **React `onShow` fires twice in development.** React's strict mode runs every effect twice, so a fader shows,
-  cancels and shows again, and the cancel does not take back the `onShow` already reported. A production build
-  reports once. The React toasts spec asserts that an arrival was reported, not that it was reported exactly once.
-
-## 33. Suspected Solid faults, not yet confirmed
-
-Each was noticed by reading the code during the port, not seen on screen, and no spec fails for any of them.
-
-- **Solid `Collapsible` and `Preview` may skip their second scroll pass.** Inside the scroll effect, the flag that
-  says a second pass is waiting is written to a signal the same effect reads, so the effect probably re-runs and
-  cancels its own next-frame pass. The React views keep that flag outside the reactive state, and their second pass
-  runs.
-- **Solid `Typewriter`'s text wrap keeps its first width.** The wrap's width is read from the container once, when
-  the wrap first appears, so after the container narrows the text still wraps at the old, wider width.
-- **The Playground's Typewriter "Custom Input" example never debounces.** It is meant to update half a second after
-  typing stops, but it chooses between updating at once and waiting only once, when it is created, before anything
-  has been typed — so it always updates at once. The React example does the same, to match.
-
-## 34. Spec cases that do not test what they say
-
-Specs are the user's, so these are recorded rather than changed.
-
-- **`tileBoard.spec.ts`, "a piece is not covered by the tile it stands on, even while that tile is hovered".** It
-  asks the browser which element sits at a point, about an element that ignores the pointer and so can never be the
-  answer; it passes whatever happens. The React gallery's version makes the piece reachable for the one reading, and
-  could be ported back.
-- **`listbox.spec.ts`, "with focus already in the list, clicking another option picks it".** Its comment says it
-  was left failing on purpose, but it passes in both frameworks.
-- **`imageMosaic.spec.ts`, "anchoring the height fills columns instead of rows".** It fails now and then with a row
-  span 50 off, and it did so on the code as it was before the port — four times in twelve repeats — so the
-  intermittency is not the port's.
-
 ## Accepted limits
 
 Faults that have been looked at and consciously left alone. Not outstanding work, not numbered, and not part
@@ -1342,6 +1273,14 @@ of the answer to "what is left" — see the note at the top of this file. Each o
 reach it, and why it was accepted, so that nobody has to re-derive the argument in order to leave it alone
 again. An entry moves back up into the numbered items only if the user says so, or if something changes that
 makes the reasoning wrong.
+
+**React faders report `onShow` twice in development.** React's strict mode runs every effect twice in a
+development build, so a fader shows, cancels and shows again, and the cancel does not take back the `onShow`
+already reported. A production build reports once. Reachable on any React page with a fader, such as toasts, by
+counting `onShow` calls under `npm start`. Accepted by the user: React's own documentation calls a double report
+in development acceptable, production is already right, and the alternative — holding `onShow` until the fade has
+really begun — would delay it by a frame in both frameworks through the shared fader. The React toasts spec
+asserts that an arrival was reported, not that it was reported exactly once, and should stay that way.
 
 **A laid-out `Tree` renders every open node, windowing being a one-dimensional device.** A window mounts a run
 of rows and moves them down a column; a layout places every visible node wherever it likes, so there is no run
