@@ -52,12 +52,20 @@ describe("the pile's geometry", () => {
     });
 
     it("runs the top card's move with no transition while it is swiped or about to return", () => {
-        expect(CardStackUtils.getCardTransitionDurationMs(0, { getIsSwiping: () => true, getMotion: () => REST, durationMs: 250 })).toBe(
-            0,
-        );
-        expect(CardStackUtils.getCardTransitionDurationMs(1, { getIsSwiping: () => true, getMotion: () => REST, durationMs: 250 })).toBe(
-            250,
-        );
+        expect(
+            CardStackUtils.getCardTransitionDurationMs(0, {
+                getIsSwiping: () => true,
+                getMotion: () => REST,
+                durationMs: 250,
+            }),
+        ).toBe(0);
+        expect(
+            CardStackUtils.getCardTransitionDurationMs(1, {
+                getIsSwiping: () => true,
+                getMotion: () => REST,
+                durationMs: 250,
+            }),
+        ).toBe(250);
     });
 });
 

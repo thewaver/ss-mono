@@ -14,9 +14,9 @@ describe("CellAnimationPlaybackUtils", () => {
     it("charges a round trip for both trips plus the hold between them", () => {
         expect(CellAnimationPlaybackUtils.computeCycleDurationMs(2000, { dir: "stack" })).toBe(4000);
         expect(CellAnimationPlaybackUtils.computeCycleDurationMs(2000, { dir: "stack", holdMs: 1000 })).toBe(5000);
-        expect(
-            CellAnimationPlaybackUtils.computeCycleDurationMs(2000, { dir: "stack-reverse", holdMs: 1000 }),
-        ).toBe(5000);
+        expect(CellAnimationPlaybackUtils.computeCycleDurationMs(2000, { dir: "stack-reverse", holdMs: 1000 })).toBe(
+            5000,
+        );
         expect(CellAnimationPlaybackUtils.computeCycleDurationMs(2000, { dir: "stack", holdMs: -1000 })).toBe(4000);
     });
 
@@ -131,7 +131,11 @@ describe("CellAnimationPlaybackUtils", () => {
 
         const progressOf = (weight: number, timeline: number, dir: CellAnimationPlaybackDirection) => {
             const playback = { dir, holdMs: HOLD_MS };
-            const breakpointOpts = CellAnimationPlaybackUtils.computeBreakpointOpts(BREAKPOINT_OPTS, timeline, playback);
+            const breakpointOpts = CellAnimationPlaybackUtils.computeBreakpointOpts(
+                BREAKPOINT_OPTS,
+                timeline,
+                playback,
+            );
 
             return CellAnimationBreakpointUtils.computeLocalTimeline(
                 CellAnimationBreakpointUtils.computeBreakpoints(weight, breakpointOpts),
@@ -147,9 +151,10 @@ describe("CellAnimationPlaybackUtils", () => {
             expect(progressOf(1, outwardAt(0.3), "stack"), "the heavy cell leads the way out").toBeGreaterThan(
                 progressOf(0, outwardAt(0.3), "stack"),
             );
-            expect(progressOf(1, returnAt(0.3), "stack"), "and under stack is still out when the light one leaves").toBe(
-                1,
-            );
+            expect(
+                progressOf(1, returnAt(0.3), "stack"),
+                "and under stack is still out when the light one leaves",
+            ).toBe(1);
             expect(progressOf(0, returnAt(0.3), "stack")).toBeLessThan(1);
             expect(progressOf(1, returnAt(0.3), "pipe"), "under pipe it leaves first").toBeLessThan(1);
             expect(progressOf(0, returnAt(0.3), "pipe")).toBe(1);

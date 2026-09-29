@@ -3,10 +3,7 @@ import type { ApiGroupKind, ApiTableKind } from "virtual:component-api";
 
 import { access } from "@thewaver/ss-components-solid";
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-import {
-    loadApiGroups,
-    toHighlightedType,
-} from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
+import { loadApiGroups, toHighlightedType } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
 import type { PageDocsTableProps, PageDocsViewProps } from "./DocsView.types";
 

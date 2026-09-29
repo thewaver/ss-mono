@@ -227,9 +227,7 @@ export const componentApi = (
             const unit = id.slice(RESOLVED_UNIT_PREFIX.length);
 
             return toModule(
-                devBuild
-                    ? await devBuild.loadUnit(unit)
-                    : toUnitCode(JSON.stringify(getApiMap()[unit] ?? [])),
+                devBuild ? await devBuild.loadUnit(unit) : toUnitCode(JSON.stringify(getApiMap()[unit] ?? [])),
             );
         },
         configureServer(server) {

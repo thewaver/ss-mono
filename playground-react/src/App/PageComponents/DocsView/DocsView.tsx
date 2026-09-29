@@ -2,10 +2,7 @@ import { useEffect, useState } from "react";
 import type { ApiGroup, ApiGroupKind, ApiTableKind } from "virtual:component-api";
 
 import * as styles from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.css";
-import {
-    loadApiGroups,
-    toHighlightedType,
-} from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
+import { loadApiGroups, toHighlightedType } from "@thewaver/ss-playground/App/PageComponents/DocsView/DocsView.utils";
 
 import type { PageDocsTableProps, PageDocsViewProps } from "./DocsView.types";
 

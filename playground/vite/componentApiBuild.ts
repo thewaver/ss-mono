@@ -490,7 +490,10 @@ const createApiReader = (
                     kind,
                     tables: tables.sort(
                         kind === "props"
-                            ? byPrimaries([`${unit}${PROPS_SUFFIX}`, `${unit}${apiOptions.slotsSuffix ?? PROPS_SUFFIX}`])
+                            ? byPrimaries([
+                                  `${unit}${PROPS_SUFFIX}`,
+                                  `${unit}${apiOptions.slotsSuffix ?? PROPS_SUFFIX}`,
+                              ])
                             : byAliasesFirst,
                     ),
                 },

@@ -95,7 +95,11 @@ export const WipeExample = (props: Props) => {
                                     LOZENGE_GROW,
                                     CellAnimationBreakpointUtils.computeBreakpoints(
                                         defs.weight,
-                                        CellAnimationPlaybackUtils.computeBreakpointOpts(props.breakpointOpts, timeline, WIPE_PLAYBACK),
+                                        CellAnimationPlaybackUtils.computeBreakpointOpts(
+                                            props.breakpointOpts,
+                                            timeline,
+                                            WIPE_PLAYBACK,
+                                        ),
                                     ),
                                     { ...defs, origin },
                                     CellAnimationPlaybackUtils.computeGlobalTimeline(timeline, legMs, WIPE_PLAYBACK),

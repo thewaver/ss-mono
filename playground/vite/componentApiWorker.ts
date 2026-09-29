@@ -10,8 +10,7 @@ export type ApiWorkerData = {
 };
 
 export type ApiWorkerRequest =
-    | { kind: "build"; generation: number; changedFiles: string[] }
-    | { kind: "prioritize"; unit: string };
+    { kind: "build"; generation: number; changedFiles: string[] } | { kind: "prioritize"; unit: string };
 
 export type ApiWorkerReport =
     | { kind: "units"; generation: number; units: string[] }

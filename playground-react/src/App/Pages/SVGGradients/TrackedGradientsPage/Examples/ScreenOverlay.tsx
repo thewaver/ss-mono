@@ -60,7 +60,7 @@ export const ScreenOverlayExample = (props: TrackedGradientExampleProps) => {
                                 renderChildren={() => <div className={styles.screenOverlayBox} />}
                             />
                         </div>
-    
+
                         <div className={styles.screenOverlayClose}>
                             <Button
                                 renderContent={(flags) => (

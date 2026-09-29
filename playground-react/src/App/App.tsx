@@ -6,6 +6,7 @@ import type { DependencyNames } from "virtual:component-dependencies";
 import { Collapsible, Sidebar, Tree, ViewportWrapper } from "@thewaver/ss-components-react";
 import type { SidebarPhase, TreeNode } from "@thewaver/ss-components-react";
 import * as styles from "@thewaver/ss-playground/App/App.css";
+import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
 import { toRouterBase } from "@thewaver/ss-playground/App/PageComponents/FrameworkSwitch/FrameworkSwitch.const";
 import {
     DEFAULT_PAGE_VIEW,
@@ -13,7 +14,6 @@ import {
     toBaseRoute,
     toPageViewRoute,
 } from "@thewaver/ss-playground/App/PageComponents/ViewTabs/ViewTabs.const";
-import { IS_BUILD_PROGRESS_SHOWN } from "@thewaver/ss-playground/App/PageComponents/BuildProgress/BuildProgress.utils";
 import { FunctionUtils, Size2d, StringUtils } from "@thewaver/ss-utils";
 
 import {
@@ -377,7 +377,8 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                                                 <PageTreeNodeContent
                                                     renderProps={renderProps}
                                                     hasExamples={
-                                                        getIsBranchConfig(node.value) || node.value.component !== undefined
+                                                        getIsBranchConfig(node.value) ||
+                                                        node.value.component !== undefined
                                                     }
                                                     detail={
                                                         getIsBranchConfig(node.value)

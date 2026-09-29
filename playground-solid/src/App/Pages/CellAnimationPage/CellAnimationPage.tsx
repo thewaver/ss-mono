@@ -590,7 +590,9 @@ export const CellAnimationPage = () => {
                 <PageProp
                     key={"playbackDir"}
                     label={"Playback direction"}
-                    hint={"Whether each pass runs one way, or goes out and comes back. Coming back, stack starts with the last cell to arrive and pipe with the first."}
+                    hint={
+                        "Whether each pass runs one way, or goes out and comes back. Coming back, stack starts with the last cell to arrive and pipe with the first."
+                    }
                 >
                     <PageSelectField
                         value={() => playbackOpts.dir!}
