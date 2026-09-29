@@ -1,7 +1,7 @@
 {
     "name": "@thewaver/ss-components-solid",
     "type": "module",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "description": "SolidJS components for building shaped UI.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -18,6 +18,9 @@
         "llms.txt"
     ],
     "license": "MIT",
+    "publishConfig": {
+        "access": "public"
+    },
     "author": "Luís Santos",
     "repository": {
         "type": "git",
@@ -123,15 +126,15 @@
     },
     "dependencies": {
         "@tanstack/virtual-core": "^3.17.11",
-        "@thewaver/ss-components": "^0.0.3"
+        "@thewaver/ss-components": "^0.0.5"
     },
     "peerDependencies": {
-        "@thewaver/ss-utils": "^0.0.24",
+        "@thewaver/ss-utils": "^0.0.26",
         "solid-js": "^1.9.15"
     },
     "devDependencies": {
         "@internationalized/date": "^3.12.4",
-        "@thewaver/ss-utils": "^0.0.24",
+        "@thewaver/ss-utils": "^0.0.26",
         "@vanilla-extract/dynamic": "^2.1.5",
         "@vanilla-extract/vite-plugin": "^5.2.6",
         "solid-js": "^1.9.15",

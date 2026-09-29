@@ -361,8 +361,12 @@ interactionFlags, element, defs)` runs during the host's render, so it calls no 
   `@thewaver/*` packages, its framework and TanStack's `virtual-core` as external, and bundles
   `@vanilla-extract/dynamic` into `_external/` as the core always did. The React package's library build is
   `vite.lib.config.ts`, a name kept from when a `vite.config.ts` beside it served the test gallery. React is a peer at `^19`, the
-  version everything was written and tested against. Versions and lifting `private` on the React package are
-  the user's. The order is forced: the core reads `StoreUtils` from `ss-utils`, so `ss-utils` goes out first, then
+  version everything was written and tested against. Versions and lifting `private` are
+  the user's, and the user handed them over for the first release: the core and `ss-utils` step one patch past
+  what the registry already holds (the last Solid-only release took `ss-utils` to 0.0.25 and the core to 0.0.4
+  from the other machine, so a manifest still reading 0.0.24 and 0.0.3 cannot be published), and the four
+  framework packages start at 0.0.1 with `private` lifted and `publishConfig.access` set to `public`, because a
+  new scoped package is otherwise published as restricted. Each carries its own `LICENSE`. The order is forced: the core reads `StoreUtils` from `ss-utils`, so `ss-utils` goes out first, then
   the core, then the two framework packages.
 - **Each framework barrel starts with `export * from "@thewaver/ss-components"`.** Where the React package
   declares its own type under a name the core also exports — fourteen of them, mostly callbacks typed with React's

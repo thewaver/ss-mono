@@ -2,6 +2,7 @@ import { globalStyle, style } from "@vanilla-extract/css";
 
 import { layerVars } from "./StyledComponents/Layer/Layer.css";
 import { themeVars } from "./Theme.css";
+import { toBackdropGradient } from "./Theme.utils";
 
 export const appRoot = style({
     position: "relative",
@@ -24,7 +25,7 @@ export const appContent = style({
     flex: 1,
     minHeight: 0,
     width: "100%",
-    backgroundImage: `radial-gradient(ellipse at top, hsl(from ${themeVars.color.background.light} h s 50% / 10%), transparent 33%), radial-gradient(ellipse at top, hsl(from ${themeVars.color.background.light} h s 50% / 10%), transparent 66%), radial-gradient(ellipse at top, ${themeVars.color.background.light}, ${themeVars.color.background.dark})`,
+    backgroundImage: toBackdropGradient(themeVars.color.background.light, themeVars.color.background.dark),
 });
 
 export const leftMenu = style({

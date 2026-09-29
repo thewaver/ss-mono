@@ -12,15 +12,14 @@ export const buildProgressClip = style({
 });
 
 export const buildProgressStrip = style({
+    position: "relative",
     display: "flex",
     alignItems: "stretch",
-    gap: themeVars.spacing.full,
     boxSizing: "border-box",
     height: BUILD_PROGRESS_HEIGHT,
-    padding: `0 ${themeVars.spacing.full} 0 ${themeVars.spacing.double}`,
     fontSize: themeVars.fontSize.small,
-    color: themeVars.color.surface.contrast,
-    backgroundImage: `linear-gradient(45deg, ${themeVars.color.surface.dark}, ${themeVars.color.surface.light})`,
+    color: themeVars.color.info.contrast,
+    backgroundImage: `linear-gradient(45deg, ${themeVars.color.info.dark}, ${themeVars.color.info.light})`,
 
     selectors: {
         [`&.${isHidden}`]: {
@@ -30,16 +29,19 @@ export const buildProgressStrip = style({
 });
 
 export const buildProgressBar = style({
-    position: "relative",
     display: "flex",
     alignItems: "center",
     flex: 1,
     minWidth: 0,
+    paddingLeft: themeVars.spacing.double,
 });
 
 export const buildProgressDismiss = style({
+    position: "relative",
     display: "flex",
     alignItems: "center",
+    padding: `0 ${themeVars.spacing.full}`,
+    fontWeight: "bold",
 });
 
 export const buildProgressFill = style({

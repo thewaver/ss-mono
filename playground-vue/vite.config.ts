@@ -11,6 +11,8 @@ import { componentDependencies } from "../playground/vite/componentDependencies.
 import { playgroundSource } from "../playground/vite/playgroundSource.ts";
 import { definePlaygroundUrls } from "../playground/vite/playgroundUrls.ts";
 import { refuseFrameworks } from "../playground/vite/refuseFrameworks.ts";
+import { themeLoading } from "../playground/vite/themeLoading.ts";
+import { VUE_THEME_VALUES } from "../playground/src/App/Theme.const.ts";
 
 const fromRepo = (path: string) => fileURLToPath(new URL(path, import.meta.url));
 
@@ -18,6 +20,7 @@ export default defineConfig({
     root: fromRepo("."),
     plugins: [
         refuseFrameworks("vue"),
+        themeLoading(VUE_THEME_VALUES.color.background),
         playgroundSource(),
         componentDependencies([fromRepo("../components-vue/src"), fromRepo("../components/src")]),
         componentApi(

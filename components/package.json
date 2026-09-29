@@ -1,7 +1,7 @@
 {
     "name": "@thewaver/ss-components",
     "type": "module",
-    "version": "0.0.3",
+    "version": "0.0.5",
     "description": "The framework-free core of the ss-components libraries: behavior, styles and types shared by @thewaver/ss-components-solid and @thewaver/ss-components-react.",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
@@ -125,10 +125,10 @@
         "colorthief": "^3.5.0"
     },
     "peerDependencies": {
-        "@thewaver/ss-utils": "^0.0.24"
+        "@thewaver/ss-utils": "^0.0.26"
     },
     "devDependencies": {
-        "@thewaver/ss-utils": "^0.0.24",
+        "@thewaver/ss-utils": "^0.0.26",
         "@vanilla-extract/css": "^1.21.2",
         "@vanilla-extract/vite-plugin": "^5.2.6",
         "tsup": "^8.5.1",
