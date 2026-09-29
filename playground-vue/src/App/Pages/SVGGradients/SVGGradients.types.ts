@@ -29,8 +29,3 @@ export type TrackedGradientExampleProps = SVGGradientsSharedProps & {
     configKey: WithNoSample<SVGDefsSamples.Gradient.Tracked.SampleKey>;
     configDefs: Record<string, number | boolean>;
 };
-
-export type TrackedGradientOverlayProps = Omit<TrackedGradientExampleProps, "paintKind"> & {
-    isShown: boolean;
-    onClose: () => void;
-};

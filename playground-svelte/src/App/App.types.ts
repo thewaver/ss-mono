@@ -1,9 +1,9 @@
-import type { Component } from "svelte";
+import type { LazyRouteComponent } from "sv-router";
 
 export type ComponentConfig = {
     name: string;
     description: string;
-    component?: Component;
+    component?: LazyRouteComponent;
 };
 
 export type MenuBranchConfig = {

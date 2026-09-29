@@ -10,13 +10,15 @@
     import * as styles from "@thewaver/ss-playground/App/Pages/SVGGradients/SVGGradients.css";
     import { ShapeConst, type Size2d } from "@thewaver/ss-utils";
 
-    import { TrackedGradientKnobs } from "../../../Knobs/TrackedGradients.const";
-    import PageButtonContent from "../../../StyledComponents/ButtonContent/ButtonContent.svelte";
-    import type { TrackedGradientOverlayProps } from "../SVGGradients.types";
+    import { TrackedGradientKnobs } from "../../../../Knobs/TrackedGradients.const";
+    import PageButtonContent from "../../../../StyledComponents/ButtonContent/ButtonContent.svelte";
+    import type { TrackedGradientExampleProps } from "../../SVGGradients.types";
 
-    let props: TrackedGradientOverlayProps = $props();
+    let props: TrackedGradientExampleProps = $props();
 
     const id = $props.id();
+
+    let isShown = $state(false);
 
     const computeDefs = (size: Size2d, element: HTMLElement | undefined) => {
         const key = props.configKey;
@@ -45,7 +47,17 @@
     };
 </script>
 
-{#if props.isShown}
+<Button
+    onClick={() => {
+        isShown = true;
+    }}
+>
+    {#snippet renderContent(flags)}
+        <PageButtonContent {flags}>Track the pointer across the screen</PageButtonContent>
+    {/snippet}
+</Button>
+
+{#if isShown}
     <div {@attach attachPortal(document.body)}>
         <div class={styles.screenOverlay}>
             <Shape
@@ -60,8 +72,8 @@
 
         <div class={styles.screenOverlayClose}>
             <Button
-                onClick={async () => {
-                    props.onClose();
+                onClick={() => {
+                    isShown = false;
                 }}
             >
                 {#snippet renderContent(flags)}

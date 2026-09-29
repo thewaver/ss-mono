@@ -1,4 +1,4 @@
-import { Index, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js";
+import { Index, Show, createEffect, createMemo, createSignal, lazy, on, onCleanup, onMount } from "solid-js";
 import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
 
@@ -32,7 +32,6 @@ import {
     SEARCH_FIELD_WIDTH,
 } from "./App.const";
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
-import { PageDocsView } from "./PageComponents/DocsView/DocsView";
 import { PageTextField } from "./PageComponents/Field/Field";
 import { PageLayer } from "./PageComponents/Layer/Layer";
 import { PageNavSettings } from "./PageComponents/NavSettings/NavSettings";
@@ -43,6 +42,10 @@ import { PageViewTabs } from "./PageComponents/ViewTabs/ViewTabs";
 import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
 import { useLayerClass } from "./StyledComponents/Layer/Layer.context";
 import { PageTreeNodeContent } from "./StyledComponents/TreeNodeContent/TreeNodeContent";
+
+const PageDocsView = lazy(() =>
+    import("./PageComponents/DocsView/DocsView").then((module) => ({ default: module.PageDocsView })),
+);
 
 const EmptyPage = () => <>{null}</>;
 

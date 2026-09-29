@@ -24,7 +24,7 @@ const WIPE_CELL_SIZE = 120;
 const WIPE_LEG_MS = 600;
 const WIPE_COLOR = "black";
 const LOZENGE_COVER_PERCENT = 150;
-const WIPE_PLAYBACK: CellAnimationPlaybackOpts = { dir: "alternate", holdMs: 400 };
+const WIPE_PLAYBACK: CellAnimationPlaybackOpts = { dir: "pipe", holdMs: 400 };
 const LOZENGE_GROW = CellAnimationKeyframeUtils.fromStops([
     { at: 0, rotate: 45, scaleX: 0, scaleY: 0 },
     { at: 1, rotate: 45, scaleX: LOZENGE_COVER_PERCENT, scaleY: LOZENGE_COVER_PERCENT },
@@ -90,7 +90,11 @@ export const WipeExample = (props: Props) => {
                                         LOZENGE_GROW,
                                         CellAnimationBreakpointUtils.computeBreakpoints(
                                             defs.weight,
-                                            access(props.breakpointOpts),
+                                            CellAnimationPlaybackUtils.computeBreakpointOpts(
+                                                access(props.breakpointOpts),
+                                                timeline,
+                                                WIPE_PLAYBACK,
+                                            ),
                                         ),
                                         { ...defs, origin: getOrigin() },
                                         CellAnimationPlaybackUtils.computeGlobalTimeline(

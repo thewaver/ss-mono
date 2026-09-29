@@ -37,7 +37,10 @@
     computeCellAnimation={(defs, timeline) =>
         CellAnimationKeyframes.computeAnimation(
             animationType,
-            CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, breakpointOpts),
+            CellAnimationBreakpointUtils.computeBreakpoints(
+                defs.weight,
+                CellAnimationPlaybackUtils.computeBreakpointOpts(breakpointOpts, timeline, playbackOpts),
+            ),
             { ...defs, origin },
             CellAnimationPlaybackUtils.computeGlobalTimeline(timeline, otherProps.animationDurationMs, playbackOpts),
             breakpointOpts.easing,

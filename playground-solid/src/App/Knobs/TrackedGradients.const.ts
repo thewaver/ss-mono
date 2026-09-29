@@ -278,7 +278,6 @@ const SMEAR_FULL_STEP_KNOB: NumberKnob = {
 };
 
 export namespace TrackedGradientKnobs {
-    export const STARTING_IS_OVERLAY_SHOWN = false;
     export const OVERLAY_SCALE_FACTOR = 0.25;
     export const OVERLAY_SCALED_KEYS = [
         "glowScale",

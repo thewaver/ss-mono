@@ -12,7 +12,6 @@ import { SVGGradientKnobs } from "../../../Knobs/SVGGradients.const";
 import { TrackedGradientKnobs } from "../../../Knobs/TrackedGradients.const";
 import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
 import PageExamples from "../../../PageComponents/Examples/PageExamples.vue";
-import PageCheckField from "../../../PageComponents/Field/PageCheckField.vue";
 import PageGroupedSelectField from "../../../PageComponents/Field/PageGroupedSelectField.vue";
 import type { Knob } from "../../../PageComponents/Knobs/Knobs.types";
 import PageKnobs from "../../../PageComponents/Knobs/Knobs.vue";
@@ -25,7 +24,7 @@ import type { SVGGradientsControls, SVGGradientsPaintKind, TrackedGradientExampl
 import PageSVGGradientsProps from "../SVGGradientsProps.vue";
 import ContinuityExample from "./Examples/Continuity.vue";
 import DefaultExample from "./Examples/Default.vue";
-import TrackedGradientOverlay from "./TrackedGradientOverlay.vue";
+import ScreenOverlayExample from "./Examples/ScreenOverlay.vue";
 
 const EXAMPLES_ROOT = "/src/App/Pages/SVGGradients/TrackedGradientsPage/Examples";
 
@@ -47,7 +46,6 @@ const defaults = computed(() =>
         : (TrackedGradientDefaults.DEFAULTS_BY_FAMILY[configKey.value] as Record<string, unknown>),
 );
 const configDefs = computed(() => configDefsByKey.value[configKey.value] ?? {});
-const isOverlayShown = shallowRef(TrackedGradientKnobs.STARTING_IS_OVERLAY_SHOWN);
 const paintKind = shallowRef<SVGGradientsPaintKind>(SVGGradientKnobs.STARTING_PAINT_KIND);
 const blurWidth = shallowRef(SVGGradientKnobs.STARTING_BLUR_WIDTH);
 const colors = shallowRef({ ...SVGDefsSamples.SAMPLE_COLORS });
@@ -88,6 +86,13 @@ const examples: ExampleDefs[] = [
         readout: () => "four boxes, each reading the pointer against its own — a pool spans them, a hand does not",
         path: `${EXAMPLES_ROOT}/Continuity.vue`,
     },
+    {
+        key: "screenOverlay",
+        name: "A screen overlay",
+        readout: () =>
+            "the gradient on a layer over the whole window, following the pointer everywhere; clicks pass through it, a button in the top-right corner closes it, and its sizes are a quarter of what the knobs say, since the box it fills is the whole window",
+        path: `${EXAMPLES_ROOT}/ScreenOverlay.vue`,
+    },
 ];
 </script>
 
@@ -114,18 +119,6 @@ const examples: ExampleDefs[] = [
 
         <PagePropsPanel scope="global">
             <PageSVGGradientsProps :controls="controls" />
-
-            <PageProp
-                item-key="isOverlayShown"
-                label="Screen overlay"
-                hint="Draws the gradient on a layer over the whole window, so it follows the pointer everywhere. Clicks pass through it, and a button in the top-right corner turns it off. Its sizes are a quarter of what the knobs say, since the box it fills is the whole window."
-            >
-                <PageCheckField
-                    :value="isOverlayShown"
-                    ariaLabel="Screen overlay"
-                    @change="(value: boolean) => (isOverlayShown = value)"
-                />
-            </PageProp>
         </PagePropsPanel>
     </PagePropsGroups>
 
@@ -137,14 +130,9 @@ const examples: ExampleDefs[] = [
         <template #continuity>
             <ContinuityExample v-bind="commonProps" />
         </template>
-    </PageExamples>
 
-    <TrackedGradientOverlay
-        :is-shown="isOverlayShown"
-        :config-defs="configDefs"
-        :config-key="configKey"
-        :colors="colors"
-        :blur-width="blurWidth"
-        @close="isOverlayShown = false"
-    />
+        <template #screenOverlay>
+            <ScreenOverlayExample v-bind="commonProps" />
+        </template>
+    </PageExamples>
 </template>

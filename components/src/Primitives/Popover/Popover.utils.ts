@@ -11,6 +11,14 @@ const getRevealShift = (viewStart: number, viewSize: number, itemStart: number, 
     return 0;
 };
 
+/**
+ * How many times {@link revealIn} measures and moves. The scale it reads is the painted width over `offsetWidth`,
+ * which is rounded to a whole pixel, so an unscaled scroller 322.28 pixels wide reads as 1.0009 — and over a
+ * scroll of three thousand pixels that leaves the element three pixels short. A second pass measures what is left
+ * and moves by that, which is small enough for the same error to vanish.
+ */
+const REVEAL_PASSES = 2;
+
 /** Moves one scroller by the least that shows `element`, converting the painted distance into its layout pixels. */
 const revealIn = (scroller: HTMLElement, element: HTMLElement) => {
     const canScrollX = scroller.scrollWidth > scroller.clientWidth;
@@ -18,22 +26,24 @@ const revealIn = (scroller: HTMLElement, element: HTMLElement) => {
 
     if ((!canScrollX && !canScrollY) || scroller.offsetWidth === 0) return;
 
-    const scrollerRect = scroller.getBoundingClientRect();
-    const elementRect = element.getBoundingClientRect();
-    const scale = scrollerRect.width / scroller.offsetWidth;
+    for (let pass = 0; pass < REVEAL_PASSES; pass++) {
+        const scrollerRect = scroller.getBoundingClientRect();
+        const elementRect = element.getBoundingClientRect();
+        const scale = scrollerRect.width / scroller.offsetWidth;
 
-    if (canScrollX) {
-        const viewStart = scrollerRect.left + scroller.clientLeft * scale;
+        if (canScrollX) {
+            const viewStart = scrollerRect.left + scroller.clientLeft * scale;
 
-        scroller.scrollLeft +=
-            getRevealShift(viewStart, scroller.clientWidth * scale, elementRect.left, elementRect.width) / scale;
-    }
+            scroller.scrollLeft +=
+                getRevealShift(viewStart, scroller.clientWidth * scale, elementRect.left, elementRect.width) / scale;
+        }
 
-    if (canScrollY) {
-        const viewStart = scrollerRect.top + scroller.clientTop * scale;
+        if (canScrollY) {
+            const viewStart = scrollerRect.top + scroller.clientTop * scale;
 
-        scroller.scrollTop +=
-            getRevealShift(viewStart, scroller.clientHeight * scale, elementRect.top, elementRect.height) / scale;
+            scroller.scrollTop +=
+                getRevealShift(viewStart, scroller.clientHeight * scale, elementRect.top, elementRect.height) / scale;
+        }
     }
 };
 

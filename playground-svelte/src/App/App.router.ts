@@ -8,7 +8,6 @@ import { StringUtils } from "@thewaver/ss-utils";
 import { MENU_CONFIGS } from "./App.const";
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
 import DocsRedirect from "./DocsRedirect.svelte";
-import DocsRoute from "./DocsRoute.svelte";
 import EmptyPage from "./EmptyPage.svelte";
 import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
 
@@ -33,7 +32,7 @@ const ROUTES: Routes = {
     ...Object.fromEntries(
         COMPONENT_CONFIGS.map((config) => [
             componentToRouteName(config.name),
-            { "/": config.component ?? DocsRedirect, "/docs": DocsRoute },
+            { "/": config.component ?? DocsRedirect, "/docs": () => import("./DocsRoute.svelte") },
         ]),
     ),
 };

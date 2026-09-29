@@ -10,7 +10,6 @@
     import { TrackedGradientKnobs } from "../../../Knobs/TrackedGradients.const";
     import type { ExampleDefs } from "../../../PageComponents/Examples/Examples.types";
     import PageExamples from "../../../PageComponents/Examples/PageExamples.svelte";
-    import PageCheckField from "../../../PageComponents/Field/PageCheckField.svelte";
     import PageGroupedSelectField from "../../../PageComponents/Field/PageGroupedSelectField.svelte";
     import PageKnobs from "../../../PageComponents/Knobs/Knobs.svelte";
     import type { Knob } from "../../../PageComponents/Knobs/Knobs.types";
@@ -23,7 +22,7 @@
     import PageSVGGradientsProps from "../SVGGradientsProps.svelte";
     import ContinuityExample from "./Examples/Continuity.svelte";
     import DefaultExample from "./Examples/Default.svelte";
-    import TrackedGradientOverlay from "./TrackedGradientOverlay.svelte";
+    import ScreenOverlayExample from "./Examples/ScreenOverlay.svelte";
 
     const EXAMPLES_ROOT = "/src/App/Pages/SVGGradients/TrackedGradientsPage/Examples";
 
@@ -45,7 +44,6 @@
             : (TrackedGradientDefaults.DEFAULTS_BY_FAMILY[configKey] as Record<string, unknown>),
     );
     const configDefs = $derived(configDefsByKey[configKey] ?? {});
-    let isOverlayShown = $state(TrackedGradientKnobs.STARTING_IS_OVERLAY_SHOWN);
     let paintKind = $state<SVGGradientsPaintKind>(SVGGradientKnobs.STARTING_PAINT_KIND);
     let blurWidth = $state(SVGGradientKnobs.STARTING_BLUR_WIDTH);
     let colors = $state.raw({ ...SVGDefsSamples.SAMPLE_COLORS });
@@ -72,6 +70,14 @@
             component: continuityExample,
             path: `${EXAMPLES_ROOT}/Continuity.svelte`,
         },
+        {
+            key: "screenOverlay",
+            name: "A screen overlay",
+            readout: () =>
+                "the gradient on a layer over the whole window, following the pointer everywhere; clicks pass through it, a button in the top-right corner closes it, and its sizes are a quarter of what the knobs say, since the box it fills is the whole window",
+            component: screenOverlayExample,
+            path: `${EXAMPLES_ROOT}/ScreenOverlay.svelte`,
+        },
     ];
 </script>
 
@@ -81,6 +87,10 @@
 
 {#snippet continuityExample()}
     <ContinuityExample {...commonProps} />
+{/snippet}
+
+{#snippet screenOverlayExample()}
+    <ScreenOverlayExample {...commonProps} />
 {/snippet}
 
 <PagePropsGroups>
@@ -121,30 +131,7 @@
                 setColor: (key, value) => (colors = { ...colors, [key]: value }),
             }}
         />
-
-        <PageProp
-            itemKey={"isOverlayShown"}
-            label={"Screen overlay"}
-            hint={"Draws the gradient on a layer over the whole window, so it follows the pointer everywhere. Clicks pass through it, and a button in the top-right corner turns it off. Its sizes are a quarter of what the knobs say, since the box it fills is the whole window."}
-        >
-            <PageCheckField
-                value={isOverlayShown}
-                ariaLabel={"Screen overlay"}
-                onChange={(value) => (isOverlayShown = value)}
-            />
-        </PageProp>
     </PagePropsPanel>
 </PagePropsGroups>
 
 <PageExamples items={examples} layout={"flow"} />
-
-<TrackedGradientOverlay
-    isShown={isOverlayShown}
-    {configDefs}
-    {configKey}
-    {colors}
-    {blurWidth}
-    onClose={() => {
-        isOverlayShown = false;
-    }}
-/>

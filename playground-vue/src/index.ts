@@ -9,7 +9,6 @@ import { AppUtils } from "./App/App.utils";
 import App from "./App/App.vue";
 import AppContent from "./App/AppContent.vue";
 import EmptyPage from "./App/EmptyPage.vue";
-import PageDocsView from "./App/PageComponents/DocsView/PageDocsView.vue";
 
 const PAGE_ROUTES: RouteRecordRaw[] = AppUtils.COMPONENT_CONFIGS.flatMap((config) => {
     const route = AppUtils.componentToRouteName(config.name);
@@ -20,7 +19,7 @@ const PAGE_ROUTES: RouteRecordRaw[] = AppUtils.COMPONENT_CONFIGS.flatMap((config
             : { path: route, redirect: toPageViewRoute(route, "docs") },
         {
             path: toPageViewRoute(route, "docs"),
-            component: PageDocsView,
+            component: () => import("./App/PageComponents/DocsView/PageDocsView.vue"),
             props: { name: config.name, description: config.description },
         },
     ];

@@ -1261,6 +1261,44 @@ is the user's to confirm or change.
 - **Odometer reels under reduced motion drop only their extra turns.** Each reel keeps its own duration, so a
   slow reel still turns its one step slowly. Falling back to `turnDurationMs` there is the alternative.
 
+## 31. Build the Docs tab's props tables in the background, with a progress strip
+
+**Asked for by the user, and every choice below is theirs.** Today the first visit to a Docs tab builds the
+props tables for all 163 components while you wait, then shows one. On a fresh dev server that is 5 to 10
+seconds, and saving any library file makes the next Docs visit wait for the whole build again.
+
+**Where the time goes**, timed with the dev server under load, so the proportions matter more than the numbers:
+
+- reading and parsing all 1,209 library files: 3.2 seconds
+- setting up TypeScript's type-checker: 1.5 seconds
+- writing out the tables for all 163 components: 6.1 seconds, about 40 milliseconds each
+
+**What was decided:**
+
+- **The build starts once the first page of a framework has finished loading in the browser.** Not when the dev
+  server starts, so a framework nobody opens never builds, and the four servers `npm start` runs do not all
+  compete for the processor at once. If the first page opened is a Docs page, the build starts then.
+- **It covers the props tables only.** Pages keep loading when they are visited, as they do now.
+- **It runs beside the dev server, not inside it.** The build is one long stretch of work, and run inside the
+  server it would stop pages from loading until it finished. A Docs page opened before the build is done has its
+  own component built next.
+- **A progress strip across the top of the page** shows a line of text, such as "Building props tables: 84 of
+  163", with the fill behind it. It is built from the library's own `Sidebar` docked to the top edge, pushes the
+  page down while it shows rather than covering it, and collapses when the build is done. An X in the corner
+  dismisses it.
+- **Rebuilds after saving a library file show the strip again.** The X hides only the current build, so the next
+  save brings it back.
+- **The deployed site has no strip**, because its tables are built ahead of time and there is nothing to wait
+  for.
+
+**What building it involves:**
+
+- In `playground/vite/componentApi.ts`: run the build in a separate worker thread, keep the parsed library in
+  memory so a save re-reads only the files that changed, write one small module per component plus a list of all
+  of them, and send progress to the page over the connection the dev server already keeps open for live reload.
+- In each of the four Playgrounds: tell the server when the first page has loaded, have the Docs view load only
+  its own component's module (about 8 KB for most, instead of 1.5 MB for all of them), and draw the strip.
+
 ## Accepted limits
 
 Faults that have been looked at and consciously left alone. Not outstanding work, not numbered, and not part
@@ -1371,6 +1409,19 @@ answer to "what is next for development"** — see the note at the top of this f
 commitment, and an entry that already carries the user's verdict is recorded here so that the same sketch is
 not put to them twice. An entry leaves this section in one of two directions: upward into a numbered item, which is the user's
 decision to take, or into `conventions.md` / `decisions.md` if building it settles something.
+
+### Publishing Exotics as a package of their own
+
+The idea was that someone already using another library for everyday controls might want only the Exotics. **The
+user's verdict was to keep one package per framework.** Splitting would not make anyone's app smaller: a bundler
+already keeps only what is imported, so a single `CellAnimation` costs about 7 KB gzipped either way. What a split
+would change is what gets installed. Against that, the Exotics still need the Abstracts, Primitives, Generators
+and Samples, so those would become a third package or stay in Essentials. Each of the four framework packages
+would split the same way, taking the count from six to about sixteen. And Menu and Tabs would keep their
+advanced layout features in Essentials, so "Exotics" would not mean "everything advanced".
+
+Worth reopening if someone actually asks to install the Exotics alone, or if the type definitions a consumer
+installs grow large enough to slow their editor.
 
 ### A pointer tracker the pointer effects can share, and where else a reading can come from
 

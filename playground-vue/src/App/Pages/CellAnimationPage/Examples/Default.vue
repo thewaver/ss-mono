@@ -29,7 +29,10 @@ const computeCellWeights = (count: Index2d) =>
 const computeCellAnimation = (defs: CellAnimationEvaluationDefs, timeline: number) =>
     CellAnimationKeyframes.computeAnimation(
         props.animationType,
-        CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, props.breakpointOpts),
+        CellAnimationBreakpointUtils.computeBreakpoints(
+            defs.weight,
+            CellAnimationPlaybackUtils.computeBreakpointOpts(props.breakpointOpts, timeline, props.playbackOpts),
+        ),
         { ...defs, origin: origin.value },
         CellAnimationPlaybackUtils.computeGlobalTimeline(timeline, props.animationDurationMs, props.playbackOpts),
         props.breakpointOpts.easing,

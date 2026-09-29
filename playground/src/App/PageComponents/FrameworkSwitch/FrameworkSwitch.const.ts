@@ -16,7 +16,7 @@ export const toRoutePath = (pathname: string) => {
     return base && pathname.startsWith(base) ? pathname.slice(base.length) || "/" : pathname;
 };
 
-export const PLAYGROUND_FRAMEWORKS: PlaygroundFramework[] = ["solid", "react", "vue", "svelte"];
+export const PLAYGROUND_FRAMEWORKS: PlaygroundFramework[] = ["react", "solid", "svelte", "vue"];
 
 export const PLAYGROUND_FRAMEWORK_LABELS: Record<PlaygroundFramework, string> = {
     solid: "Solid",

@@ -571,7 +571,7 @@ export const CellAnimationPage = () => {
                 <PageProp
                     itemKey={"playbackDir"}
                     label={"Playback direction"}
-                    hint={"Whether each pass runs the same way as the last, or turns round and comes back."}
+                    hint={"Whether each pass runs one way, or goes out and comes back. Coming back, stack starts with the last cell to arrive and pipe with the first."}
                 >
                     <PageSelectField
                         value={playbackOpts.dir!}
@@ -585,7 +585,7 @@ export const CellAnimationPage = () => {
                     itemKey={"holdMs"}
                     label={"Hold at far end (ms)"}
                     hint={
-                        "How long the grid rests at the far end before turning back. It only applies when the passes alternate."
+                        "How long the grid rests at the far end before turning back. It only applies to stack and pipe, which come back."
                     }
                 >
                     <PageNumberField
@@ -593,7 +593,7 @@ export const CellAnimationPage = () => {
                         min={CellAnimationKnobs.MIN_HOLD_MS}
                         max={CellAnimationKnobs.MAX_HOLD_MS}
                         step={CellAnimationKnobs.DURATION_STEP_MS}
-                        isDisabled={!playbackOpts.dir?.startsWith("alternate")}
+                        isDisabled={!CellAnimationPlaybackUtils.isRoundTrip(playbackOpts.dir)}
                         ariaLabel={"Hold at far end"}
                         onInput={(value) => setPlaybackOpts((previous) => ({ ...previous, holdMs: value }))}
                     />

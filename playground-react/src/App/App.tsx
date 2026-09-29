@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { BrowserRouter, Link, Navigate, Outlet, Route, Routes, useLocation } from "react-router";
 import COMPONENT_DEPENDENCIES from "virtual:component-dependencies";
 import type { DependencyNames } from "virtual:component-dependencies";
@@ -29,7 +29,6 @@ import {
     SEARCH_FIELD_WIDTH,
 } from "./App.const";
 import type { ComponentConfig, MenuBranchConfig, MenuNodeConfig } from "./App.types";
-import { PageDocsView } from "./PageComponents/DocsView/DocsView";
 import { PageTextField } from "./PageComponents/Field/Field";
 import { PageLayer } from "./PageComponents/Layer/Layer";
 import { PageNavSettings } from "./PageComponents/NavSettings/NavSettings";
@@ -41,6 +40,10 @@ import { PageViewTabs } from "./PageComponents/ViewTabs/ViewTabs";
 import type { PageViewKey } from "./PageComponents/ViewTabs/ViewTabs.types";
 import { useLayerClass } from "./StyledComponents/Layer/Layer.context";
 import { PageTreeNodeContent } from "./StyledComponents/TreeNodeContent/TreeNodeContent";
+
+const PageDocsView = lazy(() =>
+    import("./PageComponents/DocsView/DocsView").then((module) => ({ default: module.PageDocsView })),
+);
 
 const EmptyPage = () => null;
 
@@ -402,10 +405,14 @@ export function AppContent(props: { viewportAnchor: readonly [ViewportAnchor, (v
                             />
                         </div>
 
-                        <Outlet />
+                        <Suspense>
+                            <Outlet />
+                        </Suspense>
                     </div>
                 ) : (
-                    <Outlet />
+                    <Suspense>
+                        <Outlet />
+                    </Suspense>
                 )}
             </main>
         </div>

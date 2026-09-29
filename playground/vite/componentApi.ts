@@ -479,7 +479,10 @@ export const componentApi = (
         load(id) {
             if (id !== RESOLVED_ID) return undefined;
 
-            return `export default ${JSON.stringify(buildApiMap(entryFile, coreEntry, utilsEntry, options))};`;
+            return {
+                code: `export default ${JSON.stringify(buildApiMap(entryFile, coreEntry, utilsEntry, options))};`,
+                map: { mappings: "" },
+            };
         },
         configureServer(server) {
             for (const root of roots) server.watcher.add(root);

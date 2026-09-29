@@ -47,7 +47,7 @@ export namespace CellAnimationKnobs {
         easing: "linear",
     };
     export const STARTING_PLAYBACK_OPTS: CellAnimationPlaybackOpts = {
-        dir: "alternate",
+        dir: "stack",
         holdMs: 1000,
     };
 }

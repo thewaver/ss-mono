@@ -40,7 +40,14 @@ export const DefaultExample = ({
             computeCellAnimation={(defs, timeline) =>
                 CellAnimationKeyframes.computeAnimation(
                     access(animationType),
-                    CellAnimationBreakpointUtils.computeBreakpoints(defs.weight, access(breakpointOpts)),
+                    CellAnimationBreakpointUtils.computeBreakpoints(
+                        defs.weight,
+                        CellAnimationPlaybackUtils.computeBreakpointOpts(
+                            access(breakpointOpts),
+                            timeline,
+                            access(playbackOpts),
+                        ),
+                    ),
                     { ...defs, origin: getOrigin() },
                     CellAnimationPlaybackUtils.computeGlobalTimeline(
                         timeline,

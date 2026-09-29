@@ -3396,6 +3396,22 @@ into the property list a consumer actually has. Hand-writing the tables was reje
 and twenty components' worth of prop names and types, every one of them free to drift the moment a type
 changes and nothing to catch it.
 
+**The Docs view, and with it the props tables, loads only when the Docs tab is opened.** Building the tables
+means running the TypeScript compiler over the whole library: about six seconds on a fresh dev server, and a
+module of about 1.5 MB. Imported from the shell, every page paid for it on first load, the Examples view
+included, which never reads it. So the Docs route loads its view on demand in all four Playgrounds, and only
+that view imports `virtual:component-api`. The plugin also returns an empty source map for the module:
+without one, the dev server wrote a 6 MB map for 1.5 MB of generated data that points back at no file anyone
+could open.
+
+**Every page loads on demand, through each framework's own router.** The route list is one static table, and
+when it imported every page, the first view of any address fetched all hundred-odd pages: about 2,000 files,
+where half that is enough. Solid and React wrap each page in `lazy` through a local `lazyPage` in `App.const.tsx`,
+since their pages are named exports; React's routed outlet sits inside `Suspense` because its `lazy` requires
+one. Vue and Svelte hand the router the import itself, `() => import(…)`, which vue-router and sv-router both
+load on demand. What remains on first load is mostly the library, because every page imports it through its
+single index file.
+
 **The type column shows the type as it is written, not as the checker resolves it.** They differ because
 the props sit inside `AccessorProps`, so the written side is the value a prop carries — `boolean`, `TabsDir` —
 and the resolved side is `MaybeAccessor<boolean> | undefined`. The written one is also what keeps the column
@@ -3522,7 +3538,7 @@ _"One namespace per folder"_ in `conventions.md` would otherwise have put three 
 folder, and because `ScanlineAnimation` times its lines with the breakpoints too and should not have to reach
 into the cell-animation keyframes to do it.
 
-**`CellAnimationPlayback` joined them in the file-kind sweep that followed.** Its two functions turn elapsed
+**`CellAnimationPlayback` joined them in the file-kind sweep that followed.** Its functions turn elapsed
 time into a timeline position for any duration and direction the caller has, which is the reusable side of
 _"A small thing used only where it is declared stays there"_ in `conventions.md`, so it took the breakpoints'
 shape: `DIRECTIONS` in the `.const.ts`, `CellAnimationPlaybackDirection` and `CellAnimationPlaybackOpts` in the
@@ -7780,16 +7796,33 @@ and it composes at the Playground's call site rather than inside `computeAnimati
 timeline it was handed and passes the result on, which leaves the keyframe helper's signature alone and puts
 both halves of the pipeline in view together.
 
-**The four names are CSS's `animation-direction`, taken deliberately.** `normal`, `reverse`, `alternate` and
-`alternate-reverse` mean here exactly what they mean there, so the idea needs no second vocabulary. The user
-asked for the CSS names by name. `alternate-reverse` is one negation over `alternate` and was included for that
-reason rather than because a use for it was named.
+**The round trips are `stack` and `pipe`, and `alternate` was retired for them, on the user's call.** The first
+build took all four of CSS's `animation-direction` names. Then the user asked for a second way back: under
+`alternate` the cell that arrives first is the last to leave, and they wanted one where it is the first to leave
+as well. With two round trips, `alternate` no longer said which one it meant, and CSS has no word for the new one,
+so a second vocabulary was needed anyway. The user took the pair that names the difference directly: `stack`
+(last in, first out, the old `alternate`) and `pipe` (first in, first out). Each has a `-reverse` form that
+starts at the far end, as `alternate-reverse` did. `normal` and `reverse` keep their CSS names, since nothing
+competes with them. The cost the user accepted is that a reader who knows CSS no longer recognizes `stack` as
+their `alternate`.
+
+**`pipe` is `stack` with the breakpoint direction flipped on the way back, and nothing else.** The shared
+timeline runs identically under both. Running it backwards also reverses the cells' order, which is exactly
+`stack`. For `pipe`, `computeBreakpointOpts` flips `asc`/`desc` while the pass is coming back. A cell's window
+flipped end for end, read against a timeline running backwards, is that same cell's own trip played backwards.
+So the cell that led the way out leads the way back too, and because the flip happens before easing, one cell
+leaving under `pipe` moves exactly as the leading cell leaves under `stack`. The other approach was to have
+playback return a second value and have `computeLocalTimeline` invert each cell's progress. It would have
+changed the signatures of `computeLocalTimeline`, `computeAnimation` and every sample wrapper around them. This
+keeps to the rule above: playback composes at the call site and the keyframe helper does not know about it. The
+flip is decided at the loop's midpoint, which always falls inside the hold where every cell is resting at an
+end, so it needs no duration and can never happen partway through a cell's trip.
 
 **The Playground's duration field is the one-way trip, and the component is handed the whole cycle.**
 `CellAnimation`'s `animationDurationMs` is the length of one iteration and still is; `computeCycleDurationMs`
-turns the leg into that iteration — the leg unchanged when the direction does not alternate, twice the leg plus
+turns the leg into that iteration — the leg unchanged when the direction is not a round trip, twice the leg plus
 the hold when it does. The alternative, splitting the given duration between the two legs, makes the same
-number mean two different speeds depending on a dropdown elsewhere: switching to `alternate` would silently
+number mean two different speeds depending on a dropdown elsewhere: switching to `stack` would silently
 double the pace of the part already being watched. The user set this one directly.
 
 **The hold is milliseconds, not a share of the cycle.** A share is not a length — twenty per cent means one
@@ -7803,9 +7836,9 @@ argument rather than reading a duration out of the options bag.
 the pause between iterations, and for a pass that returns to where it started, that pause falls exactly at the
 near end. A second control for it would be two knobs over one gap.
 
-**Two things are called direction, and the collision is worth the CSS names.**
+**Two things are called direction, and the collision is accepted.**
 `CellAnimationBreakpoints.Direction` is `asc`/`desc` and says which cell goes first;
-`CellAnimationPlayback.Direction` is the CSS set and says which way the pass runs. Both are namespaced, and the
+`CellAnimationPlayback.Direction` says which way the pass runs and whether it comes back. Both are namespaced, and the
 Playground labels them _Direction_ and _Playback direction_.
 
 **The drawn gradient and pattern sources are timed to the cycle, not to the leg.** Those two examples serialize
@@ -7882,7 +7915,7 @@ worse: a held final frame that replays itself whenever a window changes width is
 
 ### `CellAnimation`: the screen wipe is an example, not a component
 
-**There is no `ScreenWiper`, owner's call: CellAnimation already carries weights and samples, so a separate wiper had nothing of its own.** The CellAnimation page reproduces it: a solid-color SVG source at the viewport's size, portaled into the viewport layer and fixed over it, one `alternate` iteration with a hold (in, hold, out) and `finalFrame="nothing"`, unmounted on `onAnimationEnd`. The order of the cells is whichever weight sample the page has selected. **The lozenge is a square turned 45° and scaled past √2**, the least that covers its own cell, because CellAnimation only transforms and filters rectangular cuts. **The circle has no equivalent** for the same reason: a transform cannot round a corner. Under reduced motion the leg is 0ms, so the cover cuts in, holds and cuts out.
+**There is no `ScreenWiper`, owner's call: CellAnimation already carries weights and samples, so a separate wiper had nothing of its own.** The CellAnimation page reproduces it: a solid-color SVG source at the viewport's size, portaled into the viewport layer and fixed over it, one `pipe` iteration with a hold (in, hold, out, the part covered first uncovered first) and `finalFrame="nothing"`, unmounted on `onAnimationEnd`. The order of the cells is whichever weight sample the page has selected. **The lozenge is a square turned 45° and scaled past √2**, the least that covers its own cell, because CellAnimation only transforms and filters rectangular cuts. **The circle has no equivalent** for the same reason: a transform cannot round a corner. Under reduced motion the leg is 0ms, so the cover cuts in, holds and cuts out.
 
 ### `ScanlineAnimation`: `orientation`, and why the defs are not transposed
 
