@@ -4,7 +4,9 @@ export namespace CellAnimationPlayback {
     export const DIRECTIONS: readonly CellAnimationPlaybackDirection[] = [
         "normal",
         "reverse",
-        "alternate",
-        "alternate-reverse",
+        "stack",
+        "stack-reverse",
+        "pipe",
+        "pipe-reverse",
     ];
 }

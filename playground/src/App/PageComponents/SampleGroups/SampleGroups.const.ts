@@ -1,5 +1,4 @@
-import type { SVGDefs, SVGDefsColors } from "@thewaver/ss-components";
-import { SVGDefsUtils } from "@thewaver/ss-components";
+import { type SVGDefsColors, type SVGDefsOf, SVGDefsUtils } from "@thewaver/ss-components";
 
 import type { NoSampleKey, WithNoSample } from "./SampleGroups.types";
 
@@ -35,7 +34,7 @@ export const NO_SAMPLE_KEY: NoSampleKey = "none";
 export const toGroupEntriesWithNoSample = <K, T extends Record<string, K>>(groups: Record<string, Partial<T>>) =>
     [[NO_SAMPLE_KEY, [NO_SAMPLE_KEY]], ...toGroupEntries(groups)] as [string, WithNoSample<keyof T>[]][];
 
-export const computeNoSampleDefs = (colors: SVGDefsColors, paintKind: "fill" | "stroke"): SVGDefs[] => [
+export const computeNoSampleDefs = (colors: SVGDefsColors, paintKind: "fill" | "stroke"): SVGDefsOf<never>[] => [
     {
         color:
             paintKind === "fill"

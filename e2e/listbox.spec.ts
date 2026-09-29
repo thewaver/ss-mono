@@ -259,11 +259,11 @@ test("a group heading follows its options: none, some, all", async ({ page }) =>
 });
 
 /**
- * Found while writing this spec, and left red on purpose. With focus already inside the list — somebody tabbed
- * in, or picked something by key — pressing an option further down does nothing. The press moves focus to the
- * option, the list scrolls itself as the highlight follows focus, the option slides out from under the pointer
- * between the press and the release, and the click lands on the group around it instead. The scroll is the list
- * bringing its highlighted row into view even though that row was already on screen.
+ * Found while writing this spec, as a fault. With focus already inside the list — somebody tabbed in, or picked
+ * something by key — pressing an option further down did nothing: the press moved focus to the option, the list
+ * scrolled itself as the highlight followed focus, the option slid out from under the pointer between the press
+ * and the release, and the click landed on the group around it instead. The list now scrolls a highlighted row
+ * only as far as it takes to show it whole, and the click survives even that, so this case guards the fix.
  */
 test("with focus already in the list, clicking another option picks it", async ({ page }) => {
     const before = await selectedFlags(page, MULTIPLE);

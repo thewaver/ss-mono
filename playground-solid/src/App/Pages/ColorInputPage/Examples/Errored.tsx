@@ -1,0 +1,20 @@
+import { ColorInput } from "@thewaver/ss-components-solid";
+import { COLOR_INPUT_LABELS } from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+import { NO_BRAND_COLOR } from "@thewaver/ss-playground/App/Pages/ColorInputPage/ColorInputPage.const";
+
+import { pageColorPickerSlots } from "../../../PageComponents/ColorPicker/ColorPicker";
+import { PageColorInputContent } from "../../../StyledComponents/ColorInputContent/ColorInputContent";
+import type { ColorInputExampleProps } from "../ColorInputPage.types";
+
+type Props = ColorInputExampleProps;
+
+export const ErroredExample = (props: Props) => (
+    <ColorInput
+        {...pageColorPickerSlots}
+        value={props.value}
+        hasError={() => props.value[0]() === NO_BRAND_COLOR}
+        ariaLabel={"Validated color"}
+        {...COLOR_INPUT_LABELS}
+        renderContent={(getRenderProps) => <PageColorInputContent renderProps={getRenderProps} />}
+    />
+);

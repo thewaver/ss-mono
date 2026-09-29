@@ -1,0 +1,162 @@
+import { createMemo, createSignal } from "solid-js";
+
+import { CURRENCY_INPUT_DEFAULTS } from "@thewaver/ss-components-solid";
+import { CurrencyInputKnobs } from "@thewaver/ss-playground/App/Knobs/CurrencyInputs.const";
+import { BUDGET_MAX } from "@thewaver/ss-playground/App/Pages/CurrencyInputPage/CurrencyInputPage.const";
+
+import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField, PageSelectField } from "../../PageComponents/Field/Field";
+import { PageProp } from "../../PageComponents/Prop/Prop";
+import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import type { CurrencyInputExampleProps } from "./CurrencyInputPage.types";
+import { BoundedExample } from "./Examples/Bounded";
+import { DefaultExample } from "./Examples/Default";
+import { SymbolExample } from "./Examples/Symbol";
+
+const LOCALE_FIELD_WIDTH = 120;
+const LOCALE_GROUPING = "locale";
+const EXAMPLES_ROOT = "/src/App/Pages/CurrencyInputPage/Examples";
+
+const STARTING_PRICE = 1234.56;
+const STARTING_BUDGET = 4999.99;
+const STARTING_BIG = 9876543210.12;
+const STARTING_ADJUSTMENT = -250.5;
+const describe = (value: number | undefined) => (value === undefined ? "none" : `${value}`);
+
+const describeGrouping = (sizes: number[] | undefined) =>
+    sizes === undefined ? LOCALE_GROUPING : sizes.join(" then ");
+
+export const CurrencyInputPage = () => {
+    const [getLocale, setLocale] = createSignal(CurrencyInputKnobs.STARTING_LOCALE);
+    const [getDecimals, setDecimals] = createSignal(CURRENCY_INPUT_DEFAULTS.decimals);
+    const [getGrouping, setGrouping] = createSignal<number[] | undefined>();
+    const [getHasSign, setHasSign] = createSignal(CurrencyInputKnobs.STARTING_HAS_SIGN);
+
+    const priceSignal = createSignal<number | undefined>(STARTING_PRICE);
+    const emptySignal = createSignal<number | undefined>();
+    const budgetSignal = createSignal<number | undefined>(STARTING_BUDGET);
+    const bigSignal = createSignal<number | undefined>(STARTING_BIG);
+    const negativeSignal = createSignal<number | undefined>(STARTING_ADJUSTMENT);
+
+    const getExamples = createMemo(() => {
+        const commonProps: Omit<CurrencyInputExampleProps, "value"> = {
+            locale: getLocale,
+            decimals: getDecimals,
+            groupSizes: getGrouping,
+            hasSign: getHasSign,
+        };
+
+        return [
+            {
+                key: "default",
+                name: "Default",
+                readout: () =>
+                    `value: ${describe(priceSignal[0]())} — digits fill from the right, and the separators are the field's rather than yours to type`,
+                component: () => <DefaultExample {...commonProps} value={priceSignal} />,
+                path: `${EXAMPLES_ROOT}/Default.tsx`,
+            },
+            {
+                key: "empty",
+                name: "Empty",
+                readout: () => `value: ${describe(emptySignal[0]())} — an empty field has no value at all`,
+                component: () => <DefaultExample {...commonProps} value={emptySignal} ariaLabel={"Amount"} />,
+                path: `${EXAMPLES_ROOT}/Default.tsx`,
+            },
+            {
+                key: "symbol",
+                name: "With a symbol",
+                readout: () =>
+                    `value: ${describe(priceSignal[0]())} — the currency is paint in a slot, since the library holds no currencies`,
+                component: () => <SymbolExample {...commonProps} value={priceSignal} />,
+                path: `${EXAMPLES_ROOT}/Symbol.tsx`,
+            },
+            {
+                key: "bounded",
+                name: "Bounded",
+                readout: () =>
+                    `value: ${describe(budgetSignal[0]())} — at most ${BUDGET_MAX}, and going over is refused as it is typed`,
+                component: () => <BoundedExample {...commonProps} value={budgetSignal} />,
+                path: `${EXAMPLES_ROOT}/Bounded.tsx`,
+            },
+            {
+                key: "negative",
+                name: "Signed",
+                readout: () =>
+                    `value: ${describe(negativeSignal[0]())} — a minus is only accepted where the field was told to hold one`,
+                component: () => (
+                    <DefaultExample {...commonProps} value={negativeSignal} ariaLabel={"Adjustment"} hasSign={true} />
+                ),
+                path: `${EXAMPLES_ROOT}/Default.tsx`,
+            },
+            {
+                key: "big",
+                name: "Many groups",
+                readout: () =>
+                    `value: ${describe(bigSignal[0]())} — the group count grows with the value, which a fixed pattern cannot do`,
+                component: () => <DefaultExample {...commonProps} value={bigSignal} ariaLabel={"Large amount"} />,
+                path: `${EXAMPLES_ROOT}/Default.tsx`,
+            },
+        ];
+    });
+
+    return (
+        <>
+            <PagePropsPanel scope={"global"}>
+                <PageProp
+                    key={"locale"}
+                    label={"Locale"}
+                    hint={
+                        "Which country's conventions the amount is written in, which decides the separators and where the symbol sits."
+                    }
+                >
+                    <PageSelectField
+                        value={getLocale}
+                        values={() => CurrencyInputKnobs.LOCALES}
+                        width={() => LOCALE_FIELD_WIDTH}
+                        ariaLabel={"Locale"}
+                        onChange={(locale) => setLocale(() => locale)}
+                    />
+                </PageProp>
+
+                <PageProp
+                    key={"decimals"}
+                    label={"Decimals"}
+                    hint={"How many digits are kept after the decimal separator."}
+                >
+                    <PageSelectField
+                        value={getDecimals}
+                        values={() => CurrencyInputKnobs.DECIMALS}
+                        ariaLabel={"Decimals"}
+                        onChange={setDecimals}
+                    />
+                </PageProp>
+
+                <PageProp
+                    key={"hasSign"}
+                    label={"Signed"}
+                    hint={"Allows negative amounts to be typed. With it off, a minus sign is rejected."}
+                >
+                    <PageCheckField value={getHasSign} ariaLabel={"Signed"} onChange={setHasSign} />
+                </PageProp>
+
+                <PageProp
+                    key={"grouping"}
+                    label={"Grouping"}
+                    hint={
+                        "How the digits before the decimal point are grouped, such as in threes or in the Indian lakh pattern."
+                    }
+                >
+                    <PageSelectField
+                        value={getGrouping}
+                        values={() => CurrencyInputKnobs.GROUPINGS}
+                        computeLabel={describeGrouping}
+                        ariaLabel={"Grouping"}
+                        onChange={(sizes) => setGrouping(() => sizes)}
+                    />
+                </PageProp>
+            </PagePropsPanel>
+
+            <PageExamples items={getExamples} />
+        </>
+    );
+};

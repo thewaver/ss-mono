@@ -1,9 +1,18 @@
 import { MathUtils } from "@thewaver/ss-utils";
 
-import type { NumberInputRangeDefs, NumberInputSeparators, NumberInputStepDefs } from "./NumberInput.types";
+import type {
+    NumberInputKeyMove,
+    NumberInputRangeDefs,
+    NumberInputSeparators,
+    NumberInputStepDefs,
+    NumberInputStepRepeater,
+} from "./NumberInput.types";
 
 /** How many decimal places stepping will work to. Beyond this, floating point cannot represent the difference anyway. */
 const MAX_STEP_DECIMALS = 12;
+
+/** How many steps PageUp and PageDown move when the field is not told otherwise. */
+const PAGE_STEP_MULTIPLE = 10;
 
 /** Both spellings of the exponent marker. */
 const EXPONENT_CHARACTERS = "eE";
@@ -222,5 +231,131 @@ export namespace NumberInputUtils {
         const nextUnits = snapToStep(startUnits + direction * distanceUnits, direction);
 
         return clampValue(MathUtils.roundToDecimalPlaces(base + nextUnits / scale, decimals), defs);
+    };
+
+    /**
+     * How far PageUp and PageDown move the value.
+     *
+     * @param pageStep The distance the consumer asked for, if any.
+     * @param step How far one step moves.
+     * @returns `pageStep`, or ten steps when it is left out.
+     */
+    export const computePageStep = (pageStep: number | undefined, step: number) =>
+        pageStep ?? step * PAGE_STEP_MULTIPLE;
+
+    /**
+     * Whether the field holds a number its bounds do not allow.
+     *
+     * An empty or half-typed field holds no number, so it has no range issue however it reads.
+     *
+     * @param value The number the field's text reads as, or `undefined`.
+     * @param defs The field's bounds.
+     */
+    export const getHasRangeIssue = (value: number | undefined, defs: NumberInputRangeDefs) =>
+        value !== undefined && !getIsInRange(value, defs);
+
+    /**
+     * Whether the number sits at or below the lowest allowed value, which is where a step down has nowhere to go.
+     *
+     * @param value The number the field's text reads as, or `undefined`. An empty field is at neither end.
+     * @param defs The field's bounds. With no minimum, nothing is at it.
+     */
+    export const getIsAtMin = (value: number | undefined, defs: NumberInputRangeDefs) =>
+        defs.min !== undefined && value !== undefined && value <= defs.min;
+
+    /**
+     * Whether the number sits at or above the highest allowed value, which is where a step up has nowhere to go.
+     *
+     * @param value The number the field's text reads as, or `undefined`. An empty field is at neither end.
+     * @param defs The field's bounds. With no maximum, nothing is at it.
+     */
+    export const getIsAtMax = (value: number | undefined, defs: NumberInputRangeDefs) =>
+        defs.max !== undefined && value !== undefined && value >= defs.max;
+
+    /**
+     * What a key pressed in the field does to its value, if anything.
+     *
+     * The arrows step once, PageUp and PageDown step by the page distance, and Home and End jump to the bounds —
+     * but only to a bound that exists, so a field with no maximum leaves End to the caret. Every other key is the
+     * text's, and answers nothing. Whether the field may be changed at all is the caller's to check first.
+     *
+     * @param key The key, as `KeyboardEvent.key` spells it.
+     * @param defs The field's bounds.
+     * @param pageStep How far PageUp and PageDown move, as {@link computePageStep} gives it.
+     * @returns A step to take, as a direction and an optional distance for {@link computeStep}; a value to set
+     * outright; or `undefined` when the key is not the field's, in which case its default must not be prevented.
+     */
+    export const computeKeyMove = (
+        key: string,
+        defs: NumberInputRangeDefs,
+        pageStep: number,
+    ): NumberInputKeyMove | undefined => {
+        if (key === "ArrowUp") return { direction: 1 };
+        if (key === "ArrowDown") return { direction: -1 };
+        if (key === "PageUp") return { direction: 1, distance: pageStep };
+        if (key === "PageDown") return { direction: -1, distance: pageStep };
+        if (key === "Home" && defs.min !== undefined) return { value: defs.min };
+        if (key === "End" && defs.max !== undefined) return { value: defs.max };
+
+        return undefined;
+    };
+
+    /**
+     * The value a field settles on when it is left.
+     *
+     * A number outside the bounds is pulled inside them, which is deferred to this point because clamping while the
+     * reader types would make a second digit untypeable. An empty field stays empty.
+     *
+     * @param value The number the field's text reads as, or `undefined`.
+     * @param defs The field's bounds.
+     */
+    export const computeSettledValue = (value: number | undefined, defs: NumberInputRangeDefs) =>
+        value === undefined ? undefined : clampValue(value, defs);
+
+    /**
+     * Repeats a step while a stepper button is held, the way a native spinner does.
+     *
+     * Starting steps once straight away, then waits the delay, then steps again on every interval until stopped —
+     * so a tap stays a single step. A first step that is refused starts nothing. Starting again while repeating
+     * stops the earlier repeat first, so only one is ever running.
+     *
+     * @param defs.getDelayMs How long to wait before repeating, read each time a repeat starts.
+     * @param defs.getIntervalMs How often to repeat once it has started, read as the repeat begins.
+     * @returns `start(step)`, which takes a function making one step and answering whether it moved, and answers
+     * `false` when the first step was refused; and `stop()`, which ends any repeat and answers whether one was
+     * pending or running. Stopping twice is harmless, and the repeater can be started again after either.
+     */
+    export const createStepRepeater = (defs: {
+        getDelayMs: () => number;
+        getIntervalMs: () => number;
+    }): NumberInputStepRepeater => {
+        let repeatDelay: ReturnType<typeof setTimeout> | undefined;
+        let repeatInterval: ReturnType<typeof setInterval> | undefined;
+
+        const stop = () => {
+            const wasStepping = repeatDelay !== undefined || repeatInterval !== undefined;
+
+            clearTimeout(repeatDelay);
+            clearInterval(repeatInterval);
+
+            repeatDelay = undefined;
+            repeatInterval = undefined;
+
+            return wasStepping;
+        };
+
+        const start = (step: () => boolean) => {
+            stop();
+
+            if (!step()) return false;
+
+            repeatDelay = setTimeout(() => {
+                repeatInterval = setInterval(step, defs.getIntervalMs());
+            }, defs.getDelayMs());
+
+            return true;
+        };
+
+        return { start, stop };
     };
 }

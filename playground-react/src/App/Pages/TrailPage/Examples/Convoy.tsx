@@ -1,0 +1,73 @@
+import { useState } from "react";
+
+import { Button, Trail } from "@thewaver/ss-components-react";
+import type { TrailController } from "@thewaver/ss-components-react";
+import * as styles from "@thewaver/ss-playground/App/Pages/TrailPage/TrailPage.css";
+
+import { PageMeasureBox } from "../../../PageComponents/MeasureBox/MeasureBox";
+import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageTrailTrack, PageTrailVehicle } from "../../../StyledComponents/TrailContent/TrailContent";
+import type { TrailExampleProps } from "../TrailPage.types";
+
+const CONVOY_SIZE = { width: 320, height: 150 };
+const CONVOY_PATH = "M 30 120 C 80 120, 90 30, 160 30 S 240 120, 290 120";
+const CONVOY_OFFSETS = [0, 0.12, 0.24, 0.36];
+const LEAD_LABEL = "▶";
+
+type Props = TrailExampleProps;
+
+export const ConvoyExample = (props: Props) => {
+    const [controller, setController] = useState<TrailController>();
+
+    return (
+        <div className={styles.stack}>
+            <PageMeasureBox>
+                <Trail
+                    path={CONVOY_PATH}
+                    size={CONVOY_SIZE}
+                    durationMs={props.durationMs}
+                    isLooping={props.isLooping}
+                    isTurning={props.isTurning}
+                    followerOffsets={CONVOY_OFFSETS}
+                    progress={props.progress}
+                    playback={props.playback}
+                    renderTrack={(path) => <PageTrailTrack path={path} />}
+                    renderTraveler={(place, index) => (
+                        <PageTrailVehicle
+                            id={`convoyVehicle${index}`}
+                            place={place}
+                            label={index === 0 ? LEAD_LABEL : `${index}`}
+                        />
+                    )}
+                    onMount={setController}
+                />
+            </PageMeasureBox>
+
+            <div className={styles.controls}>
+                <Button
+                    id={"convoyPlay"}
+                    renderContent={(flags) => <PageButtonContent flags={flags}>Play</PageButtonContent>}
+                    onClick={() => {
+                        props.playback[1](true);
+                    }}
+                />
+
+                <Button
+                    id={"convoyPause"}
+                    renderContent={(flags) => <PageButtonContent flags={flags}>Pause</PageButtonContent>}
+                    onClick={() => {
+                        props.playback[1](false);
+                    }}
+                />
+
+                <Button
+                    id={"convoyRewind"}
+                    renderContent={(flags) => <PageButtonContent flags={flags}>Back to start</PageButtonContent>}
+                    onClick={() => {
+                        controller?.seek(0);
+                    }}
+                />
+            </div>
+        </div>
+    );
+};

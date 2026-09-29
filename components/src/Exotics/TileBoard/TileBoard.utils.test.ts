@@ -568,3 +568,49 @@ describe("computeNextTile", () => {
         expect(TileBoardUtils.computeNextTile("ArrowRight", { row: 0, col: 0 }, layout)).toBeUndefined();
     });
 });
+
+describe("computeKeyAction", () => {
+    it("activates on Enter and Space", () => {
+        expect(TileBoardUtils.computeKeyAction("Enter", false, at(1, 1), HEXAGON)).toEqual({ kind: "activate" });
+        expect(TileBoardUtils.computeKeyAction(" ", false, at(1, 1), HEXAGON)).toEqual({ kind: "activate" });
+    });
+
+    it("jumps to the ends of the board with Ctrl, and of the row without", () => {
+        expect(TileBoardUtils.computeKeyAction("End", true, at(1, 1), HEXAGON)).toEqual({
+            kind: "move",
+            tile: TileBoardUtils.getLastTile(HEXAGON),
+        });
+        expect(TileBoardUtils.computeKeyAction("Home", false, at(1, 1), HEXAGON)).toEqual({
+            kind: "move",
+            tile: at(1, 0),
+        });
+    });
+
+    it("leaves a key that means nothing here alone", () => {
+        expect(TileBoardUtils.computeKeyAction("a", false, at(1, 1), HEXAGON)).toBeUndefined();
+    });
+});
+
+describe("getClipPath", () => {
+    it("writes an outline as a polygon, and nothing for fewer than three corners", () => {
+        expect(
+            TileBoardUtils.getClipPath([
+                { x: 0, y: 0 },
+                { x: 10, y: 0 },
+                { x: 5, y: 8 },
+            ]),
+        ).toBe("polygon(0px 0px, 10px 0px, 5px 8px)");
+        expect(TileBoardUtils.getClipPath([{ x: 0, y: 0 }])).toBe("none");
+    });
+});
+
+describe("getTileBoxSize and getRowOrigin", () => {
+    it("takes the gap off the tile and puts half of it before the row", () => {
+        expect(TileBoardUtils.getTileBoxSize(TILE, 4)).toEqual({ width: 76, height: 56 });
+        expect(TileBoardUtils.getTileBoxSize(TILE, 100)).toEqual({ width: 0, height: 0 });
+        expect(TileBoardUtils.getRowOrigin(1, HEXAGON, 4)).toEqual({
+            x: TileBoardUtils.getRowOffset(1, HEXAGON) + 2,
+            y: TileBoardUtils.getRowTop(1, HEXAGON) + 2,
+        });
+    });
+});

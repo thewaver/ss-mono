@@ -112,3 +112,37 @@ describe("getTravelerProgress", () => {
         expect(TrailUtils.getTravelerProgress(HALF_WAY, QUARTER, 1, true)).toBe(QUARTER);
     });
 });
+
+describe("computePlace", () => {
+    const straight = {
+        getPointAtLength: (at: number) => ({ x: at, y: 0 }),
+    } as unknown as SVGPathElement;
+
+    it("waits at the origin, facing nowhere, until there is a path with length", () => {
+        expect(TrailUtils.computePlace(undefined, 100, HALF_WAY)).toEqual({
+            progress: HALF_WAY,
+            point: { x: 0, y: 0 },
+            angle: 0,
+        });
+        expect(TrailUtils.computePlace(straight, 0, HALF_WAY).point).toEqual({ x: 0, y: 0 });
+    });
+
+    it("puts the traveler its share of the way along, facing along the path", () => {
+        expect(TrailUtils.computePlace(straight, 100, QUARTER)).toEqual({
+            progress: QUARTER,
+            point: { x: 25, y: 0 },
+            angle: 0,
+        });
+    });
+});
+
+describe("getTravelerTransform", () => {
+    const place = { progress: 0, point: { x: 10, y: 20 }, angle: 90 };
+
+    it("centers the traveler on its point, and turns it only when asked, after the centering", () => {
+        expect(TrailUtils.getTravelerTransform(place, false)).toBe("translate(10px, 20px) translate(-50%, -50%)");
+        expect(TrailUtils.getTravelerTransform(place, true)).toBe(
+            "translate(10px, 20px) translate(-50%, -50%) rotate(90deg)",
+        );
+    });
+});

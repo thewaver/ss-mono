@@ -1,0 +1,48 @@
+import { TrackCarousel } from "@thewaver/ss-components-solid";
+import type { CarouselControls } from "@thewaver/ss-components-solid";
+import {
+    computeCarouselRotationLabel,
+    computeCarouselStepLabel,
+    computePositionLabel,
+} from "@thewaver/ss-playground/App/PageComponents/Announcements/Announcements.const";
+
+import {
+    PageCarouselBar,
+    PageCarouselPick,
+    PageCarouselSlide,
+    PageCarouselStep,
+} from "../../../../StyledComponents/CarouselContent/CarouselContent";
+import type { CarouselExampleProps } from "../../Carousels.types";
+
+const CAROUSEL_GAP = 10;
+
+type Props = CarouselExampleProps;
+
+const renderBar = (controls: CarouselControls) => (
+    <PageCarouselBar>
+        {controls.renderStep("previous")}
+        {Array.from({ length: controls.getCount() }, (_, index) => controls.renderPick(index))}
+        {controls.renderStep("next")}
+    </PageCarouselBar>
+);
+
+export const SteppedExample = (props: Props) => {
+    return (
+        <TrackCarousel
+            slides={props.slides}
+            index={props.index}
+            isDisabled={props.isDisabled}
+            isLooping={props.isLooping}
+            orientation={props.orientation}
+            gap={() => CAROUSEL_GAP}
+            ariaLabel={"Sampler"}
+            computeSlideLabel={computePositionLabel}
+            computeStepLabel={computeCarouselStepLabel}
+            computeRotationLabel={computeCarouselRotationLabel}
+            renderSlide={(getSlide, getState) => <PageCarouselSlide state={getState}>{getSlide()}</PageCarouselSlide>}
+            renderStep={(_getStep, getRenderProps) => <PageCarouselStep renderProps={getRenderProps} />}
+            renderPick={(_getIndex, getRenderProps) => <PageCarouselPick renderProps={getRenderProps} />}
+            renderControls={renderBar}
+        />
+    );
+};

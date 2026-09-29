@@ -1,6 +1,6 @@
 import type { TimelineSpan } from "@thewaver/ss-components";
 
-import type { Clip, Meeting } from "./TimelinePage.types";
+import type { Clip, Meeting } from "./TimelineItems.types";
 
 const MINUTES_PER_HOUR = 60;
 const TENS = 10;

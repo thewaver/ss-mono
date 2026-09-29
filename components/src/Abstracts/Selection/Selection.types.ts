@@ -1,4 +1,4 @@
-import type { SignalPair } from "../../Utils/typeUtils";
+import type { Store } from "@thewaver/ss-utils";
 
 export type SelectionMode = "none" | "single" | "multiple";
 
@@ -10,7 +10,13 @@ export type SelectionGesture = {
 export type SelectionDefs<T> = {
     getMode: () => SelectionMode;
     getItems: () => T[];
-    selectionSignal: SignalPair<T[]>;
+    selection: [get: () => T[], set: (value: T[]) => void];
+};
+
+export type SelectionController<T> = Store<T | undefined> & {
+    pick: (item: T, gesture?: SelectionGesture) => void;
+    selectAll: () => void;
+    clear: () => void;
 };
 
 export type SelectionHandle<T> = {

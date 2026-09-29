@@ -1,6 +1,4 @@
-import type { Point2d } from "@thewaver/ss-utils";
-
-import type { AccessorProps } from "../../../Utils/typeUtils";
+import type { Point2d, Size2d } from "@thewaver/ss-utils";
 
 export type SVGFilterMethod = "chain" | "isolate";
 
@@ -56,42 +54,73 @@ export type SVGColorFilterDefs = {
     b: number;
 };
 
-export type SVGPointLightDefs = { kind: "point" } & AccessorProps<{
+export type SVGPointLightDefs = {
+    kind: "point";
     x: number;
     y: number;
     z: number;
-}>;
+};
 
-export type SVGDistantLightDefs = { kind: "distant" } & AccessorProps<{
+export type SVGDistantLightDefs = {
+    kind: "distant";
     azimuth: number;
     elevation: number;
-}>;
+};
 
 export type SVGLightSourceDefs = SVGPointLightDefs | SVGDistantLightDefs;
 
-export type SVGLightSurfaceDefs = AccessorProps<{
+export type SVGLightSurfaceDefs = {
     baseFrequency: number | Point2d;
     type?: "fractalNoise" | "turbulence";
     numOctaves?: number;
     seed?: number;
     stitchTiles?: "stitch" | "noStitch";
-}>;
+};
 
-type SVGBaseLightingFilterDefs = {
+export type SVGBaseLightingFilterDefs = {
     light: SVGLightSourceDefs;
     surface: SVGLightSurfaceDefs;
-} & AccessorProps<{
     surfaceScale: number;
     lightingColor?: string;
-}>;
+};
 
-export type SVGSpecularLightingFilterDefs = SVGBaseLightingFilterDefs &
-    AccessorProps<{
-        specularConstant?: number;
-        specularExponent?: number;
-    }>;
+export type SVGSpecularLightingFilterDefs = SVGBaseLightingFilterDefs & {
+    specularConstant?: number;
+    specularExponent?: number;
+};
 
-export type SVGDiffuseLightingFilterDefs = SVGBaseLightingFilterDefs &
-    AccessorProps<{
-        diffuseConstant?: number;
-    }>;
+export type SVGDiffuseLightingFilterDefs = SVGBaseLightingFilterDefs & {
+    diffuseConstant?: number;
+};
+
+export type SVGFilterPrimitiveKind =
+    | "dropShadow"
+    | "gaussianBlur"
+    | "turbulence"
+    | "hueRotation"
+    | "saturation"
+    | "brightness"
+    | "contrast"
+    | "inversion"
+    | "color"
+    | "specularLighting"
+    | "diffuseLighting";
+
+export type SVGFilterAssemblyDefs = {
+    method?: SVGFilterMethod;
+    elementSize?: Size2d;
+};
+
+export type SVGFilterRegion = {
+    filterUnits?: "userSpaceOnUse";
+    x: string;
+    y: string;
+    width: string;
+    height: string;
+};
+
+export type SVGFilterAssembly = {
+    region: SVGFilterRegion | undefined;
+    inputs: { key: string; srcIn: string }[];
+    mergeKeys: string[] | undefined;
+};

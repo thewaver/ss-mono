@@ -52,7 +52,7 @@ test("a file reached only through a displayed sibling is not followed", async ({
     );
 });
 
-test("the sections of a tab are the imported file plus its style and type siblings", async ({ page }) => {
+test("the sections of a tab are the imported file plus its style and type siblings @solid @react", async ({ page }) => {
     await page.goto("/surface");
     await openSource(page, "card");
 
@@ -62,6 +62,30 @@ test("the sections of a tab are the imported file plus its style and type siblin
         sections.map((text) => text.replace("▶", "").trim()),
         "the folder is listed as sections",
     ).toEqual(["Card.tsx", "Card.css.ts"]);
+});
+
+test("the sections of a tab are the imported file plus its style and type siblings @svelte", async ({ page }) => {
+    await page.goto("/surface");
+    await openSource(page, "card");
+
+    const sections = await page.locator(SECTION_HEADER).allTextContents();
+
+    expect(
+        sections.map((text) => text.replace("▶", "").trim()),
+        "the folder is listed as sections",
+    ).toEqual(["Card.svelte", "Card.css.ts"]);
+});
+
+test("the sections of a tab are the imported file plus its style and type siblings @vue", async ({ page }) => {
+    await page.goto("/surface");
+    await openSource(page, "card");
+
+    const sections = await page.locator(SECTION_HEADER).allTextContents();
+
+    expect(
+        sections.map((text) => text.replace("▶", "").trim()),
+        "the folder is listed as sections",
+    ).toEqual(["Card.vue", "Card.css.ts"]);
 });
 
 test("a sample gets no tab, and neither does the registry it lives in", async ({ page }) => {

@@ -1,0 +1,193 @@
+import { createMemo, createSignal } from "solid-js";
+
+import { Button } from "@thewaver/ss-components-solid";
+import type { Step } from "@thewaver/ss-components-solid";
+import { StepperKnobs } from "@thewaver/ss-playground/App/Knobs/Steppers.const";
+import { LABELS, ORDER } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.const";
+import type { StepValue } from "@thewaver/ss-playground/App/Pages/StepperPage/StepperSteps.types";
+
+import { PageExamples } from "../../PageComponents/Examples/Examples";
+import { PageCheckField } from "../../PageComponents/Field/Field";
+import { PageProp } from "../../PageComponents/Prop/Prop";
+import { PagePropsPanel } from "../../PageComponents/PropsPanel/PropsPanel";
+import { PageButtonContent } from "../../StyledComponents/ButtonContent/ButtonContent";
+import type { PageStepState } from "../../StyledComponents/StepContent/StepContent.types";
+import { ArcExample } from "./Examples/Arc";
+import { BareExample } from "./Examples/Bare";
+import { DetailedExample } from "./Examples/Detailed";
+import { FailedExample } from "./Examples/Failed";
+import { LinearExample } from "./Examples/Linear";
+import { StackedExample } from "./Examples/Stacked";
+import { STATE_WORDS } from "./StepperPage.const";
+
+const STARTING_LINEAR: StepValue = "address";
+const STARTING_FAILED: StepValue = "payment";
+const STARTING_STACKED: StepValue = "address";
+const STARTING_DETAILED: StepValue = "payment";
+const EXAMPLES_ROOT = "/src/App/Pages/StepperPage/Examples";
+
+export const StepperPage = () => {
+    const [getIsFreeNavigation, setIsFreeNavigation] = createSignal(StepperKnobs.STARTING_IS_FREE_NAVIGATION);
+
+    const [getLinearCurrent, setLinearCurrent] = createSignal<StepValue>(STARTING_LINEAR);
+    const [getFailedCurrent, setFailedCurrent] = createSignal<StepValue>(STARTING_FAILED);
+    const [getStackedCurrent, setStackedCurrent] = createSignal<StepValue>(STARTING_STACKED);
+    const [getDetailedCurrent, setDetailedCurrent] = createSignal<StepValue>(STARTING_DETAILED);
+    const [getArcCurrent, setArcCurrent] = createSignal<StepValue>(STARTING_LINEAR);
+
+    const reset = () => {
+        setLinearCurrent(STARTING_LINEAR);
+        setFailedCurrent(STARTING_FAILED);
+        setStackedCurrent(STARTING_STACKED);
+        setDetailedCurrent(STARTING_DETAILED);
+        setArcCurrent(STARTING_LINEAR);
+    };
+
+    const computeState = (value: StepValue, current: StepValue): PageStepState => {
+        if (value === current) return "current";
+
+        return ORDER.indexOf(value) < ORDER.indexOf(current) ? "done" : "ahead";
+    };
+
+    const buildSteps = (
+        current: StepValue,
+        overrides: Partial<Record<StepValue, PageStepState>> = {},
+    ): Step<StepValue, PageStepState>[] =>
+        ORDER.map((value) => {
+            const state = overrides[value] ?? computeState(value, current);
+
+            return {
+                value,
+                state,
+                isNavigable: getIsFreeNavigation() || state === "done" || state === "failed",
+            };
+        });
+
+    const describe = (step: Step<StepValue, PageStepState>, index: number) =>
+        `Step ${index + 1} of ${ORDER.length}, ${LABELS[step.value]}, ${STATE_WORDS[step.state]}`;
+
+    const getExamples = createMemo(() => [
+        {
+            key: "linear",
+            name: "Linear",
+            readout: () =>
+                `current: ${getLinearCurrent()} — only the steps behind you can be pressed, unless free navigation is on`,
+            component: () => (
+                <LinearExample
+                    steps={() => buildSteps(getLinearCurrent())}
+                    currentValue={getLinearCurrent}
+                    computeStepAriaLabel={describe}
+                    onCurrentChange={setLinearCurrent}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Linear.tsx`,
+        },
+        {
+            key: "failed",
+            name: "A step that failed",
+            readout: () =>
+                `current: ${getFailedCurrent()} — the failed step is reachable by keyboard so its tooltip can be read, and its name carries the state as words`,
+            component: () => (
+                <FailedExample
+                    steps={() => buildSteps(getFailedCurrent(), { address: "failed", details: "skipped" })}
+                    currentValue={getFailedCurrent}
+                    computeStepAriaLabel={describe}
+                    onCurrentChange={setFailedCurrent}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Failed.tsx`,
+        },
+        {
+            key: "stacked",
+            name: "Stacked",
+            readout: () => `current: ${getStackedCurrent()} — the same steps down the page`,
+            component: () => (
+                <StackedExample
+                    steps={() => buildSteps(getStackedCurrent())}
+                    currentValue={getStackedCurrent}
+                    computeStepAriaLabel={describe}
+                    onCurrentChange={setStackedCurrent}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Stacked.tsx`,
+        },
+        {
+            key: "detailed",
+            name: "Steps that carry their own content",
+            readout: () =>
+                `current: ${getDetailedCurrent()} — each step holds a body beside the connector, so the line runs past the content rather than stopping at it`,
+            component: () => (
+                <DetailedExample
+                    steps={() => buildSteps(getDetailedCurrent())}
+                    currentValue={getDetailedCurrent}
+                    computeStepAriaLabel={describe}
+                    onCurrentChange={setDetailedCurrent}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Detailed.tsx`,
+        },
+        {
+            key: "arc",
+            span: 2,
+            name: "The same steps, bent along an arc",
+            readout: () =>
+                `current: ${getArcCurrent()} — one layout function, and the run between two steps follows the curve they sit on rather than cutting across it`,
+            component: () => (
+                <ArcExample
+                    steps={() => buildSteps(getArcCurrent())}
+                    currentValue={getArcCurrent}
+                    computeStepAriaLabel={describe}
+                    onCurrentChange={setArcCurrent}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Arc.tsx`,
+        },
+        {
+            key: "bare",
+            name: "No connector",
+            readout: () => "the connector slot is optional, so a bare strip renders nothing between the steps",
+            component: () => (
+                <BareExample
+                    steps={() => buildSteps(getLinearCurrent())}
+                    currentValue={getLinearCurrent}
+                    computeStepAriaLabel={describe}
+                    onCurrentChange={setLinearCurrent}
+                />
+            ),
+            path: `${EXAMPLES_ROOT}/Bare.tsx`,
+        },
+    ]);
+
+    return (
+        <>
+            <PagePropsPanel scope={"global"}>
+                <PageProp
+                    key={"isFreeNavigation"}
+                    label={"Free navigation"}
+                    hint={"Lets any step be jumped to directly, instead of making each one be reached in order."}
+                >
+                    <PageCheckField
+                        value={getIsFreeNavigation}
+                        ariaLabel={"Free navigation"}
+                        onChange={setIsFreeNavigation}
+                    />
+                </PageProp>
+
+                <PageProp
+                    key={"currentStep"}
+                    label={"Current step"}
+                    hint={"Puts the examples back to the step they started on."}
+                >
+                    <Button
+                        renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Reset</PageButtonContent>}
+                        onClick={async () => {
+                            reset();
+                        }}
+                    />
+                </PageProp>
+            </PagePropsPanel>
+
+            <PageExamples items={getExamples} />
+        </>
+    );
+};

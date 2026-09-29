@@ -4,14 +4,17 @@ import type { Plugin } from "vite";
 
 const VIRTUAL_ID = "virtual:component-dependencies";
 const RESOLVED_ID = `\0${VIRTUAL_ID}`;
-const IMPORT_PATTERN = /^import\s+(?!type\s)[^;]*?["']([^"']+)["'];?\s*$/gm;
-const SOURCE_PATTERN = /\.tsx?$/;
+const IMPORT_PATTERN = /^\s*import\s+(?!type\s)[^;]*?["']([^"']+)["'];?\s*$/gm;
+const SOURCE_PATTERN = /\.(tsx?|svelte)$/;
 const TEST_PATTERN = /\.test\.tsx?$/;
 const ABSTRACTS_LAYER = "Abstracts";
 const GENERATORS_LAYER = "Generators";
 const PRIMITIVES_LAYER = "Primitives";
 const FOLDER_UNIT_LAYERS = new Set([ABSTRACTS_LAYER, GENERATORS_LAYER]);
 const COMPONENT_LAYERS = new Set(["Essentials", "Composites", "Exotics"]);
+const PACKAGE_IMPORT_PATTERN = /^\s*import\s+(?!type\s)\{([^}]*)\}\s*from\s*["']@thewaver\/ss-components["'];?\s*$/gm;
+const EXPORT_PATTERN = /^export\s+(?:const|let|namespace|function|class)\s+(\w+)/gm;
+const STYLES_PATTERN = /\.css\.ts$/;
 
 type DependencyKind = "abstracts" | "generators" | "primitives" | "components";
 
@@ -45,7 +48,9 @@ const resolveSpecifier = (fromFile: string, specifier: string, known: Set<string
 
     const base = path.posix.normalize(path.posix.join(path.posix.dirname(fromFile), specifier));
 
-    return [base, `${base}.ts`, `${base}.tsx`, `${base}/index.ts`].find((candidate) => known.has(candidate));
+    return [base, `${base}.ts`, `${base}.tsx`, `${base}/index.ts`, base.replace(/\.js$/, ".ts")].find((candidate) =>
+        known.has(candidate),
+    );
 };
 
 export const getUnitName = (relativeFile: string) => {
@@ -64,9 +69,30 @@ const getUnitKind = (relativeFile: string) => {
     return COMPONENT_LAYERS.has(layer) ? ("components" as const) : undefined;
 };
 
-const buildDependencyMap = async (root: string) => {
-    const files = await collectFiles(root);
+/** Which core file declares each name the core package exports, so an import of the package lands on a file. */
+const buildCoreExportIndex = async (coreFiles: string[]) => {
+    const index = new Map<string, string>();
+
+    for (const file of coreFiles) {
+        if (STYLES_PATTERN.test(file)) {
+            index.set(`${path.posix.basename(file).replace(STYLES_PATTERN, "")}Styles`, file);
+
+            continue;
+        }
+
+        const source = await readFile(file, "utf8");
+
+        for (const match of source.matchAll(EXPORT_PATTERN)) index.set(match[1], file);
+    }
+
+    return index;
+};
+
+const buildDependencyMap = async (roots: string[]) => {
+    const rootFiles = await Promise.all(roots.map((root) => collectFiles(root)));
+    const files = rootFiles.flat();
     const known = new Set(files);
+    const coreIndex = await buildCoreExportIndex(rootFiles[rootFiles.length - 1]);
     const imports = new Map<string, string[]>();
 
     for (const file of files) {
@@ -79,11 +105,27 @@ const buildDependencyMap = async (root: string) => {
             if (resolved) targets.push(resolved);
         }
 
+        for (const match of source.matchAll(PACKAGE_IMPORT_PATTERN)) {
+            for (const specifier of match[1].split(",")) {
+                const name = specifier
+                    .trim()
+                    .replace(/^type\s+/, "")
+                    .split(/\s+as\s+/)[0];
+                const target = !specifier.trim().startsWith("type ") && name ? coreIndex.get(name) : undefined;
+
+                if (target) targets.push(target);
+            }
+        }
+
         imports.set(file, targets);
     }
 
-    const rootPosix = toPosix(root);
-    const relativeTo = (file: string) => file.slice(rootPosix.length + 1);
+    const rootPosixes = roots.map(toPosix);
+    const relativeTo = (file: string) => {
+        const root = rootPosixes.find((candidate) => file.startsWith(`${candidate}/`)) ?? "";
+
+        return file.slice(root.length + 1);
+    };
 
     const entries = new Map<string, string[]>();
     const abstractUnits = new Map<string, string[]>();
@@ -93,7 +135,9 @@ const buildDependencyMap = async (root: string) => {
         const segments = relative.split("/");
         const owner = segments[segments.length - 2];
 
-        if (owner && segments[segments.length - 1].replace(SOURCE_PATTERN, "") === owner) entries.set(owner, [file]);
+        if (owner && segments[segments.length - 1].replace(SOURCE_PATTERN, "") === owner && !entries.has(owner)) {
+            entries.set(owner, [file]);
+        }
 
         if (!FOLDER_UNIT_LAYERS.has(segments[0])) continue;
 
@@ -171,7 +215,7 @@ const buildDependencyMap = async (root: string) => {
     return map;
 };
 
-export const componentDependencies = (componentsRoot: string): Plugin => ({
+export const componentDependencies = (componentsRoots: string[]): Plugin => ({
     name: "component-dependencies",
     resolveId(source) {
         return source === VIRTUAL_ID ? RESOLVED_ID : undefined;
@@ -179,13 +223,13 @@ export const componentDependencies = (componentsRoot: string): Plugin => ({
     async load(id) {
         if (id !== RESOLVED_ID) return undefined;
 
-        return `export default ${JSON.stringify(await buildDependencyMap(componentsRoot))};`;
+        return `export default ${JSON.stringify(await buildDependencyMap(componentsRoots))};`;
     },
     configureServer(server) {
-        server.watcher.add(componentsRoot);
+        for (const root of componentsRoots) server.watcher.add(root);
 
         server.watcher.on("all", (_event, file) => {
-            if (!toPosix(file).startsWith(toPosix(componentsRoot))) return;
+            if (!componentsRoots.some((root) => toPosix(file).startsWith(toPosix(root)))) return;
 
             const module = server.moduleGraph.getModuleById(RESOLVED_ID);
 

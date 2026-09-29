@@ -51,7 +51,7 @@ reading.
 17. `Paginator` — four things deliberately not built — _open_
 18. The carousels — four things deliberately not built — _open_
 19. The four components ported from React — what did not settle — _open_
-20. An anchored layer is always a frame behind — _postponed until the platform catches up_
+20. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
 21. `Table` — six things deliberately not built — _open_
 22. `Timeline` — the pointer routes the library cannot promise — _open_
 23. `GlassSurface` — what is built and what is not — _open, one item postponed until the platform catches up_
@@ -85,7 +85,7 @@ privately inside them.
   was the one item whose cost _grew_ with delay, because every control built without it grew its own half of
   the error plumbing — and nothing of it is outstanding now.
 - **Dismissal, open state and openers are all settled.** All five layers dismiss through `Dismisser`, all
-  five take a `visibilitySignal`, and `Menu` takes an anchor while `ContextMenu` opens at a point; see
+  five take a `visibility` prop, and `Menu` takes an anchor while `ContextMenu` opens at a point; see
   `decisions.md`. Nothing in this family is outstanding.
 - **`Table` / data grid stays out of scope**, and specifically must not arrive as a by-product of
   `Tree` or of virtualization.
@@ -138,7 +138,7 @@ the gaps, each with the reason it is still a gap.
   cheap answer to it was `content-visibility` on the option paint, which is gone — see `decisions.md`.
 - **Dismissal does not restore the query.** Escape and blur clear it rather than restoring the selected option's
   text, because restoring it would need the per-option string this design does not have. The open state itself is
-  no longer private — `visibilitySignal` ships; see `decisions.md`.
+  no longer private — `visibility` ships; see `decisions.md`.
 
 **_Elsewhere._** Checked against Radix, React Aria and Kobalte, which is the SolidJS one.
 
@@ -329,7 +329,7 @@ page a reason to consume it first.
 were the exposure. The component renders nothing and keeps its two `Audio` elements out of the document, so
 the spec records `play` and `pause` on the prototype before the app runs — the same trick
 `noAnimationFrames.spec.ts` uses on `requestAnimationFrame` — and reads the rest off the caption the page
-paints from `playbackSignal`, which the component now writes. What that bought immediately: the source
+paints from `playback`, which the component now writes. What that bought immediately: the source
 arriving at mount is no longer played uninvited, and a control painted from the signal is right even where
 the browser has refused to start.
 
@@ -354,10 +354,9 @@ fakes frames as a 16ms timer and advancing time to reach a fallback fires the fr
 
 - **`ElementFader`'s 100ms fallback is real and is now driven.** With no frames at all a `Modal` still
   reaches its visible target, which is the whole reason the fallback was written.
-- **Starving the frames showed the positioner opening a layer a frame behind, and that is item 20.** What
-  the test proves is narrower than the sentence it first produced: with no frames, a layer opens 30px out on
-  `ViewportWrapperPage`'s scrolled anchor and the first scroll still lands it exactly, so the capture-phase
-  listener carries a scroll on its own. It does **not** prove the poll has no other job — the test only ever
+- **Starving the frames shows the positioner needs no frame to open a layer or to follow a scroll.** With no
+  frames, a layer opens on `ViewportWrapperPage`'s scrolled anchor, because the anchor is read as the layer is
+  shown, and a scroll still lands it exactly, so the capture-phase listener carries a scroll on its own. It does **not** prove the poll has no other job — the test only ever
   opens a layer and then scrolls, and the poll is the only thing watching for an anchor that moves with no
   event to announce it. The fear this item used to record, of a popup drifting further and further from its
   field, is what was actually ruled out.
@@ -529,7 +528,7 @@ These are the gaps.
     doing is reading [caniuse](https://caniuse.com/mdn-api_eyedropper) — do not re-derive the design, the cost
     or the options, all of which are below and were settled on **2026-08-15**.
 
-    **What it would take, for when that day comes:** almost nothing in `components/src`. `valueSignal` is already a
+    **What it would take, for when that day comes:** almost nothing in `components/src`. `value` is already a
     hex string and `open()` resolves to `{ sRGBHex }`, so a consumer constructs an `EyeDropper`, awaits it, and
     writes the result into the signal — the component syncs hex into its HSV working state itself, and
     `renderPopup` already provides the space for a trigger. The two pieces that would be library-owned are the
@@ -540,7 +539,7 @@ These are the gaps.
     avoid.
 
 **Nothing about dismissal or open state is outstanding.** `ColorInput` dismisses through `Dismisser` like
-every other layer and takes a `visibilitySignal` like every other popup; both are in `decisions.md`.
+every other layer and takes a `visibility` prop like every other popup; both are in `decisions.md`.
 
 **_Elsewhere._**
 
@@ -648,19 +647,19 @@ could not be a child"_. These are the gaps, each with the reason it is still one
   A consumer who wants the published desktop behavior — the chevron opens, the label selects — has no route
   to it. Giving them one means either a second render slot the library positions, or a flag saying where the
   press landed, and neither has been argued.
-- **One selected value, and no checkboxes.** `valueSignal` is `Signal<T | undefined>`, so there is no
+- **One selected value, and no checkboxes.** `value` is `Signal<T | undefined>`, so there is no
   `aria-multiselectable`, no `Shift`-extended range, and no tri-state parent following its children. **None
   of the three is arithmetic any more**: `Abstracts/Selection` holds the toggle, the anchored range and
   `getBranchItems` / `getBranchState` / `getBranchSelection` for a folder that follows its contents, and
   `Table` drives its whole selection through it. What is left here is the API question the abstract
-  deliberately does not answer — whether `valueSignal` widens to a list, whether that is a breaking change
+  deliberately does not answer — whether `value` widens to a list, whether that is a breaking change
   worth making or a second prop, and where a tick box would be drawn given that `renderNode` is the
   consumer's. See `decisions.md` under _"`Abstracts/Selection`"_.
 
 **The focus rescue was wired to a function nothing could reach, and is now a guard over the visible rows.**
 It used to sit inside `collapse`, checking whether focus was on a descendant before removing the subtree — but
 both routes into `collapse` act on the branch itself, which is already the focused element and stays mounted,
-so the check was never true. A **consumer** writing `expandedSignal` from their own code, which is the only
+so the check was never true. A **consumer** writing `expanded` from their own code, which is the only
 way to collapse a branch out from under a focused row, never passes through `collapse` at all. The guard now
 watches the visible rows and fires when a remembered focused row leaves the set while focus has fallen to the
 document body; `tree.spec.ts` drives it through a Playground button that defers the collapse, since a button
@@ -676,7 +675,7 @@ that collapsed on the spot would be holding focus itself.
   `onLoadChildrenComplete`; React Aria has a `TreeLoadMoreItem` element and a `renderEmptyState` for the
   spinner. Both answered the half this item called hard — where "loading" is painted — by making it an element
   the consumer supplies, and that is the shape the group box grew. Built as `hasMoreChildren` plus
-  `renderPendingChildren`, with no load callback, because `expandedSignal` is the consumer's already; see
+  `renderPendingChildren`, with no load callback, because `expanded` is the consumer's already; see
   `decisions.md`.
 - **Multi-select and checkboxes are one feature, and both libraries ship it.** `selectionMode="multiple"` in
   each, with Ark UI adding `NodeCheckbox` and a `checkedValue` list carrying `indeterminate`. So the tri-state
@@ -880,25 +879,22 @@ settled that a component does not fully delegate position. Recorded so it is not
 
 ---
 
-## 20. An anchored layer is always a frame behind — _postponed until the platform catches up_
+## 20. An anchored layer trails its anchor during a scroll — _postponed until the platform catches up_
 
-Folded together from item 5 and item 12 on the user's call, after they pointed out that the drag they see
-while scrolling is the same inaccuracy the opening placement shows. It was written up as two faults — a layer
-that opens a frame behind, and a fast scroll that shows a frame of drift — and it is one: **the position an
-anchored layer paints at is the position its anchor was in one frame ago.** At rest the last frame catches up,
-so it looks settled and only moves when something else does.
+**While something is moving, the position an anchored layer paints at is the position its anchor was in one
+frame ago.** At rest the last frame catches up, so it looks settled and only moves when something else does.
+Opening is not part of it: the anchor is read once as the layer is shown, after layout and before paint, in all
+four frameworks, so a layer opens on its anchor even when no animation frames arrive.
 
-**Where it shows.** Opening a layer against `ViewportWrapperPage`'s scrolled anchor, measured with frames starved:
-30px out, and it stays there until any event arrives. Scrolling a box with a layer open: the layer trails the
-anchor while the scroll is moving and lands exactly when it stops. `viewport.spec.ts` and
-`noAnimationFrames.spec.ts` both assert the settled position, which is what a spec can see; the intermediate
-frames are checked by eye.
+**Where it shows.** Scrolling a box with a layer open: the layer trails the anchor while the scroll is moving and
+lands exactly when it stops. `viewport.spec.ts` asserts the settled position, which is what a spec can see, and
+`noAnimationFrames.spec.ts` the opening one; the intermediate frames are checked by eye.
 
 **What the layer is built on.** `AnchorUtils.createPortalPosition` derives the position from two measured signals —
 the anchor's rect from `ElementObserverUtils.createViewportRectObserver`, the content's size from a
-`ResizeObserver` — and the rect observer updates from three places: once on mount, from a capture-phase
-`scroll` and a window `resize`, and from a `requestAnimationFrame` loop that runs for as long as the layer is
-open. The poll is the only one of the three that catches an anchor moving with no event behind it: an ancestor
+`ResizeObserver` — and the rect observer updates from four places: once on mount, once as the layer is shown,
+from a capture-phase `scroll` and a window `resize`, and from a `requestAnimationFrame` loop that runs for as
+long as the layer is open. The poll is the only one of the three that catches an anchor moving with no event behind it: an ancestor
 being transformed or animated, content above it growing, a font arriving and reflowing the page.
 
 **Decided by the user: postponed, on the eyedropper's terms.** The fix is C, C needs a platform feature that
@@ -955,8 +951,7 @@ neither was tried.
 - **A layer never opens in the wrong place, as long as frames are arriving.** `Popover` already paints
   `visibility: hidden` until `getPosition()` resolves. Sampled per frame from the moment the element is added:
   hidden at `translate(0px, 0px)` for two frames, then visible at its final transform, and unchanged for the
-  next six. The 30px in `noAnimationFrames.spec.ts` is the starved case alone — with no poll to finish it, the
-  mount reading is what becomes visible.
+  next six.
 - **Frame by frame through a scroll, the gap between anchor and layer is constant**, under both a
   `scrollTop` scroll and a real wheel scroll: 528 while the list sits above the anchor, then 268 after it
   flips below. So on the main thread's own account the layer is never behind.
@@ -1274,6 +1269,14 @@ reach it, and why it was accepted, so that nobody has to re-derive the argument 
 again. An entry moves back up into the numbered items only if the user says so, or if something changes that
 makes the reasoning wrong.
 
+**React faders report `onShow` twice in development.** React's strict mode runs every effect twice in a
+development build, so a fader shows, cancels and shows again, and the cancel does not take back the `onShow`
+already reported. A production build reports once. Reachable on any React page with a fader, such as toasts, by
+counting `onShow` calls under `npm start`. Accepted by the user: React's own documentation calls a double report
+in development acceptable, production is already right, and the alternative — holding `onShow` until the fade has
+really begun — would delay it by a frame in both frameworks through the shared fader. The React toasts spec
+asserts that an arrival was reported, not that it was reported exactly once, and should stay that way.
+
 **A laid-out `Tree` renders every open node, windowing being a one-dimensional device.** A window mounts a run
 of rows and moves them down a column; a layout places every visible node wherever it likes, so there is no run
 to window. `Tree` turns virtualization off when it is given a layout, which means a placed tree of a thousand
@@ -1368,6 +1371,19 @@ answer to "what is next for development"** — see the note at the top of this f
 commitment, and an entry that already carries the user's verdict is recorded here so that the same sketch is
 not put to them twice. An entry leaves this section in one of two directions: upward into a numbered item, which is the user's
 decision to take, or into `conventions.md` / `decisions.md` if building it settles something.
+
+### Publishing Exotics as a package of their own
+
+The idea was that someone already using another library for everyday controls might want only the Exotics. **The
+user's verdict was to keep one package per framework.** Splitting would not make anyone's app smaller: a bundler
+already keeps only what is imported, so a single `CellAnimation` costs about 7 KB gzipped either way. What a split
+would change is what gets installed. Against that, the Exotics still need the Abstracts, Primitives, Generators
+and Samples, so those would become a third package or stay in Essentials. Each of the four framework packages
+would split the same way, taking the count from six to about sixteen. And Menu and Tabs would keep their
+advanced layout features in Essentials, so "Exotics" would not mean "everything advanced".
+
+Worth reopening if someone actually asks to install the Exotics alone, or if the type definitions a consumer
+installs grow large enough to slow their editor.
 
 ### A pointer tracker the pointer effects can share, and where else a reading can come from
 

@@ -1,0 +1,91 @@
+import { Show, createEffect, createSignal, on } from "solid-js";
+
+import { Button, TextInput } from "@thewaver/ss-components-solid";
+import {
+    FIELD_GAP,
+    FIELD_PADDING,
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+
+import { PageInlineEditContent } from "../../../StyledComponents/InlineEditContent/InlineEditContent";
+import {
+    PageTextFieldContent,
+    computePageTextFieldTextStyle,
+} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import type { TextInputEditableExampleProps } from "../TextInputPage.types";
+
+type Props = TextInputEditableExampleProps;
+
+export const EditableExample = (props: Props) => {
+    const draftSignal = createSignal("");
+
+    let buttonRef: HTMLElement | undefined;
+    let inputRef: HTMLElement | undefined;
+
+    const startEditing = () => {
+        draftSignal[1](props.value[0]());
+        props.editing[1](true);
+    };
+
+    const finishEditing = (isCommitting: boolean) => {
+        if (!props.editing[0]()) return;
+
+        if (isCommitting) props.value[1](draftSignal[0]());
+
+        props.editing[1](false);
+    };
+
+    createEffect(
+        on(
+            () => props.editing[0](),
+            (isEditing) => {
+                (isEditing ? inputRef : buttonRef)?.focus();
+            },
+            { defer: true },
+        ),
+    );
+
+    return (
+        <Show
+            when={props.editing[0]()}
+            fallback={
+                <Button
+                    ref={(element) => {
+                        buttonRef = element;
+                    }}
+                    ariaLabel={() => `Edit name, ${props.value[0]()}`}
+                    onClick={startEditing}
+                    renderContent={(getFlags) => (
+                        <PageInlineEditContent flags={getFlags}>{props.value[0]()}</PageInlineEditContent>
+                    )}
+                />
+            }
+        >
+            <div
+                onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        finishEditing(true);
+                    }
+
+                    if (e.key === "Escape") {
+                        e.preventDefault();
+                        finishEditing(false);
+                    }
+                }}
+                onFocusOut={() => finishEditing(true)}
+            >
+                <TextInput
+                    ref={(element) => {
+                        inputRef = element;
+                    }}
+                    value={draftSignal}
+                    padding={() => FIELD_PADDING}
+                    gap={() => FIELD_GAP}
+                    ariaLabel={"Name"}
+                    computeTextStyle={computePageTextFieldTextStyle}
+                    renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} />}
+                />
+            </div>
+        </Show>
+    );
+};

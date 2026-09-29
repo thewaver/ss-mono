@@ -1,3 +1,4 @@
+import { TreemapUtils } from "../Treemap/Treemap.utils";
 import type { SunburstArc, SunburstArcPathOpts, SunburstNode, SunburstSpan } from "./Sunburst.types";
 
 /** Zero, as a weight, a length or an angle. */
@@ -176,5 +177,71 @@ export namespace SunburstUtils {
         const radius = (arc.innerRadius + arc.outerRadius) * HALF;
 
         return `rotate(${angle - QUARTER_TURN_DEGREES}) translate(${radius},0) rotate(${angle < HALF_TURN_DEGREES ? NOTHING : HALF_TURN_DEGREES})`;
+    };
+
+    /**
+     * Every node that can be drawn as an arc, in drawing order.
+     *
+     * @param root The whole tree.
+     * @param weights What `TreemapUtils.computeWeights` answered for it.
+     * @returns Every node but the root, which is the center rather than an arc, walked depth first with each node's
+     * children heaviest first — the order they sit in clockwise, and so the order the arrows walk them.
+     */
+    export const listNodes = <T>(root: SunburstNode<T>, weights: Map<SunburstNode<T>, number>) => {
+        const nodes: SunburstNode<T>[] = [];
+
+        const walk = (node: SunburstNode<T>) =>
+            [...(node.children ?? [])]
+                .sort((first, second) => (weights.get(second) ?? NOTHING) - (weights.get(first) ?? NOTHING))
+                .forEach((child) => {
+                    nodes.push(child);
+                    walk(child);
+                });
+
+        walk(root);
+
+        return nodes;
+    };
+
+    /**
+     * Where an arc is drawn at one moment of a zoom.
+     *
+     * @param span The arc's span, from {@link computeSpans}.
+     * @param center The span of the branch being zoomed to.
+     * @param from Where the arc was drawn when the zoom began, or `undefined` for an arc that was not there then.
+     * @param progress How far through the zoom's time, `0` to `1`, as `TreemapUtils.createZoomClock` reads it.
+     * @returns Once the zoom is over, the span as {@link computeView} answers it against `center`; until then, the
+     * way there from `from` along `TreemapUtils.easeZoom`. An arc with no `from` sits where it is headed.
+     */
+    export const computeShownSpan = (
+        span: SunburstSpan,
+        center: SunburstSpan,
+        from: SunburstSpan | undefined,
+        progress: number,
+    ) => {
+        const resting = computeView(span, center);
+
+        if (progress >= WHOLE) return resting;
+
+        return interpolateSpan(from ?? resting, resting, TreemapUtils.easeZoom(progress));
+    };
+
+    /**
+     * How opaque an arc is at one moment of a zoom.
+     *
+     * @param isVisibleAtStart Whether the arc was one of the rings drawn when the zoom began.
+     * @param isVisibleAtTarget Whether it is one of the rings drawn once the zoom settles.
+     * @param progress How far through the zoom's time, `0` to `1`.
+     * @returns `1` for an arc in view and `0` for one out of it, fading between the two along `TreemapUtils.easeZoom`
+     * while the zoom runs, so an arc coming into the rings fades in and one leaving fades out.
+     */
+    export const computeOpacity = (isVisibleAtStart: boolean, isVisibleAtTarget: boolean, progress: number) => {
+        const to = isVisibleAtTarget ? WHOLE : NOTHING;
+
+        if (progress >= WHOLE) return to;
+
+        const from = isVisibleAtStart ? WHOLE : NOTHING;
+
+        return from + (to - from) * TreemapUtils.easeZoom(progress);
     };
 }

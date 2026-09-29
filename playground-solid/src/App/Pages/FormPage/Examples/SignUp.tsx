@@ -1,0 +1,113 @@
+import type { Signal } from "solid-js";
+
+import { Button, Checkbox, Form, FormField, TextInput } from "@thewaver/ss-components-solid";
+import {
+    FIELD_GAP,
+    FIELD_PADDING,
+} from "@thewaver/ss-playground/App/StyledComponents/TextFieldContent/TextFieldContent.css";
+
+import { PageButtonContent } from "../../../StyledComponents/ButtonContent/ButtonContent";
+import { PageCheckboxContent } from "../../../StyledComponents/CheckboxContent/CheckboxContent";
+import {
+    PageFormButtons,
+    PageFormFieldCaption,
+    PageFormFieldMessage,
+    PageFormStack,
+} from "../../../StyledComponents/FormFieldContent/FormFieldContent";
+import {
+    PageTextFieldContent,
+    computePageTextFieldTextStyle,
+} from "../../../StyledComponents/TextFieldContent/TextFieldContent";
+import type { FormExampleProps } from "../FormPage.types";
+
+const FIELD_WIDTH = 240;
+const MIN_PASSWORD_LENGTH = 8;
+
+type Props = FormExampleProps;
+
+const renderTextField = (signal: Signal<string>, getHasError: () => boolean) => (
+    <TextInput
+        value={signal}
+        hasError={getHasError}
+        padding={() => FIELD_PADDING}
+        gap={() => FIELD_GAP}
+        computeTextStyle={computePageTextFieldTextStyle}
+        renderContent={(getFlags) => <PageTextFieldContent flags={getFlags} width={() => FIELD_WIDTH} />}
+    />
+);
+
+export const SignUpExample = (props: Props) => {
+    const getEmailMessage = () => {
+        if (props.email[0]().length < 1) return "We only use it to sign you in.";
+
+        return props.email[0]().includes("@") ? "" : "That does not look like an email address.";
+    };
+
+    const getPasswordMessage = () =>
+        props.password[0]().length >= MIN_PASSWORD_LENGTH ? "" : `At least ${MIN_PASSWORD_LENGTH} characters.`;
+
+    return (
+        <Form
+            ariaLabel={"Sign up"}
+            onSubmit={props.onSubmit}
+            onReset={props.onReset}
+            renderContent={(getState) => (
+                <PageFormStack>
+                    <FormField
+                        hasError={() => getEmailMessage().includes("not look")}
+                        message={getEmailMessage}
+                        renderCaption={() => <PageFormFieldCaption>Email</PageFormFieldCaption>}
+                        renderMessage={(getFieldState) => (
+                            <PageFormFieldMessage state={getFieldState}>{getEmailMessage()}</PageFormFieldMessage>
+                        )}
+                        renderControl={(getFieldState) => renderTextField(props.email, () => getFieldState().hasError)}
+                    />
+
+                    <FormField
+                        hasError={() => getPasswordMessage().length > 0}
+                        message={getPasswordMessage}
+                        renderCaption={() => <PageFormFieldCaption>Password</PageFormFieldCaption>}
+                        renderMessage={(getFieldState) => (
+                            <PageFormFieldMessage state={getFieldState}>{getPasswordMessage()}</PageFormFieldMessage>
+                        )}
+                        renderControl={(getFieldState) =>
+                            renderTextField(props.password, () => getFieldState().hasError)
+                        }
+                    />
+
+                    <FormField
+                        orientation={"horizontal"}
+                        hasError={() => !props.terms[0]()}
+                        message={() => (props.terms[0]() ? "" : "Required.")}
+                        renderCaption={() => <PageFormFieldCaption>Accept the terms</PageFormFieldCaption>}
+                        renderMessage={(getFieldState) => (
+                            <PageFormFieldMessage state={getFieldState}>Required.</PageFormFieldMessage>
+                        )}
+                        renderControl={(getFieldState) => (
+                            <Checkbox
+                                checked={props.terms}
+                                hasError={() => getFieldState().hasError}
+                                renderContent={(getFlags) => <PageCheckboxContent flags={getFlags} />}
+                            />
+                        )}
+                    />
+
+                    <PageFormButtons>
+                        <Button
+                            isDisabled={() => !getState().isValid}
+                            type={"submit"}
+                            renderContent={(getFlags) => (
+                                <PageButtonContent flags={getFlags}>Sign up</PageButtonContent>
+                            )}
+                        />
+
+                        <Button
+                            type={"reset"}
+                            renderContent={(getFlags) => <PageButtonContent flags={getFlags}>Reset</PageButtonContent>}
+                        />
+                    </PageFormButtons>
+                </PageFormStack>
+            )}
+        />
+    );
+};

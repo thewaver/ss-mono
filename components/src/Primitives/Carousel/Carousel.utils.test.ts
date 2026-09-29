@@ -111,3 +111,126 @@ describe("getTurnSteps", () => {
         expect(CarouselUtils.getTurnSteps(0, 1, 0)).toBe(0);
     });
 });
+
+describe("getTravelsAcross", () => {
+    it("follows the orientation for a track and the axis for a drum", () => {
+        expect(CarouselUtils.getTravelsAcross(false, "column", "horizontal")).toBe(true);
+        expect(CarouselUtils.getTravelsAcross(false, "row", "vertical")).toBe(false);
+        expect(CarouselUtils.getTravelsAcross(true, "row", "vertical")).toBe(true);
+        expect(CarouselUtils.getTravelsAcross(true, "column", "horizontal")).toBe(false);
+    });
+});
+
+describe("getIsSwipeDisabled", () => {
+    it("refuses without controls, while disabled, and with nothing to move between", () => {
+        expect(CarouselUtils.getIsSwipeDisabled(false, false, 4)).toBe(true);
+        expect(CarouselUtils.getIsSwipeDisabled(true, true, 4)).toBe(true);
+        expect(CarouselUtils.getIsSwipeDisabled(true, false, 1)).toBe(true);
+    });
+
+    it("takes the swipe otherwise", () => {
+        expect(CarouselUtils.getIsSwipeDisabled(true, false, 2)).toBe(false);
+    });
+});
+
+describe("clampSwipeRatio and getSwipeStep", () => {
+    it("holds a swipe to one slide either way", () => {
+        expect(CarouselUtils.clampSwipeRatio(1.7)).toBe(1);
+        expect(CarouselUtils.clampSwipeRatio(-3)).toBe(-1);
+        expect(CarouselUtils.clampSwipeRatio(0.4)).toBe(0.4);
+    });
+
+    it("steps forwards for a push left or up and back for a push right or down", () => {
+        expect(CarouselUtils.getSwipeStep("left")).toBe(1);
+        expect(CarouselUtils.getSwipeStep("up")).toBe(1);
+        expect(CarouselUtils.getSwipeStep("right")).toBe(-1);
+        expect(CarouselUtils.getSwipeStep("down")).toBe(-1);
+    });
+});
+
+describe("getIsStepDisabled", () => {
+    it("disables every step on a disabled carousel or one with a single slide", () => {
+        expect(CarouselUtils.getIsStepDisabled("next", 0, 4, true, true)).toBe(true);
+        expect(CarouselUtils.getIsStepDisabled("next", 0, 1, true, false)).toBe(true);
+    });
+
+    it("disables only the step at the end of a carousel that does not loop", () => {
+        expect(CarouselUtils.getIsStepDisabled("next", 3, 4, false, false)).toBe(true);
+        expect(CarouselUtils.getIsStepDisabled("previous", 3, 4, false, false)).toBe(false);
+        expect(CarouselUtils.getIsStepDisabled("next", 3, 4, true, false)).toBe(false);
+    });
+});
+
+describe("getIsRotating", () => {
+    const rotating = {
+        autoplayDelayMs: 500,
+        isPlaying: true,
+        isHeld: false,
+        isSwiping: false,
+        isDisabled: false,
+        count: 4,
+    };
+
+    it("rotates with a delay, playback on and nothing holding it", () => {
+        expect(CarouselUtils.getIsRotating(rotating)).toBe(true);
+    });
+
+    it("stops for each thing that holds it", () => {
+        expect(CarouselUtils.getIsRotating({ ...rotating, autoplayDelayMs: undefined })).toBe(false);
+        expect(CarouselUtils.getIsRotating({ ...rotating, isPlaying: false })).toBe(false);
+        expect(CarouselUtils.getIsRotating({ ...rotating, isHeld: true })).toBe(false);
+        expect(CarouselUtils.getIsRotating({ ...rotating, isSwiping: true })).toBe(false);
+        expect(CarouselUtils.getIsRotating({ ...rotating, isDisabled: true })).toBe(false);
+        expect(CarouselUtils.getIsRotating({ ...rotating, count: 1 })).toBe(false);
+    });
+});
+
+describe("getIsPlaybackAtEnd", () => {
+    const atEnd = { isLooping: false, autoplayDelayMs: 500, isPlaying: true, isDisabled: false, count: 4, index: 3 };
+
+    it("stops a carousel that does not loop on its last slide", () => {
+        expect(CarouselUtils.getIsPlaybackAtEnd(atEnd)).toBe(true);
+    });
+
+    it("leaves every other case alone", () => {
+        expect(CarouselUtils.getIsPlaybackAtEnd({ ...atEnd, isLooping: true })).toBe(false);
+        expect(CarouselUtils.getIsPlaybackAtEnd({ ...atEnd, index: 2 })).toBe(false);
+        expect(CarouselUtils.getIsPlaybackAtEnd({ ...atEnd, isPlaying: false })).toBe(false);
+        expect(CarouselUtils.getIsPlaybackAtEnd({ ...atEnd, autoplayDelayMs: undefined })).toBe(false);
+        expect(CarouselUtils.getIsPlaybackAtEnd({ ...atEnd, isDisabled: true })).toBe(false);
+        expect(CarouselUtils.getIsPlaybackAtEnd({ ...atEnd, count: 1, index: 0 })).toBe(false);
+    });
+});
+
+describe("getIsAnnounced", () => {
+    it("announces a move the user made and not the first slide or a rotation", () => {
+        expect(CarouselUtils.getIsAnnounced(0, 1, false)).toBe(true);
+        expect(CarouselUtils.getIsAnnounced(undefined, 1, false)).toBe(false);
+        expect(CarouselUtils.getIsAnnounced(1, 1, false)).toBe(false);
+        expect(CarouselUtils.getIsAnnounced(0, 1, true)).toBe(false);
+    });
+});
+
+describe("computeTurnAngle", () => {
+    it("sets the angle from the index the first time and whenever the count changes", () => {
+        expect(CarouselUtils.computeTurnAngle(0, undefined, 1, 4)).toBe(-90);
+        expect(CarouselUtils.computeTurnAngle(-450, { index: 1, count: 4 }, 1, 6)).toBe(-60);
+    });
+
+    it("accumulates the shorter turn otherwise, so going over the end keeps going the same way", () => {
+        expect(CarouselUtils.computeTurnAngle(-270, { index: 3, count: 4 }, 0, 4)).toBe(-360);
+        expect(CarouselUtils.computeTurnAngle(0, { index: 0, count: 4 }, 3, 4)).toBe(90);
+        expect(CarouselUtils.computeTurnAngle(-90, { index: 1, count: 4 }, 1, 4)).toBe(-90);
+    });
+});
+
+describe("getDrumAngle and getTrackTransform", () => {
+    it("adds a swipe under way to the resting angle", () => {
+        expect(CarouselUtils.getDrumAngle(-90, 0.5, 4)).toBe(-45);
+    });
+
+    it("slides the track by whole slides and the swipe's share of one", () => {
+        expect(CarouselUtils.getTrackTransform(true, 0, 2)).toBe("translateX(-200%)");
+        expect(CarouselUtils.getTrackTransform(false, 0.5, 1)).toBe("translateY(-50%)");
+    });
+});

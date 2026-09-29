@@ -42,7 +42,7 @@ export const SORTABLE_ANNOUNCEMENTS: SortableAnnouncements = {
 
 export const TABLE_ANNOUNCEMENTS: TableAnnouncements = {
     ...CARRIER_ANNOUNCEMENTS,
-    restingKeyHint: "Press Enter to pick this column up and move it.",
+    restingKeyHint: "Press Shift with the left or right arrow to move this column.",
     keyHint: "Enter drops, Escape cancels.",
     computePlaceLabel: (index, count) => `column ${index + 1} of ${count}`,
     computeColumnMoved: (header, index, count) => `${header} moved to column ${index + 1} of ${count}.`,

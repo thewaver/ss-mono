@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ScrambleTextUtils } from "./ScrambleText.utils";
 
@@ -143,5 +143,64 @@ describe("getCarriedIndices", () => {
 
     it("tells case apart, since a changed case is a changed character", () => {
         expect(carry("ab", "aB")).toEqual([0, undefined]);
+    });
+});
+
+describe("createScrambler", () => {
+    const makeScrambler = (onAnimationEnd = () => {}) => {
+        const characters = Array.from("AB C");
+
+        return ScrambleTextUtils.createScrambler({
+            getCharacters: () => characters,
+            getGlyphSets: () => characters.map(() => Array.from("ABCXYZ")),
+            getSettleTimes: () => [0, 50, 50, 100],
+            getStartTimes: () => [0, 0, 0, 0],
+            getInitialDelayMs: () => 0,
+            getSettleDurationMs: () => 100,
+            getScrambleIntervalMs: () => 10,
+            onAnimationEnd,
+        });
+    };
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    it("churns every position but whitespace, never on its own character, and ends once all have settled", () => {
+        vi.useFakeTimers();
+
+        const onAnimationEnd = vi.fn();
+        const scrambler = makeScrambler(onAnimationEnd);
+
+        scrambler.start();
+        vi.advanceTimersByTime(20);
+
+        const state = scrambler.get();
+
+        expect(state.isScrambling).toBe(true);
+        expect(state.noise[2]).toBe(" ");
+        expect(state.noise[3]).not.toBe("C");
+
+        vi.advanceTimersByTime(200);
+
+        expect(scrambler.get().isScrambling).toBe(false);
+        expect(onAnimationEnd).toHaveBeenCalledTimes(1);
+    });
+
+    it("carries over only the characters that had settled when the text changed", () => {
+        vi.useFakeTimers();
+
+        const scrambler = makeScrambler();
+
+        scrambler.start();
+        vi.advanceTimersByTime(60);
+
+        expect(scrambler.getKeptAfterChange(Array.from("AB C"), Array.from("XAB C"))).toEqual([
+            false,
+            true,
+            true,
+            true,
+            false,
+        ]);
     });
 });

@@ -153,16 +153,16 @@ const PATTERN_CYCLE_MULTIPLE = 4;
 
 /**
  * What the cells are handed for one iteration, worked out from the panel rather than written down. Three
- * knobs decide it: a pass that alternates runs out and back with the hold parked between the legs, so its
- * iteration is twice the duration plus the hold, and a pass that does not is the duration alone. The duration
- * field is always the one-way trip.
+ * knobs decide it: a pass that comes back — stack or pipe — runs out and back with the hold parked between the
+ * legs, so its iteration is twice the duration plus the hold, and a pass that does not is the duration alone.
+ * The duration field is always the one-way trip.
  */
 const cycleMs = async (page: import("@playwright/test").Page) => {
     const durationMs = Number(await page.locator(`${prop("animationDurationMs")} input`).inputValue());
     const holdMs = Number(await page.locator(`${prop("holdMs")} input`).inputValue());
     const dir = ((await page.locator(`${prop("playbackDir")} [role="combobox"]`).textContent()) ?? "").trim();
 
-    return dir.startsWith("alternate") ? durationMs * 2 + holdMs : durationMs;
+    return /^(stack|pipe)/.test(dir) ? durationMs * 2 + holdMs : durationMs;
 };
 
 /**
@@ -172,7 +172,7 @@ const cycleMs = async (page: import("@playwright/test").Page) => {
  *
  * Every length below is asked of the panel first and compared second, because a literal here cannot tell a
  * break from somebody changing their mind: switching the page's opening direction from `normal` to
- * `alternate` more than doubles every duration in the source without anything having gone wrong. What is
+ * `stack` more than doubles every duration in the source without anything having gone wrong. What is
  * asserted is the relationship — the source runs for exactly one cell iteration, whatever the knobs currently
  * make that — and the direction is flipped at the end so the rule is exercised both ways rather than only in
  * whichever state the page happens to open in.
@@ -225,7 +225,7 @@ test("a drawn source takes its palette from the samples and its duration from th
 
     const oneWay = await cycleMs(page);
 
-    expect(oneWay, "a pass that does not alternate drops the return leg and the hold with it").toBeLessThan(stretched);
+    expect(oneWay, "a pass that does not come back drops the return leg and the hold with it").toBeLessThan(stretched);
 
     await expect
         .poll(() => sourceOf("gradient"), {

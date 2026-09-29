@@ -1,6 +1,6 @@
 import { type Page, expect, test } from "@playwright/test";
 
-import { example, prop, readout } from "./helpers";
+import { prop, readout } from "./helpers";
 
 const MARKER = "#timelineMarker";
 const VEHICLE = "#circuitVehicle";

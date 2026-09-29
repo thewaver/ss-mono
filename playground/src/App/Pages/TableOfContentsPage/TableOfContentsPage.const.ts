@@ -1,4 +1,4 @@
-import type { TableOfContentsSection } from "./TableOfContentsPage.types";
+import type { TableOfContentsSection } from "./TableOfContentsSection.types";
 
 export const TOC_GAP = 5;
 

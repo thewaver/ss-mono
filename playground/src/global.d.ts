@@ -1,5 +1,9 @@
 /// <reference types="vite/client" />
 
+interface ImportMetaEnv {
+    readonly VITE_PLAYGROUND_URLS: Readonly<Record<string, string>>;
+}
+
 declare module "virtual:component-dependencies" {
     export type DependencyNames = {
         abstracts: string[];
@@ -40,7 +44,7 @@ declare module "virtual:component-api" {
         tables: ApiTable[];
     };
 
-    const api: Record<string, ApiGroup[]>;
+    const api: Record<string, () => Promise<{ default: ApiGroup[] }>>;
 
     export default api;
 }

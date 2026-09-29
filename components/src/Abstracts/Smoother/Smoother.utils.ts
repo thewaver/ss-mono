@@ -1,4 +1,6 @@
-import { type Accessor, createEffect, createSignal, onCleanup, untrack } from "solid-js";
+import { StoreUtils } from "@thewaver/ss-utils";
+
+import type { SmootherFollower } from "./Smoother.types";
 
 /** How near a value has to be to its target before it is put there and the frames stop. */
 const SETTLED_EPSILON = 0.001;
@@ -35,17 +37,20 @@ export namespace SmootherUtils {
     /**
      * Follows a list of numbers, easing towards each change on animation frames.
      *
-     * Frames are asked for only while something is still moving, so a still pointer costs nothing. A change to the
-     * number of values, a change too small to be seen, or a smoothing time of `0` or less puts every value on its
-     * target at once.
+     * The follower is a store of the trailing values, starting on `initialTargets`. `follow` hands it new targets
+     * and a smoothing time; frames are asked for only while something is still moving, so a still pointer costs
+     * nothing. A change to the number of values, a change too small to be seen, or a smoothing time of `0` or less
+     * puts every value on its target at once. `stop` calls off the frame being waited for and leaves the values
+     * where they are; the next `follow` carries on from there.
      *
-     * @param getTargets The values to follow, read reactively.
-     * @param getSmoothingMs How slowly they are followed, as {@link getStep} takes it.
-     * @returns The trailing values, one per target, in the same order.
+     * @param initialTargets Where the values start.
+     * @returns The follower.
      */
-    export const create = (getTargets: Accessor<number[]>, getSmoothingMs: Accessor<number>): Accessor<number[]> => {
-        const [getValues, setValues] = createSignal(untrack(getTargets));
+    export const create = (initialTargets: number[]): SmootherFollower => {
+        const store = StoreUtils.create(initialTargets);
 
+        let targets = initialTargets;
+        let smoothingMs = 0;
         let frameId: ReturnType<typeof requestAnimationFrame> | undefined;
         let lastMs = 0;
 
@@ -58,33 +63,32 @@ export namespace SmootherUtils {
         const advance = (nowMs: number) => {
             frameId = undefined;
 
-            const targets = untrack(getTargets);
-            const smoothingMs = untrack(getSmoothingMs);
             const elapsedMs = nowMs - lastMs;
-            const values = untrack(getValues);
+            const values = store.get();
 
             lastMs = nowMs;
 
             const next = targets.map((target, index) => getStep(values[index], target, elapsedMs, smoothingMs));
 
             if (getIsSettled(next, targets)) {
-                setValues(targets);
+                store.set(targets);
 
                 return;
             }
 
-            setValues(next);
+            store.set(next);
             frameId = requestAnimationFrame(advance);
         };
 
-        createEffect(() => {
-            const targets = getTargets();
-            const smoothingMs = getSmoothingMs();
-            const values = untrack(getValues);
+        const follow = (nextTargets: number[], nextSmoothingMs: number) => {
+            const values = store.get();
+
+            targets = nextTargets;
+            smoothingMs = nextSmoothingMs;
 
             if (smoothingMs <= 0 || values.length !== targets.length || getIsSettled(values, targets)) {
                 stop();
-                setValues(targets);
+                store.set(targets);
 
                 return;
             }
@@ -93,10 +97,8 @@ export namespace SmootherUtils {
 
             lastMs = performance.now();
             frameId = requestAnimationFrame(advance);
-        });
+        };
 
-        onCleanup(stop);
-
-        return getValues;
+        return { get: store.get, subscribe: store.subscribe, follow, stop };
     };
 }

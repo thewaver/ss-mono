@@ -1,9 +1,6 @@
-import { createSignal, onCleanup } from "solid-js";
-
-import { Color, MathUtils, type Point2d, RandomUtils, type Size2d } from "@thewaver/ss-utils";
+import { Color, MathUtils, type Point2d, RandomUtils, type Store, StoreUtils } from "@thewaver/ss-utils";
 
 import type { PointerReading } from "../../Abstracts/PointerTracker/PointerTracker.types";
-import { SVGFilterDefsFactory } from "../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.factory";
 import type { CycleColorKey, SVGDefsColors } from "./SVGDefs.types";
 
 const NO_CONSUMERS = 0;
@@ -38,23 +35,6 @@ export namespace SVGDefsUtils {
             (walkKey) => colors[walkKey],
         );
     };
-
-    export const getBaseBlur = (
-        id: string,
-        defs: {
-            getSize: () => Size2d;
-            blurWidth?: number;
-        },
-    ) =>
-        defs.blurWidth
-            ? {
-                  id: `border-blur-filter-${id}`,
-                  renderDefsElement: () =>
-                      new SVGFilterDefsFactory(`border-blur-filter-${id}`)
-                          .addGaussianBlurFilter({ stdDeviation: defs.blurWidth! })
-                          .computeFilterPrimitives({ method: "isolate", elementSize: defs.getSize() }),
-              }
-            : undefined;
 
     /**
      * The five color stops of a band that fades out symmetrically either side of its core.
@@ -157,17 +137,19 @@ export namespace SVGDefsUtils {
     /**
      * A frame clock shared by every sample that animates off the pointer rather than off a SMIL timeline.
      *
-     * It runs only while somebody needs it: each consumer registers with `subscribe`, which undoes itself when
-     * that consumer is cleaned up, and each pointer movement calls `keepAwake`. With nobody subscribed, or once
-     * the grace period has passed since the last wake, the clock stops asking for frames — so a trail that has
-     * finished fading costs nothing, and the next movement starts it again.
+     * It runs only while somebody needs it: each consumer calls `retain` and the function it returns when it goes
+     * away, and each pointer movement calls `keepAwake`. With nobody retaining it, or once the grace period has
+     * passed since the last wake, the clock stops asking for frames — so a trail that has finished fading costs
+     * nothing, and the next movement starts it again. The framework halves read `frameMs` through their own store
+     * helper and tie `retain` to their component's lifetime.
      *
      * @param graceMs How long the clock keeps running after the last wake, long enough for whatever was left
      * behind to finish fading.
-     * @returns The current frame time as a signal, and the `keepAwake` and `subscribe` calls.
+     * @returns `frameMs`, a store of the current frame time; `keepAwake`; and `retain`, which counts one more
+     * consumer and returns the call that counts it out again. Calling that twice counts it out once.
      */
     export const createClock = (graceMs: number) => {
-        const [getFrameMs, setFrameMs] = createSignal(performance.now());
+        const frameMs = StoreUtils.create(performance.now());
 
         let frameId: ReturnType<typeof requestAnimationFrame> | undefined;
         let lastWakeMs = 0;
@@ -176,7 +158,7 @@ export namespace SVGDefsUtils {
         const advance = () => {
             const nowMs = performance.now();
 
-            setFrameMs(nowMs);
+            frameMs.set(nowMs);
 
             if (consumerCount === NO_CONSUMERS || nowMs - lastWakeMs > graceMs) {
                 frameId = undefined;
@@ -188,7 +170,7 @@ export namespace SVGDefsUtils {
         };
 
         return {
-            getFrameMs,
+            frameMs: frameMs as Store<number>,
             keepAwake: () => {
                 lastWakeMs = performance.now();
 
@@ -196,12 +178,17 @@ export namespace SVGDefsUtils {
 
                 frameId = requestAnimationFrame(advance);
             },
-            subscribe: () => {
+            retain: () => {
+                let isRetained = true;
+
                 consumerCount += 1;
 
-                onCleanup(() => {
+                return () => {
+                    if (!isRetained) return;
+
+                    isRetained = false;
                     consumerCount -= 1;
-                });
+                };
             },
         };
     };

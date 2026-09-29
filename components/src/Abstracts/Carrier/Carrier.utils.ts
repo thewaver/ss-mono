@@ -1,10 +1,9 @@
-import { batch, createSignal, onCleanup } from "solid-js";
-
-import type { Point2d } from "@thewaver/ss-utils";
+import { type Point2d, type Store, StoreUtils } from "@thewaver/ss-utils";
 
 import { LiveAnnouncerUtils } from "../LiveAnnouncer/LiveAnnouncer.utils";
 import type { NavigatorDirection } from "../Navigator/Navigator.types";
 import type {
+    CarrierCarryState,
     CarrierZone,
     Carry,
     CarryEndReason,
@@ -14,29 +13,21 @@ import type {
     CarryPlace,
 } from "./Carrier.types";
 
-type CarryState = {
-    carry: Carry;
-    from: CarrierZone;
-    fromPlace: CarryPlace;
-    to: CarrierZone;
-    toPlace: CarryPlace;
-    mode: CarryMode;
-};
-
 /** How far the pointer must travel before a press counts as a drag rather than a click. */
 const DRAG_SLOP_PX = 4;
 
 /** Every zone currently mounted, across every group. */
 const zones: CarrierZone[] = [];
 
-const [getCarryState, setCarryState] = createSignal<CarryState | undefined>();
+/** The carry in flight, of which there is at most one on the page. */
+const carryState = StoreUtils.create<CarrierCarryState | undefined>(undefined);
 
 /** The mounted, enabled zones belonging to one group. */
 const getGroupZones = (groupId: string) =>
     zones.filter((zone) => zone.getGroupId() === groupId && !zone.getIsDisabled());
 
 /** The zones the carried item could actually land in, its own source always among them. */
-const getAcceptingZones = (state: CarryState) =>
+const getAcceptingZones = (state: CarrierCarryState) =>
     getGroupZones(state.carry.groupId).filter((zone) => zone === state.from || zone.computeCanAccept(state.carry));
 
 /** The topmost zone of a group under a screen point, if any. */
@@ -166,42 +157,50 @@ export namespace CarrierUtils {
     };
 
     /**
-     * Makes a zone visible to carries for as long as the calling component lives.
+     * The carry in flight, as a store: the item, its source and target zones and places, and how it was begun.
      *
-     * Call this once during setup; the zone is unregistered on cleanup, so an unmounted list stops
-     * being a drop target on its own.
+     * `undefined` while nothing is being carried. The getters below read one field of it at a time.
+     */
+    export const carry: Store<CarrierCarryState | undefined> = { get: carryState.get, subscribe: carryState.subscribe };
+
+    /**
+     * Makes a zone visible to carries until the returned function is called.
+     *
+     * Call it when the zone mounts and the returned function when it goes, so an unmounted list stops being a
+     * drop target on its own. Removing the same zone twice is harmless.
      *
      * @param zone The zone's own answers about its contents, places and how to change them.
+     * @returns The function that unregisters the zone.
      */
-    export const registerZone = (zone: CarrierZone) => {
+    export const addZone = (zone: CarrierZone) => {
         LiveAnnouncerUtils.reserve("polite");
 
         zones.push(zone);
 
-        onCleanup(() => {
+        return () => {
             const index = zones.indexOf(zone);
 
             if (index >= 0) zones.splice(index, 1);
-        });
+        };
     };
 
     /** The item currently being carried, or `undefined` when nothing is in flight. */
-    export const getCarry = () => getCarryState()?.carry;
+    export const getCarry = () => carryState.get()?.carry;
 
     /** How the carry in flight was begun — by drag, by tap or by keyboard. */
-    export const getCarryMode = () => getCarryState()?.mode;
+    export const getCarryMode = () => carryState.get()?.mode;
 
     /** The zone the carry in flight started in. */
-    export const getSourceZone = () => getCarryState()?.from;
+    export const getSourceZone = () => carryState.get()?.from;
 
     /** The zone the carry in flight is currently aimed at, which may be the source. */
-    export const getTargetZone = () => getCarryState()?.to;
+    export const getTargetZone = () => carryState.get()?.to;
 
     /** The place the carry in flight started from. */
-    export const getSourcePlace = () => getCarryState()?.fromPlace;
+    export const getSourcePlace = () => carryState.get()?.fromPlace;
 
     /** The place the carry in flight is currently aimed at. */
-    export const getTargetPlace = () => getCarryState()?.toPlace;
+    export const getTargetPlace = () => carryState.get()?.toPlace;
 
     /**
      * Whether dropping right now would be accepted.
@@ -212,7 +211,7 @@ export namespace CarrierUtils {
      * the idle state.
      */
     export const getIsTargetAllowed = () => {
-        const state = getCarryState();
+        const state = carryState.get();
 
         return state === undefined || state.to.computeIsPlaceAllowed(state.toPlace, state.carry);
     };
@@ -228,9 +227,9 @@ export namespace CarrierUtils {
      * zone's `computePickedUp` or `computePickedUpByKey`.
      */
     export const start = (from: CarrierZone, place: CarryPlace, carry: Carry, mode: CarryMode) => {
-        const state: CarryState = { carry, from, fromPlace: place, to: from, toPlace: place, mode };
+        const state: CarrierCarryState = { carry, from, fromPlace: place, to: from, toPlace: place, mode };
 
-        setCarryState(state);
+        carryState.set(state);
 
         const announcements = from.getAnnouncements();
 
@@ -262,7 +261,7 @@ export namespace CarrierUtils {
      * @param y The pointer's screen position.
      */
     export const aimAtPoint = (x: number, y: number) => {
-        const state = getCarryState();
+        const state = carryState.get();
 
         if (!state) return;
 
@@ -275,7 +274,7 @@ export namespace CarrierUtils {
         if (place === undefined) return;
         if (zone === state.to && zone.computeIsSamePlace(place, state.toPlace)) return;
 
-        setCarryState({ ...state, to: zone, toPlace: place });
+        carryState.set({ ...state, to: zone, toPlace: place });
     };
 
     /**
@@ -289,7 +288,7 @@ export namespace CarrierUtils {
      * @param nudge How far to move along each axis, and how far to turn.
      */
     export const aimAtNudge = (nudge: CarryNudge) => {
-        const state = getCarryState();
+        const state = carryState.get();
 
         if (!state) return;
 
@@ -297,7 +296,7 @@ export namespace CarrierUtils {
 
         if (place === undefined || state.to.computeIsSamePlace(place, state.toPlace)) return;
 
-        setCarryState({ ...state, toPlace: place });
+        carryState.set({ ...state, toPlace: place });
 
         LiveAnnouncerUtils.announce(
             state.to
@@ -316,7 +315,7 @@ export namespace CarrierUtils {
      * @param step `1` for the next zone, `-1` for the previous.
      */
     export const aimAtNextZone = (step: number) => {
-        const state = getCarryState();
+        const state = carryState.get();
 
         if (!state) return;
 
@@ -328,7 +327,7 @@ export namespace CarrierUtils {
         const to = accepting[(((from + step) % accepting.length) + accepting.length) % accepting.length];
         const place = to.computeEntryPlace(state.carry);
 
-        setCarryState({ ...state, to, toPlace: place });
+        carryState.set({ ...state, to, toPlace: place });
 
         LiveAnnouncerUtils.announce(
             to.getAnnouncements().computeZoneEntered(to.getLabel(), to.computePlaceLabel(place, state.carry)),
@@ -343,15 +342,17 @@ export namespace CarrierUtils {
      * first two are worded by the source zone's `computeReturned` and `computeLeftInPlace`, the last two
      * by the target zone's `computeRefused` and `computeDropped`. A
      * move within one zone is handed to that zone's `moveAt`; a move between zones is a `takeAt` and a
-     * `putAt` batched together, so consumers see one update rather than a moment with the item in
-     * neither place.
+     * `putAt` run together through `opts.batch`, so consumers see one update rather than a moment with the item
+     * in neither place.
      *
      * @param reason `"cancel"` returns the item; `"drop"` commits it if the target place allows it.
+     * @param opts.batch Runs the two writes of a move between zones as one update, for a framework whose writes
+     * would otherwise each be seen at once. Without it the two run one after the other.
      */
-    export const end = (reason: CarryEndReason) => {
-        const state = getCarryState();
+    export const end = (reason: CarryEndReason, opts?: { batch?: (commit: () => void) => void }) => {
+        const state = carryState.get();
 
-        setCarryState(undefined);
+        carryState.set(undefined);
 
         if (!state) return;
 
@@ -384,10 +385,16 @@ export namespace CarrierUtils {
         if (isSameZone) {
             state.to.moveAt(state.fromPlace, state.toPlace, state.carry);
         } else {
-            batch(() => {
+            const commit = () => {
                 state.from.takeAt(state.fromPlace, state.carry);
                 state.to.putAt(state.toPlace, state.carry, { label: state.from.getLabel(), place: state.fromPlace });
-            });
+            };
+
+            if (opts?.batch) {
+                opts.batch(commit);
+            } else {
+                commit();
+            }
         }
 
         LiveAnnouncerUtils.announce(
@@ -418,12 +425,14 @@ export namespace CarrierUtils {
      * so a grab offset can be worked out from where the user actually took hold.
      * @param onDrop Called just before the carry ends, for a caller that needs to read its own state
      * while the carry is still in flight.
+     * @param opts.batch Handed to {@link CarrierUtils.end} when the drag drops.
      */
     export const dragFromPointer = (
         element: HTMLElement,
         e: PointerEvent,
         onPickUp: (from: Point2d) => void,
         onDrop?: () => void,
+        opts?: { batch?: (commit: () => void) => void },
     ) => {
         const startX = e.clientX;
         const startY = e.clientY;
@@ -458,7 +467,7 @@ export namespace CarrierUtils {
 
             onDrop?.();
 
-            end(endEvent.type === "pointercancel" ? "cancel" : "drop");
+            end(endEvent.type === "pointercancel" ? "cancel" : "drop", opts);
         };
 
         element.addEventListener("pointermove", handleMove);

@@ -1,11 +1,12 @@
-import { type Accessor, type Setter, createEffect, createSignal, onCleanup } from "solid-js";
+import { StoreUtils, type WritableStore } from "@thewaver/ss-utils";
+
+import type { MediaQueryWatcher } from "./MediaQueryMonitor.types";
 
 /** The query for a user who has asked their system to reduce animation. */
 const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
 type QueryEntry = {
-    getMatches: Accessor<boolean>;
-    setMatches: Setter<boolean>;
+    store: WritableStore<boolean>;
     onChange: () => void;
     list: MediaQueryList | undefined;
     count: number;
@@ -20,12 +21,11 @@ const getEntry = (query: string) => {
 
     if (existing) return existing;
 
-    const [getMatches, setMatches] = createSignal(false);
+    const store = StoreUtils.create(false);
 
     const entry: QueryEntry = {
-        getMatches,
-        setMatches,
-        onChange: () => setMatches(entry.list?.matches === true),
+        store,
+        onChange: () => store.set(entry.list?.matches === true),
         list: undefined,
         count: 0,
     };
@@ -36,7 +36,7 @@ const getEntry = (query: string) => {
 };
 
 /** Adds a user to an entry, starting the listener on the first one. */
-const subscribe = (query: string, entry: QueryEntry) => {
+const join = (query: string, entry: QueryEntry) => {
     entry.count += 1;
 
     if (entry.count > 1) return;
@@ -47,7 +47,7 @@ const subscribe = (query: string, entry: QueryEntry) => {
 };
 
 /** Removes a user from an entry, stopping the listener when the last one goes. */
-const unsubscribe = (entry: QueryEntry) => {
+const leave = (entry: QueryEntry) => {
     entry.count -= 1;
 
     if (entry.count > 0) return;
@@ -57,9 +57,9 @@ const unsubscribe = (entry: QueryEntry) => {
 };
 
 /**
- * Reports whether a media query matches, as a reactive accessor.
+ * Reports whether a media query matches, kept current as the page changes.
  *
- * Components asking for the same query share one `MediaQueryList` and one signal, counted so the
+ * Everything asking about the same query shares one `MediaQueryList` and one store, counted so the
  * listener starts with the first consumer and stops with the last. This matters because reduced
  * motion is asked about by nearly every animated component, and a hundred listeners for one query
  * is a hundred more than are needed.
@@ -68,38 +68,42 @@ export namespace MediaQueryMonitorUtils {
     /**
      * Watches a media query.
      *
+     * The watcher is a store of whether the query matches, shared with every other watcher of the same query.
+     * It listens only between `observe` and the function `observe` returns; outside that it holds whatever it
+     * last heard, which is `false` before anybody has observed the query at all. Each `observe` joins the count
+     * once, and ending the same one twice is harmless.
+     *
      * @param query The query text, as it would be written in CSS.
-     * @param getIsDisabled Pass `true` to not listen at all. For a component that only consults the query
-     * when a prop it is optional on has been given — it still has to ask for the accessor while setting
-     * up, and this is how it asks without joining the count.
-     * @returns Whether it currently matches. `false` until the query is first evaluated, which happens
-     * as soon as the effect runs, and `false` for as long as it is disabled.
+     * @returns The watcher.
      */
-    export const create = (query: string, getIsDisabled?: Accessor<boolean>) => {
+    export const create = (query: string): MediaQueryWatcher => {
         const entry = getEntry(query);
 
-        createEffect(() => {
-            if (getIsDisabled?.()) return;
+        return {
+            get: entry.store.get,
+            subscribe: entry.store.subscribe,
+            observe: () => {
+                let hasLeft = false;
 
-            subscribe(query, entry);
+                join(query, entry);
 
-            onCleanup(() => {
-                unsubscribe(entry);
-            });
-        });
+                return () => {
+                    if (hasLeft) return;
 
-        return () => (getIsDisabled?.() ? false : entry.getMatches());
+                    hasLeft = true;
+                    leave(entry);
+                };
+            },
+        };
     };
 
     /**
-     * Whether the user has asked for reduced motion.
+     * Watches whether the user has asked for reduced motion.
      *
      * Anything that animates should consult this and offer a still or much shorter alternative — motion
      * can cause real discomfort, and the request is explicit.
      *
-     * @param getIsDisabled Pass `true` to not listen at all. See {@link create}.
-     * @returns Whether motion should be reduced.
+     * @returns The watcher, as {@link create} gives it.
      */
-    export const createReducedMotion = (getIsDisabled?: Accessor<boolean>) =>
-        create(REDUCED_MOTION_QUERY, getIsDisabled);
+    export const createReducedMotion = () => create(REDUCED_MOTION_QUERY);
 }

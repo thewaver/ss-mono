@@ -115,6 +115,16 @@ export namespace BarrelUtils {
         getProjectedExtent(getCircumdiameter(faceExtent, faceCount) * HALF, getApothem(faceExtent, faceCount));
 
     /**
+     * How much room the whole barrel takes: its girth along the way it turns, and one face across the other way.
+     *
+     * @param faceSize A face's size.
+     * @param axis Which way the barrel turns.
+     * @param girth What {@link getGirth} answered for this barrel.
+     */
+    export const getRootSize = (faceSize: Size2d, axis: BarrelAxis, girth: number): Size2d =>
+        axis === "row" ? { width: girth, height: faceSize.height } : { width: faceSize.width, height: girth };
+
+    /**
      * The transform that puts one face on the barrel's surface.
      *
      * @param axis Which way the barrel turns.

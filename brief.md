@@ -11,11 +11,11 @@ purpose: it answers "what is outstanding", and neither of them is.
 
 | Section                                                 | Count |
 | ------------------------------------------------------- | ----: |
-| [Missing components](#missing-components)               |     2 |
-| [Blockers and known issues](#blockers-and-known-issues) |    23 |
+| [Missing components](#missing-components)               |     3 |
+| [Blockers and known issues](#blockers-and-known-issues) |    22 |
 | [Deliberately not built](#deliberately-not-built)       |    29 |
 | [Accessibility gaps](#accessibility-gaps)               |     8 |
-| [Planned projects](#planned-projects)                   |     4 |
+| [Planned projects](#planned-projects)                   |     5 |
 
 ---
 

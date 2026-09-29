@@ -1,0 +1,38 @@
+import { access } from "@thewaver/ss-components-solid";
+import * as styles from "@thewaver/ss-playground/App/StyledComponents/FileInputContent/FileInputContent.css";
+
+import { useLayerClass } from "../Layer/Layer.context";
+import type { FileInputContentProps } from "./FileInputContent.types";
+
+const NO_FILES = "none picked";
+const PICK_FILE_MARK = "⬆️";
+
+export const PageFileInputContent = (props: FileInputContentProps) => {
+    const getLayerClass = useLayerClass();
+
+    return (
+        <div
+            class={styles.fileInputContent}
+            classList={{
+                [getLayerClass()]: true,
+                [styles.isHovered]: access(props.renderProps).isHovered,
+                [styles.isDisabled]: access(props.renderProps).isDisabled,
+                [styles.hasError]: access(props.renderProps).hasError,
+            }}
+            aria-hidden="true"
+        >
+            <div class={styles.fileInputPrompt}>{PICK_FILE_MARK}</div>
+
+            <div
+                class={styles.fileInputNames}
+                classList={{ [styles.isEmpty]: !access(props.renderProps).files.length }}
+            >
+                {access(props.renderProps).files.length
+                    ? access(props.renderProps)
+                          .files.map((file) => file.name)
+                          .join(", ")
+                    : NO_FILES}
+            </div>
+        </div>
+    );
+};

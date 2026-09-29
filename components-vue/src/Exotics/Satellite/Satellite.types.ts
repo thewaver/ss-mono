@@ -1,0 +1,29 @@
+import type { VNodeChild } from "vue";
+
+import type { AnchorPlacement } from "@thewaver/ss-components";
+import type { Point2d } from "@thewaver/ss-utils";
+
+export type SatelliteDefs = {
+    /** Where this satellite sits against the subject, as one choice across and one down. */
+    placement?: AnchorPlacement;
+    /** How far this satellite is nudged from where its placement put it, in screen space whatever the placement. */
+    offset?: Point2d;
+    /** Puts this satellite under the subject rather than over it, so the subject hides whatever overlaps. */
+    isBehindSubject?: boolean;
+    /** Draws this satellite. */
+    renderSatellite: () => VNodeChild;
+};
+
+export type SatelliteProps = {
+    /**
+     * Everything hanging off the subject, each with its own placement, nudge and stacking. The wrapper grows on
+     * each side by the furthest any of them overhangs, so one padding covers them all. Leave it out or empty and
+     * only the subject is rendered, with no wrapper around it.
+     */
+    satellites?: SatelliteDefs[];
+};
+
+export type SatelliteSlots = {
+    /** The subject the satellites hang off. */
+    default?: () => VNodeChild;
+};

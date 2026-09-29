@@ -263,15 +263,26 @@ test("a piece is not covered by the tile it stands on, even while that tile is h
     await target.click();
     await target.hover();
 
-    const covered = await page.evaluate((scope) => {
+    /**
+     * The piece ignores the pointer, and `elementFromPoint` skips anything that does, so asked as it stands the
+     * browser can never name the piece and the reading would pass whatever the stacking. The piece takes the
+     * pointer for this one reading and gives it back in the same synchronous script, so no frame is ever painted
+     * with it changed.
+     */
+    const isOnTop = await page.evaluate((scope) => {
         const meeple = document.querySelector(`${scope} [data-meeple]`) as HTMLElement;
+
+        meeple.style.pointerEvents = "auto";
+
         const box = meeple.getBoundingClientRect();
         const atCenter = document.elementFromPoint(box.x + box.width * 0.5, box.y + box.height * 0.5);
 
-        return meeple.contains(atCenter) || meeple === atCenter;
+        meeple.style.pointerEvents = "";
+
+        return meeple === atCenter || meeple.contains(atCenter);
     }, MARKED);
 
-    expect(covered, "the board's own hover lift must not reach past the board").toBe(false);
+    expect(isOnTop, "the board's own hover lift must not reach past the piece").toBe(true);
 });
 
 test("the layer that wears the shape takes the pointer, and nothing else in the tile is cut by it", async ({

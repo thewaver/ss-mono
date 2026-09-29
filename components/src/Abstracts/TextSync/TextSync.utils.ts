@@ -1,6 +1,4 @@
-import { createRenderEffect, createSignal } from "solid-js";
-
-import type { TextSyncElement, TextSyncGroupDefs, TextSyncMaskResult } from "./TextSync.types";
+import type { TextSyncElement, TextSyncGroupDefs, TextSyncMaskResult, TextSyncValueSync } from "./TextSync.types";
 
 /** The low end of the digit range. */
 const DIGIT_FIRST = "0";
@@ -316,33 +314,35 @@ export namespace TextSyncUtils {
      * Two problems handled. Writing to `value` collapses the selection, so the selection is read before
      * the write and restored after it — which is what lets a controlled input be typed in at all. And
      * an input mid-composition, as with an input method editor for Chinese or Japanese, must not be
-     * written to: doing so destroys the composition in progress, so writes are held off until it ends.
+     * written to: doing so destroys the composition in progress, so writes are held off until it ends,
+     * and the element is brought back in step the moment it does.
      *
-     * @param getRef The input or textarea.
-     * @param getValue The value it should show.
+     * Nothing here knows when the value changes: call `sync` with the element whenever it or the value might
+     * have, and it writes only when the two disagree.
+     *
+     * @param getValue The value the element should show, read each time it is needed.
      * @param opts.onInput Called with what the user has produced — the masked text, where a mask is in
      * use, rather than the raw keystrokes.
      * @param opts.computeMaskedText Applies a mask on every keystroke, as
      * {@link TextSyncUtils.applyMask} or {@link TextSyncUtils.applyGroupedMask} do. Without one the text
      * passes through unchanged.
-     * @returns `handleInput`, `handleCompositionStart` and `handleCompositionEnd` to attach to the
-     * element's own handlers. All three are needed; composition is not optional for a field that anyone
-     * might type Japanese into.
+     * @returns `sync` to bring an element in step with the value, and `handleInput`, `handleCompositionStart`
+     * and `handleCompositionEnd` to attach to the element's own handlers. All three handlers are needed;
+     * composition is not optional for a field that anyone might type Japanese into.
      */
     export const createValueSync = (
-        getRef: () => TextSyncElement | undefined,
         getValue: () => string,
         opts: {
             onInput: (value: string) => void;
             computeMaskedText?: (previous: string, next: string, caret: number) => TextSyncMaskResult;
         },
-    ) => {
-        const [getIsComposing, setIsComposing] = createSignal(false);
+    ): TextSyncValueSync => {
+        let isComposing = false;
 
-        const syncElement = (element: TextSyncElement) => {
+        const sync = (element: TextSyncElement) => {
             const value = getValue();
 
-            if (getIsComposing() || element.value === value) return;
+            if (isComposing || element.value === value) return;
 
             const { selectionStart, selectionEnd } = element;
 
@@ -356,16 +356,8 @@ export namespace TextSyncUtils {
         const reportValue = (element: TextSyncElement) => {
             opts.onInput(element.value);
 
-            syncElement(element);
+            sync(element);
         };
-
-        createRenderEffect(() => {
-            const element = getRef();
-
-            if (!element) return;
-
-            syncElement(element);
-        });
 
         const reportMaskedValue = (
             element: TextSyncElement,
@@ -386,8 +378,9 @@ export namespace TextSyncUtils {
         };
 
         return {
+            sync,
             handleInput: (element: TextSyncElement) => {
-                if (getIsComposing()) return;
+                if (isComposing) return;
 
                 if (opts.computeMaskedText) {
                     reportMaskedValue(element, opts.computeMaskedText);
@@ -398,12 +391,14 @@ export namespace TextSyncUtils {
                 reportValue(element);
             },
             handleCompositionStart: () => {
-                setIsComposing(true);
+                isComposing = true;
             },
             handleCompositionEnd: (element: TextSyncElement) => {
                 opts.onInput(element.value);
 
-                setIsComposing(false);
+                isComposing = false;
+
+                sync(element);
             },
         };
     };

@@ -1,4 +1,4 @@
-export type CellAnimationPlaybackDirection = "normal" | "reverse" | "alternate" | "alternate-reverse";
+export type CellAnimationPlaybackDirection = "normal" | "reverse" | "stack" | "stack-reverse" | "pipe" | "pipe-reverse";
 
 export type CellAnimationPlaybackOpts = {
     dir?: CellAnimationPlaybackDirection;

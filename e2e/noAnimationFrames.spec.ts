@@ -58,17 +58,22 @@ test("a transition still commits when no frame ever arrives", async ({ page }) =
  * polls on a frame **and** listens for `scroll` in the capture phase, and it was undecided what losing the
  * poll costs. Driving it splits the two apart cleanly, and the split is narrower than either guess.
  *
- * The poll is load-bearing for exactly one thing: **finishing the first placement.** A layer measures itself
- * on mount, before it has its final size, so the opening position is provisional and the next tick corrects
- * it — with frames that correction lands within one frame and is the drift `backlog.md` already records
- * against a fast scroll, seen here from the other end. Everything after the first placement is carried by
- * the listener alone: the first scroll lands the layer exactly on its anchor's edge with no frame involved.
+ * Neither half of the opening waits on a frame. The observer takes its first reading of the anchor the moment
+ * it starts, which is when the layer is shown, from inside the framework's effect that runs after the DOM is
+ * updated and laid out and before the browser paints — `useLayoutEffect` in React, `createEffect` in Solid, a
+ * post-render watch in Vue, `$effect` in Svelte. The layer's own size arrives from a `ResizeObserver`, which
+ * also reports before paint. So the first position the layer is shown at is its final one, frames or no
+ * frames, in all four.
  *
- * So a positioner that stops updating is not a bug in the sense that was feared — it does not drift further
- * and further from its anchor — but it does open a frame behind, and with frames starved it stays there
- * until any event arrives. Both halves are asserted, because it is the pair that answers the question.
+ * The page is not idle before the click, which is what makes this a real test of the moment: the anchor is
+ * measured once as the page mounts, before the Playground has finished laying it out, and that reading is
+ * wrong. A layer that trusted it would open 30px off its anchor and stay there with nothing to correct it.
+ *
+ * Everything after the opening is carried by the listener alone: the first scroll lands the layer exactly on
+ * its anchor's edge with no frame involved. So a positioner that stops updating does not drift further and
+ * further from its anchor; what the poll alone catches is an anchor moving with no event behind it.
  */
-test("an anchored layer opens a frame behind, then tracks its anchor on the event alone", async ({ page }) => {
+test("an anchored layer opens in place, then tracks its anchor on the event alone", async ({ page }) => {
     await page.goto("/viewport-wrapper");
     await expect(page.locator("[data-variant]").first()).toBeVisible();
 
@@ -81,8 +86,8 @@ test("an anchored layer opens a frame behind, then tracks its anchor on the even
 
     expect(
         Math.abs(gapToAnchor(anchorBefore, before)),
-        "the opening placement is provisional, and the frame that would have finished it never came",
-    ).toBeGreaterThan(DRIFT_TOLERANCE);
+        "the anchor is read as the layer is shown, after layout and before paint, so it opens on its anchor",
+    ).toBeLessThanOrEqual(DRIFT_TOLERANCE);
 
     await page.locator(`${SCROLLED} [data-scroll-box]`).evaluate((element, by) => {
         element.scrollTop += by;

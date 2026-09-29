@@ -1,0 +1,30 @@
+{
+    "name": "playground-vue",
+    "private": true,
+    "type": "module",
+    "version": "0.0.0",
+    "scripts": {
+        "start": "vite --host",
+        "build": "vite build",
+        "preview": "vite preview",
+        "typecheck": "vue-tsc --noEmit"
+    },
+    "dependencies": {
+        "@thewaver/ss-components": "*",
+        "@thewaver/ss-components-vue": "*",
+        "@thewaver/ss-playground": "*",
+        "@thewaver/ss-utils": "*",
+        "vue": "^3.5.43",
+        "vue-router": "^5.3.1"
+    },
+    "devDependencies": {
+        "@vanilla-extract/css": "^1.21.2",
+        "@vanilla-extract/dynamic": "^2.1.5",
+        "@vanilla-extract/vite-plugin": "^5.2.6",
+        "vite": "^8.3.0",
+        "@vitejs/plugin-vue": "^6.0.9",
+        "@vitejs/plugin-vue-jsx": "^5.1.6",
+        "vite-plugin-checker": "^0.14.5",
+        "vue-tsc": "^3.3.11"
+    }
+}

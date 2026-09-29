@@ -6,7 +6,7 @@ export const bridgeBottomVar = createVar();
 export const bridgeLeftVar = createVar();
 
 export const tooltipRoot = style({
-    position: "absolute",
+    position: "fixed",
     top: 0,
     left: 0,
     pointerEvents: "none",

@@ -90,3 +90,58 @@ describe("computeStep", () => {
         ).toBeUndefined();
     });
 });
+
+describe("computeParents", () => {
+    it("answers every node's parent and nothing for the root", () => {
+        const parents = IcicleUtils.computeParents(ROOT);
+
+        expect(parents.get(DEEP_A)).toBe(TALL);
+        expect(parents.get(TALL)).toBe(ROOT);
+        expect(parents.has(ROOT)).toBe(false);
+    });
+});
+
+describe("listNodes", () => {
+    it("lists the nodes that weigh something", () => {
+        const withEmpty = branch("root", HEAVY, leaf("empty", 0));
+        const weights = TreemapUtils.computeWeights(withEmpty);
+
+        const nodes = IcicleUtils.listNodes(IcicleUtils.computeSpans(withEmpty, weights), weights);
+
+        expect(nodes.map((node) => node.value)).toEqual(["root", "heavy"]);
+    });
+});
+
+describe("getKeyStep", () => {
+    it("maps the arrows and Home and End, and nothing else", () => {
+        expect(IcicleUtils.getKeyStep("ArrowRight")).toBe("toChildren");
+        expect(IcicleUtils.getKeyStep("ArrowLeft")).toBe("toParent");
+        expect(IcicleUtils.getKeyStep("Home")).toBe("first");
+        expect(IcicleUtils.getKeyStep("x")).toBeUndefined();
+    });
+});
+
+describe("computeActivationTarget", () => {
+    const parents = IcicleUtils.computeParents(ROOT);
+
+    it("brings another cell into view, and the cell in view back up to its parent", () => {
+        expect(IcicleUtils.computeActivationTarget(TALL, ROOT, parents)).toBe(TALL);
+        expect(IcicleUtils.computeActivationTarget(TALL, TALL, parents)).toBe(ROOT);
+        expect(IcicleUtils.computeActivationTarget(ROOT, ROOT, parents)).toBeUndefined();
+    });
+});
+
+describe("computeShownSpan", () => {
+    const focus = spans.get(TALL)!;
+    const span = spans.get(DEEP_A)!;
+    const from: IcicleSpan = { start: 0, end: 0.1, column: 2 };
+
+    it("rests at the view once the zoom is over, and starts where the cell was", () => {
+        expect(IcicleUtils.computeShownSpan(span, focus, from, 1)).toEqual(IcicleUtils.computeView(span, focus));
+        expect(IcicleUtils.computeShownSpan(span, focus, from, 0)).toEqual(from);
+    });
+
+    it("sits where it is headed when it was not drawn before", () => {
+        expect(IcicleUtils.computeShownSpan(span, focus, undefined, 0.3)).toEqual(IcicleUtils.computeView(span, focus));
+    });
+});

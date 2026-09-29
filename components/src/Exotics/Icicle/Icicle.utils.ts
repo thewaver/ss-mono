@@ -1,11 +1,21 @@
 import type { Rect, Size2d } from "@thewaver/ss-utils";
 
+import { TreemapUtils } from "../Treemap/Treemap.utils";
 import type { IcicleNode, IcicleSpan, IcicleStep } from "./Icicle.types";
 
 /** Zero, as a weight, a count or an index. */
 const NOTHING = 0;
 /** One: a whole column's height, or one step along a column or between them. */
 const SINGLE = 1;
+/** The keys that walk the cells, and the step each one takes. */
+const STEP_KEYS: Record<string, IcicleStep> = {
+    ArrowUp: "up",
+    ArrowDown: "down",
+    ArrowLeft: "toParent",
+    ArrowRight: "toChildren",
+    Home: "first",
+    End: "last",
+};
 
 /**
  * Lays out an icicle, and walks a cursor around the part of it in view.
@@ -173,5 +183,82 @@ export namespace IcicleUtils {
         if (step === "last") return column[column.length - SINGLE]?.node;
 
         return column[step === "down" ? at + SINGLE : at - SINGLE]?.node;
+    };
+
+    /**
+     * Every node's parent, for walking a tree upwards.
+     *
+     * @param root The whole tree.
+     * @returns The parent of every node but the root, which has none and so is not in the map.
+     */
+    export const computeParents = <T>(root: IcicleNode<T>) => {
+        const parents = new Map<IcicleNode<T>, IcicleNode<T>>();
+
+        const walk = (node: IcicleNode<T>) =>
+            node.children?.forEach((child) => {
+                parents.set(child, node);
+                walk(child);
+            });
+
+        walk(root);
+
+        return parents;
+    };
+
+    /**
+     * The nodes that get a cell.
+     *
+     * @param spans What {@link computeSpans} answered.
+     * @param weights What `TreemapUtils.computeWeights` answered for the same tree.
+     * @returns Every node that weighs something, in the order {@link computeSpans} placed them.
+     */
+    export const listNodes = <T>(spans: Map<IcicleNode<T>, IcicleSpan>, weights: Map<IcicleNode<T>, number>) =>
+        [...spans.keys()].filter((node) => (weights.get(node) ?? NOTHING) > NOTHING);
+
+    /**
+     * Which step a key takes.
+     *
+     * @param key The key pressed, as `KeyboardEvent.key` names it.
+     * @returns The step for {@link computeStep}: up and down within a column, left to the parent, right to the
+     * children, Home and End to the column's ends. `undefined` for any other key.
+     */
+    export const getKeyStep = (key: string): IcicleStep | undefined => STEP_KEYS[key];
+
+    /**
+     * Which node an activated cell brings into view.
+     *
+     * @param node The cell activated.
+     * @param focus The node in view.
+     * @param parents What {@link computeParents} answered.
+     * @returns The cell itself, or — for the cell already in view — its parent, so pressing it again goes back up.
+     * `undefined` when the root, already in view, is pressed again.
+     */
+    export const computeActivationTarget = <T>(
+        node: IcicleNode<T>,
+        focus: IcicleNode<T>,
+        parents: Map<IcicleNode<T>, IcicleNode<T>>,
+    ) => (node !== focus ? node : parents.get(node));
+
+    /**
+     * Where a cell is drawn at one moment of a zoom.
+     *
+     * @param span The cell's span, from {@link computeSpans}.
+     * @param focus The span of the node being zoomed to.
+     * @param from Where the cell was drawn when the zoom began, or `undefined` for a cell that was not there then.
+     * @param progress How far through the zoom's time, `0` to `1`, as `TreemapUtils.createZoomClock` reads it.
+     * @returns Once the zoom is over, the span as {@link computeView} answers it against `focus`; until then, the way
+     * there from `from` along `TreemapUtils.easeZoom`. A cell with no `from` sits where it is headed.
+     */
+    export const computeShownSpan = (
+        span: IcicleSpan,
+        focus: IcicleSpan,
+        from: IcicleSpan | undefined,
+        progress: number,
+    ) => {
+        const resting = computeView(span, focus);
+
+        if (progress >= SINGLE) return resting;
+
+        return interpolateSpan(from ?? resting, resting, TreemapUtils.easeZoom(progress));
     };
 }

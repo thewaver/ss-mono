@@ -1,4 +1,4 @@
-import type { PageViewKey } from "./ViewTabs.types";
+import type { PageViewKey } from "./PageView.types";
 
 export const PAGE_VIEW_KEYS: PageViewKey[] = ["docs", "examples"];
 

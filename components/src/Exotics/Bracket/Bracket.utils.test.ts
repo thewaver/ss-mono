@@ -133,3 +133,83 @@ describe("getIsOnRoute", () => {
         expect(BracketUtils.getIsOnRoute("0", undefined)).toBe(false);
     });
 });
+
+describe("findNode", () => {
+    it("follows an id's positions down from the root", () => {
+        expect(BracketUtils.findNode(FINAL, "0").value).toBe("Final");
+        expect(BracketUtils.findNode(FINAL, "0.1.0").value).toBe("C");
+    });
+});
+
+describe("computeGeometry", () => {
+    const layout = BracketUtils.computeLayout(FINAL);
+    const opts = {
+        nodeSize: { width: 100, height: 20 },
+        layerGap: 10,
+        crossGap: 4,
+        orientation: "horizontal" as const,
+        rootSide: "end" as const,
+        headerExtent: 0,
+    };
+
+    it("sizes the board by its layers along and its first round across", () => {
+        expect(BracketUtils.computeGeometry(layout, opts).boardSize).toEqual({ width: 320, height: 92 });
+        expect(BracketUtils.computeGeometry(layout, { ...opts, orientation: "vertical" }).boardSize).toEqual({
+            width: 412,
+            height: 80,
+        });
+    });
+
+    it("puts the final at the end it was told, with the headers ahead of every match", () => {
+        const geometry = BracketUtils.computeGeometry(layout, { ...opts, headerExtent: 24 });
+        const final = BracketUtils.findPlacement(layout.placements, "0")!;
+
+        expect(BracketUtils.computeInset(geometry, final)).toEqual({ left: 220, top: 24 + 1.5 * 24 });
+        expect(BracketUtils.computeHeaderBox(geometry, 0)).toEqual({ left: 220, top: 0, width: 100, height: 24 });
+
+        const turned = BracketUtils.computeGeometry(layout, { ...opts, rootSide: "start" });
+
+        expect(BracketUtils.computeInset(turned, final).left).toBe(0);
+    });
+
+    it("joins every match that feeds another, edge to edge, marking the focused route", () => {
+        const geometry = BracketUtils.computeGeometry(layout, opts);
+        const connectors = BracketUtils.computeConnectors(layout, geometry, "b", "0.0.1");
+
+        expect(connectors).toHaveLength(6);
+        const onRoute = connectors.filter((connector) => connector.isOnFocusedRoute);
+
+        expect(onRoute.map((connector) => connector.childId)).toEqual(["0.0", "0.0.1"]);
+
+        const toFinal = connectors.find((connector) => connector.childId === "0.0")!;
+
+        expect(toFinal.from.x, "leaves the final's edge facing its feeders").toBe(220);
+        expect(toFinal.to.x, "arrives at the semi's edge facing the final").toBe(210);
+    });
+});
+
+describe("getKeyStep", () => {
+    it("points the arrow along the board at the final towards it", () => {
+        expect(BracketUtils.getKeyStep("ArrowRight", "horizontal", "end")).toBe("toRoot");
+        expect(BracketUtils.getKeyStep("ArrowLeft", "horizontal", "end")).toBe("toLeaves");
+        expect(BracketUtils.getKeyStep("ArrowLeft", "horizontal", "start")).toBe("toRoot");
+        expect(BracketUtils.getKeyStep("ArrowUp", "vertical", "start")).toBe("toRoot");
+    });
+
+    it("moves within a layer across the board, and leaves other keys alone", () => {
+        expect(BracketUtils.getKeyStep("ArrowDown", "horizontal", "end")).toBe("next");
+        expect(BracketUtils.getKeyStep("ArrowLeft", "vertical", "end")).toBe("previous");
+        expect(BracketUtils.getKeyStep("End", "vertical", "end")).toBe("last");
+        expect(BracketUtils.getKeyStep("x", "vertical", "end")).toBeUndefined();
+    });
+});
+
+describe("resolveRovingId", () => {
+    const stops = BracketUtils.computeLayout(FINAL).placements;
+
+    it("keeps the last focused match while it can be picked, and takes the first otherwise", () => {
+        expect(BracketUtils.resolveRovingId(stops, "0.1")).toBe("0.1");
+        expect(BracketUtils.resolveRovingId(stops, "9")).toBe(stops[0].id);
+        expect(BracketUtils.resolveRovingId([], "0")).toBeUndefined();
+    });
+});

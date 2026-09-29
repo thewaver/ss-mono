@@ -16,7 +16,7 @@ import { example, prop } from "./helpers";
  * anything a visitor does with the pointer. A spin pauses it for the rest duration and then it picks up again,
  * `-1` resting for good. So the only two things that bring the wheel to a standstill are a disabled wheel and a
  * visitor who has asked their system for less motion, and a consumer who wants a pause on hover builds one
- * against `autoSpinSignal` over their own box. The three tests in the middle pin that arrangement: it keeps
+ * against `autoSpin` over their own box. The three tests in the middle pin that arrangement: it keeps
  * turning under the pointer, it rests after a spin, and it comes back once the rest has run out.
  *
  * No wheel renders a button any more: the page builds its own and drives it through the handle the wheel hands

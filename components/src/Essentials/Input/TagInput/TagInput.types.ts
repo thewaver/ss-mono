@@ -1,17 +1,13 @@
-import type { Accessor, JSX } from "solid-js";
-
-import type { InteractionFlags } from "../../../Abstracts/InteractionTracker/InteractionTracker.types";
-import type {
-    InteractionControlProps,
-    InteractionWrapperProps,
-} from "../../../Primitives/InteractionWrapper/InteractionWrapper.types";
-import type { TextFieldTextStyle } from "../../../Primitives/TextField/TextField.types";
-import type { AccessorProps, SignalSource } from "../../../Utils/typeUtils";
-
 export type TagInputFlags = {
     isEmpty: boolean;
     hasTags: boolean;
 };
+
+export type TagInputKeyAction =
+    | { kind: "add" }
+    | { kind: "remove"; index: number }
+    | { kind: "focusTag"; index: number }
+    | { kind: "focusField"; isTyping: boolean };
 
 export type TagInputCbs = {
     /**
@@ -39,21 +35,3 @@ export type TagInputState = {
     /** The space between tags. */
     gap?: number;
 };
-
-export type TagInputProps = Omit<InteractionWrapperProps<TagInputFlags>, "renderControl" | "extraFlags" | "role"> &
-    AccessorProps<
-        TagInputCbs &
-            Pick<InteractionControlProps<TagInputFlags>, "id" | "renderContent"> &
-            TagInputState & {
-                /** The tags. It is the only thing that adds or removes one. */
-                valueSignal: SignalSource<string[]>;
-                /** What is currently typed but not yet turned into a tag. */
-                textSignal?: SignalSource<string>;
-                /** Styles the field's text against its current state. */
-                computeTextStyle?: (getFlags: () => InteractionFlags<TagInputFlags>) => TextFieldTextStyle;
-                /** Draws one tag. */
-                renderTag: (getTag: Accessor<string>, getFlags: () => InteractionFlags) => JSX.Element;
-                /** Draws the placeholder shown while the field is empty. */
-                renderPlaceholder?: (getFlags: () => InteractionFlags<TagInputFlags>) => JSX.Element;
-            }
-    >;

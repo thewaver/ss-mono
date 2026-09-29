@@ -1,14 +1,7 @@
 import { ShapeConst, ShapeUtils, type Size2d } from "@thewaver/ss-utils";
 
-import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
-import { SVGFilterDefsFactory } from "../../Generators/SVGDefs/SVGFilters/SVGFilterDefs.factory";
-import { SVGGradientDefsUtils } from "../../Generators/SVGDefs/SVGGradients/SVGGradientDefs.utils";
-import { PointerTrackerUtils } from "../PointerTracker/PointerTracker.utils";
 import { DEFAULT_GLASS_DEFS } from "./Glass.const";
-import type { GlassDefs, GlassTintDefs, PartialGlassDefs } from "./Glass.types";
-
-/** Stands in for a missing element, so the pointer tracker always has something to call. */
-const NO_REF = () => undefined;
+import type { GlassDefs, PartialGlassDefs } from "./Glass.types";
 
 /** How far a blur spreads relative to its radius. Three standard deviations covers effectively all of it. */
 const BLUR_REACH_RATIO = 3;
@@ -19,44 +12,13 @@ const NO_EDGE_THICKNESSES = [0];
 const computeTintGradientId = (id: string) => `glass-tint-${id}`;
 
 /**
- * Builds the tint's fill: a flat color, or a gradient built the same way the SVG defs factories
- * build one anywhere else in the library.
- *
- * @param id The instance's id, which the gradient's own id is built from.
- * @param getSize The element's current size, which a radial gradient's `elementSize` needs to hold
- * its shape on a non-square element.
- * @param tint The tint half of the glass description.
- */
-const computeTintFill = (id: string, getSize: () => Size2d, tint: GlassTintDefs) => {
-    const gradient = tint.gradient;
-
-    if (!gradient) return { color: tint.color };
-
-    const gradientId = computeTintGradientId(id);
-
-    return {
-        gradientOrPattern: {
-            id: gradientId,
-            renderDefsElement: () =>
-                gradient.kind === "linear"
-                    ? SVGGradientDefsUtils.computeLinearGradient({ ...gradient, id: gradientId })
-                    : SVGGradientDefsUtils.computeRadialGradient({
-                          ...gradient,
-                          id: gradientId,
-                          elementSize: getSize,
-                      }),
-        },
-    };
-};
-
-/**
- * Builds the SVG filters behind the frosted-glass look: a blurred backdrop, a rippled edge and a
- * highlight that follows the pointer.
+ * The measurements and names behind the frosted-glass look: its filled-out description, how far the backdrop has
+ * to be over-drawn to blur cleanly, the path that clips it back, and the ids its filters and gradient go by.
  *
  * The effect is three things layered up. The backdrop is blurred and pushed around by a turbulence
  * filter, which is what makes the content behind appear to refract. A tinted layer sits over it.
  * And a specular highlight, lit from wherever the pointer is, gives the surface something to catch
- * the light on.
+ * the light on. Building those filters is markup, and is each framework's.
  */
 export namespace GlassUtils {
     /**
@@ -131,94 +93,4 @@ export namespace GlassUtils {
 
     /** The id of an instance's tint gradient, when the tint is a gradient rather than a flat color. */
     export const getTintGradientId = computeTintGradientId;
-
-    /**
-     * Builds the pointer-tracking highlight.
-     *
-     * The light source is a point light placed over the element wherever the pointer is, so the
-     * highlight slides across the surface as the pointer moves and the glass reads as curved. The
-     * surface it lights is fractal noise rather than a flat plane, which is what stops the highlight
-     * looking like a clean gradient.
-     *
-     * @param id The instance's id, which the filter's own id is built from.
-     * @param getRef The element the pointer is tracked over. Without one the highlight sits wherever
-     * the tracker's resting position is.
-     * @param getSize The element's current size, which the pointer's position is scaled against.
-     * @param defs The glass description, filled out.
-     * @returns One definition, carrying the tint's fill and opacity along with the filter. The filter
-     * is left off entirely at a `specularConstant` of zero, rather than pointed at one that builds
-     * nothing — the same trap `computeBackdropFilterElement`'s callers have to account for.
-     */
-    export const computeSheenDefs = (
-        id: string,
-        getRef: (() => HTMLElement | undefined) | undefined,
-        getSize: () => Size2d,
-        defs: GlassDefs,
-    ): SVGDefs[] => {
-        const tintDef = { ...computeTintFill(id, getSize, defs.tint), opacity: defs.tint.opacity };
-
-        if (defs.sheen.specularConstant <= 0) return [tintDef];
-
-        const filterId = getSheenFilterId(id);
-
-        return [
-            {
-                ...tintDef,
-                filter: {
-                    id: filterId,
-                    renderDefsElement: () => {
-                        const { getReading } = PointerTrackerUtils.create(getRef ?? NO_REF);
-
-                        const getSpot = () => {
-                            const size = getSize();
-                            const ratio = getReading().boxRatio;
-
-                            return { x: ratio.x * size.width, y: ratio.y * size.height };
-                        };
-
-                        return new SVGFilterDefsFactory(filterId)
-                            .addSpecularLightingFilter({
-                                light: {
-                                    kind: "point",
-                                    x: () => getSpot().x,
-                                    y: () => getSpot().y,
-                                    z: defs.sheen.lightHeight,
-                                },
-                                surface: {
-                                    baseFrequency: defs.noise.frequency,
-                                    numOctaves: defs.noise.octaves,
-                                    seed: defs.noise.seed,
-                                },
-                                surfaceScale: defs.sheen.surfaceScale,
-                                specularConstant: defs.sheen.specularConstant,
-                                specularExponent: defs.sheen.specularExponent,
-                                lightingColor: "#FFFFFF",
-                            })
-                            .computeFilterPrimitives({ method: "chain", elementSize: getSize() });
-                    },
-                },
-            },
-        ];
-    };
-
-    /**
-     * Builds the refraction applied to whatever is behind the glass.
-     *
-     * Turbulence displaces the backdrop rather than coloring it, which is what makes the content
-     * behind appear to bend. The displacement is faded towards the edges, so the effect does not tear
-     * where it runs out of backdrop to sample.
-     *
-     * @param id The instance's id, which the filter's own id is built from.
-     * @param defs The glass description, filled out.
-     */
-    export const computeBackdropFilterElement = (id: string, defs: GlassDefs) =>
-        new SVGFilterDefsFactory(getBackdropFilterId(id))
-            .addTurbulenceFilter({
-                baseFrequency: defs.noise.frequency,
-                numOctaves: defs.noise.octaves,
-                seed: defs.noise.seed,
-                scale: defs.ripple.scale,
-                edgeFade: defs.ripple.scale,
-            })
-            .computeFilterPrimitives({ method: "chain" });
 }

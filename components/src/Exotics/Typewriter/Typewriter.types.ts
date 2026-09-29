@@ -1,6 +1,4 @@
-import type { JSX } from "solid-js";
-
-import type { AccessorProps } from "../../Utils/typeUtils";
+import type { ElementSegment } from "@thewaver/ss-utils";
 
 export type TypewriterUpdateCause = "content" | "layout" | "other";
 
@@ -25,43 +23,58 @@ export type TypewriterController = {
     update: (cause: TypewriterUpdateCause) => boolean;
 };
 
-export type TypewriterProps = AccessorProps<{
-    /** The animation each character arrives with. */
-    animationName?: string;
+export type TypewriterSegment = ElementSegment & {
+    /** Where the segment's first character sits among every animated character, an image or a break counting as one. */
+    startIndex: number;
+};
+
+export type TypewriterState = {
+    /** The measured text, split and wrapped at the width it was measured at. */
+    segments: TypewriterSegment[];
+    /** How many characters arrive, an image or a break counting as one. */
+    count: number;
+    /** The width the text was wrapped at, or `undefined` before it was first measured. */
+    width: number | undefined;
+    /** Whether a run is playing. */
+    isAnimating: boolean;
+    /** Whether a run has ever started, which is what lets the reset preferences skip the ones after. */
+    hasAnimatedOnce: boolean;
+    /** The character the caret follows, or `-1` for before the first. */
+    caretIndex: number;
+};
+
+export type TypewriterPlayerOpts = {
+    /** The element holding the text to measure: the hidden copy the consumer's children are rendered into. */
+    getContainer: () => HTMLElement | undefined;
     /** How long one character takes to arrive. */
-    animationDurationMs?: number;
-    /** How long each character waits after the one before it, which is what makes the text type rather than appear. */
-    animationDelayMs?: number;
+    getAnimationDurationMs: () => number;
+    /** How long each character waits after the one before it. */
+    getAnimationDelayMs: () => number;
     /** How long to wait before the first character arrives. */
-    initialAnimationDelayMs?: number;
-    /**
-     * Whether the characters arrive or leave. `erase` runs each character's animation backwards, last character
-     * first, and leaves the text hidden once it ends, whatever the animation's first frame draws. Changing it
-     * starts a run, so a phrase can be typed, held and erased by switching it from `onAnimationEnd`.
-     */
-    mode?: TypewriterMode;
-    /**
-     * Decides the order the characters arrive in, as a weight per character from `0` for the first to `1` for
-     * the last; an image or a line break counts as one. The whole run takes the character count times
-     * `animationDelayMs`, and each character starts at its weight's share of it. Erasing reverses the weights.
-     * Leave it out for left to right.
-     */
-    computeCharacterWeights?: (count: number) => number[];
-    /**
-     * Draws a caret after the character that arrived most recently, or before the one leaving while erasing.
-     * It moves when a character's own animation starts rather than on a timer, so it cannot drift from the
-     * text and it follows the text onto the next line. It is drawn again at every step, so a blink restarts
-     * per character and reads as solid while typing. Meant for in-order weights: with a scatter it jumps to
-     * wherever the last arrival was. It takes inline space and is decoration, so keep it narrow and mark it
-     * `aria-hidden="true"`.
-     */
-    renderCaret?: () => JSX.Element;
-    /** Starts the typing again when the text is re-laid out, for text that reflows as the window changes. */
-    resetAnimationOnLayout?: boolean;
-    /** Starts the typing again when the text itself changes. */
-    resetAnimationOnContent?: boolean;
-    /** Hands the consumer a controller once the text is up, for replaying it from outside. */
-    onMount?: (controller: TypewriterController) => void;
+    getInitialAnimationDelayMs: () => number;
+    /** Whether the characters are leaving rather than arriving. */
+    getIsErasing: () => boolean;
+    /** Whether a change to the text itself starts the typing again. Only `false` stops it. */
+    getResetAnimationOnContent: () => boolean | undefined;
+    /** Whether a re-layout starts the typing again. Only `false` stops it. */
+    getResetAnimationOnLayout: () => boolean | undefined;
     /** Runs once every character has arrived. */
     onAnimationEnd?: () => void;
-}>;
+};
+
+export type TypewriterPlayer = {
+    /** The player's state. */
+    get: () => TypewriterState;
+    /** Calls `listener` whenever the state changes, until the returned function is called. */
+    subscribe: (listener: () => void) => () => void;
+    /** Re-measures and re-splits the text, then starts a run unless the cause's preference says not to. */
+    update: (cause: TypewriterUpdateCause) => boolean;
+    /** Starts a run from nothing, unless the cause's preference says not to. */
+    restart: (cause?: TypewriterUpdateCause) => void;
+    /** Moves the caret to follow a character whose own animation has just started. */
+    reportCharacterStart: (index: number) => void;
+    /** Re-measures whenever the container changes size, until the returned function is called. */
+    observe: (container: HTMLElement) => () => void;
+    /** Stops the run under way, leaving it where it is. */
+    stop: () => void;
+};

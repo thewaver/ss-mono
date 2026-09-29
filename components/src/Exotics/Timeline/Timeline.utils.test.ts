@@ -298,3 +298,96 @@ describe("computeSteppedEdgeValue", () => {
         expect(TimelineUtils.computeSteppedEdgeValue(40, 1, 0, RANGE, toTens)).toBe(40);
     });
 });
+
+describe("computeKeyAction", () => {
+    const resting = { isHolding: false, isEditable: false };
+    const editable = { isHolding: false, isEditable: true };
+    const holding = { isHolding: true, isEditable: true };
+
+    it("walks with the arrows, Home and End while nothing is held", () => {
+        expect(TimelineUtils.computeKeyAction("ArrowRight", resting)).toEqual({ kind: "step", step: "next" });
+        expect(TimelineUtils.computeKeyAction("ArrowUp", resting)).toEqual({ kind: "step", step: "laneBefore" });
+        expect(TimelineUtils.computeKeyAction("End", resting)).toEqual({ kind: "step", step: "last" });
+    });
+
+    it("takes hold with Enter only while edges are on, and Space still activates", () => {
+        expect(TimelineUtils.computeKeyAction("Enter", resting)).toEqual({ kind: "activate" });
+        expect(TimelineUtils.computeKeyAction("Enter", editable)).toEqual({ kind: "hold" });
+        expect(TimelineUtils.computeKeyAction(" ", editable)).toEqual({ kind: "activate" });
+    });
+
+    it("moves the held edge, switches ends, drops and cancels while holding, and never walks away", () => {
+        expect(TimelineUtils.computeKeyAction("ArrowLeft", holding)).toEqual({
+            kind: "aim",
+            edge: undefined,
+            nudge: -1,
+        });
+        expect(TimelineUtils.computeKeyAction("Home", holding)).toEqual({
+            kind: "aim",
+            edge: "start",
+            nudge: undefined,
+        });
+        expect(TimelineUtils.computeKeyAction("Enter", holding)).toEqual({ kind: "drop" });
+        expect(TimelineUtils.computeKeyAction("Escape", holding)).toEqual({ kind: "cancel" });
+        expect(TimelineUtils.computeKeyAction("ArrowDown", holding)).toEqual({ kind: "ignore" });
+    });
+
+    it("leaves Tab and anything else alone", () => {
+        expect(TimelineUtils.computeKeyAction("Tab", holding)).toBeUndefined();
+        expect(TimelineUtils.computeKeyAction("a", resting)).toBeUndefined();
+    });
+});
+
+describe("computeItemBox", () => {
+    it("places an item as a share of the view across and by its lane down", () => {
+        const placement = { ...TimelineUtils.getBlankPlacement(0), startRatio: 0.25, endRatio: 0.5, lane: 2 };
+
+        expect(TimelineUtils.computeItemBox(placement, 20, 40, 4)).toEqual({
+            left: 25,
+            width: 25,
+            top: 108,
+            height: 40,
+        });
+    });
+
+    it("counts lanes and height with no gap after the last lane", () => {
+        expect(TimelineUtils.computeLaneCount([0, 2, 1])).toBe(3);
+        expect(TimelineUtils.computeLaneCount([])).toBe(1);
+        expect(TimelineUtils.computeHeight(20, 3, 40, 4)).toBe(148);
+    });
+});
+
+describe("computeRovingIndex", () => {
+    it("keeps the item last focused while it is still a stop, and falls back to the first", () => {
+        const stops = stopsOf(SPANS, [1]);
+
+        expect(TimelineUtils.computeRovingIndex(stops, 2)).toBe(2);
+        expect(TimelineUtils.computeRovingIndex(stops, 1)).toBe(stops[0].index);
+        expect(TimelineUtils.computeRovingIndex([], 1)).toBeUndefined();
+    });
+
+    it("builds what is in view plus the roving item", () => {
+        const placements = TimelineUtils.computePlacements(
+            SPANS,
+            lanesOf(SPANS),
+            TimelineUtils.computeOrder(SPANS, lanesOf(SPANS)),
+            span(0, 11),
+        );
+
+        expect(TimelineUtils.computeRenderedIndices(placements, 2)).toEqual([0, 1, 2]);
+    });
+});
+
+describe("computePointerRatio", () => {
+    it("reads a pointer as a share of the box, and the middle when there is no box", () => {
+        expect(TimelineUtils.computePointerRatio(150, { left: 100, width: 200 })).toBe(0.25);
+        expect(TimelineUtils.computePointerRatio(150, undefined)).toBe(0.5);
+    });
+});
+
+describe("computeShownSpans", () => {
+    it("draws the held item at its proposed span and leaves the list alone otherwise", () => {
+        expect(TimelineUtils.computeShownSpans(SPANS, 1, span(5, 25))[1]).toEqual(span(5, 25));
+        expect(TimelineUtils.computeShownSpans(SPANS, undefined, span(5, 25))).toBe(SPANS);
+    });
+});

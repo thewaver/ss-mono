@@ -1,8 +1,6 @@
 import type { Size2d } from "@thewaver/ss-utils";
 
-import type { InteractionFlags } from "../../Abstracts/InteractionTracker/InteractionTracker.types";
 import type { SVGAnimationDefs } from "../../Generators/SVGDefs/SVGAnimations/SVGAnimationDefs.types";
-import type { SVGDefs } from "../../Generators/SVGDefs/SVGDefs.types";
 
 export type SVGDefsColors = { [K in "primary" | "secondary" | "tertiary" | "background"]: string };
 
@@ -22,15 +20,6 @@ export type PatternElementDefs = SVGAnimationDefs &
     SVGDefsBaseElementDefs & {
         cellSize: Size2d;
     };
-
-export type PatternConfig = {
-    computeSVGDefs: (
-        id: string,
-        getInteractionFlags: (() => InteractionFlags) | undefined,
-        getRef: (() => HTMLElement | undefined) | undefined,
-        defs: PatternElementDefs,
-    ) => SVGDefs[];
-};
 
 export type TimedGradientElementDefs = SVGAnimationDefs & SVGDefsBaseElementDefs;
 
@@ -122,33 +111,7 @@ export type GradientCycleStepsOpts = GradientCycleOpts & GradientStepsOpts;
 
 export type GradientBandedCycleOpts = GradientCycleOpts & { banded?: boolean; bands?: number };
 
-export type TimedGradientConfig = {
-    computeSVGDefs: (
-        id: string,
-        getInteractionFlags: (() => InteractionFlags) | undefined,
-        getRef: (() => HTMLElement | undefined) | undefined,
-        defs: TimedGradientElementDefs,
-    ) => SVGDefs[];
-};
-
 export type TrackedGradientElementDefs = SVGDefsBaseElementDefs;
-
-export type TrackedGradientConfig = {
-    computeSVGDefs: (
-        id: string,
-        getInteractionFlags: (() => InteractionFlags) | undefined,
-        getRef: (() => HTMLElement | undefined) | undefined,
-        defs: TrackedGradientElementDefs,
-    ) => SVGDefs[];
-};
-
-export type TimedGradientFactory<T = void> = T extends void
-    ? () => TimedGradientConfig
-    : (opts?: T) => TimedGradientConfig;
-
-export type TrackedGradientFactory<T = void> = T extends void
-    ? () => TrackedGradientConfig
-    : (opts?: T) => TrackedGradientConfig;
 
 export type TimedGradientEntry =
     | { family: "elastic_circle_1"; defs?: GradientCycleOpts }
